@@ -5,8 +5,8 @@ class QrCodeService
     # Create QR code for the certificate URL using the shorter format
     if record.is_a?(Inspection)
       generate_inspection_qr_code(record)
-    elsif record.is_a?(Equipment)
-      generate_equipment_qr_code(record)
+    elsif record.is_a?(Unit)
+      generate_unit_qr_code(record)
     else
       raise ArgumentError, "Unsupported record type: #{record.class}"
     end
@@ -19,10 +19,10 @@ class QrCodeService
     generate_qr_code_from_url(url)
   end
 
-  def self.generate_equipment_qr_code(equipment)
+  def self.generate_unit_qr_code(unit)
     require "rqrcode"
 
-    url = "#{ENV["BASE_URL"]}/e/#{equipment.id}"
+    url = "#{ENV["BASE_URL"]}/u/#{unit.id}"
     generate_qr_code_from_url(url)
   end
 

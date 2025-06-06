@@ -39,13 +39,9 @@ describe "storage:cleanup rake task" do
     )
     recent_blob.update_column(:created_at, 1.day.ago)
 
-    # Create a user without attaching an image, since we removed image functionality
-    user = User.create!(email: "test@example.com", password: "password123", admin: false)
-    user.inspections.create!(
-      inspector: "Test Inspector",
-      serial: "SN12345",
-      location: "Test Location"
-    )
+    # Create a user and inspection (we no longer test with image attachments)
+    user = create(:user, email: "test@example.com")
+    create(:inspection, user: user)
 
     # Mock the purge_later method to prevent actual purging
     old_blob_query = ActiveStorage::Blob.unattached.where("active_storage_blobs.created_at <= ?", 2.days.ago)

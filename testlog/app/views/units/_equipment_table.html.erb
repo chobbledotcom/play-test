@@ -1,0 +1,20 @@
+<%= scrollable_table(class: "data-table") do %>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Manufacturer</th>
+      <th>Serial Number</th>
+      <th>Location</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% unit.each do |item| %>
+      <tr>
+        <td><%= link_to item.name, item %></td>
+        <td><%= item.manufacturer %></td>
+        <td><%= item.serial %></td>
+        <td><%= item.location %></td>
+      </tr>
+    <% end %>
+  </tbody>
+<% end %>

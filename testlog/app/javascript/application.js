@@ -1,64 +1,103 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails"
 
-// Handle equipment selection in inspection form
+// Auto-save functionality for inspection forms
 document.addEventListener("turbo:load", function() {
-  const equipmentSelect = document.querySelector('select[name="inspection[equipment_id]"]');
-  if (equipmentSelect) {
-    // Fields that will be populated from equipment
-    const nameField = document.querySelector('input[name="inspection[name]"]');
-    const serialField = document.querySelector('input[name="inspection[serial]"]');
-    const locationField = document.querySelector('input[name="inspection[location]"]');
-    const manufacturerField = document.querySelector('input[name="inspection[manufacturer]"]');
+  const autoSaveForms = document.querySelectorAll('form[data-autosave="true"]');
+  
+  autoSaveForms.forEach(form => {
+    let saveTimeout;
+    const statusElement = form.querySelector('[data-autosave-status]');
+    const savingElement = statusElement?.querySelector('.saving');
+    const savedElement = statusElement?.querySelector('.saved');
+    const errorElement = statusElement?.querySelector('.error');
     
-    // Function to toggle field state based on equipment selection
-    const toggleFieldState = (selectedId) => {
-      const hasEquipment = !!selectedId;
+    const showStatus = (type) => {
+      if (!statusElement) return;
       
-      // Disable/enable fields - name and location remain editable
-      serialField.disabled = hasEquipment;
-      manufacturerField.disabled = hasEquipment;
+      // Hide all status elements
+      savingElement?.style && (savingElement.style.display = 'none');
+      savedElement?.style && (savedElement.style.display = 'none');
+      errorElement?.style && (errorElement.style.display = 'none');
       
-      // Add/remove visual indication
-      [serialField, manufacturerField].forEach(field => {
-        if (hasEquipment) {
-          field.classList.add('equipment-controlled');
-        } else {
-          field.classList.remove('equipment-controlled');
+      // Show the requested status
+      switch(type) {
+        case 'saving':
+          savingElement?.style && (savingElement.style.display = 'inline');
+          break;
+        case 'saved':
+          savedElement?.style && (savedElement.style.display = 'inline');
+          setTimeout(() => savedElement?.style && (savedElement.style.display = 'none'), 3000);
+          break;
+        case 'error':
+          errorElement?.style && (errorElement.style.display = 'inline');
+          setTimeout(() => errorElement?.style && (errorElement.style.display = 'none'), 5000);
+          break;
+      }
+    };
+    
+    const saveForm = () => {
+      showStatus('saving');
+      
+      const formData = new FormData(form);
+      const url = form.action;
+      
+      fetch(url, {
+        method: 'PATCH',
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
         }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          showStatus('saved');
+        } else {
+          showStatus('error');
+          console.error('Auto-save errors:', data.errors);
+        }
+      })
+      .catch(error => {
+        showStatus('error');
+        console.error('Auto-save error:', error);
       });
     };
     
-    // Initial state
-    toggleFieldState(equipmentSelect.value);
-    
-    // Handle changes
-    equipmentSelect.addEventListener('change', function() {
-      const selectedEquipmentId = this.value;
+    // Auto-save on input change with debouncing
+    form.addEventListener('input', function(e) {
+      // Skip auto-save for submit buttons
+      if (e.target.type === 'submit') return;
       
-      if (selectedEquipmentId) {
-        // Fetch equipment details
-        fetch(`/equipment/${selectedEquipmentId}.json`)
-          .then(response => response.json())
-          .then(data => {
-            // Populate form fields with equipment data
-            nameField.value = data.name || '';
-            serialField.value = data.serial || '';
-            locationField.value = data.location || '';
-            manufacturerField.value = data.manufacturer || '';
-            
-            // Update field state
-            toggleFieldState(selectedEquipmentId);
-          })
-          .catch(error => console.error('Error fetching equipment details:', error));
-      } else {
-        // Clear fields if no equipment selected
-        serialField.value = '';
-        // Not clearing location field so user can keep it when changing equipment
-        manufacturerField.value = '';
-        
-        // Update field state
-        toggleFieldState(null);
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(saveForm, 2000); // Save after 2 seconds of inactivity
+    });
+    
+    // Auto-save on select/checkbox change
+    form.addEventListener('change', function(e) {
+      if (e.target.type === 'submit') return;
+      
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(saveForm, 500); // Save quickly for select/checkbox changes
+    });
+  });
+  
+  // Handle unit selection in inspection form
+  const unitSelect = document.querySelector('select[name="inspection[unit_id]"]');
+  if (unitSelect) {
+    // Handle changes to show unit details
+    unitSelect.addEventListener('change', function() {
+      const selectedUnitId = this.value;
+      
+      if (selectedUnitId) {
+        // Trigger form refresh to show unit details
+        // This could be enhanced with AJAX to avoid page refresh
+        const form = this.closest('form');
+        const currentUrl = new URL(window.location);
+        currentUrl.searchParams.set('unit_id', selectedUnitId);
+        window.location.href = currentUrl.toString();
       }
     });
   }

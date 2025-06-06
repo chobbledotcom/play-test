@@ -1,6 +1,6 @@
 <%= form_with(model: @user, url: signup_path) do |form| %>
   <header>
-    <h1>Register</h1>
+    <h1><%= t('users.titles.register') %></h1>
   </header>
 
   <% if @user.errors.any? %>
@@ -24,5 +24,5 @@
   <%= form.label :password_confirmation %>
   <%= form.password_field :password_confirmation %>
 
-  <%= form.submit "Register" %>
+  <%= form.submit t('users.buttons.register') %>
 <% end %>

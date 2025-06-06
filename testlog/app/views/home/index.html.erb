@@ -1,11 +1,11 @@
 <article class="home-page">
   <header>
-    <h1>patlog.co.uk</h1>
+    <h1><%= t('home.title') %></h1>
     <p>
-      Log your Portable Appliance Testing inspections, generate PDF certificates, and link to them with QR codes.
+      <%= t('home.subtitle') %>
     </p>
     <p>
-      A free and open source service from <a href="https://chobble.com">Chobble</a>
+      <%= t('home.attribution') %> <a href="<%= t('home.company_url') %>"><%= t('home.company_name') %></a>
     </p>
     <div class="video-container">
       <iframe
@@ -22,12 +22,12 @@
       <ul>
         <li>
           <%= link_to login_path do %>
-            <strong>Log In</strong>
+            <strong><%= t("session.login.title") %></strong>
           <% end %>
         </li>
         <li>
           <%= link_to new_user_path do %>
-            <strong>Register</strong>
+            <strong><%= t("users.titles.register") %></strong>
           <% end %>
         </li>
       </ul>
@@ -35,16 +35,16 @@
   <% end %>
   <section>
     <aside>
-      <h2>Log Inspections</h2>
-      <p>Create and log your PAT test records with all the necessary fields.</p>
+      <h2><%= t('home.features.log_inspections.title') %></h2>
+      <p><%= t('home.features.log_inspections.description') %></p>
     </aside>
     <aside>
-      <h2>Generate PDF Certificates</h2>
-      <p>Automatic certificates with QR codes links for easy verification.</p>
+      <h2><%= t('home.features.generate_pdfs.title') %></h2>
+      <p><%= t('home.features.generate_pdfs.description') %></p>
     </aside>
     <aside>
-      <h2>Search & Export</h2>
-      <p>Quickly find inspection records and export your inspections to CSV.</p>
+      <h2><%= t('home.features.search_export.title') %></h2>
+      <p><%= t('home.features.search_export.description') %></p>
     </aside>
   </section>
 </article>

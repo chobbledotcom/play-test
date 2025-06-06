@@ -27,15 +27,15 @@ class InspectionsController < ApplicationController
     @inspection.inspection_date = Date.today
     @inspection.reinspection_date = Date.today + 1.year
 
-    # Handle pre-selected equipment
-    if params[:equipment_id].present?
-      equipment = current_user.equipment.find_by(id: params[:equipment_id])
-      if equipment
-        @inspection.equipment_id = equipment.id
-        @inspection.name = equipment.name
-        @inspection.serial = equipment.serial
-        @inspection.location = equipment.location
-        @inspection.manufacturer = equipment.manufacturer
+    # Handle pre-selected unit
+    if params[:unit_id].present?
+      unit = current_user.units.find_by(id: params[:unit_id])
+      if unit
+        @inspection.unit_id = unit.id
+        @inspection.name = unit.name
+        @inspection.serial = unit.serial
+        @inspection.location = unit.location
+        @inspection.manufacturer = unit.manufacturer
       end
     end
   end
@@ -48,22 +48,21 @@ class InspectionsController < ApplicationController
 
     params = inspection_params
 
-    # Securely handle equipment association
-    if params[:equipment_id].present?
-      equipment = current_user.equipment.find_by(id: params[:equipment_id])
+    # Securely handle unit association - unit is now required
+    if params[:unit_id].present?
+      unit = current_user.units.find_by(id: params[:unit_id])
 
-      if equipment.nil?
-        # Equipment ID not found or doesn't belong to user - security issue
-        flash[:danger] = "Invalid equipment selection"
+      if unit.nil?
+        # Unit ID not found or doesn't belong to user - security issue
+        flash[:danger] = "Invalid unit selection"
         @inspection = current_user.inspections.build
         render :new, status: :unprocessable_entity and return
       end
-
-      # Set values from equipment if it exists
-      params[:name] = equipment.name
-      params[:serial] = equipment.serial
-      params[:location] = equipment.location
-      params[:manufacturer] = equipment.manufacturer
+    else
+      # Unit is required
+      flash[:danger] = "Unit selection is required"
+      @inspection = current_user.inspections.build
+      render :new, status: :unprocessable_entity and return
     end
 
     @inspection = current_user.inspections.build(params)
@@ -85,27 +84,27 @@ class InspectionsController < ApplicationController
   def update
     params = inspection_params
 
-    # Securely handle equipment association
-    if params[:equipment_id].present?
-      equipment = current_user.equipment.find_by(id: params[:equipment_id])
+    # Securely handle unit association
+    if params[:unit_id].present?
+      unit = current_user.units.find_by(id: params[:unit_id])
 
-      if equipment.nil?
-        # Equipment ID not found or doesn't belong to user - security issue
-        flash[:danger] = "Invalid equipment selection"
+      if unit.nil?
+        # Unit ID not found or doesn't belong to user - security issue
+        flash[:danger] = "Invalid unit selection"
         render :edit, status: :unprocessable_entity and return
       end
-
-      # Set values from equipment
-      params[:name] = equipment.name
-      params[:serial] = equipment.serial
-      params[:location] = equipment.location
-      params[:manufacturer] = equipment.manufacturer
     end
 
     if @inspection.update(params)
-      flash_and_redirect("updated")
+      respond_to do |format|
+        format.html { flash_and_redirect("updated") }
+        format.json { render json: {status: "success", message: t("inspections.autosave.saved")} }
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: {status: "error", errors: @inspection.errors.full_messages} }
+      end
     end
   end
 
@@ -150,8 +149,10 @@ class InspectionsController < ApplicationController
 
   def inspection_params
     params.require(:inspection).permit(
-      :inspection_date, :reinspection_date, :inspector, :serial, :name,
-      :location, :passed, :comments, :manufacturer, :equipment_id
+      :inspection_date, :reinspection_date, :inspector,
+      :location, :passed, :comments, :unit_id, :place_inspected,
+      :inspector_company_id, :rpii_registration_number,
+      :unique_report_number, :inspection_company_name, :status
     )
   end
 
@@ -160,11 +161,18 @@ class InspectionsController < ApplicationController
   end
 
   def set_inspection
-    @inspection = Inspection.find_by(id: params[:id].downcase)
+    # Try exact match first, then case-insensitive match for user-friendly URLs
+    @inspection = Inspection.find_by(id: params[:id]) ||
+      Inspection.find_by("UPPER(id) = ?", params[:id].upcase)
 
     unless @inspection
-      flash[:danger] = "Inspection record not found"
-      redirect_to inspections_path and return
+      if action_name.in?(["certificate", "qr_code"])
+        # For public certificate access, return 404 instead of redirect
+        render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
+      else
+        flash[:danger] = "Inspection record not found"
+        redirect_to inspections_path and return
+      end
     end
   end
 

@@ -25,6 +25,10 @@ group :development, :test do
 
   # Testing
   gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem "capybara"
+  gem "simplecov", require: false
+  gem "pdf-inspector", require: false
 
   # Ruby code formatter and linter
   gem "standard", require: false

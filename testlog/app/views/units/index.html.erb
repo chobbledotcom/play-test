@@ -1,0 +1,29 @@
+<header>
+  <h1><%= @title || "Equipment" %></h1>
+</header>
+
+<div class="center">
+  <%= link_to I18n.t('units.titles.new'), new_unit_path, class: "button" %>
+</div>
+
+
+<section>
+  <%= render "search_form" %>
+</section>
+
+<section>
+  <%= render "filter_form" %>
+</section>
+
+<% if @units.any? %>
+  <%= render 'unit_table', unit: @units %>
+  <div class="center">
+    <p>
+      <%= link_to units_path(format: :csv) do %>
+        <strong>Export CSV</strong>
+      <% end %>
+    </p>
+  </div>
+<% else %>
+  <p>No unit found.</p>
+<% end %>

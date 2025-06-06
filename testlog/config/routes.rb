@@ -36,11 +36,10 @@ Rails.application.routes.draw do
     end
   end
 
-  # Equipment
-  resources :equipment do
+  # Units
+  resources :units do
     collection do
       get "search"
-      get "overdue"
     end
     member do
       get "certificate"
@@ -48,11 +47,18 @@ Rails.application.routes.draw do
     end
   end
 
+  # Inspector Companies
+  resources :inspector_companies, except: [:destroy] do
+    member do
+      patch "archive"
+    end
+  end
+
   # Short URL for certificates
   get "c/:id", to: "inspections#certificate", as: "short_certificate"
   get "C/:id", to: "inspections#certificate", as: "short_certificate_uppercase"
 
-  # Short URL for equipment certificates
-  get "e/:id", to: "equipment#certificate", as: "short_equipment_certificate"
-  get "E/:id", to: "equipment#certificate", as: "short_equipment_certificate_uppercase"
+  # Short URL for unit certificates
+  get "e/:id", to: "units#certificate", as: "short_unit_certificate"
+  get "E/:id", to: "units#certificate", as: "short_unit_certificate_uppercase"
 end

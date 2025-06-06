@@ -4,11 +4,12 @@ class CreateEquipment < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :location
       t.string :serial
-      t.references :user, null: false, foreign_key: true
+      t.string :user_id, null: false, limit: 12
 
       t.timestamps
     end
 
     add_index :equipment, :serial
+    add_foreign_key :equipment, :users
   end
 end

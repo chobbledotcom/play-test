@@ -1,24 +1,30 @@
 class SessionsController < ApplicationController
-  skip_before_action :require_login, only: [:new, :create]
+  skip_before_action :require_login, only: [:new, :create, :destroy]
 
   def new
   end
 
   def create
-    user = User.find_by(email: params[:session][:email].downcase)
-    if user&.authenticate(params[:session][:password])
-      log_in user
-      if params[:session][:remember_me] == "1"
-        cookies.permanent.signed[:user_id] = user.id
-      else
-        cookies.delete(:user_id)
+    email = params.dig(:session, :email)
+    password = params.dig(:session, :password)
+
+    if email.present?
+      user = User.find_by(email: email.downcase)
+      if user&.authenticate(password)
+        log_in user
+        if params[:session][:remember_me] == "1"
+          cookies.permanent.signed[:user_id] = user.id
+        else
+          cookies.delete(:user_id)
+        end
+        flash[:success] = "Logged in"
+        redirect_to root_path
+        return
       end
-      flash[:success] = "Logged in"
-      redirect_to root_path
-    else
-      flash.now[:danger] = "Invalid email/password combination"
-      render :new, status: :unprocessable_entity
     end
+
+    flash.now[:danger] = "Invalid email/password combination"
+    render :new, status: :unprocessable_entity
   end
 
   def destroy

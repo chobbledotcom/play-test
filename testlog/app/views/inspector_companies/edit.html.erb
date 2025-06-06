@@ -1,0 +1,11 @@
+<header><h1><%= t('inspector_companies.titles.edit') %></h1></header>
+
+<article>
+  <%= render 'form' %>
+
+  <div>
+    <%= link_to t('inspector_companies.buttons.archive'), archive_inspector_company_path(@inspector_company), 
+            method: :patch, 
+            data: { confirm: "Are you sure you want to archive #{@inspector_company.name}?" } %>
+  </div>
+</article>

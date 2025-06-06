@@ -31,13 +31,9 @@ describe StorageCleanupJob do
     )
     recent_blob.update_column(:created_at, 1.day.ago)
 
-    # Create a user (we no longer test with image attachments)
-    user = User.create!(email: "test@example.com", password: "password123", admin: false)
-    user.inspections.create!(
-      inspector: "Test Inspector",
-      serial: "SN12345",
-      location: "Test Location"
-    )
+    # Create a user and inspection (we no longer test with image attachments)
+    user = create(:user, email: "test@example.com")
+    create(:inspection, user: user)
 
     # Verify the initial state
     old_blob_query = ActiveStorage::Blob.unattached.where("active_storage_blobs.created_at <= ?", 2.days.ago)

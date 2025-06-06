@@ -1,0 +1,61 @@
+<header><h1><%= t('inspector_companies.titles.index') %></h1></header>
+
+<% if current_user&.admin? %>
+  <p>
+    <%= link_to t('inspector_companies.buttons.new_company'), new_inspector_company_path %>
+  </p>
+<% end %>
+
+<%= form_with url: inspector_companies_path, method: :get, local: true do |form| %>
+  <%= form.label :search, t('inspector_companies.search.placeholder') %>
+  <%= form.text_field :search, value: params[:search], placeholder: t('inspector_companies.search.placeholder') %>
+  
+  <%= form.label :verified, t('inspector_companies.search.verified_filter') %>
+  <%= form.select :verified, options_for_select([
+    ["All Companies", ""],
+    [t('inspector_companies.status.verified'), "true"]
+  ], params[:verified]) %>
+  
+  <%= form.submit t('inspector_companies.buttons.search') %>
+  <%= link_to "Clear", inspector_companies_path %>
+<% end %>
+
+<% if @inspector_companies.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th><%= t('inspector_companies.forms.name') %></th>
+        <th><%= t('inspector_companies.forms.rpii_registration_number') %></th>
+        <th><%= t('inspector_companies.forms.phone') %></th>
+        <th><%= t('inspector_companies.headers.verification_status') %></th>
+        <th><%= t('inspector_companies.status.active') %></th>
+        <th><%= t('ui.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @inspector_companies.each do |company| %>
+        <tr>
+          <td><%= link_to company.name, company %></td>
+          <td><%= company.rpii_registration_number %></td>
+          <td><%= company.phone %></td>
+          <td><%= company.rpii_verified? ? t('inspector_companies.status.verified') : t('inspector_companies.status.not_verified') %></td>
+          <td><%= company.active? ? t('inspector_companies.status.active') : t('inspector_companies.status.archived') %></td>
+          <td>
+            <%= link_to t('ui.view'), company %>
+            <% if current_user&.admin? %>
+              | <%= link_to t('ui.edit'), edit_inspector_company_path(company) %>
+              | <%= link_to t('inspector_companies.buttons.archive'), archive_inspector_company_path(company), 
+                      method: :patch, 
+                      data: { confirm: "Are you sure you want to archive #{company.name}?" } %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p><%= t('inspector_companies.messages.no_companies') %></p>
+  <% if current_user&.admin? %>
+    <p><%= link_to t('inspector_companies.buttons.new_company'), new_inspector_company_path %></p>
+  <% end %>
+<% end %>

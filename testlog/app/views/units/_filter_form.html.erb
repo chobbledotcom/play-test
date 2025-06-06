@@ -1,0 +1,17 @@
+<%= form_with url: units_path, method: :get, data: { turbo: false } do |form| %>
+  <%= form.select :status, 
+      options_for_select([["All", ""], ["Overdue", "overdue"]], params[:status]),
+      {}, { onchange: "this.form.submit();" } %>
+  
+  <%= form.select :manufacturer, 
+      options_for_select([["All Manufacturers", ""]] + manufacturer_options(current_user).map { |m| [m, m] }, params[:manufacturer]),
+      {}, { onchange: "this.form.submit();" } %>
+  
+  <%= form.select :owner, 
+      options_for_select([["All Owners", ""]] + owner_options(current_user).map { |o| [o, o] }, params[:owner]),
+      {}, { onchange: "this.form.submit();" } %>
+  
+  <% if params[:status].present? || params[:manufacturer].present? || params[:owner].present? %>
+    <%= link_to "Clear Filters", units_path %>
+  <% end %>
+<% end %>

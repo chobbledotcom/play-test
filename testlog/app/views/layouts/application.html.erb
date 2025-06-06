@@ -22,14 +22,19 @@
             <% end %>
           </li>
           <li>
-            <%= link_to equipment_index_path do %>
-              <strong>Equipment</strong>
+            <%= link_to units_path do %>
+              <strong>Units</strong>
             <% end %>
           </li>
           <% if current_user.admin? %>
             <li>
               <%= link_to users_path do %>
                 <strong>Users</strong>
+              <% end %>
+            </li>
+            <li>
+              <%= link_to inspector_companies_path do %>
+                <strong><%= t('inspector_companies.titles.index') %></strong>
               <% end %>
             </li>
           <% end %>

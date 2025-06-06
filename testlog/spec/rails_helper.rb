@@ -9,6 +9,8 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 # return unless Rails.env.test?
 require "rspec/rails"
 # Add additional requires below this line. Rails is not loaded until this point!
+require "factory_bot_rails"
+require "capybara/rspec"
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -33,6 +35,23 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 RSpec.configure do |config|
+  # Set admin emails pattern for test environment
+  config.before(:each) do
+    ENV["ADMIN_EMAILS_PATTERN"] = "^admin\\d*@example\\.com$"
+  end
+
+  # Include FactoryBot methods
+  config.include FactoryBot::Syntax::Methods
+
+  # Include Capybara DSL in view specs
+  config.include Capybara::RSpecMatchers, type: :view
+
+  # Include Capybara DSL in feature specs
+  config.include Capybara::DSL, type: :feature
+
+  # Include Capybara DSL in request specs for integration testing
+  config.include Capybara::DSL, type: :request
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join("spec/fixtures")

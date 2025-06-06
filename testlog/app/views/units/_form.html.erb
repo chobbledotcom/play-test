@@ -1,0 +1,69 @@
+<% if @unit.errors.any? %>
+  <aside>
+    <h3><%= t('units.validations.save_error') %>. Fix these <%= pluralize(@unit.errors.count, "error") %> and try again:</h3>
+    <ul>
+    <% @unit.errors.each do |error| %>
+      <li><%= error.full_message %></li>
+    <% end %>
+    </ul>
+  </aside>
+<% end %>
+
+<%= form_with(model: @unit) do |form| %>
+  <fieldset>
+    <header>
+      <h3>Unit Details</h3>
+    </header>
+
+    <%= form.label :name, t('units.forms.name') %>
+    <%= form.text_field :name, required: true %>
+
+    <%= form.label :unit_type, t('units.forms.unit_type') %>
+    <%= form.select :unit_type, 
+        options_for_select([
+          [t('units.unit_types.bounce_house'), "bounce_house"],
+          [t('units.unit_types.slide'), "slide"], 
+          [t('units.unit_types.combo_unit'), "combo_unit"],
+          [t('units.unit_types.obstacle_course'), "obstacle_course"],
+          [t('units.unit_types.totally_enclosed'), "totally_enclosed"]
+        ], @unit.unit_type), 
+        { prompt: t('units.unit_types.select_prompt') }, 
+        { required: true } %>
+
+    <%= form.label :manufacturer, t('units.forms.manufacturer') %>
+    <%= form.text_field :manufacturer, required: true %>
+
+    <%= form.label :model, t('units.forms.model') %>
+    <%= form.text_field :model %>
+
+    <%= form.label :serial, t('units.forms.serial') %>
+    <%= form.text_field :serial, required: true %>
+
+    <%= form.label :description, t('units.forms.description') %>
+    <%= form.text_area :description, required: true %>
+
+    <%= form.label :owner, t('units.forms.owner') %>
+    <%= form.text_field :owner, required: true %>
+
+    <header>
+      <h4><%= t('units.headers.dimensions') %></h4>
+    </header>
+
+    <%= form.label :width, t('units.forms.width') %>
+    <%= form.number_field :width, step: 0.01, min: 0.01, max: 199.99, required: true %>
+
+    <%= form.label :length, t('units.forms.length') %>
+    <%= form.number_field :length, step: 0.01, min: 0.01, max: 199.99, required: true %>
+
+    <%= form.label :height, t('units.forms.height') %>
+    <%= form.number_field :height, step: 0.01, min: 0.01, max: 199.99, required: true %>
+
+    <%= form.label :manufacture_date, t('units.forms.manufacture_date') %>
+    <%= form.date_field :manufacture_date %>
+
+    <%= form.label :notes, t('units.forms.notes') %>
+    <%= form.text_area :notes, rows: 4 %>
+
+    <%= form.submit @unit.new_record? ? t('units.buttons.create') : t('units.buttons.update') %>
+  </fieldset>
+<% end %>

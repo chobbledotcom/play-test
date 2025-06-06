@@ -16,10 +16,11 @@ class CreateInspections < ActiveRecord::Migration[7.2]
       t.boolean :passed
       t.text :comments
       t.string :image_path
-      t.references :user, null: false, foreign_key: true
+      t.string :user_id, null: false, limit: 12
 
       t.timestamps
     end
     add_index :inspections, :serial
+    add_foreign_key :inspections, :users
   end
 end

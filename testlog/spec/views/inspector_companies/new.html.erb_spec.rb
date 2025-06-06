@@ -1,0 +1,70 @@
+require "rails_helper"
+
+RSpec.describe "inspector_companies/new", type: :view do
+  let(:admin_user) { create(:user, :admin) }
+
+  before do
+    assign(:inspector_company, InspectorCompany.new)
+    allow(view).to receive(:current_user).and_return(admin_user)
+  end
+
+  it "renders new inspector company form" do
+    render
+
+    expect(rendered).to include("New Inspector Company")
+    expect(rendered).to include('name="inspector_company[name]"')
+    expect(rendered).to include('name="inspector_company[rpii_registration_number]"')
+    expect(rendered).to include('name="inspector_company[email]"')
+    expect(rendered).to include('name="inspector_company[phone]"')
+    expect(rendered).to include('name="inspector_company[address]"')
+  end
+
+  it "includes form fields for company details" do
+    render
+
+    expect(rendered).to include("Company Name")
+    expect(rendered).to include("RPII Registration Number")
+    expect(rendered).to include("Email")
+    expect(rendered).to include("Phone")
+    expect(rendered).to include("Address")
+    expect(rendered).to include("City")
+    expect(rendered).to include("State")
+    expect(rendered).to include("Postal Code")
+    expect(rendered).to include("Country")
+  end
+
+  it "includes admin-only fields" do
+    render
+
+    expect(rendered).to include("RPII Verified")
+    expect(rendered).to include("Active")
+    expect(rendered).to include("Notes")
+  end
+
+  it "includes logo upload field" do
+    render
+
+    expect(rendered).to include("Company Logo")
+    expect(rendered).to include('type="file"')
+    expect(rendered).to include('accept="image/*"')
+  end
+
+  it "includes form actions" do
+    render
+
+    expect(rendered).to include('type="submit"')
+    expect(rendered).to include("Create Company")
+  end
+
+  it "sets default country to UK" do
+    render
+
+    expect(rendered).to include('value="UK"')
+  end
+
+  it "has navigation link back to companies" do
+    render
+
+    expect(rendered).to include("Inspector Companies")
+  end
+end

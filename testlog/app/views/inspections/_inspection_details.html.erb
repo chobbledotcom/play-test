@@ -6,8 +6,8 @@
   <tr>
     <th>Serial Number / Asset ID:</th>
     <td>
-      <% if @inspection.equipment %>
-        <%= link_to inspection.serial.presence || "Missing", equipment_path(@inspection.equipment) %>
+      <% if @inspection.unit %>
+        <%= link_to @inspection.serial.presence || "Missing", unit_path(@inspection.unit) %>
       <% else %>
         <%= @inspection.serial %>
       <% end %>
@@ -23,18 +23,18 @@
   </tr>
   <tr>
     <th>Inspection Date:</th>
-    <td><%= render_time(inspection.inspection_date) %></td>
+    <td><%= render_time(@inspection.inspection_date) %></td>
   </tr>
   <tr>
     <th>Next Inspection Due:</th>
-    <td><%= render_time(inspection.reinspection_date) %></td>
+    <td><%= render_time(@inspection.reinspection_date) %></td>
   </tr>
   <tr>
     <th>Inspector:</th>
-    <td><%= inspection.inspector %></td>
+    <td><%= @inspection.inspector %></td>
   </tr>
   <tr>
     <th>Overall Result:</th>
-    <td><%= inspection_result_badge(inspection) %></td>
+    <td><%= inspection_result_badge(@inspection) %></td>
   </tr>
 <% end %>

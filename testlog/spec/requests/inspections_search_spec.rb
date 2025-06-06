@@ -1,25 +1,24 @@
 require "rails_helper"
 
 RSpec.describe "Inspections Search", type: :request do
-  let(:user) { User.create!(email: "test@example.com", password: "password", password_confirmation: "password") }
+  let(:user) { create(:user) }
 
   # Create a user and create a session
   before do
     user # create the user
-    post "/login", params: {session: {email: "test@example.com", password: "password"}}
+    post "/login", params: {session: {email: user.email, password: "password123"}}
   end
 
   describe "GET /inspections/search with esoteric test cases" do
     it "handles extremely long search queries" do
       # Create an inspection with a matching serial number
-      Inspection.create!(
+      unit = create(:unit, serial: "AAAAA", manufacturer: "Test Company")
+      create(:inspection,
         user: user,
         inspector: "Search Tester",
-        serial: "AAAAA", # Just the first part will match
+        unit: unit,
         location: "Test Lab",
-        manufacturer: "Test Company",
-        passed: true
-      )
+        passed: true)
 
       # Search with extremely long query - but just use first 5 characters to ensure a match
       get "/inspections/search", params: {query: "AAAAA"}
@@ -34,14 +33,13 @@ RSpec.describe "Inspections Search", type: :request do
 
     it "handles search queries with special characters" do
       # Create inspection with special characters
-      Inspection.create!(
+      unit = create(:unit, serial: "SPEC!@#$%^&*()_+", manufacturer: "Special Co.")
+      create(:inspection,
         user: user,
         inspector: "Special Chars Tester",
-        serial: "SPEC!@#$%^&*()_+",
+        unit: unit,
         location: "Test Lab",
-        manufacturer: "Special Co.",
-        passed: true
-      )
+        passed: true)
 
       # Search with special characters
       get "/inspections/search", params: {query: "!@#$%"}
@@ -56,14 +54,13 @@ RSpec.describe "Inspections Search", type: :request do
 
     it "handles search queries with SQL injection patterns" do
       # Create an inspection with a normal serial
-      Inspection.create!(
+      unit = create(:unit, serial: "NORMAL123", manufacturer: "Test Manufacturer")
+      create(:inspection,
         user: user,
         inspector: "SQL Injection Tester",
-        serial: "NORMAL123",
+        unit: unit,
         location: "Test Lab",
-        manufacturer: "Test Manufacturer",
-        passed: true
-      )
+        passed: true)
 
       # Search with SQL injection patterns
       sql_injection_queries = [
@@ -82,20 +79,19 @@ RSpec.describe "Inspections Search", type: :request do
       end
 
       # Verify inspections table still exists and record wasn't deleted
-      expect(Inspection.find_by(serial: "NORMAL123")).to be_present
+      expect(Inspection.joins(:unit).find_by(units: {serial: "NORMAL123"})).to be_present
     end
 
     it "handles empty search queries" do
       # Create some test inspections
       3.times do |i|
-        Inspection.create!(
+        unit = create(:unit, serial: "EMPTY#{i}", manufacturer: "Search Co. #{i}")
+        create(:inspection,
           user: user,
           inspector: "Empty Search Tester #{i}",
-          serial: "EMPTY#{i}",
+          unit: unit,
           location: "Test Lab",
-          manufacturer: "Search Co. #{i}",
-          passed: true
-        )
+          passed: true)
       end
 
       # Search with empty query
@@ -111,14 +107,13 @@ RSpec.describe "Inspections Search", type: :request do
 
     it "handles Unicode and emoji in search queries" do
       # Create inspection with Unicode characters and emoji
-      Inspection.create!(
+      unit = create(:unit, serial: "ÜNICØDÉ-😎-123", manufacturer: "Émoji Company 😀")
+      create(:inspection,
         user: user,
         inspector: "Unicode Tester",
-        serial: "ÜNICØDÉ-😎-123",
+        unit: unit,
         location: "Test Lab",
-        manufacturer: "Émoji Company 😀",
-        passed: true
-      )
+        passed: true)
 
       # Search with Unicode and emoji
       get "/inspections/search", params: {query: "ÜNICØDÉ"}
@@ -144,14 +139,13 @@ RSpec.describe "Inspections Search", type: :request do
 
     it "handles case-insensitive searches correctly" do
       # Create inspection with mixed case serial
-      Inspection.create!(
+      unit = create(:unit, serial: "MiXeDcAsE123", manufacturer: "Case Sensitive Co.")
+      create(:inspection,
         user: user,
         inspector: "Case Tester",
-        serial: "MiXeDcAsE123",
+        unit: unit,
         location: "Test Lab",
-        manufacturer: "Case Sensitive Co.",
-        passed: true
-      )
+        passed: true)
 
       # Search with different case variations
       search_terms = ["mixedcase123", "MIXEDCASE123", "MiXeDcAsE123", "mixedCASE123"]

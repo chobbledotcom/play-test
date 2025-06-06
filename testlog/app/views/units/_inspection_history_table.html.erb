@@ -1,0 +1,32 @@
+<% 
+  # Check if all inspections have the same name as the unit
+  unit_name = local_assigns[:unit]&.name
+  show_name_column = !unit_name || inspections.any? { |i| i.name != unit_name }
+%>
+
+<%= scrollable_table(class: "data-table") do %>
+  <thead>
+    <tr>
+      <% if show_name_column %>
+        <th>Name</th>
+      <% end %>
+      <th>Inspection Date</th>
+      <th>Next Due</th>
+      <th>Inspector</th>
+      <th>Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% inspections.each do |inspection| %>
+      <tr>
+        <% if show_name_column %>
+          <td><%= link_to inspection.name.presence || "Unnamed", inspection %></td>
+        <% end %>
+        <td><%= link_to render_time(inspection.inspection_date), inspection %></td>
+        <td><%= render_time(inspection.reinspection_date) %></td>
+        <td><%= inspection.inspector %></td>
+        <td><%= inspection_result_badge(inspection) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+<% end %>

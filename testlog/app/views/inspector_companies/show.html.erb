@@ -1,0 +1,123 @@
+<header><h1><%= @inspector_company.name %></h1></header>
+
+<p>
+  <% if current_user&.admin? %>
+    <%= link_to t('ui.edit'), edit_inspector_company_path(@inspector_company) %>
+    | <%= link_to t('inspector_companies.buttons.archive'), archive_inspector_company_path(@inspector_company), 
+            method: :patch, 
+            data: { confirm: "Are you sure you want to archive #{@inspector_company.name}?" } %>
+    | 
+  <% end %>
+  <%= link_to t('inspector_companies.titles.index'), inspector_companies_path %>
+</p>
+
+<header><h2><%= t('inspector_companies.headers.company_details') %></h2></header>
+<table>
+  <tr>
+    <th><%= t('inspector_companies.forms.name') %></th>
+    <td><%= @inspector_company.name %></td>
+  </tr>
+  <tr>
+    <th><%= t('inspector_companies.forms.rpii_registration_number') %></th>
+    <td><%= @inspector_company.rpii_registration_number %></td>
+  </tr>
+  <tr>
+    <th><%= t('inspector_companies.headers.verification_status') %></th>
+    <td>
+      <%= @inspector_company.rpii_verified? ? t('inspector_companies.status.verified') : t('inspector_companies.status.not_verified') %>
+      <% if @inspector_company.has_valid_credentials? %>
+        (Valid Credentials)
+      <% end %>
+    </td>
+  </tr>
+  <tr>
+    <th><%= t('inspector_companies.forms.email') %></th>
+    <td>
+      <% if @inspector_company.email.present? %>
+        <%= mail_to @inspector_company.email %>
+      <% else %>
+        Not provided
+      <% end %>
+    </td>
+  </tr>
+  <tr>
+    <th><%= t('inspector_companies.forms.phone') %></th>
+    <td><%= @inspector_company.phone %></td>
+  </tr>
+  <tr>
+    <th><%= t('inspector_companies.forms.address') %></th>
+    <td><%= @inspector_company.full_address %></td>
+  </tr>
+  <tr>
+    <th><%= t('inspector_companies.forms.country') %></th>
+    <td><%= @inspector_company.country %></td>
+  </tr>
+  <tr>
+    <th>Status</th>
+    <td><%= @inspector_company.active? ? t('inspector_companies.status.active') : t('inspector_companies.status.archived') %></td>
+  </tr>
+  <% if @inspector_company.notes.present? %>
+    <tr>
+      <th><%= t('inspector_companies.forms.notes') %></th>
+      <td><%= simple_format(@inspector_company.notes) %></td>
+    </tr>
+  <% end %>
+</table>
+
+<% if @inspector_company.logo.attached? %>
+  <header><h3><%= t('inspector_companies.forms.logo') %></h3></header>
+  <p><%= image_tag @inspector_company.logo, alt: "#{@inspector_company.name} logo" %></p>
+<% end %>
+
+<header><h2><%= t('inspector_companies.headers.company_statistics') %></h2></header>
+<table>
+  <tr>
+    <th><%= t('inspector_companies.statistics.total_inspections') %></th>
+    <td><%= @company_stats[:total_inspections] %></td>
+  </tr>
+  <tr>
+    <th><%= t('inspector_companies.statistics.passed_inspections') %></th>
+    <td><%= @company_stats[:passed_inspections] %></td>
+  </tr>
+  <tr>
+    <th><%= t('inspector_companies.statistics.failed_inspections') %></th>
+    <td><%= @company_stats[:failed_inspections] %></td>
+  </tr>
+  <tr>
+    <th><%= t('inspector_companies.statistics.pass_rate') %></th>
+    <td><%= @company_stats[:pass_rate] %>%</td>
+  </tr>
+  <tr>
+    <th><%= t('inspector_companies.statistics.active_since') %></th>
+    <td><%= @company_stats[:active_since] %></td>
+  </tr>
+</table>
+
+<% if @recent_inspections.any? %>
+  <header><h2><%= t('inspector_companies.headers.recent_inspections') %></h2></header>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Serial</th>
+        <th>Location</th>
+        <th>Passed</th>
+        <th><%= t('ui.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @recent_inspections.each do |inspection| %>
+        <tr>
+          <td><%= inspection.inspection_date&.strftime("%b %d, %Y") || "No date" %></td>
+          <td><%= inspection.serial %></td>
+          <td><%= inspection.location %></td>
+          <td><%= inspection.passed? ? t('inspector_companies.status.yes') : t('inspector_companies.status.no') %></td>
+          <td><%= link_to t('ui.view'), inspection %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <p><%= link_to "View all inspections", inspections_path %></p>
+<% else %>
+  <p>No inspections recorded yet.</p>
+<% end %>

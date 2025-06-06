@@ -1,0 +1,11 @@
+<h1>Search Results</h1>
+
+<section>
+  <%= render "search_form" %>
+</section>
+
+<p><%= @units.count %> unit records found.</p>
+
+<% if @units.any? %>
+  <%= render 'unit_table', unit: @units %>
+<% end %>

@@ -1,0 +1,70 @@
+<% if @inspector_company.errors.any? %>
+  <aside>
+    <h3><%= pluralize(@inspector_company.errors.count, "error") %> prohibited this company from being saved:</h3>
+    <ul>
+      <% @inspector_company.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </aside>
+<% end %>
+
+<%= form_with(model: @inspector_company) do |form| %>
+  <fieldset>
+    <header>
+      <h3><%= t('inspector_companies.headers.company_details') %></h3>
+    </header>
+
+    <%= form.label :name, t('inspector_companies.forms.name') %>
+    <%= form.text_field :name, required: true %>
+
+    <%= form.label :rpii_registration_number, t('inspector_companies.forms.rpii_registration_number') %>
+    <%= form.text_field :rpii_registration_number, required: true %>
+
+    <%= form.label :email, t('inspector_companies.forms.email') %>
+    <%= form.email_field :email %>
+
+    <%= form.label :phone, t('inspector_companies.forms.phone') %>
+    <%= form.telephone_field :phone, required: true %>
+
+    <header>
+      <h4><%= t('inspector_companies.headers.contact_information') %></h4>
+    </header>
+
+    <%= form.label :address, t('inspector_companies.forms.address') %>
+    <%= form.text_area :address, rows: 3, required: true %>
+
+    <%= form.label :city, t('inspector_companies.forms.city') %>
+    <%= form.text_field :city %>
+
+    <%= form.label :state, t('inspector_companies.forms.state') %>
+    <%= form.text_field :state %>
+
+    <%= form.label :postal_code, t('inspector_companies.forms.postal_code') %>
+    <%= form.text_field :postal_code %>
+
+    <%= form.label :country, t('inspector_companies.forms.country') %>
+    <%= form.text_field :country, value: @inspector_company.country || "UK" %>
+
+    <header>
+      <h4><%= t('inspector_companies.headers.verification_status') %></h4>
+    </header>
+
+    <%= form.label :rpii_verified, t('inspector_companies.forms.rpii_verified') %>
+    <%= form.check_box :rpii_verified %>
+
+    <%= form.label :active, t('inspector_companies.forms.active') %>
+    <%= form.check_box :active %>
+
+    <%= form.label :notes, t('inspector_companies.forms.notes') %>
+    <%= form.text_area :notes, rows: 4 %>
+
+    <%= form.label :logo, t('inspector_companies.forms.logo') %>
+    <%= form.file_field :logo, accept: "image/*" %>
+    <% if @inspector_company.logo.attached? %>
+      <p>Current logo: <%= @inspector_company.logo.filename %></p>
+    <% end %>
+
+    <%= form.submit @inspector_company.new_record? ? t('inspector_companies.buttons.create') : t('inspector_companies.buttons.update') %>
+  </fieldset>
+<% end %>
