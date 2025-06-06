@@ -3,12 +3,12 @@ require "rails_helper"
 RSpec.describe "Inspector Companies Archive", type: :request do
   let(:admin) { create(:user, :admin) }
   let(:regular_user) { create(:user) }
-  let!(:company) { create(:inspector_company, user: admin, name: "Archive Test Company") }
+  let!(:company) { create(:inspector_company, name: "Archive Test Company") }
 
   describe "PATCH /inspector_companies/:id/archive" do
     context "when logged in as admin" do
       before do
-        post login_path, params: {session: {email: admin.email, password: I18n.t("test.password")}}
+        login_as(admin)
       end
 
       it "archives the company" do
@@ -36,17 +36,18 @@ RSpec.describe "Inspector Companies Archive", type: :request do
         expect(response.body).to include(I18n.t("inspector_companies.messages.archived"))
       end
 
-      it "removes archived company from index" do
+      it "shows archived company in index with archived status" do
         patch archive_inspector_company_path(company)
 
         follow_redirect!
-        expect(response.body).not_to include(company.name)
+        expect(response.body).to include(company.name)
+        expect(response.body).to include("Archived") # Shows archived status
       end
     end
 
     context "when logged in as regular user" do
       before do
-        post login_path, params: {session: {email: regular_user.email, password: I18n.t("test.password")}}
+        login_as(regular_user)
       end
 
       it "denies access" do

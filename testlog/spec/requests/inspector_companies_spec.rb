@@ -17,7 +17,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "GET /inspector_companies/:id" do
       it "redirects to login when not logged in" do
-        company = InspectorCompany.create!(valid_attributes.merge(user: admin_user))
+        company = InspectorCompany.create!(valid_attributes)
         visit inspector_company_path(company)
         expect(page).to have_current_path(login_path)
       end
@@ -32,7 +32,7 @@ RSpec.describe "InspectorCompanies", type: :request do
   end
 
   describe "Authorization requirements" do
-    before { post login_path, params: {session: {email: regular_user.email, password: "password123"}} }
+    before { login_as(regular_user) }
 
     describe "GET /inspector_companies/new" do
       it "denies access to regular users" do
@@ -52,7 +52,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "GET /inspector_companies/:id/edit" do
       it "denies access to regular users" do
-        company = InspectorCompany.create!(valid_attributes.merge(user: admin_user))
+        company = InspectorCompany.create!(valid_attributes)
         get edit_inspector_company_path(company)
         expect(response).to redirect_to(root_path)
         expect(flash[:danger]).to be_present
@@ -61,7 +61,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "PATCH /inspector_companies/:id" do
       it "denies access to regular users" do
-        company = InspectorCompany.create!(valid_attributes.merge(user: admin_user))
+        company = InspectorCompany.create!(valid_attributes)
         patch inspector_company_path(company), params: {inspector_company: {name: "Updated Name"}}
         expect(response).to redirect_to(root_path)
         expect(flash[:danger]).to be_present
@@ -70,7 +70,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "PATCH /inspector_companies/:id/archive" do
       it "denies access to regular users" do
-        company = InspectorCompany.create!(valid_attributes.merge(user: admin_user))
+        company = InspectorCompany.create!(valid_attributes)
         patch archive_inspector_company_path(company)
         expect(response).to redirect_to(root_path)
         expect(flash[:danger]).to be_present
@@ -79,7 +79,7 @@ RSpec.describe "InspectorCompanies", type: :request do
   end
 
   describe "When logged in as regular user" do
-    before { post login_path, params: {session: {email: regular_user.email, password: "password123"}} }
+    before { login_as(regular_user) }
 
     it "denies access to inspector companies index" do
       get inspector_companies_path
@@ -87,16 +87,15 @@ RSpec.describe "InspectorCompanies", type: :request do
       expect(flash[:danger]).to include("not authorized")
     end
 
-    it "denies access to inspector companies show" do
-      company = InspectorCompany.create!(valid_attributes.merge(user: admin_user))
+    it "allows access to inspector companies show" do
+      company = InspectorCompany.create!(valid_attributes)
       get inspector_company_path(company)
-      expect(response).to redirect_to(root_path)
-      expect(flash[:danger]).to include("not authorized")
+      expect(response).to have_http_status(:success)
     end
   end
 
   describe "When logged in as admin" do
-    before { post login_path, params: {session: {email: admin_user.email, password: "password123"}} }
+    before { login_as(admin_user) }
 
     describe "GET /inspector_companies/new" do
       it "returns http success" do
@@ -118,14 +117,20 @@ RSpec.describe "InspectorCompanies", type: :request do
           }.to change(InspectorCompany, :count).by(1)
         end
 
-        it "assigns the current user to the company" do
+        it "creates company with proper attributes" do
           post inspector_companies_path, params: {inspector_company: valid_attributes}
-          expect(InspectorCompany.last.user).to eq(admin_user)
+          company = InspectorCompany.find_by(name: valid_attributes[:name])
+          expect(company.name).to eq(valid_attributes[:name])
+          expect(company.rpii_registration_number).to eq(valid_attributes[:rpii_registration_number])
         end
 
         it "redirects to the created inspector company" do
-          post inspector_companies_path, params: {inspector_company: valid_attributes}
-          expect(response).to redirect_to(InspectorCompany.last)
+          expect {
+            post inspector_companies_path, params: {inspector_company: valid_attributes}
+          }.to change(InspectorCompany, :count).by(1)
+
+          created_company = InspectorCompany.find_by(name: valid_attributes[:name])
+          expect(response).to redirect_to(created_company)
         end
 
         it "sets a success flash message" do
@@ -150,14 +155,14 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "GET /inspector_companies/:id/edit" do
       it "returns http success" do
-        company = InspectorCompany.create!(valid_attributes.merge(user: admin_user))
+        company = InspectorCompany.create!(valid_attributes)
         get edit_inspector_company_path(company)
         expect(response).to have_http_status(:success)
       end
     end
 
     describe "PATCH /inspector_companies/:id" do
-      let(:company) { InspectorCompany.create!(valid_attributes.merge(user: admin_user)) }
+      let(:company) { InspectorCompany.create!(valid_attributes) }
 
       context "with valid parameters" do
         let(:new_attributes) do
@@ -202,7 +207,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "PATCH /inspector_companies/:id/archive" do
       it "archives the requested inspector company" do
-        company = InspectorCompany.create!(valid_attributes.merge(user: admin_user))
+        company = InspectorCompany.create!(valid_attributes)
         expect {
           patch archive_inspector_company_path(company)
           company.reload
@@ -210,31 +215,34 @@ RSpec.describe "InspectorCompanies", type: :request do
       end
 
       it "redirects to the inspector companies list" do
-        company = InspectorCompany.create!(valid_attributes.merge(user: admin_user))
+        company = InspectorCompany.create!(valid_attributes)
         patch archive_inspector_company_path(company)
         expect(response).to redirect_to(inspector_companies_path)
       end
 
       it "sets a success flash message" do
-        company = InspectorCompany.create!(valid_attributes.merge(user: admin_user))
+        company = InspectorCompany.create!(valid_attributes)
         patch archive_inspector_company_path(company)
         expect(flash[:success]).to be_present
       end
     end
 
     describe "Admin-only fields" do
-      it "allows setting rpii_verified field" do
+      it "allows setting logo field" do
+        logo_file = fixture_file_upload("test_image.jpg", "image/jpeg")
         post inspector_companies_path, params: {
-          inspector_company: valid_attributes.merge(rpii_verified: true)
+          inspector_company: valid_attributes.merge(logo: logo_file)
         }
-        expect(InspectorCompany.last.rpii_verified).to be true
+        company = InspectorCompany.find_by(name: valid_attributes[:name])
+        expect(company.logo).to be_attached
       end
 
       it "allows setting active field" do
         post inspector_companies_path, params: {
           inspector_company: valid_attributes.merge(active: false)
         }
-        expect(InspectorCompany.last.active).to be false
+        company = InspectorCompany.find_by(name: valid_attributes[:name])
+        expect(company.active).to be false
       end
 
       it "allows setting notes field" do
@@ -242,13 +250,14 @@ RSpec.describe "InspectorCompanies", type: :request do
         post inspector_companies_path, params: {
           inspector_company: valid_attributes.merge(notes: notes)
         }
-        expect(InspectorCompany.last.notes).to eq(notes)
+        company = InspectorCompany.find_by(name: valid_attributes[:name])
+        expect(company.notes).to eq(notes)
       end
     end
   end
 
   describe "Edge cases" do
-    before { post login_path, params: {session: {email: admin_user.email, password: "password123"}} }
+    before { login_as(admin_user) }
 
     it "handles missing inspector company gracefully" do
       get inspector_company_path("nonexistent")
@@ -257,7 +266,7 @@ RSpec.describe "InspectorCompanies", type: :request do
     end
 
     it "handles duplicate RPII registration numbers" do
-      InspectorCompany.create!(valid_attributes.merge(user: admin_user))
+      InspectorCompany.create!(valid_attributes)
 
       post inspector_companies_path, params: {
         inspector_company: valid_attributes.merge(name: "Different Company")

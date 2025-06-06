@@ -64,6 +64,15 @@
     <%= form.label :notes, t('units.forms.notes') %>
     <%= form.text_area :notes, rows: 4 %>
 
+    <%= form.label :photo, "Photo" %>
+    <%= form.file_field :photo, accept: "image/*" %>
+    <% if @unit.photo.attached? %>
+      <div style="margin-top: 10px;">
+        <%= image_tag ImageProcessorService.process(@unit.photo, 200), style: "max-width: 200px; height: auto;" %>
+        <p><small>Current photo</small></p>
+      </div>
+    <% end %>
+
     <%= form.submit @unit.new_record? ? t('units.buttons.create') : t('units.buttons.update') %>
   </fieldset>
 <% end %>

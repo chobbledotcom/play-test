@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_06_171628) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_06_231715) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -89,9 +89,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_171628) do
 
   create_table "inspections", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.datetime "inspection_date"
-    t.datetime "reinspection_date"
-    t.string "inspector"
-    t.string "location"
     t.boolean "passed"
     t.text "comments"
     t.string "user_id", limit: 12, null: false
@@ -99,10 +96,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_171628) do
     t.datetime "updated_at", null: false
     t.datetime "pdf_last_accessed_at"
     t.string "unit_id", null: false
-    t.string "place_inspected"
-    t.string "rpii_registration_number"
+    t.string "inspection_location"
     t.string "unique_report_number"
-    t.string "inspection_company_name"
     t.string "status", default: "draft"
     t.datetime "finalized_at"
     t.string "finalized_by_id", limit: 12
@@ -122,7 +117,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_171628) do
   end
 
   create_table "inspector_companies", id: { type: :string, limit: 12 }, force: :cascade do |t|
-    t.string "user_id", limit: 12, null: false
     t.string "name", null: false
     t.string "rpii_registration_number", null: false
     t.string "email"
@@ -132,15 +126,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_171628) do
     t.string "state"
     t.string "postal_code"
     t.string "country", default: "UK"
-    t.boolean "rpii_verified", default: false
     t.boolean "active", default: true
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["active"], name: "index_inspector_companies_on_active"
     t.index ["rpii_registration_number"], name: "index_inspector_companies_on_rpii_registration_number", unique: true
-    t.index ["rpii_verified"], name: "index_inspector_companies_on_rpii_verified"
-    t.index ["user_id"], name: "index_inspector_companies_on_user_id"
   end
 
   create_table "materials_assessments", force: :cascade do |t|
@@ -297,7 +288,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_171628) do
     t.integer "inspection_limit", default: 10, null: false
     t.datetime "last_active_at"
     t.string "time_display", default: "date"
+    t.string "inspection_company_id"
     t.index ["email"], name: "index_users_on_email"
+    t.index ["inspection_company_id"], name: "index_users_on_inspection_company_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -309,7 +302,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_171628) do
   add_foreign_key "inspections", "units"
   add_foreign_key "inspections", "users"
   add_foreign_key "inspections", "users", column: "finalized_by_id"
-  add_foreign_key "inspector_companies", "users"
   add_foreign_key "materials_assessments", "inspections"
   add_foreign_key "slide_assessments", "inspections"
   add_foreign_key "structure_assessments", "inspections"

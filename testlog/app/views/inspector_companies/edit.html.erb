@@ -4,8 +4,6 @@
   <%= render 'form' %>
 
   <div>
-    <%= link_to t('inspector_companies.buttons.archive'), archive_inspector_company_path(@inspector_company), 
-            method: :patch, 
-            data: { confirm: "Are you sure you want to archive #{@inspector_company.name}?" } %>
+    <%= render 'archive_link', inspector_company: @inspector_company %>
   </div>
 </article>

@@ -470,7 +470,7 @@ RSpec.describe AnchorageAssessment, type: :model do
 
     it "handles very large unit areas" do
       large_unit = create(:unit, user: user, name: "Large Unit", serial: "LARGE001", manufacturer: "Test Manufacturer", length: 50.0, width: 30.0, height: 5.0, description: "Large Unit", unit_type: "bounce_house", owner: "Test Owner")
-      large_inspection = create(:inspection, user: user, unit: large_unit, inspector: "Test Inspector")
+      large_inspection = create(:inspection, user: user, unit: large_unit)
       large_assessment = AnchorageAssessment.create!(inspection: large_inspection)
 
       large_assessment.update!(num_low_anchors: 5, num_high_anchors: 3)

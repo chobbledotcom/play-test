@@ -1,22 +1,13 @@
 class InspectorCompaniesController < ApplicationController
-  before_action :set_inspector_company, only: [:show, :edit, :update, :archive]
+  before_action :set_inspector_company, only: [:show, :edit, :update, :archive, :unarchive]
   before_action :require_login
   before_action :require_admin, except: [:show]
 
   def index
-    @inspector_companies = InspectorCompany.active.order(:name)
-
-    if params[:search].present?
-      search_term = "%#{params[:search]}%"
-      @inspector_companies = @inspector_companies.where(
-        "name LIKE ? OR rpii_registration_number LIKE ?",
-        search_term, search_term
-      )
-    end
-
-    if params[:verified].present?
-      @inspector_companies = @inspector_companies.verified if params[:verified] == "true"
-    end
+    @inspector_companies = InspectorCompany
+      .by_status(params[:active])
+      .search_by_term(params[:search])
+      .order(:name)
   end
 
   def show
@@ -58,6 +49,12 @@ class InspectorCompaniesController < ApplicationController
     redirect_to inspector_companies_path
   end
 
+  def unarchive
+    @inspector_company.update(active: true)
+    flash[:success] = t("inspector_companies.messages.unarchived")
+    redirect_to inspector_companies_path
+  end
+
   private
 
   def set_inspector_company
@@ -70,7 +67,7 @@ class InspectorCompaniesController < ApplicationController
   def inspector_company_params
     params.require(:inspector_company).permit(
       :name, :rpii_registration_number, :email, :phone, :address,
-      :city, :state, :postal_code, :country, :rpii_verified,
+      :city, :state, :postal_code, :country,
       :active, :notes, :logo
     )
   end

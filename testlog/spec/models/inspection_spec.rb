@@ -5,10 +5,9 @@ RSpec.describe Inspection, type: :model do
 
   describe "validations" do
     it "validates presence of required fields" do
-      inspection = build(:inspection, inspector: nil, location: nil, inspection_date: nil, place_inspected: nil)
+      inspection = build(:inspection, inspection_location: nil, inspection_date: nil, status: "completed")
       expect(inspection).not_to be_valid
-      expect(inspection.errors[:inspector]).to include("can't be blank")
-      expect(inspection.errors[:location]).to include("can't be blank")
+      expect(inspection.errors[:inspection_location]).to include("can't be blank")
     end
 
     it "can be created with valid attributes" do
@@ -17,7 +16,8 @@ RSpec.describe Inspection, type: :model do
     end
 
     it "requires a user" do
-      inspection = build(:inspection, user: nil)
+      inspector_company = create(:inspector_company)
+      inspection = build(:inspection, user: nil, inspector_company: inspector_company)
       expect(inspection).not_to be_valid
       expect(inspection.errors[:user]).to include("must exist")
     end
@@ -37,7 +37,7 @@ RSpec.describe Inspection, type: :model do
 
       # Retrieve and verify data is intact
       retrieved = Inspection.find(inspection.id)
-      expect(retrieved.inspector).to eq("Jörgen Müller 👨‍🔧")
+      expect(retrieved.inspector_company.name).to be_present
       expect(retrieved.unit.serial).to match(/ÜNICØDÉ-😎-\d+/)
       expect(retrieved.comments).to eq("❗️Tested with special 🔌 adapter. Result: ✅")
     end
@@ -58,7 +58,7 @@ RSpec.describe Inspection, type: :model do
 
       # Verify the data was saved correctly and didn't affect the database
       retrieved = Inspection.find(inspection.id)
-      expect(retrieved.inspector).to eq("Robert'); DROP TABLE inspections; --")
+      expect(retrieved.inspector_company.name).to be_present
 
       # Verify all inspections still exist
       expect(Inspection.count).to be >= 1
@@ -81,12 +81,12 @@ RSpec.describe Inspection, type: :model do
     it "handles edge case dates" do
       # Far future dates
       future_inspection = create(:inspection,
-        inspection_date: Date.today + 50.years,
-        reinspection_date: Date.today + 100.years)
+        inspection_date: Date.today + 50.years)
 
       retrieved = Inspection.find(future_inspection.id)
       expect(retrieved.inspection_date).to eq(Date.today + 50.years)
-      expect(retrieved.reinspection_date).to eq(Date.today + 100.years)
+      # reinspection_date is calculated as inspection_date + 1 year
+      expect(retrieved.reinspection_date).to eq(Date.today + 51.years)
     end
   end
 

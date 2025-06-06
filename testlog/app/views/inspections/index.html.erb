@@ -3,8 +3,14 @@
 </header>
 
 <div class="center">
-  <%= link_to new_inspection_path do %>
-    <strong>Add Inspection</strong>
+  <% if current_user.inspection_company_id.present? %>
+    <%= link_to units_path do %>
+      <strong><%= t('inspections.buttons.add_via_units') %></strong>
+    <% end %>
+  <% else %>
+    <p style="color: #e74c3c;">
+      <%= current_user.inspection_company_required_message %>
+    </p>
   <% end %>
 </div>
 

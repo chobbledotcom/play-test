@@ -3,7 +3,6 @@ require "rails_helper"
 RSpec.describe "Inspector Companies", type: :feature do
   let(:admin_user) { create(:user, :admin) }
   let(:regular_user) { create(:user) }
-  let(:inspector_company) { create(:inspector_company, user: admin_user) }
 
   describe "Access control" do
     context "when not logged in" do
@@ -16,10 +15,7 @@ RSpec.describe "Inspector Companies", type: :feature do
 
     context "when logged in as regular user" do
       before do
-        visit "/login"
-        fill_in I18n.t("session.login.email_label"), with: regular_user.email
-        fill_in I18n.t("session.login.password_label"), with: "password123"
-        click_button I18n.t("session.login.submit")
+        login_user_via_form(regular_user)
       end
 
       it "prevents access to inspector companies" do
@@ -36,10 +32,7 @@ RSpec.describe "Inspector Companies", type: :feature do
 
     context "when logged in as admin" do
       before do
-        visit "/login"
-        fill_in I18n.t("session.login.email_label"), with: admin_user.email
-        fill_in I18n.t("session.login.password_label"), with: "password123"
-        click_button I18n.t("session.login.submit")
+        login_user_via_form(admin_user)
       end
 
       it "allows access to inspector companies" do
@@ -57,35 +50,35 @@ RSpec.describe "Inspector Companies", type: :feature do
 
   describe "Inspector Companies Index", js: false do
     before do
-      visit "/login"
-      fill_in I18n.t("session.login.email_label"), with: admin_user.email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
-      click_button I18n.t("session.login.submit")
+      login_user_via_form(admin_user)
     end
 
-    context "with no companies" do
-      it "shows empty state" do
+    context "with no additional companies" do
+      it "shows empty state when no extra companies exist" do
+        # Clear any existing companies except the admin user's company
+        InspectorCompany.where.not(id: admin_user.inspection_company.id).destroy_all
+
         visit inspector_companies_path
 
-        expect(page).to have_content(I18n.t("inspector_companies.messages.no_companies"))
+        # Should show the admin user's company but indicate if no others exist
+        expect(page).to have_content(admin_user.inspection_company.name)
         expect(page).to have_link(I18n.t("inspector_companies.buttons.new_company"))
       end
     end
 
     context "with existing companies" do
-      let!(:company1) { create(:inspector_company, user: admin_user, name: "Test Company 1", rpii_verified: true) }
-      let!(:company2) { create(:inspector_company, user: admin_user, name: "Test Company 2", rpii_verified: false) }
-      let!(:archived_company) { create(:inspector_company, user: admin_user, name: "Archived Company", active: false) }
+      let!(:company1) { create(:inspector_company, name: "Test Company 1") }
+      let!(:company2) { create(:inspector_company, name: "Test Company 2") }
+      let!(:archived_company) { create(:inspector_company, name: "Archived Company", active: false) }
 
-      it "displays active companies in table" do
+      it "displays all companies in table by default" do
         visit inspector_companies_path
 
         expect(page).to have_content(company1.name)
         expect(page).to have_content(company2.name)
-        expect(page).not_to have_content(archived_company.name)
+        expect(page).to have_content(archived_company.name)
 
-        expect(page).to have_content(I18n.t("inspector_companies.status.verified"))
-        expect(page).to have_content(I18n.t("inspector_companies.status.not_verified"))
+        expect(page).to have_content(I18n.t("inspector_companies.status.valid_credentials"))
       end
 
       it "allows searching by company name" do
@@ -98,14 +91,12 @@ RSpec.describe "Inspector Companies", type: :feature do
         expect(page).not_to have_content(company2.name)
       end
 
-      it "allows filtering by verification status" do
-        visit inspector_companies_path
-
-        select I18n.t("inspector_companies.status.verified"), from: I18n.t("inspector_companies.search.verified_filter")
-        click_button I18n.t("inspector_companies.buttons.search")
+      it "allows filtering by active status" do
+        visit inspector_companies_path(active: "active")
 
         expect(page).to have_content(company1.name)
-        expect(page).not_to have_content(company2.name)
+        expect(page).to have_content(company2.name)
+        expect(page).not_to have_content(archived_company.name)
       end
 
       it "shows action links for each company" do
@@ -122,10 +113,7 @@ RSpec.describe "Inspector Companies", type: :feature do
 
   describe "Creating Inspector Company" do
     before do
-      visit "/login"
-      fill_in I18n.t("session.login.email_label"), with: admin_user.email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
-      click_button I18n.t("session.login.submit")
+      login_user_via_form(admin_user)
     end
 
     it "displays the new company form" do
@@ -134,7 +122,7 @@ RSpec.describe "Inspector Companies", type: :feature do
       expect(page).to have_content(I18n.t("inspector_companies.titles.new"))
       expect(page).to have_content(I18n.t("inspector_companies.headers.company_details"))
       expect(page).to have_content(I18n.t("inspector_companies.headers.contact_information"))
-      expect(page).to have_content(I18n.t("inspector_companies.headers.verification_status"))
+      expect(page).to have_content(I18n.t("inspector_companies.headers.company_status"))
 
       expect(page).to have_field(I18n.t("inspector_companies.forms.name"))
       expect(page).to have_field(I18n.t("inspector_companies.forms.rpii_registration_number"))
@@ -145,7 +133,6 @@ RSpec.describe "Inspector Companies", type: :feature do
       expect(page).to have_field(I18n.t("inspector_companies.forms.state"))
       expect(page).to have_field(I18n.t("inspector_companies.forms.postal_code"))
       expect(page).to have_field(I18n.t("inspector_companies.forms.country"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.rpii_verified"))
       expect(page).to have_field(I18n.t("inspector_companies.forms.active"))
       expect(page).to have_field(I18n.t("inspector_companies.forms.notes"))
       expect(page).to have_field(I18n.t("inspector_companies.forms.logo"))
@@ -164,7 +151,6 @@ RSpec.describe "Inspector Companies", type: :feature do
       fill_in I18n.t("inspector_companies.forms.city"), with: "Test City"
       fill_in I18n.t("inspector_companies.forms.state"), with: "Test State"
       fill_in I18n.t("inspector_companies.forms.postal_code"), with: "TE1 2ST"
-      check I18n.t("inspector_companies.forms.rpii_verified")
       check I18n.t("inspector_companies.forms.active")
       fill_in I18n.t("inspector_companies.forms.notes"), with: "Test notes"
 
@@ -189,13 +175,10 @@ RSpec.describe "Inspector Companies", type: :feature do
   end
 
   describe "Viewing Inspector Company" do
-    let!(:company) { create(:inspector_company, user: admin_user, name: "View Test Company") }
+    let!(:company) { create(:inspector_company, name: "View Test Company") }
 
     before do
-      visit "/login"
-      fill_in I18n.t("session.login.email_label"), with: admin_user.email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
-      click_button I18n.t("session.login.submit")
+      login_user_via_form(admin_user)
     end
 
     it "displays company details" do
@@ -220,13 +203,10 @@ RSpec.describe "Inspector Companies", type: :feature do
   end
 
   describe "Editing Inspector Company" do
-    let!(:company) { create(:inspector_company, user: admin_user, name: "Edit Test Company") }
+    let!(:company) { create(:inspector_company, name: "Edit Test Company") }
 
     before do
-      visit "/login"
-      fill_in I18n.t("session.login.email_label"), with: admin_user.email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
-      click_button I18n.t("session.login.submit")
+      login_user_via_form(admin_user)
     end
 
     it "displays the edit form with existing data" do
@@ -254,13 +234,10 @@ RSpec.describe "Inspector Companies", type: :feature do
   end
 
   describe "Archive Links Display" do
-    let!(:company) { create(:inspector_company, user: admin_user, name: "Archive Test Company") }
+    let!(:company) { create(:inspector_company, name: "Archive Test Company") }
 
     before do
-      visit "/login"
-      fill_in I18n.t("session.login.email_label"), with: admin_user.email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
-      click_button I18n.t("session.login.submit")
+      login_user_via_form(admin_user)
     end
 
     it "shows archive link on index page" do
@@ -285,10 +262,7 @@ RSpec.describe "Inspector Companies", type: :feature do
 
   describe "Form accessibility and structure" do
     before do
-      visit "/login"
-      fill_in I18n.t("session.login.email_label"), with: admin_user.email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
-      click_button I18n.t("session.login.submit")
+      login_user_via_form(admin_user)
     end
 
     it "has proper form structure with fieldsets" do
@@ -297,7 +271,7 @@ RSpec.describe "Inspector Companies", type: :feature do
       expect(page).to have_css("fieldset")
       expect(page).to have_css("fieldset header h3", text: I18n.t("inspector_companies.headers.company_details"))
       expect(page).to have_css("fieldset header h4", text: I18n.t("inspector_companies.headers.contact_information"))
-      expect(page).to have_css("fieldset header h4", text: I18n.t("inspector_companies.headers.verification_status"))
+      expect(page).to have_css("fieldset header h4", text: I18n.t("inspector_companies.headers.company_status"))
     end
 
     it "has required attributes on mandatory fields" do

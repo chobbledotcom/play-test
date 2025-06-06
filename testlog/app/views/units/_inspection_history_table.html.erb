@@ -24,7 +24,7 @@
         <% end %>
         <td><%= link_to render_time(inspection.inspection_date), inspection %></td>
         <td><%= render_time(inspection.reinspection_date) %></td>
-        <td><%= inspection.inspector %></td>
+        <td><%= inspection.inspector_company.name %></td>
         <td><%= inspection_result_badge(inspection) %></td>
       </tr>
     <% end %>

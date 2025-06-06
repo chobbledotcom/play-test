@@ -36,9 +36,9 @@ RSpec.describe "inspector_companies/new", type: :view do
   it "includes admin-only fields" do
     render
 
-    expect(rendered).to include("RPII Verified")
     expect(rendered).to include("Active")
-    expect(rendered).to include("Notes")
+    expect(rendered).to have_content(I18n.t("inspector_companies.forms.notes"))
+    expect(rendered).to have_field("inspector_company[notes]")
   end
 
   it "includes logo upload field" do

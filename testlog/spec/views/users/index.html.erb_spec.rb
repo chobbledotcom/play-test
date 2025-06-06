@@ -39,11 +39,11 @@ RSpec.describe "users/index.html.erb", type: :view do
     expect(rendered).to include("Admin")
   end
 
-  it "shows inspection limits" do
+  it "shows inspection count" do
     render
 
-    expect(rendered).to include("10")
-    expect(rendered).to include("5")
+    expect(rendered).to include("Inspections")
+    expect(rendered).to include("0") # All users have 0 inspections initially
   end
 
   it "includes action links for admin" do

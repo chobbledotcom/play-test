@@ -3,66 +3,40 @@ require "rails_helper"
 RSpec.describe "Inspections Search", type: :request do
   let(:user) { create(:user) }
 
-  # Create a user and create a session
   before do
-    user # create the user
-    post "/login", params: {session: {email: user.email, password: "password123"}}
+    login_as(user)
+  end
+
+  # Helper method to create inspection with test data
+  def create_test_inspection(serial:, manufacturer: "Test Company", location: "Test Lab", passed: true)
+    unit = create(:unit, serial: serial, manufacturer: manufacturer)
+    create(:inspection, user: user, unit: unit, inspection_location: location, passed: passed)
   end
 
   describe "GET /inspections/search with esoteric test cases" do
     it "handles extremely long search queries" do
-      # Create an inspection with a matching serial number
-      unit = create(:unit, serial: "AAAAA", manufacturer: "Test Company")
-      create(:inspection,
-        user: user,
-        inspector: "Search Tester",
-        unit: unit,
-        location: "Test Lab",
-        passed: true)
+      create_test_inspection(serial: "AAAAA")
 
-      # Search with extremely long query - but just use first 5 characters to ensure a match
       get "/inspections/search", params: {query: "AAAAA"}
 
-      # Should return successfully
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:search)
-
-      # The search should find the record
       expect(assigns(:inspections).count).to eq(1)
     end
 
     it "handles search queries with special characters" do
-      # Create inspection with special characters
-      unit = create(:unit, serial: "SPEC!@#$%^&*()_+", manufacturer: "Special Co.")
-      create(:inspection,
-        user: user,
-        inspector: "Special Chars Tester",
-        unit: unit,
-        location: "Test Lab",
-        passed: true)
+      create_test_inspection(serial: "SPEC!@#$%^&*()_+", manufacturer: "Special Co.")
 
-      # Search with special characters
       get "/inspections/search", params: {query: "!@#$%"}
 
-      # Should return successfully
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:search)
-
-      # Should find the record
       expect(assigns(:inspections).count).to eq(1)
     end
 
     it "handles search queries with SQL injection patterns" do
-      # Create an inspection with a normal serial
-      unit = create(:unit, serial: "NORMAL123", manufacturer: "Test Manufacturer")
-      create(:inspection,
-        user: user,
-        inspector: "SQL Injection Tester",
-        unit: unit,
-        location: "Test Lab",
-        passed: true)
+      create_test_inspection(serial: "NORMAL123", manufacturer: "Test Manufacturer")
 
-      # Search with SQL injection patterns
       sql_injection_queries = [
         "'; DROP TABLE inspections; --",
         "OR 1=1",
@@ -72,8 +46,6 @@ RSpec.describe "Inspections Search", type: :request do
 
       sql_injection_queries.each do |query|
         get "/inspections/search", params: {query: query}
-
-        # Should return successfully, no errors
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:search)
       end
@@ -88,9 +60,9 @@ RSpec.describe "Inspections Search", type: :request do
         unit = create(:unit, serial: "EMPTY#{i}", manufacturer: "Search Co. #{i}")
         create(:inspection,
           user: user,
-          inspector: "Empty Search Tester #{i}",
+
           unit: unit,
-          location: "Test Lab",
+          inspection_location: "Test Lab",
           passed: true)
       end
 
@@ -110,9 +82,9 @@ RSpec.describe "Inspections Search", type: :request do
       unit = create(:unit, serial: "ÜNICØDÉ-😎-123", manufacturer: "Émoji Company 😀")
       create(:inspection,
         user: user,
-        inspector: "Unicode Tester",
+
         unit: unit,
-        location: "Test Lab",
+        inspection_location: "Test Lab",
         passed: true)
 
       # Search with Unicode and emoji
@@ -142,9 +114,9 @@ RSpec.describe "Inspections Search", type: :request do
       unit = create(:unit, serial: "MiXeDcAsE123", manufacturer: "Case Sensitive Co.")
       create(:inspection,
         user: user,
-        inspector: "Case Tester",
+
         unit: unit,
-        location: "Test Lab",
+        inspection_location: "Test Lab",
         passed: true)
 
       # Search with different case variations

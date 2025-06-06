@@ -69,10 +69,7 @@ RSpec.describe "Users", type: :request do
 
     context "when logged in as the user" do
       before do
-        visit login_path
-        fill_in I18n.t("session.login.email_label"), with: user.email
-        fill_in I18n.t("session.login.password_label"), with: I18n.t("test.password")
-        click_button I18n.t("session.login.submit")
+        login_user_via_form(user)
       end
 
       it "allows access to change password page" do
@@ -131,7 +128,7 @@ RSpec.describe "Users", type: :request do
 
     context "when logged in as the user" do
       before do
-        post "/login", params: {session: {email: user.email, password: I18n.t("test.password")}}
+        login_as(user)
       end
 
       it "allows access to change settings page" do
@@ -190,7 +187,7 @@ RSpec.describe "Users", type: :request do
 
     context "when logged in as admin" do
       before do
-        post "/login", params: {session: {email: admin.email, password: I18n.t("test.password")}}
+        login_as(admin)
       end
 
       it "allows access to users index" do
@@ -247,7 +244,7 @@ RSpec.describe "Users", type: :request do
 
     context "when logged in as regular user" do
       before do
-        post "/login", params: {session: {email: regular_user.email, password: I18n.t("test.password")}}
+        login_as(regular_user)
       end
 
       it "denies access to users index" do
@@ -376,7 +373,7 @@ RSpec.describe "Users", type: :request do
     let(:user) { create(:user) }
 
     before do
-      post "/login", params: {session: {email: user.email, password: I18n.t("test.password")}}
+      login_as(user)
     end
 
     it "renders error when new password validation fails" do

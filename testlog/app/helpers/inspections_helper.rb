@@ -29,21 +29,12 @@ module InspectionsHelper
   end
 
   def inspection_actions(inspection)
-    actions = [
+    [
       {
         label: "Edit",
         url: edit_inspection_path(inspection)
       }
     ]
-
-    if inspection.unit.present?
-      actions << {
-        label: "New Inspection",
-        url: new_inspection_path(unit_id: inspection.unit.id)
-      }
-    end
-
-    actions
   end
 
   # Tabbed inspection editing helpers
@@ -59,13 +50,13 @@ module InspectionsHelper
 
   def assessment_completion_percentage(inspection)
     # Check if inspection has any assessments
-    has_assessments = inspection.user_height_assessment.present? || 
-                     inspection.slide_assessment.present? ||
-                     inspection.structure_assessment.present? || 
-                     inspection.anchorage_assessment.present? ||
-                     inspection.materials_assessment.present? || 
-                     inspection.fan_assessment.present?
-    
+    has_assessments = inspection.user_height_assessment.present? ||
+      inspection.slide_assessment.present? ||
+      inspection.structure_assessment.present? ||
+      inspection.anchorage_assessment.present? ||
+      inspection.materials_assessment.present? ||
+      inspection.fan_assessment.present?
+
     return 0 unless has_assessments
 
     total_assessments = inspection_tabs(inspection).count - 1 # Exclude 'general' tab

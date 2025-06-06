@@ -5,10 +5,7 @@ RSpec.describe "Units Form", type: :feature do
 
   before do
     # Login user for form access
-    visit "/login"
-    fill_in "Email", with: user.email
-    fill_in "Password", with: "password123"
-    click_button "Log in"
+    sign_in(user)
   end
 
   describe "Creating a new unit" do

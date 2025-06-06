@@ -6,7 +6,7 @@ RSpec.describe "Admin User Management", type: :request do
     let!(:regular_user) { create(:user) }
 
     before do
-      post login_path, params: {session: {email: admin.email, password: I18n.t("test.password")}}
+      login_as(admin)
     end
 
     it "can access users index" do
@@ -25,7 +25,7 @@ RSpec.describe "Admin User Management", type: :request do
     let!(:regular_user) { create(:user) }
 
     before do
-      post login_path, params: {session: {email: regular_user.email, password: I18n.t("test.password")}}
+      login_as(regular_user)
     end
 
     it "cannot access users index" do

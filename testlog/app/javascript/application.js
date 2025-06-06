@@ -15,55 +15,68 @@ document.addEventListener("turbo:load", function() {
     const showStatus = (type) => {
       if (!statusElement) return;
       
-      // Hide all status elements
+      // Remove all status classes and hide all status elements
+      statusElement.classList.remove('saving', 'saved', 'error');
       savingElement?.style && (savingElement.style.display = 'none');
       savedElement?.style && (savedElement.style.display = 'none');
       errorElement?.style && (errorElement.style.display = 'none');
       
-      // Show the requested status
+      // Show the container and add the appropriate class and text
+      statusElement.classList.add('visible', type);
+      
       switch(type) {
         case 'saving':
           savingElement?.style && (savingElement.style.display = 'inline');
           break;
         case 'saved':
           savedElement?.style && (savedElement.style.display = 'inline');
-          setTimeout(() => savedElement?.style && (savedElement.style.display = 'none'), 3000);
+          setTimeout(() => {
+            savedElement?.style && (savedElement.style.display = 'none');
+            statusElement.classList.remove('visible', 'saved');
+          }, 3000);
           break;
         case 'error':
           errorElement?.style && (errorElement.style.display = 'inline');
-          setTimeout(() => errorElement?.style && (errorElement.style.display = 'none'), 5000);
+          setTimeout(() => {
+            errorElement?.style && (errorElement.style.display = 'none');
+            statusElement.classList.remove('visible', 'error');
+          }, 5000);
           break;
       }
     };
     
-    const saveForm = () => {
+    const saveForm = async () => {
       showStatus('saving');
       
-      const formData = new FormData(form);
-      const url = form.action;
-      
-      fetch(url, {
-        method: 'PATCH',
-        body: formData,
-        headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 'success') {
-          showStatus('saved');
+      try {
+        // Create a form submission using Turbo
+        const formData = new FormData(form);
+        
+        const response = await fetch(form.action, {
+          method: 'PATCH',
+          body: formData,
+          headers: {
+            'Accept': 'application/json',
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'success') {
+            showStatus('saved');
+          } else {
+            showStatus('error');
+            console.error('Auto-save errors:', data.errors);
+          }
         } else {
           showStatus('error');
-          console.error('Auto-save errors:', data.errors);
+          console.error('Auto-save failed with status:', response.status);
         }
-      })
-      .catch(error => {
+      } catch (error) {
         showStatus('error');
         console.error('Auto-save error:', error);
-      });
+      }
     };
     
     // Auto-save on input change with debouncing

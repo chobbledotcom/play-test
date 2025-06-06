@@ -96,10 +96,7 @@ RSpec.describe "Home", type: :request do
       let(:user) { create(:user) }
 
       before do
-        visit login_path
-        fill_in I18n.t("session.login.email_label"), with: user.email
-        fill_in I18n.t("session.login.password_label"), with: I18n.t("test.password")
-        click_button I18n.t("session.login.submit")
+        login_user_via_form(user)
       end
 
       it "returns http success" do
@@ -199,10 +196,7 @@ RSpec.describe "Home", type: :request do
       let(:user) { create(:user) }
 
       before do
-        visit login_path
-        fill_in I18n.t("session.login.email_label"), with: user.email
-        fill_in I18n.t("session.login.password_label"), with: I18n.t("test.password")
-        click_button I18n.t("session.login.submit")
+        login_user_via_form(user)
       end
 
       it "integrates with application layout navigation" do

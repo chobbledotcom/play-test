@@ -155,6 +155,47 @@ RSpec.describe User, type: :model do
 
         expect(user.can_create_inspection?).to be true
       end
+
+      it "returns false when user's inspection company is archived" do
+        archived_company = create(:inspector_company, active: false)
+        user = create(:user, :without_company, inspection_company: archived_company)
+
+        expect(user.can_create_inspection?).to be false
+      end
+
+      it "returns false when user has no inspection company" do
+        user = create(:user, :without_company)
+
+        expect(user.can_create_inspection?).to be false
+      end
+    end
+
+    describe "#inspection_company_required_message" do
+      it "returns activation message when user has no inspection company" do
+        user = create(:user, :without_company)
+
+        expect(user.inspection_company_required_message).to eq(
+          I18n.t("users.messages.company_not_activated")
+        )
+      end
+
+      it "returns archived message when user's inspection company is archived" do
+        archived_company = create(:inspector_company, active: false)
+        user = create(:user, :without_company, inspection_company: archived_company)
+
+        expect(user.inspection_company_required_message).to eq(
+          I18n.t("users.messages.company_archived")
+        )
+      end
+
+      it "returns limit message when user has reached inspection limit" do
+        user = create(:user, inspection_limit: 1)
+        create(:inspection, user: user)
+
+        expect(user.inspection_company_required_message).to eq(
+          I18n.t("users.messages.inspection_limit_reached")
+        )
+      end
     end
   end
 end

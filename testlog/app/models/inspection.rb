@@ -3,7 +3,7 @@ class Inspection < ApplicationRecord
 
   belongs_to :user
   belongs_to :unit
-  belongs_to :inspector_company, optional: true
+  belongs_to :inspector_company
 
   # Assessment associations (normalized from single table)
   has_one :user_height_assessment, class_name: "UserHeightAssessment", dependent: :destroy
@@ -20,13 +20,10 @@ class Inspection < ApplicationRecord
     :materials_assessment, :fan_assessment,
     :enclosed_assessment
 
-  # Validations
-  validates :inspector, :location, presence: true
+  # Validations - allow drafts to be incomplete
+  validates :inspection_location, presence: true, unless: -> { status == "draft" }
   validates :inspection_date, presence: true
-  validates :place_inspected, presence: true
-  validates :rpii_registration_number, presence: true, if: -> { status.present? && status != "draft" }
   validates :unique_report_number, presence: true, uniqueness: {scope: :user_id}, if: -> { status.present? && status != "draft" }
-  validates :inspection_company_name, presence: true, if: -> { status.present? && status != "draft" }
 
   # Status validations
   validates :status, inclusion: {in: %w[draft in_progress completed finalized]}, allow_blank: true
@@ -45,13 +42,14 @@ class Inspection < ApplicationRecord
   scope :finalized, -> { where(status: "finalized") }
   scope :search, ->(query) {
     if query.present?
-      joins(:unit).where("inspection_company_name LIKE ? OR place_inspected LIKE ? OR units.serial LIKE ?",
-        "%#{query}%", "%#{query}%", "%#{query}%")
+      joins(:unit).left_joins(:inspector_company)
+        .where("inspector_companies.name LIKE ? OR inspections.inspection_location LIKE ? OR units.serial LIKE ?",
+          "%#{query}%", "%#{query}%", "%#{query}%")
     end
   }
   scope :filter_by_status, ->(status) { where(status: status) if status.present? }
   scope :filter_by_date_range, ->(start_date, end_date) { where(inspection_date: start_date..end_date) if start_date.present? && end_date.present? }
-  scope :overdue, -> { where("reinspection_date < ?", Date.today) }
+  scope :overdue, -> { where("inspection_date < ?", Date.today - 1.year) }
 
   # State machine for inspection workflow
   enum :status, {
@@ -63,6 +61,12 @@ class Inspection < ApplicationRecord
 
   # Delegate methods to unit
   delegate :name, :serial, :manufacturer, to: :unit
+
+  # Calculated fields
+  def reinspection_date
+    return nil unless inspection_date.present?
+    inspection_date + 1.year
+  end
 
   # Advanced methods
   def can_be_finalized?

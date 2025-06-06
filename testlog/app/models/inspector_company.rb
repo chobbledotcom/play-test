@@ -15,8 +15,20 @@ class InspectorCompany < ApplicationRecord
   validates :address, presence: true
 
   # Scopes
-  scope :verified, -> { where(rpii_verified: true) }
   scope :active, -> { where(active: true) }
+  scope :archived, -> { where(active: false) }
+  scope :by_status, ->(status) {
+    case status&.to_s
+    when "active" then active
+    when "archived" then archived
+    when "all" then all
+    else all # Default to all companies when no parameter provided
+    end
+  }
+  scope :search_by_term, ->(term) {
+    return all if term.blank?
+    where("name LIKE ? OR rpii_registration_number LIKE ?", "%#{term}%", "%#{term}%")
+  }
 
   # Callbacks
   before_save :normalize_phone_number
@@ -24,7 +36,7 @@ class InspectorCompany < ApplicationRecord
 
   # Methods
   def has_valid_credentials?
-    rpii_registration_number.present? && rpii_verified?
+    rpii_registration_number.present?
   end
 
   def full_address
@@ -53,8 +65,7 @@ class InspectorCompany < ApplicationRecord
       passed_inspections: inspections.where(passed: true).count,
       failed_inspections: inspections.where(passed: false).count,
       pass_rate: pass_rate,
-      active_since: created_at.year,
-      verified: rpii_verified?
+      active_since: created_at.year
     }
   end
 

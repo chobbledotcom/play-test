@@ -43,12 +43,17 @@
 
     <!-- Tab Content -->
     <div class="tab-content">
-      <% if current_tab == 'general' %>
-        <%= render 'general_form' %>
+      <% case current_tab %>
+      <% when 'general' %>
+        <%= render 'form' %>
+      <% when 'user_height' %>
+        <%= render 'user_height_form' %>
+      <% when 'slide' %>
+        <%= render 'slide_form' %>
       <% else %>
         <div class="assessment-placeholder">
           <h3><%= t("inspections.tabs.#{current_tab}") %> Assessment</h3>
-          <p>This assessment form is coming soon. Currently only the General tab is implemented.</p>
+          <p>This assessment form is coming soon. Currently only the General and User Height tabs are implemented.</p>
           <p><%= link_to "Return to General", edit_inspection_path(@inspection), class: "btn btn-primary" %></p>
         </div>
       <% end %>

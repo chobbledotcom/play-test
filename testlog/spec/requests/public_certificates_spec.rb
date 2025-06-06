@@ -59,7 +59,7 @@ RSpec.describe "Public Certificates", type: :request do
         # Create inspection with Unicode characters
         unit_unicode = create(:unit, user: user, name: "Tëst Ünït 🎉", manufacturer: "Tëst Mfg")
         inspection_unicode = create(:inspection, user: user, unit: unit_unicode,
-          inspector: "José García-López", location: "Café München")
+          inspection_location: "Café München")
 
         visit "/c/#{inspection_unicode.id}"
 

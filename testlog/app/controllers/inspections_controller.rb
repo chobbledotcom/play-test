@@ -18,67 +18,78 @@ class InspectionsController < ApplicationController
   end
 
   def new
+    unless current_user.inspection_company_id.present?
+      flash[:danger] = current_user.inspection_company_required_message
+      redirect_to root_path and return
+    end
+
     unless current_user.can_create_inspection?
-      flash[:danger] = "You have reached your inspection limit of #{current_user.inspection_limit}. Please contact an administrator."
+      flash[:danger] = current_user.inspection_company_required_message
       redirect_to inspections_path and return
     end
 
     @inspection = Inspection.new
     @inspection.inspection_date = Date.today
-    @inspection.reinspection_date = Date.today + 1.year
 
     # Handle pre-selected unit
     if params[:unit_id].present?
       unit = current_user.units.find_by(id: params[:unit_id])
       if unit
         @inspection.unit_id = unit.id
-        @inspection.name = unit.name
-        @inspection.serial = unit.serial
-        @inspection.location = unit.location
-        @inspection.manufacturer = unit.manufacturer
       end
     end
   end
 
   def create
+    unless current_user.inspection_company_id.present?
+      flash[:danger] = current_user.inspection_company_required_message
+      redirect_to root_path and return
+    end
+
     unless current_user.can_create_inspection?
-      flash[:danger] = "You have reached your inspection limit of #{current_user.inspection_limit}. Please contact an administrator."
-      redirect_to inspections_path and return
+      flash[:danger] = current_user.inspection_company_required_message
+      redirect_to root_path and return
     end
 
-    params = inspection_params
+    # Handle unit_id from URL parameter (from unit show page button)
+    unit_id = params[:unit_id] || inspection_params[:unit_id]
 
-    # Securely handle unit association - unit is now required
-    if params[:unit_id].present?
-      unit = current_user.units.find_by(id: params[:unit_id])
-
-      if unit.nil?
-        # Unit ID not found or doesn't belong to user - security issue
-        flash[:danger] = "Invalid unit selection"
-        @inspection = current_user.inspections.build
-        render :new, status: :unprocessable_entity and return
-      end
-    else
-      # Unit is required
-      flash[:danger] = "Unit selection is required"
-      @inspection = current_user.inspections.build
-      render :new, status: :unprocessable_entity and return
+    unless unit_id.present?
+      flash[:danger] = I18n.t("inspections.errors.unit_required")
+      redirect_to root_path and return
     end
 
-    @inspection = current_user.inspections.build(params)
+    # Securely handle unit association
+    unit = current_user.units.find_by(id: unit_id)
+    if unit.nil?
+      flash[:danger] = I18n.t("inspections.errors.invalid_unit")
+      redirect_to root_path and return
+    end
+
+    # Create minimal inspection with just the unit and default values
+    @inspection = current_user.inspections.build(
+      unit: unit,
+      inspection_date: Date.current,
+      status: "draft",
+      inspector_company_id: current_user.inspection_company_id
+    )
 
     if @inspection.save
       if Rails.env.production?
         NtfyService.notify("new inspection by #{current_user.email}")
       end
 
-      flash_and_redirect("created")
+      flash[:success] = I18n.t("inspections.messages.created")
+      redirect_to edit_inspection_path(@inspection)
     else
-      render :new, status: :unprocessable_entity
+      flash[:danger] = I18n.t("inspections.errors.creation_failed", errors: @inspection.errors.full_messages.join(", "))
+      redirect_to unit_path(unit)
     end
   end
 
   def edit
+    # Build assessments if they don't exist yet
+    @inspection.build_user_height_assessment unless @inspection.user_height_assessment
   end
 
   def update
@@ -149,10 +160,13 @@ class InspectionsController < ApplicationController
 
   def inspection_params
     params.require(:inspection).permit(
-      :inspection_date, :reinspection_date, :inspector,
-      :location, :passed, :comments, :unit_id, :place_inspected,
-      :inspector_company_id, :rpii_registration_number,
-      :unique_report_number, :inspection_company_name, :status
+      :inspection_date, :inspection_location, :passed, :comments, :unit_id,
+      :inspector_company_id, :unique_report_number, :status,
+      user_height_assessment_attributes: [
+        :id, :containing_wall_height, :platform_height, :user_height, :permanent_roof,
+        :users_at_1000mm, :users_at_1200mm, :users_at_1500mm, :users_at_1800mm,
+        :play_area_length, :play_area_width, :negative_adjustment, :user_height_comment
+      ]
     )
   end
 
@@ -184,7 +198,7 @@ class InspectionsController < ApplicationController
   end
 
   def flash_and_redirect(action)
-    flash[:success] = "Inspection record #{action}"
+    flash[:success] = I18n.t("inspections.messages.#{action}")
     redirect_to (action == "deleted") ? inspections_path : @inspection
   end
 

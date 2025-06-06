@@ -47,17 +47,16 @@
     <%= form.text_field :country, value: @inspector_company.country || "UK" %>
 
     <header>
-      <h4><%= t('inspector_companies.headers.verification_status') %></h4>
+      <h4><%= t('inspector_companies.headers.company_status') %></h4>
     </header>
-
-    <%= form.label :rpii_verified, t('inspector_companies.forms.rpii_verified') %>
-    <%= form.check_box :rpii_verified %>
 
     <%= form.label :active, t('inspector_companies.forms.active') %>
     <%= form.check_box :active %>
 
-    <%= form.label :notes, t('inspector_companies.forms.notes') %>
-    <%= form.text_area :notes, rows: 4 %>
+    <% if current_user&.admin? %>
+      <%= form.label :notes, t('inspector_companies.forms.notes') %>
+      <%= form.text_area :notes, rows: 4 %>
+    <% end %>
 
     <%= form.label :logo, t('inspector_companies.forms.logo') %>
     <%= form.file_field :logo, accept: "image/*" %>

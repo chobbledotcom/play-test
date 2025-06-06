@@ -80,6 +80,9 @@ en:
       admin_yes: "Yes"
       admin_no: "No"
       last_active_never: "Never"
+      company_not_activated: "Your account hasn't been activated yet. Please contact an administrator to set up your inspection company."
+      company_archived: "Your inspection company has been archived. Please contact an administrator."
+      inspection_limit_reached: "Your inspection limit has been reached. Please contact an administrator."
     
     options:
       time_full: "Show Full Time"
@@ -96,6 +99,9 @@ en:
     headers:
       unit_details: "Unit Details"
       dimensions: "Dimensions (in metres)"
+      inspection_history: "Inspection History"
+      qr_code: "Certificate QR Code"
+      certificate_link: "Certificate PDF Link"
     
     forms:
       name: "Unit Name"
@@ -134,6 +140,8 @@ en:
       create: "Create Unit"
       update: "Update Unit"
       delete: "Delete"
+      pdf_report: "PDF Report"
+      add_inspection: "Add Inspection"
     
     validations:
       name_blank: "Name can't be blank"
@@ -151,6 +159,13 @@ en:
       length_range: "Length must be less than 200"
       height_range: "Height must be greater than 0"
       save_error: "Did not save"
+    
+    messages:
+      add_inspection_confirm: "Create a new inspection for this unit?"
+      no_inspections: "No inspections recorded for this unit."
+    
+    accessibility:
+      qr_code_alt: "QR Code for Equipment Certificate"
 
   # Inspector Companies Management
   inspector_companies:
@@ -163,7 +178,7 @@ en:
     headers:
       company_details: "Company Details"
       contact_information: "Contact Information"
-      verification_status: "Verification Status"
+      company_status: "Company Status"
       company_statistics: "Company Statistics"
       recent_inspections: "Recent Inspections"
     
@@ -177,23 +192,23 @@ en:
       state: "State"
       postal_code: "Postal Code"
       country: "Country"
-      rpii_verified: "RPII Verified"
       active: "Active"
       notes: "Notes"
       logo: "Company Logo"
     
     status:
-      verified: "Verified"
-      not_verified: "Not Verified"
       active: "Active"
       archived: "Archived"
       yes: "Yes"
       no: "No"
+      valid_credentials: "Valid Credentials"
+      invalid_credentials: "Invalid Credentials"
     
     buttons:
       create: "Create Company"
       update: "Update Company"
       archive: "Archive"
+      unarchive: "Unarchive"
       search: "Search"
       new_company: "New Company"
     
@@ -201,13 +216,14 @@ en:
       created: "Inspector company created successfully."
       updated: "Inspector company updated successfully."
       archived: "Inspector company archived successfully."
+      unarchived: "Inspector company unarchived successfully."
       not_found: "Inspector company not found."
       unauthorized: "You are not authorized to access this page"
       no_companies: "No inspector companies found"
     
     search:
       placeholder: "Search by name or RPII number..."
-      verified_filter: "Show verified only"
+      active_filter: "Active Filter"
     
     statistics:
       total_inspections: "Total Inspections"
@@ -215,7 +231,6 @@ en:
       failed_inspections: "Failed"
       pass_rate: "Pass Rate"
       active_since: "Active Since"
-      verification_status: "Verification"
 
   # Background Jobs
   jobs:
@@ -238,7 +253,7 @@ en:
       fields:
         serial_number: "Serial Number"
         manufacturer: "Manufacturer"
-        location: "Location"
+        inspection_location: "Location of Inspection"
         inspection_date: "Inspection Date"
         reinspection_due: "Re-inspection Due"
         inspector: "Inspector"
@@ -286,7 +301,7 @@ en:
         name: "Name"
         serial_number: "Serial Number"
         manufacturer: "Manufacturer"
-        location: "Location"
+        inspection_location: "Location of Inspection"
         next_inspection_due: "Next Inspection Due"
         not_specified: "Not specified"
         date: "Date"
@@ -354,8 +369,7 @@ en:
       progress: "Progress"
       name: "Name"
       manufacturer: "Manufacturer"
-      location: "Location"
-      place_inspected: "Place Inspected"
+      inspection_location: "Location of Inspection"
       inspection_date: "Inspection Date"
       reinspection_date: "Reinspection Date"
       inspector: "Inspector Name"
@@ -367,6 +381,11 @@ en:
       overall_result: "Overall Result"
       pass: "Pass"
       comments: "Comments"
+      calculated_after_save: "Will be calculated after saving"
+      reinspection_date_help: "Automatically calculated as one year after inspection date"
+      inspector_help: "Determined by the user performing the inspection"
+      rpii_help: "From the selected inspector company"
+      not_available: "Not Available"
     
     status:
       draft: "Draft"
@@ -378,21 +397,72 @@ en:
       create: "Create Inspection"
       update: "Update Inspection"
       delete: "Delete Inspection"
+      cancel: "Cancel"
+      create_and_continue: "Create and Continue"
+      add_via_units: "Add Inspection (Select Unit First)"
+      save_assessment: "Save Assessment"
     
     messages:
       no_unit: "No unit selected"
       not_specified: "Not specified"
       delete_confirm: "Are you sure you want to delete this inspection?"
+      created: "Inspection created successfully. Please complete the details below."
+      updated: "Inspection updated successfully."
+      deleted: "Inspection deleted successfully."
     
     errors:
       header:
         one: "Did not save. Fix this %{count} error and try again:"
         other: "Did not save. Fix these %{count} errors and try again:"
+      unit_required: "Unit selection is required"
+      invalid_unit: "Invalid unit selection"
+      creation_failed: "Failed to create inspection: %{errors}"
     
     autosave:
       saving: "Saving..."
       saved: "Saved"
       error: "Error saving"
+    
+    assessments:
+      user_height:
+        title: "User Height Assessment"
+        sections:
+          height_measurements: "Height Measurements"
+          user_capacity: "User Capacity"
+          play_area: "Play Area"
+          safety_status: "Safety Status"
+        fields:
+          containing_wall_height: "Containing Wall Height"
+          platform_height: "Platform Height"
+          user_height: "User Height"
+          permanent_roof: "Has Permanent Roof"
+          users_at_1000mm: "Users at 1000mm"
+          users_at_1200mm: "Users at 1200mm"
+          users_at_1500mm: "Users at 1500mm"
+          users_at_1800mm: "Users at 1800mm"
+          total_capacity: "Total Capacity"
+          play_area_length: "Play Area Length"
+          play_area_width: "Play Area Width"
+          negative_adjustment: "Negative Adjustment"
+          comments: "Comments"
+        placeholders:
+          height: "Enter height in meters"
+          user_count: "Number of users"
+          dimension: "Enter dimension in meters"
+          comments: "Add any additional notes or observations"
+        hints:
+          containing_wall_height: "Height of the containing wall from ground level (meters)"
+          platform_height: "Height of the platform from ground level (meters)"
+          user_height: "Maximum user height allowed (meters)"
+          permanent_roof: "Check if the unit has a permanent roof structure"
+          play_area_dimension: "Internal dimensions of the play area (meters)"
+          negative_adjustment: "Area deduction for obstacles or unusable space (square meters)"
+        status:
+          height_requirement: "Height Requirement"
+          checks_passed: "Safety Checks Passed"
+          completion: "Assessment Completion"
+          pass: "Pass"
+          fail: "Fail"
 
   # General UI
   ui:

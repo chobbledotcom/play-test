@@ -27,6 +27,10 @@
   <% if current_user.admin? %>
     <%= form.label :inspection_limit %>
     <%= form.number_field :inspection_limit, min: 0 %>
+
+    <%= form.label :inspection_company_id, "Inspection Company" %>
+    <%= form.collection_select :inspection_company_id, InspectorCompany.active.order(:name), :id, :name, 
+        { prompt: "Select inspection company..." }, { class: "form-control" } %>
   <% end %>
 
   <%= form.submit "Update User" %>

@@ -30,8 +30,8 @@ RSpec.describe "Units PDF Generation", type: :request do
 
     it "handles unit with inspections in PDF" do
       # Create inspections for the unit
-      create(:inspection, user: user, unit: unit, passed: true, inspector: "John Inspector")
-      create(:inspection, user: user, unit: unit, passed: false, inspector: "Jane Inspector")
+      create(:inspection, user: user, unit: unit, passed: true)
+      create(:inspection, user: user, unit: unit, passed: false)
 
       visit unit_path(unit)
       click_link "PDF Report"

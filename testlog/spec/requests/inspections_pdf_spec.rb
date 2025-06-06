@@ -51,8 +51,8 @@ RSpec.describe "Inspections PDF Generation", type: :request do
       inspection = create(:inspection,
         user: user,
         unit: unit,
-        inspector: "PDF #{extremely_long_text}",
-        location: "Long location #{extremely_long_text}",
+
+        inspection_location: "Long location #{extremely_long_text}",
         passed: true,
         comments: extremely_long_text)
 
@@ -103,8 +103,8 @@ RSpec.describe "Inspections PDF Generation", type: :request do
       inspection = create(:inspection,
         user: user,
         unit: unit,
-        inspector: "<script>alert('XSS')</script>",
-        location: "<div style='color:red'>Red Location</div>",
+
+        inspection_location: "<div style='color:red'>Red Location</div>",
         passed: true,
         comments: "<h1>Big Title</h1><p>Paragraph</p><a href='http://example.com'>Link</a>")
 
@@ -126,8 +126,8 @@ RSpec.describe "Inspections PDF Generation", type: :request do
       inspection = create(:inspection,
         user: user,
         unit: unit,
-        inspector: "Precision Tester PDF",
-        location: "Calibration Lab",
+
+        inspection_location: "Calibration Lab",
         passed: true,
         comments: "Extreme precision test")
 

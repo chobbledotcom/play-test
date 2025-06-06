@@ -40,6 +40,7 @@ class UnitsController < ApplicationController
     @unit = current_user.units.build(unit_params)
 
     if @unit.save
+      process_photo_if_present
       flash[:success] = "Equipment record created"
       redirect_to @unit
     else
@@ -52,6 +53,7 @@ class UnitsController < ApplicationController
 
   def update
     if @unit.update(unit_params)
+      process_photo_if_present
       flash[:success] = "Equipment record updated"
       redirect_to @unit
     else
@@ -118,8 +120,15 @@ class UnitsController < ApplicationController
   def check_unit_owner
     unless @unit.user_id == current_user.id
       flash[:danger] = "Access denied"
-      redirect_to root_path and return
+      redirect_to units_path and return
     end
+  end
+
+  def process_photo_if_present
+    nil unless @unit.photo.attached?
+
+    # The ImageProcessorService will handle resizing when the image is displayed
+    # No need to process here as Rails Active Storage handles variants on demand
   end
 
   def unit_to_csv

@@ -134,7 +134,7 @@ RSpec.describe "Units", type: :request do
         other_unit = create(:unit)
 
         visit unit_path(other_unit)
-        expect(page).to have_current_path(root_path)
+        expect(page).to have_current_path(units_path)
         expect(page).to have_content("Access denied")
       end
     end
@@ -245,7 +245,7 @@ RSpec.describe "Units", type: :request do
         other_unit = create(:unit)
 
         visit edit_unit_path(other_unit)
-        expect(page).to have_current_path(root_path)
+        expect(page).to have_current_path(units_path)
         expect(page).to have_content("Access denied")
       end
     end
@@ -280,7 +280,7 @@ RSpec.describe "Units", type: :request do
         other_unit = create(:unit)
 
         visit edit_unit_path(other_unit)
-        expect(page).to have_current_path(root_path)
+        expect(page).to have_current_path(units_path)
         expect(page).to have_content("Access denied")
       end
     end
@@ -308,7 +308,7 @@ RSpec.describe "Units", type: :request do
         other_unit = create(:unit)
 
         visit unit_path(other_unit)
-        expect(page).to have_current_path(root_path)
+        expect(page).to have_current_path(units_path)
         expect(page).to have_content("Access denied")
       end
     end

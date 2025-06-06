@@ -1,5 +1,5 @@
 <article class="view-unit">
-  <header><h2>Unit Details</h2></header>  
+  <header><h2><%= t('units.titles.show') %></h2></header>  
   
   <%= render 'unit_details', unit: @unit %>
 
@@ -9,20 +9,20 @@
 
   <hr>
 
-  <h4>Inspection History</h4>
+  <h4><%= t('units.headers.inspection_history') %></h4>
   <% if @inspections.any? %>
     <%= render 'inspection_history_table', inspections: @inspections, unit: @unit %>
   <% else %>
-    <p>No inspections recorded for this unit.</p>
+    <p><%= t('units.messages.no_inspections') %></p>
   <% end %>
 
   <hr>
 
-  <h4>Certificate QR Code</h4>
-  <%= image_tag qr_code_unit_path(@unit), alt: "QR Code for Equipment Certificate", width: 250 %>
+  <h4><%= t('units.headers.qr_code') %></h4>
+  <%= image_tag qr_code_unit_path(@unit), alt: t('units.accessibility.qr_code_alt'), width: 250 %>
 
   <hr>
 
-  <h4>Certificate PDF Link</h4>
+  <h4><%= t('units.headers.certificate_link') %></h4>
   <%= link_to short_unit_certificate_url(@unit), short_unit_certificate_url(@unit) %>
 </article>

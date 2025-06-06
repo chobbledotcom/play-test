@@ -56,11 +56,7 @@ RSpec.describe "Sessions", type: :feature do
 
   describe "Successful login" do
     it "authenticates user and redirects to root" do
-      visit "/login"
-
-      fill_in I18n.t("session.login.email_label"), with: user.email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
-      click_button I18n.t("session.login.submit")
+      login_user_via_form(user)
 
       expect(page).to have_current_path(root_path)
       expect(page).to have_content(I18n.t("session.login.success"))
@@ -70,7 +66,7 @@ RSpec.describe "Sessions", type: :feature do
       visit "/login"
 
       fill_in I18n.t("session.login.email_label"), with: user.email.upcase
-      fill_in I18n.t("session.login.password_label"), with: "password123"
+      fill_in I18n.t("session.login.password_label"), with: user.password
       click_button I18n.t("session.login.submit")
 
       expect(page).to have_current_path(root_path)
@@ -81,7 +77,7 @@ RSpec.describe "Sessions", type: :feature do
       visit "/login"
 
       fill_in I18n.t("session.login.email_label"), with: user.email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
+      fill_in I18n.t("session.login.password_label"), with: user.password
       check I18n.t("session.login.remember_me")
       click_button I18n.t("session.login.submit")
 
@@ -93,7 +89,7 @@ RSpec.describe "Sessions", type: :feature do
       visit "/login"
 
       fill_in I18n.t("session.login.email_label"), with: user.email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
+      fill_in I18n.t("session.login.password_label"), with: user.password
       uncheck I18n.t("session.login.remember_me")
       click_button I18n.t("session.login.submit")
 
@@ -105,7 +101,7 @@ RSpec.describe "Sessions", type: :feature do
       # First login
       visit "/login"
       fill_in I18n.t("session.login.email_label"), with: user.email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
+      fill_in I18n.t("session.login.password_label"), with: user.password
       click_button I18n.t("session.login.submit")
 
       expect(page).to have_current_path(root_path)
@@ -113,7 +109,7 @@ RSpec.describe "Sessions", type: :feature do
       # Login again
       visit "/login"
       fill_in I18n.t("session.login.email_label"), with: user.email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
+      fill_in I18n.t("session.login.password_label"), with: user.password
       click_button I18n.t("session.login.submit")
 
       expect(page).to have_current_path(root_path)
@@ -137,7 +133,7 @@ RSpec.describe "Sessions", type: :feature do
       visit "/login"
 
       fill_in I18n.t("session.login.email_label"), with: "nonexistent@example.com"
-      fill_in I18n.t("session.login.password_label"), with: "password123"
+      fill_in I18n.t("session.login.password_label"), with: user.password
       click_button I18n.t("session.login.submit")
 
       expect(page).to have_current_path("/login")
@@ -148,7 +144,7 @@ RSpec.describe "Sessions", type: :feature do
       visit "/login"
 
       fill_in I18n.t("session.login.email_label"), with: ""
-      fill_in I18n.t("session.login.password_label"), with: "password123"
+      fill_in I18n.t("session.login.password_label"), with: user.password
       click_button I18n.t("session.login.submit")
 
       expect(page).to have_current_path("/login")
@@ -183,7 +179,7 @@ RSpec.describe "Sessions", type: :feature do
       before do
         visit "/login"
         fill_in I18n.t("session.login.email_label"), with: user.email
-        fill_in I18n.t("session.login.password_label"), with: "password123"
+        fill_in I18n.t("session.login.password_label"), with: user.password
         check I18n.t("session.login.remember_me")
         click_button I18n.t("session.login.submit")
       end
@@ -221,7 +217,7 @@ RSpec.describe "Sessions", type: :feature do
 
       # Try with non-existent email
       fill_in I18n.t("session.login.email_label"), with: "nonexistent@example.com"
-      fill_in I18n.t("session.login.password_label"), with: "password123"
+      fill_in I18n.t("session.login.password_label"), with: user.password
       click_button I18n.t("session.login.submit")
 
       expect(page).to have_content(I18n.t("session.login.error"))
@@ -240,7 +236,7 @@ RSpec.describe "Sessions", type: :feature do
 
       visit "/login"
       fill_in I18n.t("session.login.email_label"), with: mixed_case_email
-      fill_in I18n.t("session.login.password_label"), with: "password123"
+      fill_in I18n.t("session.login.password_label"), with: user.password
       click_button I18n.t("session.login.submit")
 
       expect(page).to have_current_path(root_path)

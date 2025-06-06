@@ -18,8 +18,8 @@
     <td><%= @inspection.manufacturer %></td>
   </tr>
   <tr>
-    <th>Location:</th>
-    <td><%= @inspection.location %></td>
+    <th><%= t('inspections.fields.inspection_location') %>:</th>
+    <td><%= @inspection.inspection_location %></td>
   </tr>
   <tr>
     <th>Inspection Date:</th>
@@ -31,7 +31,7 @@
   </tr>
   <tr>
     <th>Inspector:</th>
-    <td><%= @inspection.inspector %></td>
+    <td><%= @inspection.inspector_company.name %></td>
   </tr>
   <tr>
     <th>Overall Result:</th>

@@ -3,7 +3,7 @@
     <tr>
       <th>Name</th>
       <th>Serial</th>
-      <th>Location</th>
+      <th><%= t('inspections.fields.inspection_location') %></th>
       <th>Last Inspection</th>
       <th>Next Due</th>
       <th>Result</th>
@@ -19,10 +19,14 @@
         <td>
           <%= link_to inspection.serial.presence || "Missing", inspection_path(inspection) %>
         </td>
-        <td><%= inspection.location %></td>
+        <td><%= inspection.inspection_location %></td>
         <td><%= render_time(inspection.inspection_date) %></td>
         <td><%= render_time(inspection.reinspection_date) %></td>
         <td><%= inspection_result_badge(inspection) %></td>
+        <td>
+          <%= link_to "Edit", edit_inspection_path(inspection), class: "btn btn-primary btn-sm" %>
+          <%= link_to "Certificate", certificate_inspection_path(inspection), class: "btn btn-secondary btn-sm", target: "_blank" %>
+        </td>
       </tr>
     <% end %>
   </tbody>

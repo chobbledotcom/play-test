@@ -8,12 +8,10 @@ RSpec.describe "Inspections", type: :request do
   let(:valid_inspection_attributes) do
     {
       inspection_date: Date.today,
-      reinspection_date: Date.today + 1.year,
-      inspector: "Test Inspector",
-      location: "Test Location",
-      place_inspected: "Test Facility",
+      inspection_location: "Test Location",
       passed: true,
-      comments: "Test comments"
+      comments: "Test comments",
+      status: "draft"
     }
   end
 
@@ -75,7 +73,7 @@ RSpec.describe "Inspections", type: :request do
 
   describe "user_id association" do
     before do
-      post "/login", params: {session: {email: user.email, password: "password123"}}
+      login_as(user)
     end
 
     it "assigns the current user's ID when creating a new inspection" do
@@ -109,12 +107,12 @@ RSpec.describe "Inspections", type: :request do
 
       # Try to change the user_id during update
       patch "/inspections/#{inspection.id}", params: {
-        inspection: {location: "Updated Location", user_id: other_user.id}
+        inspection: {inspection_location: "Updated Location", user_id: other_user.id}
       }
 
       # Verify the location updated but not the user_id
       inspection.reload
-      expect(inspection.location).to eq("Updated Location")
+      expect(inspection.inspection_location).to eq("Updated Location")
       expect(inspection.user_id).to eq(user.id)
       expect(inspection.user_id).not_to eq(other_user.id)
     end
@@ -130,7 +128,7 @@ RSpec.describe "Inspections", type: :request do
 
     it "only shows the current user's inspections in the index" do
       # Log in as the first user
-      post "/login", params: {session: {email: user.email, password: "password123"}}
+      login_as(user)
 
       get "/inspections"
       expect(response).to have_http_status(:success)
@@ -142,7 +140,7 @@ RSpec.describe "Inspections", type: :request do
 
     it "prevents viewing another user's inspection" do
       # Log in as the first user
-      post "/login", params: {session: {email: user.email, password: "password123"}}
+      login_as(user)
 
       # Try to view another user's inspection
       get "/inspections/#{@other_inspection.id}"
@@ -154,7 +152,7 @@ RSpec.describe "Inspections", type: :request do
 
     it "prevents editing another user's inspection" do
       # Log in as the first user
-      post "/login", params: {session: {email: user.email, password: "password123"}}
+      login_as(user)
 
       # Try to edit another user's inspection
       get "/inspections/#{@other_inspection.id}/edit"
@@ -166,7 +164,7 @@ RSpec.describe "Inspections", type: :request do
 
     it "prevents updating another user's inspection" do
       # Log in as the first user
-      post "/login", params: {session: {email: user.email, password: "password123"}}
+      login_as(user)
 
       # Try to update another user's inspection
       patch "/inspections/#{@other_inspection.id}", params: {
@@ -184,7 +182,7 @@ RSpec.describe "Inspections", type: :request do
 
     it "prevents deleting another user's inspection" do
       # Log in as the first user
-      post "/login", params: {session: {email: user.email, password: "password123"}}
+      login_as(user)
 
       # Try to delete another user's inspection
       delete "/inspections/#{@other_inspection.id}"
@@ -200,7 +198,7 @@ RSpec.describe "Inspections", type: :request do
 
   describe "when logged in" do
     before do
-      post "/login", params: {session: {email: user.email, password: "password123"}}
+      login_as(user)
     end
 
     describe "GET /index" do
@@ -212,7 +210,7 @@ RSpec.describe "Inspections", type: :request do
 
     describe "GET /show" do
       it "returns http success for own inspection" do
-        inspection = Inspection.create!(valid_inspection_attributes.merge(user: user, unit: unit))
+        inspection = create(:inspection, user: user, unit: unit)
 
         get "/inspections/#{inspection.id}"
         expect(response).to have_http_status(:success)
@@ -221,7 +219,7 @@ RSpec.describe "Inspections", type: :request do
 
     describe "GET /edit" do
       it "returns http success for own inspection" do
-        inspection = Inspection.create!(valid_inspection_attributes.merge(user: user, unit: unit))
+        inspection = create(:inspection, user: user, unit: unit)
 
         get "/inspections/#{inspection.id}/edit"
         expect(response).to have_http_status(:success)
@@ -262,13 +260,10 @@ RSpec.describe "Inspections", type: :request do
 
     describe "PATCH /update" do
       it "updates own inspection and redirects" do
-        inspection = Inspection.create!(valid_inspection_attributes.merge(
-          user: user,
-          unit: unit
-        ))
+        inspection = create(:inspection, user: user, unit: unit)
 
         patch "/inspections/#{inspection.id}", params: {
-          inspection: {location: "Updated Location"}
+          inspection: {inspection_location: "Updated Location"}
         }
 
         expect(response).to have_http_status(:redirect)
@@ -277,17 +272,83 @@ RSpec.describe "Inspections", type: :request do
 
         # Verify the inspection was updated
         inspection.reload
-        expect(inspection.location).to eq("Updated Location")
+        expect(inspection.inspection_location).to eq("Updated Location")
         expect(inspection.user_id).to eq(user.id)
+      end
+
+      it "updates inspection with user height assessment attributes" do
+        inspection = create(:inspection, user: user, unit: unit)
+
+        patch "/inspections/#{inspection.id}", params: {
+          inspection: {
+            inspection_location: "Updated Location",
+            user_height_assessment_attributes: {
+              containing_wall_height: 2.5,
+              platform_height: 1.0,
+              user_height: 1.8,
+              permanent_roof: true,
+              users_at_1000mm: 5,
+              users_at_1200mm: 4,
+              users_at_1500mm: 3,
+              users_at_1800mm: 2,
+              play_area_length: 10.0,
+              play_area_width: 8.0,
+              negative_adjustment: 2.0,
+              user_height_comment: "Test assessment comment"
+            }
+          }
+        }
+
+        expect(response).to have_http_status(:redirect)
+        follow_redirect!
+        expect(response).to have_http_status(:success)
+
+        # Verify the inspection and assessment were updated
+        inspection.reload
+        expect(inspection.inspection_location).to eq("Updated Location")
+
+        # Verify user height assessment was created
+        assessment = inspection.user_height_assessment
+        expect(assessment).to be_present
+        expect(assessment.containing_wall_height).to eq(2.5)
+        expect(assessment.platform_height).to eq(1.0)
+        expect(assessment.user_height).to eq(1.8)
+        expect(assessment.permanent_roof).to be true
+        expect(assessment.users_at_1000mm).to eq(5)
+        expect(assessment.users_at_1200mm).to eq(4)
+        expect(assessment.users_at_1500mm).to eq(3)
+        expect(assessment.users_at_1800mm).to eq(2)
+        expect(assessment.play_area_length).to eq(10.0)
+        expect(assessment.play_area_width).to eq(8.0)
+        expect(assessment.negative_adjustment).to eq(2.0)
+        expect(assessment.user_height_comment).to eq("Test assessment comment")
+      end
+
+      it "updates existing user height assessment" do
+        inspection = create(:inspection, user: user, unit: unit)
+        assessment = create(:user_height_assessment, inspection: inspection, containing_wall_height: 1.5)
+
+        patch "/inspections/#{inspection.id}", params: {
+          inspection: {
+            user_height_assessment_attributes: {
+              id: assessment.id,
+              containing_wall_height: 3.0
+            }
+          }
+        }
+
+        expect(response).to have_http_status(:redirect)
+
+        # Verify the assessment was updated, not recreated
+        inspection.reload
+        expect(inspection.user_height_assessment.id).to eq(assessment.id)
+        expect(inspection.user_height_assessment.containing_wall_height).to eq(3.0)
       end
     end
 
     describe "DELETE /destroy" do
       it "deletes own inspection and redirects" do
-        inspection = Inspection.create!(valid_inspection_attributes.merge(
-          user: user,
-          unit: unit
-        ))
+        inspection = create(:inspection, user: user, unit: unit)
 
         delete "/inspections/#{inspection.id}"
 

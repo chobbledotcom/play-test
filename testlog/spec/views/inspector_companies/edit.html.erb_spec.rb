@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "inspector_companies/edit", type: :view do
   let(:admin_user) { create(:user, :admin) }
 
-  let(:inspector_company) { create(:inspector_company, user: admin_user) }
+  let(:inspector_company) { create(:inspector_company) }
 
   before do
     assign(:inspector_company, inspector_company)
@@ -33,7 +33,6 @@ RSpec.describe "inspector_companies/edit", type: :view do
     render
 
     expect(rendered).to include('type="checkbox"')
-    expect(rendered).to include('name="inspector_company[rpii_verified]"')
     expect(rendered).to include('name="inspector_company[active]"')
   end
 
@@ -44,11 +43,19 @@ RSpec.describe "inspector_companies/edit", type: :view do
     expect(rendered).to include("Update Company")
   end
 
+  it "includes admin-only notes field" do
+    inspector_company.update!(notes: "Existing notes")
+    render
+
+    expect(rendered).to have_content(I18n.t("inspector_companies.forms.notes"))
+    expect(rendered).to have_field("inspector_company[notes]", with: "Existing notes")
+  end
+
   it "includes archive action" do
     render
 
     expect(rendered).to include("Archive")
-    expect(rendered).to include('data-confirm="Are you sure')
+    expect(rendered).to include('data-turbo-confirm="Are you sure')
   end
 
   context "when company has existing logo" do

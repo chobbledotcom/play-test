@@ -4,7 +4,7 @@ RSpec.describe "inspector_companies/show", type: :view do
   let(:admin_user) { create(:user, :admin) }
   let(:regular_user) { create(:user) }
 
-  let(:inspector_company) { create(:inspector_company, user: admin_user) }
+  let(:inspector_company) { create(:inspector_company) }
 
   let(:company_stats) do
     {
@@ -40,10 +40,10 @@ RSpec.describe "inspector_companies/show", type: :view do
       expect(rendered).to include("UK")
     end
 
-    it "shows verification status" do
+    it "shows credentials status" do
       render
 
-      expect(rendered).to include("Not Verified")
+      expect(rendered).to include("Valid Credentials")
     end
 
     it "shows admin action links" do
@@ -63,11 +63,19 @@ RSpec.describe "inspector_companies/show", type: :view do
       expect(rendered).to include("2023") # active since
     end
 
-    it "shows notes when present" do
-      inspector_company.update!(notes: "Test notes")
+    it "shows notes field and content when present" do
+      inspector_company.update!(notes: "Test admin notes")
       render
 
-      expect(rendered).to include("Test notes")
+      expect(rendered).to have_content(I18n.t("inspector_companies.forms.notes"))
+      expect(rendered).to include("Test admin notes")
+    end
+
+    it "does not show notes section when notes are empty" do
+      inspector_company.update!(notes: "")
+      render
+
+      expect(rendered).not_to have_content(I18n.t("inspector_companies.forms.notes"))
     end
   end
 
@@ -83,6 +91,21 @@ RSpec.describe "inspector_companies/show", type: :view do
       expect(rendered).not_to include("Edit")
       expect(rendered).not_to include("Archive")
     end
+
+    it "does not show notes field even when notes are present" do
+      inspector_company.update!(notes: "Secret admin notes")
+      render
+
+      expect(rendered).not_to have_content(I18n.t("inspector_companies.forms.notes"))
+      expect(rendered).not_to include("Secret admin notes")
+    end
+
+    it "does not show notes field when notes are empty" do
+      inspector_company.update!(notes: "")
+      render
+
+      expect(rendered).not_to have_content(I18n.t("inspector_companies.forms.notes"))
+    end
   end
 
   context "when company has recent inspections" do
@@ -94,7 +117,7 @@ RSpec.describe "inspector_companies/show", type: :view do
           unit: test_unit,
           inspector_company: inspector_company,
           inspection_date: Date.current,
-          location: "Test Location",
+          inspection_location: "Test Location",
           passed: true)
       ]
     end

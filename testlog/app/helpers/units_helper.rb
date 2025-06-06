@@ -10,23 +10,26 @@ module UnitsHelper
   def unit_actions(unit)
     [
       {
-        label: "Edit",
+        label: I18n.t("ui.edit"),
         url: edit_unit_path(unit)
       },
       {
-        label: "PDF Report",
+        label: I18n.t("units.buttons.pdf_report"),
         url: certificate_unit_path(unit),
         target: "_blank"
       },
       {
-        label: "Delete",
+        label: I18n.t("units.buttons.delete"),
         url: unit,
         method: :delete,
         danger: true
       },
       {
-        label: "Add Inspection",
-        url: new_inspection_path(unit_id: unit.id)
+        label: I18n.t("units.buttons.add_inspection"),
+        url: inspections_path,
+        method: :post,
+        params: {unit_id: unit.id},
+        confirm: I18n.t("units.messages.add_inspection_confirm")
       }
     ]
   end

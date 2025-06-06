@@ -25,7 +25,7 @@ Rails.application.routes.draw do
   end
 
   # Inspections
-  resources :inspections do
+  resources :inspections, except: [:new] do
     collection do
       get "search"
       get "overdue"
@@ -51,6 +51,7 @@ Rails.application.routes.draw do
   resources :inspector_companies, except: [:destroy] do
     member do
       patch "archive"
+      patch "unarchive"
     end
   end
 

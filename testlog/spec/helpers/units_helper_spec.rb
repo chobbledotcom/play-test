@@ -114,7 +114,9 @@ RSpec.describe UnitsHelper, type: :helper do
       inspection_action = actions.find { |a| a[:label] == "Add Inspection" }
 
       expect(inspection_action).to be_present
-      expect(inspection_action[:url]).to eq(new_inspection_path(unit_id: unit.id))
+      expect(inspection_action[:url]).to eq(inspections_path)
+      expect(inspection_action[:method]).to eq(:post)
+      expect(inspection_action[:params]).to eq({unit_id: unit.id})
     end
   end
 end

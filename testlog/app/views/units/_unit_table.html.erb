@@ -1,6 +1,7 @@
 <%= scrollable_table(class: "data-table") do %>
   <thead>
     <tr>
+      <th>Photo</th>
       <th>Name</th>
       <th>Manufacturer</th>
       <th>Serial Number</th>
@@ -10,6 +11,13 @@
   <tbody>
     <% unit.each do |item| %>
       <tr>
+        <td>
+          <% if item.photo.attached? %>
+            <%= image_tag ImageProcessorService.process(item.photo, 60), style: "width: 60px; height: 60px; object-fit: cover;" %>
+          <% else %>
+            <span style="color: #ccc;">No photo</span>
+          <% end %>
+        </td>
         <td><%= link_to item.name, item %></td>
         <td><%= link_to item.manufacturer, units_path(manufacturer: item.manufacturer) %></td>
         <td><%= item.serial %></td>

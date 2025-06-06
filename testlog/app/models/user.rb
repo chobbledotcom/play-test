@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_secure_password
   has_many :inspections, dependent: :destroy
   has_many :units, dependent: :destroy
+  belongs_to :inspection_company, class_name: "InspectorCompany", optional: true
 
   validates :email, presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
   validates :password, presence: true, length: {minimum: 6}, if: :password_digest_changed?
@@ -15,7 +16,15 @@ class User < ApplicationRecord
   before_save :downcase_email
 
   def can_create_inspection?
-    inspection_limit == -1 || inspections.count < inspection_limit
+    has_inspection_company? &&
+      inspection_company_active? &&
+      within_inspection_limit?
+  end
+
+  def inspection_company_required_message
+    return I18n.t("users.messages.company_not_activated") unless has_inspection_company?
+    return I18n.t("users.messages.company_archived") unless inspection_company_active?
+    I18n.t("users.messages.inspection_limit_reached")
   end
 
   def admin?
@@ -31,6 +40,18 @@ class User < ApplicationRecord
   end
 
   private
+
+  def has_inspection_company?
+    inspection_company_id.present?
+  end
+
+  def inspection_company_active?
+    inspection_company&.active?
+  end
+
+  def within_inspection_limit?
+    inspection_limit == -1 || inspections.count < inspection_limit
+  end
 
   def downcase_email
     self.email = email.downcase

@@ -1,17 +1,14 @@
 require "rails_helper"
 
 RSpec.feature "Inspection Tabbed Editing", type: :feature do
-  let(:user) { create(:user) }
+  let(:inspector_company) { create(:inspector_company, active: true) }
+  let(:user) { create(:user, inspection_company: inspector_company) }
   let(:unit) { create(:unit, user: user) }
-  let(:inspector_company) { create(:inspector_company, user: user, rpii_verified: true, active: true) }
-  let(:inspection) { create(:inspection, user: user, unit: unit) }
+  let(:inspection) { create(:inspection, :in_progress, user: user, unit: unit, inspector_company: inspector_company) }
 
   before do
     # Login as the user
-    visit login_path
-    fill_in I18n.t("session.login.email_label"), with: user.email
-    fill_in I18n.t("session.login.password_label"), with: "password123"
-    click_button I18n.t("session.login.submit")
+    login_user_via_form(user)
   end
 
   describe "tabbed layout" do
@@ -57,9 +54,9 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       click_link I18n.t("inspections.tabs.user_height")
       expect(current_url).to include("tab=user_height")
       expect(page).to have_content("Assessment")
-      expect(page).to have_content("coming soon")
+      expect(page).to have_content("User Height Assessment")
 
-      click_link "Return to General"
+      click_link I18n.t("inspections.tabs.general")
       expect(page).to have_css(".tab-link.active", text: I18n.t("inspections.tabs.general"))
     end
   end
@@ -73,18 +70,16 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
     it "displays all general form fields" do
       expect(page).to have_field(I18n.t("inspections.fields.unit_select"))
-      expect(page).to have_field(I18n.t("inspections.fields.location"))
-      expect(page).to have_field(I18n.t("inspections.fields.place_inspected"))
+      expect(page).to have_field(I18n.t("inspections.fields.inspection_location"))
       expect(page).to have_field(I18n.t("inspections.fields.inspection_date"))
-      expect(page).to have_field(I18n.t("inspections.fields.reinspection_date"))
-      expect(page).to have_field(I18n.t("inspections.fields.inspector"))
-      expect(page).to have_field(I18n.t("inspections.fields.inspector_company"))
-      expect(page).to have_field(I18n.t("inspections.fields.rpii_registration_number"))
       expect(page).to have_field(I18n.t("inspections.fields.unique_report_number"))
-      expect(page).to have_field(I18n.t("inspections.fields.inspection_company_name"))
       expect(page).to have_field(I18n.t("inspections.fields.status"))
       expect(page).to have_field(I18n.t("inspections.fields.pass"))
       expect(page).to have_field(I18n.t("inspections.fields.comments"))
+
+      # These are read-only calculated fields, not form inputs
+      expect(page).to have_content(I18n.t("inspections.fields.reinspection_date"))
+      expect(page).to have_content(I18n.t("inspections.fields.inspector_company"))
     end
 
     it "displays current unit details when unit is selected" do
@@ -95,37 +90,23 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     end
 
     it "can update basic inspection fields" do
-      fill_in I18n.t("inspections.fields.inspector"), with: "Updated Inspector Name"
-      fill_in I18n.t("inspections.fields.location"), with: "Updated Location"
+      fill_in I18n.t("inspections.fields.inspection_location"), with: "Updated Location"
       fill_in I18n.t("inspections.fields.comments"), with: "Updated comments"
 
       click_button I18n.t("inspections.buttons.update")
 
-      expect(page).to have_content("Inspection record updated")
+      expect(page).to have_content(I18n.t("inspections.messages.updated"))
 
       inspection.reload
-      expect(inspection.inspector).to eq("Updated Inspector Name")
-      expect(inspection.location).to eq("Updated Location")
+      expect(inspection.inspection_location).to eq("Updated Location")
       expect(inspection.comments).to eq("Updated comments")
     end
 
-    it "can select inspector company from dropdown" do
-      # Verify the inspector company dropdown is present
-      expect(page).to have_field(I18n.t("inspections.fields.inspector_company"))
-      
-      # Check that the company exists and is active
-      expect(inspector_company).to be_persisted
-      expect(inspector_company.active).to be true
-      
-      # Debug: Let's see what options are actually available
-      puts "Inspector Company Name: #{inspector_company.name}"
-      puts "All active companies: #{InspectorCompany.active.pluck(:name)}"
-      
-      select inspector_company.name, from: I18n.t("inspections.fields.inspector_company")
-      click_button I18n.t("inspections.buttons.update")
-
-      inspection.reload
-      expect(inspection.inspector_company).to eq(inspector_company)
+    it "shows inspector company for regular users" do
+      # Regular users see their assigned company, not a dropdown
+      expect(page).to have_content(I18n.t("inspections.fields.inspector_company"))
+      expect(page).to have_content(inspector_company.name)
+      expect(page).to have_content("Set in your user settings")
     end
 
     it "can update inspection status" do
@@ -146,22 +127,21 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
     it "validates required fields" do
       # Clear required fields
-      fill_in I18n.t("inspections.fields.inspector"), with: ""
-      fill_in I18n.t("inspections.fields.location"), with: ""
+      fill_in I18n.t("inspections.fields.inspection_location"), with: ""
 
       click_button I18n.t("inspections.buttons.update")
 
-      expect(page).to have_content(I18n.t("inspections.errors.header", count: 2))
+      expect(page).to have_content(I18n.t("inspections.errors.header", count: 1))
     end
 
     it "can change unit selection" do
       other_unit = create(:unit, user: user, name: "Different Unit")
-      
+
       # Refresh the page to ensure new unit is loaded
       visit edit_inspection_path(inspection)
-      
-      expect(page).to have_select(I18n.t("inspections.fields.unit_select"), 
-                                 with_options: [other_unit.name])
+
+      expect(page).to have_select(I18n.t("inspections.fields.unit_select"),
+        with_options: [other_unit.name])
 
       select other_unit.name, from: I18n.t("inspections.fields.unit_select")
       click_button I18n.t("inspections.buttons.update")
@@ -184,18 +164,18 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     before { visit edit_inspection_path(inspection) }
 
     it "preserves form data when switching tabs" do
-      fill_in I18n.t("inspections.fields.inspector"), with: "Test Inspector Data"
+      fill_in I18n.t("inspections.fields.inspection_location"), with: "Test Location Data"
       # Save the form first
       click_button I18n.t("inspections.buttons.update")
 
       # Navigate to user height tab (which will show placeholder)
-      visit edit_inspection_path(inspection, tab: 'user_height')
+      visit edit_inspection_path(inspection, tab: "user_height")
       expect(page).to have_content("Assessment")
-      
+
       # Navigate back to general tab
       visit edit_inspection_path(inspection)
 
-      expect(page).to have_field(I18n.t("inspections.fields.inspector"), with: "Test Inspector Data")
+      expect(page).to have_field(I18n.t("inspections.fields.inspection_location"), with: "Test Location Data")
     end
 
     it "includes delete button" do
@@ -215,7 +195,6 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
     it "has proper form labels for accessibility" do
       expect(page).to have_css('label[for*="inspection_unit_id"]')
-      expect(page).to have_css('label[for*="inspection_inspector"]')
       expect(page).to have_css('label[for*="inspection_location"]')
       expect(page).to have_css('label[for*="inspection_passed"]')
     end
@@ -230,11 +209,15 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     before { visit edit_inspection_path(inspection) }
 
     it "displays validation errors clearly" do
-      fill_in I18n.t("inspections.fields.inspector"), with: ""
+      # Ensure we're testing an inspection with a status that requires location
+      inspection.update!(status: "in_progress")
+      visit edit_inspection_path(inspection)
+
+      fill_in I18n.t("inspections.fields.inspection_location"), with: ""
       click_button I18n.t("inspections.buttons.update")
 
       expect(page).to have_css("aside") # Error container
-      expect(page).to have_content("Inspector can't be blank")
+      expect(page).to have_content("Inspection location can't be blank")
     end
 
     it "only shows units belonging to the current user" do
@@ -242,12 +225,12 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       other_unit = create(:unit, user: other_user, name: "Other User's Unit")
 
       # Should not see other user's units in dropdown
-      expect(page).not_to have_select(I18n.t("inspections.fields.unit_select"), 
-                                     with_options: [other_unit.name])
-      
+      expect(page).not_to have_select(I18n.t("inspections.fields.unit_select"),
+        with_options: [other_unit.name])
+
       # Should see own units
-      expect(page).to have_select(I18n.t("inspections.fields.unit_select"), 
-                                 with_options: [unit.name])
+      expect(page).to have_select(I18n.t("inspections.fields.unit_select"),
+        with_options: [unit.name])
     end
   end
 end

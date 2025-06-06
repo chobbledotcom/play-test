@@ -79,7 +79,7 @@ class PdfGeneratorService
     data = [
       [I18n.t("pdf.inspection.fields.serial_number"), inspection.serial],
       [I18n.t("pdf.inspection.fields.manufacturer"), inspection.manufacturer.presence || I18n.t("pdf.inspection.fields.not_specified")],
-      [I18n.t("pdf.inspection.fields.location"), inspection.location]
+      [I18n.t("pdf.inspection.fields.inspection_location"), inspection.inspection_location]
     ]
 
     create_pdf_table(pdf, data)
@@ -94,7 +94,7 @@ class PdfGeneratorService
     results = [
       [I18n.t("pdf.inspection.fields.inspection_date"), inspection.inspection_date&.strftime("%d/%m/%Y")],
       [I18n.t("pdf.inspection.fields.reinspection_due"), inspection.reinspection_date&.strftime("%d/%m/%Y")],
-      [I18n.t("pdf.inspection.fields.inspector"), inspection.inspector],
+      [I18n.t("pdf.inspection.fields.inspector"), inspection.inspector_company.name],
       [I18n.t("pdf.inspection.fields.overall_result"), inspection.passed ? I18n.t("pdf.inspection.fields.pass") : I18n.t("pdf.inspection.fields.fail")]
     ]
 
@@ -218,7 +218,7 @@ class PdfGeneratorService
     inspections_data = equipment.inspections.order(inspection_date: :desc).map do |inspection|
       [
         inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.equipment.fields.na"),
-        inspection.inspector,
+        inspection.inspector_company.name,
         inspection.passed ? I18n.t("pdf.equipment.fields.pass") : I18n.t("pdf.equipment.fields.fail"),
         inspection.comments.to_s.truncate(30)
       ]
@@ -341,7 +341,7 @@ class PdfGeneratorService
     inspections_data = unit.inspections.order(inspection_date: :desc).map do |inspection|
       [
         inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.unit.fields.na"),
-        inspection.inspector,
+        inspection.inspector_company.name,
         inspection.passed ? I18n.t("pdf.unit.fields.pass") : I18n.t("pdf.unit.fields.fail"),
         inspection.comments.to_s.truncate(30)
       ]

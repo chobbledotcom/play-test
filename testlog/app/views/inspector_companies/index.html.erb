@@ -6,19 +6,31 @@
   </p>
 <% end %>
 
-<%= form_with url: inspector_companies_path, method: :get, local: true do |form| %>
-  <%= form.label :search, t('inspector_companies.search.placeholder') %>
-  <%= form.text_field :search, value: params[:search], placeholder: t('inspector_companies.search.placeholder') %>
-  
-  <%= form.label :verified, t('inspector_companies.search.verified_filter') %>
-  <%= form.select :verified, options_for_select([
-    ["All Companies", ""],
-    [t('inspector_companies.status.verified'), "true"]
-  ], params[:verified]) %>
-  
-  <%= form.submit t('inspector_companies.buttons.search') %>
-  <%= link_to "Clear", inspector_companies_path %>
-<% end %>
+<section>
+  <div class="search-form">
+    <%= form_with url: inspector_companies_path, method: :get do |form| %>
+      <%= form.text_field :search, placeholder: t('inspector_companies.search.placeholder'), value: params[:search] %>
+      <%= form.submit t('inspector_companies.buttons.search') %>
+    <% end %>
+  </div>
+</section>
+
+<section>
+  <%= form_with url: inspector_companies_path, method: :get, data: { turbo: false } do |form| %>
+    <%= form.hidden_field :search, value: params[:search] %>
+    <%= form.select :active, 
+        options_for_select([
+          ["All Companies", "all"],
+          [t('inspector_companies.status.active'), "active"],
+          [t('inspector_companies.status.archived'), "archived"]
+        ], params[:active]),
+        {}, { onchange: "this.form.submit();" } %>
+    
+    <% if params[:active].present? || params[:search].present? %>
+      <%= link_to "Clear Filters", inspector_companies_path %>
+    <% end %>
+  <% end %>
+</section>
 
 <% if @inspector_companies.any? %>
   <table>
@@ -27,7 +39,7 @@
         <th><%= t('inspector_companies.forms.name') %></th>
         <th><%= t('inspector_companies.forms.rpii_registration_number') %></th>
         <th><%= t('inspector_companies.forms.phone') %></th>
-        <th><%= t('inspector_companies.headers.verification_status') %></th>
+        <th><%= t('inspector_companies.headers.credentials') %></th>
         <th><%= t('inspector_companies.status.active') %></th>
         <th><%= t('ui.actions') %></th>
       </tr>
@@ -38,15 +50,13 @@
           <td><%= link_to company.name, company %></td>
           <td><%= company.rpii_registration_number %></td>
           <td><%= company.phone %></td>
-          <td><%= company.rpii_verified? ? t('inspector_companies.status.verified') : t('inspector_companies.status.not_verified') %></td>
+          <td><%= company.has_valid_credentials? ? t('inspector_companies.status.valid_credentials') : t('inspector_companies.status.invalid_credentials') %></td>
           <td><%= company.active? ? t('inspector_companies.status.active') : t('inspector_companies.status.archived') %></td>
           <td>
             <%= link_to t('ui.view'), company %>
             <% if current_user&.admin? %>
               | <%= link_to t('ui.edit'), edit_inspector_company_path(company) %>
-              | <%= link_to t('inspector_companies.buttons.archive'), archive_inspector_company_path(company), 
-                      method: :patch, 
-                      data: { confirm: "Are you sure you want to archive #{company.name}?" } %>
+              | <%= render 'archive_link', inspector_company: company %>
             <% end %>
           </td>
         </tr>

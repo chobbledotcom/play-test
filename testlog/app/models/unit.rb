@@ -103,7 +103,7 @@ class Unit < ApplicationRecord
 
   def self.overdue
     joins(:inspections)
-      .where("inspections.reinspection_date < ?", Date.today)
+      .where("inspections.inspection_date < ?", Date.today - 1.year)
       .distinct
   end
 

@@ -109,8 +109,8 @@ RSpec.describe PdfGeneratorService do
     end
 
     context "with inspections" do
-      let!(:passed_inspection) { create(:inspection, user: user, unit: unit, passed: true, inspector: "Inspector A") }
-      let!(:failed_inspection) { create(:inspection, user: user, unit: unit, passed: false, inspector: "Inspector B") }
+      let!(:passed_inspection) { create(:inspection, user: user, unit: unit, passed: true) }
+      let!(:failed_inspection) { create(:inspection, user: user, unit: unit, passed: false) }
 
       it "generates PDF with inspection history using I18n" do
         pdf = PdfGeneratorService.generate_unit_certificate(unit)
