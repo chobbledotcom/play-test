@@ -1,0 +1,10 @@
+<div class="actions">
+  <% actions.each do |action| %>
+    <%= link_to action[:path], 
+                class: "button #{action[:danger] ? 'danger' : ''}", 
+                data: action[:data],
+                target: action[:target] do %>
+      <strong><%= action[:label] %></strong>
+    <% end %>
+  <% end %>
+</div>

@@ -1,0 +1,29 @@
+<header>
+  <h1><%= @title %></h1>
+</header>
+
+<div class="center">
+  <%= link_to new_inspection_path do %>
+    <strong>Add Inspection</strong>
+  <% end %>
+</div>
+
+<section>
+  <%= render 'search_form' %>
+</section>
+
+<article>
+  <% if @inspections.any? %>
+    <%= inspection_links(current_user) %>
+    <%= render 'inspections_table', inspections: @inspections %>
+    <div class="center">
+      <p>
+        <%= link_to inspections_path(format: :csv) do %>
+          <strong>Export CSV</strong>
+        <% end %>
+      </p>
+    </div>
+  <% else %>
+    <p>No inspection records found.</p>
+  <% end %>
+</article>

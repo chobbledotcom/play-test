@@ -1,0 +1,28 @@
+<article class="view-equipment">
+  <header><h2>Equipment Details</h2></header>  
+  
+  <%= render 'equipment_details', equipment: @equipment %>
+
+  <hr>
+
+  <%= render 'shared/action_buttons', actions: equipment_actions(@equipment) %>
+
+  <hr>
+
+  <h4>Inspection History</h4>
+  <% if @inspections.any? %>
+    <%= render 'inspection_history_table', inspections: @inspections, equipment: @equipment %>
+  <% else %>
+    <p>No inspections recorded for this equipment.</p>
+  <% end %>
+
+  <hr>
+
+  <h4>Certificate QR Code</h4>
+  <%= image_tag qr_code_equipment_path(@equipment), alt: "QR Code for Equipment Certificate", width: 250 %>
+
+  <hr>
+
+  <h4>Certificate PDF Link</h4>
+  <%= link_to short_equipment_certificate_url(@equipment), short_equipment_certificate_url(@equipment) %>
+</article>

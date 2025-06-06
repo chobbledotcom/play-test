@@ -1,0 +1,27 @@
+<article class="view-inspection">
+  <header><h2>Inspection Details</h2></header>
+   
+  <%= render 'inspection_details', inspection: @inspection %>
+
+  <% if @inspection.comments.present? %>
+    <hr>
+    <h4>Comments</h4>
+    <blockquote>
+      <%= simple_format(@inspection.comments) %>
+    </blockquote>
+  <% end %>
+
+  <hr>
+
+  <%= render 'shared/action_buttons', actions: inspection_actions(@inspection) %>
+
+  <hr>
+
+  <h4>Certificate QR Code</h4>
+  <%= image_tag qr_code_inspection_path(@inspection), alt: "QR Code for Certificate", width: 250 %>
+
+  <hr>
+
+  <h4>Certificate PDF Link</h4>
+  <%= link_to short_certificate_url(@inspection), short_certificate_url(@inspection) %>
+</article>

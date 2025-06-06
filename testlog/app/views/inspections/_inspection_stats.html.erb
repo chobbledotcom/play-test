@@ -1,0 +1,11 @@
+<% if current_user %>
+  <ul>
+    <li>
+      Logged in:
+      <strong><%= current_user.email %></strong>
+    </li>
+    <li>
+      Usage: <strong><%= format_inspection_count(current_user) %></strong>
+    </li>
+  </ul>
+<% end %>

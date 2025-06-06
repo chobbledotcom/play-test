@@ -1,0 +1,40 @@
+<%= scrollable_table do %>
+  <tr>
+    <th>Name:</th>
+    <td><%= @inspection.name %></td>
+  </tr>
+  <tr>
+    <th>Serial Number / Asset ID:</th>
+    <td>
+      <% if @inspection.equipment %>
+        <%= link_to inspection.serial.presence || "Missing", equipment_path(@inspection.equipment) %>
+      <% else %>
+        <%= @inspection.serial %>
+      <% end %>
+    </td>
+  </tr>
+  <tr>
+    <th>Manufacturer:</th>
+    <td><%= @inspection.manufacturer %></td>
+  </tr>
+  <tr>
+    <th>Location:</th>
+    <td><%= @inspection.location %></td>
+  </tr>
+  <tr>
+    <th>Inspection Date:</th>
+    <td><%= render_time(inspection.inspection_date) %></td>
+  </tr>
+  <tr>
+    <th>Next Inspection Due:</th>
+    <td><%= render_time(inspection.reinspection_date) %></td>
+  </tr>
+  <tr>
+    <th>Inspector:</th>
+    <td><%= inspection.inspector %></td>
+  </tr>
+  <tr>
+    <th>Overall Result:</th>
+    <td><%= inspection_result_badge(inspection) %></td>
+  </tr>
+<% end %>

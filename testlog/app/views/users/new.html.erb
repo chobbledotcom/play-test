@@ -1,0 +1,28 @@
+<%= form_with(model: @user, url: signup_path) do |form| %>
+  <header>
+    <h1>Register</h1>
+  </header>
+
+  <% if @user.errors.any? %>
+    <aside>
+      <h3><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h3>
+      <ul>
+      <% @user.errors.each do |error| %>
+        <li><%= error.full_message %></li>
+      <% end %>
+      </ul>
+    </aside>
+  <% end %>
+
+
+  <%= form.label :email %>
+  <%= form.email_field :email %>
+
+  <%= form.label :password %>
+  <%= form.password_field :password %>
+
+  <%= form.label :password_confirmation %>
+  <%= form.password_field :password_confirmation %>
+
+  <%= form.submit "Register" %>
+<% end %>

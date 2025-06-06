@@ -1,0 +1,11 @@
+<header>
+  <h1>Edit Inspection</h1>
+</header>
+
+<article>
+  <%= render 'form' %>
+
+  <div class="delete-inspection">
+    <%= button_to "Delete", inspection_path(@inspection), method: :delete, data: { confirm: 'Are you sure you want to delete this inspection?' } %>
+  </div>
+</article>

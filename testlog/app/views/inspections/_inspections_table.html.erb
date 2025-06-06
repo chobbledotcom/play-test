@@ -1,0 +1,29 @@
+<%= scrollable_table(class: "inspections") do %>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Serial</th>
+      <th>Location</th>
+      <th>Last Inspection</th>
+      <th>Next Due</th>
+      <th>Result</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% inspections.each do |inspection| %>
+      <tr>
+        <td>
+          <%= link_to inspection.name.presence || "Unnamed", inspection_path(inspection) %>
+        </td>
+        <td>
+          <%= link_to inspection.serial.presence || "Missing", inspection_path(inspection) %>
+        </td>
+        <td><%= inspection.location %></td>
+        <td><%= render_time(inspection.inspection_date) %></td>
+        <td><%= render_time(inspection.reinspection_date) %></td>
+        <td><%= inspection_result_badge(inspection) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+<% end %>

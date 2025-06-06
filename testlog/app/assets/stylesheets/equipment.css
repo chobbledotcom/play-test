@@ -1,0 +1,59 @@
+/* Equipment styling */
+
+.view-equipment {
+	margin-bottom: 2rem;
+}
+
+.equipment form label {
+	display: block;
+	margin-top: 1rem;
+	font-weight: bold;
+}
+
+.equipment form input[type="text"] {
+	width: 100%;
+	padding: 0.5rem;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+.equipment form select {
+	width: 100%;
+	padding: 0.5rem;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+.actions {
+	margin-bottom: 3rem;
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+	justify-content: center;
+
+	a strong,
+	button {
+		padding: 0.5rem 1rem;
+	}
+}
+
+.button.small {
+	padding: 0.25rem 0.5rem;
+	font-size: 0.8rem;
+}
+
+.button.danger strong {
+	background-color: #dc3545;
+}
+
+.search-form {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.search-form input[type="text"] {
+	flex: 1;
+	min-width: 200px;
+}

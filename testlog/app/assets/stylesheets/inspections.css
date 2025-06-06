@@ -1,0 +1,8 @@
+/* Equipment-controlled fields styling */
+.equipment-controlled {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #6c757d;
+  cursor: not-allowed;
+  font-style: italic;
+}

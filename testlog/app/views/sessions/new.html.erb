@@ -1,0 +1,22 @@
+<div class="login">
+  <%= form_with(scope: :session, url: login_path) do |form| %>
+    <header><h2>Log in</h2></header>
+    <%= form.label :email %>
+    <%= form.email_field :email %>
+
+    <%= form.label :password %>
+    <%= form.password_field :password %>
+
+    <%= form.label :remember_me do %>
+      <%= form.check_box :remember_me %>
+      Remember Me
+    <% end %>
+
+    <div style="
+      display: flex;
+      justify-content: space-between;
+    ">
+      <%= form.submit "Log in" %>
+    </div>
+  <% end %>
+</div>

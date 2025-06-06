@@ -1,0 +1,50 @@
+<article class="home-page">
+  <header>
+    <h1>patlog.co.uk</h1>
+    <p>
+      Log your Portable Appliance Testing inspections, generate PDF certificates, and link to them with QR codes.
+    </p>
+    <p>
+      A free and open source service from <a href="https://chobble.com">Chobble</a>
+    </p>
+    <div class="video-container">
+      <iframe
+        src="https://iframe.mediadelivery.net/embed/417100/da1828cc-d387-482a-9875-6511fd2acf22?autoplay=false&loop=false&muted=false&preload=true&responsive=true"
+        loading="lazy"
+        allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
+        allowfullscreen="true"
+      ></iframe>
+    </div>
+  </header>
+
+  <% unless current_user %>
+    <nav>
+      <ul>
+        <li>
+          <%= link_to login_path do %>
+            <strong>Log In</strong>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to new_user_path do %>
+            <strong>Register</strong>
+          <% end %>
+        </li>
+      </ul>
+    </nav>
+  <% end %>
+  <section>
+    <aside>
+      <h2>Log Inspections</h2>
+      <p>Create and log your PAT test records with all the necessary fields.</p>
+    </aside>
+    <aside>
+      <h2>Generate PDF Certificates</h2>
+      <p>Automatic certificates with QR codes links for easy verification.</p>
+    </aside>
+    <aside>
+      <h2>Search & Export</h2>
+      <p>Quickly find inspection records and export your inspections to CSV.</p>
+    </aside>
+  </section>
+</article>

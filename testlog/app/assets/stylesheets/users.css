@@ -1,0 +1,10 @@
+.users {
+	table {
+		margin-bottom: 3rem;
+	}
+	p,
+	h1,
+	h2 {
+		text-align: center;
+	}
+}

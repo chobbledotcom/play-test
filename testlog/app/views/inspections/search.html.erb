@@ -1,0 +1,17 @@
+<header>
+  <% if params[:query].present? %>
+    <h1>Results for "<%= params[:query] %>"</h1>
+  <% end %>
+</header>
+
+<section>
+  <%= render 'search_form' %>
+</section>
+
+<article>
+  <% if @inspections.any? %>
+    <%= render 'inspections_table', inspections: @inspections %>
+  <% else %>
+    <p>No results found matching that search term.</p>
+  <% end %>
+</article>

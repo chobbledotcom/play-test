@@ -1,0 +1,53 @@
+<article class="users">
+  <header><h1>Users</h1></header>
+  <%= scrollable_table do %>
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Admin</th>
+        <th>Registered</th>
+        <th>Last Active</th>
+        <th>Inspections</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr>
+          <td><%= link_to user.email, edit_user_path(user) %></td>
+          <td><%= user.admin? ? "Yes" : "No" %></td>
+          <td title="<%= user.created_at.strftime('%d/%m/%Y') %>">
+            <%= time_ago_in_words(user.created_at) %>
+          </td>
+          <% if user.last_active_at %>
+            <td title="<%= user.last_active_at.strftime('%d/%m/%Y') %>">
+              <%= time_ago_in_words(user.last_active_at) %>
+            </td>
+          <% else %>
+            <td>Never</td>
+          <% end %>
+          <td><%= user.inspections.count %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  <% end %>
+  <hr>
+  <h2>Background Jobs</h2>
+  <%= scrollable_table do %>
+   <thead>
+      <tr>
+        <th>Job</th>
+        <th>Last Run</th>
+        <th>Next Run</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @active_jobs.each do |key, job| %>
+        <tr>
+          <td><%= job[:name] %></td>
+          <td><%= job[:last_run] ? time_ago_in_words(job[:last_run]) + " ago" : "Never" %></td>
+          <td><%= job[:next_run] ? time_ago_in_words(job[:next_run]) + " from now" : "Not scheduled" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  <% end %>
+</article>

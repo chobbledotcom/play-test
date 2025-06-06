@@ -1,0 +1,22 @@
+<%= scrollable_table do %>
+  <tr>
+    <th>Name:</th>
+    <td><%= equipment.name %></td>
+  </tr>
+  <tr>
+    <th>Manufacturer:</th>
+    <td><%= equipment.manufacturer %></td>
+  </tr>
+  <tr>
+    <th>Serial Number / Asset ID:</th>
+    <td><%= equipment.serial %></td>
+  </tr>
+  <tr>
+    <th>Location:</th>
+    <td><%= equipment.location %></td>
+  </tr>
+  <tr>
+    <th>Next Inspection Due:</th>
+    <td><%= render_time(equipment.last_due_date) %></td>
+  </tr>
+<% end %>

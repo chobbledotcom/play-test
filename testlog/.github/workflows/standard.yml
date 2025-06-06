@@ -1,0 +1,13 @@
+name: "Lint: Standard Ruby"
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: write
+    steps:
+    - name: Run Standard Ruby linter
+      uses: standardrb/standard-ruby-action@v1

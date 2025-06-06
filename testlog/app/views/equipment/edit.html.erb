@@ -1,0 +1,9 @@
+<header><h1>Edit Equipment</h1></header>
+
+<article>
+  <%= render 'form' %>
+
+  <div class="delete-inspection">
+    <%= button_to "Delete", @equipment, data: { turbo_method: :delete, turbo_confirm: "Are you sure? This cannot be undone." } %>
+  </div>
+</article>

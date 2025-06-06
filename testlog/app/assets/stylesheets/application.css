@@ -1,0 +1,109 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS (and SCSS, if configured) file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+.search-form {
+	margin: 0 auto 2rem;
+	form {
+		padding: 0;
+		box-shadow: 0;
+		display: flex;
+		flex-direction: row;
+		border: none;
+		input {
+			height: 3rem;
+			margin: 0;
+			box-sizing: border-box;
+		}
+		input[type="submit"] {
+			display: flex;
+			align-content: center;
+			padding: 0 1rem;
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+		input[type="text"] {
+			border-right: 0;
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+	}
+}
+
+.view-inspection {
+	text-align: center;
+	table {
+		margin: 1rem auto;
+	}
+}
+
+.login,
+.intro {
+	max-width: 30rem;
+	margin: 2rem auto;
+}
+
+.inspection {
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	fieldset {
+		padding: 1.5rem;
+		margin: 0;
+		border: 0;
+		box-shadow: none;
+	}
+}
+
+footer {
+	max-width: 30rem;
+	margin: 6rem auto 2rem;
+	text-align: center;
+	font-size: smaller;
+	opacity: 0.7;
+
+	p {
+		text-wrap: balance;
+		text-wrap: pretty;
+	}
+}
+
+.center {
+	text-align: center;
+}
+
+h1 {
+	font-size: 1.6rem;
+}
+
+h2 {
+	font-size: 1.4rem;
+}
+
+h3,
+h4 {
+	font-size: 1.2rem;
+}
+
+nav a strong,
+nav button {
+	padding: 0.5rem 1rem;
+}
+
+.table-container {
+	max-width: 100%;
+	overflow-x: auto;
+}
