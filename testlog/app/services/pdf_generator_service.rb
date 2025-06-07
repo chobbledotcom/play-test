@@ -1,5 +1,5 @@
 class PdfGeneratorService
-  def self.generate_inspection_certificate(inspection)
+  def self.generate_inspection_report(inspection)
     require "prawn/table"
 
     Prawn::Document.new do |pdf|
@@ -13,7 +13,7 @@ class PdfGeneratorService
     end
   end
 
-  def self.generate_unit_certificate(unit)
+  def self.generate_unit_report(unit)
     require "prawn/table"
 
     Prawn::Document.new do |pdf|
@@ -26,7 +26,7 @@ class PdfGeneratorService
     end
   end
 
-  def self.generate_equipment_certificate(equipment)
+  def self.generate_equipment_report(equipment)
     require "prawn/table"
 
     Prawn::Document.new do |pdf|
@@ -130,7 +130,7 @@ class PdfGeneratorService
       pdf.image qr_code_temp_file.path, position: :center, width: 180
       pdf.move_down 5
       pdf.text I18n.t("pdf.inspection.scan_text"), align: :center, size: 10
-      pdf.text "#{ENV["BASE_URL"]}/c/#{inspection.id}",
+      pdf.text "#{ENV["BASE_URL"]}/r/#{inspection.id}",
         align: :center, size: 10, style: :italic
     ensure
       qr_code_temp_file.unlink
@@ -159,7 +159,7 @@ class PdfGeneratorService
     table
   end
 
-  # Equipment certificate methods
+  # Equipment report methods
   def self.generate_equipment_pdf_header(pdf, equipment)
     pdf.text I18n.t("pdf.equipment.title"), size: 20, style: :bold, align: :center
     pdf.move_down 20
@@ -266,7 +266,7 @@ class PdfGeneratorService
       pdf.image qr_code_temp_file.path, position: :center, width: 180
       pdf.move_down 5
       pdf.text I18n.t("pdf.equipment.scan_text"), align: :center, size: 10
-      pdf.text "#{ENV["BASE_URL"]}/e/#{equipment.id}",
+      pdf.text "#{ENV["BASE_URL"]}/u/#{equipment.id}",
         align: :center, size: 10, style: :italic
     ensure
       qr_code_temp_file.unlink
@@ -280,7 +280,7 @@ class PdfGeneratorService
     pdf.text I18n.t("pdf.equipment.footer_text"), size: 10, align: :center, style: :italic
   end
 
-  # Unit certificate methods (updated from equipment)
+  # Unit report methods (updated from equipment)
   def self.generate_unit_pdf_header(pdf, unit)
     pdf.text I18n.t("pdf.unit.title"), size: 20, style: :bold, align: :center
     pdf.move_down 20
@@ -389,7 +389,7 @@ class PdfGeneratorService
       pdf.image qr_code_temp_file.path, position: :center, width: 180
       pdf.move_down 5
       pdf.text I18n.t("pdf.unit.scan_text"), align: :center, size: 10
-      pdf.text "#{ENV["BASE_URL"]}/e/#{unit.id}",
+      pdf.text "#{ENV["BASE_URL"]}/u/#{unit.id}",
         align: :center, size: 10, style: :italic
     ensure
       qr_code_temp_file.unlink

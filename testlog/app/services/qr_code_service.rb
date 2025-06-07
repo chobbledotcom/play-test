@@ -2,7 +2,7 @@ class QrCodeService
   def self.generate_qr_code(record)
     require "rqrcode"
 
-    # Create QR code for the certificate URL using the shorter format
+    # Create QR code for the report URL using the shorter format
     if record.is_a?(Inspection)
       generate_inspection_qr_code(record)
     elsif record.is_a?(Unit)
@@ -15,7 +15,7 @@ class QrCodeService
   def self.generate_inspection_qr_code(inspection)
     require "rqrcode"
 
-    url = "#{ENV["BASE_URL"]}/c/#{inspection.id}"
+    url = "#{ENV["BASE_URL"]}/r/#{inspection.id}"
     generate_qr_code_from_url(url)
   end
 

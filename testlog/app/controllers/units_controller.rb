@@ -1,8 +1,8 @@
 class UnitsController < ApplicationController
-  before_action :set_unit, only: [:show, :edit, :update, :destroy, :certificate, :qr_code]
+  before_action :set_unit, only: [:show, :edit, :update, :destroy, :report, :qr_code]
   before_action :check_unit_owner, only: [:show, :edit, :update, :destroy]
   before_action :no_index
-  skip_before_action :require_login, only: [:certificate, :qr_code]
+  skip_before_action :require_login, only: [:report, :qr_code]
 
   def index
     @units = current_user.units.order(created_at: :desc)
@@ -73,8 +73,8 @@ class UnitsController < ApplicationController
       current_user.units
   end
 
-  def certificate
-    pdf_data = PdfGeneratorService.generate_unit_certificate(@unit)
+  def report
+    pdf_data = PdfGeneratorService.generate_unit_report(@unit)
 
     send_data pdf_data.render,
       filename: "Equipment_History_#{@unit.serial}.pdf",
@@ -107,8 +107,8 @@ class UnitsController < ApplicationController
     @unit = Unit.find_by(id: params[:id].upcase)
 
     unless @unit
-      if action_name.in?(["certificate", "qr_code"])
-        # For public certificate access, return 404 instead of redirect
+      if action_name.in?(["report", "qr_code"])
+        # For public report access, return 404 instead of redirect
         render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
       else
         flash[:danger] = "Equipment record not found"

@@ -13,8 +13,8 @@ RSpec.describe "Units PDF Generation", type: :request do
     click_button I18n.t("session.login.submit")
   end
 
-  describe "GET /units/:id/certificate" do
-    it "generates PDF certificate for unit" do
+  describe "GET /units/:id/report" do
+    it "generates PDF report for unit" do
       visit unit_path(unit)
 
       # Check if PDF Report link exists
@@ -42,19 +42,19 @@ RSpec.describe "Units PDF Generation", type: :request do
     end
 
     it "handles missing unit gracefully" do
-      visit "/units/NONEXISTENT/certificate"
+      visit "/units/NONEXISTENT/report"
 
-      # Should return 404 for public certificate access
+      # Should return 404 for public report access
       expect(page).to have_http_status(:not_found)
     end
 
-    it "allows access to other user's unit certificate" do
+    it "allows access to other user's unit report" do
       other_user = create(:user, email: "other@example.com")
       other_unit = create(:unit, user: other_user)
 
-      visit "/units/#{other_unit.id}/certificate"
+      visit "/units/#{other_unit.id}/report"
 
-      # Unit certificates are now publicly accessible - should return PDF
+      # Unit reports are now publicly accessible - should return PDF
       expect(page.response_headers["Content-Type"]).to eq("application/pdf")
       expect(page.body[0..3]).to eq("%PDF")
     end
@@ -73,8 +73,8 @@ RSpec.describe "Units PDF Generation", type: :request do
 
   describe "PDF download integration" do
     it "allows downloading PDF through direct link" do
-      # Visit the certificate URL directly
-      page.driver.browser.get("/units/#{unit.id}/certificate")
+      # Visit the report URL directly
+      page.driver.browser.get("/units/#{unit.id}/report")
 
       # Check that it's a PDF response
       expect(page.driver.response.headers["Content-Type"]).to include("application/pdf")
@@ -82,7 +82,7 @@ RSpec.describe "Units PDF Generation", type: :request do
     end
 
     it "sets proper filename for PDF download" do
-      page.driver.browser.get("/units/#{unit.id}/certificate")
+      page.driver.browser.get("/units/#{unit.id}/report")
 
       content_disposition = page.driver.response.headers["Content-Disposition"]
       expect(content_disposition).to include("Equipment_History_#{unit.serial}.pdf")

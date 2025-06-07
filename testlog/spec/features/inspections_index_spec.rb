@@ -66,9 +66,9 @@ RSpec.feature "Inspections Index Page", type: :feature do
         expect(page).to have_link("Edit")
       end
 
-      it "provides link to view certificate" do
+      it "provides link to view report" do
         visit inspections_path
-        expect(page).to have_link("Certificate")
+        expect(page).to have_link("Report")
       end
     end
 

@@ -55,7 +55,7 @@ RSpec.describe "Home", type: :request do
       it "displays feature descriptions" do
         visit root_path
         expect(page).to have_content("Log Inspections")
-        expect(page).to have_content("Generate PDF Certificates")
+        expect(page).to have_content("Generate PDF Reports")
         expect(page).to have_content("Search & Export")
       end
 
@@ -122,7 +122,7 @@ RSpec.describe "Home", type: :request do
         visit root_path
         expect(page).to have_content("patlog.co.uk")
         expect(page).to have_content("Log Inspections")
-        expect(page).to have_content("Generate PDF Certificates")
+        expect(page).to have_content("Generate PDF Reports")
       end
 
       it "allows access without redirect" do
@@ -229,7 +229,7 @@ RSpec.describe "Home", type: :request do
     it "includes meta descriptions for SEO" do
       visit root_path
       expect(page).to have_content("Portable Appliance Testing")
-      expect(page).to have_content("PDF certificates")
+      expect(page).to have_content("PDF reports")
     end
   end
 end

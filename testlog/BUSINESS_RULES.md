@@ -10,12 +10,12 @@ This document outlines the business rules, safety standards, validation logic, a
 
 The system tracks user capacity across four distinct height categories:
 
-| Height Category | User Age Group | Field Name | Purpose |
-|----------------|---------------|------------|---------|
-| **1.0m (1000mm)** | Young children | `usersat1000mm` | Maximum users under 1 meter height |
-| **1.2m (1200mm)** | Children | `usersat1200mm` | Maximum users under 1.2 meters height |
-| **1.5m (1500mm)** | Adolescents | `usersat1500mm` | Maximum users under 1.5 meters height |
-| **1.8m (1800mm)** | Adults | `usersat1800mm` | Maximum users under 1.8 meters height |
+| Height Category   | User Age Group | Field Name      | Purpose                               |
+| ----------------- | -------------- | --------------- | ------------------------------------- |
+| **1.0m (1000mm)** | Young children | `usersat1000mm` | Maximum users under 1 meter height    |
+| **1.2m (1200mm)** | Children       | `usersat1200mm` | Maximum users under 1.2 meters height |
+| **1.5m (1500mm)** | Adolescents    | `usersat1500mm` | Maximum users under 1.5 meters height |
+| **1.8m (1800mm)** | Adults         | `usersat1800mm` | Maximum users under 1.8 meters height |
 
 ### Capacity Calculation Rules
 
@@ -30,6 +30,7 @@ The system tracks user capacity across four distinct height categories:
 Based on the slide calculation references (slide-calc-1.png and slide-calc-2.png):
 
 #### Height Categories for Slides (in millimeters):
+
 1. **< 600mm**: No containing walls required
 2. **600mm - 3000mm**: Containing walls required of user height
 3. **> 3000mm**: Containing walls required 1.25 times user height
@@ -38,16 +39,17 @@ Based on the slide calculation references (slide-calc-1.png and slide-calc-2.png
 
 ### Slide Platform and Wall Heights
 
-| Measurement | Field | Validation Rule | Safety Standard |
-|-------------|--------|----------------|-----------------|
-| Slide Platform Height | `slidePlatformHeight` | Must match platform measurements | Consistency check |
-| Slide Wall Height | `slideWallHeight` | Must meet containing wall requirements | Height-based safety |
-| First Metre Height | `slideFirstMetreHeight` | Must be measured from slide start | Slope safety |
-| Beyond First Metre | `slideBeyondFirstMetreHeight` | 50% of tallest user height minimum | Run-out safety |
+| Measurement           | Field                         | Validation Rule                        | Safety Standard     |
+| --------------------- | ----------------------------- | -------------------------------------- | ------------------- |
+| Slide Platform Height | `slidePlatformHeight`         | Must match platform measurements       | Consistency check   |
+| Slide Wall Height     | `slideWallHeight`             | Must meet containing wall requirements | Height-based safety |
+| First Metre Height    | `slideFirstMetreHeight`       | Must be measured from slide start      | Slope safety        |
+| Beyond First Metre    | `slideBeyondFirstMetreHeight` | 50% of tallest user height minimum     | Run-out safety      |
 
 ### Run-out Requirements
 
 From slide-calc-2.png specifications:
+
 - **Minimum Run-out Length**: 50% of highest platform height
 - **Absolute Minimum**: 300mm in any case
 - **Maximum Inclination**: Not more than 10°
@@ -58,25 +60,27 @@ From slide-calc-2.png specifications:
 
 ### Decimal Place Requirements
 
-| Category | Precision | Fields |
-|----------|-----------|---------|
-| **Unit Dimensions** | 1 decimal place | `unitWidth`, `unitLength`, `unitHeight` |
-| **Height Measurements** | 2 decimal places | All height-related measurements |
-| **Distance Measurements** | 2 decimal places | `runoutValue`, `blowerTubeLength` |
-| **Pressure Values** | 2 decimal places | `unitPressureValue` |
-| **User Counts** | Whole numbers | All `usersat*` fields |
+| Category                  | Precision        | Fields                                  |
+| ------------------------- | ---------------- | --------------------------------------- |
+| **Unit Dimensions**       | 1 decimal place  | `unitWidth`, `unitLength`, `unitHeight` |
+| **Height Measurements**   | 2 decimal places | All height-related measurements         |
+| **Distance Measurements** | 2 decimal places | `runoutValue`, `blowerTubeLength`       |
+| **Pressure Values**       | 2 decimal places | `unitPressureValue`                     |
+| **User Counts**           | Whole numbers    | All `usersat*` fields                   |
 
 ## Pass/Fail Validation Logic
 
 ### Binary Pass/Fail Fields
 
 All pass/fail determinations are stored as boolean values (INTEGER 0/1 in database):
+
 - **0 = Fail/False**
 - **1 = Pass/True**
 
 ### Critical Safety Checks
 
 #### Structural Integrity (Required Pass)
+
 - `seamIntegrityPass`: Seam integrity inspection
 - `lockStitchPass`: Lock stitching quality
 - `airLossPass`: Air retention test
@@ -84,22 +88,26 @@ All pass/fail determinations are stored as boolean values (INTEGER 0/1 in databa
 - `sharpEdgesPass`: Sharp edge safety check
 
 #### Slide-Specific Safety (Required Pass)
+
 - `clamberNettingPass`: Steps/climbing netting safety
 - `runoutPass`: Run-out length and angle compliance
 - `slipSheetPass`: Slip sheet integrity
 
 #### Anchoring System (Required Pass)
+
 - `numAnchorsPass`: Adequate number of anchors
 - `anchorTypePass`: Appropriate anchor type
 - `pullStrengthPass`: Anchor pull strength test
 - `anchorDegreePass`: Anchor angle compliance
 
 #### Materials Safety (Required Pass)
+
 - `fabricPass`: Fabric strength test
 - `fireRetardentPass`: Fire retardancy compliance
 - `threadPass`: Thread strength and quality
 
 #### Electrical Safety (Required Pass)
+
 - `patPass`: Portable Appliance Test (PAT)
 - `blowerVisualPass`: Visual blower inspection
 - `blowerFingerPass`: Finger probe test
@@ -109,6 +117,7 @@ All pass/fail determinations are stored as boolean values (INTEGER 0/1 in databa
 **Location**: Form1.cs:428, Form1.cs:1338-1342
 
 The final inspection result (`passed` field) is determined by:
+
 - Manual inspector assessment via radio button selection
 - All critical safety checks must pass
 - PDF report shows "Passed Inspection" (green) or "Failed Inspection" (red)
@@ -120,11 +129,13 @@ The final inspection result (`passed` field) is determined by:
 While specific ranges aren't hardcoded, the application enforces:
 
 #### Positive Values Required
+
 - All dimension measurements must be positive
 - User counts must be non-negative integers
 - Pressure values must be positive
 
 #### Logical Consistency Checks
+
 - Unit dimensions must be realistic for inflatable equipment
 - User heights must be within reasonable human ranges
 - Platform heights must be achievable for inflatable structures
@@ -132,6 +143,7 @@ While specific ranges aren't hardcoded, the application enforces:
 ### Cross-Field Validation
 
 #### Permanent Roof Synchronization
+
 **Location**: Form1.cs:837-847
 
 - `permanentRoofChecked` and `slidePermRoofedCheck` are synchronized
@@ -139,6 +151,7 @@ While specific ranges aren't hardcoded, the application enforces:
 - Ensures consistency between User Height and Slide tabs
 
 #### Height Relationship Validation
+
 - `userHeight` must be ≤ tallest user category in use
 - Slide heights must be logically related to platform heights
 - Containing wall heights must meet minimum requirements for user heights
@@ -150,16 +163,19 @@ While specific ranges aren't hardcoded, the application enforces:
 The system handles different equipment types with category-specific rules:
 
 #### Totally Enclosed Equipment
+
 - **Required**: Minimum number of exits (`exitNumber`)
 - **Required**: Exit visibility (`exitVisiblePass`)
 - **Safety Standard**: Adequate evacuation capability
 
 #### Slide Equipment
+
 - **Required**: All slide-specific measurements
 - **Required**: Run-out compliance
 - **Safety Standard**: Height-based containing wall requirements
 
 #### Standard Bounce Equipment
+
 - **Required**: Basic structural checks
 - **Required**: User capacity validation
 - **Safety Standard**: Appropriate anchoring
@@ -168,9 +184,9 @@ The system handles different equipment types with category-specific rules:
 
 ### Time-Based Safety Requirements
 
-| Measurement | Field | Standard | Critical Level |
-|-------------|--------|----------|---------------|
-| Evacuation Time | `evacTime` | Must be tested | Inspector discretion |
+| Measurement          | Field          | Standard            | Critical Level         |
+| -------------------- | -------------- | ------------------- | ---------------------- |
+| Evacuation Time      | `evacTime`     | Must be tested      | Inspector discretion   |
 | Evacuation Pass/Fail | `evacTimePass` | Required assessment | Must pass for approval |
 
 ## Pressure and Stability Requirements
@@ -242,7 +258,7 @@ The system handles different equipment types with category-specific rules:
 
 - **Field**: `Testimony` (rich text)
 - **Purpose**: Inspector's detailed findings and recommendations
-- **Usage**: Printed on final inspection certificate
+- **Usage**: Printed on final inspection report
 
 ## Validation Error Handling
 

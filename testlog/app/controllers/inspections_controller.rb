@@ -1,8 +1,8 @@
 class InspectionsController < ApplicationController
-  before_action :set_inspection, only: [:show, :edit, :update, :destroy, :certificate, :qr_code]
+  before_action :set_inspection, only: [:show, :edit, :update, :destroy, :report, :qr_code]
   before_action :check_inspection_owner, only: [:show, :edit, :update, :destroy]
   before_action :no_index
-  skip_before_action :require_login, only: [:certificate, :qr_code]
+  skip_before_action :require_login, only: [:report, :qr_code]
 
   def index
     @inspections = current_user.inspections.order(created_at: :desc)
@@ -136,13 +136,13 @@ class InspectionsController < ApplicationController
     render :index
   end
 
-  def certificate
-    pdf_data = PdfGeneratorService.generate_inspection_certificate(@inspection)
+  def report
+    pdf_data = PdfGeneratorService.generate_inspection_report(@inspection)
 
     @inspection.update(pdf_last_accessed_at: Time.current)
 
     send_data pdf_data.render,
-      filename: "PAT_Certificate_#{@inspection.serial}.pdf",
+      filename: "PAT_Report_#{@inspection.serial}.pdf",
       type: "application/pdf",
       disposition: "inline"
   end
@@ -151,7 +151,7 @@ class InspectionsController < ApplicationController
     qr_code_png = QrCodeService.generate_qr_code(@inspection)
 
     send_data qr_code_png,
-      filename: "PAT_Certificate_QR_#{@inspection.serial}.png",
+      filename: "PAT_Report_QR_#{@inspection.serial}.png",
       type: "image/png",
       disposition: "inline"
   end
@@ -180,8 +180,8 @@ class InspectionsController < ApplicationController
       Inspection.find_by("UPPER(id) = ?", params[:id].upcase)
 
     unless @inspection
-      if action_name.in?(["certificate", "qr_code"])
-        # For public certificate access, return 404 instead of redirect
+      if action_name.in?(["report", "qr_code"])
+        # For public report access, return 404 instead of redirect
         render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
       else
         flash[:danger] = "Inspection record not found"

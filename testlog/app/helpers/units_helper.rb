@@ -15,7 +15,7 @@ module UnitsHelper
       },
       {
         label: I18n.t("units.buttons.pdf_report"),
-        url: certificate_unit_path(unit),
+        url: report_unit_path(unit),
         target: "_blank"
       },
       {

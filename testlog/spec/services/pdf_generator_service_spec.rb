@@ -8,12 +8,12 @@ RSpec.describe PdfGeneratorService do
       example.run
     end
   end
-  describe ".generate_inspection_certificate" do
+  describe ".generate_inspection_report" do
     let(:user) { create(:user) }
     let(:inspection) { create(:inspection, user: user) }
 
     it "generates a PDF" do
-      pdf = PdfGeneratorService.generate_inspection_certificate(inspection)
+      pdf = PdfGeneratorService.generate_inspection_report(inspection)
       expect(pdf).to be_a(Prawn::Document)
 
       pdf_string = pdf.render
@@ -22,7 +22,7 @@ RSpec.describe PdfGeneratorService do
     end
 
     it "uses I18n translations for PDF content" do
-      pdf = PdfGeneratorService.generate_inspection_certificate(inspection)
+      pdf = PdfGeneratorService.generate_inspection_report(inspection)
       pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
       # Check that I18n translations are used
@@ -35,12 +35,12 @@ RSpec.describe PdfGeneratorService do
 
     it "handles different inspection statuses with I18n" do
       inspection.update(passed: true)
-      pdf = PdfGeneratorService.generate_inspection_certificate(inspection)
+      pdf = PdfGeneratorService.generate_inspection_report(inspection)
       pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
       expect(pdf_text).to include(I18n.t("pdf.inspection.passed"))
 
       inspection.update(passed: false)
-      pdf = PdfGeneratorService.generate_inspection_certificate(inspection)
+      pdf = PdfGeneratorService.generate_inspection_report(inspection)
       pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
       expect(pdf_text).to include(I18n.t("pdf.inspection.failed"))
     end
@@ -51,7 +51,7 @@ RSpec.describe PdfGeneratorService do
       end
 
       it "generates PDF with comments section using I18n" do
-        pdf = PdfGeneratorService.generate_inspection_certificate(inspection)
+        pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
         expect(pdf_text).to include(I18n.t("pdf.inspection.comments"))
@@ -65,7 +65,7 @@ RSpec.describe PdfGeneratorService do
       end
 
       it "shows 'not specified' text using I18n" do
-        pdf = PdfGeneratorService.generate_inspection_certificate(inspection)
+        pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
         expect(pdf_text).to include(I18n.t("pdf.inspection.fields.not_specified"))
@@ -73,12 +73,12 @@ RSpec.describe PdfGeneratorService do
     end
   end
 
-  describe ".generate_unit_certificate" do
+  describe ".generate_unit_report" do
     let(:user) { create(:user) }
     let(:unit) { create(:unit, user: user) }
 
     it "generates a PDF" do
-      pdf = PdfGeneratorService.generate_unit_certificate(unit)
+      pdf = PdfGeneratorService.generate_unit_report(unit)
       expect(pdf).to be_a(Prawn::Document)
 
       pdf_string = pdf.render
@@ -87,7 +87,7 @@ RSpec.describe PdfGeneratorService do
     end
 
     it "uses I18n translations for unit PDF content" do
-      pdf = PdfGeneratorService.generate_unit_certificate(unit)
+      pdf = PdfGeneratorService.generate_unit_report(unit)
       pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
       # Check that I18n translations are used
@@ -98,7 +98,7 @@ RSpec.describe PdfGeneratorService do
     end
 
     it "displays unit fields with I18n labels" do
-      pdf = PdfGeneratorService.generate_unit_certificate(unit)
+      pdf = PdfGeneratorService.generate_unit_report(unit)
       pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
       expect(pdf_text).to include(I18n.t("pdf.unit.fields.name"))
@@ -113,7 +113,7 @@ RSpec.describe PdfGeneratorService do
       let!(:failed_inspection) { create(:inspection, user: user, unit: unit, passed: false) }
 
       it "generates PDF with inspection history using I18n" do
-        pdf = PdfGeneratorService.generate_unit_certificate(unit)
+        pdf = PdfGeneratorService.generate_unit_report(unit)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
         expect(pdf_text).to include(I18n.t("pdf.unit.inspection_history"))
@@ -131,7 +131,7 @@ RSpec.describe PdfGeneratorService do
       end
 
       it "shows 'not specified' text using I18n" do
-        pdf = PdfGeneratorService.generate_unit_certificate(unit)
+        pdf = PdfGeneratorService.generate_unit_report(unit)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
         expect(pdf_text).to include(I18n.t("pdf.unit.fields.not_specified"))

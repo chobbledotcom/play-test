@@ -33,9 +33,9 @@ class InspectionsController < ApplicationController
   # Create new inspection with comprehensive validation
   def create
     @inspection = current_user.inspections.build(inspection_params)
-    
+
     if @inspection.save
-      redirect_to edit_inspection_path(@inspection), 
+      redirect_to edit_inspection_path(@inspection),
                   notice: 'Inspection created. Complete all assessment sections.'
     else
       render :new, status: :unprocessable_entity
@@ -56,7 +56,7 @@ class InspectionsController < ApplicationController
       if params[:auto_save]
         render json: { status: 'saved', errors: [] }
       else
-        redirect_to inspection_path(@inspection), 
+        redirect_to inspection_path(@inspection),
                     notice: 'Inspection updated successfully.'
       end
     else
@@ -71,7 +71,7 @@ class InspectionsController < ApplicationController
   # GET /inspections/:id
   # View completed inspection with pass/fail determination
   def show
-    @pdf_url = inspection_certificate_path(@inspection, format: :pdf)
+    @pdf_url = inspection_report_path(@inspection, format: :pdf)
   end
 
   # DELETE /inspections/:id
@@ -88,7 +88,7 @@ class InspectionsController < ApplicationController
       @inspection.finalize!(current_user)
       redirect_to @inspection, notice: 'Inspection finalized.'
     else
-      redirect_to edit_inspection_path(@inspection), 
+      redirect_to edit_inspection_path(@inspection),
                   alert: 'Cannot finalize: incomplete assessment sections.'
     end
   end
@@ -111,34 +111,34 @@ class InspectionsController < ApplicationController
       # Global details
       :inspection_company_name, :rpii_registration_number, :place_inspected,
       :inspection_date, :testimony, :passed, :risk_assessment,
-      
+
       # Unit details
       unit_attributes: [:id, :description, :manufacturer, :width, :length, :height,
                        :serial_number, :unit_type, :owner, :photo],
-      
+
       # All assessment attributes (150+ fields)
-      user_height_assessment_attributes: [:id, :containing_wall_height, 
+      user_height_assessment_attributes: [:id, :containing_wall_height,
                                         :containing_wall_height_comment, :platform_height,
                                         :platform_height_comment, :slide_barrier_height,
                                         # ... all height assessment fields
                                        ],
-      
+
       slide_assessment_attributes: [:id, :slide_platform_height, :slide_wall_height,
                                    # ... all slide assessment fields
                                   ],
-      
+
       structure_assessment_attributes: [:id, :seam_integrity_pass, :seam_integrity_comment,
                                        # ... all structure assessment fields
                                       ],
-      
+
       anchorage_assessment_attributes: [:id, :num_low_anchors, :num_high_anchors,
                                        # ... all anchorage assessment fields
                                       ],
-      
+
       materials_assessment_attributes: [:id, :rope_size, :rope_size_pass,
                                        # ... all materials assessment fields
                                       ],
-      
+
       fan_assessment_attributes: [:id, :blower_size_comment, :blower_flap_pass,
                                  # ... all fan assessment fields
                                 ]

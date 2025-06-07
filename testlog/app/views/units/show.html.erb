@@ -1,6 +1,6 @@
 <article class="view-unit">
-  <header><h2><%= t('units.titles.show') %></h2></header>  
-  
+  <header><h2><%= t('units.titles.show') %></h2></header>
+
   <%= render 'unit_details', unit: @unit %>
 
   <hr>
@@ -23,6 +23,6 @@
 
   <hr>
 
-  <h4><%= t('units.headers.certificate_link') %></h4>
-  <%= link_to short_unit_certificate_url(@unit), short_unit_certificate_url(@unit) %>
+  <h4><%= t('units.headers.report_link') %></h4>
+  <%= link_to short_unit_report_url(@unit), short_unit_report_url(@unit) %>
 </article>

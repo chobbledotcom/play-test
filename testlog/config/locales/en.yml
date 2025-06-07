@@ -34,7 +34,7 @@ en:
     access_denied: "Access denied"
     invalid_password: "wrongpassword"
     admin_emails_pattern: "^admin\\d*@example\\.com$"
-  
+
   # Session/Login
   session:
     login:
@@ -47,7 +47,7 @@ en:
       error: "Invalid email/password combination"
     logout:
       success: "Logged out"
-  
+
   # User Management
   users:
     titles:
@@ -56,7 +56,7 @@ en:
       settings: "Your Settings"
       change_password: "Change Password"
       index: "Users"
-    
+
     forms:
       email: "Email"
       password: "Password"
@@ -66,7 +66,7 @@ en:
       password_help: "New Password (leave blank if no change)"
       inspection_limit: "Inspection limit"
       time_display_format: "Time Display Format"
-    
+
     buttons:
       register: "Register"
       update_user: "Update User"
@@ -74,7 +74,7 @@ en:
       update_password: "Update Password"
       delete: "Delete"
       change_password: "Change Password"
-    
+
     messages:
       no_users: "No users found"
       admin_yes: "Yes"
@@ -83,11 +83,11 @@ en:
       company_not_activated: "Your account hasn't been activated yet. Please contact an administrator to set up your inspection company."
       company_archived: "Your inspection company has been archived. Please contact an administrator."
       inspection_limit_reached: "Your inspection limit has been reached. Please contact an administrator."
-    
+
     options:
       time_full: "Show Full Time"
       time_day: "Show Day Only"
-  
+
   # Units Management
   units:
     titles:
@@ -95,14 +95,14 @@ en:
       edit: "Edit Unit"
       index: "Units"
       show: "Unit Details"
-    
+
     headers:
       unit_details: "Unit Details"
       dimensions: "Dimensions (in metres)"
       inspection_history: "Inspection History"
-      qr_code: "Certificate QR Code"
-      certificate_link: "Certificate PDF Link"
-    
+      qr_code: "Report QR Code"
+      report_link: "Report PDF Link"
+
     forms:
       name: "Unit Name"
       unit_type: "Unit Type"
@@ -119,7 +119,7 @@ en:
       manufacture_date: "Manufacture Date"
       condition: "Condition"
       notes: "Additional Notes"
-    
+
     unit_types:
       bounce_house: "Bouncy Castle"
       slide: "Slide"
@@ -127,7 +127,7 @@ en:
       obstacle_course: "Obstacle Course"
       totally_enclosed: "Totally Enclosed"
       select_prompt: "Select unit type..."
-    
+
     conditions:
       excellent: "Excellent"
       good: "Good"
@@ -135,14 +135,14 @@ en:
       poor: "Poor"
       needs_repair: "Needs Repair"
       select_prompt: "Select condition..."
-    
+
     buttons:
       create: "Create Unit"
       update: "Update Unit"
       delete: "Delete"
       pdf_report: "PDF Report"
       add_inspection: "Add Inspection"
-    
+
     validations:
       name_blank: "Name can't be blank"
       unit_type_blank: "Unit type can't be blank"
@@ -159,13 +159,13 @@ en:
       length_range: "Length must be less than 200"
       height_range: "Height must be greater than 0"
       save_error: "Did not save"
-    
+
     messages:
       add_inspection_confirm: "Create a new inspection for this unit?"
       no_inspections: "No inspections recorded for this unit."
-    
+
     accessibility:
-      qr_code_alt: "QR Code for Equipment Certificate"
+      qr_code_alt: "QR Code for Equipment Report"
 
   # Inspector Companies Management
   inspector_companies:
@@ -174,14 +174,14 @@ en:
       new: "New Inspector Company"
       edit: "Edit Inspector Company"
       show: "Company Details"
-    
+
     headers:
       company_details: "Company Details"
       contact_information: "Contact Information"
       company_status: "Company Status"
       company_statistics: "Company Statistics"
       recent_inspections: "Recent Inspections"
-    
+
     forms:
       name: "Company Name"
       rpii_registration_number: "RPII Registration Number"
@@ -195,7 +195,7 @@ en:
       active: "Active"
       notes: "Notes"
       logo: "Company Logo"
-    
+
     status:
       active: "Active"
       archived: "Archived"
@@ -203,7 +203,7 @@ en:
       no: "No"
       valid_credentials: "Valid Credentials"
       invalid_credentials: "Invalid Credentials"
-    
+
     buttons:
       create: "Create Company"
       update: "Update Company"
@@ -211,7 +211,7 @@ en:
       unarchive: "Unarchive"
       search: "Search"
       new_company: "New Company"
-    
+
     messages:
       created: "Inspector company created successfully."
       updated: "Inspector company updated successfully."
@@ -220,11 +220,11 @@ en:
       not_found: "Inspector company not found."
       unauthorized: "You are not authorized to access this page"
       no_companies: "No inspector companies found"
-    
+
     search:
       placeholder: "Search by name or RPII number..."
       active_filter: "Active Filter"
-    
+
     statistics:
       total_inspections: "Total Inspections"
       passed_inspections: "Passed"
@@ -236,20 +236,20 @@ en:
   jobs:
     title: "Background Jobs"
     storage_cleanup: "StorageCleanupJob"
-  
+
   # PDF Generator
   pdf:
     inspection:
-      title: "Inspection Certificate"
+      title: "Inspection Report"
       passed: "PASSED"
       failed: "FAILED"
       equipment_details: "Equipment Details"
       inspection_results: "Inspection Results"
       comments: "Comments"
-      verification: "Certificate Verification"
-      scan_text: "Scan to verify certificate or visit:"
+      verification: "Report Verification"
+      scan_text: "Scan to verify report or visit:"
       footer_text: "Inspection Logger"
-      generated_text: "This certificate was generated on"
+      generated_text: "This report was generated on"
       fields:
         serial_number: "Serial Number"
         manufacturer: "Manufacturer"
@@ -261,12 +261,12 @@ en:
         not_specified: "Not specified"
         pass: "PASS"
         fail: "FAIL"
-    
+
     unit:
       title: "Unit History Report"
       details: "Unit Details"
       inspection_history: "Inspection History"
-      verification: "Certificate Verification"
+      verification: "Report Verification"
       scan_text: "Scan to view unit history or visit:"
       footer_text: "Inspection Logger"
       generated_text: "This report was generated on"
@@ -287,12 +287,12 @@ en:
         pass: "PASS"
         fail: "FAIL"
         na: "N/A"
-    
+
     equipment:
       title: "Equipment History Report"
       details: "Equipment Details"
       inspection_history: "Inspection History"
-      verification: "Certificate Verification"
+      verification: "Report Verification"
       scan_text: "Scan to view equipment history or visit:"
       footer_text: "Inspection Logger"
       generated_text: "This report was generated on"
@@ -311,11 +311,11 @@ en:
         pass: "PASS"
         fail: "FAIL"
         na: "N/A"
-  
+
   # Home Page
   home:
     title: "patlog.co.uk"
-    subtitle: "Log your Portable Appliance Testing inspections, generate PDF certificates, and link to them with QR codes."
+    subtitle: "Log your Portable Appliance Testing inspections, generate PDF reports, and link to them with QR codes."
     attribution: "A free and open source service from"
     company_name: "Chobble"
     company_url: "https://chobble.com"
@@ -324,8 +324,8 @@ en:
         title: "Log Inspections"
         description: "Create and log your PAT test records with all the necessary fields."
       generate_pdfs:
-        title: "Generate PDF Certificates"
-        description: "Automatic certificates with QR codes links for easy verification."
+        title: "Generate PDF Reports"
+        description: "Automatic reports with QR codes links for easy verification."
       search_export:
         title: "Search & Export"
         description: "Quickly find inspection records and export your inspections to CSV."
@@ -342,14 +342,14 @@ en:
       new: "New Inspection"
       show: "Inspection Details"
       index: "Inspections"
-    
+
     headers:
       overview: "Inspection Overview"
       unit_details: "Unit Details"
       current_unit: "Current Unit"
       inspection_details: "Inspection Details"
       status_and_results: "Status and Results"
-    
+
     tabs:
       general: "General"
       user_height: "User Height"
@@ -359,7 +359,7 @@ en:
       materials: "Materials"
       fan: "Fan"
       enclosed: "Enclosed"
-    
+
     fields:
       unit_name: "Unit Name"
       unit_select: "Select Unit (Required)"
@@ -386,13 +386,13 @@ en:
       inspector_help: "Determined by the user performing the inspection"
       rpii_help: "From the selected inspector company"
       not_available: "Not Available"
-    
+
     status:
       draft: "Draft"
       in_progress: "In Progress"
       completed: "Completed"
       finalized: "Finalized"
-    
+
     buttons:
       create: "Create Inspection"
       update: "Update Inspection"
@@ -401,7 +401,7 @@ en:
       create_and_continue: "Create and Continue"
       add_via_units: "Add Inspection (Select Unit First)"
       save_assessment: "Save Assessment"
-    
+
     messages:
       no_unit: "No unit selected"
       not_specified: "Not specified"
@@ -409,7 +409,7 @@ en:
       created: "Inspection created successfully. Please complete the details below."
       updated: "Inspection updated successfully."
       deleted: "Inspection deleted successfully."
-    
+
     errors:
       header:
         one: "Did not save. Fix this %{count} error and try again:"
@@ -417,12 +417,12 @@ en:
       unit_required: "Unit selection is required"
       invalid_unit: "Invalid unit selection"
       creation_failed: "Failed to create inspection: %{errors}"
-    
+
     autosave:
       saving: "Saving..."
       saved: "Saved"
       error: "Error saving"
-    
+
     assessments:
       user_height:
         title: "User Height Assessment"
@@ -463,7 +463,7 @@ en:
           completion: "Assessment Completion"
           pass: "Pass"
           fail: "Fail"
-      
+
       slide:
         title: "Slide Assessment"
         sections:
@@ -509,10 +509,10 @@ en:
     edit: "Edit"
     show: "Show"
     view: "View"
-    
+
   # Validation Messages
   errors:
     cant_be_blank: "can't be blank"
     is_invalid: "is invalid"
-    
+
   hello: "Hello world"

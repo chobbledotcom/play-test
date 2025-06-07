@@ -31,7 +31,7 @@ Rails.application.routes.draw do
       get "overdue"
     end
     member do
-      get "certificate"
+      get "report"
       get "qr_code"
     end
   end
@@ -42,7 +42,7 @@ Rails.application.routes.draw do
       get "search"
     end
     member do
-      get "certificate"
+      get "report"
       get "qr_code"
     end
   end
@@ -55,11 +55,11 @@ Rails.application.routes.draw do
     end
   end
 
-  # Short URL for certificates
-  get "c/:id", to: "inspections#certificate", as: "short_certificate"
-  get "C/:id", to: "inspections#certificate", as: "short_certificate_uppercase"
+  # Short URL for reports
+  get "r/:id", to: "inspections#report", as: "short_report"
+  get "R/:id", to: "inspections#report", as: "short_report_uppercase"
 
-  # Short URL for unit certificates
-  get "e/:id", to: "units#certificate", as: "short_unit_certificate"
-  get "E/:id", to: "units#certificate", as: "short_unit_certificate_uppercase"
+  # Short URL for unit reports
+  get "u/:id", to: "units#report", as: "short_unit_report"
+  get "U/:id", to: "units#report", as: "short_unit_report_uppercase"
 end

@@ -9,10 +9,12 @@ This document provides comprehensive reference documentation for all methods and
 ### Application Entry Point
 
 #### `Main()`
-**Location**: Program.cs:9  
-**Signature**: `static void Main()`  
-**Purpose**: Application entry point  
+
+**Location**: Program.cs:9
+**Signature**: `static void Main()`
+**Purpose**: Application entry point
 **Functionality**:
+
 - Initializes Windows Forms application configuration
 - Creates and runs main Form1 instance
 - Sets up application-wide settings
@@ -24,17 +26,20 @@ This document provides comprehensive reference documentation for all methods and
 ### Connection Management
 
 #### `CreateConnection()`
-**Location**: Form1.cs:71  
-**Signature**: `SQLiteConnection CreateConnection()`  
-**Purpose**: Create and open SQLite database connection  
-**Returns**: `SQLiteConnection` - Active database connection  
+
+**Location**: Form1.cs:71
+**Signature**: `SQLiteConnection CreateConnection()`
+**Purpose**: Create and open SQLite database connection
+**Returns**: `SQLiteConnection` - Active database connection
 **Functionality**:
+
 - Creates SQLite database file if it doesn't exist
 - Opens connection to `RPIIInspections.db`
 - Uses connection string: `"Data Source=RPIIInspections.db; Version = 3; New = True; Compress = True;"`
 - Handles connection exceptions silently
 
 **Usage Example**:
+
 ```csharp
 SQLiteConnection conn = CreateConnection();
 // Use connection for database operations
@@ -43,12 +48,14 @@ SQLiteConnection conn = CreateConnection();
 ### Table Management
 
 #### `CreateTable(SQLiteConnection conn)`
-**Location**: Form1.cs:96  
-**Signature**: `void CreateTable(SQLiteConnection conn)`  
-**Purpose**: Create inspection table if it doesn't exist  
+
+**Location**: Form1.cs:96
+**Signature**: `void CreateTable(SQLiteConnection conn)`
+**Purpose**: Create inspection table if it doesn't exist
 **Parameters**:
+
 - `conn` - Active SQLite database connection
-**Functionality**:
+  **Functionality**:
 - Creates `Inspections` table with complete schema
 - Includes all 142 inspection fields
 - Uses `CREATE TABLE IF NOT EXISTS` for safety
@@ -57,22 +64,26 @@ SQLiteConnection conn = CreateConnection();
 ### Data Operations
 
 #### `InsertData(SQLiteConnection conn)`
-**Location**: Form1.cs:285  
-**Signature**: `void InsertData(SQLiteConnection conn)`  
-**Purpose**: Insert current inspection data into database  
+
+**Location**: Form1.cs:285
+**Signature**: `void InsertData(SQLiteConnection conn)`
+**Purpose**: Insert current inspection data into database
 **Parameters**:
+
 - `conn` - Active SQLite database connection
-**Functionality**:
+  **Functionality**:
 - Collects all form field values
 - Constructs parameterized INSERT statement
 - Handles image data conversion
 - Executes database insertion with error handling
 
 #### `saveInspection()`
-**Location**: Form1.cs:736  
-**Signature**: `void saveInspection()`  
-**Purpose**: Complete save workflow for current inspection  
+
+**Location**: Form1.cs:736
+**Signature**: `void saveInspection()`
+**Purpose**: Complete save workflow for current inspection
 **Functionality**:
+
 - Creates database connection
 - Creates table if needed
 - Inserts current inspection data
@@ -81,18 +92,21 @@ SQLiteConnection conn = CreateConnection();
 ### Record Retrieval
 
 #### `loadRecords(string query)`
-**Location**: Form1.cs:929  
-**Signature**: `void loadRecords(string query)`  
-**Purpose**: Load inspection records into DataGridView  
+
+**Location**: Form1.cs:929
+**Signature**: `void loadRecords(string query)`
+**Purpose**: Load inspection records into DataGridView
 **Parameters**:
+
 - `query` - SQL SELECT statement to execute
-**Functionality**:
+  **Functionality**:
 - Clears existing records display
 - Executes provided SQL query
 - Populates DataGridView with results
 - Handles database read exceptions
 
 **Usage Examples**:
+
 ```csharp
 // Load all records
 loadRecords("SELECT * FROM Inspections;");
@@ -102,22 +116,26 @@ loadRecords("SELECT * FROM Inspections WHERE unitOwner LIKE '%Smith%';");
 ```
 
 #### `loadReportIntoApplication(int rowIndex)`
-**Location**: Form1.cs:1405  
-**Signature**: `void loadReportIntoApplication(int rowIndex)`  
-**Purpose**: Load selected inspection record into form fields  
+
+**Location**: Form1.cs:1405
+**Signature**: `void loadReportIntoApplication(int rowIndex)`
+**Purpose**: Load selected inspection record into form fields
 **Parameters**:
+
 - `rowIndex` - Index of record in DataGridView to load
-**Functionality**:
+  **Functionality**:
 - Extracts all field values from selected DataGridView row
 - Populates all form controls with loaded data
 - Handles type conversions for different field types
 - Restores images and checkbox states
 
 #### `clearRecords()`
-**Location**: Form1.cs:1394  
-**Signature**: `void clearRecords()`  
-**Purpose**: Clear all records from DataGridView  
+
+**Location**: Form1.cs:1394
+**Signature**: `void clearRecords()`
+**Purpose**: Clear all records from DataGridView
 **Functionality**:
+
 - Removes all rows from records DataGridView
 - Resets display for new search operations
 
@@ -128,47 +146,54 @@ loadRecords("SELECT * FROM Inspections WHERE unitOwner LIKE '%Smith%';");
 ### Image Conversion
 
 #### `ConvertStringToImage(string ImgAsString)`
-**Location**: Form1.cs:851  
-**Signature**: `Image ConvertStringToImage(string ImgAsString)`  
-**Purpose**: Convert Base64 string to Image object  
+
+**Location**: Form1.cs:851
+**Signature**: `Image ConvertStringToImage(string ImgAsString)`
+**Purpose**: Convert Base64 string to Image object
 **Parameters**:
+
 - `ImgAsString` - Base64 encoded image string
-**Returns**: `Image` - Decoded image object, or `null` if empty string  
-**Functionality**:
+  **Returns**: `Image` - Decoded image object, or `null` if empty string
+  **Functionality**:
 - Validates input string length
 - Converts Base64 string to byte array
 - Creates Image from memory stream
 - Handles conversion errors gracefully
 
 #### `ConvertImageToString(Image image)`
-**Location**: Form1.cs:897  
-**Signature**: `string ConvertImageToString(Image image)`  
-**Purpose**: Convert Image object to Base64 string  
+
+**Location**: Form1.cs:897
+**Signature**: `string ConvertImageToString(Image image)`
+**Purpose**: Convert Image object to Base64 string
 **Parameters**:
+
 - `image` - Image object to convert
-**Returns**: `string` - Base64 encoded image data, or `null` if image is null  
-**Functionality**:
+  **Returns**: `string` - Base64 encoded image data, or `null` if image is null
+  **Functionality**:
 - Validates input image is not null
 - Saves image to memory stream as PNG
 - Converts byte array to Base64 string
 - Ensures proper resource disposal
 
 #### `compressImage(Image image, double x, double y)`
-**Location**: Form1.cs:873  
-**Signature**: `Image compressImage(Image image, double x, double y)`  
-**Purpose**: Resize image while maintaining aspect ratio  
+
+**Location**: Form1.cs:873
+**Signature**: `Image compressImage(Image image, double x, double y)`
+**Purpose**: Resize image while maintaining aspect ratio
 **Parameters**:
+
 - `image` - Source image to compress
 - `x` - Target width constraint
 - `y` - Target height constraint
-**Returns**: `Image` - Compressed image, or `null` if source is null  
-**Functionality**:
+  **Returns**: `Image` - Compressed image, or `null` if source is null
+  **Functionality**:
 - Calculates optimal resize ratio maintaining aspect ratio
 - Creates new bitmap with calculated dimensions
 - Draws resized image using Graphics object
 - Prevents distortion by using minimum ratio
 
 **Usage Example**:
+
 ```csharp
 // Compress image to fit within 128x95 pixels
 Image compressed = compressImage(originalImage, 128.0, 95.0);
@@ -177,20 +202,24 @@ Image compressed = compressImage(originalImage, 128.0, 95.0);
 ### File Operations
 
 #### `choosePhoto()`
-**Location**: Form1.cs:37  
-**Signature**: `void choosePhoto()`  
-**Purpose**: Handle equipment photo selection and display  
+
+**Location**: Form1.cs:37
+**Signature**: `void choosePhoto()`
+**Purpose**: Handle equipment photo selection and display
 **Functionality**:
+
 - Opens file dialog for image selection
 - Validates selected file can be loaded as bitmap
 - Displays image in `unitPic` PictureBox
 - Shows error message if file loading fails
 
 #### `chooseLogo()`
-**Location**: Form1.cs:53  
-**Signature**: `void chooseLogo()`  
-**Purpose**: Handle inspector logo selection and display  
+
+**Location**: Form1.cs:53
+**Signature**: `void chooseLogo()`
+**Purpose**: Handle inspector logo selection and display
 **Functionality**:
+
 - Opens file dialog for logo selection
 - Validates selected file can be loaded as bitmap
 - Displays logo in `inspectorsLogo` PictureBox
@@ -203,10 +232,12 @@ Image compressed = compressImage(originalImage, 128.0, 95.0);
 ### Report Creation
 
 #### `createPDFCert()`
-**Location**: Form1.cs:1122  
-**Signature**: `void createPDFCert()`  
-**Purpose**: Generate complete PDF inspection certificate  
+
+**Location**: Form1.cs:1122
+**Signature**: `void createPDFCert()`
+**Purpose**: Generate complete PDF inspection report
 **Functionality**:
+
 - Validates unique report number is present
 - Creates PDF document with complete inspection data
 - Includes all measurements, assessments, and images
@@ -216,6 +247,7 @@ Image compressed = compressImage(originalImage, 128.0, 95.0);
 - Provides comprehensive inspection report
 
 **PDF Content Sections**:
+
 1. Header with logos and inspection details
 2. Unit specifications and photo
 3. Height measurements and user capacity
@@ -234,20 +266,23 @@ Image compressed = compressImage(originalImage, 128.0, 95.0);
 ### Text Processing
 
 #### `truncateText(string text, int maxLength)`
-**Location**: Form1.cs:1105  
-**Signature**: `string truncateText(string text, int maxLength)`  
-**Purpose**: Truncate text to specified maximum length  
+
+**Location**: Form1.cs:1105
+**Signature**: `string truncateText(string text, int maxLength)`
+**Purpose**: Truncate text to specified maximum length
 **Parameters**:
+
 - `text` - Original text string
 - `maxLength` - Maximum allowed character length
-**Returns**: `string` - Truncated text (original if within limit)  
-**Functionality**:
+  **Returns**: `string` - Truncated text (original if within limit)
+  **Functionality**:
 - Validates text length against maximum
 - Returns substring if text exceeds limit
 - Preserves original text if within limit
 - Used extensively in PDF generation for comment fields
 
 **Usage Example**:
+
 ```csharp
 // Truncate comment to 60 characters for PDF display
 string shortComment = truncateText(fullComment, 60);
@@ -260,10 +295,12 @@ string shortComment = truncateText(fullComment, 60);
 ### Form State
 
 #### `Form1()` (Constructor)
-**Location**: Form1.cs:19  
-**Signature**: `public Form1()`  
-**Purpose**: Initialize main form and default values  
+
+**Location**: Form1.cs:19
+**Signature**: `public Form1()`
+**Purpose**: Initialize main form and default values
 **Functionality**:
+
 - Calls `InitializeComponent()` for UI setup
 - Sets inspection date to current date
 - Initializes form state for new inspection
@@ -271,8 +308,10 @@ string shortComment = truncateText(fullComment, 60);
 ### Form Reset
 
 #### `newBtn_Click()` Implementation
-**Purpose**: Reset form for new inspection entry  
+
+**Purpose**: Reset form for new inspection entry
 **Functionality**:
+
 - Clears all text fields
 - Resets numeric controls to defaults
 - Unchecks all checkboxes
@@ -287,15 +326,19 @@ string shortComment = truncateText(fullComment, 60);
 ### Search Methods
 
 #### Owner Search Implementation
-**Purpose**: Search inspections by equipment owner  
+
+**Purpose**: Search inspections by equipment owner
 **Functionality**:
+
 - Constructs SQL query with LIKE operator
 - Searches `unitOwner` field for partial matches
 - Calls `loadRecords()` with filtered query
 
 #### Report Number Search Implementation
-**Purpose**: Search by unique report identifier  
+
+**Purpose**: Search by unique report identifier
 **Functionality**:
+
 - Constructs exact match SQL query
 - Searches `TagID` field for specific record
 - Loads single matching inspection
@@ -305,6 +348,7 @@ string shortComment = truncateText(fullComment, 60);
 ## Error Handling Patterns
 
 ### Database Error Handling
+
 ```csharp
 try
 {
@@ -317,6 +361,7 @@ catch (Exception ex)
 ```
 
 ### Image Processing Error Handling
+
 ```csharp
 try
 {
@@ -329,6 +374,7 @@ catch (Exception ex)
 ```
 
 ### File Operation Error Handling
+
 - File dialog validation
 - Image format validation
 - Path existence checking
@@ -339,12 +385,14 @@ catch (Exception ex)
 ## Method Dependencies
 
 ### Database Operation Flow
+
 1. `CreateConnection()` → Database connection
 2. `CreateTable()` → Table initialization
 3. `InsertData()` → Data persistence
 4. `loadRecords()` → Data retrieval
 
 ### Image Processing Flow
+
 1. File selection → `choosePhoto()` / `chooseLogo()`
 2. Display → PictureBox assignment
 3. Compression → `compressImage()`
@@ -352,6 +400,7 @@ catch (Exception ex)
 5. Retrieval → `ConvertStringToImage()`
 
 ### PDF Generation Flow
+
 1. Validation → Check required fields
 2. Image processing → `compressImage()`
 3. Content creation → `createPDFCert()`

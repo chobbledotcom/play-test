@@ -17,7 +17,7 @@ RSpec.describe "home/index.html.erb", type: :view do
       render
 
       expect(rendered).to include("Portable Appliance Testing")
-      expect(rendered).to include("generate PDF certificates")
+      expect(rendered).to include("generate PDF reports")
       expect(rendered).to include("QR codes")
     end
 
@@ -68,7 +68,7 @@ RSpec.describe "home/index.html.erb", type: :view do
       render
 
       expect(rendered).to include("PAT test records")
-      expect(rendered).to include("Automatic certificates")
+      expect(rendered).to include("Automatic reports")
       expect(rendered).to include("export your inspections")
     end
 

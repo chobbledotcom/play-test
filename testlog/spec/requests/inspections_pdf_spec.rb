@@ -16,12 +16,12 @@ RSpec.describe "Inspections PDF Generation", type: :request do
   describe "PDF navigation integration with Capybara" do
     let(:inspection) { create(:inspection, user: user) }
 
-    it "allows accessing PDF certificate from inspection show page" do
+    it "allows accessing PDF report from inspection show page" do
       visit inspection_path(inspection)
 
-      # Check if PDF Certificate link exists (if it does in the view)
-      if page.has_link?("PDF Certificate") || page.has_link?("Certificate")
-        click_link("PDF Certificate") || click_link("Certificate")
+      # Check if PDF Report link exists (if it does in the view)
+      if page.has_link?("PDF Report") || page.has_link?("Report")
+        click_link("PDF Report") || click_link("Report")
 
         # Check response is a PDF
         expect(page.response_headers["Content-Type"]).to eq("application/pdf")
@@ -29,9 +29,9 @@ RSpec.describe "Inspections PDF Generation", type: :request do
       end
     end
 
-    it "handles direct certificate URL access" do
-      # Visit the certificate URL directly using Capybara
-      page.driver.browser.get("/inspections/#{inspection.id}/certificate")
+    it "handles direct report URL access" do
+      # Visit the report URL directly using Capybara
+      page.driver.browser.get("/inspections/#{inspection.id}/report")
 
       # Check that it's a PDF response
       expect(page.driver.response.headers["Content-Type"]).to include("application/pdf")
@@ -39,7 +39,7 @@ RSpec.describe "Inspections PDF Generation", type: :request do
     end
   end
 
-  describe "GET /inspections/:id/certificate with esoteric test cases" do
+  describe "GET /inspections/:id/report with esoteric test cases" do
     it "handles extremely long text in PDF generation" do
       # Create inspection with extremely long text in all fields
       extremely_long_text = "A" * 1000  # Long but not too long for the test
@@ -56,8 +56,8 @@ RSpec.describe "Inspections PDF Generation", type: :request do
         passed: true,
         comments: extremely_long_text)
 
-      # Request the certificate
-      get "/inspections/#{inspection.id}/certificate"
+      # Request the report
+      get "/inspections/#{inspection.id}/report"
 
       # Verify response
       expect(response).to have_http_status(:success)
@@ -69,12 +69,12 @@ RSpec.describe "Inspections PDF Generation", type: :request do
       inspection = create(:inspection, user: user)
 
       # Test with lowercase URL (user-friendly)
-      get "/inspections/#{inspection.id.downcase}/certificate"
+      get "/inspections/#{inspection.id.downcase}/report"
       expect(response).to have_http_status(:success)
       expect(response.content_type).to eq("application/pdf")
 
       # Test with uppercase URL (canonical)
-      get "/inspections/#{inspection.id.upcase}/certificate"
+      get "/inspections/#{inspection.id.upcase}/report"
       expect(response).to have_http_status(:success)
       expect(response.content_type).to eq("application/pdf")
     end
@@ -85,8 +85,8 @@ RSpec.describe "Inspections PDF Generation", type: :request do
         user: user,
         passed: true)
 
-      # Request the certificate
-      get "/inspections/#{inspection.id}/certificate"
+      # Request the report
+      get "/inspections/#{inspection.id}/report"
 
       # Verify response
       expect(response).to have_http_status(:success)
@@ -108,8 +108,8 @@ RSpec.describe "Inspections PDF Generation", type: :request do
         passed: true,
         comments: "<h1>Big Title</h1><p>Paragraph</p><a href='http://example.com'>Link</a>")
 
-      # Request the certificate
-      get "/inspections/#{inspection.id}/certificate"
+      # Request the report
+      get "/inspections/#{inspection.id}/report"
 
       # Verify response
       expect(response).to have_http_status(:success)
@@ -131,8 +131,8 @@ RSpec.describe "Inspections PDF Generation", type: :request do
         passed: true,
         comments: "Extreme precision test")
 
-      # Request the certificate
-      get "/inspections/#{inspection.id}/certificate"
+      # Request the report
+      get "/inspections/#{inspection.id}/report"
 
       # Verify response
       expect(response).to have_http_status(:success)
@@ -141,10 +141,10 @@ RSpec.describe "Inspections PDF Generation", type: :request do
     end
 
     it "handles non-existent inspection ID gracefully" do
-      # Try to get certificate for non-existent ID
-      get "/inspections/99999999/certificate"
+      # Try to get report for non-existent ID
+      get "/inspections/99999999/report"
 
-      # Should return 404 for public certificate access
+      # Should return 404 for public report access
       expect(response).to have_http_status(:not_found)
     end
   end
