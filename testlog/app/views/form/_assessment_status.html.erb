@@ -1,0 +1,59 @@
+<%
+  # Smart i18n key detection for assessment type
+  if local_assigns[:i18n_base]
+    i18n_base = local_assigns[:i18n_base]
+  else
+    # Auto-detect from controller and current tab context
+    controller_name = params[:controller]
+    if controller_name == 'inspections' && params[:tab].present?
+      i18n_base = "inspections.assessments.#{params[:tab]}"
+    else
+      i18n_base = "#{controller_name}"
+    end
+  end
+  
+  # Assessment object - should be passed as 'assessment'
+  assessment_obj = assessment
+%>
+
+<% if assessment_obj&.persisted? %>
+  <div class="assessment-status">
+    <h4><%= t("#{i18n_base}.sections.safety_status") %></h4>
+    
+    <% if assessment_obj.respond_to?(:meets_height_requirements?) %>
+      <p>
+        <strong><%= t("#{i18n_base}.status.height_requirement") %>:</strong>
+        <span class="<%= assessment_obj.meets_height_requirements? ? 'text-success' : 'text-danger' %>">
+          <%= assessment_obj.meets_height_requirements? ? 
+              t("#{i18n_base}.status.pass") : 
+              t("#{i18n_base}.status.fail") %>
+        </span>
+      </p>
+    <% end %>
+    
+    <% if assessment_obj.respond_to?(:meets_runout_requirements?) %>
+      <p>
+        <strong><%= t("#{i18n_base}.status.runout_requirement") %>:</strong>
+        <span class="<%= assessment_obj.meets_runout_requirements? ? 'text-success' : 'text-danger' %>">
+          <%= assessment_obj.meets_runout_requirements? ? 
+              t("#{i18n_base}.status.pass") : 
+              t("#{i18n_base}.status.fail") %>
+        </span>
+      </p>
+    <% end %>
+    
+    <% if assessment_obj.respond_to?(:passed_checks_count) && assessment_obj.respond_to?(:safety_check_count) %>
+      <p>
+        <strong><%= t("#{i18n_base}.status.checks_passed") %>:</strong>
+        <%= assessment_obj.passed_checks_count %> / <%= assessment_obj.safety_check_count %>
+      </p>
+    <% end %>
+    
+    <% if assessment_obj.respond_to?(:completion_percentage) %>
+      <p>
+        <strong><%= t("#{i18n_base}.status.completion") %>:</strong>
+        <%= assessment_obj.completion_percentage %>%
+      </p>
+    <% end %>
+  </div>
+<% end %>

@@ -463,6 +463,44 @@ en:
           completion: "Assessment Completion"
           pass: "Pass"
           fail: "Fail"
+      
+      slide:
+        title: "Slide Assessment"
+        sections:
+          slide_measurements: "Slide Measurements"
+          safety_checks: "Safety Checks"
+          safety_status: "Safety Status"
+        fields:
+          slide_platform_height: "Slide Platform Height"
+          slide_wall_height: "Slide Wall Height"
+          runout_value: "Runout Length"
+          slide_first_metre_height: "First Metre Height"
+          slide_beyond_first_metre_height: "Beyond First Metre Height"
+          slide_permanent_roof: "Has Permanent Roof"
+          clamber_netting_pass: "Clamber Netting"
+          runout_pass: "Runout Requirements"
+          slip_sheet_pass: "Slip Sheet"
+          comments: "Comments"
+        placeholders:
+          height: "Enter height in meters"
+          length: "Enter length in meters"
+          comments: "Add any additional notes or observations"
+        hints:
+          slide_platform_height: "Height of the slide platform from ground level (meters)"
+          slide_wall_height: "Height of the slide wall structure (meters)"
+          runout_value: "Measured runout length from slide exit (meters)"
+          slide_first_metre_height: "Height measurement for the first metre of slide (meters)"
+          slide_beyond_first_metre_height: "Height measurement beyond the first metre (meters)"
+          slide_permanent_roof: "Check if the slide has a permanent roof structure"
+          clamber_netting_pass: "Assess if clamber netting meets safety requirements"
+          runout_pass: "Assess if runout length meets minimum requirements"
+          slip_sheet_pass: "Assess if slip sheet is properly installed and functional"
+        status:
+          runout_requirement: "Runout Requirement"
+          checks_passed: "Safety Checks Passed"
+          completion: "Assessment Completion"
+          pass: "Pass"
+          fail: "Fail"
 
   # General UI
   ui:

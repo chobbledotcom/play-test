@@ -1,0 +1,39 @@
+<%
+  # Get form object - either passed directly or from wrapper
+  form_object = local_assigns[:form] || @_current_form
+  
+  # Smart i18n key detection
+  if local_assigns[:i18n_base]
+    i18n_base = local_assigns[:i18n_base]
+  else
+    # Auto-detect from controller and current tab context
+    controller_name = params[:controller]
+    if controller_name == 'inspections' && params[:tab].present?
+      i18n_base = "inspections.assessments.#{params[:tab]}"
+    else
+      i18n_base = "#{controller_name}"
+    end
+  end
+  
+  # Set defaults with smart i18n lookup
+  field_label = local_assigns[:label] || t("#{i18n_base}.fields.#{field}", default: field.to_s.humanize)
+  field_hint = local_assigns[:hint] || t("#{i18n_base}.hints.#{field}", default: nil)
+  field_placeholder = local_assigns[:placeholder] || t("#{i18n_base}.placeholders.#{field}", default: nil)
+  
+  # Form field options
+  rows ||= 4
+  css_class ||= "form-control"
+  wrapper_class ||= "form-group"
+%>
+
+<div class="<%= wrapper_class %>">
+  <%= form_object.label field, field_label %>
+  <%= form_object.text_area field, {
+    rows: rows,
+    placeholder: field_placeholder,
+    class: css_class
+  }.compact %>
+  <% if field_hint.present? %>
+    <small class="form-text"><%= field_hint %></small>
+  <% end %>
+</div>

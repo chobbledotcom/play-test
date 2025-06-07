@@ -9,154 +9,48 @@
   
   <%= form.fields_for :slide_assessment, (@inspection.slide_assessment || @inspection.build_slide_assessment) do |assessment_form| %>
   
-  <div class="assessment-form slide-assessment">
-    <h3><%= t('inspections.assessments.slide.title') %></h3>
-    
-    <!-- Slide Measurements Section -->
-    <fieldset class="form-section">
-      <legend><%= t('inspections.assessments.slide.sections.slide_measurements') %></legend>
+  <%= render 'shared/assessment_form_section', form: assessment_form do %>
+    <div class="assessment-form slide-assessment">
+      <h3><%= t('inspections.assessments.slide.title') %></h3>
       
-      <div class="form-group">
-        <%= assessment_form.label :slide_platform_height, t('inspections.assessments.slide.fields.slide_platform_height') %>
-        <%= assessment_form.number_field :slide_platform_height, 
-            step: 0.01, 
-            placeholder: t('inspections.assessments.slide.placeholders.height'),
-            class: "form-control" %>
-        <small class="form-text"><%= t('inspections.assessments.slide.hints.slide_platform_height') %></small>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :slide_wall_height, t('inspections.assessments.slide.fields.slide_wall_height') %>
-        <%= assessment_form.number_field :slide_wall_height, 
-            step: 0.01, 
-            placeholder: t('inspections.assessments.slide.placeholders.height'),
-            class: "form-control" %>
-        <small class="form-text"><%= t('inspections.assessments.slide.hints.slide_wall_height') %></small>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :runout_value, t('inspections.assessments.slide.fields.runout_value') %>
-        <%= assessment_form.number_field :runout_value, 
-            step: 0.01, 
-            placeholder: t('inspections.assessments.slide.placeholders.length'),
-            class: "form-control" %>
-        <small class="form-text"><%= t('inspections.assessments.slide.hints.runout_value') %></small>
-        <% if @inspection.slide_assessment&.persisted? && @inspection.slide_assessment.slide_platform_height.present? %>
-          <div class="runout-status <%= @inspection.slide_assessment.meets_runout_requirements? ? 'text-success' : 'text-danger' %>">
-            <%= @inspection.slide_assessment.runout_compliance_status %>
-          </div>
-        <% end %>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :slide_first_metre_height, t('inspections.assessments.slide.fields.slide_first_metre_height') %>
-        <%= assessment_form.number_field :slide_first_metre_height, 
-            step: 0.01, 
-            placeholder: t('inspections.assessments.slide.placeholders.height'),
-            class: "form-control" %>
-        <small class="form-text"><%= t('inspections.assessments.slide.hints.slide_first_metre_height') %></small>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :slide_beyond_first_metre_height, t('inspections.assessments.slide.fields.slide_beyond_first_metre_height') %>
-        <%= assessment_form.number_field :slide_beyond_first_metre_height, 
-            step: 0.01, 
-            placeholder: t('inspections.assessments.slide.placeholders.height'),
-            class: "form-control" %>
-        <small class="form-text"><%= t('inspections.assessments.slide.hints.slide_beyond_first_metre_height') %></small>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.check_box :slide_permanent_roof, class: "form-check-input" %>
-        <%= assessment_form.label :slide_permanent_roof, t('inspections.assessments.slide.fields.slide_permanent_roof'), class: "form-check-label" %>
-        <small class="form-text"><%= t('inspections.assessments.slide.hints.slide_permanent_roof') %></small>
-      </div>
-    </fieldset>
-    
-    <!-- Safety Checks Section -->
-    <fieldset class="form-section">
-      <legend><%= t('inspections.assessments.slide.sections.safety_checks') %></legend>
-      
-      <div class="form-group">
-        <%= assessment_form.label :clamber_netting_pass, t('inspections.assessments.slide.fields.clamber_netting_pass') %>
-        <div class="radio-group">
-          <%= assessment_form.radio_button :clamber_netting_pass, true, id: "clamber_netting_pass_true" %>
-          <%= label_tag "clamber_netting_pass_true", t('inspections.fields.pass'), class: "radio-label" %>
-          
-          <%= assessment_form.radio_button :clamber_netting_pass, false, id: "clamber_netting_pass_false" %>
-          <%= label_tag "clamber_netting_pass_false", t('inspections.fields.fail'), class: "radio-label" %>
+      <!-- Slide Measurements Section -->
+      <%= render 'form/fieldset', legend_key: 'slide_measurements' do %>
+        <%= render 'form/number', field: :slide_platform_height %>
+        <%= render 'form/number', field: :slide_wall_height %>
+        
+        <div class="form-group">
+          <%= render 'form/number', field: :runout_value %>
+          <% if @inspection.slide_assessment&.persisted? && @inspection.slide_assessment.slide_platform_height.present? %>
+            <div class="runout-status <%= @inspection.slide_assessment.meets_runout_requirements? ? 'text-success' : 'text-danger' %>">
+              <%= @inspection.slide_assessment.runout_compliance_status %>
+            </div>
+          <% end %>
         </div>
-        <small class="form-text"><%= t('inspections.assessments.slide.hints.clamber_netting_pass') %></small>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :runout_pass, t('inspections.assessments.slide.fields.runout_pass') %>
-        <div class="radio-group">
-          <%= assessment_form.radio_button :runout_pass, true, id: "runout_pass_true" %>
-          <%= label_tag "runout_pass_true", t('inspections.fields.pass'), class: "radio-label" %>
-          
-          <%= assessment_form.radio_button :runout_pass, false, id: "runout_pass_false" %>
-          <%= label_tag "runout_pass_false", t('inspections.fields.fail'), class: "radio-label" %>
-        </div>
-        <small class="form-text"><%= t('inspections.assessments.slide.hints.runout_pass') %></small>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :slip_sheet_pass, t('inspections.assessments.slide.fields.slip_sheet_pass') %>
-        <div class="radio-group">
-          <%= assessment_form.radio_button :slip_sheet_pass, true, id: "slip_sheet_pass_true" %>
-          <%= label_tag "slip_sheet_pass_true", t('inspections.fields.pass'), class: "radio-label" %>
-          
-          <%= assessment_form.radio_button :slip_sheet_pass, false, id: "slip_sheet_pass_false" %>
-          <%= label_tag "slip_sheet_pass_false", t('inspections.fields.fail'), class: "radio-label" %>
-        </div>
-        <small class="form-text"><%= t('inspections.assessments.slide.hints.slip_sheet_pass') %></small>
-      </div>
-    </fieldset>
+        
+        <%= render 'form/number', field: :slide_first_metre_height %>
+        <%= render 'form/number', field: :slide_beyond_first_metre_height %>
+        <%= render 'form/checkbox', field: :slide_permanent_roof %>
+      <% end %>
     
-    <!-- Comments Section -->
-    <div class="form-group">
-      <%= assessment_form.label :slide_platform_height_comment, t('inspections.assessments.slide.fields.comments') %>
-      <%= assessment_form.text_area :slide_platform_height_comment, 
-          rows: 4,
-          placeholder: t('inspections.assessments.slide.placeholders.comments'),
-          class: "form-control" %>
-    </div>
-    
-    <!-- Safety Status -->
-    <% if @inspection.slide_assessment&.persisted? %>
-      <div class="assessment-status">
-        <h4><%= t('inspections.assessments.slide.sections.safety_status') %></h4>
-        <p>
-          <strong><%= t('inspections.assessments.slide.status.runout_requirement') %>:</strong>
-          <span class="<%= @inspection.slide_assessment.meets_runout_requirements? ? 'text-success' : 'text-danger' %>">
-            <%= @inspection.slide_assessment.meets_runout_requirements? ? 
-                t('inspections.assessments.slide.status.pass') : 
-                t('inspections.assessments.slide.status.fail') %>
-          </span>
-        </p>
-        <p>
-          <strong><%= t('inspections.assessments.slide.status.checks_passed') %>:</strong>
-          <%= @inspection.slide_assessment.passed_checks_count %> / <%= @inspection.slide_assessment.safety_check_count %>
-        </p>
-        <p>
-          <strong><%= t('inspections.assessments.slide.status.completion') %>:</strong>
-          <%= @inspection.slide_assessment.completion_percentage %>%
-        </p>
-      </div>
-    <% end %>
-    
-    <!-- Form Actions -->
-    <div class="form-actions">
-      <%= form.submit t('inspections.buttons.save_assessment'), class: "btn btn-primary" %>
-      <%= link_to t('inspections.buttons.cancel'), inspection_path(@inspection), class: "btn btn-secondary" %>
+      <!-- Safety Checks Section -->
+      <%= render 'form/fieldset', legend_key: 'safety_checks' do %>
+        <%= render 'form/pass_fail', field: :clamber_netting_pass %>
+        <%= render 'form/pass_fail', field: :runout_pass %>
+        <%= render 'form/pass_fail', field: :slip_sheet_pass %>
+      <% end %>
       
-      <div class="autosave-status" data-autosave-status>
-        <span class="saving" style="display: none;"><%= t('inspections.autosave.saving') %></span>
-        <span class="saved" style="display: none;"><%= t('inspections.autosave.saved') %></span>
-        <span class="error" style="display: none;"><%= t('inspections.autosave.error') %></span>
+      <!-- Comments Section -->
+      <%= render 'form/text_area', field: :slide_platform_height_comment %>
+    
+      <!-- Safety Status -->
+      <%= render 'form/assessment_status', assessment: @inspection.slide_assessment %>
+      
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <%= form.submit t('inspections.buttons.save_assessment'), class: "btn btn-primary" %>
+        <%= render 'form/autosave_status' %>
       </div>
     </div>
-  </div>
+  <% end %>
   <% end %>
 <% end %>

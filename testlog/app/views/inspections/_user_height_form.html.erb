@@ -9,168 +9,51 @@
   
   <%= form.fields_for :user_height_assessment, (@inspection.user_height_assessment || @inspection.build_user_height_assessment) do |assessment_form| %>
   
-  <div class="assessment-form user-height-assessment">
-    <h3><%= t('inspections.assessments.user_height.title') %></h3>
+  <%= render 'shared/assessment_form_section', form: assessment_form do %>
+    <div class="assessment-form user-height-assessment">
+      <h3><%= t('inspections.assessments.user_height.title') %></h3>
+      
+      <!-- Height Measurements Section -->
+      <%= render 'form/fieldset', legend_key: 'height_measurements' do %>
+        <%= render 'form/number', field: :containing_wall_height %>
+        <%= render 'form/number', field: :platform_height %>
+        <%= render 'form/number', field: :user_height %>
+        <%= render 'form/checkbox', field: :permanent_roof %>
+      <% end %>
+      
+      <!-- User Capacity Section -->
+      <%= render 'form/fieldset', legend_key: 'user_capacity' do %>
+        <%= render 'form/number', field: :users_at_1000mm, min: 0, step: 1 %>
+        <%= render 'form/number', field: :users_at_1200mm, min: 0, step: 1 %>
+        <%= render 'form/number', field: :users_at_1500mm, min: 0, step: 1 %>
+        <%= render 'form/number', field: :users_at_1800mm, min: 0, step: 1 %>
+        
+        <div class="capacity-summary">
+          <strong><%= t('inspections.assessments.user_height.fields.total_capacity') %>:</strong>
+          <span id="total-capacity"><%= @inspection.user_height_assessment&.total_user_capacity || 0 %></span>
+        </div>
+      <% end %>
+      
+      <!-- Play Area Section -->
+      <%= render 'form/fieldset', legend_key: 'play_area' do %>
+        <%= render 'form/number', field: :play_area_length, min: 0 %>
+        <%= render 'form/number', field: :play_area_width, min: 0 %>
+        <%= render 'form/number', field: :negative_adjustment, min: 0 %>
+      <% end %>
+      
+      <!-- Comments Section -->
+      <%= render 'form/text_area', field: :user_height_comment %>
     
-    <!-- Height Measurements Section -->
-    <fieldset class="form-section">
-      <legend><%= t('inspections.assessments.user_height.sections.height_measurements') %></legend>
+        <!-- Safety Status -->
+      <%= render 'form/assessment_status', assessment: @inspection.user_height_assessment %>
       
-      <div class="form-group">
-        <%= assessment_form.label :containing_wall_height, t('inspections.assessments.user_height.fields.containing_wall_height') %>
-        <%= assessment_form.number_field :containing_wall_height, 
-            step: 0.01, 
-            placeholder: t('inspections.assessments.user_height.placeholders.height'),
-            class: "form-control" %>
-        <small class="form-text"><%= t('inspections.assessments.user_height.hints.containing_wall_height') %></small>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :platform_height, t('inspections.assessments.user_height.fields.platform_height') %>
-        <%= assessment_form.number_field :platform_height, 
-            step: 0.01, 
-            placeholder: t('inspections.assessments.user_height.placeholders.height'),
-            class: "form-control" %>
-        <small class="form-text"><%= t('inspections.assessments.user_height.hints.platform_height') %></small>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :user_height, t('inspections.assessments.user_height.fields.user_height') %>
-        <%= assessment_form.number_field :user_height, 
-            step: 0.01, 
-            placeholder: t('inspections.assessments.user_height.placeholders.height'),
-            class: "form-control" %>
-        <small class="form-text"><%= t('inspections.assessments.user_height.hints.user_height') %></small>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.check_box :permanent_roof, class: "form-check-input" %>
-        <%= assessment_form.label :permanent_roof, t('inspections.assessments.user_height.fields.permanent_roof'), class: "form-check-label" %>
-        <small class="form-text"><%= t('inspections.assessments.user_height.hints.permanent_roof') %></small>
-      </div>
-    </fieldset>
-    
-    <!-- User Capacity Section -->
-    <fieldset class="form-section">
-      <legend><%= t('inspections.assessments.user_height.sections.user_capacity') %></legend>
-      
-      <div class="form-group">
-        <%= assessment_form.label :users_at_1000mm, t('inspections.assessments.user_height.fields.users_at_1000mm') %>
-        <%= assessment_form.number_field :users_at_1000mm, 
-            min: 0,
-            placeholder: t('inspections.assessments.user_height.placeholders.user_count'),
-            class: "form-control" %>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :users_at_1200mm, t('inspections.assessments.user_height.fields.users_at_1200mm') %>
-        <%= assessment_form.number_field :users_at_1200mm, 
-            min: 0,
-            placeholder: t('inspections.assessments.user_height.placeholders.user_count'),
-            class: "form-control" %>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :users_at_1500mm, t('inspections.assessments.user_height.fields.users_at_1500mm') %>
-        <%= assessment_form.number_field :users_at_1500mm, 
-            min: 0,
-            placeholder: t('inspections.assessments.user_height.placeholders.user_count'),
-            class: "form-control" %>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :users_at_1800mm, t('inspections.assessments.user_height.fields.users_at_1800mm') %>
-        <%= assessment_form.number_field :users_at_1800mm, 
-            min: 0,
-            placeholder: t('inspections.assessments.user_height.placeholders.user_count'),
-            class: "form-control" %>
-      </div>
-      
-      <div class="capacity-summary">
-        <strong><%= t('inspections.assessments.user_height.fields.total_capacity') %>:</strong>
-        <span id="total-capacity"><%= @inspection.user_height_assessment&.total_user_capacity || 0 %></span>
-      </div>
-    </fieldset>
-    
-    <!-- Play Area Section -->
-    <fieldset class="form-section">
-      <legend><%= t('inspections.assessments.user_height.sections.play_area') %></legend>
-      
-      <div class="form-group">
-        <%= assessment_form.label :play_area_length, t('inspections.assessments.user_height.fields.play_area_length') %>
-        <%= assessment_form.number_field :play_area_length, 
-            step: 0.01,
-            min: 0,
-            placeholder: t('inspections.assessments.user_height.placeholders.dimension'),
-            class: "form-control" %>
-        <small class="form-text"><%= t('inspections.assessments.user_height.hints.play_area_dimension') %></small>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :play_area_width, t('inspections.assessments.user_height.fields.play_area_width') %>
-        <%= assessment_form.number_field :play_area_width, 
-            step: 0.01,
-            min: 0,
-            placeholder: t('inspections.assessments.user_height.placeholders.dimension'),
-            class: "form-control" %>
-        <small class="form-text"><%= t('inspections.assessments.user_height.hints.play_area_dimension') %></small>
-      </div>
-      
-      <div class="form-group">
-        <%= assessment_form.label :negative_adjustment, t('inspections.assessments.user_height.fields.negative_adjustment') %>
-        <%= assessment_form.number_field :negative_adjustment, 
-            step: 0.01,
-            min: 0,
-            placeholder: t('inspections.assessments.user_height.placeholders.dimension'),
-            class: "form-control" %>
-        <small class="form-text"><%= t('inspections.assessments.user_height.hints.negative_adjustment') %></small>
-      </div>
-    </fieldset>
-    
-    <!-- Comments Section -->
-    <div class="form-group">
-      <%= assessment_form.label :user_height_comment, t('inspections.assessments.user_height.fields.comments') %>
-      <%= assessment_form.text_area :user_height_comment, 
-          rows: 4,
-          placeholder: t('inspections.assessments.user_height.placeholders.comments'),
-          class: "form-control" %>
-    </div>
-    
-    <!-- Safety Status -->
-    <% if @inspection.user_height_assessment&.persisted? %>
-      <div class="assessment-status">
-        <h4><%= t('inspections.assessments.user_height.sections.safety_status') %></h4>
-        <p>
-          <strong><%= t('inspections.assessments.user_height.status.height_requirement') %>:</strong>
-          <span class="<%= @inspection.user_height_assessment.meets_height_requirements? ? 'text-success' : 'text-danger' %>">
-            <%= @inspection.user_height_assessment.meets_height_requirements? ? 
-                t('inspections.assessments.user_height.status.pass') : 
-                t('inspections.assessments.user_height.status.fail') %>
-          </span>
-        </p>
-        <p>
-          <strong><%= t('inspections.assessments.user_height.status.checks_passed') %>:</strong>
-          <%= @inspection.user_height_assessment.passed_checks_count %> / <%= @inspection.user_height_assessment.safety_check_count %>
-        </p>
-        <p>
-          <strong><%= t('inspections.assessments.user_height.status.completion') %>:</strong>
-          <%= @inspection.user_height_assessment.completion_percentage %>%
-        </p>
-      </div>
-    <% end %>
-    
-    <!-- Form Actions -->
-    <div class="form-actions">
-      <%= form.submit t('inspections.buttons.save_assessment'), class: "btn btn-primary" %>
-      <%= link_to t('inspections.buttons.cancel'), inspection_path(@inspection), class: "btn btn-secondary" %>
-      
-      <div class="autosave-status" data-autosave-status>
-        <span class="saving" style="display: none;"><%= t('inspections.autosave.saving') %></span>
-        <span class="saved" style="display: none;"><%= t('inspections.autosave.saved') %></span>
-        <span class="error" style="display: none;"><%= t('inspections.autosave.error') %></span>
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <%= form.submit t('inspections.buttons.save_assessment'), class: "btn btn-primary" %>
+        <%= render 'form/autosave_status' %>
       </div>
     </div>
-  </div>
+  <% end %>
   <% end %>
 <% end %>
 
