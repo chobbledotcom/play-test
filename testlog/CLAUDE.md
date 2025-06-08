@@ -7,9 +7,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Run server: `rails s` or `bundle exec rails server`
 - Rails console: `rails c`
 - Lint autofix: `bundle exec rake standard:fix`
-- Run all tests: `bundle exec rspec`
+- Run all tests: `bundle exec rspec` (WARNING: Takes ages - only run when specifically requested)
 - Run single test: `bundle exec rspec spec/path/to/file_spec.rb:LINE_NUMBER`
 - Run with verbose output: `bundle exec rspec --format documentation`
+
+## Environment Notes
+
+- **ripgrep (rg) is NOT installed** - use `grep` command instead of `rg` for searching
+- **Full test suite is SLOW** - only run `bundle exec rspec` when explicitly requested
+- Prefer running individual test files or specific tests during development
 
 ## Core Development Principles
 

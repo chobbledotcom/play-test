@@ -18,11 +18,11 @@ RSpec.feature "Inspections Filtering", type: :feature do
     it "shows all inspections separated by status" do
       # Draft inspections are shown in their own section
       expect(page).to have_content(draft_inspection.serial)
-      
+
       # Complete inspections are shown in the main section
       expect(page).to have_content(completed_passed.serial)
       expect(page).to have_content(completed_failed.serial)
-      
+
       # Should have section headers
       expect(page).to have_content("Draft Inspections")
       expect(page).to have_content("Complete Inspections")
@@ -40,9 +40,9 @@ RSpec.feature "Inspections Filtering", type: :feature do
     it "filters by passed result" do
       visit inspections_path(result: "passed")
 
-      # Draft inspections are always shown regardless of result filter
-      expect(page).to have_content(draft_inspection.serial)
-      
+      # Draft inspections are filtered by result too (should not show)
+      expect(page).not_to have_content(draft_inspection.serial)
+
       # Only passed complete inspections should show in complete section
       expect(page).to have_content(completed_passed.serial)
       expect(page).not_to have_content(completed_failed.serial)
@@ -51,9 +51,9 @@ RSpec.feature "Inspections Filtering", type: :feature do
     it "filters by failed result" do
       visit inspections_path(result: "failed")
 
-      # Draft inspections are always shown regardless of result filter
-      expect(page).to have_content(draft_inspection.serial)
-      
+      # Draft inspections are filtered by result too (should not show)
+      expect(page).not_to have_content(draft_inspection.serial)
+
       # Only failed complete inspections should show in complete section
       expect(page).not_to have_content(completed_passed.serial)
       expect(page).to have_content(completed_failed.serial)
@@ -73,18 +73,22 @@ RSpec.feature "Inspections Filtering", type: :feature do
   end
 
   describe "combining filters" do
-    it "filters by status and result" do
-      visit inspections_path(status: "complete", result: "passed")
+    it "filters by result only (status filtering removed)" do
+      visit inspections_path(result: "passed")
 
+      # Draft inspections filtered by result too (should not show)
       expect(page).not_to have_content(draft_inspection.serial)
+      # Only passed complete inspections in complete section
       expect(page).to have_content(completed_passed.serial)
       expect(page).not_to have_content(completed_failed.serial)
     end
 
-    it "filters by unit and status" do
-      visit inspections_path(unit_id: unit3.id, status: "complete")
+    it "filters by unit and result" do
+      visit inspections_path(unit_id: unit3.id, result: "failed")
 
+      # Draft inspections filtered by unit and result (should not show - wrong unit)
       expect(page).not_to have_content(draft_inspection.serial)
+      # Complete inspections filtered by unit AND result
       expect(page).not_to have_content(completed_passed.serial)
       expect(page).to have_content(completed_failed.serial)
     end
@@ -92,13 +96,13 @@ RSpec.feature "Inspections Filtering", type: :feature do
 
   describe "clear filters link" do
     it "shows clear filters link when filters are active" do
-      visit inspections_path(status: "complete")
+      visit inspections_path(result: "passed")
 
       expect(page).to have_link(I18n.t("ui.buttons.clear_filters"))
     end
 
     it "clears all filters when clicked" do
-      visit inspections_path(status: "complete", result: "passed")
+      visit inspections_path(result: "passed")
       click_link I18n.t("ui.buttons.clear_filters")
 
       expect(page).to have_current_path(inspections_path)
@@ -110,11 +114,6 @@ RSpec.feature "Inspections Filtering", type: :feature do
   end
 
   describe "page title updates" do
-    it "includes status in title when filtered" do
-      visit inspections_path(status: "complete")
-      expect(page).to have_content("Inspections - Complete")
-    end
-
     it "includes result in title when filtered" do
       visit inspections_path(result: "passed")
       expect(page).to have_content("Inspections - Passed")

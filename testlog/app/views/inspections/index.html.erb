@@ -32,8 +32,8 @@
   <h2>Complete Inspections</h2>
 <% end %>
 
-<% if @inspections.any? %>
-  <%= render 'inspections_table', inspections: @inspections %>
+<% if @complete_inspections.any? %>
+  <%= render 'inspections_table', inspections: @complete_inspections %>
   <p>
     <%= link_to inspections_path(params.permit(:query, :result, :unit_id).merge(format: :csv)) do %>
       <strong>Export CSV</strong>

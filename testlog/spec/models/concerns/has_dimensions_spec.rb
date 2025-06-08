@@ -185,32 +185,32 @@ RSpec.describe HasDimensions, type: :model do
     end
 
     describe "dimension check methods" do
-      it "#has_slide_dimensions?" do
-        expect(model.has_slide_dimensions?).to be_falsy
+      it "#has_slide_attributes?" do
+        expect(model.has_slide_attributes?).to be_falsy
 
         model.slide_platform_height = 2.0
-        expect(model.has_slide_dimensions?).to be_truthy
+        expect(model.has_slide_attributes?).to be_truthy
       end
 
-      it "#has_structure_dimensions?" do
-        expect(model.has_structure_dimensions?).to be_falsy
+      it "#has_structure_attributes?" do
+        expect(model.has_structure_attributes?).to be_falsy
 
         model.stitch_length = 5.0
-        expect(model.has_structure_dimensions?).to be_truthy
+        expect(model.has_structure_attributes?).to be_truthy
       end
 
-      it "#has_user_height_dimensions?" do
-        expect(model.has_user_height_dimensions?).to be_falsy
+      it "#has_user_height_attributes?" do
+        expect(model.has_user_height_attributes?).to be_falsy
 
         model.containing_wall_height = 1.5
-        expect(model.has_user_height_dimensions?).to be_truthy
+        expect(model.has_user_height_attributes?).to be_truthy
       end
 
-      it "#has_anchorage_dimensions?" do
-        expect(model.has_anchorage_dimensions?).to be_falsy
+      it "#has_anchorage_attributes?" do
+        expect(model.has_anchorage_attributes?).to be_falsy
 
         model.num_low_anchors = 4
-        expect(model.has_anchorage_dimensions?).to be_truthy
+        expect(model.has_anchorage_attributes?).to be_truthy
       end
     end
   end

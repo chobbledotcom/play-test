@@ -5,15 +5,16 @@ class InspectionsController < ApplicationController
   skip_before_action :require_login, only: [:report, :qr_code]
 
   def index
-    # Draft inspections - shown separately, unfiltered
-    @draft_inspections = current_user.inspections.draft.order(created_at: :desc)
-
-    # Complete inspections - filtered by user inputs
-    @inspections = current_user.inspections.complete
+    # Base filtered query
+    filtered_inspections = current_user.inspections
       .search(params[:query])
       .filter_by_result(params[:result])
       .filter_by_unit(params[:unit_id])
       .order(created_at: :desc)
+
+    # Split into draft and complete
+    @draft_inspections = filtered_inspections.draft
+    @complete_inspections = filtered_inspections.complete
 
     @title = build_index_title
 
@@ -329,7 +330,7 @@ class InspectionsController < ApplicationController
       csv << headers
 
       # Export whatever inspections are already filtered by the index action
-      @inspections.includes(:unit, :inspector_company, :user).each do |inspection|
+      @complete_inspections.includes(:unit, :inspector_company, :user).each do |inspection|
         csv << csv_row_data(inspection, headers)
       end
     end

@@ -297,11 +297,11 @@ RSpec.describe Unit, type: :model do
       end
 
       it "checks for dimension categories" do
-        expect(unit.has_anchorage_dimensions?).to be_truthy
-        expect(unit.has_slide_dimensions?).to be_falsy
+        expect(unit.has_anchorage_attributes?).to be_truthy
+        expect(unit.has_slide_attributes?).to be_falsy
 
         unit.slide_platform_height = 2.5
-        expect(unit.has_slide_dimensions?).to be_truthy
+        expect(unit.has_slide_attributes?).to be_truthy
       end
     end
   end

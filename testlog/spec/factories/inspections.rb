@@ -29,6 +29,10 @@ FactoryBot.define do
       status { "complete" }
     end
 
+    trait :draft do
+      status { "draft" }
+    end
+
     trait :overdue do
       inspection_date { Date.current - 1.year - 1.month }
     end

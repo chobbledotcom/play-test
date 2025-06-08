@@ -29,11 +29,6 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
           },
           headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
-        puts "Response status: #{response.status}"
-        puts "Response location: #{response.location}"
-        puts "Response content type: #{response.content_type}"
-        puts "Response body: #{response.body[0..200]}"
-
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
 

@@ -428,7 +428,7 @@ class PdfGeneratorService
     completed_inspections = unit.inspections.where(status: "complete").order(inspection_date: :desc)
 
     if completed_inspections.empty?
-      pdf.text "No completed inspections", size: 10, style: :italic
+      pdf.text I18n.t("pdf.unit.no_completed_inspections"), size: 10, style: :italic
       pdf.move_down 10
     else
       # Create table headers

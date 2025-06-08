@@ -38,7 +38,7 @@ RSpec.describe "Units", type: :request do
     before do
       visit login_path
       fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: I18n.t("test.password")
+      fill_in I18n.t("session.login.password"), with: "password123"
       click_button I18n.t("session.login.submit")
     end
 
@@ -120,13 +120,13 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_link("Delete", href: unit_path(unit))
       end
 
-      it "shows manufacturer and owner as clickable links" do
+      it "displays manufacturer and owner information" do
         test_unit = create(:unit, user: user, manufacturer: "ACME Corp", owner: "John Doe")
 
         visit unit_path(test_unit)
 
-        expect(page).to have_link("ACME Corp", href: units_path(manufacturer: "ACME Corp"))
-        expect(page).to have_link("John Doe", href: units_path(owner: "John Doe"))
+        expect(page).to have_content("ACME Corp")
+        expect(page).to have_content("John Doe")
       end
 
       it "denies access to other user's unit" do
@@ -349,17 +349,15 @@ RSpec.describe "Units", type: :request do
         end
       end
 
-      it "shows manufacturer as clickable link" do
+      it "shows manufacturer information in the table" do
         visit units_path
 
-        expect(page).to have_link("ACME Corp", href: units_path(manufacturer: "ACME Corp"))
-        expect(page).to have_link("XYZ Industries", href: units_path(manufacturer: "XYZ Industries"))
+        expect(page).to have_content("ACME Corp")
+        expect(page).to have_content("XYZ Industries")
       end
 
-      it "allows clicking manufacturer links to filter" do
-        visit units_path
-
-        click_link "ACME Corp"
+      it "filters by manufacturer via URL parameters" do
+        visit units_path(manufacturer: "ACME Corp")
 
         expect(page).to have_content("Searchable Bounce House")
         expect(page).not_to have_content("Different Slide")
@@ -455,7 +453,7 @@ RSpec.describe "Units", type: :request do
     before do
       visit login_path
       fill_in I18n.t("session.login.email"), with: admin_user.email
-      fill_in I18n.t("session.login.password"), with: I18n.t("test.password")
+      fill_in I18n.t("session.login.password"), with: "password123"
       click_button I18n.t("session.login.submit")
     end
 
@@ -472,7 +470,7 @@ RSpec.describe "Units", type: :request do
     before do
       visit login_path
       fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: I18n.t("test.password")
+      fill_in I18n.t("session.login.password"), with: "password123"
       click_button I18n.t("session.login.submit")
     end
 

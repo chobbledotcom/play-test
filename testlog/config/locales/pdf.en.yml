@@ -33,6 +33,7 @@ en:
       footer_text: "Inspection Logger"
       generated_text: "This report was generated on"
       next_due: "Next Inspection Due"
+      no_completed_inspections: "No completed inspections"
       fields:
         name: "Name"
         serial_number: "Serial Number"

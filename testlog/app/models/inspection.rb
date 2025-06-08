@@ -45,8 +45,9 @@ class Inspection < ApplicationRecord
   scope :draft, -> { where(status: "draft") }
   scope :search, ->(query) {
     if query.present?
-      where("inspections.inspection_location LIKE ? OR inspections.id LIKE ? OR inspections.unique_report_number LIKE ?",
-        "%#{query}%", "%#{query}%", "%#{query}%")
+      joins("LEFT JOIN units ON units.id = inspections.unit_id")
+        .where("inspections.inspection_location LIKE ? OR inspections.id LIKE ? OR inspections.unique_report_number LIKE ? OR units.serial LIKE ? OR units.manufacturer LIKE ? OR units.name LIKE ?",
+          "%#{query}%", "%#{query}%", "%#{query}%", "%#{query}%", "%#{query}%", "%#{query}%")
     else
       all
     end

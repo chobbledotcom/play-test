@@ -197,7 +197,7 @@ RSpec.feature "PDF Content Structure", type: :feature do
       text_content = pdf.strings.join(" ")
 
       expect(text_content).to include(I18n.t("pdf.unit.title"))
-      expect(text_content).to include("No inspections completed")
+      expect(text_content).to include(I18n.t("pdf.unit.no_completed_inspections"))
     end
   end
 
