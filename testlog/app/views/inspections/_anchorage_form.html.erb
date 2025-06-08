@@ -10,7 +10,7 @@
   <%= form.fields_for :anchorage_assessment, (@inspection.anchorage_assessment || @inspection.build_anchorage_assessment) do |assessment_form| %>
 
     <div class="assessment-form anchorage-assessment">
-      <h3><%= t('inspections.assessments.anchorage.title') %></h3>
+      <%= render 'shared/page_header', title: t('inspections.assessments.anchorage.title') %>
 
       <!-- Safety Standards Reference -->
       <details class="safety-standards-reference">

@@ -1,5 +1,5 @@
 <div class="safety-standards-summary">
-  <h3><%= t('inspections.safety_standards.title') %></h3>
+  <%= render 'shared/page_header', title: t('inspections.safety_standards.title') %>
   <p><%= t('inspections.safety_standards.description') %></p>
 
   <% if inspection.unit.present? %>

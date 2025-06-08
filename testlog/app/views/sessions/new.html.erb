@@ -1,4 +1,4 @@
-<header><h2><%= t('session.login.title') %></h2></header>
+<%= render 'shared/page_header', title: t('session.login.title') %>
 
 <%= form_with(scope: :session, url: login_path) do |form| %>
   <%= render 'form/fieldset', legend_key: 'credentials', i18n_base: 'session.login', form: form do %>

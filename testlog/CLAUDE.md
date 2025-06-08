@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Run server: `rails s` or `bundle exec rails server`
 - Rails console: `rails c`
-- Lint autofix: `bundle exec rake standard:fix`
+- **Lint modified files only**: `bundle exec standardrb --fix path/to/file.rb` (NEVER run on entire repo)
+- Lint check (no fix): `bundle exec standardrb path/to/file.rb`
+- **ERB files don't need linting with standardrb**
 - Run all tests: `bundle exec rspec` (WARNING: Takes ages - only run when specifically requested)
 - Run single test: `bundle exec rspec spec/path/to/file_spec.rb:LINE_NUMBER`
 - Run with verbose output: `bundle exec rspec --format documentation`
@@ -43,11 +45,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### HTML & CSS Philosophy
 - **Semantic HTML only** - use proper tags for their intended purpose
-- **NO CSS classes unless absolutely necessary** - rely on semantic selectors
-- Use MVP.css framework's semantic styling
+- **ABSOLUTELY NO CSS classes** - I hate CSS classes, never use them
+- **NO class attributes at all** - rely entirely on semantic selectors
+- Use MVP.css framework's semantic styling only
 - Structure: `<article>`, `<header>`, `<nav>`, `<main>` (avoid `<section>`)
 - Forms: `<fieldset>`, `<legend>`, proper `<label>` associations
 - Tables: `<thead>`, `<tbody>`, `<th>` with proper scope
+- Buttons: use `<button>` or `<input type="submit">` without any classes
 
 ### Code Quality Standards
 - **No defensive coding** - expect correct data, let it fail if wrong
@@ -224,4 +228,3 @@ end
 - Confirmation dialogs for destructive actions
 - Success/error flash messages for user feedback
 - Auto-save forms for better UX (where appropriate)
-

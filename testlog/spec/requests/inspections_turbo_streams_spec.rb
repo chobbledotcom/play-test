@@ -81,9 +81,8 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
       context "with validation errors" do
         it "still returns turbo stream format on error" do
-          # Force a validation error by setting inspection_location to nil on non-draft
-          inspection.update!(status: "complete")
-
+          # Force a validation error by trying to clear a required field
+          # Don't mark as complete so we can actually test the validation error handling
           patch inspection_path(inspection),
             params: {inspection: {inspection_location: ""}},
             headers: turbo_headers
@@ -204,7 +203,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
     end
   end
 
-  describe "Completion issues in turbo streams" do
+  describe "Completed inspection behavior" do
     let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
 
     before do
@@ -216,13 +215,14 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
       )
     end
 
-    it "includes completion issues when inspection is completed but not fully complete" do
+    it "redirects when trying to update completed inspections" do
       patch inspection_path(inspection),
         params: {inspection: {comments: "Updated"}},
         headers: turbo_headers
 
-      # Should include the completion issues turbo stream
-      expect(response.body).to include("completion_issues_#{inspection.id}")
+      # Should redirect because completed inspections cannot be edited
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(inspection_path(inspection))
     end
   end
 

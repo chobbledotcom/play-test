@@ -211,11 +211,11 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
     let(:complete_inspection) { create_complete_inspection }
 
     context "as regular user" do
-      it "allows accessing unit selection for complete inspections" do
+      it "redirects to show page when trying to access unit selection for complete inspections" do
         visit select_unit_inspection_path(complete_inspection)
 
-        expect(page).to have_current_path(select_unit_inspection_path(complete_inspection))
-        expect(page).to have_content(I18n.t("inspections.titles.select_unit"))
+        expect(page).to have_current_path(inspection_path(complete_inspection))
+        expect(page).to have_content(I18n.t("inspections.messages.cannot_edit_complete"))
       end
     end
 
@@ -224,11 +224,11 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
         user.update!(email: "admin@example.com")
       end
 
-      it "allows accessing unit selection for complete inspections" do
+      it "redirects to show page when trying to access unit selection for complete inspections" do
         visit select_unit_inspection_path(complete_inspection)
 
-        expect(page).to have_current_path(select_unit_inspection_path(complete_inspection))
-        expect(page).to have_content(I18n.t("inspections.titles.select_unit"))
+        expect(page).to have_current_path(inspection_path(complete_inspection))
+        expect(page).to have_content(I18n.t("inspections.messages.cannot_edit_complete"))
       end
     end
   end

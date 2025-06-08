@@ -13,7 +13,7 @@ en:
       unit_details: "Unit Details"
       current_unit: "Current Unit"
       inspection_details: "Inspection Details"
-      status_and_results: "Status and Results"
+      inspection_results: "Inspection Results"
 
     sections:
       unit_details: "Unit Details"
@@ -76,6 +76,7 @@ en:
       reinspection_date_help: "Automatically calculated as one year after inspection date"
       inspector_help: "Determined by the user performing the inspection"
       rpii_help: "From the selected inspector company"
+      status_help: "Use the buttons below to change inspection status"
       not_available: "Not Available"
 
     status:
@@ -100,6 +101,9 @@ en:
       change_unit: "Change unit"
       select_unit: "Select unit"
       create_unit_from_inspection: "Create new unit from this inspection"
+      mark_complete: "Mark as Complete"
+      mark_draft: "Mark as Draft"
+      qr_and_pdf: "QR Codes & PDF"
 
     messages:
       no_unit: "No unit selected"
@@ -121,6 +125,14 @@ en:
       unit_selection_confirm: "Are you sure you want to change to unit '%{unit_name}'? This will replace the current unit and copy all dimension values."
       unit_changed: "Unit changed to '%{unit_name}' and dimension values have been updated."
       unit_change_failed: "Failed to change unit: %{errors}"
+      mark_complete_confirm: "Are you sure you want to mark this inspection as complete? This will validate all assessments are complete."
+      mark_draft_confirm: "Are you sure you want to mark this inspection as draft? This will allow further editing."
+      marked_complete: "Inspection marked as complete successfully."
+      marked_draft: "Inspection marked as draft successfully."
+      cannot_complete: "Cannot mark as complete: %{errors}"
+      completion_failed: "Failed to mark as complete: %{error}"
+      mark_draft_failed: "Failed to mark as draft: %{errors}"
+      cannot_edit_complete: "Completed inspections cannot be edited. You must mark it as draft first."
 
     errors:
       header:

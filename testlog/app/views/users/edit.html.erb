@@ -1,6 +1,4 @@
-<header>
-  <h1><%= t('users.titles.edit') %></h1>
-</header>
+<%= render 'shared/page_header', title: t('users.titles.edit') %>
 
 <%= form_with(model: @user) do |form| %>
   <%= render 'form/errors', model: @user %>

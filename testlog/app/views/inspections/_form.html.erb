@@ -78,15 +78,14 @@
         i18n_base: 'inspections.fields' %>
   <% end %>
 
-  <%= render 'form/fieldset', legend_key: 'status_and_results', i18n_base: 'inspections' do %>
-    <%= render 'form/select', 
-        field: :status, 
-        form: form, 
-        i18n_base: 'inspections.fields',
-        options: options_for_select([
-          [t('inspections.status.draft'), 'draft'],
-          [t('inspections.status.complete'), 'complete']
-        ], @inspection.status) %>
+  <%= render 'form/fieldset', legend_key: 'inspection_results', i18n_base: 'inspections' do %>
+    <div class="calculated-field">
+      <label><%= t('inspections.fields.status') %></label>
+      <p class="calculated-value">
+        <%= @inspection.status&.humanize || t('inspections.status.draft') %>
+        <small class="help-text"><%= t('inspections.fields.status_help') %></small>
+      </p>
+    </div>
 
     <%= render 'form/checkbox', 
         field: :passed, 
@@ -107,4 +106,16 @@
     
     <%= render 'form/autosave_status' %>
   </fieldset>
+<% end %>
+
+<!-- Completion Actions -->
+<% unless @inspection.new_record? %>
+  <section>
+    <% if @inspection.status == "draft" %>
+      <%= button_to t('inspections.buttons.mark_complete'), 
+          complete_inspection_path(@inspection), 
+          method: :patch, 
+          data: { turbo_confirm: t('inspections.messages.mark_complete_confirm') } %>
+    <% end %>
+  </section>
 <% end %>

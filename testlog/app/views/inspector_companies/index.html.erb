@@ -1,4 +1,4 @@
-<header><h1><%= t('inspector_companies.titles.index') %></h1></header>
+<%= render 'shared/page_header', title: t('inspector_companies.titles.index') %>
 
 <% if current_user&.admin? %>
   <p>

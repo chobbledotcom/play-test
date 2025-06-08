@@ -38,6 +38,8 @@ Rails.application.routes.draw do
       patch "replace_dimensions"
       get "select_unit"
       patch "update_unit"
+      patch "complete"
+      patch "mark_draft"
     end
   end
 

@@ -107,14 +107,20 @@ RSpec.feature "Inspector Company Selection", type: :feature do
     end
 
     context "status transitions with inspector company validation" do
-      it "allows changing status to complete with inspector company" do
+      it "allows marking inspection as complete with inspector company" do
+        # First create all necessary assessments for completion
+        create(:user_height_assessment, :complete, inspection: inspection)
+        create(:structure_assessment, :complete, inspection: inspection)
+        create(:anchorage_assessment, :passed, inspection: inspection)
+        create(:materials_assessment, :passed, inspection: inspection)
+        create(:fan_assessment, :passed, inspection: inspection)
+
         visit edit_inspection_path(inspection)
 
         # Complete with inspector company (should work since inspection already has one)
-        select I18n.t("inspections.status.complete"), from: "inspection[status]"
-        click_button I18n.t("inspections.buttons.update")
+        click_button I18n.t("inspections.buttons.mark_complete")
 
-        expect(page).to have_content(I18n.t("inspections.messages.updated"))
+        expect(page).to have_content(I18n.t("inspections.messages.marked_complete"))
         inspection.reload
         expect(inspection.status).to eq("complete")
       end
@@ -124,27 +130,35 @@ RSpec.feature "Inspector Company Selection", type: :feature do
         inspector_company.reload
         expect(inspector_company.active).to be true
 
+        # First create all necessary assessments for completion
+        create(:user_height_assessment, :complete, inspection: inspection)
+        create(:structure_assessment, :complete, inspection: inspection)
+        create(:anchorage_assessment, :passed, inspection: inspection)
+        create(:materials_assessment, :passed, inspection: inspection)
+        create(:fan_assessment, :passed, inspection: inspection)
+
         visit edit_inspection_path(inspection)
 
-        select inspector_company.name, from: "inspection[inspector_company_id]"
-        select I18n.t("inspections.status.complete"), from: "inspection[status]"
-        click_button I18n.t("inspections.buttons.update")
+        # Inspector company is already set, just mark complete
+        click_button I18n.t("inspections.buttons.mark_complete")
 
-        expect(page).to have_content("Inspection updated successfully.")
+        expect(page).to have_content(I18n.t("inspections.messages.marked_complete"))
         inspection.reload
         expect(inspection.status).to eq("complete")
         expect(inspection.inspector_company).to eq(inspector_company)
       end
 
-      it "allows in_progress status with inspector company" do
-        visit edit_inspection_path(inspection)
+      it "can mark complete inspection as draft again" do
+        # First make it complete
+        inspection.update!(status: "complete")
 
-        select I18n.t("inspections.status.complete"), from: "inspection[status]"
-        click_button I18n.t("inspections.buttons.update")
+        visit inspection_path(inspection)
 
-        expect(page).to have_content(I18n.t("inspections.messages.updated"))
+        click_button I18n.t("inspections.buttons.mark_draft")
+
+        expect(page).to have_content(I18n.t("inspections.messages.marked_draft"))
         inspection.reload
-        expect(inspection.status).to eq("complete")
+        expect(inspection.status).to eq("draft")
         expect(inspection.inspector_company_id).to be_present
       end
     end

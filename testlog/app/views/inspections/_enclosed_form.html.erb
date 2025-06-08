@@ -10,7 +10,7 @@
   <%= form.fields_for :enclosed_assessment, (@inspection.enclosed_assessment || @inspection.build_enclosed_assessment) do |assessment_form| %>
 
     <div class="assessment-form enclosed-assessment">
-      <h3><%= t('inspections.assessments.enclosed.title') %></h3>
+      <%= render 'shared/page_header', title: t('inspections.assessments.enclosed.title') %>
 
       <!-- Exit Requirements Section -->
       <%= render 'form/fieldset', legend_key: 'exit_requirements', i18n_base: 'inspections.assessments.enclosed.fields', form: assessment_form do %>

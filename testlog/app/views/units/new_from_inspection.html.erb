@@ -1,5 +1,5 @@
 <%= form_with model: @unit, url: create_unit_from_inspection_path(@inspection), local: true do |form| %>
-  <header><h1><%= t("units.titles.new_from_inspection") %></h1></header>
+  <%= render 'shared/page_header', title: t("units.titles.new_from_inspection") %>
 
   <% if @inspection.dimensions.present? %>
     <p><%= t("units.labels.dimensions") %>: <strong><%= @inspection.dimensions %></strong></p>

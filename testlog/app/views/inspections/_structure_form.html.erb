@@ -10,7 +10,7 @@
   <%= form.fields_for :structure_assessment, (@inspection.structure_assessment || @inspection.build_structure_assessment) do |assessment_form| %>
 
     <div class="assessment-form structure-assessment">
-      <h3><%= t('inspections.assessments.structure.title') %></h3>
+      <%= render 'shared/page_header', title: t('inspections.assessments.structure.title') %>
 
       <!-- Critical Safety Checks Section -->
       <%= render 'form/fieldset', legend_key: 'critical_safety_checks', i18n_base: 'inspections.assessments.structure.fields', form: assessment_form do %>

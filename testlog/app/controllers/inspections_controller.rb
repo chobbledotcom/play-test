@@ -1,6 +1,7 @@
 class InspectionsController < ApplicationController
-  before_action :set_inspection, only: [:show, :edit, :update, :destroy, :report, :qr_code, :replace_dimensions, :select_unit, :update_unit]
-  before_action :check_inspection_owner, only: [:show, :edit, :update, :destroy, :replace_dimensions, :select_unit, :update_unit]
+  before_action :set_inspection, except: [:index, :search, :overdue, :create]
+  before_action :check_inspection_owner, except: [:index, :search, :overdue, :create, :report, :qr_code]
+  before_action :redirect_if_complete, except: [:show, :mark_draft, :report, :qr_code, :index, :search, :overdue, :create]
   before_action :no_index
   skip_before_action :require_login, only: [:report, :qr_code]
 
@@ -265,11 +266,41 @@ class InspectionsController < ApplicationController
       disposition: "inline"
   end
 
+  def complete
+    # Check if inspection can be completed
+    validation_errors = @inspection.validate_completeness
+
+    if validation_errors.any?
+      flash[:danger] = t("inspections.messages.cannot_complete", errors: validation_errors.join(", "))
+      redirect_to edit_inspection_path(@inspection)
+      return
+    end
+
+    begin
+      @inspection.complete!(current_user)
+      flash[:success] = t("inspections.messages.marked_complete")
+      redirect_to @inspection
+    rescue => e
+      flash[:danger] = t("inspections.messages.completion_failed", error: e.message)
+      redirect_to edit_inspection_path(@inspection)
+    end
+  end
+
+  def mark_draft
+    if @inspection.update(status: "draft")
+      flash[:success] = t("inspections.messages.marked_draft")
+      redirect_to edit_inspection_path(@inspection)
+    else
+      flash[:danger] = t("inspections.messages.mark_draft_failed", errors: @inspection.errors.full_messages.join(", "))
+      redirect_to edit_inspection_path(@inspection)
+    end
+  end
+
   private
 
   def inspection_params
     # Get the base params with permitted top-level attributes
-    inspection_specific_params = [:inspection_date, :inspection_location, :passed, :comments, :unit_id, :inspector_company_id, :unique_report_number, :status]
+    inspection_specific_params = [:inspection_date, :inspection_location, :passed, :comments, :unit_id, :inspector_company_id, :unique_report_number]
     base_params = params.require(:inspection).permit(inspection_specific_params + Inspection::PERMITTED_COPYABLE_ATTRIBUTES)
 
     # For each assessment, permit all attributes except timestamps and inspection_id
@@ -320,6 +351,13 @@ class InspectionsController < ApplicationController
     unless @inspection.user_id == current_user.id
       flash[:danger] = I18n.t("inspections.errors.access_denied")
       redirect_to inspections_path and return
+    end
+  end
+
+  def redirect_if_complete
+    if @inspection&.status == "complete"
+      flash[:info] = I18n.t("inspections.messages.cannot_edit_complete")
+      redirect_to @inspection and return
     end
   end
 

@@ -74,11 +74,11 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         expect(response.body).to match(/\d+%/)
       end
 
-      it "shows completion issues for completed but incomplete inspections" do
-        # Mark inspection as completed but don't complete all assessments
+      it "redirects when trying to update completed inspections" do
+        # Mark inspection as completed
         inspection.update!(status: "complete")
 
-        # Create only one assessment (incomplete overall)
+        # Create an assessment
         inspection.create_user_height_assessment!(
           containing_wall_height: 1.5,
           platform_height: 1.0,
@@ -104,10 +104,9 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
           },
           headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
-        expect(response).to have_http_status(:success)
-
-        # Should include completion issues since inspection is completed but not fully complete
-        expect(response.body).to include("completion_issues_#{inspection.id}")
+        # Should redirect because completed inspections cannot be edited
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(inspection_path(inspection))
       end
     end
 

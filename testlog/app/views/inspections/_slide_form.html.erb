@@ -13,7 +13,7 @@
   <%= form.fields_for :slide_assessment, (@inspection.slide_assessment || @inspection.build_slide_assessment) do |assessment_form| %>
 
     <div class="assessment-form slide-assessment">
-      <h3><%= t('inspections.assessments.slide.title') %></h3>
+      <%= render 'shared/page_header', title: t('inspections.assessments.slide.title') %>
 
       <!-- Safety Standards Reference -->
       <details class="safety-standards-reference">

@@ -10,7 +10,7 @@
   <%= form.fields_for :fan_assessment, (@inspection.fan_assessment || @inspection.build_fan_assessment) do |assessment_form| %>
 
     <div class="assessment-form fan-assessment">
-      <h3><%= t('inspections.assessments.fan.title') %></h3>
+      <%= render 'shared/page_header', title: t('inspections.assessments.fan.title') %>
 
       <!-- Blower Specifications Section -->
       <%= render 'form/fieldset', legend_key: 'blower_specifications', i18n_base: 'inspections.assessments.fan.fields', form: assessment_form do %>

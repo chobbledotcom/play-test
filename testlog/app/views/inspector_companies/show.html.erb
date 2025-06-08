@@ -1,4 +1,4 @@
-<header><h1><%= @inspector_company.name %></h1></header>
+<%= render 'shared/page_header', title: @inspector_company.name %>
 
 <p>
   <% if current_user&.admin? %>

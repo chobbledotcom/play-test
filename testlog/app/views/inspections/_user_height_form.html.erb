@@ -13,7 +13,7 @@
   <%= form.fields_for :user_height_assessment, (@inspection.user_height_assessment || @inspection.build_user_height_assessment) do |assessment_form| %>
 
     <div class="assessment-form user-height-assessment">
-      <h3><%= t('inspections.assessments.user_height.title') %></h3>
+      <%= render 'shared/page_header', title: t('inspections.assessments.user_height.title') %>
 
       <!-- Safety Standards Reference -->
       <details class="safety-standards-reference">

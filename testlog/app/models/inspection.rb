@@ -78,6 +78,18 @@ class Inspection < ApplicationRecord
     inspection_date + 1.year
   end
 
+  # URL routing based on status
+  def primary_url_path
+    case status
+    when "complete"
+      "inspection_path(self)"
+    when "draft"
+      "edit_inspection_path(self)"
+    else
+      raise "Invalid inspection status: #{status}"
+    end
+  end
+
   # Advanced methods
   def can_be_completed?
     unit.present? && all_assessments_complete?
@@ -106,11 +118,7 @@ class Inspection < ApplicationRecord
   end
 
   def complete!(user)
-    update!(
-      status: "complete",
-      completed_at: Time.current,
-      completed_by_id: user.id
-    )
+    update!(status: "complete")
     log_audit_action("completed", user, "Inspection completed")
   end
 
@@ -120,8 +128,6 @@ class Inspection < ApplicationRecord
     new_inspection.status = "draft"
     new_inspection.unique_report_number = nil
     new_inspection.passed = nil
-    new_inspection.completed_at = nil
-    new_inspection.completed_by = nil
     new_inspection.save!
 
     # Duplicate all assessments

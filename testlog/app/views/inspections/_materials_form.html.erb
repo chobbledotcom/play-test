@@ -10,7 +10,7 @@
   <%= form.fields_for :materials_assessment, (@inspection.materials_assessment || @inspection.build_materials_assessment) do |assessment_form| %>
 
     <div class="assessment-form materials-assessment">
-      <h3><%= t('inspections.assessments.materials.title') %></h3>
+      <%= render 'shared/page_header', title: t('inspections.assessments.materials.title') %>
 
       <!-- Safety Standards Reference -->
       <details class="safety-standards-reference">

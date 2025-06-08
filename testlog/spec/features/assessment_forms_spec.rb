@@ -17,7 +17,7 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "renders slide assessment form without i18n errors" do
       visit edit_inspection_path(inspection, tab: "slide")
 
-      expect(page).to have_css("h3", text: I18n.t("inspections.assessments.slide.title"))
+      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.slide.title"))
       expect(page).to have_css(".slide-assessment")
       expect(page).not_to have_content("translation missing")
       expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
@@ -26,7 +26,7 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "renders user height assessment form without i18n errors" do
       visit edit_inspection_path(inspection, tab: "user_height")
 
-      expect(page).to have_css("h3", text: I18n.t("inspections.assessments.user_height.title"))
+      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.user_height.title"))
       expect(page).to have_css(".user-height-assessment")
       expect(page).not_to have_content("translation missing")
       expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
@@ -35,7 +35,7 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "renders structure assessment form without i18n errors" do
       visit edit_inspection_path(inspection, tab: "structure")
 
-      expect(page).to have_css("h3", text: I18n.t("inspections.assessments.structure.title"))
+      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.structure.title"))
       expect(page).to have_css(".structure-assessment")
       expect(page).not_to have_content("translation missing")
       expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
@@ -44,7 +44,7 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "renders materials assessment form without i18n errors" do
       visit edit_inspection_path(inspection, tab: "materials")
 
-      expect(page).to have_css("h3", text: I18n.t("inspections.assessments.materials.title"))
+      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.materials.title"))
       expect(page).to have_css(".materials-assessment")
       expect(page).not_to have_content("translation missing")
       expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
@@ -53,7 +53,7 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "renders anchorage assessment form without i18n errors" do
       visit edit_inspection_path(inspection, tab: "anchorage")
 
-      expect(page).to have_css("h3", text: I18n.t("inspections.assessments.anchorage.title"))
+      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.anchorage.title"))
       expect(page).to have_css(".anchorage-assessment")
       expect(page).not_to have_content("translation missing")
       expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
@@ -62,7 +62,7 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "renders fan assessment form without i18n errors" do
       visit edit_inspection_path(inspection, tab: "fan")
 
-      expect(page).to have_css("h3", text: I18n.t("inspections.assessments.fan.title"))
+      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.fan.title"))
       expect(page).to have_css(".fan-assessment")
       expect(page).not_to have_content("translation missing")
       expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
@@ -75,7 +75,7 @@ RSpec.feature "Assessment Forms", type: :feature do
       it "renders enclosed assessment form without i18n errors" do
         visit edit_inspection_path(enclosed_inspection, tab: "enclosed")
 
-        expect(page).to have_css("h3", text: I18n.t("inspections.assessments.enclosed.title"))
+        expect(page).to have_css("h1", text: I18n.t("inspections.assessments.enclosed.title"))
         expect(page).to have_css(".enclosed-assessment")
         expect(page).not_to have_content("translation missing")
         expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))

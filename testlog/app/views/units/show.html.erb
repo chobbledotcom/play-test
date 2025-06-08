@@ -1,5 +1,5 @@
 <article class="view-unit">
-  <header><h2><%= t('units.titles.show') %></h2></header>
+  <%= render 'shared/page_header', title: t('units.titles.show') %>
 
   <%= render 'unit_details', unit: @unit %>
 

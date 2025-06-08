@@ -80,9 +80,7 @@ RSpec.describe InspectionsController, type: :controller do
     end
 
     it "uses partial: parameter for rendering partials" do
-      # Mark inspection as completed to trigger completion issues
-      inspection.update!(status: "complete")
-
+      # Keep inspection as draft so we can update it
       patch :update, params: {id: inspection.id, inspection: {comments: "Test"}}
 
       # Should render the completion issues partial

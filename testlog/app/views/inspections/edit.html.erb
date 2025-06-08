@@ -1,5 +1,10 @@
 <header>
   <h1><%= t('inspections.titles.edit') %></h1>
+  <% if @inspection.status == "draft" %>
+    <nav>
+      <%= link_to t('inspections.buttons.qr_and_pdf'), inspection_path(@inspection) %>
+    </nav>
+  <% end %>
 </header>
 
 <article>

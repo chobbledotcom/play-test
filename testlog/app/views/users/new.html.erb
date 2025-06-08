@@ -1,6 +1,4 @@
-<header>
-  <h1><%= t('users.titles.register') %></h1>
-</header>
+<%= render 'shared/page_header', title: t('users.titles.register') %>
 
 <%= form_with(model: @user, url: signup_path) do |form| %>
   <%= render 'form/errors', model: @user %>
