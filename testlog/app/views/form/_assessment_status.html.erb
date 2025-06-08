@@ -1,16 +1,7 @@
 <%
-  # Smart i18n key detection for assessment type
-  if local_assigns[:i18n_base]
-    i18n_base = local_assigns[:i18n_base]
-  else
-    # Auto-detect from controller and current tab context
-    controller_name = params[:controller]
-    if controller_name == 'inspections' && params[:tab].present?
-      i18n_base = "inspections.assessments.#{params[:tab]}"
-    else
-      i18n_base = "#{controller_name}"
-    end
-  end
+  # Require explicit i18n_base - no more guessing
+  i18n_base = local_assigns[:i18n_base]
+  raise ArgumentError, "i18n_base is required for assessment status" if i18n_base.nil?
   
   # Assessment object - should be passed as 'assessment'
   assessment_obj = assessment

@@ -1,0 +1,7 @@
+<%
+  @_current_form = form
+  i18n_base = local_assigns[:i18n_base]
+  raise ArgumentError, "i18n_base is required for form sections" if i18n_base.nil?
+  @_current_i18n_base = i18n_base
+%>
+<%= yield %>

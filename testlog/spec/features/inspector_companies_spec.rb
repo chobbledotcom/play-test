@@ -269,9 +269,9 @@ RSpec.describe "Inspector Companies", type: :feature do
       visit new_inspector_company_path
 
       expect(page).to have_css("fieldset")
-      expect(page).to have_css("fieldset header h3", text: I18n.t("inspector_companies.headers.company_details"))
-      expect(page).to have_css("fieldset header h4", text: I18n.t("inspector_companies.headers.contact_information"))
-      expect(page).to have_css("fieldset header h4", text: I18n.t("inspector_companies.headers.company_status"))
+      expect(page).to have_css("fieldset legend", text: I18n.t("inspector_companies.headers.company_details"))
+      expect(page).to have_css("fieldset legend", text: I18n.t("inspector_companies.headers.contact_information"))
+      expect(page).to have_css("fieldset legend", text: I18n.t("inspector_companies.headers.company_status"))
     end
 
     it "has required attributes on mandatory fields" do

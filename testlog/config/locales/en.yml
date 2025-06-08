@@ -444,6 +444,7 @@ en:
           play_area_length: "Play Area Length"
           play_area_width: "Play Area Width"
           negative_adjustment: "Negative Adjustment"
+          user_height_comment: "Comments"
           comments: "Comments"
         placeholders:
           height: "Enter height in meters"

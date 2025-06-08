@@ -1,24 +1,6 @@
 <%
-  # Get form object - either passed directly or from wrapper
-  form_object = local_assigns[:form] || @_current_form
-  
-  # Smart i18n key detection
-  if local_assigns[:i18n_base]
-    i18n_base = local_assigns[:i18n_base]
-  else
-    # Auto-detect from controller and current tab context
-    controller_name = params[:controller]
-    if controller_name == 'inspections' && params[:tab].present?
-      i18n_base = "inspections.assessments.#{params[:tab]}"
-    else
-      i18n_base = "#{controller_name}"
-    end
-  end
-  
-  # Set defaults with smart i18n lookup
-  field_label = local_assigns[:label] || t("#{i18n_base}.fields.#{field}", default: field.to_s.humanize)
-  field_hint = local_assigns[:hint] || t("#{i18n_base}.hints.#{field}", default: nil)
-  field_placeholder = local_assigns[:placeholder] || t("#{i18n_base}.placeholders.#{field}", default: nil)
+  # Get i18n_base from section (already validated there)
+  setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
   
   # Form field options
   step ||= 0.01
@@ -29,15 +11,15 @@
 %>
 
 <div class="<%= wrapper_class %>">
-  <%= form_object.label field, field_label %>
-  <%= form_object.number_field field, {
+  <%= setup[:form_object].label field, setup[:field_label] %>
+  <%= setup[:form_object].number_field field, {
     step: step,
     min: min,
     max: max,
-    placeholder: field_placeholder,
+    placeholder: setup[:field_placeholder],
     class: css_class
   }.compact %>
-  <% if field_hint.present? %>
-    <small class="form-text"><%= field_hint %></small>
+  <% if setup[:field_hint].present? %>
+    <small class="form-text"><%= setup[:field_hint] %></small>
   <% end %>
 </div>

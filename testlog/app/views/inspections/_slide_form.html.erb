@@ -1,23 +1,23 @@
-<%= form_with model: @inspection, 
-             url: inspection_path(@inspection), 
-             method: :patch, 
+<%= form_with model: @inspection,
+             url: inspection_path(@inspection),
+             method: :patch,
              local: true,
-             html: { 
-               class: "inspection-slide-form", 
+             html: {
+               class: "inspection-slide-form",
                data: { autosave: "true" }
              } do |form| %>
-  
+
   <%= form.fields_for :slide_assessment, (@inspection.slide_assessment || @inspection.build_slide_assessment) do |assessment_form| %>
-  
-  <%= render 'shared/assessment_form_section', form: assessment_form do %>
+
+  <%= render 'form/section', form: assessment_form, i18n_base: 'inspections.assessments.slide.fields' do %>
     <div class="assessment-form slide-assessment">
       <h3><%= t('inspections.assessments.slide.title') %></h3>
-      
+
       <!-- Slide Measurements Section -->
       <%= render 'form/fieldset', legend_key: 'slide_measurements' do %>
         <%= render 'form/number', field: :slide_platform_height %>
         <%= render 'form/number', field: :slide_wall_height %>
-        
+
         <div class="form-group">
           <%= render 'form/number', field: :runout_value %>
           <% if @inspection.slide_assessment&.persisted? && @inspection.slide_assessment.slide_platform_height.present? %>
@@ -26,30 +26,26 @@
             </div>
           <% end %>
         </div>
-        
+
         <%= render 'form/number', field: :slide_first_metre_height %>
         <%= render 'form/number', field: :slide_beyond_first_metre_height %>
         <%= render 'form/checkbox', field: :slide_permanent_roof %>
       <% end %>
-    
+
       <!-- Safety Checks Section -->
       <%= render 'form/fieldset', legend_key: 'safety_checks' do %>
         <%= render 'form/pass_fail', field: :clamber_netting_pass %>
         <%= render 'form/pass_fail', field: :runout_pass %>
         <%= render 'form/pass_fail', field: :slip_sheet_pass %>
       <% end %>
-      
+
       <!-- Comments Section -->
       <%= render 'form/text_area', field: :slide_platform_height_comment %>
-    
+
       <!-- Safety Status -->
-      <%= render 'form/assessment_status', assessment: @inspection.slide_assessment %>
-      
-      <!-- Form Actions -->
-      <div class="form-actions">
-        <%= form.submit t('inspections.buttons.save_assessment'), class: "btn btn-primary" %>
-        <%= render 'form/autosave_status' %>
-      </div>
+      <%= render 'form/assessment_status', assessment: @inspection.slide_assessment, i18n_base: 'inspections.assessments.slide' %>
+
+      <%= render 'form/save_assessment' %>
     </div>
   <% end %>
   <% end %>

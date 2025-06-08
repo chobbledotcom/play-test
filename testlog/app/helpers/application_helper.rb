@@ -26,4 +26,30 @@ module ApplicationHelper
       content_tag(:table, html_options, &block)
     end
   end
+
+  # Shared form field helper logic - requires explicit i18n_base
+  def form_field_setup(field, local_assigns, i18n_base: nil)
+    # Get form object - either passed directly or from wrapper
+    form_object = local_assigns[:form] || @_current_form
+
+    # Require explicit i18n_base - no more guessing
+    i18n_base = local_assigns[:i18n_base] || i18n_base
+    raise ArgumentError, "i18n_base is required for form field setup" if i18n_base.nil?
+
+    # Simple label key construction
+    label_key = "#{i18n_base}.#{field}"
+
+    # Get label, hint, placeholder - fail loudly if required keys are missing
+    field_label = local_assigns[:label] || t(label_key, raise: true)
+    field_hint = local_assigns[:hint] || t("#{i18n_base}_hints.#{field}", default: nil)
+    field_placeholder = local_assigns[:placeholder] || t("#{i18n_base}_placeholders.#{field}", default: nil)
+
+    {
+      form_object: form_object,
+      i18n_base: i18n_base,
+      field_label: field_label,
+      field_hint: field_hint,
+      field_placeholder: field_placeholder
+    }
+  end
 end
