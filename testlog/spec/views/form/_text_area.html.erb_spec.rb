@@ -26,7 +26,6 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
     it "renders text area with label" do
       render partial: "form/text_area", locals: {field: field}
 
-      expect(rendered).to have_css("div.form-group")
       expect(rendered).to include('<label for="description">Description</label>')
       expect(rendered).to include('<textarea name="description" id="description"></textarea>')
     end
@@ -34,7 +33,7 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
     it "displays hint when present" do
       render partial: "form/text_area", locals: {field: field}
 
-      expect(rendered).to have_css("small.form-text", text: "Provide details")
+      expect(rendered).to have_css("small", text: "Provide details")
     end
 
     it "uses default rows of 4" do
@@ -45,46 +44,30 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
       expect(mock_form).to have_received(:text_area).with(field, hash_including(rows: 4))
     end
 
-    it "uses default CSS class" do
-      allow(mock_form).to receive(:text_area).with(field, hash_including(class: "form-control")).and_return('<textarea class="form-control"></textarea>'.html_safe)
-
-      render partial: "form/text_area", locals: {field: field}
-
-      expect(mock_form).to have_received(:text_area).with(field, hash_including(class: "form-control"))
-    end
-  end
-
-  context "with custom options" do
-    it "uses custom rows value" do
-      allow(mock_form).to receive(:text_area).with(field, hash_including(rows: 5)).and_return('<textarea rows="5"></textarea>'.html_safe)
-
-      render partial: "form/text_area", locals: {field: field, rows: 5}
-
-      expect(mock_form).to have_received(:text_area).with(field, hash_including(rows: 5))
-    end
-
-    it "uses custom CSS class" do
-      allow(mock_form).to receive(:text_area).with(field, hash_including(class: "custom-textarea")).and_return('<textarea class="custom-textarea"></textarea>'.html_safe)
-
-      render partial: "form/text_area", locals: {field: field, css_class: "custom-textarea"}
-
-      expect(mock_form).to have_received(:text_area).with(field, hash_including(class: "custom-textarea"))
-    end
-
-    it "uses custom wrapper class" do
-      render partial: "form/text_area", locals: {field: field, wrapper_class: "custom-wrapper"}
-
-      expect(rendered).to have_css("div.custom-wrapper")
-    end
-  end
-
-  context "with placeholder" do
-    it "includes placeholder in field options" do
+    it "includes placeholder when provided" do
       allow(mock_form).to receive(:text_area).with(field, hash_including(placeholder: "Enter description here...")).and_return('<textarea placeholder="Enter description here..."></textarea>'.html_safe)
 
       render partial: "form/text_area", locals: {field: field}
 
       expect(mock_form).to have_received(:text_area).with(field, hash_including(placeholder: "Enter description here..."))
+    end
+  end
+
+  context "with custom options" do
+    it "uses custom rows value" do
+      allow(mock_form).to receive(:text_area).with(field, hash_including(rows: 10)).and_return('<textarea rows="10"></textarea>'.html_safe)
+
+      render partial: "form/text_area", locals: {field: field, rows: 10}
+
+      expect(mock_form).to have_received(:text_area).with(field, hash_including(rows: 10))
+    end
+
+    it "respects required parameter" do
+      allow(mock_form).to receive(:text_area).with(field, hash_including(required: true)).and_return("<textarea required></textarea>".html_safe)
+
+      render partial: "form/text_area", locals: {field: field, required: true}
+
+      expect(mock_form).to have_received(:text_area).with(field, hash_including(required: true))
     end
   end
 
@@ -95,18 +78,38 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
         i18n_base: "test.forms",
         field_label: "Description",
         field_hint: nil,
+        field_placeholder: "Enter description here..."
+      })
+    end
+
+    it "does not render hint text" do
+      render partial: "form/text_area", locals: {field: field}
+
+      expect(rendered).not_to have_css("small")
+    end
+  end
+
+  context "without placeholder" do
+    before do
+      allow(view).to receive(:form_field_setup).and_return({
+        form_object: mock_form,
+        i18n_base: "test.forms",
+        field_label: "Description",
+        field_hint: "Provide details",
         field_placeholder: nil
       })
     end
 
-    it "does not render hint element" do
+    it "does not include placeholder attribute" do
+      allow(mock_form).to receive(:text_area).with(field, hash_excluding(:placeholder)).and_return("<textarea></textarea>".html_safe)
+
       render partial: "form/text_area", locals: {field: field}
 
-      expect(rendered).not_to have_css("small.form-text")
+      expect(mock_form).to have_received(:text_area).with(field, hash_excluding(:placeholder))
     end
   end
 
-  context "with explicit form object" do
+  context "form object handling" do
     let(:other_form) { double("OtherFormBuilder") }
 
     before do
@@ -114,15 +117,14 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
         form_object: other_form,
         i18n_base: "test.forms",
         field_label: "Description",
-        field_hint: nil,
-        field_placeholder: nil
+        field_hint: "Provide details",
+        field_placeholder: "Enter description here..."
       })
-
       allow(other_form).to receive(:label).and_return("<label>Description</label>".html_safe)
       allow(other_form).to receive(:text_area).and_return("<textarea></textarea>".html_safe)
     end
 
-    it "uses provided form object" do
+    it "uses the form object returned by form_field_setup" do
       render partial: "form/text_area", locals: {field: field, form: other_form}
 
       expect(other_form).to have_received(:label)
@@ -134,29 +136,40 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
     it "has proper semantic structure" do
       render partial: "form/text_area", locals: {field: field}
 
-      expect(rendered).to have_css("div.form-group")
-      expect(rendered).to have_css("div.form-group label")
-      expect(rendered).to have_css("div.form-group textarea")
-      expect(rendered).to have_css("div.form-group small.form-text")
-    end
+      doc = Nokogiri::HTML::DocumentFragment.parse(rendered)
 
-    it "maintains proper nesting order" do
-      render partial: "form/text_area", locals: {field: field}
+      # Should have label followed by textarea
+      label = doc.at_css("label")
+      textarea = doc.at_css("textarea")
 
-      # Check that label comes before textarea
-      expect(rendered).to match(/<label.*<textarea/m)
+      expect(label).not_to be_nil
+      expect(textarea).not_to be_nil
+
+      # Hint should be in a small tag
+      small = doc.at_css("small")
+      expect(small).not_to be_nil
+      expect(small.text).to eq("Provide details")
     end
   end
 
   context "with different field types" do
-    it "handles notes fields" do
-      render partial: "form/text_area", locals: {field: :notes}
-      expect(rendered).to have_css("div.form-group textarea")
-    end
+    %i[notes comments feedback].each do |field_name|
+      it "handles #{field_name} fields" do
+        allow(view).to receive(:form_field_setup).with(field_name, anything, anything).and_return({
+          form_object: mock_form,
+          i18n_base: "test.forms",
+          field_label: field_name.to_s.capitalize,
+          field_hint: nil,
+          field_placeholder: nil
+        })
 
-    it "handles comments fields" do
-      render partial: "form/text_area", locals: {field: :comments}
-      expect(rendered).to have_css("div.form-group textarea")
+        allow(mock_form).to receive(:label).with(field_name, anything).and_return("<label>#{field_name.to_s.capitalize}</label>".html_safe)
+        allow(mock_form).to receive(:text_area).with(field_name, anything).and_return("<textarea></textarea>".html_safe)
+
+        render partial: "form/text_area", locals: {field: field_name}
+
+        expect(rendered).to include("<textarea></textarea>")
+      end
     end
   end
 end

@@ -30,6 +30,48 @@ RSpec.describe Inspection, type: :model do
     end
   end
 
+  describe "inspector_company assignment" do
+    let(:inspector_company) { create(:inspector_company) }
+    let(:user_with_company) { create(:user, inspection_company: inspector_company) }
+    let(:unit) { create(:unit, user: user_with_company) }
+
+    it "copies inspector_company_id from user on creation" do
+      inspection = user_with_company.inspections.create!(
+        unit: unit,
+        inspection_date: Date.current,
+        status: "draft"
+      )
+
+      expect(inspection.inspector_company_id).to eq(inspector_company.id)
+    end
+
+    it "doesn't change inspector_company_id when user's company changes" do
+      inspection = create(:inspection, user: user_with_company, unit: unit)
+      original_company_id = inspection.inspector_company_id
+
+      new_company = create(:inspector_company, name: "New Company")
+      user_with_company.update!(inspection_company: new_company)
+
+      inspection.reload
+      expect(inspection.inspector_company_id).to eq(original_company_id)
+      expect(inspection.inspector_company_id).not_to eq(new_company.id)
+    end
+
+    it "uses explicitly set inspector_company_id over user's company" do
+      different_company = create(:inspector_company, name: "Different Company")
+
+      inspection = user_with_company.inspections.create!(
+        unit: unit,
+        inspection_date: Date.current,
+        status: "draft",
+        inspector_company_id: different_company.id
+      )
+
+      expect(inspection.inspector_company_id).to eq(different_company.id)
+      expect(inspection.inspector_company_id).not_to eq(inspector_company.id)
+    end
+  end
+
   describe "esoteric tests" do
     # Test with Unicode characters and emoji in text fields
     it "handles Unicode characters and emoji in text fields" do
@@ -117,6 +159,80 @@ RSpec.describe Inspection, type: :model do
 
       expect(Inspection.search("LOWERCASE").count).to eq(1)
       expect(Inspection.search("lowercase").count).to eq(1)
+    end
+  end
+
+  describe "HasDimensions concern" do
+    let(:inspection) { create(:inspection) }
+
+    it "includes HasDimensions module" do
+      expect(Inspection.ancestors).to include(HasDimensions)
+    end
+
+    it "has all dimension fields available" do
+      inspection.width = 10
+      inspection.length = 8
+      inspection.height = 3
+      inspection.num_low_anchors = 4
+      inspection.rope_size = 12.5
+
+      expect(inspection.dimensions).to eq("10m × 8m × 3m")
+      expect(inspection.area).to eq(80)
+      expect(inspection.volume).to eq(240)
+    end
+  end
+
+  describe "dimension copying from unit" do
+    let(:unit) {
+      create(:unit,
+        width: 12.5,
+        length: 10.0,
+        height: 4.0,
+        num_low_anchors: 6,
+        num_high_anchors: 2,
+        rope_size: 15.0,
+        slide_platform_height: 2.5,
+        containing_wall_height: 1.2,
+        users_at_1000mm: 10,
+        ambient_temperature: 22.5)
+    }
+
+    it "copies all dimensions from unit on creation" do
+      inspection = create(:inspection,
+        user: user,
+        unit: unit,
+        inspection_date: Date.current,
+        inspection_location: "Test Location",
+        inspector_company: create(:inspector_company))
+
+      # Basic dimensions
+      expect(inspection.width).to eq(12.5)
+      expect(inspection.length).to eq(10.0)
+      expect(inspection.height).to eq(4.0)
+
+      # Other dimensions
+      expect(inspection.num_low_anchors).to eq(6)
+      expect(inspection.num_high_anchors).to eq(2)
+      expect(inspection.rope_size).to eq(15.0)
+      expect(inspection.slide_platform_height).to eq(2.5)
+      expect(inspection.containing_wall_height).to eq(1.2)
+      expect(inspection.users_at_1000mm).to eq(10)
+      expect(inspection.ambient_temperature).to eq(22.5)
+    end
+
+    it "preserves inspection dimensions when unit is updated" do
+      inspection = create(:inspection, unit: unit)
+
+      # Original dimensions
+      expect(inspection.width).to eq(12.5)
+
+      # Update unit
+      unit.update!(width: 15.0, length: 12.0)
+
+      # Inspection dimensions remain unchanged
+      inspection.reload
+      expect(inspection.width).to eq(12.5)
+      expect(inspection.length).to eq(10.0)
     end
   end
 end

@@ -1,0 +1,75 @@
+<div class="safety-standards-summary">
+  <h3><%= t('inspections.safety_standards.title') %></h3>
+  <p><%= t('inspections.safety_standards.description') %></p>
+
+  <% if inspection.unit.present? %>
+    <!-- Anchor Requirements -->
+    <% if inspection.anchorage_assessment.present? %>
+      <section class="standards-section">
+        <h4><%= t('inspections.safety_standards.anchor_requirements') %></h4>
+        <% if inspection.unit.area.present? %>
+          <p><%= t('inspections.safety_standards.anchor_calculation', 
+                   required: inspection.anchorage_assessment.required_anchors,
+                   area: inspection.unit.area) %></p>
+          <p class="<%= inspection.anchorage_assessment.meets_anchor_requirements? ? 'text-success' : 'text-danger' %>">
+            <%= t('inspections.safety_standards.anchor_status',
+                  current: inspection.anchorage_assessment.total_anchors,
+                  required: inspection.anchorage_assessment.required_anchors) %>
+          </p>
+        <% else %>
+          <p class="text-warning">Unit area not specified - cannot calculate anchor requirements</p>
+        <% end %>
+      </section>
+    <% end %>
+
+    <!-- Slide Requirements -->
+    <% if inspection.slide_assessment.present? && inspection.slide_assessment.slide_platform_height.present? %>
+      <section class="standards-section">
+        <h4><%= t('inspections.safety_standards.slide_requirements') %></h4>
+        <p><%= t('inspections.safety_standards.runout_requirement',
+                 required: inspection.slide_assessment.required_runout_length&.round(2)) %></p>
+        <% if inspection.slide_assessment.runout_value.present? %>
+          <p class="<%= inspection.slide_assessment.meets_runout_requirements? ? 'text-success' : 'text-danger' %>">
+            <%= t('inspections.safety_standards.runout_status',
+                  current: inspection.slide_assessment.runout_value) %>
+          </p>
+        <% end %>
+      </section>
+    <% end %>
+
+    <!-- User Capacity -->
+    <% if inspection.unit.length.present? && inspection.unit.width.present? %>
+      <section class="standards-section">
+        <h4><%= t('inspections.safety_standards.user_capacity') %></h4>
+        <p><%= t('inspections.safety_standards.capacity_by_height') %></p>
+        <% capacity = SafetyStandard.calculate_user_capacity(inspection.unit.length, inspection.unit.width) %>
+        <ul>
+          <li><%= t('inspections.safety_standards.capacity_1000mm', count: capacity[:users_1000mm]) %></li>
+          <li><%= t('inspections.safety_standards.capacity_1200mm', count: capacity[:users_1200mm]) %></li>
+          <li><%= t('inspections.safety_standards.capacity_1500mm', count: capacity[:users_1500mm]) %></li>
+          <li><%= t('inspections.safety_standards.capacity_1800mm', count: capacity[:users_1800mm]) %></li>
+        </ul>
+      </section>
+    <% end %>
+
+    <!-- Material Requirements -->
+    <section class="standards-section">
+      <h4><%= t('inspections.safety_standards.material_requirements') %></h4>
+      <ul>
+        <li><%= t('inspections.safety_standards.fabric_strength') %></li>
+        <li><%= t('inspections.safety_standards.rope_diameter') %></li>
+      </ul>
+    </section>
+
+    <!-- Electrical Requirements -->
+    <section class="standards-section">
+      <h4><%= t('inspections.safety_standards.electrical_requirements') %></h4>
+      <ul>
+        <li><%= t('inspections.safety_standards.pat_testing') %></li>
+        <li><%= t('inspections.safety_standards.blower_distance') %></li>
+      </ul>
+    </section>
+  <% else %>
+    <p class="text-warning">No unit associated with this inspection - safety standards calculations require unit dimensions</p>
+  <% end %>
+</div>

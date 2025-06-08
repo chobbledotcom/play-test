@@ -166,11 +166,11 @@ RSpec.describe "Inspector Companies", type: :feature do
 
       click_button I18n.t("inspector_companies.buttons.create")
 
-      expect(page).to have_content("prohibited this company from being saved")
-      expect(page).to have_content("Name can't be blank")
-      expect(page).to have_content("Rpii registration number can't be blank")
-      expect(page).to have_content("Phone can't be blank")
-      expect(page).to have_content("Address can't be blank")
+      expect(page).to have_content(I18n.t("inspector_companies.errors.header", count: 4))
+      expect(page).to have_content("Name #{I18n.t("errors.messages.cant_be_blank")}")
+      expect(page).to have_content("Rpii registration number #{I18n.t("errors.messages.cant_be_blank")}")
+      expect(page).to have_content("Phone #{I18n.t("errors.messages.cant_be_blank")}")
+      expect(page).to have_content("Address #{I18n.t("errors.messages.cant_be_blank")}")
     end
   end
 

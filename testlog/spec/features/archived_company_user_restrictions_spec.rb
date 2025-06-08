@@ -23,7 +23,8 @@ RSpec.feature "Archived Company User Restrictions", type: :feature do
       click_button I18n.t("units.buttons.add_inspection")
 
       expect(page).to have_content(I18n.t("users.messages.company_archived"))
-      expect(Inspection.count).to eq(0)
+      expect(user_from_archived_company.inspections.count).to eq(0)
+      expect(current_path).to eq(unit_path(unit))
     end
 
     it "does not show add inspection button when user can't create inspections" do
@@ -38,9 +39,10 @@ RSpec.feature "Archived Company User Restrictions", type: :feature do
   end
 
   describe "Existing inspections" do
-    let!(:existing_inspection) { create(:inspection, user: user_from_archived_company, unit: unit) }
+    let(:existing_inspection) { create(:inspection, user: user_from_archived_company, unit: unit) }
 
     it "still allows viewing existing inspections" do
+      existing_inspection # Force creation
       visit inspection_path(existing_inspection)
 
       # Should be able to view the inspection
@@ -51,6 +53,7 @@ RSpec.feature "Archived Company User Restrictions", type: :feature do
     end
 
     it "shows archived company in inspection history" do
+      existing_inspection # Force creation
       visit unit_path(unit)
 
       # Should see the inspection in history with archived company name

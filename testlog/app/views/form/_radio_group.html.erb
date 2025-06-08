@@ -6,25 +6,20 @@
   field_label = setup[:field_label]
   field_hint = setup[:field_hint]
   
-  # Form field options
-  wrapper_class ||= "form-group"
-  radio_wrapper_class ||= "radio-group"
-  radio_label_class ||= "radio-label"
-  
   # Options should be array of [label, value] pairs
   # e.g. [["Pass", true], ["Fail", false]]
   options ||= []
 %>
 
-<div class="<%= wrapper_class %>">
-  <%= form_object.label field, field_label %>
-  <div class="<%= radio_wrapper_class %>">
-    <% options.each do |option_label, option_value| %>
+<div>
+  <label><%= field_label %></label>
+  <% options.each do |option_label, option_value| %>
+    <label>
       <%= form_object.radio_button field, option_value, id: "#{field}_#{option_value}" %>
-      <%= label_tag "#{field}_#{option_value}", option_label, class: radio_label_class %>
-    <% end %>
-  </div>
+      <%= option_label %>
+    </label>
+  <% end %>
   <% if field_hint.present? %>
-    <small class="form-text"><%= field_hint %></small>
+    <small><%= field_hint %></small>
   <% end %>
 </div>

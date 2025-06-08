@@ -19,7 +19,7 @@ RSpec.feature "Inspection Company Assignment", type: :feature do
 
       expect(page).to have_select("user_inspection_company_id")
       select inspector_company.name, from: "user_inspection_company_id"
-      click_button "Update User"
+      click_button I18n.t("users.buttons.update_user")
 
       expect(page).to have_content("User updated")
       regular_user.reload
@@ -56,7 +56,7 @@ RSpec.feature "Inspection Company Assignment", type: :feature do
         click_button I18n.t("units.buttons.add_inspection")
 
         expect(page).to have_content(regular_user.inspection_company_required_message)
-        expect(current_path).to eq(root_path)
+        expect(current_path).to eq(unit_path(unit))
       end
 
       scenario "User can access inspections index but sees activation message" do
@@ -91,8 +91,28 @@ RSpec.feature "Inspection Company Assignment", type: :feature do
         visit unit_path(unit)
         click_button I18n.t("units.buttons.add_inspection")
 
-        inspection = Inspection.last
+        inspection = regular_user.inspections.last
         expect(inspection.inspector_company_id).to eq(inspector_company.id)
+      end
+
+      scenario "Inspection company doesn't change when user's company changes" do
+        unit = create(:unit, user: regular_user)
+        original_company = inspector_company
+        new_company = create(:inspector_company, name: "New Company", active: true)
+
+        visit unit_path(unit)
+        click_button I18n.t("units.buttons.add_inspection")
+
+        inspection = regular_user.inspections.last
+        expect(inspection.inspector_company_id).to eq(original_company.id)
+
+        # Change user's company
+        regular_user.update!(inspection_company: new_company)
+
+        # Inspection should still have original company
+        inspection.reload
+        expect(inspection.inspector_company_id).to eq(original_company.id)
+        expect(inspection.inspector_company_id).not_to eq(new_company.id)
       end
     end
   end

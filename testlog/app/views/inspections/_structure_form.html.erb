@@ -1,0 +1,103 @@
+<%= form_with model: @inspection,
+             url: inspection_path(@inspection),
+             method: :patch,
+             local: false,
+             html: {
+               class: "inspection-structure-form",
+               data: { autosave: "true", turbo_stream: true }
+             } do |form| %>
+
+  <%= form.fields_for :structure_assessment, (@inspection.structure_assessment || @inspection.build_structure_assessment) do |assessment_form| %>
+
+    <div class="assessment-form structure-assessment">
+      <h3><%= t('inspections.assessments.structure.title') %></h3>
+
+      <!-- Critical Safety Checks Section -->
+      <%= render 'form/fieldset', legend_key: 'critical_safety_checks', i18n_base: 'inspections.assessments.structure.fields', form: assessment_form do %>
+        <%= render 'form/pass_fail', field: :seam_integrity_pass %>
+        <%= render 'form/pass_fail', field: :lock_stitch_pass %>
+        <%= render 'form/pass_fail', field: :air_loss_pass %>
+        <%= render 'form/pass_fail', field: :straight_walls_pass %>
+        <%= render 'form/pass_fail', field: :sharp_edges_pass %>
+        <%= render 'form/pass_fail', field: :unit_stable_pass %>
+      <% end %>
+
+      <!-- Measurements Section -->
+      <%= render 'form/fieldset', legend_key: 'measurements', i18n_base: 'inspections.assessments.structure.fields', form: assessment_form do %>
+        <div class="form-group">
+          <%= render 'form/number', field: :stitch_length, min: 0, step: 0.1 %>
+          <%= render 'form/pass_fail', field: :stitch_length_pass %>
+        </div>
+
+        <div class="form-group">
+          <%= render 'form/number', field: :evacuation_time, min: 0, step: 1 %>
+          <%= render 'form/pass_fail', field: :evacuation_time_pass %>
+        </div>
+
+        <div class="form-group">
+          <%= render 'form/number', field: :unit_pressure_value, min: 0, step: 0.1 %>
+          <%= render 'form/pass_fail', field: :unit_pressure_pass %>
+        </div>
+
+        <div class="form-group">
+          <%= render 'form/number', field: :blower_tube_length, min: 0, step: 0.1 %>
+          <%= render 'form/pass_fail', field: :blower_tube_length_pass %>
+        </div>
+      <% end %>
+
+      <!-- Additional Safety Checks Section -->
+      <%= render 'form/fieldset', legend_key: 'additional_safety_checks', i18n_base: 'inspections.assessments.structure.fields', form: assessment_form do %>
+        <div class="form-group">
+          <%= render 'form/number', field: :step_size_value, min: 0, step: 0.1 %>
+          <%= render 'form/pass_fail', field: :step_size_pass %>
+        </div>
+
+        <div class="form-group">
+          <%= render 'form/number', field: :fall_off_height_value, min: 0, step: 0.1 %>
+          <%= render 'form/pass_fail', field: :fall_off_height_pass %>
+        </div>
+
+        <div class="form-group">
+          <%= render 'form/number', field: :trough_depth_value, min: 0, step: 0.1 %>
+          <%= render 'form/number', field: :trough_width_value, min: 0, step: 0.1 %>
+          <%= render 'form/pass_fail', field: :trough_pass %>
+        </div>
+
+        <%= render 'form/pass_fail', field: :entrapment_pass %>
+        <%= render 'form/pass_fail', field: :markings_pass %>
+        <%= render 'form/pass_fail', field: :grounding_pass %>
+      <% end %>
+
+      <!-- Assessment Summary -->
+      <% if @inspection.structure_assessment&.persisted? %>
+        <div class="assessment-summary">
+          <h4><%= t('inspections.assessments.structure.summary.title') %></h4>
+          
+          <div class="compliance-status">
+            <strong><%= t('inspections.assessments.structure.summary.completion') %>:</strong>
+            <span class="completion-percentage"><%= @inspection.structure_assessment.completion_percentage %>%</span>
+          </div>
+
+          <div class="safety-status">
+            <strong><%= t('inspections.assessments.structure.summary.safety_checks') %>:</strong>
+            <span class="checks-count">
+              <%= @inspection.structure_assessment.passed_checks_count %> / <%= @inspection.structure_assessment.safety_check_count %>
+            </span>
+          </div>
+
+          <% if @inspection.structure_assessment.has_critical_failures? %>
+            <div class="critical-failures text-danger">
+              <strong><%= t('inspections.assessments.structure.summary.critical_failures') %>:</strong>
+              <%= @inspection.structure_assessment.critical_failure_summary %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <!-- Safety Status -->
+      <%= render 'form/assessment_status', assessment: @inspection.structure_assessment, i18n_base: 'inspections.assessments.structure' %>
+
+      <%= render 'form/save_assessment' %>
+    </div>
+  <% end %>
+<% end %>

@@ -9,23 +9,23 @@ RSpec.describe "home/index.html.erb", type: :view do
     it "displays the main heading" do
       render
 
-      expect(rendered).to include("patlog.co.uk")
+      expect(rendered).to include(I18n.t("home.company_name"))
       expect(rendered).to include("<h1>")
     end
 
     it "shows the application description" do
       render
 
-      expect(rendered).to include("Portable Appliance Testing")
-      expect(rendered).to include("generate PDF reports")
+      expect(rendered).to include(I18n.t("home.subtitle"))
+      expect(rendered).to include(I18n.t("home.features.generate_pdfs.title"))
       expect(rendered).to include("QR codes")
     end
 
     it "displays login and register navigation" do
       render
 
-      expect(rendered).to include("Log In")
-      expect(rendered).to include("Register")
+      expect(rendered).to include(I18n.t("session.login.title"))
+      expect(rendered).to include(I18n.t("users.titles.register"))
       expect(rendered).to include("/login")
       expect(rendered).to include("/users/new")
     end
@@ -33,9 +33,9 @@ RSpec.describe "home/index.html.erb", type: :view do
     it "includes company branding" do
       render
 
-      expect(rendered).to include("Chobble")
-      expect(rendered).to include("chobble.com")
-      expect(rendered).to include("free and open source")
+      expect(rendered).to include(I18n.t("home.company_name"))
+      expect(rendered).to include(I18n.t("home.company_url"))
+      expect(rendered).to include(I18n.t("home.attribution"))
     end
 
     it "contains embedded video" do
@@ -67,9 +67,9 @@ RSpec.describe "home/index.html.erb", type: :view do
     it "includes feature descriptions" do
       render
 
-      expect(rendered).to include("PAT test records")
-      expect(rendered).to include("Automatic reports")
-      expect(rendered).to include("export your inspections")
+      expect(rendered).to include("compliance tracking")
+      expect(rendered).to include(I18n.t("home.features.generate_pdfs.description"))
+      expect(rendered).to include("export data for analysis")
     end
 
     it "has accessibility-friendly structure" do
@@ -99,16 +99,16 @@ RSpec.describe "home/index.html.erb", type: :view do
     it "displays the main content" do
       render
 
-      expect(rendered).to include("patlog.co.uk")
-      expect(rendered).to include("Portable Appliance Testing")
+      expect(rendered).to include(I18n.t("home.company_name"))
+      expect(rendered).to include(I18n.t("home.subtitle"))
     end
 
     it "handles user logged in state" do
       render
 
       # The view should render without errors when user is logged in
-      expect(rendered).to include("patlog.co.uk")
-      expect(rendered).to include("Portable Appliance Testing")
+      expect(rendered).to include(I18n.t("home.company_name"))
+      expect(rendered).to include(I18n.t("home.subtitle"))
 
       # Note: The navigation visibility is controlled by view logic
       # Testing the actual navigation behavior is better done in request specs
@@ -142,15 +142,15 @@ RSpec.describe "home/index.html.erb", type: :view do
       # Check that links have proper href attributes
       expect(rendered).to match(/href="[^"]*login[^"]*"/)
       expect(rendered).to match(/href="[^"]*\/users\/new[^"]*"/)
-      expect(rendered).to match(/href="[^"]*chobble\.com[^"]*"/)
+      expect(rendered).to include(I18n.t("home.company_url"))
     end
 
     it "includes proper link attributes" do
       render
 
       # External links should have target and rel attributes for security
-      chobble_link = rendered[/href="https:\/\/chobble\.com"[^>]*>/]
-      expect(chobble_link).to be_present if chobble_link
+      patlog_link = rendered[/href="#{Regexp.escape(I18n.t("home.company_url"))}"[^>]*>/]
+      expect(patlog_link).to be_present if patlog_link
     end
 
     it "has consistent text content" do
@@ -168,7 +168,7 @@ RSpec.describe "home/index.html.erb", type: :view do
       expect(rendered).to include(I18n.t("home.features.log_inspections.title"))
       expect(rendered).to include(I18n.t("home.features.generate_pdfs.title"))
       expect(rendered).to include("Search &amp; Export")
-      expect(rendered).to include("PAT test records")
+      expect(rendered).to include("compliance tracking")
       expect(rendered).to include("QR codes")
     end
   end

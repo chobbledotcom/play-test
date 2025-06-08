@@ -28,7 +28,7 @@ class UnitsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render json: {id: @unit.id, name: @unit.name, serial: @unit.serial, manufacturer: @unit.manufacturer, unit_type: @unit.unit_type} }
+      format.json { render json: {id: @unit.id, name: @unit.name, serial: @unit.serial, manufacturer: @unit.manufacturer, has_slide: @unit.has_slide} }
     end
   end
 
@@ -54,10 +54,31 @@ class UnitsController < ApplicationController
   def update
     if @unit.update(unit_params)
       process_photo_if_present
-      flash[:success] = "Equipment record updated"
-      redirect_to @unit
+
+      respond_to do |format|
+        format.html do
+          flash[:success] = "Equipment record updated"
+          redirect_to @unit
+        end
+        format.json { render json: {status: "success", message: t("autosave.saved")} }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("autosave_status",
+              html: "<div class='saved' style='display: inline;'>#{t("autosave.saved")}</div>")
+          ]
+        end
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: {status: "error", errors: @unit.errors.full_messages} }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("autosave_status",
+              html: "<div class='error' style='display: inline;'>#{t("autosave.error")}</div>")
+          ]
+        end
+      end
     end
   end
 
@@ -91,12 +112,83 @@ class UnitsController < ApplicationController
       disposition: "inline"
   end
 
+  def new_from_inspection
+    @inspection = current_user.inspections.find_by(id: params[:id])
+
+    unless @inspection
+      flash[:danger] = I18n.t("units.errors.inspection_not_found")
+      redirect_to root_path and return
+    end
+
+    if @inspection.unit.present?
+      flash[:danger] = I18n.t("units.errors.inspection_has_unit")
+      redirect_to inspection_path(@inspection) and return
+    end
+
+    @unit = Unit.new(user: current_user)
+  end
+
+  def create_from_inspection
+    @inspection = current_user.inspections.find_by(id: params[:id])
+
+    unless @inspection
+      flash[:danger] = I18n.t("units.errors.inspection_not_found")
+      redirect_to root_path and return
+    end
+
+    if @inspection.unit.present?
+      flash[:danger] = I18n.t("units.errors.inspection_has_unit")
+      redirect_to inspection_path(@inspection) and return
+    end
+
+    @unit = current_user.units.build(unit_params)
+    @unit.copy_dimensions_from(@inspection)
+
+    if @unit.save
+      @inspection.update!(unit: @unit)
+      flash[:success] = I18n.t("units.messages.created_from_inspection")
+      redirect_to inspection_path(@inspection)
+    else
+      render :new_from_inspection, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def unit_params
     params.require(:unit).permit(:name, :serial, :manufacturer, :photo,
-      :description, :unit_type, :owner,
-      :width, :length, :height, :model, :manufacture_date, :notes)
+      :description, :has_slide, :owner,
+      :width, :length, :height, :model, :manufacture_date, :notes,
+      # Basic dimension comments
+      :width_comment, :length_comment, :height_comment,
+      # Totally enclosed flag
+      :is_totally_enclosed,
+      # Anchorage dimensions
+      :num_low_anchors, :num_high_anchors,
+      :num_low_anchors_comment, :num_high_anchors_comment,
+      # Enclosed dimensions
+      :exit_number, :exit_number_comment,
+      # Materials dimensions
+      :rope_size, :rope_size_comment,
+      # Slide dimensions
+      :slide_platform_height, :slide_wall_height, :runout_value,
+      :slide_first_metre_height, :slide_beyond_first_metre_height, :slide_permanent_roof,
+      :slide_platform_height_comment, :slide_wall_height_comment, :runout_value_comment,
+      :slide_first_metre_height_comment, :slide_beyond_first_metre_height_comment,
+      :slide_permanent_roof_comment,
+      # Structure dimensions
+      :stitch_length, :unit_pressure_value,
+      :blower_tube_length, :step_size_value, :fall_off_height_value,
+      :trough_depth_value, :trough_width_value,
+      # User height dimensions
+      :containing_wall_height, :platform_height, :user_height,
+      :users_at_1000mm, :users_at_1200mm, :users_at_1500mm, :users_at_1800mm,
+      :play_area_length, :play_area_width, :negative_adjustment, :permanent_roof,
+      :containing_wall_height_comment, :platform_height_comment,
+      :permanent_roof_comment, :play_area_length_comment, :play_area_width_comment,
+      :negative_adjustment_comment,
+      # Environmental
+      :ambient_temperature)
   end
 
   def no_index
@@ -132,7 +224,7 @@ class UnitsController < ApplicationController
   end
 
   def unit_to_csv
-    attributes = %w[id name manufacturer serial unit_type]
+    attributes = %w[id name manufacturer serial has_slide]
 
     CSV.generate(headers: true) do |csv|
       csv << attributes

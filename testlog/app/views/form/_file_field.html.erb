@@ -1,0 +1,33 @@
+<%
+  # Get i18n_base from section (already validated there)
+  setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
+  
+  # Form field options
+  accept = local_assigns[:accept] || "image/*"
+  preview_size = local_assigns[:preview_size] || 200
+  show_preview = local_assigns.has_key?(:show_preview) ? local_assigns[:show_preview] : true
+  show_filename = local_assigns[:show_filename] || false
+  model = setup[:form_object].object
+  current_file = model.send(field) if model.respond_to?(field)
+%>
+
+<%= setup[:form_object].label field, setup[:field_label] %>
+<%= setup[:form_object].file_field field, accept: accept %>
+
+<% if current_file&.attached? %>
+  <% if (show_preview && current_file.image?) || show_filename %>
+    <div class="file-preview" style="margin-top: 10px;">
+      <% if show_preview && current_file.image? %>
+        <%= image_tag ImageProcessorService.process(current_file, preview_size), 
+            style: "max-width: #{preview_size}px; height: auto;" %>
+        <p><small>Current <%= setup[:field_label].downcase %></small></p>
+      <% elsif show_filename %>
+        <p>Current <%= setup[:field_label].downcase %>: <%= current_file.filename %></p>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<% if setup[:field_hint].present? %>
+  <small class="form-text"><%= setup[:field_hint] %></small>
+<% end %>

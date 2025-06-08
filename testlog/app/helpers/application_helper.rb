@@ -41,8 +41,14 @@ module ApplicationHelper
 
     # Get label, hint, placeholder - fail loudly if required keys are missing
     field_label = local_assigns[:label] || t(label_key, raise: true)
-    field_hint = local_assigns[:hint] || t("#{i18n_base}_hints.#{field}", default: nil)
-    field_placeholder = local_assigns[:placeholder] || t("#{i18n_base}_placeholders.#{field}", default: nil)
+
+    # Build hint and placeholder keys with proper structure
+    base_parts = i18n_base.split(".")
+    hint_key = (base_parts[0..-2] + ["hints", field.to_s]).join(".")
+    placeholder_key = (base_parts[0..-2] + ["placeholders", field.to_s]).join(".")
+
+    field_hint = local_assigns[:hint] || t(hint_key, default: nil)
+    field_placeholder = local_assigns[:placeholder] || t(placeholder_key, default: nil)
 
     {
       form_object: form_object,

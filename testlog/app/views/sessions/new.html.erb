@@ -1,22 +1,21 @@
-<div class="login">
-  <%= form_with(scope: :session, url: login_path) do |form| %>
-    <header><h2><%= t('session.login.title') %></h2></header>
-    <%= form.label :email, t('session.login.email_label') %>
-    <%= form.email_field :email %>
+<header><h2><%= t('session.login.title') %></h2></header>
 
-    <%= form.label :password, t('session.login.password_label') %>
-    <%= form.password_field :password %>
+<%= form_with(scope: :session, url: login_path) do |form| %>
+  <%= render 'form/fieldset', legend_key: 'credentials', i18n_base: 'session.login', form: form do %>
+    <%= render 'form/text_field', 
+        field: :email, 
+        type: :email_field,
+        required: true %>
 
-    <%= form.label :remember_me do %>
-      <%= form.check_box :remember_me %>
-      <%= t('session.login.remember_me') %>
-    <% end %>
+    <%= render 'form/text_field', 
+        field: :password, 
+        type: :password_field,
+        required: true %>
 
-    <div style="
-      display: flex;
-      justify-content: space-between;
-    ">
-      <%= form.submit t('session.login.submit') %>
-    </div>
+    <%= render 'form/checkbox', 
+        field: :remember_me %>
   <% end %>
-</div>
+
+  <%= render 'form/submit_button',
+      text: t('session.login.submit') %>
+<% end %>

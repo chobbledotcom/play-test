@@ -40,7 +40,7 @@ RSpec.describe StructureAssessment, type: :model do
     end
 
     context "additional pass/fail checks" do
-      %w[stitch_length_pass blower_tube_length_pass evacuation_time_pass
+      %w[stitch_length_pass blower_tube_length_pass
         step_size_pass fall_off_height_pass unit_pressure_pass
         trough_pass entrapment_pass markings_pass grounding_pass].each do |check|
         it "allows true/false for #{check}" do
@@ -54,7 +54,7 @@ RSpec.describe StructureAssessment, type: :model do
     end
 
     context "measurements" do
-      %w[stitch_length evacuation_time unit_pressure_value blower_tube_length
+      %w[stitch_length unit_pressure_value blower_tube_length
         step_size_value fall_off_height_value trough_depth_value trough_width_value].each do |measurement|
         it "validates #{measurement} is non-negative" do
           assessment.send("#{measurement}=", -1.0)
@@ -79,13 +79,11 @@ RSpec.describe StructureAssessment, type: :model do
 
       # Set required measurements
       assessment.stitch_length = 5.0
-      assessment.evacuation_time = 25.0
       assessment.unit_pressure_value = 1.5
       assessment.blower_tube_length = 1.5
 
       # Set additional checks
       assessment.stitch_length_pass = true
-      assessment.evacuation_time_pass = true
       assessment.unit_pressure_pass = true
       assessment.blower_tube_length_pass = true
       assessment.step_size_pass = true
@@ -108,7 +106,6 @@ RSpec.describe StructureAssessment, type: :model do
     it "returns false when additional checks are missing" do
       StructureAssessment::CRITICAL_CHECKS.each { |check| assessment.send("#{check}=", true) }
       assessment.stitch_length = 5.0
-      assessment.evacuation_time = 25.0
       assessment.unit_pressure_value = 1.5
       assessment.blower_tube_length = 1.5
       assessment.stitch_length_pass = nil
@@ -135,7 +132,7 @@ RSpec.describe StructureAssessment, type: :model do
 
   describe "#safety_check_count" do
     it "returns total number of safety checks" do
-      expect(assessment.safety_check_count).to eq(16) # 6 critical + 10 additional
+      expect(assessment.safety_check_count).to eq(15) # 6 critical + 9 additional
     end
   end
 
@@ -144,10 +141,9 @@ RSpec.describe StructureAssessment, type: :model do
       StructureAssessment::CRITICAL_CHECKS.each { |check| assessment.send("#{check}=", true) }
       assessment.stitch_length_pass = true
       assessment.blower_tube_length_pass = false
-      assessment.evacuation_time_pass = true
 
       count = assessment.passed_checks_count
-      expect(count).to be >= 8 # At least the 6 critical + 2 additional
+      expect(count).to be >= 7 # At least the 6 critical + 1 additional
     end
 
     it "returns 0 when no checks are completed" do
@@ -159,7 +155,6 @@ RSpec.describe StructureAssessment, type: :model do
     it "calculates percentage of completed fields" do
       StructureAssessment::CRITICAL_CHECKS.each { |check| assessment.send("#{check}=", true) }
       assessment.stitch_length = 5.0
-      assessment.evacuation_time = 25.0
       # Leave other fields blank
 
       percentage = assessment.completion_percentage
@@ -190,7 +185,6 @@ RSpec.describe StructureAssessment, type: :model do
   describe "#measurement_compliance" do
     it "returns compliance status for all measurements" do
       assessment.stitch_length = 5.0
-      assessment.evacuation_time = 25.0
       assessment.unit_pressure_value = 1.5
       assessment.blower_tube_length = 1.5
       assessment.fall_off_height_value = 0.5
@@ -198,7 +192,6 @@ RSpec.describe StructureAssessment, type: :model do
       compliance = assessment.measurement_compliance
 
       expect(compliance).to have_key(:stitch_length)
-      expect(compliance).to have_key(:evacuation_time)
       expect(compliance).to have_key(:unit_pressure)
       expect(compliance).to have_key(:blower_tube_distance)
       expect(compliance).to have_key(:fall_off_height)
@@ -211,14 +204,6 @@ RSpec.describe StructureAssessment, type: :model do
         assessment.stitch_length = 5.0
         expect(SafetyStandard).to receive(:valid_stitch_length?).with(5.0)
         assessment.send(:stitch_length_compliant?)
-      end
-    end
-
-    describe "evacuation_time_compliant?" do
-      it "delegates to SafetyStandard" do
-        assessment.evacuation_time = 25.0
-        expect(SafetyStandard).to receive(:valid_evacuation_time?).with(25.0)
-        assessment.send(:evacuation_time_compliant?)
       end
     end
 
@@ -267,7 +252,6 @@ RSpec.describe StructureAssessment, type: :model do
     it "handles extreme measurement values" do
       assessment.update!(
         stitch_length: 999.99,
-        evacuation_time: 999.99,
         unit_pressure_value: 999.99
       )
 
@@ -277,7 +261,6 @@ RSpec.describe StructureAssessment, type: :model do
     it "handles zero measurement values" do
       assessment.update!(
         stitch_length: 0,
-        evacuation_time: 0,
         unit_pressure_value: 0
       )
 

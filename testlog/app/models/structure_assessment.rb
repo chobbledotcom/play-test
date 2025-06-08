@@ -6,21 +6,30 @@ class StructureAssessment < ApplicationRecord
   CRITICAL_CHECKS = %w[seam_integrity_pass lock_stitch_pass air_loss_pass
     straight_walls_pass sharp_edges_pass unit_stable_pass].freeze
 
+  # Additional pass/fail checks
+  ADDITIONAL_CHECKS = %w[stitch_length_pass blower_tube_length_pass
+    step_size_pass fall_off_height_pass unit_pressure_pass
+    trough_pass entrapment_pass markings_pass grounding_pass].freeze
+
+  # Required measurements
+  REQUIRED_MEASUREMENTS = %w[stitch_length unit_pressure_value blower_tube_length].freeze
+
+  # Pass/fail checks for measurements
+  MEASUREMENT_CHECKS = %w[stitch_length_pass unit_pressure_pass blower_tube_length_pass].freeze
+
   # Pass/fail validations
   CRITICAL_CHECKS.each do |check|
     validates check.to_sym, inclusion: {in: [true, false]}, allow_nil: true
   end
 
   # Additional pass/fail checks
-  validates :stitch_length_pass, :blower_tube_length_pass, :evacuation_time_pass,
-    :step_size_pass, :fall_off_height_pass, :unit_pressure_pass,
-    :trough_pass, :entrapment_pass, :markings_pass, :grounding_pass,
-    inclusion: {in: [true, false]}, allow_nil: true
+  ADDITIONAL_CHECKS.each do |check|
+    validates check.to_sym, inclusion: {in: [true, false]}, allow_nil: true
+  end
 
   # Measurements
-  validates :stitch_length, :evacuation_time, :unit_pressure_value,
-    :blower_tube_length, :step_size_value, :fall_off_height_value,
-    :trough_depth_value, :trough_width_value,
+  validates :stitch_length, :unit_pressure_value, :blower_tube_length,
+    :step_size_value, :fall_off_height_value, :trough_depth_value, :trough_width_value,
     numericality: {greater_than_or_equal_to: 0}, allow_blank: true
 
   # Callbacks
@@ -35,27 +44,21 @@ class StructureAssessment < ApplicationRecord
   end
 
   def safety_check_count
-    CRITICAL_CHECKS.length + 10 # Additional measurement-based checks
+    CRITICAL_CHECKS.length + ADDITIONAL_CHECKS.length
   end
 
   def passed_checks_count
     critical_passes = CRITICAL_CHECKS.count { |check| send(check) == true }
-    additional_passes = [
-      stitch_length_pass, blower_tube_length_pass, evacuation_time_pass,
-      step_size_pass, fall_off_height_pass, unit_pressure_pass,
-      trough_pass, entrapment_pass, markings_pass, grounding_pass
-    ].count(true)
+    additional_passes = ADDITIONAL_CHECKS.count { |check| send(check) == true }
 
     critical_passes + additional_passes
   end
 
   def completion_percentage
-    total_fields = 20 # Total assessable fields
-    completed_fields = (
-      CRITICAL_CHECKS.map { |check| send(check) } +
-      [stitch_length, evacuation_time, unit_pressure_value, blower_tube_length] +
-      [stitch_length_pass, evacuation_time_pass, unit_pressure_pass, blower_tube_length_pass]
-    ).count(&:present?)
+    all_assessable_fields = CRITICAL_CHECKS + REQUIRED_MEASUREMENTS + MEASUREMENT_CHECKS
+    total_fields = all_assessable_fields.length
+
+    completed_fields = all_assessable_fields.count { |field| send(field).present? }
 
     (completed_fields.to_f / total_fields * 100).round(0)
   end
@@ -70,7 +73,6 @@ class StructureAssessment < ApplicationRecord
   def measurement_compliance
     {
       stitch_length: stitch_length_compliant?,
-      evacuation_time: evacuation_time_compliant?,
       unit_pressure: unit_pressure_compliant?,
       blower_tube_distance: blower_tube_distance_compliant?,
       fall_off_height: fall_off_height_compliant?
@@ -84,21 +86,16 @@ class StructureAssessment < ApplicationRecord
   end
 
   def measurements_present?
-    stitch_length.present? && evacuation_time.present? &&
-      unit_pressure_value.present? && blower_tube_length.present?
+    REQUIRED_MEASUREMENTS.all? { |measurement| send(measurement).present? }
   end
 
   def additional_checks_complete?
-    [stitch_length_pass, evacuation_time_pass, unit_pressure_pass,
-      blower_tube_length_pass, step_size_pass, fall_off_height_pass].none?(&:nil?)
+    key_additional_checks = %w[stitch_length_pass unit_pressure_pass blower_tube_length_pass step_size_pass fall_off_height_pass]
+    key_additional_checks.none? { |check| send(check).nil? }
   end
 
   def stitch_length_compliant?
     SafetyStandard.valid_stitch_length?(stitch_length)
-  end
-
-  def evacuation_time_compliant?
-    SafetyStandard.valid_evacuation_time?(evacuation_time)
   end
 
   def unit_pressure_compliant?

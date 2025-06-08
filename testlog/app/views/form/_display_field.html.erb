@@ -1,0 +1,18 @@
+<%
+  # Display/calculated field options
+  label_text = local_assigns[:label] or raise ArgumentError, "label is required for display field"
+  value = local_assigns[:value] || ""
+  help_text = local_assigns[:help_text]
+  css_class = local_assigns[:css_class] || "calculated-field"
+  value_class = local_assigns[:value_class] || "calculated-value"
+%>
+
+<div class="<%= css_class %>">
+  <label><%= label_text %></label>
+  <p class="<%= value_class %>">
+    <%= value %>
+    <% if help_text.present? %>
+      <small class="help-text"><%= help_text %></small>
+    <% end %>
+  </p>
+</div>

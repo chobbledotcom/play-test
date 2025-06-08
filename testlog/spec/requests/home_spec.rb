@@ -43,7 +43,7 @@ RSpec.describe "Home", type: :request do
 
       it "displays the application title" do
         visit root_path
-        expect(page).to have_content("patlog.co.uk")
+        expect(page).to have_content(I18n.t("home.company_name"))
       end
 
       it "shows login and register links" do
@@ -54,16 +54,16 @@ RSpec.describe "Home", type: :request do
 
       it "displays feature descriptions" do
         visit root_path
-        expect(page).to have_content("Log Inspections")
-        expect(page).to have_content("Generate PDF Reports")
-        expect(page).to have_content("Search & Export")
+        expect(page).to have_content(I18n.t("home.features.log_inspections.title"))
+        expect(page).to have_content(I18n.t("home.features.generate_pdfs.title"))
+        expect(page).to have_content(I18n.t("home.features.search_export.title"))
       end
 
       it "includes promotional content" do
         visit root_path
-        expect(page).to have_content("Portable Appliance Testing")
+        expect(page).to have_content(I18n.t("home.subtitle"))
         expect(page).to have_content("QR codes")
-        expect(page).to have_content("free and open source")
+        expect(page).to have_content("compliance tracking")
       end
 
       it "contains embedded video" do
@@ -120,9 +120,9 @@ RSpec.describe "Home", type: :request do
 
       it "still displays application content" do
         visit root_path
-        expect(page).to have_content("patlog.co.uk")
-        expect(page).to have_content("Log Inspections")
-        expect(page).to have_content("Generate PDF Reports")
+        expect(page).to have_content(I18n.t("home.company_name"))
+        expect(page).to have_content(I18n.t("home.features.log_inspections.title"))
+        expect(page).to have_content(I18n.t("home.features.generate_pdfs.title"))
       end
 
       it "allows access without redirect" do
@@ -228,7 +228,7 @@ RSpec.describe "Home", type: :request do
 
     it "includes meta descriptions for SEO" do
       visit root_path
-      expect(page).to have_content("Portable Appliance Testing")
+      expect(page).to have_content(I18n.t("home.subtitle"))
       expect(page).to have_content("PDF reports")
     end
   end

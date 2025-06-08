@@ -1,0 +1,71 @@
+en:
+  # Inspector Companies Management
+  inspector_companies:
+    titles:
+      index: "Inspector Companies"
+      new: "New Inspector Company"
+      edit: "Edit Inspector Company"
+      show: "Company Details"
+
+    headers:
+      company_details: "Company Details"
+      contact_information: "Contact Information"
+      company_status: "Company Status"
+      company_statistics: "Company Statistics"
+      recent_inspections: "Recent Inspections"
+
+    sections:
+      search_and_filter: "Search and Filter"
+
+    forms:
+      search: "Search"
+      active: "Active"
+      name: "Company Name"
+      rpii_registration_number: "RPII Registration Number"
+      email: "Email"
+      phone: "Phone"
+      address: "Address"
+      city: "City"
+      state: "State"
+      postal_code: "Postal Code"
+      country: "Country"
+      notes: "Notes"
+      logo: "Company Logo"
+
+    status:
+      active: "Active"
+      archived: "Archived"
+      yes: "Yes"
+      no: "No"
+      valid_credentials: "Valid Credentials"
+      invalid_credentials: "Invalid Credentials"
+
+    buttons:
+      create: "Create Company"
+      update: "Update Company"
+      archive: "Archive"
+      unarchive: "Unarchive"
+      search: "Search"
+      new_company: "New Company"
+
+    messages:
+      created: "Inspector company created successfully."
+      updated: "Inspector company updated successfully."
+      archived: "Inspector company archived successfully."
+      unarchived: "Inspector company unarchived successfully."
+      not_found: "Inspector company not found."
+      unauthorized: "You are not authorized to access this page"
+      no_companies: "No inspector companies found"
+
+    errors:
+      header:
+        one: "Could not save company because there is 1 error:"
+        other: "Could not save company because there are %{count} errors:"
+
+    search:
+      placeholder: "Search by name or RPII number..."
+      active_filter: "Active Filter"
+
+    statistics:
+      total_inspections: "Total Inspections"
+      passed_inspections: "Passed"

@@ -310,7 +310,7 @@ class PdfGeneratorService
       [I18n.t("pdf.unit.fields.name"), unit.name],
       [I18n.t("pdf.unit.fields.serial_number"), unit.serial],
       [I18n.t("pdf.unit.fields.manufacturer"), unit.manufacturer.presence || I18n.t("pdf.unit.fields.not_specified")],
-      [I18n.t("pdf.unit.fields.type"), unit.unit_type.humanize],
+      [I18n.t("pdf.unit.fields.has_slide"), unit.has_slide? ? "Yes" : "No"],
       [I18n.t("pdf.unit.fields.owner"), unit.owner],
       [I18n.t("pdf.unit.fields.dimensions"), unit.dimensions]
     ]

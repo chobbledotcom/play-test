@@ -1,8 +1,9 @@
 class Inspection < ApplicationRecord
   include CustomIdGenerator
+  include HasDimensions
 
   belongs_to :user
-  belongs_to :unit
+  belongs_to :unit, optional: true
   belongs_to :inspector_company
 
   # Assessment associations (normalized from single table)
@@ -30,7 +31,10 @@ class Inspection < ApplicationRecord
   validate :cannot_finalize_incomplete_inspection, if: :finalizing?
 
   # Callbacks
+  before_validation :set_inspector_company_from_user, on: :create
+  before_validation :copy_unit_values, on: :create, if: :unit_id_changed?
   before_create :generate_unique_report_number, if: -> { status.present? && status != "draft" }
+  before_create :copy_unit_values
   before_save :auto_determine_pass_fail, if: :all_assessments_complete?
   # Removed automatic assessment creation - assessments should be created explicitly when needed
   after_update :log_status_change, if: :saved_change_to_status?
@@ -60,7 +64,7 @@ class Inspection < ApplicationRecord
   }, prefix: true
 
   # Delegate methods to unit
-  delegate :name, :serial, :manufacturer, to: :unit
+  delegate :name, :serial, :manufacturer, to: :unit, allow_nil: true
 
   # Calculated fields
   def reinspection_date
@@ -124,16 +128,6 @@ class Inspection < ApplicationRecord
     }
   end
 
-  def sync_mobile_data(mobile_data)
-    # Handle offline mobile data synchronization
-    transaction do
-      update!(mobile_data.except("assessments"))
-      sync_assessments(mobile_data["assessments"]) if mobile_data["assessments"]
-    end
-  rescue ActiveRecord::RecordInvalid
-    false
-  end
-
   def log_audit_action(action, user, details)
     # Simple logging for now - could be enhanced with audit log table later
     Rails.logger.info("Inspection #{id}: #{action} by #{user&.email} - #{details}")
@@ -146,6 +140,17 @@ class Inspection < ApplicationRecord
     self.unique_report_number = "RPII-#{Date.current.strftime("%Y%m%d")}-#{SecureRandom.hex(4).upcase}"
   end
 
+  def copy_unit_values
+    return unless unit.present?
+
+    # Copy all dimensions and boolean flags from unit using the concern method
+    copy_values_from(unit)
+  end
+
+  def set_inspector_company_from_user
+    self.inspector_company_id ||= user.inspection_company_id
+  end
+
   def create_assessment_records
     create_user_height_assessment! unless user_height_assessment.present?
     create_slide_assessment! unless slide_assessment.present?
@@ -153,7 +158,7 @@ class Inspection < ApplicationRecord
     create_anchorage_assessment! unless anchorage_assessment.present?
     create_materials_assessment! unless materials_assessment.present?
     create_fan_assessment! unless fan_assessment.present?
-    create_enclosed_assessment! if unit&.unit_type == "totally_enclosed" && !enclosed_assessment.present?
+    create_enclosed_assessment! if is_totally_enclosed? && !enclosed_assessment.present?
 
     log_audit_action("created", user, "Inspection created with assessment records") if respond_to?(:log_audit_action)
   end
@@ -163,15 +168,21 @@ class Inspection < ApplicationRecord
 
     required_assessments = [
       user_height_assessment&.complete?,
-      slide_assessment&.complete?,
       structure_assessment&.complete?,
       anchorage_assessment&.complete?,
       materials_assessment&.complete?,
       fan_assessment&.complete?
     ]
 
+    # Add slide assessment if inspection has a slide
+    if has_slide?
+      required_assessments << slide_assessment&.complete?
+    end
+
     # Add enclosed assessment if required
-    required_assessments << enclosed_assessment&.complete? if unit&.unit_type == "totally_enclosed"
+    if is_totally_enclosed?
+      required_assessments << enclosed_assessment&.complete?
+    end
 
     required_assessments.all?
   end
@@ -222,7 +233,7 @@ class Inspection < ApplicationRecord
 
     assessments = [user_height_assessment, slide_assessment, structure_assessment,
       anchorage_assessment, materials_assessment, fan_assessment]
-    assessments << enclosed_assessment if unit&.unit_type == "totally_enclosed"
+    assessments << enclosed_assessment if is_totally_enclosed?
 
     assessments.compact.sum { |a| a.respond_to?(:safety_check_count) ? a.safety_check_count : 0 }
   end
@@ -232,7 +243,7 @@ class Inspection < ApplicationRecord
 
     assessments = [user_height_assessment, slide_assessment, structure_assessment,
       anchorage_assessment, materials_assessment, fan_assessment]
-    assessments << enclosed_assessment if unit&.unit_type == "totally_enclosed"
+    assessments << enclosed_assessment if is_totally_enclosed?
 
     assessments.compact.sum { |a| a.respond_to?(:passed_checks_count) ? a.passed_checks_count : 0 }
   end
@@ -266,7 +277,7 @@ class Inspection < ApplicationRecord
       a.inspection = new_inspection
       a.save!
     }
-    if unit&.unit_type == "totally_enclosed"
+    if is_totally_enclosed?
       enclosed_assessment&.dup&.tap { |a|
         a.inspection = new_inspection
         a.save!
@@ -276,12 +287,5 @@ class Inspection < ApplicationRecord
 
   def log_status_change
     log_audit_action("status_changed", user, "Status changed from #{status_before_last_save} to #{status}")
-  end
-
-  def sync_assessments(assessments_data)
-    assessments_data.each do |type, data|
-      assessment = send("#{type}_assessment")
-      assessment&.update!(data)
-    end
   end
 end

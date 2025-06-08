@@ -11,32 +11,54 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Run single test: `bundle exec rspec spec/path/to/file_spec.rb:LINE_NUMBER`
 - Run with verbose output: `bundle exec rspec --format documentation`
 
-## Development Philosophy & Architecture
+## Core Development Principles
 
-### Testing First Approach
-- **ALWAYS write tests** - we have 954 tests with 84% coverage
-- Use **RSpec** with descriptive contexts/examples
-- Use **Capybara** for feature tests to test user workflows
-- Use **Factory Bot** for test data creation
-- Test both happy path and edge cases
-- Write integration tests for complex user flows
-- Use `--fail-fast` during development to fix issues incrementally
-
-### Frontend & UI Principles
-- **Minimal CSS** - use MVP.css framework for simple, semantic styling
-- **Progressive enhancement** - start with working HTML, enhance with minimal JavaScript
-- **Turbo-first** - use Turbo for form submissions and navigation
-  - Use `data: { turbo_method: :patch }` instead of old Rails UJS `method: :patch`
-  - Use `data: { turbo_confirm: "message" }` for confirmations
-  - Auto-submit forms with `onchange: "this.form.submit();"`
-- **Semantic HTML** - proper use of headers, sections, forms, tables
-- **Accessibility** - proper labels, alt text, semantic structure
-
-### Internationalization (i18n)
-- **Never hardcode strings** - always use I18n keys
+### Internationalization (i18n) - ALWAYS
+- **EVERY string must use I18n** - no hardcoded text anywhere
+- **Split locale files** - create new files in `config/locales/` instead of growing `en.yml`
 - Organize keys logically: `users.messages.company_archived`
 - Use I18n in tests: `I18n.t("inspector_companies.buttons.archive")`
 - Structure: `controller.section.key` or `model.field.description`
+
+### Testing Approach
+- **Write Capybara tests for ALL new code** - no exceptions
+- **No JavaScript in tests** - test the non-JS fallback behavior
+- **Run tests immediately** - write test, run it, fix issues before moving on
+- Use **RSpec** with descriptive contexts/examples
+- Use **Factory Bot** for test data creation
+- Test both happy path and edge cases
+- Use `--fail-fast` during development to fix issues incrementally
+
+### Code Organization
+- **Create partials for repeated code** - DRY principle
+- Extract common view code into partials immediately
+- Use semantic naming for partials: `_user_details.html.erb`
+- Keep partials focused on a single responsibility
+
+### HTML & CSS Philosophy
+- **Semantic HTML only** - use proper tags for their intended purpose
+- **NO CSS classes unless absolutely necessary** - rely on semantic selectors
+- Use MVP.css framework's semantic styling
+- Structure: `<article>`, `<header>`, `<nav>`, `<main>` (avoid `<section>`)
+- Forms: `<fieldset>`, `<legend>`, proper `<label>` associations
+- Tables: `<thead>`, `<tbody>`, `<th>` with proper scope
+
+### Code Quality Standards
+- **No defensive coding** - expect correct data, let it fail if wrong
+- **No fallbacks** - if data is missing, that's an error to fix
+- **Update old code** - don't support legacy patterns, refactor to new standards
+- Fix the root cause, not the symptom
+- Explicit is better than implicit
+
+### Development Philosophy & Architecture
+
+### Frontend & UI Principles
+- **Progressive enhancement** - HTML first, enhance with Turbo
+- **Turbo-first** - use Turbo for form submissions and navigation
+  - Use `data: { turbo_method: :patch }` instead of old Rails UJS
+  - Use `data: { turbo_confirm: "message" }` for confirmations
+  - Auto-submit forms with `onchange: "this.form.submit();"`
+- **Accessibility** - proper labels, ARIA where needed, keyboard navigation
 
 ### Database & Models
 - Use descriptive field names: `inspection_location` not `location`
@@ -48,9 +70,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Controllers & Business Logic
 - Keep controllers thin - delegate to models/services
 - Use semantic parameter names: "active", "archived", "all" not true/false strings
-- Default to showing all data unless filtered (better UX)
 - Use proper HTTP methods (PATCH for updates, not GET)
-- Handle edge cases gracefully with flash messages
+- Let errors bubble up - don't rescue unless you can handle it properly
+- Use Rails conventions - don't reinvent the wheel
 
 ### Code Style Guidelines
 
@@ -196,3 +218,4 @@ end
 - Confirmation dialogs for destructive actions
 - Success/error flash messages for user feedback
 - Auto-save forms for better UX (where appropriate)
+

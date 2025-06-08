@@ -37,8 +37,8 @@ RSpec.describe "Units", type: :request do
   describe "When logged in" do
     before do
       visit login_path
-      fill_in I18n.t("session.login.email_label"), with: user.email
-      fill_in I18n.t("session.login.password_label"), with: I18n.t("test.password")
+      fill_in I18n.t("session.login.email"), with: user.email
+      fill_in I18n.t("session.login.password"), with: I18n.t("test.password")
       click_button I18n.t("session.login.submit")
     end
 
@@ -69,7 +69,6 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_link("Test Bounce House", href: unit_path(test_unit))
         expect(page).to have_content("ACME Corp")
         expect(page).to have_content("TEST123")
-        expect(page).to have_content("Bouncy Castle")
       end
 
       it "provides navigation to create new unit" do
@@ -81,8 +80,8 @@ RSpec.describe "Units", type: :request do
         create(:unit, user: user)
 
         visit units_path
-        if page.has_link?("Export CSV")
-          click_link "Export CSV"
+        if page.has_link?(I18n.t("units.buttons.export_csv"))
+          click_link I18n.t("units.buttons.export_csv")
           expect(page.response_headers["Content-Type"]).to include("text/csv")
         end
       end
@@ -146,7 +145,7 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_content(I18n.t("units.titles.new"))
 
         expect(page).to have_field(I18n.t("units.forms.name"))
-        expect(page).to have_field(I18n.t("units.forms.unit_type"))
+        expect(page).to have_field(I18n.t("units.forms.has_slide"))
         expect(page).to have_field(I18n.t("units.forms.manufacturer"))
         expect(page).to have_field(I18n.t("units.forms.serial"))
         expect(page).to have_field(I18n.t("units.forms.description"))
@@ -158,17 +157,10 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_button(I18n.t("units.buttons.create"))
       end
 
-      it "shows unit type options" do
+      it "shows has slide checkbox" do
         visit new_unit_path
 
-        expect(page).to have_select(I18n.t("units.forms.unit_type"),
-          with_options: [
-            I18n.t("units.unit_types.bounce_house"),
-            I18n.t("units.unit_types.slide"),
-            I18n.t("units.unit_types.combo_unit"),
-            I18n.t("units.unit_types.obstacle_course"),
-            I18n.t("units.unit_types.totally_enclosed")
-          ])
+        expect(page).to have_field(I18n.t("units.forms.has_slide"), type: "checkbox")
       end
     end
 
@@ -177,7 +169,7 @@ RSpec.describe "Units", type: :request do
         visit new_unit_path
 
         fill_in I18n.t("units.forms.name"), with: "New Test Unit"
-        select I18n.t("units.unit_types.bounce_house"), from: I18n.t("units.forms.unit_type")
+        # Has slide checkbox defaults to unchecked
         fill_in I18n.t("units.forms.manufacturer"), with: "Test Manufacturer"
         fill_in I18n.t("units.forms.model"), with: "Test Model"
         fill_in I18n.t("units.forms.serial"), with: "NEWTEST123"
@@ -204,7 +196,7 @@ RSpec.describe "Units", type: :request do
         click_button I18n.t("units.buttons.create")
 
         expect(page).to have_http_status(:unprocessable_entity)
-        expect(page).to have_content(I18n.t("units.validations.save_error"))
+        expect(page).to have_content("Could not save unit because there")
       end
 
       it "handles duplicate serial validation" do
@@ -213,7 +205,7 @@ RSpec.describe "Units", type: :request do
         visit new_unit_path
 
         fill_in I18n.t("units.forms.name"), with: "New Unit"
-        select I18n.t("units.unit_types.slide"), from: I18n.t("units.forms.unit_type")
+        check I18n.t("units.forms.has_slide")
         fill_in I18n.t("units.forms.manufacturer"), with: "Same Mfg"
         fill_in I18n.t("units.forms.serial"), with: existing_unit.serial
         fill_in I18n.t("units.forms.description"), with: "Test Description"
@@ -273,7 +265,7 @@ RSpec.describe "Units", type: :request do
         click_button I18n.t("units.buttons.update")
 
         expect(page).to have_http_status(:unprocessable_entity)
-        expect(page).to have_content(I18n.t("units.validations.save_error"))
+        expect(page).to have_content("Could not save unit because there")
       end
 
       it "denies access to other user's unit" do
@@ -412,7 +404,7 @@ RSpec.describe "Units", type: :request do
         visit new_unit_path
 
         fill_in I18n.t("units.forms.name"), with: "Unit with Photo"
-        select I18n.t("units.unit_types.bounce_house"), from: I18n.t("units.forms.unit_type")
+        # Has slide checkbox defaults to unchecked
         fill_in I18n.t("units.forms.manufacturer"), with: "Test Manufacturer"
         fill_in I18n.t("units.forms.model"), with: "Test Model"
         fill_in I18n.t("units.forms.serial"), with: "PHOTO123"
@@ -462,8 +454,8 @@ RSpec.describe "Units", type: :request do
   describe "Admin functionality" do
     before do
       visit login_path
-      fill_in I18n.t("session.login.email_label"), with: admin_user.email
-      fill_in I18n.t("session.login.password_label"), with: I18n.t("test.password")
+      fill_in I18n.t("session.login.email"), with: admin_user.email
+      fill_in I18n.t("session.login.password"), with: I18n.t("test.password")
       click_button I18n.t("session.login.submit")
     end
 
@@ -479,8 +471,8 @@ RSpec.describe "Units", type: :request do
   describe "Edge cases and error handling" do
     before do
       visit login_path
-      fill_in I18n.t("session.login.email_label"), with: user.email
-      fill_in I18n.t("session.login.password_label"), with: I18n.t("test.password")
+      fill_in I18n.t("session.login.email"), with: user.email
+      fill_in I18n.t("session.login.password"), with: I18n.t("test.password")
       click_button I18n.t("session.login.submit")
     end
 
@@ -500,7 +492,7 @@ RSpec.describe "Units", type: :request do
 
       # Attempt to set user_id via form manipulation would be blocked by controller
       fill_in I18n.t("units.forms.name"), with: "Protected Unit"
-      select I18n.t("units.unit_types.bounce_house"), from: I18n.t("units.forms.unit_type")
+      # Has slide checkbox defaults to unchecked
       fill_in I18n.t("units.forms.manufacturer"), with: "Test Manufacturer"
       fill_in I18n.t("units.forms.model"), with: "Test Model"
       fill_in I18n.t("units.forms.serial"), with: "PROTECT123"
@@ -520,7 +512,7 @@ RSpec.describe "Units", type: :request do
       visit new_unit_path
 
       fill_in I18n.t("units.forms.name"), with: "Invalid Dimensions Unit"
-      select I18n.t("units.unit_types.bounce_house"), from: I18n.t("units.forms.unit_type")
+      # Has slide checkbox defaults to unchecked
       fill_in I18n.t("units.forms.manufacturer"), with: "Test Manufacturer"
       fill_in I18n.t("units.forms.model"), with: "Test Model"
       fill_in I18n.t("units.forms.serial"), with: "INVALID123"

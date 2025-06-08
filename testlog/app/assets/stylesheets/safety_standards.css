@@ -1,0 +1,86 @@
+/* Safety Standards Component Styling */
+
+.safety-standards-reference {
+  margin-bottom: 1.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.safety-standards-reference summary {
+  background-color: #f8f9fa;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.safety-standards-reference summary:hover {
+  background-color: #e9ecef;
+}
+
+.safety-standards-reference[open] summary {
+  border-radius: 4px 4px 0 0;
+}
+
+.safety-standard-info {
+  padding: 1rem;
+  background-color: #fff;
+}
+
+.safety-standard-info h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.safety-standard-info h5 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #34495e;
+  font-size: 1rem;
+}
+
+.formula-box {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin: 0.75rem 0;
+  font-family: 'Courier New', monospace;
+}
+
+.formula-box code {
+  background-color: transparent;
+  color: #e83e8c;
+  font-weight: 600;
+}
+
+.safety-standard-info table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+}
+
+.safety-standard-info table th,
+.safety-standard-info table td {
+  border: 1px solid #dee2e6;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.safety-standard-info table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.safety-standard-info ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.safety-standard-info li {
+  margin-bottom: 0.25rem;
+}

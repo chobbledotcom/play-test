@@ -17,7 +17,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "GET /inspector_companies/:id" do
       it "redirects to login when not logged in" do
-        company = InspectorCompany.create!(valid_attributes)
+        company = create(:inspector_company)
         visit inspector_company_path(company)
         expect(page).to have_current_path(login_path)
       end
@@ -52,7 +52,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "GET /inspector_companies/:id/edit" do
       it "denies access to regular users" do
-        company = InspectorCompany.create!(valid_attributes)
+        company = create(:inspector_company)
         get edit_inspector_company_path(company)
         expect(response).to redirect_to(root_path)
         expect(flash[:danger]).to be_present
@@ -61,7 +61,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "PATCH /inspector_companies/:id" do
       it "denies access to regular users" do
-        company = InspectorCompany.create!(valid_attributes)
+        company = create(:inspector_company)
         patch inspector_company_path(company), params: {inspector_company: {name: "Updated Name"}}
         expect(response).to redirect_to(root_path)
         expect(flash[:danger]).to be_present
@@ -70,7 +70,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "PATCH /inspector_companies/:id/archive" do
       it "denies access to regular users" do
-        company = InspectorCompany.create!(valid_attributes)
+        company = create(:inspector_company)
         patch archive_inspector_company_path(company)
         expect(response).to redirect_to(root_path)
         expect(flash[:danger]).to be_present
@@ -88,7 +88,7 @@ RSpec.describe "InspectorCompanies", type: :request do
     end
 
     it "allows access to inspector companies show" do
-      company = InspectorCompany.create!(valid_attributes)
+      company = create(:inspector_company)
       get inspector_company_path(company)
       expect(response).to have_http_status(:success)
     end
@@ -155,14 +155,14 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "GET /inspector_companies/:id/edit" do
       it "returns http success" do
-        company = InspectorCompany.create!(valid_attributes)
+        company = create(:inspector_company)
         get edit_inspector_company_path(company)
         expect(response).to have_http_status(:success)
       end
     end
 
     describe "PATCH /inspector_companies/:id" do
-      let(:company) { InspectorCompany.create!(valid_attributes) }
+      let(:company) { create(:inspector_company) }
 
       context "with valid parameters" do
         let(:new_attributes) do
@@ -207,7 +207,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "PATCH /inspector_companies/:id/archive" do
       it "archives the requested inspector company" do
-        company = InspectorCompany.create!(valid_attributes)
+        company = create(:inspector_company)
         expect {
           patch archive_inspector_company_path(company)
           company.reload
@@ -215,13 +215,13 @@ RSpec.describe "InspectorCompanies", type: :request do
       end
 
       it "redirects to the inspector companies list" do
-        company = InspectorCompany.create!(valid_attributes)
+        company = create(:inspector_company)
         patch archive_inspector_company_path(company)
         expect(response).to redirect_to(inspector_companies_path)
       end
 
       it "sets a success flash message" do
-        company = InspectorCompany.create!(valid_attributes)
+        company = create(:inspector_company)
         patch archive_inspector_company_path(company)
         expect(flash[:success]).to be_present
       end
@@ -266,10 +266,13 @@ RSpec.describe "InspectorCompanies", type: :request do
     end
 
     it "handles duplicate RPII registration numbers" do
-      InspectorCompany.create!(valid_attributes)
+      existing_company = create(:inspector_company)
 
       post inspector_companies_path, params: {
-        inspector_company: valid_attributes.merge(name: "Different Company")
+        inspector_company: valid_attributes.merge(
+          name: "Different Company",
+          rpii_registration_number: existing_company.rpii_registration_number
+        )
       }
 
       expect(response).to render_template(:new)

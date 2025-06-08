@@ -14,6 +14,9 @@
     <% inspections.each do |inspection| %>
       <tr>
         <td>
+          <% if inspection.unit.nil? %>
+            <span class="badge">[<%= t("inspections.labels.no_unit") %>]</span>
+          <% end %>
           <%= link_to inspection.name.presence || "Unnamed", inspection_path(inspection) %>
         </td>
         <td>

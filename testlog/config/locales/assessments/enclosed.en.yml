@@ -1,0 +1,21 @@
+en:
+  inspections:
+    assessments:
+      enclosed:
+        title: "Enclosed Assessment"
+        sections:
+          exit_requirements: "Exit Requirements"
+          enclosed_measurements: "Enclosed Measurements"
+          safety_checks: "Safety Checks"
+          safety_status: "Safety Status"
+        fields:
+          exit_number: "Number of Exits"
+          exit_number_pass: "Number of Exits Check"
+          exit_number_comment: "Number of Exits Comments"
+          exit_visible_pass: "Exit Visibility Check"
+          exit_visible_comment: "Exit Visibility Comments"
+        status:
+          checks_passed: "Safety Checks Passed"
+          completion: "Assessment Completion"
+          pass: "Pass"
+          fail: "Fail"

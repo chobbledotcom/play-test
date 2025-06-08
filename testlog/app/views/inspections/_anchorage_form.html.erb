@@ -1,0 +1,138 @@
+<%= form_with model: @inspection,
+             url: inspection_path(@inspection),
+             method: :patch,
+             local: false,
+             html: {
+               class: "inspection-anchorage-form",
+               data: { autosave: "true", turbo_stream: true }
+             } do |form| %>
+
+  <%= form.fields_for :anchorage_assessment, (@inspection.anchorage_assessment || @inspection.build_anchorage_assessment) do |assessment_form| %>
+
+    <div class="assessment-form anchorage-assessment">
+      <h3><%= t('inspections.assessments.anchorage.title') %></h3>
+
+      <!-- Safety Standards Reference -->
+      <details class="safety-standards-reference">
+        <summary>View Safety Standards</summary>
+        <%= render 'shared/safety_standards/anchor_requirements' %>
+      </details>
+
+      <!-- Anchor Count Section -->
+      <%= render 'form/fieldset', legend_key: 'anchor_counts', i18n_base: 'inspections.assessments.anchorage.fields', form: assessment_form do %>
+        <div class="anchor-counting">
+          <div class="form-group">
+            <%= render 'form/number', field: :num_low_anchors, min: 0, step: 1 %>
+          </div>
+          
+          <div class="form-group">
+            <%= render 'form/number', field: :num_high_anchors, min: 0, step: 1 %>
+          </div>
+
+          <!-- Total and Required Anchors Display -->
+          <% if @inspection.anchorage_assessment&.persisted? && @inspection.anchorage_assessment.num_low_anchors.present? && @inspection.anchorage_assessment.num_high_anchors.present? %>
+            <div class="anchor-totals">
+              <div class="total-anchors">
+                <strong><%= t('inspections.assessments.anchorage.summary.total_anchors') %>:</strong>
+                <span class="anchor-count"><%= @inspection.anchorage_assessment.total_anchors %></span>
+              </div>
+              
+              <% if @inspection.unit&.area.present? %>
+                <div class="required-anchors">
+                  <strong><%= t('inspections.assessments.anchorage.summary.required_anchors') %>:</strong>
+                  <span class="anchor-count"><%= @inspection.anchorage_assessment.required_anchors %></span>
+                </div>
+                
+                <div class="compliance-status">
+                  <strong><%= t('inspections.assessments.anchorage.summary.compliance_status') %>:</strong>
+                  <span class="<%= @inspection.anchorage_assessment.meets_anchor_requirements? ? 'text-success' : 'text-danger' %>">
+                    <%= @inspection.anchorage_assessment.anchor_compliance_status %>
+                  </span>
+                </div>
+              <% else %>
+                <div class="area-warning text-warning">
+                  <strong><%= t('inspections.assessments.anchorage.summary.area_warning') %>:</strong>
+                  <%= t('inspections.assessments.anchorage.summary.area_missing') %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Anchor Count Assessment -->
+        <div class="form-group">
+          <%= render 'form/pass_fail', field: :num_anchors_pass %>
+        </div>
+      <% end %>
+
+      <!-- Anchor Quality Checks Section -->
+      <%= render 'form/fieldset', legend_key: 'anchor_quality', i18n_base: 'inspections.assessments.anchorage.fields', form: assessment_form do %>
+        <%= render 'form/pass_fail', field: :anchor_type_pass %>
+        <%= render 'form/pass_fail', field: :pull_strength_pass %>
+        <%= render 'form/pass_fail', field: :anchor_degree_pass %>
+        <%= render 'form/pass_fail', field: :anchor_accessories_pass %>
+      <% end %>
+
+      <!-- Anchor Distribution Analysis -->
+      <% if @inspection.anchorage_assessment&.persisted? && @inspection.anchorage_assessment.anchor_distribution.present? %>
+        <div class="anchor-distribution-analysis">
+          <h4><%= t('inspections.assessments.anchorage.summary.distribution_title') %></h4>
+          
+          <% distribution = @inspection.anchorage_assessment.anchor_distribution %>
+          <div class="distribution-details">
+            <div class="distribution-item">
+              <span class="label"><%= t('inspections.assessments.anchorage.summary.low_anchors') %>:</span>
+              <span class="value"><%= distribution[:low_anchors] %> (<%= distribution[:percentage_low] %>%)</span>
+            </div>
+            
+            <div class="distribution-item">
+              <span class="label"><%= t('inspections.assessments.anchorage.summary.high_anchors') %>:</span>
+              <span class="value"><%= distribution[:high_anchors] %> (<%= distribution[:percentage_high] %>%)</span>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Assessment Summary -->
+      <% if @inspection.anchorage_assessment&.persisted? %>
+        <div class="anchorage-assessment-summary">
+          <h4><%= t('inspections.assessments.anchorage.summary.title') %></h4>
+          
+          <div class="summary-overview">
+            <div class="completion-status">
+              <strong><%= t('inspections.assessments.anchorage.summary.completion') %>:</strong>
+              <span class="completion-percentage"><%= @inspection.anchorage_assessment.completion_percentage %>%</span>
+            </div>
+
+            <div class="safety-checks">
+              <strong><%= t('inspections.assessments.anchorage.summary.safety_checks') %>:</strong>
+              <span class="checks-count">
+                <%= @inspection.anchorage_assessment.passed_checks_count %> / 
+                <%= @inspection.anchorage_assessment.safety_check_count %>
+              </span>
+            </div>
+          </div>
+
+          <% if @inspection.anchorage_assessment.has_critical_failures? %>
+            <div class="critical-failures text-danger">
+              <strong><%= t('inspections.assessments.anchorage.summary.critical_failures') %>:</strong>
+              <%= @inspection.anchorage_assessment.anchor_safety_summary %>
+            </div>
+          <% end %>
+
+          <div class="safety-summary">
+            <strong><%= t('inspections.assessments.anchorage.summary.safety_summary') %>:</strong>
+            <span class="<%= @inspection.anchorage_assessment.anchor_safety_summary.include?('All anchor requirements met') ? 'text-success' : 'text-warning' %>">
+              <%= @inspection.anchorage_assessment.anchor_safety_summary %>
+            </span>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Safety Status -->
+      <%= render 'form/assessment_status', assessment: @inspection.anchorage_assessment, i18n_base: 'inspections.assessments.anchorage' %>
+
+      <%= render 'form/save_assessment' %>
+    </div>
+  <% end %>
+<% end %>

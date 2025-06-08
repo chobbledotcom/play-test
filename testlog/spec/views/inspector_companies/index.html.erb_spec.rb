@@ -6,20 +6,18 @@ RSpec.describe "inspector_companies/index", type: :view do
 
   before do
     assign(:inspector_companies, [
-      InspectorCompany.create!(
+      create(:inspector_company,
         name: "First Company",
         rpii_registration_number: "RPII001",
         phone: "1234567890",
         address: "123 First St",
-        active: true
-      ),
-      InspectorCompany.create!(
+        active: true),
+      create(:inspector_company,
         name: "Second Company",
         rpii_registration_number: "RPII002",
         phone: "1234567891",
         address: "124 Second St",
-        active: true
-      )
+        active: true)
     ])
   end
 

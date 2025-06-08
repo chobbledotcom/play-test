@@ -1,17 +1,7 @@
-<% if @inspector_company.errors.any? %>
-  <aside>
-    <h3><%= pluralize(@inspector_company.errors.count, "error") %> prohibited this company from being saved:</h3>
-    <ul>
-      <% @inspector_company.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-    </ul>
-  </aside>
-<% end %>
+<%= render 'form/errors', model: @inspector_company %>
 
 <%= form_with(model: @inspector_company) do |form| %>
-  <%= render 'form/section', form: form, i18n_base: 'inspector_companies.forms' do %>
-    <%= render 'form/fieldset', legend: t('inspector_companies.headers.company_details') do %>
+    <%= render 'form/fieldset', legend: t('inspector_companies.headers.company_details'), i18n_base: 'inspector_companies.forms', form: form do %>
       <%= render 'form/text_field', field: :name, required: true %>
       <%= render 'form/text_field', field: :rpii_registration_number, required: true %>
       <%= render 'form/text_field', field: :email, type: :email_field %>
@@ -19,7 +9,7 @@
 
     <% end %>
 
-    <%= render 'form/fieldset', legend: t('inspector_companies.headers.contact_information') do %>
+    <%= render 'form/fieldset', legend: t('inspector_companies.headers.contact_information'), i18n_base: 'inspector_companies.forms', form: form do %>
       <%= render 'form/text_area', field: :address, rows: 3, required: true %>
       <%= render 'form/text_field', field: :city %>
       <%= render 'form/text_field', field: :state %>
@@ -28,7 +18,7 @@
 
     <% end %>
 
-    <%= render 'form/fieldset', legend: t('inspector_companies.headers.company_status') do %>
+    <%= render 'form/fieldset', legend: t('inspector_companies.headers.company_status'), i18n_base: 'inspector_companies.forms', form: form do %>
       <%= render 'form/checkbox', field: :active %>
 
       <% if current_user&.admin? %>
@@ -42,5 +32,4 @@
     <% end %>
 
     <%= render 'form/submit_button', text: @inspector_company.new_record? ? t('inspector_companies.buttons.create') : t('inspector_companies.buttons.update') %>
-  <% end %>
 <% end %>

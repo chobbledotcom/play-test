@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_06_231715) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_09_121000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -95,7 +95,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_231715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "pdf_last_accessed_at"
-    t.string "unit_id", null: false
+    t.string "unit_id"
     t.string "inspection_location"
     t.string "unique_report_number"
     t.string "status", default: "draft"
@@ -108,6 +108,59 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_231715) do
     t.string "inspector_signature"
     t.datetime "signature_timestamp"
     t.string "inspector_company_id"
+    t.decimal "width", precision: 8, scale: 2
+    t.decimal "length", precision: 8, scale: 2
+    t.decimal "height", precision: 8, scale: 2
+    t.integer "num_low_anchors"
+    t.integer "num_high_anchors"
+    t.integer "exit_number"
+    t.decimal "rope_size", precision: 8, scale: 2
+    t.decimal "slide_platform_height", precision: 8, scale: 2
+    t.decimal "slide_wall_height", precision: 8, scale: 2
+    t.decimal "runout_value", precision: 8, scale: 2
+    t.decimal "slide_first_metre_height", precision: 8, scale: 2
+    t.decimal "slide_beyond_first_metre_height", precision: 8, scale: 2
+    t.decimal "stitch_length", precision: 8, scale: 2
+    t.decimal "evacuation_time", precision: 8, scale: 2
+    t.decimal "unit_pressure_value", precision: 8, scale: 2
+    t.decimal "blower_tube_length", precision: 8, scale: 2
+    t.decimal "step_size_value", precision: 8, scale: 2
+    t.decimal "fall_off_height_value", precision: 8, scale: 2
+    t.decimal "trough_depth_value", precision: 8, scale: 2
+    t.decimal "trough_width_value", precision: 8, scale: 2
+    t.decimal "containing_wall_height", precision: 8, scale: 2
+    t.decimal "platform_height", precision: 8, scale: 2
+    t.decimal "user_height", precision: 8, scale: 2
+    t.integer "users_at_1000mm"
+    t.integer "users_at_1200mm"
+    t.integer "users_at_1500mm"
+    t.integer "users_at_1800mm"
+    t.decimal "play_area_length", precision: 8, scale: 2
+    t.decimal "play_area_width", precision: 8, scale: 2
+    t.decimal "negative_adjustment", precision: 8, scale: 2
+    t.boolean "slide_permanent_roof"
+    t.boolean "permanent_roof"
+    t.boolean "has_slide", default: false, null: false
+    t.boolean "is_totally_enclosed", default: false, null: false
+    t.string "width_comment", limit: 1000
+    t.string "length_comment", limit: 1000
+    t.string "height_comment", limit: 1000
+    t.string "num_low_anchors_comment", limit: 1000
+    t.string "num_high_anchors_comment", limit: 1000
+    t.string "rope_size_comment", limit: 1000
+    t.string "slide_platform_height_comment", limit: 1000
+    t.string "slide_wall_height_comment", limit: 1000
+    t.string "runout_value_comment", limit: 1000
+    t.string "slide_first_metre_height_comment", limit: 1000
+    t.string "slide_beyond_first_metre_height_comment", limit: 1000
+    t.string "slide_permanent_roof_comment", limit: 1000
+    t.string "containing_wall_height_comment", limit: 1000
+    t.string "platform_height_comment", limit: 1000
+    t.string "permanent_roof_comment", limit: 1000
+    t.string "play_area_length_comment", limit: 1000
+    t.string "play_area_width_comment", limit: 1000
+    t.string "negative_adjustment_comment", limit: 1000
+    t.string "exit_number_comment", limit: 1000
     t.index ["finalized_by_id"], name: "index_inspections_on_finalized_by_id"
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
     t.index ["status"], name: "index_inspections_on_status"
@@ -157,6 +210,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_231715) do
     t.text "thread_comment"
     t.text "fabric_comment"
     t.text "fire_retardant_comment"
+    t.string "marking_comment", limit: 1000
+    t.string "instructions_comment", limit: 1000
+    t.string "inflated_stability_comment", limit: 1000
+    t.string "protrusions_comment", limit: 1000
+    t.string "critical_defects_comment", limit: 1000
     t.index ["inspection_id"], name: "index_materials_assessments_on_inspection_id"
   end
 
@@ -228,6 +286,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_231715) do
     t.text "entrapment_comment"
     t.text "markings_comment"
     t.text "grounding_comment"
+    t.string "trough_depth_comment", limit: 1000
+    t.string "trough_width_comment", limit: 1000
+    t.string "tubes_present_comment", limit: 1000
+    t.string "netting_comment", limit: 1000
+    t.string "ventilation_comment", limit: 1000
+    t.string "step_heights_comment", limit: 1000
+    t.string "opening_dimension_comment", limit: 1000
+    t.string "entrances_comment", limit: 1000
+    t.string "fabric_integrity_comment", limit: 1000
     t.index ["inspection_id"], name: "index_structure_assessments_on_inspection_id"
   end
 
@@ -239,7 +306,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_231715) do
     t.datetime "updated_at", null: false
     t.string "manufacturer"
     t.string "description"
-    t.string "unit_type"
     t.string "owner"
     t.string "serial_number"
     t.decimal "width", precision: 8, scale: 2
@@ -249,9 +315,59 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_06_231715) do
     t.string "model"
     t.date "manufacture_date"
     t.string "condition"
+    t.integer "num_low_anchors"
+    t.integer "num_high_anchors"
+    t.integer "exit_number"
+    t.decimal "rope_size", precision: 8, scale: 2
+    t.decimal "slide_platform_height", precision: 8, scale: 2
+    t.decimal "slide_wall_height", precision: 8, scale: 2
+    t.decimal "runout_value", precision: 8, scale: 2
+    t.decimal "slide_first_metre_height", precision: 8, scale: 2
+    t.decimal "slide_beyond_first_metre_height", precision: 8, scale: 2
+    t.decimal "stitch_length", precision: 8, scale: 2
+    t.decimal "evacuation_time", precision: 8, scale: 2
+    t.decimal "unit_pressure_value", precision: 8, scale: 2
+    t.decimal "blower_tube_length", precision: 8, scale: 2
+    t.decimal "step_size_value", precision: 8, scale: 2
+    t.decimal "fall_off_height_value", precision: 8, scale: 2
+    t.decimal "trough_depth_value", precision: 8, scale: 2
+    t.decimal "trough_width_value", precision: 8, scale: 2
+    t.decimal "containing_wall_height", precision: 8, scale: 2
+    t.decimal "platform_height", precision: 8, scale: 2
+    t.decimal "user_height", precision: 8, scale: 2
+    t.integer "users_at_1000mm"
+    t.integer "users_at_1200mm"
+    t.integer "users_at_1500mm"
+    t.integer "users_at_1800mm"
+    t.decimal "play_area_length", precision: 8, scale: 2
+    t.decimal "play_area_width", precision: 8, scale: 2
+    t.decimal "negative_adjustment", precision: 8, scale: 2
+    t.boolean "slide_permanent_roof"
+    t.boolean "permanent_roof"
+    t.decimal "ambient_temperature", precision: 5, scale: 2
+    t.boolean "is_totally_enclosed", default: false
+    t.boolean "has_slide", default: false, null: false
+    t.string "width_comment", limit: 1000
+    t.string "length_comment", limit: 1000
+    t.string "height_comment", limit: 1000
+    t.string "num_low_anchors_comment", limit: 1000
+    t.string "num_high_anchors_comment", limit: 1000
+    t.string "rope_size_comment", limit: 1000
+    t.string "slide_platform_height_comment", limit: 1000
+    t.string "slide_wall_height_comment", limit: 1000
+    t.string "runout_value_comment", limit: 1000
+    t.string "slide_first_metre_height_comment", limit: 1000
+    t.string "slide_beyond_first_metre_height_comment", limit: 1000
+    t.string "slide_permanent_roof_comment", limit: 1000
+    t.string "containing_wall_height_comment", limit: 1000
+    t.string "platform_height_comment", limit: 1000
+    t.string "permanent_roof_comment", limit: 1000
+    t.string "play_area_length_comment", limit: 1000
+    t.string "play_area_width_comment", limit: 1000
+    t.string "negative_adjustment_comment", limit: 1000
+    t.string "exit_number_comment", limit: 1000
     t.index ["manufacturer", "serial_number"], name: "index_units_on_manufacturer_and_serial_number", unique: true
     t.index ["serial"], name: "index_units_on_serial"
-    t.index ["unit_type"], name: "index_units_on_unit_type"
     t.index ["user_id"], name: "index_units_on_user_id"
   end
 

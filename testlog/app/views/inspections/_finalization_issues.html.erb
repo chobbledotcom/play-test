@@ -1,0 +1,12 @@
+<% if inspection.status_completed? && !inspection.can_be_finalized? %>
+  <div class="notice">
+    <h4>Finalization Issues</h4>
+    <p>The following issues must be resolved before this inspection can be finalized:</p>
+    <ul>
+      <% inspection.validate_completeness.each do |error| %>
+        <li><%= error %></li>
+      <% end %>
+    </ul>
+    <p><strong>Action required:</strong> Please complete all assessment sections to enable finalization.</p>
+  </div>
+<% end %>

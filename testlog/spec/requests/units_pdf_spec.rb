@@ -7,10 +7,7 @@ RSpec.describe "Units PDF Generation", type: :request do
   let(:unit) { create(:unit, user: user, name: "Test Unit", manufacturer: "ACME Corp") }
 
   before do
-    visit login_path
-    fill_in I18n.t("session.login.email_label"), with: user.email
-    fill_in I18n.t("session.login.password_label"), with: I18n.t("test.password")
-    click_button I18n.t("session.login.submit")
+    login_user_via_form(user)
   end
 
   describe "GET /units/:id/report" do
@@ -18,10 +15,10 @@ RSpec.describe "Units PDF Generation", type: :request do
       visit unit_path(unit)
 
       # Check if PDF Report link exists
-      expect(page).to have_link("PDF Report")
+      expect(page).to have_link(I18n.t("units.buttons.pdf_report"))
 
       # Click the PDF Report link
-      click_link "PDF Report"
+      click_link I18n.t("units.buttons.pdf_report")
 
       # Check response is a PDF
       expect(page.response_headers["Content-Type"]).to eq("application/pdf")
@@ -34,7 +31,7 @@ RSpec.describe "Units PDF Generation", type: :request do
       create(:inspection, user: user, unit: unit, passed: false)
 
       visit unit_path(unit)
-      click_link "PDF Report"
+      click_link I18n.t("units.buttons.pdf_report")
 
       # Verify PDF is generated
       expect(page.response_headers["Content-Type"]).to eq("application/pdf")
@@ -63,7 +60,7 @@ RSpec.describe "Units PDF Generation", type: :request do
       unit.update!(name: "Test Unit with émojis 🎉", manufacturer: "Tëst Mánufäcturer")
 
       visit unit_path(unit)
-      click_link "PDF Report"
+      click_link I18n.t("units.buttons.pdf_report")
 
       # Verify PDF is generated despite Unicode content
       expect(page.response_headers["Content-Type"]).to eq("application/pdf")

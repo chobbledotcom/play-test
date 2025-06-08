@@ -5,7 +5,7 @@ FactoryBot.define do
     sequence(:serial) { |n| "TEST#{n.to_s.rjust(3, "0")}" }
     description { "Test Bounce House" }
     manufacturer { "Test Manufacturer" }
-    unit_type { "bounce_house" }
+    has_slide { false }
     owner { "Test Owner" }
     width { 10.0 }
     length { 10.0 }
@@ -14,33 +14,17 @@ FactoryBot.define do
     manufacture_date { 1.year.ago }
     notes { "Test notes" }
 
-    trait :slide do
-      unit_type { "slide" }
-      description { "Test Slide" }
+    trait :with_slide do
+      has_slide { true }
+      description { "Test Unit with Slide" }
       width { 3.0 }
       length { 8.0 }
       height { 2.0 }
     end
 
-    trait :combo_unit do
-      unit_type { "combo_unit" }
-      description { "Test Combo Unit" }
-      width { 6.0 }
-      length { 5.0 }
-      height { 4.0 }
-    end
-
     trait :totally_enclosed do
-      unit_type { "totally_enclosed" }
+      is_totally_enclosed { true }
       description { "Test Totally Enclosed Unit" }
-    end
-
-    trait :obstacle_course do
-      unit_type { "obstacle_course" }
-      description { "Test Obstacle Course" }
-      width { 10.0 }
-      length { 3.0 }
-      height { 2.5 }
     end
 
     trait :large do

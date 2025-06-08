@@ -5,7 +5,7 @@ RSpec.describe "sessions/new.html.erb", type: :view do
     render
 
     expect(rendered).to have_content(I18n.t("session.login.title"))
-    expect(rendered).to have_field(I18n.t("session.login.email_label"))
+    expect(rendered).to have_field(I18n.t("session.login.email"))
     expect(rendered).to have_field(I18n.t("session.login.password_label"))
     expect(rendered).to have_button(I18n.t("session.login.submit"))
   end

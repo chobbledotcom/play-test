@@ -1,28 +1,27 @@
-<%= form_with(model: @user, url: signup_path) do |form| %>
-  <header>
-    <h1><%= t('users.titles.register') %></h1>
-  </header>
+<header>
+  <h1><%= t('users.titles.register') %></h1>
+</header>
 
-  <% if @user.errors.any? %>
-    <aside>
-      <h3><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h3>
-      <ul>
-      <% @user.errors.each do |error| %>
-        <li><%= error.full_message %></li>
-      <% end %>
-      </ul>
-    </aside>
+<%= form_with(model: @user, url: signup_path) do |form| %>
+  <%= render 'form/errors', model: @user %>
+
+  <%= render 'form/fieldset', legend_key: 'account_details', i18n_base: 'users.forms', form: form do %>
+    <%= render 'form/text_field', 
+        field: :email, 
+        type: :email_field,
+        required: true %>
+
+    <%= render 'form/text_field', 
+        field: :password, 
+        type: :password_field,
+        required: true %>
+
+    <%= render 'form/text_field', 
+        field: :password_confirmation, 
+        type: :password_field,
+        required: true %>
   <% end %>
 
-
-  <%= form.label :email %>
-  <%= form.email_field :email %>
-
-  <%= form.label :password %>
-  <%= form.password_field :password %>
-
-  <%= form.label :password_confirmation %>
-  <%= form.password_field :password_confirmation %>
-
-  <%= form.submit t('users.buttons.register') %>
+  <%= render 'form/submit_button',
+      text: t('users.buttons.register') %>
 <% end %>

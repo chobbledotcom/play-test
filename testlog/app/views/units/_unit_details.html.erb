@@ -4,9 +4,15 @@
     <td><%= unit.name %></td>
   </tr>
   <tr>
-    <th>Type:</th>
-    <td><%= t("units.unit_types.#{unit.unit_type}") %></td>
+    <th>Has Slide:</th>
+    <td><%= unit.has_slide? ? "Yes" : "No" %></td>
   </tr>
+  <% if unit.is_totally_enclosed? %>
+  <tr>
+    <th>Totally Enclosed:</th>
+    <td>Yes</td>
+  </tr>
+  <% end %>
   <tr>
     <th>Manufacturer:</th>
     <td><%= link_to unit.manufacturer, units_path(manufacturer: unit.manufacturer) %></td>

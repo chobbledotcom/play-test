@@ -2,26 +2,21 @@
   # Get i18n_base from section (already validated there)
   setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
   
-  # Form field options
-  wrapper_class ||= "form-group"
-  radio_wrapper_class ||= "radio-group"
-  radio_label_class ||= "radio-label"
-  
   # Pass/Fail options with i18n
   pass_label = local_assigns[:pass_label] || t('inspections.fields.pass')
   fail_label = local_assigns[:fail_label] || t('inspections.fields.fail')
   options = [[pass_label, true], [fail_label, false]]
 %>
 
-<div class="<%= wrapper_class %>">
-  <%= setup[:form_object].label field, setup[:field_label] %>
-  <div class="<%= radio_wrapper_class %>">
-    <% options.each do |option_label, option_value| %>
+<div>
+  <label><%= setup[:field_label] %></label>
+  <% options.each do |option_label, option_value| %>
+    <label>
       <%= setup[:form_object].radio_button field, option_value, id: "#{field}_#{option_value}" %>
-      <%= label_tag "#{field}_#{option_value}", option_label, class: radio_label_class %>
-    <% end %>
-  </div>
+      <%= option_label %>
+    </label>
+  <% end %>
   <% if setup[:field_hint].present? %>
-    <small class="form-text"><%= setup[:field_hint] %></small>
+    <small><%= setup[:field_hint] %></small>
   <% end %>
 </div>

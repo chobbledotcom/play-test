@@ -25,21 +25,38 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     it "displays all expected tabs" do
       expect(page).to have_link(I18n.t("inspections.tabs.general"))
       expect(page).to have_link(I18n.t("inspections.tabs.user_height"))
-      expect(page).to have_link(I18n.t("inspections.tabs.slide"))
       expect(page).to have_link(I18n.t("inspections.tabs.structure"))
       expect(page).to have_link(I18n.t("inspections.tabs.anchorage"))
       expect(page).to have_link(I18n.t("inspections.tabs.materials"))
       expect(page).to have_link(I18n.t("inspections.tabs.fan"))
+
+      # Slide tab should not appear for bounce house units
+      expect(page).not_to have_link(I18n.t("inspections.tabs.slide"))
+    end
+
+    it "shows slide tab for units with slides" do
+      slide_unit = create(:unit, user: user, has_slide: true)
+      slide_inspection = create(:inspection, user: user, unit: slide_unit)
+
+      visit edit_inspection_path(slide_inspection)
+      expect(page).to have_link(I18n.t("inspections.tabs.slide"))
+
+      # Test with factory trait
+      combo_unit = create(:unit, :with_slide, user: user)
+      combo_inspection = create(:inspection, user: user, unit: combo_unit)
+
+      visit edit_inspection_path(combo_inspection)
+      expect(page).to have_link(I18n.t("inspections.tabs.slide"))
     end
 
     it "shows enclosed tab only for totally enclosed units" do
-      regular_unit = create(:unit, user: user, unit_type: "bounce_house")
+      regular_unit = create(:unit, user: user)
       regular_inspection = create(:inspection, user: user, unit: regular_unit)
 
       visit edit_inspection_path(regular_inspection)
       expect(page).not_to have_link(I18n.t("inspections.tabs.enclosed"))
 
-      enclosed_unit = create(:unit, user: user, unit_type: "totally_enclosed")
+      enclosed_unit = create(:unit, user: user, is_totally_enclosed: true)
       enclosed_inspection = create(:inspection, user: user, unit: enclosed_unit)
 
       visit edit_inspection_path(enclosed_inspection)
@@ -190,7 +207,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     it "has proper heading structure" do
       expect(page).to have_css("h1", text: I18n.t("inspections.titles.edit"))
       expect(page).to have_css("h2", text: I18n.t("inspections.headers.overview"))
-      expect(page).to have_css("h3", text: I18n.t("inspections.headers.unit_details"))
+      expect(page).to have_css("legend", text: I18n.t("inspections.sections.unit_details"))
     end
 
     it "has proper form labels for accessibility" do

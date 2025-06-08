@@ -276,8 +276,8 @@ RSpec.describe ApplicationHelper, type: :helper do
       before do
         helper.instance_variable_set(:@_current_i18n_base, "test.forms")
         allow(helper).to receive(:t).with("test.forms.name", raise: true).and_return("Test Name")
-        allow(helper).to receive(:t).with("test.forms_hints.name", default: nil).and_return(nil)
-        allow(helper).to receive(:t).with("test.forms_placeholders.name", default: nil).and_return(nil)
+        allow(helper).to receive(:t).with("test.hints.name", default: nil).and_return(nil)
+        allow(helper).to receive(:t).with("test.placeholders.name", default: nil).and_return(nil)
       end
 
       it "uses @_current_form when no form passed in local_assigns" do

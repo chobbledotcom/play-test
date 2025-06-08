@@ -1,0 +1,23 @@
+<%
+  # Get i18n_base from section (already validated there)
+  setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
+  
+  # Form field options
+  required ||= false
+  field_type = local_assigns[:field_type] || :date_field
+  
+  # Build field options
+  field_options = {
+    placeholder: setup[:field_placeholder],
+    required: required
+  }.compact
+  
+  # Add value if provided
+  field_options[:value] = local_assigns[:value] if local_assigns[:value]
+%>
+
+<%= setup[:form_object].label field, setup[:field_label] %>
+<%= setup[:form_object].send(field_type, field, field_options) %>
+<% if setup[:field_hint].present? %>
+  <small><%= setup[:field_hint] %></small>
+<% end %>

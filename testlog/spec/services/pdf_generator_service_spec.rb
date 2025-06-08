@@ -104,7 +104,7 @@ RSpec.describe PdfGeneratorService do
       expect(pdf_text).to include(I18n.t("pdf.unit.fields.name"))
       expect(pdf_text).to include(I18n.t("pdf.unit.fields.serial_number"))
       expect(pdf_text).to include(I18n.t("pdf.unit.fields.manufacturer"))
-      expect(pdf_text).to include(I18n.t("pdf.unit.fields.type"))
+      expect(pdf_text).to include(I18n.t("pdf.unit.fields.has_slide"))
       expect(pdf_text).to include(I18n.t("pdf.unit.fields.owner"))
     end
 

@@ -5,7 +5,7 @@ RSpec.describe "Public Reports", type: :request do
 
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user) }
-  let(:inspection) { create(:inspection, user: user, unit: unit) }
+  let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
 
   describe "Inspection reports - public access" do
     describe "GET /r/:id (short URL lowercase)" do
@@ -58,7 +58,7 @@ RSpec.describe "Public Reports", type: :request do
       it "works with special characters in inspection data" do
         # Create inspection with Unicode characters
         unit_unicode = create(:unit, user: user, name: "Tëst Ünït 🎉", manufacturer: "Tëst Mfg")
-        inspection_unicode = create(:inspection, user: user, unit: unit_unicode,
+        inspection_unicode = create(:inspection, :completed, user: user, unit: unit_unicode,
           inspection_location: "Café München")
 
         visit "/r/#{inspection_unicode.id}"

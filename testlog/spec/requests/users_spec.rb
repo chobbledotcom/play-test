@@ -80,8 +80,8 @@ RSpec.describe "Users", type: :request do
 
       it "updates the user's password when current password is correct" do
         visit change_password_user_path(user)
-        fill_in I18n.t("users.forms.password_current"), with: I18n.t("test.password")
-        fill_in I18n.t("users.forms.password_new"), with: "newpassword"
+        fill_in I18n.t("users.forms.current_password"), with: I18n.t("test.password")
+        fill_in I18n.t("users.forms.password"), with: "newpassword"
         fill_in I18n.t("users.forms.password_confirmation"), with: "newpassword"
         click_button I18n.t("users.buttons.update_password")
 
@@ -94,8 +94,8 @@ RSpec.describe "Users", type: :request do
 
       it "does not update the password when current password is incorrect" do
         visit change_password_user_path(user)
-        fill_in I18n.t("users.forms.password_current"), with: I18n.t("test.invalid_password")
-        fill_in I18n.t("users.forms.password_new"), with: "newpassword"
+        fill_in I18n.t("users.forms.current_password"), with: I18n.t("test.invalid_password")
+        fill_in I18n.t("users.forms.password"), with: "newpassword"
         fill_in I18n.t("users.forms.password_confirmation"), with: "newpassword"
         click_button I18n.t("users.buttons.update_password")
 
@@ -337,7 +337,8 @@ RSpec.describe "Users", type: :request do
         }
       }
 
-      expect(session[:user_id]).to eq(User.last.id)
+      created_user = User.find_by(email: "newuser@example.com")
+      expect(session[:user_id]).to eq(created_user.id)
     end
 
     it "handles password confirmation mismatch" do
@@ -354,7 +355,7 @@ RSpec.describe "Users", type: :request do
     end
 
     it "handles duplicate email" do
-      User.create!(email: "existing@example.com", password: "password", password_confirmation: "password")
+      create(:user, email: "existing@example.com")
 
       post "/signup", params: {
         user: {

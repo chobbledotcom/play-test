@@ -4,23 +4,18 @@
   
   # Form field options
   rows ||= 4
-  css_class ||= "form-control"
-  wrapper_class ||= "form-group"
   required ||= false
   
   # Build field options
   field_options = {
     rows: rows,
     placeholder: setup[:field_placeholder],
-    class: css_class,
     required: required
   }.compact
 %>
 
-<div class="<%= wrapper_class %>">
-  <%= setup[:form_object].label field, setup[:field_label] %>
-  <%= setup[:form_object].text_area field, field_options %>
-  <% if setup[:field_hint].present? %>
-    <small class="form-text"><%= setup[:field_hint] %></small>
-  <% end %>
-</div>
+<%= setup[:form_object].label field, setup[:field_label] %>
+<%= setup[:form_object].text_area field, field_options %>
+<% if setup[:field_hint].present? %>
+  <small><%= setup[:field_hint] %></small>
+<% end %>

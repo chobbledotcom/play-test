@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe SessionsHelper, type: :helper do
-  let(:user) { User.create!(email: "test@example.com", password: "password", password_confirmation: "password") }
+  let(:user) { create(:user) }
 
   # Security test helpers
   def simulate_csrf_attack

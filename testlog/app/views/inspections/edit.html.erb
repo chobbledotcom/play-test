@@ -22,10 +22,20 @@
         </div>
         <div class="detail-item">
           <span class="label"><%= t('inspections.fields.progress') %>:</span>
-          <span class="value"><%= "#{assessment_completion_percentage(@inspection)}%" %></span>
+          <%= turbo_frame_tag "inspection_progress_#{@inspection.id}" do %>
+            <span class="value"><%= "#{assessment_completion_percentage(@inspection)}%" %></span>
+          <% end %>
         </div>
       </div>
     </div>
+
+    <!-- Finalization Issues -->
+    <%= turbo_frame_tag "finalization_issues_#{@inspection.id}" do %>
+      <% if content = render('finalization_issues', inspection: @inspection) and content.strip.present? %>
+        <%= content.html_safe %>
+        <br>
+      <% end %>
+    <% end %>
 
     <!-- Tab Navigation -->
     <nav class="inspection-tabs" data-inspection-id="<%= @inspection.id %>">
@@ -50,10 +60,20 @@
         <%= render 'user_height_form' %>
       <% when 'slide' %>
         <%= render 'slide_form' %>
+      <% when 'structure' %>
+        <%= render 'structure_form' %>
+      <% when 'materials' %>
+        <%= render 'materials_form' %>
+      <% when 'anchorage' %>
+        <%= render 'anchorage_form' %>
+      <% when 'fan' %>
+        <%= render 'fan_form' %>
+      <% when 'enclosed' %>
+        <%= render 'enclosed_form' %>
       <% else %>
         <div class="assessment-placeholder">
           <h3><%= t("inspections.tabs.#{current_tab}") %> Assessment</h3>
-          <p>This assessment form is coming soon. Currently only the General and User Height tabs are implemented.</p>
+          <p>This assessment form is coming soon.</p>
           <p><%= link_to "Return to General", edit_inspection_path(@inspection), class: "btn btn-primary" %></p>
         </div>
       <% end %>
@@ -61,11 +81,13 @@
 
     <!-- Actions -->
     <div class="inspection-actions">
-      <%= button_to t('inspections.buttons.delete'), 
-          inspection_path(@inspection), 
-          method: :delete, 
-          class: "btn btn-danger", 
-          data: { confirm: t('inspections.messages.delete_confirm') } %>
+      <% if @inspection.status != "finalized" || current_user.admin? %>
+        <%= button_to t('inspections.buttons.delete'), 
+            inspection_path(@inspection), 
+            method: :delete, 
+            class: "btn btn-danger", 
+            data: { turbo_confirm: t('inspections.messages.delete_confirm') } %>
+      <% end %>
     </div>
   </div>
 </article>

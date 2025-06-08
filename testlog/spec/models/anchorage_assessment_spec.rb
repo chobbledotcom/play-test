@@ -469,9 +469,9 @@ RSpec.describe AnchorageAssessment, type: :model do
     end
 
     it "handles very large unit areas" do
-      large_unit = create(:unit, user: user, name: "Large Unit", serial: "LARGE001", manufacturer: "Test Manufacturer", length: 50.0, width: 30.0, height: 5.0, description: "Large Unit", unit_type: "bounce_house", owner: "Test Owner")
+      large_unit = create(:unit, user: user, name: "Large Unit", serial: "LARGE001", manufacturer: "Test Manufacturer", length: 50.0, width: 30.0, height: 5.0, description: "Large Unit", has_slide: false, owner: "Test Owner")
       large_inspection = create(:inspection, user: user, unit: large_unit)
-      large_assessment = AnchorageAssessment.create!(inspection: large_inspection)
+      large_assessment = create(:anchorage_assessment, inspection: large_inspection)
 
       large_assessment.update!(num_low_anchors: 5, num_high_anchors: 3)
       expect(large_assessment.meets_anchor_requirements?).to be false  # 8 anchors not enough for 1500 sqm

@@ -6,6 +6,8 @@ Rails.application.routes.draw do
 
   root "home#index"
   get "about", to: "home#about"
+  get "safety_standards", to: "home#safety_standards"
+  post "safety_standards", to: "home#safety_standards"
 
   get "signup", to: "users#new"
   post "signup", to: "users#create"
@@ -33,6 +35,7 @@ Rails.application.routes.draw do
     member do
       get "report"
       get "qr_code"
+      patch "replace_dimensions"
     end
   end
 
@@ -46,6 +49,10 @@ Rails.application.routes.draw do
       get "qr_code"
     end
   end
+
+  # Create unit from inspection
+  get "inspections/:id/new_unit", to: "units#new_from_inspection", as: "new_unit_from_inspection"
+  post "inspections/:id/create_unit", to: "units#create_from_inspection", as: "create_unit_from_inspection"
 
   # Inspector Companies
   resources :inspector_companies, except: [:destroy] do

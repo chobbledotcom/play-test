@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.feature "Inspector Company Selection", type: :feature do
   let(:inspector_company) { create(:inspector_company, active: true) }
-  let(:user) { create(:user, inspection_company: inspector_company) }
-  let(:admin_user) { create(:user, :admin, inspection_company: inspector_company) }
+  let(:user) { create(:user, :without_company, inspection_company: inspector_company) }
+  let(:admin_user) { create(:user, :admin, :without_company, inspection_company: inspector_company) }
   let(:unit) { create(:unit, user: user) }
   let(:admin_unit) { create(:unit, user: admin_user) }
   let(:another_company) { create(:inspector_company, name: "Another Company", active: true) }
@@ -20,7 +20,7 @@ RSpec.feature "Inspector Company Selection", type: :feature do
 
       # Should redirect to edit page with draft inspection
       expect(page).to have_current_path(/\/inspections\/[A-Z0-9]+\/edit/)
-      inspection = Inspection.last
+      inspection = user.inspections.last
       expect(inspection.inspector_company_id).to eq(inspector_company.id)
       expect(inspection.status).to eq("draft")
       expect(inspection.unit).to eq(unit)
@@ -162,7 +162,7 @@ RSpec.feature "Inspector Company Selection", type: :feature do
       visit edit_inspection_path(inspection)
 
       # Form should have auto-save enabled since inspection is persisted
-      form = page.find("form.inspection-general-form")
+      form = page.find("form[data-autosave]")
       expect(form["data-autosave"]).to eq("true")
     end
   end

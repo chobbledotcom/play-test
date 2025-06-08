@@ -35,7 +35,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
         visit inspections_path
 
         expect(page).to have_content("No inspection records found")
-        expect(page).to have_link(I18n.t("inspections.buttons.add_via_units"))
+        expect(page).to have_button(I18n.t("inspections.buttons.add_inspection"))
       end
     end
 
@@ -138,6 +138,31 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
       expect(page).to have_content("My Location")
       expect(page).not_to have_content("Other Location")
+    end
+  end
+
+  describe "creating inspection without unit" do
+    it "displays Add Inspection button" do
+      visit inspections_path
+
+      expect(page).to have_button(I18n.t("inspections.buttons.add_inspection"))
+    end
+
+    it "creates inspection without unit when Add Inspection is clicked" do
+      visit inspections_path
+
+      # Note: Capybara's RackTest driver doesn't support JavaScript confirmations
+      # In a real browser test, this would show the confirmation dialog
+      click_button I18n.t("inspections.buttons.add_inspection")
+
+      # Should redirect to edit page for new inspection
+      expect(current_path).to match(/\/inspections\/\w+\/edit/)
+      expect(page).to have_content(I18n.t("inspections.messages.created_without_unit"))
+
+      # Verify inspection was created without unit
+      inspection = Inspection.last
+      expect(inspection.unit).to be_nil
+      expect(inspection.user).to eq(user)
     end
   end
 end

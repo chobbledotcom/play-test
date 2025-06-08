@@ -44,6 +44,11 @@
             <% end %>
           </li>
           <li>
+            <%= link_to safety_standards_path do %>
+              <strong>Safety Standards</strong>
+            <% end %>
+          </li>
+          <li>
             <%= button_to "Log Out", logout_path, method: :delete %>
           </li>
         </ul>

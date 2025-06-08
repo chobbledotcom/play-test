@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.feature "Creating Inspection from Unit Page", type: :feature do
   let(:inspector_company) { create(:inspector_company) }
-  let(:user) { create(:user, inspection_company: inspector_company) }
+  let(:user) { create(:user, :without_company, inspection_company: inspector_company) }
   let(:unit) { create(:unit, user: user) }
 
   before do
@@ -24,7 +24,7 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       expect(page).to have_content(I18n.t("inspections.messages.created"))
 
       # Verify the inspection was created with the correct unit
-      inspection = Inspection.last
+      inspection = user.inspections.last
       expect(inspection.unit).to eq(unit)
       expect(inspection.user).to eq(user)
       expect(inspection.status).to eq("draft")
@@ -48,7 +48,7 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       click_button I18n.t("units.buttons.add_inspection")
 
       expect(page).to have_content(I18n.t("users.messages.inspection_limit_reached"))
-      expect(Inspection.count).to eq(0)
+      expect(user.inspections.count).to eq(0)
     end
 
     it "handles invalid unit gracefully" do
@@ -83,7 +83,7 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       expect(page).to have_current_path(/\/inspections\/[A-Z0-9]+\/edit/)
 
       # Form should have auto-save enabled since inspection is persisted
-      form = page.find("form.inspection-general-form")
+      form = page.find("form[data-autosave]")
       expect(form["data-autosave"]).to eq("true")
     end
   end

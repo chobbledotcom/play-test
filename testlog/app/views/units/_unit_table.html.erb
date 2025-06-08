@@ -5,7 +5,7 @@
       <th>Name</th>
       <th>Manufacturer</th>
       <th>Serial Number</th>
-      <th>Type</th>
+      <th>Has Slide</th>
     </tr>
   </thead>
   <tbody>
@@ -21,7 +21,7 @@
         <td><%= link_to item.name, item %></td>
         <td><%= link_to item.manufacturer, units_path(manufacturer: item.manufacturer) %></td>
         <td><%= item.serial %></td>
-        <td><%= t("units.unit_types.#{item.unit_type}") %></td>
+        <td><%= item.has_slide? ? "Yes" : "No" %></td>
       </tr>
     <% end %>
   </tbody>

@@ -1,28 +1,72 @@
 <%= form_with model: @inspection,
              url: inspection_path(@inspection),
              method: :patch,
-             local: true,
+             local: false,
              html: {
                class: "inspection-user-height-form",
-               data: { autosave: "true" }
+               data: { 
+                 autosave: "true",
+                 turbo_stream: true
+               }
              } do |form| %>
 
   <%= form.fields_for :user_height_assessment, (@inspection.user_height_assessment || @inspection.build_user_height_assessment) do |assessment_form| %>
 
-  <%= render 'form/section', form: assessment_form, i18n_base: 'inspections.assessments.user_height.fields' do %>
     <div class="assessment-form user-height-assessment">
       <h3><%= t('inspections.assessments.user_height.title') %></h3>
 
+      <!-- Safety Standards Reference -->
+      <details class="safety-standards-reference">
+        <summary>View Safety Standards</summary>
+        <%= render 'shared/safety_standards/wall_height_requirements' %>
+        <%= render 'shared/safety_standards/user_capacity_requirements' %>
+      </details>
+
       <!-- Height Measurements Section -->
-      <%= render 'form/fieldset', legend_key: 'height_measurements' do %>
+      <%= render 'form/fieldset', legend_key: 'height_measurements', i18n_base: 'inspections.assessments.user_height.fields', form: assessment_form do %>
         <%= render 'form/number', field: :containing_wall_height %>
         <%= render 'form/number', field: :platform_height %>
-        <%= render 'form/number', field: :user_height %>
+        <div class="form-group">
+          <%= render 'form/number', field: :user_height %>
+          <% if @inspection.user_height_assessment&.user_height.present? %>
+            <div class="safety-standards-info">
+              <strong>EN 14960:2019 Height Requirements:</strong>
+              <% user_height = @inspection.user_height_assessment.user_height %>
+              <% if user_height < 0.6 %>
+                No containing walls required
+              <% elsif user_height <= 3.0 %>
+                Containing walls must be at least <%= user_height %>m (equal to user height)
+              <% elsif user_height <= 6.0 %>
+                Containing walls must be at least <%= (user_height * 1.25).round(2) %>m (1.25x user height)
+              <% else %>
+                Containing walls must be at least <%= (user_height * 1.25).round(2) %>m + permanent roof required
+              <% end %>
+            </div>
+            <% if @inspection.user_height_assessment.containing_wall_height.present? %>
+              <div class="compliance-status <%= @inspection.user_height_assessment.meets_height_requirements? ? 'text-success' : 'text-danger' %>">
+                <%= @inspection.user_height_assessment.meets_height_requirements? ? 'Compliant' : 'Non-Compliant' %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
         <%= render 'form/checkbox', field: :permanent_roof %>
       <% end %>
 
       <!-- User Capacity Section -->
-      <%= render 'form/fieldset', legend_key: 'user_capacity' do %>
+      <%= render 'form/fieldset', legend_key: 'user_capacity', i18n_base: 'inspections.assessments.user_height.fields', form: assessment_form do %>
+        <% if @inspection.user_height_assessment&.play_area_length.present? && @inspection.user_height_assessment&.play_area_width.present? %>
+          <div class="safety-standards-info">
+            <strong>EN 14960:2019 Calculated Capacities:</strong>
+            <% capacities = @inspection.user_height_assessment.calculated_capacities %>
+            <ul>
+              <li>1.0m users: <%= capacities[:users_1000mm] %> (1.5m² per user)</li>
+              <li>1.2m users: <%= capacities[:users_1200mm] %> (2.0m² per user)</li>
+              <li>1.5m users: <%= capacities[:users_1500mm] %> (2.5m² per user)</li>
+              <li>1.8m users: <%= capacities[:users_1800mm] %> (3.0m² per user)</li>
+            </ul>
+          </div>
+        <% end %>
+        
         <%= render 'form/number', field: :users_at_1000mm, min: 0, step: 1 %>
         <%= render 'form/number', field: :users_at_1200mm, min: 0, step: 1 %>
         <%= render 'form/number', field: :users_at_1500mm, min: 0, step: 1 %>
@@ -35,7 +79,7 @@
       <% end %>
 
       <!-- Play Area Section -->
-      <%= render 'form/fieldset', legend_key: 'play_area' do %>
+      <%= render 'form/fieldset', legend_key: 'play_area', i18n_base: 'inspections.assessments.user_height.fields', form: assessment_form do %>
         <%= render 'form/number', field: :play_area_length, min: 0 %>
         <%= render 'form/number', field: :play_area_width, min: 0 %>
         <%= render 'form/number', field: :negative_adjustment, min: 0 %>
@@ -49,7 +93,6 @@
 
       <%= render 'form/save_assessment' %>
       </div>
-    <% end %>
   <% end %>
 <% end %>
 

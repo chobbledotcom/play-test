@@ -1,0 +1,78 @@
+<% case params[:calculation][:type] %>
+<% when 'anchors' %>
+  <%= turbo_stream.update "anchor-result" do %>
+    <% if @anchor_result %>
+      <div class="calculation-result">
+        <h5><%= t('safety_standards_reference.calculators.anchor.result_title') %></h5>
+        <p><strong><%= t('safety_standards_reference.calculators.anchor.area_result') %></strong> <%= @anchor_result[:area] %>m²</p>
+        <p><strong><%= t('safety_standards_reference.calculators.anchor.required_result') %></strong> <%= @anchor_result[:required_anchors] %></p>
+        <p><strong><%= t('safety_standards_reference.calculators.anchor.calculation_result') %></strong> <%= @anchor_result[:formula_breakdown] %></p>
+      </div>
+    <% elsif @anchor_error %>
+      <div class="calculation-error">
+        <p><strong>Error:</strong> <%= @anchor_error %></p>
+      </div>
+    <% end %>
+  <% end %>
+
+<% when 'user_capacity' %>
+  <%= turbo_stream.update "capacity-result" do %>
+    <% if @capacity_result %>
+      <div class="calculation-result">
+        <h5><%= t('safety_standards_reference.calculators.user_capacity.result_title') %></h5>
+        <p><strong><%= t('safety_standards_reference.calculators.user_capacity.dimensions_result') %></strong> <%= @capacity_result[:length] %>m × <%= @capacity_result[:width] %>m</p>
+        <p><strong><%= t('safety_standards_reference.calculators.user_capacity.total_area_result') %></strong> <%= @capacity_result[:area] %>m²</p>
+        <% if @capacity_result[:negative_adjustment] > 0 %>
+          <p><strong><%= t('safety_standards_reference.calculators.user_capacity.negative_adjustment_result') %></strong> -<%= @capacity_result[:negative_adjustment] %>m²</p>
+        <% end %>
+        <p><strong><%= t('safety_standards_reference.calculators.user_capacity.usable_area_result') %></strong> <%= @capacity_result[:usable_area] %>m²</p>
+        <p><strong><%= t('safety_standards_reference.calculators.user_capacity.capacities_result') %></strong></p>
+        <ul>
+          <li>1.0m users: <%= @capacity_result[:capacities][:users_1000mm] %> (young children)</li>
+          <li>1.2m users: <%= @capacity_result[:capacities][:users_1200mm] %> (children)</li>
+          <li>1.5m users: <%= @capacity_result[:capacities][:users_1500mm] %> (adolescents)</li>
+          <li>1.8m users: <%= @capacity_result[:capacities][:users_1800mm] %> (adults)</li>
+        </ul>
+      </div>
+    <% elsif @capacity_error %>
+      <div class="calculation-error">
+        <p><strong>Error:</strong> <%= @capacity_error %></p>
+      </div>
+    <% end %>
+  <% end %>
+
+<% when 'slide_runout' %>
+  <%= turbo_stream.update "runout-result" do %>
+    <% if @runout_result %>
+      <div class="calculation-result">
+        <h5><%= t('safety_standards_reference.calculators.runout.result_title') %></h5>
+        <p><strong><%= t('safety_standards_reference.calculators.runout.platform_height_result') %></strong> <%= @runout_result[:platform_height] %>m</p>
+        <p><strong><%= t('safety_standards_reference.calculators.runout.required_runout_result') %></strong> <%= @runout_result[:required_runout] %>m</p>
+        <p><strong><%= t('safety_standards_reference.calculators.runout.calculation_breakdown') %></strong> <%= @runout_result[:calculation] %></p>
+      </div>
+    <% elsif @runout_error %>
+      <div class="calculation-error">
+        <p><strong>Error:</strong> <%= @runout_error %></p>
+      </div>
+    <% end %>
+  <% end %>
+
+<% when 'wall_height' %>
+  <%= turbo_stream.update "wall-height-result" do %>
+    <% if @wall_height_result %>
+      <div class="calculation-result">
+        <h5><%= t('safety_standards_reference.calculators.wall_height.result_title') %></h5>
+        <p><strong><%= t('safety_standards_reference.calculators.wall_height.user_height_result') %></strong> <%= @wall_height_result[:user_height] %>m</p>
+        <p><strong><%= t('safety_standards_reference.calculators.wall_height.requirement_result') %></strong> <%= @wall_height_result[:requirement] %></p>
+        <% if @wall_height_result[:requires_roof] %>
+          <p><strong><%= t('safety_standards_reference.calculators.wall_height.additional_result') %></strong> Permanent roof required</p>
+        <% end %>
+      </div>
+    <% elsif @wall_height_error %>
+      <div class="calculation-error">
+        <p><strong>Error:</strong> <%= @wall_height_error %></p>
+      </div>
+    <% end %>
+  <% end %>
+
+<% end %>

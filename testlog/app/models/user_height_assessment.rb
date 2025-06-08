@@ -64,6 +64,9 @@ class UserHeightAssessment < ApplicationRecord
     SafetyStandard.calculate_user_capacity(play_area_length, play_area_width, negative_adjustment)
   end
 
+  # Alias for view compatibility
+  alias_method :calculated_capacities, :recommended_user_capacity
+
   private
 
   def required_fields_present?

@@ -1,0 +1,58 @@
+en:
+  # User Management
+  users:
+    titles:
+      register: "Register"
+      edit: "Edit User"
+      settings: "Your Settings"
+      change_password: "Change Password"
+      index: "Users"
+
+    sections:
+      account_details: "Account Details"
+      password_change: "Change Password"
+      preferences: "Preferences"
+
+    fields:
+      email: "Email"
+      password: "Password"
+
+    forms:
+      email: "Email"
+      password: "Password"
+      password_confirmation: "Password confirmation"
+      current_password: "Current password"
+      password_help: "New Password (leave blank if no change)"
+      inspection_limit: "Inspection limit"
+      inspection_company_id: "Inspection Company"
+      time_display: "Time Display Format"
+      company_prompt: "Select inspection company..."
+
+    buttons:
+      register: "Register"
+      update_user: "Update User"
+      update_settings: "Update Settings"
+      update_password: "Update Password"
+      delete: "Delete"
+      change_password: "Change Password"
+      impersonate: "Log in as %{email}"
+
+    messages:
+      no_users: "No users found"
+      admin_yes: "Yes"
+      admin_no: "No"
+      last_active_never: "Never"
+      company_not_activated: "Your account hasn't been activated yet. Please contact an administrator to set up your inspection company."
+      company_archived: "Your inspection company has been archived. Please contact an administrator."
+      inspection_limit_reached: "Your inspection limit has been reached. Please contact an administrator."
+      impersonate_confirm: "You will be logged in as %{email}. You'll need to log out to return to your admin account."
+      delete_confirm: "Are you sure?"
+
+    errors:
+      header:
+        one: "Could not save user because there is 1 error:"
+        other: "Could not save user because there are %{count} errors:"
+
+    options:
+      time_full: "Show Full Time"
+      time_day: "Show Day Only"

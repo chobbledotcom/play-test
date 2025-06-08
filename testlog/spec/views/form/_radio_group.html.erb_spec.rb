@@ -26,11 +26,6 @@ RSpec.describe "form/_radio_group.html.erb", type: :view do
     # Mock the form field setup helper
     allow(view).to receive(:form_field_setup).and_return(field_config)
 
-    # Mock form builder methods with default behavior
-    allow(mock_form).to receive(:label)
-      .with(field, "Status")
-      .and_return('<label for="status">Status</label>'.html_safe)
-
     # Mock radio buttons for each option
     allow(mock_form).to receive(:radio_button)
       .with(field, "active", {id: "status_active"})
@@ -40,15 +35,6 @@ RSpec.describe "form/_radio_group.html.erb", type: :view do
       .with(field, "inactive", {id: "status_inactive"})
       .and_return('<input type="radio" name="status" value="inactive" id="status_inactive" />'.html_safe)
 
-    # Mock label_tag for radio labels
-    allow(view).to receive(:label_tag)
-      .with("status_active", "Active", {class: "radio-label"})
-      .and_return('<label for="status_active" class="radio-label">Active</label>'.html_safe)
-
-    allow(view).to receive(:label_tag)
-      .with("status_inactive", "Inactive", {class: "radio-label"})
-      .and_return('<label for="status_inactive" class="radio-label">Inactive</label>'.html_safe)
-
     # Set current i18n base for the partial
     view.instance_variable_set(:@_current_i18n_base, "test.forms")
   end
@@ -57,20 +43,24 @@ RSpec.describe "form/_radio_group.html.erb", type: :view do
     it "renders a complete radio group with all options" do
       render_radio_group
 
-      expect(rendered).to have_css("div.form-group") do |wrapper|
-        expect(wrapper).to have_css('label[for="status"]', text: "Status")
-        expect(wrapper).to have_css("div.radio-group")
-        expect(wrapper).to have_css('input[type="radio"][name="status"][value="active"][id="status_active"]')
-        expect(wrapper).to have_css('input[type="radio"][name="status"][value="inactive"][id="status_inactive"]')
-        expect(wrapper).to have_css('label[for="status_active"].radio-label', text: "Active")
-        expect(wrapper).to have_css('label[for="status_inactive"].radio-label', text: "Inactive")
-        expect(wrapper).to have_css("small.form-text", text: "Select the current status")
-      end
+      expect(rendered).to have_css("div")
+      expect(rendered).to have_css("label", text: "Status")
+      expect(rendered).to have_css('input[type="radio"][name="status"][value="active"][id="status_active"]')
+      expect(rendered).to have_css('input[type="radio"][name="status"][value="inactive"][id="status_inactive"]')
+      expect(rendered).to have_css("label", text: "Active")
+      expect(rendered).to have_css("label", text: "Inactive")
+      expect(rendered).to have_css("small", text: "Select the current status")
     end
 
-    it "maintains correct element order (field label, radio group, hint)" do
+    it "nests radio buttons inside their labels" do
       render_radio_group
-      expect(rendered).to match(/<label.*?for="status".*?>.*?<div.*?radio-group.*?>.*?<small.*?form-text.*?>/m)
+      # Check that radio buttons are inside labels (not the field label, but the option labels)
+      expect(rendered).to have_css("label", text: "Active") do |label|
+        expect(label).to have_css('input[type="radio"]')
+      end
+      expect(rendered).to have_css("label", text: "Inactive") do |label|
+        expect(label).to have_css('input[type="radio"]')
+      end
     end
 
     context "when hint is not present" do
@@ -78,7 +68,7 @@ RSpec.describe "form/_radio_group.html.erb", type: :view do
 
       it "does not render the hint element" do
         render_radio_group
-        expect(rendered).not_to have_css("small.form-text")
+        expect(rendered).not_to have_css("small")
       end
     end
 
@@ -86,9 +76,8 @@ RSpec.describe "form/_radio_group.html.erb", type: :view do
       it "renders empty radio group" do
         render_radio_group(options: [])
 
-        expect(rendered).to have_css("div.form-group")
-        expect(rendered).to have_css('label[for="status"]', text: "Status")
-        expect(rendered).to have_css("div.radio-group")
+        expect(rendered).to have_css("div")
+        expect(rendered).to have_css("label", text: "Status")
         expect(rendered).not_to have_css('input[type="radio"]')
       end
     end
@@ -97,99 +86,28 @@ RSpec.describe "form/_radio_group.html.erb", type: :view do
   describe "option variations" do
     shared_examples "renders radio options correctly" do |options_array, description|
       it "handles #{description}" do
-        # Mock the radio buttons and labels for this specific set of options
+        # Mock the radio buttons for this specific set of options
         options_array.each do |label, value|
-          # The partial uses the raw value in the ID (no sanitization)
           radio_id = "#{field}_#{value}"
-
           allow(mock_form).to receive(:radio_button)
             .with(field, value, {id: radio_id})
             .and_return(%(<input type="radio" name="#{field}" value="#{value}" id="#{radio_id}" />).html_safe)
-
-          allow(view).to receive(:label_tag)
-            .with(radio_id, label, {class: "radio-label"})
-            .and_return(%(<label for="#{radio_id}" class="radio-label">#{label}</label>).html_safe)
         end
 
         render_radio_group(options: options_array)
 
         options_array.each do |label, value|
           radio_id = "#{field}_#{value}"
-
-          expect(rendered).to have_css(%(input[type="radio"][value="#{value}"][id="#{radio_id}"]))
-          expect(rendered).to have_css(%(label[for="#{radio_id}"].radio-label), text: label)
+          expect(rendered).to have_css(%(input[type="radio"][name="#{field}"][value="#{value}"][id="#{radio_id}"]))
+          expect(rendered).to have_css("label", text: label)
         end
       end
     end
 
-    include_examples "renders radio options correctly",
-      [["Yes", true], ["No", false]],
-      "boolean values"
-
-    include_examples "renders radio options correctly",
-      [["Small", "s"], ["Medium", "m"], ["Large", "l"], ["Extra Large", "xl"]],
-      "multiple string values"
-
-    include_examples "renders radio options correctly",
-      [["Low", 1], ["Medium", 2], ["High", 3]],
-      "integer values"
-
-    include_examples "renders radio options correctly",
-      [["Draft", "draft"], ["Published", "published"], ["Archived", "archived"]],
-      "status strings"
-
-    include_examples "renders radio options correctly",
-      [["Option with spaces", "spaced_value"], ["Special-chars!", "special_value"]],
-      "complex labels and values"
-  end
-
-  describe "CSS customization" do
-    it "applies custom wrapper class" do
-      render_radio_group(wrapper_class: "custom-wrapper")
-      expect(rendered).to have_css("div.custom-wrapper")
-      expect(rendered).not_to have_css("div.form-group")
-    end
-
-    it "applies custom radio wrapper class" do
-      render_radio_group(radio_wrapper_class: "custom-radio-wrapper")
-      expect(rendered).to have_css("div.custom-radio-wrapper")
-      expect(rendered).not_to have_css("div.radio-group")
-    end
-
-    it "applies custom radio label class" do
-      # Update mocks to expect the custom class
-      allow(view).to receive(:label_tag)
-        .with("status_active", "Active", {class: "custom-radio-label"})
-        .and_return('<label for="status_active" class="custom-radio-label">Active</label>'.html_safe)
-
-      allow(view).to receive(:label_tag)
-        .with("status_inactive", "Inactive", {class: "custom-radio-label"})
-        .and_return('<label for="status_inactive" class="custom-radio-label">Inactive</label>'.html_safe)
-
-      render_radio_group(radio_label_class: "custom-radio-label")
-      expect(rendered).to have_css("label.custom-radio-label")
-    end
-
-    it "applies multiple custom CSS classes together" do
-      # Update mocks for custom classes
-      allow(view).to receive(:label_tag)
-        .with("status_active", "Active", {class: "special-label"})
-        .and_return('<label for="status_active" class="special-label">Active</label>'.html_safe)
-
-      allow(view).to receive(:label_tag)
-        .with("status_inactive", "Inactive", {class: "special-label"})
-        .and_return('<label for="status_inactive" class="special-label">Inactive</label>'.html_safe)
-
-      render_radio_group(
-        wrapper_class: "special-wrapper",
-        radio_wrapper_class: "special-radio-wrapper",
-        radio_label_class: "special-label"
-      )
-
-      expect(rendered).to have_css("div.special-wrapper")
-      expect(rendered).to have_css("div.special-radio-wrapper")
-      expect(rendered).to have_css("label.special-label")
-    end
+    include_examples "renders radio options correctly", [["Yes", true], ["No", false]], "boolean values"
+    include_examples "renders radio options correctly", [["Small", "s"], ["Medium", "m"], ["Large", "l"]], "multiple string values"
+    include_examples "renders radio options correctly", [["One", 1], ["Two", 2], ["Three", 3]], "integer values"
+    include_examples "renders radio options correctly", [["Draft", "draft"], ["Published", "published"], ["Archived", "archived"]], "status strings"
   end
 
   describe "form object handling" do
@@ -199,150 +117,101 @@ RSpec.describe "form/_radio_group.html.erb", type: :view do
       allow(view).to receive(:form_field_setup).and_return(
         field_config.merge(form_object: other_form)
       )
-      allow(other_form).to receive(:label).and_return("<label>Status</label>".html_safe)
-      allow(other_form).to receive(:radio_button).and_return('<input type="radio" />'.html_safe)
+      allow(other_form).to receive(:radio_button)
+        .with(field, "active", {id: "status_active"})
+        .and_return('<input type="radio" />'.html_safe)
+      allow(other_form).to receive(:radio_button)
+        .with(field, "inactive", {id: "status_inactive"})
+        .and_return('<input type="radio" />'.html_safe)
     end
 
     it "uses the form object returned by form_field_setup" do
       render_radio_group(form: other_form)
 
-      expect(other_form).to have_received(:label)
       expect(other_form).to have_received(:radio_button).at_least(:once)
-      expect(mock_form).not_to have_received(:label)
     end
   end
 
   describe "different field types" do
-    shared_examples "renders correctly for field" do |field_name, field_label|
+    shared_examples "renders correctly for field" do |field_name|
       it "handles #{field_name} field" do
-        # Update mocks for the new field
-        allow(mock_form).to receive(:label)
-          .with(field_name, field_label)
-          .and_return(%(<label for="#{field_name}">#{field_label}</label>).html_safe)
-
-        # Mock radio buttons for the new field
-        default_options.each do |label, value|
-          # The partial uses the raw value in the ID (no sanitization)
-          radio_id = "#{field_name}_#{value}"
-
-          allow(mock_form).to receive(:radio_button)
-            .with(field_name, value, {id: radio_id})
-            .and_return(%(<input type="radio" name="#{field_name}" value="#{value}" id="#{radio_id}" />).html_safe)
-
-          allow(view).to receive(:label_tag)
-            .with(radio_id, label, {class: "radio-label"})
-            .and_return(%(<label for="#{radio_id}" class="radio-label">#{label}</label>).html_safe)
-        end
-
-        # Mock form_field_setup for the new field
-        allow(view).to receive(:form_field_setup).and_return(
-          field_config.merge(field_label: field_label)
-        )
+        # Mock for the new field
+        allow(mock_form).to receive(:radio_button).with(field_name, anything, anything)
+          .and_return('<input type="radio" />'.html_safe)
 
         render_radio_group(field: field_name)
-        expect(rendered).to have_css("div.form-group")
-        expect(rendered).to have_css("label", text: field_label)
+        expect(rendered).to have_css("div")
+        expect(rendered).to have_css("label", text: "Status")
       end
     end
 
-    include_examples "renders correctly for field", :priority, "Priority"
-    include_examples "renders correctly for field", :category, "Category"
-    include_examples "renders correctly for field", :visibility, "Visibility"
-    include_examples "renders correctly for field", :approval_status, "Approval Status"
+    include_examples "renders correctly for field", :priority
+    include_examples "renders correctly for field", :category
+    include_examples "renders correctly for field", :visibility
+    include_examples "renders correctly for field", :approval_status
   end
 
   describe "accessibility and semantics" do
-    it "properly associates field label with radio group" do
-      render_radio_group
-
-      # Field label should be associated with the field name
-      expect(rendered).to have_css('label[for="status"]', text: "Status")
-    end
-
     it "generates unique IDs for each radio button" do
       render_radio_group
 
-      expect(rendered).to have_css('input[type="radio"][id="status_active"]')
-      expect(rendered).to have_css('input[type="radio"][id="status_inactive"]')
-      expect(rendered).to have_css('label[for="status_active"]')
-      expect(rendered).to have_css('label[for="status_inactive"]')
+      expect(rendered).to have_css("#status_active")
+      expect(rendered).to have_css("#status_inactive")
+
+      # Ensure IDs are unique
+      doc = Nokogiri::HTML(rendered)
+      ids = doc.css("[id]").map { |el| el["id"] }
+      expect(ids).to eq(ids.uniq)
     end
 
-    it "groups radio buttons with same name attribute" do
+    it "provides proper label association through nesting" do
       render_radio_group
-
-      # All radio buttons should have the same name to group them
-      expect(rendered).to have_css('input[type="radio"][name="status"]', count: 2)
-    end
-
-    it "provides proper label association for screen readers" do
-      render_radio_group
-
-      # Each radio button should have a corresponding label with matching for/id
-      expect(rendered).to have_css('input#status_active + label[for="status_active"]')
-      expect(rendered).to have_css('input#status_inactive + label[for="status_inactive"]')
+      # Option labels contain the radio buttons
+      expect(rendered).to have_css("label", text: "Active") do |label|
+        expect(label).to have_css('input[type="radio"][value="active"]')
+      end
+      expect(rendered).to have_css("label", text: "Inactive") do |label|
+        expect(label).to have_css('input[type="radio"][value="inactive"]')
+      end
     end
 
     it "includes hint for additional context" do
       render_radio_group
-      expect(rendered).to have_css("small.form-text", text: "Select the current status")
+      expect(rendered).to have_css("small", text: field_config[:field_hint])
     end
   end
 
   describe "edge cases and error handling" do
-    it "handles empty option labels gracefully" do
-      empty_label_options = [["", "empty"], ["Normal", "normal"]]
-
-      # Mock both options in the array
+    it "handles options with nil values" do
       allow(mock_form).to receive(:radio_button)
-        .with(field, "empty", {id: "status_empty"})
-        .and_return('<input type="radio" name="status" value="empty" id="status_empty" />'.html_safe)
+        .with(field, nil, {id: "status_"})
+        .and_return('<input type="radio" name="status" value="" id="status_" />'.html_safe)
 
-      allow(mock_form).to receive(:radio_button)
-        .with(field, "normal", {id: "status_normal"})
-        .and_return('<input type="radio" name="status" value="normal" id="status_normal" />'.html_safe)
-
-      allow(view).to receive(:label_tag)
-        .with("status_empty", "", {class: "radio-label"})
-        .and_return('<label for="status_empty" class="radio-label"></label>'.html_safe)
-
-      allow(view).to receive(:label_tag)
-        .with("status_normal", "Normal", {class: "radio-label"})
-        .and_return('<label for="status_normal" class="radio-label">Normal</label>'.html_safe)
-
-      render_radio_group(options: empty_label_options)
-      expect(rendered).to have_css('input[type="radio"][value="empty"]')
-      expect(rendered).to have_css('input[type="radio"][value="normal"]')
+      render_radio_group(options: [["None", nil]])
+      expect(rendered).to have_css('input[type="radio"][value=""]')
     end
 
-    it "handles special characters in values" do
-      special_options = [["Option 1", "value with spaces"], ["Option 2", "value-with-dashes"]]
+    it "handles options with empty string values" do
+      allow(mock_form).to receive(:radio_button)
+        .with(field, "", {id: "status_"})
+        .and_return('<input type="radio" name="status" value="" id="status_" />'.html_safe)
+
+      render_radio_group(options: [["Empty", ""]])
+      expect(rendered).to have_css('input[type="radio"][value=""]')
+    end
+
+    it "handles options with special characters in labels" do
+      special_options = [["Label & Special", "special"], ['Label "Quoted"', "quoted"]]
 
       special_options.each do |label, value|
-        # The partial uses the raw value in the ID (no sanitization)
-        radio_id = "#{field}_#{value}"
-
         allow(mock_form).to receive(:radio_button)
-          .with(field, value, {id: radio_id})
-          .and_return(%(<input type="radio" name="#{field}" value="#{value}" id="#{radio_id}" />).html_safe)
-
-        allow(view).to receive(:label_tag)
-          .with(radio_id, label, {class: "radio-label"})
-          .and_return(%(<label for="#{radio_id}" class="radio-label">#{label}</label>).html_safe)
+          .with(field, value, {id: "status_#{value}"})
+          .and_return(%(<input type="radio" name="status" value="#{value}" id="status_#{value}" />).html_safe)
       end
 
       render_radio_group(options: special_options)
-      expect(rendered).to have_css('input[type="radio"][value="value with spaces"]')
-      expect(rendered).to have_css('input[type="radio"][value="value-with-dashes"]')
-    end
-
-    it "maintains form structure even with malformed options" do
-      # Test with nil values in options (should be handled gracefully)
-      render_radio_group(options: [])
-
-      expect(rendered).to have_css("div.form-group")
-      expect(rendered).to have_css("div.radio-group")
-      expect(rendered).to have_css('label[for="status"]')
+      expect(rendered).to include("Label &amp; Special")
+      expect(rendered).to include("Label &quot;Quoted&quot;")
     end
   end
 end

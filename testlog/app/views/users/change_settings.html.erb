@@ -1,23 +1,21 @@
 <header>
-  <h1>Your Settings</h1>
+  <h1><%= t('users.titles.settings') %></h1>
 </header>
 
 <%= form_with(model: @user, url: update_settings_user_path(@user), method: :patch, local: true) do |form| %>
-  <% if @user.errors.any? %>
-    <aside>
-      <h3><%= pluralize(@user.errors.count, "error") %> prevented your settings from being changed:</h3>
-      <ul>
-        <% @user.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </aside>
+  <%= render 'form/errors', model: @user %>
+
+  <%= render 'form/fieldset', legend_key: 'preferences', i18n_base: 'users.forms', form: form do %>
+    <%= render 'form/select', 
+        field: :time_display, 
+        options: options_for_select([
+          [t('users.options.time_full'), "time"],
+          [t('users.options.time_day'), "day"]
+        ], @user.time_display) %>
   <% end %>
 
-  <%= form.label :time_display, "Time Display Format" %>
-  <%= form.select :time_display, [["Show Full Time", "time"], ["Show Day Only", "day"]] %>
-
-  <%= form.submit "Update Settings" %>
+  <%= render 'form/submit_button',
+      text: t('users.buttons.update_settings') %>
 <% end %>
 
 <div class="margins center">

@@ -12,8 +12,8 @@ RSpec.describe "users/change_password.html.erb", type: :view do
     render
 
     expect(rendered).to have_content(I18n.t("users.titles.change_password"))
-    expect(rendered).to have_field(I18n.t("users.forms.password_current"))
-    expect(rendered).to have_field(I18n.t("users.forms.password_new"))
+    expect(rendered).to have_field(I18n.t("users.forms.current_password"))
+    expect(rendered).to have_field(I18n.t("users.forms.password"))
     expect(rendered).to have_field(I18n.t("users.forms.password_confirmation"))
     expect(rendered).to have_button(I18n.t("users.buttons.update_password"))
   end
@@ -32,8 +32,8 @@ RSpec.describe "users/change_password.html.erb", type: :view do
   it "uses password input fields" do
     render
 
-    expect(rendered).to have_field(I18n.t("users.forms.password_current"), type: "password")
-    expect(rendered).to have_field(I18n.t("users.forms.password_new"), type: "password")
+    expect(rendered).to have_field(I18n.t("users.forms.current_password"), type: "password")
+    expect(rendered).to have_field(I18n.t("users.forms.password"), type: "password")
     expect(rendered).to have_field(I18n.t("users.forms.password_confirmation"), type: "password")
   end
 
@@ -41,13 +41,13 @@ RSpec.describe "users/change_password.html.erb", type: :view do
     render
 
     # Password fields should be empty (nil or empty string)
-    expect(rendered).to have_field(I18n.t("users.forms.password_current"))
-    expect(rendered).to have_field(I18n.t("users.forms.password_new"))
+    expect(rendered).to have_field(I18n.t("users.forms.current_password"))
+    expect(rendered).to have_field(I18n.t("users.forms.password"))
     expect(rendered).to have_field(I18n.t("users.forms.password_confirmation"))
 
     # Verify they don't have any pre-filled values
-    expect(rendered).not_to have_field(I18n.t("users.forms.password_current"), with: /\S/)
-    expect(rendered).not_to have_field(I18n.t("users.forms.password_new"), with: /\S/)
+    expect(rendered).not_to have_field(I18n.t("users.forms.current_password"), with: /\S/)
+    expect(rendered).not_to have_field(I18n.t("users.forms.password"), with: /\S/)
     expect(rendered).not_to have_field(I18n.t("users.forms.password_confirmation"), with: /\S/)
   end
 end

@@ -1,6 +1,9 @@
 class InspectionsController < ApplicationController
-  before_action :set_inspection, only: [:show, :edit, :update, :destroy, :report, :qr_code]
-  before_action :check_inspection_owner, only: [:show, :edit, :update, :destroy]
+  before_action :set_inspection, only: [:show, :edit, :update, :destroy, :report, :qr_code, :replace_dimensions]
+  before_action :check_inspection_owner, only: [:show, :edit, :update, :destroy, :replace_dimensions]
+  before_action :check_inspection_finalized, only: [:edit, :update, :replace_dimensions]
+  before_action :check_inspection_finalized_for_delete, only: [:destroy]
+  before_action :check_inspection_complete, only: [:report, :qr_code]
   before_action :no_index
   skip_before_action :require_login, only: [:report, :qr_code]
 
@@ -41,29 +44,27 @@ class InspectionsController < ApplicationController
   end
 
   def create
+    # Handle unit_id from URL parameter (from unit show page button)
+    unit_id = params[:unit_id] || inspection_params[:unit_id]
+    unit = nil
+
     unless current_user.inspection_company_id.present?
       flash[:danger] = current_user.inspection_company_required_message
-      redirect_to root_path and return
+      redirect_to unit_id.present? ? unit_path(unit_id) : root_path and return
     end
 
     unless current_user.can_create_inspection?
       flash[:danger] = current_user.inspection_company_required_message
-      redirect_to root_path and return
+      redirect_to unit_id.present? ? unit_path(unit_id) : root_path and return
     end
 
-    # Handle unit_id from URL parameter (from unit show page button)
-    unit_id = params[:unit_id] || inspection_params[:unit_id]
-
-    unless unit_id.present?
-      flash[:danger] = I18n.t("inspections.errors.unit_required")
-      redirect_to root_path and return
-    end
-
-    # Securely handle unit association
-    unit = current_user.units.find_by(id: unit_id)
-    if unit.nil?
-      flash[:danger] = I18n.t("inspections.errors.invalid_unit")
-      redirect_to root_path and return
+    if unit_id.present?
+      # Securely handle unit association
+      unit = current_user.units.find_by(id: unit_id)
+      if unit.nil?
+        flash[:danger] = I18n.t("inspections.errors.invalid_unit")
+        redirect_to root_path and return
+      end
     end
 
     # Create minimal inspection with just the unit and default values
@@ -74,22 +75,89 @@ class InspectionsController < ApplicationController
       inspector_company_id: current_user.inspection_company_id
     )
 
+    # Copy dimensions from unit before saving
+    @inspection.send(:copy_unit_values)
+
     if @inspection.save
       if Rails.env.production?
         NtfyService.notify("new inspection by #{current_user.email}")
       end
 
-      flash[:success] = I18n.t("inspections.messages.created")
+      flash[:success] = if unit.nil?
+        I18n.t("inspections.messages.created_without_unit")
+      else
+        I18n.t("inspections.messages.created")
+      end
       redirect_to edit_inspection_path(@inspection)
     else
       flash[:danger] = I18n.t("inspections.errors.creation_failed", errors: @inspection.errors.full_messages.join(", "))
-      redirect_to unit_path(unit)
+      redirect_to unit.present? ? unit_path(unit) : root_path
     end
   end
 
   def edit
-    # Build assessments if they don't exist yet
-    @inspection.build_user_height_assessment unless @inspection.user_height_assessment
+    # Build assessments if they don't exist yet and pre-fill with inspection dimensions
+    unless @inspection.user_height_assessment
+      @inspection.build_user_height_assessment(
+        containing_wall_height: @inspection.containing_wall_height,
+        platform_height: @inspection.platform_height,
+        user_height: @inspection.user_height,
+        permanent_roof: @inspection.permanent_roof,
+        users_at_1000mm: @inspection.users_at_1000mm,
+        users_at_1200mm: @inspection.users_at_1200mm,
+        users_at_1500mm: @inspection.users_at_1500mm,
+        users_at_1800mm: @inspection.users_at_1800mm,
+        play_area_length: @inspection.play_area_length,
+        play_area_width: @inspection.play_area_width,
+        negative_adjustment: @inspection.negative_adjustment
+      )
+    end
+
+    unless @inspection.slide_assessment
+      @inspection.build_slide_assessment(
+        slide_platform_height: @inspection.slide_platform_height,
+        slide_wall_height: @inspection.slide_wall_height,
+        runout_value: @inspection.runout_value,
+        slide_first_metre_height: @inspection.slide_first_metre_height,
+        slide_beyond_first_metre_height: @inspection.slide_beyond_first_metre_height,
+        slide_permanent_roof: @inspection.slide_permanent_roof
+      )
+    end
+
+    unless @inspection.structure_assessment
+      @inspection.build_structure_assessment(
+        stitch_length: @inspection.stitch_length,
+        unit_pressure_value: @inspection.unit_pressure_value,
+        blower_tube_length: @inspection.blower_tube_length,
+        step_size_value: @inspection.step_size_value,
+        fall_off_height_value: @inspection.fall_off_height_value,
+        trough_depth_value: @inspection.trough_depth_value,
+        trough_width_value: @inspection.trough_width_value
+      )
+    end
+
+    unless @inspection.anchorage_assessment
+      @inspection.build_anchorage_assessment(
+        num_low_anchors: @inspection.num_low_anchors,
+        num_high_anchors: @inspection.num_high_anchors
+      )
+    end
+
+    unless @inspection.materials_assessment
+      @inspection.build_materials_assessment(
+        rope_size: @inspection.rope_size
+      )
+    end
+
+    unless @inspection.fan_assessment
+      @inspection.build_fan_assessment
+    end
+
+    unless @inspection.enclosed_assessment
+      @inspection.build_enclosed_assessment(
+        exit_number: @inspection.exit_number
+      )
+    end
   end
 
   def update
@@ -108,20 +176,58 @@ class InspectionsController < ApplicationController
 
     if @inspection.update(params)
       respond_to do |format|
-        format.html { flash_and_redirect("updated") }
+        format.html do
+          flash[:success] = I18n.t("inspections.messages.updated")
+          redirect_to @inspection
+        end
         format.json { render json: {status: "success", message: t("inspections.autosave.saved")} }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("inspection_progress_#{@inspection.id}",
+              html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
+            turbo_stream.replace("finalization_issues_#{@inspection.id}",
+              partial: "inspections/finalization_issues",
+              locals: {inspection: @inspection})
+          ]
+        end
       end
     else
       respond_to do |format|
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: {status: "error", errors: @inspection.errors.full_messages} }
+        format.turbo_stream do
+          # For now, just update the progress and issues on error too
+          render turbo_stream: [
+            turbo_stream.replace("inspection_progress_#{@inspection.id}",
+              html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
+            turbo_stream.replace("autosave_status",
+              html: "<div class='error' style='display: inline;'>Save failed</div>")
+          ]
+        end
       end
     end
   end
 
   def destroy
     @inspection.destroy
-    flash_and_redirect("deleted")
+    flash[:success] = I18n.t("inspections.messages.deleted")
+    redirect_to inspections_path
+  end
+
+  def replace_dimensions
+    if @inspection.unit.present?
+      @inspection.copy_dimensions_from(@inspection.unit)
+
+      if @inspection.save
+        flash[:success] = t("inspections.messages.dimensions_replaced")
+      else
+        flash[:danger] = t("inspections.messages.dimensions_replace_failed", errors: @inspection.errors.full_messages.join(", "))
+      end
+    else
+      flash[:danger] = t("inspections.messages.no_unit_for_dimensions")
+    end
+
+    redirect_to edit_inspection_path(@inspection, tab: params[:tab] || "general")
   end
 
   def search
@@ -159,15 +265,44 @@ class InspectionsController < ApplicationController
   private
 
   def inspection_params
-    params.require(:inspection).permit(
+    # Get the base params with permitted top-level attributes
+    base_params = params.require(:inspection).permit(
       :inspection_date, :inspection_location, :passed, :comments, :unit_id,
-      :inspector_company_id, :unique_report_number, :status,
-      user_height_assessment_attributes: [
-        :id, :containing_wall_height, :platform_height, :user_height, :permanent_roof,
-        :users_at_1000mm, :users_at_1200mm, :users_at_1500mm, :users_at_1800mm,
-        :play_area_length, :play_area_width, :negative_adjustment, :user_height_comment
-      ]
+      :inspector_company_id, :unique_report_number, :status, :has_slide,
+      # Dimension comment fields
+      :width_comment, :length_comment, :height_comment,
+      :num_low_anchors_comment, :num_high_anchors_comment,
+      :exit_number_comment, :rope_size_comment,
+      :slide_platform_height_comment, :slide_wall_height_comment, :runout_value_comment,
+      :slide_first_metre_height_comment, :slide_beyond_first_metre_height_comment,
+      :slide_permanent_roof_comment,
+      :containing_wall_height_comment, :platform_height_comment,
+      :permanent_roof_comment, :play_area_length_comment, :play_area_width_comment,
+      :negative_adjustment_comment
     )
+
+    # For each assessment, permit all attributes except timestamps and inspection_id
+    assessment_types = %w[
+      user_height_assessment
+      slide_assessment
+      structure_assessment
+      anchorage_assessment
+      materials_assessment
+      fan_assessment
+      enclosed_assessment
+    ]
+
+    assessment_types.each do |assessment_type|
+      next unless params[:inspection]["#{assessment_type}_attributes"].present?
+
+      # Permit all fields except the ones we want to block
+      assessment_params = params[:inspection]["#{assessment_type}_attributes"]
+      cleaned_params = assessment_params.permit!.except("created_at", "updated_at", "inspection_id")
+
+      base_params["#{assessment_type}_attributes"] = cleaned_params
+    end
+
+    base_params
   end
 
   def no_index
@@ -197,11 +332,6 @@ class InspectionsController < ApplicationController
     end
   end
 
-  def flash_and_redirect(action)
-    flash[:success] = I18n.t("inspections.messages.#{action}")
-    redirect_to (action == "deleted") ? inspections_path : @inspection
-  end
-
   def inspections_to_csv
     attributes = %w[id name serial inspection_date reinspection_date inspector location passed comments manufacturer]
 
@@ -212,6 +342,26 @@ class InspectionsController < ApplicationController
         row = attributes.map { |attr| inspection.send(attr) }
         csv << row
       end
+    end
+  end
+
+  def check_inspection_complete
+    unless @inspection.status == "completed" || @inspection.status == "finalized"
+      render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
+    end
+  end
+
+  def check_inspection_finalized
+    if @inspection.status == "finalized" && !current_user.admin?
+      flash[:danger] = I18n.t("inspections.errors.finalized_no_edit")
+      redirect_to inspection_path(@inspection)
+    end
+  end
+
+  def check_inspection_finalized_for_delete
+    if @inspection.status == "finalized" && !current_user.admin?
+      flash[:danger] = I18n.t("inspections.errors.finalized_no_delete")
+      redirect_to inspection_path(@inspection)
     end
   end
 end

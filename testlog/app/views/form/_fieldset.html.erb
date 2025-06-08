@@ -1,6 +1,9 @@
 <%
-  # Get i18n_base from explicit parameter or from parent section wrapper
-  i18n_base = local_assigns[:i18n_base] || @_current_i18n_base
+  # Set form and i18n context for child form controls
+  @_current_form = local_assigns[:form] || @_current_form
+  i18n_base = local_assigns[:i18n_base]
+  raise ArgumentError, "i18n_base is required for form fieldsets" if i18n_base.nil?
+  @_current_i18n_base = i18n_base
   
   # Determine legend text
   if local_assigns[:legend]
@@ -13,12 +16,9 @@
   else
     legend_text = local_assigns[:legend_key]&.to_s&.humanize || "Section"
   end
-  
-  # Form fieldset options
-  css_class ||= "form-section"
 %>
 
-<fieldset class="<%= css_class %>">
+<fieldset>
   <% if legend_text.present? %>
     <legend><%= legend_text %></legend>
   <% end %>

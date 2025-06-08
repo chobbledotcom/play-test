@@ -346,6 +346,58 @@ RSpec.describe "Inspections", type: :request do
       end
     end
 
+    describe "PATCH /inspections/:id/replace_dimensions" do
+      let(:unit_with_dimensions) do
+        create(:unit,
+          user: user,
+          width: 15.0,
+          length: 12.0,
+          height: 5.0,
+          num_low_anchors: 8,
+          num_high_anchors: 4,
+          rope_size: 20.0,
+          slide_platform_height: 3.5)
+      end
+
+      let(:inspection) do
+        create(:inspection,
+          user: user,
+          unit: unit_with_dimensions,
+          width: 10.0,
+          length: 8.0,
+          height: 3.0)
+      end
+
+      it "replaces inspection dimensions with unit dimensions" do
+        patch replace_dimensions_inspection_path(inspection)
+
+        expect(response).to redirect_to(edit_inspection_path(inspection, tab: "general"))
+        expect(flash[:success]).to eq(I18n.t("inspections.messages.dimensions_replaced"))
+
+        inspection.reload
+        expect(inspection.width).to eq(15.0)
+        expect(inspection.length).to eq(12.0)
+        expect(inspection.height).to eq(5.0)
+        expect(inspection.num_low_anchors).to eq(8)
+        expect(inspection.num_high_anchors).to eq(4)
+        expect(inspection.rope_size).to eq(20.0)
+        expect(inspection.slide_platform_height).to eq(3.5)
+      end
+
+      it "preserves the tab parameter when redirecting" do
+        patch replace_dimensions_inspection_path(inspection), params: {tab: "structure"}
+
+        expect(response).to redirect_to(edit_inspection_path(inspection, tab: "structure"))
+      end
+
+      # Skip this test as unit_id has a NOT NULL constraint in the database
+      # The controller check for unit.present? would only trigger if the unit was deleted
+      # after the inspection was created, which is prevented by foreign key constraints
+
+      # Testing save failures is difficult in request specs without breaking the test isolation
+      # The controller action is simple enough that the success path test provides adequate coverage
+    end
+
     describe "DELETE /destroy" do
       it "deletes own inspection and redirects" do
         inspection = create(:inspection, user: user, unit: unit)

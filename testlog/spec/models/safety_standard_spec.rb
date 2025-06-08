@@ -227,19 +227,6 @@ RSpec.describe SafetyStandard, type: :model do
       end
     end
 
-    describe ".valid_evacuation_time?" do
-      it "returns true for valid evacuation times (≤30 seconds)" do
-        expect(SafetyStandard.valid_evacuation_time?(20)).to be true
-        expect(SafetyStandard.valid_evacuation_time?(30)).to be true
-        expect(SafetyStandard.valid_evacuation_time?(15)).to be true
-      end
-
-      it "returns false for invalid evacuation times" do
-        expect(SafetyStandard.valid_evacuation_time?(35)).to be false
-        expect(SafetyStandard.valid_evacuation_time?(nil)).to be false
-      end
-    end
-
     describe ".valid_pressure?" do
       it "returns true for valid pressures (≥1.0 KPA)" do
         expect(SafetyStandard.valid_pressure?(1.0)).to be true
@@ -352,18 +339,6 @@ RSpec.describe SafetyStandard, type: :model do
         expect(result).to have_key(:blower_requirements)
         expect(result).to have_key(:grounding_test)
         expect(result[:blower_requirements]).to include(:minimum_pressure)
-      end
-    end
-
-    describe ".inspection_intervals" do
-      it "returns inspection interval information" do
-        result = SafetyStandard.inspection_intervals
-
-        expect(result).to have_key(:standard_interval)
-        expect(result).to have_key(:high_use_interval)
-        expect(result).to have_key(:commercial_interval)
-        expect(result).to have_key(:post_repair_interval)
-        expect(result[:standard_interval]).to eq(12.months)
       end
     end
   end

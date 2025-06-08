@@ -2,6 +2,7 @@
 class Unit < ApplicationRecord
   self.table_name = "units"
   include CustomIdGenerator
+  include HasDimensions
 
   belongs_to :user
   has_many :inspections, dependent: :destroy
@@ -10,8 +11,10 @@ class Unit < ApplicationRecord
   has_one_attached :photo
 
   # All fields are required for Units
-  validates :name, :serial, :description, :manufacturer, :unit_type, :owner, presence: true
+  validates :name, :serial, :description, :manufacturer, :owner, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
+
+  # Override HasDimensions validations for required basic dimensions
   validates :width, :length, :height, presence: true, numericality: {greater_than: 0, less_than: 200}
 
   # Scopes - enhanced from original Equipment and new Unit functionality
@@ -23,26 +26,15 @@ class Unit < ApplicationRecord
       all
     end
   }
-  scope :by_type, ->(type) { where(unit_type: type) if type.present? }
-  scope :with_recent_inspections, -> { joins(:inspections).where(inspections: {inspection_date: 1.year.ago..}).distinct }
-
-  # Enums for Unit functionality
-  enum :unit_type, {
-    bounce_house: "bounce_house",
-    slide: "slide",
-    combo_unit: "combo_unit",
-    obstacle_course: "obstacle_course",
-    totally_enclosed: "totally_enclosed"
-  }, prefix: false, suffix: false
+  scope :with_slide, -> { where(has_slide: true) }
+  scope :without_slide, -> { where(has_slide: false) }
+  scope :with_recent_inspections, -> { joins(:inspections).where(inspections: {inspection_date: SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago..}).distinct }
 
   # Callbacks
   before_create :generate_custom_id
   after_update :update_inspection_unit_data, if: :saved_changes_to_dimensions?
 
-  # Dimension and calculation methods
-  def dimensions
-    "#{width}m × #{length}m × #{height}m"
-  end
+  # Additional methods beyond HasDimensions concern
 
   def last_inspection
     inspections.order(inspection_date: :desc).first
@@ -57,25 +49,18 @@ class Unit < ApplicationRecord
   end
 
   def requires_enclosed_assessment?
-    totally_enclosed?
-  end
-
-  def area
-    width * length
-  end
-
-  def volume
-    width * length * height
+    is_totally_enclosed?
   end
 
   def next_inspection_due
     return nil unless last_inspection
-    # Standard inspection interval is 12 months
-    last_inspection.inspection_date + 12.months
+    # Standard inspection interval using safety standard constant
+    last_inspection.inspection_date + SafetyStandard::REINSPECTION_INTERVAL_DAYS.days
   end
 
   def inspection_overdue?
-    next_inspection_due && next_inspection_due < Date.current
+    return false unless next_inspection_due
+    next_inspection_due < Date.current
   end
 
   def compliance_status
@@ -93,8 +78,8 @@ class Unit < ApplicationRecord
   def inspection_summary
     {
       total_inspections: inspections.count,
-      passed_inspections: inspections.where(passed: true).count, # TODO: Use passed scope when available
-      failed_inspections: inspections.where(passed: false).count, # TODO: Use failed scope when available
+      passed_inspections: inspections.passed.count,
+      failed_inspections: inspections.failed.count,
       last_inspection_date: last_inspection&.inspection_date,
       next_due_date: next_inspection_due,
       compliance_status: compliance_status
@@ -102,15 +87,18 @@ class Unit < ApplicationRecord
   end
 
   def self.overdue
+    # Find units where their most recent inspection is older than the reinspection interval
+    # Using Date.current instead of Date.today for consistency with Rails timezone handling
     joins(:inspections)
-      .where("inspections.inspection_date < ?", Date.today - 1.year)
-      .distinct
+      .group("units.id")
+      .having("MAX(inspections.inspection_date) <= ?", Date.current - SafetyStandard::REINSPECTION_INTERVAL_DAYS.days)
   end
 
   private
 
   def saved_changes_to_dimensions?
-    saved_change_to_width? || saved_change_to_length? || saved_change_to_height?
+    # Use the dimension_changed? method from HasDimensions, but for saved changes
+    dimension_attributes.keys.any? { |attr| saved_change_to_attribute?(attr) }
   end
 
   def update_inspection_unit_data

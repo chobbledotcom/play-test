@@ -5,16 +5,16 @@ module LoginHelpers
 
   def login_user_via_form(user)
     visit login_path
-    fill_in I18n.t("session.login.email_label"), with: user.email
-    fill_in I18n.t("session.login.password_label"), with: user.password
+    fill_in I18n.t("session.login.email"), with: user.email
+    fill_in I18n.t("session.login.password"), with: user.password
     click_button I18n.t("session.login.submit")
   end
 
   def sign_in(user)
     visit login_path
-    fill_in "Email", with: user.email
-    fill_in "Password", with: user.password
-    click_button "Log in"
+    fill_in I18n.t("users.fields.email"), with: user.email
+    fill_in I18n.t("users.fields.password"), with: user.password
+    click_button I18n.t("sessions.buttons.log_in")
   end
 
   def create_and_login_user(attributes = {})

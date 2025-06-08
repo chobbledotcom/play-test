@@ -1,23 +1,25 @@
-<% if @inspection.errors.any? %>
-  <aside>
-    <h3><%= t('inspections.errors.header', count: @inspection.errors.count) %></h3>
-    <ul>
-    <% @inspection.errors.each do |error| %>
-      <li><%= error.full_message %></li>
+<%= render 'form/errors', model: @inspection %>
+
+<%= form_with(model: @inspection, data: (@inspection.persisted? ? {autosave: "true"} : {})) do |form| %>
+  <%= render 'form/fieldset', legend_key: 'unit_details', i18n_base: 'inspections.fields', form: form do %>
+    <%= render 'form/select', 
+        field: :unit_id, 
+        collection_select_params: {
+          collection: current_user.units.order(:name),
+          value_method: :id,
+          text_method: :name
+        },
+        prompt: t('inspections.fields.unit_select_prompt'),
+        required: true %>
+    
+    <% if @inspection.persisted? && @inspection.unit.present? %>
+      <%= link_to t('inspections.buttons.replace_dimensions'), 
+          replace_dimensions_inspection_path(@inspection), 
+          data: { 
+            turbo_method: :patch,
+            turbo_confirm: t('inspections.messages.dimensions_replace_confirm')
+          } %>
     <% end %>
-    </ul>
-  </aside>
-<% end %>
-
-<%= form_with(model: @inspection, html: {class: "inspection-general-form", data: (@inspection.persisted? ? {autosave: "true"} : {})}) do |form| %>
-  <fieldset>
-    <header>
-      <h3><%= t('inspections.headers.unit_details') %></h3>
-    </header>
-
-    <%= form.label :unit_id, t('inspections.fields.unit_select') %>
-    <%= form.collection_select :unit_id, current_user.units.order(:name), :id, :name, 
-        {prompt: t('inspections.fields.unit_select_prompt')}, {required: true} %>
     
     <% if @inspection.unit.present? %>
       <div class="unit-details-display">
@@ -28,21 +30,15 @@
       </div>
     <% end %>
 
-    <%= form.label :inspection_location, t('inspections.fields.inspection_location') %>
-    <%= form.text_field :inspection_location %>
-  </fieldset>
+    <%= render 'form/text_field', 
+        field: :inspection_location %>
+  <% end %>
 
-  <fieldset>
-    <header>
-      <h3><%= t('inspections.headers.inspection_details') %></h3>
-    </header>
-
-    <%= form.label :inspection_date, t('inspections.fields.inspection_date') %>
-    <% if current_user.time_display == "day" %>
-      <%= form.date_field :inspection_date, value: date_for_form(@inspection.inspection_date) %>
-    <% else %>
-      <%= form.datetime_local_field :inspection_date, value: date_for_form(@inspection.inspection_date) %>
-    <% end %>
+  <%= render 'form/fieldset', legend_key: 'inspection_details', i18n_base: 'inspections.fields', form: form do %>
+    <%= render 'form/date_field', 
+        field: :inspection_date, 
+        field_type: (current_user.time_display == "day" ? :date_field : :datetime_local_field),
+        value: date_for_form(@inspection.inspection_date) %>
 
     <div class="calculated-field">
       <label><%= t('inspections.fields.reinspection_date') %></label>
@@ -53,11 +49,14 @@
     </div>
 
     <% if current_user.admin? %>
-      <%= form.label :inspector_company_id, t('inspections.fields.inspector_company') %>
-      <%= form.collection_select :inspector_company_id, 
-          InspectorCompany.active.order(:name), :id, :name,
-          {prompt: t('inspections.fields.inspector_company_prompt')},
-          {class: "form-control"} %>
+      <%= render 'form/select', 
+          field: :inspector_company_id, 
+          collection_select_params: {
+            collection: InspectorCompany.active.order(:name),
+            value_method: :id,
+            text_method: :name
+          },
+          prompt: t('inspections.fields.inspector_company_prompt') %>
     <% else %>
       <div class="calculated-field">
         <label><%= t('inspections.fields.inspector_company') %></label>
@@ -68,43 +67,40 @@
       </div>
     <% end %>
 
+    <%= render 'form/text_field', 
+        field: :unique_report_number, 
+        form: form, 
+        i18n_base: 'inspections.fields' %>
+  <% end %>
 
-    <%= form.label :unique_report_number, t('inspections.fields.unique_report_number') %>
-    <%= form.text_field :unique_report_number %>
-  </fieldset>
-
-  <fieldset>
-    <header>
-      <h3><%= t('inspections.headers.status_and_results') %></h3>
-    </header>
-
-    <%= form.label :status, t('inspections.fields.status') %>
-    <%= form.select :status, 
-        options_for_select([
+  <%= render 'form/fieldset', legend_key: 'status_and_results', i18n_base: 'inspections' do %>
+    <%= render 'form/select', 
+        field: :status, 
+        form: form, 
+        i18n_base: 'inspections.fields',
+        options: options_for_select([
           [t('inspections.status.draft'), 'draft'],
           [t('inspections.status.in_progress'), 'in_progress'],
           [t('inspections.status.completed'), 'completed']
-        ], @inspection.status),
-        {}, {class: "form-control"} %>
+        ], @inspection.status) %>
 
-    <%= form.label :passed, t('inspections.fields.overall_result') %>
-    <div class="checkbox-wrapper">
-      <%= form.check_box :passed %>
-      <%= form.label :passed, t('inspections.fields.pass'), class: "checkbox-label" %>
-    </div>
+    <%= render 'form/checkbox', 
+        field: :passed, 
+        form: form, 
+        i18n_base: 'inspections.fields' %>
 
-    <%= form.label :comments, t('inspections.fields.comments') %>
-    <%= form.text_area :comments, rows: 3 %>
-  </fieldset>
+    <%= render 'form/text_area', 
+        field: :comments, 
+        form: form, 
+        i18n_base: 'inspections.fields',
+        rows: 3 %>
+  <% end %>
 
-  <fieldset class="form-actions">
-    <%= form.submit @inspection.new_record? ? t('inspections.buttons.create') : t('inspections.buttons.update'), 
-        class: "btn btn-primary" %>
+  <fieldset>
+    <%= render 'form/submit_button',
+        form: form,
+        text: (@inspection.new_record? ? t('inspections.buttons.create') : t('inspections.buttons.update')) %>
     
-    <div class="autosave-status" data-autosave-status>
-      <span class="saving" style="display: none;"><%= t('inspections.autosave.saving') %></span>
-      <span class="saved" style="display: none;"><%= t('inspections.autosave.saved') %></span>
-      <span class="error" style="display: none;"><%= t('inspections.autosave.error') %></span>
-    </div>
+    <%= render 'form/autosave_status' %>
   </fieldset>
 <% end %>

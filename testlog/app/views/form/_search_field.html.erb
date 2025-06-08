@@ -1,0 +1,15 @@
+<%
+  # Search form options
+  url = local_assigns[:url] or raise ArgumentError, "url is required for search field"
+  placeholder = local_assigns[:placeholder] || "Search..."
+  field_name = local_assigns[:field_name] || :query
+  submit_text = local_assigns[:submit_text] || "Search"
+  css_class = local_assigns[:css_class] || "search-form"
+%>
+
+<div class="<%= css_class %>">
+  <%= form_with url: url, method: :get do |form| %>
+    <%= form.text_field field_name, placeholder: placeholder, value: params[field_name] %>
+    <%= form.submit submit_text %>
+  <% end %>
+</div>

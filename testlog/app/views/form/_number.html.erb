@@ -6,6 +6,7 @@
   step ||= 0.01
   min ||= nil
   max ||= nil
+  required ||= false
   css_class ||= "form-control"
   wrapper_class ||= "form-group"
 %>
@@ -16,6 +17,7 @@
     step: step,
     min: min,
     max: max,
+    required: required,
     placeholder: setup[:field_placeholder],
     class: css_class
   }.compact %>
