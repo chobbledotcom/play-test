@@ -10,6 +10,17 @@
           [t('users.options.time_full'), "time"],
           [t('users.options.time_day'), "day"]
         ], @user.time_display) %>
+
+    <%= render 'form/text_field', 
+        field: :default_inspection_location,
+        value: @user.default_inspection_location %>
+
+    <%= render 'form/select', 
+        field: :theme, 
+        options: options_for_select([
+          [t('users.options.theme_light'), "light"],
+          [t('users.options.theme_dark'), "dark"]
+        ], @user.theme) %>
   <% end %>
 
   <%= render 'form/submit_button',

@@ -61,10 +61,10 @@ end
 # Phase 1: Inspector Companies
 Rails.logger.info "\n📋 Creating Inspector Companies..."
 
-bounce_safe = InspectorCompany.create!(
-  name: "Bounce Safe Inspections Ltd",
+stefan_testing = InspectorCompany.create!(
+  name: "Stefan's Testing Co",
   rpii_registration_number: "RPII-001",
-  email: "info@bouncesafe.co.uk",
+  email: "info@play-test.co.uk",
   phone: british_phone_number,
   address: british_address,
   city: "Birmingham",
@@ -74,12 +74,12 @@ bounce_safe = InspectorCompany.create!(
   active: true,
   notes: "Premier inflatable inspection service in the Midlands. Established 2015."
 )
-log_creation("Inspector Company", bounce_safe.name)
+log_creation("Inspector Company", stefan_testing.name)
 
-kids_play = InspectorCompany.create!(
-  name: "Kids Play Safety Services",
+steph_test = InspectorCompany.create!(
+  name: "Steph Test",
   rpii_registration_number: "RPII-002",
-  email: "enquiries@kidsplaysafety.co.uk",
+  email: "enquiries@play-test.co.uk",
   phone: british_phone_number,
   address: british_address,
   city: "Manchester",
@@ -89,12 +89,12 @@ kids_play = InspectorCompany.create!(
   active: true,
   notes: "Specialising in soft play and inflatable safety across the North West."
 )
-log_creation("Inspector Company", kids_play.name)
+log_creation("Inspector Company", steph_test.name)
 
-retired_inspections = InspectorCompany.create!(
-  name: "Retired Inspections Co",
+steve_inflatable = InspectorCompany.create!(
+  name: "Steve Inflatable Testing",
   rpii_registration_number: "RPII-003",
-  email: "old@retiredinspections.co.uk",
+  email: "old@play-test.co.uk",
   phone: british_phone_number,
   address: british_address,
   city: "London",
@@ -104,14 +104,14 @@ retired_inspections = InspectorCompany.create!(
   active: false,
   notes: "Company ceased trading in 2023. Records maintained for historical purposes."
 )
-log_creation("Inspector Company", retired_inspections.name)
+log_creation("Inspector Company", steve_inflatable.name)
 
 # Phase 2: Users
 Rails.logger.info "\n👥 Creating Users..."
 
 # Admin user (no company)
 admin_user = User.create!(
-  email: "admin@testlog.com",
+  email: "admin@play-test.co.uk",
   password: "password123",
   inspection_limit: -1,
   time_display: "date"
@@ -120,57 +120,57 @@ log_creation("User", "Admin (#{admin_user.email})")
 
 # Test user with access to all data
 test_user = User.create!(
-  email: "test@testlog.com",
+  email: "test@play-test.co.uk",
   password: "password123",
-  inspection_company: bounce_safe,
+  inspection_company: stefan_testing,
   inspection_limit: -1,
   time_display: "time"
 )
 log_creation("User", "Test User (#{test_user.email})")
 
-# Bounce Safe users
+# Stefan's Testing users
 lead_inspector = User.create!(
-  email: "lead@bouncesafe.co.uk",
+  email: "lead@play-test.co.uk",
   password: "password123",
-  inspection_company: bounce_safe,
+  inspection_company: stefan_testing,
   inspection_limit: -1,
   time_display: "time"
 )
 log_creation("User", "Lead Inspector (#{lead_inspector.email})")
 
 junior_inspector = User.create!(
-  email: "junior@bouncesafe.co.uk",
+  email: "junior@play-test.co.uk",
   password: "password123",
-  inspection_company: bounce_safe,
+  inspection_company: stefan_testing,
   inspection_limit: 10,
   time_display: "date"
 )
 log_creation("User", "Junior Inspector (#{junior_inspector.email})")
 
 senior_inspector = User.create!(
-  email: "senior@bouncesafe.co.uk",
+  email: "senior@play-test.co.uk",
   password: "password123",
-  inspection_company: bounce_safe,
+  inspection_company: stefan_testing,
   inspection_limit: 50,
   time_display: "time"
 )
 log_creation("User", "Senior Inspector (#{senior_inspector.email})")
 
-# Kids Play user
-kids_play_inspector = User.create!(
-  email: "inspector@kidsplaysafety.co.uk",
+# Steph Test user
+steph_test_inspector = User.create!(
+  email: "inspector@play-test.co.uk",
   password: "password123",
-  inspection_company: kids_play,
+  inspection_company: steph_test,
   inspection_limit: 20,
   time_display: "date"
 )
-log_creation("User", "Kids Play Inspector (#{kids_play_inspector.email})")
+log_creation("User", "Steph Test Inspector (#{steph_test_inspector.email})")
 
 # Retired company user
 retired_user = User.create!(
-  email: "old@retiredinspections.co.uk",
+  email: "old@play-test.co.uk",
   password: "password123",
-  inspection_company: retired_inspections,
+  inspection_company: steve_inflatable,
   inspection_limit: 5,
   time_display: "date"
 )
@@ -190,7 +190,7 @@ castle_standard = Unit.create!(
   serial: "ACQ-2021-#{rand(1000..9999)}",
   manufacturer: "Airquee Manufacturing Ltd",
   model: "Castle Deluxe 15",
-  owner: "Funtime Hire Birmingham",
+  owner: "Stef's Castles",
   description: "15ft x 15ft medieval themed bouncy castle with turrets",
   width: 4.5,
   length: 4.5,
@@ -206,7 +206,7 @@ castle_large = Unit.create!(
   serial: "BCN-2020-#{rand(1000..9999)}",
   manufacturer: "Bouncy Castle Network UK",
   model: "Mega Castle 30",
-  owner: "Party Plus Rentals",
+  owner: "Estephan Events",
   description: "30ft x 30ft large bouncy castle suitable for 20+ children",
   width: 9.0,
   length: 9.0,
@@ -222,7 +222,7 @@ castle_slide_combo = Unit.create!(
   serial: "J4J-2022-#{rand(1000..9999)}",
   manufacturer: "Jump4Joy Inflatables",
   model: "Princess Combo DLX",
-  owner: "Bounce About Manchester",
+  owner: "Stefan's Fun Factory",
   description: "Pink princess themed castle with integrated 8ft slide",
   width: 5.5,
   length: 7.0,
@@ -238,7 +238,7 @@ soft_play_unit = Unit.create!(
   serial: "CIU-2023-#{rand(1000..9999)}",
   manufacturer: "Custom Inflatables UK",
   model: "Soft Play Junior",
-  owner: "Kids Party Hire Co",
+  owner: "Steff's Soft Play",
   description: "Fully enclosed soft play area for under 5s",
   width: 6.0,
   length: 6.0,
@@ -254,7 +254,7 @@ obstacle_course = Unit.create!(
   serial: "IWL-2021-#{rand(1000..9999)}",
   manufacturer: "Inflatable World Ltd",
   model: "Obstacle Pro 40",
-  owner: "Event Entertainment Ltd",
+  owner: "Stephan's Adventure Co",
   description: "40ft assault course with obstacles, tunnels and slide finish",
   width: 3.0,
   length: 12.0,
@@ -270,7 +270,7 @@ giant_slide = Unit.create!(
   serial: "ACQ-2019-#{rand(1000..9999)}",
   manufacturer: "Airquee Manufacturing Ltd",
   model: "Giant Slide 25",
-  owner: "Family Fun Inflatables",
+  owner: "Stefan Family Inflatables",
   description: "25ft platform height giant inflatable slide",
   width: 5.0,
   length: 15.0,
@@ -286,7 +286,7 @@ gladiator_duel = Unit.create!(
   serial: "HHE-2022-#{rand(1000..9999)}",
   manufacturer: "Happy Hop Europe",
   model: "Gladiator Arena",
-  owner: "Premier Party Hire",
+  owner: "Stefano's Party Hire",
   description: "Inflatable gladiator duel platform with pedestals",
   width: 6.0,
   length: 6.0,
@@ -302,7 +302,7 @@ bungee_run = Unit.create!(
   serial: "PCM-2023-#{rand(1000..9999)}",
   manufacturer: "Party Castle Manufacturers",
   model: "Bungee Sprint Dual",
-  owner: "Funtime Hire Birmingham",
+  owner: "Stef's Fun Factory",
   description: "Two lane inflatable bungee run competition game",
   width: 4.0,
   length: 10.0,
@@ -469,11 +469,11 @@ end
 recent_inspection = Inspection.create!(
   user: test_user,
   unit: castle_standard,
-  inspector_company: bounce_safe,
+  inspector_company: stefan_testing,
   inspection_date: 3.days.ago,
   inspection_location: "Sutton Park, Birmingham",
-  unique_report_number: "BSI-2025-#{rand(1000..9999)}",
-  status: "completed",
+  unique_report_number: "STC-2025-#{rand(1000..9999)}",
+  status: "complete",
   passed: true,
   comments: "Annual inspection completed. Unit in excellent condition.",
   recommendations: "Continue regular maintenance schedule.",
@@ -491,11 +491,11 @@ log_creation("Inspection", "Recent passed inspection for #{castle_standard.name}
 failed_inspection = Inspection.create!(
   user: test_user,
   unit: obstacle_course,
-  inspector_company: bounce_safe,
+  inspector_company: stefan_testing,
   inspection_date: 1.week.ago,
   inspection_location: "Victoria Park, Manchester",
-  unique_report_number: "BSI-2025-#{rand(1000..9999)}",
-  status: "completed",
+  unique_report_number: "STC-2025-#{rand(1000..9999)}",
+  status: "complete",
   passed: false,
   comments: "Several issues identified requiring immediate attention.",
   recommendations: "1. Replace worn anchor straps\n2. Repair seam separation\n3. Reinspect within 30 days",
@@ -514,11 +514,11 @@ log_creation("Inspection", "Failed inspection for #{obstacle_course.name}")
   historical = Inspection.create!(
     user: test_user,
     unit: castle_large,
-    inspector_company: bounce_safe,
+    inspector_company: stefan_testing,
     inspection_date: date,
     inspection_location: "NEC Birmingham",
-    unique_report_number: "BSI-#{date.year}-#{rand(1000..9999)}",
-    status: "completed",
+    unique_report_number: "STC-#{date.year}-#{rand(1000..9999)}",
+    status: "complete",
     passed: true,
     comments: "Routine #{(date == 1.year.ago) ? "annual" : "six-month"} inspection.",
     width: castle_large.width,
@@ -537,7 +537,7 @@ end
 Inspection.create!(
   user: test_user,
   unit: giant_slide,
-  inspector_company: bounce_safe,
+  inspector_company: stefan_testing,
   inspection_date: Date.current,
   inspection_location: nil,
   status: "draft",
@@ -551,13 +551,13 @@ log_creation("Inspection", "Draft inspection for #{giant_slide.name}")
 
 # In progress inspection (different inspector)
 in_progress = Inspection.create!(
-  user: kids_play_inspector,
+  user: steph_test_inspector,
   unit: gladiator_duel,
-  inspector_company: kids_play,
+  inspector_company: steph_test,
   inspection_date: Date.current,
   inspection_location: "Heaton Park, Manchester",
-  unique_report_number: "KPS-2025-#{rand(1000..9999)}",
-  status: "in_progress",
+  unique_report_number: "ST-2025-#{rand(1000..9999)}",
+  status: "draft",
   width: gladiator_duel.width,
   length: gladiator_duel.length,
   height: gladiator_duel.height,
@@ -584,7 +584,7 @@ log_creation("Inspection", "In-progress inspection for #{gladiator_duel.name}")
     inspection_date: rand(1..60).days.ago,
     inspection_location: "#{british_address}, #{british_city}",
     unique_report_number: "#{test_user.inspection_company.name[0..2].upcase}-2025-#{rand(1000..9999)}",
-    status: "completed",
+    status: "complete",
     passed: rand(0..4) > 0, # 80% pass rate
     comments: "Regular inspection completed as scheduled.",
     width: unit.width,
@@ -601,11 +601,11 @@ end
 lead_inspection = Inspection.create!(
   user: lead_inspector,
   unit: castle_standard,
-  inspector_company: bounce_safe,
+  inspector_company: stefan_testing,
   inspection_date: 2.months.ago,
   inspection_location: "Cannon Hill Park, Birmingham",
-  unique_report_number: "BSI-2024-#{rand(1000..9999)}",
-  status: "completed",
+  unique_report_number: "STC-2024-#{rand(1000..9999)}",
+  status: "complete",
   passed: true,
   comments: "Six-month inspection completed.",
   width: castle_standard.width,
@@ -621,11 +621,11 @@ log_creation("Inspection", "Lead inspector inspection")
 complete_inspection = Inspection.create!(
   user: test_user,
   unit: castle_large,
-  inspector_company: bounce_safe,
+  inspector_company: stefan_testing,
   inspection_date: 1.month.ago,
   inspection_location: "Alexander Stadium, Birmingham",
-  unique_report_number: "BSI-2025-#{rand(1000..9999)}",
-  status: "completed",
+  unique_report_number: "STC-2025-#{rand(1000..9999)}",
+  status: "complete",
   passed: true,
   comments: "Monthly safety inspection completed. All checks passed.",
   recommendations: "No issues found. Continue standard maintenance.",
@@ -651,15 +651,13 @@ Rails.logger.info "  Users: #{User.count}"
 Rails.logger.info "  Units: #{Unit.count}"
 Rails.logger.info "  Inspections: #{Inspection.count}"
 Rails.logger.info "    - Draft: #{Inspection.where(status: "draft").count}"
-Rails.logger.info "    - In Progress: #{Inspection.where(status: "in_progress").count}"
-Rails.logger.info "    - Completed: #{Inspection.where(status: "completed").count}"
 Rails.logger.info "    - Complete: #{Inspection.where(status: "complete").count}"
 Rails.logger.info "    - Passed: #{Inspection.where(passed: true).count}"
 Rails.logger.info "    - Failed: #{Inspection.where(passed: false).count}"
 
 Rails.logger.info "\n🎉 Seed data creation complete!"
 Rails.logger.info "\n📝 Test Credentials:"
-Rails.logger.info "  Admin: admin@testlog.com / password123"
-Rails.logger.info "  Test User (all units): test@testlog.com / password123"
-Rails.logger.info "  Lead Inspector: lead@bouncesafe.co.uk / password123"
+Rails.logger.info "  Admin: admin@play-test.co.uk / password123"
+Rails.logger.info "  Test User (all units): test@play-test.co.uk / password123"
+Rails.logger.info "  Lead Inspector: lead@play-test.co.uk / password123"
 Rails.logger.info "  Other users: password123"

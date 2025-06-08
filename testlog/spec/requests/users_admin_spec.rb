@@ -32,14 +32,14 @@ RSpec.describe "Admin User Management", type: :request do
       get users_path
       expect(response).to redirect_to(root_path)
       follow_redirect!
-      expect(flash[:danger]).to be_present
+      expect(flash[:alert]).to be_present
     end
 
     it "cannot edit other users" do
       get edit_user_path(admin)
       expect(response).to redirect_to(root_path)
       follow_redirect!
-      expect(flash[:danger]).to be_present
+      expect(flash[:alert]).to be_present
     end
   end
 end

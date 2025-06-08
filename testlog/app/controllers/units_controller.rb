@@ -44,7 +44,7 @@ class UnitsController < ApplicationController
 
     if @unit.save
       process_photo_if_present
-      flash[:success] = I18n.t("units.messages.created")
+      flash[:notice] = I18n.t("units.messages.created")
       redirect_to @unit
     else
       render :new, status: :unprocessable_entity
@@ -60,7 +60,7 @@ class UnitsController < ApplicationController
 
       respond_to do |format|
         format.html do
-          flash[:success] = I18n.t("units.messages.updated")
+          flash[:notice] = I18n.t("units.messages.updated")
           redirect_to @unit
         end
         format.json { render json: {status: "success", message: t("autosave.saved")} }
@@ -87,7 +87,7 @@ class UnitsController < ApplicationController
 
   def destroy
     @unit.destroy
-    flash[:success] = I18n.t("units.messages.deleted")
+    flash[:notice] = I18n.t("units.messages.deleted")
     redirect_to units_path
   end
 
@@ -119,12 +119,12 @@ class UnitsController < ApplicationController
     @inspection = current_user.inspections.find_by(id: params[:id])
 
     unless @inspection
-      flash[:danger] = I18n.t("units.errors.inspection_not_found")
+      flash[:alert] = I18n.t("units.errors.inspection_not_found")
       redirect_to root_path and return
     end
 
     if @inspection.unit.present?
-      flash[:danger] = I18n.t("units.errors.inspection_has_unit")
+      flash[:alert] = I18n.t("units.errors.inspection_has_unit")
       redirect_to inspection_path(@inspection) and return
     end
 
@@ -135,12 +135,12 @@ class UnitsController < ApplicationController
     @inspection = current_user.inspections.find_by(id: params[:id])
 
     unless @inspection
-      flash[:danger] = I18n.t("units.errors.inspection_not_found")
+      flash[:alert] = I18n.t("units.errors.inspection_not_found")
       redirect_to root_path and return
     end
 
     if @inspection.unit.present?
-      flash[:danger] = I18n.t("units.errors.inspection_has_unit")
+      flash[:alert] = I18n.t("units.errors.inspection_has_unit")
       redirect_to inspection_path(@inspection) and return
     end
 
@@ -149,7 +149,7 @@ class UnitsController < ApplicationController
 
     if @unit.save
       @inspection.update!(unit: @unit)
-      flash[:success] = I18n.t("units.messages.created_from_inspection")
+      flash[:notice] = I18n.t("units.messages.created_from_inspection")
       redirect_to inspection_path(@inspection)
     else
       render :new_from_inspection, status: :unprocessable_entity
@@ -175,7 +175,7 @@ class UnitsController < ApplicationController
         # For public report access, return 404 instead of redirect
         render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
       else
-        flash[:danger] = I18n.t("units.messages.not_found")
+        flash[:alert] = I18n.t("units.messages.not_found")
         redirect_to units_path and return
       end
     end
@@ -183,7 +183,7 @@ class UnitsController < ApplicationController
 
   def check_unit_owner
     unless @unit.user_id == current_user.id
-      flash[:danger] = I18n.t("units.messages.access_denied")
+      flash[:alert] = I18n.t("units.messages.access_denied")
       redirect_to units_path and return
     end
   end

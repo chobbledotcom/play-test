@@ -24,7 +24,7 @@ class InspectorCompaniesController < ApplicationController
     @inspector_company = InspectorCompany.new(inspector_company_params)
 
     if @inspector_company.save
-      flash[:success] = t("inspector_companies.messages.created")
+      flash[:notice] = t("inspector_companies.messages.created")
       redirect_to @inspector_company
     else
       render :new, status: :unprocessable_entity
@@ -36,7 +36,7 @@ class InspectorCompaniesController < ApplicationController
 
   def update
     if @inspector_company.update(inspector_company_params)
-      flash[:success] = t("inspector_companies.messages.updated")
+      flash[:notice] = t("inspector_companies.messages.updated")
       redirect_to @inspector_company
     else
       render :edit, status: :unprocessable_entity
@@ -45,13 +45,13 @@ class InspectorCompaniesController < ApplicationController
 
   def archive
     @inspector_company.update(active: false)
-    flash[:success] = t("inspector_companies.messages.archived")
+    flash[:notice] = t("inspector_companies.messages.archived")
     redirect_to inspector_companies_path
   end
 
   def unarchive
     @inspector_company.update(active: true)
-    flash[:success] = t("inspector_companies.messages.unarchived")
+    flash[:notice] = t("inspector_companies.messages.unarchived")
     redirect_to inspector_companies_path
   end
 
@@ -60,7 +60,7 @@ class InspectorCompaniesController < ApplicationController
   def set_inspector_company
     @inspector_company = InspectorCompany.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    flash[:danger] = t("inspector_companies.messages.not_found")
+    flash[:alert] = t("inspector_companies.messages.not_found")
     redirect_to inspector_companies_path
   end
 
@@ -74,7 +74,7 @@ class InspectorCompaniesController < ApplicationController
 
   def require_admin
     unless current_user&.admin?
-      flash[:danger] = t("inspector_companies.messages.unauthorized")
+      flash[:alert] = t("inspector_companies.messages.unauthorized")
       redirect_to root_path
     end
   end

@@ -7,7 +7,10 @@
         <h4><%= t('inspections.headers.current_unit') %></h4>
         <% if @inspection.unit.photo.attached? %>
           <div class="unit-photo-small">
-            <%= image_tag @inspection.unit.photo, alt: "Photo of #{@inspection.unit.name}" %>
+            <%= render 'shared/image', 
+                image: @inspection.unit.photo, 
+                size: :thumbnail,
+                alt: "Photo of #{@inspection.unit.name}" %>
           </div>
         <% end %>
         <p><strong><%= t('inspections.fields.name') %>:</strong> <%= @inspection.unit.name %></p>
@@ -79,14 +82,6 @@
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'inspection_results', i18n_base: 'inspections' do %>
-    <div class="calculated-field">
-      <label><%= t('inspections.fields.status') %></label>
-      <p class="calculated-value">
-        <%= @inspection.status&.humanize || t('inspections.status.draft') %>
-        <small class="help-text"><%= t('inspections.fields.status_help') %></small>
-      </p>
-    </div>
-
     <%= render 'form/checkbox', 
         field: :passed, 
         form: form, 
@@ -111,11 +106,9 @@
 <!-- Completion Actions -->
 <% unless @inspection.new_record? %>
   <section>
-    <% if @inspection.status == "draft" %>
-      <%= button_to t('inspections.buttons.mark_complete'), 
-          complete_inspection_path(@inspection), 
-          method: :patch, 
-          data: { turbo_confirm: t('inspections.messages.mark_complete_confirm') } %>
-    <% end %>
+    <%= button_to t('inspections.buttons.mark_complete'), 
+        complete_inspection_path(@inspection), 
+        method: :patch, 
+        data: { turbo_confirm: t('inspections.messages.mark_complete_confirm') } %>
   </section>
 <% end %>

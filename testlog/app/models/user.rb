@@ -10,6 +10,7 @@ class User < ApplicationRecord
   validates :password, presence: true, length: {minimum: 6}, if: :password_digest_changed?
   validates :inspection_limit, numericality: {only_integer: true, greater_than_or_equal_to: -1}
   validates :time_display, inclusion: {in: %w[date time]}
+  validates :theme, inclusion: {in: %w[light dark]}
 
   before_create :set_default_inspection_limit
   before_create :set_default_time_display

@@ -1,7 +1,7 @@
 class InspectionsController < ApplicationController
   before_action :set_inspection, except: [:index, :search, :overdue, :create]
   before_action :check_inspection_owner, except: [:index, :search, :overdue, :create, :report, :qr_code]
-  before_action :redirect_if_complete, except: [:show, :mark_draft, :report, :qr_code, :index, :search, :overdue, :create]
+  before_action :redirect_if_complete, except: [:show, :mark_draft, :report, :qr_code, :index, :search, :overdue, :create, :destroy]
   before_action :no_index
   skip_before_action :require_login, only: [:report, :qr_code]
 
@@ -42,12 +42,12 @@ class InspectionsController < ApplicationController
 
   def new
     unless current_user.inspection_company_id.present?
-      flash[:danger] = current_user.inspection_company_required_message
+      flash[:alert] = current_user.inspection_company_required_message
       redirect_to root_path and return
     end
 
     unless current_user.can_create_inspection?
-      flash[:danger] = current_user.inspection_company_required_message
+      flash[:alert] = current_user.inspection_company_required_message
       redirect_to inspections_path and return
     end
 
@@ -69,12 +69,12 @@ class InspectionsController < ApplicationController
     unit = nil
 
     unless current_user.inspection_company_id.present?
-      flash[:danger] = current_user.inspection_company_required_message
+      flash[:alert] = current_user.inspection_company_required_message
       redirect_to unit_id.present? ? unit_path(unit_id) : root_path and return
     end
 
     unless current_user.can_create_inspection?
-      flash[:danger] = current_user.inspection_company_required_message
+      flash[:alert] = current_user.inspection_company_required_message
       redirect_to unit_id.present? ? unit_path(unit_id) : root_path and return
     end
 
@@ -82,7 +82,7 @@ class InspectionsController < ApplicationController
       # Securely handle unit association
       unit = current_user.units.find_by(id: unit_id)
       if unit.nil?
-        flash[:danger] = I18n.t("inspections.errors.invalid_unit")
+        flash[:alert] = I18n.t("inspections.errors.invalid_unit")
         redirect_to root_path and return
       end
     end
@@ -103,14 +103,14 @@ class InspectionsController < ApplicationController
         NtfyService.notify("new inspection by #{current_user.email}")
       end
 
-      flash[:success] = if unit.nil?
+      flash[:notice] = if unit.nil?
         I18n.t("inspections.messages.created_without_unit")
       else
         I18n.t("inspections.messages.created")
       end
       redirect_to edit_inspection_path(@inspection)
     else
-      flash[:danger] = I18n.t("inspections.errors.creation_failed", errors: @inspection.errors.full_messages.join(", "))
+      flash[:alert] = I18n.t("inspections.errors.creation_failed", errors: @inspection.errors.full_messages.join(", "))
       redirect_to unit.present? ? unit_path(unit) : root_path
     end
   end
@@ -129,7 +129,7 @@ class InspectionsController < ApplicationController
 
       if unit.nil?
         # Unit ID not found or doesn't belong to user - security issue
-        flash[:danger] = I18n.t("inspections.errors.invalid_unit")
+        flash[:alert] = I18n.t("inspections.errors.invalid_unit")
         render :edit, status: :unprocessable_entity and return
       end
     end
@@ -137,7 +137,7 @@ class InspectionsController < ApplicationController
     if @inspection.update(params)
       respond_to do |format|
         format.html do
-          flash[:success] = I18n.t("inspections.messages.updated")
+          flash[:notice] = I18n.t("inspections.messages.updated")
           redirect_to @inspection
         end
         format.json { render json: {status: "success", message: t("inspections.autosave.saved")} }
@@ -169,9 +169,13 @@ class InspectionsController < ApplicationController
   end
 
   def destroy
+    if @inspection.status == "complete" && !current_user.admin?
+      redirect_to @inspection.preferred_path, alert: I18n.t("inspections.messages.delete_complete_denied")
+      return
+    end
+
     @inspection.destroy
-    flash[:success] = I18n.t("inspections.messages.deleted")
-    redirect_to inspections_path
+    redirect_to inspections_path, notice: I18n.t("inspections.messages.deleted")
   end
 
   def replace_dimensions
@@ -179,12 +183,12 @@ class InspectionsController < ApplicationController
       @inspection.copy_dimensions_from(@inspection.unit)
 
       if @inspection.save
-        flash[:success] = t("inspections.messages.dimensions_replaced")
+        flash[:notice] = t("inspections.messages.dimensions_replaced")
       else
-        flash[:danger] = t("inspections.messages.dimensions_replace_failed", errors: @inspection.errors.full_messages.join(", "))
+        flash[:alert] = t("inspections.messages.dimensions_replace_failed", errors: @inspection.errors.full_messages.join(", "))
       end
     else
-      flash[:danger] = t("inspections.messages.no_unit_for_dimensions")
+      flash[:alert] = t("inspections.messages.no_unit_for_dimensions")
     end
 
     redirect_to edit_inspection_path(@inspection, tab: params[:tab] || "general")
@@ -217,7 +221,7 @@ class InspectionsController < ApplicationController
     unit = current_user.units.find_by(id: params[:unit_id])
 
     if unit.nil?
-      flash[:danger] = t("inspections.errors.invalid_unit")
+      flash[:alert] = t("inspections.errors.invalid_unit")
       redirect_to select_unit_inspection_path(@inspection) and return
     end
 
@@ -226,10 +230,10 @@ class InspectionsController < ApplicationController
     @inspection.copy_dimensions_from(unit)
 
     if @inspection.save
-      flash[:success] = t("inspections.messages.unit_changed", unit_name: unit.name)
+      flash[:notice] = t("inspections.messages.unit_changed", unit_name: unit.name)
       redirect_to edit_inspection_path(@inspection)
     else
-      flash[:danger] = t("inspections.messages.unit_change_failed", errors: @inspection.errors.full_messages.join(", "))
+      flash[:alert] = t("inspections.messages.unit_change_failed", errors: @inspection.errors.full_messages.join(", "))
       redirect_to select_unit_inspection_path(@inspection)
     end
   end
@@ -271,29 +275,28 @@ class InspectionsController < ApplicationController
     validation_errors = @inspection.validate_completeness
 
     if validation_errors.any?
-      flash[:danger] = t("inspections.messages.cannot_complete", errors: validation_errors.join(", "))
+      flash[:alert] = t("inspections.messages.cannot_complete", errors: validation_errors.join(", "))
       redirect_to edit_inspection_path(@inspection)
       return
     end
 
     begin
       @inspection.complete!(current_user)
-      flash[:success] = t("inspections.messages.marked_complete")
+      flash[:notice] = t("inspections.messages.marked_complete")
       redirect_to @inspection
     rescue => e
-      flash[:danger] = t("inspections.messages.completion_failed", error: e.message)
+      flash[:alert] = t("inspections.messages.completion_failed", error: e.message)
       redirect_to edit_inspection_path(@inspection)
     end
   end
 
   def mark_draft
     if @inspection.update(status: "draft")
-      flash[:success] = t("inspections.messages.marked_draft")
-      redirect_to edit_inspection_path(@inspection)
+      flash[:notice] = t("inspections.messages.marked_draft")
     else
-      flash[:danger] = t("inspections.messages.mark_draft_failed", errors: @inspection.errors.full_messages.join(", "))
-      redirect_to edit_inspection_path(@inspection)
+      flash[:alert] = t("inspections.messages.mark_draft_failed", errors: @inspection.errors.full_messages.join(", "))
     end
+    redirect_to edit_inspection_path(@inspection)
   end
 
   private
@@ -341,7 +344,7 @@ class InspectionsController < ApplicationController
         # For public report access, return 404 instead of redirect
         render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
       else
-        flash[:danger] = I18n.t("inspections.errors.not_found")
+        flash[:alert] = I18n.t("inspections.errors.not_found")
         redirect_to inspections_path and return
       end
     end
@@ -349,14 +352,14 @@ class InspectionsController < ApplicationController
 
   def check_inspection_owner
     unless @inspection.user_id == current_user.id
-      flash[:danger] = I18n.t("inspections.errors.access_denied")
+      flash[:alert] = I18n.t("inspections.errors.access_denied")
       redirect_to inspections_path and return
     end
   end
 
   def redirect_if_complete
     if @inspection&.status == "complete"
-      flash[:info] = I18n.t("inspections.messages.cannot_edit_complete")
+      flash[:notice] = I18n.t("inspections.messages.cannot_edit_complete")
       redirect_to @inspection and return
     end
   end

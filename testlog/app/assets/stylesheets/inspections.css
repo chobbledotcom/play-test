@@ -15,6 +15,12 @@
   margin: 1rem 0;
 }
 
+.table-list img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
 .table-list-header {
   display: none; /* Hidden on mobile by default */
   background-color: var(--color-bg-secondary);

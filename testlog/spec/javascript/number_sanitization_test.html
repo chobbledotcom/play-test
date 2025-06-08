@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Number Input Sanitization Test</title>
+    <style>
+        .test-container { margin: 20px; padding: 20px; border: 1px solid #ccc; }
+        .test-result { margin: 10px 0; }
+        .pass { color: green; }
+        .fail { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Number Input Sanitization Test</h1>
+    
+    <div class="test-container">
+        <h2>Manual Test Form</h2>
+        <form data-autosave="true">
+            <label>Width: <input type="number" name="width" step="0.01" placeholder="Try typing: 12.5abc"></label><br><br>
+            <label>Height: <input type="number" name="height" step="0.01" placeholder="Try typing: -10.5xyz"></label><br><br>
+            <label>Length: <input type="number" name="length" step="0.01" placeholder="Try typing: 5.2.7.1"></label><br><br>
+        </form>
+        <p><em>Type invalid characters in the fields above and watch them get sanitized in real-time!</em></p>
+    </div>
+
+    <div class="test-container">
+        <h2>Automated Tests</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        // Copy the sanitization function from application.js for testing
+        const sanitizeNumberInput = (input) => {
+            if (input.type === 'number' && input.value) {
+                // Strip all non-numeric characters except decimal points and minus signs
+                // Allow: digits, decimal point, minus sign at the beginning
+                const sanitized = input.value.replace(/[^0-9.-]/g, '')
+                    .replace(/^-?/, match => match) // Keep only the first minus sign if at beginning
+                    .replace(/\..*\./, match => match.substring(0, match.indexOf('.') + 1)) // Keep only first decimal point
+                    .replace(/(?!^)-/g, ''); // Remove minus signs that aren't at the beginning
+                
+                // Update the input field if value changed
+                if (input.value !== sanitized) {
+                    input.value = sanitized;
+                }
+            }
+        };
+
+        // Test cases
+        const testCases = [
+            { input: "12.5abc", expected: "12.5", description: "Remove letters from decimal number" },
+            { input: "-10.5xyz", expected: "-10.5", description: "Preserve negative sign and remove letters" },
+            { input: "5.2.7.1", expected: "5.2", description: "Keep only first decimal point" },
+            { input: "15.75", expected: "15.75", description: "Preserve valid decimal number" },
+            { input: "abc123def", expected: "123", description: "Extract numbers from text" },
+            { input: "--5", expected: "-5", description: "Keep only first minus sign" },
+            { input: "5-0", expected: "50", description: "Remove minus signs not at beginning" },
+            { input: "!", expected: "", description: "Handle pure non-numeric input" }
+        ];
+
+        // Run tests
+        const resultsDiv = document.getElementById('test-results');
+        let passCount = 0;
+        let totalCount = testCases.length;
+
+        testCases.forEach((testCase, index) => {
+            // Create a test input
+            const testInput = document.createElement('input');
+            testInput.type = 'number';
+            testInput.value = testCase.input;
+
+            // Apply sanitization
+            sanitizeNumberInput(testInput);
+
+            // Check result
+            const passed = testInput.value === testCase.expected;
+            if (passed) passCount++;
+
+            // Display result
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            resultDiv.innerHTML = `
+                <strong>Test ${index + 1}:</strong> ${testCase.description}<br>
+                Input: "${testCase.input}" → Expected: "${testCase.expected}" → Got: "${testInput.value}" 
+                <strong>${passed ? 'PASS' : 'FAIL'}</strong>
+            `;
+            resultsDiv.appendChild(resultDiv);
+        });
+
+        // Summary
+        const summaryDiv = document.createElement('div');
+        summaryDiv.className = 'test-result';
+        summaryDiv.innerHTML = `<strong>Summary: ${passCount}/${totalCount} tests passed</strong>`;
+        resultsDiv.appendChild(summaryDiv);
+
+        // Add event listeners for manual testing
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                sanitizeNumberInput(this);
+            });
+        });
+    </script>
+</body>
+</html>

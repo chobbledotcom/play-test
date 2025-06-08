@@ -17,8 +17,10 @@
     <%= form.file_field :photo, accept: "image/*" %>
     <% if @unit.photo.attached? %>
       <div style="margin-top: 10px;">
-        <%= image_tag ImageProcessorService.process(@unit.photo, 200), style: "max-width: 200px; height: auto;" %>
-        <p><small>Current photo</small></p>
+        <%= render 'shared/image_link', 
+            image: @unit.photo, 
+            alt: "Unit photo",
+            link_text: t('units.messages.view_full_photo') %>
       </div>
     <% end %>
   <% end %>

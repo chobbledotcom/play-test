@@ -113,6 +113,7 @@ en:
       created_without_unit: "Inspection created successfully without unit. You can add a unit later."
       updated: "Inspection updated successfully."
       deleted: "Inspection deleted successfully."
+      delete_complete_denied: "Cannot delete completed inspections. Only administrators can delete completed inspections."
       dimensions_replaced: "Dimensions replaced from unit successfully"
       dimensions_replace_failed: "Failed to replace dimensions: %{errors}"
       dimensions_replace_confirm: "This will re-copy all dimensions from the unit to this inspection, replacing any existing dimension values. Are you sure you want to continue?"

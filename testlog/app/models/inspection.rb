@@ -90,6 +90,17 @@ class Inspection < ApplicationRecord
     end
   end
 
+  def preferred_path
+    case status
+    when "complete"
+      Rails.application.routes.url_helpers.inspection_path(self)
+    when "draft"
+      Rails.application.routes.url_helpers.edit_inspection_path(self)
+    else
+      Rails.application.routes.url_helpers.edit_inspection_path(self)
+    end
+  end
+
   # Advanced methods
   def can_be_completed?
     unit.present? && all_assessments_complete?

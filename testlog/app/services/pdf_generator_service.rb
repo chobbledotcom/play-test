@@ -211,7 +211,7 @@ class PdfGeneratorService
 
     # Generate QR code
     qr_code_png = QrCodeService.generate_qr_code(inspection)
-    qr_code_temp_file = Tempfile.new(["qr_code", ".png"])
+    qr_code_temp_file = Tempfile.new(["qr_code_#{inspection.id}_#{Process.pid}", ".png"])
 
     begin
       qr_code_temp_file.binmode
@@ -225,7 +225,8 @@ class PdfGeneratorService
       pdf.text "#{ENV["BASE_URL"]}/r/#{inspection.id}",
         align: :center, size: 10, style: :italic
     ensure
-      qr_code_temp_file.unlink
+      qr_code_temp_file.close unless qr_code_temp_file.closed?
+      qr_code_temp_file.unlink if File.exist?(qr_code_temp_file.path)
     end
   end
 
@@ -347,7 +348,7 @@ class PdfGeneratorService
 
     # Generate QR code
     qr_code_png = QrCodeService.generate_qr_code(equipment)
-    qr_code_temp_file = Tempfile.new(["qr_code", ".png"])
+    qr_code_temp_file = Tempfile.new(["qr_code_eq_#{equipment.id}_#{Process.pid}", ".png"])
 
     begin
       qr_code_temp_file.binmode
@@ -361,7 +362,8 @@ class PdfGeneratorService
       pdf.text "#{ENV["BASE_URL"]}/u/#{equipment.id}",
         align: :center, size: 10, style: :italic
     ensure
-      qr_code_temp_file.unlink
+      qr_code_temp_file.close unless qr_code_temp_file.closed?
+      qr_code_temp_file.unlink if File.exist?(qr_code_temp_file.path)
     end
   end
 
@@ -481,7 +483,7 @@ class PdfGeneratorService
 
     # Generate QR code
     qr_code_png = QrCodeService.generate_qr_code(unit)
-    qr_code_temp_file = Tempfile.new(["qr_code", ".png"])
+    qr_code_temp_file = Tempfile.new(["qr_code_unit_#{unit.id}_#{Process.pid}", ".png"])
 
     begin
       qr_code_temp_file.binmode
@@ -495,7 +497,8 @@ class PdfGeneratorService
       pdf.text "#{ENV["BASE_URL"]}/u/#{unit.id}",
         align: :center, size: 10, style: :italic
     ensure
-      qr_code_temp_file.unlink
+      qr_code_temp_file.close unless qr_code_temp_file.closed?
+      qr_code_temp_file.unlink if File.exist?(qr_code_temp_file.path)
     end
   end
 

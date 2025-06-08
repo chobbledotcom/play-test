@@ -1,6 +1,9 @@
 <% if @inspection.unit&.photo&.attached? %>
   <div class="unit-photo">
-    <%= image_tag @inspection.unit.photo, alt: "Photo of #{@inspection.unit.name}" %>
+    <%= render 'shared/image_link', 
+        image: @inspection.unit.photo, 
+        alt: "Photo of #{@inspection.unit.name}",
+        link_text: t('units.messages.view_full_photo') %>
   </div>
 <% end %>
 

@@ -1,10 +1,8 @@
 <header>
   <h1><%= t('inspections.titles.edit') %></h1>
-  <% if @inspection.status == "draft" %>
-    <nav>
-      <%= link_to t('inspections.buttons.qr_and_pdf'), inspection_path(@inspection) %>
-    </nav>
-  <% end %>
+  <nav>
+    <%= link_to t('inspections.buttons.qr_and_pdf'), inspection_path(@inspection) %>
+  </nav>
 </header>
 
 <article>
@@ -20,10 +18,6 @@
         <div class="detail-item">
           <span class="label"><%= t('inspections.fields.serial') %>:</span>
           <span class="value"><%= @inspection.unit&.serial || t('inspections.messages.not_specified') %></span>
-        </div>
-        <div class="detail-item">
-          <span class="label"><%= t('inspections.fields.status') %>:</span>
-          <span class="value"><%= @inspection.status&.humanize || t('inspections.status.draft') %></span>
         </div>
         <div class="detail-item">
           <span class="label"><%= t('inspections.fields.progress') %>:</span>
@@ -90,7 +84,6 @@
         <%= button_to t('inspections.buttons.delete'), 
             inspection_path(@inspection), 
             method: :delete, 
-            class: "btn btn-danger", 
             data: { turbo_confirm: t('inspections.messages.delete_confirm') } %>
       <% end %>
     </div>

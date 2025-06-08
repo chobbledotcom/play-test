@@ -17,6 +17,7 @@ en:
       close: "Close"
     yes: "Yes"
     no: "No"
+    view_full_size: "View full size"
 
   # Common messages
   ui:

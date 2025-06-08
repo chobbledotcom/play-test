@@ -70,6 +70,16 @@ RSpec.configure do |config|
   # examples within a transaction, remove the following line or assign false
   # instead of true.
   config.use_transactional_fixtures = true
+  
+  # Database cleaner configuration for parallel tests
+  config.before(:suite) do
+    # Ensure database is properly set up for parallel tests
+    if ENV["TEST_ENV_NUMBER"]
+      ActiveRecord::Base.establish_connection(
+        ActiveRecord::Base.configurations.configs_for(env_name: Rails.env).first
+      )
+    end
+  end
 
   # You can uncomment this line to turn off ActiveRecord support entirely.
   # config.use_active_record = false

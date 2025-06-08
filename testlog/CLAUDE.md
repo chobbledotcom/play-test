@@ -9,9 +9,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Lint modified files only**: `bundle exec standardrb --fix path/to/file.rb` (NEVER run on entire repo)
 - Lint check (no fix): `bundle exec standardrb path/to/file.rb`
 - **ERB files don't need linting with standardrb**
-- Run all tests: `bundle exec rspec` (WARNING: Takes ages - only run when specifically requested)
+- **Run tests (parallel)**: `bin/test` (RECOMMENDED - clean output with coverage summary)
+- Run all tests: `bundle exec rspec` (WARNING: Takes ages - only run when specifically requested)  
+- **Run tests in parallel**: `bundle exec parallel_rspec spec/` (verbose output)
+- **Run parallel tests with coverage**: `bundle exec rake coverage:parallel`
 - Run single test: `bundle exec rspec spec/path/to/file_spec.rb:LINE_NUMBER`
 - Run with verbose output: `bundle exec rspec --format documentation`
+- Prepare parallel test databases: `bundle exec rails parallel:prepare`
 
 ## Environment Notes
 

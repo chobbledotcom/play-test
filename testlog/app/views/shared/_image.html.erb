@@ -1,0 +1,23 @@
+<%
+  # Shared image partial for consistent image rendering
+  # Required locals: image (ActiveStorage attachment)
+  # Optional locals: size (:thumbnail or :full), alt (alt text)
+  
+  image_attachment = local_assigns[:image]
+  size = local_assigns[:size] || :thumbnail
+  alt_text = local_assigns[:alt] || ""
+  
+  return unless image_attachment&.attached?
+  
+  variant = case size
+  when :full
+    ImageProcessorService.full_size(image_attachment)
+  else
+    ImageProcessorService.thumbnail(image_attachment)
+  end
+%>
+
+<%= image_tag variant, 
+    alt: alt_text,
+    loading: "lazy",
+    decoding: "async" %>

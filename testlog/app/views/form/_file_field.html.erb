@@ -18,8 +18,10 @@
   <% if (show_preview && current_file.image?) || show_filename %>
     <div class="file-preview" style="margin-top: 10px;">
       <% if show_preview && current_file.image? %>
-        <%= image_tag ImageProcessorService.process(current_file, preview_size), 
-            style: "max-width: #{preview_size}px; height: auto;" %>
+        <%= render 'shared/image', 
+            image: current_file, 
+            size: :thumbnail, 
+            alt: "Current #{setup[:field_label].downcase}" %>
         <p><small>Current <%= setup[:field_label].downcase %></small></p>
       <% elsif show_filename %>
         <p>Current <%= setup[:field_label].downcase %>: <%= current_file.filename %></p>

@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}🧪 Running tests in parallel...${NC}"
+
+# Create a temporary file to capture the output
+temp_output=$(mktemp)
+temp_filtered=$(mktemp)
+
+# Run tests and capture all output
+if bundle exec parallel_rspec spec/ > "$temp_output" 2>&1; then
+    # Filter out the noisy coverage lines but keep important info
+    grep -v "Coverage report generated for" "$temp_output" | \
+    grep -v "^Line Coverage:" | \
+    grep -v "^Branch Coverage:" | \
+    grep -E "(examples?, [0-9]+ failures?|Took [0-9]+ seconds|Failed examples:|Finished in)" | \
+    tail -10 > "$temp_filtered"
+    
+    echo -e "${GREEN}✅ Tests passed!${NC}"
+    
+    # Show condensed test results
+    if [ -s "$temp_filtered" ]; then
+        echo -e "${BLUE}📊 Test Summary:${NC}"
+        cat "$temp_filtered"
+    fi
+    
+    # Show final coverage summary
+    if [ -f "coverage/.last_run.json" ]; then
+        echo -e "${BLUE}📈 Coverage Summary:${NC}"
+        line_coverage=$(grep -o '"line": [0-9.]*' coverage/.last_run.json | grep -o '[0-9.]*')
+        branch_coverage=$(grep -o '"branch": [0-9.]*' coverage/.last_run.json | grep -o '[0-9.]*')
+        echo -e "  📏 Line Coverage: ${line_coverage}%"
+        echo -e "  🌿 Branch Coverage: ${branch_coverage}%"
+    fi
+    
+    cleanup_result=0
+else
+    echo -e "${RED}❌ Tests failed!${NC}"
+    
+    # Show the last part of output for failures
+    echo -e "${YELLOW}📋 Recent output:${NC}"
+    tail -30 "$temp_output"
+    
+    cleanup_result=1
+fi
+
+# Cleanup
+rm -f "$temp_output" "$temp_filtered"
+exit $cleanup_result

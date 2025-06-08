@@ -192,6 +192,7 @@ en:
       delete_confirm: "Are you sure? This cannot be undone."
       no_photo: "No photo"
       no_units_found: "No units found."
+      view_full_photo: "View full size photo"
 
     accessibility:
       qr_code_alt: "QR Code for Equipment Report"

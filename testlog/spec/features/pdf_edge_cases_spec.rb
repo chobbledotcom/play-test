@@ -197,17 +197,21 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
   feature "Memory and resource management" do
     scenario "cleans up temporary files during PDF generation" do
-      # Monitor temporary file creation
-      temp_files_before = Dir.glob("/tmp/**/*qr_code*").size
-
+      # Monitor temporary file creation more specifically for this process
+      process_pattern = "/tmp/*qr_code*#{inspection.id}_#{Process.pid}*"
+      
       10.times do
+        temp_files_before = Dir.glob(process_pattern).size
         page.driver.browser.get("/inspections/#{inspection.id}/report")
         expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
+        
+        # Allow a brief moment for cleanup
+        sleep(0.01)
+        
+        # Should not leave files for this specific process/inspection combo
+        temp_files_after = Dir.glob(process_pattern).size
+        expect(temp_files_after).to eq(temp_files_before)
       end
-
-      # Should not accumulate temporary files
-      temp_files_after = Dir.glob("/tmp/**/*qr_code*").size
-      expect(temp_files_after).to eq(temp_files_before)
     end
   end
 

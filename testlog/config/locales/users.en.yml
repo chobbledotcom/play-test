@@ -26,6 +26,8 @@ en:
       inspection_limit: "Inspection limit"
       inspection_company_id: "Inspection Company"
       time_display: "Time Display Format"
+      default_inspection_location: "Default Inspection Location"
+      theme: "Theme"
       company_prompt: "Select inspection company..."
 
     buttons:
@@ -63,3 +65,5 @@ en:
     options:
       time_full: "Show Full Time"
       time_day: "Show Day Only"
+      theme_light: "Light"
+      theme_dark: "Dark"

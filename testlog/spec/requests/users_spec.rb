@@ -144,7 +144,7 @@ RSpec.describe "Users", type: :request do
         }
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:success]).to be_present
+        expect(flash[:notice]).to be_present
 
         user.reload
         expect(user.time_display).to eq("time")
@@ -167,7 +167,7 @@ RSpec.describe "Users", type: :request do
 
         get change_settings_user_path(other_user)
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to include("settings")
+        expect(flash[:alert]).to include("settings")
 
         patch update_settings_user_path(other_user), params: {
           user: {
@@ -176,7 +176,7 @@ RSpec.describe "Users", type: :request do
         }
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to be_present
+        expect(flash[:alert]).to be_present
       end
     end
   end
@@ -209,7 +209,7 @@ RSpec.describe "Users", type: :request do
         }
 
         expect(response).to redirect_to(users_path)
-        expect(flash[:success]).to be_present
+        expect(flash[:notice]).to be_present
 
         regular_user.reload
         expect(regular_user.email).to eq("updated@example.com")
@@ -230,7 +230,7 @@ RSpec.describe "Users", type: :request do
         delete user_path(regular_user)
 
         expect(response).to redirect_to(users_path)
-        expect(flash[:success]).to be_present
+        expect(flash[:notice]).to be_present
         expect { regular_user.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
@@ -238,7 +238,7 @@ RSpec.describe "Users", type: :request do
         post impersonate_user_path(regular_user)
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:success]).to include("impersonating")
+        expect(flash[:notice]).to include("impersonating")
       end
     end
 
@@ -250,13 +250,13 @@ RSpec.describe "Users", type: :request do
       it "denies access to users index" do
         get users_path
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to be_present
+        expect(flash[:alert]).to be_present
       end
 
       it "denies access to edit other users" do
         get edit_user_path(admin)
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to be_present
+        expect(flash[:alert]).to be_present
       end
 
       it "denies updating other users" do
@@ -267,14 +267,14 @@ RSpec.describe "Users", type: :request do
         }
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to be_present
+        expect(flash[:alert]).to be_present
       end
 
       it "denies destroying other users" do
         delete user_path(admin)
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to be_present
+        expect(flash[:alert]).to be_present
       end
 
       it "denies impersonating other users" do

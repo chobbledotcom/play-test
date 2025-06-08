@@ -17,7 +17,7 @@ RSpec.describe "Inspector Companies Archive", type: :request do
         patch archive_inspector_company_path(company)
 
         expect(response).to redirect_to(inspector_companies_path)
-        expect(flash[:success]).to eq(I18n.t("inspector_companies.messages.archived"))
+        expect(flash[:notice]).to eq(I18n.t("inspector_companies.messages.archived"))
 
         company.reload
         expect(company.active).to be false
@@ -54,7 +54,7 @@ RSpec.describe "Inspector Companies Archive", type: :request do
         patch archive_inspector_company_path(company)
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to eq(I18n.t("inspector_companies.messages.unauthorized"))
+        expect(flash[:alert]).to eq(I18n.t("inspector_companies.messages.unauthorized"))
 
         company.reload
         expect(company.active).to be true
@@ -66,7 +66,7 @@ RSpec.describe "Inspector Companies Archive", type: :request do
         patch archive_inspector_company_path(company)
 
         expect(response).to redirect_to(login_path)
-        expect(flash[:danger]).to include("Please log in")
+        expect(flash[:alert]).to include("Please log in")
       end
     end
   end

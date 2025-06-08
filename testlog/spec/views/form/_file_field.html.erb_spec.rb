@@ -58,7 +58,7 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
     context "with image file and preview enabled" do
       before do
         allow(attachment).to receive(:image?).and_return(true)
-        allow(ImageProcessorService).to receive(:process).and_return("processed_image_url")
+        allow(ImageProcessorService).to receive(:thumbnail).and_return("processed_image_url")
       end
 
       it "renders file field with image preview" do
@@ -76,7 +76,7 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
 
         render "form/file_field", field: field, preview_size: 150
 
-        expect(ImageProcessorService).to have_received(:process).with(attachment, 150)
+        expect(ImageProcessorService).to have_received(:thumbnail).with(attachment)
         expect(rendered).to include("max-width: 150px")
       end
 

@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
 
   def require_login
     unless logged_in?
-      flash[:danger] = I18n.t("authorization.login_required")
+      flash[:alert] = I18n.t("authorization.login_required")
       redirect_to login_path
     end
   end
@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
 
   def require_admin
     unless current_user&.admin?
-      flash[:danger] = I18n.t("authorization.admin_required")
+      flash[:alert] = I18n.t("authorization.admin_required")
       redirect_to root_path
     end
   end

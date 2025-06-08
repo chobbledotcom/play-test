@@ -38,7 +38,7 @@ RSpec.describe "InspectorCompanies", type: :request do
       it "denies access to regular users" do
         get new_inspector_company_path
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to be_present
+        expect(flash[:alert]).to be_present
       end
     end
 
@@ -46,7 +46,7 @@ RSpec.describe "InspectorCompanies", type: :request do
       it "denies access to regular users" do
         post inspector_companies_path, params: {inspector_company: valid_attributes}
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to be_present
+        expect(flash[:alert]).to be_present
       end
     end
 
@@ -55,7 +55,7 @@ RSpec.describe "InspectorCompanies", type: :request do
         company = create(:inspector_company)
         get edit_inspector_company_path(company)
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to be_present
+        expect(flash[:alert]).to be_present
       end
     end
 
@@ -64,7 +64,7 @@ RSpec.describe "InspectorCompanies", type: :request do
         company = create(:inspector_company)
         patch inspector_company_path(company), params: {inspector_company: {name: "Updated Name"}}
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to be_present
+        expect(flash[:alert]).to be_present
       end
     end
 
@@ -73,7 +73,7 @@ RSpec.describe "InspectorCompanies", type: :request do
         company = create(:inspector_company)
         patch archive_inspector_company_path(company)
         expect(response).to redirect_to(root_path)
-        expect(flash[:danger]).to be_present
+        expect(flash[:alert]).to be_present
       end
     end
   end
@@ -84,7 +84,7 @@ RSpec.describe "InspectorCompanies", type: :request do
     it "denies access to inspector companies index" do
       get inspector_companies_path
       expect(response).to redirect_to(root_path)
-      expect(flash[:danger]).to include("not authorized")
+      expect(flash[:alert]).to include("not authorized")
     end
 
     it "allows access to inspector companies show" do
@@ -135,7 +135,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
         it "sets a success flash message" do
           post inspector_companies_path, params: {inspector_company: valid_attributes}
-          expect(flash[:success]).to be_present
+          expect(flash[:notice]).to be_present
         end
       end
 
@@ -186,7 +186,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
         it "sets a success flash message" do
           patch inspector_company_path(company), params: {inspector_company: new_attributes}
-          expect(flash[:success]).to be_present
+          expect(flash[:notice]).to be_present
         end
       end
 
@@ -223,7 +223,7 @@ RSpec.describe "InspectorCompanies", type: :request do
       it "sets a success flash message" do
         company = create(:inspector_company)
         patch archive_inspector_company_path(company)
-        expect(flash[:success]).to be_present
+        expect(flash[:notice]).to be_present
       end
     end
 
@@ -262,7 +262,7 @@ RSpec.describe "InspectorCompanies", type: :request do
     it "handles missing inspector company gracefully" do
       get inspector_company_path("nonexistent")
       expect(response).to redirect_to(inspector_companies_path)
-      expect(flash[:danger]).to be_present
+      expect(flash[:alert]).to be_present
     end
 
     it "handles duplicate RPII registration numbers" do
