@@ -13,7 +13,7 @@
     <%= render 'form/checkbox', field: :is_totally_enclosed %>
     <%= render 'form/text_area', field: :notes, rows: 4 %>
     
-    <%= form.label :photo, "Photo" %>
+    <%= form.label :photo, t('units.forms.photo') %>
     <%= form.file_field :photo, accept: "image/*" %>
     <% if @unit.photo.attached? %>
       <div style="margin-top: 10px;">
@@ -116,8 +116,6 @@
   <%= render 'form/fieldset', form: form, i18n_base: 'units.forms', legend_key: 'other_dimensions' do %>
     <%= render 'form/number', field: :rope_size, min: 0 %>
     <%= render 'form/comment', field: :rope_size_comment %>
-    
-    <%= render 'form/number', field: :ambient_temperature, step: 0.1, min: -50, max: 60 %>
   <% end %>
 
   <fieldset>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_09_121001) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_09_121004) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -99,8 +99,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_121001) do
     t.string "inspection_location"
     t.string "unique_report_number"
     t.string "status", default: "draft"
-    t.datetime "finalized_at"
-    t.string "finalized_by_id", limit: 12
     t.text "general_notes"
     t.text "recommendations"
     t.string "inspector_signature"
@@ -159,7 +157,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_121001) do
     t.string "play_area_width_comment", limit: 1000
     t.string "negative_adjustment_comment", limit: 1000
     t.string "exit_number_comment", limit: 1000
-    t.index ["finalized_by_id"], name: "index_inspections_on_finalized_by_id"
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
     t.index ["status"], name: "index_inspections_on_status"
     t.index ["unit_id"], name: "index_inspections_on_unit_id"
@@ -342,7 +339,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_121001) do
     t.decimal "negative_adjustment", precision: 8, scale: 2
     t.boolean "slide_permanent_roof"
     t.boolean "permanent_roof"
-    t.decimal "ambient_temperature", precision: 5, scale: 2
     t.boolean "is_totally_enclosed", default: false
     t.boolean "has_slide", default: false, null: false
     t.string "width_comment", limit: 1000
@@ -415,7 +411,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_121001) do
   add_foreign_key "inspections", "inspector_companies"
   add_foreign_key "inspections", "units"
   add_foreign_key "inspections", "users"
-  add_foreign_key "inspections", "users", column: "finalized_by_id"
   add_foreign_key "materials_assessments", "inspections"
   add_foreign_key "slide_assessments", "inspections"
   add_foreign_key "structure_assessments", "inspections"

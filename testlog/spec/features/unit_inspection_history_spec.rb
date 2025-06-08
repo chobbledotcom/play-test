@@ -20,9 +20,9 @@ RSpec.describe "Unit Inspection History", type: :feature do
       expect { page.has_content?("Inspector") }.not_to raise_error
 
       # The page should display inspection history without crashing
-      expect(page).to have_content("Inspection Date")
-      expect(page).to have_content("Inspector")
-      expect(page).to have_content("Result")
+      expect(page).to have_content(I18n.t("inspections.fields.last_inspection"))
+      expect(page).to have_content(I18n.t("inspections.fields.inspector"))
+      expect(page).to have_content(I18n.t("inspections.fields.result"))
     end
 
     it "displays inspection with assigned company" do
@@ -31,8 +31,8 @@ RSpec.describe "Unit Inspection History", type: :feature do
 
       visit unit_path(unit)
 
-      expect(page).to have_content("Inspection Date")
-      expect(page).to have_content("Inspector")
+      expect(page).to have_content(I18n.t("inspections.fields.last_inspection"))
+      expect(page).to have_content(I18n.t("inspections.fields.inspector"))
       expect(page).to have_content(inspection.inspector_company.name)
     end
 

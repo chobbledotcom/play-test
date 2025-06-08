@@ -25,7 +25,6 @@ module HasDimensions
       numericality: {greater_than_or_equal_to: 0},
       allow_nil: true
 
-
     # Scopes for dimensional queries
     scope :within_dimensions, ->(width, length, height) {
       where("width <= ? AND length <= ? AND height <= ?", width, length, height)
@@ -56,31 +55,43 @@ module HasDimensions
     width * length * height if width.present? && length.present? && height.present?
   end
 
-  def dimension_attributes
+  # Attribute groups for better organization and DRY code
+  def basic_attributes
     {
-      # Basic dimensions
       width: width,
       length: length,
       height: height,
       width_comment: width_comment,
       length_comment: length_comment,
-      height_comment: height_comment,
+      height_comment: height_comment
+    }
+  end
 
-      # Anchorage
+  def anchorage_attributes
+    {
       num_low_anchors: num_low_anchors,
       num_high_anchors: num_high_anchors,
       num_low_anchors_comment: num_low_anchors_comment,
-      num_high_anchors_comment: num_high_anchors_comment,
+      num_high_anchors_comment: num_high_anchors_comment
+    }
+  end
 
-      # Enclosed
+  def enclosed_attributes
+    {
       exit_number: exit_number,
-      exit_number_comment: exit_number_comment,
+      exit_number_comment: exit_number_comment
+    }
+  end
 
-      # Materials
+  def materials_attributes
+    {
       rope_size: rope_size,
-      rope_size_comment: rope_size_comment,
+      rope_size_comment: rope_size_comment
+    }
+  end
 
-      # Slide
+  def slide_attributes
+    {
       slide_platform_height: slide_platform_height,
       slide_wall_height: slide_wall_height,
       runout_value: runout_value,
@@ -92,18 +103,24 @@ module HasDimensions
       runout_value_comment: runout_value_comment,
       slide_first_metre_height_comment: slide_first_metre_height_comment,
       slide_beyond_first_metre_height_comment: slide_beyond_first_metre_height_comment,
-      slide_permanent_roof_comment: slide_permanent_roof_comment,
+      slide_permanent_roof_comment: slide_permanent_roof_comment
+    }
+  end
 
-      # Structure
+  def structure_attributes
+    {
       stitch_length: stitch_length,
       unit_pressure_value: unit_pressure_value,
       blower_tube_length: blower_tube_length,
       step_size_value: step_size_value,
       fall_off_height_value: fall_off_height_value,
       trough_depth_value: trough_depth_value,
-      trough_width_value: trough_width_value,
+      trough_width_value: trough_width_value
+    }
+  end
 
-      # User height
+  def user_height_attributes
+    {
       containing_wall_height: containing_wall_height,
       platform_height: platform_height,
       user_height: user_height,
@@ -121,29 +138,45 @@ module HasDimensions
       play_area_length_comment: play_area_length_comment,
       play_area_width_comment: play_area_width_comment,
       negative_adjustment_comment: negative_adjustment_comment
-    }.compact
+    }
   end
 
-  def has_slide_dimensions?
+  def copyable_attributes
+    basic_attributes.merge(
+      anchorage_attributes,
+      enclosed_attributes,
+      materials_attributes,
+      slide_attributes,
+      structure_attributes,
+      user_height_attributes
+    ).compact
+  end
+
+  # Alias for backward compatibility
+  def dimension_attributes
+    copyable_attributes
+  end
+
+  def has_slide_attributes?
     slide_platform_height.present? || slide_wall_height.present? ||
       runout_value.present? || slide_first_metre_height.present? ||
       slide_beyond_first_metre_height.present?
   end
 
-  def has_structure_dimensions?
+  def has_structure_attributes?
     stitch_length.present? ||
       unit_pressure_value.present? || blower_tube_length.present? ||
       step_size_value.present? || fall_off_height_value.present? ||
       trough_depth_value.present? || trough_width_value.present?
   end
 
-  def has_user_height_dimensions?
+  def has_user_height_attributes?
     containing_wall_height.present? || platform_height.present? ||
       user_height.present? || play_area_length.present? ||
       play_area_width.present?
   end
 
-  def has_anchorage_dimensions?
+  def has_anchorage_attributes?
     num_low_anchors.present? || num_high_anchors.present?
   end
 
@@ -155,13 +188,18 @@ module HasDimensions
     [users_at_1000mm, users_at_1200mm, users_at_1500mm, users_at_1800mm].compact.max || 0
   end
 
-  # Copy all dimension attributes from another object
+  # Copy all attributes from another object (dimensions, comments, flags, etc.)
+  def copy_attributes_from(source)
+    copy_shared_attributes(source)
+  end
+
+  # Alias for backward compatibility
   def copy_dimensions_from(source)
-    copy_values_from(source)
+    copy_attributes_from(source)
   end
 
   # Copy all shared attributes from another object
-  def copy_values_from(source)
+  def copy_shared_attributes(source)
     return unless source
     return unless source.respond_to?(:attributes)
 
@@ -184,10 +222,77 @@ module HasDimensions
     end
   end
 
-  # Check if any dimension has changed
-  def dimension_changed?
-    dimension_attributes.keys.any? { |attr| send("#{attr}_changed?") }
+  # Check if any copyable attribute has changed
+  def attributes_changed?
+    copyable_attributes.keys.any? { |attr| send("#{attr}_changed?") }
   end
+
+  # Alias for backward compatibility
+  def dimension_changed?
+    attributes_changed?
+  end
+
+  # Assessment pre-filling methods (for inspections)
+  def build_assessments_with_attributes
+    return unless respond_to?(:user_height_assessment)
+
+    build_user_height_assessment_with_attributes unless user_height_assessment
+    build_slide_assessment_with_attributes unless slide_assessment
+    build_structure_assessment_with_attributes unless structure_assessment
+    build_anchorage_assessment_with_attributes unless anchorage_assessment
+    build_materials_assessment_with_attributes unless materials_assessment
+    build_fan_assessment unless fan_assessment
+    build_enclosed_assessment_with_attributes unless enclosed_assessment
+  end
+
+  private
+
+  def build_user_height_assessment_with_attributes
+    build_user_height_assessment(user_height_attributes.compact)
+  end
+
+  def build_slide_assessment_with_attributes
+    build_slide_assessment(slide_attributes.compact)
+  end
+
+  def build_structure_assessment_with_attributes
+    build_structure_assessment(structure_attributes.compact)
+  end
+
+  def build_anchorage_assessment_with_attributes
+    build_anchorage_assessment(anchorage_attributes.compact)
+  end
+
+  def build_materials_assessment_with_attributes
+    build_materials_assessment(materials_attributes.compact)
+  end
+
+  def build_enclosed_assessment_with_attributes
+    build_enclosed_assessment(enclosed_attributes.compact)
+  end
+
+  # Strong parameter helper for copyable attributes
+  PERMITTED_COPYABLE_ATTRIBUTES = %i[
+    width length height has_slide is_totally_enclosed
+    width_comment length_comment height_comment
+    num_low_anchors num_high_anchors
+    num_low_anchors_comment num_high_anchors_comment
+    exit_number exit_number_comment
+    rope_size rope_size_comment
+    slide_platform_height slide_wall_height runout_value
+    slide_first_metre_height slide_beyond_first_metre_height slide_permanent_roof
+    slide_platform_height_comment slide_wall_height_comment runout_value_comment
+    slide_first_metre_height_comment slide_beyond_first_metre_height_comment
+    slide_permanent_roof_comment
+    stitch_length unit_pressure_value blower_tube_length
+    step_size_value fall_off_height_value trough_depth_value trough_width_value
+    containing_wall_height platform_height user_height
+    users_at_1000mm users_at_1200mm users_at_1500mm users_at_1800mm
+    play_area_length play_area_width negative_adjustment permanent_roof
+    containing_wall_height_comment platform_height_comment
+    permanent_roof_comment play_area_length_comment play_area_width_comment
+    negative_adjustment_comment
+  ].freeze
 
   module ClassMethods
     # Find units/inspections with similar dimensions

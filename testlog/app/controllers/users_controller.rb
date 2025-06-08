@@ -28,7 +28,7 @@ class UsersController < ApplicationController
       end
 
       log_in @user
-      flash[:success] = "Account created"
+      flash[:success] = I18n.t("users.messages.account_created")
       redirect_to root_path
     else
       render :new, status: :unprocessable_entity
@@ -40,7 +40,7 @@ class UsersController < ApplicationController
 
   def update
     if @user.update(user_params)
-      flash[:success] = "User updated"
+      flash[:success] = I18n.t("users.messages.user_updated")
       redirect_to users_path
     else
       render :edit, status: :unprocessable_entity
@@ -49,7 +49,7 @@ class UsersController < ApplicationController
 
   def destroy
     @user.destroy
-    flash[:success] = "User deleted"
+    flash[:success] = I18n.t("users.messages.user_deleted")
     redirect_to users_path
   end
 
@@ -59,20 +59,20 @@ class UsersController < ApplicationController
   def update_password
     if @user.authenticate(params[:user][:current_password])
       if @user.update(password_params)
-        flash[:success] = "Password updated"
+        flash[:success] = I18n.t("users.messages.password_updated")
         redirect_to root_path
       else
         render :change_password, status: :unprocessable_entity
       end
     else
-      @user.errors.add(:current_password, "is incorrect")
+      @user.errors.add(:current_password, I18n.t("activerecord.errors.models.user.attributes.current_password.incorrect"))
       render :change_password, status: :unprocessable_entity
     end
   end
 
   def impersonate
     log_in @user
-    flash[:success] = "You are now impersonating #{@user.email}"
+    flash[:success] = I18n.t("users.messages.impersonating", email: @user.email)
     redirect_to root_path
   end
 
@@ -81,7 +81,7 @@ class UsersController < ApplicationController
 
   def update_settings
     if @user.update(settings_params)
-      flash[:success] = "Settings updated"
+      flash[:success] = I18n.t("users.messages.settings_updated")
       redirect_to root_path
     else
       render :change_settings, status: :unprocessable_entity
@@ -107,7 +107,7 @@ class UsersController < ApplicationController
   def require_correct_user
     unless current_user == @user
       action = action_name.include?("password") ? "password" : "settings"
-      flash[:danger] = "You can only change your own #{action}"
+      flash[:danger] = I18n.t("users.messages.own_action_only", action: action)
       redirect_to root_path
     end
   end

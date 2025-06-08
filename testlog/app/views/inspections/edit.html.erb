@@ -29,9 +29,9 @@
       </div>
     </div>
 
-    <!-- Finalization Issues -->
-    <%= turbo_frame_tag "finalization_issues_#{@inspection.id}" do %>
-      <% if content = render('finalization_issues', inspection: @inspection) and content.strip.present? %>
+    <!-- Completion Issues -->
+    <%= turbo_frame_tag "completion_issues_#{@inspection.id}" do %>
+      <% if content = render('completion_issues', inspection: @inspection) and content.strip.present? %>
         <%= content.html_safe %>
         <br>
       <% end %>
@@ -81,7 +81,7 @@
 
     <!-- Actions -->
     <div class="inspection-actions">
-      <% if @inspection.status != "finalized" || current_user.admin? %>
+      <% if @inspection.status != "complete" || current_user.admin? %>
         <%= button_to t('inspections.buttons.delete'), 
             inspection_path(@inspection), 
             method: :delete, 

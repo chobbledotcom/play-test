@@ -40,7 +40,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         # Check that the response contains turbo stream elements
         expect(response.body).to include("turbo-stream")
         expect(response.body).to include("inspection_progress_#{inspection.id}")
-        expect(response.body).to include("finalization_issues_#{inspection.id}")
+        expect(response.body).to include("completion_issues_#{inspection.id}")
       end
 
       it "updates progress percentage when assessment is completed" do
@@ -79,9 +79,9 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         expect(response.body).to match(/\d+%/)
       end
 
-      it "shows finalization issues for completed but incomplete inspections" do
+      it "shows completion issues for completed but incomplete inspections" do
         # Mark inspection as completed but don't complete all assessments
-        inspection.update!(status: "completed")
+        inspection.update!(status: "complete")
 
         # Create only one assessment (incomplete overall)
         inspection.create_user_height_assessment!(
@@ -111,8 +111,8 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
         expect(response).to have_http_status(:success)
 
-        # Should include finalization issues since inspection is completed but not finalizable
-        expect(response.body).to include("finalization_issues_#{inspection.id}")
+        # Should include completion issues since inspection is completed but not fully complete
+        expect(response.body).to include("completion_issues_#{inspection.id}")
       end
     end
 

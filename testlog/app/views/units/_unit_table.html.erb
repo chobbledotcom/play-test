@@ -1,28 +1,39 @@
-<%= scrollable_table(class: "data-table") do %>
-  <thead>
-    <tr>
-      <th>Photo</th>
-      <th>Name</th>
-      <th>Manufacturer</th>
-      <th>Serial Number</th>
-      <th>Has Slide</th>
-    </tr>
-  </thead>
-  <tbody>
+<div class="table-list units-list">
+  <!-- Header row -->
+  <div class="table-list-header">
+    <span class="col-photo"><%= t('units.fields.photo') %></span>
+    <span class="col-name"><%= t('units.fields.name') %></span>
+    <span class="col-manufacturer"><%= t('units.fields.manufacturer') %></span>
+    <span class="col-serial"><%= t('units.fields.serial') %></span>
+    <span class="col-has-slide"><%= t('units.fields.has_slide') %></span>
+  </div>
+  
+  <!-- Data rows -->
+  <ul class="table-list-items">
     <% unit.each do |item| %>
-      <tr>
-        <td>
-          <% if item.photo.attached? %>
-            <%= image_tag ImageProcessorService.process(item.photo, 60), style: "width: 60px; height: 60px; object-fit: cover;" %>
-          <% else %>
-            <span style="color: #ccc;">No photo</span>
-          <% end %>
-        </td>
-        <td><%= link_to item.name, item %></td>
-        <td><%= link_to item.manufacturer, units_path(manufacturer: item.manufacturer) %></td>
-        <td><%= item.serial %></td>
-        <td><%= item.has_slide? ? "Yes" : "No" %></td>
-      </tr>
+      <li>
+        <%= link_to item, class: "table-list-link" do %>
+          <span class="col-photo" data-label="<%= t('units.fields.photo') %>">
+            <% if item.photo.attached? %>
+              <%= image_tag ImageProcessorService.process(item.photo, 60), style: "width: 60px; height: 60px; object-fit: cover;" %>
+            <% else %>
+              <span style="color: #ccc;"><%= t('units.messages.no_photo') %></span>
+            <% end %>
+          </span>
+          <span class="col-name" data-label="<%= t('units.fields.name') %>">
+            <%= item.name %>
+          </span>
+          <span class="col-manufacturer" data-label="<%= t('units.fields.manufacturer') %>">
+            <%= item.manufacturer %>
+          </span>
+          <span class="col-serial" data-label="<%= t('units.fields.serial') %>">
+            <%= item.serial %>
+          </span>
+          <span class="col-has-slide" data-label="<%= t('units.fields.has_slide') %>">
+            <%= item.has_slide? ? t('shared.yes') : t('shared.no') %>
+          </span>
+        <% end %>
+      </li>
     <% end %>
-  </tbody>
-<% end %>
+  </ul>
+</div>

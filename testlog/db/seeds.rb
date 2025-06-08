@@ -18,26 +18,26 @@ end
 def british_postcode
   # Generate realistic UK postcodes
   prefixes = ["SW", "SE", "NW", "N", "E", "W", "EC", "WC", "B", "M", "L", "G", "EH", "CF", "BS", "OX", "CB"]
-  "#{prefixes.sample}#{rand(1..20)} #{rand(1..9)}#{('A'..'Z').to_a.sample}#{('A'..'Z').to_a.sample}"
+  "#{prefixes.sample}#{rand(1..20)} #{rand(1..9)}#{("A".."Z").to_a.sample}#{("A".."Z").to_a.sample}"
 end
 
 def british_address
-  streets = ["High Street", "Church Lane", "Victoria Road", "King's Road", "Queen Street", 
-             "Park Avenue", "Station Road", "London Road", "Market Square", "The Green"]
+  streets = ["High Street", "Church Lane", "Victoria Road", "King's Road", "Queen Street",
+    "Park Avenue", "Station Road", "London Road", "Market Square", "The Green"]
   numbers = (1..200).to_a
   "#{numbers.sample} #{streets.sample}"
 end
 
 def british_city
-  ["London", "Birmingham", "Manchester", "Leeds", "Liverpool", "Newcastle", "Bristol", 
-   "Sheffield", "Nottingham", "Leicester", "Oxford", "Cambridge", "Brighton", "Southampton",
-   "Edinburgh", "Glasgow", "Cardiff", "Belfast"].sample
+  ["London", "Birmingham", "Manchester", "Leeds", "Liverpool", "Newcastle", "Bristol",
+    "Sheffield", "Nottingham", "Leicester", "Oxford", "Cambridge", "Brighton", "Southampton",
+    "Edinburgh", "Glasgow", "Cardiff", "Belfast"].sample
 end
 
 # Clear existing data in development
 if Rails.env.development?
   Rails.logger.info "🧹 Clearing existing data..."
-  
+
   # Delete in correct order to respect foreign keys
   UserHeightAssessment.destroy_all
   StructureAssessment.destroy_all
@@ -50,11 +50,11 @@ if Rails.env.development?
   Unit.destroy_all
   User.destroy_all
   InspectorCompany.destroy_all
-  
+
   # Clean up Active Storage
   ActiveStorage::Attachment.all.each { |attachment| attachment.purge }
   ActiveStorage::Blob.all.each { |blob| blob.purge }
-  
+
   Rails.logger.info "  ✅ Data cleared"
 end
 
@@ -78,7 +78,7 @@ log_creation("Inspector Company", bounce_safe.name)
 
 kids_play = InspectorCompany.create!(
   name: "Kids Play Safety Services",
-  rpii_registration_number: "RPII-002", 
+  rpii_registration_number: "RPII-002",
   email: "enquiries@kidsplaysafety.co.uk",
   phone: british_phone_number,
   address: british_address,
@@ -94,7 +94,7 @@ log_creation("Inspector Company", kids_play.name)
 retired_inspections = InspectorCompany.create!(
   name: "Retired Inspections Co",
   rpii_registration_number: "RPII-003",
-  email: "old@retiredinspections.co.uk", 
+  email: "old@retiredinspections.co.uk",
   phone: british_phone_number,
   address: british_address,
   city: "London",
@@ -117,6 +117,16 @@ admin_user = User.create!(
   time_display: "date"
 )
 log_creation("User", "Admin (#{admin_user.email})")
+
+# Test user with access to all data
+test_user = User.create!(
+  email: "test@testlog.com",
+  password: "password123",
+  inspection_company: bounce_safe,
+  inspection_limit: -1,
+  time_display: "time"
+)
+log_creation("User", "Test User (#{test_user.email})")
 
 # Bounce Safe users
 lead_inspector = User.create!(
@@ -170,30 +180,12 @@ log_creation("User", "Retired Company User (#{retired_user.email})")
 Rails.logger.info "\n🏰 Creating Inflatable Units..."
 
 # Manufacturers
-manufacturers = [
-  "Airquee Manufacturing Ltd",
-  "Bouncy Castle Network UK", 
-  "Jump4Joy Inflatables",
-  "Happy Hop Europe",
-  "Custom Inflatables UK",
-  "Inflatable World Ltd",
-  "Party Castle Manufacturers"
-]
 
 # Owners
-owners = [
-  "Funtime Hire Birmingham",
-  "Party Plus Rentals",
-  "Bounce About Manchester",
-  "Kids Party Hire Co",
-  "Event Entertainment Ltd",
-  "Family Fun Inflatables",
-  "Premier Party Hire"
-]
 
-# Create units for lead inspector
+# Create units for test user (all units will be linked to test user)
 castle_standard = Unit.create!(
-  user: lead_inspector,
+  user: test_user,
   name: "Medieval Castle Bouncer",
   serial: "ACQ-2021-#{rand(1000..9999)}",
   manufacturer: "Airquee Manufacturing Ltd",
@@ -209,7 +201,7 @@ castle_standard = Unit.create!(
 log_creation("Unit", castle_standard.name)
 
 castle_large = Unit.create!(
-  user: lead_inspector,
+  user: test_user,
   name: "Giant Party Castle",
   serial: "BCN-2020-#{rand(1000..9999)}",
   manufacturer: "Bouncy Castle Network UK",
@@ -225,7 +217,7 @@ castle_large = Unit.create!(
 log_creation("Unit", castle_large.name)
 
 castle_slide_combo = Unit.create!(
-  user: lead_inspector,
+  user: test_user,
   name: "Princess Castle with Slide",
   serial: "J4J-2022-#{rand(1000..9999)}",
   manufacturer: "Jump4Joy Inflatables",
@@ -241,7 +233,7 @@ castle_slide_combo = Unit.create!(
 log_creation("Unit", castle_slide_combo.name)
 
 soft_play_unit = Unit.create!(
-  user: junior_inspector,
+  user: test_user,
   name: "Toddler Soft Play Centre",
   serial: "CIU-2023-#{rand(1000..9999)}",
   manufacturer: "Custom Inflatables UK",
@@ -257,7 +249,7 @@ soft_play_unit = Unit.create!(
 log_creation("Unit", soft_play_unit.name)
 
 obstacle_course = Unit.create!(
-  user: senior_inspector,
+  user: test_user,
   name: "Assault Course Challenge",
   serial: "IWL-2021-#{rand(1000..9999)}",
   manufacturer: "Inflatable World Ltd",
@@ -273,7 +265,7 @@ obstacle_course = Unit.create!(
 log_creation("Unit", obstacle_course.name)
 
 giant_slide = Unit.create!(
-  user: lead_inspector,
+  user: test_user,
   name: "Mega Slide Experience",
   serial: "ACQ-2019-#{rand(1000..9999)}",
   manufacturer: "Airquee Manufacturing Ltd",
@@ -289,7 +281,7 @@ giant_slide = Unit.create!(
 log_creation("Unit", giant_slide.name)
 
 gladiator_duel = Unit.create!(
-  user: kids_play_inspector,
+  user: test_user,
   name: "Gladiator Duel Platform",
   serial: "HHE-2022-#{rand(1000..9999)}",
   manufacturer: "Happy Hop Europe",
@@ -305,7 +297,7 @@ gladiator_duel = Unit.create!(
 log_creation("Unit", gladiator_duel.name)
 
 bungee_run = Unit.create!(
-  user: senior_inspector,
+  user: test_user,
   name: "Double Bungee Run",
   serial: "PCM-2023-#{rand(1000..9999)}",
   manufacturer: "Party Castle Manufacturers",
@@ -323,48 +315,55 @@ log_creation("Unit", bungee_run.name)
 # Phase 4: Inspections with various statuses
 Rails.logger.info "\n📋 Creating Inspections..."
 
-# Helper to create full assessment data
+# Helper to create full assessment data with correct field names
 def create_assessments_for_inspection(inspection, unit, passed: true)
   # Anchorage Assessment
   AnchorageAssessment.create!(
     inspection: inspection,
     num_low_anchors: rand(6..12),
     num_high_anchors: rand(4..8),
-    low_webbing_ok: passed,
-    low_karabiner_ok: passed,
-    low_rope_ok: passed || rand(0..1) == 1,
-    high_webbing_ok: passed,
-    high_karabiner_ok: passed,
-    high_rope_ok: passed,
-    low_comment: passed ? nil : "Some wear visible on anchor points",
-    high_comment: nil
+    num_anchors_pass: passed,
+    anchor_accessories_pass: passed,
+    anchor_degree_pass: passed,
+    anchor_type_pass: passed,
+    pull_strength_pass: passed,
+    anchor_type_comment: passed ? nil : "Some wear visible on anchor points"
   )
-  
+
   # Structure Assessment
   StructureAssessment.create!(
     inspection: inspection,
-    ext_stitching_ok: passed,
-    ext_material_ok: passed,
-    ext_bolts_ok: passed,
-    ext_baffles_ok: passed,
-    ext_entrance_ok: passed,
-    int_stitching_ok: passed,
-    int_material_ok: passed,
-    int_entrance_ok: passed,
-    int_no_rope_ok: passed,
-    int_baffles_ok: passed,
-    seam_length: rand(8..12),
-    seam_condition_ok: passed,
-    seam_comment: passed ? "All seams in good condition" : "Minor thread loosening noted",
-    seal_tape_ok: passed,
-    base_drain_ok: passed,
-    pressure: rand(1.0..3.0).round(1),
-    underside_ok: passed,
-    bed_patch_ok: passed,
-    evacuation_time: rand(30..120),
-    passes: passed
+    # Critical safety checks (all required for complete assessment)
+    seam_integrity_pass: passed,
+    lock_stitch_pass: passed,
+    air_loss_pass: passed,
+    straight_walls_pass: passed,
+    sharp_edges_pass: passed,
+    unit_stable_pass: passed,
+    # Additional checks (all required for complete assessment)
+    stitch_length_pass: passed,
+    blower_tube_length_pass: passed,
+    step_size_pass: passed,
+    fall_off_height_pass: passed,
+    unit_pressure_pass: passed,
+    trough_pass: passed,
+    entrapment_pass: passed,
+    markings_pass: passed,
+    grounding_pass: passed,
+    # Required measurements
+    stitch_length: rand(8..12),
+    unit_pressure_value: rand(1.0..3.0).round(1),
+    blower_tube_length: rand(2.0..5.0).round(1),
+    step_size_value: rand(200..400),
+    fall_off_height_value: rand(0.5..2.0).round(1),
+    trough_depth_value: rand(0.1..0.5).round(1),
+    trough_width_value: rand(0.3..1.0).round(1),
+    # Comments
+    seam_integrity_comment: passed ? "All seams in good condition" : "Minor thread loosening noted",
+    lock_stitch_comment: passed ? "Lock stitching intact throughout" : "Some lock stitching showing wear",
+    stitch_length_comment: "Measured at regular intervals"
   )
-  
+
   # Materials Assessment
   MaterialsAssessment.create!(
     inspection: inspection,
@@ -381,71 +380,94 @@ def create_assessments_for_inspection(inspection, unit, passed: true)
     rope_size_comment: passed ? nil : "Rope shows signs of wear",
     fabric_comment: passed ? "Fabric in good condition" : "Minor surface wear noted"
   )
-  
+
   # Fan Assessment
   FanAssessment.create!(
     inspection: inspection,
-    serial_1: "FAN-#{rand(1000..9999)}",
-    blower_guard_ok_1: passed,
-    outlet_sealed_1: passed,
-    cable_ok_1: passed,
-    pat_test_date_1: passed ? Date.current - rand(30..300).days : nil,
-    passes_1: passed,
-    serial_2: rand(0..1) == 1 ? "FAN-#{rand(1000..9999)}" : nil,
-    blower_guard_ok_2: rand(0..1) == 1 ? passed : nil,
-    outlet_sealed_2: rand(0..1) == 1 ? passed : nil,
-    cable_ok_2: rand(0..1) == 1 ? passed : nil,
-    pat_test_date_2: rand(0..1) == 1 ? Date.current - rand(30..300).days : nil,
-    passes_2: rand(0..1) == 1 ? passed : nil
+    # All safety checks must be assessed
+    blower_flap_pass: passed,
+    blower_finger_pass: passed,
+    blower_visual_pass: passed,
+    pat_pass: passed,
+    # Required specifications
+    blower_serial: "FAN-#{rand(1000..9999)}",
+    fan_size_comment: passed ? "Fan operating correctly at optimal pressure" : "Fan requires servicing",
+    # Additional comments
+    blower_flap_comment: passed ? "Flap mechanism functioning correctly" : "Flap sticking occasionally",
+    blower_finger_comment: passed ? "Guard secure, no finger trap hazards" : "Guard needs tightening",
+    blower_visual_comment: passed ? "Visual inspection satisfactory" : "Some wear visible on housing",
+    pat_comment: passed ? "PAT test valid until #{(Date.current + 6.months).strftime("%B %Y")}" : "PAT test overdue"
   )
-  
+
   # User Height Assessment
   UserHeightAssessment.create!(
     inspection: inspection,
-    height_below_60: rand(0..4),
-    height_60_90: rand(2..6),
-    height_90_120: rand(4..8),
-    height_120_150: rand(3..6),
-    height_above_150: rand(0..3),
-    passes: passed
+    # Required height measurements
+    containing_wall_height: rand(1.0..2.0).round(1),
+    platform_height: rand(0.5..1.5).round(1),
+    user_height: rand(1.2..1.8).round(1),
+    # User capacity counts (all required for complete assessment)
+    users_at_1000mm: rand(0..5),
+    users_at_1200mm: rand(2..8),
+    users_at_1500mm: rand(4..10),
+    users_at_1800mm: rand(2..6),
+    # Play area dimensions (required)
+    play_area_length: unit.length * 0.8,
+    play_area_width: unit.width * 0.8,
+    negative_adjustment: rand(0..2.0).round(1),
+    permanent_roof: false,
+    # Required comment
+    user_height_comment: passed ? "Capacity within safe limits based on EN 14960:2019" : "Review user capacity - exceeds recommended limits",
+    # Additional comments for realism
+    containing_wall_height_comment: "Measured from base to top of wall",
+    platform_height_comment: "Platform height acceptable for age group",
+    play_area_length_comment: "Effective play area after deducting obstacles",
+    play_area_width_comment: "Width measured at narrowest point"
   )
-  
+
   # Slide Assessment (if unit has slide)
   if unit.has_slide
     SlideAssessment.create!(
       inspection: inspection,
-      platform_height: rand(2.0..6.0).round(1),
-      platform_netting_ok: passed,
-      entrance_width: rand(0.6..1.0).round(1),
-      entrance_height: rand(0.8..1.2).round(1),
-      slide_bed_ok: passed,
-      wall_height_left: rand(0.8..1.5).round(1),
-      wall_height_right: rand(0.8..1.5).round(1),
-      wall_height_angle: rand(40..60),
-      runout_length: rand(1.5..3.0).round(1),
-      landing_ok: passed,
-      slide_bed_comment: passed ? "Slide surface in excellent condition" : "Minor scuffing on slide bed",
-      passes: passed
+      # Required measurements for complete assessment
+      slide_platform_height: rand(2.0..6.0).round(1),
+      slide_wall_height: rand(1.0..2.0).round(1),
+      runout_value: rand(1.5..3.0).round(1),
+      slide_first_metre_height: rand(0.3..0.8).round(1),
+      slide_beyond_first_metre_height: rand(0.8..1.5).round(1),
+      # Safety assessments (all required)
+      clamber_netting_pass: passed,
+      runout_pass: passed,
+      slip_sheet_pass: passed,
+      slide_permanent_roof: false,
+      # Required comment
+      slide_platform_height_comment: passed ? "Platform height compliant with EN 14960:2019" : "Platform height exceeds recommended limits",
+      # Additional realistic comments
+      slide_wall_height_comment: "Wall height measured from slide bed",
+      runout_comment: passed ? "Runout area clear and adequate" : "Runout area needs extending",
+      clamber_netting_comment: passed ? "Netting secure with no gaps" : "Some gaps in netting need attention",
+      slip_sheet_comment: passed ? "Slip sheet in good condition" : "Slip sheet showing wear"
     )
   end
-  
+
   # Enclosed Assessment (if unit is totally enclosed)
   if unit.is_totally_enclosed
     EnclosedAssessment.create!(
       inspection: inspection,
-      exit_easily_found: passed,
-      exit_unobstructed: passed,
-      exit_height_ok: passed,
-      exit_width_ok: passed,
+      # Required fields for complete assessment
       exit_number: rand(1..3),
-      passes: passed
+      exit_number_pass: passed,
+      exit_visible_pass: passed,
+      # Comments
+      exit_number_comment: passed ? "Number of exits compliant with unit size" : "Additional exit required",
+      exit_visible_comment: passed ? "All exits clearly marked with illuminated signage" : "Exit signage needs improvement - not clearly visible"
     )
   end
 end
 
-# Recent completed inspection
+# Recent completed inspection (test user)
 recent_inspection = Inspection.create!(
-  user: lead_inspector,
+  user: test_user,
   unit: castle_standard,
   inspector_company: bounce_safe,
   inspection_date: 3.days.ago,
@@ -465,9 +487,9 @@ recent_inspection = Inspection.create!(
 create_assessments_for_inspection(recent_inspection, castle_standard, passed: true)
 log_creation("Inspection", "Recent passed inspection for #{castle_standard.name}")
 
-# Failed inspection
+# Failed inspection (test user)
 failed_inspection = Inspection.create!(
-  user: junior_inspector,
+  user: test_user,
   unit: obstacle_course,
   inspector_company: bounce_safe,
   inspection_date: 1.week.ago,
@@ -487,33 +509,33 @@ failed_inspection = Inspection.create!(
 create_assessments_for_inspection(failed_inspection, obstacle_course, passed: false)
 log_creation("Inspection", "Failed inspection for #{obstacle_course.name}")
 
-# Historical inspections
+# Historical inspections (test user)
 [6.months.ago, 1.year.ago].each do |date|
   historical = Inspection.create!(
-    user: senior_inspector,
+    user: test_user,
     unit: castle_large,
     inspector_company: bounce_safe,
     inspection_date: date,
     inspection_location: "NEC Birmingham",
     unique_report_number: "BSI-#{date.year}-#{rand(1000..9999)}",
-    status: "finalized",
+    status: "completed",
     passed: true,
-    comments: "Routine #{date == 1.year.ago ? 'annual' : 'six-month'} inspection.",
+    comments: "Routine #{(date == 1.year.ago) ? "annual" : "six-month"} inspection.",
     width: castle_large.width,
     length: castle_large.length,
     height: castle_large.height,
     has_slide: castle_large.has_slide,
     is_totally_enclosed: castle_large.is_totally_enclosed,
-    inspector_signature: "#{senior_inspector.email.split('@').first.titleize} (Digital Signature)",
+    inspector_signature: "#{test_user.email.split("@").first.titleize} (Digital Signature)",
     signature_timestamp: date
   )
   create_assessments_for_inspection(historical, castle_large, passed: true)
-  log_creation("Inspection", "Historical inspection from #{date.strftime('%B %Y')}")
+  log_creation("Inspection", "Historical inspection from #{date.strftime("%B %Y")}")
 end
 
-# Draft inspections
-draft_inspection = Inspection.create!(
-  user: lead_inspector,
+# Draft inspections (test user)
+Inspection.create!(
+  user: test_user,
   unit: giant_slide,
   inspector_company: bounce_safe,
   inspection_date: Date.current,
@@ -527,13 +549,14 @@ draft_inspection = Inspection.create!(
 )
 log_creation("Inspection", "Draft inspection for #{giant_slide.name}")
 
-# In progress inspection
+# In progress inspection (different inspector)
 in_progress = Inspection.create!(
   user: kids_play_inspector,
   unit: gladiator_duel,
   inspector_company: kids_play,
   inspection_date: Date.current,
   inspection_location: "Heaton Park, Manchester",
+  unique_report_number: "KPS-2025-#{rand(1000..9999)}",
   status: "in_progress",
   width: gladiator_duel.width,
   length: gladiator_duel.length,
@@ -546,22 +569,22 @@ AnchorageAssessment.create!(
   inspection: in_progress,
   num_low_anchors: 8,
   num_high_anchors: 0,
-  low_webbing_ok: true,
-  low_karabiner_ok: true,
-  low_rope_ok: true
+  num_anchors_pass: true,
+  anchor_accessories_pass: true,
+  anchor_degree_pass: true
 )
 log_creation("Inspection", "In-progress inspection for #{gladiator_duel.name}")
 
-# Create more varied inspections
+# Create more varied inspections for test user
 [soft_play_unit, castle_slide_combo, bungee_run].each do |unit|
   inspection = Inspection.create!(
-    user: unit.user,
+    user: test_user,
     unit: unit,
-    inspector_company: unit.user.inspection_company,
+    inspector_company: test_user.inspection_company,
     inspection_date: rand(1..60).days.ago,
     inspection_location: "#{british_address}, #{british_city}",
-    unique_report_number: "#{unit.user.inspection_company.name[0..2].upcase}-2025-#{rand(1000..9999)}",
-    status: ["completed", "finalized"].sample,
+    unique_report_number: "#{test_user.inspection_company.name[0..2].upcase}-2025-#{rand(1000..9999)}",
+    status: "completed",
     passed: rand(0..4) > 0, # 80% pass rate
     comments: "Regular inspection completed as scheduled.",
     width: unit.width,
@@ -574,20 +597,69 @@ log_creation("Inspection", "In-progress inspection for #{gladiator_duel.name}")
   log_creation("Inspection", "Inspection for #{unit.name}")
 end
 
+# Create a few inspections for other users to show variety
+lead_inspection = Inspection.create!(
+  user: lead_inspector,
+  unit: castle_standard,
+  inspector_company: bounce_safe,
+  inspection_date: 2.months.ago,
+  inspection_location: "Cannon Hill Park, Birmingham",
+  unique_report_number: "BSI-2024-#{rand(1000..9999)}",
+  status: "completed",
+  passed: true,
+  comments: "Six-month inspection completed.",
+  width: castle_standard.width,
+  length: castle_standard.length,
+  height: castle_standard.height,
+  has_slide: castle_standard.has_slide,
+  is_totally_enclosed: castle_standard.is_totally_enclosed
+)
+create_assessments_for_inspection(lead_inspection, castle_standard, passed: true)
+log_creation("Inspection", "Lead inspector inspection")
+
+# Create a complete inspection with all assessments
+complete_inspection = Inspection.create!(
+  user: test_user,
+  unit: castle_large,
+  inspector_company: bounce_safe,
+  inspection_date: 1.month.ago,
+  inspection_location: "Alexander Stadium, Birmingham",
+  unique_report_number: "BSI-2025-#{rand(1000..9999)}",
+  status: "completed",
+  passed: true,
+  comments: "Monthly safety inspection completed. All checks passed.",
+  recommendations: "No issues found. Continue standard maintenance.",
+  general_notes: "Unit used for major event. Excellent condition maintained.",
+  width: castle_large.width,
+  length: castle_large.length,
+  height: castle_large.height,
+  has_slide: castle_large.has_slide,
+  is_totally_enclosed: castle_large.is_totally_enclosed,
+  inspector_signature: "Test User (Digital Signature)",
+  signature_timestamp: 1.month.ago
+)
+create_assessments_for_inspection(complete_inspection, castle_large, passed: true)
+
+# Reload to ensure all associations are loaded
+complete_inspection.reload
+
+log_creation("Inspection", "Complete inspection with all assessments for #{castle_large.name}")
+
 Rails.logger.info "\n📊 Seed Data Summary:"
 Rails.logger.info "  Inspector Companies: #{InspectorCompany.count}"
 Rails.logger.info "  Users: #{User.count}"
 Rails.logger.info "  Units: #{Unit.count}"
 Rails.logger.info "  Inspections: #{Inspection.count}"
-Rails.logger.info "    - Draft: #{Inspection.where(status: 'draft').count}"
-Rails.logger.info "    - In Progress: #{Inspection.where(status: 'in_progress').count}"
-Rails.logger.info "    - Completed: #{Inspection.where(status: 'completed').count}"
-Rails.logger.info "    - Finalized: #{Inspection.where(status: 'finalized').count}"
+Rails.logger.info "    - Draft: #{Inspection.where(status: "draft").count}"
+Rails.logger.info "    - In Progress: #{Inspection.where(status: "in_progress").count}"
+Rails.logger.info "    - Completed: #{Inspection.where(status: "completed").count}"
+Rails.logger.info "    - Complete: #{Inspection.where(status: "complete").count}"
 Rails.logger.info "    - Passed: #{Inspection.where(passed: true).count}"
 Rails.logger.info "    - Failed: #{Inspection.where(passed: false).count}"
 
 Rails.logger.info "\n🎉 Seed data creation complete!"
 Rails.logger.info "\n📝 Test Credentials:"
 Rails.logger.info "  Admin: admin@testlog.com / password123"
+Rails.logger.info "  Test User (all units): test@testlog.com / password123"
 Rails.logger.info "  Lead Inspector: lead@bouncesafe.co.uk / password123"
 Rails.logger.info "  Other users: password123"

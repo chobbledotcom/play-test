@@ -1,3 +1,9 @@
+<% if unit.photo.attached? %>
+  <div class="unit-photo">
+    <%= image_tag unit.photo, alt: "Photo of #{unit.name}" %>
+  </div>
+<% end %>
+
 <%= scrollable_table do %>
   <tr>
     <th>Name:</th>

@@ -2,45 +2,47 @@
   <h1><%= @title %></h1>
 </header>
 
-<div class="center">
-  <% if current_user.inspection_company_id.present? %>
-    <%= button_to inspections_path, 
-        method: :post,
-        params: {
-          inspection: {
-            inspection_location: "",
-            inspection_date: Date.current
-          }
-        },
-        data: { 
-          turbo_confirm: t('inspections.messages.create_without_unit_confirm')
-        },
-        class: "button" do %>
-      <strong><%= t('inspections.buttons.add_inspection') %></strong>
-    <% end %>
-  <% else %>
-    <p style="color: #e74c3c;">
-      <%= current_user.inspection_company_required_message %>
-    </p>
+<% if current_user.inspection_company_id.present? %>
+  <%= button_to inspections_path,
+      method: :post,
+      params: {
+        inspection: {
+          inspection_location: "",
+          inspection_date: Date.current
+        }
+      },
+      data: {
+        turbo_confirm: t('inspections.messages.create_without_unit_confirm')
+      },
+      class: "button" do %>
+    <strong><%= t('inspections.buttons.add_inspection') %></strong>
   <% end %>
-</div>
+<% else %>
+  <p style="color: #e74c3c;">
+    <%= current_user.inspection_company_required_message %>
+  </p>
+<% end %>
 
-<section>
-  <%= render 'search_form' %>
-</section>
+<%= render 'filter_form' %>
 
-<article>
-  <% if @inspections.any? %>
-    <%= inspection_links(current_user) %>
-    <%= render 'inspections_table', inspections: @inspections %>
-    <div class="center">
-      <p>
-        <%= link_to inspections_path(format: :csv) do %>
-          <strong>Export CSV</strong>
-        <% end %>
-      </p>
-    </div>
+<% if @draft_inspections.any? %>
+  <h2>Draft Inspections</h2>
+  <%= render 'inspections_table', inspections: @draft_inspections %>
+  <hr>
+  <h2>Complete Inspections</h2>
+<% end %>
+
+<% if @inspections.any? %>
+  <%= render 'inspections_table', inspections: @inspections %>
+  <p>
+    <%= link_to inspections_path(params.permit(:query, :result, :unit_id).merge(format: :csv)) do %>
+      <strong>Export CSV</strong>
+    <% end %>
+  </p>
+<% else %>
+  <% if @draft_inspections.any? %>
+    <p>No complete inspection records found.</p>
   <% else %>
     <p>No inspection records found.</p>
   <% end %>
-</article>
+<% end %>

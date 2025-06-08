@@ -17,19 +17,19 @@ class SessionsController < ApplicationController
         else
           cookies.delete(:user_id)
         end
-        flash[:success] = "Logged in"
+        flash[:success] = I18n.t("session.login.success")
         redirect_to root_path
         return
       end
     end
 
-    flash.now[:danger] = "Invalid email/password combination"
+    flash.now[:danger] = I18n.t("session.login.error")
     render :new, status: :unprocessable_entity
   end
 
   def destroy
     log_out
-    flash[:success] = "Logged out"
+    flash[:success] = I18n.t("session.logout.success")
     redirect_to root_path
   end
 end

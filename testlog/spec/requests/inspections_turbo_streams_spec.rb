@@ -43,12 +43,12 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         expect(response.body).to match(/(&lt;span class=&#39;value&#39;&gt;|<span class='value'>)\d+%(&lt;\/span&gt;|<\/span>)/)
       end
 
-      it "includes finalization issues turbo stream" do
+      it "includes completion issues turbo stream" do
         patch inspection_path(inspection),
           params: {inspection: {comments: "Test"}},
           headers: turbo_headers
 
-        expect(response.body).to include("target=\"finalization_issues_#{inspection.id}\"")
+        expect(response.body).to include("target=\"completion_issues_#{inspection.id}\"")
       end
 
       context "when updating assessment data" do
@@ -82,7 +82,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
       context "with validation errors" do
         it "still returns turbo stream format on error" do
           # Force a validation error by setting inspection_location to nil on non-draft
-          inspection.update!(status: "in_progress")
+          inspection.update!(status: "complete")
 
           patch inspection_path(inspection),
             params: {inspection: {inspection_location: ""}},
@@ -204,11 +204,11 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
     end
   end
 
-  describe "Finalization issues in turbo streams" do
+  describe "Completion issues in turbo streams" do
     let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
 
     before do
-      inspection.update!(status: "completed")
+      inspection.update!(status: "complete")
       inspection.create_user_height_assessment!(
         containing_wall_height: 1.5,
         platform_height: 1.0,
@@ -216,13 +216,13 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
       )
     end
 
-    it "includes finalization issues when inspection is completed but not finalizable" do
+    it "includes completion issues when inspection is completed but not fully complete" do
       patch inspection_path(inspection),
         params: {inspection: {comments: "Updated"}},
         headers: turbo_headers
 
-      # Should include the finalization issues turbo stream
-      expect(response.body).to include("finalization_issues_#{inspection.id}")
+      # Should include the completion issues turbo stream
+      expect(response.body).to include("completion_issues_#{inspection.id}")
     end
   end
 

@@ -216,10 +216,10 @@ RSpec.describe InspectionsHelper, type: :helper do
     let(:user) { create(:user) }
     let(:admin_user) { create(:user, email: "admin@example.com") }
     let(:inspection) { create(:inspection, user: user) }
-    let(:finalized_inspection) do
-      inspection = create(:inspection, :completed, user: user)
-      # Bypass validation to set finalized status for testing
-      inspection.update_column(:status, "finalized")
+    let(:complete_inspection) do
+      inspection = create(:inspection, :complete, user: user)
+      # Bypass validation to set complete status for testing
+      inspection.update_column(:status, "complete")
       inspection
     end
 
@@ -229,7 +229,7 @@ RSpec.describe InspectionsHelper, type: :helper do
       allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
     end
 
-    context "for non-finalized inspections" do
+    context "for non-complete inspections" do
       before do
         allow(helper).to receive(:current_user).and_return(user)
       end
@@ -250,13 +250,13 @@ RSpec.describe InspectionsHelper, type: :helper do
       end
     end
 
-    context "for finalized inspections with regular user" do
+    context "for complete inspections with regular user" do
       before do
         allow(helper).to receive(:current_user).and_return(user)
       end
 
       it "includes only edit action" do
-        actions = helper.inspection_actions(finalized_inspection)
+        actions = helper.inspection_actions(complete_inspection)
 
         expect(actions).to include(
           hash_including(label: I18n.t("inspections.buttons.update"))
@@ -267,13 +267,13 @@ RSpec.describe InspectionsHelper, type: :helper do
       end
     end
 
-    context "for finalized inspections with admin user" do
+    context "for complete inspections with admin user" do
       before do
         allow(helper).to receive(:current_user).and_return(admin_user)
       end
 
       it "includes both edit and delete actions" do
-        actions = helper.inspection_actions(finalized_inspection)
+        actions = helper.inspection_actions(complete_inspection)
 
         expect(actions).to include(
           hash_including(label: I18n.t("inspections.buttons.update"))
@@ -293,8 +293,8 @@ RSpec.describe InspectionsHelper, type: :helper do
         allow(helper).to receive(:current_user).and_return(nil)
       end
 
-      it "includes only edit action for finalized inspections" do
-        actions = helper.inspection_actions(finalized_inspection)
+      it "includes only edit action for complete inspections" do
+        actions = helper.inspection_actions(complete_inspection)
 
         expect(actions).to include(
           hash_including(label: I18n.t("inspections.buttons.update"))

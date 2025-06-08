@@ -5,7 +5,7 @@ RSpec.describe Inspection, type: :model do
 
   describe "validations" do
     it "validates presence of required fields" do
-      inspection = build(:inspection, inspection_location: nil, inspection_date: nil, status: "completed")
+      inspection = build(:inspection, inspection_location: nil, inspection_date: nil, status: "complete")
       expect(inspection).not_to be_valid
       expect(inspection.errors[:inspection_location]).to include("can't be blank")
     end
@@ -108,9 +108,8 @@ RSpec.describe Inspection, type: :model do
 
     # Test search functionality with special characters
     it "performs search with special characters" do
-      # Create unit and inspection with special characters in serial
-      special_unit = create(:unit, serial: "SPEC!@#$%^&*()_+")
-      create(:inspection, unit: special_unit)
+      # Create inspection with special characters in location
+      create(:inspection, inspection_location: "Location SPEC!@#$%^&*()_+")
 
       # Test searching for various patterns
       expect(Inspection.search("SPEC!@#").count).to eq(1)
@@ -133,16 +132,14 @@ RSpec.describe Inspection, type: :model do
   end
 
   describe "search functionality" do
-    let!(:search_unit1) { create(:unit, serial: "SEARCH001") }
-    let!(:search_unit2) { create(:unit, serial: "ANOTHER999") }
-    let!(:search_inspection1) { create(:inspection, :passed, unit: search_unit1) }
-    let!(:search_inspection2) { create(:inspection, :failed, unit: search_unit2) }
+    let!(:search_inspection1) { create(:inspection, :passed, inspection_location: "SearchTerm123 Location") }
+    let!(:search_inspection2) { create(:inspection, :failed, inspection_location: "AnotherPlace456 Site") }
 
-    it "finds records by partial serial match" do
-      expect(Inspection.search("SEARCH").count).to eq(1)
-      expect(Inspection.search("ANOTHER").count).to eq(1)
-      expect(Inspection.search("999").count).to eq(1)
-      expect(Inspection.search("001").count).to eq(1)
+    it "finds records by partial location match" do
+      expect(Inspection.search("SearchTerm").count).to eq(1)
+      expect(Inspection.search("AnotherPlace").count).to eq(1)
+      expect(Inspection.search("456").count).to eq(1)
+      expect(Inspection.search("123").count).to eq(1)
     end
 
     it "returns empty collection when no match found" do
@@ -150,12 +147,11 @@ RSpec.describe Inspection, type: :model do
     end
 
     it "is case-insensitive when searching" do
-      expect(Inspection.search("search").count).to eq(1)
-      expect(Inspection.search("another").count).to eq(1)
+      expect(Inspection.search("searchterm").count).to eq(1)
+      expect(Inspection.search("anotherplace").count).to eq(1)
 
-      # Create a record with lowercase serial
-      lowercase_unit = create(:unit, serial: "lowercase123")
-      create(:inspection, unit: lowercase_unit)
+      # Create a record with lowercase location
+      create(:inspection, inspection_location: "lowercase123 location")
 
       expect(Inspection.search("LOWERCASE").count).to eq(1)
       expect(Inspection.search("lowercase").count).to eq(1)

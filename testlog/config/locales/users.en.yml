@@ -47,6 +47,13 @@ en:
       inspection_limit_reached: "Your inspection limit has been reached. Please contact an administrator."
       impersonate_confirm: "You will be logged in as %{email}. You'll need to log out to return to your admin account."
       delete_confirm: "Are you sure?"
+      account_created: "Account created"
+      user_updated: "User updated"
+      user_deleted: "User deleted"
+      password_updated: "Password updated"
+      settings_updated: "Settings updated"
+      impersonating: "You are now impersonating %{email}"
+      own_action_only: "You can only change your own %{action}"
 
     errors:
       header:

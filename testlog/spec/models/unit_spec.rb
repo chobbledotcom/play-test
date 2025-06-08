@@ -243,12 +243,10 @@ RSpec.describe Unit, type: :model do
     it "validates optional dimension fields" do
       unit.num_low_anchors = -1
       unit.rope_size = -5
-      unit.ambient_temperature = 100
 
       expect(unit).not_to be_valid
       expect(unit.errors[:num_low_anchors]).to include("must be greater than or equal to 0")
       expect(unit.errors[:rope_size]).to include("must be greater than or equal to 0")
-      expect(unit.errors[:ambient_temperature]).to include("must be less than 60")
     end
 
     it "has dimension_attributes method" do

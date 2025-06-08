@@ -27,8 +27,7 @@ class Inspection < ApplicationRecord
   validates :unique_report_number, presence: true, uniqueness: {scope: :user_id}, if: -> { status.present? && status != "draft" }
 
   # Status validations
-  validates :status, inclusion: {in: %w[draft in_progress completed finalized]}, allow_blank: true
-  validate :cannot_finalize_incomplete_inspection, if: :finalizing?
+  validates :status, inclusion: {in: %w[draft complete]}, allow_blank: true
 
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
@@ -42,25 +41,31 @@ class Inspection < ApplicationRecord
   # Scopes
   scope :passed, -> { where(passed: true) }
   scope :failed, -> { where(passed: false) }
-  scope :completed, -> { where(status: "completed") }
-  scope :finalized, -> { where(status: "finalized") }
+  scope :complete, -> { where(status: "complete") }
+  scope :draft, -> { where(status: "draft") }
   scope :search, ->(query) {
     if query.present?
-      joins(:unit).left_joins(:inspector_company)
-        .where("inspector_companies.name LIKE ? OR inspections.inspection_location LIKE ? OR units.serial LIKE ?",
-          "%#{query}%", "%#{query}%", "%#{query}%")
+      where("inspections.inspection_location LIKE ? OR inspections.id LIKE ? OR inspections.unique_report_number LIKE ?",
+        "%#{query}%", "%#{query}%", "%#{query}%")
+    else
+      all
     end
   }
   scope :filter_by_status, ->(status) { where(status: status) if status.present? }
+  scope :filter_by_result, ->(result) {
+    case result
+    when "passed" then where(passed: true)
+    when "failed" then where(passed: false)
+    end
+  }
+  scope :filter_by_unit, ->(unit_id) { where(unit_id: unit_id) if unit_id.present? }
   scope :filter_by_date_range, ->(start_date, end_date) { where(inspection_date: start_date..end_date) if start_date.present? && end_date.present? }
   scope :overdue, -> { where("inspection_date < ?", Date.today - 1.year) }
 
   # State machine for inspection workflow
   enum :status, {
     draft: "draft",
-    in_progress: "in_progress",
-    completed: "completed",
-    finalized: "finalized"
+    complete: "complete"
   }, prefix: true
 
   # Delegate methods to unit
@@ -73,17 +78,39 @@ class Inspection < ApplicationRecord
   end
 
   # Advanced methods
-  def can_be_finalized?
-    all_assessments_complete? && status == "completed"
+  def can_be_completed?
+    unit.present? && all_assessments_complete?
   end
 
-  def finalize!(user)
+  def completion_status
+    {
+      status: status,
+      all_assessments_complete: all_assessments_complete?,
+      missing_assessments: get_missing_assessments,
+      can_be_completed: can_be_completed?
+    }
+  end
+
+  def get_missing_assessments
+    missing = []
+    missing << "Unit" unless unit.present?
+    missing << "User Height" unless user_height_assessment&.complete?
+    missing << "Structure" unless structure_assessment&.complete?
+    missing << "Anchorage" unless anchorage_assessment&.complete?
+    missing << "Materials" unless materials_assessment&.complete?
+    missing << "Fan" unless fan_assessment&.complete?
+    missing << "Slide" if has_slide? && !slide_assessment&.complete?
+    missing << "Enclosed" if is_totally_enclosed? && !enclosed_assessment&.complete?
+    missing
+  end
+
+  def complete!(user)
     update!(
-      status: "finalized",
-      finalized_at: Time.current,
-      finalized_by: user
+      status: "complete",
+      completed_at: Time.current,
+      completed_by_id: user.id
     )
-    log_audit_action("finalized", user, "Inspection finalized and locked")
+    log_audit_action("completed", user, "Inspection completed")
   end
 
   def duplicate_for_user(user)
@@ -92,8 +119,8 @@ class Inspection < ApplicationRecord
     new_inspection.status = "draft"
     new_inspection.unique_report_number = nil
     new_inspection.passed = nil
-    new_inspection.finalized_at = nil
-    new_inspection.finalized_by = nil
+    new_inspection.completed_at = nil
+    new_inspection.completed_by = nil
     new_inspection.save!
 
     # Duplicate all assessments
@@ -144,7 +171,7 @@ class Inspection < ApplicationRecord
     return unless unit.present?
 
     # Copy all dimensions and boolean flags from unit using the concern method
-    copy_values_from(unit)
+    copy_dimensions_from(unit)
   end
 
   def set_inspector_company_from_user
@@ -218,14 +245,6 @@ class Inspection < ApplicationRecord
     anchor_ok = !anchorage_assessment&.respond_to?(:meets_anchor_requirements?) || anchorage_assessment&.meets_anchor_requirements?
 
     height_ok && runout_ok && anchor_ok
-  end
-
-  def finalizing?
-    status_changed? && status == "finalized"
-  end
-
-  def cannot_finalize_incomplete_inspection
-    errors.add(:status, "Cannot finalize incomplete inspection") unless can_be_finalized?
   end
 
   def total_safety_checks

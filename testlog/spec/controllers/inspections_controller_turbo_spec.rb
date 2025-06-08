@@ -42,7 +42,7 @@ RSpec.describe InspectionsController, type: :controller do
 
       it "handles validation errors gracefully" do
         # Force a validation error by making the inspection invalid
-        inspection.update!(status: "in_progress")
+        inspection.update!(status: "draft")
 
         # Try to clear a required field
         patch :update, params: {id: inspection.id, inspection: {inspection_location: ""}}
@@ -80,13 +80,13 @@ RSpec.describe InspectionsController, type: :controller do
     end
 
     it "uses partial: parameter for rendering partials" do
-      # Mark inspection as completed to trigger finalization issues
-      inspection.update!(status: "completed")
+      # Mark inspection as completed to trigger completion issues
+      inspection.update!(status: "complete")
 
       patch :update, params: {id: inspection.id, inspection: {comments: "Test"}}
 
-      # Should render the finalization issues partial
-      expect(response.body).to include("finalization_issues_#{inspection.id}")
+      # Should render the completion issues partial
+      expect(response.body).to include("completion_issues_#{inspection.id}")
     end
   end
 

@@ -1,15 +1,21 @@
 class InspectionsController < ApplicationController
-  before_action :set_inspection, only: [:show, :edit, :update, :destroy, :report, :qr_code, :replace_dimensions]
-  before_action :check_inspection_owner, only: [:show, :edit, :update, :destroy, :replace_dimensions]
-  before_action :check_inspection_finalized, only: [:edit, :update, :replace_dimensions]
-  before_action :check_inspection_finalized_for_delete, only: [:destroy]
-  before_action :check_inspection_complete, only: [:report, :qr_code]
+  before_action :set_inspection, only: [:show, :edit, :update, :destroy, :report, :qr_code, :replace_dimensions, :select_unit, :update_unit]
+  before_action :check_inspection_owner, only: [:show, :edit, :update, :destroy, :replace_dimensions, :select_unit, :update_unit]
   before_action :no_index
   skip_before_action :require_login, only: [:report, :qr_code]
 
   def index
-    @inspections = current_user.inspections.order(created_at: :desc)
-    @title = "Inspections"
+    # Draft inspections - shown separately, unfiltered
+    @draft_inspections = current_user.inspections.draft.order(created_at: :desc)
+
+    # Complete inspections - filtered by user inputs
+    @inspections = current_user.inspections.complete
+      .search(params[:query])
+      .filter_by_result(params[:result])
+      .filter_by_unit(params[:unit_id])
+      .order(created_at: :desc)
+
+    @title = build_index_title
 
     respond_to do |format|
       format.html
@@ -18,6 +24,18 @@ class InspectionsController < ApplicationController
   end
 
   def show
+    respond_to do |format|
+      format.html
+      format.pdf do
+        pdf_data = PdfGeneratorService.generate_inspection_report(@inspection)
+        @inspection.update(pdf_last_accessed_at: Time.current)
+
+        send_data pdf_data.render,
+          filename: "PAT_Report_#{@inspection.serial}.pdf",
+          type: "application/pdf",
+          disposition: "inline"
+      end
+    end
   end
 
   def new
@@ -96,68 +114,8 @@ class InspectionsController < ApplicationController
   end
 
   def edit
-    # Build assessments if they don't exist yet and pre-fill with inspection dimensions
-    unless @inspection.user_height_assessment
-      @inspection.build_user_height_assessment(
-        containing_wall_height: @inspection.containing_wall_height,
-        platform_height: @inspection.platform_height,
-        user_height: @inspection.user_height,
-        permanent_roof: @inspection.permanent_roof,
-        users_at_1000mm: @inspection.users_at_1000mm,
-        users_at_1200mm: @inspection.users_at_1200mm,
-        users_at_1500mm: @inspection.users_at_1500mm,
-        users_at_1800mm: @inspection.users_at_1800mm,
-        play_area_length: @inspection.play_area_length,
-        play_area_width: @inspection.play_area_width,
-        negative_adjustment: @inspection.negative_adjustment
-      )
-    end
-
-    unless @inspection.slide_assessment
-      @inspection.build_slide_assessment(
-        slide_platform_height: @inspection.slide_platform_height,
-        slide_wall_height: @inspection.slide_wall_height,
-        runout_value: @inspection.runout_value,
-        slide_first_metre_height: @inspection.slide_first_metre_height,
-        slide_beyond_first_metre_height: @inspection.slide_beyond_first_metre_height,
-        slide_permanent_roof: @inspection.slide_permanent_roof
-      )
-    end
-
-    unless @inspection.structure_assessment
-      @inspection.build_structure_assessment(
-        stitch_length: @inspection.stitch_length,
-        unit_pressure_value: @inspection.unit_pressure_value,
-        blower_tube_length: @inspection.blower_tube_length,
-        step_size_value: @inspection.step_size_value,
-        fall_off_height_value: @inspection.fall_off_height_value,
-        trough_depth_value: @inspection.trough_depth_value,
-        trough_width_value: @inspection.trough_width_value
-      )
-    end
-
-    unless @inspection.anchorage_assessment
-      @inspection.build_anchorage_assessment(
-        num_low_anchors: @inspection.num_low_anchors,
-        num_high_anchors: @inspection.num_high_anchors
-      )
-    end
-
-    unless @inspection.materials_assessment
-      @inspection.build_materials_assessment(
-        rope_size: @inspection.rope_size
-      )
-    end
-
-    unless @inspection.fan_assessment
-      @inspection.build_fan_assessment
-    end
-
-    unless @inspection.enclosed_assessment
-      @inspection.build_enclosed_assessment(
-        exit_number: @inspection.exit_number
-      )
-    end
+    # Build assessments if they don't exist yet and pre-fill with inspection attributes
+    @inspection.build_assessments_with_attributes
   end
 
   def update
@@ -169,7 +127,7 @@ class InspectionsController < ApplicationController
 
       if unit.nil?
         # Unit ID not found or doesn't belong to user - security issue
-        flash[:danger] = "Invalid unit selection"
+        flash[:danger] = I18n.t("inspections.errors.invalid_unit")
         render :edit, status: :unprocessable_entity and return
       end
     end
@@ -185,8 +143,8 @@ class InspectionsController < ApplicationController
           render turbo_stream: [
             turbo_stream.replace("inspection_progress_#{@inspection.id}",
               html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
-            turbo_stream.replace("finalization_issues_#{@inspection.id}",
-              partial: "inspections/finalization_issues",
+            turbo_stream.replace("completion_issues_#{@inspection.id}",
+              partial: "inspections/completion_issues",
               locals: {inspection: @inspection})
           ]
         end
@@ -230,6 +188,50 @@ class InspectionsController < ApplicationController
     redirect_to edit_inspection_path(@inspection, tab: params[:tab] || "general")
   end
 
+  def select_unit
+    @units = current_user.units
+    @title = t("inspections.titles.select_unit")
+
+    # Apply the same filters as the units index
+    if params[:search].present?
+      @units = @units.where("name LIKE ? OR serial LIKE ? OR manufacturer LIKE ?",
+        "%#{params[:search]}%", "%#{params[:search]}%", "%#{params[:search]}%")
+    end
+
+    if params[:manufacturer].present?
+      @units = @units.where(manufacturer: params[:manufacturer])
+    end
+
+    if params[:has_slide].present?
+      @units = @units.where(has_slide: params[:has_slide] == "true")
+    end
+
+    @units = @units.order(:name)
+
+    render :select_unit
+  end
+
+  def update_unit
+    unit = current_user.units.find_by(id: params[:unit_id])
+
+    if unit.nil?
+      flash[:danger] = t("inspections.errors.invalid_unit")
+      redirect_to select_unit_inspection_path(@inspection) and return
+    end
+
+    # Update the inspection with the new unit and copy all dimensions
+    @inspection.unit = unit
+    @inspection.copy_dimensions_from(unit)
+
+    if @inspection.save
+      flash[:success] = t("inspections.messages.unit_changed", unit_name: unit.name)
+      redirect_to edit_inspection_path(@inspection)
+    else
+      flash[:danger] = t("inspections.messages.unit_change_failed", errors: @inspection.errors.full_messages.join(", "))
+      redirect_to select_unit_inspection_path(@inspection)
+    end
+  end
+
   def search
     @inspections = params[:query].present? ?
       current_user.inspections.search(params[:query]) :
@@ -266,20 +268,8 @@ class InspectionsController < ApplicationController
 
   def inspection_params
     # Get the base params with permitted top-level attributes
-    base_params = params.require(:inspection).permit(
-      :inspection_date, :inspection_location, :passed, :comments, :unit_id,
-      :inspector_company_id, :unique_report_number, :status, :has_slide,
-      # Dimension comment fields
-      :width_comment, :length_comment, :height_comment,
-      :num_low_anchors_comment, :num_high_anchors_comment,
-      :exit_number_comment, :rope_size_comment,
-      :slide_platform_height_comment, :slide_wall_height_comment, :runout_value_comment,
-      :slide_first_metre_height_comment, :slide_beyond_first_metre_height_comment,
-      :slide_permanent_roof_comment,
-      :containing_wall_height_comment, :platform_height_comment,
-      :permanent_roof_comment, :play_area_length_comment, :play_area_width_comment,
-      :negative_adjustment_comment
-    )
+    inspection_specific_params = [:inspection_date, :inspection_location, :passed, :comments, :unit_id, :inspector_company_id, :unique_report_number, :status]
+    base_params = params.require(:inspection).permit(inspection_specific_params + Inspection::PERMITTED_COPYABLE_ATTRIBUTES)
 
     # For each assessment, permit all attributes except timestamps and inspection_id
     assessment_types = %w[
@@ -319,7 +309,7 @@ class InspectionsController < ApplicationController
         # For public report access, return 404 instead of redirect
         render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
       else
-        flash[:danger] = "Inspection record not found"
+        flash[:danger] = I18n.t("inspections.errors.not_found")
         redirect_to inspections_path and return
       end
     end
@@ -327,41 +317,66 @@ class InspectionsController < ApplicationController
 
   def check_inspection_owner
     unless @inspection.user_id == current_user.id
-      flash[:danger] = "Access denied"
+      flash[:danger] = I18n.t("inspections.errors.access_denied")
       redirect_to inspections_path and return
     end
   end
 
   def inspections_to_csv
-    attributes = %w[id name serial inspection_date reinspection_date inspector location passed comments manufacturer]
-
     CSV.generate(headers: true) do |csv|
-      csv << attributes
+      # Get headers dynamically
+      headers = csv_headers
+      csv << headers
 
-      current_user.inspections.order(created_at: :desc).each do |inspection|
-        row = attributes.map { |attr| inspection.send(attr) }
-        csv << row
+      # Export whatever inspections are already filtered by the index action
+      @inspections.includes(:unit, :inspector_company, :user).each do |inspection|
+        csv << csv_row_data(inspection, headers)
       end
     end
   end
 
-  def check_inspection_complete
-    unless @inspection.status == "completed" || @inspection.status == "finalized"
-      render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
+  def csv_headers
+    headers = []
+
+    # All inspection column names (excluding foreign keys we'll handle specially)
+    excluded_columns = %w[user_id inspector_company_id unit_id]
+    inspection_columns = Inspection.column_names - excluded_columns
+    headers += inspection_columns
+
+    # Related model data with prefixes
+    headers += %w[unit_name unit_serial unit_manufacturer unit_owner unit_description]
+    headers += %w[inspector_company_name]
+    headers += %w[inspector_user_email]
+
+    headers
+  end
+
+  def csv_row_data(inspection, headers)
+    headers.map do |header|
+      case header
+      # Unit fields
+      when "unit_name" then inspection.unit&.name
+      when "unit_serial" then inspection.unit&.serial
+      when "unit_manufacturer" then inspection.unit&.manufacturer
+      when "unit_owner" then inspection.unit&.owner
+      when "unit_description" then inspection.unit&.description
+
+      # Inspector company
+      when "inspector_company_name" then inspection.inspector_company&.name
+
+      # User (inspector) fields
+      when "inspector_user_email" then inspection.user&.email
+
+      # All other fields are direct inspection attributes
+      else
+        inspection.send(header) if inspection.respond_to?(header)
+      end
     end
   end
 
-  def check_inspection_finalized
-    if @inspection.status == "finalized" && !current_user.admin?
-      flash[:danger] = I18n.t("inspections.errors.finalized_no_edit")
-      redirect_to inspection_path(@inspection)
-    end
-  end
-
-  def check_inspection_finalized_for_delete
-    if @inspection.status == "finalized" && !current_user.admin?
-      flash[:danger] = I18n.t("inspections.errors.finalized_no_delete")
-      redirect_to inspection_path(@inspection)
-    end
+  def build_index_title
+    title = "Inspections"
+    title += " - #{(params[:result] == "passed") ? "Passed" : "Failed"}" if params[:result].present?
+    title
   end
 end

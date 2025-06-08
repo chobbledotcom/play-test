@@ -57,3 +57,28 @@
 	flex: 1;
 	min-width: 200px;
 }
+
+/* Unit photo styling */
+.unit-photo {
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+.unit-photo img {
+	max-width: 300px;
+	max-height: 200px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.unit-photo-small {
+	text-align: center;
+	margin: 1rem 0;
+}
+
+.unit-photo-small img {
+	max-width: 250px;
+	max-height: 150px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}

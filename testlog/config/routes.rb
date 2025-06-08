@@ -36,6 +36,8 @@ Rails.application.routes.draw do
       get "report"
       get "qr_code"
       patch "replace_dimensions"
+      get "select_unit"
+      patch "update_unit"
     end
   end
 

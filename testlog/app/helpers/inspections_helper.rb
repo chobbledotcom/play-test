@@ -8,18 +8,6 @@ module InspectionsHelper
     end
   end
 
-  def inspection_links(user)
-    total = user.inspections.count
-    overdue = user.inspections.overdue.count
-
-    if total > 0
-      links = []
-      links << link_to("all (#{total})", inspections_path)
-      links << link_to("overdue (#{overdue})", overdue_inspections_path) if overdue > 0
-      content_tag(:p, links.join(" / ").html_safe, class: "center") if links.any?
-    end
-  end
-
   def inspection_result_badge(inspection)
     if inspection.passed
       content_tag(:mark, "PASS")
@@ -36,16 +24,14 @@ module InspectionsHelper
       }
     ]
 
-    # Add delete action if inspection is not finalized or user is admin
-    if inspection.status != "finalized" || current_user&.admin?
-      actions << {
-        label: t("inspections.buttons.delete"),
-        url: inspection_path(inspection),
-        method: :delete,
-        confirm: t("inspections.messages.delete_confirm"),
-        danger: true
-      }
-    end
+    # Add delete action (always allowed now)
+    actions << {
+      label: t("inspections.buttons.delete"),
+      url: inspection_path(inspection),
+      method: :delete,
+      confirm: t("inspections.messages.delete_confirm"),
+      danger: true
+    }
 
     actions
   end

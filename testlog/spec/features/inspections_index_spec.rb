@@ -61,32 +61,32 @@ RSpec.feature "Inspections Index Page", type: :feature do
         expect(page).to have_content(Date.current.strftime("%b %d, %Y"))
       end
 
-      it "makes list items clickable and routes to edit for non-finalized inspections" do
+      it "makes list items clickable and routes to edit for non-complete inspections" do
         visit inspections_path
 
         # Find the list item containing the inspection data
         inspection_item = page.find("li", text: unit.name)
         inspection_link = inspection_item.find("a.table-list-link")
 
-        # Click the link should navigate to edit page for non-finalized inspection
+        # Click the link should navigate to edit page for non-complete inspection
         inspection_link.click
         expect(current_path).to eq(edit_inspection_path(inspection))
       end
 
-      it "routes to view page for finalized inspections" do
-        # Create a finalized inspection
-        finalized_inspection = create_user_inspection(inspection_location: "Finalized Location")
-        finalized_inspection.update_column(:status, "finalized")
+      it "routes to view page for complete inspections" do
+        # Create a complete inspection
+        complete_inspection = create_user_inspection(inspection_location: "Complete Location")
+        complete_inspection.update_column(:status, "complete")
 
         visit inspections_path
 
         # Find the list item and click the link
-        inspection_item = page.find("li", text: "Finalized Location")
+        inspection_item = page.find("li", text: "Complete Location")
         inspection_link = inspection_item.find("a.table-list-link")
         inspection_link.click
 
-        # Should navigate to view page for finalized inspection
-        expect(current_path).to eq(inspection_path(finalized_inspection))
+        # Should navigate to view page for complete inspection
+        expect(current_path).to eq(inspection_path(complete_inspection))
       end
     end
 

@@ -11,7 +11,13 @@
 
   <h4><%= t('units.headers.inspection_history') %></h4>
   <% if @inspections.any? %>
-    <%= render 'inspection_history_table', inspections: @inspections, unit: @unit %>
+    <%= render 'inspections/inspections_table', 
+        inspections: @inspections, 
+        unit: @unit,
+        show_name: @inspections.any? { |i| i.name != @unit.name },
+        show_serial: false,
+        show_location: true,
+        show_inspector: true %>
   <% else %>
     <p><%= t('units.messages.no_inspections') %></p>
   <% end %>

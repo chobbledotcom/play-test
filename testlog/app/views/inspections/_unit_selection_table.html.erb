@@ -1,0 +1,49 @@
+<div class="table-list units-list">
+  <!-- Header row -->
+  <div class="table-list-header">
+    <span class="col-photo"><%= t('units.fields.photo') %></span>
+    <span class="col-name"><%= t('units.fields.name') %></span>
+    <span class="col-manufacturer"><%= t('units.fields.manufacturer') %></span>
+    <span class="col-serial"><%= t('units.fields.serial') %></span>
+    <span class="col-has-slide"><%= t('units.fields.has_slide') %></span>
+    <span class="col-action"><%= t('units.actions.select') %></span>
+  </div>
+  
+  <!-- Data rows -->
+  <ul class="table-list-items">
+    <% units.each do |item| %>
+      <li>
+        <div class="table-list-content">
+          <span class="col-photo" data-label="<%= t('units.fields.photo') %>">
+            <% if item.photo.attached? %>
+              <%= image_tag ImageProcessorService.process(item.photo, 60), style: "width: 60px; height: 60px; object-fit: cover;" %>
+            <% else %>
+              <span style="color: #ccc;"><%= t('units.messages.no_photo') %></span>
+            <% end %>
+          </span>
+          <span class="col-name" data-label="<%= t('units.fields.name') %>">
+            <%= item.name %>
+          </span>
+          <span class="col-manufacturer" data-label="<%= t('units.fields.manufacturer') %>">
+            <%= item.manufacturer %>
+          </span>
+          <span class="col-serial" data-label="<%= t('units.fields.serial') %>">
+            <%= item.serial %>
+          </span>
+          <span class="col-has-slide" data-label="<%= t('units.fields.has_slide') %>">
+            <%= item.has_slide? ? t('shared.yes') : t('shared.no') %>
+          </span>
+          <span class="col-action" data-label="<%= t('units.actions.select') %>">
+            <%= button_to t('units.actions.select'), 
+                update_unit_inspection_path(inspection, unit_id: item.id), 
+                method: :patch,
+                class: "button",
+                data: { 
+                  turbo_confirm: t('inspections.messages.unit_selection_confirm', unit_name: item.name) 
+                } %>
+          </span>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</div>

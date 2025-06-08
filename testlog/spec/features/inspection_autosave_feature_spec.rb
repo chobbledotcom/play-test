@@ -29,8 +29,8 @@ RSpec.feature "Inspection Auto-save without JavaScript", type: :feature do
     # Check for turbo frame that would update progress
     expect(page).to have_css("turbo-frame#inspection_progress_#{inspection.id}")
 
-    # Check for finalization issues turbo frame
-    expect(page).to have_css("turbo-frame#finalization_issues_#{inspection.id}")
+    # Check for completion issues turbo frame
+    expect(page).to have_css("turbo-frame#completion_issues_#{inspection.id}")
   end
 
   scenario "all assessment forms are configured for auto-save" do

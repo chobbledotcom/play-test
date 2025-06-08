@@ -54,16 +54,15 @@ class InspectorCompany < ApplicationRecord
 
   def pass_rate
     return 0 if inspections.empty?
-    # Will be enhanced when passed scope is added to Inspection
-    passed_count = inspections.where(passed: true).count
+    passed_count = inspections.passed.count
     (passed_count.to_f / inspections.count * 100).round(2)
   end
 
   def company_statistics
     {
       total_inspections: inspections.count,
-      passed_inspections: inspections.where(passed: true).count,
-      failed_inspections: inspections.where(passed: false).count,
+      passed_inspections: inspections.passed.count,
+      failed_inspections: inspections.failed.count,
       pass_rate: pass_rate,
       active_since: created_at.year
     }

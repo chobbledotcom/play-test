@@ -1,3 +1,9 @@
+<% if @inspection.unit&.photo&.attached? %>
+  <div class="unit-photo">
+    <%= image_tag @inspection.unit.photo, alt: "Photo of #{@inspection.unit.name}" %>
+  </div>
+<% end %>
+
 <%= scrollable_table do %>
   <tr>
     <th>Name:</th>
@@ -7,7 +13,7 @@
     <th>Serial Number / Asset ID:</th>
     <td>
       <% if @inspection.unit %>
-        <%= link_to @inspection.serial.presence || "Missing", unit_path(@inspection.unit) %>
+        <%= link_to @inspection.serial.presence || t("inspections.messages.missing_serial"), unit_path(@inspection.unit) %>
       <% else %>
         <%= @inspection.serial %>
       <% end %>

@@ -21,17 +21,12 @@ FactoryBot.define do
       passed { false }
     end
 
-    trait :in_progress do
-      status { "in_progress" }
+    trait :complete do
+      status { "complete" }
     end
 
     trait :completed do
-      status { "completed" }
-    end
-
-    trait :finalized do
-      status { "finalized" }
-      finalized_at { Time.current }
+      status { "complete" }
     end
 
     trait :overdue do

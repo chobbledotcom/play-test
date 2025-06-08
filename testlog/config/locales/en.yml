@@ -26,3 +26,12 @@ en:
       default: "%a, %d %b %Y %H:%M:%S %z"
       short: "%d %b %H:%M"
       long: "%B %d, %Y %H:%M"
+
+  # ActiveRecord validation messages
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            current_password:
+              incorrect: "is incorrect"

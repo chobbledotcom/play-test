@@ -13,72 +13,58 @@ RSpec.describe "Inspection Status Access Control", type: :request do
     context "when inspection status is 'draft'" do
       let(:draft_inspection) { create(:inspection, user: user, unit: unit, status: "draft") }
 
-      it "returns 404 for report access" do
+      it "allows report access (now available for all statuses)" do
         get report_inspection_path(draft_inspection)
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:ok)
       end
 
-      it "returns 404 for QR code access" do
+      it "allows QR code access (now available for all statuses)" do
         get qr_code_inspection_path(draft_inspection)
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:ok)
       end
     end
 
-    context "when inspection status is 'in_progress'" do
-      let(:in_progress_inspection) { create(:inspection, user: user, unit: unit, status: "in_progress") }
-
-      it "returns 404 for report access" do
-        get report_inspection_path(in_progress_inspection)
-        expect(response).to have_http_status(:not_found)
-      end
-
-      it "returns 404 for QR code access" do
-        get qr_code_inspection_path(in_progress_inspection)
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    context "when inspection status is 'completed'" do
-      let(:completed_inspection) { create(:inspection, :completed, user: user, unit: unit) }
+    context "when inspection status is 'complete'" do
+      let(:complete_inspection) { create(:inspection, :complete, user: user, unit: unit) }
 
       it "allows report access" do
-        get report_inspection_path(completed_inspection)
+        get report_inspection_path(complete_inspection)
         expect(response).to have_http_status(:success)
         expect(response.content_type).to eq("application/pdf")
       end
 
       it "allows QR code access" do
-        get qr_code_inspection_path(completed_inspection)
+        get qr_code_inspection_path(complete_inspection)
         expect(response).to have_http_status(:success)
         expect(response.content_type).to eq("image/png")
       end
     end
 
-    # Note: Finalized status also allows access but requires complete assessments to create
-    # which is complex for this test. The controller allows both 'completed' and 'finalized'.
+    # Note: Complete status allows access for all reports and QR codes
   end
 
   describe "Public access via short URLs" do
-    context "when inspection is not completed" do
+    context "when inspection is draft" do
       let(:draft_inspection) { create(:inspection, user: user, unit: unit, status: "draft") }
 
-      it "returns 404 for public report URL" do
+      it "allows public report access (now available for all statuses)" do
         # Logout first
         delete logout_path
 
         get "/r/#{draft_inspection.id}"
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to eq("application/pdf")
       end
     end
 
-    context "when inspection is completed" do
-      let(:completed_inspection) { create(:inspection, :completed, user: user, unit: unit) }
+    context "when inspection is complete" do
+      let(:complete_inspection) { create(:inspection, :complete, user: user, unit: unit) }
 
       it "allows public report access" do
         # Logout first
         delete logout_path
 
-        get "/r/#{completed_inspection.id}"
+        get "/r/#{complete_inspection.id}"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to eq("application/pdf")
       end

@@ -47,6 +47,7 @@ en:
       unarchive: "Unarchive"
       search: "Search"
       new_company: "New Company"
+      view_all_inspections: "View all inspections"
 
     messages:
       created: "Inspector company created successfully."

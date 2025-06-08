@@ -7,6 +7,9 @@ class UnitsController < ApplicationController
   def index
     @units = current_user.units.order(created_at: :desc)
 
+    # Apply search
+    @units = @units.search(params[:query]) if params[:query].present?
+
     # Apply filters
     @units = @units.overdue if params[:status] == "overdue"
     @units = @units.where(manufacturer: params[:manufacturer]) if params[:manufacturer].present?
@@ -41,7 +44,7 @@ class UnitsController < ApplicationController
 
     if @unit.save
       process_photo_if_present
-      flash[:success] = "Equipment record created"
+      flash[:success] = I18n.t("units.messages.created")
       redirect_to @unit
     else
       render :new, status: :unprocessable_entity
@@ -57,7 +60,7 @@ class UnitsController < ApplicationController
 
       respond_to do |format|
         format.html do
-          flash[:success] = "Equipment record updated"
+          flash[:success] = I18n.t("units.messages.updated")
           redirect_to @unit
         end
         format.json { render json: {status: "success", message: t("autosave.saved")} }
@@ -84,7 +87,7 @@ class UnitsController < ApplicationController
 
   def destroy
     @unit.destroy
-    flash[:success] = "Equipment record deleted"
+    flash[:success] = I18n.t("units.messages.deleted")
     redirect_to units_path
   end
 
@@ -156,37 +159,8 @@ class UnitsController < ApplicationController
   private
 
   def unit_params
-    params.require(:unit).permit(:name, :serial, :manufacturer, :photo,
-      :description, :has_slide, :owner,
-      :width, :length, :height, :model, :manufacture_date, :notes,
-      # Basic dimension comments
-      :width_comment, :length_comment, :height_comment,
-      # Totally enclosed flag
-      :is_totally_enclosed,
-      # Anchorage dimensions
-      :num_low_anchors, :num_high_anchors,
-      :num_low_anchors_comment, :num_high_anchors_comment,
-      # Enclosed dimensions
-      :exit_number, :exit_number_comment,
-      # Materials dimensions
-      :rope_size, :rope_size_comment,
-      # Slide dimensions
-      :slide_platform_height, :slide_wall_height, :runout_value,
-      :slide_first_metre_height, :slide_beyond_first_metre_height, :slide_permanent_roof,
-      :slide_platform_height_comment, :slide_wall_height_comment, :runout_value_comment,
-      :slide_first_metre_height_comment, :slide_beyond_first_metre_height_comment,
-      :slide_permanent_roof_comment,
-      # Structure dimensions
-      :stitch_length, :unit_pressure_value,
-      :blower_tube_length, :step_size_value, :fall_off_height_value,
-      :trough_depth_value, :trough_width_value,
-      # User height dimensions
-      :containing_wall_height, :platform_height, :user_height,
-      :users_at_1000mm, :users_at_1200mm, :users_at_1500mm, :users_at_1800mm,
-      :play_area_length, :play_area_width, :negative_adjustment, :permanent_roof,
-      :containing_wall_height_comment, :platform_height_comment,
-      :permanent_roof_comment, :play_area_length_comment, :play_area_width_comment,
-      :negative_adjustment_comment)
+    unit_specific_params = [:name, :serial, :manufacturer, :photo, :description, :owner, :model, :manufacture_date, :notes]
+    params.require(:unit).permit(unit_specific_params + Unit::PERMITTED_COPYABLE_ATTRIBUTES)
   end
 
   def no_index
@@ -201,7 +175,7 @@ class UnitsController < ApplicationController
         # For public report access, return 404 instead of redirect
         render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
       else
-        flash[:danger] = "Equipment record not found"
+        flash[:danger] = I18n.t("units.messages.not_found")
         redirect_to units_path and return
       end
     end
@@ -209,7 +183,7 @@ class UnitsController < ApplicationController
 
   def check_unit_owner
     unless @unit.user_id == current_user.id
-      flash[:danger] = "Access denied"
+      flash[:danger] = I18n.t("units.messages.access_denied")
       redirect_to units_path and return
     end
   end

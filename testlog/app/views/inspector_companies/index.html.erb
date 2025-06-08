@@ -27,7 +27,7 @@
         {}, { onchange: "this.form.submit();" } %>
     
     <% if params[:active].present? || params[:search].present? %>
-      <%= link_to "Clear Filters", inspector_companies_path %>
+      <%= link_to t("ui.buttons.clear_filters"), inspector_companies_path %>
     <% end %>
   <% end %>
 </section>

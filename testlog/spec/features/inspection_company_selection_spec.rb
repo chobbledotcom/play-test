@@ -107,16 +107,16 @@ RSpec.feature "Inspector Company Selection", type: :feature do
     end
 
     context "status transitions with inspector company validation" do
-      it "allows changing status to completed with inspector company" do
+      it "allows changing status to complete with inspector company" do
         visit edit_inspection_path(inspection)
 
         # Complete with inspector company (should work since inspection already has one)
-        select I18n.t("inspections.status.completed"), from: "inspection[status]"
+        select I18n.t("inspections.status.complete"), from: "inspection[status]"
         click_button I18n.t("inspections.buttons.update")
 
         expect(page).to have_content(I18n.t("inspections.messages.updated"))
         inspection.reload
-        expect(inspection.status).to eq("completed")
+        expect(inspection.status).to eq("complete")
       end
 
       it "allows completing inspection when inspector company is selected" do
@@ -127,24 +127,24 @@ RSpec.feature "Inspector Company Selection", type: :feature do
         visit edit_inspection_path(inspection)
 
         select inspector_company.name, from: "inspection[inspector_company_id]"
-        select I18n.t("inspections.status.completed"), from: "inspection[status]"
+        select I18n.t("inspections.status.complete"), from: "inspection[status]"
         click_button I18n.t("inspections.buttons.update")
 
         expect(page).to have_content("Inspection updated successfully.")
         inspection.reload
-        expect(inspection.status).to eq("completed")
+        expect(inspection.status).to eq("complete")
         expect(inspection.inspector_company).to eq(inspector_company)
       end
 
       it "allows in_progress status with inspector company" do
         visit edit_inspection_path(inspection)
 
-        select I18n.t("inspections.status.in_progress"), from: "inspection[status]"
+        select I18n.t("inspections.status.complete"), from: "inspection[status]"
         click_button I18n.t("inspections.buttons.update")
 
         expect(page).to have_content(I18n.t("inspections.messages.updated"))
         inspection.reload
-        expect(inspection.status).to eq("in_progress")
+        expect(inspection.status).to eq("complete")
         expect(inspection.inspector_company_id).to be_present
       end
     end

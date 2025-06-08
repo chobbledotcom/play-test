@@ -14,7 +14,7 @@ RSpec.describe "Inspections PDF Generation", type: :request do
   end
 
   describe "PDF navigation integration with Capybara" do
-    let(:inspection) { create(:inspection, :completed, user: user) }
+    let(:inspection) { create(:inspection, :complete, user: user) }
 
     it "allows accessing PDF report from inspection show page" do
       visit inspection_path(inspection)
@@ -48,7 +48,7 @@ RSpec.describe "Inspections PDF Generation", type: :request do
         serial: "PDF-LONG-#{extremely_long_text[0..50]}",
         manufacturer: "Manufacturer #{extremely_long_text[0..50]}")
 
-      inspection = create(:inspection, :completed,
+      inspection = create(:inspection, :complete,
         user: user,
         unit: unit,
         inspection_location: "Long location #{extremely_long_text}",
@@ -65,7 +65,7 @@ RSpec.describe "Inspections PDF Generation", type: :request do
     end
 
     it "handles case-insensitive URLs" do
-      inspection = create(:inspection, :completed, user: user)
+      inspection = create(:inspection, :complete, user: user)
 
       # Test with lowercase URL (user-friendly)
       get "/inspections/#{inspection.id.downcase}/report"
@@ -80,7 +80,7 @@ RSpec.describe "Inspections PDF Generation", type: :request do
 
     it "handles Unicode and emoji in PDF generation" do
       # Create inspection with Unicode characters and emoji
-      inspection = create(:inspection, :completed, :with_unicode_data,
+      inspection = create(:inspection, :complete, :with_unicode_data,
         user: user,
         passed: true)
 
@@ -99,7 +99,7 @@ RSpec.describe "Inspections PDF Generation", type: :request do
         serial: "PDF-HTML-123",
         manufacturer: "<b>Bold Company</b>")
 
-      inspection = create(:inspection, :completed,
+      inspection = create(:inspection, :complete,
         user: user,
         unit: unit,
         inspection_location: "<div style='color:red'>Red Location</div>",
@@ -121,7 +121,7 @@ RSpec.describe "Inspections PDF Generation", type: :request do
         serial: "PDF-PRECISE-123",
         manufacturer: "Precision Instruments, Inc.")
 
-      inspection = create(:inspection, :completed,
+      inspection = create(:inspection, :complete,
         user: user,
         unit: unit,
         inspection_location: "Calibration Lab",

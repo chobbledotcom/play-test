@@ -1,36 +1,63 @@
+<%
+  # Options for customizing the table display
+  show_name = local_assigns.fetch(:show_name, true)
+  show_serial = local_assigns.fetch(:show_serial, true)
+  show_location = local_assigns.fetch(:show_location, true)
+  show_inspector = local_assigns.fetch(:show_inspector, false)
+  context_unit = local_assigns[:unit] # If provided, we're showing inspections for a specific unit
+%>
+
 <div class="table-list inspections-list">
   <!-- Header row -->
   <div class="table-list-header">
-    <span class="col-name">Name</span>
-    <span class="col-serial">Serial</span>
-    <span class="col-location"><%= t('inspections.fields.inspection_location') %></span>
-    <span class="col-last-inspection">Last Inspection</span>
-    <span class="col-next-due">Next Due</span>
-    <span class="col-result">Result</span>
+    <% if show_name %>
+      <span class="col-name"><%= t('inspections.fields.name') %></span>
+    <% end %>
+    <% if show_serial %>
+      <span class="col-serial"><%= t('inspections.fields.serial') %></span>
+    <% end %>
+    <% if show_location %>
+      <span class="col-location"><%= t('inspections.fields.inspection_location') %></span>
+    <% end %>
+    <span class="col-last-inspection"><%= t('inspections.fields.last_inspection') %></span>
+    <span class="col-next-due"><%= t('inspections.fields.next_due') %></span>
+    <% if show_inspector %>
+      <span class="col-inspector"><%= t('inspections.fields.inspector') %></span>
+    <% end %>
+    <span class="col-result"><%= t('inspections.fields.result') %></span>
   </div>
   
   <!-- Data rows -->
   <ul class="table-list-items">
     <% inspections.each do |inspection| %>
       <% 
-        # Route to edit page for non-finalized inspections, view page for finalized
-        target_path = inspection.status == "finalized" ? inspection_path(inspection) : edit_inspection_path(inspection)
+        # Route to edit page for draft inspections, view page for complete
+        target_path = inspection.status == "complete" ? inspection_path(inspection) : edit_inspection_path(inspection)
       %>
       <li>
         <%= link_to target_path, class: "table-list-link" do %>
-          <span class="col-name" data-label="Name">
-            <% if inspection.unit.nil? %>
-              <span class="badge">[<%= t("inspections.labels.no_unit") %>]</span>
-            <% end %>
-            <%= inspection.name.presence || "Unnamed" %>
-          </span>
-          <span class="col-serial" data-label="Serial">
-            <%= inspection.serial.presence || "Missing" %>
-          </span>
-          <span class="col-location" data-label="Location"><%= inspection.inspection_location %></span>
-          <span class="col-last-inspection" data-label="Last Inspection"><%= render_time(inspection.inspection_date) %></span>
-          <span class="col-next-due" data-label="Next Due"><%= render_time(inspection.reinspection_date) %></span>
-          <span class="col-result" data-label="Result"><%= inspection_result_badge(inspection) %></span>
+          <% if show_name %>
+            <span class="col-name" data-label="<%= t('inspections.fields.name') %>">
+              <% if inspection.unit.nil? %>
+                <span class="badge">[<%= t("inspections.labels.no_unit") %>]</span>
+              <% end %>
+              <%= inspection.name.presence || t('inspections.messages.unnamed') %>
+            </span>
+          <% end %>
+          <% if show_serial %>
+            <span class="col-serial" data-label="<%= t('inspections.fields.serial') %>">
+              <%= inspection.serial.presence || t('inspections.messages.missing_serial') %>
+            </span>
+          <% end %>
+          <% if show_location %>
+            <span class="col-location" data-label="<%= t('inspections.fields.inspection_location') %>"><%= inspection.inspection_location %></span>
+          <% end %>
+          <span class="col-last-inspection" data-label="<%= t('inspections.fields.last_inspection') %>"><%= render_time(inspection.inspection_date) %></span>
+          <span class="col-next-due" data-label="<%= t('inspections.fields.next_due') %>"><%= render_time(inspection.reinspection_date) %></span>
+          <% if show_inspector %>
+            <span class="col-inspector" data-label="<%= t('inspections.fields.inspector') %>"><%= inspection.inspector_company&.name %></span>
+          <% end %>
+          <span class="col-result" data-label="<%= t('inspections.fields.result') %>"><%= inspection_result_badge(inspection) %></span>
         <% end %>
       </li>
     <% end %>

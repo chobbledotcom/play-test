@@ -67,22 +67,6 @@ RSpec.describe HasDimensions, type: :model do
         expect(model.errors[:slide_platform_height]).to include("must be greater than or equal to 0")
       end
     end
-
-    describe "temperature validation" do
-      it "validates ambient temperature range" do
-        model.ambient_temperature = -60
-        expect(model).not_to be_valid
-        expect(model.errors[:ambient_temperature]).to include("must be greater than -50")
-
-        model.ambient_temperature = 70
-        expect(model).not_to be_valid
-        expect(model.errors[:ambient_temperature]).to include("must be less than 60")
-
-        model.ambient_temperature = 20
-        model.valid?
-        expect(model.errors[:ambient_temperature]).to be_empty
-      end
-    end
   end
 
   describe "instance methods" do

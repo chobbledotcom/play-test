@@ -21,6 +21,7 @@
   padding: 1rem;
   font-weight: bold;
   border-bottom: 2px solid var(--color);
+  color: white;
 }
 
 .table-list-items {
@@ -31,6 +32,8 @@
 
 .table-list-items li {
   border-bottom: 1px solid var(--color-bg-secondary);
+  margin: 0;
+  padding: 0;
 }
 
 .table-list-items li:last-child {
@@ -42,11 +45,14 @@
   padding: 1rem;
   text-decoration: none;
   color: inherit;
-  transition: background-color 0.2s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 .table-list-link:hover {
   background-color: var(--color-bg-secondary);
+  color: white;
 }
 
 /* Mobile view - stacked layout */
@@ -68,31 +74,86 @@
     display: flex;
     align-items: center;
   }
-  
+
   .table-list-header > span,
   .table-list-link > span {
     flex: 1;
     padding: 0 0.5rem;
     display: inline-block;
   }
-  
+
   .table-list-link {
     display: flex;
     align-items: center;
   }
-  
+
   .table-list-link > span:before {
     display: none; /* Hide mobile labels on desktop */
   }
-  
+
   /* Column widths for inspections table */
-  .inspections-list .col-name { flex: 2; }
-  .inspections-list .col-serial { flex: 1.5; }
-  .inspections-list .col-location { flex: 2; }
-  .inspections-list .col-last-inspection { flex: 1.5; }
-  .inspections-list .col-next-due { flex: 1.5; }
-  .inspections-list .col-result { flex: 1; text-align: center; }
-  
+  .inspections-list .col-name {
+    flex: 2;
+  }
+  .inspections-list .col-serial {
+    flex: 1.5;
+  }
+  .inspections-list .col-location {
+    flex: 2;
+  }
+  .inspections-list .col-last-inspection {
+    flex: 1.5;
+  }
+  .inspections-list .col-next-due {
+    flex: 1.5;
+  }
+  .inspections-list .col-inspector {
+    flex: 1.5;
+  }
+  .inspections-list .col-result {
+    flex: 1;
+    text-align: center;
+  }
+
+  /* Column widths for units table */
+  .units-list .col-photo {
+    flex: 0 0 80px;
+  }
+  .units-list .col-name {
+    flex: 2;
+  }
+  .units-list .col-manufacturer {
+    flex: 1.5;
+  }
+  .units-list .col-serial {
+    flex: 1.5;
+  }
+  .units-list .col-has-slide {
+    flex: 1;
+    text-align: center;
+  }
+
   /* Align header and data cells */
-  .table-list-header .col-result { text-align: center; }
+  .table-list-header .col-result {
+    text-align: center;
+  }
+  .table-list-header .col-has-slide {
+    text-align: center;
+  }
+}
+
+/* Completion status notice styling */
+.completion-status-notice {
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f8fbff 100%);
+  border: 1px solid #bbdefb;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.completion-status-notice ul {
+  list-style-type: none;
+  padding: 0;
 }

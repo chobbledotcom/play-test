@@ -1,0 +1,44 @@
+<header>
+  <h1><%= @title %></h1>
+</header>
+
+<article>
+  <div class="unit-selection-notice">
+    <p><%= t('inspections.messages.unit_selection_notice') %></p>
+  </div>
+</article>
+
+<section>
+  <div class="search-form">
+    <%= form_with url: select_unit_inspection_path(@inspection), method: :get do |form| %>
+      <%= form.text_field :search, placeholder: t("units.forms.search"), value: params[:search] %>
+      <%= form.submit t("ui.buttons.search") %>
+    <% end %>
+  </div>
+</section>
+
+<section>
+  <%= form_with url: select_unit_inspection_path(@inspection), method: :get, data: { turbo: false } do |form| %>
+    <%= form.select :manufacturer, 
+        options_for_select([["All Manufacturers", ""]] + manufacturer_options(current_user).map { |m| [m, m] }, params[:manufacturer]),
+        {}, { onchange: "this.form.submit();" } %>
+    
+    <%= form.select :has_slide, 
+        options_for_select([
+          ["All Units", ""],
+          [t("units.slide_status.with_slide"), "true"],
+          [t("units.slide_status.without_slide"), "false"]
+        ], params[:has_slide]),
+        {}, { onchange: "this.form.submit();" } %>
+    
+    <% if params[:manufacturer].present? || params[:has_slide].present? %>
+      <%= link_to t("ui.buttons.clear_filters"), select_unit_inspection_path(@inspection) %>
+    <% end %>
+  <% end %>
+</section>
+
+<% if @units.any? %>
+  <%= render 'unit_selection_table', units: @units, inspection: @inspection %>
+<% else %>
+  <p><%= t('units.messages.no_units_found') %></p>
+<% end %>
