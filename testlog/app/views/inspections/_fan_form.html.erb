@@ -19,7 +19,7 @@
         </div>
         
         <div class="form-group">
-          <%= render 'form/text_area', field: :fan_size_comment %>
+          <%= render 'form/comment', field: :fan_size_comment %>
         </div>
       <% end %>
 
@@ -27,17 +27,17 @@
       <%= render 'form/fieldset', legend_key: 'blower_safety_checks', i18n_base: 'inspections.assessments.fan.fields', form: assessment_form do %>
         <div class="blower-check-group">
           <%= render 'form/pass_fail', field: :blower_flap_pass %>
-          <%= render 'form/text_area', field: :blower_flap_comment %>
+          <%= render 'form/comment', field: :blower_flap_comment %>
         </div>
 
         <div class="blower-check-group">
           <%= render 'form/pass_fail', field: :blower_finger_pass %>
-          <%= render 'form/text_area', field: :blower_finger_comment %>
+          <%= render 'form/comment', field: :blower_finger_comment %>
         </div>
 
         <div class="blower-check-group">
           <%= render 'form/pass_fail', field: :blower_visual_pass %>
-          <%= render 'form/text_area', field: :blower_visual_comment %>
+          <%= render 'form/comment', field: :blower_visual_comment %>
         </div>
       <% end %>
 
@@ -45,7 +45,7 @@
       <%= render 'form/fieldset', legend_key: 'electrical_safety', i18n_base: 'inspections.assessments.fan.fields', form: assessment_form do %>
         <div class="pat-testing-group">
           <%= render 'form/pass_fail', field: :pat_pass %>
-          <%= render 'form/text_area', field: :pat_comment %>
+          <%= render 'form/comment', field: :pat_comment %>
         </div>
       <% end %>
 

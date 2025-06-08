@@ -1,36 +1,38 @@
-<%= scrollable_table(class: "inspections") do %>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Serial</th>
-      <th><%= t('inspections.fields.inspection_location') %></th>
-      <th>Last Inspection</th>
-      <th>Next Due</th>
-      <th>Result</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
+<div class="table-list inspections-list">
+  <!-- Header row -->
+  <div class="table-list-header">
+    <span class="col-name">Name</span>
+    <span class="col-serial">Serial</span>
+    <span class="col-location"><%= t('inspections.fields.inspection_location') %></span>
+    <span class="col-last-inspection">Last Inspection</span>
+    <span class="col-next-due">Next Due</span>
+    <span class="col-result">Result</span>
+  </div>
+  
+  <!-- Data rows -->
+  <ul class="table-list-items">
     <% inspections.each do |inspection| %>
-      <tr>
-        <td>
-          <% if inspection.unit.nil? %>
-            <span class="badge">[<%= t("inspections.labels.no_unit") %>]</span>
-          <% end %>
-          <%= link_to inspection.name.presence || "Unnamed", inspection_path(inspection) %>
-        </td>
-        <td>
-          <%= link_to inspection.serial.presence || "Missing", inspection_path(inspection) %>
-        </td>
-        <td><%= inspection.inspection_location %></td>
-        <td><%= render_time(inspection.inspection_date) %></td>
-        <td><%= render_time(inspection.reinspection_date) %></td>
-        <td><%= inspection_result_badge(inspection) %></td>
-        <td>
-          <%= link_to "Edit", edit_inspection_path(inspection), class: "btn btn-primary btn-sm" %>
-          <%= link_to "Report", report_inspection_path(inspection), class: "btn btn-secondary btn-sm", target: "_blank" %>
-        </td>
-      </tr>
+      <% 
+        # Route to edit page for non-finalized inspections, view page for finalized
+        target_path = inspection.status == "finalized" ? inspection_path(inspection) : edit_inspection_path(inspection)
+      %>
+      <li>
+        <%= link_to target_path, class: "table-list-link" do %>
+          <span class="col-name" data-label="Name">
+            <% if inspection.unit.nil? %>
+              <span class="badge">[<%= t("inspections.labels.no_unit") %>]</span>
+            <% end %>
+            <%= inspection.name.presence || "Unnamed" %>
+          </span>
+          <span class="col-serial" data-label="Serial">
+            <%= inspection.serial.presence || "Missing" %>
+          </span>
+          <span class="col-location" data-label="Location"><%= inspection.inspection_location %></span>
+          <span class="col-last-inspection" data-label="Last Inspection"><%= render_time(inspection.inspection_date) %></span>
+          <span class="col-next-due" data-label="Next Due"><%= render_time(inspection.reinspection_date) %></span>
+          <span class="col-result" data-label="Result"><%= inspection_result_badge(inspection) %></span>
+        <% end %>
+      </li>
     <% end %>
-  </tbody>
-<% end %>
+  </ul>
+</div>

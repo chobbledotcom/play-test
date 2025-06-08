@@ -17,12 +17,12 @@
         <div class="form-group">
           <%= render 'form/number', field: :exit_number, min: 0, step: 1 %>
           <%= render 'form/pass_fail', field: :exit_number_pass %>
-          <%= render 'form/text_area', field: :exit_number_comment %>
+          <%= render 'form/comment', field: :exit_number_comment %>
         </div>
 
         <div class="form-group">
           <%= render 'form/pass_fail', field: :exit_visible_pass %>
-          <%= render 'form/text_area', field: :exit_visible_comment %>
+          <%= render 'form/comment', field: :exit_visible_comment %>
         </div>
       <% end %>
 

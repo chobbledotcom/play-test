@@ -132,7 +132,7 @@ RSpec.feature "Unit Creation from Inspection", type: :feature do
     it "shows indicator for inspections without units" do
       visit inspections_path
 
-      within("tr", text: "No Unit Test") do
+      within("li", text: "No Unit Test") do
         expect(page).to have_content(I18n.t("inspections.labels.no_unit"))
       end
     end

@@ -6,3 +6,93 @@
   cursor: not-allowed;
   font-style: italic;
 }
+
+/* Table-list styling - reusable for all table conversions */
+.table-list {
+  border: 1px solid var(--color-bg-secondary);
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.table-list-header {
+  display: none; /* Hidden on mobile by default */
+  background-color: var(--color-bg-secondary);
+  padding: 1rem;
+  font-weight: bold;
+  border-bottom: 2px solid var(--color);
+}
+
+.table-list-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.table-list-items li {
+  border-bottom: 1px solid var(--color-bg-secondary);
+}
+
+.table-list-items li:last-child {
+  border-bottom: none;
+}
+
+.table-list-link {
+  display: block;
+  padding: 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s ease;
+}
+
+.table-list-link:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+/* Mobile view - stacked layout */
+.table-list-link > span {
+  display: block;
+  padding: 0.25rem 0;
+}
+
+.table-list-link > span:before {
+  content: attr(data-label) ": ";
+  font-weight: bold;
+  display: inline-block;
+  width: 140px;
+}
+
+/* Desktop view - table layout */
+@media (min-width: 768px) {
+  .table-list-header {
+    display: flex;
+    align-items: center;
+  }
+  
+  .table-list-header > span,
+  .table-list-link > span {
+    flex: 1;
+    padding: 0 0.5rem;
+    display: inline-block;
+  }
+  
+  .table-list-link {
+    display: flex;
+    align-items: center;
+  }
+  
+  .table-list-link > span:before {
+    display: none; /* Hide mobile labels on desktop */
+  }
+  
+  /* Column widths for inspections table */
+  .inspections-list .col-name { flex: 2; }
+  .inspections-list .col-serial { flex: 1.5; }
+  .inspections-list .col-location { flex: 2; }
+  .inspections-list .col-last-inspection { flex: 1.5; }
+  .inspections-list .col-next-due { flex: 1.5; }
+  .inspections-list .col-result { flex: 1; text-align: center; }
+  
+  /* Align header and data cells */
+  .table-list-header .col-result { text-align: center; }
+}

@@ -104,7 +104,9 @@ RSpec.feature "Assessment Forms", type: :feature do
       expect(page).to have_css("input[type='number']")
       expect(page).to have_css("input[type='radio']")
       expect(page).to have_css("input[type='checkbox']")
-      expect(page).to have_css("textarea")
+
+      # Check for comment toggle functionality (textarea hidden by default)
+      expect(page).to have_css("input[data-comment-toggle]")
     end
 
     it "displays user height assessment form sections" do
@@ -118,7 +120,9 @@ RSpec.feature "Assessment Forms", type: :feature do
       # Check for basic form elements
       expect(page).to have_css("input[type='number']")
       expect(page).to have_css("input[type='checkbox']")
-      expect(page).to have_css("textarea")
+
+      # Check for comment toggle functionality (textarea hidden by default)
+      expect(page).to have_css("input[data-comment-toggle]")
     end
 
     it "displays structure assessment form sections" do
@@ -169,7 +173,9 @@ RSpec.feature "Assessment Forms", type: :feature do
       # Check for basic form elements
       expect(page).to have_css("input[type='radio']")
       expect(page).to have_css("input[type='text']")
-      expect(page).to have_css("textarea")
+
+      # Check for comment toggle functionality (textarea hidden by default)
+      expect(page).to have_css("input[data-comment-toggle]")
     end
 
     context "for totally enclosed units" do
@@ -190,7 +196,9 @@ RSpec.feature "Assessment Forms", type: :feature do
         # Check for basic form elements
         expect(page).to have_css("input[type='number']")
         expect(page).to have_css("input[type='radio']")
-        expect(page).to have_css("textarea")
+
+        # Check for comment toggle functionality (textarea hidden by default)
+        expect(page).to have_css("input[data-comment-toggle]")
       end
     end
   end

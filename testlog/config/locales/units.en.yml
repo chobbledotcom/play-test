@@ -110,8 +110,6 @@ en:
       users_at_1800mm: "Users at 1800mm Height"
       # Enclosed unit fields
       is_totally_enclosed: "Unit is Totally Enclosed"
-      # Environmental
-      ambient_temperature: "Ambient Temperature (°C)"
       
       # Comment fields
       width_comment: "Width Comment"

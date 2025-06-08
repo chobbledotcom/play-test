@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_09_121000) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_09_121001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -103,8 +103,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_121000) do
     t.string "finalized_by_id", limit: 12
     t.text "general_notes"
     t.text "recommendations"
-    t.string "weather_conditions"
-    t.decimal "ambient_temperature", precision: 5, scale: 2
     t.string "inspector_signature"
     t.datetime "signature_timestamp"
     t.string "inspector_company_id"

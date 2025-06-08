@@ -61,14 +61,32 @@ RSpec.feature "Inspections Index Page", type: :feature do
         expect(page).to have_content(Date.current.strftime("%b %d, %Y"))
       end
 
-      it "provides link to edit inspection" do
+      it "makes list items clickable and routes to edit for non-finalized inspections" do
         visit inspections_path
-        expect(page).to have_link("Edit")
+
+        # Find the list item containing the inspection data
+        inspection_item = page.find("li", text: unit.name)
+        inspection_link = inspection_item.find("a.table-list-link")
+
+        # Click the link should navigate to edit page for non-finalized inspection
+        inspection_link.click
+        expect(current_path).to eq(edit_inspection_path(inspection))
       end
 
-      it "provides link to view report" do
+      it "routes to view page for finalized inspections" do
+        # Create a finalized inspection
+        finalized_inspection = create_user_inspection(inspection_location: "Finalized Location")
+        finalized_inspection.update_column(:status, "finalized")
+
         visit inspections_path
-        expect(page).to have_link("Report")
+
+        # Find the list item and click the link
+        inspection_item = page.find("li", text: "Finalized Location")
+        inspection_link = inspection_item.find("a.table-list-link")
+        inspection_link.click
+
+        # Should navigate to view page for finalized inspection
+        expect(current_path).to eq(inspection_path(finalized_inspection))
       end
     end
 
@@ -115,10 +133,11 @@ RSpec.feature "Inspections Index Page", type: :feature do
       expect(page).to have_css("h1", text: I18n.t("inspections.titles.index"))
     end
 
-    it "includes table headers" do
+    it "includes column headers" do
       visit inspections_path
-      expect(page).to have_css("th", text: "Name")
-      expect(page).to have_css("th", text: "Serial")
+      # On desktop, headers are visible
+      expect(page).to have_css(".table-list-header", text: "Name")
+      expect(page).to have_css(".table-list-header", text: "Serial")
     end
   end
 

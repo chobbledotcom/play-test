@@ -25,9 +25,6 @@ module HasDimensions
       numericality: {greater_than_or_equal_to: 0},
       allow_nil: true
 
-    validates :ambient_temperature,
-      numericality: {greater_than: -50, less_than: 60},
-      allow_nil: true
 
     # Scopes for dimensional queries
     scope :within_dimensions, ->(width, length, height) {
@@ -123,10 +120,7 @@ module HasDimensions
       permanent_roof_comment: permanent_roof_comment,
       play_area_length_comment: play_area_length_comment,
       play_area_width_comment: play_area_width_comment,
-      negative_adjustment_comment: negative_adjustment_comment,
-
-      # Environmental
-      ambient_temperature: ambient_temperature
+      negative_adjustment_comment: negative_adjustment_comment
     }.compact
   end
 

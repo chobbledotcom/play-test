@@ -186,9 +186,7 @@ class UnitsController < ApplicationController
       :play_area_length, :play_area_width, :negative_adjustment, :permanent_roof,
       :containing_wall_height_comment, :platform_height_comment,
       :permanent_roof_comment, :play_area_length_comment, :play_area_width_comment,
-      :negative_adjustment_comment,
-      # Environmental
-      :ambient_temperature)
+      :negative_adjustment_comment)
   end
 
   def no_index

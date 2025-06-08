@@ -193,8 +193,7 @@ RSpec.describe Inspection, type: :model do
         rope_size: 15.0,
         slide_platform_height: 2.5,
         containing_wall_height: 1.2,
-        users_at_1000mm: 10,
-        ambient_temperature: 22.5)
+        users_at_1000mm: 10)
     }
 
     it "copies all dimensions from unit on creation" do
@@ -217,7 +216,6 @@ RSpec.describe Inspection, type: :model do
       expect(inspection.slide_platform_height).to eq(2.5)
       expect(inspection.containing_wall_height).to eq(1.2)
       expect(inspection.users_at_1000mm).to eq(10)
-      expect(inspection.ambient_temperature).to eq(22.5)
     end
 
     it "preserves inspection dimensions when unit is updated" do

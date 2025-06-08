@@ -23,23 +23,54 @@
         <div class="form-group">
           <%= render 'form/number', field: :rope_size, min: 0, step: 0.1 %>
           <%= render 'form/pass_fail', field: :rope_size_pass %>
+          <%= render 'form/comment', field: :rope_size_comment %>
         </div>
       <% end %>
 
       <!-- Critical Material Safety Checks Section -->
       <%= render 'form/fieldset', legend_key: 'critical_materials', i18n_base: 'inspections.assessments.materials.fields', form: assessment_form do %>
-        <%= render 'form/pass_fail', field: :fabric_pass %>
-        <%= render 'form/pass_fail', field: :fire_retardant_pass %>
-        <%= render 'form/pass_fail', field: :thread_pass %>
+        <div class="form-group">
+          <%= render 'form/pass_fail', field: :fabric_pass %>
+          <%= render 'form/comment', field: :fabric_comment %>
+        </div>
+        
+        <div class="form-group">
+          <%= render 'form/pass_fail', field: :fire_retardant_pass %>
+          <%= render 'form/comment', field: :fire_retardant_comment %>
+        </div>
+        
+        <div class="form-group">
+          <%= render 'form/pass_fail', field: :thread_pass %>
+          <%= render 'form/comment', field: :thread_comment %>
+        </div>
       <% end %>
 
       <!-- Additional Material Checks Section -->
       <%= render 'form/fieldset', legend_key: 'additional_materials', i18n_base: 'inspections.assessments.materials.fields', form: assessment_form do %>
-        <%= render 'form/pass_fail', field: :clamber_pass %>
-        <%= render 'form/pass_fail', field: :retention_netting_pass %>
-        <%= render 'form/pass_fail', field: :zips_pass %>
-        <%= render 'form/pass_fail', field: :windows_pass %>
-        <%= render 'form/pass_fail', field: :artwork_pass %>
+        <div class="form-group">
+          <%= render 'form/pass_fail', field: :clamber_pass %>
+          <%= render 'form/comment', field: :clamber_comment %>
+        </div>
+        
+        <div class="form-group">
+          <%= render 'form/pass_fail', field: :retention_netting_pass %>
+          <%= render 'form/comment', field: :retention_netting_comment %>
+        </div>
+        
+        <div class="form-group">
+          <%= render 'form/pass_fail', field: :zips_pass %>
+          <%= render 'form/comment', field: :zips_comment %>
+        </div>
+        
+        <div class="form-group">
+          <%= render 'form/pass_fail', field: :windows_pass %>
+          <%= render 'form/comment', field: :windows_comment %>
+        </div>
+        
+        <div class="form-group">
+          <%= render 'form/pass_fail', field: :artwork_pass %>
+          <%= render 'form/comment', field: :artwork_comment %>
+        </div>
       <% end %>
 
       <!-- Material Compliance Summary -->
