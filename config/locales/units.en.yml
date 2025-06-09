@@ -7,7 +7,7 @@ en:
       index: "Units"
       show: "Unit Details"
       new_from_inspection: "Create Unit from Inspection"
-    
+
     search:
       placeholder: "Serial number or name"
 
@@ -54,7 +54,7 @@ en:
     slide_status:
       with_slide: "With Slide"
       without_slide: "Without Slide"
-      
+
     labels:
       inspection_location: "Inspection Location"
       inspection_date: "Inspection Date"
@@ -111,7 +111,7 @@ en:
       containing_wall_height: "Containing Wall Height (m)"
       platform_height: "Platform Height (m)"
       tallest_user_height: "Maximum Tallest User Height (m)"
-      user_height: "Maximum Tallest User Height (m)"  # Backward compatibility
+      user_height: "Maximum Tallest User Height (m)" # Backward compatibility
       play_area_length: "Play Area Length (m)"
       play_area_width: "Play Area Width (m)"
       negative_adjustment: "Negative Adjustment (m²)"
@@ -122,7 +122,7 @@ en:
       users_at_1800mm: "Users at 1800mm Height"
       # Enclosed unit fields
       is_totally_enclosed: "Unit is Totally Enclosed"
-      
+
       # Comment fields
       width_comment: "Width Comment"
       length_comment: "Length Comment"
@@ -160,7 +160,7 @@ en:
       add_inspection: "Add Inspection"
       add_unit: "Add Unit"
       export_csv: "Export CSV"
-      
+
     actions:
       select: "Select"
 
@@ -193,10 +193,10 @@ en:
       no_inspections: "No inspections recorded for this unit."
       created_from_inspection: "Unit created successfully and linked to inspection."
       dimensions_will_be_copied: "Dimensions will be automatically copied from the inspection."
-      created: "Equipment record created"
-      updated: "Equipment record updated"
-      deleted: "Equipment record deleted"
-      not_found: "Equipment record not found"
+      created: "Unit created"
+      updated: "Unit updated"
+      deleted: "Unit deleted"
+      not_found: "Unit not found"
       access_denied: "Access denied"
       delete_confirm: "Are you sure? This cannot be undone."
       no_photo: "No photo"
@@ -205,8 +205,8 @@ en:
       inspection_company_required: "You must be assigned to an inspection company to create units."
 
     accessibility:
-      qr_code_alt: "QR Code for Equipment Report"
-      
+      qr_code_alt: "QR Code for Unit Inspection History Report"
+
     share:
       button: "Share / Copy"
       title: "Inflatable Unit %{name} Report"

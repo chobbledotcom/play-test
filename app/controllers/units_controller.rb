@@ -16,7 +16,7 @@ class UnitsController < ApplicationController
     @units = @units.where(manufacturer: params[:manufacturer]) if params[:manufacturer].present?
     @units = @units.where(owner: params[:owner]) if params[:owner].present?
 
-    @title = "Equipment"
+    @title = "Units"
     @title += " - Overdue" if params[:status] == "overdue"
     @title += " - #{params[:manufacturer]}" if params[:manufacturer].present?
     @title += " - #{params[:owner]}" if params[:owner].present?

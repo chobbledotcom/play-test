@@ -163,6 +163,21 @@ RSpec.describe "Inspections", type: :request do
         end
       end
 
+      context "when user cannot create inspections" do
+        let(:user_at_limit) do
+          user = create(:user)
+          user.update!(inspection_limit: 0)
+          user
+        end
+        
+        before { login_as(user_at_limit) }
+
+        it "redirects with alert when limit is 0" do
+          post "/inspections", params: { inspection: valid_inspection_attributes }
+          expect_redirect_with_alert(root_path)
+        end
+      end
+
       context "with valid user" do
         it "creates inspection successfully" do
           post "/inspections", params: { inspection: valid_inspection_attributes.merge(unit_id: unit.id) }

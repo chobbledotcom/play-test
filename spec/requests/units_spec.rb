@@ -437,7 +437,7 @@ RSpec.describe "Units", type: :request do
 
       it "shows proper page titles" do
         visit units_path
-        expect(page).to have_content("Equipment") # The page shows Equipment as title
+        expect(page).to have_content("Units")
 
         visit unit_path(unit)
         expect(page).to have_content("Unit Details")
