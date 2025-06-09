@@ -199,7 +199,6 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     end
   end
 
-
   describe "navigation and workflow" do
     before { visit edit_inspection_path(inspection) }
 

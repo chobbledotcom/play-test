@@ -200,7 +200,8 @@ RSpec.describe UserHeightAssessment, type: :model do
     it "returns 100 when all fields are completed" do
       assessment.update!(
         attributes_for(:user_height_assessment, :with_basic_data).merge(
-          tallest_user_height_comment: "Complete"
+          tallest_user_height_comment: "Complete",
+          negative_adjustment: 0.5
         )
       )
 

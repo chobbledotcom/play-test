@@ -15,7 +15,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         assessment = inspection.create_user_height_assessment!(
           containing_wall_height: 1.5,
           platform_height: 1.0,
-          user_height: 1.2
+          tallest_user_height: 1.2
         )
 
         patch inspection_path(inspection),
@@ -53,7 +53,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
                 id: assessment.id,
                 containing_wall_height: 1.5,
                 platform_height: 1.0,
-                user_height: 1.2,
+                tallest_user_height: 1.2,
                 permanent_roof: false,
                 users_at_1000mm: 10,
                 users_at_1200mm: 8,
@@ -61,7 +61,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
                 users_at_1800mm: 4,
                 play_area_length: 5.0,
                 play_area_width: 4.0,
-                user_height_comment: "Test comment"
+                tallest_user_height_comment: "Test comment"
               }
             }
           },
@@ -82,7 +82,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         inspection.create_user_height_assessment!(
           containing_wall_height: 1.5,
           platform_height: 1.0,
-          user_height: 1.2,
+          tallest_user_height: 1.2,
           permanent_roof: false,
           users_at_1000mm: 10,
           users_at_1200mm: 8,
@@ -90,7 +90,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
           users_at_1800mm: 4,
           play_area_length: 5.0,
           play_area_width: 4.0,
-          user_height_comment: "Complete"
+          tallest_user_height_comment: "Complete"
         )
 
         patch inspection_path(inspection),
@@ -98,7 +98,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
             inspection: {
               user_height_assessment_attributes: {
                 id: inspection.user_height_assessment.id,
-                user_height_comment: "Updated comment"
+                tallest_user_height_comment: "Updated comment"
               }
             }
           },
@@ -144,7 +144,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
           inspection: {
             user_height_assessment_attributes: {
               id: assessment.id,
-              user_height: 1.2
+              tallest_user_height: 1.2
             }
           }
         },

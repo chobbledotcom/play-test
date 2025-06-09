@@ -85,7 +85,8 @@ RSpec.describe "Inspections", type: :request do
       expect(response).to have_http_status(:success)
 
       # Verify it was associated with the current user
-      inspection = Inspection.last
+      inspection = user.inspections.order(:created_at).last
+      expect(inspection).to be_present
       expect(inspection.user_id).to eq(user.id)
     end
 
@@ -96,7 +97,8 @@ RSpec.describe "Inspections", type: :request do
       }
 
       # Verify it still used the current user's ID
-      inspection = Inspection.last
+      inspection = user.inspections.order(:created_at).last
+      expect(inspection).to be_present
       expect(inspection.user_id).to eq(user.id)
       expect(inspection.user_id).not_to eq(other_user.id)
     end
@@ -235,7 +237,8 @@ RSpec.describe "Inspections", type: :request do
         expect(response).to have_http_status(:success)
 
         # Verify the inspection was created with correct attributes
-        inspection = Inspection.last
+        inspection = user.inspections.find_by(unit_id: unit.id)
+        expect(inspection).to be_present
         expect(inspection.unit_id).to eq(unit.id)
         expect(inspection.user_id).to eq(user.id)
       end
@@ -252,7 +255,8 @@ RSpec.describe "Inspections", type: :request do
         expect(response).to have_http_status(:success)
 
         # Check attributes and user_id
-        inspection = Inspection.last
+        inspection = user.inspections.find_by(unit_id: unit.id)
+        expect(inspection).to be_present
         expect(inspection.unit_id).to eq(unit.id)
         expect(inspection.user_id).to eq(user.id)
       end
@@ -418,7 +422,7 @@ RSpec.describe "Inspections", type: :request do
       #   admin_user = create(:user, :admin, inspection_company: user.inspection_company)
       #   admin_unit = create(:unit, user: admin_user)
       #   sign_in(admin_user)
-      #   
+      #
       #   inspection = create(:inspection, user: admin_user, unit: admin_unit, status: "complete")
       #
       #   delete "/inspections/#{inspection.id}"

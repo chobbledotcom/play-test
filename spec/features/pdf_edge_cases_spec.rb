@@ -13,7 +13,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
   feature "Extreme text handling" do
     scenario "handles 5000+ character text fields" do
       extremely_long_text = "Lorem ipsum " * 500  # ~5500 characters
-      
+
       inspection.update(
         inspection_location: "Location: #{extremely_long_text}",
         comments: "Comments: #{extremely_long_text}"
@@ -30,7 +30,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
     scenario "handles mixed Unicode, emoji, and special characters" do
       mixed_content = "测试 🎈 Ñoël Zürich ¡Hola! 数学 symbols: ∑∆π€£¥ emojis: 🏭🔧⚡🎯"
-      
+
       inspection.update(
         inspection_location: mixed_content,
         comments: "#{mixed_content} with more content"
@@ -39,7 +39,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       page.driver.browser.get("/inspections/#{inspection.id}/report")
 
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
-      
+
       pdf_text = PDF::Inspector::Text.analyze(page.driver.response.body).strings.join(" ")
       expect(pdf_text).to be_present
       expect(pdf_text.encoding.name).to eq("UTF-8")
@@ -56,9 +56,9 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
       dangerous_content.each do |content|
         inspection.update(comments: content)
-        
+
         page.driver.browser.get("/inspections/#{inspection.id}/report")
-        
+
         expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
         expect(page.driver.response.body[0..3]).to eq("%PDF")
       end
@@ -68,24 +68,24 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
   feature "Numeric precision and edge values" do
     scenario "handles extreme numeric precision" do
       # Create assessments with extreme values
-      assessment = create(:user_height_assessment, :extreme_values, inspection: inspection)
+      create(:user_height_assessment, :extreme_values, inspection: inspection)
 
       page.driver.browser.get("/inspections/#{inspection.id}/report")
 
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
       expect(page.driver.response.body[0..3]).to eq("%PDF")
-      
+
       # Just verify PDF was generated successfully with extreme numeric values
       expect { PDF::Inspector::Text.analyze(page.driver.response.body) }.not_to raise_error
     end
 
     scenario "handles nil and blank numeric values" do
-      assessment = create(:user_height_assessment, :edge_case_values, inspection: inspection)
+      create(:user_height_assessment, :edge_case_values, inspection: inspection)
 
       page.driver.browser.get("/inspections/#{inspection.id}/report")
 
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
-      
+
       pdf_text = PDF::Inspector::Text.analyze(page.driver.response.body).strings.join(" ")
       expect(pdf_text).to include("N/A").or include("0")
     end
@@ -153,7 +153,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
           # Each thread uses a fresh browser session
           new_page = Capybara::Session.new(:rack_test, Capybara.app)
           new_page.driver.browser.get("/inspections/#{inspection.id}/report")
-          
+
           results << {
             status: new_page.driver.response.status,
             content_type: new_page.driver.response.headers["Content-Type"],
@@ -178,15 +178,15 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
     scenario "cleans up temporary files during PDF generation" do
       # Monitor temporary file creation more specifically for this process
       process_pattern = "/tmp/*qr_code*#{inspection.id}_#{Process.pid}*"
-      
+
       10.times do
         temp_files_before = Dir.glob(process_pattern).size
         page.driver.browser.get("/inspections/#{inspection.id}/report")
         expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
-        
+
         # Allow a brief moment for cleanup
         sleep(0.01)
-        
+
         # Should not leave files for this specific process/inspection combo
         temp_files_after = Dir.glob(process_pattern).size
         expect(temp_files_after).to eq(temp_files_before)
@@ -199,7 +199,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       # Create assessment with potentially problematic data
       assessment = build(:user_height_assessment, inspection: inspection)
       assessment.save!(validate: false)  # Bypass validations
-      
+
       # Manually corrupt some data in the database
       assessment.update_columns(
         containing_wall_height: "invalid_number",

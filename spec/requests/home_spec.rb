@@ -186,7 +186,7 @@ RSpec.describe "Home", type: :request do
       it "renders about page content" do
         visit about_path
         expect(page).to have_content(I18n.t("about.title"))
-        expect(page).to have_content(I18n.t("about.coming_soon"))
+        expect(page).to have_content(I18n.t("about.what_it_is.title"))
       end
     end
   end
@@ -216,7 +216,7 @@ RSpec.describe "Home", type: :request do
   describe "accessibility and SEO" do
     it "includes proper page title" do
       visit root_path
-      expect(page).to have_title("Test Logger")
+      expect(page).to have_title("play-test | Professional Inspection Management | play-test.co.uk")
     end
 
     it "has semantic HTML structure for screen readers" do

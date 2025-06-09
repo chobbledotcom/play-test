@@ -160,10 +160,10 @@ RSpec.describe NtfyService do
 
       it "handles SSL errors" do
         mock_http = instance_double(Net::HTTP)
-        
+
         allow(Net::HTTP).to receive(:new).and_return(mock_http)
         allow(mock_http).to receive(:use_ssl=).and_raise(OpenSSL::SSL::SSLError.new("SSL error"))
-        
+
         expect(Rails.logger).to receive(:error).with(/NtfyService error:.*SSL error/)
 
         expect { NtfyService.notify(test_message) }.not_to raise_error
@@ -268,7 +268,7 @@ RSpec.describe NtfyService do
       it "executes notification in a separate thread" do
         thread_executed = false
         original_thread_new = Thread.method(:new)
-        
+
         allow(Thread).to receive(:new) do |&block|
           original_thread_new.call do
             thread_executed = true
@@ -290,16 +290,16 @@ RSpec.describe NtfyService do
         end
 
         NtfyService.notify(test_message)
-        
+
         # Give the thread a moment to execute
         sleep(0.01)
-        
+
         expect(thread_executed).to be true
       end
 
       it "does not block the main thread" do
         start_time = Time.current
-        
+
         # Mock a slow HTTP request
         allow(Net::HTTP).to receive(:new) do
           sleep(0.05) # 50ms delay
@@ -314,7 +314,7 @@ RSpec.describe NtfyService do
         allow(mock_request).to receive(:body=)
 
         NtfyService.notify(test_message)
-        
+
         # Should return immediately, not wait for the HTTP request
         elapsed = Time.current - start_time
         expect(elapsed).to be < 0.01 # Should be much faster than the 50ms delay
@@ -358,17 +358,17 @@ RSpec.describe NtfyService do
       it "constructs correct URI path" do
         mock_uri = instance_double(URI::HTTPS, host: "ntfy.sh", port: 443, path: "/#{channel}")
         expect(URI).to receive(:parse).with("https://ntfy.sh/#{channel}").and_return(mock_uri)
-        
+
         mock_http = instance_double(Net::HTTP)
         expect(Net::HTTP).to receive(:new).with("ntfy.sh", 443).and_return(mock_http)
         expect(mock_http).to receive(:use_ssl=).with(true)
-        
+
         mock_request = instance_double(Net::HTTP::Post)
         expect(Net::HTTP::Post).to receive(:new).with("/#{channel}").and_return(mock_request)
         expect(mock_request).to receive(:[]=).exactly(3).times
         expect(mock_request).to receive(:body=).with(test_message)
         expect(mock_http).to receive(:request).with(mock_request)
-        
+
         NtfyService.send(:send_notification, test_message)
       end
     end

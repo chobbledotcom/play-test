@@ -38,9 +38,9 @@ RSpec.describe InspectionsHelper, type: :helper do
     context "with partially complete assessments" do
       before do
         # Complete one assessment
-        create(:user_height_assessment, :with_basic_data, 
-               inspection: inspection, 
-               tallest_user_height_comment: "Complete")
+        create(:user_height_assessment, :with_basic_data,
+          inspection: inspection,
+          tallest_user_height_comment: "Complete")
 
         # Add incomplete assessment
         inspection.create_slide_assessment!(slide_platform_height: 2.0)
@@ -57,9 +57,9 @@ RSpec.describe InspectionsHelper, type: :helper do
     context "with all assessments complete" do
       before do
         # Create all complete assessments
-        create(:user_height_assessment, :with_basic_data, 
-               inspection: inspection, 
-               tallest_user_height_comment: "Complete")
+        create(:user_height_assessment, :with_basic_data,
+          inspection: inspection,
+          tallest_user_height_comment: "Complete")
 
         inspection.create_slide_assessment!(
           slide_platform_height: 2.0,
@@ -137,9 +137,9 @@ RSpec.describe InspectionsHelper, type: :helper do
 
       it "includes enclosed assessment in calculation" do
         # Create all assessments including enclosed
-        create(:user_height_assessment, :with_basic_data, 
-               inspection: inspection, 
-               tallest_user_height_comment: "Complete")
+        create(:user_height_assessment, :with_basic_data,
+          inspection: inspection,
+          tallest_user_height_comment: "Complete")
 
         inspection.create_enclosed_assessment!(
           exit_number: 2,

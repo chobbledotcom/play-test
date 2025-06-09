@@ -17,7 +17,8 @@ RSpec.feature "Inspection Creation Workflow", type: :feature do
     expect(page).to have_content(I18n.t("inspections.messages.created_without_unit"))
 
     # Should be redirected to edit the newly created inspection (check the URL)
-    created_inspection = Inspection.last
+    created_inspection = user.inspections.order(:created_at).last
+    expect(created_inspection).to be_present
     expect(current_url).to include(edit_inspection_path(created_inspection))
   end
 

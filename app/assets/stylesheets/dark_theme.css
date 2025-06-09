@@ -166,3 +166,11 @@
 .dark-theme .calculated-field .calculated-value {
   color: #CCC;
 }
+
+/* Company activation notice */
+.dark-theme #company-activation-notice {
+  background-color: #422;
+  border-color: #844;
+  color: #faa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}

@@ -24,7 +24,8 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       expect(page).to have_content(I18n.t("inspections.messages.created"))
 
       # Verify the inspection was created with the correct unit
-      inspection = user.inspections.last
+      inspection = user.inspections.find_by(unit_id: unit.id)
+      expect(inspection).to be_present
       expect(inspection.unit).to eq(unit)
       expect(inspection.user).to eq(user)
       expect(inspection.status).to eq("draft")
@@ -72,7 +73,6 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       expect(page).not_to have_button(I18n.t("units.buttons.add_inspection"))
     end
   end
-
 
   describe "Unit selection workflow" do
     it "shows unit details in inspection overview after creation" do

@@ -25,6 +25,7 @@ en:
       inspection_history: "Inspection History"
       qr_code: "Report QR Code"
       report_link: "Report PDF Link"
+      report_json_link: "Report JSON Link"
       inspection_details: "Inspection Details"
 
     sections:
@@ -200,6 +201,7 @@ en:
       no_photo: "No photo"
       no_units_found: "No units found."
       view_full_photo: "View full size photo"
+      inspection_company_required: "You must be assigned to an inspection company to create units."
 
     accessibility:
       qr_code_alt: "QR Code for Equipment Report"

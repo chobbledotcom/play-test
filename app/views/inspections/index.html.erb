@@ -14,13 +14,11 @@
       } do %>
     <strong><%= t('inspections.buttons.add_inspection') %></strong>
   <% end %>
-<% else %>
-  <p style="color: #e74c3c;">
-    <%= current_user.inspection_company_required_message %>
-  </p>
 <% end %>
 
-<%= render 'filter_form' %>
+<% if current_user.inspections.any? || current_user.units.any? %>
+  <%= render 'filter_form' %>
+<% end %>
 
 <% if @draft_inspections.any? %>
   <h2>Draft Inspections</h2>

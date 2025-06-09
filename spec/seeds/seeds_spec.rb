@@ -393,7 +393,7 @@ RSpec.describe "Seed Data", type: :model do
             expect(assessment.inspection).to be_present
             expect(assessment.containing_wall_height).to be_present
             expect(assessment.platform_height).to be_present
-            expect(assessment.user_height).to be_present
+            expect(assessment.tallest_user_height).to be_present
             expect(assessment.users_at_1000mm).to be_present
             expect(assessment.users_at_1200mm).to be_present
             expect(assessment.users_at_1500mm).to be_present
@@ -408,7 +408,7 @@ RSpec.describe "Seed Data", type: :model do
           UserHeightAssessment.all.each do |assessment|
             expect(assessment.containing_wall_height).to be_between(0.5, 3.0)
             expect(assessment.platform_height).to be_between(0.2, 2.0)
-            expect(assessment.user_height).to be_between(1.0, 2.0)
+            expect(assessment.tallest_user_height).to be_between(1.0, 2.0)
           end
         end
 

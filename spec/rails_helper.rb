@@ -70,7 +70,7 @@ RSpec.configure do |config|
   # examples within a transaction, remove the following line or assign false
   # instead of true.
   config.use_transactional_fixtures = true
-  
+
   # Database cleaner configuration for parallel tests
   config.before(:suite) do
     # Ensure database is properly set up for parallel tests

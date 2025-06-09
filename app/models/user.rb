@@ -40,11 +40,11 @@ class User < ApplicationRecord
     end
   end
 
-  private
-
   def has_inspection_company?
     inspection_company_id.present?
   end
+
+  private
 
   def inspection_company_active?
     inspection_company&.active?

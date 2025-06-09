@@ -25,7 +25,7 @@ RSpec.describe I18nUsageTracker do
   describe ".tracking_enabled" do
     it "can be set and retrieved" do
       expect(described_class.tracking_enabled).to be false
-      
+
       described_class.tracking_enabled = true
       expect(described_class.tracking_enabled).to be true
     end
@@ -56,7 +56,7 @@ RSpec.describe I18nUsageTracker do
 
       it "tracks nested keys and their parents" do
         described_class.track_key("users.messages.created")
-        
+
         expect(described_class.used_keys).to include("users.messages.created")
         expect(described_class.used_keys).to include("users.messages")
         expect(described_class.used_keys).to include("users")
@@ -94,7 +94,7 @@ RSpec.describe I18nUsageTracker do
       context "with scope option" do
         it "tracks scoped keys" do
           described_class.track_key("created", scope: "users.messages")
-          
+
           expect(described_class.used_keys).to include("created")
           expect(described_class.used_keys).to include("users.messages.created")
           expect(described_class.used_keys).to include("users.messages")
@@ -103,7 +103,7 @@ RSpec.describe I18nUsageTracker do
 
         it "handles array scope" do
           described_class.track_key("created", scope: ["users", "messages"])
-          
+
           expect(described_class.used_keys).to include("users.messages.created")
           expect(described_class.used_keys).to include("users.messages")
           expect(described_class.used_keys).to include("users")
@@ -111,7 +111,7 @@ RSpec.describe I18nUsageTracker do
 
         it "handles symbol scope" do
           described_class.track_key("created", scope: :users)
-          
+
           expect(described_class.used_keys).to include("users.created")
           expect(described_class.used_keys).to include("users")
         end
@@ -122,14 +122,14 @@ RSpec.describe I18nUsageTracker do
   describe ".all_locale_keys" do
     it "returns a set of all available locale keys" do
       keys = described_class.all_locale_keys
-      
+
       expect(keys).to be_a(Set)
       expect(keys).not_to be_empty
     end
 
     it "includes keys from all locale files" do
       keys = described_class.all_locale_keys
-      
+
       # Check for some keys we know exist in the app
       expect(keys).to include("users")
       expect(keys).to include("inspections")
@@ -139,11 +139,11 @@ RSpec.describe I18nUsageTracker do
     it "caches the result" do
       # First call loads from files
       first_call = described_class.all_locale_keys
-      
+
       # Second call should return cached version
       expect(described_class).not_to receive(:extract_keys_from_hash)
       second_call = described_class.all_locale_keys
-      
+
       expect(first_call).to eq(second_call)
     end
   end
@@ -153,20 +153,20 @@ RSpec.describe I18nUsageTracker do
 
     it "returns keys that haven't been tracked" do
       all_keys = described_class.all_locale_keys
-      
+
       # Track some keys
       described_class.track_key("users.edit.title")
       described_class.track_key("shared.save")
-      
+
       unused = described_class.unused_keys
-      
+
       expect(unused).to be_a(Set)
       expect(unused).not_to include("users.edit.title")
       expect(unused).not_to include("users.edit")
       expect(unused).not_to include("users")
       expect(unused).not_to include("shared.save")
       expect(unused).not_to include("shared")
-      
+
       # Should include keys that weren't tracked
       expect(unused.size).to be < all_keys.size
     end
@@ -179,9 +179,9 @@ RSpec.describe I18nUsageTracker do
       # Track some keys
       described_class.track_key("users.edit.title")
       described_class.track_key("shared.save")
-      
+
       report = described_class.usage_report
-      
+
       expect(report).to include(:total_keys, :used_keys, :unused_keys, :usage_percentage, :unused_key_list)
       expect(report[:total_keys]).to be > 0
       expect(report[:used_keys]).to be > 0
@@ -194,13 +194,13 @@ RSpec.describe I18nUsageTracker do
       # Mock all_locale_keys to have a known set
       known_keys = Set.new(["users", "users.edit", "users.edit.title", "shared", "shared.save"])
       allow(described_class).to receive(:all_locale_keys).and_return(known_keys)
-      
+
       # Track some keys (this will also track parent keys)
       described_class.track_key("users.edit.title")  # tracks users, users.edit, users.edit.title
       described_class.track_key("shared.save")       # tracks shared, shared.save
-      
+
       report = described_class.usage_report
-      
+
       expect(report[:total_keys]).to eq(5)
       expect(report[:used_keys]).to eq(5)  # All keys tracked
       expect(report[:unused_keys]).to eq(0)
@@ -223,10 +223,10 @@ RSpec.describe I18nUsageTracker do
           "save" => "Save"
         }
       }
-      
+
       keys = Set.new
       described_class.send(:extract_keys_from_hash, hash, [], keys)
-      
+
       expected_keys = [
         "users",
         "users.edit",
@@ -236,18 +236,18 @@ RSpec.describe I18nUsageTracker do
         "shared",
         "shared.save"
       ]
-      
+
       expected_keys.each do |key|
         expect(keys).to include(key)
       end
     end
 
     it "handles simple values" do
-      hash = { "simple" => "value" }
+      hash = {"simple" => "value"}
       keys = Set.new
-      
+
       described_class.send(:extract_keys_from_hash, hash, [], keys)
-      
+
       expect(keys).to include("simple")
     end
   end
@@ -268,7 +268,7 @@ RSpec.describe "I18n monkey patch" do
     it "tracks keys when called" do
       # Use a key that exists in the app
       I18n.t("shared.buttons.save")
-      
+
       expect(I18nUsageTracker.used_keys).to include("shared.buttons.save")
       expect(I18nUsageTracker.used_keys).to include("shared.buttons")
       expect(I18nUsageTracker.used_keys).to include("shared")
@@ -276,7 +276,7 @@ RSpec.describe "I18n monkey patch" do
 
     it "works with scope option" do
       I18n.t("save", scope: "shared.buttons")
-      
+
       expect(I18nUsageTracker.used_keys).to include("save")
       expect(I18nUsageTracker.used_keys).to include("shared.buttons.save")
       expect(I18nUsageTracker.used_keys).to include("shared.buttons")
@@ -285,9 +285,9 @@ RSpec.describe "I18n monkey patch" do
 
     it "does not track when tracking is disabled" do
       I18nUsageTracker.tracking_enabled = false
-      
+
       I18n.t("shared.buttons.save")
-      
+
       expect(I18nUsageTracker.used_keys).to be_empty
     end
   end
@@ -295,7 +295,7 @@ RSpec.describe "I18n monkey patch" do
   describe "I18n.translate" do
     it "tracks keys when called" do
       I18n.translate("shared.buttons.save")
-      
+
       expect(I18nUsageTracker.used_keys).to include("shared.buttons.save")
       expect(I18nUsageTracker.used_keys).to include("shared.buttons")
       expect(I18nUsageTracker.used_keys).to include("shared")

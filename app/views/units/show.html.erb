@@ -31,4 +31,7 @@
 
   <h4><%= t('units.headers.report_link') %></h4>
   <%= link_to short_unit_report_url(@unit), short_unit_report_url(@unit) %>
+  
+  <h4><%= t('units.headers.report_json_link') %></h4>
+  <%= link_to short_unit_report_url(@unit) + ".json", short_unit_report_url(@unit) + ".json" %>
 </article>

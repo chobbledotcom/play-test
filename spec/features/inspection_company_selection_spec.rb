@@ -20,7 +20,8 @@ RSpec.feature "Inspector Company Selection", type: :feature do
 
       # Should redirect to edit page with draft inspection
       expect(page).to have_current_path(/\/inspections\/[A-Z0-9]+\/edit/)
-      inspection = user.inspections.last
+      inspection = user.inspections.find_by(unit_id: unit.id)
+      expect(inspection).to be_present
       expect(inspection.inspector_company_id).to eq(inspector_company.id)
       expect(inspection.status).to eq("draft")
       expect(inspection.unit).to eq(unit)
@@ -163,7 +164,6 @@ RSpec.feature "Inspector Company Selection", type: :feature do
       end
     end
   end
-
 
   describe "Inspector company dropdown options" do
     before do

@@ -184,7 +184,8 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_content("Equipment record created")
         expect(page).to have_content("New Test Unit")
 
-        created_unit = Unit.last
+        created_unit = user.units.find_by(name: "New Test Unit")
+        expect(created_unit).to be_present
         expect(created_unit.user).to eq(user)
         expect(created_unit.name).to eq("New Test Unit")
       end
@@ -421,7 +422,8 @@ RSpec.describe "Units", type: :request do
 
         expect(page).to have_content("Equipment record created")
 
-        created_unit = Unit.last
+        created_unit = user.units.order(:created_at).last
+        expect(created_unit).to be_present
         # Photo upload functionality is available but file may not attach in test environment
         expect(created_unit).to respond_to(:photo)
       end
@@ -502,7 +504,8 @@ RSpec.describe "Units", type: :request do
 
       click_button I18n.t("units.buttons.create")
 
-      created_unit = Unit.last
+      created_unit = user.units.find_by(serial: "PROTECT123")
+      expect(created_unit).to be_present
       expect(created_unit.user).to eq(user) # Should be current user, not admin_user
     end
 

@@ -36,7 +36,7 @@ RSpec.feature "About Page", type: :feature do
 
   scenario "navigates to about page from navigation menu" do
     visit root_path
-    
+
     within("nav") do
       click_link "About"
     end

@@ -20,8 +20,8 @@ RSpec.feature "Inspection Dimension Copying", type: :feature do
       # Inspection should be created and we should be on edit page
       expect(page).to have_content(I18n.t("inspections.messages.created"))
 
-      # Get the created inspection
-      inspection = user.inspections.last
+      # Get the created inspection for this specific unit
+      inspection = user.inspections.find_by(unit_id: unit.id)
 
       # Verify basic dimensions were copied
       expect(inspection.width).to eq(12.5)

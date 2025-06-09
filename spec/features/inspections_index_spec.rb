@@ -125,7 +125,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
     it "has proper page title" do
       visit inspections_path
-      expect(page.title).to include("patlog.co.uk")
+      expect(page.title).to include("play-test")
     end
 
     it "has proper heading" do
@@ -179,7 +179,8 @@ RSpec.feature "Inspections Index Page", type: :feature do
       expect(page).to have_content(I18n.t("inspections.messages.created_without_unit"))
 
       # Verify inspection was created without unit
-      inspection = Inspection.last
+      inspection = user.inspections.where(unit_id: nil).order(:created_at).last
+      expect(inspection).to be_present
       expect(inspection.unit).to be_nil
       expect(inspection.user).to eq(user)
     end

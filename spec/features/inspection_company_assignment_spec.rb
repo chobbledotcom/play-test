@@ -91,7 +91,8 @@ RSpec.feature "Inspection Company Assignment", type: :feature do
         visit unit_path(unit)
         click_button I18n.t("units.buttons.add_inspection")
 
-        inspection = regular_user.inspections.last
+        inspection = regular_user.inspections.find_by(unit_id: unit.id)
+        expect(inspection).to be_present
         expect(inspection.inspector_company_id).to eq(inspector_company.id)
       end
 
@@ -103,7 +104,8 @@ RSpec.feature "Inspection Company Assignment", type: :feature do
         visit unit_path(unit)
         click_button I18n.t("units.buttons.add_inspection")
 
-        inspection = regular_user.inspections.last
+        inspection = regular_user.inspections.find_by(unit_id: unit.id)
+        expect(inspection).to be_present
         expect(inspection.inspector_company_id).to eq(original_company.id)
 
         # Change user's company

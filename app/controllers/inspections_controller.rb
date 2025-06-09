@@ -280,14 +280,22 @@ class InspectionsController < ApplicationController
   end
 
   def report
-    pdf_data = PdfGeneratorService.generate_inspection_report(@inspection)
+    respond_to do |format|
+      format.html do
+        pdf_data = PdfGeneratorService.generate_inspection_report(@inspection)
 
-    @inspection.update(pdf_last_accessed_at: Time.current)
+        @inspection.update(pdf_last_accessed_at: Time.current)
 
-    send_data pdf_data.render,
-      filename: "PAT_Report_#{@inspection.serial}.pdf",
-      type: "application/pdf",
-      disposition: "inline"
+        send_data pdf_data.render,
+          filename: "PAT_Report_#{@inspection.serial}.pdf",
+          type: "application/pdf",
+          disposition: "inline"
+      end
+
+      format.json do
+        render json: JsonSerializerService.serialize_inspection(@inspection)
+      end
+    end
   end
 
   def qr_code

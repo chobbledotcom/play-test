@@ -66,7 +66,8 @@ RSpec.feature "Unit Creation from Inspection", type: :feature do
       expect(page).to have_content(I18n.t("units.messages.created_from_inspection"))
 
       # Verify unit was created with correct data
-      unit = Unit.last
+      unit = user.units.find_by(serial: "BBC-2024-001")
+      expect(unit).to be_present
       expect(unit.name).to eq("Big Bounce Castle")
       expect(unit.serial).to eq("BBC-2024-001")
       expect(unit.manufacturer).to eq("Bouncy Co Ltd")

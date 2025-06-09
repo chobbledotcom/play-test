@@ -145,3 +145,15 @@ nav.tabs span {
   text-decoration: none;
   cursor: default;
 }
+
+#company-activation-notice {
+  max-width: 45rem;
+  margin: 1rem auto;
+  padding: 1.5rem;
+  background-color: #fee;
+  border: 2px solid #c44;
+  color: #c44;
+  text-align: center;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

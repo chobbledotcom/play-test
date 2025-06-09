@@ -50,7 +50,7 @@ FactoryBot.define do
     trait :with_comprehensive_dimensions do
       unit { nil } # No unit initially for testing inspection -> unit copying
       inspection_location { "Test Location" }
-      
+
       # All comprehensive attributes for testing copying
       width { 15.0 }
       length { 12.0 }
@@ -60,12 +60,12 @@ FactoryBot.define do
       height_comment { "Inspection height comment" }
       has_slide { true }
       is_totally_enclosed { true }
-      
+
       num_low_anchors { 8 }
       num_high_anchors { 4 }
       num_low_anchors_comment { "Inspection low anchor comment" }
       num_high_anchors_comment { "Inspection high anchor comment" }
-      
+
       stitch_length { 30.0 }
       evacuation_time { 50 }
       unit_pressure_value { 400.0 }
@@ -74,7 +74,7 @@ FactoryBot.define do
       fall_off_height_value { 2.5 }
       trough_depth_value { 1.0 }
       trough_width_value { 1.5 }
-      
+
       slide_platform_height { 3.0 }
       slide_wall_height { 2.2 }
       runout_value { 8.0 }
@@ -87,7 +87,7 @@ FactoryBot.define do
       slide_first_metre_height_comment { "Inspection first metre comment" }
       slide_beyond_first_metre_height_comment { "Inspection beyond first metre comment" }
       slide_permanent_roof_comment { "Inspection roof comment" }
-      
+
       containing_wall_height { 1.5 }
       platform_height { 1.8 }
       tallest_user_height { 2.0 }
@@ -105,10 +105,10 @@ FactoryBot.define do
       play_area_length_comment { "Inspection play area length comment" }
       play_area_width_comment { "Inspection play area width comment" }
       negative_adjustment_comment { "Inspection negative adjustment comment" }
-      
+
       exit_number { 5 }
       exit_number_comment { "Inspection exit number comment" }
-      
+
       rope_size { 22.0 }
       rope_size_comment { "Inspection rope size comment" }
     end
@@ -121,27 +121,27 @@ FactoryBot.define do
       general_notes { "Test general notes" }
       recommendations { "Test recommendations" }
       unique_report_number { "RPII-20250609-ABC123" }
-      
+
       # Dimensions
       width { 5.5 }
       length { 6.0 }
       height { 4.5 }
-      
+
       # Step and ramp measurements
       step_ramp_size { 0.3 }
       step_ramp_size_pass { true }
       critical_fall_off_height { 1.2 }
       critical_fall_off_height_pass { true }
-      
+
       # Unit pressure
       unit_pressure { 2.5 }
       unit_pressure_pass { true }
-      
+
       # Trough measurements
       trough_depth { 0.1 }
       trough_adjacent_panel_width { 0.8 }
       trough_pass { true }
-      
+
       # Safety checks - all passing
       entrapment_pass { true }
       markings_id_pass { true }
@@ -152,7 +152,7 @@ FactoryBot.define do
       windows_pass { true }
       artwork_pass { true }
       exit_sign_visible_pass { true }
-      
+
       # Risk assessment
       risk_assessment { "Low risk assessment notes" }
     end

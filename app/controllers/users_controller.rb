@@ -39,6 +39,11 @@ class UsersController < ApplicationController
   end
 
   def update
+    # Convert empty string to nil for inspection_company_id
+    if params[:user][:inspection_company_id] == ""
+      params[:user][:inspection_company_id] = nil
+    end
+
     if @user.update(user_params)
       flash[:notice] = I18n.t("users.messages.user_updated")
       redirect_to users_path

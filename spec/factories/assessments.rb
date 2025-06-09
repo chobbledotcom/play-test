@@ -83,7 +83,6 @@ FactoryBot.define do
       users_at_1000mm { nil }
       users_at_1200mm { 0 }
     end
-
   end
 
   factory :slide_assessment do

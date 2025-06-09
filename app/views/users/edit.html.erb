@@ -13,12 +13,11 @@
       <%= render 'form/number', field: :inspection_limit, min: 0 %>
       <%= render 'form/select', 
           field: :inspection_company_id,
-          collection_select_params: {
-            collection: InspectorCompany.active.order(:name),
-            value_method: :id,
-            text_method: :name
-          },
-          prompt: t('users.forms.company_prompt') %>
+          options: options_for_select(
+            [[t('users.forms.no_company'), ""]] + 
+            InspectorCompany.active.order(:name).map { |c| [c.name, c.id] },
+            @user.inspection_company_id || ""
+          ) %>
     <% end %>
   <% end %>
   

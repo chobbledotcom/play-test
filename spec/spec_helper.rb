@@ -4,13 +4,13 @@ SimpleCov.start "rails" do
   add_filter "/spec/"
   add_filter "/config/"
   add_filter "/vendor/"
-  
+
   # Enable branch coverage for better insights
   enable_coverage :branch
-  
+
   # Set minimum coverage percentage (lowered for development)
   minimum_coverage 25
-  
+
   # Configure for parallel tests - SimpleCov handles this automatically
   if ENV["TEST_ENV_NUMBER"]
     command_name "RSpec-#{ENV["TEST_ENV_NUMBER"]}"

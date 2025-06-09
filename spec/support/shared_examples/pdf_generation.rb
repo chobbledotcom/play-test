@@ -15,21 +15,20 @@ RSpec.shared_examples "handles unicode in PDFs" do |inspection_or_unit|
         inspection_location: "Test Location with Ünicøde 😀",
         comments: "Comments with émoji 🎈 and spëcial characters"
       )
-      pdf_response = page.driver.response.body
     else # Unit
       inspection_or_unit.update(
         name: "Ünicøde Unit 😎",
         manufacturer: "Émoji Company 🏭",
         description: "Description with spëcial characters"
       )
-      pdf_response = page.driver.response.body
     end
+    pdf_response = page.driver.response.body
 
     expect(pdf_response[0..3]).to eq("%PDF")
-    
+
     # Parse PDF content
     pdf_text = PDF::Inspector::Text.analyze(pdf_response).strings.join(" ")
-    
+
     # Should not crash on Unicode and should include some recognizable content
     expect(pdf_text).to be_present
     expect(pdf_text.encoding.name).to eq("UTF-8")
@@ -39,7 +38,7 @@ end
 RSpec.shared_examples "handles long text in PDFs" do |inspection_or_unit|
   it "properly truncates and handles extremely long text" do
     long_text = "A" * 2000
-    
+
     if inspection_or_unit.is_a?(Inspection)
       inspection_or_unit.update(
         inspection_location: "Long location #{long_text}",
@@ -54,7 +53,7 @@ RSpec.shared_examples "handles long text in PDFs" do |inspection_or_unit|
 
     pdf_response = page.driver.response.body
     expect(pdf_response[0..3]).to eq("%PDF")
-    
+
     # Should generate successfully without errors
     expect { PDF::Inspector::Text.analyze(pdf_response) }.not_to raise_error
   end
@@ -64,9 +63,9 @@ RSpec.shared_examples "requires authentication for PDF access" do |path|
   it "redirects unauthenticated users away from protected PDF routes" do
     # Clear any existing session
     page.driver.browser.clear_cookies
-    
+
     page.driver.browser.get(path)
-    
+
     # Should not return a PDF for unauthenticated users
     expect(page.driver.response.headers["Content-Type"]).not_to eq("application/pdf")
     expect(page.driver.response.status).to be_in([302, 401, 403])
@@ -83,7 +82,7 @@ end
 RSpec.shared_examples "handles missing data gracefully" do |pdf_response|
   it "displays appropriate messages for missing data" do
     pdf_text = PDF::Inspector::Text.analyze(pdf_response).strings.join(" ")
-    
+
     # Should handle missing data gracefully with appropriate messages
     expect(pdf_text).to include("N/A").or include("No").or include("not available")
   end

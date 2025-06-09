@@ -5,6 +5,11 @@ RSpec.describe InspectorCompany, type: :model do
     let!(:active_company) { create(:inspector_company, name: "Active Company", active: true) }
     let!(:archived_company) { create(:inspector_company, name: "Archived Company", active: false) }
 
+    before do
+      # Clean up any other inspector companies to ensure test isolation
+      InspectorCompany.where.not(id: [active_company.id, archived_company.id]).destroy_all
+    end
+
     describe ".by_status" do
       it "returns all companies when status is 'all'" do
         result = InspectorCompany.by_status("all")

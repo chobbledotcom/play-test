@@ -73,8 +73,8 @@ RSpec.describe "Inspections Search", type: :request do
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:search)
 
-      # Should return all inspections
-      expect(assigns(:inspections).count).to eq(Inspection.count)
+      # Should return all of the current user's inspections
+      expect(assigns(:inspections).count).to eq(user.inspections.count)
     end
 
     it "handles Unicode and emoji in search queries" do

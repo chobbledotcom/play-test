@@ -118,7 +118,6 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
     end
   end
 
-
   describe "Progress calculation in turbo streams" do
     let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
 

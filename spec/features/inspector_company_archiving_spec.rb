@@ -20,8 +20,10 @@ RSpec.feature "Inspector Company Archiving", type: :feature do
       expect(page).to have_content("Test Archive Company")
       expect(page).to have_link(I18n.t("inspector_companies.buttons.archive"))
 
-      # Click the archive link (this will be a PATCH request)
-      click_link I18n.t("inspector_companies.buttons.archive")
+      # Click the archive link for this specific company
+      within("tr", text: "Test Archive Company") do
+        click_link I18n.t("inspector_companies.buttons.archive")
+      end
 
       # Should be redirected to companies index
       expect(page).to have_current_path(inspector_companies_path)
@@ -45,9 +47,11 @@ RSpec.feature "Inspector Company Archiving", type: :feature do
       visit inspector_companies_path
 
       # The archive link should have a confirmation dialog and use PATCH method
-      archive_link = find_link(I18n.t("inspector_companies.buttons.archive"))
-      expect(archive_link["data-turbo-confirm"]).to include("Are you sure you want to archive Test Archive Company?")
-      expect(archive_link["data-turbo-method"]).to eq("patch")
+      within("tr", text: "Test Archive Company") do
+        archive_link = find_link(I18n.t("inspector_companies.buttons.archive"))
+        expect(archive_link["data-turbo-confirm"]).to include("Are you sure you want to archive Test Archive Company?")
+        expect(archive_link["data-turbo-method"]).to eq("patch")
+      end
     end
   end
 
@@ -119,8 +123,10 @@ RSpec.feature "Inspector Company Archiving", type: :feature do
       expect(page).to have_content("Company to Unarchive")
       expect(page).to have_link(I18n.t("inspector_companies.buttons.unarchive"))
 
-      # Click the unarchive link (this will be a PATCH request)
-      click_link I18n.t("inspector_companies.buttons.unarchive")
+      # Click the unarchive link for this specific company
+      within("tr", text: "Company to Unarchive") do
+        click_link I18n.t("inspector_companies.buttons.unarchive")
+      end
 
       # Should be redirected to companies index
       expect(page).to have_current_path(inspector_companies_path)

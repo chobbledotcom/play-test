@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_09_132048) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_09_151705) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -176,6 +176,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_132048) do
     t.boolean "artwork_pass"
     t.boolean "exit_sign_visible_pass"
     t.text "risk_assessment"
+    t.datetime "complete_date"
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
     t.index ["status"], name: "index_inspections_on_status"
     t.index ["unit_id"], name: "index_inspections_on_unit_id"

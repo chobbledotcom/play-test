@@ -13,7 +13,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
     describe "GET /inspections/:id/report" do
       it "returns a PDF for valid inspection" do
         get "/inspections/#{inspection.id}/report"
-        
+
         expect(response).to have_http_status(:success)
         expect(response.headers["Content-Type"]).to eq("application/pdf")
         expect(response.headers["Content-Disposition"]).to include("inline")
@@ -22,14 +22,14 @@ RSpec.describe "PDF API Endpoints", type: :request do
 
       it "handles case-insensitive inspection IDs" do
         get "/inspections/#{inspection.id.upcase}/report"
-        
+
         expect(response).to have_http_status(:success)
         expect(response.headers["Content-Type"]).to eq("application/pdf")
       end
 
       it "returns 404 for non-existent inspection" do
         get "/inspections/NONEXISTENT/report"
-        
+
         expect(response).to have_http_status(:not_found)
       end
 
@@ -38,7 +38,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
         other_inspection = create(:inspection, :completed, user: other_user)
 
         get "/inspections/#{other_inspection.id}/report"
-        
+
         # Reports are public, so this should succeed
         expect(response).to have_http_status(:success)
         expect(response.headers["Content-Type"]).to eq("application/pdf")
@@ -54,7 +54,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
 
         it "handles Unicode in PDF generation" do
           get "/inspections/#{inspection.id}/report"
-          
+
           expect(response).to have_http_status(:success)
           expect(response.body[0..3]).to eq("%PDF")
         end
@@ -71,7 +71,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
 
         it "handles long text in PDF generation" do
           get "/inspections/#{inspection.id}/report"
-          
+
           expect(response).to have_http_status(:success)
           expect(response.body[0..3]).to eq("%PDF")
         end
@@ -81,7 +81,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
     describe "GET /inspections/:id.pdf" do
       it "returns PDF via .pdf format" do
         get inspection_path(inspection, format: :pdf)
-        
+
         expect(response).to have_http_status(:success)
         expect(response.headers["Content-Type"]).to eq("application/pdf")
         expect(response.headers["Content-Disposition"]).to include("inline")
@@ -89,9 +89,9 @@ RSpec.describe "PDF API Endpoints", type: :request do
 
       it "allows PDF generation for draft inspections" do
         draft_inspection = create(:inspection, user: user, status: "draft")
-        
+
         get inspection_path(draft_inspection, format: :pdf)
-        
+
         # Draft inspections can generate PDFs
         expect(response).to have_http_status(:success)
         expect(response.headers["Content-Type"]).to eq("application/pdf")
@@ -102,26 +102,26 @@ RSpec.describe "PDF API Endpoints", type: :request do
       it "allows public access to completed inspections" do
         # Clear authentication for public access test
         logout
-        
+
         get "/r/#{inspection.id}"
-        
+
         expect(response).to have_http_status(:success)
         expect(response.headers["Content-Type"]).to eq("application/pdf")
       end
 
       it "handles case-insensitive public URLs" do
         logout
-        
+
         get "/r/#{inspection.id.upcase}"
-        
+
         expect(response).to have_http_status(:success)
       end
 
       it "returns 404 for non-existent public reports" do
         logout
-        
+
         get "/r/NONEXISTENT"
-        
+
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -131,7 +131,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
     describe "GET /units/:id/report" do
       it "returns a PDF for valid unit" do
         get "/units/#{unit.id}/report"
-        
+
         expect(response).to have_http_status(:success)
         expect(response.headers["Content-Type"]).to eq("application/pdf")
         expect(response.headers["Content-Disposition"]).to include("inline")
@@ -140,7 +140,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
 
       it "includes unit details in PDF" do
         get "/units/#{unit.id}/report"
-        
+
         # Should contain I18n unit report title
         pdf_text = PDF::Inspector::Text.analyze(response.body).strings.join(" ")
         expect(pdf_text).to include(I18n.t("pdf.unit.title"))
@@ -149,11 +149,11 @@ RSpec.describe "PDF API Endpoints", type: :request do
 
       it "handles units with no inspections" do
         empty_unit = create(:unit, user: user)
-        
+
         get "/units/#{empty_unit.id}/report"
-        
+
         expect(response).to have_http_status(:success)
-        
+
         pdf_text = PDF::Inspector::Text.analyze(response.body).strings.join(" ")
         expect(pdf_text).to include(I18n.t("pdf.unit.no_completed_inspections"))
       end
@@ -168,7 +168,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
 
         it "handles Unicode in unit PDFs" do
           get "/units/#{unit.id}/report"
-          
+
           expect(response).to have_http_status(:success)
           expect(response.body[0..3]).to eq("%PDF")
         end
@@ -178,19 +178,19 @@ RSpec.describe "PDF API Endpoints", type: :request do
     describe "GET /units/:id/qr_code" do
       it "returns QR code PNG for valid unit" do
         get "/units/#{unit.id}/qr_code"
-        
+
         expect(response).to have_http_status(:success)
         expect(response.headers["Content-Type"]).to eq("image/png")
-        expect(response.body.force_encoding('ASCII-8BIT')[0..3]).to eq("\x89PNG".force_encoding('ASCII-8BIT'))
+        expect(response.body.force_encoding("ASCII-8BIT")[0..3]).to eq("\x89PNG".force_encoding("ASCII-8BIT"))
       end
     end
 
     describe "GET /u/:id (public unit access)" do
       it "allows public access to unit reports" do
         logout
-        
+
         get "/u/#{unit.id}"
-        
+
         expect(response).to have_http_status(:success)
         expect(response.headers["Content-Type"]).to eq("application/pdf")
       end
@@ -201,17 +201,17 @@ RSpec.describe "PDF API Endpoints", type: :request do
     describe "GET /inspections/:id/qr_code" do
       it "returns QR code PNG for inspection" do
         get "/inspections/#{inspection.id}/qr_code"
-        
+
         expect(response).to have_http_status(:success)
         expect(response.headers["Content-Type"]).to eq("image/png")
-        expect(response.body.force_encoding('ASCII-8BIT')[0..3]).to eq("\x89PNG".force_encoding('ASCII-8BIT'))
+        expect(response.body.force_encoding("ASCII-8BIT")[0..3]).to eq("\x89PNG".force_encoding("ASCII-8BIT"))
       end
 
       it "allows public access to inspection QR codes" do
         logout
-        
+
         get "/inspections/#{inspection.id}/qr_code"
-        
+
         expect(response).to have_http_status(:success)
       end
     end
@@ -223,9 +223,9 @@ RSpec.describe "PDF API Endpoints", type: :request do
         inspection_location: "<script>alert('xss')</script>",
         comments: "<b>Bold text</b> with <em>HTML</em>"
       )
-      
+
       get "/inspections/#{inspection.id}/report"
-      
+
       expect(response).to have_http_status(:success)
       # PDF should be generated successfully even with HTML content
       expect(response.body[0..3]).to eq("%PDF")
@@ -233,7 +233,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
 
     it "handles special characters in URLs" do
       get "/inspections/#{inspection.id}%2Freport"
-      
+
       # Should handle URL encoding gracefully (may redirect or return error)
       expect(response).to have_http_status(:not_found).or have_http_status(:found).or have_http_status(:success)
     end

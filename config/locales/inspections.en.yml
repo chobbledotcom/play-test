@@ -14,6 +14,8 @@ en:
       current_unit: "Current Unit"
       inspection_details: "Inspection Details"
       inspection_results: "Inspection Results"
+      report_pdf_link: "Report PDF Link"
+      report_json_link: "Report JSON Link"
 
     sections:
       current_unit: "Current Unit"

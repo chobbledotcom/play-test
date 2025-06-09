@@ -1,0 +1,250 @@
+require "rails_helper"
+
+RSpec.describe JsonSerializerService do
+  let(:user) { create(:user) }
+
+  describe ".serialize_unit" do
+    let(:unit) { create(:unit, user: user, notes: "Private notes") }
+
+    it "includes all public fields using reflection" do
+      json = JsonSerializerService.serialize_unit(unit)
+
+      # Get expected fields using same reflection as service
+      expected_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS - PublicFieldFiltering::UNIT_EXCLUDED_FIELDS
+
+      # Check all expected fields are present (if they have values)
+      expected_fields.each do |field|
+        value = unit.send(field)
+        if value.present?
+          expect(json).to have_key(field.to_sym), "Expected field '#{field}' to be in JSON"
+        end
+      end
+
+      # Check excluded fields are not present
+      (PublicFieldFiltering::EXCLUDED_FIELDS + PublicFieldFiltering::UNIT_EXCLUDED_FIELDS).each do |field|
+        expect(json).not_to have_key(field.to_sym), "Field '#{field}' should be excluded from JSON"
+      end
+    end
+
+    it "excludes sensitive unit fields" do
+      json = JsonSerializerService.serialize_unit(unit)
+
+      expect(json).not_to have_key(:user_id)
+      expect(json).not_to have_key(:notes)
+      expect(json).not_to have_key(:created_at)
+      expect(json).not_to have_key(:updated_at)
+    end
+
+    it "includes URLs" do
+      json = JsonSerializerService.serialize_unit(unit)
+
+      expect(json[:urls]).to be_present
+      expect(json[:urls][:report_pdf]).to include("/u/#{unit.id}")
+      expect(json[:urls][:report_json]).to include("/u/#{unit.id}.json")
+      expect(json[:urls][:qr_code]).to include("/units/#{unit.id}/qr_code")
+    end
+
+    context "with inspection history" do
+      let!(:completed_inspection) { create(:inspection, :completed, user: user, unit: unit, passed: true) }
+      let!(:draft_inspection) { create(:inspection, user: user, unit: unit, status: "draft") }
+
+      it "includes only completed inspections" do
+        json = JsonSerializerService.serialize_unit(unit)
+
+        expect(json[:inspection_history].length).to eq(1)
+        expect(json[:total_inspections]).to eq(1)
+        expect(json[:last_inspection_passed]).to eq(true)
+
+        # Verify no IDs are included
+        expect(json[:inspection_history].first).not_to have_key(:id)
+        expect(json[:inspection_history].first).to have_key(:unique_report_number)
+      end
+    end
+
+    context "when include_inspections is false" do
+      it "excludes inspection history" do
+        create(:inspection, :completed, user: user, unit: unit)
+
+        json = JsonSerializerService.serialize_unit(unit, include_inspections: false)
+
+        expect(json).not_to have_key(:inspection_history)
+        expect(json).not_to have_key(:total_inspections)
+      end
+    end
+  end
+
+  describe ".serialize_inspection" do
+    let(:unit) { create(:unit, user: user, has_slide: true, is_totally_enclosed: true) }
+    let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
+
+    it "includes all public fields using reflection" do
+      json = JsonSerializerService.serialize_inspection(inspection)
+
+      # Get expected fields using same reflection as service
+      expected_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
+
+      # Check all expected fields are present (if they have values)
+      expected_fields.each do |field|
+        value = inspection.send(field)
+        if value.present?
+          expect(json).to have_key(field.to_sym), "Expected field '#{field}' to be in JSON"
+        end
+      end
+
+      # Check excluded fields are not present
+      PublicFieldFiltering::EXCLUDED_FIELDS.each do |field|
+        expect(json).not_to have_key(field.to_sym), "Field '#{field}' should be excluded from JSON"
+      end
+    end
+
+    it "excludes sensitive inspection fields" do
+      json = JsonSerializerService.serialize_inspection(inspection)
+
+      expect(json).not_to have_key(:user_id)
+      expect(json).not_to have_key(:inspector_signature)
+      expect(json).not_to have_key(:signature_timestamp)
+      expect(json).not_to have_key(:pdf_last_accessed_at)
+    end
+
+    it "includes inspector company info" do
+      json = JsonSerializerService.serialize_inspection(inspection)
+
+      expect(json[:inspector_company]).to be_present
+      expect(json[:inspector_company][:name]).to eq(inspection.inspector_company.name)
+    end
+
+    it "includes unit info" do
+      json = JsonSerializerService.serialize_inspection(inspection)
+
+      expect(json[:unit]).to be_present
+      expect(json[:unit][:id]).to eq(unit.id)
+      expect(json[:unit][:has_slide]).to eq(true)
+      expect(json[:unit][:is_totally_enclosed]).to eq(true)
+    end
+
+    context "with assessments" do
+      let!(:user_height_assessment) { create(:user_height_assessment, :complete, inspection: inspection) }
+      let!(:structure_assessment) { create(:structure_assessment, :complete, inspection: inspection, unit_pressure_value: 5.0) }
+      let!(:anchorage_assessment) { create(:anchorage_assessment, :complete, inspection: inspection, num_anchors_comment: "Private comment") }
+      let!(:materials_assessment) { create(:materials_assessment, :complete, inspection: inspection, rope_size_comment: "Private comment") }
+      let!(:fan_assessment) { create(:fan_assessment, :complete, inspection: inspection, blower_serial: "PRIVATE123") }
+      let!(:enclosed_assessment) { create(:enclosed_assessment, :passed, inspection: inspection, exit_number_comment: "Private comment") }
+      let!(:slide_assessment) { create(:slide_assessment, :complete, inspection: inspection) }
+
+      it "includes all assessments with public fields only" do
+        json = JsonSerializerService.serialize_inspection(inspection)
+
+        expect(json[:assessments]).to be_present
+
+        # Check each assessment type
+        %i[user_height_assessment structure_assessment anchorage_assessment
+          materials_assessment fan_assessment enclosed_assessment slide_assessment].each do |assessment_type|
+          expect(json[:assessments]).to have_key(assessment_type)
+        end
+      end
+
+      it "excludes assessment-specific private fields" do
+        json = JsonSerializerService.serialize_inspection(inspection)
+
+        # StructureAssessment exclusions
+        structure = json[:assessments][:structure_assessment]
+        expect(structure).not_to have_key(:unit_pressure_value)
+
+        # AnchorageAssessment exclusions
+        anchorage = json[:assessments][:anchorage_assessment]
+        expect(anchorage).not_to have_key(:num_anchors_comment)
+        expect(anchorage).not_to have_key(:anchor_accessories_comment)
+
+        # MaterialsAssessment exclusions
+        materials = json[:assessments][:materials_assessment]
+        expect(materials).not_to have_key(:rope_size_comment)
+        expect(materials).not_to have_key(:thread_comment)
+
+        # FanAssessment exclusions
+        fan = json[:assessments][:fan_assessment]
+        expect(fan).not_to have_key(:blower_serial)
+        expect(fan).not_to have_key(:pat_comment)
+
+        # EnclosedAssessment exclusions
+        enclosed = json[:assessments][:enclosed_assessment]
+        expect(enclosed).not_to have_key(:exit_number_comment)
+        expect(enclosed).not_to have_key(:exit_visible_comment)
+      end
+
+      it "includes public assessment fields using reflection" do
+        json = JsonSerializerService.serialize_inspection(inspection)
+
+        # Test UserHeightAssessment fields as example
+        user_height = json[:assessments][:user_height_assessment]
+
+        # Get expected fields
+        excluded = PublicFieldFiltering::EXCLUDED_FIELDS + (PublicFieldFiltering::ASSESSMENT_EXCLUDED_FIELDS["UserHeightAssessment"] || [])
+        expected_fields = UserHeightAssessment.column_names - excluded
+
+        expected_fields.each do |field|
+          value = user_height_assessment.send(field)
+          if value.present?
+            expect(user_height).to have_key(field.to_sym), "Expected assessment field '#{field}' to be in JSON"
+          end
+        end
+      end
+    end
+
+    context "when unit doesn't have slide" do
+      let(:unit_no_slide) { create(:unit, user: user, has_slide: false) }
+      let(:inspection_no_slide) { create(:inspection, :completed, user: user, unit: unit_no_slide) }
+
+      it "excludes slide assessment even if present" do
+        create(:slide_assessment, inspection: inspection_no_slide)
+
+        json = JsonSerializerService.serialize_inspection(inspection_no_slide)
+
+        expect(json[:assessments]).not_to have_key(:slide_assessment) if json[:assessments]
+      end
+    end
+
+    context "when include_assessments is false" do
+      it "excludes all assessments" do
+        create(:user_height_assessment, :complete, inspection: inspection)
+
+        json = JsonSerializerService.serialize_inspection(inspection, include_assessments: false)
+
+        expect(json).not_to have_key(:assessments)
+      end
+    end
+  end
+
+  describe "field coverage completeness" do
+    it "covers all Unit fields" do
+      unit = create(:unit, :with_all_fields, user: user)
+      json = JsonSerializerService.serialize_unit(unit)
+
+      # Count included fields
+      included_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS - PublicFieldFiltering::UNIT_EXCLUDED_FIELDS
+
+      # Verify we're including most fields
+      expect(included_fields.count).to be > 20 # Units have many fields
+
+      # Verify critical fields are included
+      %w[name serial manufacturer owner width length height has_slide is_totally_enclosed].each do |field|
+        expect(json).to have_key(field.to_sym)
+      end
+    end
+
+    it "covers all Inspection fields" do
+      inspection = create(:inspection, :pdf_complete_test_data, user: user)
+      json = JsonSerializerService.serialize_inspection(inspection)
+
+      # Count included fields
+      included_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
+
+      # Verify we're including most fields
+      expect(included_fields.count).to be > 30 # Inspections have many fields
+
+      # Verify critical fields are included
+      %w[inspection_date inspection_location passed status comments unique_report_number].each do |field|
+        expect(json).to have_key(field.to_sym)
+      end
+    end
+  end
+end

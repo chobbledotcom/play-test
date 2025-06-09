@@ -325,7 +325,6 @@ RSpec.feature "Assessment Forms", type: :feature do
   end
 
   describe "Form Functionality" do
-
     it "displays form error handling structure" do
       visit edit_inspection_path(inspection, tab: "slide")
 

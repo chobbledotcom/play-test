@@ -58,19 +58,7 @@ RSpec.feature "PDF Field Coverage", type: :feature do
       text_content = pdf.strings.join(" ")
 
       # Get all Inspection model fields using reflection
-      excluded_fields = %w[
-        id
-        created_at
-        updated_at
-        pdf_last_accessed_at
-        user_id
-        unit_id
-        inspector_company_id
-        inspector_signature
-        signature_timestamp
-      ]
-
-      inspection_fields = Inspection.column_names - excluded_fields
+      inspection_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Track fields that should be rendered in PDF
       missing_fields = []
@@ -114,14 +102,7 @@ RSpec.feature "PDF Field Coverage", type: :feature do
         EnclosedAssessment
       ]
 
-      # Fields that are intentionally excluded from PDF rendering
-      assessment_excluded_fields = {
-        "StructureAssessment" => %w[unit_pressure_value],
-        "AnchorageAssessment" => %w[num_anchors_comment anchor_accessories_comment anchor_degree_comment anchor_type_comment pull_strength_comment],
-        "MaterialsAssessment" => %w[rope_size_comment thread_comment fabric_comment fire_retardant_comment],
-        "FanAssessment" => %w[fan_size_comment blower_flap_comment blower_finger_comment pat_comment blower_visual_comment blower_serial],
-        "EnclosedAssessment" => %w[exit_number_comment exit_visible_comment]
-      }
+      # Use shared assessment exclusions from PublicFieldFiltering
 
       assessment_missing_fields = []
       assessment_rendered_fields = []
@@ -130,11 +111,8 @@ RSpec.feature "PDF Field Coverage", type: :feature do
         assessment = inspection.send(assessment_class.name.underscore)
         next unless assessment
 
-        # Standard exclusions plus class-specific exclusions
-        standard_excluded = %w[id inspection_id created_at updated_at]
-        class_excluded = assessment_excluded_fields[assessment_class.name] || []
-        all_excluded = standard_excluded + class_excluded
-
+        # Use shared exclusions
+        all_excluded = PublicFieldFiltering::EXCLUDED_FIELDS + (PublicFieldFiltering::ASSESSMENT_EXCLUDED_FIELDS[assessment_class.name] || [])
         assessment_fields = assessment_class.column_names - all_excluded
 
         assessment_fields.each do |field|
@@ -162,16 +140,9 @@ RSpec.feature "PDF Field Coverage", type: :feature do
         end
       end
 
-      # Report results
-      puts "\n=== PDF Field Coverage Analysis ==="
-      puts "Rendered Inspection fields (#{rendered_fields.count}): #{rendered_fields.join(", ")}"
-      puts "Missing Inspection fields (#{missing_fields.count}): #{missing_fields.join(", ")}" if missing_fields.any?
-      puts "Rendered Assessment fields (#{assessment_rendered_fields.count}): #{assessment_rendered_fields.join(", ")}"
-      puts "Missing Assessment fields (#{assessment_missing_fields.count}): #{assessment_missing_fields.join(", ")}" if assessment_missing_fields.any?
-
       # Test expectations - all non-excluded fields should be rendered
-      expect(missing_fields.count).to be <= 10,
-        "Too many Inspection fields missing from PDF: #{missing_fields.join(", ")}"
+      expect(missing_fields.count).to be <= 0,
+        "Inspection fields missing from PDF: #{missing_fields.join(", ")}"
 
       expect(assessment_missing_fields.count).to eq(0),
         "Assessment fields missing from PDF (should update exclusion list if intentional): #{assessment_missing_fields.join(", ")}"

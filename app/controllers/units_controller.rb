@@ -1,6 +1,7 @@
 class UnitsController < ApplicationController
   before_action :set_unit, only: [:show, :edit, :update, :destroy, :report, :qr_code]
   before_action :check_unit_owner, only: [:show, :edit, :update, :destroy]
+  before_action :require_inspection_company, only: [:new, :create]
   before_action :no_index
   skip_before_action :require_login, only: [:report, :qr_code]
 
@@ -107,12 +108,20 @@ class UnitsController < ApplicationController
   end
 
   def report
-    pdf_data = PdfGeneratorService.generate_unit_report(@unit)
+    respond_to do |format|
+      format.html do
+        pdf_data = PdfGeneratorService.generate_unit_report(@unit)
 
-    send_data pdf_data.render,
-      filename: "Equipment_History_#{@unit.serial}.pdf",
-      type: "application/pdf",
-      disposition: "inline"
+        send_data pdf_data.render,
+          filename: "Equipment_History_#{@unit.serial}.pdf",
+          type: "application/pdf",
+          disposition: "inline"
+      end
+
+      format.json do
+        render json: JsonSerializerService.serialize_unit(@unit)
+      end
+    end
   end
 
   def qr_code
@@ -203,6 +212,13 @@ class UnitsController < ApplicationController
 
     # The ImageProcessorService will handle resizing when the image is displayed
     # No need to process here as Rails Active Storage handles variants on demand
+  end
+
+  def require_inspection_company
+    unless current_user.has_inspection_company?
+      flash[:alert] = I18n.t("units.messages.inspection_company_required")
+      redirect_to units_path
+    end
   end
 
   def unit_to_csv

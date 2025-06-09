@@ -59,7 +59,9 @@ RSpec.feature "Inspection Dimension Replacement", type: :feature do
     expect(page).to have_link(I18n.t("inspections.buttons.replace_dimensions"))
 
     # Verify we're on the edit page for the newly created inspection
-    expect(page).to have_current_path(edit_inspection_path(Inspection.last))
+    new_inspection = user.inspections.find_by(unit_id: unit.id)
+    expect(new_inspection).to be_present
+    expect(page).to have_current_path(edit_inspection_path(new_inspection))
   end
 
   scenario "Replace dimensions link only shows when unit is present" do

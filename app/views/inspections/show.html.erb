@@ -44,8 +44,11 @@
 
   <hr>
 
-  <h4>Report PDF Link</h4>
+  <h4><%= t('inspections.headers.report_pdf_link') %></h4>
   <%= link_to short_report_url(@inspection), short_report_url(@inspection) %>
+  
+  <h4><%= t('inspections.headers.report_json_link') %></h4>
+  <%= link_to short_report_url(@inspection) + ".json", short_report_url(@inspection) + ".json" %>
 
   <hr>
 

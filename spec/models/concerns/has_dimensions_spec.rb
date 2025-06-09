@@ -257,12 +257,15 @@ RSpec.describe HasDimensions, type: :model do
 
     describe ".dimension_statistics" do
       it "calculates dimension statistics" do
+        # Ensure we only count our test units
+        Unit.where.not(id: [unit1.id, unit2.id]).destroy_all
+
         stats = Unit.dimension_statistics
 
-        expect(stats[:width][:avg]).to be_between(10, 12)
+        expect(stats[:width][:avg]).to eq(11.0) # (10 + 12) / 2
         expect(stats[:width][:min]).to eq(10)
         expect(stats[:width][:max]).to eq(12)
-        expect(stats[:area][:avg]).to be_between(100, 144)
+        expect(stats[:area][:avg]).to eq(122.0) # (100 + 144) / 2
       end
     end
   end

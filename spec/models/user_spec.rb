@@ -88,12 +88,12 @@ RSpec.describe User, type: :model do
   end
 
   describe "inspection_limit" do
-    it "defaults to 10 when LIMIT_INSPECTIONS is not set" do
+    it "defaults to -1 (unlimited) when LIMIT_INSPECTIONS is not set" do
       # Ensure environment variable is not set
       allow(ENV).to receive(:[]).with("LIMIT_INSPECTIONS").and_return(nil)
 
       user = create(:user)
-      expect(user.inspection_limit).to eq(10)
+      expect(user.inspection_limit).to eq(-1)
     end
 
     it "uses LIMIT_INSPECTIONS environment variable when set" do

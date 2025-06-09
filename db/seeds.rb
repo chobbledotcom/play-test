@@ -2,13 +2,7 @@
 # British inflatable equipment inspection system
 # Run with: rails db:seed
 
-Rails.logger = Logger.new($stdout)
-Rails.logger.info "🎪 Starting TestLog seed data creation..."
-
 # Helper methods
-def log_creation(type, name)
-  Rails.logger.info "  ✅ Created #{type}: #{name}"
-end
 
 def british_phone_number
   # Generate realistic UK mobile numbers (07xxx format)
@@ -36,8 +30,6 @@ end
 
 # Clear existing data in development
 if Rails.env.development?
-  Rails.logger.info "🧹 Clearing existing data..."
-
   # Delete in correct order to respect foreign keys
   UserHeightAssessment.destroy_all
   StructureAssessment.destroy_all
@@ -54,13 +46,9 @@ if Rails.env.development?
   # Clean up Active Storage
   ActiveStorage::Attachment.all.each { |attachment| attachment.purge }
   ActiveStorage::Blob.all.each { |blob| blob.purge }
-
-  Rails.logger.info "  ✅ Data cleared"
 end
 
 # Phase 1: Inspector Companies
-Rails.logger.info "\n📋 Creating Inspector Companies..."
-
 stefan_testing = InspectorCompany.create!(
   name: "Stefan's Testing Co",
   rpii_registration_number: "RPII-001",
@@ -74,7 +62,6 @@ stefan_testing = InspectorCompany.create!(
   active: true,
   notes: "Premier inflatable inspection service in the Midlands. Established 2015."
 )
-log_creation("Inspector Company", stefan_testing.name)
 
 steph_test = InspectorCompany.create!(
   name: "Steph Test",
@@ -89,7 +76,6 @@ steph_test = InspectorCompany.create!(
   active: true,
   notes: "Specialising in soft play and inflatable safety across the North West."
 )
-log_creation("Inspector Company", steph_test.name)
 
 steve_inflatable = InspectorCompany.create!(
   name: "Steve Inflatable Testing",
@@ -104,19 +90,15 @@ steve_inflatable = InspectorCompany.create!(
   active: false,
   notes: "Company ceased trading in 2023. Records maintained for historical purposes."
 )
-log_creation("Inspector Company", steve_inflatable.name)
 
 # Phase 2: Users
-Rails.logger.info "\n👥 Creating Users..."
-
 # Admin user (no company)
-admin_user = User.create!(
+User.create!(
   email: "admin@play-test.co.uk",
   password: "password123",
   inspection_limit: -1,
   time_display: "date"
 )
-log_creation("User", "Admin (#{admin_user.email})")
 
 # Test user with access to all data
 test_user = User.create!(
@@ -126,7 +108,6 @@ test_user = User.create!(
   inspection_limit: -1,
   time_display: "time"
 )
-log_creation("User", "Test User (#{test_user.email})")
 
 # Stefan's Testing users
 lead_inspector = User.create!(
@@ -136,25 +117,22 @@ lead_inspector = User.create!(
   inspection_limit: -1,
   time_display: "time"
 )
-log_creation("User", "Lead Inspector (#{lead_inspector.email})")
 
-junior_inspector = User.create!(
+User.create!(
   email: "junior@play-test.co.uk",
   password: "password123",
   inspection_company: stefan_testing,
   inspection_limit: 10,
   time_display: "date"
 )
-log_creation("User", "Junior Inspector (#{junior_inspector.email})")
 
-senior_inspector = User.create!(
+User.create!(
   email: "senior@play-test.co.uk",
   password: "password123",
   inspection_company: stefan_testing,
   inspection_limit: 50,
   time_display: "time"
 )
-log_creation("User", "Senior Inspector (#{senior_inspector.email})")
 
 # Steph Test user
 steph_test_inspector = User.create!(
@@ -164,21 +142,17 @@ steph_test_inspector = User.create!(
   inspection_limit: 20,
   time_display: "date"
 )
-log_creation("User", "Steph Test Inspector (#{steph_test_inspector.email})")
 
 # Retired company user
-retired_user = User.create!(
+User.create!(
   email: "old@play-test.co.uk",
   password: "password123",
   inspection_company: steve_inflatable,
   inspection_limit: 5,
   time_display: "date"
 )
-log_creation("User", "Retired Company User (#{retired_user.email})")
 
 # Phase 3: Units (British terminology)
-Rails.logger.info "\n🏰 Creating Inflatable Units..."
-
 # Manufacturers
 
 # Owners
@@ -198,13 +172,12 @@ castle_standard = Unit.create!(
   has_slide: false,
   is_totally_enclosed: false
 )
-log_creation("Unit", castle_standard.name)
 
 castle_large = Unit.create!(
   user: test_user,
   name: "Giant Party Castle",
   serial: "BCN-2020-#{rand(1000..9999)}",
-  manufacturer: "Bouncy Castle Network UK",
+  manufacturer: "Bouncy Castle Boys",
   model: "Mega Castle 30",
   owner: "Estephan Events",
   description: "30ft x 30ft large bouncy castle suitable for 20+ children",
@@ -214,7 +187,6 @@ castle_large = Unit.create!(
   has_slide: false,
   is_totally_enclosed: false
 )
-log_creation("Unit", castle_large.name)
 
 castle_slide_combo = Unit.create!(
   user: test_user,
@@ -230,7 +202,6 @@ castle_slide_combo = Unit.create!(
   has_slide: true,
   is_totally_enclosed: false
 )
-log_creation("Unit", castle_slide_combo.name)
 
 soft_play_unit = Unit.create!(
   user: test_user,
@@ -246,7 +217,6 @@ soft_play_unit = Unit.create!(
   has_slide: false,
   is_totally_enclosed: true
 )
-log_creation("Unit", soft_play_unit.name)
 
 obstacle_course = Unit.create!(
   user: test_user,
@@ -262,7 +232,6 @@ obstacle_course = Unit.create!(
   has_slide: true,
   is_totally_enclosed: false
 )
-log_creation("Unit", obstacle_course.name)
 
 giant_slide = Unit.create!(
   user: test_user,
@@ -278,7 +247,6 @@ giant_slide = Unit.create!(
   has_slide: true,
   is_totally_enclosed: false
 )
-log_creation("Unit", giant_slide.name)
 
 gladiator_duel = Unit.create!(
   user: test_user,
@@ -294,7 +262,6 @@ gladiator_duel = Unit.create!(
   has_slide: false,
   is_totally_enclosed: false
 )
-log_creation("Unit", gladiator_duel.name)
 
 bungee_run = Unit.create!(
   user: test_user,
@@ -310,10 +277,8 @@ bungee_run = Unit.create!(
   has_slide: false,
   is_totally_enclosed: false
 )
-log_creation("Unit", bungee_run.name)
 
 # Phase 4: Inspections with various statuses
-Rails.logger.info "\n📋 Creating Inspections..."
 
 # Helper to create full assessment data with correct field names
 def create_assessments_for_inspection(inspection, unit, passed: true)
@@ -417,7 +382,7 @@ def create_assessments_for_inspection(inspection, unit, passed: true)
     negative_adjustment: rand(0..2.0).round(1),
     permanent_roof: false,
     # Required comment
-    user_height_comment: passed ? "Capacity within safe limits based on EN 14960:2019" : "Review user capacity - exceeds recommended limits",
+    tallest_user_height_comment: passed ? "Capacity within safe limits based on EN 14960:2019" : "Review user capacity - exceeds recommended limits",
     # Additional comments for realism
     containing_wall_height_comment: "Measured from base to top of wall",
     platform_height_comment: "Platform height acceptable for age group",
@@ -485,7 +450,6 @@ recent_inspection = Inspection.create!(
   is_totally_enclosed: castle_standard.is_totally_enclosed
 )
 create_assessments_for_inspection(recent_inspection, castle_standard, passed: true)
-log_creation("Inspection", "Recent passed inspection for #{castle_standard.name}")
 
 # Failed inspection (test user)
 failed_inspection = Inspection.create!(
@@ -507,7 +471,6 @@ failed_inspection = Inspection.create!(
   is_totally_enclosed: obstacle_course.is_totally_enclosed
 )
 create_assessments_for_inspection(failed_inspection, obstacle_course, passed: false)
-log_creation("Inspection", "Failed inspection for #{obstacle_course.name}")
 
 # Historical inspections (test user)
 [6.months.ago, 1.year.ago].each do |date|
@@ -530,7 +493,6 @@ log_creation("Inspection", "Failed inspection for #{obstacle_course.name}")
     signature_timestamp: date
   )
   create_assessments_for_inspection(historical, castle_large, passed: true)
-  log_creation("Inspection", "Historical inspection from #{date.strftime("%B %Y")}")
 end
 
 # Draft inspections (test user)
@@ -547,7 +509,6 @@ Inspection.create!(
   has_slide: giant_slide.has_slide,
   is_totally_enclosed: giant_slide.is_totally_enclosed
 )
-log_creation("Inspection", "Draft inspection for #{giant_slide.name}")
 
 # In progress inspection (different inspector)
 in_progress = Inspection.create!(
@@ -573,7 +534,6 @@ AnchorageAssessment.create!(
   anchor_accessories_pass: true,
   anchor_degree_pass: true
 )
-log_creation("Inspection", "In-progress inspection for #{gladiator_duel.name}")
 
 # Create more varied inspections for test user
 [soft_play_unit, castle_slide_combo, bungee_run].each do |unit|
@@ -594,7 +554,6 @@ log_creation("Inspection", "In-progress inspection for #{gladiator_duel.name}")
     is_totally_enclosed: unit.is_totally_enclosed
   )
   create_assessments_for_inspection(inspection, unit, passed: inspection.passed)
-  log_creation("Inspection", "Inspection for #{unit.name}")
 end
 
 # Create a few inspections for other users to show variety
@@ -615,7 +574,6 @@ lead_inspection = Inspection.create!(
   is_totally_enclosed: castle_standard.is_totally_enclosed
 )
 create_assessments_for_inspection(lead_inspection, castle_standard, passed: true)
-log_creation("Inspection", "Lead inspector inspection")
 
 # Create a complete inspection with all assessments
 complete_inspection = Inspection.create!(
@@ -642,22 +600,3 @@ create_assessments_for_inspection(complete_inspection, castle_large, passed: tru
 
 # Reload to ensure all associations are loaded
 complete_inspection.reload
-
-log_creation("Inspection", "Complete inspection with all assessments for #{castle_large.name}")
-
-Rails.logger.info "\n📊 Seed Data Summary:"
-Rails.logger.info "  Inspector Companies: #{InspectorCompany.count}"
-Rails.logger.info "  Users: #{User.count}"
-Rails.logger.info "  Units: #{Unit.count}"
-Rails.logger.info "  Inspections: #{Inspection.count}"
-Rails.logger.info "    - Draft: #{Inspection.where(status: "draft").count}"
-Rails.logger.info "    - Complete: #{Inspection.where(status: "complete").count}"
-Rails.logger.info "    - Passed: #{Inspection.where(passed: true).count}"
-Rails.logger.info "    - Failed: #{Inspection.where(passed: false).count}"
-
-Rails.logger.info "\n🎉 Seed data creation complete!"
-Rails.logger.info "\n📝 Test Credentials:"
-Rails.logger.info "  Admin: admin@play-test.co.uk / password123"
-Rails.logger.info "  Test User (all units): test@play-test.co.uk / password123"
-Rails.logger.info "  Lead Inspector: lead@play-test.co.uk / password123"
-Rails.logger.info "  Other users: password123"

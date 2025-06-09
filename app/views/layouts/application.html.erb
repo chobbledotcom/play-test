@@ -14,6 +14,11 @@
   </head>
   <body<% if current_user&.theme == "dark" %> class="dark-theme"<% end %>>
     <% if current_user %>
+      <% if !current_user.has_inspection_company? %>
+        <aside id="company-activation-notice">
+          <%= current_user.inspection_company_required_message %>
+        </aside>
+      <% end %>
       <nav>
         <ul>
           <li>
