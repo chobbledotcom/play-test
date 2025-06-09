@@ -404,7 +404,7 @@ RSpec.describe "Inspections", type: :request do
       end
 
       it "prevents deletion of complete inspections for regular users" do
-        inspection = create(:inspection, user: user, unit: unit, status: "complete")
+        inspection = create(:inspection, :complete, user: user, unit: unit)
 
         delete "/inspections/#{inspection.id}"
 

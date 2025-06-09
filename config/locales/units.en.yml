@@ -205,3 +205,8 @@ en:
 
     accessibility:
       qr_code_alt: "QR Code for Equipment Report"
+      
+    share:
+      button: "Share / Copy"
+      title: "Inflatable Unit %{name} Report"
+      copied: "Copied!"

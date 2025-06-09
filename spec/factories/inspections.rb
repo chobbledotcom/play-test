@@ -12,6 +12,7 @@ FactoryBot.define do
     comments { "Test inspection comments" }
     sequence(:unique_report_number) { |n| "RPII-#{Date.current.strftime("%Y%m%d")}-#{n.to_s.rjust(4, "0")}" }
     status { "draft" }
+    complete_date { nil }
 
     trait :passed do
       passed { true }
@@ -23,14 +24,17 @@ FactoryBot.define do
 
     trait :complete do
       status { "complete" }
+      complete_date { Time.current }
     end
 
     trait :completed do
       status { "complete" }
+      complete_date { Time.current }
     end
 
     trait :draft do
       status { "draft" }
+      complete_date { nil }
     end
 
     trait :overdue do
@@ -115,6 +119,7 @@ FactoryBot.define do
 
     trait :pdf_complete_test_data do
       status { "complete" }
+      complete_date { Time.current }
       inspection_location { "Happy Kids Play Centre" }
       passed { true }
       comments { "Test comments" }

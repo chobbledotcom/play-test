@@ -157,3 +157,28 @@ nav.tabs span {
   border-radius: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
+/* Share button styling - link-like badge */
+#share-button {
+  display: inline-block;
+  background: none;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-link, #1976d2);
+  text-decoration: none;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+#share-button:hover {
+  background-color: var(--color-link, #1976d2);
+  color: white;
+  border-color: var(--color-link, #1976d2);
+}
+
+#share-button:active {
+  transform: translateY(1px);
+}

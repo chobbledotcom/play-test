@@ -95,4 +95,65 @@ document.addEventListener("turbo:load", function() {
       }
     });
   }
+  
+  // Share functionality
+  const shareButtons = document.querySelectorAll('[data-share-url]');
+  shareButtons.forEach(button => {
+    button.addEventListener('click', async function(e) {
+      e.preventDefault();
+      const url = this.getAttribute('data-share-url');
+      const title = this.getAttribute('data-share-title') || document.title;
+      
+      // Check if Web Share API is available (mobile)
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: title,
+            url: url
+          });
+        } catch (err) {
+          console.log('Share cancelled or failed', err);
+        }
+      } else {
+        // Fallback to clipboard copy (desktop)
+        try {
+          await navigator.clipboard.writeText(url);
+          
+          // Show feedback
+          const originalText = this.textContent;
+          this.textContent = this.getAttribute('data-copied-text') || 'Copied!';
+          this.style.color = '#16a34a'; // green color
+          
+          setTimeout(() => {
+            this.textContent = originalText;
+            this.style.color = '';
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy URL', err);
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = url;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+            document.execCommand('copy');
+            // Show feedback
+            const originalText = this.textContent;
+            this.textContent = this.getAttribute('data-copied-text') || 'Copied!';
+            this.style.color = '#16a34a';
+            
+            setTimeout(() => {
+              this.textContent = originalText;
+              this.style.color = '';
+            }, 2000);
+          } catch (err) {
+            console.error('Fallback copy failed', err);
+          }
+          document.body.removeChild(textArea);
+        }
+      }
+    });
+  });
 });

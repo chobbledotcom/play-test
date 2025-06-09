@@ -1,0 +1,42 @@
+<% if admin_debug_enabled? && @debug_render_time %>
+  <hr>
+  <details id="debug-info">
+    <summary><%= t("debug.title") %></summary>
+    <div>
+      <p>
+        <strong><%= t("debug.render_time") %>:</strong> <%= @debug_render_time %> ms<br>
+        <strong><%= t("debug.query_count") %>:</strong> <%= @debug_sql_queries&.size || 0 %><br>
+        <% if Rails.env.development? %>
+          <strong><%= t("debug.environment") %>:</strong> <%= t("debug.development") %><br>
+        <% end %>
+        <% if current_user&.admin? %>
+          <strong><%= t("debug.user_type") %>:</strong> <%= t("debug.admin") %><br>
+        <% end %>
+        <% if impersonating? %>
+          <strong><%= t("debug.user_type") %>:</strong> <%= t("debug.impersonating") %><br>
+        <% end %>
+      </p>
+      
+      <% if @debug_sql_queries&.any? %>
+        <table>
+          <thead>
+            <tr>
+              <th><%= t("debug.query") %></th>
+              <th><%= t("debug.duration") %></th>
+              <th><%= t("debug.name") %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @debug_sql_queries.each do |query| %>
+              <tr>
+                <td><code><%= query[:sql] %></code></td>
+                <td><%= query[:duration] %> ms</td>
+                <td><%= query[:name] %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+    </div>
+  </details>
+<% end %>

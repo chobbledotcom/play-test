@@ -29,6 +29,7 @@ module SessionsHelper
 
   def log_out
     session.delete(:user_id)
+    session.delete(:original_admin_id)  # Clear impersonation tracking
     forget_user
     @current_user = nil
   end

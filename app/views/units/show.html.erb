@@ -31,6 +31,11 @@
 
   <h4><%= t('units.headers.report_link') %></h4>
   <%= link_to short_unit_report_url(@unit), short_unit_report_url(@unit) %>
+  <%= render 'shared/share_button', 
+      url: short_unit_report_url(@unit),
+      title: t('units.share.title', name: @unit.name),
+      button_text: t('units.share.button'),
+      copied_text: t('units.share.copied') %>
   
   <h4><%= t('units.headers.report_json_link') %></h4>
   <%= link_to short_unit_report_url(@unit) + ".json", short_unit_report_url(@unit) + ".json" %>

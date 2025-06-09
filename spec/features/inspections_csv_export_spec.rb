@@ -6,20 +6,18 @@ RSpec.feature "Inspections CSV Export", type: :feature do
   let(:unit2) { create(:unit, user: user, name: "Test Unit 2", serial: "TU002", manufacturer: "Test Mfg") }
 
   let!(:inspection1) do
-    create(:inspection,
+    create(:inspection, :complete,
       user: user,
       unit: unit1,
-      status: "complete",
       passed: true,
       inspection_location: "Test Location 1",
       inspection_date: Date.current)
   end
 
   let!(:inspection2) do
-    create(:inspection,
+    create(:inspection, :draft,
       user: user,
       unit: unit2,
-      status: "draft",
       passed: nil,
       inspection_location: "Test Location 2",
       inspection_date: Date.current - 1.day)

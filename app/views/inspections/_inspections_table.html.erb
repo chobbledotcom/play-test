@@ -32,7 +32,7 @@
     <% inspections.each do |inspection| %>
       <% 
         # Route to edit page for draft inspections, view page for complete
-        target_path = inspection.status == "complete" ? inspection_path(inspection) : edit_inspection_path(inspection)
+        target_path = inspection.complete? ? inspection_path(inspection) : edit_inspection_path(inspection)
       %>
       <li>
         <%= link_to target_path, class: "table-list-link" do %>

@@ -83,7 +83,7 @@
 
     <!-- Actions -->
     <div class="inspection-actions">
-      <% if @inspection.status != "complete" || current_user.admin? %>
+      <% if !@inspection.complete? || current_user.admin? %>
         <%= button_to t('inspections.buttons.delete'), 
             inspection_path(@inspection), 
             method: :delete, 

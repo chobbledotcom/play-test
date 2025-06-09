@@ -76,6 +76,8 @@ class UsersController < ApplicationController
   end
 
   def impersonate
+    # Store original admin user ID before impersonating
+    session[:original_admin_id] = current_user.id if current_user.admin?
     log_in @user
     flash[:notice] = I18n.t("users.messages.impersonating", email: @user.email)
     redirect_to root_path

@@ -76,7 +76,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
       it "redirects when trying to update completed inspections" do
         # Mark inspection as completed
-        inspection.update!(status: "complete")
+        inspection.update!(status: "complete", complete_date: Time.current)
 
         # Create an assessment
         inspection.create_user_height_assessment!(

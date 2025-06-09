@@ -15,6 +15,7 @@ module PublicFieldFiltering
     inspector_signature
     signature_timestamp
     inspection_id
+    complete_date
   ].freeze
 
   # Computed fields to exclude from public outputs

@@ -91,7 +91,6 @@ class InspectionsController < ApplicationController
     @inspection = current_user.inspections.build(
       unit: unit,
       inspection_date: Date.current,
-      status: "draft",
       inspector_company_id: current_user.inspection_company_id,
       inspection_location: current_user.default_inspection_location
     )
@@ -198,7 +197,7 @@ class InspectionsController < ApplicationController
   end
 
   def destroy
-    if @inspection.status == "complete" && !current_user.admin?
+    if @inspection.complete? && !current_user.admin?
       redirect_to @inspection.preferred_path, alert: I18n.t("inspections.messages.delete_complete_denied")
       return
     end
@@ -328,7 +327,7 @@ class InspectionsController < ApplicationController
   end
 
   def mark_draft
-    if @inspection.update(status: "draft")
+    if @inspection.update(complete_date: nil)
       flash[:notice] = t("inspections.messages.marked_draft")
     else
       flash[:alert] = t("inspections.messages.mark_draft_failed", errors: @inspection.errors.full_messages.join(", "))
@@ -396,7 +395,7 @@ class InspectionsController < ApplicationController
   end
 
   def redirect_if_complete
-    if @inspection&.status == "complete"
+    if @inspection&.complete?
       flash[:notice] = I18n.t("inspections.messages.cannot_edit_complete")
       redirect_to @inspection and return
     end

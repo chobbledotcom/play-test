@@ -23,12 +23,10 @@ class Inspection < ApplicationRecord
     :enclosed_assessment
 
   # Validations - allow drafts to be incomplete
-  validates :inspection_location, presence: true, unless: -> { status == "draft" }
+  validates :inspection_location, presence: true, if: :complete?
   validates :inspection_date, presence: true
-  validates :unique_report_number, presence: true, uniqueness: {scope: :user_id}, if: -> { status.present? && status != "draft" }
+  validates :unique_report_number, presence: true, uniqueness: {scope: :user_id}, if: :complete?
 
-  # Status validations
-  validates :status, inclusion: {in: %w[draft complete]}, allow_blank: true
 
   # Step/Ramp Size validations
   validates :step_ramp_size, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
@@ -67,17 +65,16 @@ class Inspection < ApplicationRecord
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
   before_validation :copy_unit_values, on: :create, if: :unit_id_changed?
-  before_create :generate_unique_report_number, if: -> { status.present? && status != "draft" }
+  before_create :generate_unique_report_number, if: :complete?
   before_create :copy_unit_values
   before_save :auto_determine_pass_fail, if: :all_assessments_complete?
   # Removed automatic assessment creation - assessments should be created explicitly when needed
-  after_update :log_status_change, if: :saved_change_to_status?
 
   # Scopes
   scope :passed, -> { where(passed: true) }
   scope :failed, -> { where(passed: false) }
-  scope :complete, -> { where(status: "complete") }
-  scope :draft, -> { where(status: "draft") }
+  scope :complete, -> { where.not(complete_date: nil) }
+  scope :draft, -> { where(complete_date: nil) }
   scope :search, ->(query) {
     if query.present?
       joins("LEFT JOIN units ON units.id = inspections.unit_id")
@@ -87,7 +84,6 @@ class Inspection < ApplicationRecord
       all
     end
   }
-  scope :filter_by_status, ->(status) { where(status: status) if status.present? }
   scope :filter_by_result, ->(result) {
     case result
     when "passed" then where(passed: true)
@@ -98,11 +94,6 @@ class Inspection < ApplicationRecord
   scope :filter_by_date_range, ->(start_date, end_date) { where(inspection_date: start_date..end_date) if start_date.present? && end_date.present? }
   scope :overdue, -> { where("inspection_date < ?", Date.today - 1.year) }
 
-  # State machine for inspection workflow
-  enum :status, {
-    draft: "draft",
-    complete: "complete"
-  }, prefix: true
 
   # Delegate methods to unit
   delegate :name, :serial, :manufacturer, to: :unit, allow_nil: true
@@ -112,25 +103,24 @@ class Inspection < ApplicationRecord
     return nil unless inspection_date.present?
     inspection_date + 1.year
   end
+  
+  # Check if inspection is complete (not draft)
+  def complete?
+    complete_date.present?
+  end
 
-  # URL routing based on status
+  # URL routing based on completion status
   def primary_url_path
-    case status
-    when "complete"
+    if complete?
       "inspection_path(self)"
-    when "draft"
-      "edit_inspection_path(self)"
     else
-      raise "Invalid inspection status: #{status}"
+      "edit_inspection_path(self)"
     end
   end
 
   def preferred_path
-    case status
-    when "complete"
+    if complete?
       Rails.application.routes.url_helpers.inspection_path(self)
-    when "draft"
-      Rails.application.routes.url_helpers.edit_inspection_path(self)
     else
       Rails.application.routes.url_helpers.edit_inspection_path(self)
     end
@@ -143,7 +133,7 @@ class Inspection < ApplicationRecord
 
   def completion_status
     {
-      status: status,
+      complete: complete?,
       all_assessments_complete: all_assessments_complete?,
       missing_assessments: get_missing_assessments,
       can_be_completed: can_be_completed?
@@ -164,14 +154,14 @@ class Inspection < ApplicationRecord
   end
 
   def complete!(user)
-    update!(status: "complete")
+    update!(complete_date: Time.current)
     log_audit_action("completed", user, "Inspection completed")
   end
 
   def duplicate_for_user(user)
     new_inspection = dup
     new_inspection.user = user
-    new_inspection.status = "draft"
+    new_inspection.complete_date = nil
     new_inspection.unique_report_number = nil
     new_inspection.passed = nil
     new_inspection.save!
@@ -357,7 +347,4 @@ class Inspection < ApplicationRecord
     end
   end
 
-  def log_status_change
-    log_audit_action("status_changed", user, "Status changed from #{status_before_last_save} to #{status}")
-  end
 end

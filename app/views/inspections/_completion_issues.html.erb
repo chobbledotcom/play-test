@@ -1,4 +1,4 @@
-<% if inspection.status == "draft" && !inspection.can_be_completed? %>
+<% if !inspection.complete? && !inspection.can_be_completed? %>
   <div class="completion-status-notice">
     <h4>Completion Status</h4>
     <p>The following assessments are not yet complete:</p>

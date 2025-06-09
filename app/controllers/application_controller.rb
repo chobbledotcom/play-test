@@ -7,6 +7,9 @@ class ApplicationController < ActionController::Base
   before_action :require_login
   before_action :update_last_active_at
 
+  # Performance tracking for debug info
+  around_action :track_performance, if: :admin_debug_enabled?
+
   private
 
   def require_login
@@ -28,4 +31,37 @@ class ApplicationController < ActionController::Base
       redirect_to root_path
     end
   end
+
+  def admin_debug_enabled?
+    Rails.env.development? || current_user&.admin? || impersonating?
+  end
+
+  def impersonating?
+    # Check if we have an original admin ID stored (indicating impersonation is active)
+    session[:original_admin_id].present?
+  end
+
+  def track_performance
+    @debug_start_time = Time.current
+    @debug_sql_queries = []
+
+    # Subscribe to SQL queries
+    sql_subscription = ActiveSupport::Notifications.subscribe("sql.active_record") do |name, start, finish, id, payload|
+      unless payload[:name] == "SCHEMA" || payload[:sql] =~ /^PRAGMA/
+        @debug_sql_queries << {
+          sql: payload[:sql],
+          duration: ((finish - start) * 1000).round(2),
+          name: payload[:name]
+        }
+      end
+    end
+
+    yield
+  ensure
+    ActiveSupport::Notifications.unsubscribe(sql_subscription) if sql_subscription
+    @debug_render_time = ((Time.current - @debug_start_time) * 1000).round(2) if @debug_start_time
+  end
+
+  # Make debug data available to views
+  helper_method :admin_debug_enabled?, :impersonating?
 end

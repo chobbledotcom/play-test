@@ -199,4 +199,9 @@ en:
       electrical_requirements: "Electrical Safety"
       pat_testing: "PAT testing required"
       blower_distance: "Blower must be 1.2m from equipment edge"
+      
+    share:
+      button: "Share / Copy"
+      title: "Inspection Report %{id}"
+      copied: "Copied!"
 

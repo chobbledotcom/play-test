@@ -1,0 +1,13 @@
+en:
+  debug:
+    title: "Debug Info"
+    render_time: "Page render time"
+    query_count: "SQL queries"
+    query: "Query"
+    duration: "Duration"
+    name: "Name"
+    environment: "Environment"
+    development: "Development"
+    user_type: "Access level"
+    admin: "Admin user"
+    impersonating: "Impersonating user"
