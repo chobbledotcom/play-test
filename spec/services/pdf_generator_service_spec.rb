@@ -157,7 +157,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
       pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
       # Draft watermarks should appear multiple times
-      draft_count = pdf_text.scan("DRAFT").count
+      draft_count = pdf_text.scan(I18n.t("pdf.inspection.watermark.draft")).count
       expect(draft_count).to be > 5 # Should have multiple DRAFT watermarks
     end
 
@@ -166,7 +166,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
       pdf = PdfGeneratorService.generate_inspection_report(complete_inspection)
       pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-      expect(pdf_text).not_to include("DRAFT")
+      expect(pdf_text).not_to include(I18n.t("pdf.inspection.watermark.draft"))
     end
   end
 
@@ -177,26 +177,15 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
     context "with user height assessment" do
       let!(:user_height_assessment) do
-        create(:user_height_assessment,
+        create(:user_height_assessment, :standard_test_values,
           inspection: inspection,
-          containing_wall_height: 2.5,
           containing_wall_height_comment: "Wall height ok",
-          platform_height: 1.2,
           platform_height_comment: "Platform good",
-          permanent_roof: true,
           permanent_roof_comment: "Has roof",
-          tallest_user_height: 1.8,
           tallest_user_height_comment: "Tall users",
-          play_area_length: 5.0,
           play_area_length_comment: "Length good",
-          play_area_width: 4.0,
           play_area_width_comment: "Width good",
-          negative_adjustment: 0.5,
-          negative_adjustment_comment: "Small adjustment",
-          users_at_1000mm: 10,
-          users_at_1200mm: 8,
-          users_at_1500mm: 6,
-          users_at_1800mm: 4
+          negative_adjustment_comment: "Small adjustment"
         )
       end
 
@@ -207,26 +196,24 @@ RSpec.describe PdfGeneratorService, pdf: true do
         expect(pdf_text).to include(I18n.t("inspections.assessments.user_height.title"))
         expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.containing_wall_height")}: 2.5m")
         expect(pdf_text).to include("Wall height ok")
-        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.platform_height")}: 1.2m")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.platform_height")}: 1.0m")
         expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.permanent_roof")}: #{I18n.t("shared.yes")}")
         expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.tallest_user_height")}: 1.8m")
-        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.play_area_length")}: 5.0m")
-        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.play_area_width")}: 4.0m")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.play_area_length")}: 10.0m")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.play_area_width")}: 8.0m")
         # Fix: The m² character might not render correctly in the text analyzer
-        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.negative_adjustment")}: 0.5")
-        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1000mm")}: 10")
-        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1200mm")}: 8")
-        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1500mm")}: 6")
-        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1800mm")}: 4")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.negative_adjustment")}: 2.0")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1000mm")}: 5")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1200mm")}: 4")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1500mm")}: 3")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1800mm")}: 2")
       end
     end
 
     context "with slide assessment" do
       let!(:slide_assessment) do
-        create(:slide_assessment,
+        create(:slide_assessment, :complete,
           inspection: inspection,
-          slide_platform_height: 2.0,
-          slide_platform_height_comment: "Platform ok",
           slide_wall_height: 1.5,
           slide_wall_height_comment: "Wall good",
           slide_first_metre_height: 1.0,
@@ -234,14 +221,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
           slide_beyond_first_metre_height: 0.5,
           slide_beyond_first_metre_height_comment: "Beyond ok",
           slide_permanent_roof: false,
-          slide_permanent_roof_comment: "No roof",
-          clamber_netting_pass: true,
-          clamber_netting_comment: "Netting good",
-          runout_value: 3.0,
-          runout_pass: true,
-          runout_comment: "Runout ok",
-          slip_sheet_pass: true,
-          slip_sheet_comment: "Slip sheet present"
+          slide_permanent_roof_comment: "No roof"
         )
       end
 
@@ -249,9 +229,9 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include("Slide")
+        expect(pdf_text).to include(I18n.t("inspections.assessments.slide.title"))
         expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.slide_platform_height")}: 2.0m")
-        expect(pdf_text).to include("Platform ok")
+        expect(pdf_text).to include(slide_assessment.slide_platform_height_comment)
         expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.slide_wall_height")}: 1.5m")
         expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.slide_first_metre_height")}: 1.0m")
         expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.slide_beyond_first_metre_height")}: 0.5m")
@@ -264,27 +244,19 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
     context "with structure assessment" do
       let!(:structure_assessment) do
-        create(:structure_assessment,
+        create(:structure_assessment, :complete,
           inspection: inspection,
-          seam_integrity_pass: true,
-          seam_integrity_comment: "Seams good",
-          lock_stitch_pass: true,
-          lock_stitch_comment: "Stitching ok",
           stitch_length: 10,
-          stitch_length_pass: true,
           stitch_length_comment: "Length ok",
-          air_loss_pass: true,
-          air_loss_comment: "No air loss",
-          straight_walls_pass: true,
-          straight_walls_comment: "Walls straight",
-          sharp_edges_pass: true,
-          sharp_edges_comment: "No sharp edges",
           blower_tube_length: 2.5,
-          blower_tube_length_pass: true,
-          blower_tube_length_comment: "Tube good",
-          unit_stable_pass: true,
-          unit_stable_comment: "Very stable",
           evacuation_time_pass: true,
+          seam_integrity_comment: "Seams good",
+          lock_stitch_comment: "Stitching ok",
+          air_loss_comment: "No air loss",
+          straight_walls_comment: "Walls straight",
+          sharp_edges_comment: "No sharp edges",
+          blower_tube_length_comment: "Tube good",
+          unit_stable_comment: "Very stable",
           evacuation_time_comment: "Quick evacuation"
         )
       end
@@ -310,15 +282,10 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
     context "with anchorage assessment" do
       let!(:anchorage_assessment) do
-        create(:anchorage_assessment,
+        create(:anchorage_assessment, :passed,
           inspection: inspection,
           num_low_anchors: 4,
-          num_high_anchors: 2,
-          num_anchors_pass: true,
-          anchor_type_pass: true,
-          pull_strength_pass: true,
-          anchor_degree_pass: true,
-          anchor_accessories_pass: true
+          num_high_anchors: 2
         )
       end
 
@@ -341,11 +308,9 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
     context "with enclosed assessment" do
       let!(:enclosed_assessment) do
-        create(:enclosed_assessment,
+        create(:enclosed_assessment, :passed,
           inspection: inspection,
-          exit_number: 3,
-          exit_number_pass: true,
-          exit_visible_pass: true
+          exit_number: 3
         )
       end
 
@@ -361,13 +326,8 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
     context "with materials assessment" do
       let!(:materials_assessment) do
-        create(:materials_assessment,
-          inspection: inspection,
-          fabric_pass: true,
-          fire_retardant_pass: true,
-          thread_pass: true,
-          rope_size: 12,
-          rope_size_pass: true
+        create(:materials_assessment, :passed,
+          inspection: inspection
         )
       end
 
@@ -380,18 +340,14 @@ RSpec.describe PdfGeneratorService, pdf: true do
         expect(pdf_text).to include("#{I18n.t("inspections.assessments.materials.fields.fire_retardant_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
         expect(pdf_text).to include("#{I18n.t("inspections.assessments.materials.fields.thread_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
         # Rope size field shows value and pass/fail status
-        expect(pdf_text).to match(/#{I18n.t("inspections.assessments.materials.fields.rope_size")}:.*12.*#{I18n.t("pdf.inspection.fields.pass")}/)
+        expect(pdf_text).to match(/#{I18n.t("inspections.assessments.materials.fields.rope_size")}:.*25.*#{I18n.t("pdf.inspection.fields.pass")}/)
       end
     end
 
     context "with fan assessment" do
       let!(:fan_assessment) do
-        create(:fan_assessment,
-          inspection: inspection,
-          blower_flap_pass: true,
-          blower_finger_pass: true,
-          pat_pass: true,
-          blower_visual_pass: true
+        create(:fan_assessment, :passed,
+          inspection: inspection
         )
       end
 
@@ -423,7 +379,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).not_to include("Slide platform height")
+        expect(pdf_text).not_to include(I18n.t("inspections.assessments.slide.fields.slide_platform_height"))
       end
     end
 
@@ -434,7 +390,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).not_to include("Totally Enclosed")
+        expect(pdf_text).not_to include(I18n.t("inspections.assessments.enclosed.title"))
       end
     end
   end
@@ -510,15 +466,15 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
     describe ".format_pass_fail" do
       it "formats true as Pass" do
-        expect(PdfGeneratorService.format_pass_fail(true)).to eq("Pass")
+        expect(PdfGeneratorService.format_pass_fail(true)).to eq(I18n.t("pdf.inspection.fields.pass"))
       end
 
       it "formats false as Fail" do
-        expect(PdfGeneratorService.format_pass_fail(false)).to eq("Fail")
+        expect(PdfGeneratorService.format_pass_fail(false)).to eq(I18n.t("pdf.inspection.fields.fail"))
       end
 
       it "formats nil as N/A" do
-        expect(PdfGeneratorService.format_pass_fail(nil)).to eq("N/A")
+        expect(PdfGeneratorService.format_pass_fail(nil)).to eq(I18n.t("pdf.inspection.fields.na"))
       end
     end
 
@@ -532,7 +488,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
       end
 
       it "handles nil value" do
-        expect(PdfGeneratorService.format_measurement(nil, "m")).to eq("N/A")
+        expect(PdfGeneratorService.format_measurement(nil, "m")).to eq(I18n.t("pdf.inspection.fields.na"))
       end
     end
   end
@@ -547,7 +503,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include("No unit associated with this inspection")
+        expect(pdf_text).to include(I18n.t("pdf.inspection.fields.no_unit_associated"))
       end
     end
 
@@ -608,7 +564,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
         expected_due_date = (past_inspection.inspection_date + 365.days).strftime("%d/%m/%Y")
-        expect(pdf_text).to include("Next Inspection Due")
+        expect(pdf_text).to include(I18n.t("pdf.unit.fields.next_inspection_due"))
         expect(pdf_text).to include(expected_due_date)
       end
     end
@@ -635,9 +591,9 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include("Final Result")
-        expect(pdf_text).to include("PASSED")
-        expect(pdf_text).to include("Status: Complete")
+        expect(pdf_text).to include(I18n.t("pdf.inspection.final_result"))
+        expect(pdf_text).to include(I18n.t("pdf.inspection.passed"))
+        expect(pdf_text).to include("#{I18n.t("pdf.inspection.fields.status")}: #{I18n.t("pdf.inspection.fields.complete")}")
       end
     end
 
@@ -648,8 +604,8 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include("Final Result")
-        expect(pdf_text).to include("FAILED")
+        expect(pdf_text).to include(I18n.t("pdf.inspection.final_result"))
+        expect(pdf_text).to include(I18n.t("pdf.inspection.failed"))
       end
     end
   end
