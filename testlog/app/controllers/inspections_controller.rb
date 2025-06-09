@@ -333,7 +333,8 @@ class InspectionsController < ApplicationController
   def inspection_params
     # Get the base params with permitted top-level attributes
     inspection_specific_params = [:inspection_date, :inspection_location, :passed, :comments, :unit_id, :inspector_company_id, :unique_report_number]
-    base_params = params.require(:inspection).permit(inspection_specific_params + Inspection::PERMITTED_COPYABLE_ATTRIBUTES)
+    copyable_attributes = Inspection.new.copyable_attributes_via_reflection
+    base_params = params.require(:inspection).permit(inspection_specific_params + copyable_attributes)
 
     # For each assessment, permit all attributes except timestamps and inspection_id
     assessment_types = %w[

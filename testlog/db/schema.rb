@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_09_121007) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_09_121021) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -159,6 +159,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_121007) do
     t.string "exit_number_comment", limit: 1000
     t.decimal "step_ramp_size"
     t.boolean "step_ramp_size_pass"
+    t.decimal "critical_fall_off_height"
+    t.boolean "critical_fall_off_height_pass"
+    t.decimal "unit_pressure"
+    t.boolean "unit_pressure_pass"
+    t.decimal "trough_depth"
+    t.decimal "trough_adjacent_panel_width"
+    t.boolean "trough_pass"
+    t.boolean "entrapment_pass"
+    t.boolean "markings_id_pass"
+    t.boolean "grounding_pass"
+    t.boolean "clamber_netting_pass"
+    t.boolean "retention_netting_pass"
+    t.boolean "zips_pass"
+    t.boolean "windows_pass"
+    t.boolean "artwork_pass"
+    t.boolean "exit_sign_visible_pass"
+    t.text "risk_assessment"
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
     t.index ["status"], name: "index_inspections_on_status"
     t.index ["unit_id"], name: "index_inspections_on_unit_id"
@@ -363,6 +380,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_121007) do
     t.string "negative_adjustment_comment", limit: 1000
     t.string "exit_number_comment", limit: 1000
     t.decimal "step_ramp_size"
+    t.decimal "critical_fall_off_height"
+    t.decimal "unit_pressure"
+    t.decimal "trough_depth"
+    t.decimal "trough_adjacent_panel_width"
+    t.text "risk_assessment"
     t.index ["manufacturer", "serial_number"], name: "index_units_on_manufacturer_and_serial_number", unique: true
     t.index ["serial"], name: "index_units_on_serial"
     t.index ["user_id"], name: "index_units_on_user_id"
@@ -398,7 +420,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_121007) do
     t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "inspection_limit", default: 10, null: false
+    t.integer "inspection_limit", default: -1, null: false
     t.datetime "last_active_at"
     t.string "time_display", default: "date"
     t.string "inspection_company_id"

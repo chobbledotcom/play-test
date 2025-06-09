@@ -2,4 +2,9 @@
   <%= render 'form/number', field: :rope_size, min: 0 %>
   <%= render 'form/comment', field: :rope_size_comment %>
   <%= render 'form/number', field: :step_ramp_size, min: 0 %>
+  <%= render 'form/number', field: :critical_fall_off_height, min: 0 %>
+  <%= render 'form/number', field: :unit_pressure, min: 0 %>
+  <%= render 'form/number', field: :trough_depth, min: 0 %>
+  <%= render 'form/number', field: :trough_adjacent_panel_width, min: 0 %>
+  <%= render 'form/text_area', field: :risk_assessment, rows: 3 %>
 <% end %>

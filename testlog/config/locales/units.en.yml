@@ -85,6 +85,11 @@ en:
       # Materials dimensions
       rope_size: "Rope Size (mm)"
       step_ramp_size: "Step/Ramp Size (mm)"
+      critical_fall_off_height: "Critical Fall Off Height (m)"
+      unit_pressure: "Unit Pressure (kPa)"
+      trough_depth: "Trough Depth (mm)"
+      trough_adjacent_panel_width: "Trough Adjacent Panel Width (mm)"
+      risk_assessment: "Risk Assessment"
       # Slide dimensions
       slide_platform_height: "Slide Platform Height (m)"
       slide_wall_height: "Slide Wall Height (m)"

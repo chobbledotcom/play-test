@@ -170,7 +170,8 @@ class UnitsController < ApplicationController
 
   def unit_params
     unit_specific_params = [:name, :serial, :manufacturer, :photo, :description, :owner, :model, :manufacture_date, :notes]
-    params.require(:unit).permit(unit_specific_params + Unit::PERMITTED_COPYABLE_ATTRIBUTES)
+    copyable_attributes = Unit.new.copyable_attributes_via_reflection
+    params.require(:unit).permit(unit_specific_params + copyable_attributes)
   end
 
   def no_index

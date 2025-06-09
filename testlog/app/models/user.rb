@@ -60,7 +60,7 @@ class User < ApplicationRecord
 
   def set_default_inspection_limit
     env_limit = ENV["LIMIT_INSPECTIONS"]
-    self.inspection_limit = env_limit.present? ? env_limit.to_i : 10
+    self.inspection_limit = env_limit.present? ? env_limit.to_i : -1
   end
 
   def set_default_time_display

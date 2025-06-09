@@ -96,6 +96,22 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       expect(page).to have_content(I18n.t("inspections.fields.status"))
       expect(page).to have_field(I18n.t("inspections.fields.step_ramp_size"))
       expect(page).to have_content(I18n.t("inspections.fields.step_ramp_size_pass"))
+      expect(page).to have_field(I18n.t("inspections.fields.critical_fall_off_height"))
+      expect(page).to have_content(I18n.t("inspections.fields.critical_fall_off_height_pass"))
+      expect(page).to have_field(I18n.t("inspections.fields.unit_pressure"))
+      expect(page).to have_content(I18n.t("inspections.fields.unit_pressure_pass"))
+      expect(page).to have_field(I18n.t("inspections.fields.trough_depth"))
+      expect(page).to have_field(I18n.t("inspections.fields.trough_adjacent_panel_width"))
+      expect(page).to have_content(I18n.t("inspections.fields.trough_pass"))
+      expect(page).to have_content(I18n.t("inspections.fields.entrapment_pass"))
+      expect(page).to have_content(I18n.t("inspections.fields.markings_id_pass"))
+      expect(page).to have_content(I18n.t("inspections.fields.grounding_pass"))
+      expect(page).to have_content(I18n.t("inspections.fields.clamber_netting_pass"))
+      expect(page).to have_content(I18n.t("inspections.fields.retention_netting_pass"))
+      expect(page).to have_content(I18n.t("inspections.fields.zips_pass"))
+      expect(page).to have_content(I18n.t("inspections.fields.windows_pass"))
+      expect(page).to have_content(I18n.t("inspections.fields.artwork_pass"))
+      expect(page).to have_content(I18n.t("inspections.fields.exit_sign_visible_pass"))
       expect(page).to have_field(I18n.t("inspections.fields.pass"))
       expect(page).to have_field(I18n.t("inspections.fields.comments"))
 
@@ -214,7 +230,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     it "has proper heading structure" do
       expect(page).to have_css("h1", text: I18n.t("inspections.titles.edit"))
       expect(page).to have_css("h2", text: I18n.t("inspections.headers.overview"))
-      expect(page).to have_css("legend", text: I18n.t("inspections.sections.unit_details"))
+      expect(page).to have_css("legend", text: I18n.t("inspections.sections.current_unit"))
     end
 
     it "has proper form labels for accessibility" do

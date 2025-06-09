@@ -141,14 +141,15 @@ module HasDimensions
   end
 
   def copyable_attributes
-    basic_attributes.merge(
-      anchorage_attributes,
-      enclosed_attributes,
-      materials_attributes,
-      slide_attributes,
-      structure_attributes,
-      user_height_attributes
-    ).compact
+    # Use reflection-based approach to get all copyable attributes
+    copyable_attrs = copyable_attributes_via_reflection
+
+    # Create a hash with current values for these attributes
+    copyable_attrs.each_with_object({}) do |attr, hash|
+      if respond_to?(attr)
+        hash[attr] = send(attr)
+      end
+    end.compact
   end
 
   # Alias for backward compatibility
@@ -197,7 +198,7 @@ module HasDimensions
     copy_attributes_from(source)
   end
 
-  # Copy all shared attributes from another object
+  # Copy all shared attributes from another object using reflection
   def copy_shared_attributes(source)
     return unless source
     return unless source.respond_to?(:attributes)
@@ -211,14 +212,33 @@ module HasDimensions
     # Find common attributes (source has the attribute and we have a setter for it)
     common_attributes = source_attributes & my_setters
 
-    # Exclude certain attributes we never want to copy
-    excluded_attributes = %w[id created_at updated_at user_id unit_id inspection_id]
-
-    # Copy each common attribute
-    (common_attributes - excluded_attributes).each do |attr|
+    # Copy each copyable attribute
+    (common_attributes - excluded_copyable_attributes).each do |attr|
       value = source.send(attr)
       send("#{attr}=", value) if value.present? || source.send("#{attr}?") == false
     end
+  end
+
+  # Get list of copyable attributes using reflection
+  def copyable_attributes_via_reflection
+    # Get column names from this model
+    my_columns = self.class.column_names
+
+    # Get column names from the other model we copy to/from
+    other_columns = if instance_of?(Unit) && defined?(Inspection)
+      Inspection.column_names
+    elsif instance_of?(Inspection) && defined?(Unit)
+      Unit.column_names
+    else
+      # Fallback to just this model's columns
+      my_columns
+    end
+
+    # Find common attributes
+    common_attributes = my_columns & other_columns
+
+    # Remove excluded attributes
+    (common_attributes - excluded_copyable_attributes).map(&:to_sym)
   end
 
   # Check if any copyable attribute has changed
@@ -246,6 +266,18 @@ module HasDimensions
 
   private
 
+  # Attributes that should never be copied between models
+  def excluded_copyable_attributes
+    %w[
+      id created_at updated_at user_id unit_id inspection_id
+      unique_report_number status passed comments recommendations
+      general_notes inspector_signature signature_timestamp
+      pdf_last_accessed_at inspection_date inspection_location
+      name serial manufacturer model owner description
+      manufacture_date condition notes serial_number
+    ]
+  end
+
   def build_user_height_assessment_with_attributes
     build_user_height_assessment(user_height_attributes.compact)
   end
@@ -269,29 +301,6 @@ module HasDimensions
   def build_enclosed_assessment_with_attributes
     build_enclosed_assessment(enclosed_attributes.compact)
   end
-
-  # Strong parameter helper for copyable attributes
-  PERMITTED_COPYABLE_ATTRIBUTES = %i[
-    width length height has_slide is_totally_enclosed
-    width_comment length_comment height_comment
-    num_low_anchors num_high_anchors
-    num_low_anchors_comment num_high_anchors_comment
-    exit_number exit_number_comment
-    rope_size rope_size_comment
-    slide_platform_height slide_wall_height runout_value
-    slide_first_metre_height slide_beyond_first_metre_height slide_permanent_roof
-    slide_platform_height_comment slide_wall_height_comment runout_value_comment
-    slide_first_metre_height_comment slide_beyond_first_metre_height_comment
-    slide_permanent_roof_comment
-    stitch_length unit_pressure_value blower_tube_length
-    step_size_value fall_off_height_value trough_depth_value trough_width_value
-    containing_wall_height platform_height user_height
-    users_at_1000mm users_at_1200mm users_at_1500mm users_at_1800mm
-    play_area_length play_area_width negative_adjustment permanent_roof
-    containing_wall_height_comment platform_height_comment
-    permanent_roof_comment play_area_length_comment play_area_width_comment
-    negative_adjustment_comment
-  ].freeze
 
   module ClassMethods
     # Find units/inspections with similar dimensions

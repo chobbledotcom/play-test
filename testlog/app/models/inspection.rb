@@ -33,6 +33,36 @@ class Inspection < ApplicationRecord
   validates :step_ramp_size, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
   validates :step_ramp_size_pass, inclusion: {in: [true, false]}, allow_nil: true
 
+  # Critical Fall Off Height validations
+  validates :critical_fall_off_height, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
+  validates :critical_fall_off_height_pass, inclusion: {in: [true, false]}, allow_nil: true
+
+  # Unit Pressure validations
+  validates :unit_pressure, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
+  validates :unit_pressure_pass, inclusion: {in: [true, false]}, allow_nil: true
+
+  # Trough validations
+  validates :trough_depth, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
+  validates :trough_adjacent_panel_width, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
+  validates :trough_pass, inclusion: {in: [true, false]}, allow_nil: true
+
+  # Entrapment validation
+  validates :entrapment_pass, inclusion: {in: [true, false]}, allow_nil: true
+
+  # Markings/ID validation
+  validates :markings_id_pass, inclusion: {in: [true, false]}, allow_nil: true
+
+  # Grounding validation
+  validates :grounding_pass, inclusion: {in: [true, false]}, allow_nil: true
+
+  # Additional pass/fail validations
+  validates :clamber_netting_pass, inclusion: {in: [true, false]}, allow_nil: true
+  validates :retention_netting_pass, inclusion: {in: [true, false]}, allow_nil: true
+  validates :zips_pass, inclusion: {in: [true, false]}, allow_nil: true
+  validates :windows_pass, inclusion: {in: [true, false]}, allow_nil: true
+  validates :artwork_pass, inclusion: {in: [true, false]}, allow_nil: true
+  validates :exit_sign_visible_pass, inclusion: {in: [true, false]}, allow_nil: true
+
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
   before_validation :copy_unit_values, on: :create, if: :unit_id_changed?

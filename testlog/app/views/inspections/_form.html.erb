@@ -73,8 +73,33 @@
     <%= render 'form/number', field: :step_ramp_size, min: 0 %>
     <%= render 'form/pass_fail', field: :step_ramp_size_pass %>
 
+    <%= render 'form/number', field: :critical_fall_off_height, min: 0 %>
+    <%= render 'form/pass_fail', field: :critical_fall_off_height_pass %>
+
+    <%= render 'form/number', field: :unit_pressure, min: 0 %>
+    <%= render 'form/pass_fail', field: :unit_pressure_pass %>
+
+    <%= render 'form/number', field: :trough_depth, min: 0 %>
+    <%= render 'form/number', field: :trough_adjacent_panel_width, min: 0 %>
+    <%= render 'form/pass_fail', field: :trough_pass %>
+
+    <%= render 'form/pass_fail', field: :entrapment_pass %>
+
+    <%= render 'form/pass_fail', field: :markings_id_pass %>
+
+    <%= render 'form/pass_fail', field: :grounding_pass %>
+
+    <%= render 'form/pass_fail', field: :clamber_netting_pass %>
+    <%= render 'form/pass_fail', field: :retention_netting_pass %>
+    <%= render 'form/pass_fail', field: :zips_pass %>
+    <%= render 'form/pass_fail', field: :windows_pass %>
+    <%= render 'form/pass_fail', field: :artwork_pass %>
+
+    <%= render 'form/pass_fail', field: :exit_sign_visible_pass %>
+
     <%= render 'form/checkbox', field: :passed %>
 
+    <%= render 'form/text_area', field: :risk_assessment, rows: 3 %>
     <%= render 'form/text_area', field: :comments, rows: 3 %>
   <% end %>
 
