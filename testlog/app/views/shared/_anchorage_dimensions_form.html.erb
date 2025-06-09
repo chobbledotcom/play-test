@@ -1,0 +1,7 @@
+<%= render 'form/fieldset', form: form, i18n_base: i18n_base, legend_key: 'anchorage_dimensions' do %>
+  <%= render 'form/number', field: :num_low_anchors, min: 0, step: 1 %>
+  <%= render 'form/comment', field: :num_low_anchors_comment %>
+  
+  <%= render 'form/number', field: :num_high_anchors, min: 0, step: 1 %>
+  <%= render 'form/comment', field: :num_high_anchors_comment %>
+<% end %>

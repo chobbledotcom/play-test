@@ -1,7 +1,6 @@
 class Inspection < ApplicationRecord
   include CustomIdGenerator
   include HasDimensions
-  include NumberSanitizer
 
   belongs_to :user
   belongs_to :unit, optional: true
@@ -29,6 +28,10 @@ class Inspection < ApplicationRecord
 
   # Status validations
   validates :status, inclusion: {in: %w[draft complete]}, allow_blank: true
+
+  # Step/Ramp Size validations
+  validates :step_ramp_size, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
+  validates :step_ramp_size_pass, inclusion: {in: [true, false]}, allow_nil: true
 
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
@@ -190,7 +193,7 @@ class Inspection < ApplicationRecord
     return unless unit.present?
 
     # Copy all dimensions and boolean flags from unit using the concern method
-    copy_dimensions_from(unit)
+    copy_attributes_from(unit)
   end
 
   def set_inspector_company_from_user

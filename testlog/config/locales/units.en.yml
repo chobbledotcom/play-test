@@ -84,6 +84,7 @@ en:
       exit_number: "Number of Exits"
       # Materials dimensions
       rope_size: "Rope Size (mm)"
+      step_ramp_size: "Step/Ramp Size (mm)"
       # Slide dimensions
       slide_platform_height: "Slide Platform Height (m)"
       slide_wall_height: "Slide Wall Height (m)"

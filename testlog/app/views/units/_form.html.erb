@@ -1,130 +1,19 @@
 <%= render 'form/errors', model: @unit %>
 
-<%= form_with(model: @unit, data: (@unit.persisted? ? {autosave: "true"} : {})) do |form| %>
-  <%= render 'form/fieldset', form: form, i18n_base: 'units.forms', legend_key: 'unit_details' do %>
-    <%= render 'form/text_field', field: :name, required: true %>
-    <%= render 'form/checkbox', field: :has_slide %>
-    <%= render 'form/text_field', field: :manufacturer, required: true %>
-    <%= render 'form/text_field', field: :model %>
-    <%= render 'form/text_field', field: :serial, required: true %>
-    <%= render 'form/text_area', field: :description, required: true %>
-    <%= render 'form/text_field', field: :owner, required: true %>
-    <%= render 'form/date_field', field: :manufacture_date %>
-    <%= render 'form/checkbox', field: :is_totally_enclosed %>
-    <%= render 'form/text_area', field: :notes, rows: 4 %>
-    
-    <%= form.label :photo, t('units.forms.photo') %>
-    <%= form.file_field :photo, accept: "image/*" %>
-    <% if @unit.photo.attached? %>
-      <div style="margin-top: 10px;">
-        <%= render 'shared/image_link', 
-            image: @unit.photo, 
-            alt: "Unit photo",
-            link_text: t('units.messages.view_full_photo') %>
-      </div>
-    <% end %>
-  <% end %>
-
-  <%= render 'form/fieldset', form: form, i18n_base: 'units.forms', legend_key: 'basic_dimensions' do %>
-    <%= render 'form/number', field: :width, min: 0.01, max: 199.99, required: true %>
-    <%= render 'form/comment', field: :width_comment %>
-    
-    <%= render 'form/number', field: :length, min: 0.01, max: 199.99, required: true %>
-    <%= render 'form/comment', field: :length_comment %>
-    
-    <%= render 'form/number', field: :height, min: 0.01, max: 199.99, required: true %>
-    <%= render 'form/comment', field: :height_comment %>
-  <% end %>
-
-  <%= render 'form/fieldset', form: form, i18n_base: 'units.forms', legend_key: 'anchorage_dimensions' do %>
-    <%= render 'form/number', field: :num_low_anchors, min: 0, step: 1 %>
-    <%= render 'form/comment', field: :num_low_anchors_comment %>
-    
-    <%= render 'form/number', field: :num_high_anchors, min: 0, step: 1 %>
-    <%= render 'form/comment', field: :num_high_anchors_comment %>
-  <% end %>
-
-  <%= render 'form/fieldset', form: form, i18n_base: 'units.forms', legend_key: 'structure_dimensions' do %>
-    <%= render 'form/number', field: :stitch_length, min: 0 %>
-    <%= render 'form/number', field: :evacuation_time, min: 0 %>
-    <%= render 'form/number', field: :unit_pressure_value, min: 0 %>
-    <%= render 'form/number', field: :blower_tube_length, min: 0 %>
-    <%= render 'form/number', field: :step_size_value, min: 0 %>
-    <%= render 'form/number', field: :fall_off_height_value, min: 0 %>
-    <%= render 'form/number', field: :trough_depth_value, min: 0 %>
-    <%= render 'form/number', field: :trough_width_value, min: 0 %>
-  <% end %>
-
-  <% if @unit.has_slide? %>
-    <%= render 'form/fieldset', form: form, i18n_base: 'units.forms', legend_key: 'slide_dimensions' do %>
-      <%= render 'form/number', field: :slide_platform_height, min: 0 %>
-      <%= render 'form/comment', field: :slide_platform_height_comment %>
-      
-      <%= render 'form/number', field: :slide_wall_height, min: 0 %>
-      <%= render 'form/comment', field: :slide_wall_height_comment %>
-      
-      <%= render 'form/number', field: :runout_value, min: 0 %>
-      <%= render 'form/comment', field: :runout_value_comment %>
-      
-      <%= render 'form/number', field: :slide_first_metre_height, min: 0 %>
-      <%= render 'form/comment', field: :slide_first_metre_height_comment %>
-      
-      <%= render 'form/number', field: :slide_beyond_first_metre_height, min: 0 %>
-      <%= render 'form/comment', field: :slide_beyond_first_metre_height_comment %>
-      
-      <%= render 'form/checkbox', field: :slide_permanent_roof %>
-      <%= render 'form/comment', field: :slide_permanent_roof_comment %>
-    <% end %>
-  <% end %>
-
-  <%= render 'form/fieldset', form: form, i18n_base: 'units.forms', legend_key: 'user_height_dimensions' do %>
-    <%= render 'form/number', field: :containing_wall_height, min: 0 %>
-    <%= render 'form/comment', field: :containing_wall_height_comment %>
-    
-    <%= render 'form/number', field: :platform_height, min: 0 %>
-    <%= render 'form/comment', field: :platform_height_comment %>
-    
-    <%= render 'form/number', field: :user_height, min: 0 %>
-    
-    <%= render 'form/number', field: :play_area_length, min: 0 %>
-    <%= render 'form/comment', field: :play_area_length_comment %>
-    
-    <%= render 'form/number', field: :play_area_width, min: 0 %>
-    <%= render 'form/comment', field: :play_area_width_comment %>
-    
-    <%= render 'form/number', field: :negative_adjustment, min: 0 %>
-    <%= render 'form/comment', field: :negative_adjustment_comment %>
-    
-    <%= render 'form/checkbox', field: :permanent_roof %>
-    <%= render 'form/comment', field: :permanent_roof_comment %>
-    
-    <header>
-      <h4><%= t('units.headers.user_capacity') %></h4>
-    </header>
-    
-    <%= render 'form/number', field: :users_at_1000mm, min: 0, step: 1 %>
-    <%= render 'form/number', field: :users_at_1200mm, min: 0, step: 1 %>
-    <%= render 'form/number', field: :users_at_1500mm, min: 0, step: 1 %>
-    <%= render 'form/number', field: :users_at_1800mm, min: 0, step: 1 %>
-  <% end %>
-
-  <% if @unit.is_totally_enclosed? %>
-    <%= render 'form/fieldset', form: form, i18n_base: 'units.forms', legend_key: 'enclosed_dimensions' do %>
-      <%= render 'form/number', field: :exit_number, min: 0, step: 1 %>
-      <%= render 'form/comment', field: :exit_number_comment %>
-    <% end %>
-  <% end %>
-
-  <%= render 'form/fieldset', form: form, i18n_base: 'units.forms', legend_key: 'other_dimensions' do %>
-    <%= render 'form/number', field: :rope_size, min: 0 %>
-    <%= render 'form/comment', field: :rope_size_comment %>
-  <% end %>
+<%= form_with(model: @unit) do |form| %>
+  <%= render 'shared/unit_details_form', form: form, object: @unit, i18n_base: 'units.forms', show_photo: true %>
+  <%= render 'shared/basic_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
+  <%= render 'shared/anchorage_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
+  <%= render 'shared/structure_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
+  <%= render 'shared/slide_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
+  <%= render 'shared/user_height_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
+  <%= render 'shared/enclosed_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
+  <%= render 'shared/other_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
 
   <fieldset>
     <%= form.submit @unit.new_record? ? t('units.buttons.create') : t('units.buttons.update') %>
-    
-    <% if @unit.persisted? %>
-      <%= render 'form/autosave_status' %>
-    <% end %>
   </fieldset>
+  
+  <!-- Save Message Display -->
+  <div id="unit_save_message"></div>
 <% end %>

@@ -1,0 +1,25 @@
+<%= render 'form/fieldset', form: form, i18n_base: i18n_base, legend_key: 'unit_details' do %>
+  <%= render 'form/text_field', field: :name, required: true %>
+  <%= render 'form/checkbox', field: :has_slide %>
+  <%= render 'form/text_field', field: :manufacturer, required: true %>
+  <%= render 'form/text_field', field: :model %>
+  <%= render 'form/text_field', field: :serial, required: true %>
+  <%= render 'form/text_area', field: :description, required: true %>
+  <%= render 'form/text_field', field: :owner, required: true %>
+  <%= render 'form/date_field', field: :manufacture_date %>
+  <%= render 'form/checkbox', field: :is_totally_enclosed %>
+  <%= render 'form/text_area', field: :notes, rows: 4 %>
+  
+  <% if show_photo %>
+    <%= form.label :photo, t("#{i18n_base}.photo") %>
+    <%= form.file_field :photo, accept: "image/*" %>
+    <% if object.photo.attached? %>
+      <div style="margin-top: 10px;">
+        <%= render 'shared/image_link', 
+            image: object.photo, 
+            alt: "Unit photo",
+            link_text: t('units.messages.view_full_photo') %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

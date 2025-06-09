@@ -164,22 +164,6 @@ RSpec.feature "Inspector Company Selection", type: :feature do
     end
   end
 
-  describe "Auto-save functionality with inspector company" do
-    before do
-      # Login as admin user for these tests since they need dropdown access
-      login_user_via_form(admin_user)
-    end
-
-    let(:inspection) { create(:inspection, user: admin_user, unit: admin_unit, status: "draft") }
-
-    it "has auto-save enabled on existing inspections only" do
-      visit edit_inspection_path(inspection)
-
-      # Form should have auto-save enabled since inspection is persisted
-      form = page.find("form[data-autosave]")
-      expect(form["data-autosave"]).to eq("true")
-    end
-  end
 
   describe "Inspector company dropdown options" do
     before do

@@ -15,6 +15,9 @@ en:
       save: "Save"
       cancel: "Cancel"
       close: "Close"
+    messages:
+      saved_successfully: "Saved successfully"
+      save_failed: "Save failed"
     yes: "Yes"
     no: "No"
     view_full_size: "View full size"

@@ -1,0 +1,10 @@
+<%= render 'form/fieldset', form: form, i18n_base: i18n_base, legend_key: 'structure_dimensions' do %>
+  <%= render 'form/number', field: :stitch_length, min: 0 %>
+  <%= render 'form/number', field: :evacuation_time, min: 0 %>
+  <%= render 'form/number', field: :unit_pressure_value, min: 0 %>
+  <%= render 'form/number', field: :blower_tube_length, min: 0 %>
+  <%= render 'form/number', field: :step_size_value, min: 0 %>
+  <%= render 'form/number', field: :fall_off_height_value, min: 0 %>
+  <%= render 'form/number', field: :trough_depth_value, min: 0 %>
+  <%= render 'form/number', field: :trough_width_value, min: 0 %>
+<% end %>

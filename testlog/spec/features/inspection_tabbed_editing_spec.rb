@@ -23,7 +23,8 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     end
 
     it "displays all expected tabs" do
-      expect(page).to have_link(I18n.t("inspections.tabs.general"))
+      # The current tab (general) should be a span, not a link
+      expect(page).to have_content(I18n.t("inspections.tabs.general"))
       expect(page).to have_link(I18n.t("inspections.tabs.user_height"))
       expect(page).to have_link(I18n.t("inspections.tabs.structure"))
       expect(page).to have_link(I18n.t("inspections.tabs.anchorage"))
@@ -31,7 +32,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       expect(page).to have_link(I18n.t("inspections.tabs.fan"))
 
       # Slide tab should not appear for bounce house units
-      expect(page).not_to have_link(I18n.t("inspections.tabs.slide"))
+      expect(page).not_to have_content(I18n.t("inspections.tabs.slide"))
     end
 
     it "shows slide tab for units with slides" do
@@ -64,7 +65,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     end
 
     it "shows the general tab as active by default" do
-      expect(page).to have_css(".tab-link.active", text: I18n.t("inspections.tabs.general"))
+      expect(page).to have_css("nav.tabs span", text: I18n.t("inspections.tabs.general"))
     end
 
     it "can navigate between tabs" do
@@ -74,7 +75,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       expect(page).to have_content("User Height Assessment")
 
       click_link I18n.t("inspections.tabs.general")
-      expect(page).to have_css(".tab-link.active", text: I18n.t("inspections.tabs.general"))
+      expect(page).to have_css("nav.tabs span", text: I18n.t("inspections.tabs.general"))
     end
   end
 
@@ -93,6 +94,8 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       expect(page).to have_field(I18n.t("inspections.fields.unique_report_number"))
       # Status is now read-only, not a field
       expect(page).to have_content(I18n.t("inspections.fields.status"))
+      expect(page).to have_field(I18n.t("inspections.fields.step_ramp_size"))
+      expect(page).to have_content(I18n.t("inspections.fields.step_ramp_size_pass"))
       expect(page).to have_field(I18n.t("inspections.fields.pass"))
       expect(page).to have_field(I18n.t("inspections.fields.comments"))
 
@@ -180,14 +183,6 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     end
   end
 
-  describe "auto-save markup" do
-    before { visit edit_inspection_path(inspection) }
-
-    it "includes auto-save data attributes and status elements" do
-      expect(page).to have_css('form[data-autosave="true"]')
-      expect(page).to have_css("[data-autosave-status]", visible: false)
-    end
-  end
 
   describe "navigation and workflow" do
     before { visit edit_inspection_path(inspection) }

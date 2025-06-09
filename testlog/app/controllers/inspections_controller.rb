@@ -135,13 +135,7 @@ class InspectionsController < ApplicationController
       end
     end
 
-    # Assign the parameters first
-    @inspection.assign_attributes(params)
-
-    # Sanitize number fields after assignment but before saving
-    sanitized_values = @inspection.sanitize_number_attributes
-
-    if @inspection.save
+    if @inspection.update(params)
       respond_to do |format|
         format.html do
           flash[:notice] = I18n.t("inspections.messages.updated")
@@ -149,23 +143,27 @@ class InspectionsController < ApplicationController
         end
         format.json { render json: {status: "success", message: t("inspections.autosave.saved")} }
         format.turbo_stream do
-          streams = [
+          render turbo_stream: [
             turbo_stream.replace("inspection_progress_#{@inspection.id}",
               html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
             turbo_stream.replace("completion_issues_#{@inspection.id}",
               partial: "inspections/completion_issues",
-              locals: {inspection: @inspection})
+              locals: {inspection: @inspection}),
+            turbo_stream.replace("inspection_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "inspection_save_message",
+                success: true,
+                success_message: t("inspections.messages.updated")
+              }),
+            turbo_stream.replace("assessment_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "assessment_save_message",
+                success: true,
+                success_message: t("inspections.messages.updated")
+              })
           ]
-
-          # Add streams to update sanitized number fields
-          sanitized_values.each do |field_name, sanitized_value|
-            field_selector = "[name*='#{field_name}']"
-            # Use a custom JavaScript action to update field values
-            streams << turbo_stream.action("update_field_value", field_selector,
-              "data-field" => field_name, "data-value" => sanitized_value)
-          end
-
-          render turbo_stream: streams
         end
       end
     else
@@ -173,12 +171,26 @@ class InspectionsController < ApplicationController
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: {status: "error", errors: @inspection.errors.full_messages} }
         format.turbo_stream do
-          # For now, just update the progress and issues on error too
           render turbo_stream: [
             turbo_stream.replace("inspection_progress_#{@inspection.id}",
               html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
-            turbo_stream.replace("autosave_status",
-              html: "<div class='error' style='display: inline;'>Save failed</div>")
+            turbo_stream.replace("completion_issues_#{@inspection.id}",
+              partial: "inspections/completion_issues",
+              locals: {inspection: @inspection}),
+            turbo_stream.replace("inspection_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "inspection_save_message",
+                errors: @inspection.errors.full_messages,
+                error_message: t("shared.messages.save_failed")
+              }),
+            turbo_stream.replace("assessment_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "assessment_save_message",
+                errors: @inspection.errors.full_messages,
+                error_message: t("shared.messages.save_failed")
+              })
           ]
         end
       end
@@ -197,7 +209,7 @@ class InspectionsController < ApplicationController
 
   def replace_dimensions
     if @inspection.unit.present?
-      @inspection.copy_dimensions_from(@inspection.unit)
+      @inspection.copy_attributes_from(@inspection.unit)
 
       if @inspection.save
         flash[:notice] = t("inspections.messages.dimensions_replaced")
@@ -244,7 +256,7 @@ class InspectionsController < ApplicationController
 
     # Update the inspection with the new unit and copy all dimensions
     @inspection.unit = unit
-    @inspection.copy_dimensions_from(unit)
+    @inspection.copy_attributes_from(unit)
 
     if @inspection.save
       flash[:notice] = t("inspections.messages.unit_changed", unit_name: unit.name)

@@ -37,14 +37,17 @@
     <% end %>
 
     <!-- Tab Navigation -->
-    <nav class="inspection-tabs" data-inspection-id="<%= @inspection.id %>">
-      <ul class="tab-list">
+    <nav class="tabs" id="tabs" data-inspection-id="<%= @inspection.id %>">
+      <ul>
         <% inspection_tabs(@inspection).each do |tab| %>
-          <li class="tab-item">
-            <%= link_to t("inspections.tabs.#{tab}"), 
-                edit_inspection_path(@inspection, tab: tab), 
-                class: "tab-link #{'active' if current_tab == tab}", 
-                data: { tab: tab } %>
+          <li>
+            <% if current_tab == tab %>
+              <span><%= t("inspections.tabs.#{tab}") %></span>
+            <% else %>
+              <%= link_to t("inspections.tabs.#{tab}"), 
+                  edit_inspection_path(@inspection, tab: tab, anchor: "tabs"), 
+                  data: { tab: tab } %>
+            <% end %>
           </li>
         <% end %>
       </ul>

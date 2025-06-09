@@ -1,86 +1,17 @@
-/* Autosave status indicator - fixed to bottom of screen */
-.autosave-status {
+/* Form dirty state indicator */
+.form-dirty::before {
+  content: "⬤ Unsaved changes";
   position: fixed;
-  bottom: 30px;
-  right: 30px;
-  padding: 16px 24px;
-  border-radius: 12px;
-  font-size: 16px;
+  top: 20px;
+  right: 20px;
+  padding: 8px 12px;
+  background-color: #fbbf24;
+  color: #92400e;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 600;
   z-index: 1000;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(12px);
-  transition: all 0.4s ease;
-  opacity: 0;
-  transform: translateY(20px);
-  pointer-events: none;
-  border: 2px solid transparent;
-}
-
-/* Show the status container when it has the 'visible' class */
-.autosave-status.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Container color states */
-.autosave-status.saving {
-  background-color: #fef3c7;
-  color: #92400e;
-  border-color: #fbbf24;
-}
-
-.autosave-status.saved {
-  background-color: #d1fae5;
-  color: #065f46;
-  border-color: #10b981;
-}
-
-.autosave-status.error {
-  background-color: #fee2e2;
-  color: #991b1b;
-  border-color: #ef4444;
-}
-
-/* Hide all status text by default */
-.autosave-status span {
-  display: none;
-}
-
-/* Field-level autosave status */
-input.autosave-saving,
-textarea.autosave-saving,
-select.autosave-saving {
-  border-color: #3b82f6 !important;
-  outline: 2px solid rgba(59, 130, 246, 0.5) !important;
-  outline-offset: 2px;
-  transition: all 0.2s ease;
-}
-
-input.autosave-saved,
-textarea.autosave-saved,
-select.autosave-saved {
-  border-color: #10b981 !important;
-  outline: 2px solid rgba(16, 185, 129, 0.5) !important;
-  outline-offset: 2px;
-  transition: all 0.2s ease;
-}
-
-input.autosave-error,
-textarea.autosave-error,
-select.autosave-error {
-  border-color: #ef4444 !important;
-  outline: 2px solid rgba(239, 68, 68, 0.5) !important;
-  outline-offset: 2px;
-  transition: all 0.2s ease;
-}
-
-/* Field error message */
-.autosave-field-error {
-  color: #dc2626;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Field sanitization indication */
@@ -91,4 +22,68 @@ textarea.field-sanitized {
   outline-offset: 2px;
   background-color: rgba(139, 92, 246, 0.05);
   transition: all 0.3s ease;
+}
+
+/* Save message styling */
+.save-message {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.save-message .success-message {
+  padding: 8px 12px;
+  background-color: #dcfce7;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+.save-message .success-message.fade-out {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+.save-message .error-message {
+  padding: 8px 12px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.save-message .error-message ul {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+}
+
+.save-message .error-message li {
+  margin: 4px 0;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }

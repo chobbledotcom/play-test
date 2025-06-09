@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_09_121005) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_09_121007) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -157,6 +157,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_121005) do
     t.string "play_area_width_comment", limit: 1000
     t.string "negative_adjustment_comment", limit: 1000
     t.string "exit_number_comment", limit: 1000
+    t.decimal "step_ramp_size"
+    t.boolean "step_ramp_size_pass"
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
     t.index ["status"], name: "index_inspections_on_status"
     t.index ["unit_id"], name: "index_inspections_on_unit_id"
@@ -360,6 +362,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_121005) do
     t.string "play_area_width_comment", limit: 1000
     t.string "negative_adjustment_comment", limit: 1000
     t.string "exit_number_comment", limit: 1000
+    t.decimal "step_ramp_size"
     t.index ["manufacturer", "serial_number"], name: "index_units_on_manufacturer_and_serial_number", unique: true
     t.index ["serial"], name: "index_units_on_serial"
     t.index ["user_id"], name: "index_units_on_user_id"

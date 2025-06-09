@@ -1,194 +1,146 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails"
 
-// Custom Turbo Stream action to update field values
-Turbo.StreamActions.update_field_value = function() {
-  this.targetElements.forEach(element => {
-    const fieldName = this.getAttribute("data-field");
-    const newValue = this.getAttribute("data-value");
-    
-    if (element.value !== newValue) {
-      element.value = newValue;
-      // Trigger a visual indication that the field was updated
-      element.classList.add('field-sanitized');
-      setTimeout(() => {
-        element.classList.remove('field-sanitized');
-      }, 1000);
-    }
-  });
-};
-
-// Auto-save functionality for inspection forms
-document.addEventListener("turbo:load", function() {
-  const autoSaveForms = document.querySelectorAll('form[data-autosave="true"]');
+// Number input sanitization function
+function sanitizeNumberInput(input) {
+  const originalValue = input.value;
   
-  autoSaveForms.forEach(form => {
-    let saveTimeout;
-    const statusElement = form.querySelector('[data-autosave-status]');
-    const savingElement = statusElement?.querySelector('.saving');
-    const savedElement = statusElement?.querySelector('.saved');
-    const errorElement = statusElement?.querySelector('.error');
+  if (originalValue === '') return; // Don't process empty values
+  
+  // Strip all non-numeric characters except decimal points and minus signs
+  let sanitized = originalValue.replace(/[^0-9.-]/g, '');
+  
+  // Handle multiple minus signs - keep only first one if at beginning
+  const isNegative = sanitized.startsWith('-');
+  sanitized = sanitized.replace(/-/g, '');
+  if (isNegative) sanitized = '-' + sanitized;
+  
+  // Handle multiple decimal points - keep only the first one
+  const decimalParts = sanitized.split('.');
+  if (decimalParts.length > 2) {
+    sanitized = decimalParts[0] + '.' + decimalParts.slice(1).join('');
+  }
+  
+  // Update the input if the value changed
+  if (originalValue !== sanitized) {
+    input.value = sanitized;
     
-    let currentField = null;
-    let fieldErrorTimeout = null;
+    // Add visual feedback
+    input.style.borderColor = '#8b5cf6';
+    input.style.outline = '2px solid rgba(139, 92, 246, 0.5)';
     
-    const showFieldStatus = (field, type, errorMessage = null) => {
-      if (!field) return;
-      
-      // Remove any existing status classes
-      field.classList.remove('autosave-saving', 'autosave-saved', 'autosave-error');
-      
-      // Remove any existing error message
-      const existingError = field.parentElement.querySelector('.autosave-field-error');
-      if (existingError) {
-        existingError.remove();
-      }
-      
-      // Clear any existing timeout
-      if (fieldErrorTimeout) {
-        clearTimeout(fieldErrorTimeout);
-      }
-      
-      // Add the new status class
-      field.classList.add(`autosave-${type}`);
-      
-      // Handle different status types
-      switch(type) {
-        case 'saved':
-          // Remove the saved status after 2 seconds
-          setTimeout(() => {
-            field.classList.remove('autosave-saved');
-          }, 2000);
-          break;
-        case 'error':
-          // Add error message if provided
-          if (errorMessage) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'autosave-field-error';
-            errorDiv.textContent = errorMessage;
-            field.parentElement.appendChild(errorDiv);
-          }
-          // Keep error status until user interacts with the field again
-          break;
-      }
-    };
+    // Remove visual feedback after a short delay
+    setTimeout(() => {
+      input.style.borderColor = '';
+      input.style.outline = '';
+    }, 1000);
     
-    const showStatus = (type, errorMessage = null) => {
-      // Show field-level status
-      if (currentField) {
-        showFieldStatus(currentField, type, errorMessage);
-      }
-      
-      // Show global status (existing code)
-      if (!statusElement) return;
-      
-      // Remove all status classes and hide all status elements
-      statusElement.classList.remove('saving', 'saved', 'error');
-      savingElement?.style && (savingElement.style.display = 'none');
-      savedElement?.style && (savedElement.style.display = 'none');
-      errorElement?.style && (errorElement.style.display = 'none');
-      
-      // Show the container and add the appropriate class and text
-      statusElement.classList.add('visible', type);
-      
-      switch(type) {
-        case 'saving':
-          savingElement?.style && (savingElement.style.display = 'inline');
-          break;
-        case 'saved':
-          savedElement?.style && (savedElement.style.display = 'inline');
-          setTimeout(() => {
-            savedElement?.style && (savedElement.style.display = 'none');
-            statusElement.classList.remove('visible', 'saved');
-          }, 3000);
-          break;
-        case 'error':
-          errorElement?.style && (errorElement.style.display = 'inline');
-          if (errorMessage) {
-            errorElement.textContent = errorMessage;
-          }
-          setTimeout(() => {
-            errorElement?.style && (errorElement.style.display = 'none');
-            statusElement.classList.remove('visible', 'error');
-          }, 5000);
-          break;
-      }
-    };
+    return true; // Indicate that sanitization occurred
+  }
+  
+  return false; // No sanitization needed
+}
+
+// Dirty form tracking and navigation warnings
+document.addEventListener("turbo:load", function() {
+  // Run auto-fade for success messages after page load
+  autoFadeSuccessMessages();
+  const forms = document.querySelectorAll('form');
+  
+  forms.forEach(form => {
+    let isDirty = false;
     
-    const saveForm = async () => {
-      showStatus('saving');
-      
-      try {
-        // Create a form submission using Turbo Streams
-        const formData = new FormData(form);
-        
-        const response = await fetch(form.action, {
-          method: 'PATCH',
-          body: formData,
-          headers: {
-            'Accept': 'text/vnd.turbo-stream.html',
-            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-          }
-        });
-        
-        if (response.ok) {
-          const turboStreamContent = await response.text();
-          if (turboStreamContent.trim()) {
-            // Let Turbo handle the stream response
-            Turbo.renderStreamMessage(turboStreamContent);
-          }
-          showStatus('saved');
-        } else {
-          showStatus('error');
-          console.error('Auto-save failed with status:', response.status);
-        }
-      } catch (error) {
-        showStatus('error');
-        console.error('Auto-save error:', error);
-      }
-    };
-    
-    // Auto-save on input change with debouncing
+    // Mark form as dirty when any input changes
     form.addEventListener('input', function(e) {
-      // Skip auto-save for submit buttons
+      // Skip submit buttons
       if (e.target.type === 'submit') return;
       
-      // Track the current field
-      currentField = e.target;
-      
-      // Remove error status when user starts typing again
-      if (currentField.classList.contains('autosave-error')) {
-        currentField.classList.remove('autosave-error');
-        const existingError = currentField.parentElement.querySelector('.autosave-field-error');
-        if (existingError) {
-          existingError.remove();
-        }
+      // Sanitize number inputs immediately
+      if (e.target.type === 'number') {
+        sanitizeNumberInput(e.target);
       }
       
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(saveForm, 2000); // Save after 2 seconds of inactivity
+      // Mark form as dirty
+      isDirty = true;
+      document.body.classList.add('form-dirty');
     });
     
-    // Auto-save on select/checkbox change
+    // Mark form as dirty on select/checkbox changes
     form.addEventListener('change', function(e) {
       if (e.target.type === 'submit') return;
       
-      // Track the current field
-      currentField = e.target;
-      
-      // Remove error status when user changes value
-      if (currentField.classList.contains('autosave-error')) {
-        currentField.classList.remove('autosave-error');
-        const existingError = currentField.parentElement.querySelector('.autosave-field-error');
-        if (existingError) {
-          existingError.remove();
-        }
+      // Sanitize number inputs
+      if (e.target.type === 'number') {
+        sanitizeNumberInput(e.target);
       }
       
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(saveForm, 500); // Save quickly for select/checkbox changes
+      // Mark form as dirty
+      isDirty = true;
+      document.body.classList.add('form-dirty');
+    });
+    
+    // Clear dirty flag when form is submitted
+    form.addEventListener('submit', function() {
+      isDirty = false;
+      document.body.classList.remove('form-dirty');
+    });
+    
+    // Warn user before navigation if form is dirty
+    function handleNavigation(e) {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = ''; // Required for Chrome
+        return 'You have unsaved changes. Are you sure you want to leave?';
+      }
+    }
+    
+    // Add beforeunload listener for browser navigation
+    window.addEventListener('beforeunload', handleNavigation);
+    
+    // Add Turbo navigation listener
+    document.addEventListener('turbo:before-visit', function(e) {
+      if (isDirty) {
+        if (!confirm('You have unsaved changes. Are you sure you want to leave?')) {
+          e.preventDefault();
+        } else {
+          isDirty = false;
+          document.body.classList.remove('form-dirty');
+        }
+      }
     });
   });
+
+// Listen for Turbo stream updates to handle new success messages
+document.addEventListener("turbo:before-stream-render", function() {
+  // Run auto-fade after Turbo stream renders new content
+  setTimeout(autoFadeSuccessMessages, 100);
+});
+  
+// Handle auto-fade for success messages
+  function autoFadeSuccessMessages() {
+    const successMessages = document.querySelectorAll('.save-message .success-message');
+    
+    successMessages.forEach(message => {
+      // Skip if already has fade timeout set
+      if (message.dataset.fadeTimeout) return;
+      
+      // Set timeout to fade out after 10 seconds
+      const timeoutId = setTimeout(() => {
+        message.classList.add('fade-out');
+        
+        // Remove the element after fade animation completes
+        setTimeout(() => {
+          const saveMessageContainer = message.closest('.save-message');
+          if (saveMessageContainer) {
+            saveMessageContainer.innerHTML = '';
+          }
+        }, 500); // Match the CSS animation duration
+      }, 10000);
+      
+      // Mark this message as having a timeout
+      message.dataset.fadeTimeout = timeoutId;
+    });
+  }
   
   // Handle comment field toggles
   document.addEventListener('change', function(e) {

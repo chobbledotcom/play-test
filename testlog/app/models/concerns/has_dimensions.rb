@@ -71,8 +71,7 @@ module HasDimensions
     {
       num_low_anchors: num_low_anchors,
       num_high_anchors: num_high_anchors,
-      num_low_anchors_comment: num_low_anchors_comment,
-      num_high_anchors_comment: num_high_anchors_comment
+      num_anchors_comment: [num_low_anchors_comment, num_high_anchors_comment].compact.join("; ").presence
     }
   end
 
@@ -100,7 +99,7 @@ module HasDimensions
       slide_permanent_roof: slide_permanent_roof,
       slide_platform_height_comment: slide_platform_height_comment,
       slide_wall_height_comment: slide_wall_height_comment,
-      runout_value_comment: runout_value_comment,
+      runout_comment: runout_value_comment,
       slide_first_metre_height_comment: slide_first_metre_height_comment,
       slide_beyond_first_metre_height_comment: slide_beyond_first_metre_height_comment,
       slide_permanent_roof_comment: slide_permanent_roof_comment

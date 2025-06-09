@@ -1,23 +1,12 @@
 <%= render 'form/errors', model: @inspection %>
 
-<%= form_with(model: @inspection, data: (@inspection.persisted? ? {autosave: "true"} : {})) do |form| %>
+<%= form_with(model: @inspection) do |form| %>
   <%= render 'shared/page_header', title: t('inspections.headers.inspection_details') %>
-  <%= render 'form/fieldset', legend_key: 'unit_details', i18n_base: 'inspections.fields', form: form do %>
+  
+  <!-- Unit Selection/Display -->
+  <%= render 'form/fieldset', legend_key: 'current_unit', i18n_base: 'inspections.fields', form: form do %>
     <% if @inspection.unit.present? %>
-      <div class="unit-details-display">
-        <h4><%= t('inspections.headers.current_unit') %></h4>
-        <% if @inspection.unit.photo.attached? %>
-          <div class="unit-photo-small">
-            <%= render 'shared/image',
-                image: @inspection.unit.photo,
-                size: :thumbnail,
-                alt: "Photo of #{@inspection.unit.name}" %>
-          </div>
-        <% end %>
-        <p><strong><%= t('inspections.fields.name') %>:</strong> <%= @inspection.unit.name %></p>
-        <p><strong><%= t('inspections.fields.serial') %>:</strong> <%= @inspection.unit.serial %></p>
-        <p><strong><%= t('inspections.fields.manufacturer') %>:</strong> <%= @inspection.unit.manufacturer %></p>
-      </div>
+      <%= render 'shared/unit_details_display', unit: @inspection.unit %>
       <%= link_to t('inspections.buttons.change_unit'),
           select_unit_inspection_path(@inspection),
           class: "button" %>
@@ -38,12 +27,12 @@
           new_unit_from_inspection_path(@inspection),
           class: "button secondary" %>
     <% end %>
-
-    <%= render 'form/text_field',
-        field: :inspection_location %>
   <% end %>
 
+  <!-- Inspection-Specific Details -->
   <%= render 'form/fieldset', legend_key: 'inspection_details', i18n_base: 'inspections.fields', form: form do %>
+    <%= render 'form/text_field', field: :inspection_location %>
+    
     <%= render 'form/date_field',
         field: :inspection_date,
         field_type: (current_user.time_display == "day" ? :date_field : :datetime_local_field),
@@ -76,32 +65,27 @@
       </div>
     <% end %>
 
-    <%= render 'form/text_field',
-        field: :unique_report_number,
-        form: form,
-        i18n_base: 'inspections.fields' %>
+    <%= render 'form/text_field', field: :unique_report_number %>
   <% end %>
 
-  <%= render 'form/fieldset', legend_key: 'inspection_results', i18n_base: 'inspections' do %>
-    <%= render 'form/checkbox',
-        field: :passed,
-        form: form,
-        i18n_base: 'inspections.fields' %>
+  <!-- Inspection Results -->
+  <%= render 'form/fieldset', legend_key: 'inspection_results', i18n_base: 'inspections.fields' do %>
+    <%= render 'form/number', field: :step_ramp_size, min: 0 %>
+    <%= render 'form/pass_fail', field: :step_ramp_size_pass %>
 
-    <%= render 'form/text_area',
-        field: :comments,
-        form: form,
-        i18n_base: 'inspections.fields',
-        rows: 3 %>
+    <%= render 'form/checkbox', field: :passed %>
+
+    <%= render 'form/text_area', field: :comments, rows: 3 %>
   <% end %>
+
 
   <fieldset>
     <%= render 'form/submit_button',
-        form: form,
         text: (@inspection.new_record? ? t('inspections.buttons.create') : t('inspections.buttons.update')) %>
-
-    <%= render 'form/autosave_status' %>
   </fieldset>
+  
+  <!-- Save Message Display -->
+  <div id="inspection_save_message"></div>
 <% end %>
 
 <!-- Completion Actions -->

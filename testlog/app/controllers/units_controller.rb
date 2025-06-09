@@ -66,8 +66,13 @@ class UnitsController < ApplicationController
         format.json { render json: {status: "success", message: t("autosave.saved")} }
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.replace("autosave_status",
-              html: "<div class='saved' style='display: inline;'>#{t("autosave.saved")}</div>")
+            turbo_stream.replace("unit_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "unit_save_message",
+                success: true,
+                success_message: t("units.messages.updated")
+              })
           ]
         end
       end
@@ -77,8 +82,13 @@ class UnitsController < ApplicationController
         format.json { render json: {status: "error", errors: @unit.errors.full_messages} }
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.replace("autosave_status",
-              html: "<div class='error' style='display: inline;'>#{t("autosave.error")}</div>")
+            turbo_stream.replace("unit_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "unit_save_message",
+                errors: @unit.errors.full_messages,
+                error_message: t("shared.messages.save_failed")
+              })
           ]
         end
       end
@@ -145,7 +155,7 @@ class UnitsController < ApplicationController
     end
 
     @unit = current_user.units.build(unit_params)
-    @unit.copy_dimensions_from(@inspection)
+    @unit.copy_attributes_from(@inspection)
 
     if @unit.save
       @inspection.update!(unit: @unit)

@@ -1,0 +1,5 @@
+<%= render 'form/fieldset', form: form, i18n_base: i18n_base, legend_key: 'other_dimensions' do %>
+  <%= render 'form/number', field: :rope_size, min: 0 %>
+  <%= render 'form/comment', field: :rope_size_comment %>
+  <%= render 'form/number', field: :step_ramp_size, min: 0 %>
+<% end %>

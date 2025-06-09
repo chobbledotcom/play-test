@@ -73,20 +73,6 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
     end
   end
 
-  describe "New inspection form behavior" do
-    it "auto-save only works on edit page, not during creation" do
-      visit unit_path(unit)
-
-      click_button I18n.t("units.buttons.add_inspection")
-
-      # Should be on edit page now
-      expect(page).to have_current_path(/\/inspections\/[A-Z0-9]+\/edit/)
-
-      # Form should have auto-save enabled since inspection is persisted
-      form = page.find("form[data-autosave]")
-      expect(form["data-autosave"]).to eq("true")
-    end
-  end
 
   describe "Unit selection workflow" do
     it "shows unit details in inspection overview after creation" do
