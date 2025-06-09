@@ -12,7 +12,7 @@
 
     <%= favicon_link_tag asset_path("favicon.svg") %>
   </head>
-  <body>
+  <body<% if current_user&.theme == "dark" %> class="dark-theme"<% end %>>
     <% if current_user %>
       <nav>
         <ul>

@@ -1,6 +1,7 @@
 class Inspection < ApplicationRecord
   include CustomIdGenerator
   include HasDimensions
+  include NumberSanitizer
 
   belongs_to :user
   belongs_to :unit, optional: true

@@ -1,14 +1,15 @@
 <%= render 'form/errors', model: @inspection %>
 
 <%= form_with(model: @inspection, data: (@inspection.persisted? ? {autosave: "true"} : {})) do |form| %>
+  <%= render 'shared/page_header', title: t('inspections.headers.inspection_details') %>
   <%= render 'form/fieldset', legend_key: 'unit_details', i18n_base: 'inspections.fields', form: form do %>
     <% if @inspection.unit.present? %>
       <div class="unit-details-display">
         <h4><%= t('inspections.headers.current_unit') %></h4>
         <% if @inspection.unit.photo.attached? %>
           <div class="unit-photo-small">
-            <%= render 'shared/image', 
-                image: @inspection.unit.photo, 
+            <%= render 'shared/image',
+                image: @inspection.unit.photo,
                 size: :thumbnail,
                 alt: "Photo of #{@inspection.unit.name}" %>
           </div>
@@ -17,34 +18,34 @@
         <p><strong><%= t('inspections.fields.serial') %>:</strong> <%= @inspection.unit.serial %></p>
         <p><strong><%= t('inspections.fields.manufacturer') %>:</strong> <%= @inspection.unit.manufacturer %></p>
       </div>
-      <%= link_to t('inspections.buttons.change_unit'), 
-          select_unit_inspection_path(@inspection), 
+      <%= link_to t('inspections.buttons.change_unit'),
+          select_unit_inspection_path(@inspection),
           class: "button" %>
       <br>
-      <%= link_to t('inspections.buttons.replace_dimensions'), 
-          replace_dimensions_inspection_path(@inspection), 
-          data: { 
+      <%= link_to t('inspections.buttons.replace_dimensions'),
+          replace_dimensions_inspection_path(@inspection),
+          data: {
             turbo_method: :patch,
             turbo_confirm: t('inspections.messages.dimensions_replace_confirm')
           } %>
     <% else %>
       <p><%= t('inspections.messages.no_unit') %></p>
-      <%= link_to t('inspections.buttons.select_unit'), 
-          select_unit_inspection_path(@inspection), 
+      <%= link_to t('inspections.buttons.select_unit'),
+          select_unit_inspection_path(@inspection),
           class: "button" %>
       <br><br>
-      <%= link_to t('inspections.buttons.create_unit_from_inspection'), 
-          new_unit_from_inspection_path(@inspection), 
+      <%= link_to t('inspections.buttons.create_unit_from_inspection'),
+          new_unit_from_inspection_path(@inspection),
           class: "button secondary" %>
     <% end %>
 
-    <%= render 'form/text_field', 
+    <%= render 'form/text_field',
         field: :inspection_location %>
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'inspection_details', i18n_base: 'inspections.fields', form: form do %>
-    <%= render 'form/date_field', 
-        field: :inspection_date, 
+    <%= render 'form/date_field',
+        field: :inspection_date,
         field_type: (current_user.time_display == "day" ? :date_field : :datetime_local_field),
         value: date_for_form(@inspection.inspection_date) %>
 
@@ -57,8 +58,8 @@
     </div>
 
     <% if current_user.admin? %>
-      <%= render 'form/select', 
-          field: :inspector_company_id, 
+      <%= render 'form/select',
+          field: :inspector_company_id,
           collection_select_params: {
             collection: InspectorCompany.active.order(:name),
             value_method: :id,
@@ -75,21 +76,21 @@
       </div>
     <% end %>
 
-    <%= render 'form/text_field', 
-        field: :unique_report_number, 
-        form: form, 
+    <%= render 'form/text_field',
+        field: :unique_report_number,
+        form: form,
         i18n_base: 'inspections.fields' %>
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'inspection_results', i18n_base: 'inspections' do %>
-    <%= render 'form/checkbox', 
-        field: :passed, 
-        form: form, 
+    <%= render 'form/checkbox',
+        field: :passed,
+        form: form,
         i18n_base: 'inspections.fields' %>
 
-    <%= render 'form/text_area', 
-        field: :comments, 
-        form: form, 
+    <%= render 'form/text_area',
+        field: :comments,
+        form: form,
         i18n_base: 'inspections.fields',
         rows: 3 %>
   <% end %>
@@ -98,7 +99,7 @@
     <%= render 'form/submit_button',
         form: form,
         text: (@inspection.new_record? ? t('inspections.buttons.create') : t('inspections.buttons.update')) %>
-    
+
     <%= render 'form/autosave_status' %>
   </fieldset>
 <% end %>
@@ -106,9 +107,9 @@
 <!-- Completion Actions -->
 <% unless @inspection.new_record? %>
   <section>
-    <%= button_to t('inspections.buttons.mark_complete'), 
-        complete_inspection_path(@inspection), 
-        method: :patch, 
+    <%= button_to t('inspections.buttons.mark_complete'),
+        complete_inspection_path(@inspection),
+        method: :patch,
         data: { turbo_confirm: t('inspections.messages.mark_complete_confirm') } %>
   </section>
 <% end %>

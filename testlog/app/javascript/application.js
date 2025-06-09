@@ -1,6 +1,23 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails"
 
+// Custom Turbo Stream action to update field values
+Turbo.StreamActions.update_field_value = function() {
+  this.targetElements.forEach(element => {
+    const fieldName = this.getAttribute("data-field");
+    const newValue = this.getAttribute("data-value");
+    
+    if (element.value !== newValue) {
+      element.value = newValue;
+      // Trigger a visual indication that the field was updated
+      element.classList.add('field-sanitized');
+      setTimeout(() => {
+        element.classList.remove('field-sanitized');
+      }, 1000);
+    }
+  });
+};
+
 // Auto-save functionality for inspection forms
 document.addEventListener("turbo:load", function() {
   const autoSaveForms = document.querySelectorAll('form[data-autosave="true"]');
@@ -98,39 +115,12 @@ document.addEventListener("turbo:load", function() {
       }
     };
     
-    const sanitizeNumberInputs = (formData) => {
-      // Get all number inputs in the form
-      const numberInputs = form.querySelectorAll('input[type="number"]');
-      
-      numberInputs.forEach(input => {
-        if (input.value) {
-          // Strip all non-numeric characters except decimal points and minus signs
-          // Allow: digits, decimal point, minus sign at the beginning
-          const sanitized = input.value.replace(/[^0-9.-]/g, '')
-            .replace(/^-?/, match => match) // Keep only the first minus sign if at beginning
-            .replace(/\..*\./, match => match.substring(0, match.indexOf('.') + 1)) // Keep only first decimal point
-            .replace(/(?!^)-/g, ''); // Remove minus signs that aren't at the beginning
-          
-          // Update the form data with sanitized value
-          formData.set(input.name, sanitized);
-          
-          // Update the input field display with sanitized value
-          if (input.value !== sanitized) {
-            input.value = sanitized;
-          }
-        }
-      });
-    };
-
     const saveForm = async () => {
       showStatus('saving');
       
       try {
         // Create a form submission using Turbo Streams
         const formData = new FormData(form);
-        
-        // Sanitize number inputs before saving
-        sanitizeNumberInputs(formData);
         
         const response = await fetch(form.action, {
           method: 'PATCH',
@@ -158,30 +148,10 @@ document.addEventListener("turbo:load", function() {
       }
     };
     
-    // Real-time sanitization for number inputs
-    const sanitizeNumberInput = (input) => {
-      if (input.type === 'number' && input.value) {
-        // Strip all non-numeric characters except decimal points and minus signs
-        // Allow: digits, decimal point, minus sign at the beginning
-        const sanitized = input.value.replace(/[^0-9.-]/g, '')
-          .replace(/^-?/, match => match) // Keep only the first minus sign if at beginning
-          .replace(/\..*\./, match => match.substring(0, match.indexOf('.') + 1)) // Keep only first decimal point
-          .replace(/(?!^)-/g, ''); // Remove minus signs that aren't at the beginning
-        
-        // Update the input field if value changed
-        if (input.value !== sanitized) {
-          input.value = sanitized;
-        }
-      }
-    };
-
     // Auto-save on input change with debouncing
     form.addEventListener('input', function(e) {
       // Skip auto-save for submit buttons
       if (e.target.type === 'submit') return;
-      
-      // Sanitize number inputs in real-time
-      sanitizeNumberInput(e.target);
       
       // Track the current field
       currentField = e.target;
@@ -202,9 +172,6 @@ document.addEventListener("turbo:load", function() {
     // Auto-save on select/checkbox change
     form.addEventListener('change', function(e) {
       if (e.target.type === 'submit') return;
-      
-      // Sanitize number inputs on change as well
-      sanitizeNumberInput(e.target);
       
       // Track the current field
       currentField = e.target;

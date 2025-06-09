@@ -92,7 +92,8 @@ class InspectionsController < ApplicationController
       unit: unit,
       inspection_date: Date.current,
       status: "draft",
-      inspector_company_id: current_user.inspection_company_id
+      inspector_company_id: current_user.inspection_company_id,
+      inspection_location: current_user.default_inspection_location
     )
 
     # Copy dimensions from unit before saving
@@ -134,7 +135,13 @@ class InspectionsController < ApplicationController
       end
     end
 
-    if @inspection.update(params)
+    # Assign the parameters first
+    @inspection.assign_attributes(params)
+
+    # Sanitize number fields after assignment but before saving
+    sanitized_values = @inspection.sanitize_number_attributes
+
+    if @inspection.save
       respond_to do |format|
         format.html do
           flash[:notice] = I18n.t("inspections.messages.updated")
@@ -142,13 +149,23 @@ class InspectionsController < ApplicationController
         end
         format.json { render json: {status: "success", message: t("inspections.autosave.saved")} }
         format.turbo_stream do
-          render turbo_stream: [
+          streams = [
             turbo_stream.replace("inspection_progress_#{@inspection.id}",
               html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
             turbo_stream.replace("completion_issues_#{@inspection.id}",
               partial: "inspections/completion_issues",
               locals: {inspection: @inspection})
           ]
+
+          # Add streams to update sanitized number fields
+          sanitized_values.each do |field_name, sanitized_value|
+            field_selector = "[name*='#{field_name}']"
+            # Use a custom JavaScript action to update field values
+            streams << turbo_stream.action("update_field_value", field_selector,
+              "data-field" => field_name, "data-value" => sanitized_value)
+          end
+
+          render turbo_stream: streams
         end
       end
     else

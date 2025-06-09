@@ -1,0 +1,168 @@
+/* Dark Theme Styles */
+.dark-theme {
+  background-color: #111;
+  color: #EEE;
+}
+
+/* Text elements */
+.dark-theme h1, 
+.dark-theme h2, 
+.dark-theme h3, 
+.dark-theme h4, 
+.dark-theme h5, 
+.dark-theme h6 {
+  color: #EEE;
+}
+
+.dark-theme p, 
+.dark-theme span, 
+.dark-theme div, 
+.dark-theme li, 
+.dark-theme td, 
+.dark-theme th {
+  color: #EEE;
+}
+
+/* Links */
+.dark-theme a {
+  color: #EEE;
+}
+
+.dark-theme a:hover {
+  color: #CCC;
+}
+
+/* Forms */
+.dark-theme input[type="text"],
+.dark-theme input[type="email"],
+.dark-theme input[type="password"],
+.dark-theme input[type="date"],
+.dark-theme input[type="datetime-local"],
+.dark-theme input[type="number"],
+.dark-theme input[type="search"],
+.dark-theme select,
+.dark-theme textarea {
+  background-color: #222;
+  color: #EEE;
+  border: 1px solid #555;
+}
+
+.dark-theme input[type="text"]:focus,
+.dark-theme input[type="email"]:focus,
+.dark-theme input[type="password"]:focus,
+.dark-theme input[type="date"]:focus,
+.dark-theme input[type="datetime-local"]:focus,
+.dark-theme input[type="number"]:focus,
+.dark-theme input[type="search"]:focus,
+.dark-theme select:focus,
+.dark-theme textarea:focus {
+  border-color: #777;
+  background-color: #333;
+}
+
+/* Buttons */
+.dark-theme button,
+.dark-theme input[type="submit"],
+.dark-theme input[type="button"],
+.dark-theme .button {
+  background-color: #000;
+  color: #EEE;
+  border: 1px solid #333;
+}
+
+.dark-theme button:hover,
+.dark-theme input[type="submit"]:hover,
+.dark-theme input[type="button"]:hover,
+.dark-theme .button:hover {
+  background-color: #222;
+}
+
+/* Tables */
+.dark-theme table {
+  background-color: #111;
+}
+
+.dark-theme th {
+  background-color: #222;
+  color: #EEE;
+}
+
+.dark-theme td {
+  border-color: #333;
+}
+
+.dark-theme tr:nth-child(even) {
+  background-color: #1A1A1A;
+}
+
+/* Fieldsets and legends */
+.dark-theme fieldset {
+  border-color: #555;
+}
+
+.dark-theme legend {
+  color: #EEE;
+}
+
+/* Navigation */
+.dark-theme nav {
+  background-color: #000;
+}
+
+.dark-theme nav a {
+  color: #EEE;
+}
+
+.dark-theme nav a:hover {
+  background-color: #222;
+}
+
+/* Sections and articles */
+.dark-theme article {
+  background-color: #111;
+}
+
+.dark-theme section {
+  background-color: #111;
+}
+
+/* Labels */
+.dark-theme label {
+  color: #EEE;
+}
+
+/* Help text and small text */
+.dark-theme small {
+  color: #CCC;
+}
+
+.dark-theme .help-text {
+  color: #AAA;
+}
+
+/* Status and message styling */
+.dark-theme .notice,
+.dark-theme .alert,
+.dark-theme .success,
+.dark-theme .error {
+  background-color: #222;
+  border-color: #555;
+  color: #EEE;
+}
+
+/* Code blocks */
+.dark-theme code,
+.dark-theme pre {
+  background-color: #222;
+  color: #EEE;
+}
+
+/* Borders */
+.dark-theme hr {
+  border-color: #555;
+}
+
+/* Calculated fields */
+.dark-theme .calculated-field .calculated-value {
+  color: #CCC;
+}

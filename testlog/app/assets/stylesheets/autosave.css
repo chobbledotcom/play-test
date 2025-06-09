@@ -82,3 +82,13 @@ select.autosave-error {
   margin-top: 0.25rem;
   font-weight: 500;
 }
+
+/* Field sanitization indication */
+input.field-sanitized,
+textarea.field-sanitized {
+  border-color: #8b5cf6 !important;
+  outline: 2px solid rgba(139, 92, 246, 0.5) !important;
+  outline-offset: 2px;
+  background-color: rgba(139, 92, 246, 0.05);
+  transition: all 0.3s ease;
+}
