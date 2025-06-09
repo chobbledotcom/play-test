@@ -71,8 +71,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     it "can navigate between tabs" do
       click_link I18n.t("inspections.tabs.user_height")
       expect(current_url).to include("tab=user_height")
-      expect(page).to have_content("Assessment")
-      expect(page).to have_content("User Height Assessment")
+      expect(page).to have_content(I18n.t("inspections.assessments.user_height.title"))
 
       click_link I18n.t("inspections.tabs.general")
       expect(page).to have_css("nav.tabs span", text: I18n.t("inspections.tabs.general"))
@@ -209,7 +208,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
       # Navigate to user height tab (which will show placeholder)
       visit edit_inspection_path(inspection, tab: "user_height")
-      expect(page).to have_content("Assessment")
+      expect(page).to have_content(I18n.t("inspections.assessments.user_height.title"))
 
       # Navigate back to general tab
       visit edit_inspection_path(inspection)

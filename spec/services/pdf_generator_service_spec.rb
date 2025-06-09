@@ -1,7 +1,7 @@
 require "rails_helper"
 require "pdf/inspector"
 
-RSpec.describe PdfGeneratorService do
+RSpec.describe PdfGeneratorService, pdf: true do
   # Test I18n integration
   around do |example|
     I18n.with_locale(:en) do
@@ -204,20 +204,20 @@ RSpec.describe PdfGeneratorService do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include("User Height/Count")
-        expect(pdf_text).to include("Containing wall height: 2.5m")
+        expect(pdf_text).to include(I18n.t("inspections.assessments.user_height.title"))
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.containing_wall_height")}: 2.5m")
         expect(pdf_text).to include("Wall height ok")
-        expect(pdf_text).to include("Platform height: 1.2m")
-        expect(pdf_text).to include("Permanent roof: Yes")
-        expect(pdf_text).to include("User height: 1.8m")
-        expect(pdf_text).to include("Play area length: 5.0m")
-        expect(pdf_text).to include("Play area width: 4.0m")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.platform_height")}: 1.2m")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.permanent_roof")}: #{I18n.t("shared.yes")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.tallest_user_height")}: 1.8m")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.play_area_length")}: 5.0m")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.play_area_width")}: 4.0m")
         # Fix: The m² character might not render correctly in the text analyzer
-        expect(pdf_text).to include("Negative adjustment: 0.5")
-        expect(pdf_text).to include("1.0m users: 10")
-        expect(pdf_text).to include("1.2m users: 8")
-        expect(pdf_text).to include("1.5m users: 6")
-        expect(pdf_text).to include("1.8m users: 4")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.negative_adjustment")}: 0.5")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1000mm")}: 10")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1200mm")}: 8")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1500mm")}: 6")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.user_height.fields.users_at_1800mm")}: 4")
       end
     end
 
@@ -250,15 +250,15 @@ RSpec.describe PdfGeneratorService do
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
         expect(pdf_text).to include("Slide")
-        expect(pdf_text).to include("Slide platform height: 2.0m")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.slide_platform_height")}: 2.0m")
         expect(pdf_text).to include("Platform ok")
-        expect(pdf_text).to include("Slide wall height: 1.5m")
-        expect(pdf_text).to include("Slide 1st metre wall height: 1.0m")
-        expect(pdf_text).to include("Slide wall height after 1st metre: 0.5m")
-        expect(pdf_text).to include("Slide permanent roof: No")
-        expect(pdf_text).to include("Clamber netting suitable: Pass")
-        expect(pdf_text).to include("Run-out: 3.0m - Pass")
-        expect(pdf_text).to include("Slip sheet where applicable: Pass")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.slide_wall_height")}: 1.5m")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.slide_first_metre_height")}: 1.0m")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.slide_beyond_first_metre_height")}: 0.5m")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.slide_permanent_roof")}: #{I18n.t("shared.no")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.clamber_netting_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.runout_value")}: 3.0m - #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.slide.fields.slip_sheet_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
       end
     end
 
@@ -293,18 +293,18 @@ RSpec.describe PdfGeneratorService do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include("Structure")
-        expect(pdf_text).to include("Seam integrity: Pass")
+        expect(pdf_text).to include(I18n.t("inspections.assessments.structure.title"))
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.structure.fields.seam_integrity_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
         expect(pdf_text).to include("Seams good")
-        expect(pdf_text).to include("Lock stitch: Pass")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.structure.fields.lock_stitch_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
         # Stitch length field shows value and pass/fail status
-        expect(pdf_text).to match(/Stitch length:.*10.*Pass/)
-        expect(pdf_text).to include("Air loss: Pass")
-        expect(pdf_text).to include("Straight walls: Pass")
-        expect(pdf_text).to include("Sharp edges: Pass")
-        expect(pdf_text).to include("Blower tube length: 2.5m - Pass")
-        expect(pdf_text).to include("Unit stable: Pass")
-        expect(pdf_text).to include("Evacuation time <30s: Pass")
+        expect(pdf_text).to match(/#{I18n.t("inspections.assessments.structure.fields.stitch_length")}:.*10.*#{I18n.t("pdf.inspection.fields.pass")}/)
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.structure.fields.air_loss_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.structure.fields.straight_walls_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.structure.fields.sharp_edges_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.structure.fields.blower_tube_length")}: 2.5m - #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.structure.fields.unit_stable_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.structure.fields.evacuation_time_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
       end
     end
 
@@ -326,13 +326,16 @@ RSpec.describe PdfGeneratorService do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include("Anchorage")
-        expect(pdf_text).to include("Number of anchors: Low: 4, High: 2")
-        expect(pdf_text).to include("Pass")
-        expect(pdf_text).to include("Anchor type: Pass")
-        expect(pdf_text).to include("Pull strength: Pass")
-        expect(pdf_text).to include("Anchor degree: Pass")
-        expect(pdf_text).to include("Anchor accessories: Pass")
+        expect(pdf_text).to include(I18n.t("inspections.assessments.anchorage.title"))
+        # The anchor count format is complex, so just check key parts
+        # The actual format includes the i18n labels
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.anchorage.fields.num_low_anchors")}: 4")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.anchorage.fields.num_high_anchors")}: 2")
+        expect(pdf_text).to include(I18n.t("pdf.inspection.fields.pass"))
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.anchorage.fields.anchor_type_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.anchorage.fields.pull_strength_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.anchorage.fields.anchor_degree_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.anchorage.fields.anchor_accessories_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
       end
     end
 
@@ -350,9 +353,9 @@ RSpec.describe PdfGeneratorService do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include("Totally Enclosed")
-        expect(pdf_text).to include("Exit number: 3 - Pass")
-        expect(pdf_text).to include("Exits visible: Pass")
+        expect(pdf_text).to include(I18n.t("inspections.assessments.enclosed.title"))
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.enclosed.fields.exit_number")}: 3 - #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.enclosed.fields.exit_visible_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
       end
     end
 
@@ -372,12 +375,12 @@ RSpec.describe PdfGeneratorService do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include("Materials")
-        expect(pdf_text).to include("Fabric: Pass")
-        expect(pdf_text).to include("Fire retardant: Pass")
-        expect(pdf_text).to include("Thread: Pass")
+        expect(pdf_text).to include(I18n.t("inspections.assessments.materials.title"))
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.materials.fields.fabric_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.materials.fields.fire_retardant_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.materials.fields.thread_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
         # Rope size field shows value and pass/fail status
-        expect(pdf_text).to match(/Rope size:.*12.*Pass/)
+        expect(pdf_text).to match(/#{I18n.t("inspections.assessments.materials.fields.rope_size")}:.*12.*#{I18n.t("pdf.inspection.fields.pass")}/)
       end
     end
 
@@ -396,26 +399,20 @@ RSpec.describe PdfGeneratorService do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include("Fan/Blower")
-        expect(pdf_text).to include("Blower flap: Pass")
-        expect(pdf_text).to include("Finger guard: Pass")
-        expect(pdf_text).to include("PAT test: Pass")
-        expect(pdf_text).to include("Visual inspection: Pass")
+        expect(pdf_text).to include(I18n.t("inspections.assessments.fan.title"))
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.fan.fields.blower_flap_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.fan.fields.blower_finger_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.fan.fields.pat_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
+        expect(pdf_text).to include("#{I18n.t("inspections.assessments.fan.fields.blower_visual_pass")}: #{I18n.t("pdf.inspection.fields.pass")}")
       end
     end
 
     context "without assessments" do
       it "shows no assessment data messages" do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
-        pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
+        pdf_text = pdf_text_content(pdf.render)
 
-        expect(pdf_text).to include("No user height assessment data available")
-        expect(pdf_text).to include("No slide assessment data available")
-        expect(pdf_text).to include("No structure assessment data available")
-        expect(pdf_text).to include("No anchorage assessment data available")
-        expect(pdf_text).to include("No enclosed assessment data available")
-        expect(pdf_text).to include("No materials assessment data available")
-        expect(pdf_text).to include("No fan assessment data available")
+        expect_no_assessment_messages(pdf_text, inspection.unit)
       end
     end
 

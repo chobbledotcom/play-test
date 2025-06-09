@@ -143,32 +143,32 @@ RSpec.describe JsonSerializerService do
         end
       end
 
-      it "excludes assessment-specific private fields" do
+      it "includes all assessment fields except system fields" do
         json = JsonSerializerService.serialize_inspection(inspection)
 
-        # StructureAssessment exclusions
+        # StructureAssessment should include all fields
         structure = json[:assessments][:structure_assessment]
-        expect(structure).not_to have_key(:unit_pressure_value)
+        expect(structure).to have_key(:unit_pressure_value)
 
-        # AnchorageAssessment exclusions
+        # AnchorageAssessment should include all comment fields
         anchorage = json[:assessments][:anchorage_assessment]
-        expect(anchorage).not_to have_key(:num_anchors_comment)
-        expect(anchorage).not_to have_key(:anchor_accessories_comment)
+        expect(anchorage).to have_key(:num_anchors_comment)
+        expect(anchorage).to have_key(:anchor_accessories_comment)
 
-        # MaterialsAssessment exclusions
+        # MaterialsAssessment should include all fields
         materials = json[:assessments][:materials_assessment]
-        expect(materials).not_to have_key(:rope_size_comment)
-        expect(materials).not_to have_key(:thread_comment)
+        expect(materials).to have_key(:rope_size_comment)
+        expect(materials).to have_key(:thread_comment)
 
-        # FanAssessment exclusions
+        # FanAssessment should include all fields
         fan = json[:assessments][:fan_assessment]
-        expect(fan).not_to have_key(:blower_serial)
-        expect(fan).not_to have_key(:pat_comment)
+        expect(fan).to have_key(:blower_serial)
+        expect(fan).to have_key(:pat_comment)
 
-        # EnclosedAssessment exclusions
+        # EnclosedAssessment should include all fields
         enclosed = json[:assessments][:enclosed_assessment]
-        expect(enclosed).not_to have_key(:exit_number_comment)
-        expect(enclosed).not_to have_key(:exit_visible_comment)
+        expect(enclosed).to have_key(:exit_number_comment)
+        expect(enclosed).to have_key(:exit_visible_comment)
       end
 
       it "includes public assessment fields using reflection" do
@@ -178,7 +178,7 @@ RSpec.describe JsonSerializerService do
         user_height = json[:assessments][:user_height_assessment]
 
         # Get expected fields
-        excluded = PublicFieldFiltering::EXCLUDED_FIELDS + (PublicFieldFiltering::ASSESSMENT_EXCLUDED_FIELDS["UserHeightAssessment"] || [])
+        excluded = PublicFieldFiltering::EXCLUDED_FIELDS
         expected_fields = UserHeightAssessment.column_names - excluded
 
         expected_fields.each do |field|

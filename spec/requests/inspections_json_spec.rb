@@ -83,7 +83,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
           expect(user_height).not_to have_key("created_at")
         end
 
-        it "excludes assessment-specific excluded fields" do
+        it "includes all assessment fields except system fields" do
           create(:anchorage_assessment, :complete, inspection: inspection)
           create(:materials_assessment, :complete, inspection: inspection)
           create(:fan_assessment, :complete, inspection: inspection)
@@ -92,20 +92,20 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
 
           json = JSON.parse(response.body)
 
-          # Check AnchorageAssessment exclusions
+          # Check AnchorageAssessment includes all fields
           anchorage = json["assessments"]["anchorage_assessment"]
-          expect(anchorage).not_to have_key("num_anchors_comment")
-          expect(anchorage).not_to have_key("anchor_accessories_comment")
+          expect(anchorage).to have_key("num_anchors_comment")
+          expect(anchorage).to have_key("anchor_accessories_comment")
 
-          # Check MaterialsAssessment exclusions
+          # Check MaterialsAssessment includes all fields
           materials = json["assessments"]["materials_assessment"]
-          expect(materials).not_to have_key("rope_size_comment")
-          expect(materials).not_to have_key("thread_comment")
+          expect(materials).to have_key("rope_size_comment")
+          expect(materials).to have_key("thread_comment")
 
-          # Check FanAssessment exclusions
+          # Check FanAssessment includes all fields
           fan = json["assessments"]["fan_assessment"]
-          expect(fan).not_to have_key("blower_serial")
-          expect(fan).not_to have_key("pat_comment")
+          expect(fan).to have_key("blower_serial")
+          expect(fan).to have_key("pat_comment")
         end
       end
 

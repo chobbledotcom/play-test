@@ -2,7 +2,7 @@ en:
   inspections:
     assessments:
       user_height:
-        title: "User Height Assessment"
+        title: "User Height/Count"
         sections:
           height_measurements: "Height Measurements"
           user_capacity: "User Capacity"
@@ -47,7 +47,7 @@ en:
       
       # New tallest_user_height key structure (duplicate of user_height for compatibility)
       tallest_user_height:
-        title: "User Height Assessment"
+        title: "User Height/Count"
         sections:
           height_measurements: "Height Measurements"
           user_capacity: "User Capacity"

@@ -48,13 +48,13 @@ class PdfGeneratorService
       generate_final_result(pdf, inspection)
 
       # QR Code
-      generate_inspection_qr_code(pdf, inspection)
+      generate_qr_code_section(pdf, inspection, "inspection")
 
       # Add DRAFT watermark overlay for draft inspections
       add_draft_watermark(pdf) unless inspection.complete?
 
       # Footer
-      generate_inspection_pdf_footer(pdf)
+      generate_footer(pdf, "inspection")
     end
   end
 
@@ -66,8 +66,8 @@ class PdfGeneratorService
       generate_unit_pdf_header(pdf, unit)
       generate_unit_details(pdf, unit)
       generate_unit_inspection_history(pdf, unit)
-      generate_unit_qr_code(pdf, unit)
-      generate_unit_footer(pdf)
+      generate_qr_code_section(pdf, unit, "unit")
+      generate_footer(pdf, "unit")
     end
   end
 
@@ -97,31 +97,31 @@ class PdfGeneratorService
 
     # Issued by company
     if inspection.inspector_company&.name.present?
-      pdf.text "Issued by: #{inspection.inspector_company.name}", size: 12, style: :bold
+      pdf.text "#{I18n.t("pdf.inspection.fields.issued_by")}: #{inspection.inspector_company.name}", size: 12, style: :bold
     end
     pdf.move_down 5
 
     # Issue date
-    pdf.text "Issued #{inspection.inspection_date&.strftime("%d/%m/%Y") || "N/A"}",
+    pdf.text "#{I18n.t("pdf.inspection.fields.issued")} #{inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.inspection.fields.na")}",
       size: 14, style: :bold, color: "CC0000"
     pdf.move_down 5
 
     # RPII Registration Number
     if inspection.inspector_company&.rpii_registration_number.present?
-      pdf.text "RPII Reg Number: #{inspection.inspector_company.rpii_registration_number}",
+      pdf.text "#{I18n.t("pdf.inspection.fields.rpii_reg_number")}: #{inspection.inspector_company.rpii_registration_number}",
         size: 14, style: :bold, color: "CC0000"
     end
     pdf.move_down 5
 
     # Place of Inspection
     if inspection.inspection_location.present?
-      pdf.text "Place of Inspection: #{inspection.inspection_location}",
+      pdf.text "#{I18n.t("pdf.inspection.fields.place_of_inspection")}: #{inspection.inspection_location}",
         size: 8, style: :bold, color: "CC0000"
     end
     pdf.move_down 5
 
     # Unique Report Number
-    pdf.text "Unique Report Number: #{inspection.id}", size: 12, style: :bold, color: "CC0000"
+    pdf.text "#{I18n.t("pdf.inspection.fields.unique_report_number")}: #{inspection.id}", size: 12, style: :bold, color: "CC0000"
     pdf.move_down 20
   end
 
@@ -133,7 +133,7 @@ class PdfGeneratorService
 
     if unit
       # Description/Name
-      pdf.text "Description: #{truncate_text(unit.name || unit.description || "N/A", 66)}", size: 8
+      pdf.text "#{I18n.t("pdf.inspection.fields.description")}: #{truncate_text(unit.name || unit.description || I18n.t("pdf.inspection.fields.na"), 66)}", size: 8
 
       # Manufacturer
       manufacturer_text = unit.manufacturer.presence || I18n.t("pdf.inspection.fields.not_specified")
@@ -146,20 +146,20 @@ class PdfGeneratorService
       dimensions << "Height: #{unit.height}" if unit.height.present?
 
       if dimensions.any?
-        pdf.text "Size (m): #{dimensions.join(" ")}", size: 8
+        pdf.text "#{I18n.t("pdf.inspection.fields.size_m")}: #{dimensions.join(" ")}", size: 8
       end
 
       # Serial Number
-      pdf.text "Serial Number / Asset ID: #{unit.serial_number || "N/A"}", size: 8
+      pdf.text "#{I18n.t("pdf.inspection.fields.serial_number_asset_id")}: #{unit.serial || I18n.t("pdf.inspection.fields.na")}", size: 8
 
       # Owner
-      pdf.text "Owner: #{unit.owner || "N/A"}", size: 8 if unit.owner.present?
+      pdf.text "#{I18n.t("pdf.inspection.fields.owner")}: #{unit.owner || I18n.t("pdf.inspection.fields.na")}", size: 8 if unit.owner.present?
 
       # Unit Type / Has Slide
-      unit_type = unit.has_slide? ? "Unit with Slide" : "Standard Unit"
-      pdf.text "Type: #{unit_type}", size: 8
+      unit_type = unit.has_slide? ? I18n.t("pdf.inspection.fields.unit_with_slide") : I18n.t("pdf.inspection.fields.standard_unit")
+      pdf.text "#{I18n.t("pdf.inspection.fields.type")}: #{unit_type}", size: 8
     else
-      pdf.text "No unit associated with this inspection", size: 8, style: :italic
+      pdf.text I18n.t("pdf.inspection.fields.no_unit_associated"), size: 8, style: :italic
     end
 
     pdf.move_down 15
@@ -187,40 +187,6 @@ class PdfGeneratorService
     pdf.stroke_horizontal_rule
     pdf.move_down 10
     pdf.text inspection.comments
-  end
-
-  def self.generate_inspection_qr_code(pdf, inspection)
-    pdf.move_down 20
-    pdf.text I18n.t("pdf.inspection.verification"), size: 14, style: :bold
-    pdf.stroke_horizontal_rule
-    pdf.move_down 10
-
-    # Generate QR code
-    qr_code_png = QrCodeService.generate_qr_code(inspection)
-    qr_code_temp_file = Tempfile.new(["qr_code_#{inspection.id}_#{Process.pid}", ".png"])
-
-    begin
-      qr_code_temp_file.binmode
-      qr_code_temp_file.write(qr_code_png)
-      qr_code_temp_file.close
-
-      # Add QR code image and URL text
-      pdf.image qr_code_temp_file.path, position: :center, width: 180
-      pdf.move_down 5
-      pdf.text I18n.t("pdf.inspection.scan_text"), align: :center, size: 10
-      pdf.text "#{ENV["BASE_URL"]}/r/#{inspection.id}",
-        align: :center, size: 10, style: :italic
-    ensure
-      qr_code_temp_file.close unless qr_code_temp_file.closed?
-      qr_code_temp_file.unlink if File.exist?(qr_code_temp_file.path)
-    end
-  end
-
-  def self.generate_inspection_pdf_footer(pdf)
-    pdf.move_down 30
-    pdf.text "#{I18n.t("pdf.inspection.generated_text")} #{Time.now.strftime("%d/%m/%Y at %H:%M")}",
-      size: 10, align: :center, style: :italic
-    pdf.text I18n.t("pdf.inspection.footer_text"), size: 10, align: :center, style: :italic
   end
 
   def self.create_pdf_table(pdf, data)
@@ -269,9 +235,9 @@ class PdfGeneratorService
 
     data = [
       [I18n.t("pdf.unit.fields.name"), unit.name],
-      [I18n.t("pdf.unit.fields.serial_number"), unit.serial_number || unit.serial],
+      [I18n.t("pdf.unit.fields.serial_number"), unit.serial],
       [I18n.t("pdf.unit.fields.manufacturer"), unit.manufacturer.presence || I18n.t("pdf.unit.fields.not_specified")],
-      [I18n.t("pdf.unit.fields.has_slide"), unit.has_slide? ? "Yes" : "No"],
+      [I18n.t("pdf.unit.fields.has_slide"), unit.has_slide? ? I18n.t("shared.yes") : I18n.t("shared.no")],
       [I18n.t("pdf.unit.fields.owner"), unit.owner],
       [I18n.t("pdf.unit.fields.dimensions"), unit.dimensions]
     ]
@@ -339,15 +305,314 @@ class PdfGeneratorService
     end
   end
 
-  def self.generate_unit_qr_code(pdf, unit)
+  # Assessment section generators
+  def self.generate_user_height_section(pdf, inspection)
+    generate_assessment_section(pdf, "user_height", inspection.user_height_assessment) do |assessment, type|
+      # Standard measurement fields
+      measurement_fields = [
+        [:containing_wall_height, "m"],
+        [:platform_height, "m"],
+        [:tallest_user_height, "m"],
+        [:play_area_length, "m"],
+        [:play_area_width, "m"]
+      ]
+      
+      measurement_fields.each do |field, unit|
+        add_field_with_comment(pdf, assessment, field, unit, type)
+      end
+
+      # Permanent Roof
+      if !assessment.permanent_roof.nil?
+        add_boolean_field_with_comment(pdf, assessment, :permanent_roof, type)
+      end
+
+      # Negative Adjustment
+      if assessment.negative_adjustment.present?
+        add_field_with_comment(pdf, assessment, :negative_adjustment, "m²", type)
+      end
+
+      pdf.move_down 5
+
+      # User Capacities
+      pdf.text I18n.t("inspections.assessments.user_height.sections.user_capacities"), size: 8, style: :bold
+      
+      user_capacity_heights = [1000, 1200, 1500, 1800]
+      user_capacity_heights.each do |height|
+        field_name = "users_at_#{height}mm"
+        value = assessment.send(field_name) || I18n.t("pdf.inspection.fields.na")
+        pdf.text "• #{I18n.t("inspections.assessments.user_height.fields.#{field_name}")}: #{value}", size: 8
+      end
+    end
+  end
+
+  def self.generate_slide_section(pdf, inspection)
+    generate_assessment_section(pdf, "slide", inspection.slide_assessment) do |assessment, type|
+      # Height measurement fields
+      height_fields = [
+        [:slide_platform_height, "m"],
+        [:slide_wall_height, "m"],
+        [:slide_first_metre_height, "m"],
+        [:slide_beyond_first_metre_height, "m"]
+      ]
+      
+      height_fields.each do |field, unit|
+        add_field_with_comment(pdf, assessment, field, unit, type)
+      end
+
+      # Permanent Roof
+      if !assessment.slide_permanent_roof.nil?
+        add_boolean_field_with_comment(pdf, assessment, :slide_permanent_roof, type)
+      end
+
+      # Pass/fail fields
+      pass_fail_fields = [:clamber_netting_pass, :slip_sheet_pass]
+      pass_fail_fields.each do |field|
+        add_pass_fail_field_with_comment(pdf, assessment, field, type)
+      end
+
+      # Runout (special case with measurement and pass/fail)
+      add_measurement_pass_fail_field(pdf, assessment, :runout_value, "m", :runout_pass, type)
+    end
+  end
+
+  def self.generate_structure_section(pdf, inspection)
+    generate_assessment_section(pdf, "structure", inspection.structure_assessment) do |assessment, type|
+      # Simple pass/fail fields
+      pass_fail_fields = [
+        :seam_integrity_pass,
+        :lock_stitch_pass,
+        :air_loss_pass,
+        :straight_walls_pass,
+        :sharp_edges_pass,
+        :unit_stable_pass,
+        :evacuation_time_pass
+      ]
+      
+      pass_fail_fields.each do |field|
+        add_pass_fail_field_with_comment(pdf, assessment, field, type)
+      end
+      
+      # Measurement fields with pass/fail
+      measurement_fields = [
+        [:stitch_length, "mm", :stitch_length_pass],
+        [:blower_tube_length, "m", :blower_tube_length_pass],
+        [:unit_pressure_value, "Pa", :unit_pressure_pass]
+      ]
+      
+      measurement_fields.each do |value_field, unit, pass_field|
+        add_measurement_pass_fail_field(pdf, assessment, value_field, unit, pass_field, type)
+      end
+    end
+  end
+
+  def self.generate_anchorage_section(pdf, inspection)
+    generate_assessment_section(pdf, "anchorage", inspection.anchorage_assessment) do |assessment, type|
+      # Number of anchors with special formatting
+      label = I18n.t("inspections.assessments.anchorage.fields.num_anchors_pass")
+      anchor_text = "#{label}: #{I18n.t("inspections.assessments.anchorage.fields.num_low_anchors")}: #{assessment.num_low_anchors || I18n.t("pdf.inspection.fields.na")}, #{I18n.t("inspections.assessments.anchorage.fields.num_high_anchors")}: #{assessment.num_high_anchors || I18n.t("pdf.inspection.fields.na")}"
+      add_text_pass_fail_field(pdf, anchor_text, assessment, :num_anchors_pass)
+
+      # Pass/fail fields
+      pass_fail_fields = [
+        :anchor_type_pass,
+        :pull_strength_pass,
+        :anchor_degree_pass,
+        :anchor_accessories_pass
+      ]
+      
+      pass_fail_fields.each do |field|
+        add_pass_fail_field_with_comment(pdf, assessment, field, type)
+      end
+    end
+  end
+
+  def self.generate_enclosed_section(pdf, inspection)
+    generate_assessment_section(pdf, "enclosed", inspection.enclosed_assessment) do |assessment, type|
+      # Exit number with pass/fail
+      label = I18n.t("inspections.assessments.enclosed.fields.exit_number")
+      exit_text = "#{label}: #{assessment.exit_number || I18n.t("pdf.inspection.fields.na")}"
+      add_text_pass_fail_field(pdf, exit_text, assessment, :exit_number_pass)
+
+      add_pass_fail_field_with_comment(pdf, assessment, :exit_visible_pass, type)
+    end
+  end
+
+  def self.generate_materials_section(pdf, inspection)
+    generate_assessment_section(pdf, "materials", inspection.materials_assessment) do |assessment, type|
+      # Pass/fail fields
+      pass_fail_fields = [:fabric_pass, :fire_retardant_pass, :thread_pass]
+      pass_fail_fields.each do |field|
+        add_pass_fail_field_with_comment(pdf, assessment, field, type)
+      end
+      
+      # Rope size with measurement
+      add_measurement_pass_fail_field(pdf, assessment, :rope_size, "mm", :rope_size_pass, type)
+    end
+  end
+
+  def self.generate_fan_section(pdf, inspection)
+    generate_assessment_section(pdf, "fan", inspection.fan_assessment) do |assessment, type|
+      # Pass/fail fields
+      pass_fail_fields = [
+        :blower_flap_pass,
+        :blower_finger_pass,
+        :pat_pass,
+        :blower_visual_pass
+      ]
+      
+      pass_fail_fields.each do |field|
+        add_pass_fail_field_with_comment(pdf, assessment, field, type)
+      end
+
+      # Optional text fields
+      optional_fields = [
+        [:blower_serial, nil],
+        [:fan_size_comment, 60]
+      ]
+      
+      optional_fields.each do |field, truncate_length|
+        if assessment.send(field).present?
+          label = I18n.t("inspections.assessments.fan.fields.#{field}")
+          value = assessment.send(field)
+          value = truncate_text(value, truncate_length) if truncate_length
+          pdf.text "#{label}: #{value}", size: 8
+        end
+      end
+    end
+  end
+
+  def self.generate_risk_assessment_section(pdf, inspection)
+    # This section doesn't exist in the current model
+    # Placeholder for future implementation
+  end
+
+  def self.generate_final_result(pdf, inspection)
+    pdf.text I18n.t("pdf.inspection.final_result"), size: 14, style: :bold
+    pdf.move_down 5
+
+    result_text = inspection.passed? ? I18n.t("pdf.inspection.fields.passed") : I18n.t("pdf.inspection.fields.failed")
+    result_color = inspection.passed? ? "008000" : "CC0000"
+
+    pdf.text result_text, size: 16, style: :bold, color: result_color
+    pdf.move_down 10
+
+    pdf.text "#{I18n.t("pdf.inspection.fields.status")}: #{inspection.complete? ? I18n.t("pdf.inspection.fields.complete") : I18n.t("pdf.inspection.fields.draft")}", size: 10
+    pdf.move_down 15
+  end
+
+  # Generic helper methods for DRY code
+  def self.generate_assessment_section(pdf, assessment_type, assessment)
+    title = I18n.t("inspections.assessments.#{assessment_type}.title")
+    pdf.text title, size: 12, style: :bold
+    pdf.move_down 5
+
+    if assessment
+      yield(assessment, assessment_type)
+    else
+      pdf.text I18n.t("pdf.inspection.no_assessment_data", assessment_type: title), size: 8, style: :italic
+    end
+
+    pdf.move_down 15
+  end
+
+  # Generic field rendering method that handles all field types
+  def self.add_field(pdf, assessment, field_name, assessment_type, options = {})
+    # Extract options with defaults
+    unit = options[:unit]
+    pass_field = options[:pass_field]
+    custom_label = options[:label]
+    custom_text = options[:text]
+    
+    # Get the label
+    label = custom_label || I18n.t("inspections.assessments.#{assessment_type}.fields.#{field_name}")
+    
+    # Get the value
+    value = assessment.send(field_name) unless custom_text
+    
+    # Format the value based on field type
+    formatted_value = if custom_text
+      custom_text
+    elsif unit
+      format_measurement(value, unit)
+    elsif field_name.to_s.include?("_pass")
+      format_pass_fail(value)
+    elsif [true, false].include?(value)
+      value ? I18n.t("shared.yes") : I18n.t("shared.no")
+    else
+      value || I18n.t("pdf.inspection.fields.na")
+    end
+    
+    # Build the text parts
+    text_parts = []
+    text_parts << "#{label}:" unless custom_text
+    text_parts << formatted_value
+    
+    # Add pass/fail if specified
+    if pass_field
+      pass_fail = assessment.send(pass_field)
+      text_parts << "-"
+      text_parts << format_pass_fail(pass_fail)
+    end
+    
+    # Add comment if it exists
+    comment_field = derive_comment_field_name(field_name, pass_field)
+    if assessment.respond_to?(comment_field)
+      comment = assessment.send(comment_field)
+      text_parts << truncate_text(comment, 60) if comment.present?
+    end
+    
+    # Render the complete text
+    pdf.text text_parts.join(" "), size: 8
+  end
+
+  # Derive the comment field name based on the main field or pass field
+  def self.derive_comment_field_name(field_name, pass_field = nil)
+    if pass_field
+      # Use pass field as base, removing _pass suffix
+      base_name = pass_field.to_s.gsub(/_pass$/, "")
+    else
+      # Use field name as base, removing _pass suffix if present
+      base_name = field_name.to_s.gsub(/_pass$/, "")
+    end
+    "#{base_name}_comment"
+  end
+
+  # Wrapper methods for backward compatibility and clarity
+  def self.add_field_with_comment(pdf, assessment, field_name, unit, assessment_type)
+    add_field(pdf, assessment, field_name, assessment_type, unit: unit)
+  end
+
+  def self.add_boolean_field_with_comment(pdf, assessment, field_name, assessment_type)
+    add_field(pdf, assessment, field_name, assessment_type)
+  end
+
+  def self.add_pass_fail_field_with_comment(pdf, assessment, field_name, assessment_type)
+    add_field(pdf, assessment, field_name, assessment_type)
+  end
+
+  def self.add_measurement_pass_fail_field(pdf, assessment, value_field, unit, pass_field, assessment_type)
+    add_field(pdf, assessment, value_field, assessment_type, unit: unit, pass_field: pass_field)
+  end
+
+  def self.add_text_pass_fail_field(pdf, text, assessment, pass_field)
+    pass_fail = assessment.send(pass_field)
+    # Remove _pass suffix to get the base field name for comment
+    base_field_name = pass_field.to_s.gsub(/_pass$/, "")
+    comment = assessment.send("#{base_field_name}_comment") if assessment.respond_to?("#{base_field_name}_comment")
+    full_text = "#{text} - #{format_pass_fail(pass_fail)} #{truncate_text(comment, 60)}"
+    pdf.text full_text, size: 8
+  end
+
+  # Generic QR code generation
+  def self.generate_qr_code_section(pdf, record, type)
     pdf.move_down 20
-    pdf.text I18n.t("pdf.unit.verification"), size: 14, style: :bold
+    pdf.text I18n.t("pdf.#{type}.verification"), size: 14, style: :bold
     pdf.stroke_horizontal_rule
     pdf.move_down 10
 
     # Generate QR code
-    qr_code_png = QrCodeService.generate_qr_code(unit)
-    qr_code_temp_file = Tempfile.new(["qr_code_unit_#{unit.id}_#{Process.pid}", ".png"])
+    qr_code_png = QrCodeService.generate_qr_code(record)
+    qr_code_temp_file = Tempfile.new(["qr_code_#{type}_#{record.id}_#{Process.pid}", ".png"])
 
     begin
       qr_code_temp_file.binmode
@@ -357,8 +622,11 @@ class PdfGeneratorService
       # Add QR code image and URL text
       pdf.image qr_code_temp_file.path, position: :center, width: 180
       pdf.move_down 5
-      pdf.text I18n.t("pdf.unit.scan_text"), align: :center, size: 10
-      pdf.text "#{ENV["BASE_URL"]}/u/#{unit.id}",
+      pdf.text I18n.t("pdf.#{type}.scan_text"), align: :center, size: 10
+
+      # Determine URL prefix based on type
+      url_prefix = (type == "inspection") ? "r" : "u"
+      pdf.text "#{ENV["BASE_URL"]}/#{url_prefix}/#{record.id}",
         align: :center, size: 10, style: :italic
     ensure
       qr_code_temp_file.close unless qr_code_temp_file.closed?
@@ -366,206 +634,12 @@ class PdfGeneratorService
     end
   end
 
-  def self.generate_unit_footer(pdf)
+  # Generic footer
+  def self.generate_footer(pdf, type)
     pdf.move_down 30
-    pdf.text "#{I18n.t("pdf.unit.generated_text")} #{Time.now.strftime("%d/%m/%Y at %H:%M")}",
+    pdf.text "#{I18n.t("pdf.#{type}.generated_text")} #{Time.now.strftime("%d/%m/%Y at %H:%M")}",
       size: 10, align: :center, style: :italic
-    pdf.text I18n.t("pdf.unit.footer_text"), size: 10, align: :center, style: :italic
-  end
-
-  # Assessment section generators
-  def self.generate_user_height_section(pdf, inspection)
-    pdf.text "User Height/Count", size: 12, style: :bold
-    pdf.move_down 5
-
-    assessment = inspection.user_height_assessment
-
-    if assessment
-      # Containing Wall Height
-      pdf.text "Containing wall height: #{format_measurement(assessment.containing_wall_height, "m")} #{truncate_text(assessment.containing_wall_height_comment, 60)}", size: 8
-
-      # Platform Height
-      pdf.text "Platform height: #{format_measurement(assessment.platform_height, "m")} #{truncate_text(assessment.platform_height_comment, 60)}", size: 8
-
-      # Permanent Roof
-      if !assessment.permanent_roof.nil?
-        pdf.text "Permanent roof: #{assessment.permanent_roof ? "Yes" : "No"} #{truncate_text(assessment.permanent_roof_comment, 60)}", size: 8
-      end
-
-      # User Height
-      pdf.text "User height: #{format_measurement(assessment.tallest_user_height, "m")} #{truncate_text(assessment.tallest_user_height_comment, 60)}", size: 8
-
-      # Play Area Dimensions
-      pdf.text "Play area length: #{format_measurement(assessment.play_area_length, "m")} #{truncate_text(assessment.play_area_length_comment, 60)}", size: 8
-      pdf.text "Play area width: #{format_measurement(assessment.play_area_width, "m")} #{truncate_text(assessment.play_area_width_comment, 60)}", size: 8
-
-      # Negative Adjustment
-      if assessment.negative_adjustment.present?
-        pdf.text "Negative adjustment: #{format_measurement(assessment.negative_adjustment, "m²")} #{truncate_text(assessment.negative_adjustment_comment, 60)}", size: 8
-      end
-
-      pdf.move_down 5
-
-      # User Capacities
-      pdf.text "User capacities:", size: 8, style: :bold
-      pdf.text "• 1.0m users: #{assessment.users_at_1000mm || "N/A"}", size: 8
-      pdf.text "• 1.2m users: #{assessment.users_at_1200mm || "N/A"}", size: 8
-      pdf.text "• 1.5m users: #{assessment.users_at_1500mm || "N/A"}", size: 8
-      pdf.text "• 1.8m users: #{assessment.users_at_1800mm || "N/A"}", size: 8
-    else
-      pdf.text "No user height assessment data available", size: 8, style: :italic
-    end
-
-    pdf.move_down 15
-  end
-
-  def self.generate_slide_section(pdf, inspection)
-    pdf.text "Slide", size: 12, style: :bold
-    pdf.move_down 5
-
-    assessment = inspection.slide_assessment
-
-    if assessment
-      # Platform Height
-      pdf.text "Slide platform height: #{format_measurement(assessment.slide_platform_height, "m")} #{truncate_text(assessment.slide_platform_height_comment, 60)}", size: 8
-
-      # Wall Height
-      pdf.text "Slide wall height: #{format_measurement(assessment.slide_wall_height, "m")} #{truncate_text(assessment.slide_wall_height_comment, 60)}", size: 8
-
-      # First Metre Height
-      pdf.text "Slide 1st metre wall height: #{format_measurement(assessment.slide_first_metre_height, "m")} #{truncate_text(assessment.slide_first_metre_height_comment, 60)}", size: 8
-
-      # Beyond First Metre
-      pdf.text "Slide wall height after 1st metre: #{format_measurement(assessment.slide_beyond_first_metre_height, "m")} #{truncate_text(assessment.slide_beyond_first_metre_height_comment, 60)}", size: 8
-
-      # Permanent Roof
-      if !assessment.slide_permanent_roof.nil?
-        pdf.text "Slide permanent roof: #{assessment.slide_permanent_roof ? "Yes" : "No"} #{truncate_text(assessment.slide_permanent_roof_comment, 60)}", size: 8
-      end
-
-      # Clamber Netting
-      pdf.text "Clamber netting suitable: #{format_pass_fail(assessment.clamber_netting_pass)} #{truncate_text(assessment.clamber_netting_comment, 60)}", size: 8
-
-      # Runout
-      pdf.text "Run-out: #{format_measurement(assessment.runout_value, "m")} - #{format_pass_fail(assessment.runout_pass)} #{truncate_text(assessment.runout_comment, 60)}", size: 8
-
-      # Slip Sheet
-      pdf.text "Slip sheet where applicable: #{format_pass_fail(assessment.slip_sheet_pass)} #{truncate_text(assessment.slip_sheet_comment, 60)}", size: 8
-    else
-      pdf.text "No slide assessment data available", size: 8, style: :italic
-    end
-
-    pdf.move_down 15
-  end
-
-  def self.generate_structure_section(pdf, inspection)
-    pdf.text "Structure", size: 12, style: :bold
-    pdf.move_down 5
-
-    assessment = inspection.structure_assessment
-
-    if assessment
-      # Critical checks
-      pdf.text "Seam integrity: #{format_pass_fail(assessment.seam_integrity_pass)} #{truncate_text(assessment.seam_integrity_comment, 60)}", size: 8
-      pdf.text "Lock stitch: #{format_pass_fail(assessment.lock_stitch_pass)} #{truncate_text(assessment.lock_stitch_comment, 60)}", size: 8
-      pdf.text "Stitch length: #{format_measurement(assessment.stitch_length, "mm")} - #{format_pass_fail(assessment.stitch_length_pass)} #{truncate_text(assessment.stitch_length_comment, 60)}", size: 8
-      pdf.text "Air loss: #{format_pass_fail(assessment.air_loss_pass)} #{truncate_text(assessment.air_loss_comment, 60)}", size: 8
-      pdf.text "Straight walls: #{format_pass_fail(assessment.straight_walls_pass)} #{truncate_text(assessment.straight_walls_comment, 60)}", size: 8
-      pdf.text "Sharp edges: #{format_pass_fail(assessment.sharp_edges_pass)} #{truncate_text(assessment.sharp_edges_comment, 60)}", size: 8
-      pdf.text "Blower tube length: #{format_measurement(assessment.blower_tube_length, "m")} - #{format_pass_fail(assessment.blower_tube_length_pass)} #{truncate_text(assessment.blower_tube_length_comment, 60)}", size: 8
-      pdf.text "Unit stable: #{format_pass_fail(assessment.unit_stable_pass)} #{truncate_text(assessment.unit_stable_comment, 60)}", size: 8
-      pdf.text "Evacuation time <30s: #{format_pass_fail(assessment.evacuation_time_pass)} #{truncate_text(assessment.evacuation_time_comment, 60)}", size: 8
-    else
-      pdf.text "No structure assessment data available", size: 8, style: :italic
-    end
-
-    pdf.move_down 15
-  end
-
-  def self.generate_anchorage_section(pdf, inspection)
-    pdf.text "Anchorage", size: 12, style: :bold
-    pdf.move_down 5
-
-    assessment = inspection.anchorage_assessment
-    if assessment
-      pdf.text "Number of anchors: Low: #{assessment.num_low_anchors || "N/A"}, High: #{assessment.num_high_anchors || "N/A"} - #{format_pass_fail(assessment.num_anchors_pass)}", size: 8
-      pdf.text "Anchor type: #{format_pass_fail(assessment.anchor_type_pass)}", size: 8
-      pdf.text "Pull strength: #{format_pass_fail(assessment.pull_strength_pass)}", size: 8
-      pdf.text "Anchor degree: #{format_pass_fail(assessment.anchor_degree_pass)}", size: 8
-      pdf.text "Anchor accessories: #{format_pass_fail(assessment.anchor_accessories_pass)}", size: 8
-    else
-      pdf.text "No anchorage assessment data available", size: 8, style: :italic
-    end
-
-    pdf.move_down 15
-  end
-
-  def self.generate_enclosed_section(pdf, inspection)
-    pdf.text "Totally Enclosed", size: 12, style: :bold
-    pdf.move_down 5
-
-    assessment = inspection.enclosed_assessment
-    if assessment
-      pdf.text "Exit number: #{assessment.exit_number || "N/A"} - #{format_pass_fail(assessment.exit_number_pass)}", size: 8
-      pdf.text "Exits visible: #{format_pass_fail(assessment.exit_visible_pass)}", size: 8
-    else
-      pdf.text "No enclosed assessment data available", size: 8, style: :italic
-    end
-
-    pdf.move_down 15
-  end
-
-  def self.generate_materials_section(pdf, inspection)
-    pdf.text "Materials", size: 12, style: :bold
-    pdf.move_down 5
-
-    assessment = inspection.materials_assessment
-    if assessment
-      pdf.text "Fabric: #{format_pass_fail(assessment.fabric_pass)}", size: 8
-      pdf.text "Fire retardant: #{format_pass_fail(assessment.fire_retardant_pass)}", size: 8
-      pdf.text "Thread: #{format_pass_fail(assessment.thread_pass)}", size: 8
-      pdf.text "Rope size: #{format_measurement(assessment.rope_size, "mm")} - #{format_pass_fail(assessment.rope_size_pass)}", size: 8
-    else
-      pdf.text "No materials assessment data available", size: 8, style: :italic
-    end
-
-    pdf.move_down 15
-  end
-
-  def self.generate_fan_section(pdf, inspection)
-    pdf.text "Fan/Blower", size: 12, style: :bold
-    pdf.move_down 5
-
-    assessment = inspection.fan_assessment
-    if assessment
-      pdf.text "Blower flap: #{format_pass_fail(assessment.blower_flap_pass)}", size: 8
-      pdf.text "Finger guard: #{format_pass_fail(assessment.blower_finger_pass)}", size: 8
-      pdf.text "PAT test: #{format_pass_fail(assessment.pat_pass)}", size: 8
-      pdf.text "Visual inspection: #{format_pass_fail(assessment.blower_visual_pass)}", size: 8
-    else
-      pdf.text "No fan assessment data available", size: 8, style: :italic
-    end
-
-    pdf.move_down 15
-  end
-
-  def self.generate_risk_assessment_section(pdf, inspection)
-    # This section doesn't exist in the current model
-    # Placeholder for future implementation
-  end
-
-  def self.generate_final_result(pdf, inspection)
-    pdf.text "Final Result", size: 14, style: :bold
-    pdf.move_down 5
-
-    result_text = inspection.passed? ? "PASSED" : "FAILED"
-    result_color = inspection.passed? ? "008000" : "CC0000"
-
-    pdf.text result_text, size: 16, style: :bold, color: result_color
-    pdf.move_down 10
-
-    pdf.text "Status: #{inspection.complete? ? 'Complete' : 'Draft'}", size: 10
-    pdf.move_down 15
+    pdf.text I18n.t("pdf.#{type}.footer_text"), size: 10, align: :center, style: :italic
   end
 
   # Helper methods
@@ -576,14 +650,14 @@ class PdfGeneratorService
 
   def self.format_pass_fail(value)
     case value
-    when true then "Pass"
-    when false then "Fail"
-    else "N/A"
+    when true then I18n.t("pdf.inspection.fields.pass")
+    when false then I18n.t("pdf.inspection.fields.fail")
+    else I18n.t("pdf.inspection.fields.na")
     end
   end
 
   def self.format_measurement(value, unit = "")
-    return "N/A" if value.nil?
+    return I18n.t("pdf.inspection.fields.na") if value.nil?
     "#{value}#{unit}"
   end
 
@@ -601,7 +675,7 @@ class PdfGeneratorService
 
         y_positions.each do |y|
           x_positions.each do |x|
-            pdf.text_box "DRAFT",
+            pdf.text_box I18n.t("pdf.inspection.watermark.draft"),
               at: [x, y],
               width: 100,
               height: 60,

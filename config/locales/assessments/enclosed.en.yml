@@ -2,7 +2,7 @@ en:
   inspections:
     assessments:
       enclosed:
-        title: "Enclosed Assessment"
+        title: "Totally Enclosed"
         sections:
           exit_requirements: "Exit Requirements"
           enclosed_measurements: "Enclosed Measurements"

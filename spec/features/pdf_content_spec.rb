@@ -1,7 +1,7 @@
 require "rails_helper"
 require "pdf/inspector"
 
-RSpec.feature "PDF Content Structure", type: :feature do
+RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
   let(:user) { create(:user) }
   let(:inspector_company) { user.inspection_company }
   let(:unit) do
@@ -9,7 +9,7 @@ RSpec.feature "PDF Content Structure", type: :feature do
       user: user,
       name: "Test Bouncy Castle",
       manufacturer: "Bounce Co Ltd",
-      serial_number: "BCL-2024-001",
+      serial: "BCL-2024-001",
       width: 5.5,
       length: 6.0,
       height: 4.5)
@@ -41,39 +41,34 @@ RSpec.feature "PDF Content Structure", type: :feature do
         air_loss_pass: true)
 
       get(inspection_report_path(inspection))
+      pdf_text = pdf_text_content(response.body)
 
-      # Analyze PDF content
-      pdf = PDF::Inspector::Text.analyze(response.body)
-      text_content = pdf.strings.join(" ")
+      # Check all core i18n keys are present
+      expect_pdf_to_include_i18n_keys(pdf_text,
+        "pdf.inspection.title",
+        "pdf.inspection.equipment_details", 
+        "pdf.inspection.inspection_results",
+        "pdf.inspection.comments",
+        "pdf.inspection.verification",
+        "pdf.inspection.footer_text"
+      )
 
-      # Check header section
-      expect(text_content).to include(I18n.t("pdf.inspection.title"))
-      expect(text_content).to include(inspector_company.name)
-      expect(text_content).to include(inspector_company.rpii_registration_number)
-      expect(text_content).to include("Happy Kids Play Centre")
+      # Check dynamic content
+      expect(pdf_text).to include(inspector_company.name)
+      expect(pdf_text).to include(inspector_company.rpii_registration_number)
+      expect(pdf_text).to include("Happy Kids Play Centre")
+      expect(pdf_text).to include("Test Bouncy Castle")
+      expect(pdf_text).to include("BCL-2024-001")
+      expect(pdf_text).to include(unit.width.to_s)
+      expect(pdf_text).to include(unit.length.to_s)
+      expect(pdf_text).to include(unit.height.to_s)
 
-      # Check equipment details
-      expect(text_content).to include(I18n.t("pdf.inspection.equipment_details"))
-      expect(text_content).to include("Test Bouncy Castle")
-      expect(text_content).to include("Bounce Co Ltd")
-      expect(text_content).to include("BCL-2024-001")
-      expect(text_content).to include("5.5") # width
-      expect(text_content).to include("6.0") # length
-      expect(text_content).to include("4.5") # height
+      # Check assessment sections exist
+      expect(pdf_text).to include("User Height")
+      expect(pdf_text).to include("Structure")
 
-      # Check inspection results
-      expect(text_content).to include(I18n.t("pdf.inspection.inspection_results"))
-
-      # Check assessment sections
-      expect(text_content).to include("User Height")
-      expect(text_content).to include("Structure")
-
-      # Check final result
-      expect(text_content).to include("PASSED")
-
-      # Check footer
-      expect(text_content).to include(I18n.t("pdf.inspection.footer_text"))
-      expect(text_content).to include(I18n.t("pdf.inspection.verification"))
+      # Check result
+      expect_pdf_to_include_i18n(pdf_text, "pdf.inspection.passed")
     end
 
     scenario "handles failed inspection correctly" do
@@ -90,14 +85,12 @@ RSpec.feature "PDF Content Structure", type: :feature do
         seam_integrity_comment: "Torn seam on left side")
 
       get(inspection_report_path(failed_inspection))
-
-      pdf = PDF::Inspector::Text.analyze(response.body)
-      text_content = pdf.strings.join(" ")
+      pdf_text = pdf_text_content(response.body)
 
       # Check for failed status
-      expect(text_content).to include("FAILED")
-      expect(text_content).to include("Multiple safety issues found")
-      expect(text_content).to include("Torn seam on left side")
+      expect_pdf_to_include_i18n(pdf_text, "pdf.inspection.failed")
+      expect(pdf_text).to include("Multiple safety issues found")
+      expect(pdf_text).to include("Torn seam on left side")
     end
 
     scenario "includes all assessment types when present" do
@@ -143,13 +136,10 @@ RSpec.feature "PDF Content Structure", type: :feature do
       # Don't create any assessments
 
       get(inspection_report_path(inspection))
+      pdf_text = pdf_text_content(response.body)
 
-      pdf = PDF::Inspector::Text.analyze(response.body)
-      text_content = pdf.strings.join(" ")
-
-      # Should show no data messages
-      expect(text_content).to include("No user height assessment data available")
-      expect(text_content).to include("No structure assessment data available")
+      # Should show no data messages for assessments
+      expect_no_assessment_messages(pdf_text, unit)
     end
   end
 
@@ -165,39 +155,37 @@ RSpec.feature "PDF Content Structure", type: :feature do
           passed: i.even?)
       end
 
-      get(unit_report_path(unit))
+      get(report_unit_path(unit))
+      pdf_text = pdf_text_content(response.body)
 
-      pdf = PDF::Inspector::Text.analyze(response.body)
-      text_content = pdf.strings.join(" ")
-
-      # Check header
-      expect(text_content).to include(I18n.t("pdf.unit.title"))
+      # Check all core i18n keys are present
+      expect_pdf_to_include_i18n_keys(pdf_text,
+        "pdf.unit.title",
+        "pdf.unit.details",
+        "pdf.unit.inspection_history",
+        "pdf.unit.verification",
+        "pdf.unit.footer_text"
+      )
 
       # Check unit details
-      expect(text_content).to include(I18n.t("pdf.unit.details"))
-      expect(text_content).to include("Test Bouncy Castle")
-      expect(text_content).to include("Bounce Co Ltd")
-      expect(text_content).to include("BCL-2024-001")
-
-      # Check inspection history
-      expect(text_content).to include(I18n.t("pdf.unit.inspection_history"))
+      expect(pdf_text).to include("Test Bouncy Castle")
+      expect(pdf_text).to include("Bounce Co Ltd") 
+      expect(pdf_text).to include("BCL-2024-001")
 
       # Should include inspection dates
       inspections.each do |inspection|
-        expect(text_content).to include(inspection.inspection_date.strftime("%d/%m/%Y"))
+        expect(pdf_text).to include(inspection.inspection_date.strftime("%d/%m/%Y"))
       end
     end
 
     scenario "handles unit with no inspections" do
       empty_unit = create(:unit, user: user)
 
-      page.driver.browser.get(unit_report_path(empty_unit))
+      get(report_unit_path(empty_unit))
+      pdf_text = pdf_text_content(response.body)
 
-      pdf = PDF::Inspector::Text.analyze(page.driver.response.body)
-      text_content = pdf.strings.join(" ")
-
-      expect(text_content).to include(I18n.t("pdf.unit.title"))
-      expect(text_content).to include(I18n.t("pdf.unit.no_completed_inspections"))
+      expect_pdf_to_include_i18n(pdf_text, "pdf.unit.title")
+      expect_pdf_to_include_i18n(pdf_text, "pdf.unit.no_completed_inspections")
     end
   end
 

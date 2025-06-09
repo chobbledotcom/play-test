@@ -123,12 +123,8 @@ class JsonSerializerService
   end
 
   def self.serialize_assessment(assessment, klass)
-    # Get class-specific exclusions
-    class_excluded = PublicFieldFiltering::ASSESSMENT_EXCLUDED_FIELDS[klass.name] || []
-    all_excluded = PublicFieldFiltering::EXCLUDED_FIELDS + class_excluded
-
     # Use reflection to get fields
-    assessment_fields = klass.column_names - all_excluded
+    assessment_fields = klass.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
     data = {}
     assessment_fields.each do |field|

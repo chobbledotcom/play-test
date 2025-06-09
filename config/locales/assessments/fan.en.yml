@@ -2,7 +2,7 @@ en:
   inspections:
     assessments:
       fan:
-        title: "Fan Assessment"
+        title: "Fan/Blower"
         sections:
           blower_specifications: "Blower Specifications"
           blower_safety_checks: "Blower Safety Checks"

@@ -112,8 +112,7 @@ RSpec.feature "PDF Field Coverage", type: :feature do
         next unless assessment
 
         # Use shared exclusions
-        all_excluded = PublicFieldFiltering::EXCLUDED_FIELDS + (PublicFieldFiltering::ASSESSMENT_EXCLUDED_FIELDS[assessment_class.name] || [])
-        assessment_fields = assessment_class.column_names - all_excluded
+        assessment_fields = assessment_class.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
         assessment_fields.each do |field|
           field_value = assessment.send(field)
