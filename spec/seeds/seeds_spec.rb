@@ -68,7 +68,7 @@ RSpec.describe "Seed Data", type: :model do
 
     describe "Users" do
       it "creates expected number of users" do
-        expect(User.count).to eq(7)
+        expect(User.count).to eq(6)
       end
 
       it "creates users with all required fields" do
@@ -80,13 +80,6 @@ RSpec.describe "Seed Data", type: :model do
           expect(user.time_display).to be_present
           expect(["date", "time"]).to include(user.time_display)
         end
-      end
-
-      it "creates admin user without company" do
-        admin = User.find_by(email: "admin@play-test.co.uk")
-        expect(admin).to be_present
-        expect(admin.inspection_company).to be_nil
-        expect(admin.inspection_limit).to eq(-1)
       end
 
       it "creates test user with unlimited inspections" do

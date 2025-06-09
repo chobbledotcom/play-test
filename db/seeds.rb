@@ -4,7 +4,7 @@
 #
 # SECURITY NOTE: All seed users are created with random 32-character passwords
 # to prevent unauthorized access if seed data is accidentally left in production.
-# The passwords are displayed in the console output during seeding.
+# These passwords are not logged or displayed anywhere.
 
 # Helper methods
 
@@ -101,79 +101,57 @@ def generate_secure_password
   SecureRandom.alphanumeric(32)
 end
 
-# Admin user (no company)
-admin_password = generate_secure_password
-admin_user = User.create!(
-  email: "admin@play-test.co.uk",
-  password: admin_password,
-  inspection_limit: -1,
-  time_display: "date"
-)
-puts "Admin user created - Email: admin@play-test.co.uk, Password: #{admin_password}"
-
 # Test user with access to all data
-test_password = generate_secure_password
 test_user = User.create!(
   email: "test@play-test.co.uk",
-  password: test_password,
+  password: generate_secure_password,
   inspection_company: stefan_testing,
   inspection_limit: -1,
   time_display: "time"
 )
-puts "Test user created - Email: test@play-test.co.uk, Password: #{test_password}"
 
 # Stefan's Testing users
-lead_password = generate_secure_password
 lead_inspector = User.create!(
   email: "lead@play-test.co.uk",
-  password: lead_password,
+  password: generate_secure_password,
   inspection_company: stefan_testing,
   inspection_limit: -1,
   time_display: "time"
 )
-puts "Lead inspector created - Email: lead@play-test.co.uk, Password: #{lead_password}"
 
-junior_password = generate_secure_password
 User.create!(
   email: "junior@play-test.co.uk",
-  password: junior_password,
+  password: generate_secure_password,
   inspection_company: stefan_testing,
   inspection_limit: 10,
   time_display: "date"
 )
-puts "Junior inspector created - Email: junior@play-test.co.uk, Password: #{junior_password}"
 
-senior_password = generate_secure_password
 User.create!(
   email: "senior@play-test.co.uk",
-  password: senior_password,
+  password: generate_secure_password,
   inspection_company: stefan_testing,
   inspection_limit: 50,
   time_display: "time"
 )
-puts "Senior inspector created - Email: senior@play-test.co.uk, Password: #{senior_password}"
 
 # Steph Test user
-steph_password = generate_secure_password
 steph_test_inspector = User.create!(
   email: "inspector@play-test.co.uk",
-  password: steph_password,
+  password: generate_secure_password,
   inspection_company: steph_test,
   inspection_limit: 20,
   time_display: "date"
 )
-puts "Steph Test inspector created - Email: inspector@play-test.co.uk, Password: #{steph_password}"
 
 # Retired company user
-old_password = generate_secure_password
 User.create!(
   email: "old@play-test.co.uk",
-  password: old_password,
+  password: generate_secure_password,
   inspection_company: steve_inflatable,
   inspection_limit: 5,
   time_display: "date"
 )
-puts "Retired company user created - Email: old@play-test.co.uk, Password: #{old_password}"
 
 # Phase 3: Units (British terminology)
 # Manufacturers
@@ -623,12 +601,3 @@ create_assessments_for_inspection(complete_inspection, castle_large, passed: tru
 
 # Reload to ensure all associations are loaded
 complete_inspection.reload
-
-# Summary output
-puts "\n=== Seed Data Summary ==="
-puts "Inspector Companies: #{InspectorCompany.count}"
-puts "Users: #{User.count}"
-puts "Units: #{Unit.count}"
-puts "Inspections: #{Inspection.count} (#{Inspection.complete.count} complete, #{Inspection.draft.count} draft)"
-puts "\n=== IMPORTANT: Save the user credentials shown above! ==="
-puts "These passwords are randomly generated and cannot be recovered."
