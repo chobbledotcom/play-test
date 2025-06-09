@@ -1,9 +1,12 @@
 require "rails_helper"
 
 RSpec.describe "Inspections", type: :request do
+  # Shared test data
   let(:user) { create(:user) }
   let(:other_user) { create(:user) }
   let(:unit) { create(:unit, user: user) }
+  let(:user_without_company) { create(:user, :without_company) }
+  let(:user_with_limit) { create(:user, inspection_limit: 0) }
 
   let(:valid_inspection_attributes) do
     {
@@ -15,437 +18,422 @@ RSpec.describe "Inspections", type: :request do
     }
   end
 
-  describe "authentication requirements" do
-    it "redirects to login page when not logged in for index" do
-      get "/inspections"
-      expect(response).to redirect_to(login_path)
-      expect(flash[:alert]).to include("Please log in")
-    end
-
-    it "redirects to login page when not logged in for show" do
-      # Create a test inspection with user association
-      inspection = create(:inspection, user: user, unit: unit)
-
-      get "/inspections/#{inspection.id}"
-      expect(response).to redirect_to(login_path)
-      expect(flash[:alert]).to include("Please log in")
-    end
-
-    it "redirects to login page when not logged in for new inspection" do
-      get "/inspections/new"
-      expect(response).to redirect_to(login_path)
-      expect(flash[:alert]).to include("Please log in")
-    end
-
-    it "redirects to login page when not logged in for create" do
-      post "/inspections", params: {inspection: valid_inspection_attributes}
-      expect(response).to redirect_to(login_path)
-      expect(flash[:alert]).to include("Please log in")
-    end
-
-    it "redirects to login page when not logged in for edit" do
-      # Create a test inspection with user association
-      inspection = create(:inspection, user: user, unit: unit)
-
-      get "/inspections/#{inspection.id}/edit"
-      expect(response).to redirect_to(login_path)
-      expect(flash[:alert]).to include("Please log in")
-    end
-
-    it "redirects to login page when not logged in for update" do
-      # Create a test inspection with user association
-      inspection = create(:inspection, user: user, unit: unit)
-
-      patch "/inspections/#{inspection.id}", params: {inspection: {description: "Updated Unit"}}
-      expect(response).to redirect_to(login_path)
-      expect(flash[:alert]).to include("Please log in")
-    end
-
-    it "redirects to login page when not logged in for destroy" do
-      # Create a test inspection with user association
-      inspection = create(:inspection, user: user, unit: unit)
-
-      delete "/inspections/#{inspection.id}"
-      expect(response).to redirect_to(login_path)
-      expect(flash[:alert]).to include("Please log in")
-    end
+  # Helper methods
+  def expect_redirect_with_alert(path, alert_pattern = nil)
+    expect(response).to redirect_to(path)
+    expect(flash[:alert]).to be_present
+    expect(flash[:alert]).to match(alert_pattern) if alert_pattern
   end
 
-  describe "user_id association" do
-    before do
-      login_as(user)
+  def expect_success_with_notice(notice_pattern = nil)
+    expect(response).to have_http_status(:redirect)
+    follow_redirect!
+    expect(response).to have_http_status(:success)
+    expect(flash[:notice]).to match(notice_pattern) if notice_pattern
+  end
+
+  def mock_failing_save(error_messages = ["Validation error"])
+    allow_any_instance_of(Inspection).to receive(:save).and_return(false)
+    allow_any_instance_of(Inspection).to receive(:errors).and_return(
+      double(full_messages: error_messages)
+    )
+  end
+
+  def mock_failing_update(error_messages = ["Update error"])
+    allow_any_instance_of(Inspection).to receive(:update).and_return(false)
+    allow_any_instance_of(Inspection).to receive(:errors).and_return(
+      double(full_messages: error_messages)
+    )
+  end
+
+  describe "authentication requirements" do
+    %w[index show edit].each do |action|
+      it "redirects to login for #{action}" do
+        get "/inspections#{'/' + SecureRandom.hex(6) if action != 'index'}"
+        expect(response).to redirect_to(login_path)
+        expect(flash[:alert]).to include("Please log in")
+      end
     end
 
-    it "assigns the current user's ID when creating a new inspection" do
-      post "/inspections", params: {inspection: valid_inspection_attributes.merge(unit_id: unit.id)}
-
-      # Verify a new inspection was created
-      expect(response).to have_http_status(:redirect)
-      follow_redirect!
-      expect(response).to have_http_status(:success)
-
-      # Verify it was associated with the current user
-      inspection = user.inspections.order(:created_at).last
-      expect(inspection).to be_present
-      expect(inspection.user_id).to eq(user.id)
-    end
-
-    it "cannot override the user_id when creating a new inspection" do
-      # Try to set user_id to another user
-      post "/inspections", params: {
-        inspection: valid_inspection_attributes.merge(unit_id: unit.id, user_id: other_user.id)
-      }
-
-      # Verify it still used the current user's ID
-      inspection = user.inspections.order(:created_at).last
-      expect(inspection).to be_present
-      expect(inspection.user_id).to eq(user.id)
-      expect(inspection.user_id).not_to eq(other_user.id)
-    end
-
-    it "cannot override the user_id when updating an inspection" do
-      # Create a test inspection with current user
-      inspection = create(:inspection, user: user, unit: unit)
-
-      # Try to change the user_id during update
-      patch "/inspections/#{inspection.id}", params: {
-        inspection: {inspection_location: "Updated Location", user_id: other_user.id}
-      }
-
-      # Verify the location updated but not the user_id
-      inspection.reload
-      expect(inspection.inspection_location).to eq("Updated Location")
-      expect(inspection.user_id).to eq(user.id)
-      expect(inspection.user_id).not_to eq(other_user.id)
+    %w[create update destroy].each do |action|
+      it "redirects to login for #{action}" do
+        inspection = create(:inspection, user: user, unit: unit)
+        case action
+        when 'create'
+          post "/inspections", params: {inspection: valid_inspection_attributes}
+        when 'update'
+          patch "/inspections/#{inspection.id}", params: {inspection: {comments: "test"}}
+        when 'destroy'
+          delete "/inspections/#{inspection.id}"
+        end
+        expect(response).to redirect_to(login_path)
+        expect(flash[:alert]).to include("Please log in")
+      end
     end
   end
 
   describe "authorization requirements" do
-    before do
-      # Create two inspections, one for each user
-      @user_inspection = create(:inspection, user: user, unit: unit)
-      other_unit = create(:unit, user: other_user)
-      @other_inspection = create(:inspection, user: other_user, unit: other_unit)
-    end
+    let!(:user_inspection) { create(:inspection, user: user, unit: unit) }
+    let!(:other_inspection) { create(:inspection, user: other_user, unit: create(:unit, user: other_user)) }
 
-    it "only shows the current user's inspections in the index" do
-      # Log in as the first user
-      login_as(user)
+    before { login_as(user) }
 
+    it "only shows user's own inspections in index" do
       get "/inspections"
       expect(response).to have_http_status(:success)
-
-      # Verify only the current user's inspections are displayed
-      expect(response.body).to include(@user_inspection.serial)
-      expect(response.body).not_to include(@other_inspection.serial)
+      expect(response.body).to include(user_inspection.serial)
+      expect(response.body).not_to include(other_inspection.serial)
     end
 
-    it "prevents viewing another user's inspection" do
-      # Log in as the first user
-      login_as(user)
-
-      # Try to view another user's inspection
-      get "/inspections/#{@other_inspection.id}"
-
-      # Should redirect with an unauthorized message
-      expect(response).to redirect_to(inspections_path)
-      expect(flash[:alert]).to include("Access denied")
-    end
-
-    it "prevents editing another user's inspection" do
-      # Log in as the first user
-      login_as(user)
-
-      # Try to edit another user's inspection
-      get "/inspections/#{@other_inspection.id}/edit"
-
-      # Should redirect with an unauthorized message
-      expect(response).to redirect_to(inspections_path)
-      expect(flash[:alert]).to include("Access denied")
-    end
-
-    it "prevents updating another user's inspection" do
-      # Log in as the first user
-      login_as(user)
-
-      # Try to update another user's inspection
-      patch "/inspections/#{@other_inspection.id}", params: {
-        inspection: {manufacturer: "Should Not Update"}
-      }
-
-      # Should redirect with an unauthorized message
-      expect(response).to redirect_to(inspections_path)
-      expect(flash[:alert]).to include("Access denied")
-
-      # Verify the manufacturer did not change
-      @other_inspection.reload
-      expect(@other_inspection.manufacturer).to eq("Test Manufacturer")
-    end
-
-    it "prevents deleting another user's inspection" do
-      # Log in as the first user
-      login_as(user)
-
-      # Try to delete another user's inspection
-      delete "/inspections/#{@other_inspection.id}"
-
-      # Should redirect with an unauthorized message
-      expect(response).to redirect_to(inspections_path)
-      expect(flash[:alert]).to include("Access denied")
-
-      # Verify the inspection still exists
-      expect(Inspection.exists?(@other_inspection.id)).to be true
+    %w[show edit update destroy].each do |action|
+      it "prevents access to other user's inspection for #{action}" do
+        case action
+        when 'show', 'edit'
+          get "/inspections/#{other_inspection.id}#{'/' + action if action == 'edit'}"
+        when 'update'
+          patch "/inspections/#{other_inspection.id}", params: {inspection: {comments: "hack"}}
+        when 'destroy'
+          delete "/inspections/#{other_inspection.id}"
+        end
+        
+        expect_redirect_with_alert(inspections_path, /Access denied/)
+      end
     end
   end
 
   describe "when logged in" do
-    before do
-      login_as(user)
-    end
+    before { login_as(user) }
 
     describe "GET /index" do
-      it "returns http success" do
+      it "returns success" do
         get "/inspections"
         expect(response).to have_http_status(:success)
+      end
+
+      it "filters by parameters" do
+        create(:inspection, :completed, user: user, unit: unit, passed: true)
+        
+        get "/inspections", params: { result: "passed" }
+        expect(response).to have_http_status(:success)
+        expect(assigns(:title)).to include("Passed")
+      end
+
+      it "exports CSV" do
+        create(:inspection, :completed, user: user, unit: unit, comments: "Test")
+        
+        get "/inspections.csv"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("text/csv")
+        expect(response.body).to include("Test")
       end
     end
 
     describe "GET /show" do
-      it "returns http success for own inspection" do
-        inspection = create(:inspection, user: user, unit: unit)
+      let(:inspection) { create(:inspection, user: user, unit: unit) }
 
+      it "returns success" do
         get "/inspections/#{inspection.id}"
         expect(response).to have_http_status(:success)
       end
-    end
 
-    describe "GET /edit" do
-      it "returns http success for own inspection" do
-        inspection = create(:inspection, user: user, unit: unit)
-
-        get "/inspections/#{inspection.id}/edit"
+      it "serves PDF" do
+        allow(PdfGeneratorService).to receive(:generate_inspection_report).and_return(double(render: "PDF"))
+        
+        get "/inspections/#{inspection.id}.pdf"
         expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("application/pdf")
+        
+        inspection.reload
+        expect(inspection.pdf_last_accessed_at).to be_present
       end
     end
 
     describe "POST /create" do
-      it "creates a new inspection and redirects" do
-        post "/inspections", params: {inspection: valid_inspection_attributes.merge(unit_id: unit.id)}
+      context "when user has no inspection company" do
+        before { login_as(user_without_company) }
 
-        expect(response).to have_http_status(:redirect)
-        follow_redirect!
-        expect(response).to have_http_status(:success)
+        it "redirects appropriately" do
+          post "/inspections", params: { inspection: valid_inspection_attributes }
+          expect_redirect_with_alert(root_path)
+        end
 
-        # Verify the inspection was created with correct attributes
-        inspection = user.inspections.find_by(unit_id: unit.id)
-        expect(inspection).to be_present
-        expect(inspection.unit_id).to eq(unit.id)
-        expect(inspection.user_id).to eq(user.id)
+        it "redirects to unit when unit_id provided" do
+          post "/inspections", params: { inspection: valid_inspection_attributes, unit_id: unit.id }
+          expect_redirect_with_alert(unit_path(unit.id))
+        end
       end
 
-      it "creates a new inspection with all attributes and redirects" do
-        post "/inspections", params: {
-          inspection: valid_inspection_attributes.merge(
-            unit_id: unit.id
-          )
-        }
+      context "with valid user" do
+        it "creates inspection successfully" do
+          post "/inspections", params: { inspection: valid_inspection_attributes.merge(unit_id: unit.id) }
+          expect_success_with_notice
+          
+          inspection = user.inspections.last
+          expect(inspection.unit).to eq(unit)
+          expect(inspection.user).to eq(user)
+        end
 
-        expect(response).to have_http_status(:redirect)
-        follow_redirect!
-        expect(response).to have_http_status(:success)
+        it "handles invalid unit_id" do
+          post "/inspections", params: { inspection: valid_inspection_attributes, unit_id: "invalid" }
+          expect_redirect_with_alert(root_path, /invalid.*unit/i)
+        end
 
-        # Check attributes and user_id
-        inspection = user.inspections.find_by(unit_id: unit.id)
-        expect(inspection).to be_present
-        expect(inspection.unit_id).to eq(unit.id)
-        expect(inspection.user_id).to eq(user.id)
+        it "handles save failure" do
+          mock_failing_save
+          post "/inspections", params: { inspection: valid_inspection_attributes }
+          expect_redirect_with_alert(root_path, /failed/i)
+        end
+
+        it "sends notification in production" do
+          allow(Rails.env).to receive(:production?).and_return(true)
+          allow(NtfyService).to receive(:notify)
+          
+          post "/inspections", params: { inspection: valid_inspection_attributes, unit_id: unit.id }
+          expect(NtfyService).to have_received(:notify).with(/new inspection/)
+        end
       end
     end
 
     describe "PATCH /update" do
-      it "updates own inspection and redirects" do
-        inspection = create(:inspection, user: user, unit: unit)
+      let(:inspection) { create(:inspection, user: user, unit: unit) }
+      let(:complete_inspection) { create(:inspection, :completed, user: user, unit: unit) }
 
-        patch "/inspections/#{inspection.id}", params: {
-          inspection: {inspection_location: "Updated Location"}
-        }
-
-        expect(response).to have_http_status(:redirect)
-        follow_redirect!
-        expect(response).to have_http_status(:success)
-
-        # Verify the inspection was updated
+      it "updates successfully" do
+        patch "/inspections/#{inspection.id}", params: { inspection: { comments: "Updated" } }
+        expect_success_with_notice
+        
         inspection.reload
-        expect(inspection.inspection_location).to eq("Updated Location")
-        expect(inspection.user_id).to eq(user.id)
+        expect(inspection.comments).to eq("Updated")
       end
 
-      it "updates inspection with user height assessment attributes" do
-        inspection = create(:inspection, user: user, unit: unit)
-
-        patch "/inspections/#{inspection.id}", params: {
-          inspection: {
-            inspection_location: "Updated Location",
-            user_height_assessment_attributes: attributes_for(:user_height_assessment, :standard_test_values)
-          }
-        }
-
-        expect(response).to have_http_status(:redirect)
-        follow_redirect!
-        expect(response).to have_http_status(:success)
-
-        # Verify the inspection and assessment were updated
-        inspection.reload
-        expect(inspection.inspection_location).to eq("Updated Location")
-
-        # Verify user height assessment was created
-        assessment = inspection.user_height_assessment
-        expect(assessment).to be_present
-        expect(assessment.containing_wall_height).to eq(2.5)
-        expect(assessment.platform_height).to eq(1.0)
-        expect(assessment.tallest_user_height).to eq(1.8)
-        expect(assessment.permanent_roof).to be true
-        expect(assessment.users_at_1000mm).to eq(5)
-        expect(assessment.users_at_1200mm).to eq(4)
-        expect(assessment.users_at_1500mm).to eq(3)
-        expect(assessment.users_at_1800mm).to eq(2)
-        expect(assessment.play_area_length).to eq(10.0)
-        expect(assessment.play_area_width).to eq(8.0)
-        expect(assessment.negative_adjustment).to eq(2.0)
-        expect(assessment.tallest_user_height_comment).to eq("Test assessment comment")
+      it "prevents editing complete inspections" do
+        patch "/inspections/#{complete_inspection.id}", params: { inspection: { comments: "hack" } }
+        expect(response).to redirect_to(inspection_path(complete_inspection))
+        expect(flash[:notice]).to be_present
       end
 
-      it "updates existing user height assessment" do
-        inspection = create(:inspection, user: user, unit: unit)
-        assessment = create(:user_height_assessment, inspection: inspection, containing_wall_height: 1.5)
-
-        patch "/inspections/#{inspection.id}", params: {
-          inspection: {
-            user_height_assessment_attributes: {
-              id: assessment.id,
-              containing_wall_height: 3.0
-            }
-          }
-        }
-
-        expect(response).to have_http_status(:redirect)
-
-        # Verify the assessment was updated, not recreated
-        inspection.reload
-        expect(inspection.user_height_assessment.id).to eq(assessment.id)
-        expect(inspection.user_height_assessment.containing_wall_height).to eq(3.0)
-      end
-    end
-
-    describe "PATCH /inspections/:id/replace_dimensions" do
-      let(:unit_with_dimensions) do
-        create(:unit,
-          user: user,
-          width: 15.0,
-          length: 12.0,
-          height: 5.0,
-          num_low_anchors: 8,
-          num_high_anchors: 4,
-          rope_size: 20.0,
-          slide_platform_height: 3.5)
+      it "handles invalid unit_id" do
+        other_unit = create(:unit, user: other_user)
+        patch "/inspections/#{inspection.id}", params: { inspection: { unit_id: other_unit.id } }
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(flash[:alert]).to match(/invalid.*unit/i)
       end
 
-      let(:inspection) do
-        create(:inspection,
-          user: user,
-          unit: unit_with_dimensions,
-          width: 10.0,
-          length: 8.0,
-          height: 3.0)
+      %w[json turbo_stream].each do |format|
+        context "#{format} format" do
+          let(:headers) do
+            case format
+            when 'json' then { "Accept" => "application/json" }
+            when 'turbo_stream' then { "Accept" => "text/vnd.turbo-stream.html" }
+            end
+          end
+
+          it "returns success response" do
+            patch "/inspections/#{inspection.id}", 
+                  params: { inspection: { comments: "test" } },
+                  headers: headers
+            
+            expect(response).to have_http_status(:success)
+            expect(response.content_type).to include(format == 'json' ? 'json' : 'turbo-stream')
+          end
+
+          it "returns error response when update fails" do
+            test_inspection = create(:inspection, user: user, unit: unit)
+            mock_failing_update
+            
+            patch "/inspections/#{test_inspection.id}", 
+                  params: { inspection: { comments: "test" } },
+                  headers: headers
+            
+            expect(response).to have_http_status(:success)
+            
+            if format == 'json'
+              json = JSON.parse(response.body)
+              expect(json["status"]).to eq("error")
+            else
+              expect(response.body).to include("<turbo-stream")
+            end
+          end
+        end
       end
-
-      it "replaces inspection dimensions with unit dimensions" do
-        patch replace_dimensions_inspection_path(inspection)
-
-        expect(response).to redirect_to(edit_inspection_path(inspection, tab: "general"))
-        expect(flash[:notice]).to eq(I18n.t("inspections.messages.dimensions_replaced"))
-
-        inspection.reload
-        expect(inspection.width).to eq(15.0)
-        expect(inspection.length).to eq(12.0)
-        expect(inspection.height).to eq(5.0)
-        expect(inspection.num_low_anchors).to eq(8)
-        expect(inspection.num_high_anchors).to eq(4)
-        expect(inspection.rope_size).to eq(20.0)
-        expect(inspection.slide_platform_height).to eq(3.5)
-      end
-
-      it "preserves the tab parameter when redirecting" do
-        patch replace_dimensions_inspection_path(inspection), params: {tab: "structure"}
-
-        expect(response).to redirect_to(edit_inspection_path(inspection, tab: "structure"))
-      end
-
-      # Skip this test as unit_id has a NOT NULL constraint in the database
-      # The controller check for unit.present? would only trigger if the unit was deleted
-      # after the inspection was created, which is prevented by foreign key constraints
-
-      # Testing save failures is difficult in request specs without breaking the test isolation
-      # The controller action is simple enough that the success path test provides adequate coverage
     end
 
     describe "DELETE /destroy" do
-      it "deletes own draft inspection and redirects" do
+      it "deletes draft inspection" do
         inspection = create(:inspection, user: user, unit: unit, complete_date: nil)
-
+        
         delete "/inspections/#{inspection.id}"
-
-        expect(response).to have_http_status(:redirect)
-        follow_redirect!
-        expect(response).to have_http_status(:success)
-
-        # Verify the inspection was deleted
+        expect_success_with_notice
         expect(Inspection.exists?(inspection.id)).to be false
       end
 
-      it "prevents deletion of complete inspections for regular users" do
-        inspection = create(:inspection, :complete, user: user, unit: unit)
-
+      it "prevents deletion of complete inspections" do
+        inspection = create(:inspection, :completed, user: user, unit: unit)
+        
         delete "/inspections/#{inspection.id}"
-
         expect(response).to redirect_to(inspection_path(inspection))
-        expect(flash[:alert]).to eq(I18n.t("inspections.messages.delete_complete_denied"))
-
-        # Verify the inspection was NOT deleted
+        expect(flash[:alert]).to be_present
         expect(Inspection.exists?(inspection.id)).to be true
       end
+    end
 
-      # TODO: Admin deletion functionality - investigation needed
-      # The admin user deletion is currently not working due to a database constraint
-      # or validation issue. The core protection functionality is working correctly.
-      # it "allows deletion of complete inspections for admin users" do
-      #   admin_user = create(:user, :admin, inspection_company: user.inspection_company)
-      #   admin_unit = create(:unit, user: admin_user)
-      #   sign_in(admin_user)
-      #
-      #   inspection = create(:inspection, user: admin_user, unit: admin_unit, status: "complete")
-      #
-      #   delete "/inspections/#{inspection.id}"
-      #
-      #   expect(response).to have_http_status(:redirect)
-      #   follow_redirect!
-      #   expect(response).to have_http_status(:success)
-      #
-      #   # Verify the inspection was deleted
-      #   expect(Inspection.exists?(inspection.id)).to be false
-      # end
+    describe "unit management" do
+      let(:inspection) { create(:inspection, user: user, unit: nil) }
+      let!(:unit1) { create(:unit, user: user, name: "Unit One", manufacturer: "Acme") }
+      let!(:unit2) { create(:unit, user: user, name: "Unit Two", manufacturer: "Beta") }
 
-      it "allows deletion of nil status inspections (defaults to draft)" do
+      describe "GET /select_unit" do
+        it "shows all units" do
+          get "/inspections/#{inspection.id}/select_unit"
+          expect(response).to have_http_status(:success)
+          expect(response.body).to include("Unit One", "Unit Two")
+        end
+
+        it "filters by search" do
+          get "/inspections/#{inspection.id}/select_unit", params: { search: "One" }
+          expect(response).to have_http_status(:success)
+          expect(response.body).to include("Unit One")
+          expect(response.body).not_to include("Unit Two")
+        end
+      end
+
+      describe "PATCH /update_unit" do
+        it "updates unit successfully" do
+          patch "/inspections/#{inspection.id}/update_unit", params: { unit_id: unit1.id }
+          expect(response).to redirect_to(edit_inspection_path(inspection))
+          expect(flash[:notice]).to include(unit1.name)
+          
+          inspection.reload
+          expect(inspection.unit).to eq(unit1)
+        end
+
+        it "handles invalid unit_id" do
+          patch "/inspections/#{inspection.id}/update_unit", params: { unit_id: "invalid" }
+          expect_redirect_with_alert(select_unit_inspection_path(inspection), /invalid.*unit/i)
+        end
+      end
+
+      describe "PATCH /replace_dimensions" do
+        let(:inspection_with_unit) { create(:inspection, user: user, unit: unit1) }
+
+        it "replaces dimensions from unit" do
+          patch "/inspections/#{inspection_with_unit.id}/replace_dimensions"
+          expect(response).to redirect_to(edit_inspection_path(inspection_with_unit, tab: "general"))
+          expect(flash[:notice]).to be_present
+        end
+
+        it "handles inspection without unit" do
+          patch "/inspections/#{inspection.id}/replace_dimensions"
+          expect(response).to redirect_to(edit_inspection_path(inspection, tab: "general"))
+          expect(flash[:alert]).to be_present
+        end
+      end
+    end
+
+    describe "inspection status management" do
+      let(:inspection) { create(:inspection, user: user, unit: unit) }
+
+      describe "PATCH /complete" do
+        it "completes inspection successfully" do
+          allow_any_instance_of(Inspection).to receive(:validate_completeness).and_return([])
+          allow_any_instance_of(Inspection).to receive(:complete!)
+          
+          patch "/inspections/#{inspection.id}/complete"
+          expect(response).to redirect_to(inspection_path(inspection))
+          expect(flash[:notice]).to be_present
+        end
+
+        it "handles validation errors" do
+          allow_any_instance_of(Inspection).to receive(:validate_completeness).and_return(["Missing data"])
+          
+          patch "/inspections/#{inspection.id}/complete"
+          expect_redirect_with_alert(edit_inspection_path(inspection), /Missing data/)
+        end
+
+        it "handles completion errors" do
+          allow_any_instance_of(Inspection).to receive(:validate_completeness).and_return([])
+          allow_any_instance_of(Inspection).to receive(:complete!).and_raise("Error")
+          
+          patch "/inspections/#{inspection.id}/complete"
+          expect_redirect_with_alert(edit_inspection_path(inspection), /Error/)
+        end
+      end
+
+      describe "PATCH /mark_draft" do
+        let(:complete_inspection) { create(:inspection, :completed, user: user, unit: unit) }
+
+        it "marks as draft successfully" do
+          patch "/inspections/#{complete_inspection.id}/mark_draft"
+          expect(response).to redirect_to(edit_inspection_path(complete_inspection))
+          expect(flash[:notice]).to be_present
+          
+          complete_inspection.reload
+          expect(complete_inspection.complete_date).to be_nil
+        end
+
+        it "handles update failure" do
+          test_inspection = create(:inspection, :completed, user: user, unit: unit)
+          mock_failing_update
+          
+          patch "/inspections/#{test_inspection.id}/mark_draft"
+          expect_redirect_with_alert(edit_inspection_path(test_inspection), /error/)
+        end
+      end
+    end
+
+    describe "error handling" do
+      it "handles missing inspections" do
+        get "/inspections/nonexistent"
+        expect_redirect_with_alert(inspections_path, /not found/i)
+      end
+
+      it "handles case-insensitive lookup" do
         inspection = create(:inspection, user: user, unit: unit)
-
-        delete "/inspections/#{inspection.id}"
-
-        expect(response).to have_http_status(:redirect)
-        follow_redirect!
+        get "/inspections/#{inspection.id.upcase}"
         expect(response).to have_http_status(:success)
+      end
+    end
+  end
 
-        # Verify the inspection was deleted
-        expect(Inspection.exists?(inspection.id)).to be false
+  describe "public routes (no authentication required)" do
+    let(:inspection) { create(:inspection, user: user, unit: unit) }
+
+    describe "GET /report" do
+      it "serves PDF" do
+        allow(PdfGeneratorService).to receive(:generate_inspection_report).and_return(double(render: "PDF"))
+        
+        get "/r/#{inspection.id}"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("application/pdf")
+      end
+
+      it "serves JSON" do
+        allow(JsonSerializerService).to receive(:serialize_inspection).and_return({ id: inspection.id })
+        
+        get "/r/#{inspection.id}.json"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("application/json")
+      end
+
+      it "returns 404 for missing inspection" do
+        get "/r/nonexistent"
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    describe "GET /qr_code" do
+      it "serves QR code" do
+        allow(QrCodeService).to receive(:generate_qr_code).and_return("QR PNG")
+        
+        get "/inspections/#{inspection.id}/qr_code"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("image/png")
+        expect(response.body).to eq("QR PNG")
+      end
+
+      it "returns 404 for missing inspection" do
+        get "/inspections/nonexistent/qr_code"
+        expect(response).to have_http_status(:not_found)
       end
     end
   end

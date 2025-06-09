@@ -52,7 +52,7 @@ RSpec.describe "Unit JSON endpoints", type: :request do
           first_inspection = json["inspection_history"].first
           expect(first_inspection).not_to have_key("id")
           expect(first_inspection["passed"]).to eq(false)
-          expect(first_inspection["status"]).to eq("complete")
+          expect(first_inspection["complete"]).to eq(true)
           expect(first_inspection["inspector_company"]).to be_present
         end
       end

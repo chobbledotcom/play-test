@@ -73,7 +73,7 @@ RSpec.describe "Units", type: :request do
 
       it "provides navigation to create new unit" do
         visit units_path
-        expect(page).to have_link(I18n.t("units.titles.new"), href: new_unit_path)
+        expect(page).to have_button(I18n.t("units.buttons.add_unit"))
       end
 
       it "supports CSV export" do

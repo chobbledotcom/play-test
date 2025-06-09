@@ -1,7 +1,7 @@
 class InspectionsController < ApplicationController
-  before_action :set_inspection, except: [:index, :overdue, :create]
-  before_action :check_inspection_owner, except: [:index, :overdue, :create, :report, :qr_code]
-  before_action :redirect_if_complete, except: [:show, :mark_draft, :report, :qr_code, :index, :overdue, :create, :destroy]
+  before_action :set_inspection, except: [:index, :create]
+  before_action :check_inspection_owner, except: [:index, :create, :report, :qr_code]
+  before_action :redirect_if_complete, except: [:show, :mark_draft, :report, :qr_code, :index, :create, :destroy]
   before_action :no_index
   skip_before_action :require_login, only: [:report, :qr_code]
 
@@ -36,29 +36,6 @@ class InspectionsController < ApplicationController
           filename: "PAT_Report_#{@inspection.serial}.pdf",
           type: "application/pdf",
           disposition: "inline"
-      end
-    end
-  end
-
-  def new
-    unless current_user.inspection_company_id.present?
-      flash[:alert] = current_user.inspection_company_required_message
-      redirect_to root_path and return
-    end
-
-    unless current_user.can_create_inspection?
-      flash[:alert] = current_user.inspection_company_required_message
-      redirect_to inspections_path and return
-    end
-
-    @inspection = Inspection.new
-    @inspection.inspection_date = Date.today
-
-    # Handle pre-selected unit
-    if params[:unit_id].present?
-      unit = current_user.units.find_by(id: params[:unit_id])
-      if unit
-        @inspection.unit_id = unit.id
       end
     end
   end
@@ -266,13 +243,6 @@ class InspectionsController < ApplicationController
     end
   end
 
-
-  def overdue
-    @inspections = current_user.inspections.overdue.order(created_at: :desc)
-    @title = "Overdue Inspections"
-    render :index
-  end
-
   def report
     respond_to do |format|
       format.html do
@@ -338,7 +308,7 @@ class InspectionsController < ApplicationController
     copyable_attributes = Inspection.new.copyable_attributes_via_reflection
     base_params = params.require(:inspection).permit(inspection_specific_params + copyable_attributes)
 
-    # For each assessment, permit all attributes except timestamps and inspection_id
+    # For each assessment, dynamically permit attributes based on the model
     assessment_types = %w[
       user_height_assessment
       slide_assessment
@@ -352,14 +322,33 @@ class InspectionsController < ApplicationController
     assessment_types.each do |assessment_type|
       next unless params[:inspection]["#{assessment_type}_attributes"].present?
 
-      # Permit all fields except the ones we want to block
-      assessment_params = params[:inspection]["#{assessment_type}_attributes"]
-      cleaned_params = assessment_params.permit!.except("created_at", "updated_at", "inspection_id")
-
-      base_params["#{assessment_type}_attributes"] = cleaned_params
+      # Get permitted attributes dynamically from the assessment model
+      permitted_attrs = permitted_assessment_attributes(assessment_type)
+      
+      if permitted_attrs.any?
+        base_params["#{assessment_type}_attributes"] = 
+          params[:inspection]["#{assessment_type}_attributes"].permit(*permitted_attrs)
+      end
     end
 
     base_params
+  end
+
+  def permitted_assessment_attributes(assessment_type)
+    # Convert assessment_type string to model class
+    model_class = assessment_type.camelize.constantize
+    
+    # Get all column names from the model
+    all_attributes = model_class.column_names
+    
+    # Exclude system/protected attributes (but keep id for updates)
+    excluded_attributes = %w[inspection_id created_at updated_at]
+    
+    # Return the permitted attributes
+    (all_attributes - excluded_attributes).map(&:to_sym)
+  rescue NameError
+    # If model class doesn't exist, return empty array
+    []
   end
 
   def no_index
@@ -421,6 +410,9 @@ class InspectionsController < ApplicationController
     headers += %w[unit_name unit_serial unit_manufacturer unit_owner unit_description]
     headers += %w[inspector_company_name]
     headers += %w[inspector_user_email]
+    
+    # Computed fields
+    headers += %w[complete]
 
     headers
   end
@@ -440,6 +432,9 @@ class InspectionsController < ApplicationController
 
       # User (inspector) fields
       when "inspector_user_email" then inspection.user&.email
+
+      # Special computed fields
+      when "complete" then inspection.complete?
 
       # All other fields are direct inspection attributes
       else

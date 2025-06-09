@@ -100,7 +100,7 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       visit units_path
 
       # Should see the new unit button (units are not restricted by company active status)
-      expect(page).to have_link(I18n.t("units.titles.new"), href: new_unit_path)
+      expect(page).to have_button(I18n.t("units.buttons.add_unit"))
     end
   end
 
@@ -118,13 +118,13 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       # Start as user with company
       sign_in(user_with_company)
       visit units_path
-      expect(page).to have_link(I18n.t("units.titles.new"))
+      expect(page).to have_button(I18n.t("units.buttons.add_unit"))
 
       # Switch to user without company
       visit logout_path
       sign_in(user_without_company)
       visit units_path
-      expect(page).not_to have_link(I18n.t("units.titles.new"))
+      expect(page).not_to have_button(I18n.t("units.buttons.add_unit"))
 
       # Admin removes company from first user
       visit logout_path

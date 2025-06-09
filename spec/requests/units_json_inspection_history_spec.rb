@@ -80,7 +80,7 @@ RSpec.describe "Unit JSON inspection history", type: :request do
 
       expect(unit_with_inspections.inspections).to be_loaded
       expect(unit_with_inspections.inspections.count).to eq(1)
-      expect(unit_with_inspections.inspections.first.status).to eq("complete")
+      expect(unit_with_inspections.inspections.first.complete?).to eq(true)
     end
 
     it "returns correct data when called directly on model" do

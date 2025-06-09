@@ -242,7 +242,7 @@ RSpec.describe JsonSerializerService do
       expect(included_fields.count).to be > 30 # Inspections have many fields
 
       # Verify critical fields are included
-      %w[inspection_date inspection_location passed status comments unique_report_number].each do |field|
+      %w[inspection_date inspection_location passed complete comments unique_report_number].each do |field|
         expect(json).to have_key(field.to_sym)
       end
     end
