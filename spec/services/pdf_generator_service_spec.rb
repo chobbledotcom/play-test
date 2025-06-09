@@ -185,8 +185,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
           tallest_user_height_comment: "Tall users",
           play_area_length_comment: "Length good",
           play_area_width_comment: "Width good",
-          negative_adjustment_comment: "Small adjustment"
-        )
+          negative_adjustment_comment: "Small adjustment")
       end
 
       it "includes user height assessment data" do
@@ -221,8 +220,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
           slide_beyond_first_metre_height: 0.5,
           slide_beyond_first_metre_height_comment: "Beyond ok",
           slide_permanent_roof: false,
-          slide_permanent_roof_comment: "No roof"
-        )
+          slide_permanent_roof_comment: "No roof")
       end
 
       it "includes slide assessment data" do
@@ -257,8 +255,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
           sharp_edges_comment: "No sharp edges",
           blower_tube_length_comment: "Tube good",
           unit_stable_comment: "Very stable",
-          evacuation_time_comment: "Quick evacuation"
-        )
+          evacuation_time_comment: "Quick evacuation")
       end
 
       it "includes structure assessment data" do
@@ -285,8 +282,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         create(:anchorage_assessment, :passed,
           inspection: inspection,
           num_low_anchors: 4,
-          num_high_anchors: 2
-        )
+          num_high_anchors: 2)
       end
 
       it "includes anchorage assessment data" do
@@ -310,8 +306,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
       let!(:enclosed_assessment) do
         create(:enclosed_assessment, :passed,
           inspection: inspection,
-          exit_number: 3
-        )
+          exit_number: 3)
       end
 
       it "includes enclosed assessment data" do
@@ -327,8 +322,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
     context "with materials assessment" do
       let!(:materials_assessment) do
         create(:materials_assessment, :passed,
-          inspection: inspection
-        )
+          inspection: inspection)
       end
 
       it "includes materials assessment data" do
@@ -347,8 +341,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
     context "with fan assessment" do
       let!(:fan_assessment) do
         create(:fan_assessment, :passed,
-          inspection: inspection
-        )
+          inspection: inspection)
       end
 
       it "includes fan assessment data" do
@@ -426,21 +419,19 @@ RSpec.describe PdfGeneratorService, pdf: true do
       it "handles photo loading errors gracefully" do
         # Create a mock that will raise an error when image is called
         allow(Rails.logger).to receive(:warn)
-        
+
         # Mock the add_unit_photo method to simulate an error and recovery
         allow(PdfGeneratorService).to receive(:add_unit_photo) do |pdf, unit|
-          begin
-            raise StandardError.new("Photo error")
-          rescue => e
-            Rails.logger.warn "Failed to add unit photo to PDF: #{e.message}"
-          end
+          raise StandardError.new("Photo error")
+        rescue => e
+          Rails.logger.warn "Failed to add unit photo to PDF: #{e.message}"
         end
-        
+
         expect {
           pdf = PdfGeneratorService.generate_unit_report(unit)
           pdf.render
         }.not_to raise_error
-        
+
         expect(Rails.logger).to have_received(:warn).with(/Failed to add unit photo to PDF/)
       end
     end
@@ -527,7 +518,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
       it "handles QR code tempfile cleanup for inspections" do
         allow(Tempfile).to receive(:new).and_call_original
-        
+
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf.render
 
@@ -536,7 +527,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
       it "handles QR code tempfile cleanup for units" do
         allow(Tempfile).to receive(:new).and_call_original
-        
+
         pdf = PdfGeneratorService.generate_unit_report(unit)
         pdf.render
 

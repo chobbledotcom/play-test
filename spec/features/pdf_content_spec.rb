@@ -46,12 +46,11 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       # Check all core i18n keys are present
       expect_pdf_to_include_i18n_keys(pdf_text,
         "pdf.inspection.title",
-        "pdf.inspection.equipment_details", 
+        "pdf.inspection.equipment_details",
         "pdf.inspection.inspection_results",
         "pdf.inspection.comments",
         "pdf.inspection.verification",
-        "pdf.inspection.footer_text"
-      )
+        "pdf.inspection.footer_text")
 
       # Check dynamic content
       expect(pdf_text).to include(inspector_company.name)
@@ -164,12 +163,11 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         "pdf.unit.details",
         "pdf.unit.inspection_history",
         "pdf.unit.verification",
-        "pdf.unit.footer_text"
-      )
+        "pdf.unit.footer_text")
 
       # Check unit details
       expect(pdf_text).to include("Test Bouncy Castle")
-      expect(pdf_text).to include("Bounce Co Ltd") 
+      expect(pdf_text).to include("Bounce Co Ltd")
       expect(pdf_text).to include("BCL-2024-001")
 
       # Should include inspection dates

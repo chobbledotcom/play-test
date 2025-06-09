@@ -316,7 +316,7 @@ class PdfGeneratorService
         [:play_area_length, "m"],
         [:play_area_width, "m"]
       ]
-      
+
       measurement_fields.each do |field, unit|
         add_field_with_comment(pdf, assessment, field, unit, type)
       end
@@ -335,7 +335,7 @@ class PdfGeneratorService
 
       # User Capacities
       pdf.text I18n.t("inspections.assessments.user_height.sections.user_capacities"), size: 8, style: :bold
-      
+
       user_capacity_heights = [1000, 1200, 1500, 1800]
       user_capacity_heights.each do |height|
         field_name = "users_at_#{height}mm"
@@ -354,7 +354,7 @@ class PdfGeneratorService
         [:slide_first_metre_height, "m"],
         [:slide_beyond_first_metre_height, "m"]
       ]
-      
+
       height_fields.each do |field, unit|
         add_field_with_comment(pdf, assessment, field, unit, type)
       end
@@ -387,18 +387,18 @@ class PdfGeneratorService
         :unit_stable_pass,
         :evacuation_time_pass
       ]
-      
+
       pass_fail_fields.each do |field|
         add_pass_fail_field_with_comment(pdf, assessment, field, type)
       end
-      
+
       # Measurement fields with pass/fail
       measurement_fields = [
         [:stitch_length, "mm", :stitch_length_pass],
         [:blower_tube_length, "m", :blower_tube_length_pass],
         [:unit_pressure_value, "Pa", :unit_pressure_pass]
       ]
-      
+
       measurement_fields.each do |value_field, unit, pass_field|
         add_measurement_pass_fail_field(pdf, assessment, value_field, unit, pass_field, type)
       end
@@ -419,7 +419,7 @@ class PdfGeneratorService
         :anchor_degree_pass,
         :anchor_accessories_pass
       ]
-      
+
       pass_fail_fields.each do |field|
         add_pass_fail_field_with_comment(pdf, assessment, field, type)
       end
@@ -444,7 +444,7 @@ class PdfGeneratorService
       pass_fail_fields.each do |field|
         add_pass_fail_field_with_comment(pdf, assessment, field, type)
       end
-      
+
       # Rope size with measurement
       add_measurement_pass_fail_field(pdf, assessment, :rope_size, "mm", :rope_size_pass, type)
     end
@@ -459,7 +459,7 @@ class PdfGeneratorService
         :pat_pass,
         :blower_visual_pass
       ]
-      
+
       pass_fail_fields.each do |field|
         add_pass_fail_field_with_comment(pdf, assessment, field, type)
       end
@@ -469,7 +469,7 @@ class PdfGeneratorService
         [:blower_serial, nil],
         [:fan_size_comment, 60]
       ]
-      
+
       optional_fields.each do |field, truncate_length|
         if assessment.send(field).present?
           label = I18n.t("inspections.assessments.fan.fields.#{field}")
@@ -522,13 +522,13 @@ class PdfGeneratorService
     pass_field = options[:pass_field]
     custom_label = options[:label]
     custom_text = options[:text]
-    
+
     # Get the label
     label = custom_label || I18n.t("inspections.assessments.#{assessment_type}.fields.#{field_name}")
-    
+
     # Get the value
     value = assessment.send(field_name) unless custom_text
-    
+
     # Format the value based on field type
     formatted_value = if custom_text
       custom_text
@@ -541,38 +541,38 @@ class PdfGeneratorService
     else
       value || I18n.t("pdf.inspection.fields.na")
     end
-    
+
     # Build the text parts
     text_parts = []
     text_parts << "#{label}:" unless custom_text
     text_parts << formatted_value
-    
+
     # Add pass/fail if specified
     if pass_field
       pass_fail = assessment.send(pass_field)
       text_parts << "-"
       text_parts << format_pass_fail(pass_fail)
     end
-    
+
     # Add comment if it exists
     comment_field = derive_comment_field_name(field_name, pass_field)
     if assessment.respond_to?(comment_field)
       comment = assessment.send(comment_field)
       text_parts << truncate_text(comment, 60) if comment.present?
     end
-    
+
     # Render the complete text
     pdf.text text_parts.join(" "), size: 8
   end
 
   # Derive the comment field name based on the main field or pass field
   def self.derive_comment_field_name(field_name, pass_field = nil)
-    if pass_field
+    base_name = if pass_field
       # Use pass field as base, removing _pass suffix
-      base_name = pass_field.to_s.gsub(/_pass$/, "")
+      pass_field.to_s.gsub(/_pass$/, "")
     else
       # Use field name as base, removing _pass suffix if present
-      base_name = field_name.to_s.gsub(/_pass$/, "")
+      field_name.to_s.gsub(/_pass$/, "")
     end
     "#{base_name}_comment"
   end

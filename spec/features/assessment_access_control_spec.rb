@@ -46,7 +46,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
 
     # Should get access denied and redirect
     expect(page).to have_content(I18n.t("inspections.errors.access_denied"))
-    
+
     # Verify the assessment data was NOT updated
     inspection2.reload
     expect(inspection2.anchorage_assessment.num_low_anchors).not_to eq(10)
@@ -54,7 +54,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
 
   scenario "user cannot modify assessment data through form manipulation" do
     sign_in(user1)
-    
+
     # Visit user1's own inspection to get a valid form
     visit edit_inspection_path(inspection1)
     expect(page).to have_content("Edit Inspection")
@@ -95,7 +95,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
 
   scenario "user can successfully update their own assessment data" do
     sign_in(user1)
-    
+
     visit edit_inspection_path(inspection1, tab: "anchorage")
     expect(page).to have_content("Edit Inspection")
 
@@ -119,14 +119,14 @@ RSpec.feature "Assessment Access Control", type: :feature do
 
   scenario "assessment updates are isolated between users" do
     sign_in(user1)
-    
+
     # Update user1's inspection
     visit edit_inspection_path(inspection1, tab: "user_height")
-    
+
     within ".user-height-assessment" do
       fill_in "inspection_user_height_assessment_attributes_containing_wall_height", with: "2.5"
     end
-    
+
     click_button I18n.t("inspections.buttons.save_assessment")
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
 
@@ -136,7 +136,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
 
     # Check that user2's assessment data is unchanged
     visit edit_inspection_path(inspection2, tab: "user_height")
-    
+
     # User2's assessment should have the original factory values, not user1's changes
     within ".user-height-assessment" do
       wall_height_field = find_field("inspection_user_height_assessment_attributes_containing_wall_height")

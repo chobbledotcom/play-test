@@ -101,7 +101,6 @@ class UnitsController < ApplicationController
     redirect_to units_path
   end
 
-
   def report
     respond_to do |format|
       format.html do

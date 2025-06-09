@@ -324,9 +324,9 @@ class InspectionsController < ApplicationController
 
       # Get permitted attributes dynamically from the assessment model
       permitted_attrs = permitted_assessment_attributes(assessment_type)
-      
+
       if permitted_attrs.any?
-        base_params["#{assessment_type}_attributes"] = 
+        base_params["#{assessment_type}_attributes"] =
           params[:inspection]["#{assessment_type}_attributes"].permit(*permitted_attrs)
       end
     end
@@ -337,13 +337,13 @@ class InspectionsController < ApplicationController
   def permitted_assessment_attributes(assessment_type)
     # Convert assessment_type string to model class
     model_class = assessment_type.camelize.constantize
-    
+
     # Get all column names from the model
     all_attributes = model_class.column_names
-    
+
     # Exclude system/protected attributes (but keep id for updates)
     excluded_attributes = %w[inspection_id created_at updated_at]
-    
+
     # Return the permitted attributes
     (all_attributes - excluded_attributes).map(&:to_sym)
   rescue NameError
@@ -410,7 +410,7 @@ class InspectionsController < ApplicationController
     headers += %w[unit_name unit_serial unit_manufacturer unit_owner unit_description]
     headers += %w[inspector_company_name]
     headers += %w[inspector_user_email]
-    
+
     # Computed fields
     headers += %w[complete]
 
