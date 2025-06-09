@@ -700,7 +700,7 @@ class PdfGeneratorService
     pdf.text result_text, size: 16, style: :bold, color: result_color
     pdf.move_down 10
 
-    pdf.text "Status: #{inspection.complete? ? 'Complete' : 'Draft'}", size: 10
+    pdf.text "Status: #{inspection.complete? ? "Complete" : "Draft"}", size: 10
     pdf.move_down 15
   end
 

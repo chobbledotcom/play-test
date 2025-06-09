@@ -405,7 +405,7 @@ RSpec.describe Inspection, type: :model do
 
     describe "complete inspection validations" do
       it "requires inspection_location when complete" do
-        inspection = build(:inspection, 
+        inspection = build(:inspection,
           inspection_location: nil,
           complete_date: Time.current,
           inspector_company: inspector_company)
@@ -414,17 +414,17 @@ RSpec.describe Inspection, type: :model do
       end
 
       it "requires unique_report_number when complete" do
-        create(:inspection, :complete, 
+        create(:inspection, :complete,
           unique_report_number: "TEST-123",
           inspector_company: inspector_company,
           user: user)
-        
+
         duplicate = build(:inspection,
           unique_report_number: "TEST-123",
           complete_date: Time.current,
           inspector_company: inspector_company,
           user: user)
-        
+
         expect(duplicate).not_to be_valid
         expect(duplicate.errors[:unique_report_number]).to include("has already been taken")
       end
@@ -492,7 +492,7 @@ RSpec.describe Inspection, type: :model do
       it "sets inspector_company_from_user on creation" do
         user_with_company = create(:user, inspection_company: inspector_company)
         inspection = build(:inspection, user: user_with_company, inspector_company: nil)
-        
+
         inspection.valid? # Trigger validations and callbacks
         expect(inspection.inspector_company_id).to eq(inspector_company.id)
       end
@@ -511,7 +511,7 @@ RSpec.describe Inspection, type: :model do
         inspection = build(:inspection)
         inspection.complete_date = Time.current
         inspection.unique_report_number = nil
-        
+
         inspection.send(:generate_unique_report_number)
         expect(inspection.unique_report_number).to match(/RPII-\d{8}-[A-F0-9]{8}/)
       end
@@ -524,7 +524,7 @@ RSpec.describe Inspection, type: :model do
 
       it "does not overwrite existing unique_report_number" do
         existing_number = "EXISTING-123"
-        inspection = build(:inspection, 
+        inspection = build(:inspection,
           complete_date: Time.current,
           unique_report_number: existing_number)
         inspection.save!
@@ -560,7 +560,7 @@ RSpec.describe Inspection, type: :model do
         inspection.unit = create(:unit)
         allow(inspection).to receive(:all_assessments_complete?).and_return(false)
         allow(inspection).to receive(:get_missing_assessments).and_return(["User Height"])
-        
+
         status = inspection.completion_status
         expect(status[:complete]).to eq(inspection.complete?)
         expect(status[:all_assessments_complete]).to be_falsey
@@ -582,7 +582,7 @@ RSpec.describe Inspection, type: :model do
         # Mock incomplete assessments
         allow(inspection).to receive_message_chain(:user_height_assessment, :complete?).and_return(false)
         allow(inspection).to receive_message_chain(:structure_assessment, :complete?).and_return(false)
-        
+
         missing = inspection.get_missing_assessments
         expect(missing).to include("User Height", "Structure")
       end
@@ -590,7 +590,7 @@ RSpec.describe Inspection, type: :model do
       it "includes slide assessment when has_slide is true" do
         inspection.has_slide = true
         allow(inspection).to receive_message_chain(:slide_assessment, :complete?).and_return(false)
-        
+
         missing = inspection.get_missing_assessments
         expect(missing).to include("Slide")
       end
@@ -598,7 +598,7 @@ RSpec.describe Inspection, type: :model do
       it "includes enclosed assessment when is_totally_enclosed is true" do
         inspection.is_totally_enclosed = true
         allow(inspection).to receive_message_chain(:enclosed_assessment, :complete?).and_return(false)
-        
+
         missing = inspection.get_missing_assessments
         expect(missing).to include("Enclosed")
       end
@@ -608,7 +608,7 @@ RSpec.describe Inspection, type: :model do
       it "sets complete_date and logs audit action" do
         inspection.complete_date = nil
         expect(inspection).to receive(:log_audit_action).with("completed", user, "Inspection completed")
-        
+
         inspection.complete!(user)
         expect(inspection.complete_date).to be_present
       end
@@ -621,9 +621,9 @@ RSpec.describe Inspection, type: :model do
 
       it "creates a copy for new user" do
         allow(inspection).to receive(:duplicate_assessments)
-        
+
         duplicate = inspection.duplicate_for_user(new_user)
-        
+
         expect(duplicate.user).to eq(new_user)
         expect(duplicate.complete_date).to be_nil
         expect(duplicate.unique_report_number).to be_nil
@@ -650,7 +650,7 @@ RSpec.describe Inspection, type: :model do
         allow(inspection).to receive(:materials_assessment).and_return(complete_assessment)
         allow(inspection).to receive(:fan_assessment).and_return(complete_assessment)
         allow(inspection).to receive(:enclosed_assessment).and_return(complete_assessment)
-        
+
         errors = inspection.validate_completeness
         expect(errors).to be_empty
       end
@@ -660,7 +660,7 @@ RSpec.describe Inspection, type: :model do
         incomplete_assessment = double(present?: true, complete?: false)
         allow(inspection).to receive(:user_height_assessment).and_return(incomplete_assessment)
         allow(inspection).to receive(:structure_assessment).and_return(incomplete_assessment)
-        
+
         errors = inspection.validate_completeness
         expect(errors).to include("User Height Assessment incomplete")
         expect(errors).to include("Structure Assessment incomplete")
@@ -672,7 +672,7 @@ RSpec.describe Inspection, type: :model do
 
       it "returns zero summary when no safety checks" do
         allow(inspection).to receive(:total_safety_checks).and_return(0)
-        
+
         summary = inspection.pass_fail_summary
         expect(summary[:total_checks]).to eq(0)
         expect(summary[:passed_checks]).to eq(0)
@@ -684,7 +684,7 @@ RSpec.describe Inspection, type: :model do
         allow(inspection).to receive(:total_safety_checks).and_return(10)
         allow(inspection).to receive(:passed_safety_checks).and_return(8)
         allow(inspection).to receive(:failed_safety_checks).and_return(2)
-        
+
         summary = inspection.pass_fail_summary
         expect(summary[:total_checks]).to eq(10)
         expect(summary[:passed_checks]).to eq(8)
@@ -730,7 +730,7 @@ RSpec.describe Inspection, type: :model do
         user_with_company = create(:user, inspection_company: inspector_company)
         inspection.user = user_with_company
         inspection.inspector_company_id = nil
-        
+
         inspection.send(:set_inspector_company_from_user)
         expect(inspection.inspector_company_id).to eq(inspector_company.id)
       end
@@ -739,10 +739,10 @@ RSpec.describe Inspection, type: :model do
         existing_company = create(:inspector_company)
         new_company = create(:inspector_company)
         user_with_company = create(:user, inspection_company: new_company)
-        
+
         inspection.user = user_with_company
         inspection.inspector_company_id = existing_company.id
-        
+
         inspection.send(:set_inspector_company_from_user)
         expect(inspection.inspector_company_id).to eq(existing_company.id)
       end
@@ -775,7 +775,7 @@ RSpec.describe Inspection, type: :model do
           allow(inspection).to receive_message_chain(:materials_assessment, :complete?).and_return(true)
           allow(inspection).to receive_message_chain(:fan_assessment, :complete?).and_return(true)
           allow(inspection).to receive(:has_assessments?).and_return(true)
-          
+
           expect(inspection.send(:all_assessments_complete?)).to be_truthy
         end
 
@@ -789,7 +789,7 @@ RSpec.describe Inspection, type: :model do
           allow(inspection).to receive_message_chain(:fan_assessment, :complete?).and_return(true)
           allow(inspection).to receive_message_chain(:slide_assessment, :complete?).and_return(false)
           allow(inspection).to receive(:has_assessments?).and_return(true)
-          
+
           expect(inspection.send(:all_assessments_complete?)).to be_falsey
         end
 
@@ -803,7 +803,7 @@ RSpec.describe Inspection, type: :model do
           allow(inspection).to receive_message_chain(:fan_assessment, :complete?).and_return(true)
           allow(inspection).to receive_message_chain(:enclosed_assessment, :complete?).and_return(false)
           allow(inspection).to receive(:has_assessments?).and_return(true)
-          
+
           expect(inspection.send(:all_assessments_complete?)).to be_falsey
         end
       end
@@ -828,7 +828,7 @@ RSpec.describe Inspection, type: :model do
           structure = double(has_critical_failures?: true)
           allow(inspection).to receive(:structure_assessment).and_return(structure)
           allow(structure).to receive(:respond_to?).with(:has_critical_failures?).and_return(true)
-          
+
           expect(inspection.send(:all_safety_checks_pass?)).to be_falsey
         end
 
@@ -849,7 +849,7 @@ RSpec.describe Inspection, type: :model do
           allow(inspection).to receive(:user_height_assessment).and_return(nil)
           allow(inspection).to receive(:slide_assessment).and_return(nil)
           allow(inspection).to receive(:anchorage_assessment).and_return(nil)
-          
+
           expect(inspection.send(:meet_safety_thresholds?)).to be_truthy
         end
       end
@@ -867,7 +867,7 @@ RSpec.describe Inspection, type: :model do
             allow(assessment).to receive(:respond_to?).with(:present?).and_return(true)
             allow(assessment).to receive(:respond_to?).with(:empty?).and_return(false)
             allow(assessment).to receive(:present?).and_return(true)
-            
+
             allow(inspection).to receive(:user_height_assessment).and_return(assessment)
             allow(inspection).to receive(:slide_assessment).and_return(nil)
             allow(inspection).to receive(:structure_assessment).and_return(nil)
@@ -875,7 +875,7 @@ RSpec.describe Inspection, type: :model do
             allow(inspection).to receive(:materials_assessment).and_return(nil)
             allow(inspection).to receive(:fan_assessment).and_return(nil)
             allow(inspection).to receive(:has_assessments?).and_return(true)
-            
+
             expect(inspection.send(:total_safety_checks)).to eq(5)
           end
         end
@@ -892,7 +892,7 @@ RSpec.describe Inspection, type: :model do
             allow(assessment).to receive(:respond_to?).with(:present?).and_return(true)
             allow(assessment).to receive(:respond_to?).with(:empty?).and_return(false)
             allow(assessment).to receive(:present?).and_return(true)
-            
+
             allow(inspection).to receive(:user_height_assessment).and_return(assessment)
             allow(inspection).to receive(:slide_assessment).and_return(nil)
             allow(inspection).to receive(:structure_assessment).and_return(nil)
@@ -900,7 +900,7 @@ RSpec.describe Inspection, type: :model do
             allow(inspection).to receive(:materials_assessment).and_return(nil)
             allow(inspection).to receive(:fan_assessment).and_return(nil)
             allow(inspection).to receive(:has_assessments?).and_return(true)
-            
+
             expect(inspection.send(:passed_safety_checks)).to eq(4)
           end
         end
@@ -926,7 +926,7 @@ RSpec.describe Inspection, type: :model do
 
       it "duplicates all present assessments" do
         original_inspection.send(:duplicate_assessments, new_inspection)
-        
+
         new_inspection.reload
         expect(new_inspection.user_height_assessment).to be_present
         expect(new_inspection.structure_assessment).to be_present
@@ -935,9 +935,9 @@ RSpec.describe Inspection, type: :model do
       it "duplicates enclosed assessment when is_totally_enclosed" do
         original_inspection.is_totally_enclosed = true
         original_inspection.create_enclosed_assessment!
-        
+
         original_inspection.send(:duplicate_assessments, new_inspection)
-        
+
         new_inspection.reload
         expect(new_inspection.enclosed_assessment).to be_present
       end

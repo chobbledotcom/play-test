@@ -266,7 +266,6 @@ class InspectionsController < ApplicationController
     end
   end
 
-
   def overdue
     @inspections = current_user.inspections.overdue.order(created_at: :desc)
     @title = "Overdue Inspections"
