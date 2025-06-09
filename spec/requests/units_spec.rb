@@ -181,7 +181,7 @@ RSpec.describe "Units", type: :request do
 
         click_button I18n.t("units.buttons.create")
 
-        expect(page).to have_content("Equipment record created")
+        expect(page).to have_content(I18n.t("units.messages.created"))
         expect(page).to have_content("New Test Unit")
 
         created_unit = user.units.find_by(name: "New Test Unit")
@@ -251,7 +251,7 @@ RSpec.describe "Units", type: :request do
         fill_in I18n.t("units.forms.description"), with: "Updated Description"
         click_button I18n.t("units.buttons.update")
 
-        expect(page).to have_content("Equipment record updated")
+        expect(page).to have_content(I18n.t("units.messages.updated"))
         expect(page).to have_content("Updated Unit Name")
 
         unit.reload
@@ -292,7 +292,7 @@ RSpec.describe "Units", type: :request do
         page.driver.submit :delete, unit_path(unit_to_delete), {}
 
         expect(page).to have_current_path(units_path)
-        expect(page).to have_content("Equipment record deleted")
+        expect(page).to have_content(I18n.t("units.messages.deleted"))
 
         expect { unit_to_delete.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
@@ -362,7 +362,7 @@ RSpec.describe "Units", type: :request do
 
         expect(page).to have_content("Searchable Bounce House")
         expect(page).not_to have_content("Different Slide")
-        expect(page).to have_content("Equipment - ACME Corp") # Check filtered title
+        expect(page).to have_content("Units - ACME Corp") # Check filtered title
       end
     end
 
@@ -420,7 +420,7 @@ RSpec.describe "Units", type: :request do
 
         click_button I18n.t("units.buttons.create")
 
-        expect(page).to have_content("Equipment record created")
+        expect(page).to have_content(I18n.t("units.messages.created"))
 
         created_unit = user.units.order(:created_at).last
         expect(created_unit).to be_present
@@ -446,7 +446,7 @@ RSpec.describe "Units", type: :request do
       it "handles missing units gracefully" do
         visit "/units/NONEXISTENT"
         expect(page).to have_current_path(units_path)
-        expect(page).to have_content("Equipment record not found")
+        expect(page).to have_content(I18n.t("units.messages.not_found"))
       end
     end
   end

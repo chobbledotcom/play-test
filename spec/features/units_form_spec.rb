@@ -102,7 +102,6 @@ RSpec.describe "Units Form", type: :feature do
       expect(page).to have_content(I18n.t("units.sections.unit_details"))
       expect(page).to have_field(I18n.t("units.forms.name"))
       expect(page).to have_button(I18n.t("units.buttons.create"))
-      expect(page).not_to have_content("Units")
     end
   end
 
@@ -133,7 +132,6 @@ RSpec.describe "Units Form", type: :feature do
     it "uses correct terminology for updates" do
       expect(page).to have_content(I18n.t("units.sections.unit_details"))
       expect(page).to have_button(I18n.t("units.buttons.update"))
-      expect(page).not_to have_content("Units")
     end
   end
 

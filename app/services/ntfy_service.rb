@@ -23,7 +23,7 @@ class NtfyService
       http.use_ssl = true
 
       request = Net::HTTP::Post.new(uri.path)
-      request["Title"] = "patlog notification"
+      request["Title"] = "play-test notification"
       request["Priority"] = "high"
       request["Tags"] = "warning"
       request.body = message

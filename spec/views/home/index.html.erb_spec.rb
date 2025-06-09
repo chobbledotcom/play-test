@@ -149,8 +149,8 @@ RSpec.describe "home/index.html.erb", type: :view do
       render
 
       # External links should have target and rel attributes for security
-      patlog_link = rendered[/href="#{Regexp.escape(I18n.t("home.company_url"))}"[^>]*>/]
-      expect(patlog_link).to be_present if patlog_link
+      company_link = rendered[/href="#{Regexp.escape(I18n.t("home.company_url"))}"[^>]*>/]
+      expect(company_link).to be_present if company_link
     end
 
     it "has consistent text content" do

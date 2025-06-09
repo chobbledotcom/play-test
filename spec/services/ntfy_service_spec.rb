@@ -49,7 +49,7 @@ RSpec.describe NtfyService do
         expect(Net::HTTP::Post).to receive(:new).with("/#{channel}").and_return(mock_request)
 
         # Expect headers to be set
-        expect(mock_request).to receive(:[]=).with("Title", "patlog notification")
+        expect(mock_request).to receive(:[]=).with("Title", "play-test notification")
         expect(mock_request).to receive(:[]=).with("Priority", "high")
         expect(mock_request).to receive(:[]=).with("Tags", "warning")
         expect(mock_request).to receive(:body=).with(test_message)
@@ -65,7 +65,7 @@ RSpec.describe NtfyService do
         allow(Net::HTTP::Post).to receive(:new).and_return(mock_request)
         allow(mock_http).to receive(:request).and_return(mock_response)
 
-        expect(mock_request).to receive(:[]=).with("Title", "patlog notification")
+        expect(mock_request).to receive(:[]=).with("Title", "play-test notification")
         expect(mock_request).to receive(:[]=).with("Priority", "high")
         expect(mock_request).to receive(:[]=).with("Tags", "warning")
         expect(mock_request).to receive(:body=).with(test_message)
