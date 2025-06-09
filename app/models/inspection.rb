@@ -27,7 +27,6 @@ class Inspection < ApplicationRecord
   validates :inspection_date, presence: true
   validates :unique_report_number, presence: true, uniqueness: {scope: :user_id}, if: :complete?
 
-
   # Step/Ramp Size validations
   validates :step_ramp_size, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
   validates :step_ramp_size_pass, inclusion: {in: [true, false]}, allow_nil: true
@@ -68,7 +67,6 @@ class Inspection < ApplicationRecord
   before_create :generate_unique_report_number, if: :complete?
   before_create :copy_unit_values
   before_save :auto_determine_pass_fail, if: :all_assessments_complete?
-  # Removed automatic assessment creation - assessments should be created explicitly when needed
 
   # Scopes
   scope :passed, -> { where(passed: true) }
@@ -94,7 +92,6 @@ class Inspection < ApplicationRecord
   scope :filter_by_date_range, ->(start_date, end_date) { where(inspection_date: start_date..end_date) if start_date.present? && end_date.present? }
   scope :overdue, -> { where("inspection_date < ?", Date.today - 1.year) }
 
-
   # Delegate methods to unit
   delegate :name, :serial, :manufacturer, to: :unit, allow_nil: true
 
@@ -103,7 +100,7 @@ class Inspection < ApplicationRecord
     return nil unless inspection_date.present?
     inspection_date + 1.year
   end
-  
+
   # Check if inspection is complete (not draft)
   def complete?
     complete_date.present?
@@ -221,18 +218,6 @@ class Inspection < ApplicationRecord
     self.inspector_company_id ||= user.inspection_company_id
   end
 
-  def create_assessment_records
-    create_user_height_assessment! unless user_height_assessment.present?
-    create_slide_assessment! unless slide_assessment.present?
-    create_structure_assessment! unless structure_assessment.present?
-    create_anchorage_assessment! unless anchorage_assessment.present?
-    create_materials_assessment! unless materials_assessment.present?
-    create_fan_assessment! unless fan_assessment.present?
-    create_enclosed_assessment! if is_totally_enclosed? && !enclosed_assessment.present?
-
-    log_audit_action("created", user, "Inspection created with assessment records") if respond_to?(:log_audit_action)
-  end
-
   def all_assessments_complete?
     return false unless has_assessments?
 
@@ -346,5 +331,4 @@ class Inspection < ApplicationRecord
       }
     end
   end
-
 end

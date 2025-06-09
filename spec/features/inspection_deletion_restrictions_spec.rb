@@ -11,7 +11,7 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
 
   context "for regular users" do
     scenario "shows delete button for draft inspections" do
-      inspection = create(:inspection, user: user, unit: unit, status: "draft")
+      inspection = create(:inspection, user: user, unit: unit, complete_date: nil)
 
       visit edit_inspection_path(inspection)
 
@@ -19,7 +19,7 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
     end
 
     scenario "hides delete button for complete inspections" do
-      inspection = create(:inspection, user: user, unit: unit, status: "complete")
+      inspection = create(:inspection, user: user, unit: unit, complete_date: Time.current)
 
       visit edit_inspection_path(inspection)
 
@@ -27,7 +27,7 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
     end
 
     scenario "shows delete button for inspections with nil status" do
-      inspection = create(:inspection, user: user, unit: unit, status: nil)
+      inspection = create(:inspection, user: user, unit: unit, complete_date: nil)
 
       visit edit_inspection_path(inspection)
 
@@ -35,7 +35,7 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
     end
 
     scenario "successfully deletes draft inspection when delete button is clicked" do
-      inspection = create(:inspection, user: user, unit: unit, status: "draft")
+      inspection = create(:inspection, user: user, unit: unit, complete_date: nil)
 
       visit edit_inspection_path(inspection)
 
@@ -57,7 +57,7 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
   #   end
   #
   #   scenario "shows delete button for draft inspections" do
-  #     inspection = create(:inspection, user: admin_user, unit: unit, status: "draft")
+  #     inspection = create(:inspection, user: admin_user, unit: unit, complete_date: nil)
   #
   #     visit edit_inspection_path(inspection)
   #
@@ -65,7 +65,7 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
   #   end
   #
   #   scenario "shows delete button for complete inspections" do
-  #     inspection = create(:inspection, user: admin_user, unit: unit, status: "complete")
+  #     inspection = create(:inspection, user: admin_user, unit: unit, complete_date: Time.current)
   #
   #     visit edit_inspection_path(inspection)
   #
@@ -73,7 +73,7 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
   #   end
   #
   #   scenario "successfully deletes complete inspection when delete button is clicked" do
-  #     inspection = create(:inspection, user: admin_user, unit: unit, status: "complete")
+  #     inspection = create(:inspection, user: admin_user, unit: unit, complete_date: Time.current)
   #
   #     visit edit_inspection_path(inspection)
   #
@@ -88,7 +88,7 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
 
   context "edge cases and error scenarios" do
     scenario "attempting to delete complete inspection via direct URL shows error" do
-      inspection = create(:inspection, user: user, unit: unit, status: "complete")
+      inspection = create(:inspection, user: user, unit: unit, complete_date: Time.current)
 
       # Try to delete via direct HTTP request (simulating form manipulation)
       page.driver.submit :delete, "/inspections/#{inspection.id}", {}
@@ -101,13 +101,13 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
     end
 
     scenario "changing inspection to complete status hides delete button" do
-      inspection = create(:inspection, user: user, unit: unit, status: "draft")
+      inspection = create(:inspection, user: user, unit: unit, complete_date: nil)
 
       visit edit_inspection_path(inspection)
       expect(page).to have_button(I18n.t("inspections.buttons.delete"))
 
       # Change status to complete (simulating the status change)
-      inspection.update!(status: "complete")
+      inspection.update!(complete_date: Time.current)
 
       visit edit_inspection_path(inspection)
       expect(page).not_to have_button(I18n.t("inspections.buttons.delete"))

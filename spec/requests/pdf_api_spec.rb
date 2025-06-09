@@ -88,7 +88,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
       end
 
       it "allows PDF generation for draft inspections" do
-        draft_inspection = create(:inspection, user: user, status: "draft")
+        draft_inspection = create(:inspection, user: user, complete_date: nil)
 
         get inspection_path(draft_inspection, format: :pdf)
 

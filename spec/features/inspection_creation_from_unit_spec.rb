@@ -28,7 +28,7 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       expect(inspection).to be_present
       expect(inspection.unit).to eq(unit)
       expect(inspection.user).to eq(user)
-      expect(inspection.status).to eq("draft")
+      expect(inspection.complete?).to be_falsey
       expect(inspection.inspection_date).to eq(Date.current)
     end
 

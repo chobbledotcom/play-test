@@ -188,8 +188,6 @@ RSpec.describe InspectionsHelper, type: :helper do
     let(:inspection) { create(:inspection, user: user) }
     let(:complete_inspection) do
       inspection = create(:inspection, :complete, user: user)
-      # Bypass validation to set complete status for testing
-      inspection.update_column(:status, "complete")
       inspection
     end
 

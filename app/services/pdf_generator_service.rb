@@ -51,7 +51,7 @@ class PdfGeneratorService
       generate_inspection_qr_code(pdf, inspection)
 
       # Add DRAFT watermark overlay for draft inspections
-      add_draft_watermark(pdf) if inspection.status == "draft"
+      add_draft_watermark(pdf) unless inspection.complete?
 
       # Footer
       generate_inspection_pdf_footer(pdf)
@@ -427,7 +427,7 @@ class PdfGeneratorService
     pdf.move_down 10
 
     # Check for completed inspections
-    completed_inspections = unit.inspections.where(status: "complete").order(inspection_date: :desc)
+    completed_inspections = unit.inspections.complete.order(inspection_date: :desc)
 
     if completed_inspections.empty?
       pdf.text I18n.t("pdf.unit.no_completed_inspections"), size: 10, style: :italic
@@ -700,7 +700,7 @@ class PdfGeneratorService
     pdf.text result_text, size: 16, style: :bold, color: result_color
     pdf.move_down 10
 
-    pdf.text "Status: #{inspection.status.humanize}", size: 10
+    pdf.text "Status: #{inspection.complete? ? 'Complete' : 'Draft'}", size: 10
     pdf.move_down 15
   end
 

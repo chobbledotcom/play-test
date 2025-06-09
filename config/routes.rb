@@ -29,7 +29,6 @@ Rails.application.routes.draw do
   # Inspections
   resources :inspections, except: [:new] do
     collection do
-      get "search"
       get "overdue"
     end
     member do
@@ -45,9 +44,6 @@ Rails.application.routes.draw do
 
   # Units
   resources :units do
-    collection do
-      get "search"
-    end
     member do
       get "report"
       get "qr_code"

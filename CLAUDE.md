@@ -51,6 +51,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Semantic HTML only** - use proper tags for their intended purpose
 - **ABSOLUTELY NO CSS classes** - I hate CSS classes, never use them
 - **NO class attributes at all** - rely entirely on semantic selectors
+- **NO inline styles** - add CSS to dedicated CSS files using semantic selectors
 - Use MVP.css framework's semantic styling only
 - Structure: `<article>`, `<header>`, `<nav>`, `<main>` (avoid `<section>`)
 - Forms: `<fieldset>`, `<legend>`, proper `<label>` associations

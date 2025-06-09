@@ -1,7 +1,7 @@
 class InspectionsController < ApplicationController
-  before_action :set_inspection, except: [:index, :search, :overdue, :create]
-  before_action :check_inspection_owner, except: [:index, :search, :overdue, :create, :report, :qr_code]
-  before_action :redirect_if_complete, except: [:show, :mark_draft, :report, :qr_code, :index, :search, :overdue, :create, :destroy]
+  before_action :set_inspection, except: [:index, :overdue, :create]
+  before_action :check_inspection_owner, except: [:index, :overdue, :create, :report, :qr_code]
+  before_action :redirect_if_complete, except: [:show, :mark_draft, :report, :qr_code, :index, :overdue, :create, :destroy]
   before_action :no_index
   skip_before_action :require_login, only: [:report, :qr_code]
 
@@ -266,11 +266,6 @@ class InspectionsController < ApplicationController
     end
   end
 
-  def search
-    @inspections = params[:query].present? ?
-      current_user.inspections.search(params[:query]) :
-      current_user.inspections
-  end
 
   def overdue
     @inspections = current_user.inspections.overdue.order(created_at: :desc)
@@ -328,9 +323,9 @@ class InspectionsController < ApplicationController
 
   def mark_draft
     if @inspection.update(complete_date: nil)
-      flash[:notice] = t("inspections.messages.marked_draft")
+      flash[:notice] = t("inspections.messages.marked_in_progress")
     else
-      flash[:alert] = t("inspections.messages.mark_draft_failed", errors: @inspection.errors.full_messages.join(", "))
+      flash[:alert] = t("inspections.messages.mark_in_progress_failed", errors: @inspection.errors.full_messages.join(", "))
     end
     redirect_to edit_inspection_path(@inspection)
   end

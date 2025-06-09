@@ -101,11 +101,6 @@ class UnitsController < ApplicationController
     redirect_to units_path
   end
 
-  def search
-    @units = params[:query].present? ?
-      current_user.units.search(params[:query]) :
-      current_user.units
-  end
 
   def report
     respond_to do |format|

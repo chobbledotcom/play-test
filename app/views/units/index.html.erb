@@ -1,9 +1,10 @@
 <%= render 'shared/page_header', title: @title || "Equipment" %>
 
 <% if current_user.has_inspection_company? %>
-  <div class="center">
-    <%= link_to I18n.t('units.titles.new'), new_unit_path, class: "button" %>
-  </div>
+  <%= button_to new_unit_path,
+      method: :get do %>
+    <strong><%= t('units.buttons.add_unit') %></strong>
+  <% end %>
 <% end %>
 
 

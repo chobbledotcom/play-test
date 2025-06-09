@@ -11,7 +11,7 @@ RSpec.describe "Inspections", type: :request do
       inspection_location: "Test Location",
       passed: true,
       comments: "Test comments",
-      status: "draft"
+      complete_date: nil
     }
   end
 
@@ -391,7 +391,7 @@ RSpec.describe "Inspections", type: :request do
 
     describe "DELETE /destroy" do
       it "deletes own draft inspection and redirects" do
-        inspection = create(:inspection, user: user, unit: unit, status: "draft")
+        inspection = create(:inspection, user: user, unit: unit, complete_date: nil)
 
         delete "/inspections/#{inspection.id}"
 
@@ -436,7 +436,7 @@ RSpec.describe "Inspections", type: :request do
       # end
 
       it "allows deletion of nil status inspections (defaults to draft)" do
-        inspection = create(:inspection, user: user, unit: unit, status: nil)
+        inspection = create(:inspection, user: user, unit: unit)
 
         delete "/inspections/#{inspection.id}"
 

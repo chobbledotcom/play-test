@@ -76,7 +76,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
       it "routes to view page for complete inspections" do
         # Create a complete inspection
         complete_inspection = create_user_inspection(inspection_location: "Complete Location")
-        complete_inspection.update_columns(status: "complete", complete_date: Time.current)
+        complete_inspection.update_columns(complete_date: Time.current)
 
         visit inspections_path
 
@@ -94,7 +94,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
       let!(:draft_inspection) do
         create_user_inspection(
           inspection_location: "",
-          status: "draft"
+          complete_date: nil
         )
       end
 

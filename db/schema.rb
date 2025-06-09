@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_09_151705) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_09_153208) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -98,7 +98,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_151705) do
     t.string "unit_id"
     t.string "inspection_location"
     t.string "unique_report_number"
-    t.string "status", default: "draft"
     t.text "general_notes"
     t.text "recommendations"
     t.string "inspector_signature"
@@ -178,7 +177,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_151705) do
     t.text "risk_assessment"
     t.datetime "complete_date"
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
-    t.index ["status"], name: "index_inspections_on_status"
     t.index ["unit_id"], name: "index_inspections_on_unit_id"
     t.index ["user_id", "unique_report_number"], name: "index_inspections_on_user_and_report_number", unique: true
     t.index ["user_id"], name: "index_inspections_on_user_id"

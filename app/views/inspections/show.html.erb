@@ -25,10 +25,10 @@
 
   <% if @inspection.complete? %>
     <section>
-      <%= button_to t('inspections.buttons.mark_draft'), 
+      <%= button_to t('inspections.buttons.mark_in_progress'), 
           mark_draft_inspection_path(@inspection), 
           method: :patch, 
-          data: { turbo_confirm: t('inspections.messages.mark_draft_confirm') } %>
+          data: { turbo_confirm: t('inspections.messages.mark_in_progress_confirm') } %>
     </section>
   <% end %>
 

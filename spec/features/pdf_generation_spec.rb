@@ -15,7 +15,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       visit inspection_path(inspection)
 
       # For complete inspections, check if PDF is embedded
-      if inspection.status == "complete"
+      if inspection.complete?
         expect(page).to have_css("iframe", wait: 5)
         # Check for public report link (text might be different)
         expect(page).to have_link(href: /\/r\/#{inspection.id}/)
@@ -162,7 +162,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
     end
 
     scenario "user accesses draft inspection (shows PDF)" do
-      draft_inspection = create(:inspection, user: user, status: "draft")
+      draft_inspection = create(:inspection, user: user, complete_date: nil)
 
       visit inspection_path(draft_inspection)
 

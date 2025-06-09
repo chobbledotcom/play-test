@@ -36,7 +36,7 @@ RSpec.describe "Unit JSON endpoints", type: :request do
       context "with inspection history" do
         let!(:inspection1) { create(:inspection, :completed, user: user, unit: unit, passed: true, inspection_date: 2.days.ago) }
         let!(:inspection2) { create(:inspection, :completed, user: user, unit: unit, passed: false, inspection_date: 1.day.ago) }
-        let!(:draft_inspection) { create(:inspection, user: user, unit: unit, status: "draft") }
+        let!(:draft_inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
         it "includes completed inspection history" do
           get "/u/#{unit.id}.json"

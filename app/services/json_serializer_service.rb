@@ -13,14 +13,14 @@ class JsonSerializerService
 
     # Include inspection history if requested
     if include_inspections
-      completed_inspections = unit.inspections.where(status: "complete").order(inspection_date: :desc)
+      completed_inspections = unit.inspections.complete.order(inspection_date: :desc)
 
       if completed_inspections.any?
         data[:inspection_history] = completed_inspections.map do |inspection|
           {
             inspection_date: inspection.inspection_date,
             passed: inspection.passed,
-            status: inspection.status,
+            complete: inspection.complete?,
             inspector_company: inspection.inspector_company&.name,
             unique_report_number: inspection.unique_report_number,
             inspection_location: inspection.inspection_location
@@ -55,6 +55,9 @@ class JsonSerializerService
       value = inspection.send(field)
       data[field.to_sym] = value unless value.nil?
     end
+
+    # Add computed complete field
+    data[:complete] = inspection.complete?
 
     # Add inspector company info
     if inspection.inspector_company.present?

@@ -111,7 +111,7 @@ en:
       not_available: "Not Available"
 
     status:
-      draft: "Draft"
+      in_progress: "In Progress"
       complete: "Complete"
 
     labels:
@@ -133,7 +133,7 @@ en:
       select_unit: "Select unit"
       create_unit_from_inspection: "Create new unit from this inspection"
       mark_complete: "Mark as Complete"
-      mark_draft: "Mark as Draft"
+      mark_in_progress: "Mark as In Progress"
       qr_and_pdf: "QR Codes & PDF"
 
     messages:
@@ -158,13 +158,13 @@ en:
       unit_changed: "Unit changed to '%{unit_name}' and dimension values have been updated."
       unit_change_failed: "Failed to change unit: %{errors}"
       mark_complete_confirm: "Are you sure you want to mark this inspection as complete? This will validate all assessments are complete."
-      mark_draft_confirm: "Are you sure you want to mark this inspection as draft? This will allow further editing."
+      mark_in_progress_confirm: "Are you sure you want to mark this inspection as in progress? This will allow further editing."
       marked_complete: "Inspection marked as complete successfully."
-      marked_draft: "Inspection marked as draft successfully."
+      marked_in_progress: "Inspection marked as in progress successfully."
       cannot_complete: "Cannot mark as complete: %{errors}"
       completion_failed: "Failed to mark as complete: %{error}"
-      mark_draft_failed: "Failed to mark as draft: %{errors}"
-      cannot_edit_complete: "Completed inspections cannot be edited. You must mark it as draft first."
+      mark_in_progress_failed: "Failed to mark as in progress: %{errors}"
+      cannot_edit_complete: "Completed inspections cannot be edited. You must mark it as in progress first."
 
     errors:
       header:

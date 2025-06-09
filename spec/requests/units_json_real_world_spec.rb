@@ -26,7 +26,7 @@ RSpec.describe "Unit JSON real-world scenarios", type: :request do
         @draft = create(:inspection,
           user: user,
           unit: unit,
-          status: "draft")
+          complete_date: nil)
       end
 
       it "returns inspection history data" do

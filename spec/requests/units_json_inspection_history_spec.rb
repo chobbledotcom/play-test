@@ -8,7 +8,7 @@ RSpec.describe "Unit JSON inspection history", type: :request do
     context "when unit has completed inspections" do
       let!(:inspection1) { create(:inspection, :completed, user: user, unit: unit, passed: true, inspection_date: 3.days.ago) }
       let!(:inspection2) { create(:inspection, :completed, user: user, unit: unit, passed: false, inspection_date: 1.day.ago) }
-      let!(:draft_inspection) { create(:inspection, user: user, unit: unit, status: "draft") }
+      let!(:draft_inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
       it "includes inspection history with correct data" do
         get "/u/#{unit.id}.json"
@@ -42,7 +42,7 @@ RSpec.describe "Unit JSON inspection history", type: :request do
     end
 
     context "when unit has no completed inspections" do
-      let!(:draft_inspection) { create(:inspection, user: user, unit: unit, status: "draft") }
+      let!(:draft_inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
       it "returns empty inspection history" do
         get "/u/#{unit.id}.json"

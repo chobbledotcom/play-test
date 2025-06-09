@@ -19,7 +19,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
         expect(json["inspection_date"]).to eq(inspection.inspection_date.as_json)
         expect(json["inspection_location"]).to eq(inspection.inspection_location)
         expect(json["passed"]).to eq(inspection.passed)
-        expect(json["status"]).to eq(inspection.status)
+        expect(json["complete"]).to eq(inspection.complete?)
         expect(json["comments"]).to eq(inspection.comments)
 
         # Check sensitive fields are excluded

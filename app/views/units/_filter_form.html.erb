@@ -1,22 +1,22 @@
-<%= form_with url: units_path, method: :get, data: { turbo: false } do |form| %>
-  <%= form.text_field :query, 
-      placeholder: t('units.search.placeholder'), 
-      value: params[:query],
-      onkeyup: "if(event.key === 'Enter') this.form.submit();" %>
-  
-  <%= form.select :status, 
-      options_for_select([["All", ""], ["Overdue", "overdue"]], params[:status]),
-      {}, { onchange: "this.form.submit();" } %>
-  
-  <%= form.select :manufacturer, 
-      options_for_select([["All Manufacturers", ""]] + manufacturer_options(current_user).map { |m| [m, m] }, params[:manufacturer]),
-      {}, { onchange: "this.form.submit();" } %>
-  
-  <%= form.select :owner, 
-      options_for_select([["All Owners", ""]] + owner_options(current_user).map { |o| [o, o] }, params[:owner]),
-      {}, { onchange: "this.form.submit();" } %>
-  
-  <% if params[:status].present? || params[:manufacturer].present? || params[:owner].present? || params[:query].present? %>
-    <%= link_to t("ui.buttons.clear_filters"), units_path %>
-  <% end %>
+<%= form_with url: units_path, method: :get, data: { turbo: false }, id: "search-box" do |form| %>
+    <%= form.text_field :query, 
+        placeholder: t('units.search.placeholder'), 
+        value: params[:query],
+        onkeyup: "if(event.key === 'Enter') this.form.submit();" %>
+    
+    <%= form.select :status, 
+        options_for_select([["All", ""], ["Overdue", "overdue"]], params[:status]),
+        {}, { onchange: "this.form.submit();" } %>
+    
+    <%= form.select :manufacturer, 
+        options_for_select([["All Manufacturers", ""]] + manufacturer_options(current_user).map { |m| [m, m] }, params[:manufacturer]),
+        {}, { onchange: "this.form.submit();" } %>
+    
+    <%= form.select :owner, 
+        options_for_select([["All Owners", ""]] + owner_options(current_user).map { |o| [o, o] }, params[:owner]),
+        {}, { onchange: "this.form.submit();" } %>
+    
+    <% if params[:status].present? || params[:manufacturer].present? || params[:owner].present? || params[:query].present? %>
+      <%= link_to t("ui.buttons.clear_filters"), units_path %>
+    <% end %>
 <% end %>

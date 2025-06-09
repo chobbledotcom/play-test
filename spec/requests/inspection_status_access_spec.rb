@@ -11,7 +11,7 @@ RSpec.describe "Inspection Status Access Control", type: :request do
 
   describe "PDF report access based on inspection status" do
     context "when inspection status is 'draft'" do
-      let(:draft_inspection) { create(:inspection, user: user, unit: unit, status: "draft") }
+      let(:draft_inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
       it "allows report access (now available for all statuses)" do
         get report_inspection_path(draft_inspection)
@@ -45,7 +45,7 @@ RSpec.describe "Inspection Status Access Control", type: :request do
 
   describe "Public access via short URLs" do
     context "when inspection is draft" do
-      let(:draft_inspection) { create(:inspection, user: user, unit: unit, status: "draft") }
+      let(:draft_inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
       it "allows public report access (now available for all statuses)" do
         # Logout first
@@ -72,7 +72,7 @@ RSpec.describe "Inspection Status Access Control", type: :request do
   end
 
   describe "Authenticated access to inspection" do
-    let(:inspection) { create(:inspection, user: user, unit: unit, status: "draft") }
+    let(:inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
     it "still allows viewing inspection details regardless of status" do
       get inspection_path(inspection)

@@ -158,6 +158,7 @@ en:
       delete: "Delete"
       pdf_report: "PDF Report"
       add_inspection: "Add Inspection"
+      add_unit: "Add Unit"
       export_csv: "Export CSV"
       
     actions:

@@ -46,6 +46,9 @@ form.button_to {
   border: none;
   text-align: center;
   margin: 2rem auto;
+  box-shadow: none;
+  padding: 0;
+  width: fit-content;
 }
 
 .view-inspection {
@@ -181,4 +184,10 @@ nav.tabs span {
 
 #share-button:active {
   transform: translateY(1px);
+}
+
+#debug-info {
+  table {
+    white-space: wrap;
+  }
 }

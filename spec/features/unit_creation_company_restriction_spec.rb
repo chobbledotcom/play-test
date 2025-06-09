@@ -12,10 +12,10 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       visit units_path
 
       # Should see the new unit button
-      expect(page).to have_link(I18n.t("units.titles.new"), href: new_unit_path)
+      expect(page).to have_button(I18n.t("units.buttons.add_unit"))
 
       # Click the button
-      click_link I18n.t("units.titles.new")
+      click_button I18n.t("units.buttons.add_unit")
 
       # Should be on the new unit page
       expect(page).to have_current_path(new_unit_path)

@@ -206,7 +206,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
         create(:enclosed_assessment, :passed, inspection: insp) if insp.is_totally_enclosed?
 
         # Mark as complete
-        insp.update!(status: "complete", complete_date: Time.current)
+        insp.update!(complete_date: Time.current)
       end
     end
 

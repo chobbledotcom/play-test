@@ -149,7 +149,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
     let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
 
     before do
-      inspection.update!(status: "complete")
+      inspection.update!(complete_date: Time.current)
       inspection.create_user_height_assessment!(
         containing_wall_height: 1.5,
         platform_height: 1.0,

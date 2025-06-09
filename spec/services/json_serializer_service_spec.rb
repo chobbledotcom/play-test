@@ -46,7 +46,7 @@ RSpec.describe JsonSerializerService do
 
     context "with inspection history" do
       let!(:completed_inspection) { create(:inspection, :completed, user: user, unit: unit, passed: true) }
-      let!(:draft_inspection) { create(:inspection, user: user, unit: unit, status: "draft") }
+      let!(:draft_inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
       it "includes only completed inspections" do
         json = JsonSerializerService.serialize_unit(unit)

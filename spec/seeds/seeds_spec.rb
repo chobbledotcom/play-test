@@ -188,8 +188,8 @@ RSpec.describe "Seed Data", type: :model do
           expect(inspection.unit).to be_present
           expect(inspection.inspector_company).to be_present
           expect(inspection.inspection_date).to be_present
-          expect(inspection.status).to be_present
-          expect(["draft", "complete"]).to include(inspection.status)
+          # Status is now determined by complete_date presence
+          expect([true, false]).to include(inspection.complete?)
           expect(inspection.width).to be > 0
           expect(inspection.length).to be > 0
           expect(inspection.height).to be > 0
@@ -199,12 +199,12 @@ RSpec.describe "Seed Data", type: :model do
       end
 
       it "creates inspections with various statuses" do
-        expect(Inspection.where(status: "draft").count).to be >= 1
-        expect(Inspection.where(status: "complete").count).to be >= 1
+        expect(Inspection.where(complete_date: nil).count).to be >= 1
+        expect(Inspection.where.not(complete_date: nil).count).to be >= 1
       end
 
       it "creates passed and failed inspections" do
-        complete_inspections = Inspection.where(status: "complete")
+        complete_inspections = Inspection.where.not(complete_date: nil)
         expect(complete_inspections.where(passed: true).count).to be >= 1
         expect(complete_inspections.where(passed: false).count).to be >= 1
       end
@@ -237,7 +237,7 @@ RSpec.describe "Seed Data", type: :model do
     end
 
     describe "Assessment Data" do
-      let(:complete_inspections) { Inspection.where(status: "complete") }
+      let(:complete_inspections) { Inspection.where.not(complete_date: nil) }
 
       it "creates anchorage assessments for complete inspections" do
         complete_inspections.each do |inspection|
@@ -291,7 +291,7 @@ RSpec.describe "Seed Data", type: :model do
 
       describe "Anchorage Assessments" do
         it "creates assessments with required fields" do
-          AnchorageAssessment.joins(:inspection).where(inspections: {status: "complete"}).each do |assessment|
+          AnchorageAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).each do |assessment|
             expect(assessment.inspection).to be_present
             expect(assessment.num_low_anchors).to be_present
             expect(assessment.num_high_anchors).to be_present
@@ -434,7 +434,7 @@ RSpec.describe "Seed Data", type: :model do
         let(:slide_assessments) { SlideAssessment.joins(:inspection).where(inspections: {has_slide: true}) }
 
         it "creates assessments only for units with slides" do
-          slide_unit_count = Inspection.where(has_slide: true, status: "complete").count
+          slide_unit_count = Inspection.where(has_slide: true).where.not(complete_date: nil).count
           expect(SlideAssessment.count).to eq(slide_unit_count)
         end
 
@@ -472,7 +472,7 @@ RSpec.describe "Seed Data", type: :model do
         let(:enclosed_assessments) { EnclosedAssessment.joins(:inspection).where(inspections: {is_totally_enclosed: true}) }
 
         it "creates assessments only for enclosed units" do
-          enclosed_unit_count = Inspection.where(is_totally_enclosed: true, status: "complete").count
+          enclosed_unit_count = Inspection.where(is_totally_enclosed: true).where.not(complete_date: nil).count
           expect(EnclosedAssessment.count).to eq(enclosed_unit_count)
         end
 
@@ -568,7 +568,7 @@ RSpec.describe "Seed Data", type: :model do
 
       it "ensures assessment data consistency with inspection results" do
         # Test that inspections and assessments are properly linked
-        Inspection.where(status: "complete").each do |inspection|
+        Inspection.where.not(complete_date: nil).each do |inspection|
           if inspection.anchorage_assessment
             expect(inspection.anchorage_assessment.inspection).to eq(inspection)
           end

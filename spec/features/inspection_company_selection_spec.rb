@@ -23,7 +23,7 @@ RSpec.feature "Inspector Company Selection", type: :feature do
       inspection = user.inspections.find_by(unit_id: unit.id)
       expect(inspection).to be_present
       expect(inspection.inspector_company_id).to eq(inspector_company.id)
-      expect(inspection.status).to eq("draft")
+      expect(inspection.complete?).to be_falsey
       expect(inspection.unit).to eq(unit)
     end
 
@@ -48,7 +48,7 @@ RSpec.feature "Inspector Company Selection", type: :feature do
       login_user_via_form(admin_user)
     end
 
-    let(:inspection) { create(:inspection, user: admin_user, unit: admin_unit, status: "draft") }
+    let(:inspection) { create(:inspection, user: admin_user, unit: admin_unit, complete_date: nil) }
 
     context "changing inspector company" do
       it "allows changing inspector company on draft inspection" do
@@ -123,7 +123,7 @@ RSpec.feature "Inspector Company Selection", type: :feature do
 
         expect(page).to have_content(I18n.t("inspections.messages.marked_complete"))
         inspection.reload
-        expect(inspection.status).to eq("complete")
+        expect(inspection.complete?).to be_truthy
       end
 
       it "allows completing inspection when inspector company is selected" do
@@ -145,21 +145,21 @@ RSpec.feature "Inspector Company Selection", type: :feature do
 
         expect(page).to have_content(I18n.t("inspections.messages.marked_complete"))
         inspection.reload
-        expect(inspection.status).to eq("complete")
+        expect(inspection.complete?).to be_truthy
         expect(inspection.inspector_company).to eq(inspector_company)
       end
 
       it "can mark complete inspection as draft again" do
         # First make it complete
-        inspection.update!(status: "complete")
+        inspection.update!(complete_date: Time.current)
 
         visit inspection_path(inspection)
 
-        click_button I18n.t("inspections.buttons.mark_draft")
+        click_button I18n.t("inspections.buttons.mark_in_progress")
 
-        expect(page).to have_content(I18n.t("inspections.messages.marked_draft"))
+        expect(page).to have_content(I18n.t("inspections.messages.marked_in_progress"))
         inspection.reload
-        expect(inspection.status).to eq("draft")
+        expect(inspection.complete?).to be_falsey
         expect(inspection.inspector_company_id).to be_present
       end
     end
@@ -176,7 +176,7 @@ RSpec.feature "Inspector Company Selection", type: :feature do
 
     it "only shows active inspector companies in dropdown" do
       # Create an inspection to edit (since there's no new page)
-      inspection = create(:inspection, user: admin_user, unit: admin_unit, status: "draft")
+      inspection = create(:inspection, user: admin_user, unit: admin_unit, complete_date: nil)
       visit edit_inspection_path(inspection)
 
       expect(page).to have_select("inspection[inspector_company_id]",
@@ -190,7 +190,7 @@ RSpec.feature "Inspector Company Selection", type: :feature do
       create(:inspector_company, name: "A Company")
 
       # Create an inspection to edit (since there's no new page)
-      inspection = create(:inspection, user: admin_user, unit: admin_unit, status: "draft")
+      inspection = create(:inspection, user: admin_user, unit: admin_unit, complete_date: nil)
       visit edit_inspection_path(inspection)
 
       company_options = page.all('select[name="inspection[inspector_company_id]"] option').map(&:text)

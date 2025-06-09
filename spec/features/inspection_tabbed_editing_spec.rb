@@ -161,7 +161,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       click_button I18n.t("inspections.buttons.mark_complete")
 
       inspection.reload
-      expect(inspection.status).to eq("complete")
+      expect(inspection.complete?).to be_truthy
       # Should redirect to show page
       expect(page).to have_current_path(inspection_path(inspection))
     end
@@ -249,7 +249,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
     it "displays validation errors clearly" do
       # Test with a draft inspection (complete inspections redirect)
-      inspection.update!(status: "draft", inspection_location: "Original Location")
+      inspection.update!(complete_date: nil, inspection_location: "Original Location")
       visit edit_inspection_path(inspection)
 
       fill_in I18n.t("inspections.fields.inspection_location"), with: ""

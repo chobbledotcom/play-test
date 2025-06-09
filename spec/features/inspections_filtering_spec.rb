@@ -6,9 +6,9 @@ RSpec.feature "Inspections Filtering", type: :feature do
   let(:unit2) { create(:unit, user: user, name: "Unit B") }
   let(:unit3) { create(:unit, user: user, name: "Unit C") }
 
-  let!(:draft_inspection) { create(:inspection, user: user, unit: unit1, status: "draft", passed: nil) }
-  let!(:completed_passed) { create(:inspection, user: user, unit: unit2, status: "complete", passed: true) }
-  let!(:completed_failed) { create(:inspection, user: user, unit: unit3, status: "complete", passed: false) }
+  let!(:draft_inspection) { create(:inspection, user: user, unit: unit1, complete_date: nil, passed: nil) }
+  let!(:completed_passed) { create(:inspection, user: user, unit: unit2, complete_date: Time.current, passed: true) }
+  let!(:completed_failed) { create(:inspection, user: user, unit: unit3, complete_date: Time.current, passed: false) }
 
   before { sign_in(user) }
 

@@ -3,7 +3,7 @@
 module PublicFieldFiltering
   extend ActiveSupport::Concern
 
-  # System/metadata fields to exclude from public outputs
+  # System/metadata fields to exclude from public outputs (shared)
   EXCLUDED_FIELDS = %w[
     id
     created_at
@@ -15,8 +15,19 @@ module PublicFieldFiltering
     inspector_signature
     signature_timestamp
     inspection_id
-    complete_date
   ].freeze
+
+  # Additional fields to exclude from PDFs specifically
+  PDF_EXCLUDED_FIELDS = %w[
+    complete_date
+    inspection_date
+    unique_report_number
+    general_notes
+    recommendations
+  ].freeze
+
+  # Fields excluded from PDFs (combines shared + PDF-specific)
+  PDF_TOTAL_EXCLUDED_FIELDS = (EXCLUDED_FIELDS + PDF_EXCLUDED_FIELDS).freeze
 
   # Computed fields to exclude from public outputs
   EXCLUDED_COMPUTED_FIELDS = %w[

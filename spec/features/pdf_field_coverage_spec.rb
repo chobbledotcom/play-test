@@ -58,7 +58,7 @@ RSpec.feature "PDF Field Coverage", type: :feature do
       text_content = pdf.strings.join(" ")
 
       # Get all Inspection model fields using reflection
-      inspection_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
+      inspection_fields = Inspection.column_names - PublicFieldFiltering::PDF_TOTAL_EXCLUDED_FIELDS
 
       # Track fields that should be rendered in PDF
       missing_fields = []
@@ -152,7 +152,7 @@ RSpec.feature "PDF Field Coverage", type: :feature do
         "inspection_location" => inspection.inspection_location,
         "inspection_date" => inspection.inspection_date&.strftime("%d/%m/%Y"),
         "passed" => inspection.passed? ? "PASSED" : "FAILED",
-        "status" => inspection.status.humanize,
+        "status" => inspection.complete? ? "Complete" : "Draft",
         "comments" => inspection.comments
       }
 

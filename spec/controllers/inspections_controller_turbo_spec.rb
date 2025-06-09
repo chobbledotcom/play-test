@@ -42,7 +42,7 @@ RSpec.describe InspectionsController, type: :controller do
 
       it "handles validation errors gracefully" do
         # Force a validation error by making the inspection invalid
-        inspection.update!(status: "draft")
+        inspection.update!(complete_date: nil)
 
         # Try to clear a required field
         patch :update, params: {id: inspection.id, inspection: {inspection_location: ""}}
