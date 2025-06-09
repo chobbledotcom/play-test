@@ -1,55 +1,69 @@
-# RPII Utility - Inspector authentication and credentials model
 class User < ApplicationRecord
-  devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
-  
-  # Associations
+  include CustomIdGenerator
+
+  has_secure_password
   has_many :inspections, dependent: :destroy
   has_many :units, dependent: :destroy
-  has_many :inspector_companies, dependent: :destroy
-  has_many :error_logs, dependent: :destroy
-  
-  # RPII Credentials
-  validates :rpii_registration_number, presence: true, uniqueness: true
-  validates :first_name, :last_name, presence: true
-  
-  # Scopes
-  scope :verified_inspectors, -> { where(rpii_verified: true) }
-  scope :active, -> { where(deleted_at: nil) }
-  
-  # Methods
-  def full_name
-    "#{first_name} #{last_name}"
+  belongs_to :inspection_company, class_name: "InspectorCompany", optional: true
+
+  validates :email, presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
+  validates :password, presence: true, length: {minimum: 6}, if: :password_digest_changed?
+  validates :inspection_limit, numericality: {only_integer: true, greater_than_or_equal_to: -1}
+  validates :time_display, inclusion: {in: %w[date time]}
+  validates :theme, inclusion: {in: %w[light dark]}
+
+  before_create :set_default_inspection_limit
+  before_create :set_default_time_display
+  before_save :downcase_email
+
+  def can_create_inspection?
+    has_inspection_company? &&
+      inspection_company_active? &&
+      within_inspection_limit?
   end
-  
-  def valid_rpii_inspector?
-    rpii_verified? && rpii_registration_number.present?
+
+  def inspection_company_required_message
+    return I18n.t("users.messages.company_not_activated") unless has_inspection_company?
+    return I18n.t("users.messages.company_archived") unless inspection_company_active?
+    I18n.t("users.messages.inspection_limit_reached")
   end
-  
-  def inspection_statistics
-    {
-      total_inspections: inspections.count,
-      passed_inspections: inspections.passed.count,
-      failed_inspections: inspections.failed.count,
-      pass_rate: calculate_pass_rate
-    }
+
+  def admin?
+    admin_pattern = ENV["ADMIN_EMAILS_PATTERN"]
+    return false if admin_pattern.blank?
+
+    begin
+      regex = Regexp.new(admin_pattern)
+      regex.match?(email)
+    rescue RegexpError
+      false
+    end
   end
-  
-  def equipment_statistics
-    {
-      total_units: units.count,
-      units_by_type: units.group(:unit_type).count,
-      recently_inspected: units.joins(:inspections).where(inspections: { inspection_date: 30.days.ago.. }).distinct.count
-    }
-  end
-  
-  def compliance_trends
-    inspections.group_by_month(:inspection_date, last: 12).group(:passed).count
-  end
-  
+
   private
-  
-  def calculate_pass_rate
-    return 0 if inspections.empty?
-    (inspections.passed.count.to_f / inspections.count * 100).round(2)
+
+  def has_inspection_company?
+    inspection_company_id.present?
+  end
+
+  def inspection_company_active?
+    inspection_company&.active?
+  end
+
+  def within_inspection_limit?
+    inspection_limit == -1 || inspections.count < inspection_limit
+  end
+
+  def downcase_email
+    self.email = email.downcase
+  end
+
+  def set_default_inspection_limit
+    env_limit = ENV["LIMIT_INSPECTIONS"]
+    self.inspection_limit = env_limit.present? ? env_limit.to_i : -1
+  end
+
+  def set_default_time_display
+    self.time_display ||= "date"
   end
 end

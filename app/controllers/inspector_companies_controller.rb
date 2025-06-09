@@ -1,48 +1,81 @@
-# RPII Utility - Company/credential management controller
 class InspectorCompaniesController < ApplicationController
-  before_action :authenticate_user!
+  before_action :set_inspector_company, only: [:show, :edit, :update, :archive, :unarchive]
+  before_action :require_login
+  before_action :require_admin, except: [:show]
 
-  # GET /inspector_companies
   def index
-    @companies = current_user.inspector_companies.order(:name)
+    @inspector_companies = InspectorCompany
+      .by_status(params[:active])
+      .search_by_term(params[:search])
+      .order(:name)
   end
 
-  # GET /inspector_companies/new
+  def show
+    @company_stats = @inspector_company.company_statistics
+    @recent_inspections = @inspector_company.recent_inspections(5)
+  end
+
   def new
-    @company = current_user.inspector_companies.build
+    @inspector_company = InspectorCompany.new
+    @inspector_company.country = "UK"
   end
 
-  # POST /inspector_companies
   def create
-    @company = current_user.inspector_companies.build(company_params)
-    
-    if @company.save
-      redirect_to inspector_companies_path, notice: 'Company profile created.'
+    @inspector_company = InspectorCompany.new(inspector_company_params)
+
+    if @inspector_company.save
+      flash[:notice] = t("inspector_companies.messages.created")
+      redirect_to @inspector_company
     else
       render :new, status: :unprocessable_entity
     end
   end
 
-  # GET /inspector_companies/:id/edit
   def edit
-    @company = current_user.inspector_companies.find(params[:id])
   end
 
-  # PATCH /inspector_companies/:id
   def update
-    @company = current_user.inspector_companies.find(params[:id])
-    
-    if @company.update(company_params)
-      redirect_to inspector_companies_path, notice: 'Company profile updated.'
+    if @inspector_company.update(inspector_company_params)
+      flash[:notice] = t("inspector_companies.messages.updated")
+      redirect_to @inspector_company
     else
       render :edit, status: :unprocessable_entity
     end
   end
 
+  def archive
+    @inspector_company.update(active: false)
+    flash[:notice] = t("inspector_companies.messages.archived")
+    redirect_to inspector_companies_path
+  end
+
+  def unarchive
+    @inspector_company.update(active: true)
+    flash[:notice] = t("inspector_companies.messages.unarchived")
+    redirect_to inspector_companies_path
+  end
+
   private
 
-  def company_params
-    params.require(:inspector_company).permit(:name, :rpii_registration_number, 
-                                             :logo, :address, :phone, :email)
+  def set_inspector_company
+    @inspector_company = InspectorCompany.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    flash[:alert] = t("inspector_companies.messages.not_found")
+    redirect_to inspector_companies_path
+  end
+
+  def inspector_company_params
+    params.require(:inspector_company).permit(
+      :name, :rpii_registration_number, :email, :phone, :address,
+      :city, :state, :postal_code, :country,
+      :active, :notes, :logo
+    )
+  end
+
+  def require_admin
+    unless current_user&.admin?
+      flash[:alert] = t("inspector_companies.messages.unauthorized")
+      redirect_to root_path
+    end
   end
 end

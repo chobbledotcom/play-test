@@ -1,153 +1,454 @@
-# RPII Utility - Primary inspection management
 class InspectionsController < ApplicationController
-  before_action :authenticate_user!
-  before_action :set_inspection, only: [:show, :edit, :update, :destroy]
-  before_action :validate_rpii_credentials, only: [:create, :update]
+  before_action :set_inspection, except: [:index, :search, :overdue, :create]
+  before_action :check_inspection_owner, except: [:index, :search, :overdue, :create, :report, :qr_code]
+  before_action :redirect_if_complete, except: [:show, :mark_draft, :report, :qr_code, :index, :search, :overdue, :create, :destroy]
+  before_action :no_index
+  skip_before_action :require_login, only: [:report, :qr_code]
 
-  # GET /inspections
-  # Dashboard showing all inspections with search/filter
   def index
-    @inspections = current_user.inspections
-                              .includes(:unit, :inspector_company)
-                              .search(params[:search])
-                              .filter_by_status(params[:status])
-                              .order(created_at: :desc)
-                              .page(params[:page])
+    # Base filtered query
+    filtered_inspections = current_user.inspections
+      .search(params[:query])
+      .filter_by_result(params[:result])
+      .filter_by_unit(params[:unit_id])
+      .order(created_at: :desc)
+
+    # Split into draft and complete
+    @draft_inspections = filtered_inspections.draft
+    @complete_inspections = filtered_inspections.complete
+
+    @title = build_index_title
+
+    respond_to do |format|
+      format.html
+      format.csv { send_data inspections_to_csv, filename: "inspections-#{Date.today}.csv" }
+    end
   end
 
-  # GET /inspections/new
-  # Multi-step inspection creation wizard
+  def show
+    respond_to do |format|
+      format.html
+      format.pdf do
+        pdf_data = PdfGeneratorService.generate_inspection_report(@inspection)
+        @inspection.update(pdf_last_accessed_at: Time.current)
+
+        send_data pdf_data.render,
+          filename: "PAT_Report_#{@inspection.serial}.pdf",
+          type: "application/pdf",
+          disposition: "inline"
+      end
+    end
+  end
+
   def new
-    @inspection = current_user.inspections.build
-    @inspection.build_unit
-    @inspection.build_user_height_assessment
-    @inspection.build_slide_assessment
-    @inspection.build_structure_assessment
-    @inspection.build_anchorage_assessment
-    @inspection.build_materials_assessment
-    @inspection.build_fan_assessment
-    @inspection.inspection_date = Date.current
+    unless current_user.inspection_company_id.present?
+      flash[:alert] = current_user.inspection_company_required_message
+      redirect_to root_path and return
+    end
+
+    unless current_user.can_create_inspection?
+      flash[:alert] = current_user.inspection_company_required_message
+      redirect_to inspections_path and return
+    end
+
+    @inspection = Inspection.new
+    @inspection.inspection_date = Date.today
+
+    # Handle pre-selected unit
+    if params[:unit_id].present?
+      unit = current_user.units.find_by(id: params[:unit_id])
+      if unit
+        @inspection.unit_id = unit.id
+      end
+    end
   end
 
-  # POST /inspections
-  # Create new inspection with comprehensive validation
   def create
-    @inspection = current_user.inspections.build(inspection_params)
+    # Handle unit_id from URL parameter (from unit show page button)
+    unit_id = params[:unit_id] || inspection_params[:unit_id]
+    unit = nil
+
+    unless current_user.inspection_company_id.present?
+      flash[:alert] = current_user.inspection_company_required_message
+      redirect_to unit_id.present? ? unit_path(unit_id) : root_path and return
+    end
+
+    unless current_user.can_create_inspection?
+      flash[:alert] = current_user.inspection_company_required_message
+      redirect_to unit_id.present? ? unit_path(unit_id) : root_path and return
+    end
+
+    if unit_id.present?
+      # Securely handle unit association
+      unit = current_user.units.find_by(id: unit_id)
+      if unit.nil?
+        flash[:alert] = I18n.t("inspections.errors.invalid_unit")
+        redirect_to root_path and return
+      end
+    end
+
+    # Create minimal inspection with just the unit and default values
+    @inspection = current_user.inspections.build(
+      unit: unit,
+      inspection_date: Date.current,
+      status: "draft",
+      inspector_company_id: current_user.inspection_company_id,
+      inspection_location: current_user.default_inspection_location
+    )
+
+    # Copy dimensions from unit before saving
+    @inspection.send(:copy_unit_values)
 
     if @inspection.save
-      redirect_to edit_inspection_path(@inspection),
-                  notice: 'Inspection created. Complete all assessment sections.'
+      if Rails.env.production?
+        NtfyService.notify("new inspection by #{current_user.email}")
+      end
+
+      flash[:notice] = if unit.nil?
+        I18n.t("inspections.messages.created_without_unit")
+      else
+        I18n.t("inspections.messages.created")
+      end
+      redirect_to edit_inspection_path(@inspection)
     else
-      render :new, status: :unprocessable_entity
+      flash[:alert] = I18n.t("inspections.errors.creation_failed", errors: @inspection.errors.full_messages.join(", "))
+      redirect_to unit.present? ? unit_path(unit) : root_path
     end
   end
 
-  # GET /inspections/:id/edit
-  # Tabbed editing interface matching Windows Forms layout
   def edit
-    @current_tab = params[:tab] || 'unit_details'
-    @validation_errors = @inspection.validate_completeness
+    # Build assessments if they don't exist yet and pre-fill with inspection attributes
+    @inspection.build_assessments_with_attributes
   end
 
-  # PATCH /inspections/:id
-  # Update with auto-save capability and validation
   def update
-    if @inspection.update(inspection_params)
-      if params[:auto_save]
-        render json: { status: 'saved', errors: [] }
-      else
-        redirect_to inspection_path(@inspection),
-                    notice: 'Inspection updated successfully.'
+    params = inspection_params
+
+    # Securely handle unit association
+    if params[:unit_id].present?
+      unit = current_user.units.find_by(id: params[:unit_id])
+
+      if unit.nil?
+        # Unit ID not found or doesn't belong to user - security issue
+        flash[:alert] = I18n.t("inspections.errors.invalid_unit")
+        render :edit, status: :unprocessable_entity and return
+      end
+    end
+
+    if @inspection.update(params)
+      respond_to do |format|
+        format.html do
+          flash[:notice] = I18n.t("inspections.messages.updated")
+          redirect_to @inspection
+        end
+        format.json { render json: {status: "success", inspection: @inspection} }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("inspection_progress_#{@inspection.id}",
+              html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
+            turbo_stream.replace("completion_issues_#{@inspection.id}",
+              partial: "inspections/completion_issues",
+              locals: {inspection: @inspection}),
+            turbo_stream.replace("inspection_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "inspection_save_message",
+                success: true,
+                success_message: t("inspections.messages.updated")
+              }),
+            turbo_stream.replace("assessment_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "assessment_save_message",
+                success: true,
+                success_message: t("inspections.messages.updated")
+              })
+          ]
+        end
       end
     else
-      if params[:auto_save]
-        render json: { status: 'error', errors: @inspection.errors.full_messages }
-      else
-        render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: {status: "error", errors: @inspection.errors.full_messages} }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("inspection_progress_#{@inspection.id}",
+              html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
+            turbo_stream.replace("completion_issues_#{@inspection.id}",
+              partial: "inspections/completion_issues",
+              locals: {inspection: @inspection}),
+            turbo_stream.replace("inspection_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "inspection_save_message",
+                errors: @inspection.errors.full_messages,
+                error_message: t("shared.messages.save_failed")
+              }),
+            turbo_stream.replace("assessment_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "assessment_save_message",
+                errors: @inspection.errors.full_messages,
+                error_message: t("shared.messages.save_failed")
+              })
+          ]
+        end
       end
     end
   end
 
-  # GET /inspections/:id
-  # View completed inspection with pass/fail determination
-  def show
-    @pdf_url = inspection_report_path(@inspection, format: :pdf)
-  end
-
-  # DELETE /inspections/:id
-  # Soft delete with audit trail
   def destroy
-    @inspection.update(deleted_at: Time.current, deleted_by: current_user)
-    redirect_to inspections_path, notice: 'Inspection deleted.'
+    if @inspection.status == "complete" && !current_user.admin?
+      redirect_to @inspection.preferred_path, alert: I18n.t("inspections.messages.delete_complete_denied")
+      return
+    end
+
+    @inspection.destroy
+    redirect_to inspections_path, notice: I18n.t("inspections.messages.deleted")
   end
 
-  # POST /inspections/:id/finalize
-  # Lock inspection and generate final pass/fail
-  def finalize
-    if @inspection.can_be_finalized?
-      @inspection.finalize!(current_user)
-      redirect_to @inspection, notice: 'Inspection finalized.'
+  def replace_dimensions
+    if @inspection.unit.present?
+      @inspection.copy_attributes_from(@inspection.unit)
+
+      if @inspection.save
+        flash[:notice] = t("inspections.messages.dimensions_replaced")
+      else
+        flash[:alert] = t("inspections.messages.dimensions_replace_failed", errors: @inspection.errors.full_messages.join(", "))
+      end
     else
-      redirect_to edit_inspection_path(@inspection),
-                  alert: 'Cannot finalize: incomplete assessment sections.'
+      flash[:alert] = t("inspections.messages.no_unit_for_dimensions")
+    end
+
+    redirect_to edit_inspection_path(@inspection, tab: params[:tab] || "general")
+  end
+
+  def select_unit
+    @units = current_user.units
+    @title = t("inspections.titles.select_unit")
+
+    # Apply the same filters as the units index
+    if params[:search].present?
+      @units = @units.where("name LIKE ? OR serial LIKE ? OR manufacturer LIKE ?",
+        "%#{params[:search]}%", "%#{params[:search]}%", "%#{params[:search]}%")
+    end
+
+    if params[:manufacturer].present?
+      @units = @units.where(manufacturer: params[:manufacturer])
+    end
+
+    if params[:has_slide].present?
+      @units = @units.where(has_slide: params[:has_slide] == "true")
+    end
+
+    @units = @units.order(:name)
+
+    render :select_unit
+  end
+
+  def update_unit
+    unit = current_user.units.find_by(id: params[:unit_id])
+
+    if unit.nil?
+      flash[:alert] = t("inspections.errors.invalid_unit")
+      redirect_to select_unit_inspection_path(@inspection) and return
+    end
+
+    # Update the inspection with the new unit and copy all dimensions
+    @inspection.unit = unit
+    @inspection.copy_attributes_from(unit)
+
+    if @inspection.save
+      flash[:notice] = t("inspections.messages.unit_changed", unit_name: unit.name)
+      redirect_to edit_inspection_path(@inspection)
+    else
+      flash[:alert] = t("inspections.messages.unit_change_failed", errors: @inspection.errors.full_messages.join(", "))
+      redirect_to select_unit_inspection_path(@inspection)
     end
   end
 
-  # GET /inspections/:id/duplicate
-  # Create copy for similar equipment inspections
-  def duplicate
-    @new_inspection = @inspection.duplicate_for_user(current_user)
-    redirect_to edit_inspection_path(@new_inspection)
+  def search
+    @inspections = params[:query].present? ?
+      current_user.inspections.search(params[:query]) :
+      current_user.inspections
+  end
+
+  def overdue
+    @inspections = current_user.inspections.overdue.order(created_at: :desc)
+    @title = "Overdue Inspections"
+    render :index
+  end
+
+  def report
+    pdf_data = PdfGeneratorService.generate_inspection_report(@inspection)
+
+    @inspection.update(pdf_last_accessed_at: Time.current)
+
+    send_data pdf_data.render,
+      filename: "PAT_Report_#{@inspection.serial}.pdf",
+      type: "application/pdf",
+      disposition: "inline"
+  end
+
+  def qr_code
+    qr_code_png = QrCodeService.generate_qr_code(@inspection)
+
+    send_data qr_code_png,
+      filename: "PAT_Report_QR_#{@inspection.serial}.png",
+      type: "image/png",
+      disposition: "inline"
+  end
+
+  def complete
+    # Check if inspection can be completed
+    validation_errors = @inspection.validate_completeness
+
+    if validation_errors.any?
+      flash[:alert] = t("inspections.messages.cannot_complete", errors: validation_errors.join(", "))
+      redirect_to edit_inspection_path(@inspection)
+      return
+    end
+
+    begin
+      @inspection.complete!(current_user)
+      flash[:notice] = t("inspections.messages.marked_complete")
+      redirect_to @inspection
+    rescue => e
+      flash[:alert] = t("inspections.messages.completion_failed", error: e.message)
+      redirect_to edit_inspection_path(@inspection)
+    end
+  end
+
+  def mark_draft
+    if @inspection.update(status: "draft")
+      flash[:notice] = t("inspections.messages.marked_draft")
+    else
+      flash[:alert] = t("inspections.messages.mark_draft_failed", errors: @inspection.errors.full_messages.join(", "))
+    end
+    redirect_to edit_inspection_path(@inspection)
   end
 
   private
 
-  def set_inspection
-    @inspection = current_user.inspections.find(params[:id])
-  end
-
   def inspection_params
-    params.require(:inspection).permit(
-      # Global details
-      :inspection_company_name, :rpii_registration_number, :place_inspected,
-      :inspection_date, :testimony, :passed, :risk_assessment,
+    # Get the base params with permitted top-level attributes
+    inspection_specific_params = [:inspection_date, :inspection_location, :passed, :comments, :unit_id, :inspector_company_id, :unique_report_number]
+    copyable_attributes = Inspection.new.copyable_attributes_via_reflection
+    base_params = params.require(:inspection).permit(inspection_specific_params + copyable_attributes)
 
-      # Unit details
-      unit_attributes: [:id, :description, :manufacturer, :width, :length, :height,
-                       :serial_number, :unit_type, :owner, :photo],
+    # For each assessment, permit all attributes except timestamps and inspection_id
+    assessment_types = %w[
+      user_height_assessment
+      slide_assessment
+      structure_assessment
+      anchorage_assessment
+      materials_assessment
+      fan_assessment
+      enclosed_assessment
+    ]
 
-      # All assessment attributes (150+ fields)
-      user_height_assessment_attributes: [:id, :containing_wall_height,
-                                        :containing_wall_height_comment, :platform_height,
-                                        :platform_height_comment, :slide_barrier_height,
-                                        # ... all height assessment fields
-                                       ],
+    assessment_types.each do |assessment_type|
+      next unless params[:inspection]["#{assessment_type}_attributes"].present?
 
-      slide_assessment_attributes: [:id, :slide_platform_height, :slide_wall_height,
-                                   # ... all slide assessment fields
-                                  ],
+      # Permit all fields except the ones we want to block
+      assessment_params = params[:inspection]["#{assessment_type}_attributes"]
+      cleaned_params = assessment_params.permit!.except("created_at", "updated_at", "inspection_id")
 
-      structure_assessment_attributes: [:id, :seam_integrity_pass, :seam_integrity_comment,
-                                       # ... all structure assessment fields
-                                      ],
+      base_params["#{assessment_type}_attributes"] = cleaned_params
+    end
 
-      anchorage_assessment_attributes: [:id, :num_low_anchors, :num_high_anchors,
-                                       # ... all anchorage assessment fields
-                                      ],
-
-      materials_assessment_attributes: [:id, :rope_size, :rope_size_pass,
-                                       # ... all materials assessment fields
-                                      ],
-
-      fan_assessment_attributes: [:id, :blower_size_comment, :blower_flap_pass,
-                                 # ... all fan assessment fields
-                                ]
-    )
+    base_params
   end
 
-  def validate_rpii_credentials
-    unless current_user.valid_rpii_inspector?
-      redirect_to root_path, alert: 'Valid RPII registration required for inspections.'
+  def no_index
+    response.set_header("X-Robots-Tag", "noindex,nofollow")
+  end
+
+  def set_inspection
+    # Try exact match first, then case-insensitive match for user-friendly URLs
+    @inspection = Inspection.find_by(id: params[:id]) ||
+      Inspection.find_by("UPPER(id) = ?", params[:id].upcase)
+
+    unless @inspection
+      if action_name.in?(["report", "qr_code"])
+        # For public report access, return 404 instead of redirect
+        render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
+      else
+        flash[:alert] = I18n.t("inspections.errors.not_found")
+        redirect_to inspections_path and return
+      end
     end
+  end
+
+  def check_inspection_owner
+    unless @inspection.user_id == current_user.id
+      flash[:alert] = I18n.t("inspections.errors.access_denied")
+      redirect_to inspections_path and return
+    end
+  end
+
+  def redirect_if_complete
+    if @inspection&.status == "complete"
+      flash[:notice] = I18n.t("inspections.messages.cannot_edit_complete")
+      redirect_to @inspection and return
+    end
+  end
+
+  def inspections_to_csv
+    CSV.generate(headers: true) do |csv|
+      # Get headers dynamically
+      headers = csv_headers
+      csv << headers
+
+      # Export whatever inspections are already filtered by the index action
+      @complete_inspections.includes(:unit, :inspector_company, :user).each do |inspection|
+        csv << csv_row_data(inspection, headers)
+      end
+    end
+  end
+
+  def csv_headers
+    headers = []
+
+    # All inspection column names (excluding foreign keys we'll handle specially)
+    excluded_columns = %w[user_id inspector_company_id unit_id]
+    inspection_columns = Inspection.column_names - excluded_columns
+    headers += inspection_columns
+
+    # Related model data with prefixes
+    headers += %w[unit_name unit_serial unit_manufacturer unit_owner unit_description]
+    headers += %w[inspector_company_name]
+    headers += %w[inspector_user_email]
+
+    headers
+  end
+
+  def csv_row_data(inspection, headers)
+    headers.map do |header|
+      case header
+      # Unit fields
+      when "unit_name" then inspection.unit&.name
+      when "unit_serial" then inspection.unit&.serial
+      when "unit_manufacturer" then inspection.unit&.manufacturer
+      when "unit_owner" then inspection.unit&.owner
+      when "unit_description" then inspection.unit&.description
+
+      # Inspector company
+      when "inspector_company_name" then inspection.inspector_company&.name
+
+      # User (inspector) fields
+      when "inspector_user_email" then inspection.user&.email
+
+      # All other fields are direct inspection attributes
+      else
+        inspection.send(header) if inspection.respond_to?(header)
+      end
+    end
+  end
+
+  def build_index_title
+    title = "Inspections"
+    title += " - #{(params[:result] == "passed") ? "Passed" : "Failed"}" if params[:result].present?
+    title
   end
 end

@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}🧪 Running tests in parallel...${NC}"
+
+# Create a temporary file to capture the output
+temp_output=$(mktemp)
+
+# Run tests and capture all output
+if bundle exec parallel_rspec spec/ > "$temp_output" 2>&1; then
+    echo -e "${GREEN}✅ Tests passed!${NC}"
+    
+    # Show full output minus coverage noise
+    grep -v "Coverage report generated for" "$temp_output" | \
+    grep -v "^Line Coverage:" | \
+    grep -v "^Branch Coverage:" | \
+    grep -v "Stopped processing SimpleCov"
+    
+    cleanup_result=0
+else
+    echo -e "${RED}❌ Tests failed!${NC}"
+    
+    # Show full output minus coverage noise
+    echo -e "${YELLOW}📋 Full test output:${NC}"
+    grep -v "Coverage report generated for" "$temp_output" | \
+    grep -v "^Line Coverage:" | \
+    grep -v "^Branch Coverage:" | \
+    grep -v "Stopped processing SimpleCov"
+    
+    cleanup_result=1
+fi
+
+# Cleanup
+rm -f "$temp_output"
+exit $cleanup_result

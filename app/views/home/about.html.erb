@@ -1,0 +1,33 @@
+<% content_for :title, t('about.title') %>
+
+<main id="about">
+  <%= render 'shared/page_header', title: t('about.title') %>
+  
+  <article>
+    <header>
+      <h2><%= t('about.what_it_is.title') %></h2>
+    </header>
+    <p><%= t('about.what_it_is.content') %></p>
+  </article>
+
+  <article>
+    <header>
+      <h2><%= t('about.key_features.title') %></h2>
+    </header>
+    <p><%= t('about.key_features.content') %></p>
+  </article>
+
+  <article>
+    <header>
+      <h2><%= t('about.attribution.title') %></h2>
+    </header>
+    <p><%= t('about.attribution.content') %></p>
+  </article>
+
+  <article>
+    <header>
+      <h2><%= t('about.disclaimer.title') %></h2>
+    </header>
+    <p><%= t('about.disclaimer.content') %></p>
+  </article>
+</main>

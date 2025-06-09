@@ -1,0 +1,20 @@
+/* About page specific styles */
+#about article {
+  max-width: 60rem;
+  margin: 0;
+  text-align: left;
+}
+
+#about p {
+  text-align: left;
+  line-height: 1.6;
+}
+
+#about table {
+  text-align: left;
+}
+
+#about th,
+#about td {
+  text-align: left;
+}

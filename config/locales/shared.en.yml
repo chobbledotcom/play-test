@@ -1,0 +1,93 @@
+en:
+  # Navigation
+  navigation:
+    inspections: "Inspections"
+    units: "Units" 
+    settings: "Settings"
+    safety_standards: "Safety Standards"
+
+  # Shared UI elements
+  shared:
+    actions:
+      edit: "Edit"
+      delete: "Delete"
+      back: "Back"
+      save: "Save"
+      cancel: "Cancel"
+      close: "Close"
+    messages:
+      saved_successfully: "Saved successfully"
+      save_failed: "Save failed"
+    yes: "Yes"
+    no: "No"
+    view_full_size: "View full size"
+
+  # Common messages
+  ui:
+    view: "View"
+    edit: "Edit"
+    delete: "Delete"
+    archive: "Archive"
+    unarchive: "Unarchive"
+    buttons:
+      submit: "Submit"
+      clear: "Clear"
+      search: "Search"
+      clear_filters: "Clear Filters"
+
+  # Home page
+  home:
+    welcome: "Welcome"
+    title: "play-test"
+    subtitle: "Professional inspection management for inflatable play equipment"
+    description: "Professional inspection management system"
+    attribution: "Developed by"
+    company_name: "play-test.co.uk"
+    company_url: "https://play-test.co.uk"
+    recent_inspections: "Recent Inspections"
+    recent_units: "Recent Units"
+    quick_actions: "Quick Actions"
+    create_inspection: "Create Inspection"
+    create_unit: "Create Unit"
+    safety_standards: "Safety Standards"
+    
+    features:
+      log_inspections:
+        title: "Log Inspections"
+        description: "Record detailed safety inspections with compliance tracking and automatic calculations"
+      generate_pdfs:
+        title: "Generate PDF Reports"
+        description: "Create professional PDF reports with QR codes for verification and sharing"
+      search_export:
+        title: "Search & Export"
+        description: "Find inspection records quickly and export data for analysis and compliance"
+
+  # About page
+  about:
+    title: "About play-test"
+    description: "Professional inspection management for inflatable play equipment"
+    
+    what_it_is:
+      title: "What is play-test?"
+      content: "play-test is a digital inspection management system for inflatable playground equipment. It helps inspection companies ensure compliance with EN 14960:2019 safety standards by digitising the inspection process and generating professional PDF reports with QR codes."
+    
+    key_features:
+      title: "Key Features"
+      content: "Track equipment with serial numbers and dimensions. Perform seven comprehensive safety assessments including structure, anchorage, materials, electrical (PAT), slide safety, user height, and enclosed unit checks. Automatically calculate pass/fail status based on EN 14960:2019 requirements. Generate PDF inspection reports with QR codes for easy client access. Manage multiple inspection companies with data isolation. Access from any device with progressive web app support."
+    
+    attribution:
+      title: "Attribution & Licensing"
+      content: "play-test is a project by Stefan at Chobble.com, based on a Windows application originally written by Spencer Elliott of elliottsbouncycastlehire.co.uk. This is an independent project and is not affiliated with any testing bodies or certification organisations. The software is open source and licensed under the AGPLv3 license. Source code is available on the project repository."
+      
+    disclaimer:
+      title: "Disclaimer"
+      content: "This software is provided as a tool to assist with inspection record-keeping and report generation. Users are responsible for ensuring their inspections meet all applicable standards and regulations. The software authors accept no liability for inspection outcomes or regulatory compliance."
+
+
+  # Authorization messages
+  authorization:
+    login_required: "Please log in to access this page"
+    admin_required: "You are not authorized to access this page"
+
+  # Test strings
+  hello: "Hello world"

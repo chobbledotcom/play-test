@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>play-test | Professional Inspection Management | play-test.co.uk</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "mvp" %>
+    <%= stylesheet_link_tag "application" %>
+    <%= javascript_importmap_tags %>
+
+    <%= favicon_link_tag asset_path("favicon.svg") %>
+  </head>
+  <body<% if current_user&.theme == "dark" %> class="dark-theme"<% end %>>
+    <% if current_user %>
+      <nav>
+        <ul>
+          <li>
+            <%= link_to inspections_path do %>
+              <strong>Inspections</strong>
+            <% end %>
+          </li>
+          <li>
+            <%= link_to units_path do %>
+              <strong>Units</strong>
+            <% end %>
+          </li>
+          <% if current_user.admin? %>
+            <li>
+              <%= link_to users_path do %>
+                <strong>Users</strong>
+              <% end %>
+            </li>
+            <li>
+              <%= link_to inspector_companies_path do %>
+                <strong><%= t('inspector_companies.titles.index') %></strong>
+              <% end %>
+            </li>
+          <% end %>
+          <li>
+            <%= link_to change_settings_user_path(current_user) do %>
+              <strong>Settings</strong>
+            <% end %>
+          </li>
+          <li>
+            <%= link_to safety_standards_path do %>
+              <strong>Safety Standards</strong>
+            <% end %>
+          </li>
+          <li>
+            <%= link_to about_path do %>
+              <strong>About</strong>
+            <% end %>
+          </li>
+          <li>
+            <%= button_to t("sessions.buttons.log_out"), logout_path, method: :delete %>
+          </li>
+        </ul>
+      </nav>
+    <% end %>
+    <main>
+      <% flash.each do |type, message| %>
+        <article>
+          <aside><%= message %></aside>
+        </article>
+      <% end %>
+
+      <%= yield %>
+
+      <footer>
+        <p>
+          <strong>Privacy policy:</strong> I won't use your info for anything other than contacting you about this service, which will be rare. You can delete your data whenever you like.
+        </p>
+        <p>
+          <strong>Self promo:</strong> Do you need a website, software development, or honest techy advice? Get in touch with me at <a href="https://chobble.com">Chobble.com</a>.
+        </p>
+        <p>
+          <a href="https://git.chobble.com/chobble/testlog">Source Code</a>
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>
