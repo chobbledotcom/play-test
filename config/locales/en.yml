@@ -35,3 +35,7 @@ en:
           attributes:
             current_password:
               incorrect: "is incorrect"
+        unit:
+          attributes:
+            base:
+              has_complete_inspections: "Cannot delete unit with completed inspections"

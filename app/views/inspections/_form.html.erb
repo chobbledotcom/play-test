@@ -31,7 +31,7 @@
 
   <!-- Inspection-Specific Details -->
   <%= render 'form/fieldset', legend_key: 'inspection_details', i18n_base: 'inspections.fields', form: form do %>
-    <%= render 'form/text_field', field: :inspection_location %>
+    <%= render 'form/autocomplete_field', field: :inspection_location, options: inspection_location_options(current_user) %>
     
     <%= render 'form/date_field',
         field: :inspection_date,

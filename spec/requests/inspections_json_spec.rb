@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Inspection JSON endpoints", type: :request do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user, has_slide: true, is_totally_enclosed: true) }
-  let(:inspection) { create(:inspection, :completed, user: user, unit: unit, comments: "Test comments") }
+  let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
 
   describe "GET /r/:id.json" do
     context "when inspection exists" do

@@ -155,7 +155,7 @@ RSpec.feature "Inspector Company Selection", type: :feature do
 
         visit inspection_path(inspection)
 
-        click_button I18n.t("inspections.buttons.mark_in_progress")
+        click_button I18n.t("inspections.buttons.switch_to_in_progress")
 
         expect(page).to have_content(I18n.t("inspections.messages.marked_in_progress"))
         inspection.reload

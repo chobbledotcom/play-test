@@ -13,3 +13,15 @@
 #search-box select {
   width: 15rem;
 }
+
+/* Mobile styles for search box - stack vertically */
+@media (max-width: 798px) {
+  #search-box {
+    flex-direction: column;
+  }
+  
+  #search-box input[type="text"],
+  #search-box select {
+    width: 100%;
+  }
+}

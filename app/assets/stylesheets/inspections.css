@@ -46,7 +46,7 @@
   border-bottom: none;
 }
 
-.table-list-link {
+.table-list-items a {
   display: block;
   padding: 1rem;
   text-decoration: none;
@@ -56,22 +56,22 @@
     color 0.3s ease;
 }
 
-.table-list-link:hover {
+.table-list-items a:hover {
   background-color: var(--color-bg-secondary);
   color: white;
 }
 
 /* Mobile view - stacked layout */
-.table-list-link > span {
+.table-list-items a span {
   display: block;
   padding: 0.25rem 0;
 }
 
-.table-list-link > span:before {
+.table-list-items a span:before {
   content: attr(data-label) ": ";
   font-weight: bold;
   display: inline-block;
-  width: 140px;
+  margin-right: 0.5rem;
 }
 
 /* Desktop view - table layout */
@@ -82,18 +82,18 @@
   }
 
   .table-list-header > span,
-  .table-list-link > span {
+  .table-list-items a span {
     flex: 1;
     padding: 0 0.5rem;
     display: inline-block;
   }
 
-  .table-list-link {
+  .table-list-items a {
     display: flex;
     align-items: center;
   }
 
-  .table-list-link > span:before {
+  .table-list-items a span:before {
     display: none; /* Hide mobile labels on desktop */
   }
 

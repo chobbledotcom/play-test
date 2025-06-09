@@ -51,6 +51,11 @@ form.button_to {
   width: fit-content;
 }
 
+.actions form.button_to {
+  margin: 0;
+  min-width: fit-content;
+}
+
 .view-inspection {
   text-align: center;
   table {
@@ -147,6 +152,21 @@ nav.tabs span {
   color: var(--color-text, #333);
   text-decoration: none;
   cursor: default;
+}
+
+/* Mobile styles for tabs - stack vertically */
+@media (max-width: 798px) {
+  nav.tabs {
+    width: 100%;
+  }
+
+  nav.tabs ul {
+    flex-direction: column;
+  }
+
+  nav.tabs li {
+    margin-right: 0;
+  }
 }
 
 #company-activation-notice {

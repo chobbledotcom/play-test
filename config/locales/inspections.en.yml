@@ -34,6 +34,8 @@ en:
       all_statuses: "All Statuses"
       all_results: "All Results"
       all_units: "All Units"
+      all_owners: "All Owners"
+      all_locations: "All Locations"
       passed: "Passed"
       failed: "Failed"
 
@@ -134,6 +136,7 @@ en:
       create_unit_from_inspection: "Create new unit from this inspection"
       mark_complete: "Mark as Complete"
       mark_in_progress: "Mark as In Progress"
+      switch_to_in_progress: "Switch to 'In Progress'"
       qr_and_pdf: "QR Codes & PDF"
 
     messages:
@@ -165,6 +168,7 @@ en:
       completion_failed: "Failed to mark as complete: %{error}"
       mark_in_progress_failed: "Failed to mark as in progress: %{errors}"
       cannot_edit_complete: "Completed inspections cannot be edited. You must mark it as in progress first."
+      complete_inspection_notice: "You can't update or delete inspections that are marked as complete."
 
     errors:
       header:

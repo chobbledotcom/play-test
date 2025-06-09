@@ -196,6 +196,7 @@ en:
       created: "Unit created"
       updated: "Unit updated"
       deleted: "Unit deleted"
+      delete_failed: "Failed to delete unit"
       not_found: "Unit not found"
       access_denied: "Access denied"
       delete_confirm: "Are you sure? This cannot be undone."

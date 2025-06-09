@@ -10,6 +10,9 @@ class Unit < ApplicationRecord
   # File attachments
   has_one_attached :photo
 
+  # Callbacks
+  before_destroy :check_for_complete_inspections
+
   # All fields are required for Units
   validates :name, :serial, :description, :manufacturer, :owner, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
@@ -86,6 +89,10 @@ class Unit < ApplicationRecord
     }
   end
 
+  def deletable?
+    !inspections.complete.exists?
+  end
+
   def self.overdue
     # Find units where their most recent inspection is older than the reinspection interval
     # Using Date.current instead of Date.today for consistency with Rails timezone handling
@@ -95,6 +102,13 @@ class Unit < ApplicationRecord
   end
 
   private
+
+  def check_for_complete_inspections
+    if inspections.complete.exists?
+      errors.add(:base, :has_complete_inspections)
+      throw(:abort)
+    end
+  end
 
   def saved_changes_to_dimensions?
     # Use the dimension_changed? method from HasDimensions, but for saved changes

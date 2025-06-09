@@ -18,7 +18,19 @@
         ] + current_user.units.order(:name).map { |u| [u.name, u.id] }, params[:unit_id]),
         {}, { onchange: "this.form.submit();" } %>
     
-    <% if params[:result].present? || params[:unit_id].present? || params[:query].present? %>
+    <%= form.select :owner, 
+        options_for_select([
+          [t('inspections.filters.all_owners'), ""]
+        ] + owner_options(current_user), params[:owner]),
+        {}, { onchange: "this.form.submit();" } %>
+    
+    <%= form.select :inspection_location, 
+        options_for_select([
+          [t('inspections.filters.all_locations'), ""]
+        ] + inspection_location_options(current_user), params[:inspection_location]),
+        {}, { onchange: "this.form.submit();" } %>
+    
+    <% if params[:result].present? || params[:unit_id].present? || params[:query].present? || params[:owner].present? || params[:inspection_location].present? %>
       <%= link_to t("ui.buttons.clear_filters"), inspections_path %>
     <% end %>
 <% end %>

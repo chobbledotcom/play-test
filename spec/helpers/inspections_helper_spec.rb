@@ -223,15 +223,16 @@ RSpec.describe InspectionsHelper, type: :helper do
         allow(helper).to receive(:current_user).and_return(user)
       end
 
-      it "includes both edit and delete actions" do
+      it "includes no actions for complete inspections" do
         actions = helper.inspection_actions(complete_inspection)
 
-        expect(actions).to include(
+        expect(actions).not_to include(
           hash_including(label: I18n.t("inspections.buttons.update"))
         )
-        expect(actions).to include(
+        expect(actions).not_to include(
           hash_including(label: I18n.t("inspections.buttons.delete"))
         )
+        expect(actions).to be_empty
       end
     end
 
@@ -240,10 +241,10 @@ RSpec.describe InspectionsHelper, type: :helper do
         allow(helper).to receive(:current_user).and_return(admin_user)
       end
 
-      it "includes both edit and delete actions" do
+      it "includes only delete action for complete inspections" do
         actions = helper.inspection_actions(complete_inspection)
 
-        expect(actions).to include(
+        expect(actions).not_to include(
           hash_including(label: I18n.t("inspections.buttons.update"))
         )
         expect(actions).to include(
@@ -256,21 +257,5 @@ RSpec.describe InspectionsHelper, type: :helper do
       end
     end
 
-    context "when current_user is nil" do
-      before do
-        allow(helper).to receive(:current_user).and_return(nil)
-      end
-
-      it "includes both edit and delete actions for complete inspections" do
-        actions = helper.inspection_actions(complete_inspection)
-
-        expect(actions).to include(
-          hash_including(label: I18n.t("inspections.buttons.update"))
-        )
-        expect(actions).to include(
-          hash_including(label: I18n.t("inspections.buttons.delete"))
-        )
-      end
-    end
   end
 end

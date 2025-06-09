@@ -3,7 +3,9 @@
 <article>
   <%= render 'form' %>
 
-  <div class="delete-inspection">
-    <%= button_to t('units.buttons.delete'), @unit, data: { turbo_method: :delete, turbo_confirm: t('units.messages.delete_confirm') } %>
-  </div>
+  <% if @unit.deletable? %>
+    <div class="delete-inspection">
+      <%= button_to t('units.buttons.delete'), @unit, data: { turbo_method: :delete, turbo_confirm: t('units.messages.delete_confirm') } %>
+    </div>
+  <% end %>
 </article>

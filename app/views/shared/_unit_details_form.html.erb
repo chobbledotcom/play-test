@@ -5,7 +5,7 @@
   <%= render 'form/text_field', field: :model %>
   <%= render 'form/text_field', field: :serial, required: true %>
   <%= render 'form/text_area', field: :description, required: true %>
-  <%= render 'form/text_field', field: :owner, required: true %>
+  <%= render 'form/autocomplete_field', field: :owner, required: true, options: owner_options(current_user) %>
   <%= render 'form/date_field', field: :manufacture_date %>
   <%= render 'form/checkbox', field: :is_totally_enclosed %>
   <%= render 'form/text_area', field: :notes, rows: 4 %>

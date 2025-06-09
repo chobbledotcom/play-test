@@ -11,7 +11,6 @@ RSpec.describe "Unit JSON real-world scenarios", type: :request do
         @inspection1 = create(:inspection, :completed,
           user: user,
           unit: unit,
-          passed: true,
           inspection_date: 3.days.ago,
           inspection_location: "Location A")
 
@@ -25,8 +24,7 @@ RSpec.describe "Unit JSON real-world scenarios", type: :request do
         # Also create a draft inspection that should NOT appear
         @draft = create(:inspection,
           user: user,
-          unit: unit,
-          complete_date: nil)
+          unit: unit)
       end
 
       it "returns inspection history data" do

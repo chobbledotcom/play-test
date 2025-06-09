@@ -83,7 +83,13 @@
 
     <!-- Actions -->
     <div class="inspection-actions">
-      <% if !@inspection.complete? || current_user.admin? %>
+      <% if @inspection.complete? %>
+        <p><%= t('inspections.messages.complete_inspection_notice') %></p>
+        <%= button_to t('inspections.buttons.switch_to_in_progress'), 
+            mark_draft_inspection_path(@inspection), 
+            method: :patch, 
+            data: { turbo_confirm: t('inspections.messages.mark_in_progress_confirm') } %>
+      <% elsif !@inspection.complete? || current_user.admin? %>
         <%= button_to t('inspections.buttons.delete'), 
             inspection_path(@inspection), 
             method: :delete, 

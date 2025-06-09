@@ -17,21 +17,26 @@ module InspectionsHelper
   end
 
   def inspection_actions(inspection)
-    actions = [
-      {
+    actions = []
+
+    # Only show update link if inspection is not complete
+    unless inspection.complete?
+      actions << {
         label: t("inspections.buttons.update"),
         url: edit_inspection_path(inspection)
       }
-    ]
+    end
 
-    # Add delete action (always allowed now)
-    actions << {
-      label: t("inspections.buttons.delete"),
-      url: inspection_path(inspection),
-      method: :delete,
-      confirm: t("inspections.messages.delete_confirm"),
-      danger: true
-    }
+    # Show delete action if inspection is not complete OR user is admin
+    if !inspection.complete? || current_user.admin?
+      actions << {
+        label: t("inspections.buttons.delete"),
+        url: inspection_path(inspection),
+        method: :delete,
+        confirm: t("inspections.messages.delete_confirm"),
+        danger: true
+      }
+    end
 
     actions
   end
@@ -96,5 +101,9 @@ module InspectionsHelper
     end
 
     (completed_assessments.to_f / total_assessments * 100).round(0)
+  end
+
+  def inspection_location_options(user)
+    user.inspections.distinct.pluck(:inspection_location).compact.reject(&:blank?).sort
   end
 end

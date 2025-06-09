@@ -132,7 +132,7 @@ RSpec.describe Inspection, type: :model do
   end
 
   describe "search functionality" do
-    let!(:search_inspection1) { create(:inspection, :passed, inspection_location: "SearchTerm123 Location") }
+    let!(:search_inspection1) { create(:inspection, inspection_location: "SearchTerm123 Location") }
     let!(:search_inspection2) { create(:inspection, :failed, inspection_location: "AnotherPlace456 Site") }
 
     it "finds records by partial location match" do

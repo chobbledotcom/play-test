@@ -89,6 +89,16 @@ class Inspection < ApplicationRecord
     end
   }
   scope :filter_by_unit, ->(unit_id) { where(unit_id: unit_id) if unit_id.present? }
+  scope :filter_by_owner, ->(owner) {
+    if owner.present?
+      joins(:unit).where("units.owner = ?", owner)
+    else
+      all
+    end
+  }
+  scope :filter_by_inspection_location, ->(location) {
+    where(inspection_location: location) if location.present?
+  }
   scope :filter_by_date_range, ->(start_date, end_date) { where(inspection_date: start_date..end_date) if start_date.present? && end_date.present? }
   scope :overdue, -> { where("inspection_date < ?", Date.today - 1.year) }
 

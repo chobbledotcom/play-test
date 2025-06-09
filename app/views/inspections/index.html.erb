@@ -30,7 +30,7 @@
 <% if @complete_inspections.any? %>
   <%= render 'inspections_table', inspections: @complete_inspections %>
   <p>
-    <%= link_to inspections_path(params.permit(:query, :result, :unit_id).merge(format: :csv)) do %>
+    <%= link_to inspections_path(request.query_parameters.merge(format: :csv)) do %>
       <strong>Export CSV</strong>
     <% end %>
   </p>

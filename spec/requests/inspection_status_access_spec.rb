@@ -6,7 +6,7 @@ RSpec.describe "Inspection Status Access Control", type: :request do
 
   before do
     # Login
-    post "/login", params: {session: {email: user.email, password: "password123"}}
+    post "/login", params: {session: {email: user.email, password: user.password}}
   end
 
   describe "PDF report access based on inspection status" do

@@ -6,7 +6,7 @@ class UnitsController < ApplicationController
   skip_before_action :require_login, only: [:report, :qr_code]
 
   def index
-    @units = current_user.units.order(created_at: :desc)
+    @units = current_user.units.with_attached_photo.order(created_at: :desc)
 
     # Apply search
     @units = @units.search(params[:query]) if params[:query].present?
@@ -28,7 +28,7 @@ class UnitsController < ApplicationController
   end
 
   def show
-    @inspections = @unit.inspections.order(inspection_date: :desc)
+    @inspections = @unit.inspections.includes(:inspector_company).order(inspection_date: :desc)
 
     respond_to do |format|
       format.html
@@ -96,11 +96,14 @@ class UnitsController < ApplicationController
   end
 
   def destroy
-    @unit.destroy
-    flash[:notice] = I18n.t("units.messages.deleted")
-    redirect_to units_path
+    if @unit.destroy
+      flash[:notice] = I18n.t("units.messages.deleted")
+      redirect_to units_path
+    else
+      flash[:alert] = @unit.errors.full_messages.first || I18n.t("units.messages.delete_failed")
+      redirect_to @unit
+    end
   end
-
 
   def report
     respond_to do |format|
