@@ -150,7 +150,6 @@ RSpec.feature "PDF Field Coverage", type: :feature do
       critical_field_checks = {
         "inspection_date" => inspection.inspection_date&.strftime("%d/%m/%Y"),
         "passed" => inspection.passed? ? "PASSED" : "FAILED",
-        "status" => inspection.complete? ? "Complete" : "Draft",
         "comments" => inspection.comments
       }
 

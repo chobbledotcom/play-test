@@ -48,11 +48,9 @@ RSpec.describe NtfyService do
         expect(mock_http).to receive(:use_ssl=).with(true)
         expect(Net::HTTP::Post).to receive(:new).with("/#{channel}").and_return(mock_request)
 
-        # Expect headers to be set
-        expect(mock_request).to receive(:[]=).with("Title", "play-test notification")
-        expect(mock_request).to receive(:[]=).with("Priority", "high")
-        expect(mock_request).to receive(:[]=).with("Tags", "warning")
-        expect(mock_request).to receive(:body=).with(test_message)
+        # Allow headers to be set (less specific to avoid parallel test conflicts)
+        allow(mock_request).to receive(:[]=)
+        allow(mock_request).to receive(:body=)
 
         expect(mock_http).to receive(:request).with(mock_request).and_return(mock_response)
 
@@ -65,10 +63,11 @@ RSpec.describe NtfyService do
         allow(Net::HTTP::Post).to receive(:new).and_return(mock_request)
         allow(mock_http).to receive(:request).and_return(mock_response)
 
-        expect(mock_request).to receive(:[]=).with("Title", "play-test notification")
-        expect(mock_request).to receive(:[]=).with("Priority", "high")
-        expect(mock_request).to receive(:[]=).with("Tags", "warning")
-        expect(mock_request).to receive(:body=).with(test_message)
+        # Verify specific headers are set exactly once
+        expect(mock_request).to receive(:[]=).with("Title", "play-test notification").once
+        expect(mock_request).to receive(:[]=).with("Priority", "high").once
+        expect(mock_request).to receive(:[]=).with("Tags", "warning").once
+        expect(mock_request).to receive(:body=).with(test_message).once
 
         NtfyService.notify(test_message)
       end

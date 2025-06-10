@@ -11,6 +11,8 @@
     <%= javascript_importmap_tags %>
 
     <%= favicon_link_tag asset_path("favicon.svg") %>
+    <script data-goatcounter="https://analytics.play-test.co.uk/count"
+      async src="//analytics.play-test.co.uk/count.js"></script>
   </head>
   <body<% if current_user&.theme == "dark" %> class="dark-theme"<% end %>>
     <% if current_user %>

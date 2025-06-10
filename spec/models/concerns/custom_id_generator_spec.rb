@@ -10,9 +10,15 @@ RSpec.describe CustomIdGenerator, type: :concern do
   end
 
   describe ".generate_random_id" do
-    it "generates a 12-character alphanumeric uppercase ID" do
+    it "generates an ID with the configured length" do
       id = test_class.generate_random_id
-      expect(id).to match(/\A[A-Z0-9]{12}\z/)
+      expect(id.length).to eq(CustomIdGenerator::ID_LENGTH)
+      expect(id).to match(/\A[A-Z0-9]{#{CustomIdGenerator::ID_LENGTH}}\z/)
+    end
+
+    it "generates an 8-character alphanumeric uppercase ID" do
+      id = test_class.generate_random_id
+      expect(id).to match(/\A[A-Z0-9]{8}\z/)
     end
 
     it "generates unique IDs" do
@@ -28,7 +34,7 @@ RSpec.describe CustomIdGenerator, type: :concern do
       # Should call exists? twice and return an ID
       id = test_class.generate_random_id
       expect(test_class).to have_received(:exists?).twice
-      expect(id).to match(/\A[A-Z0-9]{12}\z/)
+      expect(id).to match(/\A[A-Z0-9]{8}\z/)
     end
 
     it "accepts scope conditions for uniqueness checking" do
@@ -54,7 +60,7 @@ RSpec.describe CustomIdGenerator, type: :concern do
       # Trigger the callback
       instance.send(:generate_custom_id)
 
-      expect(instance.id).to match(/\A[A-Z0-9]{12}\z/)
+      expect(instance.id).to match(/\A[A-Z0-9]{8}\z/)
     end
 
     it "does not override existing ID" do

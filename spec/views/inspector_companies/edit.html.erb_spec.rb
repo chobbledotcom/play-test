@@ -25,7 +25,6 @@ RSpec.describe "inspector_companies/edit", type: :view do
     expect(rendered).to include(inspector_company.phone)
     expect(rendered).to include(inspector_company.address)
     expect(rendered).to include(inspector_company.city)
-    expect(rendered).to include(inspector_company.state)
     expect(rendered).to include(inspector_company.postal_code)
   end
 

@@ -10,6 +10,7 @@ en:
 
     sections:
       account_details: "Account Details"
+      contact_details: "Contact Details"
       password_change: "Change Password"
       preferences: "Preferences"
 
@@ -31,6 +32,11 @@ en:
       theme: "Theme"
       company_prompt: "Select inspection company..."
       no_company: "No Company"
+      name: "Name"
+      phone: "Phone"
+      address: "Address"
+      country: "Country"
+      postal_code: "Postcode"
 
     buttons:
       register: "Register"
@@ -56,6 +62,7 @@ en:
       settings_updated: "Settings updated"
       impersonating: "You are now impersonating %{email}"
       own_action_only: "You can only change your own %{action}"
+      inherited_from_company: "These details are inherited from your company and cannot be edited here."
 
     errors:
       header:

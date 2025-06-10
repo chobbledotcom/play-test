@@ -22,6 +22,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **ripgrep (rg) is NOT installed** - use `grep` command instead of `rg` for searching
 - **Full test suite is SLOW** - only run `bundle exec rspec` when explicitly requested
 - Prefer running individual test files or specific tests during development
+- **Database locking**: If tests fail with "database is locked", just inform the user and wait for them to confirm it's unlocked
+- **NEVER paste code into Rails console** - it never works. Instead write very specific RSpec tests
 
 ## Core Development Principles
 

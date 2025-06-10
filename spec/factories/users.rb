@@ -28,6 +28,11 @@ FactoryBot.define do
 
     trait :without_company do
       inspection_company { nil }
+      name { "John Doe" }
+      phone { "1234567890" }
+      address { "123 Test Street, Test City" }
+      country { "UK" }
+      postal_code { "12345" }
     end
   end
 end

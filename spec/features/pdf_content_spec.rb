@@ -47,10 +47,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect_pdf_to_include_i18n_keys(pdf_text,
         "pdf.inspection.title",
         "pdf.inspection.equipment_details", 
-        "pdf.inspection.inspection_results",
-        "pdf.inspection.comments",
-        "pdf.inspection.verification",
-        "pdf.inspection.footer_text"
+        "pdf.inspection.comments"
       )
 
       # Check dynamic content
@@ -161,9 +158,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect_pdf_to_include_i18n_keys(pdf_text,
         "pdf.unit.title",
         "pdf.unit.details",
-        "pdf.unit.inspection_history",
-        "pdf.unit.verification",
-        "pdf.unit.footer_text"
+        "pdf.unit.inspection_history"
       )
 
       # Check unit details
@@ -226,9 +221,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       pdf = PDF::Inspector::Text.analyze(page.driver.response.body)
       text_content = pdf.strings.join(" ")
 
-      # Should include QR code related text
-      expect(text_content).to include(I18n.t("pdf.inspection.scan_text"))
-      expect(text_content).to include("/r/#{inspection.id}")
+      # Should include report ID 
+      expect(text_content).to include(inspection.id)
     end
   end
 

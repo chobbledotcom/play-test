@@ -82,7 +82,7 @@ RSpec.describe "Units PDF Generation", type: :request do
       page.driver.browser.get("/units/#{unit.id}/report")
 
       content_disposition = page.driver.response.headers["Content-Disposition"]
-      expect(content_disposition).to include("Equipment_History_#{unit.serial}.pdf")
+      expect(content_disposition).to include("#{unit.serial}.pdf")
       expect(content_disposition).to include("inline")
     end
   end

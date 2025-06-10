@@ -28,7 +28,7 @@ en:
       search: "Search"
     
     search:
-      placeholder: "Location or report number"
+      placeholder: "Location, inspection ID, internal ID, or unit serial"
       
     filters:
       all_statuses: "All Statuses"
@@ -78,8 +78,11 @@ en:
       inspector_company: "Inspector Company"
       inspector_company_id: "Inspector Company"
       inspector_company_prompt: "-- Select company (optional) --"
+      public_information: "Public Information"
       rpii_registration_number: "RPII Registration Number"
-      unique_report_number: "Unique Report Number"
+      unique_report_number: "Internal ID"
+      internal_id: "Internal ID"
+      public_inspection_id: "Public Inspection ID"
       inspection_company_name: "Inspection Company Name"
       overall_result: "Overall Result"
       pass: "Pass"
@@ -110,6 +113,7 @@ en:
       inspector_help: "Determined by the user performing the inspection"
       rpii_help: "From the selected inspector company"
       status_help: "Use the buttons below to change inspection status"
+      internal_id_help: "For internal tracking only - not displayed on public reports"
       not_available: "Not Available"
 
     status:
@@ -138,6 +142,7 @@ en:
       mark_in_progress: "Mark as In Progress"
       switch_to_in_progress: "Switch to 'In Progress'"
       qr_and_pdf: "QR Codes & PDF"
+      download_qr_code: "Download QR Code"
 
     messages:
       no_unit: "No unit selected"

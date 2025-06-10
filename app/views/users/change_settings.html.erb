@@ -3,6 +3,23 @@
 <%= form_with(model: @user, url: update_settings_user_path(@user), method: :patch, local: true) do |form| %>
   <%= render 'form/errors', model: @user %>
 
+  <%= render 'form/fieldset', legend_key: 'contact_details', i18n_base: 'users.forms', form: form do %>
+    <% if @user.has_company? %>
+      <%= render 'form/display_field', field: :name, value: @user.display_name %>
+      <%= render 'form/display_field', field: :phone, value: @user.display_phone %>
+      <%= render 'form/display_field', field: :address, value: @user.display_address %>
+      <%= render 'form/display_field', field: :country, value: @user.display_country %>
+      <%= render 'form/display_field', field: :postal_code, value: @user.display_postal_code %>
+      <p><%= t('users.messages.inherited_from_company') %></p>
+    <% else %>
+      <%= render 'form/text_field', field: :name %>
+      <%= render 'form/text_field', field: :phone %>
+      <%= render 'form/text_area', field: :address %>
+      <%= render 'form/text_field', field: :country %>
+      <%= render 'form/text_field', field: :postal_code %>
+    <% end %>
+  <% end %>
+
   <%= render 'form/fieldset', legend_key: 'preferences', i18n_base: 'users.forms', form: form do %>
     <%= render 'form/select', 
         field: :time_display, 

@@ -116,7 +116,12 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
       # These are read-only calculated fields, not form inputs
       expect(page).to have_content(I18n.t("inspections.fields.reinspection_date"))
-      expect(page).to have_content(I18n.t("inspections.fields.inspector_company"))
+      
+      # Public Information section (case insensitive since fieldset may transform case)
+      expect(page).to have_content(/public information/i)
+      expect(page).to have_content(I18n.t("inspections.fields.public_inspection_id"))
+      expect(page).to have_link(I18n.t("inspections.buttons.download_pdf"))
+      expect(page).to have_link(I18n.t("inspections.buttons.download_qr_code"))
     end
 
     it "displays current unit details when unit is selected" do
@@ -139,12 +144,6 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       expect(inspection.comments).to eq("Updated comments")
     end
 
-    it "shows inspector company for regular users" do
-      # Regular users see their assigned company, not a dropdown
-      expect(page).to have_content(I18n.t("inspections.fields.inspector_company"))
-      expect(page).to have_content(inspector_company.name)
-      expect(page).to have_content("Set in your user settings")
-    end
 
     it "can mark inspection as complete" do
       # First create all necessary assessments for completion

@@ -1,6 +1,9 @@
 module CustomIdGenerator
   extend ActiveSupport::Concern
 
+  # Standard ID length for all models using CustomIdGenerator
+  ID_LENGTH = 8
+
   included do
     self.primary_key = "id"
     before_create :generate_custom_id, if: -> { id.blank? }
@@ -9,7 +12,7 @@ module CustomIdGenerator
   class_methods do
     def generate_random_id(scope_conditions = {})
       loop do
-        id = SecureRandom.alphanumeric(12).upcase
+        id = SecureRandom.alphanumeric(CustomIdGenerator::ID_LENGTH).upcase
         break id unless exists?({id: id}.merge(scope_conditions))
       end
     end

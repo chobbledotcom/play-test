@@ -124,6 +124,6 @@ class UsersController < ApplicationController
   end
 
   def settings_params
-    params.require(:user).permit(:time_display, :default_inspection_location, :theme)
+    params.require(:user).permit(:time_display, :default_inspection_location, :theme, :name, :phone, :address, :country, :postal_code)
   end
 end

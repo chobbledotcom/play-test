@@ -123,12 +123,11 @@ RSpec.feature "User Active Status Management", type: :feature do
         sign_in active_regular_user
       end
 
-      scenario "Regular user sees read-only inspection company field" do
+      scenario "Regular user does not see inspector company field" do
         visit edit_inspection_path(inspection)
 
         expect(page).not_to have_select("inspection_inspector_company_id")
-        expect(page).to have_content(inspector_company.name)
-        expect(page).to have_content("Set in your user settings")
+        expect(page).not_to have_content("Inspector Company")
       end
     end
 
@@ -138,13 +137,12 @@ RSpec.feature "User Active Status Management", type: :feature do
         sign_in admin_user
       end
 
-      scenario "Admin can edit inspection company field" do
+      scenario "Admin does not see inspector company field on inspection edit" do
         visit edit_inspection_path(admin_inspection)
 
-        # Check that admin sees editable inspector company field
-        expect(page).to have_content(I18n.t("inspections.fields.inspector_company"))
-        # Should not see the "Set in your user settings" text that regular users see
-        expect(page).not_to have_content("Set in your user settings")
+        # Inspector company is not shown on inspection edit page
+        expect(page).not_to have_content(I18n.t("inspections.fields.inspector_company"))
+        expect(page).not_to have_select("inspection_inspector_company_id")
       end
     end
   end

@@ -80,19 +80,17 @@ RSpec.describe InspectorCompany, type: :model do
       it "combines address components" do
         company.address = "123 Test St"
         company.city = "Test City"
-        company.state = "Test State"
         company.postal_code = "12345"
 
-        expect(company.full_address).to eq("123 Test St, Test City, Test State, 12345")
+        expect(company.full_address).to eq("123 Test St, Test City, 12345")
       end
 
       it "handles missing components" do
         company.address = "123 Test St"
         company.city = "Test City"
-        company.state = nil
-        company.postal_code = "12345"
+        company.postal_code = nil
 
-        expect(company.full_address).to eq("123 Test St, Test City, 12345")
+        expect(company.full_address).to eq("123 Test St, Test City")
       end
     end
 

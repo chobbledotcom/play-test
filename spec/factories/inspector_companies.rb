@@ -6,7 +6,6 @@ FactoryBot.define do
     phone { "1234567890" }
     address { "123 Test Street" }
     city { "Test City" }
-    state { "Test State" }
     postal_code { "12345" }
     email { "company@example.com" }
     active { true }

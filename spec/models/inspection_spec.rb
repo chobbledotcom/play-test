@@ -136,14 +136,29 @@ RSpec.describe Inspection, type: :model do
     let!(:search_inspection2) { create(:inspection, :failed, inspection_location: "AnotherPlace456 Site") }
 
     it "finds records by partial location match" do
+      expect(Inspection.search("SearchTerm")).to include(search_inspection1)
+      expect(Inspection.search("AnotherPlace")).to include(search_inspection2)
       expect(Inspection.search("SearchTerm").count).to eq(1)
       expect(Inspection.search("AnotherPlace").count).to eq(1)
-      expect(Inspection.search("456").count).to eq(1)
-      expect(Inspection.search("123").count).to eq(1)
     end
 
     it "returns empty collection when no match found" do
       expect(Inspection.search("NONEXISTENT").count).to eq(0)
+    end
+
+    it "finds records by inspection ID, internal ID, and unit serial" do
+      # Create inspection with known IDs and unit
+      unit = create(:unit, serial: "UNITTEST123")
+      inspection = create(:inspection, unit: unit, unique_report_number: "INTERNAL-ABC123")
+      
+      # Search by public inspection ID
+      expect(Inspection.search(inspection.id)).to include(inspection)
+      
+      # Search by internal ID (unique_report_number)
+      expect(Inspection.search("INTERNAL-ABC")).to include(inspection)
+      
+      # Search by unit serial
+      expect(Inspection.search("UNITTEST")).to include(inspection)
     end
 
     it "is case-insensitive when searching" do

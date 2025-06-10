@@ -34,7 +34,6 @@ RSpec.describe "Seed Data", type: :model do
           expect(company.phone).to be_present
           expect(company.address).to be_present
           expect(company.city).to be_present
-          expect(company.state).to be_present
           expect(company.postal_code).to be_present
           expect(company.country).to eq("UK")
           expect([true, false]).to include(company.active)

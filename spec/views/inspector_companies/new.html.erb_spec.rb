@@ -28,7 +28,6 @@ RSpec.describe "inspector_companies/new", type: :view do
     expect(rendered).to include("Phone")
     expect(rendered).to include("Address")
     expect(rendered).to include("City")
-    expect(rendered).to include("State")
     expect(rendered).to include("Postal Code")
     expect(rendered).to include("Country")
   end

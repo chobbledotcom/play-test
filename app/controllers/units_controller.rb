@@ -111,7 +111,7 @@ class UnitsController < ApplicationController
         pdf_data = PdfGeneratorService.generate_unit_report(@unit)
 
         send_data pdf_data.render,
-          filename: "Equipment_History_#{@unit.serial}.pdf",
+          filename: "#{@unit.serial}.pdf",
           type: "application/pdf",
           disposition: "inline"
       end
@@ -126,7 +126,7 @@ class UnitsController < ApplicationController
     qr_code_png = QrCodeService.generate_qr_code(@unit)
 
     send_data qr_code_png,
-      filename: "Equipment_History_QR_#{@unit.serial}.png",
+      filename: "#{@unit.serial}_QR.png",
       type: "image/png",
       disposition: "inline"
   end

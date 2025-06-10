@@ -64,7 +64,7 @@ RSpec.describe Unit, type: :model do
       unit = build(:unit)
       expect(unit.id).to be_nil
       unit.save!
-      expect(unit.id).to match(/\A[A-Z0-9]{12}\z/)
+      expect(unit.id).to match(/\A[A-Z0-9]{8}\z/)
     end
   end
 
@@ -229,7 +229,7 @@ RSpec.describe Unit, type: :model do
   describe "CustomIdGenerator integration" do
     it "uses uppercase IDs for new unit" do
       unit = create(:unit, user: user)
-      expect(unit.id).to match(/\A[A-Z0-9]{12}\z/)
+      expect(unit.id).to match(/\A[A-Z0-9]{8}\z/)
     end
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_10_124215) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_10_161651) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -188,7 +188,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_10_124215) do
     t.string "phone", null: false
     t.text "address", null: false
     t.string "city"
-    t.string "state"
     t.string "postal_code"
     t.string "country", default: "UK"
     t.boolean "active", default: true
@@ -424,6 +423,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_10_124215) do
     t.string "theme", default: "light"
     t.string "rpii_inspector_number"
     t.date "active_until"
+    t.string "name"
+    t.string "phone"
+    t.text "address"
+    t.string "country"
+    t.string "postal_code"
     t.index ["email"], name: "index_users_on_email"
     t.index ["inspection_company_id"], name: "index_users_on_inspection_company_id"
   end

@@ -31,7 +31,7 @@ cd /home/user/git/play-test/testlog && nix develop --command bash -c "bundle exe
 - **Models**: Advanced Unit, Inspection, InspectorCompany, 7 Assessment types
 - **Database**: Comprehensive schema with specialized assessment tables
 - **Features**: Full inspection workflow, compliance tracking, safety standards
-- **ID Strategy**: CustomIdGenerator with SecureRandom.alphanumeric(12).upcase
+- **ID Strategy**: CustomIdGenerator with SecureRandom.alphanumeric(8).upcase
 
 ## Migration Phases
 

@@ -10,6 +10,8 @@ class User < ApplicationRecord
   validates :password, presence: true, length: {minimum: 6}, if: :password_digest_changed?
   validates :time_display, inclusion: {in: %w[date time]}
   validates :theme, inclusion: {in: %w[light dark]}
+  # Contact fields are only required for users without companies when they need to generate PDFs
+  # For now, we'll make them optional during signup and enforce them when needed
 
   before_create :set_default_time_display
   before_create :set_inactive_on_signup
@@ -41,6 +43,30 @@ class User < ApplicationRecord
   def active_until=(value)
     @active_until_explicitly_set = true
     super(value)
+  end
+
+  def has_company?
+    inspection_company_id.present? || inspection_company.present?
+  end
+
+  def display_name
+    has_company? ? inspection_company.name : name
+  end
+
+  def display_phone
+    has_company? ? inspection_company.phone : phone
+  end
+
+  def display_address
+    has_company? ? inspection_company.address : address
+  end
+
+  def display_country
+    has_company? ? inspection_company.country : country
+  end
+
+  def display_postal_code
+    has_company? ? inspection_company.postal_code : postal_code
   end
 
   private

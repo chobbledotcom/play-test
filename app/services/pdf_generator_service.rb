@@ -5,14 +5,17 @@ class PdfGeneratorService
     Prawn::Document.new do |pdf|
       setup_pdf_fonts(pdf)
 
+      # Initialize assessment collection
+      @current_assessment_blocks = []
+
       # Header section
       generate_inspection_pdf_header(pdf, inspection)
 
       # Unit details section
       generate_inspection_equipment_details(pdf, inspection)
 
-      # Inspection results section
-      generate_inspection_test_results(pdf, inspection)
+      # Testimony/Comments section
+      generate_inspection_comments(pdf, inspection)
 
       # User Height/Count Assessment section
       generate_user_height_section(pdf, inspection)
@@ -38,20 +41,14 @@ class PdfGeneratorService
       # Risk Assessment section
       generate_risk_assessment_section(pdf, inspection)
 
-      # Testimony/Comments section
-      generate_inspection_comments(pdf, inspection)
+      # Render all collected assessments in newspaper-style columns
+      render_all_assessments_in_columns(pdf)
 
-      # Final Result
-      generate_final_result(pdf, inspection)
-
-      # QR Code
-      generate_qr_code_section(pdf, inspection, "inspection")
+      # QR Code in bottom right corner
+      generate_qr_code_bottom_right(pdf, inspection)
 
       # Add DRAFT watermark overlay for draft inspections
       add_draft_watermark(pdf) unless inspection.complete?
-
-      # Footer
-      generate_footer(pdf, "inspection")
     end
   end
 
@@ -63,8 +60,7 @@ class PdfGeneratorService
       generate_unit_pdf_header(pdf, unit)
       generate_unit_details(pdf, unit)
       generate_unit_inspection_history(pdf, unit)
-      generate_qr_code_section(pdf, unit, "unit")
-      generate_footer(pdf, "unit")
+      generate_qr_code_bottom_right_unit(pdf, unit)
     end
   end
 
@@ -105,20 +101,27 @@ class PdfGeneratorService
       align: :center, size: 12, style: :bold, color: "663399"
     pdf.move_down 8
 
-    # Line 3: Company Name, Town, RPII Inspector No
+    # Line 3: Inspector Name, City, RPII Inspector No
     inspector_user = inspection.user
-    if inspector_user&.inspection_company
-      company_parts = []
-      company_parts << inspector_user.inspection_company.name if inspector_user.inspection_company.name.present?
-      company_parts << inspector_user.inspection_company.city if inspector_user.inspection_company.city.present?
-      company_parts << "#{I18n.t("pdf.inspection.fields.rpii_inspector_no")}: #{inspector_user.rpii_inspector_number}" if inspector_user.rpii_inspector_number.present?
+    if inspector_user
+      inspector_parts = []
+      inspector_parts << inspector_user.display_name if inspector_user.display_name.present?
+      inspector_parts << inspector_user.display_country if inspector_user.display_country.present?
+      inspector_parts << "#{I18n.t("pdf.inspection.fields.rpii_inspector_no")}: #{inspector_user.rpii_inspector_number}" if inspector_user.rpii_inspector_number.present?
 
-      if company_parts.any?
+      if inspector_parts.any?
         # Show incomplete status in red if not complete
         line3_color = inspection.complete? ? "663399" : "CC0000"
-        pdf.text company_parts.join(", "), align: :center, size: 10, color: line3_color
+        pdf.text inspector_parts.join(", "), align: :center, size: 10, color: line3_color
       end
     end
+
+    pdf.move_down 8
+
+    # Line 4: Overall Pass/Fail Status
+    status_text = inspection.passed? ? I18n.t("pdf.inspection.passed") : I18n.t("pdf.inspection.failed")
+    status_color = inspection.passed? ? "008000" : "CC0000"
+    pdf.text status_text, align: :center, size: 14, style: :bold, color: status_color
 
     pdf.move_down 15
   end
@@ -156,24 +159,13 @@ class PdfGeneratorService
     end
   end
 
-  def self.generate_inspection_test_results(pdf, inspection)
-    results = [
-      [I18n.t("pdf.inspection.fields.inspection_date"), inspection.inspection_date&.strftime("%d/%m/%Y")],
-      [I18n.t("pdf.inspection.fields.inspector"), inspection.inspector_company.name],
-      [I18n.t("pdf.inspection.fields.overall_result"), inspection.passed ? I18n.t("pdf.inspection.fields.pass") : I18n.t("pdf.inspection.fields.fail")]
-    ]
-
-    create_nice_box_table(pdf, I18n.t("pdf.inspection.inspection_results"), results) do |table|
-      table.row(results.length - 1).background_color = inspection.passed ? "CCFFCC" : "FFCCCC"
-    end
-  end
-
   def self.generate_inspection_comments(pdf, inspection)
     pdf.move_down 20
     pdf.text I18n.t("pdf.inspection.comments"), size: 14, style: :bold
     pdf.stroke_horizontal_rule
     pdf.move_down 10
     pdf.text inspection.comments
+    pdf.move_down 20  # Add padding after comments
   end
 
   def self.create_pdf_table(pdf, data)
@@ -283,7 +275,7 @@ class PdfGeneratorService
       inspections_data = completed_inspections.map do |inspection|
         [
           inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.unit.fields.na"),
-          inspection.inspector_company.name,
+          inspection.user.display_name,
           inspection.passed ? I18n.t("pdf.unit.fields.pass") : I18n.t("pdf.unit.fields.fail"),
           inspection.comments.to_s.truncate(30)
         ]
@@ -339,16 +331,25 @@ class PdfGeneratorService
         add_field_with_comment(pdf, assessment, :negative_adjustment, "m²", type)
       end
 
-      pdf.move_down 5
-
-      # User Capacities
-      pdf.text I18n.t("inspections.assessments.user_height.sections.user_capacities"), size: 8, style: :bold
+      # User Capacities - add as a section header
+      if @current_assessment_fields
+        @current_assessment_fields << "#{I18n.t("inspections.assessments.user_height.sections.user_capacities")}:"
+      else
+        pdf.move_down 5
+        pdf.text I18n.t("inspections.assessments.user_height.sections.user_capacities"), size: 8, style: :bold
+      end
 
       user_capacity_heights = [1000, 1200, 1500, 1800]
       user_capacity_heights.each do |height|
         field_name = "users_at_#{height}mm"
         value = assessment.send(field_name) || I18n.t("pdf.inspection.fields.na")
-        pdf.text "• #{I18n.t("inspections.assessments.user_height.fields.#{field_name}")}: #{value}", size: 8
+        capacity_text = "• #{I18n.t("inspections.assessments.user_height.fields.#{field_name}")}: #{value}"
+
+        if @current_assessment_fields
+          @current_assessment_fields << capacity_text
+        else
+          pdf.text capacity_text, size: 8
+        end
       end
     end
   end
@@ -475,15 +476,20 @@ class PdfGeneratorService
       # Optional text fields
       optional_fields = [
         [:blower_serial, nil],
-        [:fan_size_comment, 60]
+        [:fan_size_comment, nil]
       ]
 
-      optional_fields.each do |field, truncate_length|
+      optional_fields.each do |field, _|
         if assessment.send(field).present?
           label = I18n.t("inspections.assessments.fan.fields.#{field}")
           value = assessment.send(field)
-          value = truncate_text(value, truncate_length) if truncate_length
-          pdf.text "#{label}: #{value}", size: 8
+          field_text = "#{label}: #{value}"
+
+          if @current_assessment_fields
+            @current_assessment_fields << field_text
+          else
+            pdf.text field_text, size: 8
+          end
         end
       end
     end
@@ -511,16 +517,62 @@ class PdfGeneratorService
   # Generic helper methods for DRY code
   def self.generate_assessment_section(pdf, assessment_type, assessment)
     title = I18n.t("inspections.assessments.#{assessment_type}.title")
-    pdf.text title, size: 12, style: :bold
-    pdf.move_down 5
 
     if assessment
+      # Collect all field data first
+      @current_assessment_fields = []
       yield(assessment, assessment_type)
+
+      # Create a complete assessment block with title and fields
+      @current_assessment_blocks ||= []
+      @current_assessment_blocks << {
+        title: title,
+        fields: @current_assessment_fields.dup
+      }
+      @current_assessment_fields = nil
     else
-      pdf.text I18n.t("pdf.inspection.no_assessment_data", assessment_type: title), size: 8, style: :italic
+      # For assessments with no data, still add to blocks
+      @current_assessment_blocks ||= []
+      @current_assessment_blocks << {
+        title: title,
+        fields: [I18n.t("pdf.inspection.no_assessment_data", assessment_type: title)]
+      }
+    end
+  end
+
+  # New method to render all assessment blocks in newspaper-style columns
+  def self.render_all_assessments_in_columns(pdf)
+    return if @current_assessment_blocks.nil? || @current_assessment_blocks.empty?
+
+    # Add section header
+    pdf.text I18n.t("pdf.inspection.assessments_section"), size: 12, style: :bold
+    pdf.stroke_horizontal_rule
+    pdf.move_down 15
+
+    # Use Prawn's built-in column layout
+    pdf.column_box([0, pdf.cursor], columns: 3, width: pdf.bounds.width, spacer: 10) do
+      @current_assessment_blocks.each do |block|
+        render_assessment_block(pdf, block)
+      end
     end
 
-    pdf.move_down 15
+    # Clean up
+    @current_assessment_blocks = []
+    pdf.move_down 20
+  end
+
+  # Helper method to render a single assessment block
+  def self.render_assessment_block(pdf, block)
+    # Render title
+    pdf.text block[:title], size: 10, style: :bold
+    pdf.move_down 3
+
+    # Render fields
+    block[:fields].each do |field_text|
+      pdf.text field_text, size: 7
+    end
+
+    pdf.move_down 8  # Space between assessment blocks
   end
 
   # Generic field rendering method that handles all field types
@@ -566,11 +618,17 @@ class PdfGeneratorService
     comment_field = derive_comment_field_name(field_name, pass_field)
     if assessment.respond_to?(comment_field)
       comment = assessment.send(comment_field)
-      text_parts << truncate_text(comment, 60) if comment.present?
+      text_parts << comment if comment.present?
     end
 
-    # Render the complete text
-    pdf.text text_parts.join(" "), size: 8
+    # Collect the text instead of rendering directly
+    field_text = text_parts.join(" ")
+    if @current_assessment_fields
+      @current_assessment_fields << field_text
+    else
+      # Fallback for direct calls - render immediately
+      pdf.text field_text, size: 8
+    end
   end
 
   # Derive the comment field name based on the main field or pass field
@@ -607,47 +665,61 @@ class PdfGeneratorService
     # Remove _pass suffix to get the base field name for comment
     base_field_name = pass_field.to_s.gsub(/_pass$/, "")
     comment = assessment.send("#{base_field_name}_comment") if assessment.respond_to?("#{base_field_name}_comment")
-    full_text = "#{text} - #{format_pass_fail(pass_fail)} #{truncate_text(comment, 60)}"
-    pdf.text full_text, size: 8
+    full_text = "#{text} - #{format_pass_fail(pass_fail)} #{comment}".strip
+
+    # Collect the text instead of rendering directly
+    if @current_assessment_fields
+      @current_assessment_fields << full_text
+    else
+      # Fallback for direct calls - render immediately
+      pdf.text full_text, size: 8
+    end
   end
 
-  # Generic QR code generation
-  def self.generate_qr_code_section(pdf, record, type)
-    pdf.move_down 20
-    pdf.text I18n.t("pdf.#{type}.verification"), size: 14, style: :bold
-    pdf.stroke_horizontal_rule
-    pdf.move_down 10
-
+  # QR code in bottom right corner for inspections
+  def self.generate_qr_code_bottom_right(pdf, inspection)
     # Generate QR code
-    qr_code_png = QrCodeService.generate_qr_code(record)
-    qr_code_temp_file = Tempfile.new(["qr_code_#{type}_#{record.id}_#{Process.pid}", ".png"])
+    qr_code_png = QrCodeService.generate_qr_code(inspection)
+    qr_code_temp_file = Tempfile.new(["qr_code_inspection_#{inspection.id}_#{Process.pid}", ".png"])
 
     begin
       qr_code_temp_file.binmode
       qr_code_temp_file.write(qr_code_png)
       qr_code_temp_file.close
 
-      # Add QR code image and URL text
-      pdf.image qr_code_temp_file.path, position: :center, width: 180
-      pdf.move_down 5
-      pdf.text I18n.t("pdf.#{type}.scan_text"), align: :center, size: 10
+      # Position QR code in bottom right corner
+      qr_size = 80
+      x_position = pdf.bounds.width - qr_size - 10
+      y_position = 10 + qr_size
 
-      # Determine URL prefix based on type
-      url_prefix = (type == "inspection") ? "r" : "u"
-      pdf.text "#{ENV["BASE_URL"]}/#{url_prefix}/#{record.id}",
-        align: :center, size: 10, style: :italic
+      pdf.image qr_code_temp_file.path, at: [x_position, y_position], width: qr_size, height: qr_size
     ensure
       qr_code_temp_file.close unless qr_code_temp_file.closed?
       qr_code_temp_file.unlink if File.exist?(qr_code_temp_file.path)
     end
   end
 
-  # Generic footer
-  def self.generate_footer(pdf, type)
-    pdf.move_down 30
-    pdf.text "#{I18n.t("pdf.#{type}.generated_text")} #{Time.now.strftime("%d/%m/%Y at %H:%M")}",
-      size: 10, align: :center, style: :italic
-    pdf.text I18n.t("pdf.#{type}.footer_text"), size: 10, align: :center, style: :italic
+  # QR code in bottom right corner for units
+  def self.generate_qr_code_bottom_right_unit(pdf, unit)
+    # Generate QR code
+    qr_code_png = QrCodeService.generate_qr_code(unit)
+    qr_code_temp_file = Tempfile.new(["qr_code_unit_#{unit.id}_#{Process.pid}", ".png"])
+
+    begin
+      qr_code_temp_file.binmode
+      qr_code_temp_file.write(qr_code_png)
+      qr_code_temp_file.close
+
+      # Position QR code in bottom right corner
+      qr_size = 80
+      x_position = pdf.bounds.width - qr_size - 10
+      y_position = 10 + qr_size
+
+      pdf.image qr_code_temp_file.path, at: [x_position, y_position], width: qr_size, height: qr_size
+    ensure
+      qr_code_temp_file.close unless qr_code_temp_file.closed?
+      qr_code_temp_file.unlink if File.exist?(qr_code_temp_file.path)
+    end
   end
 
   # Helper methods

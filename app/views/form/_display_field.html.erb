@@ -1,18 +1,15 @@
 <%
-  # Display/calculated field options
-  label_text = local_assigns[:label] or raise ArgumentError, "label is required for display field"
-  value = local_assigns[:value] || ""
-  help_text = local_assigns[:help_text]
-  css_class = local_assigns[:css_class] || "calculated-field"
-  value_class = local_assigns[:value_class] || "calculated-value"
+  # Get i18n_base from section (already validated there) 
+  setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
+  
+  # Get value - either passed explicitly or from model
+  if local_assigns[:value]
+    value = local_assigns[:value]
+  else
+    model_object = setup[:form_object].object
+    value = model_object.send(field) if model_object.respond_to?(field)
+  end
 %>
 
-<div class="<%= css_class %>">
-  <label><%= label_text %></label>
-  <p class="<%= value_class %>">
-    <%= value %>
-    <% if help_text.present? %>
-      <small class="help-text"><%= help_text %></small>
-    <% end %>
-  </p>
-</div>
+<%= setup[:form_object].label field, setup[:field_label] %>
+<p><%= value %></p>

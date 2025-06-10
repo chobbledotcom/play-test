@@ -29,6 +29,24 @@
     <% end %>
   <% end %>
 
+  <!-- Public Information -->
+  <% unless @inspection.new_record? %>
+    <%= render 'form/fieldset', legend_key: 'public_information', i18n_base: 'inspections.fields', form: form do %>
+      <%= render 'form/display_field', field: :id, label: t('inspections.fields.public_inspection_id'), value: @inspection.id %>
+      
+      <div>
+        <%= link_to t('inspections.buttons.download_pdf'), 
+            report_inspection_path(@inspection), 
+            target: '_blank', 
+            class: 'button' %>
+        <%= link_to t('inspections.buttons.download_qr_code'), 
+            qr_code_inspection_path(@inspection, format: :png), 
+            download: "inspection-#{@inspection.id}-qr.png",
+            class: 'button secondary' %>
+      </div>
+    <% end %>
+  <% end %>
+
   <!-- Inspection-Specific Details -->
   <%= render 'form/fieldset', legend_key: 'inspection_details', i18n_base: 'inspections.fields', form: form do %>
     <%= render 'form/autocomplete_field', field: :inspection_location, options: inspection_location_options(current_user) %>
@@ -41,31 +59,13 @@
     <div class="calculated-field">
       <label><%= t('inspections.fields.reinspection_date') %></label>
       <p class="calculated-value">
-        <%= @inspection.reinspection_date&.strftime(current_user.time_display == "day" ? "%Y-%m-%d" : "%Y-%m-%d %H:%M") || t('inspections.fields.calculated_after_save') %>
+        <%= @inspection.reinspection_date&.strftime("%-d %B %Y") || t('inspections.fields.calculated_after_save') %>
         <small class="help-text"><%= t('inspections.fields.reinspection_date_help') %></small>
       </p>
     </div>
 
-    <% if current_user.admin? %>
-      <%= render 'form/select',
-          field: :inspector_company_id,
-          collection_select_params: {
-            collection: InspectorCompany.active.order(:name),
-            value_method: :id,
-            text_method: :name
-          },
-          prompt: t('inspections.fields.inspector_company_prompt') %>
-    <% else %>
-      <div class="calculated-field">
-        <label><%= t('inspections.fields.inspector_company') %></label>
-        <p class="calculated-value">
-          <%= @inspection.inspector_company&.name || current_user.inspection_company&.name || "Not set" %>
-          <small class="help-text">Set in your user settings</small>
-        </p>
-      </div>
-    <% end %>
 
-    <%= render 'form/text_field', field: :unique_report_number %>
+    <%= render 'form/text_field', field: :unique_report_number, help_text: t('inspections.fields.internal_id_help') %>
   <% end %>
 
   <!-- Inspection Results -->

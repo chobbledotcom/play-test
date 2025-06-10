@@ -28,9 +28,8 @@ RSpec.describe PdfGeneratorService, pdf: true do
       # Check that I18n translations are used
       expect(pdf_text).to include(I18n.t("pdf.inspection.title"))
       expect(pdf_text).to include(I18n.t("pdf.inspection.equipment_details"))
-      expect(pdf_text).to include(I18n.t("pdf.inspection.inspection_results"))
-      expect(pdf_text).to include(I18n.t("pdf.inspection.verification"))
-      expect(pdf_text).to include(I18n.t("pdf.inspection.footer_text"))
+      expect(pdf_text).to include(I18n.t("pdf.inspection.assessments_section"))
+      expect(pdf_text).to include(I18n.t("pdf.inspection.comments"))
     end
 
     it "handles different inspection statuses with I18n" do
@@ -93,8 +92,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
       # Check that I18n translations are used
       expect(pdf_text).to include(I18n.t("pdf.unit.title"))
       expect(pdf_text).to include(I18n.t("pdf.unit.details"))
-      expect(pdf_text).to include(I18n.t("pdf.unit.verification"))
-      expect(pdf_text).to include(I18n.t("pdf.unit.footer_text"))
     end
 
     it "displays unit fields with I18n labels" do
@@ -581,30 +578,27 @@ RSpec.describe PdfGeneratorService, pdf: true do
     end
   end
 
-  describe "final result section" do
+  describe "pass/fail status in header" do
     let(:user) { create(:user) }
 
     context "with passed inspection" do
       let(:inspection) { create(:inspection, :completed, user: user, passed: true) }
 
-      it "shows PASSED result" do
+      it "shows PASS in header" do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include(I18n.t("pdf.inspection.final_result"))
         expect(pdf_text).to include(I18n.t("pdf.inspection.passed"))
-        expect(pdf_text).to include("#{I18n.t("pdf.inspection.fields.status")}: #{I18n.t("pdf.inspection.fields.complete")}")
       end
     end
 
     context "with failed inspection" do
       let(:inspection) { create(:inspection, :completed, user: user, passed: false) }
 
-      it "shows FAILED result" do
+      it "shows FAIL in header" do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include(I18n.t("pdf.inspection.final_result"))
         expect(pdf_text).to include(I18n.t("pdf.inspection.failed"))
       end
     end

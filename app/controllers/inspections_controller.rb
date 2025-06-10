@@ -36,7 +36,7 @@ class InspectionsController < ApplicationController
         @inspection.update(pdf_last_accessed_at: Time.current)
 
         send_data pdf_data.render,
-          filename: "PAT_Report_#{@inspection.serial}.pdf",
+          filename: "#{@inspection.unit&.serial || @inspection.id}.pdf",
           type: "application/pdf",
           disposition: "inline"
       end
@@ -249,7 +249,7 @@ class InspectionsController < ApplicationController
         @inspection.update(pdf_last_accessed_at: Time.current)
 
         send_data pdf_data.render,
-          filename: "PAT_Report_#{@inspection.serial}.pdf",
+          filename: "#{@inspection.unit&.serial || @inspection.id}.pdf",
           type: "application/pdf",
           disposition: "inline"
       end
@@ -264,7 +264,7 @@ class InspectionsController < ApplicationController
     qr_code_png = QrCodeService.generate_qr_code(@inspection)
 
     send_data qr_code_png,
-      filename: "PAT_Report_QR_#{@inspection.serial}.png",
+      filename: "#{@inspection.unit&.serial || @inspection.id}_QR.png",
       type: "image/png",
       disposition: "inline"
   end

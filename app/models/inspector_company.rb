@@ -37,7 +37,7 @@ class InspectorCompany < ApplicationRecord
   # Credentials validation moved to individual inspector level (User model)
 
   def full_address
-    [address, city, state, postal_code].compact.join(", ")
+    [address, city, postal_code].compact.join(", ")
   end
 
   def inspection_count

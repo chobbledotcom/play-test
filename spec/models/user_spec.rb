@@ -59,14 +59,14 @@ RSpec.describe User, type: :model do
       # Verify ID is a string
       expect(user.id).to be_a(String)
 
-      # Verify ID follows the expected format (12 uppercase alphanumeric characters)
-      expect(user.id).to match(/\A[A-Z0-9]{12}\z/)
+      # Verify ID follows the expected format (8 uppercase alphanumeric characters)
+      expect(user.id).to match(/\A[A-Z0-9]{8}\z/)
 
       # Verify ID is unique for multiple users
       second_user = create(:user)
 
       expect(second_user.id).to be_a(String)
-      expect(second_user.id).to match(/\A[A-Z0-9]{12}\z/)
+      expect(second_user.id).to match(/\A[A-Z0-9]{8}\z/)
       expect(second_user.id).not_to eq(user.id)
     end
   end

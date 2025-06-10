@@ -14,3 +14,6 @@
 
 <%= setup[:form_object].label field, setup[:field_label] %>
 <%= setup[:form_object].send(field_type, field, field_options) %>
+<% if local_assigns[:help_text] %>
+  <small class="help-text"><%= local_assigns[:help_text] %></small>
+<% end %>
