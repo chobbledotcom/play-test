@@ -1,42 +1,49 @@
-# Units seed data (British terminology)
-
 puts "Creating units..."
 
-# Create units for test user (all units will be linked to test user)
-castle_standard = Unit.create!(
-  user: $test_user,
+def create_unit(name:, serial_prefix:, manufacturer:, model:, owner:, description:, width:, length:, height:, has_slide: false, is_totally_enclosed: false)
+  Unit.create!(
+    user: $test_user,
+    name: name,
+    serial: "#{serial_prefix}-#{rand(1000..9999)}",
+    manufacturer: manufacturer,
+    model: model,
+    owner: owner,
+    description: description,
+    width: width,
+    length: length,
+    height: height,
+    has_slide: has_slide,
+    is_totally_enclosed: is_totally_enclosed
+  )
+end
+
+$castle_standard = create_unit(
   name: "Medieval Castle Bouncer",
-  serial: "ACQ-2021-#{rand(1000..9999)}",
+  serial_prefix: "ACQ-2021",
   manufacturer: "Airquee Manufacturing Ltd",
   model: "Castle Deluxe 15",
   owner: "Stef's Castles",
   description: "15ft x 15ft medieval themed bouncy castle with turrets",
   width: 4.5,
   length: 4.5,
-  height: 3.5,
-  has_slide: false,
-  is_totally_enclosed: false
+  height: 3.5
 )
 
-castle_large = Unit.create!(
-  user: $test_user,
+$castle_large = create_unit(
   name: "Giant Party Castle",
-  serial: "BCN-2020-#{rand(1000..9999)}",
+  serial_prefix: "BCN-2020",
   manufacturer: "Bouncy Castle Boys",
   model: "Mega Castle 30",
   owner: "Estephan Events",
   description: "30ft x 30ft large bouncy castle suitable for 20+ children",
   width: 9.0,
   length: 9.0,
-  height: 4.5,
-  has_slide: false,
-  is_totally_enclosed: false
+  height: 4.5
 )
 
-castle_slide_combo = Unit.create!(
-  user: $test_user,
+$castle_slide_combo = create_unit(
   name: "Princess Castle with Slide",
-  serial: "J4J-2022-#{rand(1000..9999)}",
+  serial_prefix: "J4J-2022",
   manufacturer: "Jump4Joy Inflatables",
   model: "Princess Combo DLX",
   owner: "Stefan's Fun Factory",
@@ -44,14 +51,12 @@ castle_slide_combo = Unit.create!(
   width: 5.5,
   length: 7.0,
   height: 4.0,
-  has_slide: true,
-  is_totally_enclosed: false
+  has_slide: true
 )
 
-soft_play_unit = Unit.create!(
-  user: $test_user,
+$soft_play_unit = create_unit(
   name: "Toddler Soft Play Centre",
-  serial: "CIU-2023-#{rand(1000..9999)}",
+  serial_prefix: "CIU-2023",
   manufacturer: "Custom Inflatables UK",
   model: "Soft Play Junior",
   owner: "Steff's Soft Play",
@@ -59,14 +64,12 @@ soft_play_unit = Unit.create!(
   width: 6.0,
   length: 6.0,
   height: 2.5,
-  has_slide: false,
   is_totally_enclosed: true
 )
 
-obstacle_course = Unit.create!(
-  user: $test_user,
+$obstacle_course = create_unit(
   name: "Assault Course Challenge",
-  serial: "IWL-2021-#{rand(1000..9999)}",
+  serial_prefix: "IWL-2021",
   manufacturer: "Inflatable World Ltd",
   model: "Obstacle Pro 40",
   owner: "Stephan's Adventure Co",
@@ -74,14 +77,12 @@ obstacle_course = Unit.create!(
   width: 3.0,
   length: 12.0,
   height: 3.5,
-  has_slide: true,
-  is_totally_enclosed: false
+  has_slide: true
 )
 
-giant_slide = Unit.create!(
-  user: $test_user,
+$giant_slide = create_unit(
   name: "Mega Slide Experience",
-  serial: "ACQ-2019-#{rand(1000..9999)}",
+  serial_prefix: "ACQ-2019",
   manufacturer: "Airquee Manufacturing Ltd",
   model: "Giant Slide 25",
   owner: "Stefan Family Inflatables",
@@ -89,48 +90,31 @@ giant_slide = Unit.create!(
   width: 5.0,
   length: 15.0,
   height: 7.5,
-  has_slide: true,
-  is_totally_enclosed: false
+  has_slide: true
 )
 
-gladiator_duel = Unit.create!(
-  user: $test_user,
+$gladiator_duel = create_unit(
   name: "Gladiator Duel Platform",
-  serial: "HHE-2022-#{rand(1000..9999)}",
+  serial_prefix: "HHE-2022",
   manufacturer: "Happy Hop Europe",
   model: "Gladiator Arena",
   owner: "Stefano's Party Hire",
   description: "Inflatable gladiator duel platform with pedestals",
   width: 6.0,
   length: 6.0,
-  height: 1.5,
-  has_slide: false,
-  is_totally_enclosed: false
+  height: 1.5
 )
 
-bungee_run = Unit.create!(
-  user: $test_user,
+$bungee_run = create_unit(
   name: "Double Bungee Run",
-  serial: "PCM-2023-#{rand(1000..9999)}",
+  serial_prefix: "PCM-2023",
   manufacturer: "Party Castle Manufacturers",
   model: "Bungee Sprint Dual",
   owner: "Stef's Fun Factory",
   description: "Two lane inflatable bungee run competition game",
   width: 4.0,
   length: 10.0,
-  height: 2.5,
-  has_slide: false,
-  is_totally_enclosed: false
+  height: 2.5
 )
-
-# Make units available globally for inspections seed file
-$castle_standard = castle_standard
-$castle_large = castle_large
-$castle_slide_combo = castle_slide_combo
-$soft_play_unit = soft_play_unit
-$obstacle_course = obstacle_course
-$giant_slide = giant_slide
-$gladiator_duel = gladiator_duel
-$bungee_run = bungee_run
 
 puts "Created #{Unit.count} units."

@@ -45,6 +45,53 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Test both happy path and edge cases
 - Use `--fail-fast` during development to fix issues incrementally
 
+### Test Coverage Analysis
+
+#### Coverage Targets & Reports
+- **Coverage target**: 100% line and branch coverage for all files
+- **HTML report**: `coverage/index.html` (detailed view with line-by-line coverage)
+- **JSON data**: `coverage/.resultset.json` (raw coverage data from parallel test runs)
+- **Coverage thresholds**:
+  - Green (>90%): Good coverage
+  - Yellow (80-90%): Needs improvement  
+  - Red (<80%): Poor coverage requiring immediate attention
+
+#### Quick Coverage Commands
+```bash
+# Check coverage for a specific file (extracts from HTML report)
+ruby coverage_check.rb app/models/user.rb
+ruby coverage_check.rb app/controllers/users_controller.rb
+
+# View HTML report for detailed line-by-line analysis
+# Open coverage/index.html in browser
+```
+
+#### Coverage Analysis Tool
+
+**File Coverage Check** (`coverage_check.rb`):
+- **Usage**: `ruby coverage_check.rb <file_path>`
+- **Output**: Exact same figures as SimpleCov HTML report
+- **Example output**:
+  ```
+  app/controllers/users_controller.rb: 86.21% lines covered
+  87 relevant lines. 75 lines covered and 12 lines missed.
+  76.67% branches covered
+  30 total branches, 23 branches covered and 7 branches missed.
+  ```
+- **Use when**: Checking coverage after editing a specific file
+
+#### Coverage Workflow
+1. **After editing a file**: Run `ruby coverage_check.rb <file_path>` to check coverage
+2. **Before committing**: Ensure no coverage regression
+3. **When coverage drops**: Write tests for uncovered lines immediately
+4. **Focus areas**: Controllers, services, models (business logic)
+5. **HTML report**: Use for detailed line-by-line analysis when needed
+
+#### Coverage Standards
+- **Target**: >90% line coverage, >80% branch coverage for all files
+- **Priority files**: Controllers, services, models with business logic
+- **Low coverage files**: Immediate attention required for < 80% coverage
+
 ### Code Organization
 - **Create partials for repeated code** - DRY principle
 - Extract common view code into partials immediately

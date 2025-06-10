@@ -26,6 +26,7 @@
             sqlite
             nodejs
             imagemagick
+            jq
           ];
 
           # Use bundler to manage Rails version instead of Nix

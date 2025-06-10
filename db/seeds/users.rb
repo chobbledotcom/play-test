@@ -1,73 +1,58 @@
-# Users seed data
+puts "Creating users..."
 
-# Generate random secure passwords for seed users
 def generate_secure_password
   SecureRandom.alphanumeric(32)
 end
 
-puts "Creating users..."
+def create_user(email:, rpii_number:, company:, time_display: "time", active_until: Date.current + 1.year)
+  User.create!(
+    email: email,
+    password: generate_secure_password,
+    rpii_inspector_number: rpii_number,
+    inspection_company: company,
+    time_display: time_display,
+    active_until: active_until
+  )
+end
 
-# Test user with access to all data
-test_user = User.create!(
+$test_user = create_user(
   email: "test@play-test.co.uk",
-  password: generate_secure_password,
-  rpii_inspector_number: "RPII-001",
-  inspection_company: $stefan_testing,
-  time_display: "time",
-  active_until: Date.current + 1.year
+  rpii_number: "RPII-001",
+  company: $stefan_testing
 )
 
-# Stefan's Testing users
-lead_inspector = User.create!(
+$lead_inspector = create_user(
   email: "lead@play-test.co.uk",
-  password: generate_secure_password,
-  rpii_inspector_number: "RPII-002",
-  inspection_company: $stefan_testing,
-  time_display: "time",
-  active_until: Date.current + 1.year
+  rpii_number: "RPII-002",
+  company: $stefan_testing
 )
 
-User.create!(
+create_user(
   email: "junior@play-test.co.uk",
-  password: generate_secure_password,
-  rpii_inspector_number: "RPII-003",
-  inspection_company: $stefan_testing,
-  time_display: "date",
-  active_until: Date.current + 1.year
+  rpii_number: "RPII-003",
+  company: $stefan_testing,
+  time_display: "date"
 )
 
-User.create!(
+create_user(
   email: "senior@play-test.co.uk",
-  password: generate_secure_password,
-  rpii_inspector_number: "RPII-004",
-  inspection_company: $stefan_testing,
-  time_display: "time",
-  active_until: Date.current + 1.year
+  rpii_number: "RPII-004",
+  company: $stefan_testing
 )
 
-# Steph Test user
-steph_test_inspector = User.create!(
+$steph_test_inspector = create_user(
   email: "inspector@play-test.co.uk",
-  password: generate_secure_password,
-  rpii_inspector_number: "RPII-005",
-  inspection_company: $steph_test,
-  time_display: "date",
-  active_until: Date.current + 1.year
+  rpii_number: "RPII-005",
+  company: $steph_test,
+  time_display: "date"
 )
 
-# Retired company user
-User.create!(
+create_user(
   email: "old@play-test.co.uk",
-  password: generate_secure_password,
-  rpii_inspector_number: "RPII-006",
-  inspection_company: $steve_inflatable,
+  rpii_number: "RPII-006",
+  company: $steve_inflatable,
   time_display: "date",
   active_until: Date.current - 1.day
 )
-
-# Make key users available globally for other seed files
-$test_user = test_user
-$lead_inspector = lead_inspector
-$steph_test_inspector = steph_test_inspector
 
 puts "Created #{User.count} users."

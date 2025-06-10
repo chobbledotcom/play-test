@@ -10,14 +10,14 @@ puts "Starting seed data creation..."
 puts "Environment: #{Rails.env}"
 
 # Load shared test data helpers
-require_relative '../lib/test_data_helpers'
+require_relative "../lib/test_data_helpers"
 
 # Load seed files in correct order
-load Rails.root.join('db', 'seeds', 'cleanup.rb')
-load Rails.root.join('db', 'seeds', 'inspector_companies.rb')
-load Rails.root.join('db', 'seeds', 'users.rb')
-load Rails.root.join('db', 'seeds', 'units.rb')
-load Rails.root.join('db', 'seeds', 'inspections.rb')
+load Rails.root.join("db", "seeds", "cleanup.rb")
+load Rails.root.join("db", "seeds", "inspector_companies.rb")
+load Rails.root.join("db", "seeds", "users.rb")
+load Rails.root.join("db", "seeds", "units.rb")
+load Rails.root.join("db", "seeds", "inspections.rb")
 
 puts "\n=== Seed Summary ==="
 puts "Inspector Companies: #{InspectorCompany.count}"

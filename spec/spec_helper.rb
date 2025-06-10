@@ -4,6 +4,8 @@ SimpleCov.start "rails" do
   add_filter "/spec/"
   add_filter "/config/"
   add_filter "/vendor/"
+  add_filter "/db/seeds/"
+  add_filter "db/seeds.rb"
 
   # Enable branch coverage for better insights
   enable_coverage :branch
