@@ -6,8 +6,8 @@ Rails.application.routes.draw do
 
   root "home#index"
   get "about", to: "home#about"
-  get "safety_standards", to: "home#safety_standards"
-  post "safety_standards", to: "home#safety_standards"
+  get "safety_standards", to: "safety_standards#index"
+  post "safety_standards", to: "safety_standards#index"
 
   get "signup", to: "users#new"
   post "signup", to: "users#create"
