@@ -13,11 +13,11 @@ RSpec.describe MaterialsAssessment, type: :model do
   end
 
   describe "constants" do
-    it "defines material checks" do
+    it "defines material checks in alphabetical order" do
       expect(MaterialsAssessment::MATERIAL_CHECKS).to eq([
-        "rope_size_pass", "clamber_pass", "retention_netting_pass",
-        "zips_pass", "windows_pass", "artwork_pass", "thread_pass",
-        "fabric_pass", "fire_retardant_pass"
+        "artwork_pass", "clamber_pass", "fabric_pass",
+        "fire_retardant_pass", "retention_netting_pass", "rope_size_pass",
+        "thread_pass", "windows_pass", "zips_pass"
       ])
     end
 

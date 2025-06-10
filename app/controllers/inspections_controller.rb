@@ -1,6 +1,7 @@
 class InspectionsController < ApplicationController
   before_action :set_inspection, except: [:index, :create]
   before_action :check_inspection_owner, except: %i[index create report qr_code]
+  before_action :validate_unit_ownership, only: [:update]
   before_action :redirect_if_complete, except: %i[
     show
     mark_draft
@@ -110,78 +111,10 @@ class InspectionsController < ApplicationController
   end
 
   def update
-    params = inspection_params
-
-    # Securely handle unit association
-    if params[:unit_id].present?
-      unit = current_user.units.find_by(id: params[:unit_id])
-
-      if unit.nil?
-        # Unit ID not found or doesn't belong to user - security issue
-        flash[:alert] = I18n.t("inspections.errors.invalid_unit")
-        render :edit, status: :unprocessable_entity and return
-      end
-    end
-
-    if @inspection.update(params)
-      respond_to do |format|
-        format.html do
-          flash[:notice] = I18n.t("inspections.messages.updated")
-          redirect_to @inspection
-        end
-        format.json { render json: {status: "success", inspection: @inspection} }
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.replace("inspection_progress_#{@inspection.id}",
-              html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
-            turbo_stream.replace("completion_issues_#{@inspection.id}",
-              partial: "inspections/completion_issues",
-              locals: {inspection: @inspection}),
-            turbo_stream.replace("inspection_save_message",
-              partial: "shared/save_message",
-              locals: {
-                dom_id: "inspection_save_message",
-                success: true,
-                success_message: t("inspections.messages.updated")
-              }),
-            turbo_stream.replace("assessment_save_message",
-              partial: "shared/save_message",
-              locals: {
-                dom_id: "assessment_save_message",
-                success: true,
-                success_message: t("inspections.messages.updated")
-              })
-          ]
-        end
-      end
+    if @inspection.update(inspection_params)
+      handle_successful_update
     else
-      respond_to do |format|
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: {status: "error", errors: @inspection.errors.full_messages} }
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.replace("inspection_progress_#{@inspection.id}",
-              html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
-            turbo_stream.replace("completion_issues_#{@inspection.id}",
-              partial: "inspections/completion_issues",
-              locals: {inspection: @inspection}),
-            turbo_stream.replace("inspection_save_message",
-              partial: "shared/save_message",
-              locals: {
-                dom_id: "inspection_save_message",
-                errors: @inspection.errors.full_messages,
-                error_message: t("shared.messages.save_failed")
-              }),
-            turbo_stream.replace("assessment_save_message",
-              partial: "shared/save_message",
-              locals: {
-                dom_id: "assessment_save_message",
-                errors: @inspection.errors.full_messages,
-                error_message: t("shared.messages.save_failed")
-              })
-          ]
-        end
-      end
+      handle_failed_update
     end
   end
 
@@ -461,5 +394,99 @@ class InspectionsController < ApplicationController
     title = "Inspections"
     title += " - #{(params[:result] == "passed") ? "Passed" : "Failed"}" if params[:result].present?
     title
+  end
+
+  def validate_unit_ownership
+    return unless inspection_params[:unit_id].present?
+
+    unit = current_user.units.find_by(id: inspection_params[:unit_id])
+    return if unit.present?
+
+    # Unit ID not found or doesn't belong to user - security issue
+    flash[:alert] = I18n.t("inspections.errors.invalid_unit")
+    render :edit, status: :unprocessable_entity
+  end
+
+  def handle_successful_update
+    respond_to do |format|
+      format.html do
+        flash[:notice] = I18n.t("inspections.messages.updated")
+        redirect_to @inspection
+      end
+      format.json { render json: {status: "success", inspection: @inspection} }
+      format.turbo_stream { render turbo_stream: success_turbo_streams }
+    end
+  end
+
+  def handle_failed_update
+    respond_to do |format|
+      format.html { render :edit, status: :unprocessable_entity }
+      format.json { render json: {status: "error", errors: @inspection.errors.full_messages} }
+      format.turbo_stream { render turbo_stream: error_turbo_streams }
+    end
+  end
+
+  def success_turbo_streams
+    [
+      turbo_stream.replace("inspection_progress_#{@inspection.id}",
+        html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
+      turbo_stream.replace("completion_issues_#{@inspection.id}",
+        partial: "inspections/completion_issues",
+        locals: {inspection: @inspection}),
+      turbo_stream.replace("inspection_save_message",
+        partial: "shared/save_message",
+        locals: success_save_message_locals),
+      turbo_stream.replace("assessment_save_message",
+        partial: "shared/save_message",
+        locals: success_assessment_message_locals)
+    ]
+  end
+
+  def error_turbo_streams
+    [
+      turbo_stream.replace("inspection_progress_#{@inspection.id}",
+        html: "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"),
+      turbo_stream.replace("completion_issues_#{@inspection.id}",
+        partial: "inspections/completion_issues",
+        locals: {inspection: @inspection}),
+      turbo_stream.replace("inspection_save_message",
+        partial: "shared/save_message",
+        locals: error_save_message_locals),
+      turbo_stream.replace("assessment_save_message",
+        partial: "shared/save_message",
+        locals: error_assessment_message_locals)
+    ]
+  end
+
+  def success_save_message_locals
+    {
+      dom_id: "inspection_save_message",
+      success: true,
+      success_message: t("inspections.messages.updated")
+    }
+  end
+
+  def success_assessment_message_locals
+    {
+      dom_id: "assessment_save_message",
+      success: true,
+      success_message: t("inspections.messages.updated")
+    }
+  end
+
+  def error_save_message_locals
+    {
+      dom_id: "inspection_save_message",
+      errors: @inspection.errors.full_messages,
+      error_message: t("shared.messages.save_failed")
+    }
+  end
+
+  def error_assessment_message_locals
+    {
+      dom_id: "assessment_save_message",
+      errors: @inspection.errors.full_messages,
+      error_message: t("shared.messages.save_failed")
+    }
   end
 end
