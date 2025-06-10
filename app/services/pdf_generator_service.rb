@@ -1,4 +1,46 @@
 class PdfGeneratorService
+  # Equipment table constants
+  EQUIPMENT_LABEL_COLUMN_WIDTH = 90
+  EQUIPMENT_NAME_MAX_LENGTH = 30
+  EQUIPMENT_TABLE_CELL_PADDING = [4, 8]
+  EQUIPMENT_TABLE_TEXT_SIZE = 10
+
+  # General text and spacing constants
+  HEADER_TEXT_SIZE = 12
+  HEADER_SPACING = 8
+  STATUS_TEXT_SIZE = 14
+  STATUS_SPACING = 15
+  SECTION_TITLE_SIZE = 14
+  COMMENTS_PADDING = 20
+
+  # Table constants
+  TABLE_CELL_PADDING = [5, 10]
+  TABLE_FIRST_COLUMN_WIDTH = 150
+  NICE_TABLE_CELL_PADDING = [4, 8]
+  NICE_TABLE_TEXT_SIZE = 10
+
+  # Assessment layout constants
+  ASSESSMENT_COLUMNS_COUNT = 3
+  ASSESSMENT_COLUMN_SPACER = 10
+  ASSESSMENT_TITLE_SIZE = 10
+  ASSESSMENT_FIELD_TEXT_SIZE = 7
+  ASSESSMENT_BLOCK_SPACING = 8
+
+  # QR Code constants
+  QR_CODE_SIZE = 80
+  QR_CODE_MARGIN = 10
+  QR_CODE_BOTTOM_OFFSET = 10
+
+  # Unit photo constants
+  UNIT_PHOTO_X_OFFSET = 130
+  UNIT_PHOTO_WIDTH = 120
+  UNIT_PHOTO_HEIGHT = 90
+
+  # Watermark constants
+  WATERMARK_TRANSPARENCY = 0.4
+  WATERMARK_TEXT_SIZE = 24
+  WATERMARK_WIDTH = 100
+  WATERMARK_HEIGHT = 60
   def self.generate_inspection_report(inspection)
     require "prawn/table"
 
@@ -45,7 +87,7 @@ class PdfGeneratorService
       render_all_assessments_in_columns(pdf)
 
       # QR Code in bottom right corner
-      generate_qr_code_bottom_right(pdf, inspection)
+      generate_qr_code_footer(pdf, inspection)
 
       # Add DRAFT watermark overlay for draft inspections
       add_draft_watermark(pdf) unless inspection.complete?
@@ -60,7 +102,7 @@ class PdfGeneratorService
       generate_unit_pdf_header(pdf, unit)
       generate_unit_details(pdf, unit)
       generate_unit_inspection_history(pdf, unit)
-      generate_qr_code_bottom_right_unit(pdf, unit)
+      generate_qr_code_footer(pdf, unit)
     end
   end
 
@@ -81,9 +123,6 @@ class PdfGeneratorService
   end
 
   def self.generate_inspection_pdf_header(pdf, inspection)
-    # Add unit photo to top right if available
-    add_unit_photo(pdf, inspection.unit)
-
     # Line 1: Inspection Report - Unit Name - Status/Date
     unit_name = inspection.unit&.name || I18n.t("pdf.inspection.fields.na")
     status_date = if inspection.complete?
@@ -93,13 +132,13 @@ class PdfGeneratorService
     end
 
     line1_parts = [I18n.t("pdf.inspection.title"), unit_name, status_date]
-    pdf.text line1_parts.join(" - "), align: :center, size: 12, style: :bold, color: "663399"
-    pdf.move_down 8
+    pdf.text line1_parts.join(" - "), align: :center, size: HEADER_TEXT_SIZE, style: :bold, color: "663399"
+    pdf.move_down HEADER_SPACING
 
     # Line 2: Unique Report Number
     pdf.text "#{I18n.t("pdf.inspection.fields.report_id")}: #{inspection.id}",
-      align: :center, size: 12, style: :bold, color: "663399"
-    pdf.move_down 8
+      align: :center, size: HEADER_TEXT_SIZE, style: :bold, color: "663399"
+    pdf.move_down HEADER_SPACING
 
     # Line 3: Inspector Name, City, RPII Inspector No
     inspector_user = inspection.user
@@ -112,7 +151,7 @@ class PdfGeneratorService
       if inspector_parts.any?
         # Show incomplete status in red if not complete
         line3_color = inspection.complete? ? "663399" : "CC0000"
-        pdf.text inspector_parts.join(", "), align: :center, size: 10, color: line3_color
+        pdf.text inspector_parts.join(", "), align: :center, size: NICE_TABLE_TEXT_SIZE, color: line3_color
       end
     end
 
@@ -121,9 +160,9 @@ class PdfGeneratorService
     # Line 4: Overall Pass/Fail Status
     status_text = inspection.passed? ? I18n.t("pdf.inspection.passed") : I18n.t("pdf.inspection.failed")
     status_color = inspection.passed? ? "008000" : "CC0000"
-    pdf.text status_text, align: :center, size: 14, style: :bold, color: status_color
+    pdf.text status_text, align: :center, size: STATUS_TEXT_SIZE, style: :bold, color: status_color
 
-    pdf.move_down 15
+    pdf.move_down STATUS_SPACING
   end
 
   def self.generate_inspection_equipment_details(pdf, inspection)
@@ -132,28 +171,37 @@ class PdfGeneratorService
     if unit
       # Size dimensions
       dimensions = []
-      dimensions << "Width: #{unit.width}" if unit.width.present?
-      dimensions << "Length: #{unit.length}" if unit.length.present?
-      dimensions << "Height: #{unit.height}" if unit.height.present?
+      dimensions << "Width: #{format_dimension(unit.width)}" if unit.width.present?
+      dimensions << "Length: #{format_dimension(unit.length)}" if unit.length.present?
+      dimensions << "Height: #{format_dimension(unit.height)}" if unit.height.present?
       dimensions_text = dimensions.any? ? dimensions.join(" ") : I18n.t("pdf.inspection.fields.na")
 
       # Unit Type / Has Slide
       unit_type = unit.has_slide? ? I18n.t("pdf.inspection.fields.unit_with_slide") : I18n.t("pdf.inspection.fields.standard_unit")
 
+      # Create 4-column, 3-row table data
       equipment_data = [
-        [I18n.t("pdf.inspection.fields.description"), truncate_text(unit.name || unit.description || I18n.t("pdf.inspection.fields.na"), 66)],
-        [I18n.t("pdf.inspection.fields.manufacturer"), unit.manufacturer.presence || I18n.t("pdf.inspection.fields.not_specified")],
-        [I18n.t("pdf.inspection.fields.size_m"), dimensions_text],
-        [I18n.t("pdf.inspection.fields.serial_number_asset_id"), unit.serial || I18n.t("pdf.inspection.fields.na")],
-        [I18n.t("pdf.inspection.fields.type"), unit_type]
+        [
+          I18n.t("pdf.inspection.fields.description"),
+          truncate_text(unit.name || unit.description || I18n.t("pdf.inspection.fields.na"), EQUIPMENT_NAME_MAX_LENGTH),
+          I18n.t("pdf.inspection.fields.serial_number_asset_id"),
+          unit.serial || I18n.t("pdf.inspection.fields.na")
+        ],
+        [
+          I18n.t("pdf.inspection.fields.manufacturer"),
+          unit.manufacturer.presence || I18n.t("pdf.inspection.fields.not_specified"),
+          I18n.t("pdf.inspection.fields.type"),
+          unit_type
+        ],
+        [
+          I18n.t("pdf.inspection.fields.size_m"),
+          dimensions_text,
+          I18n.t("pdf.inspection.fields.owner"),
+          unit.owner.presence || I18n.t("pdf.inspection.fields.na")
+        ]
       ]
 
-      # Add owner if present
-      if unit.owner.present?
-        equipment_data << [I18n.t("pdf.inspection.fields.owner"), unit.owner]
-      end
-
-      create_nice_box_table(pdf, I18n.t("pdf.inspection.equipment_details"), equipment_data)
+      create_equipment_details_table(pdf, I18n.t("pdf.inspection.equipment_details"), equipment_data)
     else
       create_nice_box_table(pdf, I18n.t("pdf.inspection.equipment_details"), [[I18n.t("pdf.inspection.fields.no_unit_associated"), ""]])
     end
@@ -161,19 +209,19 @@ class PdfGeneratorService
 
   def self.generate_inspection_comments(pdf, inspection)
     pdf.move_down 20
-    pdf.text I18n.t("pdf.inspection.comments"), size: 14, style: :bold
+    pdf.text I18n.t("pdf.inspection.comments"), size: SECTION_TITLE_SIZE, style: :bold
     pdf.stroke_horizontal_rule
     pdf.move_down 10
     pdf.text inspection.comments
-    pdf.move_down 20  # Add padding after comments
+    pdf.move_down COMMENTS_PADDING  # Add padding after comments
   end
 
   def self.create_pdf_table(pdf, data)
     table = pdf.table(data, width: pdf.bounds.width) do |t|
       t.cells.borders = []
-      t.cells.padding = [5, 10]
+      t.cells.padding = TABLE_CELL_PADDING
       t.columns(0).font_style = :bold
-      t.columns(0).width = 150
+      t.columns(0).width = TABLE_FIRST_COLUMN_WIDTH
       t.row(0..data.length - 1).background_color = "EEEEEE"
       t.row(0..data.length - 1).borders = [:bottom]
       t.row(0..data.length - 1).border_color = "DDDDDD"
@@ -184,16 +232,44 @@ class PdfGeneratorService
   end
 
   def self.create_nice_box_table(pdf, title, data)
-    pdf.text title, size: 12, style: :bold
+    pdf.text title, size: HEADER_TEXT_SIZE, style: :bold
     pdf.stroke_horizontal_rule
     pdf.move_down 10
 
     table = pdf.table(data, width: pdf.bounds.width) do |t|
       t.cells.borders = []
-      t.cells.padding = [4, 8]
-      t.cells.size = 10
+      t.cells.padding = NICE_TABLE_CELL_PADDING
+      t.cells.size = NICE_TABLE_TEXT_SIZE
       t.columns(0).font_style = :bold
-      t.columns(0).width = 150
+      t.columns(0).width = TABLE_FIRST_COLUMN_WIDTH
+      t.row(0..data.length - 1).background_color = "EEEEEE"
+      t.row(0..data.length - 1).borders = [:bottom]
+      t.row(0..data.length - 1).border_color = "DDDDDD"
+    end
+
+    yield table if block_given?
+    pdf.move_down 15
+    table
+  end
+
+  def self.create_equipment_details_table(pdf, title, data)
+    pdf.text title, size: HEADER_TEXT_SIZE, style: :bold
+    pdf.stroke_horizontal_rule
+    pdf.move_down 10
+
+    table = pdf.table(data, width: pdf.bounds.width) do |t|
+      t.cells.borders = []
+      t.cells.padding = EQUIPMENT_TABLE_CELL_PADDING
+      t.cells.size = EQUIPMENT_TABLE_TEXT_SIZE
+      # Make label columns (0 and 2) bold
+      t.columns(0).font_style = :bold
+      t.columns(2).font_style = :bold
+      # Set column widths - labels just fit content, values take remaining space
+      t.columns(0).width = EQUIPMENT_LABEL_COLUMN_WIDTH   # Description label
+      t.columns(2).width = EQUIPMENT_LABEL_COLUMN_WIDTH   # Serial/Type/Owner labels
+      remaining_width = pdf.bounds.width - (EQUIPMENT_LABEL_COLUMN_WIDTH * 2)  # Total minus both label columns
+      t.columns(1).width = remaining_width / 2  # Description value
+      t.columns(3).width = remaining_width / 2  # Serial/Type/Owner values
       t.row(0..data.length - 1).background_color = "EEEEEE"
       t.row(0..data.length - 1).borders = [:bottom]
       t.row(0..data.length - 1).border_color = "DDDDDD"
@@ -206,102 +282,94 @@ class PdfGeneratorService
 
   # Unit report methods (updated from equipment)
   def self.generate_unit_pdf_header(pdf, unit)
-    # Add unit photo to top right if available
-    add_unit_photo(pdf, unit)
+    # Line 1: Unit Report - Unit Name - Serial Number
+    unit_name = unit.name || I18n.t("pdf.unit.fields.na")
+    serial_number = unit.serial || I18n.t("pdf.unit.fields.na")
 
-    pdf.text I18n.t("pdf.unit.title"), size: 20, style: :bold, align: :center
-    pdf.move_down 20
+    line1_parts = [I18n.t("pdf.unit.title"), unit_name, "Serial: #{serial_number}"]
+    pdf.text line1_parts.join(" - "), align: :center, size: HEADER_TEXT_SIZE, style: :bold, color: "663399"
+    pdf.move_down HEADER_SPACING
 
-    pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width) do
-      pdf.stroke_bounds
-      pdf.move_down 5
-      pdf.text "#{I18n.t("pdf.unit.fields.name").titleize}: #{unit.name}", align: :center, size: 14, style: :bold
-      pdf.move_down 2
-      pdf.text "#{I18n.t("pdf.unit.fields.serial_number")}: #{unit.serial}", align: :center, size: 14
-      pdf.move_down 2
-      if unit.next_inspection_due
-        pdf.text "#{I18n.t("pdf.unit.next_due")}: #{unit.next_inspection_due.strftime("%d/%m/%Y")}",
-          align: :center, size: 14,
-          color: (unit.next_inspection_due < Date.today) ? "CC0000" : "000000"
-      end
+    # Line 2: Unit ID
+    pdf.text "#{I18n.t("pdf.unit.fields.unit_id")}: #{unit.id}",
+      align: :center, size: HEADER_TEXT_SIZE, style: :bold, color: "663399"
+    pdf.move_down HEADER_SPACING
+
+    # Line 3: Owner and Manufacturer
+    owner_manufacturer_parts = []
+    owner_manufacturer_parts << "Owner: #{unit.owner}" if unit.owner.present?
+    owner_manufacturer_parts << "Manufacturer: #{unit.manufacturer}" if unit.manufacturer.present?
+
+    if owner_manufacturer_parts.any?
+      pdf.text owner_manufacturer_parts.join(", "), align: :center, size: NICE_TABLE_TEXT_SIZE, color: "663399"
     end
-    pdf.move_down 20
+
+    pdf.move_down HEADER_SPACING
+
+    # Line 4: Next Inspection Due Status
+    if unit.next_inspection_due
+      status_text = "#{I18n.t("pdf.unit.next_due")}: #{unit.next_inspection_due.strftime("%d/%m/%Y")}"
+      status_color = (unit.next_inspection_due < Date.today) ? "CC0000" : "008000"
+      pdf.text status_text, align: :center, size: STATUS_TEXT_SIZE, style: :bold, color: status_color
+    else
+      pdf.text I18n.t("pdf.unit.no_inspection_due"), align: :center, size: STATUS_TEXT_SIZE, style: :bold, color: "666666"
+    end
+
+    pdf.move_down STATUS_SPACING
   end
 
   def self.generate_unit_details(pdf, unit)
-    pdf.text I18n.t("pdf.unit.details"), size: 14, style: :bold
-    pdf.stroke_horizontal_rule
-    pdf.move_down 10
+    # Size dimensions
+    dimensions = []
+    dimensions << "Width: #{format_dimension(unit.width)}" if unit.width.present?
+    dimensions << "Length: #{format_dimension(unit.length)}" if unit.length.present?
+    dimensions << "Height: #{format_dimension(unit.height)}" if unit.height.present?
+    dimensions_text = dimensions.any? ? dimensions.join(" ") : I18n.t("pdf.unit.fields.na")
 
-    data = [
-      [I18n.t("pdf.unit.fields.name"), unit.name],
-      [I18n.t("pdf.unit.fields.serial_number"), unit.serial],
-      [I18n.t("pdf.unit.fields.manufacturer"), unit.manufacturer.presence || I18n.t("pdf.unit.fields.not_specified")],
-      [I18n.t("pdf.unit.fields.has_slide"), unit.has_slide? ? I18n.t("shared.yes") : I18n.t("shared.no")],
-      [I18n.t("pdf.unit.fields.owner"), unit.owner],
-      [I18n.t("pdf.unit.fields.dimensions"), unit.dimensions]
+    # Unit Type / Has Slide
+    unit.has_slide? ? I18n.t("pdf.unit.fields.unit_with_slide") : I18n.t("pdf.unit.fields.standard_unit")
+
+    # Create 4-column, 3-row table data
+    unit_data = [
+      [
+        I18n.t("pdf.unit.fields.name"),
+        truncate_text(unit.name || unit.description || I18n.t("pdf.unit.fields.na"), EQUIPMENT_NAME_MAX_LENGTH),
+        I18n.t("pdf.unit.fields.serial_number"),
+        unit.serial || I18n.t("pdf.unit.fields.na")
+      ],
+      [
+        I18n.t("pdf.unit.fields.manufacturer"),
+        unit.manufacturer.presence || I18n.t("pdf.unit.fields.not_specified"),
+        I18n.t("pdf.unit.fields.has_slide"),
+        unit.has_slide? ? I18n.t("shared.yes") : I18n.t("shared.no")
+      ],
+      [
+        I18n.t("pdf.unit.fields.size_m"),
+        dimensions_text,
+        I18n.t("pdf.unit.fields.owner"),
+        unit.owner.presence || I18n.t("pdf.unit.fields.na")
+      ]
     ]
 
-    # Add next inspection due if available
-    if unit.next_inspection_due
-      data << [I18n.t("pdf.unit.fields.next_inspection_due"), unit.next_inspection_due.strftime("%d/%m/%Y")]
-    end
-
-    create_pdf_table(pdf, data)
-    pdf.move_down 20
+    create_equipment_details_table(pdf, I18n.t("pdf.unit.details"), unit_data)
   end
 
   def self.generate_unit_inspection_history(pdf, unit)
-    pdf.text I18n.t("pdf.unit.inspection_history"), size: 14, style: :bold
-    pdf.stroke_horizontal_rule
-    pdf.move_down 10
-
     # Check for completed inspections
     completed_inspections = unit.inspections.complete.order(inspection_date: :desc)
 
     if completed_inspections.empty?
-      pdf.text I18n.t("pdf.unit.no_completed_inspections"), size: 10, style: :italic
-      pdf.move_down 10
+      create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"), [[I18n.t("pdf.unit.no_completed_inspections"), ""]])
     else
-      # Create table headers
-      headers = [
-        I18n.t("pdf.unit.fields.date"),
-        I18n.t("pdf.unit.fields.inspector"),
-        I18n.t("pdf.unit.fields.result"),
-        I18n.t("pdf.unit.fields.comments")
-      ]
-
       # Create table data from inspections
       inspections_data = completed_inspections.map do |inspection|
         [
-          inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.unit.fields.na"),
-          inspection.user.display_name,
-          inspection.passed ? I18n.t("pdf.unit.fields.pass") : I18n.t("pdf.unit.fields.fail"),
-          inspection.comments.to_s.truncate(30)
+          "#{I18n.t("pdf.unit.fields.date")}: #{inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.unit.fields.na")}",
+          "#{I18n.t("pdf.unit.fields.inspector")}: #{inspection.user.display_name}, #{I18n.t("pdf.unit.fields.result")}: #{inspection.passed ? I18n.t("pdf.unit.fields.pass") : I18n.t("pdf.unit.fields.fail")}, #{I18n.t("pdf.unit.fields.comments")}: #{inspection.comments.to_s.truncate(30)}"
         ]
       end
 
-      # Combine headers and data
-      table_data = [headers] + inspections_data
-
-      # Create table
-      pdf.table(table_data, width: pdf.bounds.width) do |table|
-        table.cells.padding = [5, 5]
-        table.row(0).font_style = :bold
-        table.row(0).background_color = "DDDDDD"
-
-        # Color code pass/fail cells
-        inspections_data.each_with_index do |_, index|
-          inspection = completed_inspections[index]
-          table.row(index + 1).column(2).background_color = inspection.passed ? "CCFFCC" : "FFCCCC"
-        end
-
-        # Set column widths
-        table.column(0).width = 75  # Date
-        table.column(1).width = 85  # Inspector
-        table.column(2).width = 60  # Result
-        table.column(3).width = pdf.bounds.width - 220  # Comments - remaining width
-      end
+      create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"), inspections_data)
     end
   end
 
@@ -676,46 +744,37 @@ class PdfGeneratorService
     end
   end
 
-  # QR code in bottom right corner for inspections
-  def self.generate_qr_code_bottom_right(pdf, inspection)
-    # Generate QR code
-    qr_code_png = QrCodeService.generate_qr_code(inspection)
-    qr_code_temp_file = Tempfile.new(["qr_code_inspection_#{inspection.id}_#{Process.pid}", ".png"])
+  # Unified QR code generator for any entity
+  def self.generate_qr_code_footer(pdf, entity)
+    entity_type = entity.class.name.downcase
+    qr_code_png = QrCodeService.generate_qr_code(entity)
+    qr_code_temp_file = Tempfile.new(["qr_code_#{entity_type}_#{entity.id}_#{Process.pid}", ".png"])
 
     begin
       qr_code_temp_file.binmode
       qr_code_temp_file.write(qr_code_png)
       qr_code_temp_file.close
 
-      # Position QR code in bottom right corner
-      qr_size = 80
-      x_position = pdf.bounds.width - qr_size - 10
-      y_position = 10 + qr_size
+      # Position elements in bottom right corner
+      photo_entity = entity.is_a?(Inspection) ? entity.unit : entity
+      photo_size = QR_CODE_SIZE * 2  # Photo is twice the size of QR code
 
-      pdf.image qr_code_temp_file.path, at: [x_position, y_position], width: qr_size, height: qr_size
-    ensure
-      qr_code_temp_file.close unless qr_code_temp_file.closed?
-      qr_code_temp_file.unlink if File.exist?(qr_code_temp_file.path)
-    end
-  end
+      # QR code position (bottom right corner)
+      qr_x = pdf.bounds.width - QR_CODE_SIZE - QR_CODE_MARGIN
+      qr_y = QR_CODE_BOTTOM_OFFSET + QR_CODE_SIZE
 
-  # QR code in bottom right corner for units
-  def self.generate_qr_code_bottom_right_unit(pdf, unit)
-    # Generate QR code
-    qr_code_png = QrCodeService.generate_qr_code(unit)
-    qr_code_temp_file = Tempfile.new(["qr_code_unit_#{unit.id}_#{Process.pid}", ".png"])
+      # Photo position (bottom right corner aligned with QR code's bottom right)
+      # In Prawn, y-coordinate is the bottom of the image
+      photo_x = qr_x + QR_CODE_SIZE - photo_size  # Photo's right edge aligns with QR's right edge
+      photo_y = qr_y - QR_CODE_SIZE + photo_size  # Photo's bottom edge aligns with QR's bottom edge
 
-    begin
-      qr_code_temp_file.binmode
-      qr_code_temp_file.write(qr_code_png)
-      qr_code_temp_file.close
+      # Add entity photo first (so it's behind the QR code)
+      add_entity_photo_footer(pdf, photo_entity, photo_x, photo_y)
 
-      # Position QR code in bottom right corner
-      qr_size = 80
-      x_position = pdf.bounds.width - qr_size - 10
-      y_position = 10 + qr_size
-
-      pdf.image qr_code_temp_file.path, at: [x_position, y_position], width: qr_size, height: qr_size
+      # Add QR code on top with transparency
+      pdf.transparent(0.5) do
+        pdf.image qr_code_temp_file.path, at: [qr_x, qr_y], width: QR_CODE_SIZE, height: QR_CODE_SIZE
+      end
     ensure
       qr_code_temp_file.close unless qr_code_temp_file.closed?
       qr_code_temp_file.unlink if File.exist?(qr_code_temp_file.path)
@@ -726,6 +785,39 @@ class PdfGeneratorService
   def self.truncate_text(text, max_length)
     return "" if text.nil?
     (text.length > max_length) ? "#{text[0...max_length]}..." : text
+  end
+
+  # Process image to handle EXIF orientation data
+  def self.process_image_with_orientation(photo)
+    # Download the image data
+    image_data = photo.download
+
+    # Create a temporary file for ImageProcessing
+    temp_file = Tempfile.new(["temp_image_#{Process.pid}", ".jpg"])
+
+    begin
+      temp_file.binmode
+      temp_file.write(image_data)
+      temp_file.close
+
+      # Use ImageProcessing to auto-orient the image based on EXIF data
+      processed_image = ImageProcessing::MiniMagick
+        .source(temp_file.path)
+        .auto_orient
+        .call
+
+      # Return the processed image as binary data
+      processed_image.read
+    ensure
+      temp_file.close unless temp_file.closed?
+      temp_file.unlink if File.exist?(temp_file.path)
+      processed_image&.close if processed_image.respond_to?(:close)
+    end
+  end
+
+  def self.format_dimension(value)
+    return "" if value.nil?
+    value.to_s.sub(/\.0$/, "")
   end
 
   def self.format_pass_fail(value)
@@ -746,20 +838,20 @@ class PdfGeneratorService
     (1..pdf.page_count).each do |page_num|
       pdf.go_to_page(page_num)
 
-      pdf.transparent(0.3) do
+      pdf.transparent(WATERMARK_TRANSPARENCY) do
         pdf.fill_color "FF0000"
 
         # 3x3 grid positions
         y_positions = [0.10, 0.30, 0.50, 0.70, 0.9].map { |pct| pdf.bounds.height * pct }
-        x_positions = [0.15, 0.50, 0.85].map { |pct| pdf.bounds.width * pct - 50 }
+        x_positions = [0.15, 0.50, 0.85].map { |pct| pdf.bounds.width * pct - (WATERMARK_WIDTH / 2) }
 
         y_positions.each do |y|
           x_positions.each do |x|
             pdf.text_box I18n.t("pdf.inspection.watermark.draft"),
               at: [x, y],
-              width: 100,
-              height: 60,
-              size: 24,
+              width: WATERMARK_WIDTH,
+              height: WATERMARK_HEIGHT,
+              size: WATERMARK_TEXT_SIZE,
               style: :bold,
               align: :center,
               valign: :top
@@ -771,18 +863,25 @@ class PdfGeneratorService
     end
   end
 
-  def self.add_unit_photo(pdf, unit, x_position = nil, y_position = nil)
-    return unless unit&.photo&.attached?
+  # Add entity photo in footer area (below QR code)
+  def self.add_entity_photo_footer(pdf, entity, x_position, y_position)
+    return unless entity&.photo&.attached?
+
+    photo_size = QR_CODE_SIZE * 2  # Twice as big as QR code
+    processed_image = process_image_with_orientation(entity.photo)
+    pdf.image StringIO.new(processed_image), at: [x_position, y_position], width: photo_size, height: photo_size
+  end
+
+  # Add entity photo in header area (top right corner)
+  def self.add_entity_photo(pdf, entity, x_position = nil, y_position = nil)
+    return unless entity&.photo&.attached?
 
     # Default position: top right corner
-    x_pos = x_position || (pdf.bounds.width - 130)
+    x_pos = x_position || (pdf.bounds.width - UNIT_PHOTO_X_OFFSET)
     y_pos = y_position || pdf.cursor
 
-    begin
-      pdf.image unit.photo, at: [x_pos, y_pos], width: 120, height: 90
-    rescue => e
-      # If image fails to load, just continue without it
-      Rails.logger.warn "Failed to add unit photo to PDF: #{e.message}"
-    end
+    processed_image = process_image_with_orientation(entity.photo)
+    pdf.image StringIO.new(processed_image), at: [x_pos, y_pos], width: UNIT_PHOTO_WIDTH, height: UNIT_PHOTO_HEIGHT
   end
+
 end

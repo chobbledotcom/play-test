@@ -55,9 +55,9 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect(pdf_text).to include(user.rpii_inspector_number) if user.rpii_inspector_number.present?
       expect(pdf_text).to include("Test Bouncy Castle")
       expect(pdf_text).to include("BCL-2024-001")
-      expect(pdf_text).to include(unit.width.to_s)
-      expect(pdf_text).to include(unit.length.to_s)
-      expect(pdf_text).to include(unit.height.to_s)
+      expect(pdf_text).to include("Width: 5.5")
+      expect(pdf_text).to include("Length: 6") 
+      expect(pdf_text).to include("Height: 4.5")
 
       # Check assessment sections exist
       expect(pdf_text).to include("User Height")

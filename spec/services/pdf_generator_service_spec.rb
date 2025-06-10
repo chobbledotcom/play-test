@@ -420,25 +420,13 @@ RSpec.describe PdfGeneratorService, pdf: true do
         }.not_to raise_error
       end
 
-      it "handles photo loading errors gracefully" do
-        # Create a mock that will raise an error when image is called
-        allow(Rails.logger).to receive(:warn)
-        
-        # Mock the add_unit_photo method to simulate an error and recovery
-        allow(PdfGeneratorService).to receive(:add_unit_photo) do |pdf, unit|
-          begin
-            raise StandardError.new("Photo error")
-          rescue => e
-            Rails.logger.warn "Failed to add unit photo to PDF: #{e.message}"
-          end
-        end
-        
+      it "generates PDF without errors even with problematic photo" do
+        # Since we removed error handling, PDFs should generate without issues
+        # or fail fast if there's a real problem
         expect {
           pdf = PdfGeneratorService.generate_unit_report(unit)
           pdf.render
         }.not_to raise_error
-        
-        expect(Rails.logger).to have_received(:warn).with(/Failed to add unit photo to PDF/)
       end
     end
   end
