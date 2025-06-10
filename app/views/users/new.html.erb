@@ -18,6 +18,8 @@
         field: :password_confirmation, 
         type: :password_field,
         required: true %>
+
+    <%= render 'form/text_field', field: :rpii_inspector_number %>
   <% end %>
 
   <%= render 'form/submit_button',

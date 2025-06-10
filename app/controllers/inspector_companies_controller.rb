@@ -66,7 +66,7 @@ class InspectorCompaniesController < ApplicationController
 
   def inspector_company_params
     params.require(:inspector_company).permit(
-      :name, :rpii_registration_number, :email, :phone, :address,
+      :name, :email, :phone, :address,
       :city, :state, :postal_code, :country,
       :active, :notes, :logo
     )

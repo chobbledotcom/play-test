@@ -3,7 +3,6 @@
 <%= form_with(model: @inspector_company) do |form| %>
     <%= render 'form/fieldset', legend: t('inspector_companies.headers.company_details'), i18n_base: 'inspector_companies.forms', form: form do %>
       <%= render 'form/text_field', field: :name, required: true %>
-      <%= render 'form/text_field', field: :rpii_registration_number, required: true %>
       <%= render 'form/text_field', field: :email, type: :email_field %>
       <%= render 'form/text_field', field: :phone, type: :telephone_field, required: true %>
 

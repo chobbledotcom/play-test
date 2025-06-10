@@ -16,18 +16,7 @@ RSpec.describe InspectorCompany, type: :model do
       expect(company.errors[:name]).to be_present
     end
 
-    it "validates presence of rpii_registration_number" do
-      company = build(:inspector_company, rpii_registration_number: nil)
-      expect(company).not_to be_valid
-      expect(company.errors[:rpii_registration_number]).to be_present
-    end
-
-    it "validates uniqueness of rpii_registration_number" do
-      create(:inspector_company, rpii_registration_number: "RPII123")
-      company = build(:inspector_company, rpii_registration_number: "RPII123")
-      expect(company).not_to be_valid
-      expect(company.errors[:rpii_registration_number]).to be_present
-    end
+    # RPII numbers are now validated at the user level, not company level
 
     it "validates presence of phone" do
       company = build(:inspector_company, phone: nil)
@@ -86,13 +75,8 @@ RSpec.describe InspectorCompany, type: :model do
     let(:company) { create(:inspector_company) }
 
     describe "#has_valid_credentials?" do
-      it "returns true when RPII number is present" do
+      it "always returns true since RPII validation moved to user level" do
         expect(company.has_valid_credentials?).to be_truthy
-      end
-
-      it "returns false when RPII number is blank" do
-        company.rpii_registration_number = ""
-        expect(company.has_valid_credentials?).to be_falsy
       end
     end
 

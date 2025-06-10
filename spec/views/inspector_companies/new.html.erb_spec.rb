@@ -13,7 +13,7 @@ RSpec.describe "inspector_companies/new", type: :view do
 
     expect(rendered).to include("New Inspector Company")
     expect(rendered).to include('name="inspector_company[name]"')
-    expect(rendered).to include('name="inspector_company[rpii_registration_number]"')
+    # Form no longer includes company-level RPII field
     expect(rendered).to include('name="inspector_company[email]"')
     expect(rendered).to include('name="inspector_company[phone]"')
     expect(rendered).to include('name="inspector_company[address]"')
@@ -23,7 +23,7 @@ RSpec.describe "inspector_companies/new", type: :view do
     render
 
     expect(rendered).to include("Company Name")
-    expect(rendered).to include("RPII Registration Number")
+    # RPII numbers are now per-inspector, not per-company
     expect(rendered).to include("Email")
     expect(rendered).to include("Phone")
     expect(rendered).to include("Address")

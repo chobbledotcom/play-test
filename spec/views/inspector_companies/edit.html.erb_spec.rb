@@ -20,7 +20,7 @@ RSpec.describe "inspector_companies/edit", type: :view do
     render
 
     expect(rendered).to include(inspector_company.name)
-    expect(rendered).to include(inspector_company.rpii_registration_number)
+    # RPII numbers are now per-inspector, not per-company
     expect(rendered).to include(inspector_company.email)
     expect(rendered).to include(inspector_company.phone)
     expect(rendered).to include(inspector_company.address)

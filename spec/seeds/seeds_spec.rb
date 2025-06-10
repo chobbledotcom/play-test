@@ -30,7 +30,6 @@ RSpec.describe "Seed Data", type: :model do
         companies = InspectorCompany.all
         companies.each do |company|
           expect(company.name).to be_present
-          expect(company.rpii_registration_number).to be_present
           expect(company.email).to be_present
           expect(company.phone).to be_present
           expect(company.address).to be_present
@@ -45,17 +44,14 @@ RSpec.describe "Seed Data", type: :model do
       it "creates specific expected companies" do
         stefan_testing = InspectorCompany.find_by(name: "Stefan's Testing Co")
         expect(stefan_testing).to be_present
-        expect(stefan_testing.rpii_registration_number).to eq("RPII-001")
         expect(stefan_testing.active).to be true
 
         steph_test = InspectorCompany.find_by(name: "Steph Test")
         expect(steph_test).to be_present
-        expect(steph_test.rpii_registration_number).to eq("RPII-002")
         expect(steph_test.active).to be true
 
         steve_inflatable = InspectorCompany.find_by(name: "Steve Inflatable Testing")
         expect(steve_inflatable).to be_present
-        expect(steve_inflatable.rpii_registration_number).to eq("RPII-003")
         expect(steve_inflatable.active).to be false
       end
 
@@ -76,6 +72,7 @@ RSpec.describe "Seed Data", type: :model do
         users.each do |user|
           expect(user.email).to be_present
           expect(user.password_digest).to be_present
+          expect(user.rpii_inspector_number).to be_present
           expect(user.inspection_limit).to be_present
           expect(user.time_display).to be_present
           expect(["date", "time"]).to include(user.time_display)
@@ -528,7 +525,7 @@ RSpec.describe "Seed Data", type: :model do
 
       it "creates unique identifiers where required" do
         # Check that required unique fields are actually unique
-        rpii_numbers = InspectorCompany.pluck(:rpii_registration_number)
+        rpii_numbers = User.pluck(:rpii_inspector_number)
         expect(rpii_numbers.uniq.length).to eq(rpii_numbers.length)
 
         user_emails = User.pluck(:email)

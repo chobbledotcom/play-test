@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_09_153208) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_10_113704) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -184,7 +184,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_153208) do
 
   create_table "inspector_companies", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.string "name", null: false
-    t.string "rpii_registration_number", null: false
     t.string "email"
     t.string "phone", null: false
     t.text "address", null: false
@@ -197,7 +196,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_153208) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["active"], name: "index_inspector_companies_on_active"
-    t.index ["rpii_registration_number"], name: "index_inspector_companies_on_rpii_registration_number", unique: true
   end
 
   create_table "materials_assessments", force: :cascade do |t|
@@ -425,6 +423,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_09_153208) do
     t.string "inspection_company_id"
     t.string "default_inspection_location"
     t.string "theme", default: "light"
+    t.string "rpii_inspector_number"
     t.index ["email"], name: "index_users_on_email"
     t.index ["inspection_company_id"], name: "index_users_on_inspection_company_id"
   end

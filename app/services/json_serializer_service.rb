@@ -63,7 +63,7 @@ class JsonSerializerService
     if inspection.inspector_company.present?
       data[:inspector_company] = {
         name: inspection.inspector_company.name,
-        rpii_registration_number: inspection.inspector_company.rpii_registration_number
+        rpii_inspector_number: inspection.user&.rpii_inspector_number
       }
     end
 

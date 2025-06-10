@@ -3,6 +3,7 @@ FactoryBot.define do
     sequence(:email) { |n| "user#{n}@example.com" }
     password { "password123" }
     password_confirmation { "password123" }
+    sequence(:rpii_inspector_number) { |n| "RPII#{n.to_s.rjust(3, "0")}" }
     inspection_limit { 10 }
     time_display { "date" }
     association :inspection_company, factory: :inspector_company

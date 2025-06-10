@@ -29,9 +29,8 @@ en:
         fail: "Fail"
         issued_by: "Issued by"
         issued: "Issued"
-        rpii_reg_number: "RPII Reg Number"
-        place_of_inspection: "Place of Inspection"
-        unique_report_number: "Unique Report Number"
+        rpii_inspector_no: "RPII Inspector No"
+        report_id: "Report ID"
         description: "Description"
         serial_number_asset_id: "Serial Number / Asset ID"
         owner: "Owner"
@@ -45,6 +44,7 @@ en:
         draft: "Draft"
         passed: "PASSED"
         failed: "FAILED"
+        incomplete: "INCOMPLETE"
         na: "N/A"
 
     unit:

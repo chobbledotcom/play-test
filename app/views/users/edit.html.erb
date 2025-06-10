@@ -8,6 +8,7 @@
     <%= render 'form/text_field', field: :password, type: :password_field, 
         label: t('users.forms.password_help') %>
     <%= render 'form/text_field', field: :password_confirmation, type: :password_field %>
+    <%= render 'form/text_field', field: :rpii_inspector_number %>
     
     <% if current_user.admin? %>
       <%= render 'form/number', field: :inspection_limit, min: 0 %>

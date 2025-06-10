@@ -23,6 +23,7 @@ en:
       password_confirmation: "Password confirmation"
       current_password: "Current password"
       password_help: "New Password (leave blank if no change)"
+      rpii_inspector_number: "RPII Inspector No"
       inspection_limit: "Inspection limit"
       inspection_company_id: "Inspection Company"
       time_display: "Time Display Format"

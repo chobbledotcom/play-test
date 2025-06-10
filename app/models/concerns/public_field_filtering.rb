@@ -24,6 +24,7 @@ module PublicFieldFiltering
     unique_report_number
     general_notes
     recommendations
+    inspection_location
   ].freeze
 
   # Fields excluded from PDFs (combines shared + PDF-specific)

@@ -8,13 +8,11 @@ RSpec.describe "inspector_companies/index", type: :view do
     assign(:inspector_companies, [
       create(:inspector_company,
         name: "First Company",
-        rpii_registration_number: "RPII001",
         phone: "1234567890",
         address: "123 First St",
         active: true),
       create(:inspector_company,
         name: "Second Company",
-        rpii_registration_number: "RPII002",
         phone: "1234567891",
         address: "124 Second St",
         active: true)
@@ -31,8 +29,9 @@ RSpec.describe "inspector_companies/index", type: :view do
 
       expect(rendered).to include("First Company")
       expect(rendered).to include("Second Company")
-      expect(rendered).to include("RPII001")
-      expect(rendered).to include("RPII002")
+      # Companies are displayed with their phone numbers
+      expect(rendered).to include("1234567890")
+      expect(rendered).to include("1234567891")
     end
 
     it "shows active status" do

@@ -9,7 +9,6 @@ class InspectorCompany < ApplicationRecord
 
   # Validations
   validates :name, presence: true
-  validates :rpii_registration_number, presence: true, uniqueness: true
   validates :email, format: {with: URI::MailTo::EMAIL_REGEXP}, allow_blank: true
   validates :phone, presence: true
   validates :address, presence: true
@@ -27,7 +26,7 @@ class InspectorCompany < ApplicationRecord
   }
   scope :search_by_term, ->(term) {
     return all if term.blank?
-    where("name LIKE ? OR rpii_registration_number LIKE ?", "%#{term}%", "%#{term}%")
+    where("name LIKE ?", "%#{term}%")
   }
 
   # Callbacks
@@ -36,7 +35,7 @@ class InspectorCompany < ApplicationRecord
 
   # Methods
   def has_valid_credentials?
-    rpii_registration_number.present?
+    true
   end
 
   def full_address

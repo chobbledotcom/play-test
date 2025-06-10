@@ -5,7 +5,7 @@ RSpec.describe "InspectorCompanies", type: :request do
   let(:regular_user) { create(:user) }
 
   let(:valid_attributes) { attributes_for(:inspector_company) }
-  let(:invalid_attributes) { {name: "", rpii_registration_number: "", phone: "", address: ""} }
+  let(:invalid_attributes) { {name: "", phone: "", address: ""} }
 
   describe "Authentication requirements" do
     describe "GET /inspector_companies" do
@@ -121,7 +121,7 @@ RSpec.describe "InspectorCompanies", type: :request do
           post inspector_companies_path, params: {inspector_company: valid_attributes}
           company = InspectorCompany.find_by(name: valid_attributes[:name])
           expect(company.name).to eq(valid_attributes[:name])
-          expect(company.rpii_registration_number).to eq(valid_attributes[:rpii_registration_number])
+          # Company no longer has RPII field - that's per-inspector now
         end
 
         it "redirects to the created inspector company" do
@@ -268,15 +268,14 @@ RSpec.describe "InspectorCompanies", type: :request do
     it "handles duplicate RPII registration numbers" do
       existing_company = create(:inspector_company)
 
+      # RPII uniqueness is now enforced at user level, not company level
       post inspector_companies_path, params: {
         inspector_company: valid_attributes.merge(
-          name: "Different Company",
-          rpii_registration_number: existing_company.rpii_registration_number
+          name: "Different Company"
         )
       }
 
-      expect(response).to render_template(:new)
-      expect(assigns(:inspector_company).errors[:rpii_registration_number]).to be_present
+      expect(response).to redirect_to(assigns(:inspector_company))
     end
   end
 end

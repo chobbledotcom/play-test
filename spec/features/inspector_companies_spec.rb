@@ -125,7 +125,7 @@ RSpec.describe "Inspector Companies", type: :feature do
       expect(page).to have_content(I18n.t("inspector_companies.headers.company_status"))
 
       expect(page).to have_field(I18n.t("inspector_companies.forms.name"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.rpii_registration_number"))
+      # RPII field no longer exists at company level
       expect(page).to have_field(I18n.t("inspector_companies.forms.email"))
       expect(page).to have_field(I18n.t("inspector_companies.forms.phone"))
       expect(page).to have_field(I18n.t("inspector_companies.forms.address"))
@@ -144,7 +144,7 @@ RSpec.describe "Inspector Companies", type: :feature do
       visit new_inspector_company_path
 
       fill_in I18n.t("inspector_companies.forms.name"), with: "Test Inspector Company"
-      fill_in I18n.t("inspector_companies.forms.rpii_registration_number"), with: "RPII-12345"
+      # RPII numbers are now per-inspector, not per-company
       fill_in I18n.t("inspector_companies.forms.email"), with: "test@example.com"
       fill_in I18n.t("inspector_companies.forms.phone"), with: "01234567890"
       fill_in I18n.t("inspector_companies.forms.address"), with: "123 Test Street"
@@ -166,9 +166,9 @@ RSpec.describe "Inspector Companies", type: :feature do
 
       click_button I18n.t("inspector_companies.buttons.create")
 
-      expect(page).to have_content(I18n.t("inspector_companies.errors.header", count: 4))
+      expect(page).to have_content(I18n.t("inspector_companies.errors.header", count: 3))
       expect(page).to have_content("Name #{I18n.t("errors.messages.cant_be_blank")}")
-      expect(page).to have_content("Rpii registration number #{I18n.t("errors.messages.cant_be_blank")}")
+      # RPII validation is now at user level, not company level
       expect(page).to have_content("Phone #{I18n.t("errors.messages.cant_be_blank")}")
       expect(page).to have_content("Address #{I18n.t("errors.messages.cant_be_blank")}")
     end
@@ -188,7 +188,7 @@ RSpec.describe "Inspector Companies", type: :feature do
       expect(page).to have_content(I18n.t("inspector_companies.headers.company_details"))
       expect(page).to have_content(I18n.t("inspector_companies.headers.company_statistics"))
 
-      expect(page).to have_content(company.rpii_registration_number)
+      # Company RPII field no longer exists
       expect(page).to have_content(company.phone)
       expect(page).to have_content(company.email)
     end
@@ -214,7 +214,7 @@ RSpec.describe "Inspector Companies", type: :feature do
 
       expect(page).to have_content(I18n.t("inspector_companies.titles.edit"))
       expect(page).to have_field(I18n.t("inspector_companies.forms.name"), with: company.name)
-      expect(page).to have_field(I18n.t("inspector_companies.forms.rpii_registration_number"), with: company.rpii_registration_number)
+      # RPII field no longer exists at company level
       expect(page).to have_button(I18n.t("inspector_companies.buttons.update"))
       expect(page).to have_link(I18n.t("inspector_companies.buttons.archive"))
     end
@@ -278,7 +278,7 @@ RSpec.describe "Inspector Companies", type: :feature do
       visit new_inspector_company_path
 
       expect(find_field(I18n.t("inspector_companies.forms.name"))["required"]).to eq("required")
-      expect(find_field(I18n.t("inspector_companies.forms.rpii_registration_number"))["required"]).to eq("required")
+      # RPII field validation now at user level
       expect(find_field(I18n.t("inspector_companies.forms.phone"))["required"]).to eq("required")
       expect(find_field(I18n.t("inspector_companies.forms.address"))["required"]).to eq("required")
     end

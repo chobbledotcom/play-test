@@ -23,20 +23,17 @@ class PdfGeneratorService
       # Structure Assessment section
       generate_structure_section(pdf, inspection)
 
-      # Start two-column layout for remaining sections
-      pdf.column_box([0, pdf.cursor], columns: 2, width: pdf.bounds.width, height: 400) do
-        # Anchorage Assessment
-        generate_anchorage_section(pdf, inspection)
+      # Anchorage Assessment
+      generate_anchorage_section(pdf, inspection)
 
-        # Totally Enclosed section (if applicable)
-        generate_enclosed_section(pdf, inspection) if inspection.unit&.is_totally_enclosed?
+      # Totally Enclosed section (if applicable)
+      generate_enclosed_section(pdf, inspection) if inspection.unit&.is_totally_enclosed?
 
-        # Materials Assessment
-        generate_materials_section(pdf, inspection)
+      # Materials Assessment
+      generate_materials_section(pdf, inspection)
 
-        # Fan/Blower Assessment
-        generate_fan_section(pdf, inspection)
-      end
+      # Fan/Blower Assessment
+      generate_fan_section(pdf, inspection)
 
       # Risk Assessment section
       generate_risk_assessment_section(pdf, inspection)
@@ -91,92 +88,82 @@ class PdfGeneratorService
     # Add unit photo to top right if available
     add_unit_photo(pdf, inspection.unit)
 
-    # Inspection Report title
-    pdf.text I18n.t("pdf.inspection.title"), size: 14, style: :bold, color: "CC0000"
-    pdf.move_down 5
-
-    # Issued by company
-    if inspection.inspector_company&.name.present?
-      pdf.text "#{I18n.t("pdf.inspection.fields.issued_by")}: #{inspection.inspector_company.name}", size: 12, style: :bold
-    end
-    pdf.move_down 5
-
-    # Issue date
-    pdf.text "#{I18n.t("pdf.inspection.fields.issued")} #{inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.inspection.fields.na")}",
-      size: 14, style: :bold, color: "CC0000"
-    pdf.move_down 5
-
-    # RPII Registration Number
-    if inspection.inspector_company&.rpii_registration_number.present?
-      pdf.text "#{I18n.t("pdf.inspection.fields.rpii_reg_number")}: #{inspection.inspector_company.rpii_registration_number}",
-        size: 14, style: :bold, color: "CC0000"
-    end
-    pdf.move_down 5
-
-    # Place of Inspection
-    if inspection.inspection_location.present?
-      pdf.text "#{I18n.t("pdf.inspection.fields.place_of_inspection")}: #{inspection.inspection_location}",
-        size: 8, style: :bold, color: "CC0000"
-    end
-    pdf.move_down 5
-
-    # Unique Report Number
-    pdf.text "#{I18n.t("pdf.inspection.fields.unique_report_number")}: #{inspection.id}", size: 12, style: :bold, color: "CC0000"
-    pdf.move_down 20
-  end
-
-  def self.generate_inspection_equipment_details(pdf, inspection)
-    pdf.text I18n.t("pdf.inspection.equipment_details"), size: 12, style: :bold
-    pdf.move_down 5
-
-    unit = inspection.unit
-
-    if unit
-      # Description/Name
-      pdf.text "#{I18n.t("pdf.inspection.fields.description")}: #{truncate_text(unit.name || unit.description || I18n.t("pdf.inspection.fields.na"), 66)}", size: 8
-
-      # Manufacturer
-      manufacturer_text = unit.manufacturer.presence || I18n.t("pdf.inspection.fields.not_specified")
-      pdf.text "#{I18n.t("pdf.inspection.fields.manufacturer")}: #{manufacturer_text}", size: 8
-
-      # Size dimensions
-      dimensions = []
-      dimensions << "Width: #{unit.width}" if unit.width.present?
-      dimensions << "Length: #{unit.length}" if unit.length.present?
-      dimensions << "Height: #{unit.height}" if unit.height.present?
-
-      if dimensions.any?
-        pdf.text "#{I18n.t("pdf.inspection.fields.size_m")}: #{dimensions.join(" ")}", size: 8
-      end
-
-      # Serial Number
-      pdf.text "#{I18n.t("pdf.inspection.fields.serial_number_asset_id")}: #{unit.serial || I18n.t("pdf.inspection.fields.na")}", size: 8
-
-      # Owner
-      pdf.text "#{I18n.t("pdf.inspection.fields.owner")}: #{unit.owner || I18n.t("pdf.inspection.fields.na")}", size: 8 if unit.owner.present?
-
-      # Unit Type / Has Slide
-      unit_type = unit.has_slide? ? I18n.t("pdf.inspection.fields.unit_with_slide") : I18n.t("pdf.inspection.fields.standard_unit")
-      pdf.text "#{I18n.t("pdf.inspection.fields.type")}: #{unit_type}", size: 8
+    # Line 1: Inspection Report - Unit Name - Status/Date
+    unit_name = inspection.unit&.name || I18n.t("pdf.inspection.fields.na")
+    status_date = if inspection.complete?
+      "#{I18n.t("pdf.inspection.fields.issued")} #{inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.inspection.fields.na")}"
     else
-      pdf.text I18n.t("pdf.inspection.fields.no_unit_associated"), size: 8, style: :italic
+      I18n.t("pdf.inspection.fields.incomplete")
+    end
+
+    line1_parts = [I18n.t("pdf.inspection.title"), unit_name, status_date]
+    pdf.text line1_parts.join(" - "), align: :center, size: 12, style: :bold, color: "663399"
+    pdf.move_down 8
+
+    # Line 2: Unique Report Number
+    pdf.text "#{I18n.t("pdf.inspection.fields.report_id")}: #{inspection.id}",
+      align: :center, size: 12, style: :bold, color: "663399"
+    pdf.move_down 8
+
+    # Line 3: Company Name, Town, RPII Inspector No
+    inspector_user = inspection.user
+    if inspector_user&.inspection_company
+      company_parts = []
+      company_parts << inspector_user.inspection_company.name if inspector_user.inspection_company.name.present?
+      company_parts << inspector_user.inspection_company.city if inspector_user.inspection_company.city.present?
+      company_parts << "#{I18n.t("pdf.inspection.fields.rpii_inspector_no")}: #{inspector_user.rpii_inspector_number}" if inspector_user.rpii_inspector_number.present?
+
+      if company_parts.any?
+        # Show incomplete status in red if not complete
+        line3_color = inspection.complete? ? "663399" : "CC0000"
+        pdf.text company_parts.join(", "), align: :center, size: 10, color: line3_color
+      end
     end
 
     pdf.move_down 15
   end
 
-  def self.generate_inspection_test_results(pdf, inspection)
-    pdf.text I18n.t("pdf.inspection.inspection_results"), size: 14, style: :bold
-    pdf.stroke_horizontal_rule
-    pdf.move_down 10
+  def self.generate_inspection_equipment_details(pdf, inspection)
+    unit = inspection.unit
 
+    if unit
+      # Size dimensions
+      dimensions = []
+      dimensions << "Width: #{unit.width}" if unit.width.present?
+      dimensions << "Length: #{unit.length}" if unit.length.present?
+      dimensions << "Height: #{unit.height}" if unit.height.present?
+      dimensions_text = dimensions.any? ? dimensions.join(" ") : I18n.t("pdf.inspection.fields.na")
+
+      # Unit Type / Has Slide
+      unit_type = unit.has_slide? ? I18n.t("pdf.inspection.fields.unit_with_slide") : I18n.t("pdf.inspection.fields.standard_unit")
+
+      equipment_data = [
+        [I18n.t("pdf.inspection.fields.description"), truncate_text(unit.name || unit.description || I18n.t("pdf.inspection.fields.na"), 66)],
+        [I18n.t("pdf.inspection.fields.manufacturer"), unit.manufacturer.presence || I18n.t("pdf.inspection.fields.not_specified")],
+        [I18n.t("pdf.inspection.fields.size_m"), dimensions_text],
+        [I18n.t("pdf.inspection.fields.serial_number_asset_id"), unit.serial || I18n.t("pdf.inspection.fields.na")],
+        [I18n.t("pdf.inspection.fields.type"), unit_type]
+      ]
+
+      # Add owner if present
+      if unit.owner.present?
+        equipment_data << [I18n.t("pdf.inspection.fields.owner"), unit.owner]
+      end
+
+      create_nice_box_table(pdf, I18n.t("pdf.inspection.equipment_details"), equipment_data)
+    else
+      create_nice_box_table(pdf, I18n.t("pdf.inspection.equipment_details"), [[I18n.t("pdf.inspection.fields.no_unit_associated"), ""]])
+    end
+  end
+
+  def self.generate_inspection_test_results(pdf, inspection)
     results = [
       [I18n.t("pdf.inspection.fields.inspection_date"), inspection.inspection_date&.strftime("%d/%m/%Y")],
       [I18n.t("pdf.inspection.fields.inspector"), inspection.inspector_company.name],
       [I18n.t("pdf.inspection.fields.overall_result"), inspection.passed ? I18n.t("pdf.inspection.fields.pass") : I18n.t("pdf.inspection.fields.fail")]
     ]
 
-    create_pdf_table(pdf, results) do |table|
+    create_nice_box_table(pdf, I18n.t("pdf.inspection.inspection_results"), results) do |table|
       table.row(results.length - 1).background_color = inspection.passed ? "CCFFCC" : "FFCCCC"
     end
   end
@@ -204,6 +191,27 @@ class PdfGeneratorService
     table
   end
 
+  def self.create_nice_box_table(pdf, title, data)
+    pdf.text title, size: 12, style: :bold
+    pdf.stroke_horizontal_rule
+    pdf.move_down 10
+
+    table = pdf.table(data, width: pdf.bounds.width) do |t|
+      t.cells.borders = []
+      t.cells.padding = [4, 8]
+      t.cells.size = 10
+      t.columns(0).font_style = :bold
+      t.columns(0).width = 150
+      t.row(0..data.length - 1).background_color = "EEEEEE"
+      t.row(0..data.length - 1).borders = [:bottom]
+      t.row(0..data.length - 1).border_color = "DDDDDD"
+    end
+
+    yield table if block_given?
+    pdf.move_down 15
+    table
+  end
+
   # Unit report methods (updated from equipment)
   def self.generate_unit_pdf_header(pdf, unit)
     # Add unit photo to top right if available
@@ -212,7 +220,7 @@ class PdfGeneratorService
     pdf.text I18n.t("pdf.unit.title"), size: 20, style: :bold, align: :center
     pdf.move_down 20
 
-    pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width, height: 70) do
+    pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width) do
       pdf.stroke_bounds
       pdf.move_down 5
       pdf.text "#{I18n.t("pdf.unit.fields.name").titleize}: #{unit.name}", align: :center, size: 14, style: :bold
@@ -316,7 +324,7 @@ class PdfGeneratorService
         [:play_area_length, "m"],
         [:play_area_width, "m"]
       ]
-      
+
       measurement_fields.each do |field, unit|
         add_field_with_comment(pdf, assessment, field, unit, type)
       end
@@ -335,7 +343,7 @@ class PdfGeneratorService
 
       # User Capacities
       pdf.text I18n.t("inspections.assessments.user_height.sections.user_capacities"), size: 8, style: :bold
-      
+
       user_capacity_heights = [1000, 1200, 1500, 1800]
       user_capacity_heights.each do |height|
         field_name = "users_at_#{height}mm"
@@ -354,7 +362,7 @@ class PdfGeneratorService
         [:slide_first_metre_height, "m"],
         [:slide_beyond_first_metre_height, "m"]
       ]
-      
+
       height_fields.each do |field, unit|
         add_field_with_comment(pdf, assessment, field, unit, type)
       end
@@ -387,18 +395,18 @@ class PdfGeneratorService
         :unit_stable_pass,
         :evacuation_time_pass
       ]
-      
+
       pass_fail_fields.each do |field|
         add_pass_fail_field_with_comment(pdf, assessment, field, type)
       end
-      
+
       # Measurement fields with pass/fail
       measurement_fields = [
         [:stitch_length, "mm", :stitch_length_pass],
         [:blower_tube_length, "m", :blower_tube_length_pass],
         [:unit_pressure_value, "Pa", :unit_pressure_pass]
       ]
-      
+
       measurement_fields.each do |value_field, unit, pass_field|
         add_measurement_pass_fail_field(pdf, assessment, value_field, unit, pass_field, type)
       end
@@ -419,7 +427,7 @@ class PdfGeneratorService
         :anchor_degree_pass,
         :anchor_accessories_pass
       ]
-      
+
       pass_fail_fields.each do |field|
         add_pass_fail_field_with_comment(pdf, assessment, field, type)
       end
@@ -444,7 +452,7 @@ class PdfGeneratorService
       pass_fail_fields.each do |field|
         add_pass_fail_field_with_comment(pdf, assessment, field, type)
       end
-      
+
       # Rope size with measurement
       add_measurement_pass_fail_field(pdf, assessment, :rope_size, "mm", :rope_size_pass, type)
     end
@@ -459,7 +467,7 @@ class PdfGeneratorService
         :pat_pass,
         :blower_visual_pass
       ]
-      
+
       pass_fail_fields.each do |field|
         add_pass_fail_field_with_comment(pdf, assessment, field, type)
       end
@@ -469,7 +477,7 @@ class PdfGeneratorService
         [:blower_serial, nil],
         [:fan_size_comment, 60]
       ]
-      
+
       optional_fields.each do |field, truncate_length|
         if assessment.send(field).present?
           label = I18n.t("inspections.assessments.fan.fields.#{field}")
@@ -522,13 +530,13 @@ class PdfGeneratorService
     pass_field = options[:pass_field]
     custom_label = options[:label]
     custom_text = options[:text]
-    
+
     # Get the label
     label = custom_label || I18n.t("inspections.assessments.#{assessment_type}.fields.#{field_name}")
-    
+
     # Get the value
     value = assessment.send(field_name) unless custom_text
-    
+
     # Format the value based on field type
     formatted_value = if custom_text
       custom_text
@@ -541,38 +549,38 @@ class PdfGeneratorService
     else
       value || I18n.t("pdf.inspection.fields.na")
     end
-    
+
     # Build the text parts
     text_parts = []
     text_parts << "#{label}:" unless custom_text
     text_parts << formatted_value
-    
+
     # Add pass/fail if specified
     if pass_field
       pass_fail = assessment.send(pass_field)
       text_parts << "-"
       text_parts << format_pass_fail(pass_fail)
     end
-    
+
     # Add comment if it exists
     comment_field = derive_comment_field_name(field_name, pass_field)
     if assessment.respond_to?(comment_field)
       comment = assessment.send(comment_field)
       text_parts << truncate_text(comment, 60) if comment.present?
     end
-    
+
     # Render the complete text
     pdf.text text_parts.join(" "), size: 8
   end
 
   # Derive the comment field name based on the main field or pass field
   def self.derive_comment_field_name(field_name, pass_field = nil)
-    if pass_field
+    base_name = if pass_field
       # Use pass field as base, removing _pass suffix
-      base_name = pass_field.to_s.gsub(/_pass$/, "")
+      pass_field.to_s.gsub(/_pass$/, "")
     else
       # Use field name as base, removing _pass suffix if present
-      base_name = field_name.to_s.gsub(/_pass$/, "")
+      field_name.to_s.gsub(/_pass$/, "")
     end
     "#{base_name}_comment"
   end

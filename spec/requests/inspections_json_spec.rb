@@ -43,7 +43,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
 
         expect(json["inspector_company"]).to be_present
         expect(json["inspector_company"]["name"]).to eq(inspection.inspector_company.name)
-        expect(json["inspector_company"]["rpii_registration_number"]).to eq(inspection.inspector_company.rpii_registration_number)
+        expect(json["inspector_company"]["rpii_inspector_number"]).to eq(inspection.user.rpii_inspector_number)
       end
 
       it "includes unit info" do

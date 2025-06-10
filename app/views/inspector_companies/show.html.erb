@@ -15,10 +15,7 @@
     <th><%= t('inspector_companies.forms.name') %></th>
     <td><%= @inspector_company.name %></td>
   </tr>
-  <tr>
-    <th><%= t('inspector_companies.forms.rpii_registration_number') %></th>
-    <td><%= @inspector_company.rpii_registration_number %></td>
-  </tr>
+  <!-- RPII numbers are now per-inspector, not per-company -->
   <tr>
     <th><%= t('inspector_companies.headers.credentials') %></th>
     <td>

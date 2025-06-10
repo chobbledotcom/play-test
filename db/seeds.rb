@@ -6,31 +6,8 @@
 # to prevent unauthorized access if seed data is accidentally left in production.
 # These passwords are not logged or displayed anywhere.
 
-# Helper methods
-
-def british_phone_number
-  # Generate realistic UK mobile numbers (07xxx format)
-  "07#{rand(100..999)} #{rand(100..999)} #{rand(1000..9999)}"
-end
-
-def british_postcode
-  # Generate realistic UK postcodes
-  prefixes = ["SW", "SE", "NW", "N", "E", "W", "EC", "WC", "B", "M", "L", "G", "EH", "CF", "BS", "OX", "CB"]
-  "#{prefixes.sample}#{rand(1..20)} #{rand(1..9)}#{("A".."Z").to_a.sample}#{("A".."Z").to_a.sample}"
-end
-
-def british_address
-  streets = ["High Street", "Church Lane", "Victoria Road", "King's Road", "Queen Street",
-    "Park Avenue", "Station Road", "London Road", "Market Square", "The Green"]
-  numbers = (1..200).to_a
-  "#{numbers.sample} #{streets.sample}"
-end
-
-def british_city
-  ["London", "Birmingham", "Manchester", "Leeds", "Liverpool", "Newcastle", "Bristol",
-    "Sheffield", "Nottingham", "Leicester", "Oxford", "Cambridge", "Brighton", "Southampton",
-    "Edinburgh", "Glasgow", "Cardiff", "Belfast"].sample
-end
+# Load shared test data helpers
+require_relative '../lib/test_data_helpers'
 
 # Clear existing data in development
 if Rails.env.development?
@@ -55,13 +32,12 @@ end
 # Phase 1: Inspector Companies
 stefan_testing = InspectorCompany.create!(
   name: "Stefan's Testing Co",
-  rpii_registration_number: "RPII-001",
   email: "info@play-test.co.uk",
-  phone: british_phone_number,
-  address: british_address,
+  phone: TestDataHelpers.british_phone_number,
+  address: TestDataHelpers.british_address,
   city: "Birmingham",
   state: "West Midlands",
-  postal_code: british_postcode,
+  postal_code: TestDataHelpers.british_postcode,
   country: "UK",
   active: true,
   notes: "Premier inflatable inspection service in the Midlands. Established 2015."
@@ -69,13 +45,12 @@ stefan_testing = InspectorCompany.create!(
 
 steph_test = InspectorCompany.create!(
   name: "Steph Test",
-  rpii_registration_number: "RPII-002",
   email: "enquiries@play-test.co.uk",
-  phone: british_phone_number,
-  address: british_address,
+  phone: TestDataHelpers.british_phone_number,
+  address: TestDataHelpers.british_address,
   city: "Manchester",
   state: "Greater Manchester",
-  postal_code: british_postcode,
+  postal_code: TestDataHelpers.british_postcode,
   country: "UK",
   active: true,
   notes: "Specialising in soft play and inflatable safety across the North West."
@@ -83,13 +58,12 @@ steph_test = InspectorCompany.create!(
 
 steve_inflatable = InspectorCompany.create!(
   name: "Steve Inflatable Testing",
-  rpii_registration_number: "RPII-003",
   email: "old@play-test.co.uk",
-  phone: british_phone_number,
-  address: british_address,
+  phone: TestDataHelpers.british_phone_number,
+  address: TestDataHelpers.british_address,
   city: "London",
   state: "Greater London",
-  postal_code: british_postcode,
+  postal_code: TestDataHelpers.british_postcode,
   country: "UK",
   active: false,
   notes: "Company ceased trading in 2023. Records maintained for historical purposes."
@@ -105,6 +79,7 @@ end
 test_user = User.create!(
   email: "test@play-test.co.uk",
   password: generate_secure_password,
+  rpii_inspector_number: "RPII-001",
   inspection_company: stefan_testing,
   inspection_limit: -1,
   time_display: "time"
@@ -114,6 +89,7 @@ test_user = User.create!(
 lead_inspector = User.create!(
   email: "lead@play-test.co.uk",
   password: generate_secure_password,
+  rpii_inspector_number: "RPII-002",
   inspection_company: stefan_testing,
   inspection_limit: -1,
   time_display: "time"
@@ -122,6 +98,7 @@ lead_inspector = User.create!(
 User.create!(
   email: "junior@play-test.co.uk",
   password: generate_secure_password,
+  rpii_inspector_number: "RPII-003",
   inspection_company: stefan_testing,
   inspection_limit: 10,
   time_display: "date"
@@ -130,6 +107,7 @@ User.create!(
 User.create!(
   email: "senior@play-test.co.uk",
   password: generate_secure_password,
+  rpii_inspector_number: "RPII-004",
   inspection_company: stefan_testing,
   inspection_limit: 50,
   time_display: "time"
@@ -139,6 +117,7 @@ User.create!(
 steph_test_inspector = User.create!(
   email: "inspector@play-test.co.uk",
   password: generate_secure_password,
+  rpii_inspector_number: "RPII-005",
   inspection_company: steph_test,
   inspection_limit: 20,
   time_display: "date"
@@ -148,6 +127,7 @@ steph_test_inspector = User.create!(
 User.create!(
   email: "old@play-test.co.uk",
   password: generate_secure_password,
+  rpii_inspector_number: "RPII-006",
   inspection_company: steve_inflatable,
   inspection_limit: 5,
   time_display: "date"
@@ -543,7 +523,7 @@ AnchorageAssessment.create!(
     unit: unit,
     inspector_company: test_user.inspection_company,
     inspection_date: rand(1..60).days.ago,
-    inspection_location: "#{british_address}, #{british_city}",
+    inspection_location: "#{TestDataHelpers.british_address}, #{TestDataHelpers.british_city}",
     unique_report_number: "#{test_user.inspection_company.name[0..2].upcase}-2025-#{rand(1000..9999)}",
     complete_date: Time.current,
     passed: rand(0..4) > 0, # 80% pass rate
