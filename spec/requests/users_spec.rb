@@ -62,6 +62,21 @@ RSpec.describe "Users", type: :request do
 
       expect(page).to have_current_path(root_path)
     end
+
+    it "creates new users as inactive by default" do
+      post "/users", params: {
+        user: {
+          email: "newuser@example.com",
+          password: "password123",
+          password_confirmation: "password123"
+        }
+      }
+
+      user = User.find_by(email: "newuser@example.com")
+      expect(user).to be_present
+      expect(user.active_until).to eq(Date.current - 1.day)
+      expect(user.is_active?).to be false
+    end
   end
 
   describe "password change functionality" do

@@ -12,6 +12,7 @@ class User < ApplicationRecord
   validates :theme, inclusion: {in: %w[light dark]}
 
   before_create :set_default_time_display
+  before_create :set_inactive_on_signup
   before_save :downcase_email
 
   def is_active?
@@ -37,6 +38,11 @@ class User < ApplicationRecord
     end
   end
 
+  def active_until=(value)
+    @active_until_explicitly_set = true
+    super(value)
+  end
+
   private
 
   def downcase_email
@@ -46,5 +52,14 @@ class User < ApplicationRecord
 
   def set_default_time_display
     self.time_display ||= "date"
+  end
+
+  def set_inactive_on_signup
+    # Set active_until to yesterday so user is inactive by default
+    # Admin will need to extend this date for user to become active
+    # Only set default if active_until was not explicitly provided
+    unless instance_variable_get(:@active_until_explicitly_set)
+      self.active_until = Date.current - 1.day
+    end
   end
 end

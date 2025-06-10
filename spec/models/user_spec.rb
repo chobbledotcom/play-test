@@ -88,9 +88,10 @@ RSpec.describe User, type: :model do
   end
 
   describe "active_until" do
-    it "defaults to nil (active indefinitely)" do
-      user = create(:user)
-      expect(user.active_until).to be_nil
+    it "defaults to yesterday (inactive on signup)" do
+      user = create(:user, :newly_signed_up)
+      expect(user.active_until).to eq(Date.current - 1.day)
+      expect(user.is_active?).to be false # Yesterday means inactive
     end
 
     describe "#is_active?" do

@@ -5,7 +5,8 @@ FactoryBot.define do
     password_confirmation { "password123" }
     sequence(:rpii_inspector_number) { |n| "RPII#{n.to_s.rjust(3, "0")}" }
     time_display { "date" }
-    active_until { nil }
+    # Default factory creates active users for tests - real signups will be inactive
+    active_until { Date.current + 1.year }
     association :inspection_company, factory: :inspector_company
 
     trait :admin do
@@ -17,6 +18,11 @@ FactoryBot.define do
     end
 
     trait :inactive_user do
+      active_until { Date.current - 1.day }
+    end
+
+    trait :newly_signed_up do
+      # This simulates the real signup behavior
       active_until { Date.current - 1.day }
     end
 
