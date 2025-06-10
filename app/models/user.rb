@@ -8,24 +8,21 @@ class User < ApplicationRecord
 
   validates :email, presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
   validates :password, presence: true, length: {minimum: 6}, if: :password_digest_changed?
-  validates :inspection_limit, numericality: {only_integer: true, greater_than_or_equal_to: -1}
   validates :time_display, inclusion: {in: %w[date time]}
   validates :theme, inclusion: {in: %w[light dark]}
 
-  before_create :set_default_inspection_limit
   before_create :set_default_time_display
   before_save :downcase_email
 
-  def can_create_inspection?
-    has_inspection_company? &&
-      inspection_company_active? &&
-      within_inspection_limit?
+  def is_active?
+    active_until.nil? || active_until >= Date.current
   end
 
-  def inspection_company_required_message
-    return I18n.t("users.messages.company_not_activated") unless has_inspection_company?
-    return I18n.t("users.messages.company_archived") unless inspection_company_active?
-    I18n.t("users.messages.inspection_limit_reached")
+  # Temporary alias - will be removed later
+  alias_method :can_create_inspection?, :is_active?
+
+  def inactive_user_message
+    I18n.t("users.messages.user_inactive")
   end
 
   def admin?
@@ -40,28 +37,12 @@ class User < ApplicationRecord
     end
   end
 
-  def has_inspection_company?
-    inspection_company_id.present?
-  end
-
   private
-
-  def inspection_company_active?
-    inspection_company&.active?
-  end
-
-  def within_inspection_limit?
-    inspection_limit == -1 || inspections.count < inspection_limit
-  end
 
   def downcase_email
     self.email = email.downcase
   end
 
-  def set_default_inspection_limit
-    env_limit = ENV["LIMIT_INSPECTIONS"]
-    self.inspection_limit = env_limit.present? ? env_limit.to_i : -1
-  end
 
   def set_default_time_display
     self.time_display ||= "date"

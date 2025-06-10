@@ -204,7 +204,7 @@ RSpec.describe "Users", type: :request do
         patch user_path(regular_user), params: {
           user: {
             email: "updated@example.com",
-            inspection_limit: 100
+            active_until: Date.current + 1.year
           }
         }
 
@@ -213,7 +213,7 @@ RSpec.describe "Users", type: :request do
 
         regular_user.reload
         expect(regular_user.email).to eq("updated@example.com")
-        expect(regular_user.inspection_limit).to eq(100)
+        expect(regular_user.active_until).to eq(Date.current + 1.year)
       end
 
       it "renders error when user update fails" do

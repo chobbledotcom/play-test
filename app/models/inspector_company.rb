@@ -34,9 +34,7 @@ class InspectorCompany < ApplicationRecord
   after_update :update_inspection_company_data, if: :saved_change_to_name?
 
   # Methods
-  def has_valid_credentials?
-    true
-  end
+  # Credentials validation moved to individual inspector level (User model)
 
   def full_address
     [address, city, state, postal_code].compact.join(", ")

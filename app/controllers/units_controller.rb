@@ -213,8 +213,8 @@ class UnitsController < ApplicationController
   end
 
   def require_inspection_company
-    unless current_user.has_inspection_company?
-      flash[:alert] = I18n.t("units.messages.inspection_company_required")
+    unless current_user.is_active?
+      flash[:alert] = current_user.inactive_user_message
       redirect_to units_path
     end
   end

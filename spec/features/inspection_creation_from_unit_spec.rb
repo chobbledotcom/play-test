@@ -40,15 +40,15 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       expect(button["data-turbo-confirm"]).to eq(I18n.t("units.messages.add_inspection_confirm"))
     end
 
-    it "prevents creating inspection when at limit" do
-      # Simulate user at inspection limit
-      allow_any_instance_of(User).to receive(:can_create_inspection?).and_return(false)
+    it "prevents creating inspection when user is inactive" do
+      # Make user inactive
+      user.update!(active_until: Date.current - 1.day)
 
       visit unit_path(unit)
 
       click_button I18n.t("units.buttons.add_inspection")
 
-      expect(page).to have_content(I18n.t("users.messages.inspection_limit_reached"))
+      expect(page).to have_content(I18n.t("users.messages.user_inactive"))
       expect(user.inspections.count).to eq(0)
     end
 

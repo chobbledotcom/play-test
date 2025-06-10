@@ -14,9 +14,9 @@
   </head>
   <body<% if current_user&.theme == "dark" %> class="dark-theme"<% end %>>
     <% if current_user %>
-      <% if !current_user.has_inspection_company? %>
+      <% if !current_user.is_active? %>
         <aside id="company-activation-notice">
-          <%= current_user.inspection_company_required_message %>
+          <%= current_user.inactive_user_message %>
         </aside>
       <% end %>
       <nav>

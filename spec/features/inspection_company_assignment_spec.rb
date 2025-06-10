@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.feature "Inspection Company Assignment", type: :feature do
+RSpec.feature "User Active Status Management", type: :feature do
   let(:admin_user) { create(:user, email: "admin@example.com") }
-  let(:regular_user) { create(:user, :without_company, email: "user@example.com") }
+  let(:regular_user) { create(:user, :inactive_user, email: "user@example.com") }
   let!(:inspector_company) { create(:inspector_company, active: true) }
 
   before do
@@ -11,30 +11,30 @@ RSpec.feature "Inspection Company Assignment", type: :feature do
     allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
   end
 
-  describe "Admin assigning inspection company to user" do
+  describe "Admin managing user active status" do
     before { sign_in admin_user }
 
-    scenario "Admin can assign inspection company to user" do
+    scenario "Admin can set user active until date" do
       visit edit_user_path(regular_user)
 
-      expect(page).to have_select("user_inspection_company_id")
-      select inspector_company.name, from: "user_inspection_company_id"
+      expect(page).to have_field("user_active_until")
+      fill_in "user_active_until", with: (Date.current + 1.year).strftime("%Y-%m-%d")
       click_button I18n.t("users.buttons.update_user")
 
       expect(page).to have_content("User updated")
       regular_user.reload
-      expect(regular_user.inspection_company_id).to eq(inspector_company.id)
+      expect(regular_user.active_until).to eq(Date.current + 1.year)
     end
   end
 
   describe "Non-admin user restrictions" do
     before { sign_in regular_user }
 
-    scenario "Regular user cannot see inspection company field in settings" do
+    scenario "Regular user cannot see active until field in settings" do
       visit change_settings_user_path(regular_user)
 
-      expect(page).not_to have_select("user_inspection_company_id")
-      expect(page).not_to have_content("Inspection Company")
+      expect(page).not_to have_field("user_active_until")
+      expect(page).not_to have_content("Active Until")
     end
 
     scenario "Regular user cannot access admin user edit page" do
@@ -46,35 +46,35 @@ RSpec.feature "Inspection Company Assignment", type: :feature do
   end
 
   describe "Inspection creation restrictions" do
-    context "when user has no inspection company assigned" do
+    context "when user is inactive" do
       before { sign_in regular_user }
 
-      scenario "User cannot create inspection without company" do
+      scenario "User cannot create inspection when inactive" do
         unit = create(:unit, user: regular_user)
 
         visit unit_path(unit)
         click_button I18n.t("units.buttons.add_inspection")
 
-        expect(page).to have_content(regular_user.inspection_company_required_message)
+        expect(page).to have_content(regular_user.inactive_user_message)
         expect(current_path).to eq(unit_path(unit))
       end
 
-      scenario "User can access inspections index but sees activation message" do
+      scenario "User can access inspections index but sees inactive message" do
         visit inspections_path
 
         expect(current_path).to eq(inspections_path)
-        expect(page).to have_content(regular_user.inspection_company_required_message)
-        expect(page).not_to have_link(I18n.t("inspections.buttons.add_via_units"))
+        expect(page).to have_content(regular_user.inactive_user_message)
+        expect(page).not_to have_button(I18n.t("inspections.buttons.add_inspection"))
       end
     end
 
-    context "when user has inspection company assigned" do
+    context "when user is active" do
       before do
-        regular_user.update!(inspection_company: inspector_company)
+        regular_user.update!(active_until: Date.current + 1.year, inspection_company: inspector_company)
         sign_in regular_user
       end
 
-      scenario "User can create inspection when company is assigned" do
+      scenario "User can create inspection when active" do
         unit = create(:unit, user: regular_user)
 
         visit unit_path(unit)
@@ -82,7 +82,7 @@ RSpec.feature "Inspection Company Assignment", type: :feature do
 
         # Should redirect to edit page for the new inspection
         expect(current_path).to match(/\/inspections\/\w+\/edit/)
-        expect(page).not_to have_content(regular_user.inspection_company_required_message)
+        expect(page).not_to have_content(regular_user.inactive_user_message)
       end
 
       scenario "Created inspection has user's inspection company" do
@@ -96,39 +96,31 @@ RSpec.feature "Inspection Company Assignment", type: :feature do
         expect(inspection.inspector_company_id).to eq(inspector_company.id)
       end
 
-      scenario "Inspection company doesn't change when user's company changes" do
+      scenario "User can still create inspections regardless of company changes" do
         unit = create(:unit, user: regular_user)
-        original_company = inspector_company
-        new_company = create(:inspector_company, name: "New Company", active: true)
 
         visit unit_path(unit)
         click_button I18n.t("units.buttons.add_inspection")
 
         inspection = regular_user.inspections.find_by(unit_id: unit.id)
         expect(inspection).to be_present
-        expect(inspection.inspector_company_id).to eq(original_company.id)
-
-        # Change user's company
-        regular_user.update!(inspection_company: new_company)
-
-        # Inspection should still have original company
-        inspection.reload
-        expect(inspection.inspector_company_id).to eq(original_company.id)
-        expect(inspection.inspector_company_id).not_to eq(new_company.id)
+        
+        # Active users can always create inspections
+        expect(regular_user.is_active?).to be true
       end
     end
   end
 
   describe "Inspection form display" do
-    let(:unit) { create(:unit, user: regular_user) }
+    let(:active_regular_user) { create(:user, :active_user, inspection_company: inspector_company) }
+    let(:unit) { create(:unit, user: active_regular_user) }
     let(:admin_unit) { create(:unit, user: admin_user) }
-    let(:inspection) { create(:inspection, user: regular_user, unit: unit, inspector_company: inspector_company) }
+    let(:inspection) { create(:inspection, user: active_regular_user, unit: unit, inspector_company: inspector_company) }
     let(:admin_inspection) { create(:inspection, user: admin_user, unit: admin_unit, inspector_company: inspector_company) }
 
     context "for regular users" do
       before do
-        regular_user.update!(inspection_company: inspector_company)
-        sign_in regular_user
+        sign_in active_regular_user
       end
 
       scenario "Regular user sees read-only inspection company field" do
@@ -142,7 +134,7 @@ RSpec.feature "Inspection Company Assignment", type: :feature do
 
     context "for admin users" do
       before do
-        admin_user.update!(inspection_company: inspector_company)
+        admin_user.update!(inspection_company: inspector_company, active_until: nil)
         sign_in admin_user
       end
 

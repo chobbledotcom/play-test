@@ -40,11 +40,11 @@ RSpec.feature "Unit creation company restriction", type: :feature do
     end
   end
 
-  context "when user does not have an inspection company" do
-    let(:user_without_company) { create(:user, :without_company) }
+  context "when user is inactive" do
+    let(:inactive_user) { create(:user, :inactive_user) }
 
     before do
-      sign_in(user_without_company)
+      sign_in(inactive_user)
     end
 
     scenario "user cannot see the new unit button" do
@@ -60,7 +60,7 @@ RSpec.feature "Unit creation company restriction", type: :feature do
 
       # Should be redirected to units index with an error message
       expect(page).to have_current_path(units_path)
-      expect(page).to have_content(I18n.t("units.messages.inspection_company_required"))
+      expect(page).to have_content(inactive_user.inactive_user_message)
     end
 
     scenario "user cannot create a unit via POST request" do
@@ -81,16 +81,16 @@ RSpec.feature "Unit creation company restriction", type: :feature do
 
       # Should be redirected with error message
       expect(page).to have_current_path(units_path)
-      expect(page).to have_content(I18n.t("units.messages.inspection_company_required"))
+      expect(page).to have_content(inactive_user.inactive_user_message)
 
       # Verify no unit was created for this user
-      expect(user_without_company.units.reload.count).to eq(0)
+      expect(inactive_user.units.reload.count).to eq(0)
     end
   end
 
   context "when user's company is archived" do
     let(:archived_company) { create(:inspector_company, active: false) }
-    let(:user_with_archived_company) { create(:user, inspection_company: archived_company) }
+    let(:user_with_archived_company) { create(:user, :active_user, inspection_company: archived_company) }
 
     before do
       sign_in(user_with_archived_company)
@@ -104,40 +104,40 @@ RSpec.feature "Unit creation company restriction", type: :feature do
     end
   end
 
-  context "switching between users with and without companies" do
+  context "switching between active and inactive users" do
     let(:admin_user) { create(:user, :without_company, email: "admin@example.com") }
-    let(:user_with_company) { create(:user) }
-    let(:user_without_company) { create(:user, :without_company) }
+    let(:active_user) { create(:user, :active_user) }
+    let(:inactive_user) { create(:user, :inactive_user) }
 
     before do
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
     end
 
-    scenario "button visibility changes based on user's company status" do
-      # Start as user with company
-      sign_in(user_with_company)
+    scenario "button visibility changes based on user's active status" do
+      # Start as active user
+      sign_in(active_user)
       visit units_path
       expect(page).to have_button(I18n.t("units.buttons.add_unit"))
 
-      # Switch to user without company
+      # Switch to inactive user
       visit logout_path
-      sign_in(user_without_company)
+      sign_in(inactive_user)
       visit units_path
       expect(page).not_to have_button(I18n.t("units.buttons.add_unit"))
 
-      # Admin removes company from first user
+      # Admin makes first user inactive
       visit logout_path
       sign_in(admin_user)
-      visit edit_user_path(user_with_company)
-      select I18n.t("users.forms.no_company"), from: I18n.t("users.forms.inspection_company_id")
+      visit edit_user_path(active_user)
+      fill_in "user_active_until", with: (Date.current - 1.day).strftime("%Y-%m-%d")
       click_button I18n.t("users.buttons.update_user")
 
       # Now first user should not see the button
       visit logout_path
-      sign_in(user_with_company)
+      sign_in(active_user)
       visit units_path
-      expect(page).not_to have_link(I18n.t("units.titles.new"))
+      expect(page).not_to have_button(I18n.t("units.buttons.add_unit"))
     end
   end
 end

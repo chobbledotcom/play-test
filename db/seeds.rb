@@ -81,8 +81,8 @@ test_user = User.create!(
   password: generate_secure_password,
   rpii_inspector_number: "RPII-001",
   inspection_company: stefan_testing,
-  inspection_limit: -1,
-  time_display: "time"
+  time_display: "time",
+  active_until: Date.current + 1.year
 )
 
 # Stefan's Testing users
@@ -91,8 +91,8 @@ lead_inspector = User.create!(
   password: generate_secure_password,
   rpii_inspector_number: "RPII-002",
   inspection_company: stefan_testing,
-  inspection_limit: -1,
-  time_display: "time"
+  time_display: "time",
+  active_until: Date.current + 1.year
 )
 
 User.create!(
@@ -100,8 +100,8 @@ User.create!(
   password: generate_secure_password,
   rpii_inspector_number: "RPII-003",
   inspection_company: stefan_testing,
-  inspection_limit: 10,
-  time_display: "date"
+  time_display: "date",
+  active_until: Date.current + 1.year
 )
 
 User.create!(
@@ -109,8 +109,8 @@ User.create!(
   password: generate_secure_password,
   rpii_inspector_number: "RPII-004",
   inspection_company: stefan_testing,
-  inspection_limit: 50,
-  time_display: "time"
+  time_display: "time",
+  active_until: Date.current + 1.year
 )
 
 # Steph Test user
@@ -119,8 +119,8 @@ steph_test_inspector = User.create!(
   password: generate_secure_password,
   rpii_inspector_number: "RPII-005",
   inspection_company: steph_test,
-  inspection_limit: 20,
-  time_display: "date"
+  time_display: "date",
+  active_until: Date.current + 1.year
 )
 
 # Retired company user
@@ -129,8 +129,8 @@ User.create!(
   password: generate_secure_password,
   rpii_inspector_number: "RPII-006",
   inspection_company: steve_inflatable,
-  inspection_limit: 5,
-  time_display: "date"
+  time_display: "date",
+  active_until: Date.current - 1.day
 )
 
 # Phase 3: Units (British terminology)

@@ -48,13 +48,8 @@ class InspectionsController < ApplicationController
     unit_id = params[:unit_id] || inspection_params[:unit_id]
     unit = nil
 
-    unless current_user.inspection_company_id.present?
-      flash[:alert] = current_user.inspection_company_required_message
-      redirect_to unit_id.present? ? unit_path(unit_id) : root_path and return
-    end
-
-    unless current_user.can_create_inspection?
-      flash[:alert] = current_user.inspection_company_required_message
+    unless current_user.is_active?
+      flash[:alert] = current_user.inactive_user_message
       redirect_to unit_id.present? ? unit_path(unit_id) : root_path and return
     end
 

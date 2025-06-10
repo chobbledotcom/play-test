@@ -40,11 +40,7 @@ RSpec.describe "inspector_companies/show", type: :view do
       expect(rendered).to include("UK")
     end
 
-    it "shows credentials status" do
-      render
-
-      expect(rendered).to include("Valid Credentials")
-    end
+    # Credentials are now validated at the inspector level, not company level
 
     it "shows admin action links" do
       render

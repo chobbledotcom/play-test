@@ -16,12 +16,7 @@
     <td><%= @inspector_company.name %></td>
   </tr>
   <!-- RPII numbers are now per-inspector, not per-company -->
-  <tr>
-    <th><%= t('inspector_companies.headers.credentials') %></th>
-    <td>
-      <%= @inspector_company.has_valid_credentials? ? t('inspector_companies.status.valid_credentials') : t('inspector_companies.status.invalid_credentials') %>
-    </td>
-  </tr>
+  <!-- Credentials are now validated at the inspector level, not company level -->
   <tr>
     <th><%= t('inspector_companies.forms.email') %></th>
     <td>

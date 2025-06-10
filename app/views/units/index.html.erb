@@ -1,6 +1,6 @@
 <%= render 'shared/page_header', title: @title || "Equipment" %>
 
-<% if current_user.has_inspection_company? %>
+<% if current_user.is_active? %>
   <%= button_to new_unit_path,
       method: :get do %>
     <strong><%= t('units.buttons.add_unit') %></strong>

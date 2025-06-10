@@ -38,7 +38,6 @@
       <tr>
         <th><%= t('inspector_companies.forms.name') %></th>
         <th><%= t('inspector_companies.forms.phone') %></th>
-        <th><%= t('inspector_companies.headers.credentials') %></th>
         <th><%= t('inspector_companies.status.active') %></th>
         <th><%= t('ui.actions') %></th>
       </tr>
@@ -48,7 +47,6 @@
         <tr>
           <td><%= link_to company.name, company %></td>
           <td><%= company.phone %></td>
-          <td><%= company.has_valid_credentials? ? t('inspector_companies.status.valid_credentials') : t('inspector_companies.status.invalid_credentials') %></td>
           <td><%= company.active? ? t('inspector_companies.status.active') : t('inspector_companies.status.archived') %></td>
           <td>
             <%= link_to t('ui.view'), company %>

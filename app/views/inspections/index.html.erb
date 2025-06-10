@@ -1,6 +1,6 @@
 <%= render 'shared/page_header', title: @title %>
 
-<% if current_user.inspection_company_id.present? %>
+<% if current_user.is_active? %>
   <%= button_to inspections_path,
       method: :post,
       params: {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_10_113704) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_10_124215) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -417,13 +417,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_10_113704) do
     t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "inspection_limit", default: -1, null: false
     t.datetime "last_active_at"
     t.string "time_display", default: "date"
     t.string "inspection_company_id"
     t.string "default_inspection_location"
     t.string "theme", default: "light"
     t.string "rpii_inspector_number"
+    t.date "active_until"
     t.index ["email"], name: "index_users_on_email"
     t.index ["inspection_company_id"], name: "index_users_on_inspection_company_id"
   end

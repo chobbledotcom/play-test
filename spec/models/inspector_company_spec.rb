@@ -74,11 +74,7 @@ RSpec.describe InspectorCompany, type: :model do
   describe "methods" do
     let(:company) { create(:inspector_company) }
 
-    describe "#has_valid_credentials?" do
-      it "always returns true since RPII validation moved to user level" do
-        expect(company.has_valid_credentials?).to be_truthy
-      end
-    end
+    # Credentials validation moved to user level - no longer relevant for companies
 
     describe "#full_address" do
       it "combines address components" do

@@ -149,8 +149,9 @@ RSpec.describe "Inspections", type: :request do
     end
 
     describe "POST /create" do
-      context "when user has no inspection company" do
-        before { login_as(user_without_company) }
+      context "when user is inactive" do
+        let(:inactive_user) { create(:user, :inactive_user) }
+        before { login_as(inactive_user) }
 
         it "redirects appropriately" do
           post "/inspections", params: { inspection: valid_inspection_attributes }
@@ -165,14 +166,13 @@ RSpec.describe "Inspections", type: :request do
 
       context "when user cannot create inspections" do
         let(:user_at_limit) do
-          user = create(:user)
-          user.update!(inspection_limit: 0)
+          user = create(:user, :inactive_user)
           user
         end
         
         before { login_as(user_at_limit) }
 
-        it "redirects with alert when limit is 0" do
+        it "redirects with alert when user is inactive" do
           post "/inspections", params: { inspection: valid_inspection_attributes }
           expect_redirect_with_alert(root_path)
         end

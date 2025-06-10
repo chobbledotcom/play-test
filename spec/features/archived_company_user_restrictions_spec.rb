@@ -1,16 +1,16 @@
 require "rails_helper"
 
-RSpec.feature "Archived Company User Restrictions", type: :feature do
+RSpec.feature "Inactive User Restrictions", type: :feature do
   let(:archived_company) { create(:inspector_company, name: "Archived Company", active: false) }
-  let(:user_from_archived_company) { create(:user, :without_company, inspection_company: archived_company) }
-  let!(:unit) { create(:unit, user: user_from_archived_company) }
+  let(:inactive_user) { create(:user, :inactive_user, inspection_company: archived_company) }
+  let!(:unit) { create(:unit, user: inactive_user) }
 
   before do
-    sign_in(user_from_archived_company)
+    sign_in(inactive_user)
   end
 
   describe "Creating inspections" do
-    it "prevents users from archived companies from creating inspections via units page" do
+    it "prevents inactive users from creating inspections via units page" do
       visit unit_path(unit)
 
       # User should see their unit but not be able to create inspections
@@ -19,11 +19,11 @@ RSpec.feature "Archived Company User Restrictions", type: :feature do
       # Should see "Add Inspection" button (since it's their unit)
       expect(page).to have_button(I18n.t("units.buttons.add_inspection"))
 
-      # But clicking it should show the archived company message and not create inspection
+      # But clicking it should show the inactive user message and not create inspection
       click_button I18n.t("units.buttons.add_inspection")
 
-      expect(page).to have_content(I18n.t("users.messages.company_archived"))
-      expect(user_from_archived_company.inspections.count).to eq(0)
+      expect(page).to have_content(I18n.t("users.messages.user_inactive"))
+      expect(inactive_user.inspections.count).to eq(0)
       expect(current_path).to eq(unit_path(unit))
     end
 
@@ -39,7 +39,7 @@ RSpec.feature "Archived Company User Restrictions", type: :feature do
   end
 
   describe "Existing inspections" do
-    let(:existing_inspection) { create(:inspection, user: user_from_archived_company, unit: unit) }
+    let(:existing_inspection) { create(:inspection, user: inactive_user, unit: unit) }
 
     it "still allows viewing existing inspections" do
       existing_inspection # Force creation

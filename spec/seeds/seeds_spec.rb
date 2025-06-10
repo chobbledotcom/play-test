@@ -73,17 +73,16 @@ RSpec.describe "Seed Data", type: :model do
           expect(user.email).to be_present
           expect(user.password_digest).to be_present
           expect(user.rpii_inspector_number).to be_present
-          expect(user.inspection_limit).to be_present
           expect(user.time_display).to be_present
           expect(["date", "time"]).to include(user.time_display)
         end
       end
 
-      it "creates test user with unlimited inspections" do
+      it "creates test user with active status" do
         test_user = User.find_by(email: "test@play-test.co.uk")
         expect(test_user).to be_present
         expect(test_user.inspection_company.name).to eq("Stefan's Testing Co")
-        expect(test_user.inspection_limit).to eq(-1)
+        expect(test_user.is_active?).to be true
       end
 
       it "assigns users to appropriate companies" do
@@ -101,10 +100,10 @@ RSpec.describe "Seed Data", type: :model do
         expect(steve_users.count).to eq(1)
       end
 
-      it "creates users with valid inspection limits" do
+      it "creates users with valid active status" do
         User.all.each do |user|
-          expect(user.inspection_limit).to be >= -1
-          expect(user.inspection_limit).to be_a(Integer)
+          # All users should either be active (nil active_until) or have a date
+          expect(user.active_until).to be_nil.or(be_a(Date))
         end
       end
     end

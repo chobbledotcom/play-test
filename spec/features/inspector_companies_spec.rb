@@ -77,8 +77,6 @@ RSpec.describe "Inspector Companies", type: :feature do
         expect(page).to have_content(company1.name)
         expect(page).to have_content(company2.name)
         expect(page).to have_content(archived_company.name)
-
-        expect(page).to have_content(I18n.t("inspector_companies.status.valid_credentials"))
       end
 
       it "allows searching by company name" do

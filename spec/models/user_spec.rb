@@ -87,113 +87,51 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "inspection_limit" do
-    it "defaults to -1 (unlimited) when LIMIT_INSPECTIONS is not set" do
-      # Ensure environment variable is not set
-      allow(ENV).to receive(:[]).with("LIMIT_INSPECTIONS").and_return(nil)
-
+  describe "active_until" do
+    it "defaults to nil (active indefinitely)" do
       user = create(:user)
-      expect(user.inspection_limit).to eq(-1)
+      expect(user.active_until).to be_nil
     end
 
-    it "uses LIMIT_INSPECTIONS environment variable when set" do
-      # Mock the environment variable
-      allow(ENV).to receive(:[]).with("LIMIT_INSPECTIONS").and_return("20")
+    describe "#is_active?" do
+      it "returns true when active_until is nil" do
+        user = create(:user, active_until: nil)
+        expect(user.is_active?).to be true
+      end
 
-      user = create(:user)
-      expect(user.inspection_limit).to eq(20)
-    end
+      it "returns true when active_until is in the future" do
+        user = create(:user, active_until: Date.current + 1.day)
+        expect(user.is_active?).to be true
+      end
 
-    it "allows unlimited inspections when LIMIT_INSPECTIONS is -1" do
-      # Mock the environment variable
-      allow(ENV).to receive(:[]).with("LIMIT_INSPECTIONS").and_return("-1")
+      it "returns true when active_until is today" do
+        user = create(:user, active_until: Date.current)
+        expect(user.is_active?).to be true
+      end
 
-      user = create(:user)
-      expect(user.inspection_limit).to eq(-1)
-      expect(user.can_create_inspection?).to be true
-    end
-
-    it "validates that inspection_limit is -1 or a non-negative integer" do
-      user = build(:user, inspection_limit: -2)
-      expect(user).not_to be_valid
-      expect(user.errors[:inspection_limit]).to include("must be greater than or equal to -1")
+      it "returns false when active_until is in the past" do
+        user = create(:user, active_until: Date.current - 1.day)
+        expect(user.is_active?).to be false
+      end
     end
 
     describe "#can_create_inspection?" do
-      it "returns true when user has fewer inspections than their limit" do
-        user = create(:user, :limited_inspections)
-        create(:inspection, user: user)
+      it "returns true when user is active" do
+        user = create(:user, :active_user)
         expect(user.can_create_inspection?).to be true
       end
 
-      it "returns false when user has reached their inspection limit (for non-unlimited users)" do
-        allow_any_instance_of(User).to receive(:set_default_inspection_limit)
-
-        # Create a user with a specific limit
-        user = build(:user, inspection_limit: 1)
-        user.save!
-
-        # Create an inspection to reach the limit
-        create(:inspection, user: user)
-
-        # Force reload the user to ensure counts are updated
-        user.reload
-
-        # Check the state before testing can_create_inspection?
-        expect(user.inspection_limit).to eq(1)
-        expect(user.inspections.count).to eq(1)
-
-        # Now test the method
-        expect(user.can_create_inspection?).to be false
-      end
-
-      it "returns true when user has unlimited inspections (-1)" do
-        user = create(:user, :unlimited_inspections)
-
-        # Create more than a typical limit to verify unlimited works
-        create_list(:inspection, 5, user: user)
-
-        expect(user.can_create_inspection?).to be true
-      end
-
-      it "returns false when user's inspection company is archived" do
-        archived_company = create(:inspector_company, active: false)
-        user = create(:user, :without_company, inspection_company: archived_company)
-
-        expect(user.can_create_inspection?).to be false
-      end
-
-      it "returns false when user has no inspection company" do
-        user = create(:user, :without_company)
-
+      it "returns false when user is inactive" do
+        user = create(:user, :inactive_user)
         expect(user.can_create_inspection?).to be false
       end
     end
 
-    describe "#inspection_company_required_message" do
-      it "returns activation message when user has no inspection company" do
-        user = create(:user, :without_company)
-
-        expect(user.inspection_company_required_message).to eq(
-          I18n.t("users.messages.company_not_activated")
-        )
-      end
-
-      it "returns archived message when user's inspection company is archived" do
-        archived_company = create(:inspector_company, active: false)
-        user = create(:user, :without_company, inspection_company: archived_company)
-
-        expect(user.inspection_company_required_message).to eq(
-          I18n.t("users.messages.company_archived")
-        )
-      end
-
-      it "returns limit message when user has reached inspection limit" do
-        user = create(:user, inspection_limit: 1)
-        create(:inspection, user: user)
-
-        expect(user.inspection_company_required_message).to eq(
-          I18n.t("users.messages.inspection_limit_reached")
+    describe "#inactive_user_message" do
+      it "returns inactive user message" do
+        user = create(:user)
+        expect(user.inactive_user_message).to eq(
+          I18n.t("users.messages.user_inactive")
         )
       end
     end

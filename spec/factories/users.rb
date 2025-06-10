@@ -4,20 +4,20 @@ FactoryBot.define do
     password { "password123" }
     password_confirmation { "password123" }
     sequence(:rpii_inspector_number) { |n| "RPII#{n.to_s.rjust(3, "0")}" }
-    inspection_limit { 10 }
     time_display { "date" }
+    active_until { nil }
     association :inspection_company, factory: :inspector_company
 
     trait :admin do
       sequence(:email) { |n| "admin#{n}@example.com" }
     end
 
-    trait :unlimited_inspections do
-      inspection_limit { -1 }
+    trait :active_user do
+      active_until { Date.current + 1.year }
     end
 
-    trait :limited_inspections do
-      inspection_limit { 2 }
+    trait :inactive_user do
+      active_until { Date.current - 1.day }
     end
 
     trait :without_company do

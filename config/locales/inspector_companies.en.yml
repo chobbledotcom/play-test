@@ -37,8 +37,7 @@ en:
       archived: "Archived"
       yes: "Yes"
       no: "No"
-      valid_credentials: "Valid Credentials"
-      invalid_credentials: "Invalid Credentials"
+      # Credential validation moved to inspector level
 
     buttons:
       create: "Create Company"
