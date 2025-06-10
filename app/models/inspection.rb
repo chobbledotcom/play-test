@@ -7,41 +7,52 @@ class Inspection < ApplicationRecord
   belongs_to :inspector_company
 
   # Assessment associations (normalized from single table)
-  has_one :user_height_assessment, class_name: "UserHeightAssessment", dependent: :destroy
-  alias_method :tallest_user_height_assessment, :user_height_assessment  # Alias for new field name
-  has_one :slide_assessment, class_name: "SlideAssessment", dependent: :destroy
-  has_one :structure_assessment, class_name: "StructureAssessment", dependent: :destroy
-  has_one :anchorage_assessment, class_name: "AnchorageAssessment", dependent: :destroy
-  has_one :materials_assessment, class_name: "MaterialsAssessment", dependent: :destroy
+  has_one :user_height_assessment, class_name: "UserHeightAssessment",
+    dependent: :destroy
+  alias_method :tallest_user_height_assessment, :user_height_assessment
+  has_one :slide_assessment, class_name: "SlideAssessment",
+    dependent: :destroy
+  has_one :structure_assessment, class_name: "StructureAssessment",
+    dependent: :destroy
+  has_one :anchorage_assessment, class_name: "AnchorageAssessment",
+    dependent: :destroy
+  has_one :materials_assessment, class_name: "MaterialsAssessment",
+    dependent: :destroy
   has_one :fan_assessment, class_name: "FanAssessment", dependent: :destroy
-  has_one :enclosed_assessment, class_name: "EnclosedAssessment", dependent: :destroy
+  has_one :enclosed_assessment, class_name: "EnclosedAssessment",
+    dependent: :destroy
 
   # Accept nested attributes for all assessments
   accepts_nested_attributes_for :user_height_assessment, :slide_assessment,
-    :structure_assessment, :anchorage_assessment,
-    :materials_assessment, :fan_assessment,
-    :enclosed_assessment
+    :structure_assessment, :anchorage_assessment, :materials_assessment,
+    :fan_assessment, :enclosed_assessment
 
   # Validations - allow drafts to be incomplete
   validates :inspection_location, presence: true, if: :complete?
   validates :inspection_date, presence: true
-  validates :unique_report_number, presence: true, uniqueness: {scope: :user_id}, if: :complete?
+  validates :unique_report_number, presence: true,
+    uniqueness: {scope: :user_id}, if: :complete?
 
   # Step/Ramp Size validations
-  validates :step_ramp_size, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
+  validates :step_ramp_size,
+    numericality: {greater_than_or_equal_to: 0}, allow_blank: true
   validates :step_ramp_size_pass, inclusion: {in: [true, false]}, allow_nil: true
 
   # Critical Fall Off Height validations
-  validates :critical_fall_off_height, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
+  validates :critical_fall_off_height,
+    numericality: {greater_than_or_equal_to: 0}, allow_blank: true
   validates :critical_fall_off_height_pass, inclusion: {in: [true, false]}, allow_nil: true
 
   # Unit Pressure validations
-  validates :unit_pressure, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
+  validates :unit_pressure,
+    numericality: {greater_than_or_equal_to: 0}, allow_blank: true
   validates :unit_pressure_pass, inclusion: {in: [true, false]}, allow_nil: true
 
   # Trough validations
-  validates :trough_depth, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
-  validates :trough_adjacent_panel_width, numericality: {greater_than_or_equal_to: 0}, allow_blank: true
+  validates :trough_depth,
+    numericality: {greater_than_or_equal_to: 0}, allow_blank: true
+  validates :trough_adjacent_panel_width,
+    numericality: {greater_than_or_equal_to: 0}, allow_blank: true
   validates :trough_pass, inclusion: {in: [true, false]}, allow_nil: true
 
   # Entrapment validation
@@ -76,8 +87,7 @@ class Inspection < ApplicationRecord
   scope :search, ->(query) {
     if query.present?
       joins("LEFT JOIN units ON units.id = inspections.unit_id")
-        .where("inspections.inspection_location LIKE ? OR inspections.id LIKE ? OR inspections.unique_report_number LIKE ? OR units.serial LIKE ? OR units.manufacturer LIKE ? OR units.name LIKE ?",
-          "%#{query}%", "%#{query}%", "%#{query}%", "%#{query}%", "%#{query}%", "%#{query}%")
+        .where(search_conditions, *search_values(query))
     else
       all
     end
@@ -99,8 +109,22 @@ class Inspection < ApplicationRecord
   scope :filter_by_inspection_location, ->(location) {
     where(inspection_location: location) if location.present?
   }
-  scope :filter_by_date_range, ->(start_date, end_date) { where(inspection_date: start_date..end_date) if start_date.present? && end_date.present? }
+  scope :filter_by_date_range, ->(start_date, end_date) {
+    where(inspection_date: start_date..end_date) if both_dates_present?(start_date, end_date)
+  }
   scope :overdue, -> { where("inspection_date < ?", Date.today - 1.year) }
+
+  # Helper methods for scopes
+  def self.search_conditions
+    "inspections.inspection_location LIKE ? OR inspections.id LIKE ? OR " \
+    "inspections.unique_report_number LIKE ? OR units.serial LIKE ? OR " \
+    "units.manufacturer LIKE ? OR units.name LIKE ?"
+  end
+
+  def self.search_values(query) = Array.new(6) { "%#{query}%" }
+
+  def self.both_dates_present?(start_date, end_date) =
+    start_date.present? && end_date.present?
 
   # Delegate methods to unit
   delegate :name, :serial, :manufacturer, to: :unit, allow_nil: true
@@ -180,18 +204,9 @@ class Inspection < ApplicationRecord
   end
 
   def validate_completeness
-    errors = []
-
-    # Check each assessment section if they exist
-    errors << "User Height Assessment incomplete" if user_height_assessment.present? && !user_height_assessment.complete?
-    errors << "Slide Assessment incomplete" if slide_assessment.present? && !slide_assessment.complete?
-    errors << "Structure Assessment incomplete" if structure_assessment.present? && !structure_assessment.complete?
-    errors << "Anchorage Assessment incomplete" if anchorage_assessment.present? && !anchorage_assessment.complete?
-    errors << "Materials Assessment incomplete" if materials_assessment.present? && !materials_assessment.complete?
-    errors << "Fan Assessment incomplete" if fan_assessment.present? && !fan_assessment.complete?
-    errors << "Totally Enclosed Assessment incomplete" if enclosed_assessment.present? && !enclosed_assessment.complete?
-
-    errors
+    assessment_validation_data.filter_map do |name, assessment, message|
+      message if assessment&.present? && !assessment.complete?
+    end
   end
 
   def pass_fail_summary
@@ -305,40 +320,41 @@ class Inspection < ApplicationRecord
     assessments.compact.sum { |a| a.respond_to?(:passed_checks_count) ? a.passed_checks_count : 0 }
   end
 
-  def failed_safety_checks
-    total_safety_checks - passed_safety_checks
-  end
+  def failed_safety_checks = total_safety_checks - passed_safety_checks
 
   def duplicate_assessments(new_inspection)
-    user_height_assessment&.dup&.tap { |a|
-      a.inspection = new_inspection
-      a.save!
-    }
-    slide_assessment&.dup&.tap { |a|
-      a.inspection = new_inspection
-      a.save!
-    }
-    structure_assessment&.dup&.tap { |a|
-      a.inspection = new_inspection
-      a.save!
-    }
-    anchorage_assessment&.dup&.tap { |a|
-      a.inspection = new_inspection
-      a.save!
-    }
-    materials_assessment&.dup&.tap { |a|
-      a.inspection = new_inspection
-      a.save!
-    }
-    fan_assessment&.dup&.tap { |a|
-      a.inspection = new_inspection
-      a.save!
-    }
-    if is_totally_enclosed?
-      enclosed_assessment&.dup&.tap { |a|
-        a.inspection = new_inspection
-        a.save!
-      }
+    assessments_to_duplicate.each do |assessment|
+      duplicate_single_assessment(assessment, new_inspection)
+    end
+  end
+
+  private
+
+  def assessment_validation_data
+    [
+      [:user_height, user_height_assessment, "User Height Assessment incomplete"],
+      [:slide, slide_assessment, "Slide Assessment incomplete"],
+      [:structure, structure_assessment, "Structure Assessment incomplete"],
+      [:anchorage, anchorage_assessment, "Anchorage Assessment incomplete"],
+      [:materials, materials_assessment, "Materials Assessment incomplete"],
+      [:fan, fan_assessment, "Fan Assessment incomplete"],
+      [:enclosed, enclosed_assessment, "Totally Enclosed Assessment incomplete"]
+    ]
+  end
+
+  def assessments_to_duplicate
+    assessments = [
+      user_height_assessment, slide_assessment, structure_assessment,
+      anchorage_assessment, materials_assessment, fan_assessment
+    ]
+    assessments << enclosed_assessment if is_totally_enclosed?
+    assessments.compact
+  end
+
+  def duplicate_single_assessment(assessment, new_inspection)
+    assessment.dup.tap do |duplicated|
+      duplicated.inspection = new_inspection
+      duplicated.save!
     end
   end
 end

@@ -65,6 +65,7 @@ en:
       inherited_from_company: "These details are inherited from your company and cannot be edited here."
 
     errors:
+      wrong_password: "Current password is incorrect"
       header:
         one: "Could not save user because there is 1 error:"
         other: "Could not save user because there are %{count} errors:"

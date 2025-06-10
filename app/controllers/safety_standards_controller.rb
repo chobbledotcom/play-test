@@ -35,7 +35,8 @@ class SafetyStandardsController < ApplicationController
   end
 
   def redirect_with_calculation_params
-    redirect_to safety_standards_path(calculation: params[:calculation].to_unsafe_h)
+    calculation_params = params[:calculation].to_unsafe_h
+    redirect_to safety_standards_path(calculation: calculation_params)
   end
 
   def calculate_safety_standard
@@ -100,7 +101,9 @@ class SafetyStandardsController < ApplicationController
       area: area,
       negative_adjustment: negative_adjustment,
       usable_area: usable_area,
-      capacities: SafetyStandard.calculate_user_capacity(length, width, negative_adjustment)
+      capacities: SafetyStandard.calculate_user_capacity(length,
+        width,
+        negative_adjustment)
     }
   end
 
@@ -121,12 +124,15 @@ class SafetyStandardsController < ApplicationController
     {
       platform_height: platform_height,
       required_runout: required_runout,
-      calculation: build_runout_calculation_text(platform_height, required_runout)
+      calculation: build_runout_calculation_text(platform_height,
+        required_runout)
     }
   end
 
   def build_runout_calculation_text(platform_height, required_runout)
-    "50% of #{platform_height}m = #{platform_height * 0.5}m, minimum 0.3m = #{required_runout}m"
+    half_height = platform_height * 0.5
+    "50% of #{platform_height}m = #{half_height}m, " \
+    "minimum 0.3m = #{required_runout}m"
   end
 
   def calculate_wall_height
@@ -157,9 +163,11 @@ class SafetyStandardsController < ApplicationController
     when thresholds[:no_walls_required]..thresholds[:basic_walls]
       "Walls must be at least #{user_height}m (equal to user height)"
     when thresholds[:basic_walls]..thresholds[:enhanced_walls]
-      "Walls must be at least #{calculate_enhanced_wall_height(user_height)}m (1.25× user height)"
+      enhanced_height = calculate_enhanced_wall_height(user_height)
+      "Walls must be at least #{enhanced_height}m (1.25× user height)"
     when thresholds[:enhanced_walls]..thresholds[:max_safe_height]
-      "Walls must be at least #{calculate_enhanced_wall_height(user_height)}m + permanent roof required"
+      enhanced_height = calculate_enhanced_wall_height(user_height)
+      "Walls must be at least #{enhanced_height}m + permanent roof required"
     else
       "Exceeds safe height limits (>#{thresholds[:max_safe_height]}m)"
     end

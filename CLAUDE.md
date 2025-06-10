@@ -151,6 +151,8 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 - **No defensive coding** - expect correct data, let it fail if wrong
 - **No fallbacks** - if data is missing, that's an error to fix
 - **Update old code** - don't support legacy patterns, refactor to new standards
+- **Use modern Ruby syntax** - leverage Ruby 3.0+ features for cleaner, more expressive code
+- **Prioritise readability** - choose the newest, tidiest syntax that improves code clarity
 - Fix the root cause, not the symptom
 - Explicit is better than implicit
 
@@ -190,6 +192,19 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 - Error handling with begin/rescue with specific error messages
 - Flash messages for user-facing errors
 
+### Modern Ruby Syntax Preferences (Ruby 3.0+)
+
+**Always prefer the newest, tidiest syntax available:**
+- **Endless methods** for simple one-liners: `def total = a + b`
+- **Hash shorthand** when key matches method: `{width:, height:}`
+- **Numbered parameters** in simple blocks: `map { _1.upcase }`
+- **Pattern matching** for complex dispatch: `case type in "foo" then ...`
+- **Rightward assignment** for clarity: `(a * b) => result`
+- **Enhanced safe navigation**: `value&.method&.chain || default`
+- **Modern enumerable methods**: `Hash#except`, `Enumerable#filter_map`
+
+**When refactoring, always upgrade to modern syntax** - don't maintain legacy patterns for compatibility
+
 ## Rails Style Guide & Code Standards
 
 ### Line Length & Formatting Standards (80 chars max)
@@ -199,12 +214,18 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 StandardRB will collapse excess whitespace, so use minimal formatting:
 
 ```ruby
-# GOOD - Arrays/hashes: break only if over 80 chars, use shorthand notation
-ALLOWED_FORMATS = %i[pdf csv json xml]  # Under 80 chars, keep on one line
+# GOOD - Arrays/hashes: alphabetical order when order doesn't matter
+ALLOWED_FORMATS = %i[csv json pdf xml]  # Alphabetical, under 80 chars
 
+# GOOD - Break one per line when over 80 chars, maintain alphabetical order
 LONGER_FORMAT_LIST = %i[
-  pdf csv json xml html docx
-]  # Break but minimize lines since StandardRB collapses whitespace
+  csv
+  docx
+  html
+  json
+  pdf
+  xml
+]
 
 # GOOD - Method calls: extract variables instead of parameter alignment
 long_method_name = some_object.very_long_method_name
@@ -218,6 +239,51 @@ some_object
 user_params = { email: "test@example.com", name: "Test User", active: true }
 create(:user, user_params)
 
+# GOOD - Use Ruby shorthand hash syntax when key matches method name
+def basic_attributes
+  {width:, length:, height:, width_comment:, length_comment:}
+end
+
+# BAD - Redundant explicit assignment
+def basic_attributes  
+  {width: width, length: length, height: height}
+end
+
+# GOOD - Use endless methods for simple one-liners (Ruby 3.0+)
+def total_anchors = (num_low_anchors || 0) + (num_high_anchors || 0)
+def max_capacity = user_capacity_values.compact.max || 0
+
+# BAD - Traditional method definition for simple cases
+def total_anchors
+  (num_low_anchors || 0) + (num_high_anchors || 0)
+end
+
+# GOOD - Use numbered parameters in blocks (Ruby 2.7+)  
+methods.grep(/=$/).map { _1.to_s.chomp("=") }
+attributes.map { unit.send(_1) }
+
+# BAD - Unnecessary block parameter names
+methods.grep(/=$/).map { |m| m.to_s.chomp("=") }
+attributes.map { |attr| unit.send(attr) }
+
+# GOOD - Pattern matching for complex dispatch (Ruby 3.0+)
+case calculation_type
+in "anchors" then calculate_anchors
+in "user_capacity" then calculate_user_capacity  
+in "slide_runout" then calculate_slide_runout
+else handle_unknown_type
+end
+
+# GOOD - Rightward assignment for complex expressions (Ruby 3.0+)
+def build_result(length, width, adjustment)
+  (length * width) => area
+  (area - adjustment) => usable_area
+  # ... rest of method
+end
+
+# GOOD - Enhanced safe navigation and modern syntax
+def format_dimension(value) = value&.to_s&.sub(/\.0$/, "") || ""
+
 # GOOD - Long strings: extract to variables or break with backslash
 error_msg = "This is a very long error message that needs to be broken " \
             "across multiple lines for readability"
@@ -230,20 +296,26 @@ error_msg = "This is a very long error message that needs to be broken " \
 LONG_FORMATS = [:pdf, :csv, :json, :xml, :html, :txt, :docx, :xlsx]
 ```
 
-**Length-Based Rule:**
+**Array Ordering & Length Rules:**
 ```ruby  
-# GOOD - Short arrays stay on one line
-validates :name, :email, presence: true
-SIMPLE_ARRAY = %i[active inactive archived]
+# GOOD - Alphabetical order when order doesn't matter
+validates :email, :name, presence: true
+SIMPLE_ARRAY = %i[active archived inactive]
 
-# GOOD - Break when line would exceed 80 chars
-validates :name, :email, :phone, :address, :company, presence: true  # Too long!
-validates :name,  
-          :email,
-          :phone, 
-          :address,
-          :company,
-          presence: true
+# GOOD - One per line when over 80 chars, alphabetical order
+before_action :set_user, only: %i[
+  change_password
+  change_settings
+  destroy
+  edit
+  impersonate
+  update
+  update_password
+  update_settings
+]
+
+# BAD - Random order, hard to scan
+SIMPLE_ARRAY = %i[inactive active archived]
 ```
 
 ### Method Design Principles

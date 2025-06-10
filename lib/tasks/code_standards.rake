@@ -156,7 +156,8 @@ namespace :code_standards do
     puts "To lint only modified files: rake code_standards:lint_modified"
     
     puts "\nFORMATTING PREFERENCES (StandardRB compatible - see CLAUDE.md):"
-    puts "• Arrays/hashes: break only if line would exceed 80 chars, use %i[] %w[]"
+    puts "• Arrays: alphabetical order when order doesn't matter, use %i[] %w[]"
+    puts "• Arrays: one per line when over 80 chars, maintain alphabetical order"
     puts "• Method calls: extract variables or break at method chain points"
     puts "• Hash parameters: extract to variables for readability"
     puts "• Long strings: extract to variables or break with backslash"

@@ -13,7 +13,9 @@ class UnitsController < ApplicationController
 
     # Apply filters
     @units = @units.overdue if params[:status] == "overdue"
-    @units = @units.where(manufacturer: params[:manufacturer]) if params[:manufacturer].present?
+    if params[:manufacturer].present?
+      @units = @units.where(manufacturer: params[:manufacturer])
+    end
     @units = @units.where(owner: params[:owner]) if params[:owner].present?
 
     @title = "Units"
@@ -28,7 +30,9 @@ class UnitsController < ApplicationController
   end
 
   def show
-    @inspections = @unit.inspections.includes(:inspector_company).order(inspection_date: :desc)
+    @inspections = @unit.inspections
+      .includes(:inspector_company)
+      .order(inspection_date: :desc)
 
     respond_to do |format|
       format.html
@@ -40,7 +44,16 @@ class UnitsController < ApplicationController
           type: "application/pdf",
           disposition: "inline"
       end
-      format.json { render json: {id: @unit.id, name: @unit.name, serial: @unit.serial, manufacturer: @unit.manufacturer, has_slide: @unit.has_slide} }
+      format.json do
+        unit_data = {
+          id: @unit.id,
+          name: @unit.name,
+          serial: @unit.serial,
+          manufacturer: @unit.manufacturer,
+          has_slide: @unit.has_slide
+        }
+        render json: unit_data
+      end
     end
   end
 
@@ -87,7 +100,10 @@ class UnitsController < ApplicationController
     else
       respond_to do |format|
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: {status: "error", errors: @unit.errors.full_messages} }
+        format.json do
+          error_data = {status: "error", errors: @unit.errors.full_messages}
+          render json: error_data
+        end
         format.turbo_stream do
           render turbo_stream: [
             turbo_stream.replace("unit_save_message",
@@ -108,7 +124,9 @@ class UnitsController < ApplicationController
       flash[:notice] = I18n.t("units.messages.deleted")
       redirect_to units_path
     else
-      flash[:alert] = @unit.errors.full_messages.first || I18n.t("units.messages.delete_failed")
+      error_message = @unit.errors.full_messages.first ||
+        I18n.t("units.messages.delete_failed")
+      flash[:alert] = error_message
       redirect_to @unit
     end
   end
@@ -184,7 +202,8 @@ class UnitsController < ApplicationController
 
   def unit_params
     unit_specific_params = %i[
-      name serial manufacturer photo description owner model manufacture_date notes
+      name serial manufacturer photo description
+      owner model manufacture_date notes
     ]
     copyable_attributes = Unit.new.copyable_attributes_via_reflection
     params.require(:unit).permit(unit_specific_params + copyable_attributes)
@@ -200,7 +219,8 @@ class UnitsController < ApplicationController
     unless @unit
       if action_name.in?(["report", "qr_code"])
         # For public report access, return 404 instead of redirect
-        render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
+        error_file = "#{Rails.root}/public/404.html"
+        render file: error_file, status: :not_found, layout: false
       else
         flash[:alert] = I18n.t("units.messages.not_found")
         redirect_to units_path and return

@@ -15,13 +15,13 @@ module HasDimensions
       numericality: {only_integer: true, greater_than_or_equal_to: 0},
       allow_nil: true
 
-    validates :rope_size, :slide_platform_height, :slide_wall_height, :runout_value,
-      :slide_first_metre_height, :slide_beyond_first_metre_height,
-      :stitch_length, :unit_pressure_value,
+    validates :rope_size, :slide_platform_height, :slide_wall_height,
+      :runout_value, :slide_first_metre_height,
+      :slide_beyond_first_metre_height, :stitch_length, :unit_pressure_value,
       :blower_tube_length, :step_size_value, :fall_off_height_value,
       :trough_depth_value, :trough_width_value, :containing_wall_height,
-      :platform_height, :tallest_user_height, :play_area_length, :play_area_width,
-      :negative_adjustment,
+      :platform_height, :tallest_user_height, :play_area_length,
+      :play_area_width, :negative_adjustment,
       numericality: {greater_than_or_equal_to: 0},
       allow_nil: true
 
@@ -52,92 +52,56 @@ module HasDimensions
   end
 
   def volume
-    width * length * height if width.present? && length.present? && height.present?
+    return unless dimensions_present?
+
+    width * length * height
   end
 
   # Attribute groups for better organization and DRY code
   def basic_attributes
     {
-      width: width,
-      length: length,
-      height: height,
-      width_comment: width_comment,
-      length_comment: length_comment,
-      height_comment: height_comment
+      width:, length:, height:,
+      width_comment:, length_comment:, height_comment:
     }
   end
 
   def anchorage_attributes
     {
-      num_low_anchors: num_low_anchors,
-      num_high_anchors: num_high_anchors,
-      num_anchors_comment: [num_low_anchors_comment, num_high_anchors_comment].compact.join("; ").presence
+      num_low_anchors:, num_high_anchors:,
+      num_anchors_comment: combined_anchor_comments
     }
   end
 
   def enclosed_attributes
-    {
-      exit_number: exit_number,
-      exit_number_comment: exit_number_comment
-    }
+    {exit_number:, exit_number_comment:}
   end
 
   def materials_attributes
-    {
-      rope_size: rope_size,
-      rope_size_comment: rope_size_comment
-    }
+    {rope_size:, rope_size_comment:}
   end
 
   def slide_attributes
     {
-      slide_platform_height: slide_platform_height,
-      slide_wall_height: slide_wall_height,
-      runout_value: runout_value,
-      slide_first_metre_height: slide_first_metre_height,
-      slide_beyond_first_metre_height: slide_beyond_first_metre_height,
-      slide_permanent_roof: slide_permanent_roof,
-      slide_platform_height_comment: slide_platform_height_comment,
-      slide_wall_height_comment: slide_wall_height_comment,
-      runout_comment: runout_value_comment,
-      slide_first_metre_height_comment: slide_first_metre_height_comment,
-      slide_beyond_first_metre_height_comment: slide_beyond_first_metre_height_comment,
-      slide_permanent_roof_comment: slide_permanent_roof_comment
+      slide_platform_height:, slide_wall_height:, runout_value:,
+      slide_first_metre_height:, slide_beyond_first_metre_height:,
+      slide_permanent_roof:, slide_platform_height_comment:,
+      slide_wall_height_comment:, slide_first_metre_height_comment:,
+      slide_beyond_first_metre_height_comment:,
+      slide_permanent_roof_comment:,
+      runout_comment: runout_value_comment
     }
   end
 
   def structure_attributes
     {
-      stitch_length: stitch_length,
-      unit_pressure_value: unit_pressure_value,
-      blower_tube_length: blower_tube_length,
-      step_size_value: step_size_value,
-      fall_off_height_value: fall_off_height_value,
-      trough_depth_value: trough_depth_value,
-      trough_width_value: trough_width_value
+      stitch_length:, unit_pressure_value:, blower_tube_length:,
+      step_size_value:, fall_off_height_value:, trough_depth_value:,
+      trough_width_value:
     }
   end
 
   def user_height_attributes
-    {
-      containing_wall_height: containing_wall_height,
-      platform_height: platform_height,
-      tallest_user_height: tallest_user_height,
-      users_at_1000mm: users_at_1000mm,
-      users_at_1200mm: users_at_1200mm,
-      users_at_1500mm: users_at_1500mm,
-      users_at_1800mm: users_at_1800mm,
-      play_area_length: play_area_length,
-      play_area_width: play_area_width,
-      negative_adjustment: negative_adjustment,
-      permanent_roof: permanent_roof,
-      containing_wall_height_comment: containing_wall_height_comment,
-      platform_height_comment: platform_height_comment,
-      permanent_roof_comment: permanent_roof_comment,
-      play_area_length_comment: play_area_length_comment,
-      play_area_width_comment: play_area_width_comment,
-      negative_adjustment_comment: negative_adjustment_comment
-    }
+    user_height_data_attributes.merge(user_height_comment_attributes)
   end
 
   def copyable_attributes
@@ -185,7 +149,7 @@ module HasDimensions
   end
 
   def max_user_capacity
-    [users_at_1000mm, users_at_1200mm, users_at_1500mm, users_at_1800mm].compact.max || 0
+    user_capacity_values.compact.max || 0
   end
 
   # Copy all attributes from another object (dimensions, comments, flags, etc.)
@@ -209,13 +173,13 @@ module HasDimensions
     # Get all setter methods on this object
     my_setters = methods.grep(/=$/).map { |m| m.to_s.chomp("=") }
 
-    # Find common attributes (source has the attribute and we have a setter for it)
+    # Find common attributes (source has attribute and we have setter)
     common_attributes = source_attributes & my_setters
 
     # Copy each copyable attribute
     (common_attributes - excluded_copyable_attributes).each do |attr|
       value = source.send(attr)
-      send("#{attr}=", value) if value.present? || source.send("#{attr}?") == false
+      send("#{attr}=", value) if should_copy_value?(value, source, attr)
     end
   end
 
@@ -302,14 +266,50 @@ module HasDimensions
     build_enclosed_assessment(enclosed_attributes.compact)
   end
 
+  private
+
+  def combined_anchor_comments
+    comments = [num_low_anchors_comment, num_high_anchors_comment]
+    comments.compact.join("; ").presence
+  end
+
+  def user_capacity_values
+    [users_at_1000mm, users_at_1200mm, users_at_1500mm, users_at_1800mm]
+  end
+
+  def should_copy_value?(value, source, attr)
+    value.present? || source.send("#{attr}?") == false
+  end
+
+  def dimensions_present?
+    width.present? && length.present? && height.present?
+  end
+
+  def user_height_data_attributes
+    {
+      containing_wall_height:, platform_height:, tallest_user_height:,
+      users_at_1000mm:, users_at_1200mm:, users_at_1500mm:,
+      users_at_1800mm:, play_area_length:, play_area_width:,
+      negative_adjustment:, permanent_roof:
+    }
+  end
+
+  def user_height_comment_attributes
+    {
+      containing_wall_height_comment:, platform_height_comment:,
+      permanent_roof_comment:, play_area_length_comment:,
+      play_area_width_comment:, negative_adjustment_comment:
+    }
+  end
+
   module ClassMethods
     # Find units/inspections with similar dimensions
     def with_similar_dimensions(reference, tolerance: 0.1)
-      return none unless reference.respond_to?(:width) && reference.width.present?
+      return none unless valid_reference_dimensions?(reference)
 
-      width_range = (reference.width * (1 - tolerance))..(reference.width * (1 + tolerance))
-      length_range = (reference.length * (1 - tolerance))..(reference.length * (1 + tolerance))
-      height_range = (reference.height * (1 - tolerance))..(reference.height * (1 + tolerance))
+      width_range = dimension_range(reference.width, tolerance)
+      length_range = dimension_range(reference.length, tolerance)
+      height_range = dimension_range(reference.height, tolerance)
 
       where(width: width_range, length: length_range, height: height_range)
     end
@@ -317,11 +317,36 @@ module HasDimensions
     # Statistical methods for dimensions
     def dimension_statistics
       {
-        width: {avg: average(:width), min: minimum(:width), max: maximum(:width)},
-        length: {avg: average(:length), min: minimum(:length), max: maximum(:length)},
-        height: {avg: average(:height), min: minimum(:height), max: maximum(:height)},
-        area: {avg: average("width * length"), min: minimum("width * length"), max: maximum("width * length")}
+        width: dimension_stats(:width),
+        length: dimension_stats(:length),
+        height: dimension_stats(:height),
+        area: area_stats
       }
+    end
+
+    private
+
+    def valid_reference_dimensions?(reference)
+      reference.respond_to?(:width) && reference.width.present?
+    end
+
+    def dimension_range(value, tolerance)
+      (value * (1 - tolerance))..(value * (1 + tolerance))
+    end
+
+    def dimension_stats(column)
+      avg = average(column)
+      min = minimum(column)
+      max = maximum(column)
+      {avg:, min:, max:}
+    end
+
+    def area_stats
+      area_calculation = "width * length"
+      avg = average(area_calculation)
+      min = minimum(area_calculation)
+      max = maximum(area_calculation)
+      {avg:, min:, max:}
     end
   end
 end

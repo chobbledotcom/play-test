@@ -1,11 +1,18 @@
 class UsersController < ApplicationController
   skip_before_action :require_login, only: [:new, :create]
-  before_action :require_admin, only: %i[index edit update destroy impersonate]
+  before_action :require_admin, only: %i[destroy edit impersonate index update]
   before_action :set_user, only: %i[
-    edit update destroy change_password update_password change_settings update_settings impersonate
+    change_password
+    change_settings
+    destroy
+    edit
+    impersonate
+    update
+    update_password
+    update_settings
   ]
   before_action :require_correct_user, only: %i[
-    change_password update_password change_settings update_settings
+    change_password change_settings update_password update_settings
   ]
 
   def index
@@ -74,7 +81,7 @@ class UsersController < ApplicationController
         render :change_password, status: :unprocessable_entity
       end
     else
-      @user.errors.add(:current_password, I18n.t("activerecord.errors.models.user.attributes.current_password.incorrect"))
+      @user.errors.add(:current_password, I18n.t("users.errors.wrong_password"))
       render :change_password, status: :unprocessable_entity
     end
   end
@@ -107,7 +114,11 @@ class UsersController < ApplicationController
 
   def user_params
     if current_user&.admin?
-      params.require(:user).permit(:email, :password, :password_confirmation, :active_until, :inspection_company_id, :rpii_inspector_number)
+      admin_permitted_params = %i[
+        active_until email inspection_company_id password
+        password_confirmation rpii_inspector_number
+      ]
+      params.require(:user).permit(admin_permitted_params)
     else
       params.require(:user).permit(:email, :password, :password_confirmation)
     end
@@ -128,7 +139,11 @@ class UsersController < ApplicationController
   end
 
   def settings_params
-    params.require(:user).permit(:time_display, :default_inspection_location, :theme, :name, :phone, :address, :country, :postal_code)
+    settings_fields = %i[
+      time_display default_inspection_location theme name
+      phone address country postal_code
+    ]
+    params.require(:user).permit(settings_fields)
   end
 
   # Helper methods for cleaner public interface
@@ -157,7 +172,8 @@ class UsersController < ApplicationController
 
   def normalise_company_association_params
     # Convert empty string to nil for proper association handling
-    params[:user][:inspection_company_id] = nil if params[:user][:inspection_company_id] == ""
+    company_id = params[:user][:inspection_company_id]
+    params[:user][:inspection_company_id] = nil if company_id == ""
   end
 
   def current_password_valid?
@@ -165,7 +181,7 @@ class UsersController < ApplicationController
   end
 
   def handle_incorrect_current_password
-    @user.errors.add(:current_password, I18n.t("activerecord.errors.models.user.attributes.current_password.incorrect"))
+    @user.errors.add(:current_password, I18n.t("users.errors.wrong_password"))
     render :change_password, status: :unprocessable_entity
   end
 
