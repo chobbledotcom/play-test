@@ -126,4 +126,50 @@ class UsersController < ApplicationController
   def settings_params
     params.require(:user).permit(:time_display, :default_inspection_location, :theme, :name, :phone, :address, :country, :postal_code)
   end
+
+  # Helper methods for cleaner public interface
+
+  def storage_cleanup_job_status
+    {
+      storage_cleanup: {
+        name: "StorageCleanupJob",
+        scheduled: StorageCleanupJob.scheduled?,
+        last_run: StorageCleanupJob.last_run_at,
+        next_run: StorageCleanupJob.next_run_at
+      }
+    }
+  end
+
+  def handle_successful_user_creation
+    notify_new_user_in_production
+    log_in @user
+    flash[:notice] = I18n.t("users.messages.account_created")
+    redirect_to root_path
+  end
+
+  def notify_new_user_in_production
+    NtfyService.notify("new user: #{@user.email}") if Rails.env.production?
+  end
+
+  def normalise_company_association_params
+    # Convert empty string to nil for proper association handling
+    params[:user][:inspection_company_id] = nil if params[:user][:inspection_company_id] == ""
+  end
+
+  def current_password_valid?
+    @user.authenticate(params[:user][:current_password])
+  end
+
+  def handle_incorrect_current_password
+    @user.errors.add(:current_password, I18n.t("activerecord.errors.models.user.attributes.current_password.incorrect"))
+    render :change_password, status: :unprocessable_entity
+  end
+
+  def store_original_admin_session
+    session[:original_admin_id] = current_user.id if current_user.admin?
+  end
+
+  def password_action?
+    action_name.include?("password")
+  end
 end

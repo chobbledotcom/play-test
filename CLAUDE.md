@@ -35,9 +35,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Structure: `controller.section.key` or `model.field.description`
 
 ### Testing Approach
+- **Before editing ANY file** - identify what tests/test files are associated with it
 - **Write Capybara tests for ALL new code** - no exceptions
 - **No JavaScript in tests** - test the non-JS fallback behavior
-- **Run tests immediately** - write test, run it, fix issues before moving on
+- **Run tests immediately after editing** - run associated tests as soon as you edit a file
+- **Never build up a backlog** - fix broken tests immediately, don't accumulate issues
 - Use **RSpec** with descriptive contexts/examples
 - Use **Factory Bot** for test data creation
 - Test both happy path and edge cases
@@ -102,6 +104,226 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ActiveRecord validations for data integrity
 - Error handling with begin/rescue with specific error messages
 - Flash messages for user-facing errors
+
+## Rails Style Guide & Code Standards
+
+### Method Design Principles
+- **Maximum 20 lines per method** - if longer, extract private methods or delegate to other objects
+- **Single responsibility** - each method should do one thing well
+- **Descriptive names** - `calculate_total_tax` not `calc_tax` or `get_tax`
+- **No deep nesting** - use guard clauses and early returns
+- **Extract complex conditions** - use predicate methods like `user.can_edit_inspection?`
+
+### Comments Policy
+- **Only comment WHY, never WHAT** - code should be self-explanatory about what it does
+- **Comments explain business context** - regulatory requirements, edge cases, non-obvious decisions
+- **No redundant comments** - `user.save # saves the user` is pointless
+- **Self-documenting code first** - use descriptive method/variable names instead of comments
+- **Remove outdated comments** - incorrect comments are worse than no comments
+- **Use British English** - in comments, variable names, and method names (colour not color, organised not organized)
+
+### Object-Oriented Design
+- **Fat models, skinny controllers** - business logic belongs in models
+- **Use service objects** for complex operations that span multiple models
+- **Value objects** for data that doesn't belong in the database (calculations, transformations)
+- **Concerns for shared behavior** - but prefer composition over inheritance
+- **Delegate appropriately** - `delegate :name, to: :company, prefix: true`
+
+### DRY Principles (Done Right)
+- **DRY code, not DRY tests** - test clarity trumps test brevity
+- **Extract methods for business logic** - not just to reduce lines
+- **Partial extraction** - when the same view logic appears 3+ times
+- **Don't abstract too early** - wait until you see the pattern clearly
+- **Readable duplication > clever abstraction** - if it makes tests harder to understand, don't do it
+
+### Rails Conventions (Always Follow)
+- **Use Rails idioms** - `find_by` not `where(...).first`
+- **Leverage ActiveRecord** - scopes, validations, callbacks where appropriate
+- **RESTful routes** - use Rails routing helpers, avoid custom routes unless necessary
+- **Standard CRUD actions** - index, show, new, create, edit, update, destroy
+- **Rails naming conventions** - no exceptions, update old code to match
+
+### No Backwards Compatibility Code
+- **Update all references** when changing method signatures
+- **Refactor immediately** - don't leave deprecated code paths
+- **Fix at the source** - don't work around old patterns
+- **Consistent codebase** - all code should follow current standards
+- **Delete unused code** - if it's not called, remove it
+
+### Factory Design (Test Data)
+- **Minimal factories** - only set required attributes and uniqueness constraints
+- **Use traits for variations** - `:with_company`, `:archived`, `:admin`
+- **Factory inheritance** sparingly - prefer traits over factory hierarchies
+- **Realistic but simple data** - "Test User" not "John Smith from New York"
+- **Avoid factory dependencies** - each factory should be independently creatable
+
+### Method Length & Complexity Examples
+
+```ruby
+# GOOD - Short, focused methods
+def archive_company
+  update(active: false)
+  notify_users_of_archival
+  log_archival_event
+end
+
+private
+
+def notify_users_of_archival
+  users.each { |user| UserMailer.company_archived(user).deliver_later }
+end
+
+def log_archival_event
+  Rails.logger.info "Company #{name} archived by #{Current.user&.email}"
+end
+
+# BAD - Too long, multiple responsibilities
+def archive_company_and_handle_everything
+  # 25+ lines of mixed concerns
+end
+```
+
+### Object Usage Examples
+
+```ruby
+# GOOD - Service object for complex operations
+class InspectionCompletionService
+  def initialize(inspection)
+    @inspection = inspection
+  end
+
+  def complete
+    validate_completion_requirements
+    mark_as_complete
+    generate_completion_report
+    notify_stakeholders
+  end
+
+  private
+  # ... implementation
+end
+
+# Usage in controller
+def complete
+  service = InspectionCompletionService.new(@inspection)
+  if service.complete
+    flash[:success] = t("inspections.messages.completed")
+    redirect_to @inspection
+  else
+    render :show
+  end
+end
+```
+
+### Factory Examples
+
+```ruby
+# GOOD - Minimal factory
+FactoryBot.define do
+  factory :user do
+    email { "user#{rand(10000)}@example.com" }
+    password { "password123" }
+    
+    trait :admin do
+      email { "admin#{rand(10000)}@example.com" }
+    end
+    
+    trait :with_company do
+      association :inspection_company
+    end
+  end
+end
+
+# BAD - Over-specified factory
+FactoryBot.define do
+  factory :user do
+    first_name { "John" }
+    last_name { "Smith" }
+    email { "john.smith.#{rand(10000)}@example.com" }
+    password { "SuperSecurePassword123!" }
+    phone { "+1-555-123-4567" }
+    created_at { 1.day.ago }
+    # ... unnecessary details
+  end
+end
+```
+
+### Test Clarity Examples
+
+```ruby
+# GOOD - Clear test even with some duplication
+RSpec.describe "User archiving" do
+  it "prevents login when user is archived" do
+    user = create(:user, active: false)
+    post sessions_path, params: { email: user.email, password: "password123" }
+    expect(response).to redirect_to(new_session_path)
+    expect(flash[:error]).to include("account is inactive")
+  end
+  
+  it "allows login when user is active" do
+    user = create(:user, active: true)
+    post sessions_path, params: { email: user.email, password: "password123" }
+    expect(response).to redirect_to(dashboard_path)
+  end
+end
+
+# BAD - DRY but unclear
+RSpec.describe "User archiving" do
+  let(:user) { create(:user, active: user_active) }
+  let(:expected_redirect) { user_active ? dashboard_path : new_session_path }
+  
+  [true, false].each do |status|
+    context "when user active is #{status}" do
+      let(:user_active) { status }
+      it "handles login appropriately" do
+        # ... test logic that's hard to follow
+      end
+    end
+  end
+end
+```
+
+### Comment Examples
+
+```ruby
+# GOOD - Explains WHY, business context (British English)
+def calculate_inspection_deadline
+  # RPII regulations require 30-day inspection cycles for critical equipment
+  # but allow 45 days for non-critical during winter months
+  base_days = critical_equipment? ? 30 : 45
+  winter_extension = winter_season? && !critical_equipment? ? 15 : 0
+  base_days + winter_extension
+end
+
+# GOOD - Explains non-obvious business rule
+def organise_user_inspections
+  # Keep inspection records for 7 years per regulatory requirement
+  # but mark as archived to hide from normal views
+  inspections.update_all(archived: true, archived_at: Time.current)
+end
+
+# GOOD - British English in variable names
+def set_equipment_colour
+  # Use manufacturer's colour specification for safety compliance
+  self.equipment_colour = manufacturer_colour_code
+end
+
+# BAD - American English spelling
+def set_equipment_color
+  self.equipment_color = manufacturer_color_code
+end
+
+# BAD - Explains WHAT the code does (obvious)
+def organise_user_inspections
+  # Update all inspections to set archived to true and archived_at to current time
+  inspections.update_all(archived: true, archived_at: Time.current)
+end
+
+# GOOD - No comment needed, method name is clear
+def owns_inspection?(inspection)
+  inspection.user_id == id
+end
+```
 
 ## Established Patterns & Examples
 
