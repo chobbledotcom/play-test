@@ -140,8 +140,8 @@ class UsersController < ApplicationController
 
   def settings_params
     settings_fields = %i[
-      time_display default_inspection_location theme name
-      phone address country postal_code
+      address country default_inspection_location name
+      phone postal_code theme time_display
     ]
     params.require(:user).permit(settings_fields)
   end

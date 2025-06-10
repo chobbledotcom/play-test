@@ -2,9 +2,10 @@
 class AnchorageAssessment < ApplicationRecord
   belongs_to :inspection
 
-  # Anchor counts
-  validates :num_low_anchors, :num_high_anchors,
-    numericality: {greater_than_or_equal_to: 0, only_integer: true}, allow_blank: true
+  # Anchor counts (alphabetical order)
+  validates :num_high_anchors, :num_low_anchors,
+    numericality: {greater_than_or_equal_to: 0, only_integer: true},
+    allow_blank: true
 
   # Pass/fail assessments
   validates :num_anchors_pass, :anchor_accessories_pass, :anchor_degree_pass,
@@ -22,7 +23,8 @@ class AnchorageAssessment < ApplicationRecord
   def meets_anchor_requirements?
     return false unless total_anchors.present? && inspection.unit.area.present?
 
-    required_anchors = SafetyStandard.calculate_required_anchors(inspection.unit.area)
+    unit_area = inspection.unit.area
+    required_anchors = SafetyStandard.calculate_required_anchors(unit_area)
     total_anchors >= required_anchors
   end
 
@@ -45,7 +47,9 @@ class AnchorageAssessment < ApplicationRecord
     if meets_anchor_requirements?
       "Compliant"
     else
-      "Non-Compliant (Requires #{required_anchors} total anchors, has #{total_anchors})"
+      required = required_anchors
+      actual = total_anchors
+      "Non-Compliant (Requires #{required} total anchors, has #{actual})"
     end
   end
 
@@ -117,6 +121,8 @@ class AnchorageAssessment < ApplicationRecord
   end
 
   def log_assessment_update
-    inspection.log_audit_action("assessment_updated", inspection.user, "Anchorage Assessment updated")
+    inspection.log_audit_action("assessment_updated",
+      inspection.user,
+      "Anchorage Assessment updated")
   end
 end

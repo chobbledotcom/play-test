@@ -80,7 +80,7 @@ RSpec.describe FanAssessment, type: :model do
           blower_visual_pass
           pat_pass
         ]
-        
+
         expect(described_class::SAFETY_CHECKS).to eq(expected_checks)
       end
 

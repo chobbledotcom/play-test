@@ -97,8 +97,8 @@ class InspectionsController < ApplicationController
       redirect_to edit_inspection_path(@inspection)
     else
       error_messages = @inspection.errors.full_messages.join(", ")
-      flash[:alert] = I18n.t("inspections.errors.creation_failed", 
-                             errors: error_messages)
+      flash[:alert] = I18n.t("inspections.errors.creation_failed",
+        errors: error_messages)
       redirect_to unit.present? ? unit_path(unit) : root_path
     end
   end

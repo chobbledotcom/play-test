@@ -48,11 +48,7 @@ class ApplicationController < ActionController::Base
     @debug_sql_queries = []
 
     # Subscribe to SQL queries for this request
-    ActiveSupport::Notifications.subscribe("sql.active_record") do |name,
-                                                                    start,
-                                                                    finish,
-                                                                    id,
-                                                                    payload|
+    ActiveSupport::Notifications.subscribe("sql.active_record") do |name, start, finish, id, payload|
       unless payload[:name] == "SCHEMA" || payload[:sql] =~ /^PRAGMA/
         @debug_sql_queries << {
           sql: payload[:sql],

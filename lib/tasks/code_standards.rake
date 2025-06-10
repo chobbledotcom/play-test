@@ -1,22 +1,20 @@
 namespace :code_standards do
   desc "Check code standards violations (read-only)"
-  task :check => :environment do
-    
+  task check: :environment do
     # Standards from CLAUDE.md
-    MAX_METHOD_LINES = 20
-    MAX_FILE_LINES = 500
-    MAX_LINE_LENGTH = 80
-    
+    max_method_lines = 20
+    max_file_lines = 500
+    max_line_length = 80
+
     # Directories to check
-    DIRECTORIES_TO_CHECK = %w[
+    directories_to_check = %w[
       app/controllers
       app/models
       app/services
       app/helpers
       app/jobs
       lib
-    ].freeze
-
+    ]
     def ruby_files_in(directory)
       Dir.glob("#{Rails.root}/#{directory}/**/*.rb")
     end
@@ -53,7 +51,7 @@ namespace :code_standards do
         elsif current_method && !stripped.empty?
           # Check if we've reached the end of the current method
           current_indent = line.match(/^(\s*)/)[1].length
-          
+
           # Method ends when we hit 'end' at the same or lesser indentation
           if stripped == "end" && current_indent <= indent_level
             methods << {
@@ -82,11 +80,10 @@ namespace :code_standards do
       methods
     end
 
-
     # Collect all violations
     all_violations = []
-    
-    DIRECTORIES_TO_CHECK.each do |directory|
+
+    directories_to_check.each do |directory|
       ruby_files_in(directory).each do |file_path|
         relative_path = file_path.sub("#{Rails.root}/", "")
         file_content = File.read(file_path)
@@ -94,67 +91,67 @@ namespace :code_standards do
         methods = extract_methods_from_file(file_path)
 
         # Check file length
-        if file_lines.length > MAX_FILE_LINES
+        if file_lines.length > max_file_lines
           all_violations << {
             file: relative_path,
             type: :file_length,
-            message: "#{file_lines.length} lines (max #{MAX_FILE_LINES})"
+            message: "#{file_lines.length} lines (max #{max_file_lines})"
           }
         end
 
         # Check line length
         file_lines.each_with_index do |line, index|
-          if line.chomp.length > MAX_LINE_LENGTH
+          if line.chomp.length > max_line_length
             all_violations << {
               file: relative_path,
               type: :line_length,
               line_number: index + 1,
               length: line.chomp.length,
-              message: "Line #{index + 1}: #{line.chomp.length} chars (max #{MAX_LINE_LENGTH})"
+              message: "Line #{index + 1}: #{line.chomp.length} chars (max #{max_line_length})"
             }
           end
         end
 
         # Check method length
-        long_methods = methods.select { |m| m[:length] > MAX_METHOD_LINES }
+        long_methods = methods.select { |m| m[:length] > max_method_lines }
         long_methods.each do |method|
           all_violations << {
             file: relative_path,
             type: :method_length,
             line_number: method[:start_line],
-            message: "Method '#{method[:name]}' is #{method[:length]} lines (max #{MAX_METHOD_LINES})"
+            message: "Method '#{method[:name]}' is #{method[:length]} lines (max #{max_method_lines})"
           }
         end
       end
     end
 
     # Report results
-    puts "\n" + "="*80
+    puts "\n" + "=" * 80
     puts "CODE STANDARDS REPORT"
-    puts "="*80
-    
+    puts "=" * 80
+
     if all_violations.empty?
       puts "✅ All files meet code standards!"
       exit 0
     end
-    
+
     violations_by_type = all_violations.group_by { |v| v[:type] }
-    
+
     violations_by_type.each do |type, violations|
-      puts "\n#{type.to_s.upcase.gsub('_', ' ')} VIOLATIONS (#{violations.length}):"
+      puts "\n#{type.to_s.upcase.tr("_", " ")} VIOLATIONS (#{violations.length}):"
       puts "-" * 50
-      
+
       violations.each do |violation|
-        puts "#{violation[:file]}:#{violation[:line_number] || ''} #{violation[:message]}"
+        puts "#{violation[:file]}:#{violation[:line_number] || ""} #{violation[:message]}"
       end
     end
-    
-    puts "\n" + "="*80
+
+    puts "\n" + "=" * 80
     puts "TOTAL: #{all_violations.length} violations found"
-    
+
     puts "\nTo apply StandardRB formatting: bundle exec standardrb --fix"
     puts "To lint only modified files: rake code_standards:lint_modified"
-    
+
     puts "\nFORMATTING PREFERENCES (StandardRB compatible - see CLAUDE.md):"
     puts "• Arrays: alphabetical order when order doesn't matter, use %i[] %w[]"
     puts "• Arrays: one per line when over 80 chars, maintain alphabetical order"
@@ -163,33 +160,33 @@ namespace :code_standards do
     puts "• Long strings: extract to variables or break with backslash"
     puts "• Comments: break at sentence boundaries (StandardRB preserves these)"
     puts "• Avoid parameter alignment - StandardRB collapses whitespace"
-    
+
     exit 1 if all_violations.any?
   end
-  
+
   desc "Run StandardRB linter on modified files only"
   task :lint_modified do
-    modified_files = `git diff --name-only HEAD`.split("\n").select { |f| f.end_with?('.rb') }
-    
+    modified_files = `git diff --name-only HEAD`.split("\n").select { |f| f.end_with?(".rb") }
+
     if modified_files.empty?
       puts "No modified Ruby files to lint."
     else
       puts "Linting #{modified_files.length} modified Ruby files..."
-      system("bundle exec standardrb --fix #{modified_files.join(' ')}")
+      system("bundle exec standardrb --fix #{modified_files.join(" ")}")
     end
   end
-  
+
   desc "Full workflow: lint with StandardRB then check standards"
   task :fix_all do
     puts "Step 1: Running StandardRB on all Ruby files..."
     system("bundle exec standardrb --fix app/ lib/ spec/")
-    
+
     puts "\nStep 2: Checking remaining code standards violations..."
     Rake::Task["code_standards:check"].invoke
-  rescue SystemExit => e
+  rescue SystemExit
     puts "\nWorkflow complete. Check output above for any remaining violations."
   end
 end
 
 desc "Check code standards (alias for code_standards:check)"
-task :code_standards => "code_standards:check"
+task code_standards: "code_standards:check"
