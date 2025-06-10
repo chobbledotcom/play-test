@@ -40,8 +40,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         lock_stitch_pass: true,
         air_loss_pass: true)
 
-      get(inspection_report_path(inspection))
-      pdf_text = pdf_text_content(response.body)
+      page.driver.browser.get(inspection_report_path(inspection))
+      pdf_text = pdf_text_content(page.driver.response.body)
 
       # Check all core i18n keys are present
       expect_pdf_to_include_i18n_keys(pdf_text,
@@ -80,8 +80,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         seam_integrity_pass: false,
         seam_integrity_comment: "Torn seam on left side")
 
-      get(inspection_report_path(failed_inspection))
-      pdf_text = pdf_text_content(response.body)
+      page.driver.browser.get(inspection_report_path(failed_inspection))
+      pdf_text = pdf_text_content(page.driver.response.body)
 
       # Check for failed status
       expect_pdf_to_include_i18n(pdf_text, "pdf.inspection.failed")
@@ -109,9 +109,9 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       create(:slide_assessment, inspection: inspection)
       create(:enclosed_assessment, inspection: inspection)
 
-      get(inspection_report_path(inspection))
+      page.driver.browser.get(inspection_report_path(inspection))
 
-      pdf = PDF::Inspector::Text.analyze(response.body)
+      pdf = PDF::Inspector::Text.analyze(page.driver.response.body)
       text_content = pdf.strings.join(" ")
 
       # Check all assessment sections are present
@@ -131,8 +131,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       # Don't create any assessments
 
-      get(inspection_report_path(inspection))
-      pdf_text = pdf_text_content(response.body)
+      page.driver.browser.get(inspection_report_path(inspection))
+      pdf_text = pdf_text_content(page.driver.response.body)
 
       # Should show no data messages for assessments
       expect_no_assessment_messages(pdf_text, unit)
@@ -151,8 +151,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
           passed: i.even?)
       end
 
-      get(report_unit_path(unit))
-      pdf_text = pdf_text_content(response.body)
+      page.driver.browser.get(report_unit_path(unit))
+      pdf_text = pdf_text_content(page.driver.response.body)
 
       # Check all core i18n keys are present
       expect_pdf_to_include_i18n_keys(pdf_text,
@@ -175,8 +175,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
     scenario "handles unit with no inspections" do
       empty_unit = create(:unit, user: user)
 
-      get(report_unit_path(empty_unit))
-      pdf_text = pdf_text_content(response.body)
+      page.driver.browser.get(report_unit_path(empty_unit))
+      pdf_text = pdf_text_content(page.driver.response.body)
 
       expect_pdf_to_include_i18n(pdf_text, "pdf.unit.title")
       expect_pdf_to_include_i18n(pdf_text, "pdf.unit.no_completed_inspections")
@@ -227,15 +227,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
   end
 
   private
-
-  def get(path)
-    # Helper method to make direct GET requests in feature specs
-    page.driver.browser.get(path)
-  end
-
-  def response
-    page.driver.response
-  end
 
   def inspection_report_path(inspection)
     "/inspections/#{inspection.id}/report"

@@ -45,6 +45,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Test both happy path and edge cases
 - Use `--fail-fast` during development to fix issues incrementally
 
+#### Helper Method Guidelines
+- **Only extract helper methods when they add value**:
+  - Used multiple times (DRY principle)
+  - Hide genuinely complex logic that obscures test intent
+  - Provide meaningful abstractions
+- **Don't extract single-use methods** - if a method is only called once, it just splits logic unnecessarily
+- **Keep test flow readable** - the test should tell a clear story without jumping to many helper methods
+- **Inline simple expectations** - `expect(page).to have_content("text")` doesn't need a helper method
+
+```ruby
+# GOOD - Helper method used multiple times
+def sign_in_as_admin
+  allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
+  sign_in(admin_user)
+end
+
+# GOOD - Complex logic that helps readability
+def expect_all_dimensions_copied(source, target)
+  %w[width length height has_slide].each do |attr|
+    expect(target.send(attr)).to eq(source.send(attr)), "#{attr} should be copied"
+  end
+end
+
+# BAD - Single-use method that just splits logic
+def expect_page_title_present
+  expect(page).to have_content(I18n.t("about.title"))
+end
+
+# GOOD - Just inline it instead
+scenario "displays page title" do
+  visit about_path
+  expect(page).to have_content(I18n.t("about.title"))
+end
+```
+
 ### Test Coverage Analysis
 
 #### Coverage Targets & Reports

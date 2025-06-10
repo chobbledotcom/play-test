@@ -51,10 +51,10 @@ RSpec.feature "PDF Field Coverage", type: :feature do
       create(:enclosed_assessment, :passed,
         inspection: inspection)
 
-      get(inspection_report_path(inspection))
+      page.driver.browser.get(inspection_report_path(inspection))
 
       # Just check that the PDF actually has the important stuff
-      pdf = PDF::Inspector::Text.analyze(response.body)
+      pdf = PDF::Inspector::Text.analyze(page.driver.response.body)
       text_content = pdf.strings.join(" ")
 
       # Core inspection info
@@ -96,16 +96,16 @@ RSpec.feature "PDF Field Coverage", type: :feature do
       create(:user_height_assessment, inspection: inspection)
       create(:structure_assessment, inspection: inspection)
 
-      get(inspection_report_path(inspection))
+      page.driver.browser.get(inspection_report_path(inspection))
 
       # Should generate PDF successfully even with minimal data
-      expect(response.status).to eq(200)
-      expect(response.headers["Content-Type"]).to eq("application/pdf")
+      expect(page.driver.response.status).to eq(200)
+      expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
 
       # Verify it's a valid PDF
-      expect { PDF::Inspector::Text.analyze(response.body) }.not_to raise_error
+      expect { PDF::Inspector::Text.analyze(page.driver.response.body) }.not_to raise_error
 
-      pdf = PDF::Inspector::Text.analyze(response.body)
+      pdf = PDF::Inspector::Text.analyze(page.driver.response.body)
       text_content = pdf.strings.join(" ")
 
       # Should include fallback text for missing data
@@ -115,14 +115,6 @@ RSpec.feature "PDF Field Coverage", type: :feature do
   end
 
   private
-
-  def get(path)
-    page.driver.browser.get(path)
-  end
-
-  def response
-    page.driver.response
-  end
 
   def inspection_report_path(inspection)
     "/inspections/#{inspection.id}/report"

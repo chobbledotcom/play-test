@@ -6,24 +6,19 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
   let(:unit) { create(:unit, user: user) }
 
   before do
-    # Login as the user
     login_user_via_form(user)
   end
 
-  describe "Creating inspection from unit show page" do
-    it "creates inspection and redirects to edit page" do
+  describe "creating inspection from unit show page" do
+    scenario "creates inspection and redirects to edit page" do
       visit unit_path(unit)
-
       expect(page).to have_button(I18n.t("units.buttons.add_inspection"))
 
-      # Click the button to create inspection
       click_button I18n.t("units.buttons.add_inspection")
 
-      # Should redirect to edit page for the new inspection
       expect(page).to have_current_path(/\/inspections\/[A-Z0-9]+\/edit/)
       expect(page).to have_content(I18n.t("inspections.messages.created"))
 
-      # Verify the inspection was created with the correct unit
       inspection = user.inspections.find_by(unit_id: unit.id)
       expect(inspection).to be_present
       expect(inspection.unit).to eq(unit)
@@ -32,18 +27,15 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       expect(inspection.inspection_date).to eq(Date.current)
     end
 
-    it "shows confirmation data attribute on button" do
+    scenario "shows confirmation data attribute on button" do
       visit unit_path(unit)
 
-      # Check that button has confirmation attribute
       button = page.find_button(I18n.t("units.buttons.add_inspection"))
       expect(button["data-turbo-confirm"]).to eq(I18n.t("units.messages.add_inspection_confirm"))
     end
 
-    it "prevents creating inspection when user is inactive" do
-      # Make user inactive
+    scenario "prevents creating inspection when user is inactive" do
       user.update!(active_until: Date.current - 1.day)
-
       visit unit_path(unit)
 
       click_button I18n.t("units.buttons.add_inspection")
@@ -52,35 +44,23 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       expect(user.inspections.count).to eq(0)
     end
 
-    it "handles invalid unit gracefully" do
-      # Create a unit that doesn't belong to this user
+    scenario "prevents creating inspection for other user's unit" do
       other_user = create(:user)
       other_unit = create(:unit, user: other_user)
 
-      # Try to create an inspection for a unit that doesn't belong to the current user
-      # We'll do this by manipulating the form to submit an invalid unit_id
-      visit unit_path(unit)
-
-      # Use JavaScript to change the form action to include invalid unit_id
-      # Since we can't easily test direct POST in feature specs without JS,
-      # we'll test this scenario differently
-
-      # Instead, let's verify the button only appears for owned units
       visit unit_path(other_unit)
 
-      # Should redirect to units index since user doesn't own this unit
       expect(page).to have_current_path(units_path)
       expect(page).not_to have_button(I18n.t("units.buttons.add_inspection"))
+      expect(other_user.inspections.count).to eq(0)
     end
   end
 
-  describe "Unit selection workflow" do
-    it "shows unit details in inspection overview after creation" do
+  describe "unit selection workflow" do
+    scenario "shows unit details in inspection overview after creation" do
       visit unit_path(unit)
-
       click_button I18n.t("units.buttons.add_inspection")
 
-      # Should show unit details in the inspection edit page
       expect(page).to have_content(unit.name)
       expect(page).to have_content(unit.serial)
       expect(page).to have_content(unit.manufacturer)

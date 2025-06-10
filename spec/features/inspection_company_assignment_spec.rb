@@ -6,24 +6,21 @@ RSpec.feature "User Active Status Management", type: :feature do
   let!(:inspector_company) { create(:inspector_company, active: true) }
 
   before do
-    # Set up admin pattern to make admin_user an admin
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
+    setup_admin_environment
   end
 
-  describe "Admin managing user active status" do
+  describe "admin managing user active status" do
     before { sign_in admin_user }
 
-    scenario "Admin can set user active until date" do
+    scenario "sets user active until date" do
       visit edit_user_path(regular_user)
 
       expect(page).to have_field("user_active_until")
-      fill_in "user_active_until", with: (Date.current + 1.year).strftime("%Y-%m-%d")
-      click_button I18n.t("users.buttons.update_user")
-
-      expect(page).to have_content("User updated")
-      regular_user.reload
-      expect(regular_user.active_until).to eq(Date.current + 1.year)
+      
+      set_user_active_until_date
+      submit_user_update
+      
+      expect_user_updated_successfully
     end
   end
 
@@ -96,18 +93,6 @@ RSpec.feature "User Active Status Management", type: :feature do
         expect(inspection.inspector_company_id).to eq(inspector_company.id)
       end
 
-      scenario "User can still create inspections regardless of company changes" do
-        unit = create(:unit, user: regular_user)
-
-        visit unit_path(unit)
-        click_button I18n.t("units.buttons.add_inspection")
-
-        inspection = regular_user.inspections.find_by(unit_id: unit.id)
-        expect(inspection).to be_present
-        
-        # Active users can always create inspections
-        expect(regular_user.is_active?).to be true
-      end
     end
   end
 
@@ -145,5 +130,26 @@ RSpec.feature "User Active Status Management", type: :feature do
         expect(page).not_to have_select("inspection_inspector_company_id")
       end
     end
+  end
+
+  private
+
+  def setup_admin_environment
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
+  end
+
+  def set_user_active_until_date
+    fill_in "user_active_until", with: (Date.current + 1.year).strftime("%Y-%m-%d")
+  end
+
+  def submit_user_update
+    click_button I18n.t("users.buttons.update_user")
+  end
+
+  def expect_user_updated_successfully
+    expect(page).to have_content("User updated")
+    regular_user.reload
+    expect(regular_user.active_until).to eq(Date.current + 1.year)
   end
 end

@@ -185,16 +185,4 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
     end
   end
 
-  private
-
-  def sign_in(user)
-    visit login_path
-    fill_in I18n.t("session.login.email"), with: user.email
-    fill_in I18n.t("session.login.password"), with: "password123"
-    click_button I18n.t("session.login.submit")
-  end
-
-  def short_report_url(inspection)
-    "#{ENV["BASE_URL"] || "http://localhost:3000"}/r/#{inspection.id}"
-  end
 end

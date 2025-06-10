@@ -9,45 +9,8 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
 
   before { sign_in(user) }
 
-  # Helper methods for DRY code
-  def visit_edit_inspection
-    visit edit_inspection_path(inspection)
-  end
-
-  def visit_select_unit(params = {})
-    visit select_unit_inspection_path(inspection, params)
-  end
-
-  def click_change_unit
-    click_link I18n.t("inspections.buttons.change_unit")
-  end
-
-  def click_select_unit
-    click_link I18n.t("inspections.buttons.select_unit")
-  end
-
-  def select_unit_button(unit)
-    within "li", text: unit.name do
-      click_button I18n.t("units.actions.select")
-    end
-  end
-
-  def expect_unit_details(unit)
-    expect(page).to have_content(unit.name)
-    expect(page).to have_content(unit.serial)
-    expect(page).to have_content(unit.manufacturer)
-  end
-
-  def expect_units_visible(*units)
-    units.each { |unit| expect(page).to have_content(unit.name) }
-  end
-
-  def expect_units_not_visible(*units)
-    units.each { |unit| expect(page).not_to have_content(unit.name) }
-  end
-
   describe "changing unit from inspection edit page" do
-    before { visit_edit_inspection }
+    before { visit edit_inspection_path(inspection) }
 
     it "shows current unit details and change unit link" do
       within ".tab-content" do
@@ -60,7 +23,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
     end
 
     it "navigates to unit selection page when clicking change unit" do
-      click_change_unit
+      click_link I18n.t("inspections.buttons.change_unit")
 
       expect(page).to have_current_path(select_unit_inspection_path(inspection))
       expect(page).to have_content(I18n.t("inspections.titles.select_unit"))
@@ -161,7 +124,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
     end
 
     it "allows selecting a unit" do
-      click_select_unit
+      click_link I18n.t("inspections.buttons.select_unit")
       select_unit_button(unit1)
 
       expect(page).to have_current_path(edit_inspection_path(inspection_no_unit))
@@ -193,23 +156,6 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
   end
 
   describe "complete inspection restrictions" do
-    # Helper to create a complete inspection with all assessments
-    def create_complete_inspection
-      create(:inspection, user: user, unit: unit1, has_slide: true).tap do |insp|
-        # Create all required assessments with their appropriate passing traits
-        create(:user_height_assessment, :complete, inspection: insp)
-        create(:slide_assessment, :complete, inspection: insp)
-        create(:structure_assessment, :complete, inspection: insp)
-        create(:anchorage_assessment, :passed, inspection: insp)
-        create(:materials_assessment, :passed, inspection: insp)
-        create(:fan_assessment, :passed, inspection: insp)
-        create(:enclosed_assessment, :passed, inspection: insp) if insp.is_totally_enclosed?
-
-        # Mark as complete
-        insp.update!(complete_date: Time.current)
-      end
-    end
-
     let(:complete_inspection) { create_complete_inspection }
 
     context "as regular user" do
@@ -232,6 +178,44 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
         expect(page).to have_current_path(inspection_path(complete_inspection))
         expect(page).to have_content(I18n.t("inspections.messages.cannot_edit_complete"))
       end
+    end
+  end
+
+  private
+
+  def select_unit_button(unit)
+    within "li", text: unit.name do
+      click_button I18n.t("units.actions.select")
+    end
+  end
+
+  def expect_unit_details(unit)
+    expect(page).to have_content(unit.name)
+    expect(page).to have_content(unit.serial)
+    expect(page).to have_content(unit.manufacturer)
+  end
+
+  def expect_units_visible(*units)
+    units.each { |unit| expect(page).to have_content(unit.name) }
+  end
+
+  def expect_units_not_visible(*units)
+    units.each { |unit| expect(page).not_to have_content(unit.name) }
+  end
+
+  def create_complete_inspection
+    create(:inspection, user: user, unit: unit1, has_slide: true).tap do |insp|
+      # Create all required assessments with their appropriate passing traits
+      create(:user_height_assessment, :complete, inspection: insp)
+      create(:slide_assessment, :complete, inspection: insp)
+      create(:structure_assessment, :complete, inspection: insp)
+      create(:anchorage_assessment, :passed, inspection: insp)
+      create(:materials_assessment, :passed, inspection: insp)
+      create(:fan_assessment, :passed, inspection: insp)
+      create(:enclosed_assessment, :passed, inspection: insp) if insp.is_totally_enclosed?
+
+      # Mark as complete
+      insp.update!(complete_date: Time.current)
     end
   end
 end

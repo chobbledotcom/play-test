@@ -6,86 +6,34 @@ RSpec.feature "Assessment Forms", type: :feature do
   let(:user) { create(:user, inspection_company: inspection_company) }
   let(:unit) { create(:unit, user: user) }
   let(:inspection) { create(:inspection, unit: unit, user: user) }
+  let(:enclosed_unit) { create(:unit, user: user, is_totally_enclosed: true) }
+  let(:enclosed_inspection) { create(:inspection, unit: enclosed_unit, user: user) }
 
   before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
+    setup_admin_environment
     sign_in(user)
   end
 
-  describe "Assessment Form Rendering" do
-    it "renders slide assessment form without i18n errors" do
-      visit edit_inspection_path(inspection, tab: "slide")
+  describe "form rendering" do
+    %w[slide user_height structure materials anchorage fan].each do |tab_name|
+      scenario "renders #{tab_name} assessment form without errors" do
+        visit edit_inspection_path(inspection, tab: tab_name)
 
-      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.slide.title"))
-      expect(page).to have_css(".slide-assessment")
-      expect(page).not_to have_content("translation missing")
-      expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
-    end
-
-    it "renders user height assessment form without i18n errors" do
-      visit edit_inspection_path(inspection, tab: "user_height")
-
-      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.user_height.title"))
-      expect(page).to have_css(".user-height-assessment")
-      expect(page).not_to have_content("translation missing")
-      expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
-    end
-
-    it "renders structure assessment form without i18n errors" do
-      visit edit_inspection_path(inspection, tab: "structure")
-
-      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.structure.title"))
-      expect(page).to have_css(".structure-assessment")
-      expect(page).not_to have_content("translation missing")
-      expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
-    end
-
-    it "renders materials assessment form without i18n errors" do
-      visit edit_inspection_path(inspection, tab: "materials")
-
-      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.materials.title"))
-      expect(page).to have_css(".materials-assessment")
-      expect(page).not_to have_content("translation missing")
-      expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
-    end
-
-    it "renders anchorage assessment form without i18n errors" do
-      visit edit_inspection_path(inspection, tab: "anchorage")
-
-      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.anchorage.title"))
-      expect(page).to have_css(".anchorage-assessment")
-      expect(page).not_to have_content("translation missing")
-      expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
-    end
-
-    it "renders fan assessment form without i18n errors" do
-      visit edit_inspection_path(inspection, tab: "fan")
-
-      expect(page).to have_css("h1", text: I18n.t("inspections.assessments.fan.title"))
-      expect(page).to have_css(".fan-assessment")
-      expect(page).not_to have_content("translation missing")
-      expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
+        expect_assessment_form_rendered(tab_name)
+      end
     end
 
     context "for totally enclosed units" do
-      let(:enclosed_unit) { create(:unit, user: user, is_totally_enclosed: true) }
-      let(:enclosed_inspection) { create(:inspection, unit: enclosed_unit, user: user) }
-
-      it "renders enclosed assessment form without i18n errors" do
+      scenario "renders enclosed assessment form without errors" do
         visit edit_inspection_path(enclosed_inspection, tab: "enclosed")
 
-        expect(page).to have_css("h1", text: I18n.t("inspections.assessments.enclosed.title"))
-        expect(page).to have_css(".enclosed-assessment")
-        expect(page).not_to have_content("translation missing")
-        expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
+        expect_assessment_form_rendered("enclosed")
       end
 
-      it "shows enclosed tab only for totally enclosed units" do
+      scenario "shows enclosed tab only for totally enclosed units" do
         visit edit_inspection_path(enclosed_inspection)
         expect(page).to have_link(I18n.t("inspections.tabs.enclosed"))
 
-        # Regular inspection should not have enclosed tab
         visit edit_inspection_path(inspection)
         expect(page).not_to have_link(I18n.t("inspections.tabs.enclosed"))
       end
@@ -325,11 +273,15 @@ RSpec.feature "Assessment Forms", type: :feature do
   end
 
   describe "Form Functionality" do
-    it "displays form error handling structure" do
+    it "saves slide assessment data when form is submitted" do
       visit edit_inspection_path(inspection, tab: "slide")
 
-      # Check that error display structure exists (even if no errors currently)
-      expect(page).to have_css("form") # Form exists
+      fill_in I18n.t("inspections.assessments.slide.fields.slide_platform_height"), with: "2.5"
+      click_button I18n.t("inspections.buttons.save_assessment")
+
+      expect(page).to have_content(I18n.t("inspections.messages.updated"))
+      inspection.reload
+      expect(inspection.slide_assessment.slide_platform_height).to eq(2.5)
     end
   end
 
@@ -378,5 +330,19 @@ RSpec.feature "Assessment Forms", type: :feature do
       visit edit_inspection_path(inspection, tab: "slide")
       expect(page).not_to have_css(".assessment-status")
     end
+  end
+
+  private
+
+  def setup_admin_environment
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
+  end
+
+  def expect_assessment_form_rendered(tab_name)
+    expect(page).to have_css("h1", text: I18n.t("inspections.assessments.#{tab_name}.title"))
+    expect(page).to have_css(".#{tab_name.tr('_', '-')}-assessment")
+    expect(page).not_to have_content("translation missing")
+    expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
   end
 end

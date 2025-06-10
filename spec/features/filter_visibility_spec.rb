@@ -8,15 +8,12 @@ RSpec.feature "Filter Visibility", type: :feature do
     sign_in(user)
   end
 
-  describe "Inspections index page" do
+  describe "inspections index page" do
     context "when user has no inspections and no units" do
-      it "does not show the filter form" do
+      scenario "does not show filter form" do
         visit inspections_path
 
-        expect(page).not_to have_css("form[action='#{inspections_path}'][method='get']")
-        expect(page).not_to have_field("query")
-        expect(page).not_to have_select("result")
-        expect(page).not_to have_select("unit_id")
+        expect_no_filter_form_for_inspections
       end
     end
 
@@ -25,13 +22,10 @@ RSpec.feature "Filter Visibility", type: :feature do
         create(:unit, user: user)
       end
 
-      it "shows the filter form to allow filtering by unit" do
+      scenario "shows filter form to allow filtering by unit" do
         visit inspections_path
 
-        expect(page).to have_css("form[action='#{inspections_path}'][method='get']")
-        expect(page).to have_field("query")
-        expect(page).to have_select("result")
-        expect(page).to have_select("unit_id")
+        expect_inspections_filter_form_present
       end
     end
 
@@ -40,12 +34,10 @@ RSpec.feature "Filter Visibility", type: :feature do
         create(:inspection, user: user)
       end
 
-      it "shows the filter form" do
+      scenario "shows filter form" do
         visit inspections_path
 
-        expect(page).to have_css("form[action='#{inspections_path}'][method='get']")
-        expect(page).to have_field("query")
-        expect(page).to have_select("result")
+        expect_inspections_filter_form_present
       end
     end
 
@@ -56,27 +48,21 @@ RSpec.feature "Filter Visibility", type: :feature do
         create(:inspection, :completed, user: user, unit: unit)
       end
 
-      it "shows the filter form" do
+      scenario "shows filter form with unit selector" do
         visit inspections_path
 
-        expect(page).to have_css("form[action='#{inspections_path}'][method='get']")
-        expect(page).to have_field("query")
-        expect(page).to have_select("result")
+        expect_inspections_filter_form_present
         expect(page).to have_select("unit_id")
       end
     end
   end
 
-  describe "Units index page" do
+  describe "units index page" do
     context "when user has no units" do
-      it "does not show the filter form" do
+      scenario "does not show filter form" do
         visit units_path
 
-        expect(page).not_to have_css("form[action='#{units_path}'][method='get']")
-        expect(page).not_to have_field("query")
-        expect(page).not_to have_select("status")
-        expect(page).not_to have_select("manufacturer")
-        expect(page).not_to have_select("owner")
+        expect_no_filter_form_for_units
         expect(page).to have_content(I18n.t("units.messages.no_units_found"))
       end
     end
@@ -87,34 +73,22 @@ RSpec.feature "Filter Visibility", type: :feature do
         create(:unit, user: user, manufacturer: "Widget Inc", owner: "Jane Smith")
       end
 
-      it "shows the filter form" do
+      scenario "shows filter form" do
         visit units_path
 
-        expect(page).to have_css("form[action='#{units_path}'][method='get']")
-        expect(page).to have_field("query")
-        expect(page).to have_select("status")
-        expect(page).to have_select("manufacturer")
-        expect(page).to have_select("owner")
+        expect_units_filter_form_present
       end
 
-      it "populates manufacturer dropdown with unique values" do
+      scenario "populates manufacturer dropdown with unique values" do
         visit units_path
 
-        within "select[name='manufacturer']" do
-          expect(page).to have_content("All Manufacturers")
-          expect(page).to have_content("Acme Corp")
-          expect(page).to have_content("Widget Inc")
-        end
+        expect_manufacturer_dropdown_populated
       end
 
-      it "populates owner dropdown with unique values" do
+      scenario "populates owner dropdown with unique values" do
         visit units_path
 
-        within "select[name='owner']" do
-          expect(page).to have_content("All Owners")
-          expect(page).to have_content("John Doe")
-          expect(page).to have_content("Jane Smith")
-        end
+        expect_owner_dropdown_populated
       end
     end
 
@@ -123,31 +97,80 @@ RSpec.feature "Filter Visibility", type: :feature do
         create(:unit, user: user, manufacturer: "Acme Corp")
       end
 
-      it "still shows the filter form to allow clearing filters" do
+      scenario "shows filter form to allow clearing filters" do
         visit units_path(manufacturer: "NonExistent Corp")
 
-        expect(page).to have_css("form[action='#{units_path}'][method='get']")
+        expect_units_filter_form_present
         expect(page).to have_content(I18n.t("units.messages.no_units_found"))
         expect(page).to have_link(I18n.t("ui.buttons.clear_filters"))
+        
+        click_link I18n.t("ui.buttons.clear_filters")
+        
+        expect(current_path).to eq(units_path)
+        expect(page).not_to have_content(I18n.t("units.messages.no_units_found"))
       end
     end
   end
 
-  describe "Cross-user isolation" do
+  describe "cross-user isolation" do
     before do
-      # Other user has units and inspections
       other_unit = create(:unit, user: other_user)
       create(:inspection, user: other_user, unit: other_unit)
-
-      # Current user has nothing
     end
 
-    it "does not show filter form based on other user's data" do
+    scenario "does not show filter form based on other user's data" do
       visit inspections_path
-      expect(page).not_to have_css("form[action='#{inspections_path}'][method='get']")
+      expect_no_filter_form_for_inspections
 
       visit units_path
-      expect(page).not_to have_css("form[action='#{units_path}'][method='get']")
+      expect_no_filter_form_for_units
+    end
+  end
+
+  private
+
+  def expect_no_filter_form_for_inspections
+    expect(page).not_to have_css("form[action='#{inspections_path}'][method='get']")
+    expect(page).not_to have_field("query")
+    expect(page).not_to have_select("result")
+    expect(page).not_to have_select("unit_id")
+  end
+
+  def expect_inspections_filter_form_present
+    expect(page).to have_css("form[action='#{inspections_path}'][method='get']")
+    expect(page).to have_field("query")
+    expect(page).to have_select("result")
+  end
+
+  def expect_no_filter_form_for_units
+    expect(page).not_to have_css("form[action='#{units_path}'][method='get']")
+    expect(page).not_to have_field("query")
+    expect(page).not_to have_select("status")
+    expect(page).not_to have_select("manufacturer")
+    expect(page).not_to have_select("owner")
+  end
+
+  def expect_units_filter_form_present
+    expect(page).to have_css("form[action='#{units_path}'][method='get']")
+    expect(page).to have_field("query")
+    expect(page).to have_select("status")
+    expect(page).to have_select("manufacturer")
+    expect(page).to have_select("owner")
+  end
+
+  def expect_manufacturer_dropdown_populated
+    within "select[name='manufacturer']" do
+      expect(page).to have_content("All Manufacturers")
+      expect(page).to have_content("Acme Corp")
+      expect(page).to have_content("Widget Inc")
+    end
+  end
+
+  def expect_owner_dropdown_populated
+    within "select[name='owner']" do
+      expect(page).to have_content("All Owners")
+      expect(page).to have_content("John Doe")
+      expect(page).to have_content("Jane Smith")
     end
   end
 end

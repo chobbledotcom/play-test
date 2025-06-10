@@ -133,7 +133,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     expect(page).to have_content("Source: app/models/safety_standard.rb")
 
     # Perform calculation and verify breakdown is shown
-    within(".calculator-form", text: "Calculate Required Anchors") do
+    within(".calculator-form", text: I18n.t("safety_standards_reference.calculators.anchor.title")) do
       fill_in "Area (m²):", with: "16.0"
       click_button "Calculate Anchors"
     end
@@ -164,7 +164,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     visit safety_standards_path
 
     # Test invalid area
-    within(".calculator-form", text: "Calculate Required Anchors") do
+    within(".calculator-form", text: I18n.t("safety_standards_reference.calculators.anchor.title")) do
       fill_in "Area (m²):", with: "0"
       click_button "Calculate Anchors"
     end
@@ -190,7 +190,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     test_areas.each do |area|
       visit safety_standards_path
 
-      within(".calculator-form", text: "Calculate Required Anchors") do
+      within(".calculator-form", text: I18n.t("safety_standards_reference.calculators.anchor.title")) do
         fill_in "Area (m²):", with: area.to_s
         click_button "Calculate Anchors"
       end
