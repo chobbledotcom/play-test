@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
+  # Only allow modern browsers supporting webp images, web push, badges,
+  # import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
   include SessionsHelper
@@ -37,7 +38,8 @@ class ApplicationController < ActionController::Base
   end
 
   def impersonating?
-    # Check if we have an original admin ID stored (indicating impersonation is active)
+    # Check if we have an original admin ID stored
+    # (indicating impersonation is active)
     session[:original_admin_id].present?
   end
 
@@ -46,7 +48,11 @@ class ApplicationController < ActionController::Base
     @debug_sql_queries = []
 
     # Subscribe to SQL queries for this request
-    ActiveSupport::Notifications.subscribe("sql.active_record") do |name, start, finish, id, payload|
+    ActiveSupport::Notifications.subscribe("sql.active_record") do |name,
+                                                                    start,
+                                                                    finish,
+                                                                    id,
+                                                                    payload|
       unless payload[:name] == "SCHEMA" || payload[:sql] =~ /^PRAGMA/
         @debug_sql_queries << {
           sql: payload[:sql],
@@ -58,7 +64,10 @@ class ApplicationController < ActionController::Base
   end
 
   # Make debug data available to views
-  helper_method :admin_debug_enabled?, :impersonating?, :debug_render_time, :debug_sql_queries
+  helper_method :admin_debug_enabled?,
+    :impersonating?,
+    :debug_render_time,
+    :debug_sql_queries
 
   def debug_render_time
     # Calculate time since request started

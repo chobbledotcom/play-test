@@ -13,7 +13,7 @@ RSpec.describe CustomIdGenerator, type: :concern do
     it "generates an ID with the configured length" do
       id = test_class.generate_random_id
       expect(id.length).to eq(CustomIdGenerator::ID_LENGTH)
-      expect(id).to match(/\A[A-Z0-9]{#{CustomIdGenerator::ID_LENGTH}}\z/)
+      expect(id).to match(/\A[A-Z0-9]{#{CustomIdGenerator::ID_LENGTH}}\z/o)
     end
 
     it "generates an 8-character alphanumeric uppercase ID" do

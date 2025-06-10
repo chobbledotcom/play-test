@@ -184,5 +184,4 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       expect(page).to have_link(href: /\/r\/#{inspection.id}/)
     end
   end
-
 end

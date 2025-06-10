@@ -1,8 +1,12 @@
 class UsersController < ApplicationController
   skip_before_action :require_login, only: [:new, :create]
-  before_action :require_admin, only: [:index, :edit, :update, :destroy, :impersonate]
-  before_action :set_user, only: [:edit, :update, :destroy, :change_password, :update_password, :change_settings, :update_settings, :impersonate]
-  before_action :require_correct_user, only: [:change_password, :update_password, :change_settings, :update_settings]
+  before_action :require_admin, only: %i[index edit update destroy impersonate]
+  before_action :set_user, only: %i[
+    edit update destroy change_password update_password change_settings update_settings impersonate
+  ]
+  before_action :require_correct_user, only: %i[
+    change_password update_password change_settings update_settings
+  ]
 
   def index
     @users = User.includes(:inspections).all

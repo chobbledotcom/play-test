@@ -20,7 +20,7 @@ RSpec.feature "Admin User Management", type: :feature do
     click_button I18n.t("users.buttons.update_user")
 
     expect(page).to have_content(I18n.t("users.messages.user_updated"))
-    
+
     regular_user.reload
     expect(regular_user.active_until).to eq(Date.current - 1.day)
     expect(regular_user.is_active?).to be false

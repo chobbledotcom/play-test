@@ -116,7 +116,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
       # These are read-only calculated fields, not form inputs
       expect(page).to have_content(I18n.t("inspections.fields.reinspection_date"))
-      
+
       # Public Information section (case insensitive since fieldset may transform case)
       expect(page).to have_content(/public information/i)
       expect(page).to have_content(I18n.t("inspections.fields.public_inspection_id"))
@@ -143,7 +143,6 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       expect(inspection.inspection_location).to eq("Updated Location")
       expect(inspection.comments).to eq("Updated comments")
     end
-
 
     it "can mark inspection as complete" do
       # First create all necessary assessments for completion

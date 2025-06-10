@@ -42,7 +42,7 @@ class User < ApplicationRecord
 
   def active_until=(value)
     @active_until_explicitly_set = true
-    super(value)
+    super
   end
 
   def has_company?
@@ -74,7 +74,6 @@ class User < ApplicationRecord
   def downcase_email
     self.email = email.downcase
   end
-
 
   def set_default_time_display
     self.time_display ||= "date"

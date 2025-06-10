@@ -1,7 +1,15 @@
 class InspectionsController < ApplicationController
   before_action :set_inspection, except: [:index, :create]
-  before_action :check_inspection_owner, except: [:index, :create, :report, :qr_code]
-  before_action :redirect_if_complete, except: [:show, :mark_draft, :report, :qr_code, :index, :create, :destroy]
+  before_action :check_inspection_owner, except: %i[index create report qr_code]
+  before_action :redirect_if_complete, except: %i[
+    show
+    mark_draft
+    report
+    qr_code
+    index
+    create
+    destroy
+  ]
   before_action :no_index
   skip_before_action :require_login, only: [:report, :qr_code]
 
@@ -24,7 +32,10 @@ class InspectionsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.csv { send_data inspections_to_csv, filename: "inspections-#{Date.today}.csv" }
+      format.csv do
+        send_data inspections_to_csv,
+          filename: "inspections-#{Date.today}.csv"
+      end
     end
   end
 
@@ -85,13 +96,16 @@ class InspectionsController < ApplicationController
       end
       redirect_to edit_inspection_path(@inspection)
     else
-      flash[:alert] = I18n.t("inspections.errors.creation_failed", errors: @inspection.errors.full_messages.join(", "))
+      error_messages = @inspection.errors.full_messages.join(", ")
+      flash[:alert] = I18n.t("inspections.errors.creation_failed", 
+                             errors: error_messages)
       redirect_to unit.present? ? unit_path(unit) : root_path
     end
   end
 
   def edit
-    # Build assessments if they don't exist yet and pre-fill with inspection attributes
+    # Build assessments if they don't exist yet
+    # and pre-fill with inspection attributes
     @inspection.build_assessments_with_attributes
   end
 
@@ -302,7 +316,9 @@ class InspectionsController < ApplicationController
 
   def inspection_params
     # Get the base params with permitted top-level attributes
-    inspection_specific_params = [:inspection_date, :inspection_location, :passed, :comments, :unit_id, :inspector_company_id, :unique_report_number]
+    inspection_specific_params = %i[
+      inspection_date inspection_location passed comments unit_id inspector_company_id unique_report_number
+    ]
     copyable_attributes = Inspection.new.copyable_attributes_via_reflection
     base_params = params.require(:inspection).permit(inspection_specific_params + copyable_attributes)
 

@@ -59,25 +59,25 @@ RSpec.feature "PDF Field Coverage", type: :feature do
 
       # Core inspection info
       expect(text_content).to include("Test Bouncy Castle")
-      expect(text_content).to include("BCL-2024-001") 
+      expect(text_content).to include("BCL-2024-001")
       expect(text_content).to include(inspection.inspection_date.strftime("%d/%m/%Y"))
       expect(text_content).to include(inspection.passed? ? I18n.t("pdf.inspection.passed") : I18n.t("pdf.inspection.failed"))
       expect(text_content).to include("#{I18n.t("pdf.inspection.fields.report_id")}: #{inspection.id}")
-      
+
       # Unit details (the stuff we just fixed)
-      expect(text_content).to include(I18n.t('pdf.dimensions.width'))
-      expect(text_content).to include(I18n.t('pdf.dimensions.length'))
-      expect(text_content).to include(I18n.t('pdf.dimensions.height'))
+      expect(text_content).to include(I18n.t("pdf.dimensions.width"))
+      expect(text_content).to include(I18n.t("pdf.dimensions.length"))
+      expect(text_content).to include(I18n.t("pdf.dimensions.height"))
       expect(text_content).to include("Bounce Co Ltd")
       expect(text_content).to include("Test Owner")
-      
+
       # Assessment sections exist
       expect(text_content).to include(I18n.t("inspections.assessments.user_height.title"))
       expect(text_content).to include(I18n.t("inspections.assessments.structure.title"))
       expect(text_content).to include(I18n.t("inspections.assessments.anchorage.title"))
       expect(text_content).to include(I18n.t("inspections.assessments.materials.title"))
       expect(text_content).to include(I18n.t("inspections.assessments.fan.title"))
-      
+
       # Some actual assessment data shows up
       expect(text_content).to include(I18n.t("pdf.inspection.fields.pass")) # Should have some passing assessments
       expect(text_content).to include("2.5") # containing_wall_height

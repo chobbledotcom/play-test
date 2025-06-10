@@ -1,4 +1,4 @@
-require 'test_data_helpers'
+require "test_data_helpers"
 
 FactoryBot.define do
   factory :inspector_company do

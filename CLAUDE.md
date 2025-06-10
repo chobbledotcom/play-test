@@ -10,6 +10,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Lint check (no fix): `bundle exec standardrb path/to/file.rb`
 - **ERB files don't need linting with standardrb**
 - **Run tests (parallel)**: `bin/test` (RECOMMENDED - clean output with coverage summary)
+- **Check code standards**: `rake code_standards` (reports violations)
+- **Lint modified files**: `rake code_standards:lint_modified` (StandardRB on changed files only)
+- **Full standards workflow**: `rake code_standards:fix_all` (StandardRB + standards check)
 - Run all tests: `bundle exec rspec` (WARNING: Takes ages - only run when specifically requested)  
 - **Run tests in parallel**: `bundle exec parallel_rspec spec/` (verbose output)
 - **Run parallel tests with coverage**: `bundle exec rake coverage:parallel`
@@ -188,6 +191,60 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 - Flash messages for user-facing errors
 
 ## Rails Style Guide & Code Standards
+
+### Line Length & Formatting Standards (80 chars max)
+
+**Breaking Long Lines (StandardRB Compatible):**
+
+StandardRB will collapse excess whitespace, so use minimal formatting:
+
+```ruby
+# GOOD - Arrays/hashes: break only if over 80 chars, use shorthand notation
+ALLOWED_FORMATS = %i[pdf csv json xml]  # Under 80 chars, keep on one line
+
+LONGER_FORMAT_LIST = %i[
+  pdf csv json xml html docx
+]  # Break but minimize lines since StandardRB collapses whitespace
+
+# GOOD - Method calls: extract variables instead of parameter alignment
+long_method_name = some_object.very_long_method_name
+result = long_method_name(first_parameter, second_parameter, third_parameter)
+
+# OR break at method call
+some_object
+  .very_long_method_name(first_parameter, second_parameter, third_parameter)
+
+# GOOD - Hash parameters: extract variables for readability
+user_params = { email: "test@example.com", name: "Test User", active: true }
+create(:user, user_params)
+
+# GOOD - Long strings: extract to variables or break with backslash
+error_msg = "This is a very long error message that needs to be broken " \
+            "across multiple lines for readability"
+
+# GOOD - Comments: break at sentence boundaries (StandardRB preserves these)
+# This is a long comment that explains the business logic
+# and should be broken at natural sentence boundaries
+
+# BAD - All on one line when over 80 chars
+LONG_FORMATS = [:pdf, :csv, :json, :xml, :html, :txt, :docx, :xlsx]
+```
+
+**Length-Based Rule:**
+```ruby  
+# GOOD - Short arrays stay on one line
+validates :name, :email, presence: true
+SIMPLE_ARRAY = %i[active inactive archived]
+
+# GOOD - Break when line would exceed 80 chars
+validates :name, :email, :phone, :address, :company, presence: true  # Too long!
+validates :name,  
+          :email,
+          :phone, 
+          :address,
+          :company,
+          presence: true
+```
 
 ### Method Design Principles
 - **Maximum 20 lines per method** - if longer, extract private methods or delegate to other objects

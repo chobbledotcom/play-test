@@ -37,7 +37,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
 
     expect(page).to have_content(I18n.t("inspections.errors.access_denied"))
     expect(current_path).to eq(inspections_path)
-    
+
     inspection2.reload
     expect(inspection2.anchorage_assessment.num_low_anchors).not_to eq(10)
   end
@@ -58,7 +58,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
 
     expect(page).to have_content(I18n.t("inspections.errors.access_denied"))
     expect(current_path).to eq(inspections_path)
-    
+
     inspection2.reload
     assessment = inspection2.user_height_assessment
     expect(assessment.containing_wall_height).not_to eq(999.99)
@@ -84,7 +84,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
     click_button I18n.t("inspections.buttons.save_assessment")
 
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
-    
+
     inspection1.reload
     expect(inspection1.anchorage_assessment.num_low_anchors).to eq(8)
     expect(inspection1.anchorage_assessment.num_high_anchors).to eq(6)
@@ -120,5 +120,4 @@ RSpec.feature "Assessment Access Control", type: :feature do
     expect(page).to have_content(I18n.t("inspections.errors.access_denied"))
     expect(current_path).to eq(inspections_path)
   end
-
 end

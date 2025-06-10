@@ -4,7 +4,7 @@ require "pdf/inspector"
 RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
   let(:user) { create(:user) }
   let(:inspector_company) { user.inspection_company }
-  
+
   # No authentication needed for PDFs
 
   describe "i18n string usage verification" do
@@ -16,16 +16,14 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
         manufacturer: "Test Mfg",
         serial: "TEST123",
         has_slide: true,
-        is_totally_enclosed: true
-      )
+        is_totally_enclosed: true)
 
       # Create complete inspection with all assessments
       inspection = create(:inspection, :completed,
         user: user,
         unit: unit,
         passed: true,
-        comments: "Test comments"
-      )
+        comments: "Test comments")
 
       # Create all assessment types
       create(:user_height_assessment, :complete, inspection: inspection)
@@ -40,7 +38,7 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
       inspection_pdf_text = pdf_text_content(
         PdfGeneratorService.generate_inspection_report(inspection).render
       )
-      
+
       unit_pdf_text = pdf_text_content(
         PdfGeneratorService.generate_unit_report(unit).render
       )
@@ -49,9 +47,8 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
       failed_inspection = create(:inspection, :completed,
         user: user,
         unit: unit,
-        passed: false
-      )
-      
+        passed: false)
+
       failed_pdf_text = pdf_text_content(
         PdfGeneratorService.generate_inspection_report(failed_inspection).render
       )
@@ -66,11 +63,11 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
       # Check each PDF i18n key
       all_pdf_i18n_keys.each do |key|
         value = I18n.t(key)
-        
+
         # Skip checking keys that are placeholders or dynamic
         next if value.include?("%{")
         next if value.blank?
-        
+
         if all_pdf_text.include?(value)
           used_keys << key
         else
@@ -92,7 +89,7 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
 
     it "verifies no hardcoded strings in PDF generation" do
       # This test helps ensure we're using i18n for all user-facing text
-      
+
       # Common hardcoded strings to check for
       hardcoded_patterns = [
         /Equipment Details/i,
@@ -127,9 +124,9 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
     it "generates inspection PDF with all sections" do
       unit = create(:unit, user: user, has_slide: true, is_totally_enclosed: true, name: "Test Unit PDF", serial: "SERIAL123")
       inspection = create(:inspection, :completed, user: user, unit: unit)
-      
+
       # Create all assessments
-      assessments = {
+      {
         user_height: create(:user_height_assessment, :complete, inspection: inspection),
         structure: create(:structure_assessment, :complete, inspection: inspection),
         anchorage: create(:anchorage_assessment, :complete, inspection: inspection),
@@ -140,21 +137,20 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
       }
 
       get report_inspection_path(inspection)
-      
+
       # Ensure we got a PDF response
       expect(response).to have_http_status(:success)
       expect(response.headers["Content-Type"]).to eq("application/pdf")
       expect(response.body).not_to be_nil
       expect(response.body[0..3]).to eq("%PDF")
-      
+
       pdf_text = pdf_text_content(response.body)
 
       # Verify core sections using i18n
       expect_pdf_to_include_i18n_keys(pdf_text,
         "pdf.inspection.title",
         "pdf.inspection.equipment_details",
-        "pdf.inspection.comments"
-      )
+        "pdf.inspection.comments")
 
       # Verify dynamic content
       expect(pdf_text).to include(unit.name)
@@ -164,15 +160,14 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
 
     it "generates unit PDF with inspection history" do
       unit = create(:unit, user: user)
-      
+
       # Create inspection history
       3.times do |i|
         create(:inspection, :completed,
           user: user,
           unit: unit,
           inspection_date: i.months.ago,
-          passed: i.even?
-        )
+          passed: i.even?)
       end
 
       get report_unit_path(unit)
@@ -182,8 +177,7 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
       expect_pdf_to_include_i18n_keys(pdf_text,
         "pdf.unit.title",
         "pdf.unit.details",
-        "pdf.unit.inspection_history"
-      )
+        "pdf.unit.inspection_history")
     end
   end
 end

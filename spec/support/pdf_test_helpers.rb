@@ -19,25 +19,25 @@ module PdfTestHelpers
   # Get all PDF i18n keys from locale files
   def all_pdf_i18n_keys
     keys = []
-    
+
     # Get all keys under pdf namespace
     I18n.backend.translations[:en][:pdf].each do |section, content|
       collect_keys(content, "pdf.#{section}", keys)
     end
-    
+
     keys
   end
 
   # Check that all assessment sections show proper "no data" messages
   def expect_no_assessment_messages(pdf_text, unit = nil)
     assessment_types = %w[user_height structure anchorage materials fan]
-    
+
     # Only check for slide if unit has a slide
-    assessment_types << 'slide' if unit&.has_slide?
-    
+    assessment_types << "slide" if unit&.has_slide?
+
     # Only check for enclosed if unit is totally enclosed
-    assessment_types << 'enclosed' if unit&.is_totally_enclosed?
-    
+    assessment_types << "enclosed" if unit&.is_totally_enclosed?
+
     assessment_types.each do |type|
       title = I18n.t("inspections.assessments.#{type}.title")
       expect(pdf_text).to include(I18n.t("pdf.inspection.no_assessment_data", assessment_type: title))
@@ -60,6 +60,6 @@ end
 
 RSpec.configure do |config|
   config.include PdfTestHelpers, type: :feature
-  config.include PdfTestHelpers, type: :request  
+  config.include PdfTestHelpers, type: :request
   config.include PdfTestHelpers, pdf: true
 end

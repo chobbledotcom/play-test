@@ -266,7 +266,7 @@ RSpec.describe "InspectorCompanies", type: :request do
     end
 
     it "handles duplicate RPII registration numbers" do
-      existing_company = create(:inspector_company)
+      create(:inspector_company)
 
       # RPII uniqueness is now enforced at user level, not company level
       post inspector_companies_path, params: {

@@ -1,5 +1,7 @@
 class InspectorCompaniesController < ApplicationController
-  before_action :set_inspector_company, only: [:show, :edit, :update, :archive, :unarchive]
+  before_action :set_inspector_company, only: %i[
+    show edit update archive unarchive
+  ]
   before_action :require_login
   before_action :require_admin, except: [:show]
 

@@ -50,9 +50,9 @@ class SafetyStandardsController < ApplicationController
 
   def calculate_anchors
     area = params[:calculation][:area].to_f
-    
+
     return set_anchor_error unless area.positive?
-    
+
     @anchor_result = build_anchor_result(area)
   end
 
@@ -79,7 +79,7 @@ class SafetyStandardsController < ApplicationController
     negative_adjustment = params[:calculation][:negative_adjustment].to_f
 
     return set_capacity_error unless valid_dimensions?(length, width)
-    
+
     @capacity_result = build_capacity_result(length, width, negative_adjustment)
   end
 
@@ -108,7 +108,7 @@ class SafetyStandardsController < ApplicationController
     platform_height = params[:calculation][:platform_height].to_f
 
     return set_runout_error unless platform_height.positive?
-    
+
     @runout_result = build_runout_result(platform_height)
   end
 
@@ -133,7 +133,7 @@ class SafetyStandardsController < ApplicationController
     user_height = params[:calculation][:user_height].to_f
 
     return set_wall_height_error unless user_height.positive?
-    
+
     @wall_height_result = build_wall_height_result(user_height)
   end
 

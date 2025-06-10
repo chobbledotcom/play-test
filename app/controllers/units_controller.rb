@@ -1,5 +1,5 @@
 class UnitsController < ApplicationController
-  before_action :set_unit, only: [:show, :edit, :update, :destroy, :report, :qr_code]
+  before_action :set_unit, only: %i[show edit update destroy report qr_code]
   before_action :check_unit_owner, only: [:show, :edit, :update, :destroy]
   before_action :require_inspection_company, only: [:new, :create]
   before_action :no_index
@@ -183,7 +183,9 @@ class UnitsController < ApplicationController
   private
 
   def unit_params
-    unit_specific_params = [:name, :serial, :manufacturer, :photo, :description, :owner, :model, :manufacture_date, :notes]
+    unit_specific_params = %i[
+      name serial manufacturer photo description owner model manufacture_date notes
+    ]
     copyable_attributes = Unit.new.copyable_attributes_via_reflection
     params.require(:unit).permit(unit_specific_params + copyable_attributes)
   end

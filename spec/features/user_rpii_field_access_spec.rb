@@ -114,7 +114,7 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
       click_button I18n.t("users.buttons.register")
 
       expect(page).to have_content(I18n.t("users.messages.account_created"))
-      
+
       new_user = User.find_by(email: "newuser@example.com")
       expect(new_user).to be_present
       expect(new_user.rpii_inspector_number).to be_nil

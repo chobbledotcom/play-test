@@ -35,8 +35,8 @@ module TestDataHelpers
 
   # Generate inspection location
   def self.inspection_location
-    venues = ["Park", "Recreation Centre", "Community Hall", "School", "Leisure Centre", 
-              "Sports Complex", "Village Hall", "Town Square", "Festival Grounds"]
+    venues = ["Park", "Recreation Centre", "Community Hall", "School", "Leisure Centre",
+      "Sports Complex", "Village Hall", "Town Square", "Festival Grounds"]
     "#{british_city} #{venues.sample}"
   end
 end

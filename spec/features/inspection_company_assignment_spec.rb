@@ -16,10 +16,10 @@ RSpec.feature "User Active Status Management", type: :feature do
       visit edit_user_path(regular_user)
 
       expect(page).to have_field("user_active_until")
-      
+
       set_user_active_until_date
       submit_user_update
-      
+
       expect_user_updated_successfully
     end
   end
@@ -92,7 +92,6 @@ RSpec.feature "User Active Status Management", type: :feature do
         expect(inspection).to be_present
         expect(inspection.inspector_company_id).to eq(inspector_company.id)
       end
-
     end
   end
 

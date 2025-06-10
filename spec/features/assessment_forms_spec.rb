@@ -341,7 +341,7 @@ RSpec.feature "Assessment Forms", type: :feature do
 
   def expect_assessment_form_rendered(tab_name)
     expect(page).to have_css("h1", text: I18n.t("inspections.assessments.#{tab_name}.title"))
-    expect(page).to have_css(".#{tab_name.tr('_', '-')}-assessment")
+    expect(page).to have_css(".#{tab_name.tr("_", "-")}-assessment")
     expect(page).not_to have_content("translation missing")
     expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
   end

@@ -16,7 +16,7 @@ RSpec.feature "Comprehensive Attribute Copying", type: :feature do
       click_button I18n.t("units.buttons.add_inspection")
 
       expect(page).to have_current_path(/\/inspections\/[A-Z0-9]+\/edit/)
-      
+
       inspection = user.inspections.find_by(unit_id: unit.id)
       expect(inspection).to be_present
       expect_all_dimensions_copied(unit, inspection)
@@ -24,11 +24,11 @@ RSpec.feature "Comprehensive Attribute Copying", type: :feature do
 
     scenario "replaces dimensions when using replace dimensions button" do
       inspection = create(:inspection, user: user, unit: unit, inspector_company: inspector_company,
-                         width: 5.0, length: 4.0, height: 2.0, has_slide: false, is_totally_enclosed: false,
-                         num_low_anchors: 1, rope_size: 10.0)
+        width: 5.0, length: 4.0, height: 2.0, has_slide: false, is_totally_enclosed: false,
+        num_low_anchors: 1, rope_size: 10.0)
       visit edit_inspection_path(inspection)
       visit replace_dimensions_inspection_path(inspection)
-      
+
       inspection.reload
       expect_all_dimensions_copied(unit, inspection)
     end
@@ -39,7 +39,7 @@ RSpec.feature "Comprehensive Attribute Copying", type: :feature do
 
     scenario "copies all dimensions when creating unit from inspection" do
       visit new_unit_from_inspection_path(inspection)
-      
+
       fill_in I18n.t("units.fields.name"), with: "Unit from Inspection"
       fill_in I18n.t("units.fields.serial"), with: "UFI-2024-001"
       fill_in I18n.t("units.fields.manufacturer"), with: "Inspection Manufacturer"
@@ -53,7 +53,7 @@ RSpec.feature "Comprehensive Attribute Copying", type: :feature do
       unit = user.units.find_by(serial: "UFI-2024-001")
       expect(unit).to be_present
       expect_all_dimensions_copied(inspection, unit)
-      
+
       expect(unit.name).to eq("Unit from Inspection")
       expect(unit.serial).to eq("UFI-2024-001")
       expect(unit.manufacturer).to eq("Inspection Manufacturer")
@@ -93,8 +93,8 @@ RSpec.feature "Comprehensive Attribute Copying", type: :feature do
   private
 
   def expect_all_dimensions_copied(source, target)
-    %w[width length height has_slide is_totally_enclosed num_low_anchors rope_size 
-       slide_platform_height tallest_user_height].each do |attr|
+    %w[width length height has_slide is_totally_enclosed num_low_anchors rope_size
+      slide_platform_height tallest_user_height].each do |attr|
       expect(target.send(attr)).to eq(source.send(attr)), "#{attr} should be copied"
     end
   end

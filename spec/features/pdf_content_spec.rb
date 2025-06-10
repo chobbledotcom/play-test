@@ -46,18 +46,17 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       # Check all core i18n keys are present
       expect_pdf_to_include_i18n_keys(pdf_text,
         "pdf.inspection.title",
-        "pdf.inspection.equipment_details", 
-        "pdf.inspection.comments"
-      )
+        "pdf.inspection.equipment_details",
+        "pdf.inspection.comments")
 
       # Check dynamic content
       expect(pdf_text).to include(inspector_company.name)
       expect(pdf_text).to include(user.rpii_inspector_number) if user.rpii_inspector_number.present?
       expect(pdf_text).to include("Test Bouncy Castle")
       expect(pdf_text).to include("BCL-2024-001")
-      expect(pdf_text).to include(I18n.t('pdf.dimensions.width'))
-      expect(pdf_text).to include(I18n.t('pdf.dimensions.length'))
-      expect(pdf_text).to include(I18n.t('pdf.dimensions.height'))
+      expect(pdf_text).to include(I18n.t("pdf.dimensions.width"))
+      expect(pdf_text).to include(I18n.t("pdf.dimensions.length"))
+      expect(pdf_text).to include(I18n.t("pdf.dimensions.height"))
 
       # Check assessment sections exist
       expect(pdf_text).to include(I18n.t("inspections.assessments.user_height.title"))
@@ -158,12 +157,11 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect_pdf_to_include_i18n_keys(pdf_text,
         "pdf.unit.title",
         "pdf.unit.details",
-        "pdf.unit.inspection_history"
-      )
+        "pdf.unit.inspection_history")
 
       # Check unit details
       expect(pdf_text).to include("Test Bouncy Castle")
-      expect(pdf_text).to include("Bounce Co Ltd") 
+      expect(pdf_text).to include("Bounce Co Ltd")
       expect(pdf_text).to include("BCL-2024-001")
 
       # Should include inspection dates
@@ -221,7 +219,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       pdf = PDF::Inspector::Text.analyze(page.driver.response.body)
       text_content = pdf.strings.join(" ")
 
-      # Should include report ID 
+      # Should include report ID
       expect(text_content).to include(inspection.id)
     end
   end

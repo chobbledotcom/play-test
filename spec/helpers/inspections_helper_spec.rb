@@ -251,6 +251,5 @@ RSpec.describe InspectionsHelper, type: :helper do
         )
       end
     end
-
   end
 end

@@ -103,9 +103,9 @@ RSpec.feature "Filter Visibility", type: :feature do
         expect_units_filter_form_present
         expect(page).to have_content(I18n.t("units.messages.no_units_found"))
         expect(page).to have_link(I18n.t("ui.buttons.clear_filters"))
-        
+
         click_link I18n.t("ui.buttons.clear_filters")
-        
+
         expect(current_path).to eq(units_path)
         expect(page).not_to have_content(I18n.t("units.messages.no_units_found"))
       end

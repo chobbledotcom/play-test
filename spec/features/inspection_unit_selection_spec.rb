@@ -32,7 +32,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
   end
 
   describe "unit selection page" do
-    before { visit_select_unit }
+    before { visit select_unit_inspection_path(inspection) }
 
     it "displays all user units in a list with select buttons" do
       expect_units_visible(unit1, unit2, unit3)
@@ -61,14 +61,14 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
       end
 
       it "filters units by manufacturer" do
-        visit_select_unit(manufacturer: "Acme")
+        visit select_unit_inspection_path(inspection, manufacturer: "Acme")
 
         expect_units_visible(unit1, unit3)
         expect_units_not_visible(unit2)
       end
 
       it "filters units by slide status" do
-        visit_select_unit(has_slide: "true")
+        visit select_unit_inspection_path(inspection, has_slide: "true")
 
         expect_units_visible(unit3)
         expect_units_not_visible(unit1, unit2)
@@ -89,7 +89,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
       end
     end
 
-    before { visit_select_unit }
+    before { visit select_unit_inspection_path(inspection) }
 
     it "updates the inspection with the selected unit" do
       select_unit_button(unit_with_dimensions)
@@ -140,7 +140,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
     let!(:other_unit) { create(:unit, user: other_user, name: "Other Unit") }
 
     it "only shows units belonging to the current user" do
-      visit_select_unit
+      visit select_unit_inspection_path(inspection)
 
       expect_units_visible(unit1, unit2, unit3)
       expect_units_not_visible(other_unit)
