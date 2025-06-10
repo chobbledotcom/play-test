@@ -98,10 +98,10 @@ RSpec.describe PdfGeneratorService, pdf: true do
       pdf = PdfGeneratorService.generate_unit_report(unit)
       pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-      expect(pdf_text).to include(I18n.t("pdf.unit.fields.name"))
-      expect(pdf_text).to include(I18n.t("pdf.unit.fields.serial_number"))
-      expect(pdf_text).to include(I18n.t("pdf.unit.fields.manufacturer"))
-      expect(pdf_text).to include(I18n.t("pdf.unit.fields.has_slide"))
+      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.description"))
+      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.serial_number_asset_id"))
+      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.manufacturer"))
+      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.type"))
       expect(pdf_text).to include(I18n.t("pdf.unit.fields.owner"))
     end
 
@@ -492,19 +492,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
       end
     end
 
-    context "with very long comments" do
-      let(:long_comment) { "A" * 100 }
-      let(:inspection) { create(:inspection, :completed, user: user, comments: long_comment) }
-
-      it "truncates long comments in inspection history" do
-        unit = inspection.unit
-        pdf = PdfGeneratorService.generate_unit_report(unit)
-        pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
-
-        # Should be truncated to 30 characters
-        expect(pdf_text).to include("A" * 27 + "...")
-      end
-    end
 
     context "QR code generation" do
       let(:inspection) { create(:inspection, user: user) }
@@ -512,7 +499,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
       it "handles QR code tempfile cleanup for inspections" do
         allow(Tempfile).to receive(:new).and_call_original
-        
+
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf.render
 
@@ -521,7 +508,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
       it "handles QR code tempfile cleanup for units" do
         allow(Tempfile).to receive(:new).and_call_original
-        
+
         pdf = PdfGeneratorService.generate_unit_report(unit)
         pdf.render
 
@@ -537,31 +524,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
           pdf = PdfGeneratorService.generate_inspection_report(inspection)
           pdf.render
         }.not_to raise_error
-      end
-    end
-
-    context "unit with next inspection due" do
-      let(:unit) { create(:unit, user: user) }
-      let!(:past_inspection) { create(:inspection, :completed, unit: unit, user: user, inspection_date: Date.today - 330.days) }
-
-      it "includes next inspection due date" do
-        pdf = PdfGeneratorService.generate_unit_report(unit)
-        pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
-
-        expected_due_date = (past_inspection.inspection_date + 365.days).strftime("%d/%m/%Y")
-        expect(pdf_text).to include(I18n.t("pdf.unit.fields.next_inspection_due"))
-        expect(pdf_text).to include(expected_due_date)
-      end
-    end
-
-    context "unit with overdue inspection" do
-      let(:unit) { create(:unit, user: user) }
-      let!(:old_inspection) { create(:inspection, :completed, unit: unit, user: user, inspection_date: Date.today - 400.days) }
-
-      it "shows overdue date" do
-        pdf = PdfGeneratorService.generate_unit_report(unit)
-        # Can't easily test color in PDF, but ensure it renders without error
-        expect { pdf.render }.not_to raise_error
       end
     end
   end

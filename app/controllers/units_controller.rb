@@ -32,6 +32,14 @@ class UnitsController < ApplicationController
 
     respond_to do |format|
       format.html
+      format.pdf do
+        pdf_data = PdfGeneratorService.generate_unit_report(@unit)
+
+        send_data pdf_data.render,
+          filename: "#{@unit.serial}.pdf",
+          type: "application/pdf",
+          disposition: "inline"
+      end
       format.json { render json: {id: @unit.id, name: @unit.name, serial: @unit.serial, manufacturer: @unit.manufacturer, has_slide: @unit.has_slide} }
     end
   end

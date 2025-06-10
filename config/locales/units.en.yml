@@ -26,6 +26,7 @@ en:
       qr_code: "Report QR Code"
       report_link: "Report PDF Link"
       report_json_link: "Report JSON Link"
+      unit_report: "Unit Report"
       inspection_details: "Inspection Details"
 
     sections:
@@ -160,6 +161,7 @@ en:
       add_inspection: "Add Inspection"
       add_unit: "Add Unit"
       export_csv: "Export CSV"
+      download_pdf: "Download PDF"
 
     actions:
       select: "Select"
@@ -204,6 +206,7 @@ en:
       no_units_found: "No units found."
       view_full_photo: "View full size photo"
       inspection_company_required: "You must be assigned to an inspection company to create units."
+      pdf_not_supported: "Your browser does not support PDFs."
 
     accessibility:
       qr_code_alt: "QR Code for Unit Inspection History Report"

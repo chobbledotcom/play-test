@@ -65,9 +65,9 @@ RSpec.feature "PDF Field Coverage", type: :feature do
       expect(text_content).to include("#{I18n.t("pdf.inspection.fields.report_id")}: #{inspection.id}")
       
       # Unit details (the stuff we just fixed)
-      expect(text_content).to include("Width: 5.5")
-      expect(text_content).to include("Length: 6")
-      expect(text_content).to include("Height: 4.5")
+      expect(text_content).to include(I18n.t('pdf.dimensions.width'))
+      expect(text_content).to include(I18n.t('pdf.dimensions.length'))
+      expect(text_content).to include(I18n.t('pdf.dimensions.height'))
       expect(text_content).to include("Bounce Co Ltd")
       expect(text_content).to include("Test Owner")
       

@@ -5,7 +5,7 @@ en:
       title: "Inspection Report"
       passed: "PASSED"
       failed: "FAILED"
-      equipment_details: "Equipment Details"
+      equipment_details: "Unit Details"
       inspection_results: "Inspection Results"
       assessments_section: "Assessment Results"
       comments: "Comments"
@@ -47,6 +47,15 @@ en:
         failed: "FAILED"
         incomplete: "INCOMPLETE"
         na: "N/A"
+        width: "Width"
+        length: "Length"
+        height: "Height"
+        width_with_unit: "Width (m)"
+        length_with_unit: "Length (m)"
+        height_with_unit: "Height (m)"
+        size: "Size"
+        size_with_unit: "Size (m)"
+        unit_meters: "m"
 
     unit:
       title: "Unit History Report"
@@ -81,6 +90,17 @@ en:
         pass: "PASS"
         fail: "FAIL"
         na: "N/A"
+
+    dimensions:
+      width: "Width"
+      length: "Length"
+      height: "Height"
+      width_with_unit: "Width (m)"
+      length_with_unit: "Length (m)"
+      height_with_unit: "Height (m)"
+      size: "Size"
+      size_with_unit: "Size (m)"
+      unit_meters: "m"
 
     equipment:
       title: "Equipment History Report"
