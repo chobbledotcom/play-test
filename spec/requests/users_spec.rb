@@ -46,6 +46,8 @@ RSpec.describe "Users", type: :request do
       visit "/signup"
       expect(page).to have_content(I18n.t("users.titles.register"))
       expect(page).to have_field(I18n.t("users.forms.email"))
+      expect(page).to have_field(I18n.t("users.forms.name"))
+      expect(page).to have_field(I18n.t("users.forms.rpii_inspector_number"))
       expect(page).to have_field(I18n.t("users.forms.password"))
       expect(page).to have_field(I18n.t("users.forms.password_confirmation"))
       expect(page).to have_button(I18n.t("users.buttons.register"))
@@ -57,6 +59,7 @@ RSpec.describe "Users", type: :request do
       visit "/signup"
       fill_in I18n.t("users.forms.email"), with: "newuser@example.com"
       fill_in I18n.t("users.forms.name"), with: "New User"
+      fill_in I18n.t("users.forms.rpii_inspector_number"), with: "RPII123"
       fill_in I18n.t("users.forms.password"), with: "password"
       fill_in I18n.t("users.forms.password_confirmation"), with: "password"
       click_button I18n.t("users.buttons.register")
@@ -69,6 +72,7 @@ RSpec.describe "Users", type: :request do
         user: {
           email: "newuser@example.com",
           name: "New User",
+          rpii_inspector_number: "RPII123",
           password: "password123",
           password_confirmation: "password123"
         }
@@ -76,6 +80,7 @@ RSpec.describe "Users", type: :request do
 
       user = User.find_by(email: "newuser@example.com")
       expect(user).to be_present
+      expect(user.rpii_inspector_number).to eq("RPII123")
       expect(user.active_until).to eq(Date.current - 1.day)
       expect(user.is_active?).to be false
     end
@@ -323,6 +328,7 @@ RSpec.describe "Users", type: :request do
         user: {
           email: "newuser@example.com",
           name: "New User",
+          rpii_inspector_number: "RPII123",
           password: "password",
           password_confirmation: "password"
         }
@@ -339,6 +345,7 @@ RSpec.describe "Users", type: :request do
         user: {
           email: "newuser@example.com",
           name: "New User",
+          rpii_inspector_number: "RPII123",
           password: "password",
           password_confirmation: "password"
         }
@@ -352,6 +359,7 @@ RSpec.describe "Users", type: :request do
         user: {
           email: "newuser@example.com",
           name: "New User",
+          rpii_inspector_number: "RPII123",
           password: "password",
           password_confirmation: "password"
         }
@@ -481,24 +489,26 @@ RSpec.describe "Users", type: :request do
     let(:regular_user) { create(:user) }
     let(:company) { create(:inspector_company) }
 
-    it "restricts non-admin user creation to basic fields only" do
+    it "accepts RPII during registration but ignores admin-only fields" do
       post "/signup", params: {
         user: {
           email: "newuser@example.com",
           name: "New User",
+          rpii_inspector_number: "RPII-REG-123",
           password: "password123",
           password_confirmation: "password123",
           # These admin-only fields should be ignored
           active_until: Date.current + 1.year,
-          inspection_company_id: company.id,
-          rpii_inspector_number: "SHOULD_BE_IGNORED"
+          inspection_company_id: company.id
         }
       }
 
       created_user = User.find_by(email: "newuser@example.com")
       expect(created_user).to be_present
-      # Non-admin fields should be ignored during creation
-      expect(created_user.rpii_inspector_number).to be_nil
+      # RPII should be accepted during registration
+      expect(created_user.rpii_inspector_number).to eq("RPII-REG-123")
+      # Admin-only fields should be ignored
+      expect(created_user.active_until).to eq(Date.current - 1.day) # Default inactive
       expect(created_user.inspection_company_id).to be_nil
     end
 
@@ -512,6 +522,48 @@ RSpec.describe "Users", type: :request do
 
       # Should be redirected due to admin requirement
       expect(response).to redirect_to(root_path)
+    end
+
+    describe "updating settings with empty name" do
+      before do
+        login_as(regular_user)
+      end
+
+      it "allows updating settings even if name is empty" do
+        # Create user with empty name (bypassing validation)
+        regular_user.update_column(:name, nil)
+        
+        settings_attrs = {
+          phone: "020 7946 0958",
+          theme: "dark",
+          time_display: "time"
+        }
+        
+        patch update_settings_user_path(regular_user), params: { user: settings_attrs }
+        
+        regular_user.reload
+        expect(regular_user.phone).to eq("020 7946 0958")
+        expect(regular_user.theme).to eq("dark")
+        expect(regular_user.time_display).to eq("time")
+        expect(regular_user.name).to be_nil
+      end
+
+      it "prevents users from changing their own name through settings" do
+        original_name = regular_user.name
+        
+        settings_attrs = {
+          name: "Hacker McHackface",
+          phone: "020 7946 0958",
+          theme: "dark"
+        }
+        
+        patch update_settings_user_path(regular_user), params: { user: settings_attrs }
+        
+        regular_user.reload
+        expect(regular_user.name).to eq(original_name)
+        expect(regular_user.phone).to eq("020 7946 0958")
+        expect(regular_user.theme).to eq("dark")
+      end
     end
   end
 end

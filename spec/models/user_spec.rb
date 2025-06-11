@@ -50,6 +50,18 @@ RSpec.describe User, type: :model do
       expect(duplicate_user).not_to be_valid
       expect(duplicate_user.errors[:email]).to include("has already been taken")
     end
+
+    it "requires an RPII inspector number" do
+      user = build(:user, rpii_inspector_number: nil)
+      expect(user).not_to be_valid
+      expect(user.errors[:rpii_inspector_number]).to include("can't be blank")
+    end
+
+    it "requires a non-blank RPII inspector number" do
+      user = build(:user, rpii_inspector_number: "")
+      expect(user).not_to be_valid
+      expect(user.errors[:rpii_inspector_number]).to include("can't be blank")
+    end
   end
 
   describe "associations" do

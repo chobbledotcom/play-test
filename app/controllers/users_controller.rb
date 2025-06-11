@@ -168,8 +168,8 @@ class UsersController < ApplicationController
       ]
       params.require(:user).permit(admin_permitted_params)
     elsif action_name == "create"
-      # Allow name during user registration
-      params.require(:user).permit(:email, :name, :password, :password_confirmation)
+      # Allow name and RPII number during user registration
+      params.require(:user).permit(:email, :name, :rpii_inspector_number, :password, :password_confirmation)
     else
       params.require(:user).permit(:email, :password, :password_confirmation)
     end

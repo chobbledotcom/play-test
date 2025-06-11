@@ -28,24 +28,24 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
       expect(target_user.rpii_inspector_number).to eq("RPII-456")
     end
 
-    it "can set RPII inspector number for users without one" do
-      user_without_rpii = create(:user, rpii_inspector_number: nil)
-      visit edit_user_path(user_without_rpii)
+    it "can update RPII inspector number for existing users" do
+      user_with_rpii = create(:user, rpii_inspector_number: "RPII-OLD")
+      visit edit_user_path(user_with_rpii)
 
       expect(page).to have_field(I18n.t("users.forms.rpii_inspector_number"))
       fill_in I18n.t("users.forms.rpii_inspector_number"), with: "RPII-789"
       click_button I18n.t("users.buttons.update_user")
 
       expect(page).to have_content(I18n.t("users.messages.user_updated"))
-      user_without_rpii.reload
-      expect(user_without_rpii.rpii_inspector_number).to eq("RPII-789")
+      user_with_rpii.reload
+      expect(user_with_rpii.rpii_inspector_number).to eq("RPII-789")
     end
 
-    it "does not show RPII field in new user registration form" do
+    it "shows RPII field in new user registration form" do
       visit new_user_path
 
-      expect(page).not_to have_field(I18n.t("users.forms.rpii_inspector_number"))
-      expect(page).not_to have_field("user[rpii_inspector_number]")
+      expect(page).to have_field(I18n.t("users.forms.rpii_inspector_number"))
+      expect(page).to have_field("user[rpii_inspector_number]")
     end
   end
 
@@ -81,28 +81,29 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
       expect(regular_user.rpii_inspector_number).not_to eq("HACKED-999")
     end
 
-    it "does not show RPII field in new user registration form when logged out" do
+    it "shows RPII field in new user registration form when logged out" do
       visit logout_path
       visit new_user_path
 
-      expect(page).not_to have_field(I18n.t("users.forms.rpii_inspector_number"))
-      expect(page).not_to have_field("user[rpii_inspector_number]")
+      expect(page).to have_field(I18n.t("users.forms.rpii_inspector_number"))
+      expect(page).to have_field("user[rpii_inspector_number]")
     end
   end
 
   describe "Unauthenticated access" do
-    it "does not show RPII field in new user registration form" do
+    it "shows RPII field in new user registration form" do
       visit new_user_path
 
-      expect(page).not_to have_field(I18n.t("users.forms.rpii_inspector_number"))
-      expect(page).not_to have_field("user[rpii_inspector_number]")
+      expect(page).to have_field(I18n.t("users.forms.rpii_inspector_number"))
+      expect(page).to have_field("user[rpii_inspector_number]")
     end
 
-    it "creates users without RPII data during registration" do
+    it "requires RPII data during registration" do
       visit new_user_path
 
       fill_in I18n.t("users.forms.email"), with: "newuser@example.com"
       fill_in I18n.t("users.forms.name"), with: "New Test User"
+      fill_in I18n.t("users.forms.rpii_inspector_number"), with: "RPII-NEW-123"
       fill_in I18n.t("users.forms.password"), with: "password123"
       fill_in I18n.t("users.forms.password_confirmation"), with: "password123"
 
@@ -112,7 +113,22 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
 
       new_user = User.find_by(email: "newuser@example.com")
       expect(new_user).to be_present
-      expect(new_user.rpii_inspector_number).to be_nil
+      expect(new_user.rpii_inspector_number).to eq("RPII-NEW-123")
+    end
+
+    it "shows error when RPII is not provided during registration" do
+      visit new_user_path
+
+      fill_in I18n.t("users.forms.email"), with: "newuser@example.com"
+      fill_in I18n.t("users.forms.name"), with: "New Test User"
+      fill_in I18n.t("users.forms.password"), with: "password123"
+      fill_in I18n.t("users.forms.password_confirmation"), with: "password123"
+      # Intentionally not filling RPII field
+
+      click_button I18n.t("users.buttons.register")
+
+      expect(page).not_to have_content(I18n.t("users.messages.account_created"))
+      expect(page).to have_content("can't be blank")
     end
   end
 end

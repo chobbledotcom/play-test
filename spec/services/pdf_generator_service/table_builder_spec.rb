@@ -187,7 +187,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
     let(:company1) { create(:inspector_company, name: "Smith Inspections") }
     let(:company2) { create(:inspector_company, name: "Doe Inspections") }
     let(:user1) { create(:user, name: "John Smith", rpii_inspector_number: "RPII123", inspection_company: company1) }
-    let(:user2) { create(:user, name: "Jane Doe", rpii_inspector_number: nil, inspection_company: company2) }
+    let(:user2) { create(:user, name: "Jane Doe", rpii_inspector_number: "RPII456", inspection_company: company2) }
     let(:inspections) do
       [
         create(:inspection, :passed, inspection_date: Date.new(2024, 1, 15), user: user1, inspection_location: "Site A"),
@@ -268,7 +268,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
           I18n.t("pdf.inspection.fields.inspection_location")
         ],
         ["15/01/2024", I18n.t("pdf.unit.fields.pass"), "John Smith", "RPII123", "Site A"],
-        ["20/02/2024", I18n.t("pdf.unit.fields.fail"), "Jane Doe", I18n.t("pdf.unit.fields.na"), "Site B"],
+        ["20/02/2024", I18n.t("pdf.unit.fields.fail"), "Jane Doe", "RPII456", "Site B"],
         ["01/03/2024", I18n.t("pdf.unit.fields.fail"), "John Smith", "RPII123", I18n.t("pdf.unit.fields.na")]
       ]
 

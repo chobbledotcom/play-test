@@ -12,7 +12,8 @@ class User < ApplicationRecord
   password_length_options = {minimum: 6}
   validates :password, presence: true, length: password_length_options,
     if: :password_digest_changed?
-  validates :name, presence: true
+  validates :name, presence: true, if: :validate_name?
+  validates :rpii_inspector_number, presence: true
   validates :time_display, inclusion: {in: %w[date time]}
   validates :theme, inclusion: {in: %w[light dark]}
   # Contact fields are only required for users without companies
@@ -72,6 +73,12 @@ class User < ApplicationRecord
   end
 
   private
+
+  def validate_name?
+    # Skip name validation if we're only updating settings fields
+    # Name is required for new records and when explicitly being updated
+    new_record? || name_changed?
+  end
 
   def downcase_email
     self.email = email.downcase

@@ -10,6 +10,8 @@ RSpec.describe "users/new.html.erb", type: :view do
 
     expect(rendered).to have_content(I18n.t("users.titles.register"))
     expect(rendered).to have_field("Email")
+    expect(rendered).to have_field("Name")
+    expect(rendered).to have_field("RPII Inspector No")
     expect(rendered).to have_field("Password")
     expect(rendered).to have_field("Password confirmation")
     expect(rendered).to have_button(I18n.t("users.buttons.register"))
