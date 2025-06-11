@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       get "change_settings"
       patch "update_settings"
       post "impersonate"
+      post "verify_rpii"
     end
   end
 

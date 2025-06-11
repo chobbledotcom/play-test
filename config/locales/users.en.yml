@@ -46,6 +46,7 @@ en:
       delete: "Delete"
       change_password: "Change Password"
       impersonate: "Log in as %{email}"
+      verify_rpii: "Verify RPII Number"
 
     messages:
       no_users: "No users found"
@@ -63,6 +64,8 @@ en:
       impersonating: "You are now impersonating %{email}"
       own_action_only: "You can only change your own %{action}"
       inherited_from_company: "These details are inherited from your company and cannot be edited here."
+      rpii_verified: "RPII inspector number verified successfully"
+      rpii_verification_failed: "RPII inspector number verification failed"
 
     errors:
       wrong_password: "Current password is incorrect"
@@ -75,3 +78,9 @@ en:
       time_day: "Show Day Only"
       theme_light: "Light"
       theme_dark: "Dark"
+    
+    verification:
+      details_header: "RPII Verification Details"
+      name: "Inspector Name"
+      number: "Inspector Number"
+      qualifications: "Qualifications"

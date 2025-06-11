@@ -69,7 +69,18 @@
     <main>
       <% flash.each do |type, message| %>
         <article>
-          <aside><%= message %></aside>
+          <aside>
+            <%= message %>
+            <% if type.to_s == "notice" && session[:rpii_verification_details] %>
+              <div style="margin-top: 0.5rem; padding: 0.5rem; background: #f0f0f0;">
+                <strong><%= t("users.verification.details_header") %></strong><br>
+                <%= t("users.verification.name") %>: <%= session[:rpii_verification_details]["name"] %><br>
+                <%= t("users.verification.number") %>: <%= session[:rpii_verification_details]["number"] %><br>
+                <%= t("users.verification.qualifications") %>: <%= session[:rpii_verification_details]["qualifications"] %>
+              </div>
+              <% session.delete(:rpii_verification_details) %>
+            <% end %>
+          </aside>
         </article>
       <% end %>
 

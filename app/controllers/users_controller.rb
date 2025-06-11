@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   skip_before_action :require_login, only: [:new, :create]
-  before_action :require_admin, only: %i[destroy edit impersonate index update]
+  before_action :require_admin, only: %i[destroy edit impersonate index update verify_rpii]
   before_action :set_user, only: %i[
     change_password
     change_settings
@@ -10,6 +10,7 @@ class UsersController < ApplicationController
     update
     update_password
     update_settings
+    verify_rpii
   ]
   before_action :require_correct_user, only: %i[
     change_password change_settings update_password update_settings
@@ -152,6 +153,24 @@ class UsersController < ApplicationController
         end
       end
     end
+  end
+
+  def verify_rpii
+    result = @user.verify_rpii_inspector_number
+
+    if result[:valid]
+      inspector = result[:inspector]
+      flash[:notice] = I18n.t("users.messages.rpii_verified")
+      session[:rpii_verification_details] = {
+        name: inspector[:name],
+        number: inspector[:number],
+        qualifications: inspector[:qualifications]
+      }
+    else
+      flash[:alert] = I18n.t("users.messages.rpii_verification_failed")
+      session.delete(:rpii_verification_details)
+    end
+    redirect_to edit_user_path(@user)
   end
 
   private

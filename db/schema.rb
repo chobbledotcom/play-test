@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_10_161651) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_11_104600) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -428,6 +428,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_10_161651) do
     t.text "address"
     t.string "country"
     t.string "postal_code"
+    t.datetime "rpii_verified_date"
     t.index ["email"], name: "index_users_on_email"
     t.index ["inspection_company_id"], name: "index_users_on_inspection_company_id"
   end

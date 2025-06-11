@@ -17,6 +17,17 @@
         label: t('users.forms.password_help') %>
     <%= render 'form/text_field', field: :password_confirmation, type: :password_field %>
     <%= render 'form/text_field', field: :rpii_inspector_number %>
+    <% if @user.rpii_inspector_number.present? %>
+      <div style="margin-bottom: 1rem;">
+        <%= button_to t('users.buttons.verify_rpii'), 
+            verify_rpii_user_path(@user), 
+            method: :post,
+            form: { style: "display: inline;" } %>
+        <% if @user.rpii_verified? %>
+          <small style="color: green;">✓ <%= l(@user.rpii_verified_date, format: :short) %></small>
+        <% end %>
+      </div>
+    <% end %>
     <%= render 'form/date_field', field: :active_until %>
     <%= render 'form/select', 
         field: :inspection_company_id,

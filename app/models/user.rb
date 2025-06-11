@@ -72,6 +72,24 @@ class User < ApplicationRecord
     has_company? ? inspection_company.postal_code : postal_code
   end
 
+  def verify_rpii_inspector_number
+    return {valid: false, error: :blank_number} if rpii_inspector_number.blank?
+
+    result = RpiiVerificationService.verify(rpii_inspector_number)
+
+    if result[:valid]
+      update(rpii_verified_date: Time.current)
+      {valid: true, inspector: result[:inspector]}
+    else
+      update(rpii_verified_date: nil)
+      {valid: false, error: :not_found}
+    end
+  end
+
+  def rpii_verified?
+    rpii_verified_date.present?
+  end
+
   private
 
   def validate_name?
