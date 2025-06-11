@@ -221,8 +221,8 @@ RSpec.feature "Inspector Company Management", type: :feature do
       visit inspector_companies_path
       expect(page).to have_content(I18n.t("inspector_companies.titles.index"))
 
-      # Go to new company
-      click_link I18n.t("inspector_companies.buttons.new_company")
+      # Go to new company (use first link to avoid ambiguity)
+      first(:link, I18n.t("inspector_companies.buttons.new_company")).click
       expect(page).to have_content(I18n.t("inspector_companies.titles.new"))
 
       # Create company
