@@ -31,7 +31,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       expect(page).to have_link(I18n.t("inspections.tabs.materials"))
       expect(page).to have_link(I18n.t("inspections.tabs.fan"))
 
-      # Slide tab should not appear for bounce house units
+      # Slide tab should not appear for bouncy castle units
       expect(page).not_to have_content(I18n.t("inspections.tabs.slide"))
     end
 

@@ -3,7 +3,7 @@ FactoryBot.define do
     association :user
     sequence(:name) { |n| "Test Unit #{n}" }
     sequence(:serial) { |n| "TEST#{n.to_s.rjust(3, "0")}" }
-    description { "Test Bounce House" }
+    description { "Test Bouncy Castle" }
     manufacturer { "Test Manufacturer" }
     has_slide { false }
     owner { "Test Owner" }

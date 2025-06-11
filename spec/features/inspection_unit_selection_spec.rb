@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.feature "Inspection Unit Selection", type: :feature do
   let(:user) { create(:user) }
-  let!(:unit1) { create(:unit, user: user, name: "Bouncy Castle 1", serial: "BC001", manufacturer: "Acme", owner: "John Doe", description: "Large bounce house") }
+  let!(:unit1) { create(:unit, user: user, name: "Bouncy Castle 1", serial: "BC001", manufacturer: "Acme", owner: "John Doe", description: "Large bouncy castle") }
   let!(:unit2) { create(:unit, user: user, name: "Bouncy Castle 2", serial: "BC002", manufacturer: "Beta Corp") }
   let!(:unit3) { create(:unit, user: user, name: "Slide Unit", serial: "SL001", manufacturer: "Acme", has_slide: true) }
   let(:inspection) { create(:inspection, user: user, unit: unit1) }
@@ -18,7 +18,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
         expect(page).to have_link(I18n.t("inspections.buttons.change_unit"))
         expect(page).to have_link(unit1.name, href: edit_unit_path(unit1))
         expect(page).to have_content("John Doe") # owner
-        expect(page).to have_content("Large bounce house") # description
+        expect(page).to have_content("Large bouncy castle") # description
       end
     end
 

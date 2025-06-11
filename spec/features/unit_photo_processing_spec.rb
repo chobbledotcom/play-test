@@ -12,7 +12,7 @@ RSpec.feature "Unit Photo Processing", type: :feature do
     visit new_unit_path
 
     # Fill in required unit fields
-    fill_in I18n.t("units.forms.name"), with: "Test Bounce House"
+    fill_in I18n.t("units.forms.name"), with: "Test Bouncy Castle"
     fill_in I18n.t("units.forms.serial"), with: "TEST123"
     fill_in I18n.t("units.forms.manufacturer"), with: "Test Manufacturer"
     fill_in I18n.t("units.forms.description"), with: "Test Description"
@@ -28,7 +28,7 @@ RSpec.feature "Unit Photo Processing", type: :feature do
     # Verify the unit was created with correct data
     unit = Unit.find_by(serial: "TEST123")
     expect(unit).to be_present
-    expect(unit.name).to eq("Test Bounce House")
+    expect(unit.name).to eq("Test Bouncy Castle")
     expect(unit.serial).to eq("TEST123")
     expect(unit.width).to eq(10.0)
     expect(unit.length).to eq(12.0)

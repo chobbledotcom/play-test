@@ -25,9 +25,6 @@ class QrCodeService
   end
 
   def self.generate_qr_code_from_url(url)
-    # Upper case characters take less QR code space (!?!)
-    url.upcase!
-
     # Create QR code with optimized options for chunkier appearance
     qrcode = RQRCode::QRCode.new(url, {
       # Use lower error correction level for fewer modules (chunkier code)

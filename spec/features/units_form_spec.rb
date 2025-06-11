@@ -44,12 +44,12 @@ RSpec.describe "Units Form", type: :feature do
     end
 
     it "successfully creates a unit with valid data" do
-      fill_in I18n.t("units.forms.name"), with: "Test Bounce House"
+      fill_in I18n.t("units.forms.name"), with: "Test Bouncy Castle"
       # Unit type is no longer needed - removed
       fill_in I18n.t("units.forms.manufacturer"), with: "JumpCo"
       fill_in I18n.t("units.forms.model"), with: "JC-2000"
       fill_in I18n.t("units.forms.serial"), with: "ASSET-001"
-      fill_in I18n.t("units.forms.description"), with: "Large bounce house for events"
+      fill_in I18n.t("units.forms.description"), with: "Large bouncy castle for events"
       fill_in I18n.t("units.forms.owner"), with: "Test Company Ltd"
       fill_in I18n.t("units.forms.width"), with: "5.0"
       fill_in I18n.t("units.forms.length"), with: "5.0"
@@ -60,7 +60,7 @@ RSpec.describe "Units Form", type: :feature do
       click_button I18n.t("units.buttons.create")
 
       expect(page).to have_current_path(%r{/units/\w+})
-      expect(page).to have_content("Test Bounce House")
+      expect(page).to have_content("Test Bouncy Castle")
       expect(page).to have_content("JumpCo")
     end
 

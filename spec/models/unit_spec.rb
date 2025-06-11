@@ -86,17 +86,17 @@ RSpec.describe Unit, type: :model do
   end
 
   describe "search functionality" do
-    let!(:unit1) { create(:unit, name: "Bounce House", serial: "BH001", description: "Inflatable bouncy castle") }
+    let!(:unit1) { create(:unit, name: "Bouncy Castle", serial: "BC001", description: "Inflatable bouncy castle") }
     let!(:unit2) { create(:unit, name: "Slide Unit", serial: "SL002", has_slide: true, description: "Giant inflatable slide") }
 
     it "searches by serial" do
-      results = Unit.search("BH001")
+      results = Unit.search("BC001")
       expect(results).to include(unit1)
       expect(results).not_to include(unit2)
     end
 
     it "searches by name" do
-      results = Unit.search("Bounce")
+      results = Unit.search("Bouncy")
       expect(results).to include(unit1)
       expect(results).not_to include(unit2)
     end
@@ -185,7 +185,7 @@ RSpec.describe Unit, type: :model do
 
       describe "enhanced search" do
         it "searches across all relevant fields" do
-          results = Unit.search("Bounce")
+          results = Unit.search("Bouncy")
           expect(results).to include(test_unit)
 
           results = Unit.search("Test Manufacturer")

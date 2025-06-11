@@ -1,4 +1,4 @@
-# RPII Utility - Unit model for bounce house inspection system
+# RPII Utility - Unit model for bouncy castle inspection system
 class Unit < ApplicationRecord
   self.table_name = "units"
   include CustomIdGenerator

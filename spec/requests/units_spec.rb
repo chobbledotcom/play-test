@@ -64,11 +64,11 @@ RSpec.describe "Units", type: :request do
       end
 
       it "shows unit details in table" do
-        test_unit = create(:unit, user: user, name: "Test Bounce House", manufacturer: "ACME Corp", serial: "TEST123")
+        test_unit = create(:unit, user: user, name: "Test Bouncy Castle", manufacturer: "ACME Corp", serial: "TEST123")
 
         visit units_path
 
-        expect(page).to have_link("Test Bounce House", href: unit_path(test_unit))
+        expect(page).to have_link("Test Bouncy Castle", href: unit_path(test_unit))
         expect(page).to have_content("ACME Corp")
         expect(page).to have_content("TEST123")
       end
@@ -315,7 +315,7 @@ RSpec.describe "Units", type: :request do
 
     describe "Search and filtering functionality" do
       before do
-        create(:unit, user: user, name: "Searchable Bounce House", manufacturer: "ACME Corp", owner: "John Doe")
+        create(:unit, user: user, name: "Searchable Bouncy Castle", manufacturer: "ACME Corp", owner: "John Doe")
         create(:unit, user: user, name: "Different Slide", manufacturer: "XYZ Industries", owner: "Jane Smith")
       end
 
@@ -326,7 +326,7 @@ RSpec.describe "Units", type: :request do
           fill_in "Search", with: "Searchable"
           click_button "Search"
 
-          expect(page).to have_content("Searchable Bounce House")
+          expect(page).to have_content("Searchable Bouncy Castle")
           expect(page).not_to have_content("Different Slide")
         end
       end
@@ -339,7 +339,7 @@ RSpec.describe "Units", type: :request do
           # Give time for auto-submit or check current page
           visit current_path + "?manufacturer=ACME+Corp"
 
-          expect(page).to have_content("Searchable Bounce House")
+          expect(page).to have_content("Searchable Bouncy Castle")
           expect(page).not_to have_content("Different Slide")
         end
       end
@@ -353,7 +353,7 @@ RSpec.describe "Units", type: :request do
           visit current_path + "?owner=Jane+Smith"
 
           expect(page).to have_content("Different Slide")
-          expect(page).not_to have_content("Searchable Bounce House")
+          expect(page).not_to have_content("Searchable Bouncy Castle")
         end
       end
 
@@ -367,7 +367,7 @@ RSpec.describe "Units", type: :request do
       it "filters by manufacturer via URL parameters" do
         visit units_path(manufacturer: "ACME Corp")
 
-        expect(page).to have_content("Searchable Bounce House")
+        expect(page).to have_content("Searchable Bouncy Castle")
         expect(page).not_to have_content("Different Slide")
         expect(page).to have_content("Units - ACME Corp") # Check filtered title
       end
