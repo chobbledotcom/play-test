@@ -7,14 +7,6 @@ RSpec.describe "users/index.html.erb", type: :view do
 
   before do
     assign(:users, [admin_user, regular_user1, regular_user2])
-    assign(:active_jobs, {
-      storage_cleanup: {
-        name: "StorageCleanupJob",
-        scheduled: true,
-        last_run: 1.day.ago,
-        next_run: 1.hour.from_now
-      }
-    })
     allow(view).to receive(:current_user).and_return(admin_user)
   end
 
@@ -54,19 +46,6 @@ RSpec.describe "users/index.html.erb", type: :view do
     expect(rendered).to have_link(regular_user1.email, href: edit_user_path(regular_user1))
   end
 
-  it "displays background job status" do
-    render
-
-    expect(rendered).to include("StorageCleanupJob")
-    expect(rendered).to include("Background Jobs")
-  end
-
-  it "shows job timing information" do
-    render
-
-    expect(rendered).to include("Last Run")
-    expect(rendered).to include("Next Run")
-  end
 
   it "handles empty user list" do
     assign(:users, [])

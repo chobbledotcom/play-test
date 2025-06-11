@@ -214,3 +214,12 @@ en:
       title: "Inspection Report %{id}"
       copied: "Copied!"
 
+    validation:
+      anchorage_incomplete: "Anchorage Assessment incomplete"
+      enclosed_incomplete: "Totally Enclosed Assessment incomplete"  
+      fan_incomplete: "Fan Assessment incomplete"
+      materials_incomplete: "Materials Assessment incomplete"
+      slide_incomplete: "Slide Assessment incomplete"
+      structure_incomplete: "Structure Assessment incomplete"
+      user_height_incomplete: "User Height Assessment incomplete"
+

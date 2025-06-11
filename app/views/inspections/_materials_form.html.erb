@@ -91,7 +91,7 @@
               <strong><%= t('inspections.assessments.materials.summary.overall_materials') %>:</strong>
               <span class="material-count">
                 <%= @inspection.materials_assessment.passed_checks_count %> / 
-                <%= @inspection.materials_assessment.safety_check_count %>
+                <%= MaterialsAssessment::SAFETY_CHECK_COUNT %>
               </span>
             </div>
 

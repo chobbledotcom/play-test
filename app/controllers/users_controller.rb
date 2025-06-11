@@ -17,14 +17,6 @@ class UsersController < ApplicationController
 
   def index
     @users = User.includes(:inspections).all
-    @active_jobs = {
-      storage_cleanup: {
-        name: "StorageCleanupJob",
-        scheduled: StorageCleanupJob.scheduled?,
-        last_run: StorageCleanupJob.last_run_at,
-        next_run: StorageCleanupJob.next_run_at
-      }
-    }
   end
 
   def new
@@ -148,16 +140,6 @@ class UsersController < ApplicationController
 
   # Helper methods for cleaner public interface
 
-  def storage_cleanup_job_status
-    {
-      storage_cleanup: {
-        name: "StorageCleanupJob",
-        scheduled: StorageCleanupJob.scheduled?,
-        last_run: StorageCleanupJob.last_run_at,
-        next_run: StorageCleanupJob.next_run_at
-      }
-    }
-  end
 
   def handle_successful_user_creation
     notify_new_user_in_production

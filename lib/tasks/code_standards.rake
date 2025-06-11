@@ -122,6 +122,44 @@ namespace :code_standards do
             message: "Method '#{method[:name]}' is #{method[:length]} lines (max #{max_method_lines})"
           }
         end
+
+        # Check for hardcoded strings (excluding test files)
+        unless relative_path.include?("/spec/") || relative_path.include?("/test/")
+          file_lines.each_with_index do |line, index|
+            # Skip comments and regex patterns
+            stripped = line.strip
+            next if stripped.start_with?("#")
+            next if stripped.match?(/\/.*\//) # Skip regex literals
+            next if stripped.include?("I18n.t") # Skip I18n calls
+            next if stripped.include?("Rails.logger") # Skip logger messages
+            next if stripped.include?("puts") || stripped.include?("print") # Skip debug output
+            
+            # Look for hardcoded user-facing strings (quoted strings not in specific contexts)
+            hardcoded_strings = stripped.scan(/"([^"]*[a-zA-Z][^"]*)"/).flatten
+            hardcoded_strings += stripped.scan(/'([^']*[a-zA-Z][^']*)'/).flatten
+            
+            hardcoded_strings.each do |string|
+              # Skip technical strings (method names, file paths, etc.)
+              next if string.match?(/^[a-z_]+$/) # snake_case identifiers
+              next if string.match?(/^[A-Z_]+$/) # CONSTANTS
+              next if string.match?(/^[a-z]+\.[a-z]+/) # file extensions
+              next if string.match?(/^\//) # paths
+              next if string.match?(/^[a-z]+_[a-z]+_path$/) # Rails path helpers
+              next if string.match?(/^\w+:/) # Hash keys or XML namespaces
+              next if string.length < 3 # Very short strings
+              
+              # If it looks like user-facing text, flag it
+              if string.match?(/[A-Z].*[a-z]/) || string.include?(" ")
+                all_violations << {
+                  file: relative_path,
+                  type: :hardcoded_string,
+                  line_number: index + 1,
+                  message: "Line #{index + 1}: Hardcoded string '#{string}' - use I18n.t() instead"
+                }
+              end
+            end
+          end
+        end
       end
     end
 

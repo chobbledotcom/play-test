@@ -35,18 +35,27 @@ class Inspection < ApplicationRecord
 
   # Step/Ramp Size validations
   validates :step_ramp_size,
-    numericality: {greater_than_or_equal_to: 0}, allow_blank: true
-  validates :step_ramp_size_pass, inclusion: {in: [true, false]}, allow_nil: true
+    numericality: {greater_than_or_equal_to: 0},
+    allow_blank: true
+  validates :step_ramp_size_pass,
+    inclusion: {in: [true, false]},
+    allow_nil: true
 
   # Critical Fall Off Height validations
   validates :critical_fall_off_height,
-    numericality: {greater_than_or_equal_to: 0}, allow_blank: true
-  validates :critical_fall_off_height_pass, inclusion: {in: [true, false]}, allow_nil: true
+    numericality: {greater_than_or_equal_to: 0},
+    allow_blank: true
+  validates :critical_fall_off_height_pass,
+    inclusion: {in: [true, false]},
+    allow_nil: true
 
   # Unit Pressure validations
   validates :unit_pressure,
-    numericality: {greater_than_or_equal_to: 0}, allow_blank: true
-  validates :unit_pressure_pass, inclusion: {in: [true, false]}, allow_nil: true
+    numericality: {greater_than_or_equal_to: 0},
+    allow_blank: true
+  validates :unit_pressure_pass,
+    inclusion: {in: [true, false]},
+    allow_nil: true
 
   # Trough validations
   validates :trough_depth,
@@ -65,12 +74,18 @@ class Inspection < ApplicationRecord
   validates :grounding_pass, inclusion: {in: [true, false]}, allow_nil: true
 
   # Additional pass/fail validations
-  validates :clamber_netting_pass, inclusion: {in: [true, false]}, allow_nil: true
-  validates :retention_netting_pass, inclusion: {in: [true, false]}, allow_nil: true
+  validates :clamber_netting_pass,
+    inclusion: {in: [true, false]},
+    allow_nil: true
+  validates :retention_netting_pass,
+    inclusion: {in: [true, false]},
+    allow_nil: true
   validates :zips_pass, inclusion: {in: [true, false]}, allow_nil: true
   validates :windows_pass, inclusion: {in: [true, false]}, allow_nil: true
   validates :artwork_pass, inclusion: {in: [true, false]}, allow_nil: true
-  validates :exit_sign_visible_pass, inclusion: {in: [true, false]}, allow_nil: true
+  validates :exit_sign_visible_pass,
+    inclusion: {in: [true, false]},
+    allow_nil: true
 
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
@@ -98,7 +113,9 @@ class Inspection < ApplicationRecord
     when "failed" then where(passed: false)
     end
   }
-  scope :filter_by_unit, ->(unit_id) { where(unit_id: unit_id) if unit_id.present? }
+  scope :filter_by_unit, ->(unit_id) {
+    where(unit_id: unit_id) if unit_id.present?
+  }
   scope :filter_by_owner, ->(owner) {
     if owner.present?
       joins(:unit).where("units.owner = ?", owner)
@@ -110,7 +127,8 @@ class Inspection < ApplicationRecord
     where(inspection_location: location) if location.present?
   }
   scope :filter_by_date_range, ->(start_date, end_date) {
-    where(inspection_date: start_date..end_date) if both_dates_present?(start_date, end_date)
+    range = start_date..end_date
+    where(inspection_date: range) if both_dates_present?(start_date, end_date)
   }
   scope :overdue, -> { where("inspection_date < ?", Date.today - 1.year) }
 
@@ -163,11 +181,16 @@ class Inspection < ApplicationRecord
   end
 
   def completion_status
+    complete = complete?
+    all_assessments_complete = all_assessments_complete?
+    missing_assessments = get_missing_assessments
+    can_be_completed = can_be_completed?
+
     {
-      complete: complete?,
-      all_assessments_complete: all_assessments_complete?,
-      missing_assessments: get_missing_assessments,
-      can_be_completed: can_be_completed?
+      complete:,
+      all_assessments_complete:,
+      missing_assessments:,
+      can_be_completed:
     }
   end
 
@@ -180,7 +203,9 @@ class Inspection < ApplicationRecord
     missing << "Materials" unless materials_assessment&.complete?
     missing << "Fan" unless fan_assessment&.complete?
     missing << "Slide" if has_slide? && !slide_assessment&.complete?
-    missing << "Enclosed" if is_totally_enclosed? && !enclosed_assessment&.complete?
+    if is_totally_enclosed? && !enclosed_assessment&.complete?
+      missing << "Enclosed"
+    end
     missing
   end
 
@@ -210,26 +235,45 @@ class Inspection < ApplicationRecord
   end
 
   def pass_fail_summary
-    return {total_checks: 0, passed_checks: 0, failed_checks: 0, pass_percentage: 0} if total_safety_checks == 0
+    total_checks = total_safety_checks
+    return zero_summary if total_checks == 0
+
+    passed_checks = passed_safety_checks
+    failed_checks = failed_safety_checks
+    percentage = passed_checks.to_f / total_checks * 100
+    pass_percentage = percentage.round(2)
 
     {
-      total_checks: total_safety_checks,
-      passed_checks: passed_safety_checks,
-      failed_checks: failed_safety_checks,
-      pass_percentage: (passed_safety_checks.to_f / total_safety_checks * 100).round(2)
+      failed_checks:,
+      pass_percentage:,
+      passed_checks:,
+      total_checks:
+    }
+  end
+
+  def zero_summary
+    {
+      failed_checks: 0,
+      pass_percentage: 0,
+      passed_checks: 0,
+      total_checks: 0
     }
   end
 
   def log_audit_action(action, user, details)
     # Simple logging for now - could be enhanced with audit log table later
-    Rails.logger.info("Inspection #{id}: #{action} by #{user&.email} - #{details}")
+    message = "Inspection #{id}: #{action} by #{user&.email} - #{details}"
+    Rails.logger.info(message)
   end
 
   private
 
   def generate_unique_report_number
     return if unique_report_number.present?
-    self.unique_report_number = "RPII-#{Date.current.strftime("%Y%m%d")}-#{SecureRandom.hex(4).upcase}"
+
+    date_part = Date.current.strftime("%Y%m%d")
+    hex_part = SecureRandom.hex(4).upcase
+    self.unique_report_number = "RPII-#{date_part}-#{hex_part}"
   end
 
   def copy_unit_values
@@ -246,25 +290,34 @@ class Inspection < ApplicationRecord
   def all_assessments_complete?
     return false unless has_assessments?
 
-    required_assessments = [
-      user_height_assessment&.complete?,
-      structure_assessment&.complete?,
+    required_assessment_completions.all?
+  end
+
+  def required_assessment_completions
+    base_completions = [
       anchorage_assessment&.complete?,
+      fan_assessment&.complete?,
       materials_assessment&.complete?,
-      fan_assessment&.complete?
+      structure_assessment&.complete?,
+      user_height_assessment&.complete?
     ]
 
-    # Add slide assessment if inspection has a slide
-    if has_slide?
-      required_assessments << slide_assessment&.complete?
-    end
+    base_completions << slide_assessment&.complete? if has_slide?
+    base_completions << enclosed_assessment&.complete? if is_totally_enclosed?
+    base_completions
+  end
 
-    # Add enclosed assessment if required
-    if is_totally_enclosed?
-      required_assessments << enclosed_assessment&.complete?
-    end
-
-    required_assessments.all?
+  def all_assessments
+    base_assessments = [
+      anchorage_assessment,
+      fan_assessment,
+      materials_assessment,
+      slide_assessment,
+      structure_assessment,
+      user_height_assessment
+    ]
+    base_assessments << enclosed_assessment if is_totally_enclosed?
+    base_assessments
   end
 
   def has_assessments?
@@ -282,9 +335,9 @@ class Inspection < ApplicationRecord
 
     # Business logic to determine overall pass/fail
     critical_failures = [
-      structure_assessment&.respond_to?(:has_critical_failures?) && structure_assessment.has_critical_failures?,
-      anchorage_assessment&.respond_to?(:has_critical_failures?) && anchorage_assessment.has_critical_failures?,
-      materials_assessment&.respond_to?(:has_critical_failures?) && materials_assessment.has_critical_failures?
+      structure_assessment&.has_critical_failures?,
+      anchorage_assessment&.has_critical_failures?,
+      materials_assessment&.has_critical_failures?
     ].any?
 
     !critical_failures && meet_safety_thresholds?
@@ -293,9 +346,9 @@ class Inspection < ApplicationRecord
   def meet_safety_thresholds?
     return true unless has_assessments?
 
-    height_ok = !user_height_assessment&.respond_to?(:meets_height_requirements?) || user_height_assessment&.meets_height_requirements?
-    runout_ok = !slide_assessment&.respond_to?(:meets_runout_requirements?) || slide_assessment&.meets_runout_requirements?
-    anchor_ok = !anchorage_assessment&.respond_to?(:meets_anchor_requirements?) || anchorage_assessment&.meets_anchor_requirements?
+    height_ok = user_height_assessment&.meets_height_requirements? != false
+    runout_ok = slide_assessment&.meets_runout_requirements? != false
+    anchor_ok = anchorage_assessment&.meets_anchor_requirements? != false
 
     height_ok && runout_ok && anchor_ok
   end
@@ -303,21 +356,20 @@ class Inspection < ApplicationRecord
   def total_safety_checks
     return 0 unless has_assessments?
 
-    assessments = [user_height_assessment, slide_assessment, structure_assessment,
-      anchorage_assessment, materials_assessment, fan_assessment]
-    assessments << enclosed_assessment if is_totally_enclosed?
-
-    assessments.compact.sum { |a| a.respond_to?(:safety_check_count) ? a.safety_check_count : 0 }
+    all_assessments.compact.sum do |assessment|
+      case assessment
+      when MaterialsAssessment
+        MaterialsAssessment::SAFETY_CHECK_COUNT
+      else
+        assessment.safety_check_count
+      end
+    end
   end
 
   def passed_safety_checks
     return 0 unless has_assessments?
 
-    assessments = [user_height_assessment, slide_assessment, structure_assessment,
-      anchorage_assessment, materials_assessment, fan_assessment]
-    assessments << enclosed_assessment if is_totally_enclosed?
-
-    assessments.compact.sum { |a| a.respond_to?(:passed_checks_count) ? a.passed_checks_count : 0 }
+    all_assessments.compact.sum(&:passed_checks_count)
   end
 
   def failed_safety_checks = total_safety_checks - passed_safety_checks
@@ -331,15 +383,21 @@ class Inspection < ApplicationRecord
   private
 
   def assessment_validation_data
-    [
-      [:user_height, user_height_assessment, "User Height Assessment incomplete"],
-      [:slide, slide_assessment, "Slide Assessment incomplete"],
-      [:structure, structure_assessment, "Structure Assessment incomplete"],
-      [:anchorage, anchorage_assessment, "Anchorage Assessment incomplete"],
-      [:materials, materials_assessment, "Materials Assessment incomplete"],
-      [:fan, fan_assessment, "Fan Assessment incomplete"],
-      [:enclosed, enclosed_assessment, "Totally Enclosed Assessment incomplete"]
+    assessment_types = %i[
+      anchorage
+      enclosed
+      fan
+      materials
+      slide
+      structure
+      user_height
     ]
+    
+    assessment_types.map do |type|
+      assessment = send("#{type}_assessment")
+      message = I18n.t("inspections.validation.#{type}_incomplete")
+      [type, assessment, message]
+    end
   end
 
   def assessments_to_duplicate

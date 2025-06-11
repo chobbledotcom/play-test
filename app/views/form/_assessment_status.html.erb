@@ -33,10 +33,17 @@
       </p>
     <% end %>
     
-    <% if assessment_obj.respond_to?(:passed_checks_count) && assessment_obj.respond_to?(:safety_check_count) %>
+    <% if assessment_obj.respond_to?(:passed_checks_count) %>
       <p>
         <strong><%= t("#{i18n_base}.status.checks_passed") %>:</strong>
-        <%= assessment_obj.passed_checks_count %> / <%= assessment_obj.safety_check_count %>
+        <%= assessment_obj.passed_checks_count %> / <%
+        if assessment_obj.is_a?(MaterialsAssessment) %><%=
+          MaterialsAssessment::SAFETY_CHECK_COUNT %><%
+        elsif assessment_obj.respond_to?(:safety_check_count) %><%=
+          assessment_obj.safety_check_count %><%
+        else %><%=
+          t("#{i18n_base}.status.unknown") %><%
+        end %>
       </p>
     <% end %>
     

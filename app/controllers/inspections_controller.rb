@@ -15,20 +15,9 @@ class InspectionsController < ApplicationController
   skip_before_action :require_login, only: [:report, :qr_code]
 
   def index
-    # Base filtered query with eager loading to avoid N+1 queries
-    filtered_inspections = current_user.inspections
-      .includes(:unit, :inspector_company)
-      .search(params[:query])
-      .filter_by_result(params[:result])
-      .filter_by_unit(params[:unit_id])
-      .filter_by_owner(params[:owner])
-      .filter_by_inspection_location(params[:inspection_location])
-      .order(created_at: :desc)
-
-    # Split into draft and complete
+    filtered_inspections = filtered_inspections_query
     @draft_inspections = filtered_inspections.draft
     @complete_inspections = filtered_inspections.complete
-
     @title = build_index_title
 
     respond_to do |format|
@@ -120,7 +109,8 @@ class InspectionsController < ApplicationController
 
   def destroy
     if @inspection.complete? && !current_user.admin?
-      redirect_to @inspection.preferred_path, alert: I18n.t("inspections.messages.delete_complete_denied")
+      alert_message = I18n.t("inspections.messages.delete_complete_denied")
+      redirect_to @inspection.preferred_path, alert: alert_message
       return
     end
 
@@ -135,20 +125,21 @@ class InspectionsController < ApplicationController
       if @inspection.save
         flash[:notice] = t("inspections.messages.dimensions_replaced")
       else
-        flash[:alert] = t("inspections.messages.dimensions_replace_failed", errors: @inspection.errors.full_messages.join(", "))
+        error_messages = @inspection.errors.full_messages.join(", ")
+        flash[:alert] = t("inspections.messages.dimensions_replace_failed", errors: error_messages)
       end
     else
       flash[:alert] = t("inspections.messages.no_unit_for_dimensions")
     end
 
-    redirect_to edit_inspection_path(@inspection, tab: params[:tab] || "general")
+    tab_param = params[:tab] || "general"
+    redirect_to edit_inspection_path(@inspection, tab: tab_param)
   end
 
   def select_unit
     @units = current_user.units
     @title = t("inspections.titles.select_unit")
 
-    # Apply the same filters as the units index
     if params[:search].present?
       @units = @units.where("name LIKE ? OR serial LIKE ? OR manufacturer LIKE ?",
         "%#{params[:search]}%", "%#{params[:search]}%", "%#{params[:search]}%")
@@ -221,7 +212,8 @@ class InspectionsController < ApplicationController
     validation_errors = @inspection.validate_completeness
 
     if validation_errors.any?
-      flash[:alert] = t("inspections.messages.cannot_complete", errors: validation_errors.join(", "))
+      error_list = validation_errors.join(", ")
+      flash[:alert] = t("inspections.messages.cannot_complete", errors: error_list)
       redirect_to edit_inspection_path(@inspection)
       return
     end
@@ -231,7 +223,8 @@ class InspectionsController < ApplicationController
       flash[:notice] = t("inspections.messages.marked_complete")
       redirect_to @inspection
     rescue => e
-      flash[:alert] = t("inspections.messages.completion_failed", error: e.message)
+      error_message = e.message
+      flash[:alert] = t("inspections.messages.completion_failed", error: error_message)
       redirect_to edit_inspection_path(@inspection)
     end
   end
@@ -240,12 +233,24 @@ class InspectionsController < ApplicationController
     if @inspection.update(complete_date: nil)
       flash[:notice] = t("inspections.messages.marked_in_progress")
     else
-      flash[:alert] = t("inspections.messages.mark_in_progress_failed", errors: @inspection.errors.full_messages.join(", "))
+      error_messages = @inspection.errors.full_messages.join(", ")
+      flash[:alert] = t("inspections.messages.mark_in_progress_failed", errors: error_messages)
     end
     redirect_to edit_inspection_path(@inspection)
   end
 
   private
+
+  def filtered_inspections_query
+    current_user.inspections
+      .includes(:unit, :inspector_company)
+      .search(params[:query])
+      .filter_by_result(params[:result])
+      .filter_by_unit(params[:unit_id])
+      .filter_by_owner(params[:owner])
+      .filter_by_inspection_location(params[:inspection_location])
+      .order(created_at: :desc)
+  end
 
   def inspection_params
     # Get the base params with permitted top-level attributes

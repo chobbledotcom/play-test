@@ -24,6 +24,9 @@ class MaterialsAssessment < ApplicationRecord
     fabric_pass fire_retardant_pass thread_pass
   ].freeze
 
+  # Derived constants
+  SAFETY_CHECK_COUNT = MATERIAL_CHECKS.length
+
   MATERIAL_CHECKS.each do |check|
     validates check.to_sym, inclusion: {in: [true, false]}, allow_nil: true
   end
@@ -40,12 +43,10 @@ class MaterialsAssessment < ApplicationRecord
     CRITICAL_MATERIAL_CHECKS.any? { send(it) == false }
   end
 
-  def safety_check_count = MATERIAL_CHECKS.length
-
   def passed_checks_count = MATERIAL_CHECKS.count { send(it) == true }
 
   def completion_percentage
-    total_fields = MATERIAL_CHECKS.length + 1 # Include rope_size
+    total_fields = SAFETY_CHECK_COUNT + 1 # Include rope_size
     completed_fields = completed_material_fields.count(&:present?)
 
     (completed_fields.to_f / total_fields * 100).round(0)
@@ -56,7 +57,7 @@ class MaterialsAssessment < ApplicationRecord
       critical_passed: critical_checks_passed_count,
       critical_total: CRITICAL_MATERIAL_CHECKS.length,
       overall_passed: passed_checks_count,
-      overall_total: safety_check_count,
+      overall_total: SAFETY_CHECK_COUNT,
       rope_compliant: rope_size_compliant?
     }
   end
@@ -74,11 +75,19 @@ class MaterialsAssessment < ApplicationRecord
   def material_test_requirements
     requirements = []
 
-    requirements << fabric_tensile_requirement if fabric_pass != true
-    requirements << fabric_tear_requirement if fabric_pass != true
-    requirements << fire_retardant_requirement if fire_retardant_pass != true
-    requirements << thread_tensile_requirement if thread_pass != true
-    requirements << "Rope diameter: 18-45mm range" unless rope_size_compliant?
+    if fabric_pass != true
+      requirements << I18n.t("materials_assessment.requirements.fabric_tensile")
+      requirements << I18n.t("materials_assessment.requirements.fabric_tear")
+    end
+    if fire_retardant_pass != true
+      requirements << I18n.t("materials_assessment.requirements.fire_retardant")
+    end
+    if thread_pass != true
+      requirements << I18n.t("materials_assessment.requirements.thread_tensile")
+    end
+    unless rope_size_compliant?
+      requirements << I18n.t("materials_assessment.requirements.rope_diameter")
+    end
 
     requirements
   end
@@ -109,14 +118,6 @@ class MaterialsAssessment < ApplicationRecord
   def failed_critical_checks
     CRITICAL_MATERIAL_CHECKS.select { send(it) == false }
   end
-
-  def fabric_tensile_requirement = "Fabric tensile strength: 1850N minimum"
-
-  def fabric_tear_requirement = "Fabric tear strength: 350N minimum"
-
-  def fire_retardant_requirement = "Fire retardancy: EN 71-3 compliance"
-
-  def thread_tensile_requirement = "Thread tensile strength: 88N minimum"
 
   def log_assessment_update
     inspection.log_audit_action("assessment_updated", inspection.user,

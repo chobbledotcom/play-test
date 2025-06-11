@@ -104,9 +104,9 @@ RSpec.describe MaterialsAssessment, type: :model do
     end
   end
 
-  describe "#safety_check_count" do
-    it "returns the number of material checks" do
-      expect(assessment.safety_check_count).to eq(MaterialsAssessment::MATERIAL_CHECKS.length)
+  describe "SAFETY_CHECK_COUNT" do
+    it "equals the number of material checks" do
+      expect(MaterialsAssessment::SAFETY_CHECK_COUNT).to eq(MaterialsAssessment::MATERIAL_CHECKS.length)
     end
   end
 

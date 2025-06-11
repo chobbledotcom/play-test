@@ -150,6 +150,8 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 ### Code Quality Standards
 - **No defensive coding** - expect correct data, let it fail if wrong
 - **No fallbacks** - if data is missing, that's an error to fix
+- **Trust our own interfaces** - avoid `respond_to?` checks for methods we control; we know what our objects support
+- **ABSOLUTELY NO hardcoded strings** - every user-facing string must use I18n, no exceptions
 - **Update old code** - don't support legacy patterns, refactor to new standards
 - **Use modern Ruby syntax** - leverage Ruby 3.0+ features for cleaner, more expressive code
 - **Prioritise readability** - choose the newest, tidiest syntax that improves code clarity
@@ -195,13 +197,18 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 ### Modern Ruby Syntax Preferences (Ruby 3.0+)
 
 **Always prefer the newest, tidiest syntax available:**
-- **Endless methods** for simple one-liners: `def total = a + b`
+- **Endless methods** for simple computation: `def total = a + b`
 - **Hash shorthand** when key matches method: `{width:, height:}`
 - **Numbered parameters** in simple blocks: `map { _1.upcase }`
 - **Pattern matching** for complex dispatch: `case type in "foo" then ...`
 - **Rightward assignment** for clarity: `(a * b) => result`
 - **Enhanced safe navigation**: `value&.method&.chain || default`
 - **Modern enumerable methods**: `Hash#except`, `Enumerable#filter_map`
+
+**Critical principle: Avoid unnecessary methods:**
+- **Never create methods that just return constants** - use the constant directly
+- **Use I18n for all user-facing strings** - no hardcoded English text
+- **Endless methods should perform computation** - not just return static values
 
 **When refactoring, always upgrade to modern syntax** - don't maintain legacy patterns for compatibility
 
@@ -284,7 +291,42 @@ end
 # GOOD - Enhanced safe navigation and modern syntax
 def format_dimension(value) = value&.to_s&.sub(/\.0$/, "") || ""
 
-# GOOD - Long strings: extract to variables or break with backslash
+# GOOD - Constants for static values, endless methods for computation
+SAFETY_CHECK_COUNT = MATERIAL_CHECKS.length
+def passed_checks_count = MATERIAL_CHECKS.count { _1 == true }  # Actual computation
+
+# GOOD - Use constants directly in views and other models
+<%= MaterialsAssessment::SAFETY_CHECK_COUNT %>
+
+# GOOD - Handle different assessment types explicitly
+case assessment
+when MaterialsAssessment
+  MaterialsAssessment::SAFETY_CHECK_COUNT
+else
+  assessment.respond_to?(:safety_check_count) ? assessment.safety_check_count : 0
+end
+
+# BAD - Method that just returns a string
+def fabric_requirement = "Fabric tensile strength: 1850N minimum"
+
+# GOOD - Use I18n for user-facing strings  
+I18n.t("materials_assessment.requirements.fabric_tensile")
+
+# BAD - Method that just transforms a constant
+def total_checks = CHECKS.length
+
+# GOOD - Just use the constant directly
+TOTAL_CHECKS = CHECKS.length
+# Update callers to use TOTAL_CHECKS instead of total_checks method
+
+# GOOD - Long strings: extract to variables (NEVER use backslash continuation)
+error_msg = "This is a very long error message that needs to be broken across multiple lines for readability"
+
+# GOOD - For very long strings, extract to variables FIRST
+base_msg = "This is a very long error message that needs to be broken"
+full_msg = "#{base_msg} across multiple lines for readability"
+
+# BAD - NEVER use backslash continuation for strings
 error_msg = "This is a very long error message that needs to be broken " \
             "across multiple lines for readability"
 

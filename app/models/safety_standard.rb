@@ -102,7 +102,7 @@ class SafetyStandard
           example_input: 25.0,
           input_unit: "m²",
           output_unit: "anchors",
-          formula_text: "((Area² × #{ANCHOR_CALCULATION_CONSTANTS[:area_coefficient]}) ÷ #{ANCHOR_CALCULATION_CONSTANTS[:base_divisor]}) × #{ANCHOR_CALCULATION_CONSTANTS[:safety_factor]} safety factor",
+          formula_text: anchor_formula_text,
           standard_reference: "EN 14960:2019"
         },
         user_capacity: {
@@ -122,7 +122,7 @@ class SafetyStandard
           example_input: 2.5,
           input_unit: "m",
           output_unit: "m",
-          formula_text: "#{(RUNOUT_CALCULATION_CONSTANTS[:platform_height_ratio] * 100).to_i}% of platform height, minimum #{(RUNOUT_CALCULATION_CONSTANTS[:minimum_runout_meters] * 1000).to_i}mm",
+          formula_text: slide_runout_formula_text,
           standard_reference: "EN 14960:2019"
         },
         wall_height: {
@@ -137,6 +137,23 @@ class SafetyStandard
         }
       }
     end
+
+    private
+
+    def anchor_formula_text
+      area_coeff = ANCHOR_CALCULATION_CONSTANTS[:area_coefficient]
+      base_div = ANCHOR_CALCULATION_CONSTANTS[:base_divisor]
+      safety_fact = ANCHOR_CALCULATION_CONSTANTS[:safety_factor]
+      "((Area² × #{area_coeff}) ÷ #{base_div}) × #{safety_fact} safety factor"
+    end
+
+    def slide_runout_formula_text
+      height_ratio = (RUNOUT_CALCULATION_CONSTANTS[:platform_height_ratio] * 100).to_i
+      min_runout = (RUNOUT_CALCULATION_CONSTANTS[:minimum_runout_meters] * 1000).to_i
+      "#{height_ratio}% of platform height, minimum #{min_runout}mm"
+    end
+
+    public
 
     def get_method_source(method_name)
       method_obj = method(method_name)
@@ -158,7 +175,8 @@ class SafetyStandard
         related_constants.each do |constant_name|
           constants_section += extract_constant_definition(lines, constant_name)
         end
-        constants_section + "\n# Method Implementation:\n" + method_lines.join("")
+        constants_section + "\n# Method Implementation:\n" +
+          method_lines.join("")
       else
         method_lines.join("")
       end
