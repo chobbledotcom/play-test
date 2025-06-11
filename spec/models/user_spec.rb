@@ -7,6 +7,18 @@ RSpec.describe User, type: :model do
       expect(user).to be_valid
     end
 
+    it "requires a name" do
+      user = build(:user, name: nil)
+      expect(user).not_to be_valid
+      expect(user.errors[:name]).to include("can't be blank")
+    end
+
+    it "requires a non-blank name" do
+      user = build(:user, name: "")
+      expect(user).not_to be_valid
+      expect(user.errors[:name]).to include("can't be blank")
+    end
+
     it "requires an email" do
       user = build(:user, email: nil)
       expect(user).not_to be_valid

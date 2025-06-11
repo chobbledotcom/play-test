@@ -92,9 +92,8 @@ class PdfGeneratorService
     if unit
       unit_data = TableBuilder.build_unit_details_table(unit, :inspection)
       TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.inspection.equipment_details"), unit_data)
-    else
-      TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.inspection.equipment_details"), [[I18n.t("pdf.inspection.fields.no_unit_associated"), ""]])
     end
+    # Hide the table entirely when no unit is associated
   end
 
   def self.generate_inspection_comments(pdf, inspection)

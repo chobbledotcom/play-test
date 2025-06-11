@@ -4,9 +4,10 @@ def generate_secure_password
   SecureRandom.alphanumeric(32)
 end
 
-def create_user(email:, rpii_number:, company:, time_display: "time", active_until: Date.current + 1.year)
+def create_user(email:, name:, rpii_number:, company:, time_display: "time", active_until: Date.current + 1.year)
   User.create!(
     email: email,
+    name: name,
     password: generate_secure_password,
     rpii_inspector_number: rpii_number,
     inspection_company: company,
@@ -17,18 +18,21 @@ end
 
 $test_user = create_user(
   email: "test@play-test.co.uk",
+  name: "Test User",
   rpii_number: "RPII-001",
   company: $stefan_testing
 )
 
 $lead_inspector = create_user(
   email: "lead@play-test.co.uk",
+  name: "Lead Inspector",
   rpii_number: "RPII-002",
   company: $stefan_testing
 )
 
 create_user(
   email: "junior@play-test.co.uk",
+  name: "Junior Inspector",
   rpii_number: "RPII-003",
   company: $stefan_testing,
   time_display: "date"
@@ -36,12 +40,14 @@ create_user(
 
 create_user(
   email: "senior@play-test.co.uk",
+  name: "Senior Inspector",
   rpii_number: "RPII-004",
   company: $stefan_testing
 )
 
 $steph_test_inspector = create_user(
   email: "inspector@play-test.co.uk",
+  name: "Steph Inspector",
   rpii_number: "RPII-005",
   company: $steph_test,
   time_display: "date"
@@ -49,6 +55,7 @@ $steph_test_inspector = create_user(
 
 create_user(
   email: "old@play-test.co.uk",
+  name: "Expired Inspector",
   rpii_number: "RPII-006",
   company: $steve_inflatable,
   time_display: "date",

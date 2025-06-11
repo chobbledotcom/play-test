@@ -107,12 +107,12 @@ class UsersController < ApplicationController
   def user_params
     if current_user&.admin?
       admin_permitted_params = %i[
-        active_until email inspection_company_id password
+        active_until email inspection_company_id name password
         password_confirmation rpii_inspector_number
       ]
       params.require(:user).permit(admin_permitted_params)
     else
-      params.require(:user).permit(:email, :password, :password_confirmation)
+      params.require(:user).permit(:email, :name, :password, :password_confirmation)
     end
   end
 

@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :user do
     sequence(:email) { |n| "user#{n}@example.com" }
+    sequence(:name) { |n| "Test User #{n}" }
     password { "password123" }
     password_confirmation { "password123" }
     sequence(:rpii_inspector_number) { |n| "RPII#{n.to_s.rjust(3, "0")}" }

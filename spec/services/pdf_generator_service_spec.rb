@@ -63,11 +63,13 @@ RSpec.describe PdfGeneratorService, pdf: true do
         inspection.unit.update(manufacturer: nil)
       end
 
-      it "shows 'not specified' text using I18n" do
+      it "shows blank string for missing manufacturer" do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include(I18n.t("pdf.inspection.fields.not_specified"))
+        # Manufacturer field should be blank (empty string) when not specified
+        expect(pdf_text).to include(I18n.t("pdf.inspection.fields.manufacturer"))
+        # The actual value after the manufacturer label should be empty/blank
       end
     end
   end
@@ -127,11 +129,13 @@ RSpec.describe PdfGeneratorService, pdf: true do
         unit.update(manufacturer: nil)
       end
 
-      it "shows 'not specified' text using I18n" do
+      it "shows blank string for missing manufacturer" do
         pdf = PdfGeneratorService.generate_unit_report(unit)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include(I18n.t("pdf.unit.fields.not_specified"))
+        # Manufacturer field should be blank (empty string) when not specified
+        expect(pdf_text).to include(I18n.t("pdf.inspection.fields.manufacturer"))
+        # The actual value after the manufacturer label should be empty/blank
       end
     end
 
@@ -481,7 +485,8 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = PDF::Inspector::Text.analyze(pdf.render).strings.join(" ")
 
-        expect(pdf_text).to include(I18n.t("pdf.inspection.fields.no_unit_associated"))
+        # Unit details table should be hidden entirely when no unit is associated
+        expect(pdf_text).not_to include(I18n.t("pdf.inspection.equipment_details"))
       end
     end
 

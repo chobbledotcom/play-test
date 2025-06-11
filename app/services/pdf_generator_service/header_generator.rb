@@ -24,7 +24,7 @@ class PdfGeneratorService
       inspector_user = inspection.user
       if inspector_user
         inspector_parts = []
-        inspector_parts << inspector_user.display_name if inspector_user.display_name.present?
+        inspector_parts << inspector_user.name if inspector_user.name.present?
         inspector_parts << inspector_user.display_country if inspector_user.display_country.present?
         inspector_parts << "#{I18n.t("pdf.inspection.fields.rpii_inspector_no")}: #{inspector_user.rpii_inspector_number}" if inspector_user.rpii_inspector_number.present?
 

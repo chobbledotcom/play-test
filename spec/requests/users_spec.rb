@@ -56,6 +56,7 @@ RSpec.describe "Users", type: :request do
     it "creates a user and redirects" do
       visit "/signup"
       fill_in I18n.t("users.forms.email"), with: "newuser@example.com"
+      fill_in I18n.t("users.forms.name"), with: "New User"
       fill_in I18n.t("users.forms.password"), with: "password"
       fill_in I18n.t("users.forms.password_confirmation"), with: "password"
       click_button I18n.t("users.buttons.register")
@@ -67,6 +68,7 @@ RSpec.describe "Users", type: :request do
       post "/users", params: {
         user: {
           email: "newuser@example.com",
+          name: "New User",
           password: "password123",
           password_confirmation: "password123"
         }
@@ -320,6 +322,7 @@ RSpec.describe "Users", type: :request do
       post "/signup", params: {
         user: {
           email: "newuser@example.com",
+          name: "New User",
           password: "password",
           password_confirmation: "password"
         }
@@ -335,6 +338,7 @@ RSpec.describe "Users", type: :request do
       post "/signup", params: {
         user: {
           email: "newuser@example.com",
+          name: "New User",
           password: "password",
           password_confirmation: "password"
         }
@@ -347,6 +351,7 @@ RSpec.describe "Users", type: :request do
       post "/signup", params: {
         user: {
           email: "newuser@example.com",
+          name: "New User",
           password: "password",
           password_confirmation: "password"
         }
@@ -480,6 +485,7 @@ RSpec.describe "Users", type: :request do
       post "/signup", params: {
         user: {
           email: "newuser@example.com",
+          name: "New User",
           password: "password123",
           password_confirmation: "password123",
           # These admin-only fields should be ignored

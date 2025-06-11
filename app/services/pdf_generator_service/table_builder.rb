@@ -88,7 +88,7 @@ class PdfGeneratorService
         table_data << [
           inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.unit.fields.na"),
           inspection.passed ? I18n.t("pdf.unit.fields.pass") : I18n.t("pdf.unit.fields.fail"),
-          inspection.user.display_name || I18n.t("pdf.unit.fields.na"),
+          inspection.user.name || I18n.t("pdf.unit.fields.na"),
           inspection.user.rpii_inspector_number || I18n.t("pdf.unit.fields.na"),
           inspection.inspection_location || I18n.t("pdf.unit.fields.na")
         ]
@@ -144,7 +144,7 @@ class PdfGeneratorService
       dimensions << "#{I18n.t("pdf.dimensions.width")}: #{Utilities.format_dimension(unit.width)}" if unit.width.present?
       dimensions << "#{I18n.t("pdf.dimensions.length")}: #{Utilities.format_dimension(unit.length)}" if unit.length.present?
       dimensions << "#{I18n.t("pdf.dimensions.height")}: #{Utilities.format_dimension(unit.height)}" if unit.height.present?
-      dimensions_text = dimensions.any? ? dimensions.join(" ") : I18n.t("pdf.#{context}.fields.na")
+      dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
 
       # Unit Type / Has Slide (use the better inspection format for both)
       unit_type = unit.has_slide? ? I18n.t("pdf.inspection.fields.unit_with_slide") : I18n.t("pdf.inspection.fields.standard_unit")
@@ -153,13 +153,13 @@ class PdfGeneratorService
       [
         [
           I18n.t("pdf.inspection.fields.description"),
-          Utilities.truncate_text(unit.name || unit.description || I18n.t("pdf.#{context}.fields.na"), UNIT_NAME_MAX_LENGTH),
+          Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH),
           I18n.t("pdf.inspection.fields.serial_number_asset_id"),
-          unit.serial || I18n.t("pdf.#{context}.fields.na")
+          unit.serial || ""
         ],
         [
           I18n.t("pdf.inspection.fields.manufacturer"),
-          unit.manufacturer.presence || I18n.t("pdf.#{context}.fields.not_specified"),
+          unit.manufacturer.presence || "",
           I18n.t("pdf.inspection.fields.type"),
           unit_type
         ],
@@ -167,7 +167,7 @@ class PdfGeneratorService
           I18n.t("pdf.inspection.fields.size_m"),
           dimensions_text,
           I18n.t("pdf.inspection.fields.owner"),
-          unit.owner.presence || I18n.t("pdf.#{context}.fields.na")
+          unit.owner.presence || ""
         ]
       ]
     end

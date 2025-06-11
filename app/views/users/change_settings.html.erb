@@ -5,7 +5,7 @@
 
   <%= render 'form/fieldset', legend_key: 'contact_details', i18n_base: 'users.forms', form: form do %>
     <% if @user.has_company? %>
-      <%= render 'form/display_field', field: :name, value: @user.display_name %>
+      <%= render 'form/display_field', field: :name, value: @user.name %>
       <%= render 'form/display_field', field: :phone, value: @user.display_phone %>
       <%= render 'form/display_field', field: :address, value: @user.display_address %>
       <%= render 'form/display_field', field: :country, value: @user.display_country %>

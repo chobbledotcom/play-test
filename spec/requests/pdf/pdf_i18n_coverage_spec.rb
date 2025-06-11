@@ -155,7 +155,7 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
       # Verify dynamic content
       expect(pdf_text).to include(unit.name)
       expect(pdf_text).to include(unit.serial)
-      expect(pdf_text).to include(inspector_company.name)
+      expect(pdf_text).to include(user.name)
     end
 
     it "generates unit PDF with inspection history" do

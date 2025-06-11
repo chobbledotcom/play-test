@@ -50,7 +50,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         "pdf.inspection.comments")
 
       # Check dynamic content
-      expect(pdf_text).to include(inspector_company.name)
       expect(pdf_text).to include(user.rpii_inspector_number) if user.rpii_inspector_number.present?
       expect(pdf_text).to include("Test Bouncy Castle")
       expect(pdf_text).to include("BCL-2024-001")

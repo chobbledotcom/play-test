@@ -12,6 +12,7 @@ class User < ApplicationRecord
   password_length_options = {minimum: 6}
   validates :password, presence: true, length: password_length_options,
     if: :password_digest_changed?
+  validates :name, presence: true
   validates :time_display, inclusion: {in: %w[date time]}
   validates :theme, inclusion: {in: %w[light dark]}
   # Contact fields are only required for users without companies
@@ -52,10 +53,6 @@ class User < ApplicationRecord
 
   def has_company?
     inspection_company_id.present? || inspection_company.present?
-  end
-
-  def display_name
-    has_company? ? inspection_company.name : name
   end
 
   def display_phone

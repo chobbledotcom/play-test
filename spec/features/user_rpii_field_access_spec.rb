@@ -108,6 +108,7 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
       visit new_user_path
 
       fill_in I18n.t("users.forms.email"), with: "newuser@example.com"
+      fill_in I18n.t("users.forms.name"), with: "New Test User"
       fill_in I18n.t("users.forms.password"), with: "password123"
       fill_in I18n.t("users.forms.password_confirmation"), with: "password123"
 
