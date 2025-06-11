@@ -169,15 +169,32 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
 
     context "as admin" do
       let(:admin_user) { create(:user, :admin) }
+      let(:admin_unit) { create(:unit, user: admin_user) }
+      let(:admin_complete_inspection) do
+        create(:inspection, user: admin_user, unit: admin_unit, has_slide: true).tap do |insp|
+          # Create all required assessments with their appropriate passing traits
+          create(:user_height_assessment, :complete, inspection: insp)
+          create(:slide_assessment, :complete, inspection: insp)
+          create(:structure_assessment, :complete, inspection: insp)
+          create(:anchorage_assessment, :passed, inspection: insp)
+          create(:materials_assessment, :passed, inspection: insp)
+          create(:fan_assessment, :passed, inspection: insp)
+          create(:enclosed_assessment, :passed, inspection: insp) if insp.is_totally_enclosed?
+          
+          # Mark as complete
+          insp.update!(complete_date: Time.current)
+          insp
+        end
+      end
       
       before do
         sign_in(admin_user)
       end
 
       it "redirects to show page when trying to access unit selection for complete inspections" do
-        visit select_unit_inspection_path(complete_inspection)
+        visit select_unit_inspection_path(admin_complete_inspection)
 
-        expect(page).to have_current_path(inspection_path(complete_inspection))
+        expect(page).to have_current_path(inspection_path(admin_complete_inspection))
         expect(page).to have_content(I18n.t("inspections.messages.cannot_edit_complete"))
       end
     end
