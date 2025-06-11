@@ -404,4 +404,108 @@ RSpec.describe "Users", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
     end
   end
+
+  describe "admin user parameter handling" do
+    let(:admin) { create(:user, :admin) }
+    let(:company) { create(:inspector_company) }
+    let(:regular_user) { create(:user) }
+
+    before do
+      login_as(admin)
+    end
+
+    it "allows admin to set additional fields when updating users" do
+      patch user_path(regular_user), params: {
+        user: {
+          email: "updated@example.com",
+          active_until: Date.current + 1.year,
+          inspection_company_id: company.id,
+          rpii_inspector_number: "RPII123"
+        }
+      }
+
+      expect(response).to redirect_to(users_path)
+      regular_user.reload
+      expect(regular_user.email).to eq("updated@example.com")
+      expect(regular_user.active_until).to eq(Date.current + 1.year)
+      expect(regular_user.inspection_company_id).to eq(company.id)
+      expect(regular_user.rpii_inspector_number).to eq("RPII123")
+    end
+
+    it "converts empty string to nil for inspection_company_id" do
+      patch user_path(regular_user), params: {
+        user: {
+          inspection_company_id: "" # Empty string should become nil
+        }
+      }
+
+      expect(response).to redirect_to(users_path)
+      regular_user.reload
+      expect(regular_user.inspection_company_id).to be_nil
+    end
+  end
+
+  describe "impersonation with admin context" do
+    let(:admin) { create(:user, :admin) }
+    let(:target_user) { create(:user) }
+
+    before do
+      login_as(admin)
+    end
+
+    it "stores original admin ID in session when impersonating" do
+      post impersonate_user_path(target_user)
+
+      expect(session[:original_admin_id]).to eq(admin.id)
+      expect(session[:user_id]).to eq(target_user.id)
+    end
+
+    it "handles impersonation when admin flag is present" do
+      # Ensure admin? returns true
+      allow_any_instance_of(User).to receive(:admin?).and_return(true)
+
+      post impersonate_user_path(target_user)
+
+      expect(response).to redirect_to(root_path)
+      expect(flash[:notice]).to include("impersonating")
+      expect(flash[:notice]).to include(target_user.email)
+    end
+  end
+
+  describe "non-admin user parameter restrictions" do
+    let(:regular_user) { create(:user) }
+    let(:company) { create(:inspector_company) }
+
+    it "restricts non-admin user creation to basic fields only" do
+      post "/signup", params: {
+        user: {
+          email: "newuser@example.com",
+          password: "password123",
+          password_confirmation: "password123",
+          # These admin-only fields should be ignored
+          active_until: Date.current + 1.year,
+          inspection_company_id: company.id,
+          rpii_inspector_number: "SHOULD_BE_IGNORED"
+        }
+      }
+
+      created_user = User.find_by(email: "newuser@example.com")
+      expect(created_user).to be_present
+      # Non-admin fields should be ignored during creation
+      expect(created_user.rpii_inspector_number).to be_nil
+      expect(created_user.inspection_company_id).to be_nil
+    end
+
+    it "handles impersonation without existing admin session" do
+      login_as(regular_user)
+      # Simulate a non-admin user somehow reaching impersonate action
+      # (this would normally be blocked by before_action, but testing the method itself)
+      allow_any_instance_of(User).to receive(:admin?).and_return(false)
+
+      post impersonate_user_path(regular_user)
+
+      # Should be redirected due to admin requirement
+      expect(response).to redirect_to(root_path)
+    end
+  end
 end

@@ -65,7 +65,6 @@ class UnitsController < ApplicationController
     @unit = current_user.units.build(unit_params)
 
     if @unit.save
-      process_photo_if_present
       flash[:notice] = I18n.t("units.messages.created")
       redirect_to @unit
     else
@@ -78,8 +77,6 @@ class UnitsController < ApplicationController
 
   def update
     if @unit.update(unit_params)
-      process_photo_if_present
-
       respond_to do |format|
         format.html do
           flash[:notice] = I18n.t("units.messages.updated")
@@ -134,6 +131,15 @@ class UnitsController < ApplicationController
   def report
     respond_to do |format|
       format.html do
+        pdf_data = PdfGeneratorService.generate_unit_report(@unit)
+
+        send_data pdf_data.render,
+          filename: "#{@unit.serial}.pdf",
+          type: "application/pdf",
+          disposition: "inline"
+      end
+
+      format.pdf do
         pdf_data = PdfGeneratorService.generate_unit_report(@unit)
 
         send_data pdf_data.render,
@@ -233,13 +239,6 @@ class UnitsController < ApplicationController
       flash[:alert] = I18n.t("units.messages.access_denied")
       redirect_to units_path and return
     end
-  end
-
-  def process_photo_if_present
-    nil unless @unit.photo.attached?
-
-    # The ImageProcessorService will handle resizing when the image is displayed
-    # No need to process here as Rails Active Storage handles variants on demand
   end
 
   def require_inspection_company

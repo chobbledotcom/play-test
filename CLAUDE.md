@@ -43,6 +43,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **No JavaScript in tests** - test the non-JS fallback behavior
 - **Run tests immediately after editing** - run associated tests as soon as you edit a file
 - **Never build up a backlog** - fix broken tests immediately, don't accumulate issues
+- **NEVER delete tests unless 100% unnecessary** - fix rather than delete tests
+- **Never delete tests that would reduce coverage** - always maintain or increase test coverage
 - Use **RSpec** with descriptive contexts/examples
 - Use **Factory Bot** for test data creation
 - Test both happy path and edge cases
@@ -152,6 +154,7 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 - **No fallbacks** - if data is missing, that's an error to fix
 - **Trust our own interfaces** - avoid `respond_to?` checks for methods we control; we know what our objects support
 - **ABSOLUTELY NO hardcoded strings** - every user-facing string must use I18n, no exceptions
+- **ABSOLUTELY NO unused methods** - delete any method that isn't called; unused code is technical debt
 - **Update old code** - don't support legacy patterns, refactor to new standards
 - **Use modern Ruby syntax** - leverage Ruby 3.0+ features for cleaner, more expressive code
 - **Prioritise readability** - choose the newest, tidiest syntax that improves code clarity

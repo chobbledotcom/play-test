@@ -137,40 +137,4 @@ class UsersController < ApplicationController
     ]
     params.require(:user).permit(settings_fields)
   end
-
-  # Helper methods for cleaner public interface
-
-  def handle_successful_user_creation
-    notify_new_user_in_production
-    log_in @user
-    flash[:notice] = I18n.t("users.messages.account_created")
-    redirect_to root_path
-  end
-
-  def notify_new_user_in_production
-    NtfyService.notify("new user: #{@user.email}") if Rails.env.production?
-  end
-
-  def normalise_company_association_params
-    # Convert empty string to nil for proper association handling
-    company_id = params[:user][:inspection_company_id]
-    params[:user][:inspection_company_id] = nil if company_id == ""
-  end
-
-  def current_password_valid?
-    @user.authenticate(params[:user][:current_password])
-  end
-
-  def handle_incorrect_current_password
-    @user.errors.add(:current_password, I18n.t("users.errors.wrong_password"))
-    render :change_password, status: :unprocessable_entity
-  end
-
-  def store_original_admin_session
-    session[:original_admin_id] = current_user.id if current_user.admin?
-  end
-
-  def password_action?
-    action_name.include?("password")
-  end
 end

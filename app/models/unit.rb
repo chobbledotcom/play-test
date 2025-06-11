@@ -5,7 +5,9 @@ class Unit < ApplicationRecord
   include HasDimensions
 
   belongs_to :user
-  has_many :inspections, dependent: :destroy
+  has_many :inspections
+  has_many :complete_inspections, -> { where.not(complete_date: nil) }, class_name: "Inspection"
+  has_many :draft_inspections, -> { where(complete_date: nil) }, class_name: "Inspection"
 
   # File attachments
   has_one_attached :photo
@@ -104,7 +106,21 @@ class Unit < ApplicationRecord
   end
 
   def deletable?
-    !inspections.complete.exists?
+    !complete_inspections.exists?
+  end
+
+  def destroy
+    # Check if unit can be deleted before attempting destroy
+    if complete_inspections.exists?
+      errors.add(:base, :has_complete_inspections)
+      return false
+    end
+
+    # Manually destroy draft inspections first
+    draft_inspections.destroy_all
+
+    # Then destroy the unit
+    super
   end
 
   def self.overdue
@@ -119,7 +135,7 @@ class Unit < ApplicationRecord
   private
 
   def check_for_complete_inspections
-    if inspections.complete.exists?
+    if complete_inspections.exists?
       errors.add(:base, :has_complete_inspections)
       throw(:abort)
     end

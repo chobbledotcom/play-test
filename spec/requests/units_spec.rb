@@ -530,4 +530,249 @@ RSpec.describe "Units", type: :request do
       expect(page).to have_content("must be less than 200")
     end
   end
+
+  describe "Format-specific responses" do
+    before do
+      login_as(user)
+    end
+
+    describe "JSON format" do
+      it "returns unit data as JSON" do
+        get unit_path(unit, format: :json)
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("application/json")
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response["id"]).to eq(unit.id)
+        expect(json_response["name"]).to eq(unit.name)
+        expect(json_response["serial"]).to eq(unit.serial)
+        expect(json_response["manufacturer"]).to eq(unit.manufacturer)
+        expect(json_response["has_slide"]).to eq(unit.has_slide)
+      end
+    end
+
+    describe "PDF format" do
+      it "generates PDF report for unit" do
+        get unit_path(unit, format: :pdf)
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("application/pdf")
+        expect(response.headers["Content-Disposition"]).to include("#{unit.serial}.pdf")
+      end
+    end
+
+    describe "CSV export" do
+      it "exports units as CSV" do
+        get units_path(format: :csv)
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("text/csv")
+        expect(response.headers["Content-Disposition"]).to include("unit-#{Date.today}.csv")
+      end
+    end
+  end
+
+  describe "Public access functionality" do
+    describe "report action" do
+      it "returns PDF for HTML format" do
+        get "/units/#{unit.id}/report"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("application/pdf")
+        expect(response.headers["Content-Disposition"]).to include("#{unit.serial}.pdf")
+      end
+
+      it "returns PDF for .pdf format" do
+        get "/units/#{unit.id}/report.pdf"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("application/pdf")
+        expect(response.headers["Content-Disposition"]).to include("#{unit.serial}.pdf")
+      end
+
+      it "returns JSON for .json format" do
+        get "/units/#{unit.id}/report.json"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("application/json")
+      end
+
+      it "returns 404 for non-existent unit" do
+        get "/units/NONEXISTENT/report"
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    describe "QR code generation" do
+      it "generates QR code PNG for unit" do
+        get "/units/#{unit.id}/qr_code"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("image/png")
+        expect(response.headers["Content-Disposition"]).to include("#{unit.serial}_QR.png")
+      end
+
+      it "returns 404 for non-existent unit QR code" do
+        get "/units/NONEXISTENT/qr_code"
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
+  describe "Create from inspection functionality" do
+    let(:inspection) { 
+      create(:inspection, user: user, unit: nil, width: 5.0, length: 4.0, height: 3.0) 
+    }
+
+    before do
+      login_as(user)
+    end
+
+    describe "new_from_inspection" do
+      it "shows form for creating unit from inspection" do
+        get "/inspections/#{inspection.id}/new_unit"
+        expect(response).to have_http_status(:success)
+        expect(assigns(:inspection)).to eq(inspection)
+        expect(assigns(:unit)).to be_a_new_record
+      end
+
+      it "redirects if inspection not found" do
+        get "/inspections/999999/new_unit"
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq(I18n.t("units.errors.inspection_not_found"))
+      end
+
+      it "redirects if inspection already has unit" do
+        inspection_with_unit = create(:inspection, user: user, unit: unit)
+        get "/inspections/#{inspection_with_unit.id}/new_unit"
+        expect(response).to redirect_to(inspection_path(inspection_with_unit))
+        expect(flash[:alert]).to eq(I18n.t("units.errors.inspection_has_unit"))
+      end
+    end
+
+    describe "create_from_inspection" do
+      it "creates unit and associates with inspection" do
+        post "/inspections/#{inspection.id}/create_unit", params: {
+          unit: {
+            name: "New Unit from Inspection",
+            manufacturer: "Test Manufacturer",
+            serial: "FROM_INSP_123",
+            description: "Created from inspection",
+            owner: "Test Owner",
+            width: 5.0,
+            length: 4.0,
+            height: 3.0,
+            model: "Test Model"
+          }
+        }
+
+        expect(response).to redirect_to(inspection_path(inspection))
+        expect(flash[:notice]).to include("created successfully and linked")
+        
+        inspection.reload
+        expect(inspection.unit).to be_present
+        expect(inspection.unit.name).to eq("New Unit from Inspection")
+      end
+
+      it "handles validation errors when creating from inspection" do
+        post "/inspections/#{inspection.id}/create_unit", params: {
+          unit: {
+            name: "", # Invalid - required field
+            manufacturer: "",
+            serial: ""
+          }
+        }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(assigns(:unit).errors).to be_present
+      end
+
+      it "redirects if inspection not found during creation" do
+        post "/inspections/999999/create_unit", params: { unit: { name: "Test" } }
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq(I18n.t("units.errors.inspection_not_found"))
+      end
+
+      it "redirects if inspection already has unit during creation" do
+        inspection_with_unit = create(:inspection, user: user, unit: unit)
+        post "/inspections/#{inspection_with_unit.id}/create_unit", params: {
+          unit: { name: "Test" }
+        }
+        expect(response).to redirect_to(inspection_path(inspection_with_unit))
+        expect(flash[:alert]).to eq(I18n.t("units.errors.inspection_has_unit"))
+      end
+    end
+  end
+
+  describe "Turbo stream responses" do
+    before do
+      login_as(user)
+    end
+
+    it "handles successful update with turbo stream" do
+      patch unit_path(unit), params: {
+        unit: { name: "Updated via Turbo" }
+      }, headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+      expect(response).to have_http_status(:success)
+      expect(response.content_type).to include("turbo-stream")
+      expect(response.body).to include("unit_save_message")
+    end
+
+  end
+
+  describe "Access control and error handling" do
+    describe "inactive user restrictions" do
+      let(:inactive_user) { create(:user, active_until: Date.current - 1.day) }
+
+      before do
+        login_as(inactive_user)
+      end
+
+      it "prevents inactive user from creating new unit" do
+        get new_unit_path
+        expect(response).to redirect_to(units_path)
+        expect(flash[:alert]).to be_present
+      end
+
+      it "prevents inactive user from posting new unit" do
+        post units_path, params: {
+          unit: {
+            name: "Should Fail",
+            manufacturer: "Test",
+            serial: "FAIL123",
+            description: "Test",
+            owner: "Test",
+            width: 5.0,
+            length: 4.0,
+            height: 3.0
+          }
+        }
+        expect(response).to redirect_to(units_path)
+        expect(flash[:alert]).to be_present
+      end
+    end
+
+    describe "destroy error handling" do
+      before do
+        login_as(user)
+      end
+
+      it "prevents deletion of units with complete inspections" do
+        # Units with complete inspections should not be deletable (defense in depth)
+        unit_with_complete = create(:unit, user: user)
+        create(:inspection, :complete, unit: unit_with_complete, user: user, passed: true)
+
+        delete unit_path(unit_with_complete)
+        
+        expect(response).to redirect_to(unit_path(unit_with_complete))
+        expect(flash[:alert]).to be_present
+      end
+
+      it "allows deletion of units with only draft inspections" do
+        # Units with only draft inspections can be deleted
+        unit_with_draft = create(:unit, user: user)
+        create(:inspection, unit: unit_with_draft, user: user, complete_date: nil)
+
+        delete unit_path(unit_with_draft)
+        
+        expect(response).to redirect_to(units_path)
+        expect(flash[:notice]).to eq(I18n.t("units.messages.deleted"))
+      end
+    end
+  end
 end
