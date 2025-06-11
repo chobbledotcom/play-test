@@ -8,27 +8,27 @@ class PhotoProcessingService
     begin
       # Create MiniMagick image from data
       image = MiniMagick::Image.read(image_data)
-      
+
       # Apply EXIF orientation correction first
       image.auto_orient
-      
+
       # Resize to maximum 1200px on longest side
       image.resize "#{ImageProcessorService::FULL_SIZE}x#{ImageProcessorService::FULL_SIZE}>"
-      
+
       # Convert to JPEG with 75% quality
       image.format "jpeg"
       image.quality "75"
-      
+
       # Get processed image data
       processed_data = image.to_blob
-      
+
       # Create a new StringIO object with processed data
       processed_io = StringIO.new(processed_data)
       # Add custom attributes by defining singleton methods
       processed_filename = change_extension_to_jpg(original_filename)
       processed_io.define_singleton_method(:original_filename) { processed_filename }
       processed_io.define_singleton_method(:content_type) { "image/jpeg" }
-      
+
       processed_io
     rescue => e
       Rails.logger.error "Photo processing failed: #{e.message}"
@@ -45,7 +45,7 @@ class PhotoProcessingService
   # Validate that data is a processable image
   def self.valid_image_data?(image_data)
     return false if image_data.nil? || image_data.empty?
-    
+
     begin
       image = MiniMagick::Image.read(image_data)
       # Try to get basic image properties to ensure it's valid
@@ -62,12 +62,12 @@ class PhotoProcessingService
     valid_image_data?(uploaded_file.read)
   end
 
-  private
-
   def self.change_extension_to_jpg(filename)
     return "photo.jpg" unless filename.present?
-    
+
     basename = File.basename(filename, ".*")
     "#{basename}.jpg"
   end
+
+  private_class_method :change_extension_to_jpg
 end

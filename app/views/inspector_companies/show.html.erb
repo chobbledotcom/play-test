@@ -3,7 +3,6 @@
 <p>
   <% if current_user&.admin? %>
     <%= link_to t('ui.edit'), edit_inspector_company_path(@inspector_company) %>
-    | <%= render 'archive_link', inspector_company: @inspector_company %>
     | 
   <% end %>
   <%= link_to t('inspector_companies.titles.index'), inspector_companies_path %>

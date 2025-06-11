@@ -103,7 +103,6 @@ RSpec.describe "Inspector Companies", type: :feature do
         within("table tbody") do
           expect(page).to have_link(I18n.t("ui.view"))
           expect(page).to have_link(I18n.t("ui.edit"))
-          expect(page).to have_link(I18n.t("inspector_companies.buttons.archive"))
         end
       end
     end
@@ -195,7 +194,6 @@ RSpec.describe "Inspector Companies", type: :feature do
       visit inspector_company_path(company)
 
       expect(page).to have_link(I18n.t("ui.edit"))
-      expect(page).to have_link(I18n.t("inspector_companies.buttons.archive"))
       expect(page).to have_link(I18n.t("inspector_companies.titles.index"))
     end
   end
@@ -214,7 +212,6 @@ RSpec.describe "Inspector Companies", type: :feature do
       expect(page).to have_field(I18n.t("inspector_companies.forms.name"), with: company.name)
       # RPII field no longer exists at company level
       expect(page).to have_button(I18n.t("inspector_companies.buttons.update"))
-      expect(page).to have_link(I18n.t("inspector_companies.buttons.archive"))
     end
 
     it "successfully updates company data" do
@@ -228,33 +225,6 @@ RSpec.describe "Inspector Companies", type: :feature do
       expect(page).to have_current_path(inspector_company_path(company))
       expect(page).to have_content(I18n.t("inspector_companies.messages.updated"))
       expect(page).to have_content("Updated Company Name")
-    end
-  end
-
-  describe "Archive Links Display" do
-    let!(:company) { create(:inspector_company, name: "Archive Test Company") }
-
-    before do
-      login_user_via_form(admin_user)
-    end
-
-    it "shows archive link on index page" do
-      visit inspector_companies_path
-
-      expect(page).to have_content(company.name)
-      expect(page).to have_link(I18n.t("inspector_companies.buttons.archive"))
-    end
-
-    it "shows archive link on show page" do
-      visit inspector_company_path(company)
-
-      expect(page).to have_link(I18n.t("inspector_companies.buttons.archive"))
-    end
-
-    it "shows archive link on edit page" do
-      visit edit_inspector_company_path(company)
-
-      expect(page).to have_link(I18n.t("inspector_companies.buttons.archive"))
     end
   end
 

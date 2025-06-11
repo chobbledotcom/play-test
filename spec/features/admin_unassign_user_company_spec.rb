@@ -57,5 +57,4 @@ RSpec.feature "Admin User Management", type: :feature do
 
     expect(page).to have_content(I18n.t("users.messages.user_inactive"))
   end
-
 end

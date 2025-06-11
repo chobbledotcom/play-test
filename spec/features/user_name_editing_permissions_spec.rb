@@ -5,7 +5,6 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
   let(:regular_user) { create(:user, :without_company, email: "user@example.com", name: "Original Name") }
   let!(:inspector_company) { create(:inspector_company, active: true) }
 
-
   describe "Admin name editing permissions" do
     before { sign_in admin_user }
 
@@ -19,7 +18,7 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       click_button I18n.t("users.buttons.update_user")
 
       expect(page).to have_content(I18n.t("users.messages.user_updated"))
-      
+
       regular_user.reload
       expect(regular_user.name).to eq("New Admin Changed Name")
     end
@@ -52,7 +51,7 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       # Name should be displayed as read-only
       expect(page).to have_content("Original Name")
       expect(page).not_to have_field("user_name")
-      
+
       # Other editable fields should be present for users without company
       expect(page).to have_field("user_phone")
       expect(page).to have_field("user_address")
@@ -71,7 +70,7 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       expect(page).not_to have_field("user_address")
       expect(page).not_to have_field("user_country")
       expect(page).not_to have_field("user_postal_code")
-      
+
       expect(page).to have_content(I18n.t("users.messages.inherited_from_company"))
     end
 
@@ -82,14 +81,14 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       expect(page).to have_select("user_time_display")
       expect(page).to have_field("user_default_inspection_location")
       expect(page).to have_select("user_theme")
-      
-      # Update preferences  
+
+      # Update preferences
       select I18n.t("users.options.time_full"), from: "user_time_display"
       fill_in "user_default_inspection_location", with: "Test Location"
       click_button I18n.t("users.buttons.update_settings")
 
       expect(page).to have_content(I18n.t("users.messages.settings_updated"))
-      
+
       regular_user.reload
       expect(regular_user.time_display).to eq("time")
       expect(regular_user.default_inspection_location).to eq("Test Location")
@@ -97,5 +96,4 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       expect(regular_user.name).to eq("Original Name")
     end
   end
-
 end

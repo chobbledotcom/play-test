@@ -42,8 +42,6 @@ en:
     buttons:
       create: "Create Company"
       update: "Update Company"
-      archive: "Archive"
-      unarchive: "Unarchive"
       search: "Search"
       new_company: "New Company"
       view_all_inspections: "View all inspections"
@@ -51,8 +49,6 @@ en:
     messages:
       created: "Inspector company created successfully."
       updated: "Inspector company updated successfully."
-      archived: "Inspector company archived successfully."
-      unarchived: "Inspector company unarchived successfully."
       not_found: "Inspector company not found."
       unauthorized: "You are not authorized to access this page"
       no_companies: "No inspector companies found"

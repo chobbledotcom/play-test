@@ -180,13 +180,12 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
           create(:materials_assessment, :passed, inspection: insp)
           create(:fan_assessment, :passed, inspection: insp)
           create(:enclosed_assessment, :passed, inspection: insp) if insp.is_totally_enclosed?
-          
+
           # Mark as complete
           insp.update!(complete_date: Time.current)
-          insp
         end
       end
-      
+
       before do
         sign_in(admin_user)
       end

@@ -44,7 +44,6 @@ RSpec.describe "inspector_companies/index", type: :view do
       render
 
       expect(rendered).to include("Edit")
-      expect(rendered).to include("Archive")
     end
 
     it "includes search form" do
@@ -65,7 +64,6 @@ RSpec.describe "inspector_companies/index", type: :view do
       expect(rendered).to include("First Company")
       # Should have admin action links - use Capybara matchers
       expect(rendered).to have_link("Edit")
-      expect(rendered).to have_link("Archive")
     end
   end
 
@@ -83,7 +81,6 @@ RSpec.describe "inspector_companies/index", type: :view do
       expect(rendered).to include("First Company")
       # Should not have admin action links - use Capybara matchers
       expect(rendered).not_to have_link("Edit")
-      expect(rendered).not_to have_link("Archive")
       expect(rendered).not_to have_content("Delete")
     end
   end

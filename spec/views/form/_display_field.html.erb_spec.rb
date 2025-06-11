@@ -24,7 +24,7 @@ RSpec.describe "form/_display_field.html.erb", type: :view do
     user_with_nil_phone = create(:user, :without_company, phone: nil)
     form_object_nil = ActionView::Helpers::FormBuilder.new(:user, user_with_nil_phone, view, {})
     assign(:_current_form, form_object_nil)
-    
+
     render "form/display_field",
       field: :phone
 

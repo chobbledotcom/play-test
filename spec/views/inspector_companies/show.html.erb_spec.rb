@@ -46,7 +46,6 @@ RSpec.describe "inspector_companies/show", type: :view do
       render
 
       expect(rendered).to include("Edit")
-      expect(rendered).to include("Archive")
     end
 
     it "displays company statistics" do

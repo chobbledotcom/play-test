@@ -5,7 +5,6 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
   let(:regular_user) { create(:user, :without_company) }
   let(:target_user) { create(:user, rpii_inspector_number: "RPII-123") }
 
-
   describe "Admin user access" do
     before do
       sign_in(admin_user)

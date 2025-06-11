@@ -109,7 +109,6 @@ RSpec.feature "Unit creation company restriction", type: :feature do
     let(:active_user) { create(:user, :active_user) }
     let(:inactive_user) { create(:user, :inactive_user) }
 
-
     scenario "button visibility changes based on user's active status" do
       # Start as active user
       sign_in(active_user)

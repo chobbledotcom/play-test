@@ -5,7 +5,6 @@ RSpec.feature "User Active Status Management", type: :feature do
   let(:regular_user) { create(:user, :inactive_user, email: "user@example.com") }
   let!(:inspector_company) { create(:inspector_company, active: true) }
 
-
   describe "admin managing user active status" do
     before { sign_in admin_user }
 
@@ -127,7 +126,6 @@ RSpec.feature "User Active Status Management", type: :feature do
       end
     end
   end
-
 
   def set_user_active_until_date
     fill_in "user_active_until", with: (Date.current + 1.year).strftime("%Y-%m-%d")

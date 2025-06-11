@@ -75,7 +75,7 @@ RSpec.feature "Unit Photo Processing", type: :feature do
 
     # Should show validation errors
     expect(page).to have_content("can't be blank")
-    
+
     # No new unit should be created
     expect(Unit.count).to eq(initial_count)
   end

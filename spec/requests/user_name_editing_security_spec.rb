@@ -15,7 +15,7 @@ RSpec.describe "User Name Editing Security", type: :request do
           default_inspection_location: "Test Location"
         }
       }
-      
+
       regular_user.reload
       # Name should not have changed due to controller parameter restrictions
       expect(regular_user.name).to eq("Original Name")
@@ -32,10 +32,10 @@ RSpec.describe "User Name Editing Security", type: :request do
           email: regular_user.email
         }
       }
-      
+
       # Should redirect due to unauthorized access
       expect(response).to redirect_to(root_path)
-      
+
       regular_user.reload
       # Name should not have changed
       expect(regular_user.name).to eq("Original Name")

@@ -333,7 +333,6 @@ RSpec.feature "Assessment Forms", type: :feature do
 
   private
 
-
   def expect_assessment_form_rendered(tab_name)
     expect(page).to have_css("h1", text: I18n.t("inspections.assessments.#{tab_name}.title"))
     expect(page).to have_css(".#{tab_name.tr("_", "-")}-assessment")

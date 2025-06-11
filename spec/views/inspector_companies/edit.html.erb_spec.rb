@@ -50,13 +50,6 @@ RSpec.describe "inspector_companies/edit", type: :view do
     expect(rendered).to have_field("inspector_company[notes]", with: "Existing notes")
   end
 
-  it "includes archive action" do
-    render
-
-    expect(rendered).to include("Archive")
-    expect(rendered).to include('data-turbo-confirm="Are you sure')
-  end
-
   context "when company has existing logo" do
     before do
       # Mock the logo attachment

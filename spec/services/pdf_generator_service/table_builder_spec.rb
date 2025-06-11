@@ -20,21 +20,21 @@ RSpec.describe PdfGeneratorService::TableBuilder do
     allow(pdf_double).to receive(:text)
     allow(pdf_double).to receive(:stroke_horizontal_rule)
     allow(pdf_double).to receive(:move_down)
-    
+
     allow(table_double).to receive(:cells).and_return(cells_double)
     allow(table_double).to receive(:columns).and_return(columns_double)
     allow(table_double).to receive(:row).and_return(row_double)
     allow(table_double).to receive(:column_widths=)
-    
+
     allow(cells_double).to receive(:borders=)
     allow(cells_double).to receive(:padding=)
     allow(cells_double).to receive(:size=)
     allow(cells_double).to receive(:border_width=)
     allow(cells_double).to receive(:border_color=)
-    
+
     allow(columns_double).to receive(:font_style=)
     allow(columns_double).to receive(:width=)
-    
+
     allow(row_double).to receive(:background_color=)
     allow(row_double).to receive(:borders=)
     allow(row_double).to receive(:border_color=)
@@ -198,24 +198,24 @@ RSpec.describe PdfGeneratorService::TableBuilder do
 
     before do
       allow(pdf_double).to receive(:table).and_yield(table_double).and_return(table_double)
-      
+
       # Create separate row doubles for each row to track calls properly
       @row0_double = double("row0")
       @row1_double = double("row1")
       @row2_double = double("row2")
       @row3_double = double("row3")
-      
+
       allow(table_double).to receive(:row).with(0).and_return(@row0_double)
       allow(table_double).to receive(:row).with(1).and_return(@row1_double)
       allow(table_double).to receive(:row).with(2).and_return(@row2_double)
       allow(table_double).to receive(:row).with(3).and_return(@row3_double)
-      
+
       [@row0_double, @row1_double, @row2_double, @row3_double].each do |row|
         allow(row).to receive(:background_color=)
         allow(row).to receive(:font_style=)
         allow(row).to receive(:column).with(1).and_return(double("cell", text_color: nil, font_style: nil))
       end
-      
+
       # Mock cell styling for result column
       [@row1_double, @row2_double, @row3_double].each do |row|
         cell_double = double("cell")
@@ -303,9 +303,9 @@ RSpec.describe PdfGeneratorService::TableBuilder do
     end
 
     it "sets column widths correctly" do
-      remaining_width = 500 - PdfGeneratorService::Configuration::HISTORY_DATE_COLUMN_WIDTH - 
-                       PdfGeneratorService::Configuration::HISTORY_RESULT_COLUMN_WIDTH - 
-                       PdfGeneratorService::Configuration::HISTORY_RPII_COLUMN_WIDTH
+      remaining_width = 500 - PdfGeneratorService::Configuration::HISTORY_DATE_COLUMN_WIDTH -
+        PdfGeneratorService::Configuration::HISTORY_RESULT_COLUMN_WIDTH -
+        PdfGeneratorService::Configuration::HISTORY_RPII_COLUMN_WIDTH
       inspector_width = remaining_width * PdfGeneratorService::Configuration::HISTORY_INSPECTOR_WIDTH_PERCENT
       location_width = remaining_width * PdfGeneratorService::Configuration::HISTORY_LOCATION_WIDTH_PERCENT
 
@@ -353,8 +353,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
           width: 12.5,
           length: 8.0,
           height: 3.5,
-          has_slide: true
-        )
+          has_slide: true)
       end
 
       it "formats complete unit data correctly" do
@@ -410,8 +409,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
           width: nil,
           length: nil,
           height: nil,
-          has_slide: false
-        )
+          has_slide: false)
       end
 
       it "handles missing data with appropriate fallbacks" do
@@ -449,8 +447,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
           width: 10.0,
           length: nil,
           height: 4.0,
-          has_slide: false
-        )
+          has_slide: false)
       end
 
       it "includes only present dimensions" do
@@ -465,8 +462,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       let(:unit) do
         build(:unit,
           manufacturer: "",
-          name: "Test Unit"
-        )
+          name: "Test Unit")
       end
 
       it "shows empty string for empty manufacturer" do
@@ -480,14 +476,13 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       let(:unit) do
         create(:unit,
           name: "This is a very long unit name that exceeds the maximum allowed length and should be truncated properly",
-          description: "Also a very long description that should be considered when name is nil"
-        )
+          description: "Also a very long description that should be considered when name is nil")
       end
 
       it "truncates long unit name" do
         allow(PdfGeneratorService::Utilities).to receive(:truncate_text).and_call_original
 
-        result = described_class.build_unit_details_table(unit, "inspection")
+        described_class.build_unit_details_table(unit, "inspection")
 
         expect(PdfGeneratorService::Utilities).to have_received(:truncate_text).with(
           unit.name,
@@ -499,7 +494,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         unit.name = nil
         allow(PdfGeneratorService::Utilities).to receive(:truncate_text).and_call_original
 
-        result = described_class.build_unit_details_table(unit, "inspection")
+        described_class.build_unit_details_table(unit, "inspection")
 
         expect(PdfGeneratorService::Utilities).to have_received(:truncate_text).with(
           unit.description,

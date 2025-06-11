@@ -52,12 +52,7 @@ Rails.application.routes.draw do
   post "inspections/:id/create_unit", to: "units#create_from_inspection", as: "create_unit_from_inspection"
 
   # Inspector Companies
-  resources :inspector_companies, except: [:destroy] do
-    member do
-      patch "archive"
-      patch "unarchive"
-    end
-  end
+  resources :inspector_companies, except: [:destroy]
 
   # Short URL for reports
   get "r/:id", to: "inspections#report", as: "short_report"

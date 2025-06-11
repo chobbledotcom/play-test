@@ -1,6 +1,6 @@
 class InspectorCompaniesController < ApplicationController
   before_action :set_inspector_company, only: %i[
-    show edit update archive unarchive
+    show edit update
   ]
   before_action :require_login
   before_action :require_admin, except: [:show]
@@ -71,18 +71,6 @@ class InspectorCompaniesController < ApplicationController
         end
       end
     end
-  end
-
-  def archive
-    @inspector_company.update(active: false)
-    flash[:notice] = t("inspector_companies.messages.archived")
-    redirect_to inspector_companies_path
-  end
-
-  def unarchive
-    @inspector_company.update(active: true)
-    flash[:notice] = t("inspector_companies.messages.unarchived")
-    redirect_to inspector_companies_path
   end
 
   private

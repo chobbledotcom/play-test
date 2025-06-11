@@ -68,14 +68,6 @@ RSpec.describe "InspectorCompanies", type: :request do
       end
     end
 
-    describe "PATCH /inspector_companies/:id/archive" do
-      it "denies access to regular users" do
-        company = create(:inspector_company)
-        patch archive_inspector_company_path(company)
-        expect(response).to redirect_to(root_path)
-        expect(flash[:alert]).to be_present
-      end
-    end
   end
 
   describe "When logged in as regular user" do
@@ -84,7 +76,7 @@ RSpec.describe "InspectorCompanies", type: :request do
     it "denies access to inspector companies index" do
       get inspector_companies_path
       expect(response).to redirect_to(root_path)
-      expect(flash[:alert]).to include("not authorized")
+      expect(flash[:alert]).to include(I18n.t("inspector_companies.messages.unauthorized"))
     end
 
     it "allows access to inspector companies show" do
@@ -205,25 +197,33 @@ RSpec.describe "InspectorCompanies", type: :request do
       end
     end
 
-    describe "PATCH /inspector_companies/:id/archive" do
-      it "archives the requested inspector company" do
-        company = create(:inspector_company)
-        expect {
-          patch archive_inspector_company_path(company)
-          company.reload
-        }.to change { company.active? }.from(true).to(false)
+    describe "Turbo stream responses" do
+      let(:company) { create(:inspector_company) }
+
+      context "successful update with turbo stream" do
+        it "returns turbo stream with success message" do
+          patch inspector_company_path(company),
+            params: {inspector_company: {name: "Updated Name"}},
+            headers: {"Accept" => "text/vnd.turbo-stream.html"}
+
+          expect(response).to have_http_status(:success)
+          expect(response.content_type).to include("text/vnd.turbo-stream.html")
+          expect(response.body).to include("inspector_company_save_message")
+          expect(response.body).to include(I18n.t("inspector_companies.messages.updated"))
+        end
       end
 
-      it "redirects to the inspector companies list" do
-        company = create(:inspector_company)
-        patch archive_inspector_company_path(company)
-        expect(response).to redirect_to(inspector_companies_path)
-      end
+      context "failed update with turbo stream" do
+        it "returns turbo stream with error message" do
+          patch inspector_company_path(company),
+            params: {inspector_company: {name: ""}},
+            headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
-      it "sets a success flash message" do
-        company = create(:inspector_company)
-        patch archive_inspector_company_path(company)
-        expect(flash[:notice]).to be_present
+          expect(response).to have_http_status(:success)
+          expect(response.content_type).to include("text/vnd.turbo-stream.html")
+          expect(response.body).to include("inspector_company_save_message")
+          expect(response.body).to include(I18n.t("shared.messages.save_failed"))
+        end
       end
     end
 
@@ -259,8 +259,20 @@ RSpec.describe "InspectorCompanies", type: :request do
   describe "Edge cases" do
     before { login_as(admin_user) }
 
-    it "handles missing inspector company gracefully" do
+    it "handles missing inspector company gracefully on show" do
       get inspector_company_path("nonexistent")
+      expect(response).to redirect_to(inspector_companies_path)
+      expect(flash[:alert]).to be_present
+    end
+
+    it "handles missing inspector company gracefully on edit" do
+      get edit_inspector_company_path("nonexistent")
+      expect(response).to redirect_to(inspector_companies_path)
+      expect(flash[:alert]).to be_present
+    end
+
+    it "handles missing inspector company gracefully on update" do
+      patch inspector_company_path("nonexistent"), params: {inspector_company: {name: "Test"}}
       expect(response).to redirect_to(inspector_companies_path)
       expect(flash[:alert]).to be_present
     end

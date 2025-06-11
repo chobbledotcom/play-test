@@ -73,7 +73,6 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
       # Should process the image (might be same if no orientation change needed, but should not error)
       expect(processed_data).to be_a(String)
     end
-
   end
 
   describe ".add_entity_photo_footer" do

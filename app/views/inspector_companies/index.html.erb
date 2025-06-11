@@ -52,7 +52,6 @@
             <%= link_to t('ui.view'), company %>
             <% if current_user&.admin? %>
               | <%= link_to t('ui.edit'), edit_inspector_company_path(company) %>
-              | <%= render 'archive_link', inspector_company: company %>
             <% end %>
           </td>
         </tr>

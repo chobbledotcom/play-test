@@ -93,7 +93,7 @@ class UnitsController < ApplicationController
               }),
             turbo_stream.replace("unit_photo_preview",
               partial: "shared/unit_photo_preview",
-              locals: { unit: @unit })
+              locals: {unit: @unit})
           ]
         end
       end

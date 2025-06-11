@@ -541,7 +541,7 @@ RSpec.describe "Units", type: :request do
         get unit_path(unit, format: :json)
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("application/json")
-        
+
         json_response = JSON.parse(response.body)
         expect(json_response["id"]).to eq(unit.id)
         expect(json_response["name"]).to eq(unit.name)
@@ -614,8 +614,8 @@ RSpec.describe "Units", type: :request do
   end
 
   describe "Create from inspection functionality" do
-    let(:inspection) { 
-      create(:inspection, user: user, unit: nil, width: 5.0, length: 4.0, height: 3.0) 
+    let(:inspection) {
+      create(:inspection, user: user, unit: nil, width: 5.0, length: 4.0, height: 3.0)
     }
 
     before do
@@ -662,7 +662,7 @@ RSpec.describe "Units", type: :request do
 
         expect(response).to redirect_to(inspection_path(inspection))
         expect(flash[:notice]).to include("created successfully and linked")
-        
+
         inspection.reload
         expect(inspection.unit).to be_present
         expect(inspection.unit.name).to eq("New Unit from Inspection")
@@ -682,7 +682,7 @@ RSpec.describe "Units", type: :request do
       end
 
       it "redirects if inspection not found during creation" do
-        post "/inspections/999999/create_unit", params: { unit: { name: "Test" } }
+        post "/inspections/999999/create_unit", params: {unit: {name: "Test"}}
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to eq(I18n.t("units.errors.inspection_not_found"))
       end
@@ -690,7 +690,7 @@ RSpec.describe "Units", type: :request do
       it "redirects if inspection already has unit during creation" do
         inspection_with_unit = create(:inspection, user: user, unit: unit)
         post "/inspections/#{inspection_with_unit.id}/create_unit", params: {
-          unit: { name: "Test" }
+          unit: {name: "Test"}
         }
         expect(response).to redirect_to(inspection_path(inspection_with_unit))
         expect(flash[:alert]).to eq(I18n.t("units.errors.inspection_has_unit"))
@@ -705,14 +705,13 @@ RSpec.describe "Units", type: :request do
 
     it "handles successful update with turbo stream" do
       patch unit_path(unit), params: {
-        unit: { name: "Updated via Turbo" }
-      }, headers: { "Accept" => "text/vnd.turbo-stream.html" }
+        unit: {name: "Updated via Turbo"}
+      }, headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
       expect(response).to have_http_status(:success)
       expect(response.content_type).to include("turbo-stream")
       expect(response.body).to include("unit_save_message")
     end
-
   end
 
   describe "Access control and error handling" do
@@ -758,7 +757,7 @@ RSpec.describe "Units", type: :request do
         create(:inspection, :complete, unit: unit_with_complete, user: user, passed: true)
 
         delete unit_path(unit_with_complete)
-        
+
         expect(response).to redirect_to(unit_path(unit_with_complete))
         expect(flash[:alert]).to be_present
       end
@@ -769,7 +768,7 @@ RSpec.describe "Units", type: :request do
         create(:inspection, unit: unit_with_draft, user: user, complete_date: nil)
 
         delete unit_path(unit_with_draft)
-        
+
         expect(response).to redirect_to(units_path)
         expect(flash[:notice]).to eq(I18n.t("units.messages.deleted"))
       end
