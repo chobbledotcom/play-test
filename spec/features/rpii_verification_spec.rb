@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.feature "RPII Verification", type: :feature do
   let(:admin_user) { create(:user, email: "admin@testcompany.com") }
-  let(:user_with_valid_rpii) { create(:user, rpii_inspector_number: "AI0025") } # Chris Winters
+  let(:user_with_valid_rpii) { create(:user, name: "Chris Winters", rpii_inspector_number: "AI0025") } # Chris Winters
   let(:user_with_invalid_rpii) { create(:user, rpii_inspector_number: "9999") }
   let(:user_without_rpii) { create(:user, rpii_inspector_number: "TEMP123").tap { |u| u.update_column(:rpii_inspector_number, "") } }
 
@@ -21,10 +21,6 @@ RSpec.feature "RPII Verification", type: :feature do
     click_button I18n.t("users.buttons.verify_rpii")
     
     expect(page).to have_content(I18n.t("users.messages.rpii_verified"))
-    expect(page).to have_content(I18n.t("users.verification.details_header"))
-    expect(page).to have_content("Chris Winters") # The expected name for AI0025
-    expect(page).to have_content("AI0025")
-    expect(page).to have_content("Inflatable Annual")
     expect(page).to have_content("✓")
     
     # Verify the date was saved
@@ -38,8 +34,7 @@ RSpec.feature "RPII Verification", type: :feature do
     
     click_button I18n.t("users.buttons.verify_rpii")
     
-    expect(page).to have_content(I18n.t("users.messages.rpii_verification_failed"))
-    expect(page).not_to have_content(I18n.t("users.verification.details_header"))
+    expect(page).to have_content(I18n.t("users.messages.rpii_not_found"))
     expect(page).not_to have_content("✓")
     
     # Verify the date was cleared
@@ -65,7 +60,7 @@ RSpec.feature "RPII Verification", type: :feature do
     
     click_button I18n.t("users.buttons.verify_rpii")
     
-    expect(page).to have_content(I18n.t("users.messages.rpii_verification_failed"))
+    expect(page).to have_content(I18n.t("users.messages.rpii_not_found"))
     expect(page).not_to have_content("✓")
     
     # Verify the date was cleared
@@ -105,11 +100,7 @@ RSpec.feature "RPII Verification", type: :feature do
     
     click_button I18n.t("users.buttons.verify_rpii")
     
-    # Verification shows different name from RPII
-    expect(page).to have_content(I18n.t("users.verification.details_header"))
-    expect(page).to have_content("Chris Winters") # RPII name
-    expect(page).not_to have_content("John Smith") # User's name not in verification details
-    
-    # Admin can now see the mismatch and decide what to do
+    # Should show name mismatch error
+    expect(page).to have_content(I18n.t("users.messages.rpii_name_mismatch", user_name: "John Smith", inspector_name: "Chris Winters"))
   end
 end

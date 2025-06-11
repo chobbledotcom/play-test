@@ -1,0 +1,49 @@
+en:
+  # Home page
+  home:
+    welcome: "Welcome"
+    title: "play-test"
+    subtitle: "Inspection management for inflatable play equipment"
+    description: "Inspection management system"
+    attribution: "Developed by"
+    company_name: "chobble.com"
+    company_url: "https://chobble.com"
+    license_info: "Released under AGPLv3 - anyone can use and improve it"
+    recent_inspections: "Recent Inspections"
+    recent_units: "Recent Units"
+    quick_actions: "Quick Actions"
+    create_inspection: "Create Inspection"
+    create_unit: "Create Unit"
+    safety_standards: "Safety Standards"
+    
+    features:
+      log_inspections:
+        title: "Log Inspections"
+        description: "Record safety inspections with compliance tracking and calculations"
+      generate_pdfs:
+        title: "Generate PDF Reports"
+        description: "Create PDF reports with QR codes for verification and sharing"
+      search_export:
+        title: "Search & Export"
+        description: "Find inspection records and export data for analysis"
+
+  # About page
+  about:
+    title: "About play-test"
+    description: "Inspection management for inflatable play equipment"
+    
+    what_it_is:
+      title: "What is play-test?"
+      content: "play-test is a digital inspection management system for inflatable playground equipment. It helps inspection companies ensure compliance with EN 14960:2019 safety standards by digitising the inspection process and generating PDF reports with QR codes."
+    
+    key_features:
+      title: "Key Features"
+      content: "Track equipment with serial numbers and dimensions. Perform seven comprehensive safety assessments including structure, anchorage, materials, electrical (PAT), slide safety, user height, and enclosed unit checks. Automatically calculate pass/fail status based on EN 14960:2019 requirements. Generate PDF inspection reports with QR codes for easy client access. Manage multiple inspection companies with data isolation. Access from any device with progressive web app support."
+    
+    attribution:
+      title: "Attribution & Licensing"
+      content: "play-test is a project by Stefan at Chobble.com, based on a Windows application originally written by Spencer Elliott of elliottsbouncycastlehire.co.uk. This is an independent project and is not affiliated with any testing bodies or certification organisations. The software is open source and licensed under the AGPLv3 license. Source code is available on the project repository."
+      
+    disclaimer:
+      title: "Disclaimer"
+      content: "This software is provided as a tool to assist with inspection record-keeping and report generation. Users are responsible for ensuring their inspections meet all applicable standards and regulations. The software authors accept no liability for inspection outcomes or regulatory compliance."

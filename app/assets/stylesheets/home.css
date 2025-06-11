@@ -15,22 +15,4 @@
   aside {
     align-content: center;
   }
-
-  .video-container {
-    margin: 2rem auto;
-    position: relative;
-    aspect-ratio: 16/9;
-    max-width: 40rem;
-    border-radius: 5px;
-    overflow: hidden;
-
-    iframe {
-      border: 0;
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 100%;
-    }
-  }
 }

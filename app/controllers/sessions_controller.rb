@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
           cookies.delete(:user_id)
         end
         flash[:notice] = I18n.t("session.login.success")
-        redirect_to root_path
+        redirect_to inspections_path
         return
       end
     end

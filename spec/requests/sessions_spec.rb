@@ -15,7 +15,7 @@ require "rails_helper"
 # AUTHENTICATION FLOW:
 # 1. User submits email/password via login form
 # 2. Controller finds user by email (case insensitive) and verifies password
-# 3. On success: sets session[:user_id], handles remember_me cookie, redirects to root
+# 3. On success: sets session[:user_id], handles remember_me cookie, redirects to inspections
 # 4. On failure: shows error message and re-renders form with :unprocessable_entity
 #
 # REMEMBER ME FUNCTIONALITY:
@@ -30,7 +30,7 @@ require "rails_helper"
 # ERROR HANDLING:
 # - Invalid credentials show "Invalid email/password combination" via flash.now
 # - Failed login renders :new template with :unprocessable_entity status
-# - All authentication redirects go to root_path
+# - All authentication redirects go to inspections_path
 
 RSpec.describe "Sessions", type: :feature do
   let(:user) { create(:user) }
@@ -58,7 +58,7 @@ RSpec.describe "Sessions", type: :feature do
     it "authenticates user and redirects to root" do
       login_user_via_form(user)
 
-      expect(page).to have_current_path(root_path)
+      expect(page).to have_current_path(inspections_path)
       expect(page).to have_content(I18n.t("session.login.success"))
     end
 
@@ -69,7 +69,7 @@ RSpec.describe "Sessions", type: :feature do
       fill_in I18n.t("session.login.password"), with: user.password
       click_button I18n.t("session.login.submit")
 
-      expect(page).to have_current_path(root_path)
+      expect(page).to have_current_path(inspections_path)
       expect(page).to have_content(I18n.t("session.login.success"))
     end
 
@@ -81,7 +81,7 @@ RSpec.describe "Sessions", type: :feature do
       check I18n.t("session.login.remember_me")
       click_button I18n.t("session.login.submit")
 
-      expect(page).to have_current_path(root_path)
+      expect(page).to have_current_path(inspections_path)
       expect(page).to have_content(I18n.t("session.login.success"))
     end
 
@@ -93,7 +93,7 @@ RSpec.describe "Sessions", type: :feature do
       uncheck I18n.t("session.login.remember_me")
       click_button I18n.t("session.login.submit")
 
-      expect(page).to have_current_path(root_path)
+      expect(page).to have_current_path(inspections_path)
       expect(page).to have_content(I18n.t("session.login.success"))
     end
 
@@ -104,7 +104,7 @@ RSpec.describe "Sessions", type: :feature do
       fill_in I18n.t("session.login.password"), with: user.password
       click_button I18n.t("session.login.submit")
 
-      expect(page).to have_current_path(root_path)
+      expect(page).to have_current_path(inspections_path)
 
       # Login again
       visit "/login"
@@ -112,7 +112,7 @@ RSpec.describe "Sessions", type: :feature do
       fill_in I18n.t("session.login.password"), with: user.password
       click_button I18n.t("session.login.submit")
 
-      expect(page).to have_current_path(root_path)
+      expect(page).to have_current_path(inspections_path)
       expect(page).to have_content(I18n.t("session.login.success"))
     end
   end
@@ -239,7 +239,7 @@ RSpec.describe "Sessions", type: :feature do
       fill_in I18n.t("session.login.password"), with: user.password
       click_button I18n.t("session.login.submit")
 
-      expect(page).to have_current_path(root_path)
+      expect(page).to have_current_path(inspections_path)
       expect(page).to have_content(I18n.t("session.login.success"))
     end
   end

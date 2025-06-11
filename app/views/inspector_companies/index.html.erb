@@ -1,36 +1,15 @@
 <%= render 'shared/page_header', title: t('inspector_companies.titles.index') %>
 
 <% if current_user&.admin? %>
-  <p>
-    <%= link_to t('inspector_companies.buttons.new_company'), new_inspector_company_path %>
-  </p>
+  <%= button_to new_inspector_company_path,
+      method: :get do %>
+    <strong><%= t('inspector_companies.buttons.new_company') %></strong>
+  <% end %>
 <% end %>
 
-<section>
-  <div class="search-form">
-    <%= form_with url: inspector_companies_path, method: :get do |form| %>
-      <%= form.text_field :search, placeholder: t('inspector_companies.search.placeholder'), value: params[:search] %>
-      <%= form.submit t('inspector_companies.buttons.search') %>
-    <% end %>
-  </div>
-</section>
-
-<section>
-  <%= form_with url: inspector_companies_path, method: :get, data: { turbo: false } do |form| %>
-    <%= form.hidden_field :search, value: params[:search] %>
-    <%= form.select :active, 
-        options_for_select([
-          ["All Companies", "all"],
-          [t('inspector_companies.status.active'), "active"],
-          [t('inspector_companies.status.archived'), "archived"]
-        ], params[:active]),
-        {}, { onchange: "this.form.submit();" } %>
-    
-    <% if params[:active].present? || params[:search].present? %>
-      <%= link_to t("ui.buttons.clear_filters"), inspector_companies_path %>
-    <% end %>
-  <% end %>
-</section>
+<% if @inspector_companies.any? || params[:search].present? || params[:active].present? %>
+  <%= render "filter_form" %>
+<% end %>
 
 <% if @inspector_companies.any? %>
   <table>

@@ -62,6 +62,9 @@ en:
       placeholder: "Search by name or RPII number..."
       active_filter: "Active Filter"
 
+    filters:
+      all_companies: "All Companies"
+
     statistics:
       total_inspections: "Total Inspections"
       passed_inspections: "Passed"

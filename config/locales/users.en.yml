@@ -8,6 +8,9 @@ en:
       change_password: "Change Password"
       index: "Users"
 
+    headers:
+      user_details: "User Details"
+
     sections:
       account_details: "Account Details"
       contact_details: "Contact Details"

@@ -52,10 +52,10 @@ RSpec.describe "inspector_companies/index", type: :view do
       expect(rendered).to include('name="search"')
     end
 
-    it "shows add new company link" do
+    it "shows add new company button" do
       render
 
-      expect(rendered).to include("New Company")
+      expect(rendered).to have_button("New Company")
     end
 
     it "shows admin action links for companies" do
@@ -97,10 +97,10 @@ RSpec.describe "inspector_companies/index", type: :view do
       expect(rendered).to include("No inspector companies found")
     end
 
-    it "shows add first company link for admin" do
+    it "shows add first company button for admin" do
       render
 
-      expect(rendered).to include("New Company")
+      expect(rendered).to have_button("New Company")
     end
   end
 end

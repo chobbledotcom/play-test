@@ -62,7 +62,7 @@ RSpec.describe "Inspector Companies", type: :feature do
 
         # Should show the admin user's company but indicate if no others exist
         expect(page).to have_content(admin_user.inspection_company.name)
-        expect(page).to have_link(I18n.t("inspector_companies.buttons.new_company"))
+        expect(page).to have_button(I18n.t("inspector_companies.buttons.new_company"))
       end
     end
 
@@ -83,7 +83,8 @@ RSpec.describe "Inspector Companies", type: :feature do
         visit inspector_companies_path
 
         fill_in I18n.t("inspector_companies.search.placeholder"), with: "Test Company 1"
-        click_button I18n.t("inspector_companies.buttons.search")
+        # Since we can't simulate Enter key in tests, visit the URL with search params
+        visit inspector_companies_path(search: "Test Company 1")
 
         expect(page).to have_content(company1.name)
         expect(page).not_to have_content(company2.name)

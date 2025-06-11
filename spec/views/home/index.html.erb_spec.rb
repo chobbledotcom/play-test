@@ -38,13 +38,6 @@ RSpec.describe "home/index.html.erb", type: :view do
       expect(rendered).to include(I18n.t("home.attribution"))
     end
 
-    it "contains embedded video" do
-      render
-
-      expect(rendered).to include("iframe")
-      expect(rendered).to include("mediadelivery.net")
-      expect(rendered).to include("video-container")
-    end
 
     it "displays feature sections" do
       render
@@ -80,13 +73,6 @@ RSpec.describe "home/index.html.erb", type: :view do
       expect(rendered).to include("<p>")
     end
 
-    it "includes video with proper attributes" do
-      render
-
-      expect(rendered).to include("loading=\"lazy\"")
-      expect(rendered).to include("allowfullscreen")
-      expect(rendered).to include("responsive=true")
-    end
   end
 
   context "when user is logged in" do
@@ -178,12 +164,6 @@ RSpec.describe "home/index.html.erb", type: :view do
       allow(view).to receive(:current_user).and_return(nil)
     end
 
-    it "includes responsive video container" do
-      render
-
-      expect(rendered).to include("video-container")
-      expect(rendered).to include("responsive=true")
-    end
 
     it "has mobile-friendly navigation structure" do
       render
