@@ -1,9 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # fix_code_standards.sh - Automated code standards fixing script
 # This script iteratively calls rake code_standards and instructs Claude to fix violations
 
-set -e  # Exit on any error
+set -x  # Enable verbose debugging
+# Don't exit on error anymore - we'll handle errors manually
 
 echo "🔧 Starting automated code standards fixing..."
 echo "================================================"
@@ -20,23 +21,56 @@ while [ $iteration -lt $max_iterations ]; do
     
     # Check current violations
     echo "📊 Checking current code standards violations..."
+    echo "🔍 Running: rake code_standards"
     
     # Run rake code_standards and capture the output
-    if ! violation_output=$(rake code_standards 2>&1); then
-        echo "❌ Error running rake code_standards"
-        exit 1
+    echo "⏳ Executing rake command..."
+    violation_output=$(rake code_standards 2>&1)
+    rake_exit_code=$?
+    
+    echo "📋 Rake exit code: $rake_exit_code"
+    echo "📏 Output length: ${#violation_output} characters"
+    echo "🔍 First 500 chars of output:"
+    echo "${violation_output:0:500}"
+    echo "..."
+    
+    # Check if rake actually failed (not just violations found)
+    echo "🔍 Checking if output contains 'violations found'..."
+    if echo "$violation_output" | grep -q "violations found"; then
+        echo "✅ Found 'violations found' in output - rake ran successfully"
+    else
+        echo "⚠️  Did not find 'violations found' in output"
+        if [ $rake_exit_code -ne 0 ]; then
+            echo "❌ Error running rake code_standards (exit code: $rake_exit_code)"
+            echo "📄 Full output:"
+            echo "$violation_output"
+            exit 1
+        fi
     fi
     
     # Check if there are any violations
+    echo "🔍 Checking for completion (TOTAL: 0 violations found)..."
     if echo "$violation_output" | grep -q "TOTAL: 0 violations found"; then
         echo "🎉 SUCCESS! No more code standards violations found!"
         echo "✅ All code standards have been fixed after $iteration iterations"
         exit 0
+    else
+        echo "📊 Still have violations to fix..."
     fi
     
     # Extract violation count
-    violation_count=$(echo "$violation_output" | grep "TOTAL:" | sed 's/.*TOTAL: \([0-9]*\) violations found.*/\1/')
-    echo "📈 Found $violation_count violations remaining"
+    echo "🔍 Extracting violation count..."
+    violation_count_line=$(echo "$violation_output" | grep "TOTAL:")
+    echo "📊 Violation count line: '$violation_count_line'"
+    
+    if [ -n "$violation_count_line" ]; then
+        violation_count=$(echo "$violation_count_line" | sed 's/.*TOTAL: \([0-9]*\) violations found.*/\1/')
+        echo "📈 Found $violation_count violations remaining"
+    else
+        echo "⚠️  Could not find TOTAL line in output"
+        echo "📄 Searching for 'TOTAL' in output:"
+        echo "$violation_output" | grep -i total || echo "No lines containing 'total' found"
+    fi
     
     # Show a sample of violations for context
     echo "📋 Sample violations:"
@@ -45,26 +79,63 @@ while [ $iteration -lt $max_iterations ]; do
     echo
     echo "🤖 Calling Claude to fix next cluster..."
     echo "----------------------------------------"
+    echo "🔍 Current working directory: $(pwd)"
+    echo "🔍 Checking if claude command exists..."
     
-    # Call Claude with specific instructions
-    claude_prompt="Based on the rake code_standards output above, choose a logical cluster of related violations to fix (e.g., same file, same type of violation, related functionality). 
+    if ! command -v claude &> /dev/null; then
+        echo "❌ 'claude' command not found in PATH"
+        echo "📋 Available commands containing 'claude':"
+        compgen -c | grep -i claude || echo "No claude commands found"
+        exit 1
+    fi
+    
+    # Truncate violation output to first 50 lines to avoid overwhelming Claude
+    echo "🔍 Truncating violation output for Claude (first 50 lines)..."
+    truncated_violations=$(echo "$violation_output" | head -50)
+    
+    # Call Claude with specific instructions including the violation data
+    claude_prompt="I need you to fix code standards violations. Here's a sample of the current rake code_standards output (first 50 lines):
 
-IMPORTANT REQUIREMENTS:
-1. Consult CLAUDE.md before making ANY changes - follow the formatting rules exactly
-2. NEVER use backslash continuation for strings - extract variables instead  
-3. Extract variables for readability when lines are too long
-4. Break down methods over 20 lines by extracting private methods
-5. Remove WHAT comments, only keep WHY comments
-6. Use modern Ruby syntax (endless methods, numbered parameters, etc.)
-7. Run tests after changes to ensure no breakage
-8. Apply StandardRB linting when done
+$truncated_violations
+
+Based on this output, choose a logical cluster of related violations to fix (e.g., same file, same type of violation, related functionality). 
+
+CRITICAL RULES - NO EXCEPTIONS:
+1. ABSOLUTELY NO BACKSLASH CONTINUATION (\\) FOR STRINGS - This is FORBIDDEN
+2. Instead of backslash continuation, extract variables: 
+   BAD:  \"long string that needs\" \\
+         \"to be broken\"
+   GOOD: long_desc = \"long string that needs to be broken\"
+3. Consult CLAUDE.md before making ANY changes - follow the formatting rules exactly
+4. Extract variables for readability when lines are too long
+5. Break down methods over 20 lines by extracting private methods
+6. Remove WHAT comments, only keep WHY comments
+7. Use modern Ruby syntax (endless methods, numbered parameters, etc.)
+8. Run tests after changes to ensure no breakage
+9. Apply StandardRB linting when done
+
+REMEMBER: If you see \\(backslash) at end of line, that's WRONG. Extract to variables instead.
 
 Pick 3-5 related violations and fix them systematically. Focus on one area at a time for better maintainability."
 
-    # Use Claude Code CLI to fix the violations
-    if ! echo "$claude_prompt" | claude code; then
-        echo "❌ Error calling Claude Code CLI"
-        exit 1
+    echo "📝 Claude prompt prepared (${#claude_prompt} characters)"
+    echo "⏳ Calling Claude Code CLI..."
+    
+    # Use Claude Code CLI to fix the violations  
+    echo "🔍 Calling Claude with Edit tools..."
+    echo "📝 Prompt length: ${#claude_prompt} characters"
+    echo "📋 Command: claude -p '[PROMPT]' --allowedTools Edit"
+    echo "🔄 Starting execution..."
+    
+    # Use the working method: claude -p with --allowedTools Edit
+    # Force output to be visible with explicit flushing
+    claude -p "$claude_prompt" --allowedTools Edit | tee /dev/stderr
+    claude_exit_code=${PIPESTATUS[0]}
+    
+    if [ $claude_exit_code -ne 0 ]; then
+        echo "❌ Claude command failed with exit code: $claude_exit_code"
+        echo "🔄 Continuing to next iteration..."
+        continue
     fi
     
     echo "✅ Claude completed fixing cluster in iteration $iteration"

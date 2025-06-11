@@ -97,7 +97,8 @@ class SafetyStandard
       {
         anchors: {
           title: "Anchor Requirements",
-          description: "Anchors must be calculated based on the play area to ensure adequate ground restraint for wind loads.",
+          description: "Anchors must be calculated based on the play area to " \
+                       "ensure adequate ground restraint for wind loads.",
           method_name: :calculate_required_anchors,
           example_input: 25.0,
           input_unit: "m²",
@@ -107,7 +108,8 @@ class SafetyStandard
         },
         user_capacity: {
           title: "User Capacity Calculations",
-          description: "Based on age-appropriate space allocation per user by height category.",
+          description: "Based on age-appropriate space allocation per " \
+                       "user by height category.",
           method_name: :calculate_user_capacity,
           example_input: [5.0, 4.0, 2.0],
           input_unit: ["length (m)", "width (m)", "negative adjustment (m²)"],
@@ -234,35 +236,45 @@ class SafetyStandard
       when :anchors
         area = metadata[:example_input]
         result = calculate_required_anchors(area)
-        "For #{area}#{metadata[:input_unit]} area: #{result} #{metadata[:output_unit]} required"
+        area_input = "#{area}#{metadata[:input_unit]} area"
+        "For #{area_input}: #{result} #{metadata[:output_unit]} required"
       when :user_capacity
         length, width, negative_adj = metadata[:example_input]
         result = calculate_user_capacity(length, width, negative_adj)
         usable_area = (length * width) - negative_adj
-        "For #{length}m × #{width}m (#{usable_area}m² usable): #{result[:users_1200mm]} children (1.2m category)"
+        area_desc = "#{length}m × #{width}m (#{usable_area}m² usable)"
+        "For #{area_desc}: #{result[:users_1200mm]} children (1.2m category)"
       when :slide_runout
         platform_height = metadata[:example_input]
         result = calculate_required_runout(platform_height)
-        "For #{platform_height}#{metadata[:input_unit]} platform: #{result}#{metadata[:output_unit]} runout required"
+        platform_desc = "#{platform_height}#{metadata[:input_unit]} platform"
+        "For #{platform_desc}: #{result}#{metadata[:output_unit]} runout required"
       when :wall_height
         user_height = metadata[:example_input]
         case user_height
         when 0..SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
           requirement = "No containing walls required"
-        when SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]..SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
-          requirement = "Walls must be at least #{user_height}m (equal to user height)"
-        when SLIDE_HEIGHT_THRESHOLDS[:basic_walls]..SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
+        when SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]..
+             SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
+          requirement = "Walls must be at least #{user_height}m " \
+                        "(equal to user height)"
+        when SLIDE_HEIGHT_THRESHOLDS[:basic_walls]..
+             SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
           multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
-          requirement = "Walls must be at least #{(user_height * multiplier).round(2)}m (#{multiplier}× user height)"
+          wall_height = (user_height * multiplier).round(2)
+          requirement = "Walls must be at least #{wall_height}m " \
+                        "(#{multiplier}× user height)"
         end
-        "For #{user_height}#{metadata[:input_unit]} user height: #{requirement}"
+        height_desc = "#{user_height}#{metadata[:input_unit]} user height"
+        "For #{height_desc}: #{requirement}"
       else
         "Example not available for #{calculation_type}"
       end
     end
 
     def meets_height_requirements?(user_height, containing_wall_height)
-      # EN 14960:2019 - Containing wall heights must scale with user height using WALL_HEIGHT_CONSTANTS
+      # EN 14960:2019 - Containing wall heights must scale with user height
+      # using WALL_HEIGHT_CONSTANTS
       return false if user_height.nil? || containing_wall_height.nil?
 
       enhanced_multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
@@ -270,11 +282,14 @@ class SafetyStandard
       case user_height
       when 0..SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
         true # No containing walls required
-      when SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]..SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
+      when SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]..
+           SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
         containing_wall_height >= user_height
-      when SLIDE_HEIGHT_THRESHOLDS[:basic_walls]..SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
+      when SLIDE_HEIGHT_THRESHOLDS[:basic_walls]..
+           SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
         containing_wall_height >= (user_height * enhanced_multiplier)
-      when SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]..SLIDE_HEIGHT_THRESHOLDS[:max_safe_height]
+      when SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]..
+           SLIDE_HEIGHT_THRESHOLDS[:max_safe_height]
         containing_wall_height >= (user_height * enhanced_multiplier) # Plus permanent roof required
       else
         false # Exceeds safe height limits
@@ -282,7 +297,8 @@ class SafetyStandard
     end
 
     def meets_runout_requirements?(runout_length, platform_height)
-      # EN 14960:2019 - Slide runout length must be minimum 50% of platform height or 300mm, whichever is greater, to ensure safe deceleration
+      # EN 14960:2019 - Slide runout length must be minimum 50% of platform
+      # height or 300mm, whichever is greater, to ensure safe deceleration
       return false if runout_length.nil? || platform_height.nil?
 
       required_runout = calculate_required_runout(platform_height)
@@ -290,7 +306,8 @@ class SafetyStandard
     end
 
     def calculate_required_runout(platform_height)
-      # EN 14960:2019 - Minimum runout distance calculation using RUNOUT_CALCULATION_CONSTANTS for safe landing
+      # EN 14960:2019 - Minimum runout distance calculation using
+      # RUNOUT_CALCULATION_CONSTANTS for safe landing
       return 0 if platform_height.nil? || platform_height <= 0
 
       # Calculate using constants from RUNOUT_CALCULATION_CONSTANTS
