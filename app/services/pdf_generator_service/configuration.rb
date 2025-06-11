@@ -43,8 +43,8 @@ class PdfGeneratorService
 
     # QR Code constants
     QR_CODE_SIZE = 80
-    QR_CODE_MARGIN = 10
-    QR_CODE_BOTTOM_OFFSET = 10
+    QR_CODE_MARGIN = 0  # No margin - align with table right edge
+    QR_CODE_BOTTOM_OFFSET = HEADER_SPACING  # Match header spacing from top
 
     # Unit photo constants
     UNIT_PHOTO_X_OFFSET = 130

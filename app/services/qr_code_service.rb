@@ -7,8 +7,6 @@ class QrCodeService
       generate_inspection_qr_code(record)
     elsif record.is_a?(Unit)
       generate_unit_qr_code(record)
-    else
-      raise ArgumentError, "Unsupported record type: #{record.class}"
     end
   end
 

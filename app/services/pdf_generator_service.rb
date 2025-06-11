@@ -5,6 +5,8 @@ class PdfGeneratorService
   require_relative "pdf_generator_service/table_builder"
   require_relative "pdf_generator_service/field_formatter"
   require_relative "pdf_generator_service/assessment_renderer"
+  require_relative "pdf_generator_service/position_calculator"
+  require_relative "pdf_generator_service/image_orientation_processor"
   require_relative "pdf_generator_service/image_processor"
 
   include Configuration
