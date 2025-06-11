@@ -140,7 +140,6 @@ class UsersController < ApplicationController
 
   # Helper methods for cleaner public interface
 
-
   def handle_successful_user_creation
     notify_new_user_in_production
     log_in @user

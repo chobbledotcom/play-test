@@ -46,7 +46,6 @@ RSpec.describe "users/index.html.erb", type: :view do
     expect(rendered).to have_link(regular_user1.email, href: edit_user_path(regular_user1))
   end
 
-
   it "handles empty user list" do
     assign(:users, [])
 

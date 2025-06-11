@@ -116,21 +116,38 @@ CRITICAL RULES - NO EXCEPTIONS:
 
 REMEMBER: If you see \\(backslash) at end of line, that's WRONG. Extract to variables instead.
 
-Pick 3-5 related violations and fix them systematically. Focus on one area at a time for better maintainability."
+Pick 3-5 related violations and fix them systematically. Focus on one area at a time for better maintainability.
+
+MANDATORY SELF-CHECK AFTER CHANGES:
+After you make any edits, you MUST carefully review each change to verify it follows CLAUDE.md rules:
+1. Check for any backslash continuations (\\) - these are FORBIDDEN 
+2. Verify variables are extracted instead of long lines
+3. Confirm methods are under 20 lines
+4. Ensure only WHY comments remain (no WHAT comments)
+5. Verify modern Ruby syntax is used where appropriate
+
+If you find any rule violations in your own changes, fix them immediately before proceeding."
 
     echo "📝 Claude prompt prepared (${#claude_prompt} characters)"
     echo "⏳ Calling Claude Code CLI..."
     
+    # Write prompt to file for better handling of large prompts
+    prompt_file="/tmp/claude_prompt_$$"
+    echo "$claude_prompt" > "$prompt_file"
+    echo "📁 Wrote prompt to: $prompt_file"
+    
     # Use Claude Code CLI to fix the violations  
     echo "🔍 Calling Claude with Edit tools..."
-    echo "📝 Prompt length: ${#claude_prompt} characters"
-    echo "📋 Command: claude -p '[PROMPT]' --allowedTools Edit"
+    echo "📝 Prompt file size: $(wc -c < "$prompt_file") bytes"
+    echo "📋 Command: cat $prompt_file | claude --allowedTools Edit --verbose"
     echo "🔄 Starting execution..."
     
-    # Use the working method: claude -p with --allowedTools Edit
-    # Force output to be visible with explicit flushing
-    claude -p "$claude_prompt" --allowedTools Edit | tee /dev/stderr
-    claude_exit_code=${PIPESTATUS[0]}
+    # Use file-based approach for better handling
+    cat "$prompt_file" | claude --allowedTools Edit --verbose
+    claude_exit_code=${PIPESTATUS[1]}
+    
+    # Clean up prompt file
+    rm -f "$prompt_file"
     
     if [ $claude_exit_code -ne 0 ]; then
         echo "❌ Claude command failed with exit code: $claude_exit_code"

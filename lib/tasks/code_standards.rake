@@ -133,11 +133,11 @@ namespace :code_standards do
             next if stripped.include?("I18n.t") # Skip I18n calls
             next if stripped.include?("Rails.logger") # Skip logger messages
             next if stripped.include?("puts") || stripped.include?("print") # Skip debug output
-            
+
             # Look for hardcoded user-facing strings (quoted strings not in specific contexts)
             hardcoded_strings = stripped.scan(/"([^"]*[a-zA-Z][^"]*)"/).flatten
             hardcoded_strings += stripped.scan(/'([^']*[a-zA-Z][^']*)'/).flatten
-            
+
             hardcoded_strings.each do |string|
               # Skip technical strings (method names, file paths, etc.)
               next if string.match?(/^[a-z_]+$/) # snake_case identifiers
@@ -147,7 +147,7 @@ namespace :code_standards do
               next if string.match?(/^[a-z]+_[a-z]+_path$/) # Rails path helpers
               next if string.match?(/^\w+:/) # Hash keys or XML namespaces
               next if string.length < 3 # Very short strings
-              
+
               # If it looks like user-facing text, flag it
               if string.match?(/[A-Z].*[a-z]/) || string.include?(" ")
                 all_violations << {

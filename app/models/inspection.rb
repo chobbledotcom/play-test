@@ -392,7 +392,7 @@ class Inspection < ApplicationRecord
       structure
       user_height
     ]
-    
+
     assessment_types.map do |type|
       assessment = send("#{type}_assessment")
       message = I18n.t("inspections.validation.#{type}_incomplete")

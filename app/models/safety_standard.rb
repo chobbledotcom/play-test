@@ -97,8 +97,7 @@ class SafetyStandard
       {
         anchors: {
           title: "Anchor Requirements",
-          description: "Anchors must be calculated based on the play area to " \
-                       "ensure adequate ground restraint for wind loads.",
+          description: anchor_calculation_description,
           method_name: :calculate_required_anchors,
           example_input: 25.0,
           input_unit: "m²",
@@ -108,8 +107,7 @@ class SafetyStandard
         },
         user_capacity: {
           title: "User Capacity Calculations",
-          description: "Based on age-appropriate space allocation per " \
-                       "user by height category.",
+          description: user_capacity_description,
           method_name: :calculate_user_capacity,
           example_input: [5.0, 4.0, 2.0],
           input_unit: ["length (m)", "width (m)", "negative adjustment (m²)"],
@@ -150,8 +148,10 @@ class SafetyStandard
     end
 
     def slide_runout_formula_text
-      height_ratio = (RUNOUT_CALCULATION_CONSTANTS[:platform_height_ratio] * 100).to_i
-      min_runout = (RUNOUT_CALCULATION_CONSTANTS[:minimum_runout_meters] * 1000).to_i
+      ratio_constant = RUNOUT_CALCULATION_CONSTANTS[:platform_height_ratio]
+      height_ratio = (ratio_constant * 100).to_i
+      min_constant = RUNOUT_CALCULATION_CONSTANTS[:minimum_runout_meters]
+      min_runout = (min_constant * 1000).to_i
       "#{height_ratio}% of platform height, minimum #{min_runout}mm"
     end
 
@@ -254,16 +254,16 @@ class SafetyStandard
         case user_height
         when 0..SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
           requirement = "No containing walls required"
-        when SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]..
-             SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
-          requirement = "Walls must be at least #{user_height}m " \
-                        "(equal to user height)"
-        when SLIDE_HEIGHT_THRESHOLDS[:basic_walls]..
-             SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
+        when (SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]..
+              SLIDE_HEIGHT_THRESHOLDS[:basic_walls])
+          height_desc = "(equal to user height)"
+          requirement = "Walls must be at least #{user_height}m #{height_desc}"
+        when (SLIDE_HEIGHT_THRESHOLDS[:basic_walls]..
+              SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls])
           multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
           wall_height = (user_height * multiplier).round(2)
-          requirement = "Walls must be at least #{wall_height}m " \
-                        "(#{multiplier}× user height)"
+          height_desc = "(#{multiplier}× user height)"
+          requirement = "Walls must be at least #{wall_height}m #{height_desc}"
         end
         height_desc = "#{user_height}#{metadata[:input_unit]} user height"
         "For #{height_desc}: #{requirement}"
@@ -282,15 +282,16 @@ class SafetyStandard
       case user_height
       when 0..SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
         true # No containing walls required
-      when SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]..
-           SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
+      when (SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]..
+            SLIDE_HEIGHT_THRESHOLDS[:basic_walls])
         containing_wall_height >= user_height
-      when SLIDE_HEIGHT_THRESHOLDS[:basic_walls]..
-           SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
+      when (SLIDE_HEIGHT_THRESHOLDS[:basic_walls]..
+            SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls])
         containing_wall_height >= (user_height * enhanced_multiplier)
-      when SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]..
-           SLIDE_HEIGHT_THRESHOLDS[:max_safe_height]
-        containing_wall_height >= (user_height * enhanced_multiplier) # Plus permanent roof required
+      when (SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]..
+            SLIDE_HEIGHT_THRESHOLDS[:max_safe_height])
+        # Plus permanent roof required
+        containing_wall_height >= (user_height * enhanced_multiplier)
       else
         false # Exceeds safe height limits
       end
@@ -318,8 +319,8 @@ class SafetyStandard
     end
 
     def calculate_required_anchors(area_m2)
-      # EN 14960:2019 - Anchor point calculation: ((Area² × area_coefficient) ÷ base_divisor) × safety_factor, ensuring adequate ground restraint for wind loads
-      # Formula from original Windows app: ((Area² × area_coefficient) ÷ base_divisor) × safety_factor, rounded up
+      # EN 14960:2019 - Anchor calculation for adequate ground restraint
+      # Formula from original Windows app, rounded up
       return 0 if area_m2.nil? || area_m2 <= 0
 
       # Formula using constants from ANCHOR_CALCULATION_CONSTANTS
@@ -331,7 +332,7 @@ class SafetyStandard
     end
 
     def calculate_user_capacity(length, width, negative_adjustment = 0)
-      # EN 14960:2019 - User capacity based on age-appropriate space allocation using USER_SPACE_REQUIREMENTS constants
+      # EN 14960:2019 - User capacity based on age-appropriate space allocation
       return {} if length.nil? || width.nil?
 
       usable_area = (length * width) - (negative_adjustment || 0)
@@ -347,12 +348,12 @@ class SafetyStandard
     end
 
     def slide_calculations
-      # EN 14960:2019 - Comprehensive slide safety requirements including containing wall heights, runout specifications, and gradient limitations
+      # EN 14960:2019 - Comprehensive slide safety requirements
       {
         containing_wall_heights: {
           under_600mm: "No containing walls required",
           between_600_3000mm: "Containing walls required of user height",
-          between_3000_6000mm: "Containing walls required #{WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]} times user height",
+          between_3000_6000mm: wall_height_requirement,
           over_6000mm: "Both containing walls AND permanent roof required"
         },
         runout_requirements: {
@@ -473,12 +474,33 @@ class SafetyStandard
     end
 
     def requires_multiple_exits?(user_count)
-      # EN 14960:2019 - Multiple exits required above threshold to ensure adequate emergency evacuation capacity and prevent overcrowding
+      # EN 14960:2019 - Multiple exits required above threshold
       threshold = EQUIPMENT_SAFETY_LIMITS[:multi_exit_threshold]
       user_count.present? && user_count > threshold
     end
 
     private
+
+    def wall_height_requirement
+      multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
+      "Containing walls required #{multiplier} times user height"
+    end
+
+    def fabric_tensile_requirement(fabric_standards)
+      "#{fabric_standards[:min_tensile_strength]} Newtons minimum"
+    end
+
+    def fabric_tear_requirement(fabric_standards)
+      "#{fabric_standards[:min_tear_strength]} Newtons minimum"
+    end
+
+    def anchor_calculation_description
+      I18n.t("safety_standards_reference.calculators.anchor.description")
+    end
+
+    def user_capacity_description
+      I18n.t("safety_standards_reference.calculators.user_capacity.description")
+    end
 
     def extract_method_lines(lines, start_line, method_name)
       method_lines = []

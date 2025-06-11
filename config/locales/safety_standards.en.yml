@@ -7,6 +7,7 @@ en:
     calculators:
       anchor:
         title: "Calculate Required Anchors"
+        description: "Anchors must be calculated based on the play area to ensure adequate ground restraint for wind loads."
         area_label: "Area (m²):"
         area_placeholder: "e.g. 25.0"
         submit: "Calculate Anchors"
@@ -17,6 +18,7 @@ en:
         
       user_capacity:
         title: "Calculate User Capacity"
+        description: "Based on age-appropriate space allocation per user by height category."
         length_label: "Length (m):"
         width_label: "Width (m):"
         adjustment_label: "Negative Adjustment (m²):"
