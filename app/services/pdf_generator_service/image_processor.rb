@@ -33,15 +33,19 @@ class PdfGeneratorService
 
     # Process image to handle EXIF orientation data
     def self.process_image_with_orientation(photo)
-      ImageOrientationProcessor.process_with_orientation(photo)
+      image = create_image(photo)
+      ImageOrientationProcessor.process_with_orientation(image)
     end
 
     # Add entity photo in footer area (below QR code)
     def self.add_entity_photo_footer(pdf, entity, qr_x, qr_y)
       return unless entity&.photo&.attached?
 
+      # Create image object once and reuse it
+      image = create_image(entity.photo)
+
       # Get original image dimensions
-      original_width, original_height = ImageOrientationProcessor.get_dimensions(entity.photo)
+      original_width, original_height = ImageOrientationProcessor.get_dimensions(image)
 
       # Calculate photo dimensions maintaining aspect ratio
       photo_width, photo_height = PositionCalculator.footer_photo_dimensions(original_width, original_height)
@@ -49,25 +53,13 @@ class PdfGeneratorService
       # Calculate position based on photo dimensions
       photo_x, photo_y = PositionCalculator.photo_footer_position(qr_x, qr_y, photo_width, photo_height)
 
-      processed_image = process_image_with_orientation(entity.photo)
+      processed_image = ImageOrientationProcessor.process_with_orientation(image)
       pdf.image StringIO.new(processed_image), at: [photo_x, photo_y], width: photo_width, height: photo_height
     end
 
-    # Add entity photo in header area (top right corner)
-    def self.add_entity_photo(pdf, entity, x_position = nil, y_position = nil)
-      return unless entity&.photo&.attached?
-
-      # Get original image dimensions
-      original_width, original_height = ImageOrientationProcessor.get_dimensions(entity.photo)
-
-      # Calculate photo dimensions maintaining aspect ratio
-      photo_width, photo_height = PositionCalculator.header_photo_dimensions(original_width, original_height)
-
-      # Calculate position using PositionCalculator
-      x_pos, y_pos = PositionCalculator.header_photo_position(pdf.bounds.width, pdf.cursor, x_position, y_position)
-
-      processed_image = process_image_with_orientation(entity.photo)
-      pdf.image StringIO.new(processed_image), at: [x_pos, y_pos], width: photo_width, height: photo_height
+    def self.create_image(photo)
+      image_data = photo.download
+      MiniMagick::Image.read(image_data)
     end
   end
 end

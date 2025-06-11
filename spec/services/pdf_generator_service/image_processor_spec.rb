@@ -74,15 +74,6 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
       expect(processed_data).to be_a(String)
     end
 
-    it "handles image processing errors" do
-      # Create a mock photo that will cause processing to fail
-      bad_photo = double("bad_photo")
-      allow(bad_photo).to receive(:download).and_return("invalid_image_data")
-
-      expect {
-        described_class.process_image_with_orientation(bad_photo)
-      }.to raise_error
-    end
   end
 
   describe ".add_entity_photo_footer" do
@@ -101,30 +92,6 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
     context "with nil entity" do
       it "does nothing when entity is nil" do
         expect { described_class.add_entity_photo_footer(pdf, nil, 100, 200) }.not_to raise_error
-      end
-    end
-  end
-
-  describe ".add_entity_photo" do
-    context "with unit that has photo" do
-      it "does not raise errors with specific position" do
-        expect { described_class.add_entity_photo(pdf, unit_with_photo, 300, 400) }.not_to raise_error
-      end
-
-      it "does not raise errors with default position" do
-        expect { described_class.add_entity_photo(pdf, unit_with_photo) }.not_to raise_error
-      end
-    end
-
-    context "with unit without photo" do
-      it "does nothing when no photo attached" do
-        expect { described_class.add_entity_photo(pdf, unit_without_photo, 100, 200) }.not_to raise_error
-      end
-    end
-
-    context "with nil entity" do
-      it "does nothing when entity is nil" do
-        expect { described_class.add_entity_photo(pdf, nil, 100, 200) }.not_to raise_error
       end
     end
   end

@@ -26,13 +26,6 @@ class PdfGeneratorService
       [photo_x, photo_y]
     end
 
-    # Calculate default header photo position (top right corner)
-    def self.header_photo_position(pdf_bounds_width, pdf_cursor, x_position = nil, y_position = nil)
-      x_pos = x_position || (pdf_bounds_width - UNIT_PHOTO_X_OFFSET)
-      y_pos = y_position || pdf_cursor
-      [x_pos, y_pos]
-    end
-
     # Calculate photo dimensions for footer (width = 2x QR size, height maintains aspect ratio)
     # Note: original_width and original_height should be post-EXIF-rotation dimensions
     def self.footer_photo_dimensions(original_width, original_height)
@@ -46,19 +39,9 @@ class PdfGeneratorService
       [target_width, target_height]
     end
 
-    # Calculate photo dimensions for header (fit within max dimensions while maintaining aspect ratio)
-    def self.header_photo_dimensions(original_width, original_height)
-      fit_dimensions(original_width, original_height, UNIT_PHOTO_WIDTH, UNIT_PHOTO_HEIGHT)
-    end
-
     # Get QR code dimensions
     def self.qr_code_dimensions
       [QR_CODE_SIZE, QR_CODE_SIZE]
-    end
-
-    # Get default header photo dimensions (for backward compatibility)
-    def self.default_header_photo_dimensions
-      [UNIT_PHOTO_WIDTH, UNIT_PHOTO_HEIGHT]
     end
 
     # Check if coordinates are within PDF bounds

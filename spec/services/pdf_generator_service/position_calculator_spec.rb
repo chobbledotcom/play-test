@@ -133,58 +133,6 @@ RSpec.describe PdfGeneratorService::PositionCalculator do
     end
   end
 
-  describe ".header_photo_position" do
-    let(:pdf_width) { 500 }
-    let(:pdf_cursor) { 700 }
-
-    context "with default positioning" do
-      it "calculates top right corner position" do
-        x_pos, y_pos = described_class.header_photo_position(pdf_width, pdf_cursor)
-
-        expected_x = pdf_width - unit_photo_x_offset
-        expected_y = pdf_cursor
-
-        expect(x_pos).to eq(expected_x)
-        expect(y_pos).to eq(expected_y)
-      end
-    end
-
-    context "with custom x position" do
-      let(:custom_x) { 300 }
-
-      it "uses custom x position" do
-        x_pos, y_pos = described_class.header_photo_position(pdf_width, pdf_cursor, custom_x)
-
-        expect(x_pos).to eq(custom_x)
-        expect(y_pos).to eq(pdf_cursor)
-      end
-    end
-
-    context "with custom y position" do
-      let(:custom_y) { 600 }
-
-      it "uses custom y position" do
-        x_pos, y_pos = described_class.header_photo_position(pdf_width, pdf_cursor, nil, custom_y)
-
-        expected_x = pdf_width - unit_photo_x_offset
-        expect(x_pos).to eq(expected_x)
-        expect(y_pos).to eq(custom_y)
-      end
-    end
-
-    context "with both custom positions" do
-      let(:custom_x) { 250 }
-      let(:custom_y) { 550 }
-
-      it "uses both custom positions" do
-        x_pos, y_pos = described_class.header_photo_position(pdf_width, pdf_cursor, custom_x, custom_y)
-
-        expect(x_pos).to eq(custom_x)
-        expect(y_pos).to eq(custom_y)
-      end
-    end
-  end
-
   describe ".footer_photo_dimensions" do
     context "with landscape image" do
       it "calculates dimensions maintaining aspect ratio" do
@@ -241,39 +189,6 @@ RSpec.describe PdfGeneratorService::PositionCalculator do
 
       expect(width).to eq(qr_code_size)
       expect(height).to eq(qr_code_size)
-    end
-  end
-
-  describe ".header_photo_dimensions" do
-    it "fits image within header photo bounds maintaining aspect ratio" do
-      # Test with image that fits within bounds
-      width, height = described_class.header_photo_dimensions(100, 80)
-
-      expect(width).to eq(100)
-      expect(height).to eq(80)
-    end
-
-    it "scales down large image maintaining aspect ratio" do
-      # Test with image larger than bounds
-      width, height = described_class.header_photo_dimensions(200, 160)
-
-      # Should scale down proportionally to fit within unit_photo_width x unit_photo_height
-      expect(width).to be <= unit_photo_width
-      expect(height).to be <= unit_photo_height
-
-      # Check aspect ratio is maintained (allowing for rounding)
-      original_ratio = 200.0 / 160.0
-      fitted_ratio = width.to_f / height.to_f
-      expect(fitted_ratio).to be_within(0.01).of(original_ratio)
-    end
-  end
-
-  describe ".default_header_photo_dimensions" do
-    it "returns default header photo width and height" do
-      width, height = described_class.default_header_photo_dimensions
-
-      expect(width).to eq(unit_photo_width)
-      expect(height).to eq(unit_photo_height)
     end
   end
 
