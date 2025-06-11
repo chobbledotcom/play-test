@@ -236,19 +236,24 @@ class SafetyStandard
       when :anchors
         area = metadata[:example_input]
         result = calculate_required_anchors(area)
-        area_input = "#{area}#{metadata[:input_unit]} area"
-        "For #{area_input}: #{result} #{metadata[:output_unit]} required"
+        input_unit = metadata[:input_unit]
+        area_input = "#{area}#{input_unit} area"
+        output_unit = metadata[:output_unit]
+        "For #{area_input}: #{result} #{output_unit} required"
       when :user_capacity
         length, width, negative_adj = metadata[:example_input]
         result = calculate_user_capacity(length, width, negative_adj)
         usable_area = (length * width) - negative_adj
         area_desc = "#{length}m × #{width}m (#{usable_area}m² usable)"
-        "For #{area_desc}: #{result[:users_1200mm]} children (1.2m category)"
+        user_count = result[:users_1200mm]
+        "For #{area_desc}: #{user_count} children (1.2m category)"
       when :slide_runout
         platform_height = metadata[:example_input]
         result = calculate_required_runout(platform_height)
-        platform_desc = "#{platform_height}#{metadata[:input_unit]} platform"
-        "For #{platform_desc}: #{result}#{metadata[:output_unit]} runout required"
+        input_unit = metadata[:input_unit]
+        platform_desc = "#{platform_height}#{input_unit} platform"
+        output_unit = metadata[:output_unit]
+        "For #{platform_desc}: #{result}#{output_unit} runout required"
       when :wall_height
         user_height = metadata[:example_input]
         case user_height
@@ -265,7 +270,8 @@ class SafetyStandard
           height_desc = "(#{multiplier}× user height)"
           requirement = "Walls must be at least #{wall_height}m #{height_desc}"
         end
-        height_desc = "#{user_height}#{metadata[:input_unit]} user height"
+        input_unit = metadata[:input_unit]
+        height_desc = "#{user_height}#{input_unit} user height"
         "For #{height_desc}: #{requirement}"
       else
         "Example not available for #{calculation_type}"
@@ -339,11 +345,16 @@ class SafetyStandard
       return {} if usable_area <= 0
 
       # Standard capacity calculation using constants from USER_SPACE_REQUIREMENTS
+      space_1000 = USER_SPACE_REQUIREMENTS[:young_children_1000mm]
+      space_1200 = USER_SPACE_REQUIREMENTS[:children_1200mm]
+      space_1500 = USER_SPACE_REQUIREMENTS[:adolescents_1500mm]
+      space_1800 = USER_SPACE_REQUIREMENTS[:adults_1800mm]
+
       {
-        users_1000mm: (usable_area / USER_SPACE_REQUIREMENTS[:young_children_1000mm]).floor,
-        users_1200mm: (usable_area / USER_SPACE_REQUIREMENTS[:children_1200mm]).floor,
-        users_1500mm: (usable_area / USER_SPACE_REQUIREMENTS[:adolescents_1500mm]).floor,
-        users_1800mm: (usable_area / USER_SPACE_REQUIREMENTS[:adults_1800mm]).floor
+        users_1000mm: (usable_area / space_1000).floor,
+        users_1200mm: (usable_area / space_1200).floor,
+        users_1500mm: (usable_area / space_1500).floor,
+        users_1800mm: (usable_area / space_1800).floor
       }
     end
 
@@ -372,7 +383,8 @@ class SafetyStandard
     end
 
     def anchor_formulas
-      # EN 14960:2019 - Anchoring system calculations and requirements for secure ground attachment with specified pull strength minimums
+      # EN 14960:2019 - Anchoring system calculations and requirements
+      # for secure ground attachment with specified pull strength minimums
       {
         calculation: "((Area² × 114) ÷ 1600) × 1.5",
         description: "Number of anchor points per side, rounded up",
@@ -393,83 +405,108 @@ class SafetyStandard
       rope_standards = MATERIAL_STANDARDS[:rope]
       netting_standards = MATERIAL_STANDARDS[:netting]
 
+      # Extract values for complex interpolations
+      min_tensile = fabric_standards[:min_tensile_strength]
+      min_tear = fabric_standards[:min_tear_strength]
+      fire_std = fabric_standards[:fire_standard]
+      thread_tensile = thread_standards[:min_tensile_strength]
+      min_dia = rope_standards[:min_diameter]
+      max_dia = rope_standards[:max_diameter]
+      max_swing = rope_standards[:max_swing_percentage]
+      max_vertical = netting_standards[:max_vertical_mesh]
+      max_roof = netting_standards[:max_roof_mesh]
+
       {
         fabric: {
-          tensile_strength: "#{fabric_standards[:min_tensile_strength]} Newtons minimum",
-          tear_strength: "#{fabric_standards[:min_tear_strength]} Newtons minimum",
-          fire_retardancy: "Must meet #{fabric_standards[:fire_standard]} requirements"
+          tensile_strength: "#{min_tensile} Newtons minimum",
+          tear_strength: "#{min_tear} Newtons minimum",
+          fire_retardancy: "Must meet #{fire_std} requirements"
         },
         thread: {
           material: "Non-rotting yarn required",
-          tensile_strength: "#{thread_standards[:min_tensile_strength]} Newtons minimum",
+          tensile_strength: "#{thread_tensile} Newtons minimum",
           stitch_type: "Lock stitching required"
         },
         rope: {
-          diameter_range: "#{rope_standards[:min_diameter]}mm - #{rope_standards[:max_diameter]}mm",
+          diameter_range: "#{min_dia}mm - #{max_dia}mm",
           material: "Non-monofilament",
           attachment: "Fixed at both ends",
-          swing_limitation: "No greater than #{rope_standards[:max_swing_percentage]}% swing to prevent strangulation"
+          swing_limitation: "No greater than #{max_swing}% swing to prevent strangulation"
         },
         netting: {
-          vertical_mesh_size: "#{netting_standards[:max_vertical_mesh]}mm maximum for >1m height",
-          roof_mesh_size: "#{netting_standards[:max_roof_mesh]}mm maximum",
+          vertical_mesh_size: "#{max_vertical}mm maximum for >1m height",
+          roof_mesh_size: "#{max_roof}mm maximum",
           strength: "Support heaviest intended user"
         }
       }
     end
 
     def electrical_requirements
-      # PAT testing standards and EN 14960:2019 - Electrical safety requirements using EQUIPMENT_SAFETY_LIMITS and GROUNDING_TEST_WEIGHTS
+      # PAT testing standards and EN 14960:2019 - Electrical safety requirements
+      # using EQUIPMENT_SAFETY_LIMITS and GROUNDING_TEST_WEIGHTS
       safety_limits = EQUIPMENT_SAFETY_LIMITS
       test_weights = GROUNDING_TEST_WEIGHTS
       netting_mesh = MATERIAL_STANDARDS[:netting][:max_roof_mesh]
 
+      # Extract values for complex interpolations
+      min_pressure = safety_limits[:min_pressure]
+      min_distance = safety_limits[:min_blower_distance]
+      weight_1000 = test_weights[:height_1000mm]
+      weight_1200 = test_weights[:height_1200mm]
+      weight_1500 = test_weights[:height_1500mm]
+      weight_1800 = test_weights[:height_1800mm]
+
       {
         pat_testing: "Portable Appliance Test required",
         blower_requirements: {
-          minimum_pressure: "#{safety_limits[:min_pressure]} KPA operational pressure",
+          minimum_pressure: "#{min_pressure} KPA operational pressure",
           finger_probe: "#{netting_mesh}mm probe must not contact moving/hot parts",
           return_flap: "Required to reduce deflation time",
-          distance: "#{safety_limits[:min_blower_distance]}m minimum from equipment edge"
+          distance: "#{min_distance}m minimum from equipment edge"
         },
         grounding_test: {
-          "1.0m_height": "#{test_weights[:height_1000mm]}kg test weight",
-          "1.2m_height": "#{test_weights[:height_1200mm]}kg test weight",
-          "1.5m_height": "#{test_weights[:height_1500mm]}kg test weight",
-          "1.8m_height": "#{test_weights[:height_1800mm]}kg test weight"
+          "1.0m_height": "#{weight_1000}kg test weight",
+          "1.2m_height": "#{weight_1200}kg test weight",
+          "1.5m_height": "#{weight_1500}kg test weight",
+          "1.8m_height": "#{weight_1800}kg test weight"
         }
       }
     end
 
     # Validation methods for business rules
     def valid_stitch_length?(length_mm)
-      # EN 14960:2019 - Stitch length must be within specified range to ensure adequate seam strength while maintaining fabric integrity
+      # EN 14960:2019 - Stitch length must be within specified range to ensure
+      # adequate seam strength while maintaining fabric integrity
       min_length = MATERIAL_STANDARDS[:thread][:stitch_length_min]
       max_length = MATERIAL_STANDARDS[:thread][:stitch_length_max]
       length_mm.present? && length_mm.between?(min_length, max_length)
     end
 
     def valid_pressure?(pressure_kpa)
-      # EN 14960:2019 - Minimum operational pressure required to maintain structural integrity and prevent collapse
+      # EN 14960:2019 - Minimum operational pressure required to maintain
+      # structural integrity and prevent collapse
       min_pressure = EQUIPMENT_SAFETY_LIMITS[:min_pressure]
       pressure_kpa.present? && pressure_kpa >= min_pressure
     end
 
     def valid_fall_height?(height_m)
-      # EN 14960:2019 - Maximum fall height to minimize injury risk from accidental falls outside the structure
+      # EN 14960:2019 - Maximum fall height to minimize injury risk from
+      # accidental falls outside the structure
       max_height = EQUIPMENT_SAFETY_LIMITS[:max_fall_height]
       height_m.present? && height_m <= max_height
     end
 
     def valid_rope_diameter?(diameter_mm)
-      # EN 14960:2019 - Rope diameter range prevents finger entrapment while ensuring adequate grip and structural strength
+      # EN 14960:2019 - Rope diameter range prevents finger entrapment while
+      # ensuring adequate grip and structural strength
       min_diameter = MATERIAL_STANDARDS[:rope][:min_diameter]
       max_diameter = MATERIAL_STANDARDS[:rope][:max_diameter]
       diameter_mm.present? && diameter_mm.between?(min_diameter, max_diameter)
     end
 
     def requires_permanent_roof?(user_height)
-      # EN 14960:2019 - Permanent roof mandatory for user heights above enhanced walls threshold to prevent users from being thrown clear
+      # EN 14960:2019 - Permanent roof mandatory for user heights above enhanced
+      # walls threshold to prevent users from being thrown clear
       user_height.present? && user_height > SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
     end
 
