@@ -211,3 +211,31 @@ nav.tabs span {
     white-space: wrap;
   }
 }
+
+/* Construction banner styles */
+.construction-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 2rem 0;
+}
+
+.construction-banner img {
+  height: auto;
+}
+
+.construction-main {
+  max-width: 90%;
+}
+
+/* Mobile styles - hide diggers and limit main gif width */
+@media (max-width: 798px) {
+  .construction-digger {
+    display: none;
+  }
+  
+  .construction-main {
+    max-width: 90%;
+  }
+}

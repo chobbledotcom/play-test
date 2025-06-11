@@ -15,6 +15,7 @@
       async src="//analytics.play-test.co.uk/count.js"></script>
   </head>
   <body<% if current_user&.theme == "dark" %> class="dark-theme"<% end %>>
+    <%= render 'shared/construction_banner' %>
     <% if current_user %>
       <% if !current_user.is_active? %>
         <aside id="company-activation-notice">
@@ -99,5 +100,6 @@
       </footer>
       <%= render 'shared/debug_info' %>
     </main>
+    <%= render 'shared/construction_banner' %>
   </body>
 </html>
