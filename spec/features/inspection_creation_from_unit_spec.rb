@@ -50,7 +50,9 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
 
       visit unit_path(other_unit)
 
-      expect(page).to have_current_path(units_path)
+      # Should show PDF viewer for non-owner
+      expect(page).to have_current_path(unit_path(other_unit))
+      expect(page.html).to include("<iframe")
       expect(page).not_to have_button(I18n.t("units.buttons.add_inspection"))
       expect(other_user.inspections.count).to eq(0)
     end

@@ -5,10 +5,10 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
   let(:unit) { create(:unit, user: user, has_slide: true, is_totally_enclosed: true) }
   let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
 
-  describe "GET /r/:id.json" do
+  describe "GET /inspections/:id.json" do
     context "when inspection exists" do
       it "returns inspection data as JSON" do
-        get "/r/#{inspection.id}.json"
+        get "/inspections/#{inspection.id}.json"
 
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to include("application/json")
@@ -31,13 +31,13 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
 
         # Check URLs are included
         expect(json["urls"]).to be_present
-        expect(json["urls"]["report_pdf"]).to include("/r/#{inspection.id}")
-        expect(json["urls"]["report_json"]).to include("/r/#{inspection.id}.json")
-        expect(json["urls"]["qr_code"]).to include("/inspections/#{inspection.id}/qr_code")
+        expect(json["urls"]["report_pdf"]).to include("/inspections/#{inspection.id}.pdf")
+        expect(json["urls"]["report_json"]).to include("/inspections/#{inspection.id}.json")
+        expect(json["urls"]["qr_code"]).to include("/inspections/#{inspection.id}.png")
       end
 
       it "includes inspector company info" do
-        get "/r/#{inspection.id}.json"
+        get "/inspections/#{inspection.id}.json"
 
         json = JSON.parse(response.body)
 
@@ -47,7 +47,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
       end
 
       it "includes unit info" do
-        get "/r/#{inspection.id}.json"
+        get "/inspections/#{inspection.id}.json"
 
         json = JSON.parse(response.body)
 
@@ -65,7 +65,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
         let!(:enclosed_assessment) { create(:enclosed_assessment, :passed, inspection: inspection) }
 
         it "includes assessment data" do
-          get "/r/#{inspection.id}.json"
+          get "/inspections/#{inspection.id}.json"
 
           json = JSON.parse(response.body)
 
@@ -88,7 +88,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
           create(:materials_assessment, :complete, inspection: inspection)
           create(:fan_assessment, :complete, inspection: inspection)
 
-          get "/r/#{inspection.id}.json"
+          get "/inspections/#{inspection.id}.json"
 
           json = JSON.parse(response.body)
 
@@ -116,7 +116,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
         it "excludes slide assessment even if present" do
           create(:slide_assessment, inspection: inspection_no_slide)
 
-          get "/r/#{inspection_no_slide.id}.json"
+          get inspection_path(inspection_no_slide, format: :json)
 
           json = JSON.parse(response.body)
 
@@ -129,15 +129,15 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
 
     context "when inspection does not exist" do
       it "returns 404" do
-        get "/r/NONEXISTENT.json"
+        get "/inspections/NONEXISTENT.json"
 
         expect(response).to have_http_status(:not_found)
       end
     end
 
     context "using long URL format" do
-      it "returns JSON for /inspections/:id/report.json" do
-        get "/inspections/#{inspection.id}/report.json"
+      it "returns JSON for /inspections/:id.json" do
+        get "/inspections/#{inspection.id}.json"
 
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to include("application/json")
@@ -150,7 +150,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
 
   describe "field coverage using reflection" do
     it "includes all inspection fields except excluded ones" do
-      get "/r/#{inspection.id}.json"
+      get "/inspections/#{inspection.id}.json"
 
       json = JSON.parse(response.body)
 

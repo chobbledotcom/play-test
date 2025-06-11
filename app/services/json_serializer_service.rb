@@ -36,9 +36,9 @@ class JsonSerializerService
     # Add public URLs
     base_url = ENV["BASE_URL"] || Rails.application.routes.default_url_options[:host] || "localhost:3000"
     data[:urls] = {
-      report_pdf: "#{base_url}/u/#{unit.id}",
-      report_json: "#{base_url}/u/#{unit.id}.json",
-      qr_code: "#{base_url}/units/#{unit.id}/qr_code"
+      report_pdf: "#{base_url}/units/#{unit.id}.pdf",
+      report_json: "#{base_url}/units/#{unit.id}.json",
+      qr_code: "#{base_url}/units/#{unit.id}.png"
     }
 
     data
@@ -114,9 +114,9 @@ class JsonSerializerService
     # Add public URLs
     base_url = ENV["BASE_URL"] || Rails.application.routes.default_url_options[:host] || "localhost:3000"
     data[:urls] = {
-      report_pdf: "#{base_url}/r/#{inspection.id}",
-      report_json: "#{base_url}/r/#{inspection.id}.json",
-      qr_code: "#{base_url}/inspections/#{inspection.id}/qr_code"
+      report_pdf: "#{base_url}/inspections/#{inspection.id}.pdf",
+      report_json: "#{base_url}/inspections/#{inspection.id}.json",
+      qr_code: "#{base_url}/inspections/#{inspection.id}.png"
     }
 
     data

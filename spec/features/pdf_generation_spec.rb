@@ -18,7 +18,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       if inspection.complete?
         expect(page).to have_css("iframe", wait: 5)
         # Check for public report link (text might be different)
-        expect(page).to have_link(href: /\/r\/#{inspection.id}/)
+        expect(page).to have_link(href: inspection_url(inspection, format: :pdf))
       end
 
       # Verify embedded PDF works by checking iframe presence
@@ -40,18 +40,18 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       expect(page).to have_css("iframe", wait: 5)
 
       # Verify the PDF is accessible
-      page.driver.browser.get("/inspections/#{full_inspection.id}/report")
+      page.driver.browser.get("/inspections/#{full_inspection.id}.pdf")
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
     end
 
     scenario "user shares public report link" do
       visit inspection_path(inspection)
 
-      # Should have public report link visible
-      expect(page).to have_link(href: /\/r\/#{inspection.id}/)
+      # Should have PDF link visible
+      expect(page).to have_link(href: /\.pdf/)
 
-      # Access public PDF directly
-      page.driver.browser.get("/r/#{inspection.id}")
+      # Access public PDF directly with .pdf extension
+      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
 
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
       expect(page.driver.response.body[0..3]).to eq("%PDF")
@@ -76,7 +76,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       expect(page).to have_css("img[alt*='QR']")
 
       # Access unit report directly
-      page.driver.browser.get("/units/#{unit.id}/report")
+      page.driver.browser.get("/units/#{unit.id}.pdf")
 
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
 
@@ -91,7 +91,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       visit unit_path(empty_unit)
 
       # Access empty unit report
-      page.driver.browser.get("/units/#{empty_unit.id}/report")
+      page.driver.browser.get("/units/#{empty_unit.id}.pdf")
 
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
 
@@ -145,9 +145,8 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
     scenario "user encounters missing inspection gracefully" do
       visit "/inspections/NONEXISTENT"
 
-      # Should show appropriate error message
-      expect(page).to have_content(I18n.t("inspections.errors.not_found"))
-      expect(current_path).to eq(inspections_path)
+      # Should return 404 for non-existent resources
+      expect(page.status_code).to eq(404)
     end
 
     scenario "user tries to access unauthorized inspection" do
@@ -156,9 +155,10 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
       visit inspection_path(other_inspection)
 
-      # Should be redirected with error
-      expect(page).to have_content(I18n.t("inspections.errors.access_denied"))
-      expect(current_path).to eq(inspections_path)
+      # Should show PDF viewer for non-owner
+      expect(current_path).to eq(inspection_path(other_inspection))
+      expect(page.html).to include("<iframe")
+      expect(page.html).to include(inspection_path(other_inspection, format: :pdf))
     end
 
     scenario "user accesses draft inspection (shows PDF)" do
@@ -181,7 +181,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       expect(page).to have_css("iframe", wait: 5)
 
       # Public link should be easily accessible
-      expect(page).to have_link(href: /\/r\/#{inspection.id}/)
+      expect(page).to have_link(href: inspection_url(inspection, format: :pdf))
     end
   end
 end

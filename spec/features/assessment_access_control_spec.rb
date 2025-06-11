@@ -65,11 +65,15 @@ RSpec.feature "Assessment Access Control", type: :feature do
     expect(assessment.platform_height).not_to eq(888.88)
   end
 
-  scenario "prevents accessing assessment data through JSON endpoints" do
+  scenario "allows public access to inspection JSON data" do
+    # JSON format is intentionally public for sharing reports
     sign_in(user1)
     visit inspection_path(inspection2, format: :json)
 
-    expect_access_denied
+    # Should receive JSON data, not be denied access
+    expect(page).to have_content(inspection2.unique_report_number)
+    expect(page).to have_content("\"inspection_date\"")
+    expect(page).not_to have_content(I18n.t("inspections.errors.access_denied"))
   end
 
   scenario "allows updating own assessment data successfully" do

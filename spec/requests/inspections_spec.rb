@@ -47,12 +47,18 @@ RSpec.describe "Inspections", type: :request do
   end
 
   describe "authentication requirements" do
-    %w[index show edit].each do |action|
+    %w[index edit].each do |action|
       it "redirects to login for #{action}" do
-        get "/inspections#{"/" + SecureRandom.hex(6) if action != "index"}"
+        path = (action == "index") ? "/inspections" : "/inspections/#{SecureRandom.hex(6)}/edit"
+        get path
         expect(response).to redirect_to(login_path)
         expect(flash[:alert]).to include("Please log in")
       end
+    end
+
+    it "returns 404 for show when not logged in and inspection doesn't exist" do
+      get "/inspections/nonexistent"
+      expect(response).to have_http_status(:not_found)
     end
 
     %w[create update destroy].each do |action|
@@ -85,11 +91,11 @@ RSpec.describe "Inspections", type: :request do
       expect(response.body).not_to include(other_inspection.serial)
     end
 
-    %w[show edit update destroy].each do |action|
+    %w[edit update destroy].each do |action|
       it "prevents access to other user's inspection for #{action}" do
         case action
-        when "show", "edit"
-          get "/inspections/#{other_inspection.id}#{"/" + action if action == "edit"}"
+        when "edit"
+          get "/inspections/#{other_inspection.id}/edit"
         when "update"
           patch "/inspections/#{other_inspection.id}", params: {inspection: {comments: "hack"}}
         when "destroy"
@@ -98,6 +104,14 @@ RSpec.describe "Inspections", type: :request do
 
         expect_redirect_with_alert(inspections_path, /Access denied/)
       end
+    end
+
+    it "shows PDF viewer for other user's inspection show page" do
+      get "/inspections/#{other_inspection.id}"
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("<iframe")
+      expect(response.body).to include("/inspections/#{other_inspection.id}.pdf")
     end
   end
 
@@ -399,7 +413,7 @@ RSpec.describe "Inspections", type: :request do
     describe "error handling" do
       it "handles missing inspections" do
         get "/inspections/nonexistent"
-        expect_redirect_with_alert(inspections_path, /not found/i)
+        expect(response).to have_http_status(:not_found)
       end
 
       it "handles case-insensitive lookup" do
@@ -413,42 +427,51 @@ RSpec.describe "Inspections", type: :request do
   describe "public routes (no authentication required)" do
     let(:inspection) { create(:inspection, user: user, unit: unit) }
 
-    describe "GET /report" do
-      it "serves PDF" do
+    describe "show action with different formats" do
+      it "serves PDF via .pdf format" do
         allow(PdfGeneratorService).to receive(:generate_inspection_report).and_return(double(render: "PDF"))
 
-        get "/r/#{inspection.id}"
+        get "/inspections/#{inspection.id}.pdf"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("application/pdf")
       end
 
-      it "serves JSON" do
+      it "serves JSON via .json format" do
         allow(JsonSerializerService).to receive(:serialize_inspection).and_return({id: inspection.id})
 
-        get "/r/#{inspection.id}.json"
+        get "/inspections/#{inspection.id}.json"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("application/json")
       end
 
-      it "returns 404 for missing inspection" do
-        get "/r/nonexistent"
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    describe "GET /qr_code" do
-      it "serves QR code" do
+      it "serves QR code via .png format" do
         allow(QrCodeService).to receive(:generate_qr_code).and_return("QR PNG")
 
-        get "/inspections/#{inspection.id}/qr_code"
+        get "/inspections/#{inspection.id}.png"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("image/png")
         expect(response.body).to eq("QR PNG")
       end
 
       it "returns 404 for missing inspection" do
-        get "/inspections/nonexistent/qr_code"
+        get "/inspections/nonexistent.pdf"
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    describe "HTML access" do
+      it "shows minimal PDF viewer" do
+        get "/inspections/#{inspection.id}"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("text/html")
+        expect(response.body).to include("<iframe")
+      end
+
+      it "handles case-insensitive IDs" do
+        get "/inspections/#{inspection.id.upcase}"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("text/html")
+        expect(response.body).to include("<iframe")
       end
     end
   end

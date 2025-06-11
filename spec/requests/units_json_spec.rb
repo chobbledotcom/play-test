@@ -4,10 +4,10 @@ RSpec.describe "Unit JSON endpoints", type: :request do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user, notes: "Private notes") }
 
-  describe "GET /u/:id.json" do
+  describe "GET /units/:id.json" do
     context "when unit exists" do
       it "returns unit data as JSON" do
-        get "/u/#{unit.id}.json"
+        get "/units/#{unit.id}.json"
 
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to include("application/json")
@@ -28,9 +28,9 @@ RSpec.describe "Unit JSON endpoints", type: :request do
 
         # Check URLs are included
         expect(json["urls"]).to be_present
-        expect(json["urls"]["report_pdf"]).to include("/u/#{unit.id}")
-        expect(json["urls"]["report_json"]).to include("/u/#{unit.id}.json")
-        expect(json["urls"]["qr_code"]).to include("/units/#{unit.id}/qr_code")
+        expect(json["urls"]["report_pdf"]).to include("/units/#{unit.id}.pdf")
+        expect(json["urls"]["report_json"]).to include("/units/#{unit.id}.json")
+        expect(json["urls"]["qr_code"]).to include("/units/#{unit.id}.png")
       end
 
       context "with inspection history" do
@@ -39,7 +39,7 @@ RSpec.describe "Unit JSON endpoints", type: :request do
         let!(:draft_inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
         it "includes completed inspection history" do
-          get "/u/#{unit.id}.json"
+          get "/units/#{unit.id}.json"
 
           json = JSON.parse(response.body)
 
@@ -60,15 +60,15 @@ RSpec.describe "Unit JSON endpoints", type: :request do
 
     context "when unit does not exist" do
       it "returns 404" do
-        get "/u/NONEXISTENT.json"
+        get "/units/NONEXISTENT.json"
 
         expect(response).to have_http_status(:not_found)
       end
     end
 
     context "using long URL format" do
-      it "returns JSON for /units/:id/report.json" do
-        get "/units/#{unit.id}/report.json"
+      it "returns JSON for /units/:id.json" do
+        get "/units/#{unit.id}.json"
 
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to include("application/json")
@@ -81,7 +81,7 @@ RSpec.describe "Unit JSON endpoints", type: :request do
 
   describe "field coverage using reflection" do
     it "includes all unit fields except excluded ones" do
-      get "/u/#{unit.id}.json"
+      get "/units/#{unit.id}.json"
 
       json = JSON.parse(response.body)
 

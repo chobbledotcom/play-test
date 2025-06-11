@@ -39,9 +39,9 @@ RSpec.describe JsonSerializerService do
       json = JsonSerializerService.serialize_unit(unit)
 
       expect(json[:urls]).to be_present
-      expect(json[:urls][:report_pdf]).to include("/u/#{unit.id}")
-      expect(json[:urls][:report_json]).to include("/u/#{unit.id}.json")
-      expect(json[:urls][:qr_code]).to include("/units/#{unit.id}/qr_code")
+      expect(json[:urls][:report_pdf]).to include("/units/#{unit.id}.pdf")
+      expect(json[:urls][:report_json]).to include("/units/#{unit.id}.json")
+      expect(json[:urls][:qr_code]).to include("/units/#{unit.id}.png")
     end
 
     context "with inspection history" do

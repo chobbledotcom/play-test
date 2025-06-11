@@ -67,7 +67,6 @@ RSpec.describe "InspectorCompanies", type: :request do
         expect(flash[:alert]).to be_present
       end
     end
-
   end
 
   describe "When logged in as regular user" do

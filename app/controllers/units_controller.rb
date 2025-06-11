@@ -1,31 +1,23 @@
 class UnitsController < ApplicationController
-  before_action :set_unit, only: %i[show edit update destroy report qr_code]
-  before_action :check_unit_owner, only: [:show, :edit, :update, :destroy]
-  before_action :require_inspection_company, only: [:new, :create]
+  include UnitTurboStreams
+  include PublicViewable
+
+  skip_before_action :require_login, only: %i[show]
+  before_action :set_unit, only: %i[destroy edit show update]
+  before_action :check_unit_owner, only: %i[destroy edit update]
+  before_action :require_inspection_company, only: %i[create new]
   before_action :no_index
-  skip_before_action :require_login, only: [:report, :qr_code]
 
   def index
-    @units = current_user.units.with_attached_photo.order(created_at: :desc)
-
-    # Apply search
-    @units = @units.search(params[:query]) if params[:query].present?
-
-    # Apply filters
-    @units = @units.overdue if params[:status] == "overdue"
-    if params[:manufacturer].present?
-      @units = @units.where(manufacturer: params[:manufacturer])
-    end
-    @units = @units.where(owner: params[:owner]) if params[:owner].present?
-
-    @title = "Units"
-    @title += " - Overdue" if params[:status] == "overdue"
-    @title += " - #{params[:manufacturer]}" if params[:manufacturer].present?
-    @title += " - #{params[:owner]}" if params[:owner].present?
+    @units = filtered_units_query
+    @title = build_index_title
 
     respond_to do |format|
       format.html
-      format.csv { send_data unit_to_csv, filename: "unit-#{Date.today}.csv" }
+      format.csv do
+        csv_data = UnitCsvExportService.new(@units).generate
+        send_data csv_data, filename: "units-#{Date.today}.csv"
+      end
     end
   end
 
@@ -35,31 +27,16 @@ class UnitsController < ApplicationController
       .order(inspection_date: :desc)
 
     respond_to do |format|
-      format.html
-      format.pdf do
-        pdf_data = PdfGeneratorService.generate_unit_report(@unit)
-
-        send_data pdf_data.render,
-          filename: "#{@unit.serial}.pdf",
-          type: "application/pdf",
-          disposition: "inline"
-      end
+      format.html { render_show_html }
+      format.pdf { send_unit_pdf }
+      format.png { send_unit_qr_code }
       format.json do
-        unit_data = {
-          id: @unit.id,
-          name: @unit.name,
-          serial: @unit.serial,
-          manufacturer: @unit.manufacturer,
-          has_slide: @unit.has_slide
-        }
-        render json: unit_data
+        render json: JsonSerializerService.serialize_unit(@unit)
       end
     end
   end
 
-  def new
-    @unit = Unit.new
-  end
+  def new = @unit = Unit.new
 
   def create
     @unit = current_user.units.build(unit_params)
@@ -72,8 +49,7 @@ class UnitsController < ApplicationController
     end
   end
 
-  def edit
-  end
+  def edit = nil
 
   def update
     if @unit.update(unit_params)
@@ -82,39 +58,15 @@ class UnitsController < ApplicationController
           flash[:notice] = I18n.t("units.messages.updated")
           redirect_to @unit
         end
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.replace("unit_save_message",
-              partial: "shared/save_message",
-              locals: {
-                dom_id: "unit_save_message",
-                success: true,
-                success_message: t("units.messages.updated")
-              }),
-            turbo_stream.replace("unit_photo_preview",
-              partial: "shared/unit_photo_preview",
-              locals: {unit: @unit})
-          ]
-        end
+        format.turbo_stream { render_unit_update_success_stream }
       end
     else
       respond_to do |format|
         format.html { render :edit, status: :unprocessable_entity }
         format.json do
-          error_data = {status: "error", errors: @unit.errors.full_messages}
-          render json: error_data
+          render json: {status: I18n.t("shared.api.error"), errors: @unit.errors.full_messages}
         end
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.replace("unit_save_message",
-              partial: "shared/save_message",
-              locals: {
-                dom_id: "unit_save_message",
-                errors: @unit.errors.full_messages,
-                error_message: t("shared.messages.save_failed")
-              })
-          ]
-        end
+        format.turbo_stream { render_unit_update_error_stream }
       end
     end
   end
@@ -124,47 +76,12 @@ class UnitsController < ApplicationController
       flash[:notice] = I18n.t("units.messages.deleted")
       redirect_to units_path
     else
-      error_message = @unit.errors.full_messages.first ||
-        I18n.t("units.messages.delete_failed")
+      @unit.errors.full_messages.first || I18n.t("units.messages.delete_failed") => error_message
       flash[:alert] = error_message
       redirect_to @unit
     end
   end
 
-  def report
-    respond_to do |format|
-      format.html do
-        pdf_data = PdfGeneratorService.generate_unit_report(@unit)
-
-        send_data pdf_data.render,
-          filename: "#{@unit.serial}.pdf",
-          type: "application/pdf",
-          disposition: "inline"
-      end
-
-      format.pdf do
-        pdf_data = PdfGeneratorService.generate_unit_report(@unit)
-
-        send_data pdf_data.render,
-          filename: "#{@unit.serial}.pdf",
-          type: "application/pdf",
-          disposition: "inline"
-      end
-
-      format.json do
-        render json: JsonSerializerService.serialize_unit(@unit)
-      end
-    end
-  end
-
-  def qr_code
-    qr_code_png = QrCodeService.generate_qr_code(@unit)
-
-    send_data qr_code_png,
-      filename: "#{@unit.serial}_QR.png",
-      type: "image/png",
-      disposition: "inline"
-  end
 
   def new_from_inspection
     @inspection = current_user.inspections.find_by(id: params[:id])
@@ -174,7 +91,7 @@ class UnitsController < ApplicationController
       redirect_to root_path and return
     end
 
-    if @inspection.unit.present?
+    if @inspection.unit
       flash[:alert] = I18n.t("units.errors.inspection_has_unit")
       redirect_to inspection_path(@inspection) and return
     end
@@ -183,62 +100,42 @@ class UnitsController < ApplicationController
   end
 
   def create_from_inspection
-    @inspection = current_user.inspections.find_by(id: params[:id])
+    service = UnitCreationFromInspectionService.new(
+      user: current_user,
+      inspection_id: params[:id],
+      unit_params: unit_params
+    )
 
-    unless @inspection
-      flash[:alert] = I18n.t("units.errors.inspection_not_found")
-      redirect_to root_path and return
-    end
-
-    if @inspection.unit.present?
-      flash[:alert] = I18n.t("units.errors.inspection_has_unit")
-      redirect_to inspection_path(@inspection) and return
-    end
-
-    @unit = current_user.units.build(unit_params)
-    @unit.copy_attributes_from(@inspection)
-
-    if @unit.save
-      @inspection.update!(unit: @unit)
+    if service.create
       flash[:notice] = I18n.t("units.messages.created_from_inspection")
-      redirect_to inspection_path(@inspection)
+      redirect_to inspection_path(service.inspection)
+    elsif service.error_message
+      flash[:alert] = service.error_message
+      redirect_to service.inspection ? inspection_path(service.inspection) : root_path
     else
+      @unit = service.unit
+      @inspection = service.inspection
       render :new_from_inspection, status: :unprocessable_entity
     end
   end
 
   private
 
-  def unit_params
-    unit_specific_params = %i[
-      name serial manufacturer photo description
-      owner model manufacture_date notes
-    ]
-    copyable_attributes = Unit.new.copyable_attributes_via_reflection
-    params.require(:unit).permit(unit_specific_params + copyable_attributes)
-  end
+  def unit_params = UnitParamsService.new(params).permitted_params
 
-  def no_index
-    response.set_header("X-Robots-Tag", "noindex,nofollow")
-  end
+  def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
 
   def set_unit
     @unit = Unit.find_by(id: params[:id].upcase)
 
     unless @unit
-      if action_name.in?(["report", "qr_code"])
-        # For public report access, return 404 instead of redirect
-        error_file = "#{Rails.root}/public/404.html"
-        render file: error_file, status: :not_found, layout: false
-      else
-        flash[:alert] = I18n.t("units.messages.not_found")
-        redirect_to units_path and return
-      end
+      # Always return 404 for non-existent resources regardless of login status
+      head :not_found
     end
   end
 
   def check_unit_owner
-    unless @unit.user_id == current_user.id
+    unless current_user && @unit.user_id == current_user.id
       flash[:alert] = I18n.t("units.messages.access_denied")
       redirect_to units_path and return
     end
@@ -251,16 +148,55 @@ class UnitsController < ApplicationController
     end
   end
 
-  def unit_to_csv
-    attributes = %w[id name manufacturer serial has_slide]
+  def send_unit_pdf
+    pdf_data = PdfGeneratorService.generate_unit_report(@unit)
 
-    CSV.generate(headers: true) do |csv|
-      csv << attributes
+    send_data pdf_data.render,
+      filename: "#{@unit.serial}.pdf",
+      type: "application/pdf",
+      disposition: "inline"
+  end
 
-      current_user.units.order(created_at: :desc).each do |unit|
-        row = attributes.map { |attr| unit.send(attr) }
-        csv << row
-      end
-    end
+  def send_unit_qr_code
+    qr_code_png = QrCodeService.generate_qr_code(@unit)
+
+    send_data qr_code_png,
+      filename: "#{@unit.serial}_QR.png",
+      type: "image/png",
+      disposition: "inline"
+  end
+
+  # PublicViewable implementation
+  def check_resource_owner
+    check_unit_owner
+  end
+
+  def owns_resource?
+    @unit && current_user && @unit.user_id == current_user.id
+  end
+
+  def pdf_filename
+    "#{@unit.serial}.pdf"
+  end
+
+  def resource_pdf_url
+    unit_path(@unit, format: :pdf)
+  end
+
+  def filtered_units_query
+    units = current_user.units.with_attached_photo
+    units = units.search(params[:query])
+    units = units.overdue if params[:status] == "overdue"
+    units = units.by_manufacturer(params[:manufacturer])
+    units = units.by_owner(params[:owner])
+    units.order(created_at: :desc)
+  end
+
+  def build_index_title
+    I18n.t("units.titles.index") => title
+    title += " - #{I18n.t("units.status.overdue")}" if params[:status] == "overdue"
+    title += " - #{params[:manufacturer]}" if params[:manufacturer]
+    title += " - #{params[:owner]}" if params[:owner]
+    title
   end
 end

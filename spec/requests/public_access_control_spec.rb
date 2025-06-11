@@ -44,66 +44,66 @@ RSpec.describe "Public Access Control", type: :request do
     end
 
     describe "Public report access" do
-      it "allows access to inspection PDF via short URL (lowercase)" do
-        visit "/r/#{inspection.id}"
-        expect(page.response_headers["Content-Type"]).to eq("application/pdf")
-        expect(page.body[0..3]).to eq("%PDF")
+      it "shows minimal PDF viewer for inspection HTML" do
+        visit "/inspections/#{inspection.id}"
+        expect(page.response_headers["Content-Type"]).to eq("text/html; charset=utf-8")
+        expect(page.body).to include("<iframe")
       end
 
-      it "allows access to inspection PDF via short URL (uppercase)" do
-        visit "/R/#{inspection.id}"
+      it "allows access to inspection PDF" do
+        visit "/inspections/#{inspection.id}.pdf"
         expect(page.response_headers["Content-Type"]).to eq("application/pdf")
         expect(page.body[0..3]).to eq("%PDF")
       end
 
       it "allows access to inspection JSON via short URL" do
-        visit "/r/#{inspection.id}.json"
+        visit "/inspections/#{inspection.id}.json"
         expect(page.response_headers["Content-Type"]).to include("application/json")
         json = JSON.parse(page.body)
         expect(json).to have_key("inspection_date")
       end
 
       it "allows access to inspection JSON via long URL" do
-        visit "/inspections/#{inspection.id}/report.json"
+        visit "/inspections/#{inspection.id}.json"
         expect(page.response_headers["Content-Type"]).to include("application/json")
         json = JSON.parse(page.body)
         expect(json).to have_key("inspection_date")
       end
 
       it "allows access to inspection QR code" do
-        page.driver.browser.get("/inspections/#{inspection.id}/qr_code")
+        page.driver.browser.get("/inspections/#{inspection.id}.png")
         expect(page.driver.response.headers["Content-Type"]).to include("image/png")
         expect(page.driver.response.body[1..3]).to eq("PNG")
       end
 
-      it "allows access to unit PDF via short URL (lowercase)" do
-        visit "/u/#{unit.id}"
-        expect(page.response_headers["Content-Type"]).to eq("application/pdf")
-        expect(page.body[0..3]).to eq("%PDF")
+      it "shows minimal PDF viewer for unit HTML" do
+        visit "/units/#{unit.id}"
+        expect(page.response_headers["Content-Type"]).to eq("text/html; charset=utf-8")
+        expect(page.body).to include("<iframe")
       end
 
-      it "allows access to unit PDF via short URL (uppercase)" do
-        visit "/U/#{unit.id}"
+      it "allows access to unit PDF" do
+        visit "/units/#{unit.id}.pdf"
         expect(page.response_headers["Content-Type"]).to eq("application/pdf")
         expect(page.body[0..3]).to eq("%PDF")
       end
 
       it "allows access to unit JSON via short URL" do
-        visit "/u/#{unit.id}.json"
+        visit "/units/#{unit.id}.json"
         expect(page.response_headers["Content-Type"]).to include("application/json")
         json = JSON.parse(page.body)
         expect(json).to have_key("name")
       end
 
       it "allows access to unit JSON via long URL" do
-        visit "/units/#{unit.id}/report.json"
+        visit "/units/#{unit.id}.json"
         expect(page.response_headers["Content-Type"]).to include("application/json")
         json = JSON.parse(page.body)
         expect(json).to have_key("name")
       end
 
       it "allows access to unit QR code" do
-        page.driver.browser.get("/units/#{unit.id}/qr_code")
+        page.driver.browser.get("/units/#{unit.id}.png")
         expect(page.driver.response.headers["Content-Type"]).to include("image/png")
         expect(page.driver.response.body[1..3]).to eq("PNG")
       end
@@ -130,9 +130,11 @@ RSpec.describe "Public Access Control", type: :request do
       expect(page).to have_content(I18n.t("authorization.login_required"))
     end
 
-    it "redirects inspection show page to login" do
+    it "shows PDF viewer for inspection show page when not logged in" do
       visit inspection_path(inspection)
-      expect(page.current_path).to eq(login_path)
+      expect(page.current_path).to eq(inspection_path(inspection))
+      expect(page.html).to include("<iframe")
+      expect(page.html).to include(inspection_path(inspection, format: :pdf))
     end
 
     it "redirects inspection edit page to login" do
@@ -145,9 +147,11 @@ RSpec.describe "Public Access Control", type: :request do
       expect(page.current_path).to eq(login_path)
     end
 
-    it "redirects unit show page to login" do
+    it "shows PDF viewer for unit show page when not logged in" do
       visit unit_path(unit)
-      expect(page.current_path).to eq(login_path)
+      expect(page.current_path).to eq(unit_path(unit))
+      expect(page.html).to include("<iframe")
+      expect(page.html).to include(unit_path(unit, format: :pdf))
     end
 
     it "redirects unit edit page to login" do
@@ -197,15 +201,21 @@ RSpec.describe "Public Access Control", type: :request do
       expect(page.current_path).to eq(login_path)
     end
 
-    describe "Protected JSON endpoints" do
-      it "redirects inspection show JSON to login when not using report endpoint" do
+    describe "Public JSON endpoints" do
+      it "allows public access to inspection JSON" do
         visit "/inspections/#{inspection.id}.json"
-        expect(page.current_path).to eq(login_path)
+        expect(page).to have_http_status(:success)
+        expect(page.current_path).to eq("/inspections/#{inspection.id}.json")
+        json = JSON.parse(page.body)
+        expect(json).to have_key("inspection_date")
       end
 
-      it "redirects unit show JSON to login when not using report endpoint" do
+      it "allows public access to unit JSON" do
         visit "/units/#{unit.id}.json"
-        expect(page.current_path).to eq(login_path)
+        expect(page).to have_http_status(:success)
+        expect(page.current_path).to eq("/units/#{unit.id}.json")
+        json = JSON.parse(page.body)
+        expect(json).to have_key("serial")
       end
     end
   end
@@ -217,37 +227,39 @@ RSpec.describe "Public Access Control", type: :request do
     end
 
     it "returns 404 for non-existent inspection reports" do
-      visit "/r/NONEXISTENT"
+      visit "/inspections/NONEXISTENT"
       expect(page).to have_http_status(:not_found)
     end
 
     it "returns 404 for non-existent unit reports" do
-      visit "/u/NONEXISTENT"
+      visit "/units/NONEXISTENT"
       expect(page).to have_http_status(:not_found)
     end
 
     it "returns 404 for non-existent inspection QR codes" do
-      page.driver.browser.get("/inspections/NONEXISTENT/qr_code")
+      page.driver.browser.get("/inspections/NONEXISTENT.png")
       expect(page.driver.response.status).to eq(404)
     end
 
     it "returns 404 for non-existent unit QR codes" do
-      page.driver.browser.get("/units/NONEXISTENT/qr_code")
+      page.driver.browser.get("/units/NONEXISTENT.png")
       expect(page.driver.response.status).to eq(404)
     end
 
     it "handles case-insensitive IDs for public reports" do
       # Test lowercase
-      visit "/r/#{inspection.id.downcase}"
-      expect(page.response_headers["Content-Type"]).to eq("application/pdf")
+      visit "/inspections/#{inspection.id.downcase}"
+      expect(page.response_headers["Content-Type"]).to eq("text/html; charset=utf-8")
+      expect(page.body).to include("<iframe")
 
       # Test uppercase
-      visit "/r/#{inspection.id.upcase}"
-      expect(page.response_headers["Content-Type"]).to eq("application/pdf")
+      visit "/inspections/#{inspection.id.upcase}"
+      expect(page.response_headers["Content-Type"]).to eq("text/html; charset=utf-8")
+      expect(page.body).to include("<iframe")
     end
 
     it "prevents directory traversal attacks" do
-      visit "/r/../../../etc/passwd"
+      visit "/inspections/../../../etc/passwd"
       expect(page).to have_http_status(:not_found)
     end
 
@@ -262,17 +274,17 @@ RSpec.describe "Public Access Control", type: :request do
 
   describe "Response headers and security" do
     it "sets noindex header on inspection reports" do
-      visit "/r/#{inspection.id}"
+      visit "/inspections/#{inspection.id}"
       expect(page.response_headers["X-Robots-Tag"]).to include("noindex")
     end
 
     it "sets noindex header on unit reports" do
-      visit "/u/#{unit.id}"
+      visit "/units/#{unit.id}"
       expect(page.response_headers["X-Robots-Tag"]).to include("noindex")
     end
 
     it "does not leak user information in public JSON" do
-      visit "/r/#{inspection.id}.json"
+      visit "/inspections/#{inspection.id}.json"
       json = JSON.parse(page.body)
 
       expect(json).not_to have_key("user_id")

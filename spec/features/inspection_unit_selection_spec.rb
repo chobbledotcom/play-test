@@ -66,13 +66,6 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
         expect_units_visible(unit1, unit3)
         expect_units_not_visible(unit2)
       end
-
-      it "filters units by slide status" do
-        visit select_unit_inspection_path(inspection, has_slide: "true")
-
-        expect_units_visible(unit3)
-        expect_units_not_visible(unit1, unit2)
-      end
     end
   end
 

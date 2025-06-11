@@ -49,7 +49,7 @@ RSpec.describe "Units PDF Generation", type: :request do
       other_user = create(:user, email: "other@example.com")
       other_unit = create(:unit, user: other_user)
 
-      visit "/units/#{other_unit.id}/report"
+      visit "/units/#{other_unit.id}.pdf"
 
       # Unit reports are now publicly accessible - should return PDF
       expect(page.response_headers["Content-Type"]).to eq("application/pdf")
@@ -71,7 +71,7 @@ RSpec.describe "Units PDF Generation", type: :request do
   describe "PDF download integration" do
     it "allows downloading PDF through direct link" do
       # Visit the report URL directly
-      page.driver.browser.get("/units/#{unit.id}/report")
+      page.driver.browser.get("/units/#{unit.id}.pdf")
 
       # Check that it's a PDF response
       expect(page.driver.response.headers["Content-Type"]).to include("application/pdf")
@@ -79,7 +79,7 @@ RSpec.describe "Units PDF Generation", type: :request do
     end
 
     it "sets proper filename for PDF download" do
-      page.driver.browser.get("/units/#{unit.id}/report")
+      page.driver.browser.get("/units/#{unit.id}.pdf")
 
       content_disposition = page.driver.response.headers["Content-Disposition"]
       expect(content_disposition).to include("#{unit.serial}.pdf")
@@ -92,7 +92,7 @@ RSpec.describe "Units PDF Generation", type: :request do
       visit unit_path(unit)
 
       # The QR code endpoint should be accessible (though we can't easily test the image)
-      page.driver.browser.get("/units/#{unit.id}/qr_code")
+      page.driver.browser.get("/units/#{unit.id}.png")
 
       # Check that it's a PNG response
       expect(page.driver.response.headers["Content-Type"]).to include("image/png")

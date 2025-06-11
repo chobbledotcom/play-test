@@ -117,6 +117,6 @@ RSpec.feature "PDF Field Coverage", type: :feature do
   private
 
   def inspection_report_path(inspection)
-    "/inspections/#{inspection.id}/report"
+    "/inspections/#{inspection.id}.pdf"
   end
 end

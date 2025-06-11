@@ -110,7 +110,7 @@ RSpec.feature "Inspector Company Management", type: :feature do
       visit inspector_companies_path(active: "active")
       expect(page).to have_content("Filter Active Company")
 
-      visit inspector_companies_path(active: "archived")  
+      visit inspector_companies_path(active: "archived")
       expect(page).to have_content("Filter Archived Company")
     end
 

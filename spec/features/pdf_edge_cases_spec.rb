@@ -19,7 +19,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
         comments: "Comments: #{extremely_long_text}"
       )
 
-      page.driver.browser.get("/inspections/#{inspection.id}/report")
+      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
 
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
       expect(page.driver.response.body[0..3]).to eq("%PDF")
@@ -36,7 +36,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
         comments: "#{mixed_content} with more content"
       )
 
-      page.driver.browser.get("/inspections/#{inspection.id}/report")
+      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
 
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
 
@@ -57,7 +57,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       dangerous_content.each do |content|
         inspection.update(comments: content)
 
-        page.driver.browser.get("/inspections/#{inspection.id}/report")
+        page.driver.browser.get("/inspections/#{inspection.id}.pdf")
 
         expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
         expect(page.driver.response.body[0..3]).to eq("%PDF")
@@ -70,7 +70,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       # Create assessments with extreme values
       create(:user_height_assessment, :extreme_values, inspection: inspection)
 
-      page.driver.browser.get("/inspections/#{inspection.id}/report")
+      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
 
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
       expect(page.driver.response.body[0..3]).to eq("%PDF")
@@ -82,7 +82,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
     scenario "handles nil and blank numeric values" do
       create(:user_height_assessment, :edge_case_values, inspection: inspection)
 
-      page.driver.browser.get("/inspections/#{inspection.id}/report")
+      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
 
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
 
@@ -116,7 +116,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       )
 
       start_time = Time.current
-      page.driver.browser.get("/inspections/#{full_inspection.id}/report")
+      page.driver.browser.get("/inspections/#{full_inspection.id}.pdf")
       generation_time = Time.current - start_time
 
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
@@ -134,7 +134,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
     end
 
     scenario "generates PDFs with reasonable file sizes" do
-      page.driver.browser.get("/inspections/#{inspection.id}/report")
+      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
 
       pdf_size = page.driver.response.body.bytesize
       expect(pdf_size).to be < 2.megabytes  # Should be under 2MB for basic inspection
@@ -152,7 +152,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
         threads << Thread.new do
           # Each thread uses a fresh browser session
           new_page = Capybara::Session.new(:rack_test, Capybara.app)
-          new_page.driver.browser.get("/inspections/#{inspection.id}/report")
+          new_page.driver.browser.get("/inspections/#{inspection.id}.pdf")
 
           results << {
             status: new_page.driver.response.status,
@@ -181,7 +181,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
       10.times do
         temp_files_before = Dir.glob(process_pattern).size
-        page.driver.browser.get("/inspections/#{inspection.id}/report")
+        page.driver.browser.get("/inspections/#{inspection.id}.pdf")
         expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
 
         # Allow a brief moment for cleanup
@@ -206,7 +206,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
         users_at_1000mm: -999
       )
 
-      page.driver.browser.get("/inspections/#{inspection.id}/report")
+      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
 
       # Should still generate PDF, just with "N/A" or safe defaults
       expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")

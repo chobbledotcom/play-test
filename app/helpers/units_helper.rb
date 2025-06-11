@@ -15,7 +15,7 @@ module UnitsHelper
       },
       {
         label: I18n.t("units.buttons.pdf_report"),
-        url: report_unit_path(unit),
+        url: unit_path(unit, format: :pdf),
         target: "_blank"
       }
     ]

@@ -239,10 +239,10 @@ RSpec.describe HasDimensions, type: :model do
   end
 
   describe "class methods" do
-    let!(:unit1) { create(:unit, width: 10, length: 10, height: 3) }
-    let!(:unit2) { create(:unit, width: 12, length: 12, height: 3.5) }
-
     describe ".with_similar_dimensions" do
+      let!(:unit1) { create(:unit, width: 10, length: 10, height: 3) }
+      let!(:unit2) { create(:unit, width: 12, length: 12, height: 3.5) }
+
       it "finds units with similar dimensions within tolerance" do
         results = Unit.with_similar_dimensions(unit1, tolerance: 0.2)
         expect(results).to include(unit1, unit2)
@@ -252,20 +252,6 @@ RSpec.describe HasDimensions, type: :model do
         unit3 = create(:unit, width: 20, length: 20, height: 5)
         results = Unit.with_similar_dimensions(unit1, tolerance: 0.1)
         expect(results).not_to include(unit3)
-      end
-    end
-
-    describe ".dimension_statistics" do
-      it "calculates dimension statistics" do
-        # Ensure we only count our test units
-        Unit.where.not(id: [unit1.id, unit2.id]).destroy_all
-
-        stats = Unit.dimension_statistics
-
-        expect(stats[:width][:avg]).to be_within(0.01).of(11.0) # (10 + 12) / 2
-        expect(stats[:width][:min]).to be_within(0.01).of(10)
-        expect(stats[:width][:max]).to be_within(0.01).of(12)
-        expect(stats[:area][:avg]).to be_within(0.01).of(122.0) # (100 + 144) / 2
       end
     end
   end

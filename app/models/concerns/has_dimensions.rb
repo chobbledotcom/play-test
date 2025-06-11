@@ -314,16 +314,6 @@ module HasDimensions
       where(width: width_range, length: length_range, height: height_range)
     end
 
-    # Statistical methods for dimensions
-    def dimension_statistics
-      {
-        width: dimension_stats(:width),
-        length: dimension_stats(:length),
-        height: dimension_stats(:height),
-        area: area_stats
-      }
-    end
-
     private
 
     def valid_reference_dimensions?(reference)
@@ -332,21 +322,6 @@ module HasDimensions
 
     def dimension_range(value, tolerance)
       (value * (1 - tolerance))..(value * (1 + tolerance))
-    end
-
-    def dimension_stats(column)
-      avg = average(column)
-      min = minimum(column)
-      max = maximum(column)
-      {avg:, min:, max:}
-    end
-
-    def area_stats
-      area_calculation = "width * length"
-      avg = average(area_calculation)
-      min = minimum(area_calculation)
-      max = maximum(area_calculation)
-      {avg:, min:, max:}
     end
   end
 end

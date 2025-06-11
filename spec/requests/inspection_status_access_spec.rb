@@ -14,12 +14,12 @@ RSpec.describe "Inspection Status Access Control", type: :request do
       let(:draft_inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
       it "allows report access (now available for all statuses)" do
-        get report_inspection_path(draft_inspection)
+        get inspection_path(draft_inspection, format: :pdf)
         expect(response).to have_http_status(:ok)
       end
 
       it "allows QR code access (now available for all statuses)" do
-        get qr_code_inspection_path(draft_inspection)
+        get inspection_path(draft_inspection, format: :png)
         expect(response).to have_http_status(:ok)
       end
     end
@@ -28,13 +28,13 @@ RSpec.describe "Inspection Status Access Control", type: :request do
       let(:complete_inspection) { create(:inspection, :complete, user: user, unit: unit) }
 
       it "allows report access" do
-        get report_inspection_path(complete_inspection)
+        get inspection_path(complete_inspection, format: :pdf)
         expect(response).to have_http_status(:success)
         expect(response.content_type).to eq("application/pdf")
       end
 
       it "allows QR code access" do
-        get qr_code_inspection_path(complete_inspection)
+        get inspection_path(complete_inspection, format: :png)
         expect(response).to have_http_status(:success)
         expect(response.content_type).to eq("image/png")
       end
@@ -43,15 +43,25 @@ RSpec.describe "Inspection Status Access Control", type: :request do
     # Note: Complete status allows access for all reports and QR codes
   end
 
-  describe "Public access via short URLs" do
+  describe "Public access" do
     context "when inspection is draft" do
       let(:draft_inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
-      it "allows public report access (now available for all statuses)" do
+      it "shows minimal PDF viewer for HTML requests" do
         # Logout first
         delete logout_path
 
-        get "/r/#{draft_inspection.id}"
+        get "/inspections/#{draft_inspection.id}"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to eq("text/html; charset=utf-8")
+        expect(response.body).to include("<iframe")
+      end
+
+      it "allows public PDF access" do
+        # Logout first
+        delete logout_path
+
+        get "/inspections/#{draft_inspection.id}.pdf"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to eq("application/pdf")
       end
@@ -60,11 +70,21 @@ RSpec.describe "Inspection Status Access Control", type: :request do
     context "when inspection is complete" do
       let(:complete_inspection) { create(:inspection, :complete, user: user, unit: unit) }
 
-      it "allows public report access" do
+      it "shows minimal PDF viewer for HTML requests" do
         # Logout first
         delete logout_path
 
-        get "/r/#{complete_inspection.id}"
+        get "/inspections/#{complete_inspection.id}"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to eq("text/html; charset=utf-8")
+        expect(response.body).to include("<iframe")
+      end
+
+      it "allows public PDF access" do
+        # Logout first
+        delete logout_path
+
+        get "/inspections/#{complete_inspection.id}.pdf"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to eq("application/pdf")
       end

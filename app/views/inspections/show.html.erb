@@ -1,37 +1,50 @@
-<article class="view-inspection">
-  <%= render 'shared/page_header', title: t('inspections.titles.show') %>
+<% if !logged_in? || (current_user && @inspection.user_id != current_user.id) %>
+  <article class="view-inspection">
+    <%= render 'shared/page_header', title: t('inspections.titles.show') %>
+    
+    <iframe src="<%= inspection_path(@inspection, format: :pdf) %>" 
+            width="100%" 
+            height="800" 
+            style="border: 1px solid #ccc;">
+      <p><%= t('inspections.messages.pdf_not_supported_html') %></p>
+      <%= link_to t('inspections.buttons.download_pdf'), inspection_path(@inspection, format: :pdf) %>
+    </iframe>
+  </article>
+<% else %>
+  <article class="view-inspection">
+    <%= render 'shared/page_header', title: t('inspections.titles.show') %>
 
-  <% if @inspection.unit.nil? %>
-    <aside class="notice">
-      <h4><%= t("inspections.labels.no_unit") %></h4>
-      <p><%= t("inspections.messages.no_unit_description") %></p>
-      <%= link_to t("inspections.buttons.create_unit"), new_unit_from_inspection_path(@inspection), class: "button" %>
-    </aside>
-  <% end %>
+    <% if @inspection.unit.nil? %>
+      <aside class="notice">
+        <h4><%= t("inspections.labels.no_unit") %></h4>
+        <p><%= t("inspections.messages.no_unit_description") %></p>
+        <%= link_to t("inspections.buttons.create_unit"), new_unit_from_inspection_path(@inspection), class: "button" %>
+      </aside>
+    <% end %>
 
-  <%= render 'inspection_details', inspection: @inspection %>
+    <%= render 'inspection_details', inspection: @inspection %>
 
-  <% if @inspection.comments.present? %>
+    <% if @inspection.comments.present? %>
+      <hr>
+      <h4>Comments</h4>
+      <blockquote>
+        <%= simple_format(@inspection.comments) %>
+      </blockquote>
+    <% end %>
+
     <hr>
-    <h4>Comments</h4>
-    <blockquote>
-      <%= simple_format(@inspection.comments) %>
-    </blockquote>
-  <% end %>
 
-  <hr>
+    <%= render 'shared/action_buttons', actions: inspection_actions(@inspection) %>
 
-  <%= render 'shared/action_buttons', actions: inspection_actions(@inspection) %>
-
-  <% if @inspection.complete? %>
-    <section>
-      <p><%= t('inspections.messages.complete_inspection_notice') %></p>
-      <%= button_to t('inspections.buttons.switch_to_in_progress'), 
-          mark_draft_inspection_path(@inspection), 
-          method: :patch, 
-          data: { turbo_confirm: t('inspections.messages.mark_in_progress_confirm') } %>
-    </section>
-  <% end %>
+    <% if @inspection.complete? %>
+      <section>
+        <p><%= t('inspections.messages.complete_inspection_notice') %></p>
+        <%= button_to t('inspections.buttons.switch_to_in_progress'), 
+            mark_draft_inspection_path(@inspection),
+            method: :patch, 
+            data: { turbo_confirm: t('inspections.messages.mark_in_progress_confirm') } %>
+      </section>
+    <% end %>
 
   <% if content = render('completion_issues', inspection: @inspection) and content.strip.present? %>
     <hr>
@@ -41,20 +54,20 @@
   <hr>
 
   <h4>Report QR Code</h4>
-  <%= image_tag qr_code_inspection_path(@inspection), alt: "QR Code for Report", width: 250 %>
+  <%= image_tag inspection_path(@inspection, format: :png), alt: "QR Code for Report", width: 250 %>
 
   <hr>
 
   <h4><%= t('inspections.headers.report_pdf_link') %></h4>
-  <%= link_to short_report_url(@inspection), short_report_url(@inspection) %>
+  <%= link_to inspection_url(@inspection, format: :pdf), inspection_url(@inspection, format: :pdf) %>
   <%= render 'shared/share_button',
-      url: short_report_url(@inspection),
+      url: inspection_url(@inspection, format: :pdf),
       title: t('inspections.share.title', id: @inspection.id),
       button_text: t('inspections.share.button'),
       copied_text: t('inspections.share.copied') %>
   
   <h4><%= t('inspections.headers.report_json_link') %></h4>
-  <%= link_to short_report_url(@inspection) + ".json", short_report_url(@inspection) + ".json" %>
+  <%= link_to inspection_url(@inspection, format: :json), inspection_url(@inspection, format: :json) %>
 
   <hr>
 
@@ -64,11 +77,12 @@
       <p><strong>Note:</strong> This is a draft report. It will be clearly marked as DRAFT in the PDF.</p>
     </div>
   <% end %>
-  <iframe src="<%= inspection_path(@inspection, format: :pdf) %>" 
-          width="100%" 
-          height="800px" 
-          style="border: 1px solid #ccc;">
-    Your browser does not support PDFs. 
-    <%= link_to t("inspections.buttons.download_pdf"), inspection_path(@inspection, format: :pdf) %>.
-  </iframe>
-</article>
+    <iframe src="<%= inspection_path(@inspection, format: :pdf) %>" 
+            width="100%" 
+            height="800px" 
+            style="border: 1px solid #ccc;">
+      Your browser does not support PDFs. 
+      <%= link_to t("inspections.buttons.download_pdf"), inspection_path(@inspection, format: :pdf) %>.
+    </iframe>
+  </article>
+<% end %>

@@ -149,7 +149,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
           passed: i.even?)
       end
 
-      page.driver.browser.get(report_unit_path(unit))
+      page.driver.browser.get(unit_report_path(unit))
       pdf_text = pdf_text_content(page.driver.response.body)
 
       # Check all core i18n keys are present
@@ -172,7 +172,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
     scenario "handles unit with no inspections" do
       empty_unit = create(:unit, user: user)
 
-      page.driver.browser.get(report_unit_path(empty_unit))
+      page.driver.browser.get(unit_report_path(empty_unit))
       pdf_text = pdf_text_content(page.driver.response.body)
 
       expect_pdf_to_include_i18n(pdf_text, "pdf.unit.title")
@@ -226,10 +226,10 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
   private
 
   def inspection_report_path(inspection)
-    "/inspections/#{inspection.id}/report"
+    "/inspections/#{inspection.id}.pdf"
   end
 
   def unit_report_path(unit)
-    "/units/#{unit.id}/report"
+    "/units/#{unit.id}.pdf"
   end
 end

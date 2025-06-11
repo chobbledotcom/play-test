@@ -36,11 +36,11 @@
       
       <div>
         <%= link_to t('inspections.buttons.download_pdf'), 
-            report_inspection_path(@inspection), 
+            inspection_path(@inspection, format: :pdf), 
             target: '_blank', 
             class: 'button' %>
         <%= link_to t('inspections.buttons.download_qr_code'), 
-            qr_code_inspection_path(@inspection, format: :png), 
+            inspection_path(@inspection, format: :png), 
             download: "inspection-#{@inspection.id}-qr.png",
             class: 'button secondary' %>
       </div>

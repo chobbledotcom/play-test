@@ -136,7 +136,7 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
         enclosed: create(:enclosed_assessment, inspection: inspection)
       }
 
-      get report_inspection_path(inspection)
+      get inspection_path(inspection, format: :pdf)
 
       # Ensure we got a PDF response
       expect(response).to have_http_status(:success)
@@ -170,7 +170,7 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
           passed: i.even?)
       end
 
-      get report_unit_path(unit)
+      get unit_path(unit, format: :pdf)
       pdf_text = pdf_text_content(response.body)
 
       # Verify sections using i18n

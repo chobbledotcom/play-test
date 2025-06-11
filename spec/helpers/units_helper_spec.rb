@@ -95,7 +95,7 @@ RSpec.describe UnitsHelper, type: :helper do
       pdf_action = actions.find { |a| a[:label] == "PDF Report" }
 
       expect(pdf_action).to be_present
-      expect(pdf_action[:url]).to eq(report_unit_path(unit))
+      expect(pdf_action[:url]).to eq(unit_path(unit, format: :pdf))
       expect(pdf_action[:target]).to eq("_blank")
     end
 

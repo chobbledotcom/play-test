@@ -29,7 +29,7 @@ RSpec.describe "Unit JSON real-world scenarios", type: :request do
 
       it "returns inspection history data" do
         # Make the request
-        get "/u/#{unit.id}.json"
+        get "/units/#{unit.id}.json"
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
@@ -73,7 +73,7 @@ RSpec.describe "Unit JSON real-world scenarios", type: :request do
         expect(json[:inspection_history]).to be_present
 
         # Now test through the actual endpoint
-        get "/u/#{unit.id}.json"
+        get "/units/#{unit.id}.json"
         response_json = JSON.parse(response.body)
         expect(response_json["inspection_history"]).to be_present
       end

@@ -29,8 +29,6 @@ Rails.application.routes.draw do
   # Inspections
   resources :inspections, except: [:new] do
     member do
-      get "report"
-      get "qr_code"
       patch "replace_dimensions"
       get "select_unit"
       patch "update_unit"
@@ -40,12 +38,7 @@ Rails.application.routes.draw do
   end
 
   # Units
-  resources :units do
-    member do
-      get "report"
-      get "qr_code"
-    end
-  end
+  resources :units
 
   # Create unit from inspection
   get "inspections/:id/new_unit", to: "units#new_from_inspection", as: "new_unit_from_inspection"
@@ -53,12 +46,4 @@ Rails.application.routes.draw do
 
   # Inspector Companies
   resources :inspector_companies, except: [:destroy]
-
-  # Short URL for reports
-  get "r/:id", to: "inspections#report", as: "short_report"
-  get "R/:id", to: "inspections#report", as: "short_report_uppercase"
-
-  # Short URL for unit reports
-  get "u/:id", to: "units#report", as: "short_unit_report"
-  get "U/:id", to: "units#report", as: "short_unit_report_uppercase"
 end

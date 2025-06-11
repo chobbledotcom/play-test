@@ -11,7 +11,7 @@ RSpec.describe "Unit JSON inspection history", type: :request do
       let!(:draft_inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
       it "includes inspection history with correct data" do
-        get "/u/#{unit.id}.json"
+        get "/units/#{unit.id}.json"
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
@@ -45,7 +45,7 @@ RSpec.describe "Unit JSON inspection history", type: :request do
       let!(:draft_inspection) { create(:inspection, user: user, unit: unit, complete_date: nil) }
 
       it "returns empty inspection history" do
-        get "/u/#{unit.id}.json"
+        get "/units/#{unit.id}.json"
 
         json = JSON.parse(response.body)
 
@@ -59,7 +59,7 @@ RSpec.describe "Unit JSON inspection history", type: :request do
 
     context "when unit has no inspections at all" do
       it "returns no inspection history fields" do
-        get "/u/#{unit.id}.json"
+        get "/units/#{unit.id}.json"
 
         json = JSON.parse(response.body)
 

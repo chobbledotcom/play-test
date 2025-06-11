@@ -18,6 +18,9 @@ en:
     messages:
       saved_successfully: "Saved successfully"
       save_failed: "Save failed"
+    api:
+      success: "success"
+      error: "error"
     yes: "Yes"
     no: "No"
     view_full_size: "View full size"
@@ -33,7 +36,7 @@ en:
       submit: "Submit"
       clear: "Clear"
       search: "Search"
-      clear_filters: "Clear Filters"
+      clear_filters: "Reset"
 
   # Home page
   home:

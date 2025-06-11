@@ -29,6 +29,9 @@ en:
       unit_report: "Unit Report"
       inspection_details: "Inspection Details"
 
+    status:
+      overdue: "Overdue"
+      
     sections:
       filters: "Filter Units"
       search: "Search Units"
@@ -209,6 +212,7 @@ en:
       view_full_photo: "View full size photo"
       inspection_company_required: "You must be assigned to an inspection company to create units."
       pdf_not_supported: "Your browser does not support PDFs."
+      pdf_not_supported_html: "Your browser does not support PDFs."
 
     accessibility:
       qr_code_alt: "QR Code for Unit Inspection History Report"

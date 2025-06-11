@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= @pdf_title || "PDF Viewer" %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe src="<%= @pdf_url %>"></iframe>
+  </body>
+</html>

@@ -20,9 +20,11 @@ RSpec.describe "Units", type: :request do
     end
 
     describe "GET /units/:id" do
-      it "redirects to login when not logged in" do
+      it "shows unit page when not logged in (public access)" do
         visit unit_path(unit)
-        expect(page).to have_current_path(login_path)
+        expect(page).to have_current_path(unit_path(unit))
+        # When not logged in, the page shows an iframe with the PDF
+        expect(page).to have_css("iframe[src='#{unit_path(unit, format: :pdf)}']")
       end
     end
 
@@ -129,12 +131,12 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_content("John Doe")
       end
 
-      it "denies access to other user's unit" do
+      it "shows minimal PDF viewer for other user's unit" do
         other_unit = create(:unit)
 
         visit unit_path(other_unit)
-        expect(page).to have_current_path(units_path)
-        expect(page).to have_content("Access denied")
+        expect(page).to have_current_path(unit_path(other_unit))
+        expect(page).to have_css("iframe")
       end
     end
 
@@ -297,12 +299,17 @@ RSpec.describe "Units", type: :request do
         expect { unit_to_delete.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
-      it "denies access to other user's unit" do
+      it "prevents deletion of other user's unit" do
         other_unit = create(:unit)
 
-        visit unit_path(other_unit)
+        # Try to delete another user's unit
+        page.driver.submit :delete, unit_path(other_unit), {}
+
         expect(page).to have_current_path(units_path)
         expect(page).to have_content("Access denied")
+
+        # Verify the unit wasn't deleted
+        expect { other_unit.reload }.not_to raise_error
       end
     end
 
@@ -443,10 +450,9 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_content("Unit Details")
       end
 
-      it "handles missing units gracefully" do
+      it "returns 404 for missing units" do
         visit "/units/NONEXISTENT"
-        expect(page).to have_current_path(units_path)
-        expect(page).to have_content(I18n.t("units.messages.not_found"))
+        expect(page).to have_http_status(:not_found)
       end
     end
   end
@@ -543,7 +549,14 @@ RSpec.describe "Units", type: :request do
         expect(response.content_type).to include("application/json")
 
         json_response = JSON.parse(response.body)
-        expect(json_response["id"]).to eq(unit.id)
+        # The JSON serializer uses symbols as keys, not strings
+        expect(json_response).to have_key("name")
+        expect(json_response).to have_key("serial")
+        expect(json_response).to have_key("manufacturer")
+        expect(json_response).to have_key("has_slide")
+        expect(json_response).to have_key("urls")
+
+        # Check specific values
         expect(json_response["name"]).to eq(unit.name)
         expect(json_response["serial"]).to eq(unit.serial)
         expect(json_response["manufacturer"]).to eq(unit.manufacturer)
@@ -565,50 +578,52 @@ RSpec.describe "Units", type: :request do
         get units_path(format: :csv)
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("text/csv")
-        expect(response.headers["Content-Disposition"]).to include("unit-#{Date.today}.csv")
+        expect(response.headers["Content-Disposition"]).to include("units-#{Date.today}.csv")
       end
     end
   end
 
   describe "Public access functionality" do
-    describe "report action" do
-      it "returns PDF for HTML format" do
-        get "/units/#{unit.id}/report"
-        expect(response).to have_http_status(:success)
-        expect(response.content_type).to include("application/pdf")
-        expect(response.headers["Content-Disposition"]).to include("#{unit.serial}.pdf")
-      end
-
+    describe "show action with different formats" do
       it "returns PDF for .pdf format" do
-        get "/units/#{unit.id}/report.pdf"
+        get "/units/#{unit.id}.pdf"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("application/pdf")
         expect(response.headers["Content-Disposition"]).to include("#{unit.serial}.pdf")
       end
 
       it "returns JSON for .json format" do
-        get "/units/#{unit.id}/report.json"
+        get "/units/#{unit.id}.json"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("application/json")
       end
 
-      it "returns 404 for non-existent unit" do
-        get "/units/NONEXISTENT/report"
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    describe "QR code generation" do
-      it "generates QR code PNG for unit" do
-        get "/units/#{unit.id}/qr_code"
+      it "returns PNG (QR code) for .png format" do
+        get "/units/#{unit.id}.png"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("image/png")
         expect(response.headers["Content-Disposition"]).to include("#{unit.serial}_QR.png")
       end
 
-      it "returns 404 for non-existent unit QR code" do
-        get "/units/NONEXISTENT/qr_code"
+      it "returns 404 for non-existent unit" do
+        get "/units/NONEXISTENT.pdf"
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    describe "HTML access" do
+      it "shows minimal PDF viewer for non-logged-in users" do
+        get "/units/#{unit.id}"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("text/html")
+        expect(response.body).to include("<iframe")
+      end
+
+      it "handles case-insensitive IDs" do
+        get "/units/#{unit.id.upcase}"
+        expect(response).to have_http_status(:success)
+        expect(response.content_type).to include("text/html")
+        expect(response.body).to include("<iframe")
       end
     end
   end

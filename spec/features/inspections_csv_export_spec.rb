@@ -93,8 +93,8 @@ RSpec.feature "Inspections CSV Export", type: :feature do
 
   describe "CSV export error handling" do
     it "raises error if CSV generation fails" do
-      # Mock the CSV generation to raise an error
-      allow_any_instance_of(InspectionsController).to receive(:inspections_to_csv).and_raise(StandardError.new("CSV generation failed"))
+      # Mock the CSV generation service to raise an error
+      allow_any_instance_of(InspectionCsvExportService).to receive(:generate).and_raise(StandardError.new("CSV generation failed"))
 
       visit inspections_path
 

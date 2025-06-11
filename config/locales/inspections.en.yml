@@ -119,6 +119,8 @@ en:
     status:
       in_progress: "In Progress"
       complete: "Complete"
+      passed: "Passed"
+      failed: "Failed"
 
     labels:
       no_unit: "No Unit"
@@ -164,6 +166,7 @@ en:
       unit_selection_notice: "Select a unit below to update this inspection. Clicking a unit will replace the current unit and copy all dimension values from the selected unit."
       unit_selection_confirm: "Are you sure you want to change to unit '%{unit_name}'? This will replace the current unit and copy all dimension values."
       unit_changed: "Unit changed to '%{unit_name}' and dimension values have been updated."
+      pdf_not_supported_html: "Your browser does not support PDFs."
       unit_change_failed: "Failed to change unit: %{errors}"
       mark_complete_confirm: "Are you sure you want to mark this inspection as complete? This will validate all assessments are complete."
       mark_in_progress_confirm: "Are you sure you want to mark this inspection as in progress? This will allow further editing."
