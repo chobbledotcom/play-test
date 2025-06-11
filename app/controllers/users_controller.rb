@@ -158,22 +158,43 @@ class UsersController < ApplicationController
   def verify_rpii
     result = @user.verify_rpii_inspector_number
 
-    if result[:valid]
-      inspector = result[:inspector]
-      flash[:notice] = I18n.t("users.messages.rpii_verified")
-      session[:rpii_verification_details] = {
-        name: inspector[:name],
-        number: inspector[:number],
-        qualifications: inspector[:qualifications]
-      }
-    else
-      flash[:alert] = I18n.t("users.messages.rpii_verification_failed")
-      session.delete(:rpii_verification_details)
+    respond_to do |format|
+      format.html do
+        if result[:valid]
+          flash[:notice] = I18n.t("users.messages.rpii_verified")
+        else
+          flash[:alert] = get_rpii_error_message(result)
+        end
+        redirect_to edit_user_path(@user)
+      end
+
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("rpii_verification_result",
+          partial: "users/rpii_verification_result",
+          locals: {result: result, user: @user})
+      end
     end
-    redirect_to edit_user_path(@user)
   end
 
   private
+
+  def get_rpii_error_message(result)
+    case result[:error]
+    when :blank_number
+      I18n.t("users.messages.rpii_blank_number")
+    when :blank_name
+      I18n.t("users.messages.rpii_blank_name")
+    when :name_mismatch
+      inspector = result[:inspector]
+      I18n.t("users.messages.rpii_name_mismatch",
+        user_name: @user.name,
+        inspector_name: inspector[:name])
+    when :not_found
+      I18n.t("users.messages.rpii_not_found")
+    else
+      I18n.t("users.messages.rpii_verification_failed")
+    end
+  end
 
   def set_user
     @user = User.find(params[:id])

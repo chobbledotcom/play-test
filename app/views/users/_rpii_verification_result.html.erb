@@ -1,0 +1,49 @@
+<div id="rpii_verification_result">
+  <% if result[:valid] %>
+    <% inspector = result[:inspector] %>
+    <div style="margin-top: 1rem; padding: 1rem; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px;">
+      <h4 style="color: #155724; margin-top: 0;"><%= t('users.verification.success_header') %></h4>
+      <dl>
+        <dt><%= t('users.verification.name') %>:</dt>
+        <dd><%= inspector[:name] %></dd>
+        
+        <dt><%= t('users.verification.number') %>:</dt>
+        <dd><%= inspector[:number] %></dd>
+        
+        <dt><%= t('users.verification.qualifications') %>:</dt>
+        <dd><%= inspector[:qualifications] %></dd>
+      </dl>
+      <p style="color: #155724; margin-bottom: 0;">
+        ✓ <%= t('users.messages.rpii_verified_on', date: l(user.rpii_verified_date, format: :short)) %>
+      </p>
+    </div>
+  <% else %>
+    <div style="margin-top: 1rem; padding: 1rem; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px;">
+      <h4 style="color: #721c24; margin-top: 0;"><%= t('users.verification.failure_header') %></h4>
+      <p style="color: #721c24; margin-bottom: 0;">
+        <% case result[:error] %>
+        <% when :blank_number %>
+          <%= t('users.messages.rpii_blank_number') %>
+        <% when :blank_name %>
+          <%= t('users.messages.rpii_blank_name') %>
+        <% when :name_mismatch %>
+          <% inspector = result[:inspector] %>
+          <%= t('users.messages.rpii_name_mismatch', 
+                user_name: user.name, 
+                inspector_name: inspector[:name]) %>
+          <% if inspector %>
+            <dl style="margin-top: 1rem;">
+              <dt><%= t('users.verification.found_inspector') %>:</dt>
+              <dd><%= inspector[:name] %> (<%= inspector[:number] %>)</dd>
+              <dd><%= inspector[:qualifications] %></dd>
+            </dl>
+          <% end %>
+        <% when :not_found %>
+          <%= t('users.messages.rpii_not_found') %>
+        <% else %>
+          <%= t('users.messages.rpii_verification_failed') %>
+        <% end %>
+      </p>
+    </div>
+  <% end %>
+</div>

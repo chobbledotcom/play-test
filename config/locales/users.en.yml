@@ -13,6 +13,7 @@ en:
       contact_details: "Contact Details"
       password_change: "Change Password"
       preferences: "Preferences"
+      update_user: "Update User"
 
     fields:
       email: "Email"
@@ -66,6 +67,11 @@ en:
       inherited_from_company: "These details are inherited from your company and cannot be edited here."
       rpii_verified: "RPII inspector number verified successfully"
       rpii_verification_failed: "RPII inspector number verification failed"
+      rpii_verified_on: "Verified on %{date}"
+      rpii_blank_number: "RPII inspector number is required"
+      rpii_blank_name: "User name is required for verification"
+      rpii_name_mismatch: "Name mismatch: User name '%{user_name}' does not match inspector name '%{inspector_name}'"
+      rpii_not_found: "RPII inspector number not found"
 
     errors:
       wrong_password: "Current password is incorrect"
@@ -84,3 +90,6 @@ en:
       name: "Inspector Name"
       number: "Inspector Number"
       qualifications: "Qualifications"
+      success_header: "Verification Successful"
+      failure_header: "Verification Failed"
+      found_inspector: "Found Inspector"

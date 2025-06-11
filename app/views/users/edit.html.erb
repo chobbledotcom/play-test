@@ -17,17 +17,6 @@
         label: t('users.forms.password_help') %>
     <%= render 'form/text_field', field: :password_confirmation, type: :password_field %>
     <%= render 'form/text_field', field: :rpii_inspector_number %>
-    <% if @user.rpii_inspector_number.present? %>
-      <div style="margin-bottom: 1rem;">
-        <%= button_to t('users.buttons.verify_rpii'), 
-            verify_rpii_user_path(@user), 
-            method: :post,
-            form: { style: "display: inline;" } %>
-        <% if @user.rpii_verified? %>
-          <small style="color: green;">✓ <%= l(@user.rpii_verified_date, format: :short) %></small>
-        <% end %>
-      </div>
-    <% end %>
     <%= render 'form/date_field', field: :active_until %>
     <%= render 'form/select', 
         field: :inspection_company_id,
@@ -38,13 +27,24 @@
         ) %>
   <% end %>
 
-  
-  <fieldset>
-    <%= render 'form/submit_button', text: t('users.buttons.update_user'), form: form %>
-  </fieldset>
+  <%= render 'form/submit_button', text: t('users.buttons.update_user'), form: form %>
   
   <!-- Save Message Display -->
   <div id="user_edit_save_message"></div>
+<% end %>
+
+<% if @user.rpii_inspector_number.present? %>
+  <article>
+    <%= button_to t('users.buttons.verify_rpii'), 
+        verify_rpii_user_path(@user), 
+        method: :post,
+        data: { turbo: !Rails.env.test? } %>
+    <div id="rpii_verification_result">
+      <% if @user.rpii_verified? %>
+        <p style="color: green;">✓ <%= t('users.messages.rpii_verified_on', date: l(@user.rpii_verified_date, format: :short)) %></p>
+      <% end %>
+    </div>
+  </article>
 <% end %>
 
 <% if @user != current_user %>

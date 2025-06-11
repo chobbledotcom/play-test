@@ -74,12 +74,20 @@ class User < ApplicationRecord
 
   def verify_rpii_inspector_number
     return {valid: false, error: :blank_number} if rpii_inspector_number.blank?
+    return {valid: false, error: :blank_name} if name.blank?
 
     result = RpiiVerificationService.verify(rpii_inspector_number)
 
     if result[:valid]
-      update(rpii_verified_date: Time.current)
-      {valid: true, inspector: result[:inspector]}
+      inspector = result[:inspector]
+      # Check if the inspector name matches the user's name
+      if inspector[:name].present? && names_match?(name, inspector[:name])
+        update(rpii_verified_date: Time.current)
+        {valid: true, inspector: inspector}
+      else
+        update(rpii_verified_date: nil)
+        {valid: false, error: :name_mismatch, inspector: inspector}
+      end
     else
       update(rpii_verified_date: nil)
       {valid: false, error: :not_found}
@@ -96,6 +104,22 @@ class User < ApplicationRecord
     # Skip name validation if we're only updating settings fields
     # Name is required for new records and when explicitly being updated
     new_record? || name_changed?
+  end
+
+  def names_match?(user_name, inspector_name)
+    # Normalize names for comparison - case insensitive and trimmed
+    normalized_user = user_name.to_s.strip.downcase
+    normalized_inspector = inspector_name.to_s.strip.downcase
+
+    # Exact match
+    return true if normalized_user == normalized_inspector
+
+    # Check if all parts of user name are in inspector name (handles middle names)
+    user_parts = normalized_user.split(/\s+/)
+    inspector_parts = normalized_inspector.split(/\s+/)
+
+    # All parts of user name should be in inspector name
+    user_parts.all? { |part| inspector_parts.include?(part) }
   end
 
   def downcase_email
