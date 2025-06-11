@@ -48,9 +48,12 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
 
   context "when file is attached" do
     let(:attachment) { double("attachment") }
+    let(:blob) { double("blob") }
 
     before do
       allow(attachment).to receive(:attached?).and_return(true)
+      allow(attachment).to receive(:blob).and_return(blob)
+      allow(blob).to receive(:persisted?).and_return(true)
       allow(mock_object).to receive(:respond_to?).with(:photo).and_return(true)
       allow(mock_object).to receive(:photo).and_return(attachment)
     end

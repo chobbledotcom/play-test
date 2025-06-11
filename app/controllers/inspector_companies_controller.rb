@@ -38,10 +38,38 @@ class InspectorCompaniesController < ApplicationController
 
   def update
     if @inspector_company.update(inspector_company_params)
-      flash[:notice] = t("inspector_companies.messages.updated")
-      redirect_to @inspector_company
+      respond_to do |format|
+        format.html do
+          flash[:notice] = t("inspector_companies.messages.updated")
+          redirect_to @inspector_company
+        end
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("inspector_company_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "inspector_company_save_message",
+                success: true,
+                success_message: t("inspector_companies.messages.updated")
+              })
+          ]
+        end
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("inspector_company_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "inspector_company_save_message",
+                errors: @inspector_company.errors.full_messages,
+                error_message: t("shared.messages.save_failed")
+              })
+          ]
+        end
+      end
     end
   end
 

@@ -71,9 +71,6 @@ RSpec.describe "inspector_companies/index", type: :view do
 
   context "when user is regular user" do
     before do
-      # Ensure no admin pattern matches regular user
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return(nil)
       allow(view).to receive(:current_user).and_return(regular_user)
     end
 

@@ -5,11 +5,6 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
   let(:regular_user) { create(:user, :without_company) }
   let(:target_user) { create(:user, rpii_inspector_number: "RPII-123") }
 
-  before do
-    # Set up admin pattern to match factory emails
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin.*@")
-  end
 
   describe "Admin user access" do
     before do

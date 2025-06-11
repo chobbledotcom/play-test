@@ -9,15 +9,22 @@
   
   return unless image_attachment&.attached?
   
-  variant = case size
-  when :full
-    ImageProcessorService.full_size(image_attachment)
-  else
-    ImageProcessorService.thumbnail(image_attachment)
-  end
+  # Don't try to display images that aren't persisted yet (validation failures)  
+  return unless image_attachment.blob.persisted?
+  
+  begin
+    variant = case size
+    when :full
+      ImageProcessorService.full_size(image_attachment)
+    else
+      ImageProcessorService.thumbnail(image_attachment)
+    end
 %>
 
 <%= image_tag variant, 
     alt: alt_text,
     loading: "lazy",
     decoding: "async" %>
+<% rescue ActiveStorage::InvariableError %>
+  <p><small>Cannot display: invalid image format</small></p>
+<% end %>

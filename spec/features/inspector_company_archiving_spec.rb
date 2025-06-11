@@ -1,14 +1,10 @@
 require "rails_helper"
 
 RSpec.feature "Inspector Company Archiving", type: :feature do
-  let(:admin_user) { create(:user, :without_company, email: "admin@testcompany.com") }
+  let(:admin_user) { create(:user, :admin, :without_company) }
   let!(:inspector_company) { create(:inspector_company, name: "Test Archive Company", active: true) }
 
   before do
-    # Set up admin pattern to make admin_user an admin
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
-
     sign_in(admin_user)
   end
 

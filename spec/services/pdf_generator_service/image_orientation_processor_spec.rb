@@ -4,6 +4,11 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user) }
 
+  def create_raw_image(filename)
+    image_data = File.binread(Rails.root.join("spec", "fixtures", "files", filename))
+    MiniMagick::Image.read(image_data)
+  end
+
   before do
     unit.photo.attach(
       io: File.open(Rails.root.join("spec", "fixtures", "files", "test_image.jpg")),
@@ -59,90 +64,51 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
 
   describe ".needs_orientation_correction?" do
     it "returns false for orientation 1 (normal)" do
-      # Use real image with orientation 1
-      unit.photo.attach(
-        io: File.open(Rails.root.join("spec", "fixtures", "files", "orientation_1_normal.jpg")),
-        filename: "orientation_1_normal.jpg",
-        content_type: "image/jpeg"
-      )
-      image = PdfGeneratorService::ImageProcessor.create_image(unit.photo)
-      
+      image = create_raw_image("orientation_1_normal.jpg")
+
       result = described_class.needs_orientation_correction?(image)
       expect(result).to be false
     end
 
     it "returns true for orientation 2 (horizontal flip)" do
-      unit.photo.attach(
-        io: File.open(Rails.root.join("spec", "fixtures", "files", "orientation_2_flip_horizontal.jpg")),
-        filename: "orientation_2_flip_horizontal.jpg",
-        content_type: "image/jpeg"
-      )
-      image = PdfGeneratorService::ImageProcessor.create_image(unit.photo)
-      
+      image = create_raw_image("orientation_2_flip_horizontal.jpg")
+
       result = described_class.needs_orientation_correction?(image)
       expect(result).to be true
     end
 
     it "returns true for orientation 3 (180° rotation)" do
-      unit.photo.attach(
-        io: File.open(Rails.root.join("spec", "fixtures", "files", "orientation_3_rotate_180.jpg")),
-        filename: "orientation_3_rotate_180.jpg",
-        content_type: "image/jpeg"
-      )
-      image = PdfGeneratorService::ImageProcessor.create_image(unit.photo)
-      
+      image = create_raw_image("orientation_3_rotate_180.jpg")
+
       result = described_class.needs_orientation_correction?(image)
       expect(result).to be true
     end
 
     it "returns true for orientation 6 (90° clockwise)" do
-      unit.photo.attach(
-        io: File.open(Rails.root.join("spec", "fixtures", "files", "orientation_6_rotate_90_cw.jpg")),
-        filename: "orientation_6_rotate_90_cw.jpg",
-        content_type: "image/jpeg"
-      )
-      image = PdfGeneratorService::ImageProcessor.create_image(unit.photo)
-      
+      image = create_raw_image("orientation_6_rotate_90_cw.jpg")
+
       result = described_class.needs_orientation_correction?(image)
       expect(result).to be true
     end
 
     it "returns true for orientation 8 (90° counter-clockwise)" do
-      unit.photo.attach(
-        io: File.open(Rails.root.join("spec", "fixtures", "files", "orientation_8_rotate_90_ccw.jpg")),
-        filename: "orientation_8_rotate_90_ccw.jpg",
-        content_type: "image/jpeg"
-      )
-      image = PdfGeneratorService::ImageProcessor.create_image(unit.photo)
-      
+      image = create_raw_image("orientation_8_rotate_90_ccw.jpg")
+
       result = described_class.needs_orientation_correction?(image)
       expect(result).to be true
     end
 
     it "returns false when no EXIF data present" do
-      unit.photo.attach(
-        io: File.open(Rails.root.join("spec", "fixtures", "files", "no_exif.jpg")),
-        filename: "no_exif.jpg",
-        content_type: "image/jpeg"
-      )
-      image = PdfGeneratorService::ImageProcessor.create_image(unit.photo)
-      
+      image = create_raw_image("no_exif.jpg")
+
       result = described_class.needs_orientation_correction?(image)
       expect(result).to be false
     end
   end
 
-  describe "EXIF orientation handling with real images" do
+  describe "EXIF orientation handling with raw images" do
     context "with landscape image needing 90° clockwise rotation (orientation 6)" do
-      before do
-        unit.photo.attach(
-          io: File.open(Rails.root.join("spec", "fixtures", "files", "orientation_6_rotate_90_cw.jpg")),
-          filename: "orientation_6_rotate_90_cw.jpg",
-          content_type: "image/jpeg"
-        )
-      end
-
-      let(:image) { PdfGeneratorService::ImageProcessor.create_image(unit.photo) }
+      let(:image) { create_raw_image("orientation_6_rotate_90_cw.jpg") }
 
       it "correctly identifies need for correction" do
         expect(described_class.needs_orientation_correction?(image)).to be true
@@ -151,7 +117,7 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
       it "applies auto_orient and returns corrected dimensions" do
         # Original image is 100x60 landscape, after 90° rotation it becomes 60x100 portrait
         width, height = described_class.get_dimensions(image)
-        
+
         # After rotation, landscape (100x60) becomes portrait (60x100)
         expect(width).to eq(60)
         expect(height).to eq(100)
@@ -159,22 +125,14 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
 
       it "processes image with orientation correction" do
         result = described_class.process_with_orientation(image)
-        
+
         expect(result).to be_a(String)
         expect(result.length).to be > 0
       end
     end
 
     context "with image needing 180° rotation (orientation 3)" do
-      before do
-        unit.photo.attach(
-          io: File.open(Rails.root.join("spec", "fixtures", "files", "orientation_3_rotate_180.jpg")),
-          filename: "orientation_3_rotate_180.jpg",
-          content_type: "image/jpeg"
-        )
-      end
-
-      let(:image) { PdfGeneratorService::ImageProcessor.create_image(unit.photo) }
+      let(:image) { create_raw_image("orientation_3_rotate_180.jpg") }
 
       it "correctly identifies need for correction" do
         expect(described_class.needs_orientation_correction?(image)).to be true
@@ -182,7 +140,7 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
 
       it "maintains dimensions after 180-degree rotation" do
         width, height = described_class.get_dimensions(image)
-        
+
         # 180° rotation keeps same dimensions: 100x60 stays 100x60
         expect(width).to eq(100)
         expect(height).to eq(60)
@@ -190,22 +148,14 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
 
       it "processes image with orientation correction" do
         result = described_class.process_with_orientation(image)
-        
+
         expect(result).to be_a(String)
         expect(result.length).to be > 0
       end
     end
 
     context "with horizontally flipped image (orientation 2)" do
-      before do
-        unit.photo.attach(
-          io: File.open(Rails.root.join("spec", "fixtures", "files", "orientation_2_flip_horizontal.jpg")),
-          filename: "orientation_2_flip_horizontal.jpg",
-          content_type: "image/jpeg"
-        )
-      end
-
-      let(:image) { PdfGeneratorService::ImageProcessor.create_image(unit.photo) }
+      let(:image) { create_raw_image("orientation_2_flip_horizontal.jpg") }
 
       it "correctly identifies need for correction" do
         expect(described_class.needs_orientation_correction?(image)).to be true
@@ -213,7 +163,7 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
 
       it "maintains dimensions after horizontal flip" do
         width, height = described_class.get_dimensions(image)
-        
+
         # Horizontal flip keeps same dimensions: 100x60 stays 100x60
         expect(width).to eq(100)
         expect(height).to eq(60)
@@ -221,28 +171,20 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
 
       it "processes image with orientation correction" do
         result = described_class.process_with_orientation(image)
-        
+
         expect(result).to be_a(String)
         expect(result.length).to be > 0
       end
     end
 
     context "with large image needing rotation" do
-      before do
-        unit.photo.attach(
-          io: File.open(Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")),
-          filename: "large_landscape.jpg",
-          content_type: "image/jpeg"
-        )
-      end
-
-      let(:image) { PdfGeneratorService::ImageProcessor.create_image(unit.photo) }
+      let(:image) { create_raw_image("large_landscape.jpg") }
 
       it "correctly handles large images with orientation 6" do
         expect(described_class.needs_orientation_correction?(image)).to be true
-        
+
         width, height = described_class.get_dimensions(image)
-        
+
         # Large landscape (1600x1200) with orientation 6 becomes portrait (1200x1600)
         expect(width).to eq(1200)
         expect(height).to eq(1600)
@@ -250,7 +192,7 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
 
       it "processes large image efficiently" do
         result = described_class.process_with_orientation(image)
-        
+
         expect(result).to be_a(String)
         expect(result.length).to be > 0
       end
@@ -276,15 +218,7 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
     end
 
     context "complete workflow with real rotation" do
-      before do
-        unit.photo.attach(
-          io: File.open(Rails.root.join("spec", "fixtures", "files", "orientation_6_rotate_90_cw.jpg")),
-          filename: "orientation_6_rotate_90_cw.jpg", 
-          content_type: "image/jpeg"
-        )
-      end
-
-      let(:image) { PdfGeneratorService::ImageProcessor.create_image(unit.photo) }
+      let(:image) { create_raw_image("orientation_6_rotate_90_cw.jpg") }
 
       it "handles complete workflow with rotation needed" do
         # Check that it needs correction
@@ -321,20 +255,20 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
       it "provides correct dimensions for aspect ratio calculations" do
         # This is the key test - ensuring PositionCalculator gets post-rotation dimensions
         corrected_width, corrected_height = described_class.get_dimensions(image)
-        
+
         # Use the corrected dimensions in PositionCalculator
         photo_width, photo_height = PdfGeneratorService::PositionCalculator.footer_photo_dimensions(corrected_width, corrected_height)
-        
+
         # QR code size is typically 36, so photo width should be 72
         qr_size = PdfGeneratorService::Configuration::QR_CODE_SIZE
         expected_width = qr_size * 2
-        
+
         expect(photo_width).to eq(expected_width)
-        
+
         # Height should maintain aspect ratio based on corrected dimensions (60x100 = 0.6 ratio)
         aspect_ratio = corrected_width.to_f / corrected_height.to_f
         expected_height = (expected_width / aspect_ratio).round
-        
+
         expect(photo_height).to eq(expected_height)
       end
     end

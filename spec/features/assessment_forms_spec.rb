@@ -10,7 +10,6 @@ RSpec.feature "Assessment Forms", type: :feature do
   let(:enclosed_inspection) { create(:inspection, unit: enclosed_unit, user: user) }
 
   before do
-    setup_admin_environment
     sign_in(user)
   end
 
@@ -334,10 +333,6 @@ RSpec.feature "Assessment Forms", type: :feature do
 
   private
 
-  def setup_admin_environment
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
-  end
 
   def expect_assessment_form_rendered(tab_name)
     expect(page).to have_css("h1", text: I18n.t("inspections.assessments.#{tab_name}.title"))

@@ -1,6 +1,13 @@
 <%= render 'form/errors', model: @inspector_company %>
 
-<%= form_with(model: @inspector_company) do |form| %>
+<%= form_with model: @inspector_company,
+             local: false,
+             html: {
+               class: "inspector-company-form",
+               data: { 
+                 turbo_stream: true
+               }
+             } do |form| %>
     <%= render 'form/fieldset', legend: t('inspector_companies.headers.company_details'), i18n_base: 'inspector_companies.forms', form: form do %>
       <%= render 'form/text_field', field: :name, required: true %>
       <%= render 'form/text_field', field: :email, type: :email_field %>
@@ -31,4 +38,7 @@
     <% end %>
 
     <%= render 'form/submit_button', text: @inspector_company.new_record? ? t('inspector_companies.buttons.create') : t('inspector_companies.buttons.update') %>
+    
+    <!-- Save Message Display -->
+    <div id="inspector_company_save_message"></div>
 <% end %>

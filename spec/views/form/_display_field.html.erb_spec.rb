@@ -10,18 +10,7 @@ RSpec.describe "form/_display_field.html.erb", type: :view do
     assign(:_current_i18n_base, "users.forms")
   end
 
-  it "renders display field with explicit value" do
-    render "form/display_field",
-      field: :name,
-      value: "Custom Value"
-
-    expect(rendered).to include("<label")
-    expect(rendered).to include("Name")
-    expect(rendered).to include("<p>")
-    expect(rendered).to include("Custom Value")
-  end
-
-  it "renders display field using model value when no value provided" do
+  it "renders display field using model value automatically" do
     render "form/display_field",
       field: :name
 
@@ -32,12 +21,15 @@ RSpec.describe "form/_display_field.html.erb", type: :view do
   end
 
   it "handles nil values gracefully" do
+    user_with_nil_phone = create(:user, :without_company, phone: nil)
+    form_object_nil = ActionView::Helpers::FormBuilder.new(:user, user_with_nil_phone, view, {})
+    assign(:_current_form, form_object_nil)
+    
     render "form/display_field",
-      field: :name,
-      value: nil
+      field: :phone
 
     expect(rendered).to include("<label")
-    expect(rendered).to include("Name")
+    expect(rendered).to include("Phone")
     expect(rendered).to include("<p>")
     # Should not crash with nil value
   end

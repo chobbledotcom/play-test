@@ -63,4 +63,31 @@ RSpec.describe "users/change_settings.html.erb", type: :view do
 
     expect(rendered).to have_content("Your Settings")
   end
+
+  it "displays name as read-only for users without company" do
+    user.update!(inspection_company: nil)
+    assign(:user, user)
+    
+    render
+
+    # Name should be displayed but not editable
+    expect(rendered).to have_content(user.name)
+    expect(rendered).not_to have_field("user_name")
+    expect(rendered).not_to have_field("Name")
+  end
+
+  it "displays all contact details as read-only for users with company" do
+    company = create(:inspector_company)
+    user.update!(inspection_company: company)
+    assign(:user, user)
+    
+    render
+
+    # All contact details should be read-only
+    expect(rendered).to have_content(user.name)
+    expect(rendered).not_to have_field("user_name")
+    expect(rendered).not_to have_field("user_phone") 
+    expect(rendered).not_to have_field("user_address")
+    expect(rendered).to have_content("These details are inherited from your company")
+  end
 end

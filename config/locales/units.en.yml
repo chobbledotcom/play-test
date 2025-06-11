@@ -39,6 +39,7 @@ en:
       structure_dimensions: "Structure Specifications"
       slide_dimensions: "Slide Specifications"
       user_height_dimensions: "Tallest User Height & Capacity"
+      user_capacity: "User Capacity at Various Heights"
       enclosed_dimensions: "Enclosed Unit Specifications"
       other_dimensions: "Other Specifications"
 
@@ -189,6 +190,7 @@ en:
       inspection_not_found: "Inspection not found"
       inspection_has_unit: "This inspection already has a unit associated with it"
       unauthorized: "You are not authorized to access this unit"
+      invalid_image: "Photo must be a valid image file"
 
     messages:
       add_inspection_confirm: "Create a new inspection for this unit?"

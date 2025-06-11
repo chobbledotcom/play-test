@@ -1,0 +1,53 @@
+/* Save message styling - consistent across all forms */
+.save-message {
+  max-width: 30rem;
+  margin: 1rem auto;
+  text-align: center;
+}
+
+.save-message .success-message {
+  padding: 1rem;
+  background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
+  border: 1px solid #90ee90;
+  border-radius: 8px;
+  color: #2d5016;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-in;
+}
+
+.save-message .error-message {
+  padding: 1rem;
+  background: linear-gradient(135deg, #ffe8e8 0%, #fff0f0 100%);
+  border: 1px solid #ffb3b3;
+  border-radius: 8px;
+  color: #cc0000;
+  font-weight: 500;  
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-in;
+}
+
+.save-message .error-message ul {
+  margin: 0.5rem 0 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.save-message .error-message li {
+  margin: 0.25rem 0;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.save-message .error-message li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #cc0000;
+  font-weight: bold;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

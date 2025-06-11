@@ -90,7 +90,10 @@ class UnitsController < ApplicationController
                 dom_id: "unit_save_message",
                 success: true,
                 success_message: t("units.messages.updated")
-              })
+              }),
+            turbo_stream.replace("unit_photo_preview",
+              partial: "shared/unit_photo_preview",
+              locals: { unit: @unit })
           ]
         end
       end

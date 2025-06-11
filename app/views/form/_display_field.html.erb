@@ -2,13 +2,9 @@
   # Get i18n_base from section (already validated there) 
   setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
   
-  # Get value - either passed explicitly or from model
-  if local_assigns[:value]
-    value = local_assigns[:value]
-  else
-    model_object = setup[:form_object].object
-    value = model_object.send(field) if model_object.respond_to?(field)
-  end
+  # Get value from model object automatically
+  model_object = setup[:form_object].object
+  value = model_object.send(field) if model_object.respond_to?(field)
 %>
 
 <%= setup[:form_object].label field, setup[:field_label] %>

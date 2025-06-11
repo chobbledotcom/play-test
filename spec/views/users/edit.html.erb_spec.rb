@@ -20,7 +20,11 @@ RSpec.describe "users/edit.html.erb", type: :view do
   it "includes admin-only fields for admin users" do
     render
 
-    # Admin users should see additional controls
+    # Admin users should see name field and other admin controls
+    expect(rendered).to have_field("Name")
+    expect(rendered).to have_field("RPII Inspector No")
+    expect(rendered).to have_field("Active Until")
+    expect(rendered).to have_select("Inspection Company")
     expect(rendered).to have_button("Delete")
   end
 

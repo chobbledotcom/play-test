@@ -48,10 +48,38 @@ class UsersController < ApplicationController
     end
 
     if @user.update(user_params)
-      flash[:notice] = I18n.t("users.messages.user_updated")
-      redirect_to users_path
+      respond_to do |format|
+        format.html do
+          flash[:notice] = I18n.t("users.messages.user_updated")
+          redirect_to users_path
+        end
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("user_edit_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "user_edit_save_message",
+                success: true,
+                success_message: I18n.t("users.messages.user_updated")
+              })
+          ]
+        end
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("user_edit_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "user_edit_save_message",
+                errors: @user.errors.full_messages,
+                error_message: t("shared.messages.save_failed")
+              })
+          ]
+        end
+      end
     end
   end
 
@@ -91,10 +119,38 @@ class UsersController < ApplicationController
 
   def update_settings
     if @user.update(settings_params)
-      flash[:notice] = I18n.t("users.messages.settings_updated")
-      redirect_to root_path
+      respond_to do |format|
+        format.html do
+          flash[:notice] = I18n.t("users.messages.settings_updated")
+          redirect_to root_path
+        end
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("user_settings_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "user_settings_save_message",
+                success: true,
+                success_message: I18n.t("users.messages.settings_updated")
+              })
+          ]
+        end
+      end
     else
-      render :change_settings, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :change_settings, status: :unprocessable_entity }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("user_settings_save_message",
+              partial: "shared/save_message",
+              locals: {
+                dom_id: "user_settings_save_message",
+                errors: @user.errors.full_messages,
+                error_message: t("shared.messages.save_failed")
+              })
+          ]
+        end
+      end
     end
   end
 
@@ -111,8 +167,11 @@ class UsersController < ApplicationController
         password_confirmation rpii_inspector_number
       ]
       params.require(:user).permit(admin_permitted_params)
-    else
+    elsif action_name == "create"
+      # Allow name during user registration
       params.require(:user).permit(:email, :name, :password, :password_confirmation)
+    else
+      params.require(:user).permit(:email, :password, :password_confirmation)
     end
   end
 
@@ -132,7 +191,7 @@ class UsersController < ApplicationController
 
   def settings_params
     settings_fields = %i[
-      address country default_inspection_location name
+      address country default_inspection_location
       phone postal_code theme time_display
     ]
     params.require(:user).permit(settings_fields)

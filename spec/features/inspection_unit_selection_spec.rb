@@ -168,8 +168,10 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
     end
 
     context "as admin" do
+      let(:admin_user) { create(:user, :admin) }
+      
       before do
-        user.update!(email: "admin@example.com")
+        sign_in(admin_user)
       end
 
       it "redirects to show page when trying to access unit selection for complete inspections" do

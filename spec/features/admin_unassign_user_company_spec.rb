@@ -1,12 +1,11 @@
 require "rails_helper"
 
 RSpec.feature "Admin User Management", type: :feature do
-  let(:admin_user) { create(:user, :without_company, email: "admin@example.com") }
+  let(:admin_user) { create(:user, :admin, :without_company) }
   let(:inspector_company) { create(:inspector_company, name: "Test Company") }
   let(:regular_user) { create(:user, :active_user, email: "user@example.com", inspection_company: inspector_company) }
 
   before do
-    setup_admin_environment
     sign_in(admin_user)
   end
 
@@ -59,10 +58,4 @@ RSpec.feature "Admin User Management", type: :feature do
     expect(page).to have_content(I18n.t("users.messages.user_inactive"))
   end
 
-  private
-
-  def setup_admin_environment
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
-  end
 end

@@ -1,14 +1,12 @@
 require "rails_helper"
 
 RSpec.describe "Admin user company management", type: :request do
-  let(:admin_user) { create(:user, :without_company, email: "admin@example.com") }
+  let(:admin_user) { create(:user, :admin, :without_company) }
   let(:inspector_company) { create(:inspector_company) }
   let(:user_with_company) { create(:user, inspection_company: inspector_company) }
   let(:user_without_company) { create(:user, :without_company) }
 
   before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
     login_as(admin_user)
   end
 

@@ -32,7 +32,7 @@
   <!-- Public Information -->
   <% unless @inspection.new_record? %>
     <%= render 'form/fieldset', legend_key: 'public_information', i18n_base: 'inspections.fields', form: form do %>
-      <%= render 'form/display_field', field: :id, label: t('inspections.fields.public_inspection_id'), value: @inspection.id %>
+      <%= render 'form/display_field', field: :id, label: t('inspections.fields.public_inspection_id') %>
       
       <div>
         <%= link_to t('inspections.buttons.download_pdf'), 

@@ -1,13 +1,10 @@
 require "rails_helper"
 
 RSpec.feature "User Active Status Management", type: :feature do
-  let(:admin_user) { create(:user, email: "admin@example.com") }
+  let(:admin_user) { create(:user, :admin) }
   let(:regular_user) { create(:user, :inactive_user, email: "user@example.com") }
   let!(:inspector_company) { create(:inspector_company, active: true) }
 
-  before do
-    setup_admin_environment
-  end
 
   describe "admin managing user active status" do
     before { sign_in admin_user }
@@ -131,12 +128,6 @@ RSpec.feature "User Active Status Management", type: :feature do
     end
   end
 
-  private
-
-  def setup_admin_environment
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
-  end
 
   def set_user_active_until_date
     fill_in "user_active_until", with: (Date.current + 1.year).strftime("%Y-%m-%d")

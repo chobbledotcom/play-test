@@ -105,14 +105,10 @@ RSpec.feature "Unit creation company restriction", type: :feature do
   end
 
   context "switching between active and inactive users" do
-    let(:admin_user) { create(:user, :without_company, email: "admin@example.com") }
+    let(:admin_user) { create(:user, :admin, :without_company) }
     let(:active_user) { create(:user, :active_user) }
     let(:inactive_user) { create(:user, :inactive_user) }
 
-    before do
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
-    end
 
     scenario "button visibility changes based on user's active status" do
       # Start as active user

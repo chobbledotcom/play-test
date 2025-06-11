@@ -1,6 +1,12 @@
 <%= render 'form/errors', model: @unit %>
 
-<%= form_with(model: @unit) do |form| %>
+<%= form_with model: @unit,
+             local: true,
+             html: {
+               class: "unit-form",
+               multipart: true
+             } do |form| %>
+  <%= render 'shared/page_header', title: t('units.headers.unit_details') %>
   <%= render 'shared/unit_details_form', form: form, object: @unit, i18n_base: 'units.forms', show_photo: true %>
   <%= render 'shared/basic_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
   <%= render 'shared/anchorage_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>

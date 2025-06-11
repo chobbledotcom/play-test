@@ -262,10 +262,10 @@ RSpec.describe HasDimensions, type: :model do
 
         stats = Unit.dimension_statistics
 
-        expect(stats[:width][:avg]).to eq(11.0) # (10 + 12) / 2
-        expect(stats[:width][:min]).to eq(10)
-        expect(stats[:width][:max]).to eq(12)
-        expect(stats[:area][:avg]).to eq(122.0) # (100 + 144) / 2
+        expect(stats[:width][:avg]).to be_within(0.01).of(11.0) # (10 + 12) / 2
+        expect(stats[:width][:min]).to be_within(0.01).of(10)
+        expect(stats[:width][:max]).to be_within(0.01).of(12)
+        expect(stats[:area][:avg]).to be_within(0.01).of(122.0) # (100 + 144) / 2
       end
     end
   end

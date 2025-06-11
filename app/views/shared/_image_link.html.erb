@@ -8,11 +8,18 @@
   link_text = local_assigns[:link_text] || t('shared.view_full_size')
   
   return unless image_attachment&.attached?
+  
+  # Don't try to display images that aren't persisted yet (validation failures)
+  return unless image_attachment.blob.persisted?
 %>
 
 <div>
-  <%= link_to rails_blob_path(ImageProcessorService.full_size(image_attachment), disposition: "inline") do %>
-    <%= render 'shared/image', image: image_attachment, size: :thumbnail, alt: alt_text %>
-    <p><small><%= link_text %></small></p>
+  <% begin %>
+    <%= link_to rails_blob_path(ImageProcessorService.full_size(image_attachment), disposition: "inline") do %>
+      <%= render 'shared/image', image: image_attachment, size: :thumbnail, alt: alt_text %>
+      <p><small><%= link_text %></small></p>
+    <% end %>
+  <% rescue ActiveStorage::InvariableError %>
+    <p><small>Invalid image file</small></p>
   <% end %>
 </div>
