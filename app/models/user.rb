@@ -6,11 +6,16 @@ class User < ApplicationRecord
   has_many :units, dependent: :destroy
   belongs_to :inspection_company, class_name: "InspectorCompany", optional: true
 
-  validates :email, presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
-  validates :password, presence: true, length: {minimum: 6}, if: :password_digest_changed?
+  email_format_options = {with: URI::MailTo::EMAIL_REGEXP}
+  validates :email, presence: true, uniqueness: true,
+    format: email_format_options
+  password_length_options = {minimum: 6}
+  validates :password, presence: true, length: password_length_options,
+    if: :password_digest_changed?
   validates :time_display, inclusion: {in: %w[date time]}
   validates :theme, inclusion: {in: %w[light dark]}
-  # Contact fields are only required for users without companies when they need to generate PDFs
+  # Contact fields are only required for users without companies
+  # when they need to generate PDFs
   # For now, we'll make them optional during signup and enforce them when needed
 
   before_create :set_default_time_display

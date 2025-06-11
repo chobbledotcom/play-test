@@ -18,20 +18,33 @@ class Unit < ApplicationRecord
   validates :serial, uniqueness: {scope: [:user_id]}
 
   # Override HasDimensions validations for required basic dimensions
-  validates :width, :length, :height, presence: true, numericality: {greater_than: 0, less_than: 200}
+  dimension_validation_options = {greater_than: 0, less_than: 200}
+  validates :width, :length, :height,
+    presence: true, numericality: dimension_validation_options
 
   # Scopes - enhanced from original Equipment and new Unit functionality
   scope :search, ->(query) {
     if query.present?
-      where("serial LIKE ? OR name LIKE ? OR description LIKE ? OR manufacturer LIKE ? OR owner LIKE ?",
-        "%#{query}%", "%#{query}%", "%#{query}%", "%#{query}%", "%#{query}%")
+      search_term = "%#{query}%"
+      where(<<~SQL, *([search_term] * 5))
+        serial LIKE ?
+        OR name LIKE ?
+        OR description LIKE ?
+        OR manufacturer LIKE ?
+        OR owner LIKE ?
+      SQL
     else
       all
     end
   }
   scope :with_slide, -> { where(has_slide: true) }
   scope :without_slide, -> { where(has_slide: false) }
-  scope :with_recent_inspections, -> { joins(:inspections).where(inspections: {inspection_date: SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago..}).distinct }
+  scope :with_recent_inspections, -> {
+    cutoff_date = SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago
+    joins(:inspections)
+      .where(inspections: {inspection_date: cutoff_date..})
+      .distinct
+  }
 
   # Callbacks
   before_create :generate_custom_id
@@ -58,7 +71,8 @@ class Unit < ApplicationRecord
   def next_inspection_due
     return nil unless last_inspection
     # Standard inspection interval using safety standard constant
-    last_inspection.inspection_date + SafetyStandard::REINSPECTION_INTERVAL_DAYS.days
+    reinspection_interval = SafetyStandard::REINSPECTION_INTERVAL_DAYS.days
+    last_inspection.inspection_date + reinspection_interval
   end
 
   def inspection_overdue?
@@ -94,11 +108,12 @@ class Unit < ApplicationRecord
   end
 
   def self.overdue
-    # Find units where their most recent inspection is older than the reinspection interval
-    # Using Date.current instead of Date.today for consistency with Rails timezone handling
+    # Find units where their most recent inspection is older than the interval
+    # Using Date.current instead of Date.today for Rails timezone consistency
+    cutoff_date = Date.current - SafetyStandard::REINSPECTION_INTERVAL_DAYS.days
     joins(:inspections)
       .group("units.id")
-      .having("MAX(inspections.inspection_date) <= ?", Date.current - SafetyStandard::REINSPECTION_INTERVAL_DAYS.days)
+      .having("MAX(inspections.inspection_date) <= ?", cutoff_date)
   end
 
   private
@@ -111,14 +126,15 @@ class Unit < ApplicationRecord
   end
 
   def saved_changes_to_dimensions?
-    # Use the dimension_changed? method from HasDimensions, but for saved changes
-    dimension_attributes.keys.any? { |attr| saved_change_to_attribute?(attr) }
+    # Use dimension_changed? from HasDimensions for saved changes
+    dimension_attributes.keys.any? { saved_change_to_attribute?(it) }
   end
 
   def update_inspection_unit_data
     # Update any draft inspections with new unit dimensions
+    audit_message = "Unit dimensions updated"
     inspections.each do |inspection|
-      inspection.log_audit_action("unit_updated", user, "Unit dimensions updated")
+      inspection.log_audit_action("unit_updated", user, audit_message)
     end
   end
 end

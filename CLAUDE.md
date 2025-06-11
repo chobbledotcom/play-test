@@ -210,6 +210,11 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 - **Use I18n for all user-facing strings** - no hardcoded English text
 - **Endless methods should perform computation** - not just return static values
 
+**String Interpolation Rule:**
+- **Extract variables for complex interpolations** - nothing more complex than a single word with underscores should appear between `#{}` brackets
+- Extract `#{hash[:key]}`, `#{object.method}`, `#{complex + calculation}` to variables first
+- Keep simple: `#{variable}`, `#{method_name}`, `#{simple_var}`
+
 **When refactoring, always upgrade to modern syntax** - don't maintain legacy patterns for compatibility
 
 ## Rails Style Guide & Code Standards
@@ -333,6 +338,26 @@ error_msg = "This is a very long error message that needs to be broken " \
 # GOOD - Comments: break at sentence boundaries (StandardRB preserves these)
 # This is a long comment that explains the business logic
 # and should be broken at natural sentence boundaries
+
+# GOOD - SQL queries: use heredoc with line breaks before OR/AND
+scope :search, ->(query) {
+  if query.present?
+    search_term = "%#{query}%"
+    where(<<~SQL, search_term, search_term, search_term, search_term, search_term)
+      serial LIKE ?
+      OR name LIKE ?
+      OR description LIKE ?
+      OR manufacturer LIKE ?
+      OR owner LIKE ?
+    SQL
+  else
+    all
+  end
+}
+
+# BAD - Long SQL on single line
+where("serial LIKE ? OR name LIKE ? OR description LIKE ? OR manufacturer LIKE ? OR owner LIKE ?", 
+      search_term, search_term, search_term, search_term, search_term)
 
 # BAD - All on one line when over 80 chars
 LONG_FORMATS = [:pdf, :csv, :json, :xml, :html, :txt, :docx, :xlsx]
