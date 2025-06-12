@@ -2,18 +2,18 @@
   <div class="unit-photo">
     <%= render 'shared/image_link', 
         image: @inspection.unit.photo, 
-        alt: "Photo of #{@inspection.unit.name}",
+        alt: t('inspections.messages.photo_of', name: @inspection.unit.name),
         link_text: t('units.messages.view_full_photo') %>
   </div>
 <% end %>
 
 <%= scrollable_table do %>
   <tr>
-    <th>Name:</th>
+    <th><%= t('inspections.fields.name') %>:</th>
     <td><%= @inspection.name %></td>
   </tr>
   <tr>
-    <th>Serial Number / Asset ID:</th>
+    <th><%= t('inspections.fields.serial') %>:</th>
     <td>
       <% if @inspection.unit %>
         <%= link_to @inspection.serial.presence || t("inspections.messages.missing_serial"), unit_path(@inspection.unit) %>
@@ -23,7 +23,7 @@
     </td>
   </tr>
   <tr>
-    <th>Manufacturer:</th>
+    <th><%= t('inspections.fields.manufacturer') %>:</th>
     <td><%= @inspection.manufacturer %></td>
   </tr>
   <tr>
@@ -31,19 +31,19 @@
     <td><%= @inspection.inspection_location %></td>
   </tr>
   <tr>
-    <th>Inspection Date:</th>
+    <th><%= t('inspections.fields.inspection_date') %>:</th>
     <td><%= render_time(@inspection.inspection_date) %></td>
   </tr>
   <tr>
-    <th>Next Inspection Due:</th>
+    <th><%= t('inspections.fields.reinspection_date') %>:</th>
     <td><%= render_time(@inspection.reinspection_date) %></td>
   </tr>
   <tr>
-    <th>Inspector:</th>
-    <td><%= @inspection.inspector_company.name %></td>
+    <th><%= t('inspections.fields.inspector') %>:</th>
+    <td><%= @inspection.user.name %></td>
   </tr>
   <tr>
-    <th>Overall Result:</th>
+    <th><%= t('inspections.fields.overall_result') %>:</th>
     <td><%= inspection_result_badge(@inspection) %></td>
   </tr>
 <% end %>

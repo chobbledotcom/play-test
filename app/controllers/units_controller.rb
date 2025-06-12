@@ -82,7 +82,6 @@ class UnitsController < ApplicationController
     end
   end
 
-
   def new_from_inspection
     @inspection = current_user.inspections.find_by(id: params[:id])
 
@@ -193,10 +192,10 @@ class UnitsController < ApplicationController
   end
 
   def build_index_title
-    I18n.t("units.titles.index") => title
-    title += " - #{I18n.t("units.status.overdue")}" if params[:status] == "overdue"
-    title += " - #{params[:manufacturer]}" if params[:manufacturer]
-    title += " - #{params[:owner]}" if params[:owner]
-    title
+    title_parts = [I18n.t("units.titles.index")]
+    title_parts << I18n.t("units.status.overdue") if params[:status] == "overdue"
+    title_parts << params[:manufacturer] if params[:manufacturer].present?
+    title_parts << params[:owner] if params[:owner].present?
+    title_parts.join(" - ")
   end
 end

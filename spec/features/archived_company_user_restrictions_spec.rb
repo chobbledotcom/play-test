@@ -33,7 +33,7 @@ RSpec.feature "Inactive User Restrictions", type: :feature do
 
       inspection_identifier = existing_inspection.name || existing_inspection.serial
       expect(page).to have_content(inspection_identifier)
-      expect(page).to have_content("Archived Company")
+      expect(page).to have_content(I18n.t("users.messages.user_inactive"))
     end
 
     scenario "shows archived company in inspection history" do

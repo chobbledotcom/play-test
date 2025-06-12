@@ -13,6 +13,7 @@ FactoryBot.define do
     model { "Test Model" }
     manufacture_date { 1.year.ago }
     notes { "Test notes" }
+    is_seed { false }
 
     # Base traits for dimension groups
     trait :with_slide_dimensions do

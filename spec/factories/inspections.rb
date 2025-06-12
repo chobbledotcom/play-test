@@ -12,6 +12,7 @@ FactoryBot.define do
     comments { "Test inspection comments" }
     sequence(:unique_report_number) { |n| "RPII-#{Date.current.strftime("%Y%m%d")}-#{n.to_s.rjust(4, "0")}" }
     complete_date { nil }
+    is_seed { false }
 
     trait :passed do
       passed { true }

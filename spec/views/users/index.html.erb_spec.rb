@@ -7,6 +7,11 @@ RSpec.describe "users/index.html.erb", type: :view do
 
   before do
     assign(:users, [admin_user, regular_user1, regular_user2])
+    assign(:inspection_counts, {
+      admin_user.id => 5,
+      regular_user1.id => 3,
+      regular_user2.id => 0
+    })
     allow(view).to receive(:current_user).and_return(admin_user)
   end
 
@@ -35,7 +40,9 @@ RSpec.describe "users/index.html.erb", type: :view do
     render
 
     expect(rendered).to include("Inspections")
-    expect(rendered).to include("0") # All users have 0 inspections initially
+    expect(rendered).to include("5") # admin_user
+    expect(rendered).to include("3") # regular_user1
+    expect(rendered).to include("0") # regular_user2
   end
 
   it "includes action links for admin" do

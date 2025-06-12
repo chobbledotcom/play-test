@@ -24,8 +24,8 @@ RSpec.feature "Inspections Filtering", type: :feature do
       expect(page).to have_content(completed_failed.serial)
 
       # Should have section headers
-      expect(page).to have_content("Draft Inspections")
-      expect(page).to have_content("Complete Inspections")
+      expect(page).to have_content("In Progress")
+      expect(page).to have_content("Completed")
     end
 
     it "does not have status filter (statuses are now separated)" do

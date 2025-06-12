@@ -16,15 +16,15 @@
   <% end %>
 <% end %>
 
-<% if current_user.inspections.any? || current_user.units.any? %>
+<% if @has_any_inspections || current_user.units.any? %>
   <%= render 'filter_form' %>
 <% end %>
 
 <% if @draft_inspections.any? %>
-  <h2>Draft Inspections</h2>
+  <h2><%= t('inspections.headings.in_progress') %></h2>
   <%= render 'inspections_table', inspections: @draft_inspections %>
   <hr>
-  <h2>Complete Inspections</h2>
+  <h2><%= t('inspections.headings.completed') %></h2>
 <% end %>
 
 <% if @complete_inspections.any? %>

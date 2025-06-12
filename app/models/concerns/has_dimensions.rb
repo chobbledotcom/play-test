@@ -238,7 +238,8 @@ module HasDimensions
       general_notes inspector_signature signature_timestamp
       pdf_last_accessed_at inspection_date inspection_location
       name serial manufacturer model owner description
-      manufacture_date condition notes serial_number
+      manufacture_date condition notes serial_number is_seed
+      inspector_company_id
     ]
   end
 

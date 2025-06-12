@@ -49,6 +49,21 @@
   </article>
 <% end %>
 
+<% if @user.has_seed_data? %>
+  <article>
+    <%= button_to t('users.buttons.delete_seeds'), 
+        delete_seeds_user_path(@user), 
+        method: :delete,
+        data: { confirm: t('users.messages.delete_seeds_confirm', email: @user.email) } %>
+  </article>
+<% else %>
+  <article>
+    <%= button_to t('users.buttons.add_seeds'), 
+        add_seeds_user_path(@user), 
+        method: :post %>
+  </article>
+<% end %>
+
 <% if @user != current_user %>
   <article>
     <%= button_to t('users.buttons.impersonate', email: @user.email), 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_11_104600) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_12_000335) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -176,7 +176,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_11_104600) do
     t.boolean "exit_sign_visible_pass"
     t.text "risk_assessment"
     t.datetime "complete_date"
+    t.boolean "is_seed", default: false, null: false
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
+    t.index ["is_seed"], name: "index_inspections_on_is_seed"
     t.index ["unit_id"], name: "index_inspections_on_unit_id"
     t.index ["user_id", "unique_report_number"], name: "index_inspections_on_user_and_report_number", unique: true
     t.index ["user_id"], name: "index_inspections_on_user_id"
@@ -381,6 +383,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_11_104600) do
     t.decimal "trough_depth"
     t.decimal "trough_adjacent_panel_width"
     t.text "risk_assessment"
+    t.boolean "is_seed", default: false, null: false
+    t.index ["is_seed"], name: "index_units_on_is_seed"
     t.index ["manufacturer", "serial_number"], name: "index_units_on_manufacturer_and_serial_number", unique: true
     t.index ["serial"], name: "index_units_on_serial"
     t.index ["user_id"], name: "index_units_on_user_id"

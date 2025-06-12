@@ -27,7 +27,7 @@
     <%= form.select :inspection_location, 
         options_for_select([
           [t('inspections.filters.all_locations'), ""]
-        ] + inspection_location_options(current_user), params[:inspection_location]),
+        ] + @inspection_locations, params[:inspection_location]),
         {}, { onchange: "this.form.submit();" } %>
     
     <% if params[:result].present? || params[:unit_id].present? || params[:query].present? || params[:owner].present? || params[:inspection_location].present? %>

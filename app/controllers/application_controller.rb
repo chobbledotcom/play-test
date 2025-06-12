@@ -10,6 +10,34 @@ class ApplicationController < ActionController::Base
 
   # Performance tracking for debug info
   before_action :start_debug_timer, if: :admin_debug_enabled?
+  after_action :check_query_limit, if: :should_check_query_limit?
+  after_action :cleanup_debug_subscription, if: :admin_debug_enabled?
+  
+  rescue_from StandardError do |exception|
+    if Rails.env.production?
+      user_info = current_user ? "User: #{current_user.email}" : "User: Not logged in"
+      
+      message = <<~MESSAGE
+        500 Error in play-test
+        
+        #{exception.class}: #{exception.message}
+        
+        #{user_info}
+        Controller: #{controller_name}##{action_name}
+        Path: #{request.fullpath}
+        Method: #{request.request_method}
+        IP: #{request.remote_ip}
+        
+        Backtrace (first 5 lines):
+        #{exception.backtrace.first(5).join("\n")}
+      MESSAGE
+      
+      NtfyService.notify(message)
+    end
+    
+    raise exception
+  end
+
 
   private
 
@@ -37,6 +65,14 @@ class ApplicationController < ActionController::Base
     Rails.env.development? || current_user&.admin? || impersonating?
   end
 
+  def should_check_query_limit?
+    admin_debug_enabled? && !seed_data_action?
+  end
+
+  def seed_data_action?
+    controller_name == "users" && %w[add_seeds delete_seeds].include?(action_name)
+  end
+
   def impersonating?
     # Check if we have an original admin ID stored
     # (indicating impersonation is active)
@@ -47,8 +83,9 @@ class ApplicationController < ActionController::Base
     @debug_start_time = Time.current
     @debug_sql_queries = []
 
-    # Subscribe to SQL queries for this request
-    ActiveSupport::Notifications.subscribe("sql.active_record") do |name, start, finish, id, payload|
+    ActiveSupport::Notifications.unsubscribe(@debug_subscription) if @debug_subscription
+
+    @debug_subscription = ActiveSupport::Notifications.subscribe("sql.active_record") do |name, start, finish, id, payload|
       unless payload[:name] == "SCHEMA" || payload[:sql] =~ /^PRAGMA/
         @debug_sql_queries << {
           sql: payload[:sql],
@@ -66,7 +103,6 @@ class ApplicationController < ActionController::Base
     :debug_sql_queries
 
   def debug_render_time
-    # Calculate time since request started
     if @debug_start_time
       ((Time.current - @debug_start_time) * 1000).round(2)
     end
@@ -75,4 +111,45 @@ class ApplicationController < ActionController::Base
   def debug_sql_queries
     @debug_sql_queries || []
   end
+
+  def check_query_limit
+    table_query_counts = count_queries_by_table
+
+    table_query_counts.each do |table, count|
+      if count > 5
+        Rails.logger.error "N+1 query detected: #{table} was queried #{count} times"
+        Rails.logger.error "Queries for #{table}:"
+        debug_sql_queries.select { |q| table_from_query(q[:sql]) == table }.each_with_index do |query, i|
+          Rails.logger.error "  #{i + 1}. #{query[:name]}: #{query[:sql]}"
+        end
+        raise "N+1 query detected: #{table} table was queried #{count} times (limit: 5)"
+      end
+    end
+  end
+
+  def count_queries_by_table
+    debug_sql_queries.each_with_object(Hash.new(0)) do |query, counts|
+      table = table_from_query(query[:sql])
+      counts[table] += 1 if table
+    end
+  end
+
+  def table_from_query(sql)
+    if sql =~ /FROM\s+["']?(\w+)["']?/i
+      $1
+    elsif sql =~ /INSERT\s+INTO\s+["']?(\w+)["']?/i
+      $1
+    elsif sql =~ /UPDATE\s+["']?(\w+)["']?/i
+      $1
+    elsif sql =~ /DELETE\s+FROM\s+["']?(\w+)["']?/i
+      $1
+    end
+  end
+
+  def cleanup_debug_subscription
+    ActiveSupport::Notifications.unsubscribe(@debug_subscription) if @debug_subscription
+    @debug_subscription = nil
+  end
+
+
 end

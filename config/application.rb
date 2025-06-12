@@ -44,5 +44,6 @@ module PatLogger
 
     # Preserve full timezone rather than offset in Rails 8.1+
     config.active_support.to_time_preserves_timezone = :zone
+    
   end
 end

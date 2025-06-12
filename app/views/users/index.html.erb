@@ -25,7 +25,7 @@
           <% else %>
             <td>Never</td>
           <% end %>
-          <td><%= user.inspections.count %></td>
+          <td><%= @inspection_counts[user.id] || 0 %></td>
         </tr>
       <% end %>
     </tbody>

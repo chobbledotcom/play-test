@@ -98,6 +98,10 @@ class User < ApplicationRecord
     rpii_verified_date.present?
   end
 
+  def has_seed_data?
+    units.seed_data.exists? || inspections.seed_data.exists?
+  end
+
   private
 
   def validate_name?

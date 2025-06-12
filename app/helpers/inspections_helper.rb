@@ -99,7 +99,4 @@ module InspectionsHelper
     (completed_assessments.to_f / total_assessments * 100).round(0)
   end
 
-  def inspection_location_options(user)
-    user.inspections.distinct.pluck(:inspection_location).compact.reject(&:blank?).sort
-  end
 end

@@ -4,7 +4,7 @@ class Inspection < ApplicationRecord
 
   belongs_to :user
   belongs_to :unit, optional: true
-  belongs_to :inspector_company
+  belongs_to :inspector_company, optional: true
 
   # Assessment associations (normalized from single table)
   has_one :user_height_assessment, class_name: "UserHeightAssessment",
@@ -95,6 +95,8 @@ class Inspection < ApplicationRecord
   before_save :auto_determine_pass_fail, if: :all_assessments_complete?
 
   # Scopes
+  scope :seed_data, -> { where(is_seed: true) }
+  scope :non_seed_data, -> { where(is_seed: false) }
   scope :passed, -> { where(passed: true) }
   scope :failed, -> { where(passed: false) }
   scope :complete, -> { where.not(complete_date: nil) }

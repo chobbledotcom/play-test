@@ -51,6 +51,8 @@ en:
       change_password: "Change Password"
       impersonate: "Log in as %{email}"
       verify_rpii: "Verify RPII Number"
+      add_seeds: "Add Seeds"
+      delete_seeds: "Delete Seeds"
 
     messages:
       no_users: "No users found"
@@ -75,6 +77,11 @@ en:
       rpii_blank_name: "User name is required for verification"
       rpii_name_mismatch: "Name mismatch: User name '%{user_name}' does not match inspector name '%{inspector_name}'"
       rpii_not_found: "RPII inspector number not found"
+      seeds_added: "Successfully added seed data for user"
+      seeds_failed: "Failed to add seed data"
+      seeds_deleted: "Successfully deleted seed data for user"
+      seeds_delete_failed: "Failed to delete seed data"
+      delete_seeds_confirm: "Are you sure you want to delete all seed data for %{email}? This will remove all seed units and inspections."
 
     errors:
       wrong_password: "Current password is incorrect"

@@ -49,18 +49,25 @@ class InspectorCompany < ApplicationRecord
     inspections.order(inspection_date: :desc).limit(limit)
   end
 
-  def pass_rate
-    return 0 if inspections.empty?
-    passed_count = inspections.passed.count
-    (passed_count.to_f / inspections.count * 100).round(2)
+  def pass_rate(total = nil, passed = nil)
+    total ||= inspections.count
+    passed ||= inspections.passed.count
+    return 0 if total == 0
+    (passed.to_f / total * 100).round(2)
   end
 
   def company_statistics
+    # Use group to get all counts in a single query
+    counts = inspections.group(:passed).count
+    passed_count = counts[true] || 0
+    failed_count = counts[false] || 0
+    total_count = passed_count + failed_count
+
     {
-      total_inspections: inspections.count,
-      passed_inspections: inspections.passed.count,
-      failed_inspections: inspections.failed.count,
-      pass_rate: pass_rate,
+      total_inspections: total_count,
+      passed_inspections: passed_count,
+      failed_inspections: failed_count,
+      pass_rate: pass_rate(total_count, passed_count),
       active_since: created_at.year
     }
   end

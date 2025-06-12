@@ -26,6 +26,8 @@ class Unit < ApplicationRecord
     presence: true, numericality: dimension_validation_options
 
   # Scopes - enhanced from original Equipment and new Unit functionality
+  scope :seed_data, -> { where(is_seed: true) }
+  scope :non_seed_data, -> { where(is_seed: false) }
   scope :search, ->(query) {
     if query.present?
       search_term = "%#{query}%"
@@ -42,8 +44,8 @@ class Unit < ApplicationRecord
   }
   scope :with_slide, -> { where(has_slide: true) }
   scope :without_slide, -> { where(has_slide: false) }
-  scope :by_manufacturer, ->(manufacturer) { where(manufacturer: manufacturer) if manufacturer }
-  scope :by_owner, ->(owner) { where(owner: owner) if owner }
+  scope :by_manufacturer, ->(manufacturer) { where(manufacturer: manufacturer) if manufacturer.present? }
+  scope :by_owner, ->(owner) { where(owner: owner) if owner.present? }
   scope :with_recent_inspections, -> {
     cutoff_date = SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago
     joins(:inspections)

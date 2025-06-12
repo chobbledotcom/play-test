@@ -10,10 +10,21 @@ class InspectionsController < ApplicationController
   before_action :no_index
 
   def index
-    filtered_inspections = filtered_inspections_query
-    @draft_inspections = filtered_inspections.draft
-    @complete_inspections = filtered_inspections.complete
+    # Load all inspections in one query to avoid N+1
+    all_inspections = filtered_inspections_query_without_order.to_a
+
+    # Partition into draft and complete in memory
+    @draft_inspections = all_inspections
+      .select { it.complete_date.nil? }
+      .sort_by(&:created_at)
+
+    @complete_inspections = all_inspections
+      .select { it.complete_date.present? }
+      .sort_by { -it.created_at.to_i }
+
     @title = build_index_title
+    @has_any_inspections = all_inspections.any?
+    load_inspection_locations
 
     respond_to do |format|
       format.html
@@ -52,6 +63,7 @@ class InspectionsController < ApplicationController
     # Build assessments if they don't exist yet
     # and pre-fill with inspection attributes
     @inspection.build_assessments_with_attributes
+    load_inspection_locations
   end
 
   def update
@@ -155,26 +167,35 @@ class InspectionsController < ApplicationController
     redirect_to edit_inspection_path(@inspection)
   end
 
-
   private
 
-  def filtered_inspections_query = current_user.inspections
+  def filtered_inspections_query_without_order = current_user.inspections
     .includes(:unit, :inspector_company)
     .search(params[:query])
     .filter_by_result(params[:result])
     .filter_by_unit(params[:unit_id])
     .filter_by_owner(params[:owner])
     .filter_by_inspection_location(params[:inspection_location])
-    .order(created_at: :desc)
 
   def inspection_params = InspectionParamsService.new(params).permitted_params
 
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
 
   def set_inspection
-    # Try exact match first, then case-insensitive match for user-friendly URLs
-    @inspection = Inspection.find_by(id: params[:id]) ||
-      Inspection.find_by("UPPER(id) = ?", params[:id].upcase)
+    @inspection = Inspection
+      .includes(
+        :user,
+        :inspector_company,
+        :anchorage_assessment,
+        :enclosed_assessment,
+        :fan_assessment,
+        :materials_assessment,
+        :slide_assessment,
+        :structure_assessment,
+        :user_height_assessment,
+        unit: {photo_attachment: :blob}
+      )
+      .find_by(id: params[:id]&.upcase)
 
     unless @inspection
       # Always return 404 for non-existent resources regardless of login status
@@ -273,4 +294,16 @@ class InspectionsController < ApplicationController
   def resource_pdf_url
     inspection_path(@inspection, format: :pdf)
   end
+
+  def load_inspection_locations
+    # Use already loaded inspections to avoid extra query
+    all_inspections = (@draft_inspections || []) + (@complete_inspections || [])
+    @inspection_locations = all_inspections
+      .map(&:inspection_location)
+      .compact
+      .reject(&:blank?)
+      .uniq
+      .sort
+  end
 end
+

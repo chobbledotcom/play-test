@@ -7,7 +7,7 @@ class InspectionCsvExportService
     CSV.generate(headers: true) do |csv|
       csv << headers
 
-      @inspections.includes(:unit, :inspector_company, :user).each do |inspection|
+      @inspections.each do |inspection|
         csv << row_data(inspection)
       end
     end

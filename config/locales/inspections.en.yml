@@ -17,6 +17,10 @@ en:
       report_pdf_link: "Report PDF Link"
       report_json_link: "Report JSON Link"
 
+    headings:
+      in_progress: "In Progress"
+      completed: "Completed"
+
     sections:
       current_unit: "Current Unit"
       unit_details: "Unit Details"
@@ -163,6 +167,7 @@ en:
       create_without_unit_confirm: "This will create an inspection without an associated unit. If you're inspecting a unit you have seen before, it's faster to select the unit from the \"Units\" tab above and start the inspection from there. Continue?"
       unnamed: "Unnamed"
       missing_serial: "Missing"
+      photo_of: "Photo of %{name}"
       unit_selection_notice: "Select a unit below to update this inspection. Clicking a unit will replace the current unit and copy all dimension values from the selected unit."
       unit_selection_confirm: "Are you sure you want to change to unit '%{unit_name}'? This will replace the current unit and copy all dimension values."
       unit_changed: "Unit changed to '%{unit_name}' and dimension values have been updated."
