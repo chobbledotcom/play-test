@@ -1,15 +1,11 @@
 <%= render 'shared/page_header', title: t('users.titles.settings') %>
 
-<%= form_with model: @user, 
-             url: update_settings_user_path(@user), 
-             method: :patch, 
-             local: false,
-             html: {
-               class: "user-settings-form",
-               data: { 
-                 turbo_stream: true
-               }
-             } do |form| %>
+<%= form_with model: @user,
+  url: update_settings_user_path(@user),
+  method: :patch,
+  local: false,
+  html: { data: { turbo_stream: true } } do |form|
+%>
   <%= render 'form/errors', model: @user %>
 
   <%= render 'form/fieldset', legend_key: 'contact_details', i18n_base: 'users.forms', form: form do %>
@@ -30,28 +26,27 @@
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'preferences', i18n_base: 'users.forms', form: form do %>
-    <%= render 'form/select', 
-        field: :time_display, 
-        options: options_for_select([
-          [t('users.options.time_full'), "time"],
-          [t('users.options.time_day'), "day"]
-        ], @user.time_display) %>
+    <%= render 'form/select',
+      field: :time_display,
+      options: options_for_select([
+        [t('users.options.time_full'), "time"],
+        [t('users.options.time_day'), "day"]
+      ], @user.time_display)
+    %>
 
-    <%= render 'form/text_field', 
-        field: :default_inspection_location,
-        value: @user.default_inspection_location %>
+    <%= render 'form/text_field', field: :default_inspection_location %>
 
-    <%= render 'form/select', 
-        field: :theme, 
-        options: options_for_select([
-          [t('users.options.theme_light'), "light"],
-          [t('users.options.theme_dark'), "dark"]
-        ], @user.theme) %>
+    <%= render 'form/select',
+      field: :theme,
+      options: options_for_select([
+        [t('users.options.theme_light'), "light"],
+        [t('users.options.theme_dark'), "dark"]
+      ], @user.theme)
+    %>
   <% end %>
 
-  <%= render 'form/submit_button',
-      text: t('users.buttons.update_settings') %>
-      
+  <%= render 'form/submit_button', text: t('users.buttons.update_settings') %>
+
   <!-- Save Message Display -->
   <div id="user_settings_save_message"></div>
 <% end %>
@@ -61,4 +56,3 @@
     <strong>Change Password</strong>
   <% end %>
 </div>
-

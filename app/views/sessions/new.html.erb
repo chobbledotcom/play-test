@@ -1,21 +1,33 @@
 <%= render 'shared/page_header', title: t('session.login.title') %>
 
 <%= form_with(scope: :session, url: login_path) do |form| %>
-  <%= render 'form/fieldset', legend_key: 'credentials', i18n_base: 'session.login', form: form do %>
-    <%= render 'form/text_field', 
-        field: :email, 
-        type: :email_field,
-        required: true %>
+  <%= render 'shared/page_header', title: t('session.login.title') %>
 
-    <%= render 'form/text_field', 
-        field: :password, 
-        type: :password_field,
-        required: true %>
+  <%= render 'form/fieldset',
+    legend_key: 'credentials',
+    i18n_base: 'session.login',
+    form: form do
+  %>
 
-    <%= render 'form/checkbox', 
-        field: :remember_me %>
+    <%= render 'form/text_field',
+      field: :email,
+      type: :email_field,
+      required: true
+    %>
+
+    <%= render 'form/text_field',
+      field: :password,
+      type: :password_field,
+      required: true
+    %>
+
+    <%= render 'form/checkbox',
+      field: :remember_me
+    %>
+
   <% end %>
 
   <%= render 'form/submit_button',
-      text: t('session.login.submit') %>
+    text: t('session.login.submit')
+  %>
 <% end %>

@@ -1,7 +1,7 @@
 <%
   # Get i18n_base from section (already validated there)
-  setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
-  
+  setup = form_field_setup(field, local_assigns)
+
   # Form field options
   accept = local_assigns[:accept] || "image/*"
   preview_size = local_assigns[:preview_size] || 200
@@ -18,9 +18,9 @@
   <% if (show_preview && current_file.image?) || show_filename %>
     <div class="file-preview" style="margin-top: 10px;">
       <% if show_preview && current_file.image? %>
-        <%= render 'shared/image', 
-            image: current_file, 
-            size: :thumbnail, 
+        <%= render 'shared/image',
+            image: current_file,
+            size: :thumbnail,
             alt: "Current #{setup[:field_label].downcase}" %>
         <p><small>Current <%= setup[:field_label].downcase %></small></p>
       <% elsif show_filename %>

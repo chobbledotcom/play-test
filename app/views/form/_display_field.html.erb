@@ -1,7 +1,7 @@
 <%
-  # Get i18n_base from section (already validated there) 
-  setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
-  
+  # Get i18n_base from section (already validated there)
+  setup = form_field_setup(field, local_assigns)
+
   # Get value from model object automatically
   model_object = setup[:form_object].object
   value = model_object.send(field) if model_object.respond_to?(field)

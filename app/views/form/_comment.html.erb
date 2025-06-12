@@ -3,60 +3,38 @@
   # Required parameters:
   #   field: Symbol representing the field name
   # Optional parameters:
-  #   form: Form builder object (defaults to @_current_form from fieldset)
-  #   i18n_base: Base path for i18n translations (defaults to @_current_i18n_base from fieldset)
-  #   rows: Number of rows for the textarea (default: 2)
   #   maxlength: Maximum character length (default: 1000)
   #   placeholder: Placeholder text
-  #   label: Custom label text (defaults to i18n translation)
-  
-  field ||= nil
-  form ||= @_current_form
-  i18n_base ||= @_current_i18n_base || ''
-  rows ||= 2
+
   maxlength ||= 1000
   placeholder ||= nil
-  label ||= t("#{i18n_base}.#{field}")
+
+  form = @_current_form
   checkbox_id = "toggle_#{field}_#{form.object.object_id}"
   textarea_id = "#{form.object_name}_#{field}"
-  
+
   # Check if there's existing content
   has_content = form.object.send(field).present?
 %>
 
 <div class="comment-field-container">
   <label for="<%= checkbox_id %>">
-    <input type="checkbox" id="<%= checkbox_id %>" <%= 'checked' if has_content %> 
-           data-comment-toggle="<%= textarea_id %>" 
-           data-comment-container="<%= textarea_id %>_container">
-    <%= label %>
+    <input type="checkbox" id="<%= checkbox_id %>"
+      <%= 'checked' if has_content %>
+      data-comment-toggle="<%= textarea_id %>"
+      data-comment-container="<%= textarea_id %>_container"
+    >
+    <%= t("#{@_current_i18n_base}.#{field}") %>
   </label>
-  
-  <div id="<%= textarea_id %>_container" style="display: <%= has_content ? 'block' : 'none' %>; margin-top: 0.5rem;">
-    <%= form.text_area field, 
-        rows: rows,
+
+  <div id="<%= textarea_id %>_container"
+    style="display: <%= has_content ? 'block' : 'none' %>"
+  >
+    <%= form.text_field field,
         maxlength: maxlength,
         placeholder: placeholder,
         id: textarea_id,
-        style: "width: 100%; font-size: 0.9em;" %>
-    <small style="color: #666;">Max <%= maxlength %> characters</small>
+        title: "Max #{maxlength} characters"
+    %>
   </div>
 </div>
-
-<style>
-  .comment-field-container {
-    margin-bottom: 1rem;
-  }
-  
-  .comment-field-container label {
-    cursor: pointer;
-    font-weight: normal;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .comment-field-container input[type="checkbox"] {
-    margin: 0;
-  }
-</style>

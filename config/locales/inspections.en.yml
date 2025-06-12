@@ -46,7 +46,7 @@ en:
     tabs:
       general: "General"
       user_height: "Tallest User Height"
-      tallest_user_height: "Tallest User Height"  # New key for compatibility
+      tallest_user_height: "Tallest User Height" # New key for compatibility
       slide: "Slide"
       structure: "Structure"
       anchorage: "Anchorage"
@@ -70,8 +70,6 @@ en:
       unit_select_prompt: "-- Select a unit --"
       status: "Status"
       progress: "Progress"
-      name: "Name"
-      manufacturer: "Manufacturer"
       inspection_location: "Location of Inspection"
       inspection_date: "Inspection Date"
       reinspection_date: "Reinspection Date"
@@ -86,7 +84,7 @@ en:
       rpii_registration_number: "RPII Registration Number"
       unique_report_number: "Internal ID"
       internal_id: "Internal ID"
-      public_inspection_id: "Public Inspection ID"
+      id: "Public Inspection ID"
       inspection_company_name: "Inspection Company Name"
       overall_result: "Overall Result"
       pass: "Pass"
@@ -166,7 +164,7 @@ en:
       dimensions_replace_confirm: "This will re-copy all dimensions from the unit to this inspection, replacing any existing dimension values. Are you sure you want to continue?"
       no_unit_for_dimensions: "No unit selected for this inspection"
       no_unit_description: "This inspection doesn't have a unit associated with it. Create a unit to link equipment information."
-      create_without_unit_confirm: "This will create an inspection without an associated unit. If you're inspecting a unit you have seen before, it's faster to select the unit from the \"Units\" tab above and start the inspection from there. Continue?"
+      create_without_unit_confirm: 'This will create an inspection without an associated unit. If you''re inspecting a unit you have seen before, it''s faster to select the unit from the "Units" tab above and start the inspection from there. Continue?'
       unnamed: "Unnamed"
       missing_serial: "Missing"
       photo_of: "Photo of %{name}"

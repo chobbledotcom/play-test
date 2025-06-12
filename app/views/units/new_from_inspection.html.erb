@@ -2,29 +2,26 @@
   <%= render 'shared/page_header', title: t("units.titles.new_from_inspection") %>
 
   <% if @inspection.dimensions.present? %>
-    <p><%= t("units.labels.dimensions") %>: <strong><%= @inspection.dimensions %></strong></p>
+    <p>
+      <%= t("units.labels.dimensions") %>:
+      <strong><%= @inspection.dimensions %></strong>
+    </p>
   <% end %>
 
   <%= render "form/errors", model: @unit %>
 
-  <fieldset>
-    <legend><%= t("units.sections.basic_information") %></legend>
+  <%= render 'form/fieldset', legend_key: 'basic_information', i18n_base: 'units.fields', form: form do %>
+    <%= render "form/text_field", field: :name, required: true %>
+    <%= render "form/text_field", field: :serial, required: true %>
+    <%= render "form/text_field", field: :manufacturer, required: true %>
+    <%= render "form/text_field", field: :description, required: true %>
+    <%= render "form/checkbox", field: :has_slide %>
+    <%= render "form/text_field", field: :model %>
+    <%= render "form/text_field", field: :owner %>
+  <% end %>
 
-    <%= render "form/text_field", form: form, field: :name, required: true, i18n_base: "units.fields" %>
-    <%= render "form/text_field", form: form, field: :serial, required: true, i18n_base: "units.fields" %>
-    <%= render "form/text_field", form: form, field: :manufacturer, required: true, i18n_base: "units.fields" %>
-    <%= render "form/text_field", form: form, field: :description, required: true, i18n_base: "units.fields" %>
+  <p><%= t("units.messages.dimensions_will_be_copied") %></p>
 
-    <%= render "form/checkbox", form: form, field: :has_slide, i18n_base: "units.fields" %>
-
-    <%= render "form/text_field", form: form, field: :model, i18n_base: "units.fields" %>
-    <%= render "form/text_field", form: form, field: :owner, i18n_base: "units.fields" %>
-  </fieldset>
-
-  <section>
-    <p><%= t("units.messages.dimensions_will_be_copied") %></p>
-  </section>
-
-  <%= form.submit t("units.buttons.create"), class: "button" %>
+  <%= form.submit t("units.buttons.create") %>
   <%= link_to t("shared.buttons.cancel"), inspection_path(@inspection) %>
 <% end %>

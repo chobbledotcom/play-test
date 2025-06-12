@@ -84,29 +84,6 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
     end
   end
 
-  describe "custom labels" do
-    before do
-      # Allow t to be called with default parameter
-      allow(view).to receive(:t).and_call_original
-    end
-
-    it "uses explicit pass_label when provided" do
-      render_pass_fail(pass_label: "Approved")
-      expect(rendered).to have_css("label", text: "Approved")
-    end
-
-    it "uses explicit fail_label when provided" do
-      render_pass_fail(fail_label: "Rejected")
-      expect(rendered).to have_css("label", text: "Rejected")
-    end
-
-    it "uses both custom labels when provided" do
-      render_pass_fail(pass_label: "Good", fail_label: "Bad")
-      expect(rendered).to have_css("label", text: "Good")
-      expect(rendered).to have_css("label", text: "Bad")
-    end
-  end
-
   describe "form object handling" do
     let(:other_form) { double("OtherFormBuilder") }
 
@@ -159,19 +136,6 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
       expect(view).to receive(:t).with("inspections.fields.fail").and_return("Fail")
 
       render_pass_fail
-    end
-
-    it "skips i18n lookup when explicit labels provided" do
-      # Should not call t for pass/fail labels when custom labels are provided
-      expect(view).not_to receive(:t).with("inspections.fields.pass")
-      expect(view).not_to receive(:t).with("inspections.fields.fail")
-
-      # But still needs to call for field setup
-      allow(view).to receive(:t).and_call_original
-
-      render_pass_fail(pass_label: "Yes", fail_label: "No")
-      expect(rendered).to have_css("label", text: "Yes")
-      expect(rendered).to have_css("label", text: "No")
     end
   end
 

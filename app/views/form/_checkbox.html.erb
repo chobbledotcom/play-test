@@ -1,6 +1,6 @@
 <%
   # Get i18n_base from section (already validated there)
-  setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
+  setup = form_field_setup(field, local_assigns)
 %>
 
 <%= setup[:form_object].label field do %>

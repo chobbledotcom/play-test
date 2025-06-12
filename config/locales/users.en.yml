@@ -42,6 +42,26 @@ en:
       country: "Country"
       postal_code: "Postcode"
 
+    edit:
+      email: "Email"
+      password: "New Password"
+      password_confirmation: "Password confirmation"
+      current_password: "Current password"
+      password_help: "New Password (leave blank if no change)"
+      rpii_inspector_number: "RPII Inspector No"
+      active_until: "Active Until"
+      inspection_company_id: "Inspection Company"
+      time_display: "Time Display Format"
+      default_inspection_location: "Default Inspection Location"
+      theme: "Theme"
+      company_prompt: "Select inspection company..."
+      no_company: "No Company"
+      name: "Name"
+      phone: "Phone"
+      address: "Address"
+      country: "Country"
+      postal_code: "Postcode"
+
     buttons:
       register: "Register"
       update_user: "Update User"
@@ -94,7 +114,7 @@ en:
       time_day: "Show Day Only"
       theme_light: "Light"
       theme_dark: "Dark"
-    
+
     verification:
       details_header: "RPII Verification Details"
       name: "Inspector Name"

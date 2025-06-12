@@ -27,35 +27,52 @@ module ApplicationHelper
     end
   end
 
-  # Shared form field helper logic - requires explicit i18n_base
-  def form_field_setup(field, local_assigns, i18n_base: nil)
-    # Get form object - either passed directly or from wrapper
-    form_object = local_assigns[:form] || @_current_form
+  ALLOWED_LOCAL_ASSIGNS = %i[
+    accept
+    field
+    max
+    min
+    options
+    required
+    rows
+    step
+    type
+  ]
 
-    # Require explicit i18n_base - no more guessing
-    i18n_base = local_assigns[:i18n_base] || i18n_base
-    raise ArgumentError, "i18n_base is required for form field setup" if i18n_base.nil?
+  def form_field_setup(field, local_assigns)
+    locally_assigned_keys = (local_assigns || {}).keys
+    disallowed_keys = locally_assigned_keys - ALLOWED_LOCAL_ASSIGNS
 
-    # Simple label key construction
+    if disallowed_keys.any?
+      raise ArgumentError, "local_assigns contains #{disallowed_keys.inspect}"
+    end
+
+    form_object = @_current_form
+    i18n_base = @_current_i18n_base
+
+    if i18n_base.nil?
+      raise ArgumentError, "no @_current_form in form_field_setup"
+    elsif form_object.nil?
+      raise ArgumentError, "no @_current_i18n_base in form_field_setup"
+    end
+
     label_key = "#{i18n_base}.#{field}"
+    field_label = t(label_key, raise: true)
 
-    # Get label, hint, placeholder - fail loudly if required keys are missing
-    field_label = local_assigns[:label] || t(label_key, raise: true)
-
-    # Build hint and placeholder keys with proper structure
     base_parts = i18n_base.split(".")
-    hint_key = (base_parts[0..-2] + ["hints", field.to_s]).join(".")
-    placeholder_key = (base_parts[0..-2] + ["placeholders", field.to_s]).join(".")
+    root = base_parts[0..-2]
+    hint_key = (root + ["hints", field]).join(".")
+    placeholder_key = (root + ["placeholders", field]).join(".")
 
-    field_hint = local_assigns[:hint] || t(hint_key, default: nil)
-    field_placeholder = local_assigns[:placeholder] || t(placeholder_key, default: nil)
+    field_hint = t(hint_key, default: nil)
+    field_placeholder = t(placeholder_key, default: nil)
 
     {
-      form_object: form_object,
-      i18n_base: i18n_base,
-      field_label: field_label,
-      field_hint: field_hint,
-      field_placeholder: field_placeholder
+      form_object:,
+      i18n_base:,
+      field_label:,
+      field_hint:,
+      field_placeholder:
     }
   end
 end

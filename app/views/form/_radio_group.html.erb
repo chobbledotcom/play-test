@@ -1,11 +1,11 @@
 <%
   # Use the standardized form field setup helper
-  setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
-  
+  setup = form_field_setup(field, local_assigns)
+
   form_object = setup[:form_object]
   field_label = setup[:field_label]
   field_hint = setup[:field_hint]
-  
+
   # Options should be array of [label, value] pairs
   # e.g. [["Pass", true], ["Fail", false]]
   options ||= []

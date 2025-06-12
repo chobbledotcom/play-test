@@ -1,24 +1,24 @@
 <%
   # Get i18n_base from section (already validated there)
-  setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
-  
+  setup = form_field_setup(field, local_assigns)
+
   # Form field options
   required ||= false
-  
+
   # Options should be:
   # - For select: options_for_select array or collection_select params
   # - For collection_select: [collection, value_method, text_method]
   options ||= []
   collection_select_params = local_assigns[:collection_select_params]
   prompt = local_assigns[:prompt]
-  
+
   # Build select options
   select_options = {}
   select_options[:prompt] = prompt if prompt
-  
-  # Build field options  
+
+  # Build field options
   field_options = { required: required }.compact
-  
+
   # Add any additional HTML attributes
   field_options[:onchange] = local_assigns[:onchange] if local_assigns[:onchange]
 %>
@@ -26,9 +26,9 @@
 <%= setup[:form_object].label field, setup[:field_label] %>
 <% if collection_select_params %>
   <%= setup[:form_object].collection_select(
-        field, 
-        collection_select_params[:collection], 
-        collection_select_params[:value_method], 
+        field,
+        collection_select_params[:collection],
+        collection_select_params[:value_method],
         collection_select_params[:text_method],
         select_options,
         field_options

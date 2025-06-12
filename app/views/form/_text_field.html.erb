@@ -1,11 +1,11 @@
 <%
   # Get i18n_base from section (already validated there)
-  setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
-  
+  setup = form_field_setup(field, local_assigns)
+
   # Form field options
   field_type = local_assigns[:type] || :text_field
   required ||= false
-  
+
   # Build field options
   field_options = { required: required }
   field_options[:accept] = local_assigns[:accept] if local_assigns[:accept]

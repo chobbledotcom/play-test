@@ -1,11 +1,11 @@
 <%
   # Get i18n_base from section (already validated there)
-  setup = form_field_setup(field, local_assigns, i18n_base: @_current_i18n_base)
-  
+  setup = form_field_setup(field, local_assigns)
+
   # Form field options
   rows ||= 4
   required ||= false
-  
+
   # Build field options
   field_options = {
     rows: rows,

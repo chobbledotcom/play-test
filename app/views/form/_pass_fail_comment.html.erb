@@ -1,0 +1,15 @@
+<%
+  # Composite partial for pass/fail + comment fields
+  # Required parameters:
+  #   field: Base field name (e.g., 'slip_sheet_integrity')
+  # 
+  # This will render:
+  #   - Pass/fail field: field (e.g., 'slip_sheet_integrity')
+  #   - Comment field: field + '_comment' (e.g., 'slip_sheet_integrity_comment')
+  
+  pass_fail_field = field
+  comment_field = "#{field}_comment".to_sym
+%>
+
+<%= render 'form/pass_fail', field: pass_fail_field %>
+<%= render 'form/comment', field: comment_field %>

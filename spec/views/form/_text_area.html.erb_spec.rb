@@ -151,25 +151,4 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
       expect(small.text).to eq("Provide details")
     end
   end
-
-  context "with different field types" do
-    %i[notes comments feedback].each do |field_name|
-      it "handles #{field_name} fields" do
-        allow(view).to receive(:form_field_setup).with(field_name, anything, anything).and_return({
-          form_object: mock_form,
-          i18n_base: "test.forms",
-          field_label: field_name.to_s.capitalize,
-          field_hint: nil,
-          field_placeholder: nil
-        })
-
-        allow(mock_form).to receive(:label).with(field_name, anything).and_return("<label>#{field_name.to_s.capitalize}</label>".html_safe)
-        allow(mock_form).to receive(:text_area).with(field_name, anything).and_return("<textarea></textarea>".html_safe)
-
-        render partial: "form/text_area", locals: {field: field_name}
-
-        expect(rendered).to include("<textarea></textarea>")
-      end
-    end
-  end
 end

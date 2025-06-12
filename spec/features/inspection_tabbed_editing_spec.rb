@@ -119,7 +119,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
       # Public Information section (case insensitive since fieldset may transform case)
       expect(page).to have_content(/public information/i)
-      expect(page).to have_content(I18n.t("inspections.fields.public_inspection_id"))
+      expect(page).to have_content(I18n.t("inspections.fields.id"))
       expect(page).to have_link(I18n.t("inspections.buttons.download_pdf"))
       expect(page).to have_link(I18n.t("inspections.buttons.download_qr_code"))
     end

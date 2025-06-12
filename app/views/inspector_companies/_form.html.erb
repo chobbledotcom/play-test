@@ -1,13 +1,9 @@
 <%= render 'form/errors', model: @inspector_company %>
 
 <%= form_with model: @inspector_company,
-             local: false,
-             html: {
-               class: "inspector-company-form",
-               data: { 
-                 turbo_stream: true
-               }
-             } do |form| %>
+  local: false,
+  html: { data: { turbo_stream: true } } do |form|
+%>
     <%= render 'form/fieldset', legend: t('inspector_companies.headers.company_details'), i18n_base: 'inspector_companies.forms', form: form do %>
       <%= render 'form/text_field', field: :name, required: true %>
       <%= render 'form/text_field', field: :email, type: :email_field %>
@@ -20,7 +16,7 @@
       <%= render 'form/text_field', field: :city %>
       <%= render 'form/text_field', field: :state %>
       <%= render 'form/text_field', field: :postal_code %>
-      <%= render 'form/text_field', field: :country, value: @inspector_company.country || "UK" %>
+      <%= render 'form/text_field', field: :country %>
 
     <% end %>
 
@@ -31,14 +27,10 @@
         <%= render 'form/text_area', field: :notes, rows: 4 %>
       <% end %>
 
-      <%= render 'form/text_field', field: :logo, type: :file_field, accept: "image/*" %>
-      <% if @inspector_company.logo.attached? %>
-        <p>Current logo: <%= @inspector_company.logo.filename %></p>
-      <% end %>
+      <%= render 'form/file_field', field: :logo %>
     <% end %>
 
     <%= render 'form/submit_button', text: @inspector_company.new_record? ? t('inspector_companies.buttons.create') : t('inspector_companies.buttons.update') %>
-    
-    <!-- Save Message Display -->
+
     <div id="inspector_company_save_message"></div>
 <% end %>

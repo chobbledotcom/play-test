@@ -1,44 +1,37 @@
 <%= render 'shared/page_header', title: t('users.titles.edit') %>
 
 <%= form_with model: @user,
-             local: false,
-             html: {
-               class: "user-edit-form",
-               data: { 
-                 turbo_stream: true
-               }
-             } do |form| %>
-  <%= render 'form/errors', model: @user %>
-  
+  local: false,
+  html: { data: { turbo_stream: true } } do |form|
+%>
   <%= render 'shared/page_header', title: t('users.headers.user_details') %>
-  
-  <%= render 'form/fieldset', legend_key: 'account_details', i18n_base: 'users.forms', form: form do %>
+  <%= render 'form/errors', model: @user %>
+  <%= render 'form/fieldset', legend_key: 'account_details', i18n_base: 'users.edit', form: form do %>
     <%= render 'form/text_field', field: :name %>
     <%= render 'form/text_field', field: :email, type: :email_field %>
-    <%= render 'form/text_field', field: :password, type: :password_field, 
-        label: t('users.forms.password_help') %>
+    <%= render 'form/text_field', field: :password, type: :password_field %>
     <%= render 'form/text_field', field: :password_confirmation, type: :password_field %>
     <%= render 'form/text_field', field: :rpii_inspector_number %>
     <%= render 'form/date_field', field: :active_until %>
-    <%= render 'form/select', 
+    <%= render 'form/select',
         field: :inspection_company_id,
         options: options_for_select(
-          [[t('users.forms.no_company'), ""]] + 
+          [[t('users.forms.no_company'), ""]] +
           InspectorCompany.active.order(:name).map { |c| [c.name, c.id] },
           @user.inspection_company_id || ""
         ) %>
   <% end %>
 
   <%= render 'form/submit_button', text: t('users.buttons.update_user'), form: form %>
-  
+
   <!-- Save Message Display -->
   <div id="user_edit_save_message"></div>
 <% end %>
 
 <% if @user.rpii_inspector_number.present? %>
   <article>
-    <%= button_to t('users.buttons.verify_rpii'), 
-        verify_rpii_user_path(@user), 
+    <%= button_to t('users.buttons.verify_rpii'),
+        verify_rpii_user_path(@user),
         method: :post,
         data: { turbo: !Rails.env.test? } %>
     <div id="rpii_verification_result">
@@ -51,27 +44,27 @@
 
 <% if @user.has_seed_data? %>
   <article>
-    <%= button_to t('users.buttons.delete_seeds'), 
-        delete_seeds_user_path(@user), 
+    <%= button_to t('users.buttons.delete_seeds'),
+        delete_seeds_user_path(@user),
         method: :delete,
         data: { confirm: t('users.messages.delete_seeds_confirm', email: @user.email) } %>
   </article>
 <% else %>
   <article>
-    <%= button_to t('users.buttons.add_seeds'), 
-        add_seeds_user_path(@user), 
+    <%= button_to t('users.buttons.add_seeds'),
+        add_seeds_user_path(@user),
         method: :post %>
   </article>
 <% end %>
 
 <% if @user != current_user %>
   <article>
-    <%= button_to t('users.buttons.impersonate', email: @user.email), 
-        impersonate_user_path(@user), method: :post, 
+    <%= button_to t('users.buttons.impersonate', email: @user.email),
+        impersonate_user_path(@user), method: :post,
         data: { confirm: t('users.messages.impersonate_confirm', email: @user.email) } %>
   </article>
   <article>
-    <%= button_to t('users.buttons.delete'), user_path(@user), method: :delete, 
+    <%= button_to t('users.buttons.delete'), user_path(@user), method: :delete,
         data: { confirm: t('users.messages.delete_confirm') } %>
   </article>
 <% end %>

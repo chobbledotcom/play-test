@@ -53,14 +53,29 @@ RSpec.describe "inspector_companies/edit", type: :view do
   context "when company has existing logo" do
     before do
       # Mock the logo attachment
-      allow(inspector_company).to receive_message_chain(:logo, :attached?).and_return(true)
-      allow(inspector_company).to receive_message_chain(:logo, :filename).and_return("logo.png")
+      logo_attachment = double("logo_attachment")
+      allow(logo_attachment).to receive(:attached?).and_return(true)
+      allow(logo_attachment).to receive(:image?).and_return(true)
+      allow(logo_attachment).to receive(:filename).and_return("logo.png")
+      
+      # Mock for the image rendering
+      blob = double("blob")
+      allow(logo_attachment).to receive(:blob).and_return(blob)
+      allow(blob).to receive(:persisted?).and_return(true)
+      
+      allow(inspector_company).to receive(:logo).and_return(logo_attachment)
+      allow(ImageProcessorService).to receive(:thumbnail).and_return("processed_image_url")
+      
+      # Mock image_tag to avoid asset pipeline issues in tests
+      allow(view).to receive(:image_tag).and_return('<img src="test-logo.jpg" alt="Current logo">'.html_safe)
     end
 
-    it "shows current logo information" do
+    it "shows current logo preview" do
       render
 
-      expect(rendered).to include("Current logo: logo.png")
+      expect(rendered).to include("Current logo")
+      expect(rendered).to include("file-preview")
+      expect(rendered).to include('<img src="test-logo.jpg"')
     end
   end
 end
