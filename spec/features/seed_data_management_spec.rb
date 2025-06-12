@@ -55,10 +55,6 @@ RSpec.feature "Seed Data Management", type: :feature do
     expect(page).not_to have_button(I18n.t("users.buttons.delete_seeds"))
   end
 
-  scenario "seed data includes castle images" do
-    # Skip this test in test environment as we don't attach images there
-    skip "Castle images not attached in test environment"
-  end
 
   scenario "seed inspections are properly backdated" do
     visit edit_user_path(test_user)

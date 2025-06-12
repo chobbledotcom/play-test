@@ -30,10 +30,10 @@ en:
 
     forms:
       search: "Search"
-    
+
     search:
       placeholder: "Location, inspection ID, internal ID, or unit serial"
-      
+
     filters:
       all_statuses: "All Statuses"
       all_results: "All Results"
@@ -117,7 +117,7 @@ en:
       inspector_help: "Determined by the user performing the inspection"
       rpii_help: "From the selected inspector company"
       status_help: "Use the buttons below to change inspection status"
-      internal_id_help: "For internal tracking only - not displayed on public reports"
+      internal_id_help: "For your records"
       not_available: "Not Available"
 
     status:
@@ -145,10 +145,12 @@ en:
       select_unit: "Select unit"
       create_unit_from_inspection: "Create new unit from this inspection"
       mark_complete: "Mark as Complete"
+      mark_incomplete: "Mark as Incomplete"
       mark_in_progress: "Mark as In Progress"
       switch_to_in_progress: "Switch to 'In Progress'"
       qr_and_pdf: "QR Codes & PDF"
       download_qr_code: "Download QR Code"
+      use_suggested_id: "Use its public ID - %{id}"
 
     messages:
       no_unit: "No unit selected"
@@ -176,6 +178,7 @@ en:
       mark_complete_confirm: "Are you sure you want to mark this inspection as complete? This will validate all assessments are complete."
       mark_in_progress_confirm: "Are you sure you want to mark this inspection as in progress? This will allow further editing."
       marked_complete: "Inspection marked as complete successfully."
+      marked_incomplete: "Inspection marked as incomplete successfully."
       marked_in_progress: "Inspection marked as in progress successfully."
       cannot_complete: "Cannot mark as complete: %{errors}"
       completion_failed: "Failed to mark as complete: %{error}"
@@ -216,7 +219,7 @@ en:
       electrical_requirements: "Electrical Safety"
       pat_testing: "PAT testing required"
       blower_distance: "Blower must be 1.2m from equipment edge"
-      
+
     share:
       button: "Share / Copy"
       title: "Inspection Report %{id}"
@@ -224,10 +227,9 @@ en:
 
     validation:
       anchorage_incomplete: "Anchorage Assessment incomplete"
-      enclosed_incomplete: "Totally Enclosed Assessment incomplete"  
+      enclosed_incomplete: "Totally Enclosed Assessment incomplete"
       fan_incomplete: "Fan Assessment incomplete"
       materials_incomplete: "Materials Assessment incomplete"
       slide_incomplete: "Slide Assessment incomplete"
       structure_incomplete: "Structure Assessment incomplete"
       user_height_incomplete: "User Height Assessment incomplete"
-

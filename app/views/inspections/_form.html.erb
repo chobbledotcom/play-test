@@ -2,7 +2,7 @@
 
 <%= form_with(model: @inspection) do |form| %>
   <%= render 'shared/page_header', title: t('inspections.headers.inspection_details') %>
-  
+
   <!-- Unit Selection/Display -->
   <%= render 'form/fieldset', legend_key: 'current_unit', i18n_base: 'inspections.fields', form: form do %>
     <% if @inspection.unit.present? %>
@@ -33,14 +33,14 @@
   <% unless @inspection.new_record? %>
     <%= render 'form/fieldset', legend_key: 'public_information', i18n_base: 'inspections.fields', form: form do %>
       <%= render 'form/display_field', field: :id, label: t('inspections.fields.public_inspection_id') %>
-      
+
       <div>
-        <%= link_to t('inspections.buttons.download_pdf'), 
-            inspection_path(@inspection, format: :pdf), 
-            target: '_blank', 
-            class: 'button' %>
-        <%= link_to t('inspections.buttons.download_qr_code'), 
-            inspection_path(@inspection, format: :png), 
+        <%= link_to t('inspections.buttons.download_pdf'),
+            inspection_path(@inspection, format: :pdf),
+            target: '_blank',
+            class: 'button' %> /
+        <%= link_to t('inspections.buttons.download_qr_code'),
+            inspection_path(@inspection, format: :png),
             download: "inspection-#{@inspection.id}-qr.png",
             class: 'button secondary' %>
       </div>
@@ -50,7 +50,7 @@
   <!-- Inspection-Specific Details -->
   <%= render 'form/fieldset', legend_key: 'inspection_details', i18n_base: 'inspections.fields', form: form do %>
     <%= render 'form/autocomplete_field', field: :inspection_location, options: @inspection_locations %>
-    
+
     <%= render 'form/date_field',
         field: :inspection_date,
         field_type: (current_user.time_display == "day" ? :date_field : :datetime_local_field),
@@ -65,7 +65,20 @@
     </div>
 
 
-    <%= render 'form/text_field', field: :unique_report_number, help_text: t('inspections.fields.internal_id_help') %>
+    <div id="unique_report_number_section">
+      <%= form.label :unique_report_number, t('inspections.fields.unique_report_number') %>
+      <%= form.text_field :unique_report_number %>
+      <% if @inspection.unique_report_number.blank? && @inspection.persisted? %>
+        <button type="button"
+                onclick="document.getElementById('inspection_unique_report_number').value = '<%= @inspection.id %>'; this.style.display = 'none';"
+                class="button secondary small">
+          <%= t('inspections.buttons.use_suggested_id', id: @inspection.id) %>
+        </button>
+      <% end %>
+      <div>
+        <small class="help-text"><%= t('inspections.fields.internal_id_help') %></small>
+      </div>
+    </div>
   <% end %>
 
   <!-- Inspection Results -->
@@ -108,7 +121,7 @@
     <%= render 'form/submit_button',
         text: (@inspection.new_record? ? t('inspections.buttons.create') : t('inspections.buttons.update')) %>
   </fieldset>
-  
+
   <!-- Save Message Display -->
   <div id="inspection_save_message"></div>
 <% end %>

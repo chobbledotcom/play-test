@@ -10,7 +10,7 @@ FactoryBot.define do
     passed { true }
     inspection_date { Date.current }
     comments { "Test inspection comments" }
-    sequence(:unique_report_number) { |n| "RPII-#{Date.current.strftime("%Y%m%d")}-#{n.to_s.rjust(4, "0")}" }
+    unique_report_number { nil } # User provides this manually
     complete_date { nil }
     is_seed { false }
 

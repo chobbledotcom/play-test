@@ -6,7 +6,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
   let(:unit1) { create(:unit, user: user1) }
   let(:unit2) { create(:unit, user: user2) }
   let(:inspection1) { create(:inspection, user: user1, unit: unit1) }
-  let(:inspection2) { create(:inspection, user: user2, unit: unit2) }
+  let(:inspection2) { create(:inspection, user: user2, unit: unit2, unique_report_number: "TEST-REPORT-123") }
 
   before do
     create(:anchorage_assessment, :complete, inspection: inspection1)

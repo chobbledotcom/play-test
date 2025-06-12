@@ -20,10 +20,6 @@ RSpec.describe SeedDataService do
         expect(user.inspections.seed_data.count).to eq(100)
       end
 
-      it "attaches castle images to units" do
-        # Skip in test environment as we don't attach images
-        skip "Castle images not attached in test environment"
-      end
 
       it "creates units with varied types" do
         described_class.add_seeds_for_user(user)

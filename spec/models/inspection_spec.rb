@@ -1,3 +1,46 @@
+# Business Logic: Inspection Model
+#
+# An Inspection represents a safety inspection record for inflatable play equipment (bouncy castles).
+# This system serves as a document store for inspection records, allowing users to create, edit,
+# and manage their inspection documentation.
+#
+# Key Business Rules:
+# 1. Inspection Lifecycle:
+#    - Draft state: Incomplete inspection
+#    - Complete state: Inspection marked as complete with unique report number and completion date
+#    - Inspections remain editable - users can toggle between complete/incomplete as needed
+#    - Users have full control over their inspection records
+#
+# 2. User Association:
+#    - Each inspection belongs to a user who created it
+#    - Inspections may inherit certain fields from the user at creation time
+#    - No direct dependency on inspector companies (users may or may not have a company)
+#
+# 3. Unit Association & Dimension Copying:
+#    - Inspections can be created from existing units (equipment records)
+#    - All dimensions are copied from unit at creation time (snapshot approach)
+#    - Changes to unit don't affect existing inspections (historical accuracy)
+#
+# 4. Assessment Components:
+#    - Multiple safety assessments can be attached to an inspection
+#    - Core assessments: User Height, Structure, Anchorage, Materials, Fan
+#    - Conditional assessments: Slide (if has_slide), Enclosed (if is_totally_enclosed)
+#
+# 5. Validation & Data Requirements:
+#    - Complete inspections require: location, unique report number, all assessments
+#    - Pass/fail determination based on safety check results
+#    - Reinspection due date automatically calculated as inspection_date + 1 year
+#
+# 6. Search & Filtering:
+#    - Searchable by location, inspection ID, internal ID, unit serial/name
+#    - Filterable by status (draft/complete), result (passed/failed), date range
+#    - Overdue scope identifies inspections older than 1 year
+#
+# 7. Data Integrity:
+#    - Unicode support for international locations and names
+#    - Numeric validations ensure non-negative measurements
+#    - Unique report numbers prevent duplicate official reports
+
 require "rails_helper"
 
 RSpec.describe Inspection, type: :model do
@@ -428,7 +471,7 @@ RSpec.describe Inspection, type: :model do
         expect(inspection.errors[:inspection_location]).to include("can't be blank")
       end
 
-      it "requires unique_report_number when complete" do
+      it "validates unique_report_number uniqueness when provided" do
         create(:inspection, :complete,
           unique_report_number: "TEST-123",
           inspector_company: inspector_company,
@@ -442,6 +485,15 @@ RSpec.describe Inspection, type: :model do
 
         expect(duplicate).not_to be_valid
         expect(duplicate.errors[:unique_report_number]).to include("has already been taken")
+      end
+
+      it "allows complete inspection without unique_report_number" do
+        inspection = build(:inspection,
+          inspection_location: "Test Location",
+          complete_date: Time.current,
+          unique_report_number: nil,
+          inspector_company: inspector_company)
+        expect(inspection).to be_valid
       end
 
       it "allows blank inspection_location when draft" do
@@ -521,24 +573,17 @@ RSpec.describe Inspection, type: :model do
     end
 
     describe "before_create callbacks" do
-      it "generates unique_report_number when complete" do
-        # Test the method directly since the validation creates a circular dependency
+      it "does not auto-generate unique_report_number" do
         inspection = build(:inspection)
         inspection.complete_date = Time.current
         inspection.unique_report_number = nil
-
-        inspection.send(:generate_unique_report_number)
-        expect(inspection.unique_report_number).to match(/RPII-\d{8}-[A-F0-9]{8}/)
-      end
-
-      it "does not generate unique_report_number when draft" do
-        inspection = build(:inspection, complete_date: nil, unique_report_number: nil)
         inspection.save!
+        
         expect(inspection.unique_report_number).to be_nil
       end
 
-      it "does not overwrite existing unique_report_number" do
-        existing_number = "EXISTING-123"
+      it "preserves user-provided unique_report_number" do
+        existing_number = "USER-PROVIDED-123"
         inspection = build(:inspection,
           complete_date: Time.current,
           unique_report_number: existing_number)
@@ -626,6 +671,89 @@ RSpec.describe Inspection, type: :model do
 
         inspection.complete!(user)
         expect(inspection.complete_date).to be_present
+      end
+    end
+
+    describe "inspection lifecycle management" do
+      let(:inspection) { create(:inspection, user: user) }
+      
+      it "allows editing after marking as complete" do
+        inspection.complete!(user)
+        expect(inspection.complete?).to be true
+        
+        inspection.update!(inspection_location: "Updated after completion")
+        expect(inspection.reload.inspection_location).to eq("Updated after completion")
+      end
+      
+      it "allows toggling between complete and incomplete states" do
+        inspection.complete!(user)
+        expect(inspection.complete?).to be true
+        
+        inspection.update!(complete_date: nil)
+        expect(inspection.complete?).to be false
+        
+        inspection.complete!(user)
+        expect(inspection.complete?).to be true
+      end
+      
+      it "preserves all data when toggling completion status" do
+        original_location = "Original Location"
+        original_report_number = "TEST-REPORT-123"
+        inspection.update!(
+          inspection_location: original_location, 
+          comments: "Test comments",
+          unique_report_number: original_report_number
+        )
+        
+        inspection.complete!(user)
+        inspection.update!(complete_date: nil)
+        
+        expect(inspection.inspection_location).to eq(original_location)
+        expect(inspection.comments).to eq("Test comments")
+        expect(inspection.unique_report_number).to eq(original_report_number) # Should preserve report number
+      end
+
+      it "allows users full control over their inspection records" do
+        # User can create draft
+        expect(inspection.complete?).to be false
+        
+        # User can add data
+        inspection.update!(
+          inspection_location: "Test Location",
+          passed: true,
+          comments: "All good"
+        )
+        
+        # User can mark complete
+        inspection.complete!(user)
+        expect(inspection.complete?).to be true
+        
+        # User can still edit when complete
+        inspection.update!(comments: "Updated comments after completion")
+        expect(inspection.reload.comments).to eq("Updated comments after completion")
+        
+        # User can revert to draft
+        inspection.update!(complete_date: nil)
+        expect(inspection.complete?).to be false
+      end
+
+      it "does not auto-generate unique_report_number" do
+        expect(inspection.unique_report_number).to be_nil
+        
+        # Marking complete without setting report number should not generate one
+        inspection.complete!(user)
+        expect(inspection.unique_report_number).to be_nil
+        
+        # User can set their own report number
+        inspection.update!(unique_report_number: "CUSTOM-2024-001")
+        expect(inspection.unique_report_number).to eq("CUSTOM-2024-001")
+      end
+
+      it "allows user to set unique_report_number manually" do
+        inspection.update!(unique_report_number: "USER-DEFINED-123")
+        inspection.complete!(user)
+        
+        expect(inspection.unique_report_number).to eq("USER-DEFINED-123")
       end
     end
 

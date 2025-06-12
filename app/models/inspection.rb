@@ -30,8 +30,8 @@ class Inspection < ApplicationRecord
   # Validations - allow drafts to be incomplete
   validates :inspection_location, presence: true, if: :complete?
   validates :inspection_date, presence: true
-  validates :unique_report_number, presence: true,
-    uniqueness: {scope: :user_id}, if: :complete?
+  validates :unique_report_number,
+    uniqueness: {scope: :user_id, allow_blank: true}
 
   # Step/Ramp Size validations
   validates :step_ramp_size,
@@ -90,7 +90,6 @@ class Inspection < ApplicationRecord
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
   before_validation :copy_unit_values, on: :create, if: :unit_id_changed?
-  before_create :generate_unique_report_number, if: :complete?
   before_create :copy_unit_values
   before_save :auto_determine_pass_fail, if: :all_assessments_complete?
 
