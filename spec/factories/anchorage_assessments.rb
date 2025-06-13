@@ -26,11 +26,15 @@ FactoryBot.define do
     trait :complete do
       num_low_anchors { 6 }
       num_high_anchors { 4 }
+      num_low_anchors_pass { true }
+      num_high_anchors_pass { true }
       num_anchors_pass { true }
       anchor_type_pass { true }
       pull_strength_pass { true }
       anchor_degree_pass { true }
       anchor_accessories_pass { true }
+      num_low_anchors_comment { "Low anchor count appropriate" }
+      num_high_anchors_comment { "High anchor count adequate" }
       num_anchors_comment { "Adequate anchor count for unit size" }
       anchor_type_comment { "Appropriate anchor type for surface" }
       pull_strength_comment { "Pull strength meets requirements" }

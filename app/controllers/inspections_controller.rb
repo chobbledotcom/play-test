@@ -89,6 +89,7 @@ class InspectionsController < ApplicationController
 
   def select_unit
     @units = current_user.units
+      .includes(photo_attachment: :blob)
       .search(params[:search])
       .by_manufacturer(params[:manufacturer])
       .order(:name)
@@ -158,11 +159,11 @@ class InspectionsController < ApplicationController
   private
 
   INSPECTION_SPECIFIC_PARAMS = %i[
-    comments
     inspection_date
     inspection_location
     inspector_company_id
     passed
+    risk_assessment
     unique_report_number
     unit_id
   ].freeze

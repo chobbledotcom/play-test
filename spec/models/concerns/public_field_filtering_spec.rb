@@ -60,8 +60,6 @@ RSpec.describe PublicFieldFiltering do
           user_id
           unit_id
           inspector_company_id
-          inspector_signature
-          signature_timestamp
           inspection_id
           is_seed
         ]
@@ -80,8 +78,6 @@ RSpec.describe PublicFieldFiltering do
           complete_date
           inspection_date
           unique_report_number
-          general_notes
-          recommendations
           inspection_location
         ]
 

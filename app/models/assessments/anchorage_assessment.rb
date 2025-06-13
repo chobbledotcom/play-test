@@ -1,6 +1,7 @@
 class Assessments::AnchorageAssessment < ApplicationRecord
   include AssessmentLogging
   include SafetyCheckMethods
+  include AssessmentCompletion
   
   belongs_to :inspection
 
@@ -17,10 +18,6 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   # Callbacks
   after_update :log_assessment_update, if: :saved_changes?
   after_save :update_anchor_calculations, if: :saved_change_to_anchor_counts?
-
-  def complete?
-    anchor_counts_present? && anchor_assessments_complete?
-  end
 
   def meets_anchor_requirements?
     return false unless total_anchors.present? && inspection.area.present?
@@ -56,16 +53,6 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   end
 
 
-  def completion_percentage
-    total_fields = 7 # Total assessable fields
-    completed_fields = [
-      num_low_anchors, num_high_anchors,
-      num_anchors_pass, anchor_accessories_pass, anchor_degree_pass,
-      anchor_type_pass, pull_strength_pass
-    ].count { |field| !field.nil? }
-
-    (completed_fields.to_f / total_fields * 100).round(0)
-  end
 
   def anchor_distribution
     return {} unless num_low_anchors.present? && num_high_anchors.present?
@@ -94,17 +81,12 @@ class Assessments::AnchorageAssessment < ApplicationRecord
 
   private
 
-  def anchor_counts_present?
-    num_low_anchors.present? && num_high_anchors.present?
-  end
-
-  def anchor_assessments_complete?
-    [num_anchors_pass, anchor_accessories_pass, anchor_degree_pass,
-      anchor_type_pass, pull_strength_pass].none?(&:nil?)
-  end
-
   def saved_change_to_anchor_counts?
     saved_change_to_num_low_anchors? || saved_change_to_num_high_anchors?
+  end
+
+  def anchor_counts_present?
+    num_low_anchors.present? && num_high_anchors.present?
   end
 
   def update_anchor_calculations

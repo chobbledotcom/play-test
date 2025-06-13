@@ -68,3 +68,6 @@ en:
     statistics:
       total_inspections: "Total Inspections"
       passed_inspections: "Passed"
+      failed_inspections: "Failed"
+      pass_rate: "Pass Rate"
+      active_since: "Active Since"

@@ -288,7 +288,7 @@ RSpec.describe "Seed Data", type: :model do
           Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).each do |assessment|
             expect(assessment.inspection).to be_present
             expect([true, false]).to include(assessment.seam_integrity_pass)
-            expect([true, false]).to include(assessment.lock_stitch_pass)
+            expect([true, false]).to include(assessment.uses_lock_stitching_pass)
             expect([true, false]).to include(assessment.air_loss_pass)
             expect([true, false]).to include(assessment.straight_walls_pass)
             expect([true, false]).to include(assessment.sharp_edges_pass)
@@ -299,24 +299,24 @@ RSpec.describe "Seed Data", type: :model do
         it "creates assessments with required measurements" do
           Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).each do |assessment|
             expect(assessment.stitch_length).to be_present
-            expect(assessment.unit_pressure_value).to be_present
+            expect(assessment.unit_pressure).to be_present
             expect(assessment.blower_tube_length).to be_present
-            expect(assessment.step_size_value).to be_present
-            expect(assessment.fall_off_height_value).to be_present
-            expect(assessment.trough_depth_value).to be_present
-            expect(assessment.trough_width_value).to be_present
+            expect(assessment.step_size).to be_present
+            expect(assessment.critical_fall_off_height).to be_present
+            expect(assessment.trough_depth).to be_present
+            expect(assessment.trough_width).to be_present
           end
         end
 
         it "creates assessments with realistic measurement values" do
           Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).each do |assessment|
             expect(assessment.stitch_length).to be_between(5, 20)
-            expect(assessment.unit_pressure_value).to be_between(0.5, 5.0)
+            expect(assessment.unit_pressure).to be_between(0.5, 5.0)
             expect(assessment.blower_tube_length).to be_between(1.0, 10.0)
-            expect(assessment.step_size_value).to be_between(100, 500)
-            expect(assessment.fall_off_height_value).to be_between(0.1, 3.0)
-            expect(assessment.trough_depth_value).to be_between(0.05, 1.0)
-            expect(assessment.trough_width_value).to be_between(0.1, 2.0)
+            expect(assessment.step_size).to be_between(100, 500)
+            expect(assessment.critical_fall_off_height).to be_between(0.1, 3.0)
+            expect(assessment.trough_depth).to be_between(0.05, 1.0)
+            expect(assessment.trough_width).to be_between(0.1, 2.0)
           end
         end
       end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_13_153352) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_13_205036) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -55,6 +55,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_153352) do
     t.text "anchor_degree_comment"
     t.text "anchor_type_comment"
     t.text "pull_strength_comment"
+    t.text "num_low_anchors_comment"
+    t.text "num_high_anchors_comment"
+    t.boolean "num_low_anchors_pass"
+    t.boolean "num_high_anchors_pass"
     t.index ["inspection_id"], name: "index_anchorage_assessments_on_inspection_id"
   end
 
@@ -86,13 +90,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_153352) do
     t.boolean "blower_visual_pass"
     t.text "blower_visual_comment"
     t.string "blower_serial"
+    t.boolean "blower_serial_pass"
+    t.text "blower_serial_comment"
     t.index ["inspection_id"], name: "index_fan_assessments_on_inspection_id"
   end
 
   create_table "inspections", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.datetime "inspection_date"
     t.boolean "passed"
-    t.text "comments"
     t.string "user_id", limit: 12, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -100,10 +105,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_153352) do
     t.string "unit_id"
     t.string "inspection_location"
     t.string "unique_report_number"
-    t.text "general_notes"
-    t.text "recommendations"
-    t.string "inspector_signature"
-    t.datetime "signature_timestamp"
     t.string "inspector_company_id"
     t.decimal "width", precision: 8, scale: 2
     t.decimal "length", precision: 8, scale: 2
@@ -113,19 +114,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_153352) do
     t.string "width_comment", limit: 1000
     t.string "length_comment", limit: 1000
     t.string "height_comment", limit: 1000
-    t.decimal "step_ramp_size"
-    t.boolean "step_ramp_size_pass"
-    t.decimal "critical_fall_off_height"
-    t.boolean "critical_fall_off_height_pass"
-    t.decimal "unit_pressure"
-    t.boolean "unit_pressure_pass"
-    t.decimal "trough_depth"
-    t.decimal "trough_adjacent_panel_width"
     t.text "risk_assessment"
     t.datetime "complete_date"
     t.boolean "is_seed", default: false, null: false
-    t.string "step_ramp_size_comment", limit: 1000
-    t.string "critical_fall_off_height_comment", limit: 1000
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
     t.index ["is_seed"], name: "index_inspections_on_is_seed"
     t.index ["unit_id"], name: "index_inspections_on_unit_id"
@@ -206,24 +197,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_153352) do
   create_table "structure_assessments", force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
     t.boolean "seam_integrity_pass"
-    t.boolean "lock_stitch_pass"
+    t.boolean "uses_lock_stitching_pass"
     t.boolean "air_loss_pass"
     t.boolean "straight_walls_pass"
     t.boolean "sharp_edges_pass"
     t.boolean "unit_stable_pass"
     t.decimal "stitch_length", precision: 8, scale: 2
     t.decimal "evacuation_time", precision: 8, scale: 2
-    t.decimal "unit_pressure_value", precision: 8, scale: 2
+    t.decimal "unit_pressure", precision: 8, scale: 2
     t.decimal "blower_tube_length", precision: 8, scale: 2
-    t.decimal "step_size_value", precision: 8, scale: 2
-    t.decimal "fall_off_height_value", precision: 8, scale: 2
-    t.decimal "trough_depth_value", precision: 8, scale: 2
-    t.decimal "trough_width_value", precision: 8, scale: 2
+    t.decimal "step_size", precision: 8, scale: 2
+    t.decimal "critical_fall_off_height", precision: 8, scale: 2
+    t.decimal "trough_depth", precision: 8, scale: 2
+    t.decimal "trough_width", precision: 8, scale: 2
     t.boolean "stitch_length_pass"
     t.boolean "blower_tube_length_pass"
     t.boolean "evacuation_time_pass"
     t.boolean "step_size_pass"
-    t.boolean "fall_off_height_pass"
+    t.boolean "critical_fall_off_height_pass"
     t.boolean "unit_pressure_pass"
     t.boolean "trough_pass"
     t.boolean "entrapment_pass"
@@ -232,7 +223,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_153352) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "seam_integrity_comment"
-    t.text "lock_stitch_comment"
+    t.text "uses_lock_stitching_comment"
     t.text "stitch_length_comment"
     t.text "air_loss_comment"
     t.text "straight_walls_comment"
@@ -241,7 +232,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_153352) do
     t.text "unit_stable_comment"
     t.text "evacuation_time_comment"
     t.text "step_size_comment"
-    t.text "fall_off_height_comment"
+    t.text "critical_fall_off_height_comment"
     t.text "unit_pressure_comment"
     t.text "trough_comment"
     t.text "entrapment_comment"
@@ -256,6 +247,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_153352) do
     t.string "opening_dimension_comment", limit: 1000
     t.string "entrances_comment", limit: 1000
     t.string "fabric_integrity_comment", limit: 1000
+    t.boolean "trough_depth_pass"
+    t.decimal "trough_adjacent_panel_width", precision: 8, scale: 2
+    t.boolean "trough_adjacent_panel_width_pass"
+    t.text "trough_adjacent_panel_width_comment"
+    t.decimal "step_ramp_size", precision: 8, scale: 2
+    t.boolean "step_ramp_size_pass"
+    t.text "step_ramp_size_comment"
     t.index ["inspection_id"], name: "index_structure_assessments_on_inspection_id"
   end
 

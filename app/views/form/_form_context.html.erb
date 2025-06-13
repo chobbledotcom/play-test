@@ -51,10 +51,6 @@ end %>
   <% if model && model.persisted? && model.respond_to?(:pass_columns_count) && model.pass_columns_count > 0 %>
     <div class="assessment-summary">
       <h4><%= I18n.t("#{i18n_base}.summary.title", default: "Assessment Summary") %></h4>
-      <div class="compliance-status">
-        <strong><%= I18n.t("#{i18n_base}.summary.completion", default: "Completion") %>:</strong>
-        <span class="completion-percentage"><%= model.completion_percentage %>%</span>
-      </div>
       <div class="safety-status">
         <strong><%= I18n.t("#{i18n_base}.summary.safety_checks", default: "Safety Checks") %>:</strong>
         <span class="checks-count">

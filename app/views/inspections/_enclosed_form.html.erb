@@ -1,22 +1,15 @@
 <%= render 'form/form_context', model: @inspection.enclosed_assessment, i18n_base: 'forms.enclosed', url: inspection_enclosed_assessment_path(@inspection) do |form| %>
 
-      <%= render 'shared/page_header', title: t('forms.enclosed.header') %>
+    <div class="assessment-form enclosed-assessment">
 
-      <!-- Exit Requirements Section -->
+      <!-- Exit Requirements -->
       <%= render 'form/fieldset', legend_key: 'exit_requirements' do %>
-        <%= render 'form/number_pass_fail_comment', field: :exit_number, number_options: { min: 0, step: 1 } %>
+        <%= render 'form/number_pass_fail_comment', field: :exit_number %>
         <%= render 'form/pass_fail_comment', field: :exit_sign_always_visible_pass %>
-      <% end %>
-
-      <!-- Critical Failures Summary -->
-      <% if @inspection.enclosed_assessment&.persisted? && @inspection.enclosed_assessment.has_critical_failures? %>
-        <div class="critical-failures text-danger">
-          <strong><%= t('forms.enclosed.summary.critical_failures') %>:</strong>
-          <%= @inspection.enclosed_assessment.critical_failure_summary %>
-        </div>
       <% end %>
 
       <!-- Safety Status -->
       <%= render 'form/assessment_status', assessment: @inspection.enclosed_assessment %>
 
+    </div>
 <% end %>

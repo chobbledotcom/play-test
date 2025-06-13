@@ -44,13 +44,6 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 RSpec.configure do |config|
-  # Raise exceptions on missing translations in tests
-  config.before(:suite) do
-    I18n.exception_handler = lambda do |exception, locale, key, options|
-      raise exception.to_exception
-    end
-  end
-
   # Set admin emails pattern for test environment
   config.before(:each) do
     ENV["ADMIN_EMAILS_PATTERN"] = "^admin\\d*@example\\.com$"

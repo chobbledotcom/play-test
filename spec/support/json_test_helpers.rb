@@ -5,8 +5,6 @@ module JsonTestHelpers
     created_at
     updated_at
     is_seed
-    inspector_signature
-    signature_timestamp
   ].freeze
 
   # Basic fields that should be in inspection JSON

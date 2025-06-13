@@ -184,30 +184,6 @@ RSpec.describe Assessments::MaterialsAssessment, type: :model do
   end
 
   describe "private methods" do
-    describe "#material_assessments_complete?" do
-      it "returns true when all material checks are present" do
-        Assessments::MaterialsAssessment::MATERIAL_CHECKS.each { |check| assessment.send("#{check}=", true) }
-        expect(assessment.send(:material_assessments_complete?)).to be true
-      end
-
-      it "returns false when any material check is nil" do
-        Assessments::MaterialsAssessment::MATERIAL_CHECKS.each { |check| assessment.send("#{check}=", true) }
-        assessment.fabric_strength_pass = nil
-        expect(assessment.send(:material_assessments_complete?)).to be false
-      end
-    end
-
-    describe "#rope_specifications_present?" do
-      it "returns true when ropes is present" do
-        assessment.ropes = 25.0
-        expect(assessment.send(:rope_specifications_present?)).to be true
-      end
-
-      it "returns false when ropes is nil" do
-        assessment.ropes = nil
-        expect(assessment.send(:rope_specifications_present?)).to be false
-      end
-    end
 
     describe "#ropes_compliant?" do
       it "delegates to SafetyStandard" do

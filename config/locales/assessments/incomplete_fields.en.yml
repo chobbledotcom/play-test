@@ -1,0 +1,10 @@
+en:
+  assessments:
+    incomplete_fields:
+      show_details:
+        one: "Show 1 incomplete field"
+        other: "Show %{count} incomplete fields"
+      description: "The following fields must be completed before this assessment can be marked as finished:"
+      needs_assessment: "Needs pass/fail assessment"
+      needs_number: "Needs numeric value"
+      needs_value: "Needs to be filled in"

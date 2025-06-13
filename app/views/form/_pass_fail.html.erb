@@ -1,6 +1,7 @@
 <%
-  # Get the form object
-  form = @_current_form
+  # Get field setup with proper i18n lookup (will raise if missing)
+  field_data = form_field_setup(field, local_assigns)
+  form = field_data[:form_object]
   
   # Pass/Fail options with i18n
   pass_label = t('shared.pass')
@@ -9,7 +10,7 @@
 %>
 
 <div>
-  <label><%= pass_label %>/<%= fail_label %></label>
+  <label><%= field_data[:field_label] %></label>
   <% options.each do |option_label, option_value| %>
     <label>
       <%= form.radio_button field, option_value, id: "#{field}_#{option_value}" %>

@@ -14,18 +14,12 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
     scenario "user accesses PDF from inspection show page" do
       visit inspection_path(inspection)
 
-      # For complete inspections, check if PDF is embedded
-      if inspection.complete?
-        expect(page).to have_css("iframe", wait: 5)
-        # Check for public report link (text might be different)
-        expect(page).to have_link(href: inspection_url(inspection, format: :pdf))
-      end
-
-      # Verify embedded PDF works by checking iframe presence
-      if page.has_css?("iframe")
-        # PDF should be embedded successfully
-        expect(page).to have_css("iframe[src*='#{inspection.id}']")
-      end
+      # PDF should always be embedded (even for draft inspections)
+      expect(page).to have_css("iframe", wait: 5)
+      
+      # Verify the iframe points to the correct inspection PDF
+      expect(page).to have_css("iframe[src*='#{inspection.id}']")
+      expect(page).to have_css("iframe[src*='pdf']")
     end
 
     scenario "user generates PDF with full assessment workflow" do
@@ -65,9 +59,9 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
       visit unit_path(unit)
 
-      # Should have link to unit report or QR code
-      expect(page).to have_content(I18n.t("units.headers.qr_code"))
-      expect(page).to have_css("img[alt*='QR']")
+      # Should have QR code link in the reports section
+      expect(page).to have_content(I18n.t("units.fields.qr_code"))
+      expect(page).to have_link(I18n.t("units.fields.qr_code"), href: unit_path(unit, format: :png))
 
       # Access unit report directly
       pdf_text = get_pdf_text("/units/#{unit.id}.pdf")
@@ -164,11 +158,12 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       # Skip JS test due to selenium driver issues, just test regular viewport
       visit inspection_path(inspection)
 
-      # PDF should be accessible
+      # PDF should be accessible via iframe
       expect(page).to have_css("iframe", wait: 5)
 
-      # Public link should be easily accessible
-      expect(page).to have_link(href: inspection_url(inspection, format: :pdf))
+      # Verify the iframe contains the PDF URL
+      expect(page).to have_css("iframe[src*='#{inspection.id}']")
+      expect(page).to have_css("iframe[src*='pdf']")
     end
   end
 end

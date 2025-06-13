@@ -25,6 +25,7 @@ FactoryBot.define do
       play_area_length { 5.0 }
       play_area_width { 4.0 }
       negative_adjustment { 0.0 }
+      permanent_roof { false }  # This was missing!
       containing_wall_height_comment { "Wall height adequate for age group" }
       platform_height_comment { "Platform height meets standards" }
       tallest_user_height_comment { "User height appropriate" }
@@ -72,6 +73,7 @@ FactoryBot.define do
       users_at_1800mm { 4 }
       play_area_length { 5.0 }
       play_area_width { 4.0 }
+      negative_adjustment { 0.0 }
       # Include pass/fail fields for completeness
       height_requirements_pass { true }
       permanent_roof_pass { true }

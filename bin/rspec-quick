@@ -6,5 +6,26 @@ echo "🚀 Running tests quickly with in-memory database..."
 echo "Coverage checks disabled for speed."
 echo ""
 
-# Disable coverage and use in-memory database
-DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec rspec "$@"
+# Store the output in a variable to parse it
+output=$(DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec rspec "$@" 2>&1)
+exit_code=$?
+
+# Display the output
+echo "$output"
+
+# Extract and highlight the final test count
+if [[ "$output" =~ ([0-9]+)\ examples?,\ ([0-9]+)\ failures? ]]; then
+    total="${BASH_REMATCH[1]}"
+    failures="${BASH_REMATCH[2]}"
+    
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    if [ "$failures" -eq 0 ]; then
+        echo "✅ All $total tests passed!"
+    else
+        echo "❌ $failures out of $total tests failed!"
+    fi
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+fi
+
+exit $exit_code

@@ -38,7 +38,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         expect(response.body).to include("completion_issues_#{inspection.id}")
       end
 
-      it "updates progress percentage when assessment is completed" do
+      it "updates progress status when assessment is updated" do
         # Start with incomplete assessment
         assessment = inspection.create_user_height_assessment!(
           containing_wall_height: nil,
@@ -69,9 +69,9 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
         expect(response).to have_http_status(:success)
 
-        # The response should contain an updated progress percentage
-        # Since we have one complete assessment out of several, it should be > 0%
-        expect(response.body).to match(/\d+%/)
+        # The response should contain an updated progress status
+        expect(response.body).to include("inspection_progress_#{inspection.id}")
+        expect(response.body).to match(/(&lt;span class=&#39;value&#39;&gt;|<span class='value'>)(In Progress|Complete)(&lt;\/span&gt;|<\/span>)/)
       end
 
       it "redirects when trying to update completed inspections" do

@@ -124,17 +124,17 @@ RSpec.describe Inspection, type: :model do
       retrieved = Inspection.find(inspection.id)
       expect(retrieved.inspector_company.name).to be_present
       expect(retrieved.unit.serial).to match(/ÜNICØDÉ-😎-\d+/)
-      expect(retrieved.comments).to eq("❗️Tested with special 🔌 adapter. Result: ✅")
+      expect(retrieved.risk_assessment).to eq("❗️Tested with special 🔌 adapter. Result: ✅")
     end
 
     # Test with maximum possible database field lengths
     it "handles maximum length strings in text fields" do
-      inspection = create(:inspection, :max_length_comments)
+      inspection = create(:inspection, :max_length_risk_assessment)
       extremely_long_text = "A" * 65535  # Text field typical max size
 
-      # Verify the extremely long comment was saved correctly
+      # Verify the extremely long risk assessment was saved correctly
       retrieved = Inspection.find(inspection.id)
-      expect(retrieved.comments).to eq(extremely_long_text)
+      expect(retrieved.risk_assessment).to eq(extremely_long_text)
     end
 
     # Test with SQL injection attempts in string fields
@@ -433,50 +433,6 @@ RSpec.describe Inspection, type: :model do
       end
     end
 
-    describe "numeric field validations" do
-      let(:inspection) { build(:inspection) }
-
-      it "validates step_ramp_size is non-negative" do
-        inspection.step_ramp_size = -1
-        expect(inspection).not_to be_valid
-        expect(inspection.errors[:step_ramp_size]).to include("must be greater than or equal to 0")
-      end
-
-      it "validates critical_fall_off_height is non-negative" do
-        inspection.critical_fall_off_height = -1
-        expect(inspection).not_to be_valid
-        expect(inspection.errors[:critical_fall_off_height]).to include("must be greater than or equal to 0")
-      end
-
-      it "validates unit_pressure is non-negative" do
-        inspection.unit_pressure = -1
-        expect(inspection).not_to be_valid
-        expect(inspection.errors[:unit_pressure]).to include("must be greater than or equal to 0")
-      end
-
-      it "validates trough_depth is non-negative" do
-        inspection.trough_depth = -1
-        expect(inspection).not_to be_valid
-        expect(inspection.errors[:trough_depth]).to include("must be greater than or equal to 0")
-      end
-
-      it "validates trough_adjacent_panel_width is non-negative" do
-        inspection.trough_adjacent_panel_width = -1
-        expect(inspection).not_to be_valid
-        expect(inspection.errors[:trough_adjacent_panel_width]).to include("must be greater than or equal to 0")
-      end
-    end
-
-    describe "boolean field validations" do
-      let(:inspection) { build(:inspection) }
-
-      it "allows boolean pass/fail fields to be true, false, or nil" do
-        inspection.step_ramp_size_pass = true
-        inspection.critical_fall_off_height_pass = false
-        inspection.unit_pressure_pass = nil
-        expect(inspection).to be_valid
-      end
-    end
   end
 
   describe "callbacks and lifecycle" do
@@ -620,9 +576,10 @@ RSpec.describe Inspection, type: :model do
       it "preserves all data when toggling completion status" do
         original_location = "Original Location"
         original_report_number = "TEST-REPORT-123"
+        original_risk_assessment = "Test risk assessment with detailed findings."
         inspection.update!(
           inspection_location: original_location,
-          comments: "Test comments",
+          risk_assessment: original_risk_assessment,
           unique_report_number: original_report_number
         )
 
@@ -630,7 +587,7 @@ RSpec.describe Inspection, type: :model do
         inspection.update!(complete_date: nil)
 
         expect(inspection.inspection_location).to eq(original_location)
-        expect(inspection.comments).to eq("Test comments")
+        expect(inspection.risk_assessment).to eq(original_risk_assessment)
         expect(inspection.unique_report_number).to eq(original_report_number) # Should preserve report number
       end
 
@@ -642,7 +599,7 @@ RSpec.describe Inspection, type: :model do
         inspection.update!(
           inspection_location: "Test Location",
           passed: true,
-          comments: "All good"
+          risk_assessment: "All safety checks passed. Unit in good condition."
         )
 
         # User can mark complete
@@ -650,8 +607,8 @@ RSpec.describe Inspection, type: :model do
         expect(inspection.complete?).to be true
 
         # User can still edit when complete
-        inspection.update!(comments: "Updated comments after completion")
-        expect(inspection.reload.comments).to eq("Updated comments after completion")
+        inspection.update!(risk_assessment: "Updated assessment after completion")
+        expect(inspection.reload.risk_assessment).to eq("Updated assessment after completion")
 
         # User can revert to draft
         inspection.update!(complete_date: nil)

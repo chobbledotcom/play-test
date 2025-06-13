@@ -1,6 +1,7 @@
 class Assessments::UserHeightAssessment < ApplicationRecord
   include AssessmentLogging
   include SafetyCheckMethods
+  include AssessmentCompletion
   
   belongs_to :inspection
 
@@ -22,10 +23,6 @@ class Assessments::UserHeightAssessment < ApplicationRecord
     inclusion: {in: [true, false]}, allow_nil: true
 
 
-  def complete?
-    required_fields_present? && height_measurements_valid? && safety_assessments_complete?
-  end
-
   def meets_height_requirements?
     return false unless tallest_user_height.present? && containing_wall_height.present?
 
@@ -37,17 +34,6 @@ class Assessments::UserHeightAssessment < ApplicationRecord
   end
 
 
-  def completion_percentage
-    total_fields = 12 # Total number of assessable fields
-    completed_fields = [
-      containing_wall_height, platform_height, tallest_user_height,
-      users_at_1000mm, users_at_1200mm, users_at_1500mm, users_at_1800mm,
-      play_area_length, play_area_width, negative_adjustment,
-      tallest_user_height_comment
-    ].count(&:present?) + (permanent_roof.nil? ? 0 : 1)
-
-    (completed_fields.to_f / total_fields * 100).round(0)
-  end
 
   def recommended_user_capacity
     return {} unless play_area_length.present? && play_area_width.present?
@@ -59,22 +45,6 @@ class Assessments::UserHeightAssessment < ApplicationRecord
   alias_method :calculated_capacities, :recommended_user_capacity
 
   private
-
-  def required_fields_present?
-    containing_wall_height.present? && platform_height.present? && tallest_user_height.present?
-  end
-
-  def height_measurements_valid?
-    return true unless containing_wall_height.present? && platform_height.present?
-    containing_wall_height >= platform_height
-  end
-
-  def safety_assessments_complete?
-    %w[
-      height_requirements_pass permanent_roof_pass user_capacity_pass
-      play_area_pass negative_adjustments_pass
-    ].all? { |check| !send(check).nil? }
-  end
 
   def permanent_roof_compliant?
     # Business logic for permanent roof requirements based on height

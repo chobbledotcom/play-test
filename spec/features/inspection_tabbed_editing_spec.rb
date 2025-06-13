@@ -101,7 +101,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
     it "can update basic inspection fields" do
       fill_in_form :inspections, :inspection_location, "Updated Location"
-      fill_in_form :inspections, :comments, "Updated comments"
+      fill_in_form :inspections, :risk_assessment, "Updated risk assessment"
 
       submit_form :inspections
 
@@ -109,7 +109,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
       inspection.reload
       expect(inspection.inspection_location).to eq("Updated Location")
-      expect(inspection.comments).to eq("Updated comments")
+      expect(inspection.risk_assessment).to eq("Updated risk assessment")
     end
 
     it "can mark inspection as complete" do
@@ -199,9 +199,9 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       expect(page).to have_css('label[for*="inspection_passed"]')
     end
 
-    it "shows completion percentage in overview" do
-      expect(page).to have_content(I18n.t("inspections.fields.progress"))
-      expect(page).to have_content("%") # Should show percentage
+    it "shows completion status in overview" do
+      expect(page).to have_content(I18n.t("inspections.fields.status"))
+      expect(page).to have_content("In Progress") # Should show status
     end
   end
 

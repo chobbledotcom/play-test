@@ -14,7 +14,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
       it "returns turbo stream content type" do
         patch inspection_path(inspection),
-          params: {inspection: {comments: "Updated via turbo"}},
+          params: {inspection: {inspection_location: "Updated via turbo"}},
           headers: turbo_headers
 
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
@@ -22,7 +22,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
       it "returns properly formatted turbo stream elements" do
         patch inspection_path(inspection),
-          params: {inspection: {comments: "Test update"}},
+          params: {inspection: {inspection_location: "Test update"}},
           headers: turbo_headers
 
         # Parse the response to check structure
@@ -34,18 +34,19 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         expect(response.body).to include("</turbo-stream>")
       end
 
-      it "includes progress percentage in turbo stream" do
+      it "includes progress status in turbo stream" do
         patch inspection_path(inspection),
-          params: {inspection: {comments: "Test"}},
+          params: {inspection: {inspection_location: "Test Location"}},
           headers: turbo_headers
 
-        # Should include a percentage value (HTML might be escaped in template)
-        expect(response.body).to match(/(&lt;span class=&#39;value&#39;&gt;|<span class='value'>)\d+%(&lt;\/span&gt;|<\/span>)/)
+        # Should include the progress status (HTML might be escaped in template)
+        expect(response.body).to include("inspection_progress_#{inspection.id}")
+        expect(response.body).to match(/(&lt;span class=&#39;value&#39;&gt;|<span class='value'>)(In Progress|Complete)(&lt;\/span&gt;|<\/span>)/)
       end
 
       it "includes completion issues turbo stream" do
         patch inspection_path(inspection),
-          params: {inspection: {comments: "Test"}},
+          params: {inspection: {inspection_location: "Test"}},
           headers: turbo_headers
 
         expect(response.body).to include("target=\"completion_issues_#{inspection.id}\"")
@@ -98,7 +99,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
       it "returns JSON response for backwards compatibility" do
         patch inspection_path(inspection),
-          params: {inspection: {comments: "Updated via JSON"}},
+          params: {inspection: {inspection_location: "Updated via JSON"}},
           headers: json_headers
 
         expect(response.content_type).to include("application/json")
@@ -110,7 +111,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
     context "when request is standard HTML" do
       it "redirects on success" do
         patch inspection_path(inspection),
-          params: {inspection: {comments: "Updated via HTML"}}
+          params: {inspection: {risk_assessment: "Updated via HTML"}}
 
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(inspection_path(inspection))
@@ -128,20 +129,31 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         platform_height: nil
       )
 
+      # Get the complete attributes for user height assessment
+      complete_attrs = attributes_for(:user_height_assessment, :complete).merge(
+        id: inspection.user_height_assessment.id
+      )
+
       # Complete the assessment
       patch inspection_path(inspection),
         params: {
           inspection: {
-            user_height_assessment_attributes: attributes_for(:user_height_assessment, :with_basic_data).merge(
-              id: inspection.user_height_assessment.id,
-              tallest_user_height_comment: "Complete"
-            )
+            user_height_assessment_attributes: complete_attrs
           }
         },
         headers: turbo_headers
 
-      # Should show some progress (not 0%)
-      expect(response.body).to match(/(&lt;span class=&#39;value&#39;&gt;|<span class='value'>)([1-9]\d*)%(&lt;\/span&gt;|<\/span>)/)
+      # Reload to check if update worked
+      inspection.reload
+      user_height = inspection.user_height_assessment.reload
+      
+      # Debug output
+      if user_height.incomplete_fields.any?
+        puts "User height incomplete fields: #{user_height.incomplete_fields.inspect}"
+      end
+      
+      # Should show In Progress status
+      expect(response.body).to match(/(&lt;span class=&#39;value&#39;&gt;|<span class='value'>)(In Progress|Complete)(&lt;\/span&gt;|<\/span>)/)
     end
   end
 
@@ -159,7 +171,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
     it "redirects when trying to update completed inspections" do
       patch inspection_path(inspection),
-        params: {inspection: {comments: "Updated"}},
+        params: {inspection: {inspection_location: "Updated"}},
         headers: turbo_headers
 
       # Should redirect because completed inspections cannot be edited
@@ -174,7 +186,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
     it "doesn't break on controller helper method calls" do
       # This test ensures we're using helpers.method_name correctly
       patch inspection_path(inspection),
-        params: {inspection: {comments: "Test"}},
+        params: {inspection: {inspection_location: "Test"}},
         headers: turbo_headers
 
       expect(response).to have_http_status(:ok)
@@ -186,11 +198,11 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
       inspection.user_height_assessment&.destroy
 
       patch inspection_path(inspection),
-        params: {inspection: {comments: "Test"}},
+        params: {inspection: {inspection_location: "Test"}},
         headers: turbo_headers
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("0%") # Should show 0% progress
+      expect(response.body).to include("In Progress") # Should show In Progress status
     end
   end
 end

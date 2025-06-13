@@ -62,12 +62,14 @@
 }
 
 /* Mobile view - stacked layout */
-.table-list-items a span {
+.table-list-items a span,
+.table-list-content span {
   display: block;
   padding: 0.25rem 0;
 }
 
-.table-list-items a span:before {
+.table-list-items a span:before,
+.table-list-content span:before {
   content: attr(data-label) ": ";
   font-weight: bold;
   display: inline-block;
@@ -82,18 +84,22 @@
   }
 
   .table-list-header > span,
-  .table-list-items a span {
+  .table-list-items a span,
+  .table-list-content span {
     flex: 1;
     padding: 0 0.5rem;
     display: inline-block;
   }
 
-  .table-list-items a {
+  .table-list-items a,
+  .table-list-content {
     display: flex;
     align-items: center;
+    padding: 1rem;
   }
 
-  .table-list-items a span:before {
+  .table-list-items a span:before,
+  .table-list-content span:before {
     display: none; /* Hide mobile labels on desktop */
   }
 
@@ -138,6 +144,10 @@
     flex: 1;
     text-align: center;
   }
+  .units-list .col-action {
+    flex: 1;
+    text-align: center;
+  }
 
   /* Align header and data cells */
   .table-list-header .col-result {
@@ -146,12 +156,30 @@
   .table-list-header .col-has-slide {
     text-align: center;
   }
+  .table-list-header .col-action {
+    text-align: center;
+  }
+}
+
+/* Button styling within table-list */
+.table-list .button_to {
+  margin: 0 auto;
+  padding: 0;
+  min-width: 0;
+}
+
+.table-list .button_to input[type="submit"],
+.table-list .button_to button {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  min-width: 0;
+  width: auto;
 }
 
 /* Completion status notice styling */
 .completion-status-notice {
   max-width: 30rem;
-  margin: 0 auto;
+  margin: 2rem auto;
   padding: 1rem;
   background: linear-gradient(135deg, #e3f2fd 0%, #f8fbff 100%);
   border: 1px solid #bbdefb;

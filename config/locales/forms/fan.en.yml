@@ -3,16 +3,15 @@ en:
     fan:
       header: "Fan/Blower"
       sections:
-        blower_specifications: "Blower Specifications"
-        blower_safety_checks: "Blower Safety Checks"
-        electrical_safety: "Electrical Safety"
+        fan_assessment: "Fan Assessment"
       fields:
-        blower_serial: "Blower Serial Number"
-        fan_size_type: "Fan Size / Type"
-        blower_flap_pass: "Blower Flap"
-        blower_finger_pass: "Finger Guards"
-        blower_visual_pass: "Visual Condition"
-        pat_pass: "PAT Test"
+        fan_size_type: "Blower size"
+        blower_serial: "Blower serial number"
+        blower_serial_pass: "Blower serial"
+        blower_flap_pass: "Return flap present"
+        blower_finger_pass: "Finger probe Test"
+        pat_pass: "PAT"
+        blower_visual_pass: "Visual Inspection"
       status:
         checks_passed: "Safety Checks Passed"
         completion: "Assessment Completion"

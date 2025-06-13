@@ -288,8 +288,6 @@ RSpec.describe "Public Access Control", type: :request do
       json = JSON.parse(page.body)
 
       expect(json).not_to have_key("user_id")
-      expect(json).not_to have_key("inspector_signature")
-      expect(json).not_to have_key("signature_timestamp")
     end
   end
 end

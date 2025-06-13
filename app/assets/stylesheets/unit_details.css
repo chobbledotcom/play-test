@@ -1,0 +1,68 @@
+/* Unit Details Wrapper - specific to unit details only */
+.unit-details-wrapper {
+  max-width: 40rem;
+  margin: 2rem auto;
+}
+
+/* Unit Details List - scoped to avoid affecting other .table-list elements */
+.unit-details-wrapper .unit-details-list {
+  list-style: none;
+  margin: 2rem auto;
+  padding: 0;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.unit-details-wrapper .unit-details-list li {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border, #ccc);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.unit-details-wrapper .unit-details-list li:last-child {
+  border-bottom: none;
+}
+
+/* Alternating row backgrounds - scoped */
+.unit-details-wrapper .unit-details-list li:nth-child(odd) {
+  background-color: white;
+}
+
+.unit-details-wrapper .unit-details-list li:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.unit-details-wrapper .unit-details-list strong {
+  color: var(--color-link, #1976d2);
+  width: 15rem;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.unit-details-wrapper .unit-details-list span {
+  flex: 1;
+  margin-left: 1rem;
+  text-align: left;
+}
+
+/* Mobile view - inline flow - scoped */
+@media (max-width: 789px) {
+  .unit-details-wrapper .unit-details-list li {
+    display: block;
+    text-align: left;
+  }
+  
+  .unit-details-wrapper .unit-details-list strong,
+  .unit-details-wrapper .unit-details-list span {
+    display: inline;
+  }
+}
+
+/* Share button styling - remove vertical margins */
+.share-button {
+  margin-top: 0;
+  margin-bottom: 0;
+}

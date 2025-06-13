@@ -102,13 +102,13 @@ class PdfGeneratorService
     def generate_structure_section(pdf, inspection)
       generate_assessment_section(pdf, "structure", inspection.structure_assessment) do
         # Pass/fail checks
-        %i[seam_integrity_pass lock_stitch_pass air_loss_pass straight_walls_pass 
+        %i[seam_integrity_pass uses_lock_stitching_pass air_loss_pass straight_walls_pass 
            sharp_edges_pass unit_stable_pass evacuation_time_pass].each { |field| add field }
         
         # Measurements with pass/fail
         add :stitch_length, unit: "mm", pass: :stitch_length_pass
         add :blower_tube_length, unit: "m", pass: :blower_tube_length_pass
-        add :unit_pressure_value, unit: "Pa", pass: :unit_pressure_pass
+        add :unit_pressure, unit: "Pa", pass: :unit_pressure_pass
       end
     end
 

@@ -30,8 +30,8 @@
               <% end %>
             </div>
             <% if @inspection.user_height_assessment.containing_wall_height.present? %>
-              <div class="compliance-status <%= @inspection.user_height_assessment.meets_height_requirements? ? 'text-success' : 'text-danger' %>">
-                <%= @inspection.user_height_assessment.meets_height_requirements? ? 'Compliant' : 'Non-Compliant' %>
+              <div class="compliance-status">
+                <%= render 'shared/pass_fail_string', passed: @inspection.user_height_assessment.meets_height_requirements? %>
               </div>
             <% end %>
           <% end %>
@@ -60,7 +60,7 @@
         <%= render 'form/number', field: :users_at_1800mm, min: 0, step: 1 %>
 
         <div class="capacity-summary">
-          <strong><%= t('forms.user_height.fields.total_capacity') %>:</strong>
+          <strong><%= t('forms.tallest_user_height.fields.total_capacity') %>:</strong>
           <span id="total-capacity"><%= @inspection.user_height_assessment&.total_user_capacity || 0 %></span>
         </div>
       <% end %>

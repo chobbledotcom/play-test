@@ -9,7 +9,7 @@
   <%= render 'form/text_area', field: :notes, rows: 4 %>
   
   <% if show_photo %>
-    <%= form.label :photo, t("#{i18n_base}.photo") %>
+    <%= form.label :photo, t("#{i18n_base}.fields.photo") %>
     <%= form.file_field :photo, accept: "image/*" %>
     <div id="unit_photo_preview">
       <% if object.photo.attached? %>

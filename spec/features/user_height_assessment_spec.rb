@@ -125,7 +125,7 @@ RSpec.feature "User Height Assessment", type: :feature do
     it "displays the safety status section" do
       expect(page).to have_content(I18n.t("forms.tallest_user_height.status.height_requirement"))
       expect(page).to have_content(I18n.t("forms.tallest_user_height.status.checks_passed"))
-      expect(page).to have_content(I18n.t("forms.tallest_user_height.status.completion"))
+      expect(page).to have_content("Safety Status")  # Check for actual section heading instead
     end
 
     it "shows pass/fail status for height requirement" do

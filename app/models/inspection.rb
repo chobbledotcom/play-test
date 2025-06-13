@@ -33,35 +33,9 @@ class Inspection < ApplicationRecord
   validates :unique_report_number,
     uniqueness: {scope: :user_id, allow_blank: true}
 
-  # Step/Ramp Size validations
-  validates :step_ramp_size,
-    numericality: {greater_than_or_equal_to: 0},
-    allow_blank: true
-  validates :step_ramp_size_pass,
-    inclusion: {in: [true, false]},
-    allow_nil: true
 
-  # Critical Fall Off Height validations
-  validates :critical_fall_off_height,
-    numericality: {greater_than_or_equal_to: 0},
-    allow_blank: true
-  validates :critical_fall_off_height_pass,
-    inclusion: {in: [true, false]},
-    allow_nil: true
 
-  # Unit Pressure validations
-  validates :unit_pressure,
-    numericality: {greater_than_or_equal_to: 0},
-    allow_blank: true
-  validates :unit_pressure_pass,
-    inclusion: {in: [true, false]},
-    allow_nil: true
 
-  # Trough validations (only remaining inspection fields)
-  validates :trough_depth,
-    numericality: {greater_than_or_equal_to: 0}, allow_blank: true
-  validates :trough_adjacent_panel_width,
-    numericality: {greater_than_or_equal_to: 0}, allow_blank: true
 
 
   # Callbacks
@@ -120,9 +94,6 @@ class Inspection < ApplicationRecord
 
   def self.both_dates_present?(start_date, end_date) =
     start_date.present? && end_date.present?
-
-  # Delegate methods to unit
-  delegate :name, :serial, :manufacturer, to: :unit, allow_nil: true
 
   # Calculated fields
   def reinspection_date
@@ -212,6 +183,11 @@ class Inspection < ApplicationRecord
 
   def validate_completeness
     assessment_validation_data.filter_map do |name, assessment, message|
+      # Skip slide assessment if unit doesn't have a slide
+      next if name == :slide && !has_slide?
+      # Skip enclosed assessment if unit is not totally enclosed
+      next if name == :enclosed && !is_totally_enclosed?
+      
       message if assessment&.present? && !assessment.complete?
     end
   end

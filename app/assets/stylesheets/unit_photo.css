@@ -1,0 +1,20 @@
+/* Unit Photo Styling - scoped to unit-details-wrapper */
+.unit-details-wrapper .unit-photo {
+  max-width: 40rem;
+  margin: 0 auto 2rem auto;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: 5px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.unit-details-wrapper .unit-photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.unit-details-wrapper .unit-photo p {
+  margin: 0.5rem 0;
+  padding: 0 1rem;
+}

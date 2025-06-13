@@ -41,12 +41,12 @@
               <% if inspection.unit.nil? %>
                 <span class="badge">[<%= t("inspections.labels.no_unit") %>]</span>
               <% end %>
-              <%= inspection.name.presence || t('inspections.messages.unnamed') %>
+              <%= inspection.unit&.name.presence || t('inspections.messages.unnamed') %>
             </span>
           <% end %>
           <% if show_serial %>
             <span class="col-serial" data-label="<%= t('inspections.fields.serial') %>">
-              <%= inspection.serial.presence || t('inspections.messages.missing_serial') %>
+              <%= inspection.unit&.serial.presence || t('inspections.messages.missing_serial') %>
             </span>
           <% end %>
           <% if show_location %>

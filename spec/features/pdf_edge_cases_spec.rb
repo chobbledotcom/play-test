@@ -15,8 +15,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       extremely_long_text = "Lorem ipsum " * 500  # ~5500 characters
 
       inspection.update(
-        inspection_location: "Location: #{extremely_long_text}",
-        comments: "Comments: #{extremely_long_text}"
+        inspection_location: "Location: #{extremely_long_text}"
       )
 
       pdf_data = get_pdf("/inspections/#{inspection.id}.pdf")
@@ -27,8 +26,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       mixed_content = "测试 🎈 Ñoël Zürich ¡Hola! 数学 symbols: ∑∆π€£¥ emojis: 🏭🔧⚡🎯"
 
       inspection.update(
-        inspection_location: mixed_content,
-        comments: "#{mixed_content} with more content"
+        inspection_location: mixed_content
       )
 
       pdf_text = get_pdf_text("/inspections/#{inspection.id}.pdf")
@@ -46,7 +44,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       ]
 
       dangerous_content.each do |content|
-        inspection.update(comments: content)
+        inspection.update(risk_assessment: content)
         get_pdf("/inspections/#{inspection.id}.pdf")
       end
     end

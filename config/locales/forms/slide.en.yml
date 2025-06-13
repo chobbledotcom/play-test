@@ -15,6 +15,7 @@ en:
         slip_sheet_pass: "Slip Sheet Integrity"
       status:
         runout_requirement: "Runout Requirement"
+        height_requirement: "Height Requirement"
         checks_passed: "Checks Passed"
         completion: "Completion"
       submit: "Save Assessment"

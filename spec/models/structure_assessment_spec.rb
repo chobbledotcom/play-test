@@ -14,7 +14,7 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
   describe "constants" do
     it "defines critical checks" do
       expect(Assessments::StructureAssessment::CRITICAL_CHECKS).to eq([
-        "seam_integrity_pass", "lock_stitch_pass", "air_loss_pass",
+        "seam_integrity_pass", "uses_lock_stitching_pass", "air_loss_pass",
         "straight_walls_pass", "sharp_edges_pass", "unit_stable_pass"
       ])
     end
@@ -29,22 +29,22 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
 
     context "additional pass/fail checks" do
       %w[stitch_length_pass blower_tube_length_pass
-        step_size_pass fall_off_height_pass unit_pressure_pass
+        step_size_pass critical_fall_off_height_pass unit_pressure_pass
         trough_pass entrapment_pass markings_pass grounding_pass].each do |field|
         include_examples "validates boolean field", field
       end
     end
 
     context "measurements" do
-      %w[stitch_length unit_pressure_value blower_tube_length
-        step_size_value fall_off_height_value trough_depth_value trough_width_value].each do |field|
+      %w[stitch_length unit_pressure blower_tube_length
+        step_size critical_fall_off_height trough_depth trough_width].each do |field|
         include_examples "validates non-negative numeric field", field
       end
     end
 
     context "comment fields" do
       (Assessments::StructureAssessment::CRITICAL_CHECKS + %w[stitch_length_pass blower_tube_length_pass
-        step_size_pass fall_off_height_pass unit_pressure_pass
+        step_size_pass critical_fall_off_height_pass unit_pressure_pass
         trough_pass entrapment_pass markings_pass grounding_pass]).map { |check| check.sub("_pass", "_comment") }.each do |field|
         include_examples "validates comment field", field
       end
@@ -53,24 +53,9 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
 
   describe "#complete?" do
     it "returns true when all sections are complete" do
-      # Set all critical checks
-      Assessments::StructureAssessment::CRITICAL_CHECKS.each do |check|
-        assessment.send("#{check}=", true)
-      end
-
-      # Set required measurements
-      assessment.stitch_length = 5.0
-      assessment.unit_pressure_value = 1.5
-      assessment.blower_tube_length = 1.5
-
-      # Set additional checks
-      assessment.stitch_length_pass = true
-      assessment.unit_pressure_pass = true
-      assessment.blower_tube_length_pass = true
-      assessment.step_size_pass = true
-      assessment.fall_off_height_pass = true
-
-      expect(assessment.complete?).to be true
+      # Use the complete factory trait
+      complete_assessment = build(:structure_assessment, :complete)
+      expect(complete_assessment.complete?).to be true
     end
 
     it "returns false when critical checks are missing" do
@@ -87,7 +72,7 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
     it "returns false when additional checks are missing" do
       Assessments::StructureAssessment::CRITICAL_CHECKS.each { |check| assessment.send("#{check}=", true) }
       assessment.stitch_length = 5.0
-      assessment.unit_pressure_value = 1.5
+      assessment.unit_pressure = 1.5
       assessment.blower_tube_length = 1.5
       assessment.stitch_length_pass = nil
       expect(assessment.complete?).to be false
@@ -129,9 +114,9 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
   describe "#measurement_compliance" do
     it "returns compliance status for all measurements" do
       assessment.stitch_length = 5.0
-      assessment.unit_pressure_value = 1.5
+      assessment.unit_pressure = 1.5
       assessment.blower_tube_length = 1.5
-      assessment.fall_off_height_value = 0.5
+      assessment.critical_fall_off_height = 0.5
 
       compliance = assessment.measurement_compliance
 
@@ -153,7 +138,7 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
 
     describe "unit_pressure_compliant?" do
       it "delegates to SafetyStandard" do
-        assessment.unit_pressure_value = 1.5
+        assessment.unit_pressure = 1.5
         expect(SafetyStandard).to receive(:valid_pressure?).with(1.5)
         assessment.send(:unit_pressure_compliant?)
       end
@@ -178,7 +163,7 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
 
     describe "fall_off_height_compliant?" do
       it "delegates to SafetyStandard" do
-        assessment.fall_off_height_value = 0.5
+        assessment.critical_fall_off_height = 0.5
         expect(SafetyStandard).to receive(:valid_fall_height?).with(0.5)
         assessment.send(:fall_off_height_compliant?)
       end
@@ -189,7 +174,7 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
     it "handles extreme measurement values" do
       assessment.update!(
         stitch_length: 999.99,
-        unit_pressure_value: 999.99
+        unit_pressure: 999.99
       )
 
       expect(assessment).to be_valid
@@ -198,7 +183,7 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
     it "handles zero measurement values" do
       assessment.update!(
         stitch_length: 0,
-        unit_pressure_value: 0
+        unit_pressure: 0
       )
 
       expect(assessment).to be_valid
@@ -206,7 +191,7 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
 
     it "handles mixed pass/fail states" do
       assessment.seam_integrity_pass = true
-      assessment.lock_stitch_pass = false
+      assessment.uses_lock_stitching_pass = false
       assessment.air_loss_pass = true
       assessment.straight_walls_pass = false
       assessment.sharp_edges_pass = true

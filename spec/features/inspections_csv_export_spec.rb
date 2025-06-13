@@ -47,7 +47,7 @@ RSpec.feature "Inspections CSV Export", type: :feature do
       expect(csv_lines.length).to eq(1) # Should only have complete inspection
 
       # Check that key headers are present (CSV includes all inspection columns)
-      key_headers = %w[id inspection_date inspection_location passed comments unit_name unit_serial unit_manufacturer inspector_company_name]
+      key_headers = %w[id inspection_date inspection_location passed risk_assessment unit_name unit_serial unit_manufacturer inspector_company_name]
       key_headers.each do |header|
         expect(csv_lines.headers).to include(header)
       end

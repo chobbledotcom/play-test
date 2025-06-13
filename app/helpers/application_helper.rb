@@ -22,6 +22,7 @@ module ApplicationHelper
     field
     max
     min
+    number_options
     options
     required
     rows

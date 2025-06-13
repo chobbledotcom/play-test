@@ -2,20 +2,26 @@ en:
   forms:
     materials:
       header: "Materials Assessment"
+      summary:
+        title: "Materials Assessment Summary"
+        critical_materials: "Critical Materials Check"
+        additional_materials: "Additional Materials Check"
+        rope_specifications: "Rope Specifications Check"
+        overall_materials: "Overall Materials Assessment"
+        test_requirements: "Test Requirements"
+        non_critical_issues: "Non-Critical Issues"
       sections:
-        rope_specifications: "Rope Specifications"
-        critical_materials: "Critical Materials"
-        additional_materials: "Additional Materials"
+        materials_assessment: "Materials Assessment"
       fields:
-        ropes: "Rope Size"
-        fabric_strength_pass: "Fabric Strength"
-        fire_retardant_pass: "Fire Retardant"
-        thread_pass: "Thread"
-        clamber_netting_pass: "Clamber Netting"
-        retention_netting_pass: "Retention Netting"
+        ropes: "Ropes (mm)"
+        clamber_netting_pass: "Clamber netting"
+        retention_netting_pass: "Retention netting"
         zips_pass: "Zips"
         windows_pass: "Windows"
         artwork_pass: "Artwork"
+        thread_pass: "Thread"
+        fabric_strength_pass: "Fabric strength"
+        fire_retardant_pass: "Fire retardent"
       status:
         checks_passed: "Safety Checks Passed"
         completion: "Assessment Completion"

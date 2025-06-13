@@ -17,7 +17,7 @@ module AssessmentController
           redirect_to @inspection
         end
         format.json { render json: {status: I18n.t("shared.api.success"), inspection: @inspection} }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("flash", partial: "shared/save_message", locals: {message: I18n.t("inspections.messages.updated")}) }
+        format.turbo_stream { render_save_message(I18n.t("inspections.messages.updated")) }
       end
     else
       respond_to do |format|
@@ -31,7 +31,7 @@ module AssessmentController
           render "inspections/edit", status: :unprocessable_entity
         end
         format.json { render json: {errors: @assessment.errors}, status: :unprocessable_entity }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("flash", partial: "shared/save_message", locals: {message: @assessment.errors.full_messages.join(", "), type: "error"}) }
+        format.turbo_stream { render_error_message(@assessment.errors.full_messages.join(", ")) }
       end
     end
   end
@@ -64,7 +64,7 @@ module AssessmentController
         redirect_to inspections_path
       end
       format.json { render json: {error: I18n.t("inspections.errors.access_denied")}, status: :forbidden }
-      format.turbo_stream { render turbo_stream: turbo_stream.replace("flash", partial: "shared/save_message", locals: {message: I18n.t("inspections.errors.access_denied"), type: "error"}) }
+      format.turbo_stream { render_error_message(I18n.t("inspections.errors.access_denied")) }
     end
   end
 
@@ -99,6 +99,16 @@ module AssessmentController
     # This is needed when rendering the inspections/edit view
     # For now, just set an empty array since we're only editing one inspection
     @inspection_locations = []
+  end
+
+  def render_save_message(message, type: "success")
+    render turbo_stream: turbo_stream.replace("form_save_message", 
+                                             partial: "shared/save_message", 
+                                             locals: {message: message, type: type})
+  end
+
+  def render_error_message(message)
+    render_save_message(message, type: "error")
   end
 
 end

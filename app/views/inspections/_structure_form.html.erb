@@ -2,60 +2,38 @@
 
     <div class="assessment-form structure-assessment">
 
-      <!-- Critical Safety Checks Section -->
-      <%= render 'form/fieldset', legend_key: 'critical_safety_checks' do %>
-        <%= render 'form/pass_fail', field: :seam_integrity_pass %>
-        <%= render 'form/pass_fail', field: :lock_stitch_pass %>
-        <%= render 'form/pass_fail', field: :air_loss_pass %>
-        <%= render 'form/pass_fail', field: :straight_walls_pass %>
-        <%= render 'form/pass_fail', field: :sharp_edges_pass %>
-        <%= render 'form/pass_fail', field: :unit_stable_pass %>
+      <!-- Fabric and Construction -->
+      <%= render 'form/fieldset', legend_key: 'fabric_construction' do %>
+        <%= render 'form/pass_fail_comment', field: :seam_integrity_pass %>
+        <%= render 'form/pass_fail_comment', field: :uses_lock_stitching_pass %>
+        <%= render 'form/number_pass_fail_comment', field: :stitch_length %>
+        <%= render 'form/pass_fail_comment', field: :air_loss_pass %>
+        <%= render 'form/pass_fail_comment', field: :straight_walls_pass %>
+        <%= render 'form/pass_fail_comment', field: :sharp_edges_pass %>
       <% end %>
 
-      <!-- Measurements Section -->
-      <%= render 'form/fieldset', legend_key: 'measurements' do %>
-        <div class="form-group">
-          <%= render 'form/number', field: :stitch_length, min: 0, step: 0.1 %>
-          <%= render 'form/pass_fail', field: :stitch_length_pass %>
-        </div>
-
-        <div class="form-group">
-          <%= render 'form/number', field: :evacuation_time, min: 0, step: 1 %>
-          <%= render 'form/pass_fail', field: :evacuation_time_pass %>
-        </div>
-
-        <div class="form-group">
-          <%= render 'form/number', field: :unit_pressure_value, min: 0, step: 0.1 %>
-          <%= render 'form/pass_fail', field: :unit_pressure_pass %>
-        </div>
-
-        <div class="form-group">
-          <%= render 'form/number', field: :blower_tube_length, min: 0, step: 0.1 %>
-          <%= render 'form/pass_fail', field: :blower_tube_length_pass %>
-        </div>
+      <!-- Structural Safety and Measurements -->
+      <%= render 'form/fieldset', legend_key: 'structural_safety' do %>
+        <%= render 'form/number_pass_fail_comment', field: :blower_tube_length %>
+        <%= render 'form/pass_fail_comment', field: :unit_stable_pass %>
+        <%= render 'form/number_pass_fail_comment', field: :evacuation_time %>
+        <%= render 'form/number_pass_fail_comment', field: :step_size %>
+        <%= render 'form/number_pass_fail_comment', field: :critical_fall_off_height %>
+        <%= render 'form/number_pass_fail_comment', field: :unit_pressure %>
       <% end %>
 
-      <!-- Additional Safety Checks Section -->
-      <%= render 'form/fieldset', legend_key: 'additional_safety_checks' do %>
-        <div class="form-group">
-          <%= render 'form/number', field: :step_size_value, min: 0, step: 0.1 %>
-          <%= render 'form/pass_fail', field: :step_size_pass %>
-        </div>
+      <!-- Trough Assessment -->
+      <%= render 'form/fieldset', legend_key: 'trough_assessment' do %>
+        <%= render 'form/number_pass_fail_comment', field: :trough_depth %>
+        <%= render 'form/number_pass_fail_comment', field: :trough_adjacent_panel_width %>
+        <%= render 'form/pass_fail_comment', field: :trough_pass %>
+      <% end %>
 
-        <div class="form-group">
-          <%= render 'form/number', field: :fall_off_height_value, min: 0, step: 0.1 %>
-          <%= render 'form/pass_fail', field: :fall_off_height_pass %>
-        </div>
-
-        <div class="form-group">
-          <%= render 'form/number', field: :trough_depth_value, min: 0, step: 0.1 %>
-          <%= render 'form/number', field: :trough_width_value, min: 0, step: 0.1 %>
-          <%= render 'form/pass_fail', field: :trough_pass %>
-        </div>
-
-        <%= render 'form/pass_fail', field: :entrapment_pass %>
-        <%= render 'form/pass_fail', field: :markings_pass %>
-        <%= render 'form/pass_fail', field: :grounding_pass %>
+      <!-- Safety Compliance -->
+      <%= render 'form/fieldset', legend_key: 'safety_compliance' do %>
+        <%= render 'form/pass_fail_comment', field: :entrapment_pass %>
+        <%= render 'form/pass_fail_comment', field: :markings_pass %>
+        <%= render 'form/pass_fail_comment', field: :grounding_pass %>
       <% end %>
 
       <!-- Critical Failures Summary -->

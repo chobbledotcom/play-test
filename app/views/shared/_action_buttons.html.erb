@@ -1,22 +1,20 @@
 <div class="actions">
   <% actions.each do |action| %>
     <% if action[:method] == :post %>
-      <%= button_to action[:url], 
+      <%= button_to action[:label],
+                    action[:url], 
                     method: :post,
                     params: action[:params] || {},
                     class: "button #{action[:danger] ? 'danger' : ''}",
-                    data: { turbo_confirm: action[:confirm] } do %>
-        <strong><%= action[:label] %></strong>
-      <% end %>
+                    data: { turbo_confirm: action[:confirm] } %>
     <% else %>
-      <%= link_to action[:url], 
-                class: "button #{action[:danger] ? 'danger' : ''}",
-                target: action[:target],
-                data: action[:method] == :delete ? 
-                      { turbo_method: :delete, turbo_confirm: action[:confirm] || "Are you sure? This cannot be undone." } : 
-                      action[:data] do %>
-        <strong><%= action[:label] %></strong>
-      <% end %>
+      <%= link_to action[:label],
+                  action[:url], 
+                  class: "button #{action[:danger] ? 'danger' : ''}",
+                  target: action[:target],
+                  data: action[:method] == :delete ? 
+                        { turbo_method: :delete, turbo_confirm: action[:confirm] || "Are you sure? This cannot be undone." } : 
+                        action[:data] %>
     <% end %>
   <% end %>
 </div>

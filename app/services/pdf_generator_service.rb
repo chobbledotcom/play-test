@@ -14,7 +14,7 @@ class PdfGeneratorService
   def self.generate_inspection_report(inspection)
     require "prawn/table"
 
-    Prawn::Document.new do |pdf|
+    Prawn::Document.new(page_size: "A4", page_layout: :portrait) do |pdf|
       Configuration.setup_pdf_fonts(pdf)
 
       # Initialize assessment renderer
@@ -25,9 +25,6 @@ class PdfGeneratorService
 
       # Unit details section
       generate_inspection_unit_details(pdf, inspection)
-
-      # Testimony/Comments section
-      generate_inspection_comments(pdf, inspection)
 
       # User Height/Count Assessment section
       renderer = AssessmentRenderer.generate_user_height_section(pdf, inspection)
@@ -79,7 +76,7 @@ class PdfGeneratorService
   def self.generate_unit_report(unit)
     require "prawn/table"
 
-    Prawn::Document.new do |pdf|
+    Prawn::Document.new(page_size: "A4", page_layout: :portrait) do |pdf|
       Configuration.setup_pdf_fonts(pdf)
       HeaderGenerator.generate_unit_pdf_header(pdf, unit)
       generate_unit_details(pdf, unit)
@@ -98,14 +95,6 @@ class PdfGeneratorService
     # Hide the table entirely when no unit is associated
   end
 
-  def self.generate_inspection_comments(pdf, inspection)
-    pdf.move_down 20
-    pdf.text I18n.t("shared.comments"), size: SECTION_TITLE_SIZE, style: :bold
-    pdf.stroke_horizontal_rule
-    pdf.move_down 10
-    pdf.text inspection.comments
-    pdf.move_down COMMENTS_PADDING
-  end
 
   def self.generate_unit_details(pdf, unit)
     unit_data = TableBuilder.build_unit_details_table(unit, :unit)

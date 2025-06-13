@@ -22,9 +22,10 @@ module InspectionTurboStreams
   end
 
   def progress_update_stream
+    status = @inspection.complete? ? I18n.t('inspections.status.complete') : I18n.t('inspections.status.in_progress')
     turbo_stream.replace(
       "inspection_progress_#{@inspection.id}",
-      html: progress_html
+      html: "<span class='value'>#{status}</span>"
     )
   end
 
@@ -52,9 +53,6 @@ module InspectionTurboStreams
     )
   end
 
-  def progress_html
-    "<span class='value'>#{helpers.assessment_completion_percentage(@inspection)}%</span>"
-  end
 
   def save_message_locals(success:, dom_id:)
     if success

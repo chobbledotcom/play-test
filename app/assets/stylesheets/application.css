@@ -117,11 +117,8 @@ nav button {
 
 /* Tab Navigation */
 nav.tabs {
-  border-bottom: 1px solid var(--color-border, #ccc);
-  margin-bottom: 2rem;
+  margin: 2rem auto;
   width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 nav.tabs ul {
@@ -129,17 +126,24 @@ nav.tabs ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
 }
 
 nav.tabs li {
-  margin-right: 1rem;
+  margin: 0;
+  padding: 0;
 }
 
-nav.tabs a {
+nav.tabs a,
+nav.tabs span {
   display: block;
   padding: 0.5rem 1rem;
   text-decoration: underline;
-  color: var(--color-link, #1976d2);
+  width: 15rem;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 nav.tabs a:hover {
@@ -147,26 +151,10 @@ nav.tabs a:hover {
 }
 
 nav.tabs span {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: var(--color-text, #333);
+  color: var(--color-link);
+  border: 2px solid var(--color-link);
   text-decoration: none;
   cursor: default;
-}
-
-/* Mobile styles for tabs - stack vertically */
-@media (max-width: 798px) {
-  nav.tabs {
-    width: 100%;
-  }
-
-  nav.tabs ul {
-    flex-direction: column;
-  }
-
-  nav.tabs li {
-    margin-right: 0;
-  }
 }
 
 #company-activation-notice {
@@ -182,7 +170,7 @@ nav.tabs span {
 }
 
 /* Share button styling - link-like badge */
-#share-button {
+.share-button {
   display: inline-block;
   background: none;
   border: 1px solid var(--color-border, #ccc);
@@ -196,13 +184,13 @@ nav.tabs span {
   transition: all 0.2s ease;
 }
 
-#share-button:hover {
+.share-button:hover {
   background-color: var(--color-link, #1976d2);
   color: white;
   border-color: var(--color-link, #1976d2);
 }
 
-#share-button:active {
+.share-button:active {
   transform: translateY(1px);
 }
 
@@ -234,7 +222,7 @@ nav.tabs span {
   .construction-digger {
     display: none;
   }
-  
+
   .construction-main {
     max-width: 90%;
   }

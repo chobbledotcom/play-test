@@ -1,6 +1,7 @@
 class Assessments::MaterialsAssessment < ApplicationRecord
   include AssessmentLogging
   include SafetyCheckMethods
+  include AssessmentCompletion
   
   belongs_to :inspection
 
@@ -35,22 +36,12 @@ class Assessments::MaterialsAssessment < ApplicationRecord
   # Callbacks
   after_update :log_assessment_update, if: :saved_changes?
 
-  def complete?
-    material_assessments_complete? && rope_specifications_present?
-  end
-
   def has_critical_failures?
     # Fire retardant, fabric strength, and thread are critical for safety
     CRITICAL_MATERIAL_CHECKS.any? { send(it) == false }
   end
 
 
-  def completion_percentage
-    total_fields = pass_columns_count + 1 # Include ropes
-    completed_fields = completed_material_fields.count(&:present?)
-
-    (completed_fields.to_f / total_fields * 100).round(0)
-  end
 
   def material_compliance_summary
     {
@@ -100,10 +91,6 @@ class Assessments::MaterialsAssessment < ApplicationRecord
   end
 
   private
-
-  def material_assessments_complete? = MATERIAL_CHECKS.all? { !send(it).nil? }
-
-  def rope_specifications_present? = ropes.present?
 
   def ropes_compliant? = SafetyStandard.valid_rope_diameter?(ropes)
 

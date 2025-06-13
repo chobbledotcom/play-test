@@ -1,15 +1,47 @@
 <%
-  # Composite partial for checkbox + comment fields
+  # Composite partial for checkbox + comment fields with grid layout
   # Required parameters:
-  #   field: Base field name (e.g., 'slide_permanent_roof')
+  #   field: Base field name (e.g., 'uses_lock_stitching')
   # 
   # This will render:
-  #   - Checkbox field: field (e.g., 'slide_permanent_roof')
-  #   - Comment field: field + '_comment' (e.g., 'slide_permanent_roof_comment')
+  #   - Checkbox field: field (e.g., 'uses_lock_stitching')
+  #   - Comment field: field + '_comment' (e.g., 'uses_lock_stitching_comment')
   
   checkbox_field = field
   comment_field = "#{field}_comment".to_sym
+  
+  # Get the form object
+  form = @_current_form
+  model = form.object
+  
+  # Get field label from i18n (will raise if missing) 
+  field_data = form_field_setup(field, local_assigns)
+  
+  # Generate unique ID for comment checkbox
+  comment_checkbox_id = "#{field}_has_comment_#{model.object_id}"
+  comment_textarea_id = "#{field}_comment_textarea_#{model.object_id}"
 %>
 
-<%= render 'form/checkbox', field: checkbox_field %>
-<%= render 'form/comment', field: comment_field %>
+<div class="checkbox-comment">
+  <!-- Label -->
+  <label><%= field_data[:field_label] %></label>
+  
+  <!-- Main checkbox -->
+  <%= form.check_box checkbox_field, 
+      id: "#{checkbox_field}_checkbox" %>
+  <label for="<%= checkbox_field %>_checkbox"><%= t('shared.yes') %></label>
+  
+  <!-- Comment checkbox -->
+  <input type="checkbox" 
+         id="<%= comment_checkbox_id %>" 
+         <%= 'checked' if model.send(comment_field).present? %>
+         onchange="document.getElementById('<%= comment_textarea_id %>').style.display = this.checked ? 'block' : 'none';">
+  <label for="<%= comment_checkbox_id %>"><%= t('shared.comment') %></label>
+  
+  <!-- Comment textarea (hidden by default, spans full width) -->
+  <%= form.text_area comment_field,
+      rows: 2,
+      placeholder: "Add comment...",
+      id: comment_textarea_id,
+      style: "display: #{model.send(comment_field).present? ? 'block' : 'none'};" %>
+</div>

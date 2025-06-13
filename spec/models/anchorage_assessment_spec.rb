@@ -39,6 +39,8 @@ RSpec.describe Assessments::AnchorageAssessment, type: :model do
         num_low_anchors: 4,
         num_high_anchors: 4,
         num_anchors_pass: true,
+        num_low_anchors_pass: true,
+        num_high_anchors_pass: true,
         anchor_accessories_pass: true,
         anchor_degree_pass: true,
         anchor_type_pass: true,
@@ -284,29 +286,6 @@ RSpec.describe Assessments::AnchorageAssessment, type: :model do
       end
     end
 
-    describe "#anchor_assessments_complete?" do
-      it "returns true when all assessments are present" do
-        assessment.update!(
-          num_anchors_pass: true,
-          anchor_accessories_pass: false,
-          anchor_degree_pass: true,
-          anchor_type_pass: true,
-          pull_strength_pass: false
-        )
-        expect(assessment.send(:anchor_assessments_complete?)).to be true
-      end
-
-      it "returns false when any assessment is nil" do
-        assessment.update!(
-          num_anchors_pass: true,
-          anchor_accessories_pass: nil,
-          anchor_degree_pass: true,
-          anchor_type_pass: true,
-          pull_strength_pass: false
-        )
-        expect(assessment.send(:anchor_assessments_complete?)).to be false
-      end
-    end
 
     describe "#saved_change_to_anchor_counts?" do
       it "returns true when low anchors count changes" do

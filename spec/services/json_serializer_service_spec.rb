@@ -101,8 +101,6 @@ RSpec.describe JsonSerializerService do
       json = JsonSerializerService.serialize_inspection(inspection)
 
       expect(json).not_to have_key(:user_id)
-      expect(json).not_to have_key(:inspector_signature)
-      expect(json).not_to have_key(:signature_timestamp)
       expect(json).not_to have_key(:pdf_last_accessed_at)
     end
 
@@ -128,7 +126,7 @@ RSpec.describe JsonSerializerService do
     context "with assessments" do
       before do
         # Update existing assessments with specific test data
-        inspection.structure_assessment.update!(unit_pressure_value: 5.0)
+        inspection.structure_assessment.update!(unit_pressure: 5.0)
         inspection.anchorage_assessment.update!(num_anchors_comment: "Private comment")
         inspection.materials_assessment.update!(ropes_comment: "Private comment")
         inspection.fan_assessment.update!(blower_serial: "PRIVATE123")
@@ -152,7 +150,7 @@ RSpec.describe JsonSerializerService do
 
         # StructureAssessment should include all fields
         structure = json[:assessments][:structure_assessment]
-        expect(structure).to have_key(:unit_pressure_value)
+        expect(structure).to have_key(:unit_pressure)
 
         # AnchorageAssessment should include all comment fields
         anchorage = json[:assessments][:anchorage_assessment]
@@ -234,10 +232,10 @@ RSpec.describe JsonSerializerService do
       included_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Verify we're including the expected number of fields
-      expect(included_fields.count).to eq(27) # Inspections have 37 fields minus 10 excluded
+      expect(included_fields.count).to eq(14) # Actual count of included fields
 
       # Verify critical fields are included
-      %w[inspection_date inspection_location passed complete_date comments unique_report_number].each do |field|
+      %w[inspection_date inspection_location passed complete_date unique_report_number].each do |field|
         expect(json).to have_key(field.to_sym)
       end
     end

@@ -68,15 +68,23 @@
     </div>
   <% end %>
 
+  <!-- Unit Dimensions -->
+  <%= render 'form/fieldset', legend_key: 'unit_dimensions' do %>
+    <%= render 'form/number_comment', field: :width %>
+    <%= render 'form/number_comment', field: :length %>
+    <%= render 'form/number_comment', field: :height %>
+  <% end %>
+
+  <!-- Unit Configuration -->
+  <%= render 'form/fieldset', legend_key: 'unit_configuration' do %>
+    <%= render 'form/checkbox', field: :has_slide %>
+    <%= render 'form/checkbox', field: :is_totally_enclosed %>
+  <% end %>
+
   <!-- Inspection Results -->
   <%= render 'form/fieldset', legend_key: 'inspection_results' do %>
-    <%= render 'form/number_pass_fail_comment', field: :step_ramp_size, min: 0 %>
-    <%= render 'form/number_pass_fail_comment', field: :critical_fall_off_height, min: 0 %>
-
     <%= render 'form/checkbox', field: :passed %>
-
     <%= render 'form/text_area', field: :risk_assessment, rows: 3 %>
-    <%= render 'form/text_area', field: :comments, rows: 3 %>
   <% end %>
 
   <!-- Save Message Display -->

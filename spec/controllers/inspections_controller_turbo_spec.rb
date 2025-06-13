@@ -24,8 +24,8 @@ RSpec.describe InspectionsController, type: :controller do
       end
 
       it "uses helpers to access helper methods" do
-        # Mock the helpers to ensure it's being used correctly
-        expect(controller.helpers).to receive(:assessment_completion_percentage).with(inspection).and_return(50)
+        # Verify that the controller still has access to helpers
+        expect(controller.helpers).to respond_to(:inspection_tabs)
 
         patch :update, params: {id: inspection.id, inspection: {comments: "Test"}}
 
@@ -60,7 +60,6 @@ RSpec.describe InspectionsController, type: :controller do
       end
 
       it "accesses helper methods through helpers proxy" do
-        expect(controller.helpers).to respond_to(:assessment_completion_percentage)
         expect(controller.helpers).to respond_to(:inspection_tabs)
       end
     end
@@ -76,7 +75,7 @@ RSpec.describe InspectionsController, type: :controller do
 
       # Should use html: parameter, not blocks (HTML is escaped in template)
       expect(response.body).to match(/(&lt;span class=&#39;value&#39;&gt;|<span class='value'>)/)
-      expect(response.body).to match(/%(&lt;\/span&gt;|<\/span>)/)
+      expect(response.body).to match(/(In Progress|Complete)/)
     end
 
     it "uses partial: parameter for rendering partials" do

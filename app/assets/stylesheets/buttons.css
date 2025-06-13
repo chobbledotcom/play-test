@@ -1,0 +1,19 @@
+/* General button styling for standalone buttons - minimal overrides */
+a.button,
+button.button {
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* Danger variant */
+a.button.danger,
+button.button.danger {
+  background: var(--color-error);
+  border-color: var(--color-error);
+}
+
+a.button.danger:hover,
+button.button.danger:hover {
+  background: #c62828;
+  border-color: #c62828;
+}

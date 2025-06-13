@@ -48,9 +48,9 @@ class InspectorCompaniesController < ApplicationController
             turbo_stream.replace("form_save_message",
               partial: "shared/save_message",
               locals: {
-                dom_id: "form_save_message",
-                success: true,
-                success_message: t("inspector_companies.messages.updated")
+                element_id: "form_save_message",
+                message: t("inspector_companies.messages.updated"),
+                type: "success"
               })
           ]
         end
@@ -63,9 +63,9 @@ class InspectorCompaniesController < ApplicationController
             turbo_stream.replace("form_save_message",
               partial: "shared/save_message",
               locals: {
-                dom_id: "form_save_message",
-                errors: @inspector_company.errors.full_messages,
-                error_message: t("shared.messages.save_failed")
+                element_id: "form_save_message",
+                message: t("shared.messages.save_failed"),
+                type: "error"
               })
           ]
         end

@@ -1,0 +1,61 @@
+/* Incomplete Fields Display Styling */
+.incomplete-fields-details {
+  margin: 1rem 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.incomplete-fields-summary {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--color-link);
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.incomplete-fields-summary:hover {
+  background-color: #e8e8e8;
+}
+
+.incomplete-fields-summary::marker {
+  color: var(--color-link);
+}
+
+.incomplete-fields-content {
+  padding: 1rem;
+  background-color: white;
+  border-top: 1px solid #e0e0e0;
+}
+
+.incomplete-fields-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0 0;
+}
+
+.incomplete-field-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.incomplete-field-item:last-child {
+  border-bottom: none;
+}
+
+.incomplete-field-item strong {
+  color: #333;
+  flex: 1;
+}
+
+.field-type {
+  font-size: 0.9em;
+  color: #666;
+  font-style: italic;
+  margin-left: 1rem;
+  white-space: nowrap;
+}

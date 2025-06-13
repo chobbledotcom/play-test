@@ -350,7 +350,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
 
         # Check structure and that all fields are present
         expect(result).to be_an(Array)
-        expect(result.length).to eq(3) # 3 rows
+        expect(result.length).to eq(4) # 4 rows
         
         # Check each row has 4 columns (label, value, label, value)
         result.each do |row|
@@ -374,7 +374,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
 
         # Check structure 
         expect(result).to be_an(Array)
-        expect(result.length).to eq(3) # 3 rows
+        expect(result.length).to eq(4) # 4 rows
         
         # Check each row has 4 columns
         result.each do |row|
@@ -398,7 +398,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
 
         # Check structure 
         expect(result).to be_an(Array)
-        expect(result.length).to eq(3) # 3 rows
+        expect(result.length).to eq(4) # 4 rows
         
         # Check manufacturer is missing (empty string)
         flattened = result.flatten

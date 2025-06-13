@@ -176,23 +176,13 @@ class SeedDataService
         unique_report_number: generate_report_number(user.inspection_company, inspection_date),
         is_seed: true,
         passed: passed,
-        comments: generate_inspection_comment(passed),
-        recommendations: passed ? nil : I18n.t("seed_data.recommendations.standard"),
+        risk_assessment: generate_risk_assessment(passed),
         # Copy dimensions from config
         width: config[:width],
         length: config[:length],
         height: config[:height],
         has_slide: config[:has_slide] || false,
         is_totally_enclosed: config[:is_totally_enclosed] || false,
-        # Pass/fail fields that remain on inspections
-        step_ramp_size: rand(0.3..0.8).round(1),
-        step_ramp_size_pass: passed,
-        critical_fall_off_height: rand(0.5..2.0).round(1),
-        critical_fall_off_height_pass: passed,
-        unit_pressure: rand(1.0..3.0).round(1),
-        unit_pressure_pass: passed,
-        trough_depth: rand(0.2..0.5).round(1),
-        trough_adjacent_panel_width: rand(0.3..0.8).round(1)
       }
     end
 
@@ -201,11 +191,28 @@ class SeedDataService
       "#{company_prefix}-#{date.year}-#{SecureRandom.hex(4).upcase}"
     end
 
-    def generate_inspection_comment(passed)
+    def generate_risk_assessment(passed)
       if passed
-        I18n.t("seed_data.inspection_comments.passed").sample
+        [
+          "Unit inspected and found to be in good operational condition. All safety features functioning correctly. Suitable for continued use with standard supervision requirements.",
+          "Comprehensive safety assessment completed. Unit meets all EN 14960:2019 requirements. No significant hazards identified. Regular maintenance schedule should be maintained.",
+          "Risk assessment indicates low risk profile. All structural elements secure, adequate ventilation present, and safety markings clearly visible. Recommend continued operation with routine checks.",
+          "Safety evaluation satisfactory. Anchoring system robust, materials show no signs of degradation. Unit provides safe environment for users within specified age and height limits.",
+          "Full risk assessment completed with no critical issues identified. Minor wear noted on high-traffic areas but within acceptable limits. Unit certified safe for public use.",
+          "Detailed inspection reveals unit maintains structural integrity. All seams intact, proper inflation pressure maintained. Risk level assessed as minimal with appropriate supervision.",
+          "Unit passes comprehensive safety review. Emergency exits clearly marked and functional. Blower system operating within specifications. Low risk rating assigned.",
+          "Risk evaluation complete. Unit demonstrates good stability under load conditions. Safety padding adequate where required. Suitable for continued commercial operation."
+        ].sample
       else
-        I18n.t("seed_data.inspection_comments.failed").sample
+        [
+          "Risk assessment identifies multiple safety concerns requiring immediate attention. Unit should not be used until repairs completed and re-inspected. High risk rating assigned.",
+          "Critical safety deficiencies noted during inspection. Structural integrity compromised in several areas. Unit poses unacceptable risk to users and must be withdrawn from service.",
+          "Significant hazards identified including inadequate anchoring and material degradation. Risk level unacceptable for public use. Comprehensive repairs required before recertification.",
+          "Safety assessment failed. Multiple non-conformances with EN 14960:2019 identified. Unit presents substantial risk of injury. Recommend immediate decommissioning or major refurbishment.",
+          "High risk factors present including compromised seams and insufficient inflation. Unit unsafe for operation. Client advised to cease use pending extensive remedial work.",
+          "Risk evaluation reveals dangerous conditions. Emergency exits partially obstructed, significant wear to load-bearing elements. Unit fails safety standards and requires urgent attention.",
+          "Assessment indicates elevated risk profile due to equipment failures and material defects. Unit not suitable for use. Full replacement of critical components necessary."
+        ].sample
       end
     end
 
@@ -235,7 +242,7 @@ class SeedDataService
     def create_structure_assessment(inspection, unit, passed)
       inspection.structure_assessment.update!(
         seam_integrity_pass: passed,
-        lock_stitch_pass: passed,
+        uses_lock_stitching_pass: passed,
         air_loss_pass: passed,
         straight_walls_pass: passed,
         sharp_edges_pass: passed,
@@ -243,21 +250,21 @@ class SeedDataService
         stitch_length_pass: passed,
         blower_tube_length_pass: passed,
         step_size_pass: passed,
-        fall_off_height_pass: passed,
+        critical_fall_off_height_pass: passed,
         unit_pressure_pass: passed,
         trough_pass: passed,
         entrapment_pass: passed,
         markings_pass: passed,
         grounding_pass: passed,
         stitch_length: rand(8..12),
-        unit_pressure_value: rand(1.0..3.0).round(1),
+        unit_pressure: rand(1.0..3.0).round(1),
         blower_tube_length: rand(2.0..5.0).round(1),
-        step_size_value: rand(200..400),
-        fall_off_height_value: rand(0.5..2.0).round(1),
-        trough_depth_value: rand(0.1..0.5).round(1),
-        trough_width_value: rand(0.3..1.0).round(1),
+        step_size: rand(200..400),
+        critical_fall_off_height: rand(0.5..2.0).round(1),
+        trough_depth: rand(0.1..0.5).round(1),
+        trough_width: rand(0.3..1.0).round(1),
         seam_integrity_comment: passed ? "All seams in good condition" : "Minor thread loosening noted",
-        lock_stitch_comment: passed ? "Lock stitching intact throughout" : "Some lock stitching showing wear",
+        uses_lock_stitching_comment: passed ? "Lock stitching intact throughout" : "Some lock stitching showing wear",
         stitch_length_comment: "Measured at regular intervals"
       )
     end

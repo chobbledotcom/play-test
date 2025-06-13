@@ -9,10 +9,14 @@ FactoryBot.define do
     inspection_location { "Test Location" }
     passed { true }
     inspection_date { Date.current }
-    comments { "Test inspection comments" }
     unique_report_number { nil } # User provides this manually
     complete_date { nil }
     is_seed { false }
+    risk_assessment { 
+      "Standard risk assessment completed. Unit inspected in accordance with EN 14960:2019. " \
+      "All safety features present and functional. No significant hazards identified. " \
+      "Unit suitable for continued operation with appropriate supervision."
+    }
 
     trait :passed do
       passed { true }
@@ -20,6 +24,11 @@ FactoryBot.define do
 
     trait :failed do
       passed { false }
+      risk_assessment {
+        "Risk assessment identifies critical safety issues. Multiple failures detected including " \
+        "compromised structural integrity and inadequate anchoring. Unit poses unacceptable risk " \
+        "to users and must be withdrawn from service immediately pending repairs."
+      }
     end
 
     trait :complete do
@@ -44,7 +53,7 @@ FactoryBot.define do
 
     trait :with_unicode_data do
       inspection_location { "Meeting Room 🏢 3F" }
-      comments { "❗️Tested with special 🔌 adapter. Result: ✅" }
+      risk_assessment { "❗️Tested with special 🔌 adapter. Result: ✅" }
       association :unit, factory: [:unit, :with_unicode_serial]
     end
 
@@ -71,38 +80,39 @@ FactoryBot.define do
       complete_date { Time.current }
       inspection_location { "Happy Kids Play Centre" }
       passed { true }
-      comments { "Test comments" }
-      general_notes { "Test general notes" }
-      recommendations { "Test recommendations" }
       unique_report_number { "RPII-20250609-#{SecureRandom.alphanumeric(6).upcase}" }
-
-      # Step and ramp measurements
-      step_ramp_size { 0.3 }
-      step_ramp_size_pass { true }
-      critical_fall_off_height { 1.2 }
-      critical_fall_off_height_pass { true }
-
-      # Unit pressure
-      unit_pressure { 2.5 }
-      unit_pressure_pass { true }
-
-      # Trough measurements
-      trough_depth { 0.1 }
-      trough_adjacent_panel_width { 0.8 }
 
       # Risk assessment
       risk_assessment { "Low risk assessment notes" }
       
       # Use the complete assessments trait
       with_complete_assessments
+      
+      after(:create) do |inspection|
+        inspection.structure_assessment.update!(
+          step_ramp_size: 0.3,
+          step_ramp_size_pass: true,
+          trough_depth: 0.1,
+          trough_adjacent_panel_width: 0.8,
+          unit_pressure: 2.5,
+          unit_pressure_pass: true,
+          critical_fall_off_height: 1.2,
+          critical_fall_off_height_pass: true
+        )
+      end
     end
 
     trait :sql_injection_test do
       inspection_location { "Location'); UPDATE users SET admin=true; --" }
     end
 
-    trait :max_length_comments do
-      comments { "A" * 65535 }
+    trait :with_unicode_data do
+      risk_assessment { "❗️Tested with special 🔌 adapter. Result: ✅" }
+      association :unit, factory: [:unit, :with_unicode_serial]
+    end
+
+    trait :max_length_risk_assessment do
+      risk_assessment { "A" * 65535 }
     end
 
     trait :totally_enclosed do

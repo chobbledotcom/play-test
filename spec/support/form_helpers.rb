@@ -52,11 +52,24 @@ module FormHelpers
     # Check if any pass/fail fields exist
     has_pass_fail_fields = fields.keys.any? { |k| k.to_s.end_with?('_pass') }
     
-    # If there are pass/fail fields, ensure the generic Pass/Fail label is present
+    # Check if any comment fields exist
+    has_comment_fields = fields.keys.any? { |k| k.to_s.end_with?('_comment') }
+    
+    # If there are pass/fail fields, ensure the generic Pass and Fail labels are present
     if has_pass_fail_fields
-      generic_label = "#{I18n.t('shared.pass')}/#{I18n.t('shared.fail')}"
-      expect(page).to have_content(generic_label),
-        "Expected to find generic Pass/Fail label '#{generic_label}' on the page"
+      pass_label = I18n.t('shared.pass')
+      fail_label = I18n.t('shared.fail')
+      expect(page).to have_content(pass_label),
+        "Expected to find generic Pass label '#{pass_label}' on the page"
+      expect(page).to have_content(fail_label),
+        "Expected to find generic Fail label '#{fail_label}' on the page"
+    end
+    
+    # If there are comment fields, ensure the generic Comment label is present
+    if has_comment_fields
+      generic_comment_label = I18n.t('shared.comment')
+      expect(page).to have_content(generic_comment_label),
+        "Expected to find generic Comment label '#{generic_comment_label}' on the page"
     end
     
     fields.each do |field_key, field_label|

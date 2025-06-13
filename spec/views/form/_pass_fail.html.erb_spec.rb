@@ -12,8 +12,17 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
   before do
     # Set the form context as form_context would
     view.instance_variable_set(:@_current_form, mock_form)
+    view.instance_variable_set(:@_current_i18n_base, "forms.test")
 
-    # Mock i18n translations for pass/fail labels
+    # Mock i18n translations
+    allow(view).to receive(:t).and_call_original
+    
+    # Mock field label lookup
+    allow(view).to receive(:t)
+      .with("forms.test.fields.#{field}", raise: true)
+      .and_return("Status")
+    
+    # Mock pass/fail labels
     allow(view).to receive(:t)
       .with("shared.pass")
       .and_return("Pass")
@@ -36,7 +45,7 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
       render_pass_fail
 
       expect(rendered).to have_css("div")
-      expect(rendered).to have_css("label", text: "#{I18n.t("shared.pass")}/#{I18n.t("shared.fail")}")
+      expect(rendered).to have_css("label", text: "Status") # Field label
       expect(rendered).to have_css('input[type="radio"][name="status"][value="true"][id="status_true"]')
       expect(rendered).to have_css('input[type="radio"][name="status"][value="false"][id="status_false"]')
       expect(rendered).to have_css("label", text: I18n.t("shared.pass"))
@@ -68,6 +77,11 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
   describe "different field contexts" do
     shared_examples "renders correctly for field" do |field_name|
       it "handles #{field_name} field" do
+        # Mock field label lookup for this field
+        allow(view).to receive(:t)
+          .with("forms.test.fields.#{field_name}", raise: true)
+          .and_return(field_name.to_s.humanize)
+        
         # Mock for the new field
         allow(mock_form).to receive(:radio_button)
           .with(field_name, true, id: "#{field_name}_true")
@@ -78,7 +92,7 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
 
         render_pass_fail(field: field_name)
         expect(rendered).to have_css("div")
-        expect(rendered).to have_css("label", text: "#{I18n.t("shared.pass")}/#{I18n.t("shared.fail")}")
+        expect(rendered).to have_css("label", text: field_name.to_s.humanize)
       end
     end
 

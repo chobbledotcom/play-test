@@ -8,66 +8,6 @@ RSpec.describe InspectionsHelper, type: :helper do
     end
   end
 
-  describe "#assessment_completion_percentage" do
-    let(:user) { create(:user) }
-    let(:inspection) { create(:inspection, user: user) }
-
-    context "with no assessments" do
-      it "returns 0" do
-        expect(helper.assessment_completion_percentage(inspection)).to eq(0)
-      end
-    end
-
-    context "with incomplete assessments" do
-      before do
-        # Create assessments but don't complete them
-        inspection.create_user_height_assessment!(containing_wall_height: 1.0)
-        inspection.create_slide_assessment!(slide_platform_height: 2.0)
-      end
-
-      it "returns 0 when no assessments are complete" do
-        expect(helper.assessment_completion_percentage(inspection)).to eq(0)
-      end
-    end
-
-    context "with partially complete assessments" do
-      before do
-        # Complete one assessment
-        create(:user_height_assessment, :with_basic_data,
-          inspection: inspection,
-          tallest_user_height_comment: "Complete")
-
-        # Add incomplete assessment
-        inspection.create_slide_assessment!(slide_platform_height: 2.0)
-      end
-
-      it "calculates percentage based on completed assessments" do
-        # With 1 complete out of 6 expected assessments
-        percentage = helper.assessment_completion_percentage(inspection)
-        expect(percentage).to be > 0
-        expect(percentage).to be <= 100
-      end
-    end
-
-    context "with all assessments complete" do
-      let(:complete_inspection) { create(:inspection, :with_complete_assessments) }
-
-      it "returns 100 when all assessments are complete" do
-        expect(helper.assessment_completion_percentage(complete_inspection)).to eq(100)
-      end
-    end
-
-    context "with totally enclosed unit" do
-      it "includes enclosed assessment in calculation" do
-        unit = create(:unit)
-        complete_inspection = create(:inspection, :with_complete_assessments, unit: unit, is_totally_enclosed: true)
-
-        # Should calculate based on 7 assessments for totally enclosed
-        percentage = helper.assessment_completion_percentage(complete_inspection)
-        expect(percentage).to eq(100)
-      end
-    end
-  end
 
   describe "#inspection_tabs" do
     let(:user) { create(:user) }

@@ -43,7 +43,7 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
         user: user, 
         unit: unit,
         inspection_location: "Original Location",
-        comments: "Original Comments",
+        risk_assessment: "Original risk assessment with detailed findings.",
         unique_report_number: "ORIG-123"
       )
       
@@ -72,7 +72,7 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       inspection.reload
       expect(inspection.complete?).to be false
       expect(inspection.inspection_location).to eq("Original Location")
-      expect(inspection.comments).to eq("Original Comments")
+      expect(inspection.risk_assessment).to be_present
       expect(inspection.unique_report_number).to eq("ORIG-123")
       
       # Now we can edit again

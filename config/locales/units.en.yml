@@ -55,6 +55,15 @@ en:
       owner: "Owner"
       description: "Description"
       photo: "Photo"
+      width: "Width"
+      length: "Length"
+      height: "Height"
+      size_unit: "Size"
+      manufacture_date: "Manufacture Date"
+      notes: "Notes"
+      reports: "Reports"
+      qr_code: "QR Code"
+      latest_inspection: "Latest Inspection"
 
     slide_status:
       with_slide: "With Slide"
@@ -98,6 +107,7 @@ en:
 
     actions:
       select: "Select"
+      click_here: "Click here"
 
     validations:
       name_blank: "Name can't be blank"
@@ -151,3 +161,6 @@ en:
       button: "Share / Copy"
       title: "Inflatable Unit %{name} Report"
       copied: "Copied!"
+
+    forms:
+      search: "Search units..."

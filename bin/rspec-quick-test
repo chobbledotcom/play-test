@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Test script to run rspec without complex filtering
+
+echo "Running tests..."
+
+# Check if format is JSON
+format_args=""
+for arg in "$@"; do
+  if [[ "$arg" == "--format=json" ]] || [[ "$arg" == "json" ]]; then
+    format_args="--format json"
+  fi
+done
+
+if [[ -z "$format_args" ]]; then
+  format_args="--format progress"
+fi
+
+# Run tests
+DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec parallel_rspec \
+  --fail-fast \
+  --test-options "--fail-fast $format_args" \
+  "$@" 2>&1 | \
+  grep -v "✅ Using in-memory SQLite database for tests" | \
+  grep -v "RSpec is shutting down and will print the summary report"

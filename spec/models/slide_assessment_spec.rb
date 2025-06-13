@@ -39,6 +39,9 @@ RSpec.describe Assessments::SlideAssessment, type: :model do
         slide_platform_height: 2.0,
         slide_wall_height: 1.5,
         runout: 3.0,
+        slide_first_metre_height: 1.2,
+        slide_beyond_first_metre_height: 1.0,
+        slide_permanent_roof: false,
         clamber_netting_pass: true,
         runout_pass: true,
         slip_sheet_pass: true
@@ -133,45 +136,6 @@ RSpec.describe Assessments::SlideAssessment, type: :model do
   end
 
   describe "private methods" do
-    describe "#slide_measurements_present?" do
-      it "returns true when all measurements are present" do
-        assessment.update!(
-          slide_platform_height: 2.0,
-          slide_wall_height: 1.5,
-          runout: 3.0
-        )
-        expect(assessment.send(:slide_measurements_present?)).to be true
-      end
-
-      it "returns false when any measurement is missing" do
-        assessment.update!(
-          slide_platform_height: 2.0,
-          slide_wall_height: nil,
-          runout: 3.0
-        )
-        expect(assessment.send(:slide_measurements_present?)).to be false
-      end
-    end
-
-    describe "#safety_assessments_complete?" do
-      it "returns true when all safety checks are present" do
-        assessment.update!(
-          clamber_netting_pass: true,
-          runout_pass: false,
-          slip_sheet_pass: true
-        )
-        expect(assessment.send(:safety_assessments_complete?)).to be true
-      end
-
-      it "returns false when any safety check is nil" do
-        assessment.update!(
-          clamber_netting_pass: true,
-          runout_pass: nil,
-          slip_sheet_pass: true
-        )
-        expect(assessment.send(:safety_assessments_complete?)).to be false
-      end
-    end
   end
 
   describe "edge cases" do

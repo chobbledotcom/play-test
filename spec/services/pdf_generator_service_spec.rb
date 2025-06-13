@@ -30,8 +30,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
       expect_pdf_to_include_i18n_keys(pdf_text,
         "pdf.inspection.title",
         "pdf.inspection.equipment_details", 
-        "pdf.inspection.assessments_section",
-        "shared.comments"
+        "pdf.inspection.assessments_section"
       )
     end
 
@@ -47,19 +46,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
       expect(pdf_text).to include(I18n.t("pdf.inspection.failed"))
     end
 
-    context "with comments" do
-      before do
-        inspection.update(comments: "Test comments")
-      end
-
-      it "generates PDF with comments section using I18n" do
-        pdf = PdfGeneratorService.generate_inspection_report(inspection)
-        pdf_text = pdf_text_content(pdf.render)
-
-        expect_pdf_to_include_i18n(pdf_text, "shared.comments")
-        expect(pdf_text).to include("Test comments")
-      end
-    end
 
     context "with missing manufacturer" do
       before do
@@ -106,8 +92,9 @@ RSpec.describe PdfGeneratorService, pdf: true do
       expect(pdf_text).to include(I18n.t("pdf.inspection.fields.description"))
       expect(pdf_text).to include(I18n.t("pdf.inspection.fields.serial"))
       expect(pdf_text).to include(I18n.t("pdf.inspection.fields.manufacturer"))
-      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.type"))
-      expect(pdf_text).to include(I18n.t("pdf.unit.fields.owner"))
+      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.has_slide"))
+      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.totally_enclosed"))
+      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.owner"))
     end
 
     context "with inspections" do

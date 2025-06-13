@@ -14,6 +14,7 @@ RSpec.describe Assessments::FanAssessment, type: :model do
     describe "SAFETY_CHECKS" do
       it "contains all safety check field names" do
         expected_checks = %w[
+          blower_serial_pass
           blower_flap_pass
           blower_finger_pass
           blower_visual_pass

@@ -150,12 +150,9 @@ class PdfGeneratorService
       end
       dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
 
-      # Unit Type / Has Slide - use last inspection data if available
-      unit_type = if last_inspection
-        last_inspection.has_slide? ? I18n.t("pdf.inspection.fields.unit_with_slide") : I18n.t("pdf.inspection.fields.standard_unit")
-      else
-        I18n.t("pdf.inspection.fields.standard_unit")
-      end
+      # Has slide and totally enclosed values from last inspection
+      has_slide = last_inspection&.has_slide? ? I18n.t("shared.yes") : I18n.t("shared.no")
+      totally_enclosed = last_inspection&.is_totally_enclosed? ? I18n.t("shared.yes") : I18n.t("shared.no")
 
       # Use the same format for both inspection and unit PDFs (the inspection format is better)
       [
@@ -168,14 +165,20 @@ class PdfGeneratorService
         [
           I18n.t("pdf.inspection.fields.manufacturer"),
           unit.manufacturer.presence || "",
-          I18n.t("pdf.inspection.fields.type"),
-          unit_type
+          I18n.t("pdf.inspection.fields.owner"),
+          unit.owner.presence || ""
+        ],
+        [
+          I18n.t("pdf.inspection.fields.has_slide"),
+          has_slide,
+          I18n.t("pdf.inspection.fields.totally_enclosed"),
+          totally_enclosed
         ],
         [
           I18n.t("pdf.inspection.fields.size_m"),
           dimensions_text,
-          I18n.t("pdf.inspection.fields.owner"),
-          unit.owner.presence || ""
+          "",
+          ""
         ]
       ]
     end

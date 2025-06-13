@@ -19,20 +19,28 @@ en:
       saved_successfully: "Saved successfully"
       save_failed: "Save failed"
       invalid_image_format: "Cannot display: invalid image format"
+      link_copied: "Link copied to clipboard!"
+      pdf_not_supported: "Your browser does not support PDFs"
     api:
       success: "success"
       error: "error"
-    yes: "Yes"
-    no: "No"
+    buttons:
+      cancel: "Cancel"
+      share: "Share"
+      download_pdf: "Download PDF"
+    "yes": "Yes"
+    "no": "No"
     view_full_size: "View full size"
     comment: "Comment"
     comments: "Comments"
     pass: "Pass"
     fail: "Fail"
     safety_status: "Safety Status"
+    field_comment_placeholder: "%{field} comment"
 
   # Common messages
   ui:
+    actions: "Actions"
     view: "View"
     edit: "Edit"
     delete: "Delete"
@@ -43,6 +51,7 @@ en:
       clear: "Clear"
       search: "Search"
       clear_filters: "Reset"
+      cancel: "Cancel"
 
   # Authorization messages
   authorization:

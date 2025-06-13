@@ -1,0 +1,35 @@
+/* Action buttons styling - minimal overrides to preserve MVP.css */
+.actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.actions a,
+.actions button {
+  font-weight: bold;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+/* Danger variant */
+
+.actions a.danger:hover,
+.actions button.danger:hover {
+  background: #c62828;
+  border-color: #c62828;
+}
+
+/* Override form.button_to styling within actions */
+.actions form.button_to {
+  margin: 0;
+  display: inline-block;
+}
+
+.actions form.button_to button {
+  margin: 0;
+}

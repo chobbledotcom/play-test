@@ -17,11 +17,11 @@ RSpec.feature "Inspections Filtering", type: :feature do
 
     it "shows all inspections separated by status" do
       # Draft inspections are shown in their own section
-      expect(page).to have_content(draft_inspection.serial)
+      expect(page).to have_content("Unit A")
 
       # Complete inspections are shown in the main section
-      expect(page).to have_content(completed_passed.serial)
-      expect(page).to have_content(completed_failed.serial)
+      expect(page).to have_content("Unit B")
+      expect(page).to have_content("Unit C")
 
       # Should have section headers
       expect(page).to have_content("In Progress")
@@ -40,23 +40,29 @@ RSpec.feature "Inspections Filtering", type: :feature do
     it "filters by passed result" do
       visit inspections_path(result: "passed")
 
-      # Draft inspections are filtered by result too (should not show)
-      expect(page).not_to have_content(draft_inspection.serial)
+      # Check within the inspections list, not the filter dropdown
+      within(".inspections-list") do
+        # Draft inspections are filtered by result too (should not show)
+        expect(page).not_to have_content("Unit A")
 
-      # Only passed complete inspections should show in complete section
-      expect(page).to have_content(completed_passed.serial)
-      expect(page).not_to have_content(completed_failed.serial)
+        # Only passed complete inspections should show
+        expect(page).to have_content("Unit B")
+        expect(page).not_to have_content("Unit C")
+      end
     end
 
     it "filters by failed result" do
       visit inspections_path(result: "failed")
 
-      # Draft inspections are filtered by result too (should not show)
-      expect(page).not_to have_content(draft_inspection.serial)
+      # Check within the inspections list, not the filter dropdown
+      within(".inspections-list") do
+        # Draft inspections are filtered by result too (should not show)
+        expect(page).not_to have_content("Unit A")
 
-      # Only failed complete inspections should show in complete section
-      expect(page).not_to have_content(completed_passed.serial)
-      expect(page).to have_content(completed_failed.serial)
+        # Only failed complete inspections should show
+        expect(page).not_to have_content("Unit B")
+        expect(page).to have_content("Unit C")
+      end
     end
   end
 
@@ -66,9 +72,11 @@ RSpec.feature "Inspections Filtering", type: :feature do
     it "filters by specific unit" do
       visit inspections_path(unit_id: unit1.id)
 
-      expect(page).to have_content(draft_inspection.serial)
-      expect(page).not_to have_content(completed_passed.serial)
-      expect(page).not_to have_content(completed_failed.serial)
+      within(".inspections-list") do
+        expect(page).to have_content("Unit A")
+        expect(page).not_to have_content("Unit B")
+        expect(page).not_to have_content("Unit C")
+      end
     end
   end
 
@@ -76,21 +84,25 @@ RSpec.feature "Inspections Filtering", type: :feature do
     it "filters by result only (status filtering removed)" do
       visit inspections_path(result: "passed")
 
-      # Draft inspections filtered by result too (should not show)
-      expect(page).not_to have_content(draft_inspection.serial)
-      # Only passed complete inspections in complete section
-      expect(page).to have_content(completed_passed.serial)
-      expect(page).not_to have_content(completed_failed.serial)
+      within(".inspections-list") do
+        # Draft inspections filtered by result too (should not show)
+        expect(page).not_to have_content("Unit A")
+        # Only passed complete inspections in complete section
+        expect(page).to have_content("Unit B")
+        expect(page).not_to have_content("Unit C")
+      end
     end
 
     it "filters by unit and result" do
       visit inspections_path(unit_id: unit3.id, result: "failed")
 
-      # Draft inspections filtered by unit and result (should not show - wrong unit)
-      expect(page).not_to have_content(draft_inspection.serial)
-      # Complete inspections filtered by unit AND result
-      expect(page).not_to have_content(completed_passed.serial)
-      expect(page).to have_content(completed_failed.serial)
+      within(".inspections-list") do
+        # Draft inspections filtered by unit and result (should not show - wrong unit)
+        expect(page).not_to have_content("Unit A")
+        # Complete inspections filtered by unit AND result
+        expect(page).not_to have_content("Unit B")
+        expect(page).to have_content("Unit C")
+      end
     end
   end
 
@@ -107,9 +119,9 @@ RSpec.feature "Inspections Filtering", type: :feature do
 
       expect(page).to have_current_path(inspections_path)
       # Should show all inspections again
-      expect(page).to have_content(draft_inspection.serial)
-      expect(page).to have_content(completed_passed.serial)
-      expect(page).to have_content(completed_failed.serial)
+      expect(page).to have_content("Unit A")
+      expect(page).to have_content("Unit B")
+      expect(page).to have_content("Unit C")
     end
   end
 

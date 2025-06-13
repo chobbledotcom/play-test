@@ -20,9 +20,9 @@
           <span class="value"><%= @inspection.unit&.serial || t('inspections.messages.not_specified') %></span>
         </div>
         <div class="detail-item">
-          <span class="label"><%= t('inspections.fields.progress') %>:</span>
+          <span class="label"><%= t('inspections.fields.status') %>:</span>
           <%= turbo_frame_tag "inspection_progress_#{@inspection.id}" do %>
-            <span class="value"><%= "#{assessment_completion_percentage(@inspection)}%" %></span>
+            <span class="value"><%= @inspection.complete? ? t('inspections.status.complete') : t('inspections.status.in_progress') %></span>
           <% end %>
         </div>
       </div>

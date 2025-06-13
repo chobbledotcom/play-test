@@ -137,21 +137,21 @@ RSpec.feature "Assessment Forms", type: :feature do
       # Update the auto-created assessment
       inspection.structure_assessment.update!(
         seam_integrity_pass: true,
-        lock_stitch_pass: true,
+        uses_lock_stitching_pass: true,
         air_loss_pass: false,
         straight_walls_pass: true,
         sharp_edges_pass: true,
         unit_stable_pass: true,
         stitch_length: 10.0,
-        unit_pressure_value: 500.0
+        unit_pressure: 500.0
       )
 
       visit edit_inspection_path(inspection, tab: "structure")
 
-      expect(page).to have_css(".assessment-summary")
-      # Structure assessment summary is displayed
-      expect(page).to have_css(".completion-percentage")
-      expect(page).to have_css(".checks-count")
+      expect(page).to have_css(".assessment-status")
+      # Structure assessment summary is displayed with critical failure noted
+      expect(page).to have_content("Critical Failures")
+      expect(page).to have_content("Air loss pass")
     end
 
     it "shows material compliance summary for materials assessment with data" do
@@ -173,11 +173,10 @@ RSpec.feature "Assessment Forms", type: :feature do
 
       visit edit_inspection_path(inspection, tab: "materials")
 
-      expect(page).to have_css(".material-compliance-summary")
-      # Materials assessment summary is displayed
-      expect(page).to have_css(".critical-materials")
-      expect(page).to have_css(".overall-materials")
-      expect(page).to have_css(".completion-percentage")
+      expect(page).to have_css(".materials-assessment")
+      # Materials assessment status is displayed
+      expect(page).to have_css(".assessment-status")
+      expect(page).to have_content("Safety Checks Passed:")
     end
 
     it "shows anchorage assessment summary for anchorage assessment with data" do
@@ -194,10 +193,10 @@ RSpec.feature "Assessment Forms", type: :feature do
 
       visit edit_inspection_path(inspection, tab: "anchorage")
 
-      expect(page).to have_css(".anchorage-assessment-summary")
-      # Anchorage assessment summary is displayed
-      expect(page).to have_css(".completion-status")
-      expect(page).to have_css(".safety-checks")
+      expect(page).to have_css(".anchorage-assessment")
+      # Anchorage assessment status is displayed
+      expect(page).to have_css(".assessment-status")
+      expect(page).to have_content("Safety Checks Passed:")
     end
 
     context "for totally enclosed units" do
@@ -214,56 +213,64 @@ RSpec.feature "Assessment Forms", type: :feature do
 
         visit edit_inspection_path(enclosed_inspection, tab: "enclosed")
 
-        expect(page).to have_css(".assessment-summary")
-        # Enclosed assessment summary is displayed
-        expect(page).to have_css(".completion-percentage")
-        expect(page).to have_css(".checks-count")
+        expect(page).to have_css(".enclosed-assessment")
+        # Enclosed assessment status is displayed
+        expect(page).to have_css(".assessment-status")
+        expect(page).to have_content("Safety Checks Passed:")
       end
     end
   end
 
   describe "Form Functionality" do
     it "saves slide assessment data when form is submitted" do
-      visit edit_inspection_path(inspection, tab: "slide")
+      visit edit_inspection_path(slide_inspection, tab: "slide")
 
-      fill_in I18n.t("forms.slide.fields.slide_platform_height"), with: "2.5"
+      # Debug: Check if the slide tab is actually present
+      expect(page).to have_content("Slide Assessment")
+      
+      # Use field name instead of label text since label doesn't have 'for' attribute
+      within(".slide-assessment") do
+        fill_in "assessments_slide_assessment[slide_platform_height]", with: "2.5"
+      end
+      
       click_button I18n.t("forms.slide.submit")
 
       expect(page).to have_content(I18n.t("inspections.messages.updated"))
-      inspection.reload
-      expect(inspection.slide_assessment.slide_platform_height).to eq(2.5)
+      slide_inspection.reload
+      expect(slide_inspection.slide_assessment.slide_platform_height).to eq(2.5)
     end
   end
 
   describe "Assessment Status Display" do
     it "shows assessment status when assessments are persisted" do
-      # Visit the edit page to create the assessments
-      visit edit_inspection_path(inspection)
+      # Ensure assessments are created
+      expect(slide_inspection.slide_assessment).to be_present
+      expect(slide_inspection.user_height_assessment).to be_present
       
       # Update the assessments that were automatically created
-      inspection.slide_assessment.update!(slide_platform_height: 2.0)
-      inspection.user_height_assessment.update!(containing_wall_height: 1.5)
-      inspection.structure_assessment.update!(seam_integrity_pass: true, stitch_length: 10.0)
-      inspection.materials_assessment.update!(fabric_strength_pass: true)
-      inspection.anchorage_assessment.update!(num_low_anchors: 4)
-      inspection.fan_assessment.update!(blower_serial: "FAN123")
+      slide_inspection.slide_assessment.update!(slide_platform_height: 2.0)
+      slide_inspection.user_height_assessment.update!(containing_wall_height: 1.5)
+      slide_inspection.structure_assessment.update!(seam_integrity_pass: true, stitch_length: 10.0)
+      slide_inspection.materials_assessment.update!(fabric_strength_pass: true)
+      slide_inspection.anchorage_assessment.update!(num_low_anchors: 4)
+      slide_inspection.fan_assessment.update!(blower_serial: "FAN123")
 
-      visit edit_inspection_path(inspection, tab: "slide")
+      visit edit_inspection_path(slide_inspection, tab: "slide")
       expect(page).to have_css(".assessment-status")
 
-      visit edit_inspection_path(inspection, tab: "user_height")
+      visit edit_inspection_path(slide_inspection, tab: "user_height")
       expect(page).to have_css(".assessment-status")
 
-      visit edit_inspection_path(inspection, tab: "structure")
+      visit edit_inspection_path(slide_inspection, tab: "structure")
       expect(page).to have_css(".assessment-status")
 
-      visit edit_inspection_path(inspection, tab: "materials")
+      visit edit_inspection_path(slide_inspection, tab: "materials")
       expect(page).to have_css(".assessment-status")
 
-      visit edit_inspection_path(inspection, tab: "anchorage")
+      visit edit_inspection_path(slide_inspection, tab: "anchorage")
       expect(page).to have_css(".assessment-status")
 
-      visit edit_inspection_path(inspection, tab: "fan")
+      visit edit_inspection_path(slide_inspection, tab: "fan")
       expect(page).to have_css(".assessment-status")
     end
 
@@ -291,8 +298,8 @@ RSpec.feature "Assessment Forms", type: :feature do
       visit edit_inspection_path(fresh_inspection, tab: "slide")
       # Assessment status shows even when empty since assessments are auto-created
       expect(page).to have_css(".assessment-status")
-      # Should show 0% completion for empty assessment
-      expect(page).to have_content("Completion: 0%")
+      # Should show incomplete fields for empty assessment
+      expect(page).to have_content("incomplete fields")
     end
   end
 

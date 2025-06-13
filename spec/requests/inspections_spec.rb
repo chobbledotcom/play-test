@@ -87,8 +87,8 @@ RSpec.describe "Inspections", type: :request do
     it "only shows user's own inspections in index" do
       get "/inspections"
       expect(response).to have_http_status(:success)
-      expect(response.body).to include(user_inspection.serial)
-      expect(response.body).not_to include(other_inspection.serial)
+      expect(response.body).to include(user_inspection.id)
+      expect(response.body).not_to include(other_inspection.id)
     end
 
     %w[edit update destroy].each do |action|
@@ -133,12 +133,12 @@ RSpec.describe "Inspections", type: :request do
       end
 
       it "exports CSV" do
-        create(:inspection, :completed, user: user, unit: unit, comments: "Test")
+        create(:inspection, :completed, user: user, unit: unit, risk_assessment: "Test risk assessment")
 
         get "/inspections.csv"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("text/csv")
-        expect(response.body).to include("Test")
+        expect(response.body).to include("Test risk assessment")
       end
     end
 
@@ -231,15 +231,15 @@ RSpec.describe "Inspections", type: :request do
       let(:complete_inspection) { create(:inspection, :completed, user: user, unit: unit) }
 
       it "updates successfully" do
-        patch "/inspections/#{inspection.id}", params: {inspection: {comments: "Updated"}}
+        patch "/inspections/#{inspection.id}", params: {inspection: {risk_assessment: "Updated assessment"}}
         expect_success_with_notice
 
         inspection.reload
-        expect(inspection.comments).to eq("Updated")
+        expect(inspection.risk_assessment).to eq("Updated assessment")
       end
 
       it "prevents editing complete inspections" do
-        patch "/inspections/#{complete_inspection.id}", params: {inspection: {comments: "hack"}}
+        patch "/inspections/#{complete_inspection.id}", params: {inspection: {risk_assessment: "hack"}}
         expect(response).to redirect_to(inspection_path(complete_inspection))
         expect(flash[:notice]).to be_present
       end
@@ -262,7 +262,7 @@ RSpec.describe "Inspections", type: :request do
 
           it "returns success response" do
             patch "/inspections/#{inspection.id}",
-              params: {inspection: {comments: "test"}},
+              params: {inspection: {risk_assessment: "test assessment"}},
               headers: headers
 
             expect(response).to have_http_status(:success)
@@ -274,7 +274,7 @@ RSpec.describe "Inspections", type: :request do
             mock_failing_update
 
             patch "/inspections/#{test_inspection.id}",
-              params: {inspection: {comments: "test"}},
+              params: {inspection: {risk_assessment: "test assessment"}},
               headers: headers
 
             expect(response).to have_http_status(:success)

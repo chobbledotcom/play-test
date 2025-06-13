@@ -1,5 +1,5 @@
 <%
-  # Composite partial for number + comment fields
+  # Composite partial for number + comment fields with grid layout
   # Required parameters:
   #   field: Base field name (e.g., 'slide_platform_height')
   # Optional parameters (passed through to number field):
@@ -17,7 +17,38 @@
 
   # Extract number field options
   number_options = local_assigns.slice(:step, :min, :max, :required)
+  
+  # Get the form object
+  form = @_current_form
+  model = form.object
+
+  # Get field label from i18n (will raise if missing)
+  field_data = form_field_setup(field, local_assigns)
+
+  # Generate unique ID for comment checkbox
+  comment_checkbox_id = "#{field}_has_comment_#{model.object_id}"
+  comment_textarea_id = "#{field}_comment_textarea_#{model.object_id}"
 %>
 
-<%= render 'form/number', field: number_field, **number_options %>
-<%= render 'form/comment', field: comment_field %>
+<div class="form-grid number-comment">
+  <label>
+    <%= field_data[:field_label] %>
+  </label>
+
+  <%= form.number_field number_field, **number_options %>
+
+  <label for="<%= comment_checkbox_id %>">
+    <input type="checkbox"
+      id="<%= comment_checkbox_id %>"
+      <%= 'checked' if model.send(comment_field).present? %>
+      onchange="document.getElementById('<%= comment_textarea_id %>').style.display = this.checked ? 'block' : 'none';"
+    >
+    <%= t('shared.comment') %>
+  </label>
+
+  <%= form.text_area comment_field,
+      rows: 2,
+      placeholder: t('shared.field_comment_placeholder', field: field_data[:field_label]),
+      id: comment_textarea_id,
+      style: "display: #{model.send(comment_field).present? ? 'block' : 'none'};" %>
+</div>

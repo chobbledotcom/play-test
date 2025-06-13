@@ -53,7 +53,7 @@ RSpec.feature "Safety Standards Display", type: :feature do
     within(".user-height-assessment") do
       expect(page).to have_content("EN 14960:2019 Height Requirements:")
       expect(page).to have_content("Containing walls must be at least 1.2m")
-      expect(page).to have_content("Compliant")
+      expect(page).to have_content("Pass")
 
       expect(page).to have_content("EN 14960:2019 Calculated Capacities:")
       expect(page).to have_content("1.0m users: 13 (1.5m² per user)")

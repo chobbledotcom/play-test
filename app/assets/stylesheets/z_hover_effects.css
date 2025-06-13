@@ -123,7 +123,8 @@ nav a:active {
 }
 
 /* Active page styling - inverted colors */
-nav a.active {
+nav a.active,
+nav a.active:hover {
   background-color: var(--color-bg) !important;
   color: var(--color-link) !important;
   border: 2px solid var(--color-link) !important;
@@ -133,10 +134,8 @@ nav a.active {
 nav a.active:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
-  background-color: rgba(108, 12, 108, 0.1) !important;
   color: var(--color-link) !important;
 }
-
 
 nav button:hover:not([disabled]) {
   filter: none !important;
@@ -175,16 +174,16 @@ input[type="radio"]:hover {
 }
 
 /* Share button special effects */
-#share-button {
+.share-button {
   transition: all 0.2s ease;
 }
 
-#share-button:hover {
+.share-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
 }
 
-#share-button:active {
+.share-button:active {
   transform: translateY(0);
   box-shadow: 0 1px 4px rgba(25, 118, 210, 0.2);
 }

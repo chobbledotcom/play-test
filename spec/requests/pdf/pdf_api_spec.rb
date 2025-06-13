@@ -48,7 +48,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
         before do
           inspection.update(
             inspection_location: "Test Location with Ünicøde 😀",
-            comments: "Comments with émoji 🎈"
+            risk_assessment: "Risk assessment with émoji 🎈"
           )
         end
 
@@ -65,7 +65,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
           long_text = "A" * 1000
           inspection.update(
             inspection_location: "Long location #{long_text}",
-            comments: "Long comments #{long_text}"
+            risk_assessment: "Long risk assessment #{long_text}"
           )
         end
 
@@ -242,7 +242,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
     it "handles HTML content in fields gracefully" do
       inspection.update(
         inspection_location: "<script>alert('xss')</script>",
-        comments: "<b>Bold text</b> with <em>HTML</em>"
+        risk_assessment: "<b>Bold text</b> with <em>HTML</em>"
       )
 
       get "/inspections/#{inspection.id}.pdf"

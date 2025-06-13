@@ -126,7 +126,7 @@ RSpec.describe "inspector_companies/show", type: :view do
       expect(rendered).to include("Recent Inspections")
       expect(rendered).to include("TEST001")
       expect(rendered).to include("Test Location")
-      expect(rendered).to include("Yes") # passed
+      expect(rendered).to include("Pass") # passed
     end
   end
 

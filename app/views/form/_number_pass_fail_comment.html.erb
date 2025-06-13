@@ -7,29 +7,68 @@
   #   min: Minimum value
   #   max: Maximum value
   #   required: Whether the number field is required
-  # 
+  #
   # This will render:
   #   - Number field: field (e.g., 'slide_platform_height')
-  #   - Pass/fail field: field + '_pass' (e.g., 'slide_platform_height_pass') - Only for Inspections
+  #   - Pass/fail field: field + '_pass' (e.g., 'slide_platform_height_pass')
   #   - Comment field: field + '_comment' (e.g., 'slide_platform_height_comment')
-  
+
   number_field = field
   pass_fail_field = "#{field}_pass".to_sym
   comment_field = "#{field}_comment".to_sym
-  
+
   # Extract number field options
   number_options = local_assigns.slice(:step, :min, :max, :required)
-  
-  # Get the form object to check model type
+
+  # Get the form object
   form = @_current_form
   model = form.object
-  model_class_name = model.class.name
+
+  # Get field label from i18n
+  field_data = form_field_setup(field, local_assigns)
+
+  # Generate unique ID for comment checkbox
+  comment_checkbox_id = "#{field}_has_comment_#{model.object_id}"
+  comment_textarea_id = "#{field}_comment_textarea_#{model.object_id}"
 %>
 
-<%= render 'form/number', field: number_field, **number_options %>
+<div class="form-grid pass-fail-comment with-number">
+  <!-- Label -->
+  <label for="<%= form.field_id(number_field) %>">
+    <%= field_data[:field_label] %>
+    <%= form.number_field number_field,
+        id: form.field_id(number_field),
+        step: number_options[:step] || 0.01,
+        min: number_options[:min],
+        max: number_options[:max],
+        required: number_options[:required],
+        placeholder: field_data[:field_placeholder] %>
+  </label>
 
-<% if model_class_name != 'Unit' %>
-  <%= render 'form/pass_fail', field: pass_fail_field %>
-<% end %>
+  <label for="<%= pass_fail_field %>_true">
+    <%= t('shared.pass') %>
+    <%= form.radio_button pass_fail_field, true,
+        id: "#{pass_fail_field}_true" %>
+  </label>
 
-<%= render 'form/comment', field: comment_field %>
+  <label for="<%= pass_fail_field %>_false">
+    <%= form.radio_button pass_fail_field, false,
+        id: "#{pass_fail_field}_false" %>
+    <%= t('shared.fail') %>
+  </label>
+
+  <label for="<%= comment_checkbox_id %>">
+    <input type="checkbox"
+      id="<%= comment_checkbox_id %>"
+      <%= 'checked' if model.send(comment_field).present? %>
+      onchange="document.getElementById('<%= comment_textarea_id %>').style.display = this.checked ? 'block' : 'none';"
+    >
+    <%= t('shared.comment') %>
+  </label>
+
+  <%= form.text_area comment_field,
+      rows: 2,
+      placeholder: t('shared.field_comment_placeholder', field: field_data[:field_label]),
+      id: comment_textarea_id,
+      style: "display: #{model.send(comment_field).present? ? 'block' : 'none'};" %>
+</div>

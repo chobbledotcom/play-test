@@ -10,6 +10,24 @@ BLUE='\033[0;34m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Check if any arguments contain --format (do this first for JSON detection)
+format_args=""
+other_args=()
+skip_next=false
+
+for arg in "$@"; do
+  if [[ "$skip_next" == "true" ]]; then
+    format_args="--format $arg"
+    skip_next=false
+  elif [[ "$arg" == "--format" ]]; then
+    skip_next=true
+  elif [[ "$arg" == --format=* ]]; then
+    format_args="--format ${arg#--format=}"
+  else
+    other_args+=("$arg")
+  fi
+done
+
 # Check if any argument contains a line number (e.g., spec/file.rb:123)
 has_line_number=false
 for arg in "$@"; do
@@ -29,54 +47,47 @@ if [[ "$has_line_number" == "true" ]]; then
   exec bin/rspec-quick "$@"
 fi
 
-echo -e "${YELLOW}⚡ RSpec Quicker${NC} - Parallel tests with fail-fast"
-echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "  ${GREEN}✓${NC} In-memory database for speed"
-echo -e "  ${GREEN}✓${NC} Coverage disabled"
-echo -e "  ${GREEN}✓${NC} Stops on first failure"
-echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo ""
+# Only show banner if not using JSON format (for rspec-find compatibility)
+if [[ "$format_args" != *"json"* ]]; then
+  echo -e "${YELLOW}⚡ RSpec Quicker${NC} - Parallel tests with fail-fast"
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo -e "  ${GREEN}✓${NC} In-memory database for speed"
+  echo -e "  ${GREEN}✓${NC} Coverage disabled"
+  echo -e "  ${GREEN}✓${NC} Stops on first failure"
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo ""
+fi
 
 # Start timer
 START_TIME=$(date +%s)
-
-# Check if any arguments contain --format
-format_args=""
-other_args=()
-skip_next=false
-
-for arg in "$@"; do
-  if [[ "$skip_next" == "true" ]]; then
-    format_args="--format $arg"
-    skip_next=false
-  elif [[ "$arg" == "--format" ]]; then
-    skip_next=true
-  elif [[ "$arg" == --format=* ]]; then
-    format_args="--format ${arg#--format=}"
-  else
-    other_args+=("$arg")
-  fi
-done
 
 # Default to progress format if not specified
 if [[ -z "$format_args" ]]; then
   format_args="--format progress"
 fi
 
-# Disable coverage, use in-memory database, and run in parallel with fail-fast
-# Filter out unwanted messages and clean up output
-DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec parallel_rspec \
-  --fail-fast \
-  --test-options "--fail-fast $format_args" \
-  "${other_args[@]}" 2>&1 | \
-  grep -v "✅ Using in-memory SQLite database for tests" | \
-  grep -v "RSpec is shutting down and will print the summary report" | \
-  awk '
+# Check if we're using JSON format
+if [[ "$format_args" == *"json"* ]]; then
+  # For JSON format, minimal filtering to preserve all output including summary line
+  DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec parallel_rspec \
+    --fail-fast \
+    --test-options "--fail-fast $format_args" \
+    "${other_args[@]}" 2>&1 | \
+    grep -v "✅ Using in-memory SQLite database for tests" | \
+    grep -v "RSpec is shutting down and will print the summary report"
+else
+  # For other formats, clean up the output but preserve the summary
+  DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec parallel_rspec \
+    --fail-fast \
+    --test-options "--fail-fast $format_args" \
+    "${other_args[@]}" 2>&1 | \
+    grep -v "✅ Using in-memory SQLite database for tests" | \
+    grep -v "RSpec is shutting down and will print the summary report" | \
+    awk '
     BEGIN { 
-      buffer = ""
-      in_final_summary = 0
-      failure_buffer = ""
       collecting_failure = 0
+      failure_buffer = ""
+      found_summary = 0
     }
     
     # Capture failure information
@@ -111,20 +122,22 @@ DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec parallel_rspec \
     # Skip all "Finished in" lines
     /^Finished in .* seconds/ { next }
     
-    # Skip intermediate example count lines
-    /^[0-9]+ examples?, [0-9]+ failures?/ { next }
-    
     # Keep "Tests Failed" or "Tests Passed"
     /^Tests (Failed|Passed)/ { 
       collecting_failure = 0
       if (failure_buffer) print failure_buffer
       print
+      found_summary = 1
       next
     }
     
-    # Keep "Took X seconds"
+    # Keep "Took X seconds" and the summary line after it
     /^Took [0-9]+ seconds/ {
       print
+      getline
+      if ($0 ~ /^[0-9]+ examples?, [0-9]+ failures?/) {
+        print
+      }
       next
     }
     
@@ -138,6 +151,7 @@ DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec parallel_rspec \
     }
   ' | \
   sed '/^$/N;/^\n$/d'  # Remove excessive blank lines
+fi
 
 # Capture exit status
 EXIT_STATUS=${PIPESTATUS[0]}
@@ -146,13 +160,16 @@ EXIT_STATUS=${PIPESTATUS[0]}
 END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))
 
-echo ""
-echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-if [ $EXIT_STATUS -eq 0 ]; then
-    echo -e "${GREEN}✅ All tests passed!${NC} (${DURATION}s)"
-else
-    echo -e "${RED}❌ Tests failed!${NC} (${DURATION}s)"
+# Only show footer banner if not using JSON format
+if [[ "$format_args" != *"json"* ]]; then
+  echo ""
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  if [ $EXIT_STATUS -eq 0 ]; then
+      echo -e "${GREEN}✅ All tests passed!${NC} (${DURATION}s)"
+  else
+      echo -e "${RED}❌ Tests failed!${NC} (${DURATION}s)"
+  fi
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 fi
-echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 exit $EXIT_STATUS

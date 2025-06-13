@@ -71,42 +71,48 @@ Judgement can be used here, but must be cautious considering over-loading and ev
 
 # Anchorage
 
-- with pass/fail
-  - Number of anchors (w p/f)
-    - low anchor points
-    - high anchor points
-  - Correct anchor accessories
-  - Anchors between 30-45 deg
-  - Anchors permanently closed and metal
-  - Pull strength test
+- number_pass_fail_comment - num_low_anchors - "Low anchor points"
+- number_pass_fail_comment - num_high_anchors - "High anchor points"
+- pass_fail_comment - anchor_accessories - "Correct anchor accessories"
+- pass_fail_comment - anchor_degree - "Anchors between 30-45"
+- pass_fail_comment - anchor_type - "Anchors permanently closed and metal"
+- pass_fail_comment - pull_strength - "Pull strength test"
+
+- Correct anchor accessories
+- Anchors between 30-45 deg
+- Anchors permanently closed and metal
+- Pull strength test
 
 # Totally Enclosed !
 
-- with pass/fail:
-  - Number of exits (count)
-  - Exist sign always visible?
+- number_pass_fail_comment - exit_number - "Number of exits"
+- pass_fail_comment - exit_sign_always_visible - "Exit sign always visible"
 
 # Materials
 
-- with pass/fail
-  - Ropes (mm)
-  - Clamber netting
-  - Retention netting
-  - Zips
-  - Windows
-  - Artwork
-  - Thread
-  - Fabric strength
-  - Fire retardent
+- number_pass_fail_comment - ropes - Ropes (mm)
+- pass_fail_comment - clamber_netting - Clamber netting
+- pass_fail_comment - retention_netting - Retention netting
+- pass_fail_comment - zips - Zips
+- pass_fail_comment - windows - Windows
+- pass_fail_comment - artwork - Artwork
+- pass_fail_comment - thread - Thread
+- pass_fail_comment - fabric_strength - Fabric strength
+- pass_fail_comment - fire_retardent - Fire retardent
 
 # Fan
 
-- Blower size (comment only)
-- Blower serial (comment only)
-- with pass/fail
-  - Return flap present
-  - Finger probe Test
-  - PAT
-  - Visual Inspection
+- text - fan_size_type - Blower size
+- pass_fail_comment - blower_serial - Blower serial
+- pass_fail_comment - blower_flap - Return flap present
+- pass_fail_comment - blower_finger - Finger probe Test
+- pass_fail_comment - pat - PAT
+- pass_fail_comment - blower_visual - Visual Inspection
 
 # Notes / risk assessment
+
+- number_comment - width
+- number_comment - length
+- number_comment - height
+- checkbox - has_slide
+- checkbox - is_totally_enclosed

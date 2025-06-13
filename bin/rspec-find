@@ -35,8 +35,7 @@ end
 # Get any additional arguments passed to the script
 additional_args = ARGV.join(' ')
 
-# Build the rspec command - use rspec-quicker for parallel execution with fail-fast
-# rspec-quicker already includes bundle exec, in-memory DB, and parallel execution
+# Build the rspec command - use rspec-quicker with JSON format for fast parallel execution
 rspec_command = "bin/rspec-quicker --format json"
 rspec_command += " #{additional_args}" unless additional_args.empty?
 
@@ -83,35 +82,94 @@ end
 
 puts "\n" # New line after dots
 
-# Parse the JSON output
-# The stdout might have some non-JSON content before and after the actual JSON
-# Find the JSON by looking for the pattern
-json_match = stdout_data.match(/\{"version".*?"summary_line".*?\}/m)
-if json_match.nil?
-  puts "Error: No JSON found in RSpec output"
+# With parallel_rspec, we get multiple JSON outputs plus a final summary
+# First, try to extract the final summary line which has the total count
+final_summary_match = stdout_data.match(/(\d+) examples?, (\d+) failures?(?:, (\d+) pending)?$/)
+total_example_count = nil
+total_failure_count = nil
+total_pending_count = 0
+
+if final_summary_match
+  total_example_count = final_summary_match[1].to_i
+  total_failure_count = final_summary_match[2].to_i
+  total_pending_count = final_summary_match[3].to_i if final_summary_match[3]
+end
+
+# Parse all JSON objects from the output
+# Each parallel process outputs its own JSON, we need to combine them
+json_objects = []
+examples = []
+duration = 0
+
+# Extract JSON from rspec-quicker output
+# rspec-quicker outputs: metadata line, then JSON (possibly followed by status), then summary lines
+lines = stdout_data.split("\n")
+
+lines.each do |line|
+  # Only process lines that contain JSON
+  next unless line.include?('{"version"')
+  
+  # Extract just the JSON part (remove any trailing "Tests Failed" etc)
+  json_start = line.index('{"version"')
+  json_part = line[json_start..-1]
+  
+  # Find the end of the JSON by looking for the closing brace of the root object
+  brace_count = 0
+  json_end = nil
+  json_part.each_char.with_index do |char, i|
+    case char
+    when '{'
+      brace_count += 1
+    when '}'
+      brace_count -= 1
+      if brace_count == 0
+        json_end = i
+        break
+      end
+    end
+  end
+  
+  if json_end
+    clean_json = json_part[0..json_end]
+    parsed = JSON.parse(clean_json)
+    json_objects << parsed
+    # Collect all examples from all JSON objects
+    examples.concat(parsed['examples'] || [])
+    duration += parsed['summary']['duration'] || 0
+  end
+end
+
+# Debug: show what we actually parsed
+if ENV['DEBUG']
+  puts "\nDEBUG: JSON parsing results:"
+  puts "JSON objects found: #{json_objects.length}"
+  puts "Total examples: #{examples.length}"
+  json_objects.each_with_index do |obj, i|
+    puts "Object #{i}: #{obj['summary']['example_count']} examples, #{obj['summary']['failure_count']} failures"
+  end
+end
+
+# If we couldn't find any JSON, show debug info
+if json_objects.empty?
+  puts "Error: No valid JSON found in RSpec output"
   puts "Raw output (first 1000 chars):"
   puts stdout_data[0..1000]
   puts "\nStderr:"
-  puts stderr_data
+  puts stderr_data[0..500] if stderr_data && !stderr_data.empty?
   exit 1
 end
 
-begin
-  json_content = json_match[0]
-  results = JSON.parse(json_content)
-rescue JSON::ParserError => e
-  puts "Error parsing RSpec JSON output: #{e.message}"
-  puts "Attempted to parse (first 500 chars):"
-  puts json_content[0..500] + "..."
-  exit 1
+# Use the final summary line counts if available, otherwise sum from JSON
+if total_example_count
+  example_count = total_example_count
+  failure_count = total_failure_count
+  pending_count = total_pending_count
+else
+  # Sum up from all JSON objects
+  example_count = json_objects.sum { |j| j['summary']['example_count'] || 0 }
+  failure_count = json_objects.sum { |j| j['summary']['failure_count'] || 0 }
+  pending_count = json_objects.sum { |j| j['summary']['pending_count'] || 0 }
 end
-
-# Extract summary information
-summary = results['summary']
-example_count = summary['example_count']
-failure_count = summary['failure_count']
-pending_count = summary['pending_count']
-duration = summary['duration']
 
 # Display test summary
 puts "\n📊 TEST SUMMARY:"
@@ -125,6 +183,24 @@ puts " --- "
 
 # Check if there were any failures
 if failure_count == 0
+  # Safety check: if no arguments were provided, we should have run a lot of tests
+  if additional_args.empty? && example_count < 1000
+    puts "\n❌ SUSPICIOUS TEST COUNT!"
+    puts " --- "
+    puts "Expected thousands of tests when running without arguments, but only got #{example_count}."
+    puts "This suggests rspec-quicker isn't running all tests properly."
+    puts ""
+    puts "Debugging info:"
+    puts "Command run: #{rspec_command}"
+    puts "Total examples: #{example_count}"
+    puts "JSON objects found: #{json_objects.length}"
+    puts ""
+    puts "Raw output (first 500 chars):"
+    puts stdout_data[0..500]
+    puts " --- "
+    exit 1
+  end
+  
   puts "\n✅ ALL TESTS PASSED! No failures found."
   
   # If arguments were provided, warn that there might be failures elsewhere
@@ -141,8 +217,8 @@ if failure_count == 0
   exit 0
 end
 
-# Find the first failure
-failure = results['examples'].find { |ex| ex['status'] == 'failed' }
+# Find the first failure from all examples
+failure = examples.find { |ex| ex['status'] == 'failed' }
 
 if failure.nil?
   puts "\n❓ No failure details found despite failure count > 0"

@@ -40,10 +40,11 @@
       </p>
     <% end %>
 
-    <% if assessment_obj.respond_to?(:completion_percentage) %>
-      <p>
-        <strong><%= t("#{i18n_base}.status.completion") %>:</strong>
-        <%= assessment_obj.completion_percentage %>%
-      </p>
+    
+    <% if assessment_obj.respond_to?(:complete?) && !assessment_obj.complete? %>
+      <% assessment_type = i18n_base.split('.').last %>
+      <%= render 'shared/incomplete_fields', 
+                 assessment: assessment_obj,
+                 assessment_type: assessment_type %>
     <% end %>
   </div>

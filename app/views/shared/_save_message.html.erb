@@ -1,21 +1,18 @@
 <!-- Save Message Display -->
-<div id="<%= dom_id || "save_message" %>" class="save-message">
-  <% if defined?(success) && success %>
-    <div class="success-message">
-      <%= success_message || t('shared.messages.saved_successfully') %>
-    </div>
-  <% end %>
-  
-  <% if defined?(errors) && errors.present? %>
+<%
+  # Handle the message and type parameters
+  message_text = local_assigns[:message]
+  message_type = local_assigns[:type] || (local_assigns[:errors].present? ? "error" : "success")
+  element_id = local_assigns[:element_id] || "save_message"
+%>
+<div id="<%= element_id %>" class="save-message">
+  <% if message_type == "error" %>
     <div class="error-message">
-      <%= error_message || t('shared.messages.save_failed') %>
-      <% if errors.is_a?(Array) && errors.any? %>
-        <ul>
-          <% errors.each do |error| %>
-            <li><%= error %></li>
-          <% end %>
-        </ul>
-      <% end %>
+      <%= message_text || t('shared.messages.save_failed') %>
+    </div>
+  <% else %>
+    <div class="success-message">
+      <%= message_text || t('shared.messages.saved_successfully') %>
     </div>
   <% end %>
 </div>

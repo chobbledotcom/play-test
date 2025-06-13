@@ -43,9 +43,6 @@ RSpec.shared_examples "an assessment model" do
       expect(assessment).to respond_to(:passed_checks_count)
     end
 
-    it "responds to #completion_percentage" do
-      expect(assessment).to respond_to(:completion_percentage)
-    end
   end
 end
 

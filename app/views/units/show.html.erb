@@ -2,13 +2,9 @@
   <article class="view-unit">
     <%= render 'shared/page_header', title: t('units.titles.show') %>
     
-    <iframe src="<%= unit_path(@unit, format: :pdf) %>" 
-            width="100%" 
-            height="800" 
-            style="border: 1px solid #ccc;">
-      <p><%= t('units.messages.pdf_not_supported_html') %></p>
-      <%= link_to t('units.buttons.download_pdf'), unit_path(@unit, format: :pdf) %>
-    </iframe>
+    <%= render 'shared/pdf_embed', 
+               url: unit_path(@unit, format: :pdf),
+               title: "Unit #{@unit.serial} Report" %>
   </article>
 <% else %>
   <article class="view-unit">
@@ -27,7 +23,7 @@
       <%= render 'inspections/inspections_table', 
           inspections: @inspections, 
           unit: @unit,
-          show_name: @inspections.any? { |i| i.name != @unit.name },
+          show_name: @inspections.any? { |i| i.unit&.name != @unit.name },
           show_serial: false,
           show_location: true,
           show_inspector: true %>
@@ -36,32 +32,10 @@
     <% end %>
 
     <hr>
-
-    <h4><%= t('units.headers.qr_code') %></h4>
-    <%= image_tag unit_path(@unit, format: :png), alt: t('units.accessibility.qr_code_alt'), width: 250 %>
-
-    <hr>
 <% end %>
 
-  <h4><%= t('units.headers.report_link') %></h4>
-  <%= link_to unit_url(@unit, format: :pdf), unit_url(@unit, format: :pdf) %>
-  <%= render 'shared/share_button', 
-      url: unit_url(@unit, format: :pdf),
-      title: t('units.share.title', name: @unit.name),
-      button_text: t('units.share.button'),
-      copied_text: t('units.share.copied') %>
-  
-  <h4><%= t('units.headers.report_json_link') %></h4>
-  <%= link_to unit_url(@unit, format: :json), unit_url(@unit, format: :json) %>
-
-  <hr>
-
   <h4><%= t('units.headers.unit_report') %></h4>
-  <iframe src="<%= unit_path(@unit, format: :pdf) %>" 
-          width="100%" 
-          height="800px" 
-          style="border: 1px solid #ccc;">
-    <%= t('units.messages.pdf_not_supported') %>
-    <%= link_to t('units.buttons.download_pdf'), unit_path(@unit, format: :pdf) %>.
-  </iframe>
+  <%= render 'shared/pdf_embed', 
+             url: unit_path(@unit, format: :pdf),
+             title: "Unit #{@unit.serial} Report" %>
 </article>

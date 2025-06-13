@@ -110,18 +110,6 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
       end
     end
 
-    context "with completion percentage" do
-      before do
-        setup_assessment_with_method(:completion_percentage, 75)
-      end
-
-      it "displays completion percentage" do
-        render_assessment_status
-        
-        expect(rendered).to include(I18n.t("forms.slide.status.completion"))
-        expect(rendered).to include("75%")
-      end
-    end
 
     context "with custom i18n_base" do
       before do
@@ -154,11 +142,14 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
     context "with all features" do
       before do
         allow(mock_assessment).to receive(:respond_to?).and_return(true)
+        allow(mock_assessment).to receive(:complete?).and_return(false)
+        allow(mock_assessment).to receive(:incomplete_fields).and_return([
+          { field: :test_field, label: "Test Field", type: :text }
+        ])
         allow(mock_assessment).to receive(:meets_height_requirements?).and_return(true)
         allow(mock_assessment).to receive(:meets_runout_requirements?).and_return(false)
         allow(mock_assessment).to receive(:passed_checks_count).and_return(7)
         allow(mock_assessment).to receive(:pass_columns_count).and_return(10)
-        allow(mock_assessment).to receive(:completion_percentage).and_return(90)
       end
 
       it "displays all status information" do
@@ -169,7 +160,6 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
         expect(rendered).to include("text-success")
         expect(rendered).to include("text-danger")
         expect(rendered.gsub(/\s+/, ' ')).to include("7 / 10")
-        expect(rendered).to include("90%")
       end
     end
   end
@@ -186,10 +176,9 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
     before do
       allow(mock_assessment).to receive(:persisted?).and_return(true)
       allow(mock_assessment).to receive(:respond_to?) do |method|
-        [:meets_runout_requirements?, :completion_percentage].include?(method)
+        [:meets_runout_requirements?].include?(method)
       end
       allow(mock_assessment).to receive(:meets_runout_requirements?).and_return(true)
-      allow(mock_assessment).to receive(:completion_percentage).and_return(50)
     end
 
     it "has proper semantic structure" do
