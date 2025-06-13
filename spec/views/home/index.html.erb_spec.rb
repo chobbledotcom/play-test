@@ -38,7 +38,6 @@ RSpec.describe "home/index.html.erb", type: :view do
       expect(rendered).to include(I18n.t("home.attribution"))
     end
 
-
     it "displays feature sections" do
       render
 
@@ -72,7 +71,6 @@ RSpec.describe "home/index.html.erb", type: :view do
       expect(rendered).to include("<h2>")
       expect(rendered).to include("<p>")
     end
-
   end
 
   context "when user is logged in" do
@@ -163,7 +161,6 @@ RSpec.describe "home/index.html.erb", type: :view do
     before do
       allow(view).to receive(:current_user).and_return(nil)
     end
-
 
     it "has mobile-friendly navigation structure" do
       render

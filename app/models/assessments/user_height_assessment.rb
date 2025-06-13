@@ -1,7 +1,7 @@
 class Assessments::UserHeightAssessment < ApplicationRecord
   include AssessmentLogging
   include SafetyCheckMethods
-  
+
   belongs_to :inspection
 
   # Height measurements (2 decimal places)
@@ -21,7 +21,6 @@ class Assessments::UserHeightAssessment < ApplicationRecord
     :play_area_pass, :negative_adjustments_pass,
     inclusion: {in: [true, false]}, allow_nil: true
 
-
   def complete?
     required_fields_present? && height_measurements_valid? && safety_assessments_complete?
   end
@@ -35,7 +34,6 @@ class Assessments::UserHeightAssessment < ApplicationRecord
   def total_user_capacity
     [users_at_1000mm, users_at_1200mm, users_at_1500mm, users_at_1800mm].compact.sum
   end
-
 
   def completion_percentage
     total_fields = 12 # Total number of assessable fields

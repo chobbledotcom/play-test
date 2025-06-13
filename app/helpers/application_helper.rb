@@ -57,7 +57,7 @@ module ApplicationHelper
 
     # Look for field label in the fields namespace
     fields_key = "#{i18n_base}.fields.#{field}"
-    
+
     field_label = t(fields_key, raise: true)
 
     base_parts = i18n_base.split(".")
@@ -83,7 +83,7 @@ module ApplicationHelper
     # Extract controller name from the path
     route = Rails.application.routes.recognize_path(path)
     path_controller = route[:controller]
-    
+
     # Check if we're in the same controller
     controller_name == path_controller
   rescue ActionController::RoutingError

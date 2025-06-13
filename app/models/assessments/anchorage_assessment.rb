@@ -1,7 +1,7 @@
 class Assessments::AnchorageAssessment < ApplicationRecord
   include AssessmentLogging
   include SafetyCheckMethods
-  
+
   belongs_to :inspection
 
   # Anchor counts (alphabetical order)
@@ -54,7 +54,6 @@ class Assessments::AnchorageAssessment < ApplicationRecord
       "Non-Compliant (Requires #{required} total anchors, has #{actual})"
     end
   end
-
 
   def completion_percentage
     total_fields = 7 # Total assessable fields
@@ -113,6 +112,4 @@ class Assessments::AnchorageAssessment < ApplicationRecord
       update_column(:num_anchors_pass, meets_anchor_requirements?)
     end
   end
-
-
 end

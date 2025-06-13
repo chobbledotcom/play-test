@@ -8,12 +8,12 @@ RSpec.describe "form/_submit_button.html.erb", type: :view do
   def setup_submit_button(text: default_button_text, base: i18n_base)
     @mock_form = mock_form_builder
     setup_form_field_config(field: :submit, i18n_base: base)
-    
+
     # Override the submit method specifically
     allow(@mock_form).to receive(:submit) do |button_text|
       %(<input type="submit" value="#{button_text}" />).html_safe
     end
-    
+
     allow(view).to receive(:t)
       .with("#{base}.submit", raise: true)
       .and_return(text)
@@ -26,7 +26,7 @@ RSpec.describe "form/_submit_button.html.erb", type: :view do
   def expect_submit_button_with_text(expected_text)
     render_form_partial("submit_button")
     expect(rendered).to have_css('input[type="submit"]')
-    expect(rendered).to include(%{value="#{expected_text}"})
+    expect(rendered).to include(%(value="#{expected_text}"))
     expect(@mock_form).to have_received(:submit).with(expected_text)
   end
 
@@ -67,7 +67,7 @@ RSpec.describe "form/_submit_button.html.erb", type: :view do
   describe "different form types" do
     {
       "inspector_companies" => "Save Company",
-      "users" => "Update User", 
+      "users" => "Update User",
       "session_new" => "Sign In",
       "units" => "Save Unit"
     }.each do |form_type, expected_text|
@@ -97,7 +97,7 @@ RSpec.describe "form/_submit_button.html.erb", type: :view do
   describe "edge cases and error handling" do
     {
       "HTML entities" => "&lt;Save&gt;",
-      "very long text" => "This is a very long submit button text that might wrap or cause layout issues", 
+      "very long text" => "This is a very long submit button text that might wrap or cause layout issues",
       "Unicode characters" => "Submit ✓ 提交"
     }.each do |description, test_text|
       it "handles #{description} from i18n" do

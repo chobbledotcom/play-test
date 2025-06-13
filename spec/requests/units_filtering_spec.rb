@@ -16,7 +16,7 @@ RSpec.describe "Units Filtering", type: :request do
     context "when filtering by manufacturer" do
       it "shows only units from the selected manufacturer" do
         get units_path(manufacturer: "Airquee Ltd")
-        
+
         expect(response.body).to include("Airquee Castle")
         expect(response.body).not_to include("Bouncy Castle")
         expect(response.body).not_to include("Other Castle")
@@ -24,7 +24,7 @@ RSpec.describe "Units Filtering", type: :request do
 
       it "shows all units when manufacturer filter is empty string" do
         get units_path(manufacturer: "")
-        
+
         expect(response.body).to include("Airquee Castle")
         expect(response.body).to include("Bouncy Castle")
         expect(response.body).to include("Other Castle")
@@ -34,7 +34,7 @@ RSpec.describe "Units Filtering", type: :request do
     context "when filtering by owner" do
       it "shows only units from the selected owner" do
         get units_path(owner: "Owner B")
-        
+
         expect(response.body).not_to include("Airquee Castle")
         expect(response.body).to include("Bouncy Castle")
         expect(response.body).not_to include("Other Castle")
@@ -42,7 +42,7 @@ RSpec.describe "Units Filtering", type: :request do
 
       it "shows all units when owner filter is empty string" do
         get units_path(owner: "")
-        
+
         expect(response.body).to include("Airquee Castle")
         expect(response.body).to include("Bouncy Castle")
         expect(response.body).to include("Other Castle")
@@ -54,7 +54,7 @@ RSpec.describe "Units Filtering", type: :request do
 
       it "applies both filters" do
         get units_path(manufacturer: "Airquee Ltd", owner: "Owner B")
-        
+
         expect(response.body).to include("Airquee B")
         expect(response.body).not_to include("Airquee Castle")
         expect(response.body).not_to include("Bouncy Castle")
@@ -68,23 +68,21 @@ RSpec.describe "Units Filtering", type: :request do
 
       before do
         # Create an old inspection for the overdue unit
-        create(:inspection, :completed, 
-          user: user, 
+        create(:inspection, :completed,
+          user: user,
           unit: overdue_unit,
-          inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 10).days.ago
-        )
-        
+          inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 10).days.ago)
+
         # Create a recent inspection for the current unit
         create(:inspection, :completed,
           user: user,
           unit: current_unit,
-          inspection_date: 10.days.ago
-        )
+          inspection_date: 10.days.ago)
       end
 
       it "shows only overdue units when status is overdue" do
         get units_path(status: "overdue")
-        
+
         expect(response.body).to include("Overdue Unit")
         expect(response.body).not_to include("Current Unit")
       end
@@ -100,7 +98,7 @@ RSpec.describe "Units Filtering", type: :request do
 
       it "finds units by serial number" do
         get units_path(query: "AIR-2024")
-        
+
         expect(response.body).to include("Search Airquee")
         expect(response.body).not_to include("Search Bouncy")
         expect(response.body).not_to include("Search Other")
@@ -108,7 +106,7 @@ RSpec.describe "Units Filtering", type: :request do
 
       it "finds units by name" do
         get units_path(query: "Search Bouncy")
-        
+
         expect(response.body).not_to include("Search Airquee")
         expect(response.body).to include("Search Bouncy")
         expect(response.body).not_to include("Search Other")

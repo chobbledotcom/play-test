@@ -43,7 +43,7 @@ module UnitsHelper
   # Tabbed unit editing helpers
   def unit_tabs(unit)
     tabs = %w[general user_height]
-    
+
     # Get last inspection to determine unit characteristics
     last_inspection = unit.last_inspection
 

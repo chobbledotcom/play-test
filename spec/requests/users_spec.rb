@@ -532,14 +532,14 @@ RSpec.describe "Users", type: :request do
       it "allows updating settings even if name is empty" do
         # Create user with empty name (bypassing validation)
         regular_user.update_column(:name, nil)
-        
+
         settings_attrs = {
           phone: "020 7946 0958",
           theme: "dark"
         }
-        
-        patch update_settings_user_path(regular_user), params: { user: settings_attrs }
-        
+
+        patch update_settings_user_path(regular_user), params: {user: settings_attrs}
+
         regular_user.reload
         expect(regular_user.phone).to eq("020 7946 0958")
         expect(regular_user.theme).to eq("dark")
@@ -548,15 +548,15 @@ RSpec.describe "Users", type: :request do
 
       it "prevents users from changing their own name through settings" do
         original_name = regular_user.name
-        
+
         settings_attrs = {
           name: "Hacker McHackface",
           phone: "020 7946 0958",
           theme: "dark"
         }
-        
-        patch update_settings_user_path(regular_user), params: { user: settings_attrs }
-        
+
+        patch update_settings_user_path(regular_user), params: {user: settings_attrs}
+
         regular_user.reload
         expect(regular_user.name).to eq(original_name)
         expect(regular_user.phone).to eq("020 7946 0958")

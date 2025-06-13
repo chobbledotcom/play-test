@@ -13,7 +13,7 @@ RSpec.describe "Assessment Controllers", type: :request do
     it "updates structure assessment" do
       # Create assessment by visiting inspection
       get edit_inspection_path(inspection)
-      
+
       patch inspection_structure_assessment_path(inspection), params: {
         assessments_structure_assessment: {
           seam_integrity_pass: true,
@@ -32,7 +32,7 @@ RSpec.describe "Assessment Controllers", type: :request do
     it "updates user height assessment" do
       # Create assessment by visiting inspection
       get edit_inspection_path(inspection)
-      
+
       patch inspection_user_height_assessment_path(inspection), params: {
         assessments_user_height_assessment: {
           containing_wall_height: 1.8,
@@ -51,7 +51,7 @@ RSpec.describe "Assessment Controllers", type: :request do
     it "updates materials assessment" do
       # Create assessment by visiting inspection
       get edit_inspection_path(inspection)
-      
+
       patch inspection_materials_assessment_path(inspection), params: {
         assessments_materials_assessment: {
           ropes: 30.0,
@@ -70,7 +70,7 @@ RSpec.describe "Assessment Controllers", type: :request do
     it "updates slide assessment" do
       # Create assessment by visiting inspection
       get edit_inspection_path(inspection)
-      
+
       patch inspection_slide_assessment_path(inspection), params: {
         assessments_slide_assessment: {
           slide_platform_height: 2.5,

@@ -1,12 +1,12 @@
 class Assessments::EnclosedAssessment < ApplicationRecord
   include AssessmentLogging
   include SafetyCheckMethods
-  
+
   belongs_to :inspection
 
   validates :inspection_id, presence: true, uniqueness: true
   validates :exit_number, numericality: {greater_than: 0}, allow_blank: true
-  validates :exit_number_pass, :exit_sign_always_visible_pass, :exit_sign_visible_pass, 
+  validates :exit_number_pass, :exit_sign_always_visible_pass, :exit_sign_visible_pass,
     inclusion: {in: [true, false]}, allow_nil: true
 
   # Required assessment methods
@@ -28,7 +28,6 @@ class Assessments::EnclosedAssessment < ApplicationRecord
 
     (completed_fields.to_f / total_fields * 100).round(0)
   end
-
 
   def has_critical_failures?
     exit_number_pass == false || exit_sign_always_visible_pass == false || exit_sign_visible_pass == false

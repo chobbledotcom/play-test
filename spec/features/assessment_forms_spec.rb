@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.feature "Assessment Forms", type: :feature do
-  
   let(:admin_user) { create(:user, :without_company, email: "admin@testcompany.com") }
   let(:inspection_company) { create(:inspector_company, name: "Test Company") }
   let(:user) { create(:user, inspection_company: inspection_company) }
@@ -45,63 +44,63 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "allows switching between different assessment tabs" do
       # Define tabs to test with their corresponding i18n bases
       tabs_to_test = {
-        'user_height' => 'forms.tallest_user_height',
-        'structure' => 'forms.structure',
-        'materials' => 'forms.materials',
-        'anchorage' => 'forms.anchorage',
-        'fan' => 'forms.fan',
-        'general' => 'forms.inspections'
+        "user_height" => "forms.tallest_user_height",
+        "structure" => "forms.structure",
+        "materials" => "forms.materials",
+        "anchorage" => "forms.anchorage",
+        "fan" => "forms.fan",
+        "general" => "forms.inspections"
       }
-      
+
       # Add slide tab if inspection has slide
       if slide_inspection.has_slide
-        tabs_to_test['slide'] = 'forms.slide'
+        tabs_to_test["slide"] = "forms.slide"
       end
-      
+
       # Ensure inspection has a unit (required for some tabs)
       expect(inspection.unit).to be_present
-      
+
       # Start with general tab
       visit edit_inspection_path(inspection)
-      
+
       # Test each tab navigation
       tabs_to_test.each do |tab_name, i18n_base|
         # For slide tab, we need to use the slide inspection
-        if tab_name == 'slide'
-          visit edit_inspection_path(slide_inspection, tab: 'slide')
+        if tab_name == "slide"
+          visit edit_inspection_path(slide_inspection, tab: "slide")
         else
           # Check if we're already on this tab
           current_tab_matches = current_url.include?("tab=#{tab_name}")
-          
+
           # Skip clicking if we're already on this tab
           unless current_tab_matches
             click_link I18n.t("inspections.tabs.#{tab_name}")
           end
         end
-        
+
         # Verify we're on the correct tab
         expect(current_url).to include("tab=#{tab_name}")
-        
+
         # Verify the form content matches i18n structure
         expect_form_matches_i18n(i18n_base)
-        
+
         # Verify submit button is present
         expect(page).to have_button(I18n.t("#{i18n_base}.submit"))
-        
+
         # Verify no missing translations
         expect(page).not_to have_content("translation missing")
-        
+
         # Special case for user_height - check for specific content
-        if tab_name == 'user_height'
+        if tab_name == "user_height"
           expect(page).to have_content("Total Capacity")
         end
       end
-      
+
       # Test enclosed tab separately since it needs a different inspection
       if enclosed_inspection.is_totally_enclosed
-        visit edit_inspection_path(enclosed_inspection, tab: 'enclosed')
+        visit edit_inspection_path(enclosed_inspection, tab: "enclosed")
         expect(current_url).to include("tab=enclosed")
-        expect_form_matches_i18n('forms.enclosed')
+        expect_form_matches_i18n("forms.enclosed")
         expect(page).to have_button(I18n.t("forms.enclosed.submit"))
         expect(page).not_to have_content("translation missing")
       end
@@ -116,7 +115,7 @@ RSpec.feature "Assessment Forms", type: :feature do
 
         # Can navigate to enclosed assessment
         click_link I18n.t("inspections.tabs.enclosed")
-        expect_form_matches_i18n('forms.enclosed')
+        expect_form_matches_i18n("forms.enclosed")
       end
     end
 
@@ -133,7 +132,7 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "shows assessment summary for structure assessment with data" do
       # Visit to create the assessment
       visit edit_inspection_path(inspection)
-      
+
       # Update the auto-created assessment
       inspection.structure_assessment.update!(
         seam_integrity_pass: true,
@@ -157,7 +156,7 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "shows material compliance summary for materials assessment with data" do
       # Visit to create the assessment
       visit edit_inspection_path(inspection)
-      
+
       # Update the auto-created assessment
       inspection.materials_assessment.update!(
         ropes: 25.0,
@@ -183,7 +182,7 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "shows anchorage assessment summary for anchorage assessment with data" do
       # Visit to create the assessment
       visit edit_inspection_path(inspection)
-      
+
       # Update the auto-created assessment
       inspection.anchorage_assessment.update!(
         num_low_anchors: 4,
@@ -204,7 +203,7 @@ RSpec.feature "Assessment Forms", type: :feature do
       it "shows enclosed assessment summary for enclosed assessment with data" do
         # Visit to create the assessment
         visit edit_inspection_path(enclosed_inspection)
-        
+
         # Update the auto-created assessment
         enclosed_inspection.enclosed_assessment.update!(
           exit_number: 2,
@@ -239,7 +238,7 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "shows assessment status when assessments are persisted" do
       # Visit the edit page to create the assessments
       visit edit_inspection_path(inspection)
-      
+
       # Update the assessments that were automatically created
       inspection.slide_assessment.update!(slide_platform_height: 2.0)
       inspection.user_height_assessment.update!(containing_wall_height: 1.5)
@@ -271,7 +270,7 @@ RSpec.feature "Assessment Forms", type: :feature do
       it "shows assessment status for enclosed assessments" do
         # Visit the edit page to create the assessment
         visit edit_inspection_path(enclosed_inspection)
-        
+
         # Update the assessment that was automatically created
         enclosed_inspection.enclosed_assessment.update!(exit_number: 2)
 
@@ -283,11 +282,11 @@ RSpec.feature "Assessment Forms", type: :feature do
     it "shows assessment status even for empty assessments" do
       # Create a fresh inspection that hasn't been visited
       fresh_inspection = create(:inspection, user: user)
-      
+
       # Verify assessments exist but are empty (no data filled in)
       expect(fresh_inspection.slide_assessment).to be_present
       expect(fresh_inspection.slide_assessment.slide_platform_height).to be_nil
-      
+
       visit edit_inspection_path(fresh_inspection, tab: "slide")
       # Assessment status shows even when empty since assessments are auto-created
       expect(page).to have_css(".assessment-status")
@@ -306,7 +305,7 @@ RSpec.feature "Assessment Forms", type: :feature do
     else
       tab_name
     end
-    
+
     expect(page).to have_css("h1", text: I18n.t("forms.#{i18n_key}.header"))
     expect(page).not_to have_content("translation missing")
     expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))

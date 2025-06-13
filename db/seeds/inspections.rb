@@ -252,7 +252,7 @@ Assessments::AnchorageAssessment.create!(
     has_slide = false
     is_totally_enclosed = false
   end
-  
+
   inspection = Inspection.create!(
     user: $test_user,
     unit: unit,

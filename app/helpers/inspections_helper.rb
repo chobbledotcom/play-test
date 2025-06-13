@@ -98,5 +98,4 @@ module InspectionsHelper
 
     (completed_assessments.to_f / total_assessments * 100).round(0)
   end
-
 end

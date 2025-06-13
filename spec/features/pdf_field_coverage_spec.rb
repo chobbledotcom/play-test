@@ -2,7 +2,6 @@ require "rails_helper"
 require "pdf/inspector"
 
 RSpec.feature "PDF Field Coverage", type: :feature do
-  
   let(:user) { create(:user) }
   let(:inspector_company) { user.inspection_company }
   let(:unit) do

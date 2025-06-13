@@ -86,7 +86,7 @@ module AssessmentController
   # Automatically derive from controller name
   def assessment_type
     # e.g. "MaterialsAssessmentsController" -> "materials"
-    controller_name.singularize.sub(/_assessment$/, '')
+    controller_name.singularize.sub(/_assessment$/, "")
   end
 
   # Automatically derive from controller name
@@ -100,5 +100,4 @@ module AssessmentController
     # For now, just set an empty array since we're only editing one inspection
     @inspection_locations = []
   end
-
 end

@@ -33,7 +33,7 @@ create_user(
   email: "junior@play-test.co.uk",
   name: "Junior Inspector",
   rpii_number: "RPII-003",
-  company: $stefan_testing,
+  company: $stefan_testing
 )
 
 create_user(
@@ -47,7 +47,7 @@ $steph_test_inspector = create_user(
   email: "inspector@play-test.co.uk",
   name: "Steph Inspector",
   rpii_number: "RPII-005",
-  company: $steph_test,
+  company: $steph_test
 )
 
 create_user(

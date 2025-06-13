@@ -116,7 +116,6 @@ RSpec.describe Unit, type: :model do
       end
     end
 
-
     describe "scopes" do
       describe "enhanced search" do
         it "searches across all relevant fields" do
@@ -143,7 +142,6 @@ RSpec.describe Unit, type: :model do
         expect(test_unit).to respond_to(:inspection_summary)
       end
 
-
       it "provides inspection summary" do
         summary = test_unit.inspection_summary
         expect(summary[:total_inspections]).to eq(0)
@@ -160,7 +158,6 @@ RSpec.describe Unit, type: :model do
       expect(unit.id).to match(/\A[A-Z0-9]{8}\z/)
     end
   end
-
 
   describe "#inspection_overdue?" do
     let(:unit) { create(:unit) }

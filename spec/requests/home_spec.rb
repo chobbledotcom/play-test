@@ -66,7 +66,6 @@ RSpec.describe "Home", type: :request do
         expect(page).to have_content("compliance tracking")
       end
 
-
       it "includes company branding" do
         visit root_path
         expect(page).to have_content(I18n.t("home.company_name"))

@@ -48,13 +48,12 @@ FactoryBot.define do
       association :unit, factory: [:unit, :with_unicode_serial]
     end
 
-
     trait :with_complete_assessments do
       # Dimensions needed for calculations
       width { 5.5 }
       length { 6.0 }
       height { 4.5 }
-      
+
       after(:create) do |inspection|
         # Update all assessments with complete data (assessments are already created by inspection callback)
         inspection.anchorage_assessment.update!(attributes_for(:anchorage_assessment, :complete).except(:inspection_id))
@@ -92,7 +91,7 @@ FactoryBot.define do
 
       # Risk assessment
       risk_assessment { "Low risk assessment notes" }
-      
+
       # Use the complete assessments trait
       with_complete_assessments
     end

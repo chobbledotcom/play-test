@@ -18,39 +18,39 @@ class PdfGeneratorService
       # Build label from i18n
       label = field_label(fields.first)
       parts = ["#{label}:"]
-      
+
       # Add field values
       fields.each_with_index do |field, i|
         value = @current_assessment.send(field)
-        
-        if field.to_s.end_with?('_pass')
-          parts << pass_fail(value)
+
+        parts << if field.to_s.end_with?("_pass")
+          pass_fail(value)
         else
-          parts << (unit && i == 0 ? "#{value}#{unit}" : value.to_s)
+          ((unit && i == 0) ? "#{value}#{unit}" : value.to_s)
         end
       end
-      
+
       # Add pass/fail if specified
       if pass
         pass_value = @current_assessment.send(pass)
         parts << "-" << pass_fail(pass_value)
       end
-      
+
       # Add comment if exists
-      comment_field = "#{(pass || fields.first).to_s.sub(/_pass$/, '')}_comment"
+      comment_field = "#{(pass || fields.first).to_s.sub(/_pass$/, "")}_comment"
       if @current_assessment.respond_to?(comment_field)
         comment = @current_assessment.send(comment_field)
         parts << "- #{comment}" if comment.present?
       end
-      
+
       @current_assessment_fields << parts.join(" ")
     end
-    
+
     # Get field label from forms namespace
     def field_label(field_name)
       I18n.t("forms.#{@current_assessment_type}.fields.#{field_name}")
     end
-    
+
     # Format pass/fail values consistently
     def pass_fail(value)
       value ? I18n.t("shared.pass") : I18n.t("shared.fail")
@@ -87,13 +87,13 @@ class PdfGeneratorService
         add :slide_wall_height, unit: "m"
         add :slide_first_metre_height, unit: "m"
         add :slide_beyond_first_metre_height, unit: "m"
-        
+
         add :slide_permanent_roof if @current_assessment.slide_permanent_roof.present?
-        
+
         # Pass/fail checks
         add :clamber_netting_pass
         add :slip_sheet_pass
-        
+
         # Measurement with pass/fail
         add :runout, unit: "m", pass: :runout_pass
       end
@@ -102,9 +102,9 @@ class PdfGeneratorService
     def generate_structure_section(pdf, inspection)
       generate_assessment_section(pdf, "structure", inspection.structure_assessment) do
         # Pass/fail checks
-        %i[seam_integrity_pass lock_stitch_pass air_loss_pass straight_walls_pass 
-           sharp_edges_pass unit_stable_pass evacuation_time_pass].each { |field| add field }
-        
+        %i[seam_integrity_pass lock_stitch_pass air_loss_pass straight_walls_pass
+          sharp_edges_pass unit_stable_pass evacuation_time_pass].each { |field| add field }
+
         # Measurements with pass/fail
         add :stitch_length, unit: "mm", pass: :stitch_length_pass
         add :blower_tube_length, unit: "m", pass: :blower_tube_length_pass
@@ -116,15 +116,15 @@ class PdfGeneratorService
       generate_assessment_section(pdf, "anchorage", inspection.anchorage_assessment) do
         # Anchor counts with combined label
         low = @current_assessment.num_low_anchors || "N/A"
-        high = @current_assessment.num_high_anchors || "N/A" 
+        high = @current_assessment.num_high_anchors || "N/A"
         text = "#{field_label(:num_anchors_pass)}: Low: #{low}, High: #{high}"
         pass_value = @current_assessment.num_anchors_pass
         text += " - #{pass_fail(pass_value)}" unless pass_value.nil?
         @current_assessment_fields << text
-        
+
         # Pass/fail checks
-        %i[anchor_type_pass pull_strength_pass anchor_degree_pass 
-           anchor_accessories_pass].each { |field| add field }
+        %i[anchor_type_pass pull_strength_pass anchor_degree_pass
+          anchor_accessories_pass].each { |field| add field }
       end
     end
 
@@ -132,7 +132,7 @@ class PdfGeneratorService
       generate_assessment_section(pdf, "enclosed", inspection.enclosed_assessment) do
         # Exit number with pass/fail
         add :exit_number, pass: :exit_number_pass
-        
+
         # Pass/fail checks
         add :exit_sign_always_visible_pass
       end
@@ -142,7 +142,7 @@ class PdfGeneratorService
       generate_assessment_section(pdf, "materials", inspection.materials_assessment) do
         # Pass/fail checks
         %i[fabric_strength_pass fire_retardant_pass thread_pass].each { |field| add field }
-        
+
         # Rope size with pass/fail
         add :ropes, unit: "mm", pass: :ropes_pass
       end
@@ -152,7 +152,7 @@ class PdfGeneratorService
       generate_assessment_section(pdf, "fan", inspection.fan_assessment) do
         # Pass/fail checks
         %i[blower_flap_pass blower_finger_pass pat_pass blower_visual_pass].each { |field| add field }
-        
+
         # Optional text fields
         add :blower_serial if @current_assessment.blower_serial.present?
         add :fan_size_type if @current_assessment.fan_size_type.present?
@@ -173,7 +173,7 @@ class PdfGeneratorService
         @current_assessment_type = assessment_type
         @current_assessment = assessment
         @current_assessment_fields = []
-        
+
         # Execute the block
         yield
 

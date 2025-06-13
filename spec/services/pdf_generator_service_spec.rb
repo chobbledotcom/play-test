@@ -2,7 +2,6 @@ require "rails_helper"
 require "pdf/inspector"
 
 RSpec.describe PdfGeneratorService, pdf: true do
-  
   # Test I18n integration
   around do |example|
     I18n.with_locale(:en) do
@@ -29,10 +28,9 @@ RSpec.describe PdfGeneratorService, pdf: true do
       # Check that I18n translations are used
       expect_pdf_to_include_i18n_keys(pdf_text,
         "pdf.inspection.title",
-        "pdf.inspection.equipment_details", 
+        "pdf.inspection.equipment_details",
         "pdf.inspection.assessments_section",
-        "shared.comments"
-      )
+        "shared.comments")
     end
 
     it "handles different inspection statuses with I18n" do
@@ -121,11 +119,10 @@ RSpec.describe PdfGeneratorService, pdf: true do
         expect_pdf_to_include_i18n_keys(pdf_text,
           "pdf.unit.inspection_history",
           "pdf.unit.fields.date",
-          "pdf.unit.fields.inspector", 
+          "pdf.unit.fields.inspector",
           "pdf.unit.fields.result",
           "shared.pass",
-          "shared.fail"
-        )
+          "shared.fail")
       end
     end
 
@@ -252,7 +249,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
     context "without assessments" do
       let(:empty_inspection) { create(:inspection, user: user, unit: unit, has_slide: true, is_totally_enclosed: true) }
-      
+
       it "shows no assessment data messages" do
         pdf = PdfGeneratorService.generate_inspection_report(empty_inspection)
         pdf_text = pdf_text_content(pdf.render)

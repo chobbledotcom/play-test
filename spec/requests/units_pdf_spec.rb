@@ -71,7 +71,7 @@ RSpec.describe "Units PDF Generation", type: :request do
   describe "PDF download integration" do
     it "allows downloading PDF through direct link" do
       # Visit the report URL directly
-      pdf_data = get_pdf("/units/#{unit.id}.pdf")
+      get_pdf("/units/#{unit.id}.pdf")
     end
 
     it "sets proper filename for PDF download" do

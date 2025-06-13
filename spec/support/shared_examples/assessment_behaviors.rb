@@ -10,13 +10,13 @@ RSpec.shared_examples "an assessment model" do
   describe "audit logging" do
     it "logs assessment updates when changes are made" do
       # Find a changeable field
-      changeable_field = assessment.class.column_names.find { |col| 
-        (col.end_with?("_comment") || col.end_with?("_pass")) && assessment.respond_to?("#{col}=")
+      changeable_field = assessment.class.column_names.find { |col|
+        col.end_with?("_comment", "_pass") && assessment.respond_to?("#{col}=")
       }
-      
+
       if changeable_field
         expect(assessment).to receive(:log_assessment_update)
-        test_value = changeable_field.end_with?("_pass") ? true : "new value"
+        test_value = changeable_field.end_with?("_pass") || "new value"
         assessment.update!(changeable_field => test_value)
       else
         pending "No changeable field found for audit logging test"
@@ -122,7 +122,7 @@ RSpec.shared_examples "validates comment field" do |field|
   it "allows blank #{field}" do
     assessment.send("#{field}=", nil)
     expect(assessment).to be_valid
-    
+
     assessment.send("#{field}=", "")
     expect(assessment).to be_valid
   end
@@ -148,12 +148,12 @@ RSpec.shared_examples "has safety check methods" do
       assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
         assessment.send("#{check}=", true) if assessment.respond_to?("#{check}=")
       end
-      
+
       # Count how many we actually set
-      actual_checks = assessment.class.column_names.count { |col| 
+      actual_checks = assessment.class.column_names.count { |col|
         col.end_with?("_pass") && assessment.respond_to?(col)
       }
-      
+
       expect(assessment.passed_checks_count).to eq(actual_checks)
     end
 
@@ -162,7 +162,7 @@ RSpec.shared_examples "has safety check methods" do
       assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
         assessment.send("#{check}=", false) if assessment.respond_to?("#{check}=")
       end
-      
+
       expect(assessment.passed_checks_count).to eq(0)
     end
   end

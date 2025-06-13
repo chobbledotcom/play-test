@@ -45,7 +45,6 @@ class Assessments::StructureAssessment < ApplicationRecord
     CRITICAL_CHECKS.any? { |check| send(check) == false }
   end
 
-
   def completion_percentage
     all_assessable_fields = CRITICAL_CHECKS + REQUIRED_MEASUREMENTS + MEASUREMENT_CHECKS
     total_fields = all_assessable_fields.length

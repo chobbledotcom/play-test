@@ -1,7 +1,7 @@
 class Assessments::FanAssessment < ApplicationRecord
   include AssessmentLogging
   include SafetyCheckMethods
-  
+
   belongs_to :inspection
 
   validates :inspection_id, presence: true, uniqueness: true
@@ -14,7 +14,6 @@ class Assessments::FanAssessment < ApplicationRecord
     validates check.to_sym, inclusion: {in: [true, false]}, allow_nil: true
   end
 
-
   def complete?
     safety_checks_assessed? && specifications_present?
   end
@@ -22,7 +21,6 @@ class Assessments::FanAssessment < ApplicationRecord
   def has_critical_failures?
     SAFETY_CHECKS.any? { |check| send(check) == false }
   end
-
 
   def completion_percentage
     total_fields = 6 # 4 safety checks + serial + type
@@ -50,5 +48,4 @@ class Assessments::FanAssessment < ApplicationRecord
   def specifications_present?
     blower_serial.present? && fan_size_type.present?
   end
-
 end

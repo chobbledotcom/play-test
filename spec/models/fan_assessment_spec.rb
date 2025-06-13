@@ -9,7 +9,7 @@ RSpec.describe Assessments::FanAssessment, type: :model do
   # Use shared examples for common behaviors
   it_behaves_like "an assessment model"
   it_behaves_like "has safety check methods"
-  
+
   describe "constants" do
     describe "SAFETY_CHECKS" do
       it "contains all safety check field names" do
@@ -192,7 +192,8 @@ RSpec.describe Assessments::FanAssessment, type: :model do
         pat_comment: "PAT test passed",
         blower_visual_pass: true,
         blower_visual_comment: "Good visual condition",
-        blower_serial: "BL789456")
+        blower_serial: "BL789456"
+      )
 
       expect(assessment.fan_size_type).to eq("2HP centrifugal blower")
       expect(assessment.blower_serial).to eq("BL789456")

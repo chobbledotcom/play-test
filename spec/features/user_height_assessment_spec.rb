@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.feature "User Height Assessment", type: :feature do
-  
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user) }
   let(:inspection) { create(:inspection, user: user, unit: unit) }
@@ -101,14 +100,14 @@ RSpec.feature "User Height Assessment", type: :feature do
       fill_in_form :tallest_user_height, :containing_wall_height, "-1"
 
       click_button I18n.t("inspections.buttons.save_assessment")
-      
+
       # The form should re-render with errors
       expect(page.status_code).to eq(422)
-      
+
       # Should show error messages
       expect(page).to have_css(".form-errors")
       expect(page).to have_content("Containing wall height must be greater than or equal to 0")
-      
+
       # The validation should have failed
       assessment = inspection.user_height_assessment.reload
       expect(assessment.containing_wall_height).not_to eq(-1)
@@ -117,7 +116,7 @@ RSpec.feature "User Height Assessment", type: :feature do
 
   describe "viewing assessment status" do
     let(:inspection_with_data) { create(:inspection, :with_complete_assessments, user: user, unit: unit) }
-    
+
     before do
       visit edit_inspection_path(inspection_with_data, tab: "user_height")
     end
@@ -130,7 +129,7 @@ RSpec.feature "User Height Assessment", type: :feature do
 
     it "shows pass/fail status for height requirement" do
       expect(page).to have_css(".assessment-status")
-      
+
       within(".assessment-status") do
         # With factory data: containing_wall_height: 1.2, tallest_user_height: 1.8
         # This should fail since wall height < user height

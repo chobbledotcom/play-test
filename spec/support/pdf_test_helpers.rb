@@ -75,7 +75,7 @@ module PdfTestHelpers
       when "user_height" then "tallest_user_height"
       else type
       end
-      
+
       title = I18n.t("forms.#{form_type}.header")
       expect(pdf_text).to include(I18n.t("pdf.inspection.no_assessment_data", assessment_type: title))
     end

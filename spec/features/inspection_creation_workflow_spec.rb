@@ -21,5 +21,4 @@ RSpec.feature "Inspection Creation Workflow", type: :feature do
     expect(created_inspection).to be_present
     expect(current_url).to include(edit_inspection_path(created_inspection))
   end
-
 end

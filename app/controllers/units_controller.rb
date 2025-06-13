@@ -153,7 +153,6 @@ class UnitsController < ApplicationController
     end
   end
 
-
   def send_unit_pdf
     pdf_data = PdfGeneratorService.generate_unit_report(@unit)
 

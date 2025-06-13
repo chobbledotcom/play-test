@@ -63,7 +63,6 @@ class Inspection < ApplicationRecord
   validates :trough_adjacent_panel_width,
     numericality: {greater_than_or_equal_to: 0}, allow_blank: true
 
-
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
   before_save :auto_determine_pass_fail, if: :all_assessments_complete?
@@ -302,7 +301,6 @@ class Inspection < ApplicationRecord
     base_assessments << enclosed_assessment if is_totally_enclosed?
     base_assessments
   end
-
 
   def auto_determine_pass_fail
     self.passed = all_safety_checks_pass?

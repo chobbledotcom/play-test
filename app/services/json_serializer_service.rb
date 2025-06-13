@@ -66,26 +66,26 @@ class JsonSerializerService
 
   def self.serialize_inspection(inspection)
     return nil unless inspection
-    
+
     # Use reflection to get all columns except excluded ones
     inspection_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
-    
+
     data = {}
     inspection_fields.each do |field|
       value = inspection.send(field)
       data[field.to_sym] = format_value(value) unless value.nil?
     end
-    
+
     # Add computed fields
     data[:complete] = inspection.complete?
     data[:passed] = inspection.passed? if inspection.complete?
-    
+
     # Add inspector info
     data[:inspector] = {
       name: inspection.user.name,
       rpii_inspector_number: inspection.user.rpii_inspector_number
     }
-    
+
     # Add URLs
     base_url = ENV["BASE_URL"] || Rails.application.routes.default_url_options[:host] || "localhost:3000"
     data[:urls] = {
@@ -100,7 +100,7 @@ class JsonSerializerService
         name: inspection.unit.name,
         serial: inspection.unit.serial,
         manufacturer: inspection.unit.manufacturer,
-        owner: inspection.unit.owner,
+        owner: inspection.unit.owner
       }
     end
 
@@ -109,8 +109,8 @@ class JsonSerializerService
     ASSESSMENT_TYPES.each do |name, klass|
       assessment = inspection.send(name)
       if !assessment ||
-        (name == :slide_assessment && !inspection.has_slide?) ||
-        (name == :enclosed_assessment && !inspection.is_totally_enclosed?)
+          (name == :slide_assessment && !inspection.has_slide?) ||
+          (name == :enclosed_assessment && !inspection.is_totally_enclosed?)
         next
       else
         assessments[name] = serialize_assessment(assessment, klass)

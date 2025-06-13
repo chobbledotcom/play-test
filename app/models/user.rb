@@ -128,7 +128,6 @@ class User < ApplicationRecord
     self.email = email.downcase
   end
 
-
   def set_inactive_on_signup
     # Set active_until to yesterday so user is inactive by default
     # Admin will need to extend this date for user to become active
