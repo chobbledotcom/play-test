@@ -28,6 +28,72 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Database locking**: If tests fail with "database is locked", just inform the user and wait for them to confirm it's unlocked
 - **NEVER paste code into Rails console** - it never works. Instead write very specific RSpec tests
 
+## Test Helper Scripts
+
+### Finding Test Failures (`bin/rspec-find`)
+
+- **Purpose**: Quickly identify the first failing test with detailed information
+- **Usage**: `bin/rspec-find [options] [rspec_args]`
+- **Options**:
+  - `-h, --help`: Show help message
+- **Examples**:
+  ```bash
+  bin/rspec-find                      # Run all tests
+  bin/rspec-find spec/models/         # Run only model specs
+  bin/rspec-find spec/features/       # Run only feature specs
+  bin/rspec-find spec/models/user_spec.rb  # Run specific file
+  ```
+- **Output**: 
+  - File path, line number, and test description
+  - Full error message and backtrace
+  - Complete test method code (with line numbers)
+  - Copy-pasteable examples for using `rspec-replace`
+- **Features**:
+  - Runs `rspec --fail-fast` to stop at first failure
+  - Shows progress dots while running
+  - Parses JSON output for accurate failure details
+  - Extracts test method boundaries automatically
+  - Clear success message when all tests pass
+
+### Replacing Test Code (`bin/rspec-replace`)
+
+- **Purpose**: Test replacements for broken tests without editing files
+- **Usage**: `bin/rspec-replace [options] FILE:LINE REPLACEMENT_CODE`
+- **Options**:
+  - `-w, --write`: Write changes to file if tests pass and line count is reasonable
+  - `-h, --help`: Show help message
+- **Examples**:
+  ```bash
+  # Single line replacement (test only)
+  bin/rspec-replace spec/models/user_spec.rb:42 'it "works" do; expect(true).to be true; end'
+  
+  # Multi-line replacement (test only)
+  bin/rspec-replace spec/models/user_spec.rb:42 'it "validates email format" do
+    user = build(:user, email: "invalid")
+    expect(user).not_to be_valid
+  end'
+  
+  # Automatically write changes if tests pass
+  bin/rspec-replace --write spec/models/user_spec.rb:42 'it "fixed test" do
+    # Fixed implementation
+  end'
+  ```
+- **Features**:
+  - Automatically detects test boundaries (it/scenario/describe/context blocks)
+  - Preserves proper indentation
+  - Runs the modified test without changing the actual file
+  - Shows original file paths in error messages
+  - **Auto-write safety**: With `--write`, only writes if:
+    - Tests pass
+    - Line count doesn't change by more than 10 lines
+  - Shows line count changes and suggestions
+- **Workflow**:
+  1. Run `bin/rspec-find` to identify failing test
+  2. Use `bin/rspec-replace` to test fixes
+  3. Once working, either:
+     - Add `--write` to auto-apply the fix
+     - Manually apply the fix to the file
+
 ## Core Development Principles
 
 ### Internationalization (i18n) - ALWAYS
@@ -294,6 +360,7 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 - **Update old code** - don't support legacy patterns, refactor to new standards
 - **Use modern Ruby syntax** - leverage Ruby 3.0+ features for cleaner, more expressive code
 - **Prioritise readability** - choose the newest, tidiest syntax that improves code clarity
+- **Prefer to crash than quietly fail** - raise exceptions for error conditions, don't return false/nil
 - Fix the root cause, not the symptom
 - Explicit is better than implicit
 

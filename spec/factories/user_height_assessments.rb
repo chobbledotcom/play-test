@@ -32,6 +32,12 @@ FactoryBot.define do
       play_area_width_comment { "Width adequate for user count" }
       negative_adjustment_comment { "No negative adjustments required" }
       permanent_roof_comment { "Roof structure appropriate" }
+      # Pass/fail fields required for complete? to return true
+      height_requirements_pass { true }
+      permanent_roof_pass { true }
+      user_capacity_pass { true }
+      play_area_pass { true }
+      negative_adjustments_pass { true }
     end
 
     trait :incomplete do

@@ -52,6 +52,13 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       # Mark as complete
       click_button I18n.t("inspections.buttons.mark_complete")
       
+      # Debug: Check for error messages
+      if current_path.include?("/edit")
+        puts "Still on edit page. Checking for error messages..."
+        puts "Page content: #{page.text}"
+        save_and_open_page if page.has_css?(".alert")
+      end
+      
       # The inspection should be marked as complete and redirected to show page
       expect(page).to have_current_path(inspection_path(inspection))
       

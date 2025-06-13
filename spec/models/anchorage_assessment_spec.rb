@@ -8,7 +8,7 @@ RSpec.describe Assessments::AnchorageAssessment, type: :model do
 
   # Use shared examples for common behaviors
   it_behaves_like "an assessment model"
-  it_behaves_like "has safety check methods", 5
+  it_behaves_like "has safety check methods"
   it_behaves_like "delegates to SafetyStandard", [:calculate_required_anchors]
 
   describe "validations" do

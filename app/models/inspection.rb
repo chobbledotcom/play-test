@@ -1,31 +1,31 @@
 class Inspection < ApplicationRecord
   include CustomIdGenerator
 
-  ASSESSMENT_TYPES = %i[
-    anchorage_assessment
-    enclosed_assessment
-    fan_assessment
-    materials_assessment
-    slide_assessment
-    structure_assessment
-    user_height_assessment
-  ].freeze
+  ASSESSMENT_TYPES = {
+    anchorage_assessment: Assessments::AnchorageAssessment,
+    enclosed_assessment: Assessments::EnclosedAssessment,
+    fan_assessment: Assessments::FanAssessment,
+    materials_assessment: Assessments::MaterialsAssessment,
+    slide_assessment: Assessments::SlideAssessment,
+    structure_assessment: Assessments::StructureAssessment,
+    user_height_assessment: Assessments::UserHeightAssessment
+  }.freeze
 
   belongs_to :user
   belongs_to :unit, optional: true
   belongs_to :inspector_company, optional: true
 
   # Assessment associations (normalized from single table)
-  ASSESSMENT_TYPES.each do |assessment|
-    has_one assessment,
-      class_name: "Assessments::#{assessment.to_s.classify}",
+  ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
+    has_one assessment_name,
+      class_name: assessment_class.name,
       dependent: :destroy
   end
 
   alias_method :tallest_user_height_assessment, :user_height_assessment
 
   # Accept nested attributes for all assessments
-  accepts_nested_attributes_for(*ASSESSMENT_TYPES)
+  accepts_nested_attributes_for(*ASSESSMENT_TYPES.keys)
 
   # Validations - allow drafts to be incomplete
   validates :inspection_location, presence: true, if: :complete?
@@ -217,7 +217,7 @@ class Inspection < ApplicationRecord
   end
 
   def pass_fail_summary
-    total_checks = total_safety_checks
+    total_checks = total_pass_columns
     return zero_summary if total_checks == 0
 
     passed_checks = passed_safety_checks

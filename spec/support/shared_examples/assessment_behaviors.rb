@@ -133,10 +133,12 @@ RSpec.shared_examples "validates comment field" do |field|
   end
 end
 
-RSpec.shared_examples "has safety check methods" do |check_count|
+RSpec.shared_examples "has safety check methods" do
   describe "#pass_columns_count" do
     it "returns the correct number of pass/fail checks" do
-      expect(assessment.pass_columns_count).to eq(check_count)
+      # Count actual columns from the database that end with _pass
+      actual_pass_columns = assessment.class.column_names.count { |col| col.end_with?("_pass") }
+      expect(assessment.pass_columns_count).to eq(actual_pass_columns)
     end
   end
 

@@ -8,7 +8,7 @@ RSpec.describe Assessments::MaterialsAssessment, type: :model do
 
   # Use shared examples for common behaviors
   it_behaves_like "an assessment model"
-  it_behaves_like "has safety check methods", 9  # 9 _pass columns in materials assessment
+  it_behaves_like "has safety check methods"
   it_behaves_like "delegates to SafetyStandard", [:valid_rope_diameter?]
 
   describe "constants" do
@@ -177,8 +177,8 @@ RSpec.describe Assessments::MaterialsAssessment, type: :model do
       assessment.retention_netting_pass = true
 
       issues = assessment.non_critical_issues
-      expect(issues).to include("Rope size pass")
-      expect(issues).to include("Clamber pass")
+      expect(issues).to include("Ropes pass")
+      expect(issues).to include("Clamber netting pass")
       expect(issues).not_to include("Retention netting pass")
     end
   end
@@ -243,7 +243,7 @@ RSpec.describe Assessments::MaterialsAssessment, type: :model do
       assessment.clamber_netting_pass = false  # non-critical
 
       expect(assessment.has_critical_failures?).to be true
-      expect(assessment.non_critical_issues).to include("Rope size pass", "Clamber pass")
+      expect(assessment.non_critical_issues).to include("Clamber netting pass", "Ropes pass")
     end
 
     it "handles decimal rope sizes" do

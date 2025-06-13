@@ -712,7 +712,7 @@ RSpec.describe Inspection, type: :model do
       let(:inspection) { create(:inspection) }
 
       it "returns zero summary when no safety checks" do
-        allow(inspection).to receive(:total_safety_checks).and_return(0)
+        allow(inspection).to receive(:total_pass_columns).and_return(0)
 
         summary = inspection.pass_fail_summary
         expect(summary[:total_checks]).to eq(0)
@@ -722,7 +722,7 @@ RSpec.describe Inspection, type: :model do
       end
 
       it "calculates pass/fail summary" do
-        allow(inspection).to receive(:total_safety_checks).and_return(10)
+        allow(inspection).to receive(:total_pass_columns).and_return(10)
         allow(inspection).to receive(:passed_safety_checks).and_return(8)
         allow(inspection).to receive(:failed_safety_checks).and_return(2)
 
@@ -865,14 +865,14 @@ RSpec.describe Inspection, type: :model do
       end
 
       describe "safety check counting methods" do
-        describe "#total_safety_checks" do
+        describe "#total_pass_columns" do
           it "counts safety checks from auto-created assessments" do
-            expect(inspection.send(:total_safety_checks)).to be > 0
+            expect(inspection.send(:total_pass_columns)).to be > 0
           end
 
           it "sums safety checks from all assessments" do
-            assessment = double(safety_check_count: 5)
-            allow(assessment).to receive(:respond_to?).with(:safety_check_count).and_return(true)
+            assessment = double(pass_columns_count: 5)
+            allow(assessment).to receive(:respond_to?).with(:pass_columns_count).and_return(true)
             allow(assessment).to receive(:respond_to?).with(:present?).and_return(true)
             allow(assessment).to receive(:respond_to?).with(:empty?).and_return(false)
             allow(assessment).to receive(:present?).and_return(true)
@@ -883,8 +883,9 @@ RSpec.describe Inspection, type: :model do
             allow(inspection).to receive(:anchorage_assessment).and_return(nil)
             allow(inspection).to receive(:materials_assessment).and_return(nil)
             allow(inspection).to receive(:fan_assessment).and_return(nil)
+            allow(inspection).to receive(:enclosed_assessment).and_return(nil)
 
-            expect(inspection.send(:total_safety_checks)).to eq(5)
+            expect(inspection.send(:total_pass_columns)).to eq(5)
           end
         end
 
@@ -906,6 +907,7 @@ RSpec.describe Inspection, type: :model do
             allow(inspection).to receive(:anchorage_assessment).and_return(nil)
             allow(inspection).to receive(:materials_assessment).and_return(nil)
             allow(inspection).to receive(:fan_assessment).and_return(nil)
+            allow(inspection).to receive(:enclosed_assessment).and_return(nil)
 
             expect(inspection.send(:passed_safety_checks)).to eq(4)
           end
@@ -913,7 +915,7 @@ RSpec.describe Inspection, type: :model do
 
         describe "#failed_safety_checks" do
           it "calculates failed checks as total minus passed" do
-            allow(inspection).to receive(:total_safety_checks).and_return(10)
+            allow(inspection).to receive(:total_pass_columns).and_return(10)
             allow(inspection).to receive(:passed_safety_checks).and_return(7)
             expect(inspection.send(:failed_safety_checks)).to eq(3)
           end

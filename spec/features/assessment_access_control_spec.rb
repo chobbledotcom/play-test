@@ -89,7 +89,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
     sign_in(user1)
     visit edit_inspection_path(inspection1, tab: "user_height")
     within ".user-height-assessment" do
-      fill_in "user_height_assessment[containing_wall_height]", with: "2.5"
+      fill_in I18n.t("forms.tallest_user_height.fields.containing_wall_height"), with: "2.5"
     end
     click_button I18n.t("inspections.buttons.save_assessment")
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
@@ -99,7 +99,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
     visit edit_inspection_path(inspection2, tab: "user_height")
 
     within ".user-height-assessment" do
-      wall_height_field = find_field("user_height_assessment[containing_wall_height]")
+      wall_height_field = find_field(I18n.t("forms.tallest_user_height.fields.containing_wall_height"))
       expect(wall_height_field.value).not_to eq("2.5")
     end
 

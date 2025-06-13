@@ -8,7 +8,7 @@ RSpec.describe Assessments::SlideAssessment, type: :model do
 
   # Use shared examples for common behaviors
   it_behaves_like "an assessment model"
-  it_behaves_like "has safety check methods", 3
+  it_behaves_like "has safety check methods"
   it_behaves_like "delegates to SafetyStandard", [:calculate_required_runout, :meets_runout_requirements?]
 
   describe "validations" do

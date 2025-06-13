@@ -96,17 +96,17 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
     context "with passed checks count" do
       before do
         allow(mock_assessment).to receive(:respond_to?) do |method|
-          [:passed_checks_count, :safety_check_count].include?(method)
+          [:passed_checks_count, :pass_columns_count].include?(method)
         end
         allow(mock_assessment).to receive(:passed_checks_count).and_return(5)
-        allow(mock_assessment).to receive(:safety_check_count).and_return(10)
+        allow(mock_assessment).to receive(:pass_columns_count).and_return(10)
       end
 
       it "displays checks passed count" do
         render_assessment_status
         
         expect(rendered).to include(I18n.t("forms.slide.status.checks_passed"))
-        expect(rendered).to include("5 / 10")
+        expect(rendered.gsub(/\s+/, ' ')).to include("5 / 10")
       end
     end
 
@@ -157,7 +157,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
         allow(mock_assessment).to receive(:meets_height_requirements?).and_return(true)
         allow(mock_assessment).to receive(:meets_runout_requirements?).and_return(false)
         allow(mock_assessment).to receive(:passed_checks_count).and_return(7)
-        allow(mock_assessment).to receive(:safety_check_count).and_return(10)
+        allow(mock_assessment).to receive(:pass_columns_count).and_return(10)
         allow(mock_assessment).to receive(:completion_percentage).and_return(90)
       end
 
@@ -168,7 +168,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
         expect(rendered).to include("<h4>")
         expect(rendered).to include("text-success")
         expect(rendered).to include("text-danger")
-        expect(rendered).to include("7 / 10")
+        expect(rendered.gsub(/\s+/, ' ')).to include("7 / 10")
         expect(rendered).to include("90%")
       end
     end

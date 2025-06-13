@@ -14,6 +14,7 @@ en:
         reinspection_date: "Reinspection Date"
         unique_report_number: "Internal ID"
         step_ramp_size: "Step/Ramp Size (mm)"
+        step_ramp_size_pass: "Step/Ramp Size Pass"
         critical_fall_off_height: "Critical Fall Off Height (m)"
         passed: "Passed"
         risk_assessment: "Risk Assessment"

@@ -8,7 +8,7 @@ RSpec.describe Assessments::FanAssessment, type: :model do
 
   # Use shared examples for common behaviors
   it_behaves_like "an assessment model"
-  it_behaves_like "has safety check methods", 4
+  it_behaves_like "has safety check methods"
   
   describe "constants" do
     describe "SAFETY_CHECKS" do

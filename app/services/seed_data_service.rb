@@ -7,11 +7,11 @@ class SeedDataService
   INSPECTION_DURATION_RANGE = 1..4
   HIGH_PASS_RATE = 0.95
   NORMAL_PASS_RATE = 0.85
-  
+
   # Stefan-variant owner names as per existing seeds
   STEFAN_OWNER_NAMES = [
     "Stefan's Bouncers",
-    "Steph's Castles", 
+    "Steph's Castles",
     "Steve's Inflatables",
     "Stefano's Party Hire",
     "Stef's Fun Factory",
@@ -26,7 +26,7 @@ class SeedDataService
 
   class << self
     def add_seeds_for_user(user)
-      return false if user.has_seed_data?
+      raise "User already has seed data" if user.has_seed_data?
 
       ActiveRecord::Base.transaction do
         Rails.logger.info I18n.t("seed_data.logging.starting_creation", user_id: user.id)
@@ -36,10 +36,6 @@ class SeedDataService
         Rails.logger.info I18n.t("seed_data.logging.creation_completed")
       end
       true
-    rescue => e
-      Rails.logger.error I18n.t("seed_data.logging.failed_to_create", error: e.message)
-      Rails.logger.error e.backtrace.join("\n")
-      false
     end
 
     def delete_seeds_for_user(user)
@@ -50,29 +46,26 @@ class SeedDataService
         user.units.seed_data.destroy_all
       end
       true
-    rescue => e
-      Rails.logger.error I18n.t("seed_data.logging.failed_to_delete", error: e.message)
-      false
     end
 
     private
 
     def ensure_castle_blobs_exist
       @castle_images = []
-      
+
       (1..CASTLE_IMAGE_COUNT).each do |i|
         filename = "castle-#{i}.jpg"
         filepath = Rails.root.join("app/assets/castles", filename)
-        
+
         next unless File.exist?(filepath)
-        
+
         # Read and cache the file content in memory
         @castle_images << {
           filename: filename,
           content: File.read(filepath, mode: "rb") # Read in binary mode for images
         }
       end
-      
+
       # If no castle images found, don't fail - just log
       Rails.logger.warn I18n.t("seed_data.logging.no_castle_images") if @castle_images.empty?
     end
@@ -80,14 +73,14 @@ class SeedDataService
     def create_seed_units_for_user(user)
       # Mix of unit types similar to existing seeds
       unit_configs = [
-        { name: "Medieval Castle Bouncer", manufacturer: "Airquee Manufacturing Ltd", width: 4.5, length: 4.5, height: 3.5 },
-        { name: "Giant Party Castle", manufacturer: "Bouncy Castle Boys", width: 9.0, length: 9.0, height: 4.5 },
-        { name: "Princess Castle with Slide", manufacturer: "Jump4Joy Inflatables", width: 5.5, length: 7.0, height: 4.0, has_slide: true },
-        { name: "Toddler Soft Play Centre", manufacturer: "Custom Inflatables UK", width: 6.0, length: 6.0, height: 2.5, is_totally_enclosed: true },
-        { name: "Assault Course Challenge", manufacturer: "Inflatable World Ltd", width: 3.0, length: 12.0, height: 3.5, has_slide: true },
-        { name: "Mega Slide Experience", manufacturer: "Airquee Manufacturing Ltd", width: 5.0, length: 15.0, height: 7.5, has_slide: true },
-        { name: "Gladiator Duel Platform", manufacturer: "Happy Hop Europe", width: 6.0, length: 6.0, height: 1.5 },
-        { name: "Double Bungee Run", manufacturer: "Party Castle Manufacturers", width: 4.0, length: 10.0, height: 2.5 }
+        {name: "Medieval Castle Bouncer", manufacturer: "Airquee Manufacturing Ltd", width: 4.5, length: 4.5, height: 3.5},
+        {name: "Giant Party Castle", manufacturer: "Bouncy Castle Boys", width: 9.0, length: 9.0, height: 4.5},
+        {name: "Princess Castle with Slide", manufacturer: "Jump4Joy Inflatables", width: 5.5, length: 7.0, height: 4.0, has_slide: true},
+        {name: "Toddler Soft Play Centre", manufacturer: "Custom Inflatables UK", width: 6.0, length: 6.0, height: 2.5, is_totally_enclosed: true},
+        {name: "Assault Course Challenge", manufacturer: "Inflatable World Ltd", width: 3.0, length: 12.0, height: 3.5, has_slide: true},
+        {name: "Mega Slide Experience", manufacturer: "Airquee Manufacturing Ltd", width: 5.0, length: 15.0, height: 7.5, has_slide: true},
+        {name: "Gladiator Duel Platform", manufacturer: "Happy Hop Europe", width: 6.0, length: 6.0, height: 1.5},
+        {name: "Double Bungee Run", manufacturer: "Party Castle Manufacturers", width: 4.0, length: 10.0, height: 2.5}
       ]
 
       UNIT_COUNT.times do |i|
@@ -109,7 +102,7 @@ class SeedDataService
         owner: STEFAN_OWNER_NAMES.sample,
         is_seed: true
       )
-      
+
       # Attach random castle image if available
       # For test environment, skip images as castle files don't exist
       if @castle_images.any? && !Rails.env.test?
@@ -121,7 +114,7 @@ class SeedDataService
           content_type: "image/jpeg"
         )
       end
-      
+
       unit
     end
 
@@ -146,33 +139,33 @@ class SeedDataService
 
     def create_inspections_for_unit(unit, user, config, has_incomplete_recent: false)
       offset_days = rand(INSPECTION_OFFSET_RANGE)
-      
+
       INSPECTION_COUNT.times do |i|
         create_single_inspection(unit, user, config, offset_days, i, has_incomplete_recent)
       end
     end
-    
+
     def create_single_inspection(unit, user, config, offset_days, index, has_incomplete_recent)
       inspection_date = calculate_inspection_date(offset_days, index)
       passed = determine_pass_status(index)
       is_complete = !(index == 0 && has_incomplete_recent)
-      
+
       inspection = user.inspections.create!(
         build_inspection_attributes(unit, user, config, inspection_date, passed, is_complete)
       )
-      
+
       create_assessments_for_inspection(inspection, unit, config, passed: passed)
     end
-    
+
     def calculate_inspection_date(offset_days, index)
       days_ago = offset_days + (index * INSPECTION_INTERVAL_DAYS)
       Date.current - days_ago.days
     end
-    
+
     def determine_pass_status(index)
-      index == 0 ? (rand < HIGH_PASS_RATE) : (rand < NORMAL_PASS_RATE)
+      (index == 0) ? (rand < HIGH_PASS_RATE) : (rand < NORMAL_PASS_RATE)
     end
-    
+
     def build_inspection_attributes(unit, user, config, inspection_date, passed, is_complete)
       {
         unit: unit,
@@ -271,18 +264,18 @@ class SeedDataService
 
     def create_materials_assessment(inspection, unit, passed)
       inspection.materials_assessment.update!(
-        rope_size: rand(18..45),
-        rope_size_pass: passed,
-        clamber_pass: passed,
+        ropes: rand(18..45),
+        ropes_pass: passed,
+        clamber_netting_pass: passed,
         retention_netting_pass: passed,
         zips_pass: passed,
         windows_pass: passed,
         artwork_pass: passed,
         thread_pass: passed,
-        fabric_pass: passed,
+        fabric_strength_pass: passed,
         fire_retardant_pass: passed,
-        rope_size_comment: passed ? nil : "Rope shows signs of wear",
-        fabric_comment: passed ? "Fabric in good condition" : "Minor surface wear noted"
+        ropes_comment: passed ? nil : "Rope shows signs of wear",
+        thread_comment: passed ? "Thread in good condition" : "Minor thread wear noted"
       )
     end
 
@@ -304,7 +297,7 @@ class SeedDataService
     def create_user_height_assessment(inspection, unit, passed)
       play_area_length = inspection.length * 0.8
       play_area_width = inspection.width * 0.8
-      
+
       inspection.user_height_assessment.update!(
         containing_wall_height: rand(1.0..2.0).round(1),
         platform_height: rand(0.5..1.5).round(1),
@@ -348,10 +341,11 @@ class SeedDataService
       inspection.enclosed_assessment.update!(
         exit_number: rand(1..3),
         exit_number_pass: passed,
-        exit_visible_pass: passed,
+        exit_sign_always_visible_pass: passed,
         exit_sign_visible_pass: passed,
         exit_number_comment: passed ? "Number of exits compliant with unit size" : "Additional exit required",
-        exit_visible_comment: passed ? "All exits clearly marked with illuminated signage" : "Exit signage needs improvement - not clearly visible"
+        exit_sign_always_visible_comment: passed ? "Exit signs visible from all points" : "Exit signs obscured from some angles",
+        exit_sign_visible_comment: passed ? "All exits clearly marked with illuminated signage" : "Exit signage needs improvement - not clearly visible"
       )
     end
   end

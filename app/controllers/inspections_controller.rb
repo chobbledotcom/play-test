@@ -174,7 +174,7 @@ class InspectionsController < ApplicationController
   end
 
   def add_assessment_params(base_params)
-    Inspection::ASSESSMENT_TYPES.each do |ass_type|
+    Inspection::ASSESSMENT_TYPES.each do |ass_type, _ass_class|
       ass_key = "#{ass_type}_attributes"
       next unless params[:inspection][ass_key].present?
 

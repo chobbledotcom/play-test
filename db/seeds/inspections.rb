@@ -55,18 +55,18 @@ end
 
 def create_materials_assessment(inspection, passed)
   inspection.materials_assessment.update!(
-    rope_size: rand(18..45),
-    rope_size_pass: passed,
-    clamber_pass: passed,
+    ropes: rand(18..45),
+    ropes_pass: passed,
+    clamber_netting_pass: passed,
     retention_netting_pass: passed,
     zips_pass: passed,
     windows_pass: passed,
     artwork_pass: passed,
     thread_pass: passed,
-    fabric_pass: passed,
+    fabric_strength_pass: passed,
     fire_retardant_pass: passed,
-    rope_size_comment: passed ? nil : "Rope shows signs of wear",
-    fabric_comment: passed ? "Fabric in good condition" : "Minor surface wear noted"
+    ropes_comment: passed ? nil : "Rope shows signs of wear",
+    fabric_strength_comment: passed ? "Fabric in good condition" : "Minor surface wear noted"
   )
 end
 
@@ -129,9 +129,11 @@ def create_enclosed_assessment(inspection, passed)
   inspection.enclosed_assessment.update!(
     exit_number: rand(1..3),
     exit_number_pass: passed,
-    exit_visible_pass: passed,
+    exit_sign_always_visible_pass: passed,
+    exit_sign_visible_pass: passed,
     exit_number_comment: passed ? "Number of exits compliant with unit size" : "Additional exit required",
-    exit_visible_comment: passed ? "All exits clearly marked with illuminated signage" : "Exit signage needs improvement - not clearly visible"
+    exit_sign_always_visible_comment: passed ? "Exit signs visible from all points" : "Exit signs obscured from some angles",
+    exit_sign_visible_comment: passed ? "All exits clearly marked with illuminated signage" : "Exit signage needs improvement - not clearly visible"
   )
 end
 
@@ -226,7 +228,7 @@ in_progress = Inspection.create!(
   is_totally_enclosed: false
 )
 
-AnchorageAssessment.create!(
+Assessments::AnchorageAssessment.create!(
   inspection: in_progress,
   num_low_anchors: 8,
   num_high_anchors: 0,

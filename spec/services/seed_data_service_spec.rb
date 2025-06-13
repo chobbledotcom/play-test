@@ -98,32 +98,39 @@ RSpec.describe SeedDataService do
 
       it "does not create any new data" do
         expect { described_class.add_seeds_for_user(user) }
-          .not_to change { user.units.count }
+          .to raise_error(RuntimeError, "User already has seed data")
         
-        expect { described_class.add_seeds_for_user(user) }
-          .not_to change { user.inspections.count }
+        # Verify counts didn't change
+        expect(user.units.count).to eq(1)
+        expect(user.inspections.count).to eq(0)
       end
 
-      it "returns false" do
-        expect(described_class.add_seeds_for_user(user)).to be false
+      it "raises an error" do
+        expect { described_class.add_seeds_for_user(user) }
+          .to raise_error(RuntimeError, "User already has seed data")
       end
     end
 
     context "when creation fails" do
       before do
-        allow_any_instance_of(Unit).to receive(:save!).and_raise(ActiveRecord::RecordInvalid)
+        allow_any_instance_of(Unit).to receive(:save!).and_raise(ActiveRecord::RecordInvalid.new)
       end
 
       it "rolls back all changes" do
-        expect { described_class.add_seeds_for_user(user) }
-          .not_to change { user.units.count }
+        initial_unit_count = user.units.count
+        initial_inspection_count = user.inspections.count
         
         expect { described_class.add_seeds_for_user(user) }
-          .not_to change { user.inspections.count }
+          .to raise_error(ActiveRecord::RecordInvalid)
+        
+        # Verify rollback occurred
+        expect(user.units.count).to eq(initial_unit_count)
+        expect(user.inspections.count).to eq(initial_inspection_count)
       end
 
-      it "returns false" do
-        expect(described_class.add_seeds_for_user(user)).to be false
+      it "raises an error" do
+        expect { described_class.add_seeds_for_user(user) }
+          .to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end
@@ -182,8 +189,9 @@ RSpec.describe SeedDataService do
         allow_any_instance_of(ActiveRecord::Relation).to receive(:destroy_all).and_raise(StandardError)
       end
 
-      it "returns false" do
-        expect(described_class.delete_seeds_for_user(user)).to be false
+      it "raises an error" do
+        expect { described_class.delete_seeds_for_user(user) }
+          .to raise_error(StandardError)
       end
     end
   end

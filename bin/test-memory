@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Run tests with in-memory SQLite database using bin/test
+
+echo "🧠 Running tests with in-memory database..."
+echo "This prevents database locking issues but doesn't support parallel tests."
+echo ""
+
+# Set environment variable and run bin/test with all arguments passed through
+IN_MEMORY_DB=true bin/test "$@"

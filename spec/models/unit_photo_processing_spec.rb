@@ -21,8 +21,6 @@ RSpec.describe "Unit Photo Processing", type: :model do
 
       # Check that the file has been processed (not the original)
       image = PdfGeneratorService::ImageProcessor.create_image(unit.photo)
-      puts "Processed image dimensions: #{image.width}x#{image.height}"
-      puts "File size: #{unit.photo.blob.byte_size} bytes"
 
       # The large test image was 1600x1200, should be processed to fit within 1200px
       expect([image.width, image.height].max).to be <= ImageProcessorService::FULL_SIZE

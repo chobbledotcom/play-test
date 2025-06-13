@@ -1,0 +1,236 @@
+#!/usr/bin/env ruby
+
+require 'open3'
+require 'json'
+require 'optparse'
+
+# Parse command line options
+options = {}
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: rspec-find [options] [rspec_args]"
+  
+  opts.separator ""
+  opts.separator "Find the first failing test and show how to fix it"
+  opts.separator ""
+  opts.separator "Examples:"
+  opts.separator "  rspec-find                    # Run all tests"
+  opts.separator "  rspec-find spec/models/       # Run model tests only"
+  opts.separator "  rspec-find spec/features/     # Run feature tests only"
+  opts.separator ""
+  opts.separator "Options:"
+  
+  opts.on("-h", "--help", "Show this help message") do
+    puts opts
+    exit
+  end
+end
+
+begin
+  parser.parse!
+rescue OptionParser::InvalidOption => e
+  # Pass unknown options through to rspec
+  ARGV.unshift(e.args.first)
+end
+
+# Get any additional arguments passed to the script
+additional_args = ARGV.join(' ')
+
+# Build the rspec command - use rspec-quicker for parallel execution with fail-fast
+# rspec-quicker already includes bundle exec, in-memory DB, and parallel execution
+rspec_command = "bin/rspec-quicker --format json"
+rspec_command += " #{additional_args}" unless additional_args.empty?
+
+# Run rspec with parallel execution and fail-fast
+puts "⚡ Running tests in parallel with fail-fast..."
+puts "Using in-memory database (no locking issues)..."
+puts " --- "
+
+# Show progress by using popen3 instead of capture3
+stdout_data = ""
+stderr_data = ""
+
+Open3.popen3(rspec_command) do |stdin, stdout, stderr, wait_thr|
+  stdin.close
+  
+  # Read both stdout and stderr
+  threads = []
+  test_count = 0
+  threads << Thread.new do
+    while line = stdout.gets
+      stdout_data << line
+      # Show progress dots only for actual test execution
+      if line.include?('"status":') && (line.include?('"passed"') || line.include?('"failed"') || line.include?('"pending"'))
+        test_count += 1
+        print "."
+        STDOUT.flush
+        if test_count % 50 == 0
+          print " [#{test_count}]\n"
+          STDOUT.flush
+        end
+      end
+    end
+  end
+  
+  threads << Thread.new do
+    while line = stderr.gets
+      stderr_data << line
+    end
+  end
+  
+  threads.each(&:join)
+  status = wait_thr.value
+end
+
+puts "\n" # New line after dots
+
+# Parse the JSON output
+# The stdout might have some non-JSON content before and after the actual JSON
+# Find the JSON by looking for the pattern
+json_match = stdout_data.match(/\{"version".*?"summary_line".*?\}/m)
+if json_match.nil?
+  puts "Error: No JSON found in RSpec output"
+  puts "Raw output (first 1000 chars):"
+  puts stdout_data[0..1000]
+  puts "\nStderr:"
+  puts stderr_data
+  exit 1
+end
+
+begin
+  json_content = json_match[0]
+  results = JSON.parse(json_content)
+rescue JSON::ParserError => e
+  puts "Error parsing RSpec JSON output: #{e.message}"
+  puts "Attempted to parse (first 500 chars):"
+  puts json_content[0..500] + "..."
+  exit 1
+end
+
+# Extract summary information
+summary = results['summary']
+example_count = summary['example_count']
+failure_count = summary['failure_count']
+pending_count = summary['pending_count']
+duration = summary['duration']
+
+# Display test summary
+puts "\n📊 TEST SUMMARY:"
+puts " --- "
+puts "Total tests:    #{example_count}"
+puts "Passed:         #{example_count - failure_count - pending_count} ✅"
+puts "Failed:         #{failure_count} ❌"
+puts "Pending:        #{pending_count} ⏸️" if pending_count > 0
+puts "Duration:       #{duration.round(2)} seconds"
+puts " --- "
+
+# Check if there were any failures
+if failure_count == 0
+  puts "\n✅ ALL TESTS PASSED! No failures found."
+  
+  # If arguments were provided, warn that there might be failures elsewhere
+  if !additional_args.empty?
+    puts ""
+    puts "⚠️  NOTE: You ran tests with specific arguments:"
+    puts "   #{additional_args}"
+    puts ""
+    puts "   There might be failures in other parts of the test suite."
+    puts "   Run 'bin/rspec-find' without arguments to check all tests."
+  end
+  
+  puts " --- "
+  exit 0
+end
+
+# Find the first failure
+failure = results['examples'].find { |ex| ex['status'] == 'failed' }
+
+if failure.nil?
+  puts "\n❓ No failure details found despite failure count > 0"
+  exit 1
+end
+
+# Extract failure details
+file_path = failure['file_path']
+line_number = failure['line_number']
+full_description = failure['full_description']
+exception = failure['exception']
+error_message = exception['message'] if exception
+backtrace = exception['backtrace'] if exception
+
+# Try to find the test method details
+puts "\n❌ FAILURE FOUND:"
+puts " --- "
+puts "File: #{file_path}"
+puts "Line: #{line_number}"
+puts "Test: #{full_description}"
+puts "\nError:"
+puts error_message
+puts "\nBacktrace (first 5 lines):"
+puts backtrace[0..4].join("\n") if backtrace
+
+# Read the file to find the test method
+if File.exist?(file_path)
+  lines = File.readlines(file_path)
+  
+  # Find the test method boundaries
+  start_line = nil
+  end_line = nil
+  indent_level = nil
+  
+  # Start from the failure line and work backwards to find the beginning
+  (line_number - 1).downto(0) do |i|
+    line = lines[i]
+    if line =~ /^\s*(it|scenario|specify|example)\s+['"]/ || line =~ /^\s*(it|scenario|specify|example)\s+do/
+      start_line = i + 1
+      indent_level = line[/^\s*/].length
+      break
+    end
+  end
+  
+  # Find the end of the test
+  if start_line && indent_level
+    lines.each_with_index do |line, i|
+      next if i < start_line
+      
+      # Check if we've reached an 'end' at the same indent level
+      if line =~ /^\s{#{indent_level}}end\s*$/
+        end_line = i + 1
+        break
+      end
+    end
+  end
+  
+  if start_line && end_line
+    puts "\nTest method (lines #{start_line}-#{end_line}):"
+    puts "-" * 80
+    puts lines[(start_line-1)..(end_line-1)].join
+    puts "-" * 80
+  end
+end
+
+# Provide rspec-replace instructions
+puts "\n📝 TO FIX THIS TEST WITH rspec-replace:"
+puts " --- "
+puts "1. First, run the specific test to see the full error:"
+puts "   bin/rspec-quicker #{file_path}:#{line_number}"
+puts ""
+puts "2. Then use rspec-replace to test a replacement:"
+puts "   bin/rspec-replace #{file_path}:#{line_number} 'your replacement test code'"
+puts ""
+puts "3. Example single-line replacement:"
+puts "   bin/rspec-replace #{file_path}:#{line_number} 'it \"works correctly\" do; expect(true).to be true; end'"
+puts ""
+puts "4. Example multi-line replacement:"
+puts "   bin/rspec-replace #{file_path}:#{line_number} 'it \"works correctly\" do"
+puts "     user = create(:user)"
+puts "     expect(user).to be_valid"
+puts "   end'"
+puts ""
+puts "5. The tool will automatically find and replace the entire test at that line."
+puts ""
+puts "💡 TIPS:"
+puts "   - rspec-replace automatically detects test boundaries"
+puts "   - Use single quotes to avoid shell interpolation issues"
+puts "   - For help: bin/rspec-replace --help"
+puts "   - For help: bin/rspec-find --help"
+puts " --- "

@@ -364,7 +364,9 @@ RSpec.describe NtfyService do
 
         mock_request = instance_double(Net::HTTP::Post)
         expect(Net::HTTP::Post).to receive(:new).with("/#{channel}").and_return(mock_request)
-        expect(mock_request).to receive(:[]=).exactly(3).times
+        expect(mock_request).to receive(:[]=).with("Title", "play-test notification")
+        expect(mock_request).to receive(:[]=).with("Priority", "high")
+        expect(mock_request).to receive(:[]=).with("Tags", "warning")
         expect(mock_request).to receive(:body=).with(test_message)
         expect(mock_http).to receive(:request).with(mock_request)
 

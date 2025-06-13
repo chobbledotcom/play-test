@@ -183,7 +183,7 @@ RSpec.describe JsonSerializerService do
 
         # Get expected fields
         excluded = PublicFieldFiltering::EXCLUDED_FIELDS
-        expected_fields = UserHeightAssessment.column_names - excluded
+        expected_fields = Assessments::UserHeightAssessment.column_names - excluded
 
         expected_fields.each do |field|
           value = inspection.user_height_assessment.send(field)
@@ -234,7 +234,7 @@ RSpec.describe JsonSerializerService do
       included_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Verify we're including the expected number of fields
-      expect(included_fields.count).to eq(25) # Inspections have 35 fields minus 10 excluded
+      expect(included_fields.count).to eq(27) # Inspections have 37 fields minus 10 excluded
 
       # Verify critical fields are included
       %w[inspection_date inspection_location passed complete_date comments unique_report_number].each do |field|

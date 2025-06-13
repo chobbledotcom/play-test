@@ -33,10 +33,22 @@
           shellHook = ''
             export GEM_HOME=$PWD/.gems
             export PATH=$GEM_HOME/bin:$PATH
+            
+            # Add bin directory to PATH for easy access to scripts
+            export PATH=$PWD/bin:$PATH
+            
             echo "Installing dependencies from Gemfile..."
             gem install bundler
             bundle install
             echo "Ruby $(ruby --version) with Rails $(rails --version)"
+            echo ""
+            echo "Custom scripts available (without bin/ prefix):"
+            echo "  rspec-find     - Find first failing test with details"
+            echo "  rspec-memory   - Run tests with memory profiling"
+            echo "  rspec-quick    - Run tests quickly with in-memory DB"
+            echo "  rspec-quicker  - Run tests in parallel with fail-fast"
+            echo "  rspec-replace  - Test replacements for broken tests"
+            echo "  test-memory    - Run tests with memory analysis"
           '';
         };
       }

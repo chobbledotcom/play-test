@@ -24,5 +24,6 @@ puts "Inspector Companies: #{InspectorCompany.count}"
 puts "Users: #{User.count}"
 puts "Units: #{Unit.count}"
 puts "Inspections: #{Inspection.count}"
-puts "Total Assessments: #{AnchorageAssessment.count + StructureAssessment.count + SlideAssessment.count + MaterialsAssessment.count + FanAssessment.count + EnclosedAssessment.count + UserHeightAssessment.count}"
+total_assessments = Inspection::ASSESSMENT_TYPES.values.sum(&:count)
+puts "Total Assessments: #{total_assessments}"
 puts "\nSeed data creation complete!"

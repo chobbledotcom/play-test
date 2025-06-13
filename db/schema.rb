@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_13_075220) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_13_153352) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -124,6 +124,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_075220) do
     t.text "risk_assessment"
     t.datetime "complete_date"
     t.boolean "is_seed", default: false, null: false
+    t.string "step_ramp_size_comment", limit: 1000
+    t.string "critical_fall_off_height_comment", limit: 1000
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
     t.index ["is_seed"], name: "index_inspections_on_is_seed"
     t.index ["unit_id"], name: "index_inspections_on_unit_id"

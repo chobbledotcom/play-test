@@ -1,15 +1,15 @@
 <%
+  # Get the form object
+  form = @_current_form
+  
   # Pass/Fail options with i18n
   pass_label = t('shared.pass')
   fail_label = t('shared.fail')
   options = [[pass_label, true], [fail_label, false]]
-  
-  # Get the form object
-  form = @_current_form
 %>
 
 <div>
-  <label><%= t('shared.pass') %>/<%= t('shared.fail') %></label>
+  <label><%= pass_label %>/<%= fail_label %></label>
   <% options.each do |option_label, option_value| %>
     <label>
       <%= form.radio_button field, option_value, id: "#{field}_#{option_value}" %>

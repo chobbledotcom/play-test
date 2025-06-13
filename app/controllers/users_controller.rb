@@ -184,20 +184,20 @@ class UsersController < ApplicationController
   end
 
   def add_seeds
-    if SeedDataService.add_seeds_for_user(@user)
-      flash[:notice] = I18n.t("users.messages.seeds_added")
-    else
-      flash[:alert] = I18n.t("users.messages.seeds_failed")
-    end
+    SeedDataService.add_seeds_for_user(@user)
+    flash[:notice] = I18n.t("users.messages.seeds_added")
+    redirect_to edit_user_path(@user)
+  rescue => e
+    flash[:alert] = "#{I18n.t("users.messages.seeds_failed")}: #{e.message}"
     redirect_to edit_user_path(@user)
   end
 
   def delete_seeds
-    if SeedDataService.delete_seeds_for_user(@user)
-      flash[:notice] = I18n.t("users.messages.seeds_deleted")
-    else
-      flash[:alert] = I18n.t("users.messages.seeds_delete_failed")
-    end
+    SeedDataService.delete_seeds_for_user(@user)
+    flash[:notice] = I18n.t("users.messages.seeds_deleted")
+    redirect_to edit_user_path(@user)
+  rescue => e
+    flash[:alert] = "#{I18n.t("users.messages.seeds_delete_failed")}: #{e.message}"
     redirect_to edit_user_path(@user)
   end
 

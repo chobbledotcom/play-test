@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Run RSpec tests quickly with in-memory database and no coverage checks
+# Perfect for running single files without database locking issues
+
+echo "🚀 Running tests quickly with in-memory database..."
+echo "Coverage checks disabled for speed."
+echo ""
+
+# Disable coverage and use in-memory database
+DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec rspec "$@"

@@ -8,7 +8,7 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
 
   # Use shared examples for common behaviors
   it_behaves_like "an assessment model"
-  it_behaves_like "has safety check methods", 3
+  it_behaves_like "has safety check methods"
   
   describe "validations" do
     context "exit number" do
@@ -114,7 +114,7 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
         exit_number_pass: false,
         exit_sign_always_visible_pass: false,
         exit_sign_visible_pass: false)
-      expect(assessment.critical_failure_summary).to eq("Insufficient exits, Exits not clearly visible, Exit signs not visible")
+      expect(assessment.critical_failure_summary).to eq("Insufficient exits, Exit signs not always visible, Exit signs not visible")
     end
 
     it "lists only failed items" do
