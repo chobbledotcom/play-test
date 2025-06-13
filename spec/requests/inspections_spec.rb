@@ -175,7 +175,7 @@ RSpec.describe "Inspections", type: :request do
         it "redirects to unit when unit_id provided and user owns it" do
           # Create unit owned by the inactive user
           inactive_unit = create(:unit, user: inactive_user)
-          
+
           post "/inspections", params: {inspection: valid_inspection_attributes, unit_id: inactive_unit.id}
           expect_redirect_with_alert(unit_path(inactive_unit))
         end

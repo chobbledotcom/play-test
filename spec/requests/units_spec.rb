@@ -338,7 +338,6 @@ RSpec.describe "Units", type: :request do
     end
 
     describe "Unit details and business logic" do
-
       it "shows inspection history section" do
         test_unit = create(:unit, user: user)
 

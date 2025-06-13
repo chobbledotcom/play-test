@@ -18,7 +18,6 @@ class Unit < ApplicationRecord
   validates :name, :serial, :description, :manufacturer, :owner, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
 
-
   # Scopes - enhanced from original Equipment and new Unit functionality
   scope :seed_data, -> { where(is_seed: true) }
   scope :non_seed_data, -> { where(is_seed: false) }
@@ -68,7 +67,6 @@ class Unit < ApplicationRecord
   def inspection_history
     inspections.includes(:user).order(inspection_date: :desc)
   end
-
 
   def next_inspection_due
     return nil unless last_inspection
@@ -138,7 +136,6 @@ class Unit < ApplicationRecord
       throw(:abort)
     end
   end
-
 
   def process_photo_upload
     return unless photo.attached?

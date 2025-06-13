@@ -43,13 +43,13 @@ RSpec.feature "Unit Inspection Association", type: :feature do
 
       # First check if we see the success message
       expect(page).to have_content(I18n.t("units.messages.created_from_inspection"))
-      
+
       # Then verify we're on the inspection page
       expect(current_path).to eq(inspection_path(inspection))
 
       unit = user.units.find_by(serial: "UFI-2024-001")
       expect(unit).to be_present
-      
+
       inspection.reload
       expect(inspection.unit).to eq(unit)
 

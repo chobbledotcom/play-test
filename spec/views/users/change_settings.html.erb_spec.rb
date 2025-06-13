@@ -15,7 +15,6 @@ RSpec.describe "users/change_settings.html.erb", type: :view do
     expect(rendered).to have_button("Update Settings")
   end
 
-
   it "includes navigation links" do
     render
 

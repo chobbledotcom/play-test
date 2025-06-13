@@ -65,7 +65,8 @@ RSpec.feature "Safety Standards Display", type: :feature do
     # Update the auto-created anchorage assessment
     inspection.anchorage_assessment.update!(
       num_low_anchors: 3,
-      num_high_anchors: 2)
+      num_high_anchors: 2
+    )
 
     visit edit_inspection_path(inspection, tab: "anchorage")
 

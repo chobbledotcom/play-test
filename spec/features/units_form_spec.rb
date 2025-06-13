@@ -43,7 +43,7 @@ RSpec.describe "Units Form", type: :feature do
 
     it "validates serial uniqueness per user" do
       create(:unit, user: user, serial: "DUPLICATE-001")
-      
+
       fill_in_form :units, :name, "Test Unit"
       fill_in_form :units, :manufacturer, "Test Mfg"
       fill_in_form :units, :serial, "DUPLICATE-001"

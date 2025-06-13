@@ -86,7 +86,7 @@ module AssessmentController
   # Automatically derive from controller name
   def assessment_type
     # e.g. "MaterialsAssessmentsController" -> "materials"
-    controller_name.singularize.sub(/_assessment$/, '')
+    controller_name.singularize.sub(/_assessment$/, "")
   end
 
   # Automatically derive from controller name
@@ -102,13 +102,12 @@ module AssessmentController
   end
 
   def render_save_message(message, type: "success")
-    render turbo_stream: turbo_stream.replace("form_save_message", 
-                                             partial: "shared/save_message", 
-                                             locals: {message: message, type: type})
+    render turbo_stream: turbo_stream.replace("form_save_message",
+      partial: "shared/save_message",
+      locals: {message: message, type: type})
   end
 
   def render_error_message(message)
     render_save_message(message, type: "error")
   end
-
 end

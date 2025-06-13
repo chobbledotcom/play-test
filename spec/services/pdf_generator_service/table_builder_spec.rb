@@ -351,16 +351,16 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         # Check structure and that all fields are present
         expect(result).to be_an(Array)
         expect(result.length).to eq(4) # 4 rows
-        
+
         # Check each row has 4 columns (label, value, label, value)
         result.each do |row|
           expect(row.length).to eq(4)
         end
-        
+
         # Check key fields are included
         flattened = result.flatten
         expect(flattened).to include(unit.name)
-        expect(flattened).to include(unit.serial) 
+        expect(flattened).to include(unit.serial)
         expect(flattened).to include(unit.manufacturer)
         expect(flattened).to include(unit.owner)
       end
@@ -372,15 +372,15 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       it "handles missing data with appropriate fallbacks" do
         result = described_class.build_unit_details_table(unit, "unit")
 
-        # Check structure 
+        # Check structure
         expect(result).to be_an(Array)
         expect(result.length).to eq(4) # 4 rows
-        
+
         # Check each row has 4 columns
         result.each do |row|
           expect(row.length).to eq(4)
         end
-        
+
         # Check that missing name/description shows as empty string
         flattened = result.flatten
         expect(flattened).to include("") # empty description
@@ -396,10 +396,10 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       it "handles partial data correctly" do
         result = described_class.build_unit_details_table(unit, "inspection")
 
-        # Check structure 
+        # Check structure
         expect(result).to be_an(Array)
         expect(result.length).to eq(4) # 4 rows
-        
+
         # Check manufacturer is missing (empty string)
         flattened = result.flatten
         expect(flattened).to include("") # empty manufacturer

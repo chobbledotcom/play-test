@@ -16,12 +16,12 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
 
     # Mock i18n translations
     allow(view).to receive(:t).and_call_original
-    
+
     # Mock field label lookup
     allow(view).to receive(:t)
       .with("forms.test.fields.#{field}", raise: true)
       .and_return("Status")
-    
+
     # Mock pass/fail labels
     allow(view).to receive(:t)
       .with("shared.pass")
@@ -81,7 +81,7 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
         allow(view).to receive(:t)
           .with("forms.test.fields.#{field_name}", raise: true)
           .and_return(field_name.to_s.humanize)
-        
+
         # Mock for the new field
         allow(mock_form).to receive(:radio_button)
           .with(field_name, true, id: "#{field_name}_true")

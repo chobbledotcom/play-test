@@ -9,7 +9,7 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
   # Use shared examples for common behaviors
   it_behaves_like "an assessment model"
   it_behaves_like "has safety check methods"
-  
+
   describe "validations" do
     context "exit number" do
       it "validates exit_number is positive when present" do
@@ -43,7 +43,8 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
         exit_number: 2,
         exit_number_pass: true,
         exit_sign_always_visible_pass: true,
-        exit_sign_visible_pass: true)
+        exit_sign_visible_pass: true
+      )
       expect(assessment.complete?).to be true
     end
 
@@ -51,7 +52,8 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
       assessment.assign_attributes(
         exit_number: nil,
         exit_number_pass: true,
-        exit_sign_always_visible_pass: true)
+        exit_sign_always_visible_pass: true
+      )
       expect(assessment.complete?).to be false
     end
 
@@ -60,7 +62,8 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
         exit_number: 2,
         exit_number_pass: nil,
         exit_sign_always_visible_pass: true,
-        exit_sign_visible_pass: true)
+        exit_sign_visible_pass: true
+      )
       expect(assessment.complete?).to be false
     end
 
@@ -69,7 +72,8 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
         exit_number: 2,
         exit_number_pass: true,
         exit_sign_always_visible_pass: true,
-        exit_sign_visible_pass: nil)
+        exit_sign_visible_pass: nil
+      )
       expect(assessment.complete?).to be false
     end
   end
@@ -79,7 +83,8 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
       assessment.assign_attributes(
         exit_number_pass: true,
         exit_sign_always_visible_pass: true,
-        exit_sign_visible_pass: true)
+        exit_sign_visible_pass: true
+      )
       expect(assessment.has_critical_failures?).to be false
     end
 
@@ -87,7 +92,8 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
       assessment.assign_attributes(
         exit_number_pass: false,
         exit_sign_always_visible_pass: true,
-        exit_sign_visible_pass: true)
+        exit_sign_visible_pass: true
+      )
       expect(assessment.has_critical_failures?).to be true
     end
 
@@ -95,7 +101,8 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
       assessment.assign_attributes(
         exit_number_pass: true,
         exit_sign_always_visible_pass: false,
-        exit_sign_visible_pass: true)
+        exit_sign_visible_pass: true
+      )
       expect(assessment.has_critical_failures?).to be true
     end
 
@@ -103,7 +110,8 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
       assessment.assign_attributes(
         exit_number_pass: true,
         exit_sign_always_visible_pass: true,
-        exit_sign_visible_pass: false)
+        exit_sign_visible_pass: false
+      )
       expect(assessment.has_critical_failures?).to be true
     end
   end
@@ -113,7 +121,8 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
       assessment.assign_attributes(
         exit_number_pass: false,
         exit_sign_always_visible_pass: false,
-        exit_sign_visible_pass: false)
+        exit_sign_visible_pass: false
+      )
       expect(assessment.critical_failure_summary).to eq("Insufficient exits, Exit signs not always visible, Exit signs not visible")
     end
 
@@ -121,7 +130,8 @@ RSpec.describe Assessments::EnclosedAssessment, type: :model do
       assessment.assign_attributes(
         exit_number_pass: false,
         exit_sign_always_visible_pass: true,
-        exit_sign_visible_pass: true)
+        exit_sign_visible_pass: true
+      )
       expect(assessment.critical_failure_summary).to eq("Insufficient exits")
     end
   end

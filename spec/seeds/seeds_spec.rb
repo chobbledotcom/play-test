@@ -9,7 +9,7 @@ RSpec.describe "Seed Data", type: :model do
       Inspection::ASSESSMENT_TYPES.each_value do |assessment_class|
         assessment_class.destroy_all
       end
-      
+
       Inspection.destroy_all
       Unit.destroy_all
       User.destroy_all
@@ -131,7 +131,7 @@ RSpec.describe "Seed Data", type: :model do
 
       it "creates units with inspections having correct slide and enclosed flags" do
         # Units with slide inspections
-        slide_unit_names = Unit.joins(:inspections).where(inspections: { has_slide: true }).distinct.pluck(:name)
+        slide_unit_names = Unit.joins(:inspections).where(inspections: {has_slide: true}).distinct.pluck(:name)
         expect(slide_unit_names).to include(
           "Princess Castle with Slide",
           "Assault Course Challenge",
@@ -139,10 +139,9 @@ RSpec.describe "Seed Data", type: :model do
         )
 
         # Units with enclosed inspections
-        enclosed_unit_names = Unit.joins(:inspections).where(inspections: { is_totally_enclosed: true }).distinct.pluck(:name)
+        enclosed_unit_names = Unit.joins(:inspections).where(inspections: {is_totally_enclosed: true}).distinct.pluck(:name)
         expect(enclosed_unit_names).to include("Toddler Soft Play Centre")
       end
-
 
       it "creates units with unique serials" do
         serials = Unit.pluck(:serial)
@@ -411,11 +410,11 @@ RSpec.describe "Seed Data", type: :model do
           # All inspections have slide assessments, but only those with has_slide have data
           slide_inspections = Inspection.where(has_slide: true).where.not(complete_date: nil)
           non_slide_inspections = Inspection.where(has_slide: false).where.not(complete_date: nil)
-          
+
           slide_inspections.each do |inspection|
             expect(inspection.slide_assessment.slide_platform_height).to be_present
           end
-          
+
           non_slide_inspections.each do |inspection|
             expect(inspection.slide_assessment.slide_platform_height).to be_nil
           end
@@ -458,11 +457,11 @@ RSpec.describe "Seed Data", type: :model do
           # All inspections have enclosed assessments, but only those with is_totally_enclosed have data
           enclosed_inspections = Inspection.where(is_totally_enclosed: true).where.not(complete_date: nil)
           non_enclosed_inspections = Inspection.where(is_totally_enclosed: false).where.not(complete_date: nil)
-          
+
           enclosed_inspections.each do |inspection|
             expect(inspection.enclosed_assessment.exit_number).to be_present
           end
-          
+
           non_enclosed_inspections.each do |inspection|
             expect(inspection.enclosed_assessment.exit_number).to be_nil
           end
@@ -500,10 +499,10 @@ RSpec.describe "Seed Data", type: :model do
       it "ensures all created records are valid" do
         # Base models
         base_models = [InspectorCompany, User, Unit, Inspection]
-        
+
         # Add assessment models from the hash
         assessment_models = Inspection::ASSESSMENT_TYPES.values
-        
+
         (base_models + assessment_models).each do |model_class|
           model_class.all.each do |record|
             expect(record).to be_valid,
@@ -519,7 +518,7 @@ RSpec.describe "Seed Data", type: :model do
           User.all.each(&:validate!)
           Unit.all.each(&:validate!)
           Inspection.all.each(&:validate!)
-          
+
           # Validate assessments using the hash
           Inspection::ASSESSMENT_TYPES.each_value do |assessment_class|
             assessment_class.joins(:inspection).where.not(inspections: {complete_date: nil}).each(&:validate!)

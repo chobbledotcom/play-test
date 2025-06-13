@@ -190,7 +190,7 @@ create_assessments_for_inspection(failed_inspection, $obstacle_course, passed: f
     height: 4.5,
     has_slide: false,
     is_totally_enclosed: false,
-    risk_assessment: date == 1.year.ago ? 
+    risk_assessment: (date == 1.year.ago) ?
       "Annual inspection completed. Unit in satisfactory condition with minor wear noted on entry/exit points. All repairs from previous inspection holding well. Blower system maintenance performed. Risk: LOW." :
       "Six-month interim inspection. Unit performing well under heavy commercial use. Slight fading to artwork but purely cosmetic. All safety systems operational. Recommend continued monitoring of high-traffic areas. Risk: LOW."
   )
@@ -252,7 +252,7 @@ Assessments::AnchorageAssessment.create!(
     has_slide = false
     is_totally_enclosed = false
   end
-  
+
   passed_status = rand(0..4) > 0
   risk_text = case unit
   when $soft_play_unit
@@ -276,7 +276,7 @@ Assessments::AnchorageAssessment.create!(
   else
     passed_status ? "Unit inspected and meets safety requirements. Risk: LOW." : "Safety failures identified. Unit unsafe for use. Risk: HIGH."
   end
-  
+
   inspection = Inspection.create!(
     user: $test_user,
     unit: unit,

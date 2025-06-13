@@ -16,7 +16,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
       # PDF should always be embedded (even for draft inspections)
       expect(page).to have_css("iframe", wait: 5)
-      
+
       # Verify the iframe points to the correct inspection PDF
       expect(page).to have_css("iframe[src*='#{inspection.id}']")
       expect(page).to have_css("iframe[src*='pdf']")

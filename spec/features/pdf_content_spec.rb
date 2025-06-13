@@ -1,10 +1,9 @@
 require "rails_helper"
 require "pdf/inspector"
 
+ASSESSMENT_FORMS = %w[tallest_user_height structure anchorage materials fan slide enclosed].freeze
+
 RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
-  
-  ASSESSMENT_FORMS = %w[tallest_user_height structure anchorage materials fan slide enclosed].freeze
-  
   let(:user) { create(:user) }
   let(:inspector_company) { user.inspection_company }
   let(:unit) do
@@ -29,12 +28,14 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       inspection.user_height_assessment.update!(
         containing_wall_height: 2.5,
         tallest_user_height: 1.8,
-        users_at_1800mm: 5)
+        users_at_1800mm: 5
+      )
 
       inspection.structure_assessment.update!(
         seam_integrity_pass: true,
         uses_lock_stitching_pass: true,
-        air_loss_pass: true)
+        air_loss_pass: true
+      )
 
       pdf_text = get_pdf_text(inspection_report_path(inspection))
 
@@ -69,7 +70,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       # Update the auto-created assessment
       failed_inspection.structure_assessment.update!(
         seam_integrity_pass: false,
-        seam_integrity_comment: "Torn seam on left side")
+        seam_integrity_comment: "Torn seam on left side"
+      )
 
       pdf_text = get_pdf_text(inspection_report_path(failed_inspection))
 
@@ -172,10 +174,10 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       inspection = create(:inspection, :completed, :pdf_complete_test_data, user: user, unit: unit)
 
       pdf_data = get_pdf(inspection_report_path(inspection))
-      
+
       # PDF should contain image data (QR code)
       expect(pdf_data).to include("/Image")
-      
+
       text_content = pdf_text_content(pdf_data)
 
       # Should include report ID

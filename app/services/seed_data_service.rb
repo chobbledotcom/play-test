@@ -182,7 +182,7 @@ class SeedDataService
         length: config[:length],
         height: config[:height],
         has_slide: config[:has_slide] || false,
-        is_totally_enclosed: config[:is_totally_enclosed] || false,
+        is_totally_enclosed: config[:is_totally_enclosed] || false
       }
     end
 

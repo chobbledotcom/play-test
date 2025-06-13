@@ -70,16 +70,16 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
         it "includes all assessment fields except system fields" do
           # Use complete inspection that already has all assessments
           complete_inspection = create_complete_inspection(user: user, unit: unit)
-          
+
           json = get_inspection_json(complete_inspection)
 
           # Check specific fields are included using helper
-          expect_assessment_json(json, "anchorage_assessment", 
+          expect_assessment_json(json, "anchorage_assessment",
             %w[num_anchors_comment anchor_accessories_comment])
-          
+
           expect_assessment_json(json, "materials_assessment",
             %w[ropes_comment thread_comment])
-            
+
           expect_assessment_json(json, "fan_assessment",
             %w[blower_serial pat_comment])
         end

@@ -432,7 +432,6 @@ RSpec.describe Inspection, type: :model do
         expect(inspection).to be_valid
       end
     end
-
   end
 
   describe "callbacks and lifecycle" do
@@ -446,7 +445,6 @@ RSpec.describe Inspection, type: :model do
         inspection.valid? # Trigger validations and callbacks
         expect(inspection.inspector_company_id).to eq(inspector_company.id)
       end
-
     end
 
     describe "before_create callbacks" do
@@ -734,7 +732,6 @@ RSpec.describe Inspection, type: :model do
     describe "assessment checking methods" do
       let(:inspection) { create(:inspection) }
 
-
       describe "#all_assessments_complete?" do
         it "returns false when no assessments" do
           expect(inspection.send(:all_assessments_complete?)).to be_falsey
@@ -879,6 +876,5 @@ RSpec.describe Inspection, type: :model do
         end
       end
     end
-
   end
 end

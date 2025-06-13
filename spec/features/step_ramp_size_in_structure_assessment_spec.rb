@@ -12,17 +12,17 @@ RSpec.feature "Step Ramp Size in Structure Assessment", type: :feature do
 
     it "shows and saves step size field" do
       visit edit_inspection_path(inspection, tab: "structure")
-      
+
       # Verify field is visible
       expect(page).to have_content("Step Size")
-      
+
       # Fill and save using i18n
       fill_in I18n.t("forms.structure.fields.step_size"), with: "25"
       click_button I18n.t("forms.structure.submit")
-      
+
       # Verify success
       expect(page).to have_content(I18n.t("inspections.messages.updated"))
-      
+
       # Verify saved
       inspection.reload
       expect(inspection.structure_assessment.step_size).to eq(25.0)
@@ -33,12 +33,12 @@ RSpec.feature "Step Ramp Size in Structure Assessment", type: :feature do
     it "moves step_ramp_size fields from inspections to structure assessments" do
       # This test verifies that the migration worked correctly
       structure_assessment = inspection.structure_assessment
-      
+
       # These fields should exist in structure_assessment
       expect(structure_assessment).to respond_to(:step_ramp_size)
       expect(structure_assessment).to respond_to(:step_ramp_size_pass)
       expect(structure_assessment).to respond_to(:step_ramp_size_comment)
-      
+
       # These fields should no longer exist in inspection
       expect(inspection).not_to respond_to(:step_ramp_size)
       expect(inspection).not_to respond_to(:step_ramp_size_pass)

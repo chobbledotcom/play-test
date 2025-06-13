@@ -4,7 +4,7 @@ class MoveStepRampSizeToStructureAssessment < ActiveRecord::Migration[8.0]
     add_column :structure_assessments, :step_ramp_size, :decimal, precision: 8, scale: 2
     add_column :structure_assessments, :step_ramp_size_pass, :boolean
     add_column :structure_assessments, :step_ramp_size_comment, :text
-    
+
     # Migrate data from inspections to structure_assessments
     execute <<-SQL
       UPDATE structure_assessments 
@@ -32,19 +32,19 @@ class MoveStepRampSizeToStructureAssessment < ActiveRecord::Migration[8.0]
           OR inspections.step_ramp_size_comment IS NOT NULL)
       )
     SQL
-    
+
     # Remove fields from inspections
     remove_column :inspections, :step_ramp_size
     remove_column :inspections, :step_ramp_size_pass
     remove_column :inspections, :step_ramp_size_comment
   end
-  
+
   def down
     # Add fields back to inspections
     add_column :inspections, :step_ramp_size, :decimal, precision: 8, scale: 2
     add_column :inspections, :step_ramp_size_pass, :boolean
     add_column :inspections, :step_ramp_size_comment, :string, limit: 1000
-    
+
     # Migrate data back from structure_assessments to inspections
     execute <<-SQL
       UPDATE inspections 
@@ -72,7 +72,7 @@ class MoveStepRampSizeToStructureAssessment < ActiveRecord::Migration[8.0]
           OR structure_assessments.step_ramp_size_comment IS NOT NULL)
       )
     SQL
-    
+
     # Remove fields from structure_assessments
     remove_column :structure_assessments, :step_ramp_size
     remove_column :structure_assessments, :step_ramp_size_pass

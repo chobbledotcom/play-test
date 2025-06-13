@@ -22,7 +22,7 @@ module InspectionTurboStreams
   end
 
   def progress_update_stream
-    status = @inspection.complete? ? I18n.t('inspections.status.complete') : I18n.t('inspections.status.in_progress')
+    status = @inspection.complete? ? I18n.t("inspections.status.complete") : I18n.t("inspections.status.in_progress")
     turbo_stream.replace(
       "inspection_progress_#{@inspection.id}",
       html: "<span class='value'>#{status}</span>"
@@ -52,7 +52,6 @@ module InspectionTurboStreams
       locals: save_message_locals(success: success, dom_id: "form_save_message")
     )
   end
-
 
   def save_message_locals(success:, dom_id:)
     if success

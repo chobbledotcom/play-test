@@ -104,6 +104,9 @@
   }
 
   /* Column widths for inspections table */
+  .inspections-list .col-photo {
+    flex: 0 0 80px;
+  }
   .inspections-list .col-name {
     flex: 2;
   }

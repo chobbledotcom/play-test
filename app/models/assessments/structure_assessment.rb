@@ -5,7 +5,7 @@ class Assessments::StructureAssessment < ApplicationRecord
 
   belongs_to :inspection
 
-  # Critical safety checks  
+  # Critical safety checks
   CRITICAL_CHECKS = %w[seam_integrity_pass uses_lock_stitching_pass air_loss_pass
     straight_walls_pass sharp_edges_pass unit_stable_pass].freeze
 
@@ -41,8 +41,6 @@ class Assessments::StructureAssessment < ApplicationRecord
   def has_critical_failures?
     CRITICAL_CHECKS.any? { |check| send(check) == false }
   end
-
-
 
   def critical_failure_summary
     failures = CRITICAL_CHECKS.select { |check| send(check) == false }

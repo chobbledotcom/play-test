@@ -1,24 +1,24 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe AssessmentCompletion, type: :model do
   let(:inspection) { create(:inspection) }
   let(:assessment) { inspection.user_height_assessment }
 
-  describe '#incomplete_fields' do
-    context 'with a new assessment' do
-      it 'returns all required fields as incomplete' do
+  describe "#incomplete_fields" do
+    context "with a new assessment" do
+      it "returns all required fields as incomplete" do
         incomplete = assessment.incomplete_fields
-        
+
         expect(incomplete).to be_an(Array)
         expect(incomplete).not_to be_empty
-        
+
         # Should include required measurements
         expect(incomplete.map { |f| f[:field] }).to include(
           :containing_wall_height,
           :platform_height,
           :tallest_user_height
         )
-        
+
         # Should include pass/fail assessments
         expect(incomplete.map { |f| f[:field] }).to include(
           :height_requirements_pass,
@@ -28,11 +28,11 @@ RSpec.describe AssessmentCompletion, type: :model do
           :negative_adjustments_pass
         )
       end
-      
-      it 'returns field info with labels and types' do
+
+      it "returns field info with labels and types" do
         incomplete = assessment.incomplete_fields
         field_info = incomplete.find { |f| f[:field] == :height_requirements_pass }
-        
+
         expect(field_info).to include(
           field: :height_requirements_pass,
           type: :pass_fail
@@ -40,8 +40,8 @@ RSpec.describe AssessmentCompletion, type: :model do
         expect(field_info[:label]).to be_present
       end
     end
-    
-    context 'with a partially complete assessment' do
+
+    context "with a partially complete assessment" do
       before do
         assessment.update!(
           containing_wall_height: 2.5,
@@ -49,17 +49,17 @@ RSpec.describe AssessmentCompletion, type: :model do
           tallest_user_height: 1.8
         )
       end
-      
-      it 'only returns incomplete fields' do
+
+      it "only returns incomplete fields" do
         incomplete = assessment.incomplete_fields
-        
+
         # Should not include completed measurements
         expect(incomplete.map { |f| f[:field] }).not_to include(
           :containing_wall_height,
           :platform_height,
           :tallest_user_height
         )
-        
+
         # Should still include uncompleted pass/fail assessments
         expect(incomplete.map { |f| f[:field] }).to include(
           :height_requirements_pass,
@@ -70,8 +70,8 @@ RSpec.describe AssessmentCompletion, type: :model do
         )
       end
     end
-    
-    context 'with a complete assessment' do
+
+    context "with a complete assessment" do
       before do
         assessment.update!(
           containing_wall_height: 2.5,
@@ -92,8 +92,8 @@ RSpec.describe AssessmentCompletion, type: :model do
           negative_adjustments_pass: true
         )
       end
-      
-      it 'returns an empty array' do
+
+      it "returns an empty array" do
         incomplete = assessment.incomplete_fields
         expect(incomplete).to be_empty
         expect(assessment).to be_complete

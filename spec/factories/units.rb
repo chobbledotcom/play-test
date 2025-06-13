@@ -32,7 +32,6 @@ FactoryBot.define do
       description { "Small compact bouncy castle" }
     end
 
-
     trait :totally_enclosed_description do
       description { "Totally enclosed inflatable play structure" }
     end

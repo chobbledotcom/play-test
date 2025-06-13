@@ -1,14 +1,12 @@
 <%= render 'shared/page_header', title: @inspector_company.name %>
 
-<p>
-  <% if current_user&.admin? %>
-    <%= link_to t('ui.edit'), edit_inspector_company_path(@inspector_company) %>
-    | 
-  <% end %>
-  <%= link_to t('inspector_companies.titles.index'), inspector_companies_path %>
-</p>
+<% if current_user&.admin? %>
+  <%= link_to t('ui.edit'),
+    edit_inspector_company_path(@inspector_company),
+    class: "button"
+  %>
+<% end %>
 
-<header><h2><%= t('inspector_companies.headers.company_details') %></h2></header>
 <table>
   <tr>
     <th><%= t('inspector_companies.forms.name') %></th>
@@ -50,12 +48,17 @@
   <% end %>
 </table>
 
+<hr>
+
 <% if @inspector_company.logo.attached? %>
   <header><h3><%= t('inspector_companies.forms.logo') %></h3></header>
   <p><%= image_tag @inspector_company.logo, alt: "#{@inspector_company.name} logo" %></p>
+  <hr>
 <% end %>
 
-<header><h2><%= t('inspector_companies.headers.company_statistics') %></h2></header>
+<header>
+  <h2><%= t('inspector_companies.headers.company_statistics') %></h2>
+</header>
 <table>
   <tr>
     <th><%= t('inspector_companies.statistics.total_inspections') %></th>
@@ -80,6 +83,7 @@
 </table>
 
 <% if @recent_inspections.any? %>
+  <hr>
   <header><h2><%= t('inspector_companies.headers.recent_inspections') %></h2></header>
   <table>
     <thead>
@@ -103,7 +107,6 @@
       <% end %>
     </tbody>
   </table>
-  <p><%= link_to t("inspector_companies.buttons.view_all_inspections"), inspections_path %></p>
 <% else %>
   <p>No inspections recorded yet.</p>
 <% end %>

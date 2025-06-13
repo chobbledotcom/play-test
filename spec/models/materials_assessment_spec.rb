@@ -184,7 +184,6 @@ RSpec.describe Assessments::MaterialsAssessment, type: :model do
   end
 
   describe "private methods" do
-
     describe "#ropes_compliant?" do
       it "delegates to SafetyStandard" do
         assessment.ropes = 25.0

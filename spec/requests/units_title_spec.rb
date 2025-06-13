@@ -10,50 +10,50 @@ RSpec.describe "Units Index Title", type: :request do
   describe "page title construction" do
     it "shows only base title when no filters are applied" do
       get units_path
-      
-      expect(response.body).to include("<h1>#{I18n.t('units.titles.index')}</h1>")
-      expect(response.body).not_to include("<h1>#{I18n.t('units.titles.index')} - </h1>")
+
+      expect(response.body).to include("<h1>#{I18n.t("units.titles.index")}</h1>")
+      expect(response.body).not_to include("<h1>#{I18n.t("units.titles.index")} - </h1>")
     end
 
     it "includes overdue status in title when filtered" do
       get units_path(status: "overdue")
-      
-      expected_title = "#{I18n.t('units.titles.index')} - #{I18n.t('units.status.overdue')}"
+
+      expected_title = "#{I18n.t("units.titles.index")} - #{I18n.t("units.status.overdue")}"
       expect(response.body).to include("<h1>#{expected_title}</h1>")
     end
 
     it "includes manufacturer in title when filtered" do
       get units_path(manufacturer: "Airquee Ltd")
-      
-      expected_title = "#{I18n.t('units.titles.index')} - Airquee Ltd"
+
+      expected_title = "#{I18n.t("units.titles.index")} - Airquee Ltd"
       expect(response.body).to include("<h1>#{expected_title}</h1>")
     end
 
     it "includes owner in title when filtered" do
       get units_path(owner: "Stef's Rentals")
-      
+
       # Check for the actual HTML that appears in the page
       expect(response.body).to include("<h1>Units - Stef&#39;s Rentals</h1>")
     end
 
     it "combines multiple filters in title" do
       get units_path(status: "overdue", manufacturer: "Bouncy Co", owner: "John's Events")
-      
+
       # Check for the actual HTML that appears in the page
       expect(response.body).to include("<h1>Units - Overdue - Bouncy Co - John&#39;s Events</h1>")
     end
 
     it "ignores empty string parameters" do
       get units_path(manufacturer: "", owner: "")
-      
-      expect(response.body).to include("<h1>#{I18n.t('units.titles.index')}</h1>")
+
+      expect(response.body).to include("<h1>#{I18n.t("units.titles.index")}</h1>")
       expect(response.body).not_to include(" - ")
     end
 
     it "ignores nil parameters" do
       get units_path(manufacturer: nil, owner: nil)
-      
-      expect(response.body).to include("<h1>#{I18n.t('units.titles.index')}</h1>")
+
+      expect(response.body).to include("<h1>#{I18n.t("units.titles.index")}</h1>")
       expect(response.body).not_to include(" - ")
     end
   end

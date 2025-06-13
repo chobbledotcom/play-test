@@ -5,7 +5,7 @@ class MoveTroughFieldsToStructureAssessment < ActiveRecord::Migration[8.0]
     add_column :structure_assessments, :trough_adjacent_panel_width, :decimal, precision: 8, scale: 2
     add_column :structure_assessments, :trough_adjacent_panel_width_pass, :boolean
     add_column :structure_assessments, :trough_adjacent_panel_width_comment, :text
-    
+
     # Migrate data from inspections to structure_assessments
     execute <<-SQL
       UPDATE structure_assessments 
@@ -21,7 +21,7 @@ class MoveTroughFieldsToStructureAssessment < ActiveRecord::Migration[8.0]
         AND inspections.trough_depth IS NOT NULL
       )
     SQL
-    
+
     execute <<-SQL
       UPDATE structure_assessments 
       SET trough_adjacent_panel_width = (
@@ -36,17 +36,17 @@ class MoveTroughFieldsToStructureAssessment < ActiveRecord::Migration[8.0]
         AND inspections.trough_adjacent_panel_width IS NOT NULL
       )
     SQL
-    
+
     # Remove fields from inspections
     remove_column :inspections, :trough_depth
     remove_column :inspections, :trough_adjacent_panel_width
   end
-  
+
   def down
     # Add fields back to inspections
     add_column :inspections, :trough_depth, :decimal, precision: 8, scale: 2
     add_column :inspections, :trough_adjacent_panel_width, :decimal, precision: 8, scale: 2
-    
+
     # Migrate data back from structure_assessments to inspections
     execute <<-SQL
       UPDATE inspections 
@@ -62,7 +62,7 @@ class MoveTroughFieldsToStructureAssessment < ActiveRecord::Migration[8.0]
         AND structure_assessments.trough_depth_value IS NOT NULL
       )
     SQL
-    
+
     execute <<-SQL
       UPDATE inspections 
       SET trough_adjacent_panel_width = (
@@ -77,7 +77,7 @@ class MoveTroughFieldsToStructureAssessment < ActiveRecord::Migration[8.0]
         AND structure_assessments.trough_adjacent_panel_width IS NOT NULL
       )
     SQL
-    
+
     # Remove fields from structure_assessments
     remove_column :structure_assessments, :trough_depth_value_pass
     remove_column :structure_assessments, :trough_adjacent_panel_width

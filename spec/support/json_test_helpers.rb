@@ -73,12 +73,12 @@ module JsonTestHelpers
   def expect_assessment_json(json, assessment_type, expected_fields)
     expect(json["assessments"]).to be_present
     expect(json["assessments"][assessment_type]).to be_present
-    
+
     assessment = json["assessments"][assessment_type]
     expected_fields.each do |field|
       expect(assessment).to have_key(field.to_s)
     end
-    
+
     # Verify system fields are excluded
     ASSESSMENT_EXCLUDED_FIELDS.each do |field|
       expect(assessment).not_to have_key(field)
@@ -88,10 +88,10 @@ module JsonTestHelpers
   # Verify all assessments are included
   def expect_all_assessments_present(json)
     # Only check assessments that should exist for this inspection
-    expected_assessments = %w[user_height_assessment structure_assessment 
-                             anchorage_assessment materials_assessment 
-                             fan_assessment]
-    
+    expected_assessments = %w[user_height_assessment structure_assessment
+      anchorage_assessment materials_assessment
+      fan_assessment]
+
     expected_assessments.each do |assessment_type|
       expect(json["assessments"]).to have_key(assessment_type)
     end

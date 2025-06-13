@@ -98,7 +98,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
     scenario "generates PDFs with reasonable file sizes" do
       pdf_data = get_pdf("/inspections/#{inspection.id}.pdf")
       pdf_size = pdf_data.bytesize
-      
+
       expect(pdf_size).to be < 2.megabytes  # Should be under 2MB for basic inspection
       expect(pdf_size).to be > 1.kilobyte   # Should have substantial content
     end

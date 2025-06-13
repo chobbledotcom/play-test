@@ -146,12 +146,12 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
       # Reload to check if update worked
       inspection.reload
       user_height = inspection.user_height_assessment.reload
-      
+
       # Debug output
       if user_height.incomplete_fields.any?
         puts "User height incomplete fields: #{user_height.incomplete_fields.inspect}"
       end
-      
+
       # Should show In Progress status
       expect(response.body).to match(/(&lt;span class=&#39;value&#39;&gt;|<span class='value'>)(In Progress|Complete)(&lt;\/span&gt;|<\/span>)/)
     end

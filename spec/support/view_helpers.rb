@@ -14,12 +14,12 @@ module ViewHelpers
   # Usage: expect_submit_button("forms.inspector_companies")
   #        expect_submit_button(text: "Save Changes")
   def expect_submit_button(i18n_base_or_options)
-    if i18n_base_or_options.is_a?(Hash)
-      text = i18n_base_or_options[:text]
+    text = if i18n_base_or_options.is_a?(Hash)
+      i18n_base_or_options[:text]
     else
-      text = I18n.t("#{i18n_base_or_options}.submit")
+      I18n.t("#{i18n_base_or_options}.submit")
     end
-    
+
     expect(rendered).to include('type="submit"')
     expect(rendered).to include(text)
   end
@@ -70,7 +70,7 @@ module ViewHelpers
   # Usage: expect_form_fields_from_i18n("forms.inspector_companies")
   def expect_form_fields_from_i18n(i18n_base)
     fields = I18n.t("#{i18n_base}.fields", raise: true)
-    
+
     fields.each do |field_key, field_label|
       # Just check the label is present - actual field testing is separate
       expect(rendered).to have_content(field_label),
@@ -84,7 +84,7 @@ module ViewHelpers
   # Usage: expect_form_sections_from_i18n("forms.inspector_companies")
   def expect_form_sections_from_i18n(i18n_base)
     sections = I18n.t("#{i18n_base}.sections", default: {})
-    
+
     sections.each do |_key, section_title|
       expect(rendered).to have_content(section_title)
     end
@@ -117,14 +117,14 @@ module ViewHelpers
   # Usage: mock_form = mock_form_builder
   def mock_form_builder
     form = double("FormBuilder")
-    
+
     # Common form builder methods
     %i[text_field email_field password_field text_area select check_box
-       number_field telephone_field file_field hidden_field radio_button
-       submit label].each do |method|
+      number_field telephone_field file_field hidden_field radio_button
+      submit label].each do |method|
       allow(form).to receive(method).and_return("<#{method} />".html_safe)
     end
-    
+
     form
   end
 
@@ -139,10 +139,10 @@ module ViewHelpers
       field_hint: options[:hint],
       field_placeholder: options[:placeholder]
     }
-    
+
     allow(view).to receive(:form_field_setup).and_return(config)
     view.instance_variable_set(:@_current_i18n_base, i18n_base)
-    
+
     config
   end
 
@@ -199,7 +199,7 @@ module ViewHelpers
     link_selector = "a"
     link_selector += "[data-turbo-method='#{method}']" if method
     link_selector += "[data-turbo-confirm]" if confirm
-    
+
     expect(rendered).to have_css(link_selector, text: text)
   end
 
@@ -209,11 +209,11 @@ module ViewHelpers
     # Check header if defined
     header = I18n.t("#{i18n_base}.header", default: nil)
     expect_i18n_content("#{i18n_base}.header") if header
-    
+
     # Check sections and fields
     expect_form_sections_from_i18n(i18n_base)
     expect_form_fields_from_i18n(i18n_base)
-    
+
     # Check submit button
     expect_submit_button(i18n_base)
   end

@@ -14,7 +14,7 @@ module InspectionsHelper
 
   def inspection_actions(inspection)
     actions = []
-    
+
     # Regular users cannot edit or delete complete inspections
     if inspection.complete?
       # Only admins can delete complete inspections
@@ -41,7 +41,7 @@ module InspectionsHelper
         danger: true
       }
     end
-    
+
     actions
   end
 
@@ -65,6 +65,4 @@ module InspectionsHelper
   def current_tab
     params[:tab].presence || "general"
   end
-
-
 end

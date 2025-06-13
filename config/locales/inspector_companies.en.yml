@@ -2,7 +2,7 @@ en:
   # Inspector Companies Management
   inspector_companies:
     titles:
-      index: "Inspector Companies"
+      index: "Companies"
       new: "New Inspector Company"
       edit: "Edit Inspector Company"
       show: "Company Details"

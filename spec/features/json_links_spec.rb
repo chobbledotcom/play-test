@@ -15,12 +15,12 @@ RSpec.feature "JSON Links", type: :feature do
     # Check PDF and JSON content is present (links may be in share buttons)
     expect(page).to have_content("PDF")
     expect(page).to have_content("JSON")
-    
+
     # The actual links might be generated dynamically or in share buttons
     # Just verify the page can be accessed directly
     visit unit_path(unit, format: :pdf)
     expect(page.status_code).to eq(200)
-    
+
     visit unit_path(unit, format: :json)
     expect(page.status_code).to eq(200)
   end
@@ -31,12 +31,12 @@ RSpec.feature "JSON Links", type: :feature do
     # Check PDF and JSON content is present (links may be in share buttons)
     expect(page).to have_content("PDF")
     expect(page).to have_content("JSON")
-    
+
     # The actual links might be generated dynamically or in share buttons
     # Just verify the page can be accessed directly
     visit inspection_path(inspection, format: :pdf)
     expect(page.status_code).to eq(200)
-    
+
     visit inspection_path(inspection, format: :json)
     expect(page.status_code).to eq(200)
   end

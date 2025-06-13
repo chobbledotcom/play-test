@@ -39,7 +39,7 @@ Rails.application.routes.draw do
       get "unified_edit"
       patch "unified_update"
     end
-    
+
     resource :anchorage_assessment, only: [:update]
     resource :enclosed_assessment, only: [:update]
     resource :fan_assessment, only: [:update]

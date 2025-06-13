@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.describe "form/_assessment_status.html.erb", type: :view do
-  
   let(:mock_assessment) { double("Assessment") }
 
   before do
@@ -57,7 +56,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
       it "displays height requirement status as pass" do
         render_assessment_status(i18n_base: "forms.tallest_user_height")
-        
+
         expect_safety_header_present
         expect(rendered).to include(I18n.t("forms.tallest_user_height.status.height_requirement"))
         expect_status_displayed("height_requirement", pass: true)
@@ -65,9 +64,9 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
       it "displays height requirement status as fail when false" do
         setup_assessment_with_method(:meets_height_requirements?, false)
-        
+
         render_assessment_status(i18n_base: "forms.tallest_user_height")
-        
+
         expect_status_displayed("height_requirement", pass: false)
       end
     end
@@ -79,16 +78,16 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
       it "displays runout requirement status as pass" do
         render_assessment_status
-        
+
         expect(rendered).to include(I18n.t("forms.slide.status.runout_requirement"))
         expect_status_displayed("runout_requirement", pass: true)
       end
 
       it "displays runout requirement status as fail when false" do
         setup_assessment_with_method(:meets_runout_requirements?, false)
-        
+
         render_assessment_status
-        
+
         expect_status_displayed("runout_requirement", pass: false)
       end
     end
@@ -104,12 +103,11 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
       it "displays checks passed count" do
         render_assessment_status
-        
+
         expect(rendered).to include(I18n.t("forms.slide.status.checks_passed"))
-        expect(rendered.gsub(/\s+/, ' ')).to include("5 / 10")
+        expect(rendered.gsub(/\s+/, " ")).to include("5 / 10")
       end
     end
-
 
     context "with custom i18n_base" do
       before do
@@ -118,7 +116,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
       it "uses provided i18n_base for translations" do
         render_assessment_status(i18n_base: "custom.path")
-        
+
         # The header uses shared.safety_status, not the i18n_base
         expect_safety_header_present
       end
@@ -133,7 +131,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
       it "requires i18n_base to be provided" do
         render_assessment_status(i18n_base: "units")
-        
+
         # The header uses shared.safety_status
         expect_safety_header_present
       end
@@ -144,7 +142,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
         allow(mock_assessment).to receive(:respond_to?).and_return(true)
         allow(mock_assessment).to receive(:complete?).and_return(false)
         allow(mock_assessment).to receive(:incomplete_fields).and_return([
-          { field: :test_field, label: "Test Field", type: :text }
+          {field: :test_field, label: "Test Field", type: :text}
         ])
         allow(mock_assessment).to receive(:meets_height_requirements?).and_return(true)
         allow(mock_assessment).to receive(:meets_runout_requirements?).and_return(false)
@@ -154,12 +152,12 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
       it "displays all status information" do
         render_assessment_status
-        
+
         expect_safety_header_present
         expect(rendered).to include("<h4>")
         expect(rendered).to include("text-success")
         expect(rendered).to include("text-danger")
-        expect(rendered.gsub(/\s+/, ' ')).to include("7 / 10")
+        expect(rendered.gsub(/\s+/, " ")).to include("7 / 10")
       end
     end
   end
@@ -183,7 +181,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
     it "has proper semantic structure" do
       render_assessment_status
-      
+
       expect_safety_header_present
       expect(rendered).to include("<h4>")
       expect(rendered).to include("<p>")

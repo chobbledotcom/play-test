@@ -51,7 +51,8 @@ form.button_to {
   width: fit-content;
 }
 
-.actions form.button_to {
+.actions form.button_to,
+nav form.button_to {
   margin: 0;
   min-width: fit-content;
 }

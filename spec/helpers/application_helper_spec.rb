@@ -31,7 +31,6 @@ RSpec.describe ApplicationHelper, type: :helper do
         expect(helper.render_time(test_datetime)).to eq("Jun 06, 2025")
       end
     end
-
   end
 
   describe "#date_for_form" do
@@ -120,7 +119,6 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
-
   describe "#form_field_setup" do
     let(:mock_form) { double("FormBuilder") }
     let(:field) { :name }
@@ -170,7 +168,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "raises ArgumentError about disallowed keys" do
-        expect { result }.to raise_error(ArgumentError, 'local_assigns contains [:form]')
+        expect { result }.to raise_error(ArgumentError, "local_assigns contains [:form]")
       end
     end
 
@@ -183,7 +181,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "raises ArgumentError about disallowed keys" do
-        expect { result }.to raise_error(ArgumentError, 'local_assigns contains [:i18n_base]')
+        expect { result }.to raise_error(ArgumentError, "local_assigns contains [:i18n_base]")
       end
     end
 
@@ -196,7 +194,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "raises ArgumentError about disallowed keys" do
-        expect { result }.to raise_error(ArgumentError, 'local_assigns contains [:form, :i18n_base]')
+        expect { result }.to raise_error(ArgumentError, "local_assigns contains [:form, :i18n_base]")
       end
     end
 
@@ -209,7 +207,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "raises ArgumentError about disallowed keys" do
-        expect { result }.to raise_error(ArgumentError, 'local_assigns contains [:label]')
+        expect { result }.to raise_error(ArgumentError, "local_assigns contains [:label]")
       end
     end
 
@@ -268,7 +266,6 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
     end
 
-
     context "with allowed local_assigns keys" do
       let(:local_assigns) { {min: 0, max: 100, step: 5, required: true} }
 
@@ -292,7 +289,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "raises error only for disallowed keys" do
-        expect { result }.to raise_error(ArgumentError, 'local_assigns contains [:form]')
+        expect { result }.to raise_error(ArgumentError, "local_assigns contains [:form]")
       end
     end
 
@@ -305,7 +302,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "raises error listing all disallowed keys" do
-        expect { result }.to raise_error(ArgumentError, 'local_assigns contains [:label, :i18n_base, :form]')
+        expect { result }.to raise_error(ArgumentError, "local_assigns contains [:label, :i18n_base, :form]")
       end
     end
   end

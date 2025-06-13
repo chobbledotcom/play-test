@@ -17,8 +17,8 @@ RSpec.describe "inspector_companies/edit", type: :view do
   it "pre-populates form fields with existing data" do
     render
 
-    expect_model_attributes_displayed(inspector_company, :name, :email, :phone, 
-                                     :address, :city, :postal_code)
+    expect_model_attributes_displayed(inspector_company, :name, :email, :phone,
+      :address, :city, :postal_code)
   end
 
   it "shows form for boolean fields" do
@@ -48,15 +48,15 @@ RSpec.describe "inspector_companies/edit", type: :view do
       allow(logo_attachment).to receive(:attached?).and_return(true)
       allow(logo_attachment).to receive(:image?).and_return(true)
       allow(logo_attachment).to receive(:filename).and_return("logo.png")
-      
+
       # Mock for the image rendering
       blob = double("blob")
       allow(logo_attachment).to receive(:blob).and_return(blob)
       allow(blob).to receive(:persisted?).and_return(true)
-      
+
       allow(inspector_company).to receive(:logo).and_return(logo_attachment)
       allow(ImageProcessorService).to receive(:thumbnail).and_return("processed_image_url")
-      
+
       # Mock image_tag to avoid asset pipeline issues in tests
       allow(view).to receive(:image_tag).and_return('<img src="test-logo.jpg" alt="Current logo">'.html_safe)
     end

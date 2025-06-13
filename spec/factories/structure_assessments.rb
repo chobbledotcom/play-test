@@ -12,8 +12,8 @@ FactoryBot.define do
     # Set critical safety checks based on transient attribute
     after(:build) do |assessment, evaluator|
       if evaluator.critical_checks_pass == true
-        %w[seam_integrity_pass uses_lock_stitching_pass air_loss_pass 
-           straight_walls_pass sharp_edges_pass unit_stable_pass].each do |check|
+        %w[seam_integrity_pass uses_lock_stitching_pass air_loss_pass
+          straight_walls_pass sharp_edges_pass unit_stable_pass].each do |check|
           assessment.send("#{check}=", true)
         end
       elsif evaluator.critical_checks_pass == false
@@ -23,8 +23,8 @@ FactoryBot.define do
       end
 
       if evaluator.measurement_checks_pass == true
-        %w[stitch_length_pass evacuation_time_pass unit_pressure_pass 
-           blower_tube_length_pass step_size_pass critical_fall_off_height_pass].each do |check|
+        %w[stitch_length_pass evacuation_time_pass unit_pressure_pass
+          blower_tube_length_pass step_size_pass critical_fall_off_height_pass].each do |check|
           assessment.send("#{check}=", true)
         end
       elsif evaluator.measurement_checks_pass == false
@@ -52,7 +52,7 @@ FactoryBot.define do
       straight_walls_pass { true }
       sharp_edges_pass { true }
       unit_stable_pass { true }
-      
+
       # Measurements with passing values
       stitch_length { 15.0 }
       evacuation_time { 30.0 }
@@ -62,7 +62,7 @@ FactoryBot.define do
       critical_fall_off_height { 0.6 }
       trough_depth { 0.3 }
       trough_width { 0.8 }
-      
+
       # Measurement pass/fail checks
       stitch_length_pass { true }
       evacuation_time_pass { true }
@@ -70,7 +70,7 @@ FactoryBot.define do
       blower_tube_length_pass { true }
       step_size_pass { true }
       critical_fall_off_height_pass { true }
-      
+
       # Additional checks
       trough_pass { true }
       entrapment_pass { true }
@@ -80,14 +80,14 @@ FactoryBot.define do
 
     trait :complete do
       passed
-      
+
       # Additional complete-only fields
       trough_depth_pass { true }
       trough_adjacent_panel_width { 0.8 }
       trough_adjacent_panel_width_pass { true }
       step_ramp_size { 0.3 }
       step_ramp_size_pass { true }
-      
+
       # Comments for documentation
       seam_integrity_comment { "Seams in good condition" }
       uses_lock_stitching_comment { "Lock stitching is used" }
@@ -110,7 +110,7 @@ FactoryBot.define do
       critical_checks_pass { false }
       measurement_checks_pass { false }
       additional_checks_pass { false }
-      
+
       # Failing measurement values
       stitch_length { 10.0 }
       unit_pressure { 1.0 }

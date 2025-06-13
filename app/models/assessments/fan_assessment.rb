@@ -2,7 +2,7 @@ class Assessments::FanAssessment < ApplicationRecord
   include AssessmentLogging
   include SafetyCheckMethods
   include AssessmentCompletion
-  
+
   belongs_to :inspection
 
   validates :inspection_id, presence: true, uniqueness: true
@@ -15,12 +15,9 @@ class Assessments::FanAssessment < ApplicationRecord
     validates check.to_sym, inclusion: {in: [true, false]}, allow_nil: true
   end
 
-
   def has_critical_failures?
     SAFETY_CHECKS.any? { |check| send(check) == false }
   end
-
-
 
   def safety_issues_summary
     failures = SAFETY_CHECKS.select { |check| send(check) == false }
@@ -30,5 +27,4 @@ class Assessments::FanAssessment < ApplicationRecord
   end
 
   private
-
 end

@@ -8,7 +8,6 @@ RSpec.describe InspectionsHelper, type: :helper do
     end
   end
 
-
   describe "#inspection_tabs" do
     let(:user) { create(:user) }
     let(:inspection) { create(:inspection, user: user) }

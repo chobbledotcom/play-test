@@ -30,7 +30,7 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       fill_in_form :units, :manufacturer, "Test Manufacturer"
       fill_in_form :units, :owner, "Test Owner"
       fill_in_form :units, :description, "Test Description"
-      
+
       # Optional fields using form helpers
       fill_in_form :units, :model, "Test Model"
       fill_in_form :units, :notes, "Created via automated test"
@@ -48,17 +48,17 @@ RSpec.feature "Unit creation company restriction", type: :feature do
 
       # Use our comprehensive helper to verify the entire form structure matches i18n
       expect_form_fields_present("forms.units")
-      
+
       # Fill minimal required fields using our standardized helpers
       fill_in_form :units, :name, "Helper Demo Unit"
       fill_in_form :units, :serial, "DEMO123"
       fill_in_form :units, :manufacturer, "Helper Corp"
       fill_in_form :units, :owner, "Test Owner"
       fill_in_form :units, :description, "Demonstrates form helper capabilities"
-      
+
       # Submit using our standardized submit helper
       submit_form :units
-      
+
       expect(page).to have_content("Helper Demo Unit")
     end
   end

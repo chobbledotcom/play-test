@@ -189,25 +189,25 @@ RSpec.feature "Inspections Index Page", type: :feature do
   describe "inspection ordering" do
     context "draft inspections" do
       it "displays oldest draft inspections first" do
-        old_draft = create_user_inspection(
+        create_user_inspection(
           inspection_location: "Old Draft",
           created_at: 3.days.ago
         )
-        new_draft = create_user_inspection(
-          inspection_location: "New Draft", 
+        create_user_inspection(
+          inspection_location: "New Draft",
           created_at: 1.day.ago
         )
-        middle_draft = create_user_inspection(
+        create_user_inspection(
           inspection_location: "Middle Draft",
           created_at: 2.days.ago
         )
-        
+
         visit inspections_path
-        
+
         # Find all draft inspection locations in order
-        draft_table = page.find('h2', text: 'In Progress').sibling('.table-list')
-        draft_rows = draft_table.all('.table-list-items li')
-        
+        draft_table = page.find("h2", text: "In Progress").sibling(".table-list")
+        draft_rows = draft_table.all(".table-list-items li")
+
         expect(draft_rows[0].text).to include("Old Draft")
         expect(draft_rows[1].text).to include("Middle Draft")
         expect(draft_rows[2].text).to include("New Draft")
@@ -216,34 +216,34 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
     context "completed inspections" do
       it "displays newest completed inspections first" do
-        old_complete = create_user_inspection(
+        create_user_inspection(
           inspection_location: "Old Complete",
           complete_date: Time.current,
           created_at: 3.days.ago
         )
-        new_complete = create_user_inspection(
+        create_user_inspection(
           inspection_location: "New Complete",
           complete_date: Time.current,
           created_at: 1.day.ago
         )
-        middle_complete = create_user_inspection(
+        create_user_inspection(
           inspection_location: "Middle Complete",
           complete_date: Time.current,
           created_at: 2.days.ago
         )
-        
+
         visit inspections_path
-        
+
         # Find all completed inspection locations in order
         # When there are no draft inspections, the Completed heading isn't shown
         # so we look for the table directly after the filter form
-        complete_table = if page.has_css?('h2', text: 'Completed')
-          page.find('h2', text: 'Completed').sibling('.table-list')
+        complete_table = if page.has_css?("h2", text: "Completed")
+          page.find("h2", text: "Completed").sibling(".table-list")
         else
-          page.find('.table-list')
+          page.find(".table-list")
         end
-        complete_rows = complete_table.all('.table-list-items li')
-        
+        complete_rows = complete_table.all(".table-list-items li")
+
         expect(complete_rows[0].text).to include("New Complete")
         expect(complete_rows[1].text).to include("Middle Complete")
         expect(complete_rows[2].text).to include("Old Complete")

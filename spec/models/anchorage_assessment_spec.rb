@@ -286,7 +286,6 @@ RSpec.describe Assessments::AnchorageAssessment, type: :model do
       end
     end
 
-
     describe "#saved_change_to_anchor_counts?" do
       it "returns true when low anchors count changes" do
         assessment.update!(num_low_anchors: 5)

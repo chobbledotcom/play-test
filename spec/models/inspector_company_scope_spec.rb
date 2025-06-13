@@ -5,7 +5,6 @@ RSpec.describe InspectorCompany, type: :model do
     let!(:active_company) { create(:inspector_company, name: "Active Company", active: true) }
     let!(:archived_company) { create(:inspector_company, name: "Archived Company", active: false) }
 
-
     describe ".by_status" do
       it "returns all companies when status is 'all'" do
         result = InspectorCompany.by_status("all")
@@ -45,7 +44,7 @@ RSpec.describe InspectorCompany, type: :model do
           .order(:name)
 
         expect(result).to include(active_company, archived_company)
-        
+
         # Check that our test companies appear in alphabetical order
         company_names = result.pluck(:name)
         expect(company_names).to include("Active Company", "Archived Company")

@@ -90,8 +90,9 @@ hr {
   background-color: var(--color-bg-secondary);
   border: none;
   height: 1px;
-  margin: 4rem auto;
+  margin: 6rem auto;
   width: 60%;
+  opacity: 0.3;
 }
 
 section {

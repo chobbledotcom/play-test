@@ -33,11 +33,6 @@ class Inspection < ApplicationRecord
   validates :unique_report_number,
     uniqueness: {scope: :user_id, allow_blank: true}
 
-
-
-
-
-
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
   before_save :auto_determine_pass_fail, if: :all_assessments_complete?
@@ -187,7 +182,7 @@ class Inspection < ApplicationRecord
       next if name == :slide && !has_slide?
       # Skip enclosed assessment if unit is not totally enclosed
       next if name == :enclosed && !is_totally_enclosed?
-      
+
       message if assessment&.present? && !assessment.complete?
     end
   end
@@ -278,7 +273,6 @@ class Inspection < ApplicationRecord
     base_assessments << enclosed_assessment if is_totally_enclosed?
     base_assessments
   end
-
 
   def auto_determine_pass_fail
     self.passed = all_safety_checks_pass?

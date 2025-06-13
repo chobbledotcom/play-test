@@ -2,7 +2,7 @@ class Assessments::MaterialsAssessment < ApplicationRecord
   include AssessmentLogging
   include SafetyCheckMethods
   include AssessmentCompletion
-  
+
   belongs_to :inspection
 
   # Material specifications
@@ -40,8 +40,6 @@ class Assessments::MaterialsAssessment < ApplicationRecord
     # Fire retardant, fabric strength, and thread are critical for safety
     CRITICAL_MATERIAL_CHECKS.any? { send(it) == false }
   end
-
-
 
   def material_compliance_summary
     {
@@ -105,5 +103,4 @@ class Assessments::MaterialsAssessment < ApplicationRecord
   def failed_critical_checks
     CRITICAL_MATERIAL_CHECKS.select { send(it) == false }
   end
-
 end

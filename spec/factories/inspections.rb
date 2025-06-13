@@ -12,7 +12,7 @@ FactoryBot.define do
     unique_report_number { nil } # User provides this manually
     complete_date { nil }
     is_seed { false }
-    risk_assessment { 
+    risk_assessment {
       "Standard risk assessment completed. Unit inspected in accordance with EN 14960:2019. " \
       "All safety features present and functional. No significant hazards identified. " \
       "Unit suitable for continued operation with appropriate supervision."
@@ -57,13 +57,12 @@ FactoryBot.define do
       association :unit, factory: [:unit, :with_unicode_serial]
     end
 
-
     trait :with_complete_assessments do
       # Dimensions needed for calculations
       width { 5.5 }
       length { 6.0 }
       height { 4.5 }
-      
+
       after(:create) do |inspection|
         # Update all assessments with complete data (assessments are already created by inspection callback)
         inspection.anchorage_assessment.update!(attributes_for(:anchorage_assessment, :complete).except(:inspection_id))
@@ -84,10 +83,10 @@ FactoryBot.define do
 
       # Risk assessment
       risk_assessment { "Low risk assessment notes" }
-      
+
       # Use the complete assessments trait
       with_complete_assessments
-      
+
       after(:create) do |inspection|
         inspection.structure_assessment.update!(
           step_ramp_size: 0.3,

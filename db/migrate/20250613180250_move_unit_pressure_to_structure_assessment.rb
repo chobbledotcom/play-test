@@ -21,17 +21,17 @@ class MoveUnitPressureToStructureAssessment < ActiveRecord::Migration[8.0]
         AND (inspections.unit_pressure IS NOT NULL OR inspections.unit_pressure_pass IS NOT NULL)
       )
     SQL
-    
+
     # Remove fields from inspections
     remove_column :inspections, :unit_pressure
     remove_column :inspections, :unit_pressure_pass
   end
-  
+
   def down
     # Add fields back to inspections
     add_column :inspections, :unit_pressure, :decimal, precision: 8, scale: 2
     add_column :inspections, :unit_pressure_pass, :boolean
-    
+
     # Migrate data back from structure_assessments to inspections
     execute <<-SQL
       UPDATE inspections 

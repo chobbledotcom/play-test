@@ -16,7 +16,6 @@ RSpec.describe InspectorCompany, type: :model do
       expect(company.errors[:name]).to be_present
     end
 
-
     it "validates presence of phone" do
       company = build(:inspector_company, phone: nil)
       expect(company).not_to be_valid

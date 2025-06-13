@@ -41,21 +41,21 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
       failed_pdf_text = pdf_text_content(
         PdfGeneratorService.generate_inspection_report(failed_inspection).render
       )
-      
+
       # Test incomplete inspection (to trigger "INCOMPLETE" text)
       incomplete_inspection = create(:inspection,
         user: user,
         unit: unit,
         complete_date: nil)
-      
+
       incomplete_pdf_text = pdf_text_content(
         PdfGeneratorService.generate_inspection_report(incomplete_inspection).render
       )
-      
+
       # Combine all PDF text for checking
       all_pdf_text = [
-        inspection_pdf_text, 
-        unit_pdf_text, 
+        inspection_pdf_text,
+        unit_pdf_text,
         failed_pdf_text,
         incomplete_pdf_text
       ].join(" ")
@@ -72,7 +72,7 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
         pdf.inspection.fields.incomplete
         pdf.unit.no_completed_inspections
       ]
-      
+
       # Check each PDF i18n key
       all_pdf_i18n_keys.each do |key|
         value = I18n.t(key)
@@ -80,7 +80,7 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
         # Skip checking keys that are placeholders or dynamic
         next if value.include?("%{")
         next if value.blank?
-        
+
         # Skip known fallback keys
         next if fallback_keys.include?(key)
 

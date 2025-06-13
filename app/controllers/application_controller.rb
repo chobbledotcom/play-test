@@ -12,11 +12,11 @@ class ApplicationController < ActionController::Base
   before_action :start_debug_timer, if: :admin_debug_enabled?
   after_action :check_query_limit, if: :should_check_query_limit?
   after_action :cleanup_debug_subscription, if: :admin_debug_enabled?
-  
+
   rescue_from StandardError do |exception|
     if Rails.env.production?
       user_info = current_user ? "User: #{current_user.email}" : "User: Not logged in"
-      
+
       message = <<~MESSAGE
         500 Error in play-test
         
@@ -31,13 +31,12 @@ class ApplicationController < ActionController::Base
         Backtrace (first 5 lines):
         #{exception.backtrace.first(5).join("\n")}
       MESSAGE
-      
+
       NtfyService.notify(message)
     end
-    
+
     raise exception
   end
-
 
   private
 
@@ -150,6 +149,4 @@ class ApplicationController < ActionController::Base
     ActiveSupport::Notifications.unsubscribe(@debug_subscription) if @debug_subscription
     @debug_subscription = nil
   end
-
-
 end

@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.feature "Inspection Tabbed Editing", type: :feature do
-  
   let(:inspector_company) { create(:inspector_company, active: true) }
   let(:user) { create(:user, inspection_company: inspector_company) }
   let(:unit) { create(:unit, user: user) }
@@ -79,7 +78,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     it "displays general form sections" do
       # When inspection has a unit, it shows unit details rather than select field
       expect(page).to have_content(I18n.t("inspections.headers.current_unit"))
-      
+
       expect_form_matches_i18n("forms.inspections")
 
       # These are read-only calculated fields, not form inputs

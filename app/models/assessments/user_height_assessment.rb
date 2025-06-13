@@ -2,7 +2,7 @@ class Assessments::UserHeightAssessment < ApplicationRecord
   include AssessmentLogging
   include SafetyCheckMethods
   include AssessmentCompletion
-  
+
   belongs_to :inspection
 
   # Height measurements (2 decimal places)
@@ -22,7 +22,6 @@ class Assessments::UserHeightAssessment < ApplicationRecord
     :play_area_pass, :negative_adjustments_pass,
     inclusion: {in: [true, false]}, allow_nil: true
 
-
   def meets_height_requirements?
     return false unless tallest_user_height.present? && containing_wall_height.present?
 
@@ -32,8 +31,6 @@ class Assessments::UserHeightAssessment < ApplicationRecord
   def total_user_capacity
     [users_at_1000mm, users_at_1200mm, users_at_1500mm, users_at_1800mm].compact.sum
   end
-
-
 
   def recommended_user_capacity
     return {} unless play_area_length.present? && play_area_width.present?
