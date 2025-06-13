@@ -1,11 +1,12 @@
 class UnitsController < ApplicationController
   include UnitTurboStreams
   include PublicViewable
+  include UserActivityCheck
 
   skip_before_action :require_login, only: %i[show]
   before_action :set_unit, only: %i[destroy edit show update]
   before_action :check_unit_owner, only: %i[destroy edit update]
-  before_action :require_inspection_company, only: %i[create new]
+  before_action :require_user_active, only: %i[create new edit update]
   before_action :no_index
 
   def index
@@ -120,7 +121,19 @@ class UnitsController < ApplicationController
 
   private
 
-  def unit_params = UnitParamsService.new(params).permitted_params
+  def unit_params
+    params.require(:unit).permit(*%i[
+      description
+      manufacture_date
+      manufacturer
+      model
+      name
+      notes
+      owner
+      photo
+      serial
+    ])
+  end
 
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
 
@@ -140,12 +153,6 @@ class UnitsController < ApplicationController
     end
   end
 
-  def require_inspection_company
-    unless current_user.is_active?
-      flash[:alert] = current_user.inactive_user_message
-      redirect_to units_path
-    end
-  end
 
   def send_unit_pdf
     pdf_data = PdfGeneratorService.generate_unit_report(@unit)
@@ -197,5 +204,9 @@ class UnitsController < ApplicationController
     title_parts << params[:manufacturer] if params[:manufacturer].present?
     title_parts << params[:owner] if params[:owner].present?
     title_parts.join(" - ")
+  end
+
+  def handle_inactive_user_redirect
+    redirect_to units_path
   end
 end

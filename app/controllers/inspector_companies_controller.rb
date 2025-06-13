@@ -45,10 +45,10 @@ class InspectorCompaniesController < ApplicationController
         end
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.replace("inspector_company_save_message",
+            turbo_stream.replace("form_save_message",
               partial: "shared/save_message",
               locals: {
-                dom_id: "inspector_company_save_message",
+                dom_id: "form_save_message",
                 success: true,
                 success_message: t("inspector_companies.messages.updated")
               })
@@ -60,10 +60,10 @@ class InspectorCompaniesController < ApplicationController
         format.html { render :edit, status: :unprocessable_entity }
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.replace("inspector_company_save_message",
+            turbo_stream.replace("form_save_message",
               partial: "shared/save_message",
               locals: {
-                dom_id: "inspector_company_save_message",
+                dom_id: "form_save_message",
                 errors: @inspector_company.errors.full_messages,
                 error_message: t("shared.messages.save_failed")
               })

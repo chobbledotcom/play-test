@@ -19,13 +19,8 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
         comments: "Comments: #{extremely_long_text}"
       )
 
-      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
-
-      expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
-      expect(page.driver.response.body[0..3]).to eq("%PDF")
-
-      # PDF should be generated without errors
-      expect { PDF::Inspector::Text.analyze(page.driver.response.body) }.not_to raise_error
+      pdf_data = get_pdf("/inspections/#{inspection.id}.pdf")
+      expect_valid_pdf(pdf_data)
     end
 
     scenario "handles mixed Unicode, emoji, and special characters" do
@@ -36,11 +31,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
         comments: "#{mixed_content} with more content"
       )
 
-      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
-
-      expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
-
-      pdf_text = PDF::Inspector::Text.analyze(page.driver.response.body).strings.join(" ")
+      pdf_text = get_pdf_text("/inspections/#{inspection.id}.pdf")
       expect(pdf_text).to be_present
       expect(pdf_text.encoding.name).to eq("UTF-8")
     end
@@ -56,37 +47,25 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
       dangerous_content.each do |content|
         inspection.update(comments: content)
-
-        page.driver.browser.get("/inspections/#{inspection.id}.pdf")
-
-        expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
-        expect(page.driver.response.body[0..3]).to eq("%PDF")
+        get_pdf("/inspections/#{inspection.id}.pdf")
       end
     end
   end
 
   feature "Numeric precision and edge values" do
     scenario "handles extreme numeric precision" do
-      # Create assessments with extreme values
-      create(:user_height_assessment, :extreme_values, inspection: inspection)
+      # Update the auto-created assessment with extreme values
+      inspection.user_height_assessment.update!(attributes_for(:user_height_assessment, :extreme_values).except(:inspection_id))
 
-      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
-
-      expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
-      expect(page.driver.response.body[0..3]).to eq("%PDF")
-
-      # Just verify PDF was generated successfully with extreme numeric values
-      expect { PDF::Inspector::Text.analyze(page.driver.response.body) }.not_to raise_error
+      pdf_data = get_pdf("/inspections/#{inspection.id}.pdf")
+      expect_valid_pdf(pdf_data)
     end
 
     scenario "handles nil and blank numeric values" do
-      create(:user_height_assessment, :edge_case_values, inspection: inspection)
+      # Update the auto-created assessment with edge case values
+      inspection.user_height_assessment.update!(attributes_for(:user_height_assessment, :edge_case_values).except(:inspection_id))
 
-      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
-
-      expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
-
-      pdf_text = PDF::Inspector::Text.analyze(page.driver.response.body).strings.join(" ")
+      pdf_text = get_pdf_text("/inspections/#{inspection.id}.pdf")
       expect(pdf_text).to include("N/A").or include("0")
     end
   end
@@ -94,18 +73,9 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
   feature "Large data sets and performance" do
     scenario "handles inspection with all assessment types and maximum data" do
       # Create unit with all features
-      full_unit = create(:unit, :maximum_size_full_featured, user: user)
+      full_unit = create(:unit, :with_all_fields, user: user)
 
-      full_inspection = create(:inspection, :completed, user: user, unit: full_unit)
-
-      # Create all assessment types with full data
-      create(:user_height_assessment, inspection: full_inspection)
-      create(:slide_assessment, inspection: full_inspection)
-      create(:structure_assessment, inspection: full_inspection)
-      create(:anchorage_assessment, inspection: full_inspection)
-      create(:materials_assessment, inspection: full_inspection)
-      create(:fan_assessment, inspection: full_inspection)
-      create(:enclosed_assessment, inspection: full_inspection)
+      full_inspection = create(:inspection, :completed, :with_complete_assessments, :with_slide, :totally_enclosed, user: user, unit: full_unit)
 
       # Add maximum length comments to all assessments
       long_comment = "Detailed assessment comment " * 50
@@ -116,27 +86,21 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       )
 
       start_time = Time.current
-      page.driver.browser.get("/inspections/#{full_inspection.id}.pdf")
+      pdf_text = test_pdf_content("/inspections/#{full_inspection.id}.pdf")
       generation_time = Time.current - start_time
 
-      expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
       expect(generation_time).to be < 10.seconds  # Should generate within 10 seconds
 
       # Verify PDF contains all sections
-      pdf_text = PDF::Inspector::Text.analyze(page.driver.response.body).strings.join(" ")
-      expect(pdf_text).to include("User Height")
-      expect(pdf_text).to include("Slide")
-      expect(pdf_text).to include("Structure")
-      expect(pdf_text).to include("Anchorage")
-      expect(pdf_text).to include("Materials")
-      expect(pdf_text).to include("Fan/Blower")
-      expect(pdf_text).to include("Totally Enclosed")
+      %w[User\ Height Slide Structure Anchorage Materials Fan/Blower Totally\ Enclosed].each do |section|
+        expect(pdf_text).to include(section)
+      end
     end
 
     scenario "generates PDFs with reasonable file sizes" do
-      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
-
-      pdf_size = page.driver.response.body.bytesize
+      pdf_data = get_pdf("/inspections/#{inspection.id}.pdf")
+      pdf_size = pdf_data.bytesize
+      
       expect(pdf_size).to be < 2.megabytes  # Should be under 2MB for basic inspection
       expect(pdf_size).to be > 1.kilobyte   # Should have substantial content
     end
@@ -181,8 +145,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
       10.times do
         temp_files_before = Dir.glob(process_pattern).size
-        page.driver.browser.get("/inspections/#{inspection.id}.pdf")
-        expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
+        get_pdf("/inspections/#{inspection.id}.pdf")
 
         # Allow a brief moment for cleanup
         sleep(0.01)
@@ -206,11 +169,9 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
         users_at_1000mm: -999
       )
 
-      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
-
       # Should still generate PDF, just with "N/A" or safe defaults
-      expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
-      expect(page.driver.response.body[0..3]).to eq("%PDF")
+      pdf_data = get_pdf("/inspections/#{inspection.id}.pdf")
+      expect_valid_pdf(pdf_data)
     end
   end
 end

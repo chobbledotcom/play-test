@@ -16,7 +16,6 @@ RSpec.describe InspectorCompany, type: :model do
       expect(company.errors[:name]).to be_present
     end
 
-    # RPII numbers are now validated at the user level, not company level
 
     it "validates presence of phone" do
       company = build(:inspector_company, phone: nil)

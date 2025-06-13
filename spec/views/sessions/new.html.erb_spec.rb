@@ -4,22 +4,20 @@ RSpec.describe "sessions/new.html.erb", type: :view do
   it "renders login form" do
     render
 
-    expect(rendered).to have_content(I18n.t("session.login.title"))
-    expect(rendered).to have_field(I18n.t("session.login.email"))
-    expect(rendered).to have_field(I18n.t("session.login.password_label"))
-    expect(rendered).to have_button(I18n.t("session.login.submit"))
+    # Use helper to verify entire form matches i18n structure
+    expect_standard_form_structure("forms.session_new")
   end
 
   it "displays login heading" do
     render
 
-    expect(rendered).to have_content(I18n.t("session.login.title"))
+    expect(rendered).to have_content(I18n.t("forms.session_new.header"))
   end
 
   it "includes remember me checkbox" do
     render
 
-    expect(rendered).to have_content(I18n.t("session.login.remember_me"))
+    expect(rendered).to have_content(I18n.t("forms.session_new.fields.remember_me"))
     expect(rendered).to have_field(type: "checkbox")
   end
 

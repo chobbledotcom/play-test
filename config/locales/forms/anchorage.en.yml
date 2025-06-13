@@ -1,0 +1,33 @@
+en:
+  forms:
+    anchorage:
+      header: "Anchorage Assessment"
+      sections:
+        anchor_counts: "Anchor Counts"
+        anchor_quality: "Anchor Quality"
+      fields:
+        num_low_anchors: "Number of Low Anchors"
+        num_high_anchors: "Number of High Anchors"
+        num_anchors_pass: "Number of Anchors Check"
+        anchor_type_pass: "Anchor Type Check"
+        pull_strength_pass: "Pull Strength Check"
+        anchor_degree_pass: "Anchor Degree Check"
+        anchor_accessories_pass: "Anchor Accessories Check"
+      status:
+        checks_passed: "Safety Checks Passed"
+        completion: "Assessment Completion"
+      summary:
+        title: "Assessment Summary"
+        total_anchors: "Total Anchors"
+        required_anchors: "Required Anchors"
+        compliance_status: "Compliance Status"
+        area_warning: "Warning"
+        area_missing: "Unit area must be set to calculate required anchors"
+        distribution_title: "Anchor Distribution Analysis"
+        low_anchors: "Low Anchors"
+        high_anchors: "High Anchors"
+        completion: "Completion"
+        safety_checks: "Safety Checks"
+        critical_failures: "Critical Failures"
+        safety_summary: "Safety Summary"
+      submit: "Save Assessment"

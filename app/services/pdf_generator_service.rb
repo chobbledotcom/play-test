@@ -33,8 +33,8 @@ class PdfGeneratorService
       renderer = AssessmentRenderer.generate_user_height_section(pdf, inspection)
       assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
 
-      # Slide Assessment section (if unit has slide)
-      if inspection.unit&.has_slide?
+      # Slide Assessment section (if inspection has slide)
+      if inspection.has_slide?
         renderer = AssessmentRenderer.generate_slide_section(pdf, inspection)
         assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
       end
@@ -48,7 +48,7 @@ class PdfGeneratorService
       assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
 
       # Totally Enclosed section (if applicable)
-      if inspection.unit&.is_totally_enclosed?
+      if inspection.is_totally_enclosed?
         renderer = AssessmentRenderer.generate_enclosed_section(pdf, inspection)
         assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
       end
@@ -100,7 +100,7 @@ class PdfGeneratorService
 
   def self.generate_inspection_comments(pdf, inspection)
     pdf.move_down 20
-    pdf.text I18n.t("pdf.inspection.comments"), size: SECTION_TITLE_SIZE, style: :bold
+    pdf.text I18n.t("shared.comments"), size: SECTION_TITLE_SIZE, style: :bold
     pdf.stroke_horizontal_rule
     pdf.move_down 10
     pdf.text inspection.comments

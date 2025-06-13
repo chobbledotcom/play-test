@@ -23,23 +23,13 @@ RSpec.describe Unit, type: :model do
   describe "validations" do
     it "validates presence of all required fields" do
       unit = build(:unit, user: user, name: nil, serial: nil,
-        description: nil, manufacturer: nil, owner: nil,
-        width: nil, length: nil, height: nil)
+        description: nil, manufacturer: nil, owner: nil)
       expect(unit).not_to be_valid
       expect(unit.errors[:name]).to be_present
       expect(unit.errors[:serial]).to be_present
       expect(unit.errors[:description]).to be_present
       expect(unit.errors[:manufacturer]).to be_present
       expect(unit.errors[:owner]).to be_present
-      expect(unit.errors[:width]).to be_present
-      expect(unit.errors[:length]).to be_present
-      expect(unit.errors[:height]).to be_present
-    end
-
-    it "validates dimension ranges" do
-      unit = build(:unit, width: 250.0) # Too large
-      expect(unit).not_to be_valid
-      expect(unit.errors[:width]).to be_present
     end
 
     it "validates serial uniqueness within user" do
@@ -87,7 +77,7 @@ RSpec.describe Unit, type: :model do
 
   describe "search functionality" do
     let!(:unit1) { create(:unit, name: "Bouncy Castle", serial: "BC001", description: "Inflatable bouncy castle") }
-    let!(:unit2) { create(:unit, name: "Slide Unit", serial: "SL002", has_slide: true, description: "Giant inflatable slide") }
+    let!(:unit2) { create(:unit, name: "Slide Unit", serial: "SL002", description: "Giant inflatable slide") }
 
     it "searches by serial" do
       results = Unit.search("BC001")
@@ -108,21 +98,12 @@ RSpec.describe Unit, type: :model do
     describe "validations in unit mode" do
       it "validates unit-specific fields when in unit mode" do
         unit = build(:unit, user: user, manufacturer: nil,
-          owner: nil, width: nil, length: nil, height: nil, serial: nil)
+          owner: nil, serial: nil)
 
         expect(unit).not_to be_valid
         expect(unit.errors[:manufacturer]).to be_present
         expect(unit.errors[:owner]).to be_present
-        expect(unit.errors[:width]).to be_present
-        expect(unit.errors[:length]).to be_present
-        expect(unit.errors[:height]).to be_present
         expect(unit.errors[:serial]).to be_present
-      end
-
-      it "validates dimension ranges" do
-        unit = build(:unit, width: 250.0) # Too large
-        expect(unit).not_to be_valid
-        expect(unit.errors[:width]).to be_present
       end
 
       it "validates serial uniqueness within user" do
@@ -135,54 +116,8 @@ RSpec.describe Unit, type: :model do
       end
     end
 
-    describe "has_slide attribute" do
-      it "defaults to false" do
-        new_unit = Unit.new
-        expect(new_unit.has_slide).to be_falsy
-      end
-
-      it "can be set to true" do
-        test_unit.has_slide = true
-        expect(test_unit.has_slide).to be_truthy
-      end
-    end
-
-    describe "dimensions and calculations" do
-      it "calculates dimensions string" do
-        expect(test_unit.dimensions).to eq("10m × 10m × 3m")
-      end
-
-      it "calculates area" do
-        expect(test_unit.area).to eq(100.0)
-      end
-
-      it "calculates volume" do
-        expect(test_unit.volume).to eq(300.0)
-      end
-    end
 
     describe "scopes" do
-      let!(:slide_unit) {
-        create(:unit, user: user, name: "Slide Unit",
-          serial: "SLIDE001", manufacturer: "Slide Co", has_slide: true)
-      }
-
-      describe ".with_slide" do
-        it "filters units with slides" do
-          results = Unit.with_slide
-          expect(results).to include(slide_unit)
-          expect(results).not_to include(test_unit)
-        end
-      end
-
-      describe ".without_slide" do
-        it "filters units without slides" do
-          results = Unit.without_slide
-          expect(results).to include(test_unit)
-          expect(results).not_to include(slide_unit)
-        end
-      end
-
       describe "enhanced search" do
         it "searches across all relevant fields" do
           results = Unit.search("Bouncy")
@@ -208,13 +143,6 @@ RSpec.describe Unit, type: :model do
         expect(test_unit).to respond_to(:inspection_summary)
       end
 
-      it "determines enclosed assessment requirement" do
-        test_unit.is_totally_enclosed = true
-        expect(test_unit.requires_enclosed_assessment?).to be_truthy
-
-        test_unit.is_totally_enclosed = false
-        expect(test_unit.requires_enclosed_assessment?).to be_falsy
-      end
 
       it "provides inspection summary" do
         summary = test_unit.inspection_summary
@@ -233,78 +161,6 @@ RSpec.describe Unit, type: :model do
     end
   end
 
-  describe "HasDimensions concern" do
-    let(:unit) { create(:unit, user: user) }
-
-    it "includes HasDimensions module" do
-      expect(Unit.ancestors).to include(HasDimensions)
-    end
-
-    it "validates optional dimension fields" do
-      unit.num_low_anchors = -1
-      unit.rope_size = -5
-
-      expect(unit).not_to be_valid
-      expect(unit.errors[:num_low_anchors]).to include("must be greater than or equal to 0")
-      expect(unit.errors[:rope_size]).to include("must be greater than or equal to 0")
-    end
-
-    it "has dimension_attributes method" do
-      unit.update!(
-        num_low_anchors: 4,
-        num_high_anchors: 2,
-        rope_size: 12.5,
-        slide_platform_height: 2.0
-      )
-
-      attrs = unit.dimension_attributes
-      expect(attrs[:width]).to eq(10.0)
-      expect(attrs[:num_low_anchors]).to eq(4)
-      expect(attrs[:rope_size]).to eq(12.5)
-      expect(attrs[:slide_platform_height]).to eq(2.0)
-    end
-
-    it "triggers update callback when dimensions change" do
-      create(:inspection,
-        user: user,
-        unit: unit,
-        inspection_date: Date.current,
-        inspection_location: "Test Location",
-        inspector_company: create(:inspector_company))
-
-      expect(unit).to receive(:update_inspection_unit_data)
-      unit.update!(width: 15.0)
-    end
-
-    describe "dimension helper methods" do
-      before do
-        unit.update!(
-          num_low_anchors: 6,
-          num_high_anchors: 2,
-          users_at_1000mm: 10,
-          users_at_1200mm: 15,
-          users_at_1500mm: 20,
-          users_at_1800mm: 18
-        )
-      end
-
-      it "calculates total anchors" do
-        expect(unit.total_anchors).to eq(8)
-      end
-
-      it "calculates max user capacity" do
-        expect(unit.max_user_capacity).to eq(20)
-      end
-
-      it "checks for dimension categories" do
-        expect(unit.has_anchorage_attributes?).to be_truthy
-        expect(unit.has_slide_attributes?).to be_falsy
-
-        unit.slide_platform_height = 2.5
-        expect(unit.has_slide_attributes?).to be_truthy
-      end
-    end
-  end
 
   describe "#inspection_overdue?" do
     let(:unit) { create(:unit) }
@@ -317,21 +173,21 @@ RSpec.describe Unit, type: :model do
 
     context "when last inspection was within the reinspection interval" do
       it "returns false" do
-        create(:inspection, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago)
+        create(:inspection, :complete, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago)
         expect(unit.inspection_overdue?).to be false
       end
     end
 
     context "when last inspection was beyond the reinspection interval" do
       it "returns true" do
-        create(:inspection, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 30).days.ago)
+        create(:inspection, :complete, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 30).days.ago)
         expect(unit.inspection_overdue?).to be true
       end
     end
 
     context "when last inspection was exactly at the reinspection interval" do
       it "returns false" do
-        create(:inspection, unit: unit, inspection_date: SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago)
+        create(:inspection, :complete, unit: unit, inspection_date: SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago)
         expect(unit.inspection_overdue?).to be false
       end
     end
@@ -349,15 +205,15 @@ RSpec.describe Unit, type: :model do
     context "when unit has been inspected" do
       it "returns date after reinspection interval from last inspection" do
         inspection_date = Date.new(2024, 1, 15)
-        create(:inspection, unit: unit, inspection_date: inspection_date)
+        create(:inspection, :completed, unit: unit, inspection_date: inspection_date)
 
         expect(unit.next_inspection_due).to eq(inspection_date + SafetyStandard::REINSPECTION_INTERVAL_DAYS.days)
       end
 
       it "uses the most recent inspection date" do
-        create(:inspection, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS * 2).days.ago)
+        create(:inspection, :completed, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS * 2).days.ago)
         recent_date = (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago.to_date
-        create(:inspection, unit: unit, inspection_date: recent_date)
+        create(:inspection, :completed, unit: unit, inspection_date: recent_date)
 
         expect(unit.next_inspection_due).to eq(recent_date + SafetyStandard::REINSPECTION_INTERVAL_DAYS.days)
       end
@@ -415,21 +271,21 @@ RSpec.describe Unit, type: :model do
 
     context "when inspection is overdue" do
       it "returns 'Overdue'" do
-        create(:inspection, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 30).days.ago, passed: true)
+        create(:inspection, :completed, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 30).days.ago, passed: true)
         expect(unit.compliance_status).to eq("Overdue")
       end
     end
 
     context "when recently inspected and passed" do
       it "returns 'Compliant'" do
-        create(:inspection, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago, passed: true)
+        create(:inspection, :completed, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago, passed: true)
         expect(unit.compliance_status).to eq("Compliant")
       end
     end
 
     context "when recently inspected but failed" do
       it "returns 'Non-Compliant'" do
-        create(:inspection, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago, passed: false)
+        create(:inspection, :completed, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago, passed: false)
         expect(unit.compliance_status).to eq("Non-Compliant")
       end
     end

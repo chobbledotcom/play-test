@@ -1,5 +1,5 @@
 class UnitCsvExportService
-  ATTRIBUTES = %w[id name manufacturer serial has_slide].freeze
+  ATTRIBUTES = %w[id name manufacturer serial].freeze
 
   def initialize(units)
     @units = units

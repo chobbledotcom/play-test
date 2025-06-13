@@ -44,6 +44,13 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 RSpec.configure do |config|
+  # Raise exceptions on missing translations in tests
+  config.before(:suite) do
+    I18n.exception_handler = lambda do |exception, locale, key, options|
+      raise exception.to_exception
+    end
+  end
+
   # Set admin emails pattern for test environment
   config.before(:each) do
     ENV["ADMIN_EMAILS_PATTERN"] = "^admin\\d*@example\\.com$"
@@ -100,6 +107,9 @@ RSpec.configure do |config|
   #
   # To enable this behaviour uncomment the line below.
   # config.infer_spec_type_from_file_location!
+
+  # Include form helpers for all feature tests
+  config.include FormHelpers, type: :feature
 
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!

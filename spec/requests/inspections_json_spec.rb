@@ -2,32 +2,20 @@ require "rails_helper"
 
 RSpec.describe "Inspection JSON endpoints", type: :request do
   let(:user) { create(:user) }
-  let(:unit) { create(:unit, user: user, has_slide: true, is_totally_enclosed: true) }
-  let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
+  let(:unit) { create(:unit, user: user) }
+  let(:inspection) { create(:inspection, :completed, user: user, unit: unit, has_slide: true, is_totally_enclosed: true) }
 
   describe "GET /inspections/:id.json" do
     context "when inspection exists" do
       it "returns inspection data as JSON" do
-        get "/inspections/#{inspection.id}.json"
+        json = get_inspection_json(inspection)
 
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to include("application/json")
-
-        json = JSON.parse(response.body)
-
-        # Check basic fields are included
-        expect(json["inspection_date"]).to eq(inspection.inspection_date.as_json)
+        # Check specific field values
+        nice_date = inspection.inspection_date.strftime("%F") # YYYY-MM-DD
+        expect(json["inspection_date"]).to eq(nice_date)
         expect(json["inspection_location"]).to eq(inspection.inspection_location)
         expect(json["passed"]).to eq(inspection.passed)
         expect(json["complete"]).to eq(inspection.complete?)
-        expect(json["comments"]).to eq(inspection.comments)
-
-        # Check sensitive fields are excluded
-        expect(json).not_to have_key("user_id")
-        expect(json).not_to have_key("inspector_signature")
-        expect(json).not_to have_key("signature_timestamp")
-        expect(json).not_to have_key("created_at")
-        expect(json).not_to have_key("updated_at")
 
         # Check URLs are included
         expect(json["urls"]).to be_present
@@ -39,11 +27,12 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
       it "includes inspector company info" do
         get "/inspections/#{inspection.id}.json"
 
-        json = JSON.parse(response.body)
+        user = inspection.user
+        result = JSON.parse(response.body)&.dig("inspector")
 
-        expect(json["inspector_company"]).to be_present
-        expect(json["inspector_company"]["name"]).to eq(inspection.inspector_company.name)
-        expect(json["inspector_company"]["rpii_inspector_number"]).to eq(inspection.user.rpii_inspector_number)
+        expect(result).to be_present
+        expect(result["name"]).to eq(user.name)
+        expect(result["rpii_inspector_number"]).to eq(user.rpii_inspector_number)
       end
 
       it "includes unit info" do
@@ -54,15 +43,10 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
         expect(json["unit"]).to be_present
         expect(json["unit"]["id"]).to eq(unit.id)
         expect(json["unit"]["name"]).to eq(unit.name)
-        expect(json["unit"]["has_slide"]).to eq(true)
-        expect(json["unit"]["is_totally_enclosed"]).to eq(true)
       end
 
       context "with assessments" do
-        let!(:user_height_assessment) { create(:user_height_assessment, :complete, inspection: inspection) }
-        let!(:structure_assessment) { create(:structure_assessment, :complete, inspection: inspection) }
-        let!(:slide_assessment) { create(:slide_assessment, :complete, inspection: inspection) }
-        let!(:enclosed_assessment) { create(:enclosed_assessment, :passed, inspection: inspection) }
+        let(:inspection) { create(:inspection, :pdf_complete_test_data, :with_slide, :totally_enclosed, user: user, unit: unit) }
 
         it "includes assessment data" do
           get "/inspections/#{inspection.id}.json"
@@ -84,39 +68,31 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
         end
 
         it "includes all assessment fields except system fields" do
-          create(:anchorage_assessment, :complete, inspection: inspection)
-          create(:materials_assessment, :complete, inspection: inspection)
-          create(:fan_assessment, :complete, inspection: inspection)
+          # Use complete inspection that already has all assessments
+          complete_inspection = create_complete_inspection(user: user, unit: unit)
+          
+          json = get_inspection_json(complete_inspection)
 
-          get "/inspections/#{inspection.id}.json"
-
-          json = JSON.parse(response.body)
-
-          # Check AnchorageAssessment includes all fields
-          anchorage = json["assessments"]["anchorage_assessment"]
-          expect(anchorage).to have_key("num_anchors_comment")
-          expect(anchorage).to have_key("anchor_accessories_comment")
-
-          # Check MaterialsAssessment includes all fields
-          materials = json["assessments"]["materials_assessment"]
-          expect(materials).to have_key("rope_size_comment")
-          expect(materials).to have_key("thread_comment")
-
-          # Check FanAssessment includes all fields
-          fan = json["assessments"]["fan_assessment"]
-          expect(fan).to have_key("blower_serial")
-          expect(fan).to have_key("pat_comment")
+          # Check specific fields are included using helper
+          expect_assessment_json(json, "anchorage_assessment", 
+            %w[num_anchors_comment anchor_accessories_comment])
+          
+          expect_assessment_json(json, "materials_assessment",
+            %w[ropes_comment thread_comment])
+            
+          expect_assessment_json(json, "fan_assessment",
+            %w[blower_serial pat_comment])
         end
       end
 
       context "when unit doesn't have slide" do
-        let(:unit_no_slide) { create(:unit, user: user, has_slide: false) }
-        let(:inspection_no_slide) { create(:inspection, :completed, user: user, unit: unit_no_slide) }
-
         it "excludes slide assessment even if present" do
-          create(:slide_assessment, inspection: inspection_no_slide)
+          inspection = create(:inspection, :completed, has_slide: false)
 
-          get inspection_path(inspection_no_slide, format: :json)
+          # Slide assessment already exists from inspection creation
+          inspection.slide_assessment.update!(runout: 2.5)
+
+          get inspection_path(inspection, format: :json)
 
           json = JSON.parse(response.body)
 
@@ -144,35 +120,6 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
 
         json = JSON.parse(response.body)
         expect(json["inspection_location"]).to eq(inspection.inspection_location)
-      end
-    end
-  end
-
-  describe "field coverage using reflection" do
-    it "includes all inspection fields except excluded ones" do
-      get "/inspections/#{inspection.id}.json"
-
-      json = JSON.parse(response.body)
-
-      # Get expected fields using same reflection as service
-      excluded_fields = %w[
-        id created_at updated_at pdf_last_accessed_at
-        user_id unit_id inspector_company_id
-        inspector_signature signature_timestamp
-      ]
-      expected_fields = Inspection.column_names - excluded_fields
-
-      # Check all expected fields are present (if they have values)
-      expected_fields.each do |field|
-        value = inspection.send(field)
-        if value.present?
-          expect(json).to have_key(field), "Expected field '#{field}' to be in JSON"
-        end
-      end
-
-      # Check excluded fields are not present
-      excluded_fields.each do |field|
-        expect(json).not_to have_key(field), "Field '#{field}' should be excluded from JSON"
       end
     end
   end

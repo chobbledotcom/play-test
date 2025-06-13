@@ -22,12 +22,4 @@ RSpec.feature "Inspection Creation Workflow", type: :feature do
     expect(current_url).to include(edit_inspection_path(created_inspection))
   end
 
-  private
-
-  def sign_in(user)
-    visit login_path
-    fill_in I18n.t("session.login.email"), with: user.email
-    fill_in I18n.t("session.login.password"), with: "password123"
-    click_button I18n.t("session.login.submit")
-  end
 end

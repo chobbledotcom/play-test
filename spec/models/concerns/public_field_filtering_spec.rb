@@ -63,6 +63,7 @@ RSpec.describe PublicFieldFiltering do
           inspector_signature
           signature_timestamp
           inspection_id
+          is_seed
         ]
 
         expect(described_class::EXCLUDED_FIELDS).to eq(expected_fields)

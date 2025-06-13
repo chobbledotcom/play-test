@@ -78,19 +78,18 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       visit change_settings_user_path(regular_user)
 
       # Should be able to edit preferences
-      expect(page).to have_select("user_time_display")
       expect(page).to have_field("user_default_inspection_location")
       expect(page).to have_select("user_theme")
 
       # Update preferences
-      select I18n.t("users.options.time_full"), from: "user_time_display"
+      select I18n.t("users.options.theme_dark"), from: "user_theme"
       fill_in "user_default_inspection_location", with: "Test Location"
       click_button I18n.t("users.buttons.update_settings")
 
       expect(page).to have_content(I18n.t("users.messages.settings_updated"))
 
       regular_user.reload
-      expect(regular_user.time_display).to eq("time")
+      expect(regular_user.theme).to eq("dark")
       expect(regular_user.default_inspection_location).to eq("Test Location")
       # Name should remain unchanged
       expect(regular_user.name).to eq("Original Name")

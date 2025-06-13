@@ -1,179 +1,146 @@
 require "rails_helper"
 
-RSpec.describe EnclosedAssessment, type: :model do
-  let(:inspection) { create(:inspection) }
+RSpec.describe Assessments::EnclosedAssessment, type: :model do
+  let(:user) { create(:user) }
+  let(:unit) { create(:unit, user: user) }
+  let(:inspection) { create(:inspection, user: user, unit: unit) }
+  let(:assessment) { inspection.enclosed_assessment }
 
-  describe "associations" do
-    it "belongs to inspection" do
-      assessment = build(:enclosed_assessment, inspection: inspection)
-      expect(assessment.inspection).to eq(inspection)
-    end
-  end
-
+  # Use shared examples for common behaviors
+  it_behaves_like "an assessment model"
+  it_behaves_like "has safety check methods", 3
+  
   describe "validations" do
-    it "validates presence of inspection_id" do
-      assessment = build(:enclosed_assessment, inspection_id: nil)
-      expect(assessment).not_to be_valid
-      expect(assessment.errors[:inspection_id]).to include("can't be blank")
+    context "exit number" do
+      it "validates exit_number is positive when present" do
+        assessment.exit_number = -1
+        expect(assessment).not_to be_valid
+        expect(assessment.errors[:exit_number]).to include("must be greater than 0")
+      end
+
+      it "allows exit_number to be blank" do
+        assessment.exit_number = nil
+        expect(assessment).to be_valid
+      end
     end
 
-    it "validates uniqueness of inspection_id" do
-      create(:enclosed_assessment, inspection: inspection)
-      duplicate = build(:enclosed_assessment, inspection: inspection)
-      expect(duplicate).not_to be_valid
-      expect(duplicate.errors[:inspection_id]).to include("has already been taken")
+    context "pass/fail assessments" do
+      %w[exit_number_pass exit_sign_always_visible_pass exit_sign_visible_pass].each do |field|
+        include_examples "validates boolean field", field
+      end
     end
 
-    it "validates exit_number is positive when present" do
-      assessment = build(:enclosed_assessment, inspection: inspection, exit_number: -1)
-      expect(assessment).not_to be_valid
-      expect(assessment.errors[:exit_number]).to include("must be greater than 0")
-    end
-
-    it "allows exit_number to be blank" do
-      assessment = build(:enclosed_assessment, inspection: inspection, exit_number: nil)
-      expect(assessment).to be_valid
-    end
-  end
-
-  describe "factory" do
-    it "creates valid enclosed assessment" do
-      assessment = build(:enclosed_assessment, inspection: inspection)
-      expect(assessment).to be_valid
-    end
-
-    it "creates valid passed assessment" do
-      assessment = build(:enclosed_assessment, :passed, inspection: inspection)
-      expect(assessment).to be_valid
-      expect(assessment.exit_number_pass).to be true
-      expect(assessment.exit_visible_pass).to be true
-    end
-
-    it "creates valid failed assessment" do
-      assessment = build(:enclosed_assessment, :failed, inspection: inspection)
-      expect(assessment).to be_valid
-      expect(assessment.exit_number_pass).to be false
-      expect(assessment.exit_visible_pass).to be false
+    context "comment fields" do
+      %w[exit_number_comment exit_sign_always_visible_comment exit_sign_visible_comment].each do |field|
+        include_examples "validates comment field", field
+      end
     end
   end
 
   describe "#complete?" do
     it "returns true when all required fields are present" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
+      assessment.assign_attributes(
         exit_number: 2,
         exit_number_pass: true,
-        exit_visible_pass: true)
+        exit_sign_always_visible_pass: true,
+        exit_sign_visible_pass: true)
       expect(assessment.complete?).to be true
     end
 
     it "returns false when exit_number is missing" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
+      assessment.assign_attributes(
         exit_number: nil,
         exit_number_pass: true,
-        exit_visible_pass: true)
+        exit_sign_always_visible_pass: true)
       expect(assessment.complete?).to be false
     end
 
     it "returns false when exit_number_pass is missing" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
+      assessment.assign_attributes(
         exit_number: 2,
         exit_number_pass: nil,
-        exit_visible_pass: true)
+        exit_sign_always_visible_pass: true,
+        exit_sign_visible_pass: true)
       expect(assessment.complete?).to be false
     end
-  end
 
-  describe "#completion_percentage" do
-    it "returns 100 when all fields are complete" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
+    it "returns false when exit_sign_visible_pass is missing" do
+      assessment.assign_attributes(
         exit_number: 2,
         exit_number_pass: true,
-        exit_visible_pass: true)
-      expect(assessment.completion_percentage).to eq(100)
-    end
-
-    it "returns 67 when 2 of 3 fields are complete" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
-        exit_number: 2,
-        exit_number_pass: true,
-        exit_visible_pass: nil)
-      expect(assessment.completion_percentage).to eq(67)
-    end
-
-    it "returns 0 when no fields are complete" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
-        exit_number: nil,
-        exit_number_pass: nil,
-        exit_visible_pass: nil)
-      expect(assessment.completion_percentage).to eq(0)
-    end
-  end
-
-  describe "#passed_checks_count" do
-    it "counts passed checks" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
-        exit_number_pass: true,
-        exit_visible_pass: true)
-      expect(assessment.passed_checks_count).to eq(2)
-    end
-
-    it "counts only true values" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
-        exit_number_pass: true,
-        exit_visible_pass: false)
-      expect(assessment.passed_checks_count).to eq(1)
+        exit_sign_always_visible_pass: true,
+        exit_sign_visible_pass: nil)
+      expect(assessment.complete?).to be false
     end
   end
 
   describe "#has_critical_failures?" do
     it "returns false when all checks pass" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
+      assessment.assign_attributes(
         exit_number_pass: true,
-        exit_visible_pass: true)
+        exit_sign_always_visible_pass: true,
+        exit_sign_visible_pass: true)
       expect(assessment.has_critical_failures?).to be false
     end
 
     it "returns true when exit_number_pass fails" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
+      assessment.assign_attributes(
         exit_number_pass: false,
-        exit_visible_pass: true)
+        exit_sign_always_visible_pass: true,
+        exit_sign_visible_pass: true)
       expect(assessment.has_critical_failures?).to be true
     end
 
-    it "returns true when exit_visible_pass fails" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
+    it "returns true when exit_sign_always_visible_pass fails" do
+      assessment.assign_attributes(
         exit_number_pass: true,
-        exit_visible_pass: false)
+        exit_sign_always_visible_pass: false,
+        exit_sign_visible_pass: true)
+      expect(assessment.has_critical_failures?).to be true
+    end
+
+    it "returns true when exit_sign_visible_pass fails" do
+      assessment.assign_attributes(
+        exit_number_pass: true,
+        exit_sign_always_visible_pass: true,
+        exit_sign_visible_pass: false)
       expect(assessment.has_critical_failures?).to be true
     end
   end
 
   describe "#critical_failure_summary" do
     it "lists all critical failures" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
+      assessment.assign_attributes(
         exit_number_pass: false,
-        exit_visible_pass: false)
-      expect(assessment.critical_failure_summary).to eq("Insufficient exits, Exits not clearly visible")
+        exit_sign_always_visible_pass: false,
+        exit_sign_visible_pass: false)
+      expect(assessment.critical_failure_summary).to eq("Insufficient exits, Exits not clearly visible, Exit signs not visible")
     end
 
     it "lists only failed items" do
-      assessment = build(:enclosed_assessment,
-        inspection: inspection,
+      assessment.assign_attributes(
         exit_number_pass: false,
-        exit_visible_pass: true)
+        exit_sign_always_visible_pass: true,
+        exit_sign_visible_pass: true)
       expect(assessment.critical_failure_summary).to eq("Insufficient exits")
+    end
+  end
+
+  describe "factory traits" do
+    it "creates valid passed assessment" do
+      # Apply passed trait attributes
+      assessment.assign_attributes(attributes_for(:enclosed_assessment, :passed).except(:inspection_id))
+      expect(assessment).to be_valid
+      expect(assessment.exit_number_pass).to be true
+      expect(assessment.exit_sign_always_visible_pass).to be true
+    end
+
+    it "creates valid failed assessment" do
+      # Apply failed trait attributes
+      assessment.assign_attributes(attributes_for(:enclosed_assessment, :failed).except(:inspection_id))
+      expect(assessment).to be_valid
+      expect(assessment.exit_number_pass).to be false
+      expect(assessment.exit_sign_always_visible_pass).to be false
     end
   end
 end

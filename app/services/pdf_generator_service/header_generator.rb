@@ -48,9 +48,9 @@ class PdfGeneratorService
     def self.generate_unit_pdf_header(pdf, unit)
       # Line 1: Unit Report - Unit Name - Serial Number
       unit_name = unit.name || I18n.t("pdf.unit.fields.na")
-      serial_number = unit.serial || I18n.t("pdf.unit.fields.na")
+      serial = unit.serial || I18n.t("pdf.unit.fields.na")
 
-      line1_parts = [I18n.t("pdf.unit.title"), unit_name, "Serial: #{serial_number}"]
+      line1_parts = [I18n.t("pdf.unit.title"), unit_name, "Serial: #{serial}"]
       pdf.text line1_parts.join(" - "), align: :center, size: HEADER_TEXT_SIZE, style: :bold, color: "663399"
       pdf.move_down HEADER_SPACING
 

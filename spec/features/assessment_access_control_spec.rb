@@ -5,15 +5,8 @@ RSpec.feature "Assessment Access Control", type: :feature do
   let(:user2) { create(:user) }
   let(:unit1) { create(:unit, user: user1) }
   let(:unit2) { create(:unit, user: user2) }
-  let(:inspection1) { create(:inspection, user: user1, unit: unit1) }
-  let(:inspection2) { create(:inspection, user: user2, unit: unit2, unique_report_number: "TEST-REPORT-123") }
-
-  before do
-    create(:anchorage_assessment, :complete, inspection: inspection1)
-    create(:user_height_assessment, :complete, inspection: inspection1)
-    create(:anchorage_assessment, :complete, inspection: inspection2)
-    create(:user_height_assessment, :complete, inspection: inspection2)
-  end
+  let(:inspection1) { create(:inspection, :with_complete_assessments, user: user1, unit: unit1) }
+  let(:inspection2) { create(:inspection, :with_complete_assessments, user: user2, unit: unit2, unique_report_number: "TEST-REPORT-123") }
 
   scenario "prevents viewing another user's inspection assessment form" do
     sign_in(user1)
@@ -81,10 +74,8 @@ RSpec.feature "Assessment Access Control", type: :feature do
     visit edit_inspection_path(inspection1, tab: "anchorage")
     expect(page).to have_content("Edit Inspection")
 
-    within ".anchorage-assessment" do
-      fill_in "inspection_anchorage_assessment_attributes_num_low_anchors", with: "8"
-      fill_in "inspection_anchorage_assessment_attributes_num_high_anchors", with: "6"
-    end
+    fill_in I18n.t("forms.anchorage.fields.num_low_anchors"), with: "8"
+    fill_in I18n.t("forms.anchorage.fields.num_high_anchors"), with: "6"
     click_button I18n.t("inspections.buttons.save_assessment")
 
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
@@ -98,7 +89,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
     sign_in(user1)
     visit edit_inspection_path(inspection1, tab: "user_height")
     within ".user-height-assessment" do
-      fill_in "inspection_user_height_assessment_attributes_containing_wall_height", with: "2.5"
+      fill_in "user_height_assessment[containing_wall_height]", with: "2.5"
     end
     click_button I18n.t("inspections.buttons.save_assessment")
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
@@ -108,7 +99,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
     visit edit_inspection_path(inspection2, tab: "user_height")
 
     within ".user-height-assessment" do
-      wall_height_field = find_field("inspection_user_height_assessment_attributes_containing_wall_height")
+      wall_height_field = find_field("user_height_assessment[containing_wall_height]")
       expect(wall_height_field.value).not_to eq("2.5")
     end
 

@@ -20,8 +20,8 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
     end
 
-    context "when current_user has date time_display preference" do
-      let(:user) { double("User", time_display: "date") }
+    context "when current_user is present" do
+      let(:user) { double("User") }
 
       before do
         allow(helper).to receive(:current_user).and_return(user)
@@ -32,41 +32,6 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
     end
 
-    context "when current_user has time time_display preference" do
-      let(:user) { double("User", time_display: "time") }
-
-      before do
-        allow(helper).to receive(:current_user).and_return(user)
-      end
-
-      it "formats datetime with date and time" do
-        expect(helper.render_time(test_datetime)).to eq("Jun 06, 2025 - 14:30")
-      end
-    end
-
-    context "when current_user has invalid time_display preference" do
-      let(:user) { double("User", time_display: "invalid") }
-
-      before do
-        allow(helper).to receive(:current_user).and_return(user)
-      end
-
-      it "falls back to default date format" do
-        expect(helper.render_time(test_datetime)).to eq("Jun 06, 2025")
-      end
-    end
-
-    context "when current_user has nil time_display preference" do
-      let(:user) { double("User", time_display: nil) }
-
-      before do
-        allow(helper).to receive(:current_user).and_return(user)
-      end
-
-      it "falls back to default date format" do
-        expect(helper.render_time(test_datetime)).to eq("Jun 06, 2025")
-      end
-    end
   end
 
   describe "#date_for_form" do
@@ -81,15 +46,15 @@ RSpec.describe ApplicationHelper, type: :helper do
         allow(helper).to receive(:current_user).and_return(nil)
       end
 
-      it "returns full datetime" do
+      it "returns date only" do
         result = helper.date_for_form(test_datetime)
-        expect(result).to eq(test_datetime)
-        expect(result).to be_a(Time)
+        expect(result).to eq(test_datetime.to_date)
+        expect(result).to be_a(Date)
       end
     end
 
-    context "when current_user has date time_display preference" do
-      let(:user) { double("User", time_display: "date") }
+    context "when current_user is present" do
+      let(:user) { double("User") }
 
       before do
         allow(helper).to receive(:current_user).and_return(user)
@@ -99,34 +64,6 @@ RSpec.describe ApplicationHelper, type: :helper do
         result = helper.date_for_form(test_datetime)
         expect(result).to eq(test_datetime.to_date)
         expect(result).to be_a(Date)
-      end
-    end
-
-    context "when current_user has time time_display preference" do
-      let(:user) { double("User", time_display: "time") }
-
-      before do
-        allow(helper).to receive(:current_user).and_return(user)
-      end
-
-      it "returns full datetime" do
-        result = helper.date_for_form(test_datetime)
-        expect(result).to eq(test_datetime)
-        expect(result).to be_a(Time)
-      end
-    end
-
-    context "when current_user has invalid time_display preference" do
-      let(:user) { double("User", time_display: "invalid") }
-
-      before do
-        allow(helper).to receive(:current_user).and_return(user)
-      end
-
-      it "returns full datetime" do
-        result = helper.date_for_form(test_datetime)
-        expect(result).to eq(test_datetime)
-        expect(result).to be_a(Time)
       end
     end
   end
@@ -183,15 +120,6 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
-  describe "TIME_FORMATS constant" do
-    it "has correct date format" do
-      expect(ApplicationHelper::TIME_FORMATS["date"]).to eq("%b %d, %Y")
-    end
-
-    it "has correct time format" do
-      expect(ApplicationHelper::TIME_FORMATS["time"]).to eq("%b %d, %Y - %H:%M")
-    end
-  end
 
   describe "#form_field_setup" do
     let(:mock_form) { double("FormBuilder") }
@@ -230,7 +158,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       include_examples "detects form object and i18n base", "inspector_companies.forms"
-      include_examples "uses correct label key and value", "inspector_companies.forms.name", "Company Name"
+      include_examples "uses correct label key and value", "inspector_companies.forms.fields.name", "Company Name"
     end
 
     context "when form is passed in local_assigns" do
@@ -238,7 +166,7 @@ RSpec.describe ApplicationHelper, type: :helper do
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
-        helper.instance_variable_set(:@_current_i18n_base, "test.forms")
+        helper.instance_variable_set(:@_current_i18n_base, "forms.test")
       end
 
       it "raises ArgumentError about disallowed keys" do
@@ -251,7 +179,7 @@ RSpec.describe ApplicationHelper, type: :helper do
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
-        helper.instance_variable_set(:@_current_i18n_base, "test.forms")
+        helper.instance_variable_set(:@_current_i18n_base, "forms.test")
       end
 
       it "raises ArgumentError about disallowed keys" do
@@ -264,7 +192,7 @@ RSpec.describe ApplicationHelper, type: :helper do
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
-        helper.instance_variable_set(:@_current_i18n_base, "test.forms")
+        helper.instance_variable_set(:@_current_i18n_base, "forms.test")
       end
 
       it "raises ArgumentError about disallowed keys" do
@@ -292,14 +220,14 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "looks up hints and placeholders when present" do
-        mock_translations("inspector_companies.forms.name", "Company Name", "Enter company name", "e.g. Acme Corp")
+        mock_translations("inspector_companies.forms.fields.name", "Company Name", "Enter company name", "e.g. Acme Corp")
 
         expect(result[:field_hint]).to eq("Enter company name")
         expect(result[:field_placeholder]).to eq("e.g. Acme Corp")
       end
 
       it "returns nil for missing hints and placeholders" do
-        mock_translations("inspector_companies.forms.name", "Company Name", nil, nil)
+        mock_translations("inspector_companies.forms.fields.name", "Company Name", nil, nil)
 
         expect(result[:field_hint]).to be_nil
         expect(result[:field_placeholder]).to be_nil
@@ -320,7 +248,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     context "without @_current_form" do
       before do
         helper.instance_variable_set(:@_current_form, nil)
-        helper.instance_variable_set(:@_current_i18n_base, "test.forms")
+        helper.instance_variable_set(:@_current_i18n_base, "forms.test")
       end
 
       it "raises ArgumentError" do
@@ -331,8 +259,8 @@ RSpec.describe ApplicationHelper, type: :helper do
     context "with missing i18n translation" do
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
-        helper.instance_variable_set(:@_current_i18n_base, "test.forms")
-        allow(helper).to receive(:t).with("test.forms.name", raise: true).and_raise(I18n::MissingTranslationData.new(:en, "test.forms.name"))
+        helper.instance_variable_set(:@_current_i18n_base, "forms.test")
+        allow(helper).to receive(:t).with("forms.test.fields.name", raise: true).and_raise(I18n::MissingTranslationData.new(:en, "forms.test.fields.name"))
       end
 
       it "raises I18n::MissingTranslationData for missing label" do
@@ -346,8 +274,8 @@ RSpec.describe ApplicationHelper, type: :helper do
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
-        helper.instance_variable_set(:@_current_i18n_base, "test.forms")
-        mock_translations("test.forms.name", "Test Name")
+        helper.instance_variable_set(:@_current_i18n_base, "forms.test")
+        mock_translations("forms.test.fields.name", "Test Name")
       end
 
       it "does not raise error for allowed keys" do
@@ -360,7 +288,7 @@ RSpec.describe ApplicationHelper, type: :helper do
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
-        helper.instance_variable_set(:@_current_i18n_base, "test.forms")
+        helper.instance_variable_set(:@_current_i18n_base, "forms.test")
       end
 
       it "raises error only for disallowed keys" do
@@ -373,7 +301,7 @@ RSpec.describe ApplicationHelper, type: :helper do
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
-        helper.instance_variable_set(:@_current_i18n_base, "test.forms")
+        helper.instance_variable_set(:@_current_i18n_base, "forms.test")
       end
 
       it "raises error listing all disallowed keys" do

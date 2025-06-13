@@ -1,0 +1,25 @@
+en:
+  forms:
+    inspector_companies:
+      header: "Inspector Company Form"
+      sections:
+        company_details: "Company Details"
+        contact_information: "Contact Information"
+        company_status: "Company Status"
+      fields:
+        name: "Company Name"
+        email: "Email Address"
+        phone: "Phone Number"
+        address: "Address"
+        city: "City"
+        state: "State/Province"
+        postal_code: "Postal Code"
+        country: "Country"
+        active: "Active"
+        notes: "Internal Notes"
+        logo: "Company Logo"
+      submit: "Save Company"
+      errors:
+        header:
+          one: "1 error prevented this company from being saved:"
+          other: "%{count} errors prevented this company from being saved:"

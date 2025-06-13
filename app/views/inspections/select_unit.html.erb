@@ -21,15 +21,7 @@
         options_for_select([["All Manufacturers", ""]] + manufacturer_options(current_user).map { |m| [m, m] }, params[:manufacturer]),
         {}, { onchange: "this.form.submit();" } %>
     
-    <%= form.select :has_slide, 
-        options_for_select([
-          ["All Units", ""],
-          [t("units.slide_status.with_slide"), "true"],
-          [t("units.slide_status.without_slide"), "false"]
-        ], params[:has_slide]),
-        {}, { onchange: "this.form.submit();" } %>
-    
-    <% if params[:manufacturer].present? || params[:has_slide].present? %>
+    <% if params[:manufacturer].present? %>
       <%= link_to t("ui.buttons.clear_filters"), select_unit_inspection_path(@inspection) %>
     <% end %>
   <% end %>

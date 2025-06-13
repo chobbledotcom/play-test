@@ -13,7 +13,7 @@ require "rails_helper"
 # - GET /users/:id/change_password - Shows password change form (only for own account)
 # - PATCH /users/:id/update_password - Updates password after verifying current password
 # - GET /users/:id/change_settings - Shows settings form (only for own account)
-# - PATCH /users/:id/update_settings - Updates user preferences like time_display
+# - PATCH /users/:id/update_settings - Updates user preferences like theme
 #
 # ADMIN ACCESS (must be logged in as admin):
 # - GET /users - Lists all users with inspection counts and background job status
@@ -33,7 +33,7 @@ require "rails_helper"
 # - Validation failures render forms with :unprocessable_entity status
 # - Authorization failures redirect to root_path with danger flash
 # - Password changes require current password verification
-# - Settings only allow valid time_display values ("date" or "time")
+# - Settings only allow valid theme values ("light" or "dark")
 
 RSpec.describe "Users", type: :request do
   describe "GET /signup" do
@@ -57,11 +57,11 @@ RSpec.describe "Users", type: :request do
   describe "POST /signup" do
     it "creates a user and redirects" do
       visit "/signup"
-      fill_in I18n.t("users.forms.email"), with: "newuser@example.com"
-      fill_in I18n.t("users.forms.name"), with: "New User"
-      fill_in I18n.t("users.forms.rpii_inspector_number"), with: "RPII123"
-      fill_in I18n.t("users.forms.password"), with: "password"
-      fill_in I18n.t("users.forms.password_confirmation"), with: "password"
+      fill_in I18n.t("forms.user_new.fields.email"), with: "newuser@example.com"
+      fill_in I18n.t("forms.user_new.fields.name"), with: "New User"
+      fill_in I18n.t("forms.user_new.fields.rpii_inspector_number"), with: "RPII123"
+      fill_in I18n.t("forms.user_new.fields.password"), with: "password"
+      fill_in I18n.t("forms.user_new.fields.password_confirmation"), with: "password"
       click_button I18n.t("users.buttons.register")
 
       expect(page).to have_current_path(root_path)
@@ -102,9 +102,9 @@ RSpec.describe "Users", type: :request do
 
       it "updates the user's password when current password is correct" do
         visit change_password_user_path(user)
-        fill_in I18n.t("users.forms.current_password"), with: I18n.t("test.password")
-        fill_in I18n.t("users.forms.password"), with: "newpassword"
-        fill_in I18n.t("users.forms.password_confirmation"), with: "newpassword"
+        fill_in I18n.t("forms.user_change_password.fields.current_password"), with: I18n.t("test.password")
+        fill_in I18n.t("forms.user_change_password.fields.password"), with: "newpassword"
+        fill_in I18n.t("forms.user_change_password.fields.password_confirmation"), with: "newpassword"
         click_button I18n.t("users.buttons.update_password")
 
         expect(page).to have_current_path(root_path)
@@ -116,9 +116,9 @@ RSpec.describe "Users", type: :request do
 
       it "does not update the password when current password is incorrect" do
         visit change_password_user_path(user)
-        fill_in I18n.t("users.forms.current_password"), with: I18n.t("test.invalid_password")
-        fill_in I18n.t("users.forms.password"), with: "newpassword"
-        fill_in I18n.t("users.forms.password_confirmation"), with: "newpassword"
+        fill_in I18n.t("forms.user_change_password.fields.current_password"), with: I18n.t("test.invalid_password")
+        fill_in I18n.t("forms.user_change_password.fields.password"), with: "newpassword"
+        fill_in I18n.t("forms.user_change_password.fields.password_confirmation"), with: "newpassword"
         click_button I18n.t("users.buttons.update_password")
 
         expect(page).to have_http_status(:unprocessable_entity)
@@ -161,7 +161,7 @@ RSpec.describe "Users", type: :request do
       it "updates the user's settings" do
         patch update_settings_user_path(user), params: {
           user: {
-            time_display: "time"
+            theme: "dark"
           }
         }
 
@@ -169,7 +169,7 @@ RSpec.describe "Users", type: :request do
         expect(flash[:notice]).to be_present
 
         user.reload
-        expect(user.time_display).to eq("time")
+        expect(user.theme).to eq("dark")
       end
 
       it "renders error when settings update fails" do
@@ -177,7 +177,7 @@ RSpec.describe "Users", type: :request do
 
         patch update_settings_user_path(user), params: {
           user: {
-            time_display: "invalid"
+            theme: "invalid"
           }
         }
 
@@ -193,7 +193,7 @@ RSpec.describe "Users", type: :request do
 
         patch update_settings_user_path(other_user), params: {
           user: {
-            time_display: "time"
+            theme: "dark"
           }
         }
 
@@ -535,8 +535,7 @@ RSpec.describe "Users", type: :request do
         
         settings_attrs = {
           phone: "020 7946 0958",
-          theme: "dark",
-          time_display: "time"
+          theme: "dark"
         }
         
         patch update_settings_user_path(regular_user), params: { user: settings_attrs }
@@ -544,7 +543,6 @@ RSpec.describe "Users", type: :request do
         regular_user.reload
         expect(regular_user.phone).to eq("020 7946 0958")
         expect(regular_user.theme).to eq("dark")
-        expect(regular_user.time_display).to eq("time")
         expect(regular_user.name).to be_nil
       end
 

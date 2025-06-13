@@ -5,7 +5,6 @@ FactoryBot.define do
     password { "password123" }
     password_confirmation { "password123" }
     sequence(:rpii_inspector_number) { |n| "RPII#{n.to_s.rjust(3, "0")}" }
-    time_display { "date" }
     # Default factory creates active users for tests - real signups will be inactive
     active_until { Date.current + 1.year }
     association :inspection_company, factory: :inspector_company

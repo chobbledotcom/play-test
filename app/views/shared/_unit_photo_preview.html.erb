@@ -1,8 +1,1 @@
-<% if unit.photo.attached? %>
-  <div style="margin-top: 10px;">
-    <%= render 'shared/image_link', 
-        image: unit.photo, 
-        alt: "Unit photo",
-        link_text: t('units.messages.view_full_photo') %>
-  </div>
-<% end %>
+<%= render 'shared/unit_photo', unit: unit %>

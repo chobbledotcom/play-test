@@ -18,12 +18,18 @@ en:
     messages:
       saved_successfully: "Saved successfully"
       save_failed: "Save failed"
+      invalid_image_format: "Cannot display: invalid image format"
     api:
       success: "success"
       error: "error"
     yes: "Yes"
     no: "No"
     view_full_size: "View full size"
+    comment: "Comment"
+    comments: "Comments"
+    pass: "Pass"
+    fail: "Fail"
+    safety_status: "Safety Status"
 
   # Common messages
   ui:

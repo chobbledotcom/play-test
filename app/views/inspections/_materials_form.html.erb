@@ -1,16 +1,6 @@
-<%= form_with model: @inspection,
-             url: inspection_path(@inspection),
-             method: :patch,
-             local: false,
-             html: {
-               class: "inspection-materials-form",
-               data: { turbo_stream: true }
-             } do |form| %>
-
-  <%= form.fields_for :materials_assessment, (@inspection.materials_assessment || @inspection.build_materials_assessment) do |assessment_form| %>
+<%= render 'form/form_context', model: @inspection.materials_assessment, i18n_base: 'forms.materials', url: inspection_materials_assessment_path(@inspection) do |form| %>
 
     <div class="assessment-form materials-assessment">
-      <%= render 'shared/page_header', title: t('inspections.assessments.materials.title') %>
 
       <!-- Safety Standards Reference -->
       <details class="safety-standards-reference">
@@ -19,98 +9,58 @@
       </details>
 
       <!-- Rope Specifications Section -->
-      <%= render 'form/fieldset', legend_key: 'rope_specifications', i18n_base: 'inspections.assessments.materials.fields', form: assessment_form do %>
-        <div class="form-group">
-          <%= render 'form/number', field: :rope_size, min: 0, step: 0.1 %>
-          <%= render 'form/pass_fail', field: :rope_size_pass %>
-          <%= render 'form/comment', field: :rope_size_comment %>
-        </div>
+      <%= render 'form/fieldset', legend_key: 'rope_specifications' do %>
+        <%= render 'form/number_pass_fail_comment', field: :ropes, number_options: { min: 0, step: 0.1 } %>
       <% end %>
 
       <!-- Critical Material Safety Checks Section -->
-      <%= render 'form/fieldset', legend_key: 'critical_materials', i18n_base: 'inspections.assessments.materials.fields', form: assessment_form do %>
-        <div class="form-group">
-          <%= render 'form/pass_fail', field: :fabric_pass %>
-          <%= render 'form/comment', field: :fabric_comment %>
-        </div>
-        
-        <div class="form-group">
-          <%= render 'form/pass_fail', field: :fire_retardant_pass %>
-          <%= render 'form/comment', field: :fire_retardant_comment %>
-        </div>
-        
-        <div class="form-group">
-          <%= render 'form/pass_fail', field: :thread_pass %>
-          <%= render 'form/comment', field: :thread_comment %>
-        </div>
+      <%= render 'form/fieldset', legend_key: 'critical_materials' do %>
+        <%= render 'form/pass_fail_comment', field: :fabric_strength_pass %>
+        <%= render 'form/pass_fail_comment', field: :fire_retardant_pass %>
+        <%= render 'form/pass_fail_comment', field: :thread_pass %>
       <% end %>
 
       <!-- Additional Material Checks Section -->
-      <%= render 'form/fieldset', legend_key: 'additional_materials', i18n_base: 'inspections.assessments.materials.fields', form: assessment_form do %>
-        <div class="form-group">
-          <%= render 'form/pass_fail', field: :clamber_pass %>
-          <%= render 'form/comment', field: :clamber_comment %>
-        </div>
-        
-        <div class="form-group">
-          <%= render 'form/pass_fail', field: :retention_netting_pass %>
-          <%= render 'form/comment', field: :retention_netting_comment %>
-        </div>
-        
-        <div class="form-group">
-          <%= render 'form/pass_fail', field: :zips_pass %>
-          <%= render 'form/comment', field: :zips_comment %>
-        </div>
-        
-        <div class="form-group">
-          <%= render 'form/pass_fail', field: :windows_pass %>
-          <%= render 'form/comment', field: :windows_comment %>
-        </div>
-        
-        <div class="form-group">
-          <%= render 'form/pass_fail', field: :artwork_pass %>
-          <%= render 'form/comment', field: :artwork_comment %>
-        </div>
+      <%= render 'form/fieldset', legend_key: 'additional_materials' do %>
+        <%= render 'form/pass_fail_comment', field: :clamber_netting_pass %>
+        <%= render 'form/pass_fail_comment', field: :retention_netting_pass %>
+        <%= render 'form/pass_fail_comment', field: :zips_pass %>
+        <%= render 'form/pass_fail_comment', field: :windows_pass %>
+        <%= render 'form/pass_fail_comment', field: :artwork_pass %>
       <% end %>
 
       <!-- Material Compliance Summary -->
       <% if @inspection.materials_assessment&.persisted? %>
         <div class="material-compliance-summary">
-          <h4><%= t('inspections.assessments.materials.summary.title') %></h4>
-          
+          <h4><%= t('forms.materials.summary.title') %></h4>
+
           <div class="compliance-overview">
             <div class="critical-materials">
-              <strong><%= t('inspections.assessments.materials.summary.critical_materials') %>:</strong>
+              <strong><%= t('forms.materials.summary.critical_materials') %>:</strong>
               <span class="<%= @inspection.materials_assessment.has_critical_failures? ? 'text-danger' : 'text-success' %>">
-                <%= @inspection.materials_assessment.material_compliance_summary[:critical_passed] %> / 
+                <%= @inspection.materials_assessment.material_compliance_summary[:critical_passed] %> /
                 <%= @inspection.materials_assessment.material_compliance_summary[:critical_total] %>
               </span>
             </div>
 
             <div class="overall-materials">
-              <strong><%= t('inspections.assessments.materials.summary.overall_materials') %>:</strong>
+              <strong><%= t('forms.materials.summary.overall_materials') %>:</strong>
               <span class="material-count">
-                <%= @inspection.materials_assessment.passed_checks_count %> / 
-                <%= MaterialsAssessment::SAFETY_CHECK_COUNT %>
+                <%= @inspection.materials_assessment.passed_checks_count %> / <%= @inspection.enclosed_assessment.pass_columns_count %>
               </span>
-            </div>
-
-            <div class="completion-status">
-              <strong><%= t('inspections.assessments.materials.summary.completion') %>:</strong>
-              <span class="completion-percentage"><%= @inspection.materials_assessment.completion_percentage %>%</span>
             </div>
           </div>
 
           <% if @inspection.materials_assessment.has_critical_failures? %>
             <div class="critical-failures text-danger">
-              <strong><%= t('inspections.assessments.materials.summary.critical_status') %>:</strong>
+              <strong><%= t('forms.materials.summary.critical_status') %>:</strong>
               <%= @inspection.materials_assessment.critical_material_status %>
             </div>
           <% end %>
 
           <% if @inspection.materials_assessment.material_test_requirements.any? %>
             <div class="test-requirements">
-              <strong><%= t('inspections.assessments.materials.summary.test_requirements') %>:</strong>
+              <strong><%= t('forms.materials.summary.test_requirements') %>:</strong>
               <ul>
                 <% @inspection.materials_assessment.material_test_requirements.each do |requirement| %>
                   <li><%= requirement %></li>
@@ -121,7 +71,7 @@
 
           <% if @inspection.materials_assessment.non_critical_issues.any? %>
             <div class="non-critical-issues text-warning">
-              <strong><%= t('inspections.assessments.materials.summary.non_critical_issues') %>:</strong>
+              <strong><%= t('forms.materials.summary.non_critical_issues') %>:</strong>
               <%= @inspection.materials_assessment.non_critical_issues.join(", ") %>
             </div>
           <% end %>
@@ -129,9 +79,7 @@
       <% end %>
 
       <!-- Safety Status -->
-      <%= render 'form/assessment_status', assessment: @inspection.materials_assessment, i18n_base: 'inspections.assessments.materials' %>
+      <%= render 'form/assessment_status', assessment: @inspection.materials_assessment %>
 
-      <%= render 'form/save_assessment' %>
     </div>
-  <% end %>
 <% end %>

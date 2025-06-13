@@ -21,14 +21,16 @@ RSpec.describe SeedDataService do
       end
 
 
-      it "creates units with varied types" do
+      it "creates units with varied manufacturers and descriptions" do
         described_class.add_seeds_for_user(user)
         
         units = user.units.seed_data
-        expect(units.with_slide.count).to be > 0
-        expect(units.without_slide.count).to be > 0
-        expect(units.where(is_totally_enclosed: true).count).to be > 0
-        expect(units.where(is_totally_enclosed: false).count).to be > 0
+        manufacturers = units.pluck(:manufacturer).uniq
+        descriptions = units.pluck(:description).uniq
+        
+        expect(manufacturers.count).to be > 1
+        expect(descriptions.count).to be > 1
+        expect(units.count).to be > 0
       end
 
       it "creates inspections with proper date spacing" do

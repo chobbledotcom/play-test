@@ -16,13 +16,18 @@ RSpec.describe "form/_errors.html.erb", type: :view do
     allow(view).to receive(:t).and_call_original
     allow(view).to receive(:pluralize).and_call_original
 
-    # Add i18n translations for test model
+    # Set up form context that errors partial expects
+    view.instance_variable_set(:@_current_i18n_base, "forms.inspections")
+
+    # Add i18n translations for form errors (this should exist in real forms)
     I18n.backend.store_translations(:en, {
-      test_models: {
-        errors: {
-          header: {
-            one: "Could not save test model because there is 1 error:",
-            other: "Could not save test model because there are %{count} errors:"
+      forms: {
+        inspections: {
+          errors: {
+            header: {
+              one: "Could not save inspection because there is 1 error:",
+              other: "Could not save inspection because there are %{count} errors:"
+            }
           }
         }
       }
@@ -84,7 +89,7 @@ RSpec.describe "form/_errors.html.erb", type: :view do
     context "with model-specific i18n lookup" do
       it "attempts model-specific translation first" do
         allow(view).to receive(:t)
-          .with("test_models.errors.header", hash_including(count: 2))
+          .with("forms.inspections.errors.header", hash_including(count: 2, raise: true))
           .and_return("Test Model Error Header")
 
         render_errors
@@ -93,19 +98,19 @@ RSpec.describe "form/_errors.html.erb", type: :view do
 
       it "falls back to generic errors.header translation" do
         allow(view).to receive(:t)
-          .with("test_models.errors.header", hash_including(count: 2))
+          .with("forms.inspections.errors.header", hash_including(count: 2, raise: true))
           .and_return("Generic Error Header")
 
         render_errors
         expect(rendered).to have_css("h3", text: "Generic Error Header")
       end
 
-      it "falls back to pluralized count when all translations missing" do
-        allow(view).to receive(:t).with(anything, hash_including(:count)).and_return("2 errors")
-        allow(view).to receive(:pluralize).with(2, "error").and_return("2 errors")
+      it "raises error when translation is missing (no fallback)" do
+        allow(view).to receive(:t)
+          .with("forms.inspections.errors.header", hash_including(count: 2, raise: true))
+          .and_raise(I18n::MissingTranslationData.new(:en, "forms.inspections.errors.header"))
 
-        render_errors
-        expect(rendered).to have_css("h3", text: "2 errors")
+        expect { render_errors }.to raise_error(ActionView::Template::Error)
       end
     end
   end

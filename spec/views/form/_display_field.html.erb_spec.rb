@@ -7,7 +7,7 @@ RSpec.describe "form/_display_field.html.erb", type: :view do
   before do
     # Set up form context like fieldset would
     assign(:_current_form, form_object)
-    assign(:_current_i18n_base, "users.forms")
+    assign(:_current_i18n_base, "forms.user_settings")
   end
 
   it "renders display field using model value automatically" do

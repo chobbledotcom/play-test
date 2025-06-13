@@ -1,31 +1,31 @@
 class Inspection < ApplicationRecord
   include CustomIdGenerator
-  include HasDimensions
+
+  ASSESSMENT_TYPES = %i[
+    anchorage_assessment
+    enclosed_assessment
+    fan_assessment
+    materials_assessment
+    slide_assessment
+    structure_assessment
+    user_height_assessment
+  ].freeze
 
   belongs_to :user
   belongs_to :unit, optional: true
   belongs_to :inspector_company, optional: true
 
   # Assessment associations (normalized from single table)
-  has_one :user_height_assessment, class_name: "UserHeightAssessment",
-    dependent: :destroy
+  ASSESSMENT_TYPES.each do |assessment|
+    has_one assessment,
+      class_name: "Assessments::#{assessment.to_s.classify}",
+      dependent: :destroy
+  end
+
   alias_method :tallest_user_height_assessment, :user_height_assessment
-  has_one :slide_assessment, class_name: "SlideAssessment",
-    dependent: :destroy
-  has_one :structure_assessment, class_name: "StructureAssessment",
-    dependent: :destroy
-  has_one :anchorage_assessment, class_name: "AnchorageAssessment",
-    dependent: :destroy
-  has_one :materials_assessment, class_name: "MaterialsAssessment",
-    dependent: :destroy
-  has_one :fan_assessment, class_name: "FanAssessment", dependent: :destroy
-  has_one :enclosed_assessment, class_name: "EnclosedAssessment",
-    dependent: :destroy
 
   # Accept nested attributes for all assessments
-  accepts_nested_attributes_for :user_height_assessment, :slide_assessment,
-    :structure_assessment, :anchorage_assessment, :materials_assessment,
-    :fan_assessment, :enclosed_assessment
+  accepts_nested_attributes_for(*ASSESSMENT_TYPES)
 
   # Validations - allow drafts to be incomplete
   validates :inspection_location, presence: true, if: :complete?
@@ -57,41 +57,17 @@ class Inspection < ApplicationRecord
     inclusion: {in: [true, false]},
     allow_nil: true
 
-  # Trough validations
+  # Trough validations (only remaining inspection fields)
   validates :trough_depth,
     numericality: {greater_than_or_equal_to: 0}, allow_blank: true
   validates :trough_adjacent_panel_width,
     numericality: {greater_than_or_equal_to: 0}, allow_blank: true
-  validates :trough_pass, inclusion: {in: [true, false]}, allow_nil: true
 
-  # Entrapment validation
-  validates :entrapment_pass, inclusion: {in: [true, false]}, allow_nil: true
-
-  # Markings/ID validation
-  validates :markings_id_pass, inclusion: {in: [true, false]}, allow_nil: true
-
-  # Grounding validation
-  validates :grounding_pass, inclusion: {in: [true, false]}, allow_nil: true
-
-  # Additional pass/fail validations
-  validates :clamber_netting_pass,
-    inclusion: {in: [true, false]},
-    allow_nil: true
-  validates :retention_netting_pass,
-    inclusion: {in: [true, false]},
-    allow_nil: true
-  validates :zips_pass, inclusion: {in: [true, false]}, allow_nil: true
-  validates :windows_pass, inclusion: {in: [true, false]}, allow_nil: true
-  validates :artwork_pass, inclusion: {in: [true, false]}, allow_nil: true
-  validates :exit_sign_visible_pass,
-    inclusion: {in: [true, false]},
-    allow_nil: true
 
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
-  before_validation :copy_unit_values, on: :create, if: :unit_id_changed?
-  before_create :copy_unit_values
   before_save :auto_determine_pass_fail, if: :all_assessments_complete?
+  after_create :create_assessments
 
   # Scopes
   scope :seed_data, -> { where(is_seed: true) }
@@ -152,6 +128,11 @@ class Inspection < ApplicationRecord
   def reinspection_date
     return nil unless inspection_date.present?
     inspection_date + 1.year
+  end
+
+  def area
+    return nil unless width && height
+    width * height
   end
 
   # Check if inspection is complete (not draft)
@@ -277,11 +258,14 @@ class Inspection < ApplicationRecord
     self.unique_report_number = "RPII-#{date_part}-#{hex_part}"
   end
 
-  def copy_unit_values
-    return unless unit.present?
-
-    # Copy all dimensions and boolean flags from unit using the concern method
-    copy_attributes_from(unit)
+  def create_assessments
+    create_user_height_assessment! unless user_height_assessment
+    create_slide_assessment! unless slide_assessment
+    create_structure_assessment! unless structure_assessment
+    create_anchorage_assessment! unless anchorage_assessment
+    create_materials_assessment! unless materials_assessment
+    create_fan_assessment! unless fan_assessment
+    create_enclosed_assessment! unless enclosed_assessment
   end
 
   def set_inspector_company_from_user
@@ -289,8 +273,6 @@ class Inspection < ApplicationRecord
   end
 
   def all_assessments_complete?
-    return false unless has_assessments?
-
     required_assessment_completions.all?
   end
 
@@ -321,19 +303,12 @@ class Inspection < ApplicationRecord
     base_assessments
   end
 
-  def has_assessments?
-    user_height_assessment.present? || slide_assessment.present? ||
-      structure_assessment.present? || anchorage_assessment.present? ||
-      materials_assessment.present? || fan_assessment.present?
-  end
 
   def auto_determine_pass_fail
     self.passed = all_safety_checks_pass?
   end
 
   def all_safety_checks_pass?
-    return true unless has_assessments?
-
     # Business logic to determine overall pass/fail
     critical_failures = [
       structure_assessment&.has_critical_failures?,
@@ -345,8 +320,6 @@ class Inspection < ApplicationRecord
   end
 
   def meet_safety_thresholds?
-    return true unless has_assessments?
-
     height_ok = user_height_assessment&.meets_height_requirements? != false
     runout_ok = slide_assessment&.meets_runout_requirements? != false
     anchor_ok = anchorage_assessment&.meets_anchor_requirements? != false
@@ -354,26 +327,15 @@ class Inspection < ApplicationRecord
     height_ok && runout_ok && anchor_ok
   end
 
-  def total_safety_checks
-    return 0 unless has_assessments?
-
-    all_assessments.compact.sum do |assessment|
-      case assessment
-      when MaterialsAssessment
-        MaterialsAssessment::SAFETY_CHECK_COUNT
-      else
-        assessment.safety_check_count
-      end
-    end
+  def total_pass_columns
+    all_assessments.compact.sum(&:pass_columns_count)
   end
 
   def passed_safety_checks
-    return 0 unless has_assessments?
-
     all_assessments.compact.sum(&:passed_checks_count)
   end
 
-  def failed_safety_checks = total_safety_checks - passed_safety_checks
+  def failed_safety_checks = total_pass_columns - passed_safety_checks
 
   def duplicate_assessments(new_inspection)
     assessments_to_duplicate.each do |assessment|

@@ -1,4 +1,3 @@
-# RPII Utility - Business rules and calculations model
 class SafetyStandard
   include ActiveModel::Model
 

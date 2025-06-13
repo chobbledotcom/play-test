@@ -39,11 +39,7 @@ RSpec.describe "Sessions", type: :feature do
     it "displays the login form" do
       visit "/login"
 
-      expect(page).to have_content(I18n.t("session.login.title"))
-      expect(page).to have_field(I18n.t("session.login.email"))
-      expect(page).to have_field(I18n.t("session.login.password"))
-      expect(page).to have_field(I18n.t("session.login.remember_me"))
-      expect(page).to have_button(I18n.t("session.login.submit"))
+      expect_form_matches_i18n("forms.session_new")
     end
 
     it "is accessible without authentication" do
@@ -65,9 +61,9 @@ RSpec.describe "Sessions", type: :feature do
     it "handles case-insensitive email" do
       visit "/login"
 
-      fill_in I18n.t("session.login.email"), with: user.email.upcase
-      fill_in I18n.t("session.login.password"), with: user.password
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, user.email.upcase
+      fill_in_form :session_new, :password, user.password
+      submit_form :session_new
 
       expect(page).to have_current_path(inspections_path)
       expect(page).to have_content(I18n.t("session.login.success"))
@@ -76,10 +72,10 @@ RSpec.describe "Sessions", type: :feature do
     it "works with remember me checked" do
       visit "/login"
 
-      fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: user.password
-      check I18n.t("session.login.remember_me")
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, user.email
+      fill_in_form :session_new, :password, user.password
+      check_form :session_new, :remember_me
+      submit_form :session_new
 
       expect(page).to have_current_path(inspections_path)
       expect(page).to have_content(I18n.t("session.login.success"))
@@ -88,10 +84,10 @@ RSpec.describe "Sessions", type: :feature do
     it "works with remember me unchecked" do
       visit "/login"
 
-      fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: user.password
-      uncheck I18n.t("session.login.remember_me")
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, user.email
+      fill_in_form :session_new, :password, user.password
+      uncheck_form :session_new, :remember_me
+      submit_form :session_new
 
       expect(page).to have_current_path(inspections_path)
       expect(page).to have_content(I18n.t("session.login.success"))
@@ -100,17 +96,17 @@ RSpec.describe "Sessions", type: :feature do
     it "allows re-login when already logged in" do
       # First login
       visit "/login"
-      fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: user.password
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, user.email
+      fill_in_form :session_new, :password, user.password
+      submit_form :session_new
 
       expect(page).to have_current_path(inspections_path)
 
       # Login again
       visit "/login"
-      fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: user.password
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, user.email
+      fill_in_form :session_new, :password, user.password
+      submit_form :session_new
 
       expect(page).to have_current_path(inspections_path)
       expect(page).to have_content(I18n.t("session.login.success"))
@@ -121,9 +117,9 @@ RSpec.describe "Sessions", type: :feature do
     it "shows error for wrong password" do
       visit "/login"
 
-      fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: "wrongpassword"
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, user.email
+      fill_in_form :session_new, :password, "wrongpassword"
+      submit_form :session_new
 
       expect(page).to have_current_path("/login")
       expect(page).to have_content(I18n.t("session.login.error"))
@@ -132,9 +128,9 @@ RSpec.describe "Sessions", type: :feature do
     it "shows error for nonexistent email" do
       visit "/login"
 
-      fill_in I18n.t("session.login.email"), with: "nonexistent@example.com"
-      fill_in I18n.t("session.login.password"), with: user.password
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, "nonexistent@example.com"
+      fill_in_form :session_new, :password, user.password
+      submit_form :session_new
 
       expect(page).to have_current_path("/login")
       expect(page).to have_content(I18n.t("session.login.error"))
@@ -143,9 +139,9 @@ RSpec.describe "Sessions", type: :feature do
     it "shows error for empty email" do
       visit "/login"
 
-      fill_in I18n.t("session.login.email"), with: ""
-      fill_in I18n.t("session.login.password"), with: user.password
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, ""
+      fill_in_form :session_new, :password, user.password
+      submit_form :session_new
 
       expect(page).to have_current_path("/login")
       expect(page).to have_content(I18n.t("session.login.error"))
@@ -154,9 +150,9 @@ RSpec.describe "Sessions", type: :feature do
     it "shows error for empty password" do
       visit "/login"
 
-      fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: ""
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, user.email
+      fill_in_form :session_new, :password, ""
+      submit_form :session_new
 
       expect(page).to have_current_path("/login")
       expect(page).to have_content(I18n.t("session.login.error"))
@@ -165,9 +161,9 @@ RSpec.describe "Sessions", type: :feature do
     it "displays error messages immediately" do
       visit "/login"
 
-      fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: "wrong"
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, user.email
+      fill_in_form :session_new, :password, "wrong"
+      submit_form :session_new
 
       expect(page).to have_content(I18n.t("session.login.error"))
       expect(page).to have_current_path("/login")
@@ -178,10 +174,10 @@ RSpec.describe "Sessions", type: :feature do
     context "when logged in" do
       before do
         visit "/login"
-        fill_in I18n.t("session.login.email"), with: user.email
-        fill_in I18n.t("session.login.password"), with: user.password
-        check I18n.t("session.login.remember_me")
-        click_button I18n.t("session.login.submit")
+        fill_in_form :session_new, :email, user.email
+        fill_in_form :session_new, :password, user.password
+        check_form :session_new, :remember_me
+        submit_form :session_new
       end
 
       it "logs out user and redirects to root" do
@@ -216,16 +212,16 @@ RSpec.describe "Sessions", type: :feature do
       visit "/login"
 
       # Try with non-existent email
-      fill_in I18n.t("session.login.email"), with: "nonexistent@example.com"
-      fill_in I18n.t("session.login.password"), with: user.password
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, "nonexistent@example.com"
+      fill_in_form :session_new, :password, user.password
+      submit_form :session_new
 
       expect(page).to have_content(I18n.t("session.login.error"))
 
       # Try with existing email but wrong password
-      fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: "wrongpassword"
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, user.email
+      fill_in_form :session_new, :password, "wrongpassword"
+      submit_form :session_new
 
       # Both should show the same error message
       expect(page).to have_content(I18n.t("session.login.error"))
@@ -235,9 +231,9 @@ RSpec.describe "Sessions", type: :feature do
       mixed_case_email = user.email.chars.map.with_index { |c, i| i.even? ? c.upcase : c }.join
 
       visit "/login"
-      fill_in I18n.t("session.login.email"), with: mixed_case_email
-      fill_in I18n.t("session.login.password"), with: user.password
-      click_button I18n.t("session.login.submit")
+      fill_in_form :session_new, :email, mixed_case_email
+      fill_in_form :session_new, :password, user.password
+      submit_form :session_new
 
       expect(page).to have_current_path(inspections_path)
       expect(page).to have_content(I18n.t("session.login.success"))

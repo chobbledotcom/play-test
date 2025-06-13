@@ -1,0 +1,20 @@
+en:
+  forms:
+    user_settings:
+      header: "User Settings"
+      sections:
+        contact_details: "Contact Details"
+        preferences: "Preferences"
+      fields:
+        name: "Name"
+        phone: "Phone"
+        address: "Address"
+        country: "Country"
+        postal_code: "Postal Code"
+        default_inspection_location: "Default Inspection Location"
+        theme: "Theme"
+      errors:
+        header:
+          one: "1 error prevented these settings from being saved:"
+          other: "%{count} errors prevented these settings from being saved:"
+      submit: "Update Settings"

@@ -1,0 +1,17 @@
+en:
+  forms:
+    user_new:
+      header: "Register"
+      sections:
+        account_details: "Account Details"
+      fields:
+        email: "Email"
+        name: "Name"
+        rpii_inspector_number: "RPII Inspector No"
+        password: "Password"
+        password_confirmation: "Password confirmation"
+      submit: "Register"
+      errors:
+        header:
+          one: "1 error prevented registration:"
+          other: "%{count} errors prevented registration:"

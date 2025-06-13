@@ -1,12 +1,5 @@
-<%= render 'shared/page_header', title: t('users.titles.edit') %>
-
-<%= form_with model: @user,
-  local: false,
-  html: { data: { turbo_stream: true } } do |form|
-%>
-  <%= render 'shared/page_header', title: t('users.headers.user_details') %>
-  <%= render 'form/errors', model: @user %>
-  <%= render 'form/fieldset', legend_key: 'account_details', i18n_base: 'users.edit', form: form do %>
+<%= render 'form/form_context', model: @user, i18n_base: 'forms.user_edit' do |form| %>
+  <%= render 'form/fieldset', legend_key: 'account_details' do %>
     <%= render 'form/text_field', field: :name %>
     <%= render 'form/text_field', field: :email, type: :email_field %>
     <%= render 'form/text_field', field: :password, type: :password_field %>
@@ -21,8 +14,6 @@
           @user.inspection_company_id || ""
         ) %>
   <% end %>
-
-  <%= render 'form/submit_button', text: t('users.buttons.update_user'), form: form %>
 
   <!-- Save Message Display -->
   <div id="user_edit_save_message"></div>

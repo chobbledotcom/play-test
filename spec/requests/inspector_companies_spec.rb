@@ -207,7 +207,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
           expect(response).to have_http_status(:success)
           expect(response.content_type).to include("text/vnd.turbo-stream.html")
-          expect(response.body).to include("inspector_company_save_message")
+          expect(response.body).to include("form_save_message")
           expect(response.body).to include(I18n.t("inspector_companies.messages.updated"))
         end
       end
@@ -220,7 +220,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
           expect(response).to have_http_status(:success)
           expect(response.content_type).to include("text/vnd.turbo-stream.html")
-          expect(response.body).to include("inspector_company_save_message")
+          expect(response.body).to include("form_save_message")
           expect(response.body).to include(I18n.t("shared.messages.save_failed"))
         end
       end
@@ -274,19 +274,6 @@ RSpec.describe "InspectorCompanies", type: :request do
       patch inspector_company_path("nonexistent"), params: {inspector_company: {name: "Test"}}
       expect(response).to redirect_to(inspector_companies_path)
       expect(flash[:alert]).to be_present
-    end
-
-    it "handles duplicate RPII registration numbers" do
-      create(:inspector_company)
-
-      # RPII uniqueness is now enforced at user level, not company level
-      post inspector_companies_path, params: {
-        inspector_company: valid_attributes.merge(
-          name: "Different Company"
-        )
-      }
-
-      expect(response).to redirect_to(assigns(:inspector_company))
     end
   end
 end

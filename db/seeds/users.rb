@@ -4,14 +4,13 @@ def generate_secure_password
   SecureRandom.alphanumeric(32)
 end
 
-def create_user(email:, name:, rpii_number:, company:, time_display: "time", active_until: Date.current + 1.year)
+def create_user(email:, name:, rpii_number:, company:, active_until: Date.current + 1.year)
   User.create!(
     email: email,
     name: name,
     password: generate_secure_password,
     rpii_inspector_number: rpii_number,
     inspection_company: company,
-    time_display: time_display,
     active_until: active_until
   )
 end
@@ -35,7 +34,6 @@ create_user(
   name: "Junior Inspector",
   rpii_number: "RPII-003",
   company: $stefan_testing,
-  time_display: "date"
 )
 
 create_user(
@@ -50,7 +48,6 @@ $steph_test_inspector = create_user(
   name: "Steph Inspector",
   rpii_number: "RPII-005",
   company: $steph_test,
-  time_display: "date"
 )
 
 create_user(
@@ -58,7 +55,6 @@ create_user(
   name: "Expired Inspector",
   rpii_number: "RPII-006",
   company: $steve_inflatable,
-  time_display: "date",
   active_until: Date.current - 1.day
 )
 

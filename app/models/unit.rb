@@ -1,8 +1,6 @@
-# RPII Utility - Unit model for bouncy castle inspection system
 class Unit < ApplicationRecord
   self.table_name = "units"
   include CustomIdGenerator
-  include HasDimensions
 
   belongs_to :user
   has_many :inspections
@@ -20,10 +18,6 @@ class Unit < ApplicationRecord
   validates :name, :serial, :description, :manufacturer, :owner, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
 
-  # Override HasDimensions validations for required basic dimensions
-  dimension_validation_options = {greater_than: 0, less_than: 200}
-  validates :width, :length, :height,
-    presence: true, numericality: dimension_validation_options
 
   # Scopes - enhanced from original Equipment and new Unit functionality
   scope :seed_data, -> { where(is_seed: true) }
@@ -42,8 +36,6 @@ class Unit < ApplicationRecord
       all
     end
   }
-  scope :with_slide, -> { where(has_slide: true) }
-  scope :without_slide, -> { where(has_slide: false) }
   scope :by_manufacturer, ->(manufacturer) { where(manufacturer: manufacturer) if manufacturer.present? }
   scope :by_owner, ->(owner) { where(owner: owner) if owner.present? }
   scope :with_recent_inspections, -> {
@@ -53,14 +45,20 @@ class Unit < ApplicationRecord
       .distinct
   }
 
+  scope :inspection_due, -> {
+    joins(:inspections)
+      .merge(Inspection.completed)
+      .group("units.id")
+      .having("MAX(inspections.complete_date) + INTERVAL #{SafetyStandard::REINSPECTION_INTERVAL_DAYS} DAY <= CURRENT_DATE")
+  }
+
   # Callbacks
   before_create :generate_custom_id
-  after_update :update_inspection_unit_data, if: :saved_changes_to_dimensions?
 
-  # Additional methods beyond HasDimensions concern
+  # Instance methods
 
   def last_inspection
-    inspections.order(inspection_date: :desc).first
+    inspections.merge(Inspection.complete).order(complete_date: :desc).first
   end
 
   def last_inspection_status
@@ -71,15 +69,10 @@ class Unit < ApplicationRecord
     inspections.includes(:user).order(inspection_date: :desc)
   end
 
-  def requires_enclosed_assessment?
-    is_totally_enclosed?
-  end
 
   def next_inspection_due
     return nil unless last_inspection
-    # Standard inspection interval using safety standard constant
-    reinspection_interval = SafetyStandard::REINSPECTION_INTERVAL_DAYS.days
-    last_inspection.inspection_date + reinspection_interval
+    last_inspection.inspection_date + SafetyStandard::REINSPECTION_INTERVAL_DAYS.days
   end
 
   def inspection_overdue?
@@ -146,18 +139,6 @@ class Unit < ApplicationRecord
     end
   end
 
-  def saved_changes_to_dimensions?
-    # Use dimension_changed? from HasDimensions for saved changes
-    dimension_attributes.keys.any? { saved_change_to_attribute?(it) }
-  end
-
-  def update_inspection_unit_data
-    # Update any draft inspections with new unit dimensions
-    audit_message = "Unit dimensions updated"
-    inspections.each do |inspection|
-      inspection.log_audit_action("unit_updated", user, audit_message)
-    end
-  end
 
   def process_photo_upload
     return unless photo.attached?

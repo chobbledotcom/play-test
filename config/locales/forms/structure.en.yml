@@ -1,0 +1,45 @@
+en:
+  forms:
+    structure:
+      header: "Structure Assessment"
+      sections:
+        critical_safety_checks: "Critical Safety Checks"
+        measurements: "Measurements"
+        additional_safety_checks: "Additional Safety Checks"
+      fields:
+        # Critical Safety Checks
+        seam_integrity_pass: "Seam Integrity"
+        lock_stitch_pass: "Lock Stitch"
+        air_loss_pass: "Air Loss"
+        straight_walls_pass: "Straight Walls"
+        sharp_edges_pass: "Sharp Edges"
+        unit_stable_pass: "Unit Stable"
+        # Measurements
+        stitch_length: "Stitch Length"
+        stitch_length_pass: "Stitch Length Check"
+        evacuation_time: "Evacuation Time"
+        evacuation_time_pass: "Evacuation Time Check"
+        unit_pressure_value: "Unit Pressure"
+        unit_pressure_pass: "Unit Pressure Check"
+        blower_tube_length: "Blower Tube Length"
+        blower_tube_length_pass: "Blower Tube Length Check"
+        # Additional Safety Checks
+        step_size_value: "Step Size"
+        step_size_pass: "Step Size Check"
+        fall_off_height_value: "Fall Off Height"
+        fall_off_height_pass: "Fall Off Height Check"
+        trough_depth_value: "Trough Depth"
+        trough_width_value: "Trough Width"
+        trough_pass: "Trough Check"
+        entrapment_pass: "Entrapment"
+        markings_pass: "Markings"
+        grounding_pass: "Grounding"
+      status:
+        checks_passed: "Safety Checks Passed"
+        completion: "Assessment Completion"
+      summary:
+        title: "Assessment Summary"
+        completion: "Completion"
+        safety_checks: "Safety Checks"
+        critical_failures: "Critical Failures"
+      submit: "Save Assessment"

@@ -1,14 +1,5 @@
-<%= render 'shared/page_header', title: t('session.login.title') %>
-
-<%= form_with(scope: :session, url: login_path) do |form| %>
-  <%= render 'shared/page_header', title: t('session.login.title') %>
-
-  <%= render 'form/fieldset',
-    legend_key: 'credentials',
-    i18n_base: 'session.login',
-    form: form do
-  %>
-
+<%= render 'form/form_context', model: nil, i18n_base: 'forms.session_new', url: login_path, scope: :session do |form| %>
+  <%= render 'form/fieldset', legend_key: 'credentials' do %>
     <%= render 'form/text_field',
       field: :email,
       type: :email_field,
@@ -24,10 +15,5 @@
     <%= render 'form/checkbox',
       field: :remember_me
     %>
-
   <% end %>
-
-  <%= render 'form/submit_button',
-    text: t('session.login.submit')
-  %>
 <% end %>

@@ -23,7 +23,6 @@ RSpec.describe "inspector_companies/new", type: :view do
     render
 
     expect(rendered).to include("Company Name")
-    # RPII numbers are now per-inspector, not per-company
     expect(rendered).to include("Email")
     expect(rendered).to include("Phone")
     expect(rendered).to include("Address")
@@ -52,7 +51,7 @@ RSpec.describe "inspector_companies/new", type: :view do
     render
 
     expect(rendered).to include('type="submit"')
-    expect(rendered).to include("Create Company")
+    expect(rendered).to include(I18n.t("forms.inspector_companies.submit"))
   end
 
   it "sets default country to UK" do

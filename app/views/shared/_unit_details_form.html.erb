@@ -1,13 +1,11 @@
 <%= render 'form/fieldset', form: form, i18n_base: i18n_base, legend_key: 'unit_details' do %>
   <%= render 'form/text_field', field: :name, required: true %>
-  <%= render 'form/checkbox', field: :has_slide %>
   <%= render 'form/text_field', field: :manufacturer, required: true %>
   <%= render 'form/text_field', field: :model %>
   <%= render 'form/text_field', field: :serial, required: true %>
   <%= render 'form/text_area', field: :description, required: true %>
   <%= render 'form/autocomplete_field', field: :owner, required: true, options: owner_options(current_user) %>
   <%= render 'form/date_field', field: :manufacture_date %>
-  <%= render 'form/checkbox', field: :is_totally_enclosed %>
   <%= render 'form/text_area', field: :notes, rows: 4 %>
   
   <% if show_photo %>

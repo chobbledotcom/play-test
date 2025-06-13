@@ -1,4 +1,14 @@
 class JsonSerializerService
+  # Helper to format value for JSON, especially dates
+  def self.format_value(value)
+    case value
+    when Date, Time, DateTime
+      value.strftime("%Y-%m-%d")
+    else
+      value
+    end
+  end
+
   def self.serialize_unit(unit, include_inspections: true)
     return nil unless unit
 
@@ -8,7 +18,7 @@ class JsonSerializerService
     data = {}
     unit_fields.each do |field|
       value = unit.send(field)
-      data[field.to_sym] = value unless value.nil?
+      data[field.to_sym] = format_value(value) unless value.nil?
     end
 
     # Include inspection history if requested
@@ -18,7 +28,7 @@ class JsonSerializerService
       if completed_inspections.any?
         data[:inspection_history] = completed_inspections.map do |inspection|
           {
-            inspection_date: inspection.inspection_date,
+            inspection_date: format_value(inspection.inspection_date),
             passed: inspection.passed,
             complete: inspection.complete?,
             inspector_company: inspection.inspector_company&.name,
@@ -28,7 +38,7 @@ class JsonSerializerService
         end
 
         data[:total_inspections] = completed_inspections.count
-        data[:last_inspection_date] = completed_inspections.first&.inspection_date
+        data[:last_inspection_date] = format_value(completed_inspections.first&.inspection_date)
         data[:last_inspection_passed] = completed_inspections.first&.passed
       end
     end
@@ -44,80 +54,70 @@ class JsonSerializerService
     data
   end
 
-  def self.serialize_inspection(inspection, include_assessments: true)
-    return nil unless inspection
+  ASSESSMENT_TYPES = {
+    user_height_assessment: Assessments::UserHeightAssessment,
+    slide_assessment: Assessments::SlideAssessment,
+    structure_assessment: Assessments::StructureAssessment,
+    anchorage_assessment: Assessments::AnchorageAssessment,
+    materials_assessment: Assessments::MaterialsAssessment,
+    fan_assessment: Assessments::FanAssessment,
+    enclosed_assessment: Assessments::EnclosedAssessment
+  }
 
+  def self.serialize_inspection(inspection)
+    return nil unless inspection
+    
     # Use reflection to get all columns except excluded ones
     inspection_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
-
+    
     data = {}
     inspection_fields.each do |field|
       value = inspection.send(field)
-      data[field.to_sym] = value unless value.nil?
+      data[field.to_sym] = format_value(value) unless value.nil?
     end
-
-    # Add computed complete field
+    
+    # Add computed fields
     data[:complete] = inspection.complete?
-
-    # Add inspector company info
-    if inspection.inspector_company.present?
-      data[:inspector_company] = {
-        name: inspection.inspector_company.name,
-        rpii_inspector_number: inspection.user&.rpii_inspector_number
-      }
-    end
-
-    # Add unit info if present
-    if inspection.unit.present?
-      data[:unit] = {
-        id: inspection.unit.id,
-        name: inspection.unit.name,
-        serial_number: inspection.unit.serial_number || inspection.unit.serial,
-        manufacturer: inspection.unit.manufacturer,
-        owner: inspection.unit.owner,
-        has_slide: inspection.unit.has_slide?,
-        is_totally_enclosed: inspection.unit.is_totally_enclosed?
-      }
-    end
-
-    # Include assessment data if requested
-    if include_assessments
-      assessments = {}
-
-      # Assessment types to include
-      assessment_types = {
-        user_height_assessment: UserHeightAssessment,
-        slide_assessment: SlideAssessment,
-        structure_assessment: StructureAssessment,
-        anchorage_assessment: AnchorageAssessment,
-        materials_assessment: MaterialsAssessment,
-        fan_assessment: FanAssessment,
-        enclosed_assessment: EnclosedAssessment
-      }
-
-      assessment_types.each do |association_name, klass|
-        assessment = inspection.send(association_name)
-        next unless assessment
-
-        # Skip slide assessment if unit doesn't have slide
-        next if association_name == :slide_assessment && !inspection.unit&.has_slide?
-
-        # Skip enclosed assessment if unit isn't totally enclosed
-        next if association_name == :enclosed_assessment && !inspection.unit&.is_totally_enclosed?
-
-        assessments[association_name] = serialize_assessment(assessment, klass)
-      end
-
-      data[:assessments] = assessments if assessments.any?
-    end
-
-    # Add public URLs
+    data[:passed] = inspection.passed? if inspection.complete?
+    
+    # Add inspector info
+    data[:inspector] = {
+      name: inspection.user.name,
+      rpii_inspector_number: inspection.user.rpii_inspector_number
+    }
+    
+    # Add URLs
     base_url = ENV["BASE_URL"] || Rails.application.routes.default_url_options[:host] || "localhost:3000"
     data[:urls] = {
       report_pdf: "#{base_url}/inspections/#{inspection.id}.pdf",
       report_json: "#{base_url}/inspections/#{inspection.id}.json",
       qr_code: "#{base_url}/inspections/#{inspection.id}.png"
     }
+
+    if inspection.unit
+      data[:unit] = {
+        id: inspection.unit.id,
+        name: inspection.unit.name,
+        serial: inspection.unit.serial,
+        manufacturer: inspection.unit.manufacturer,
+        owner: inspection.unit.owner,
+      }
+    end
+
+    assessments = {}
+
+    ASSESSMENT_TYPES.each do |name, klass|
+      assessment = inspection.send(name)
+      if !assessment ||
+        (name == :slide_assessment && !inspection.has_slide?) ||
+        (name == :enclosed_assessment && !inspection.is_totally_enclosed?)
+        next
+      else
+        assessments[name] = serialize_assessment(assessment, klass)
+      end
+    end
+
+    data[:assessments] = assessments
 
     data
   end
@@ -129,7 +129,7 @@ class JsonSerializerService
     data = {}
     assessment_fields.each do |field|
       value = assessment.send(field)
-      data[field.to_sym] = value unless value.nil?
+      data[field.to_sym] = format_value(value) unless value.nil?
     end
 
     data

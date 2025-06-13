@@ -18,7 +18,6 @@ RSpec.describe "Unit JSON endpoints", type: :request do
         expect(json["name"]).to eq(unit.name)
         expect(json["serial"]).to eq(unit.serial)
         expect(json["manufacturer"]).to eq(unit.manufacturer)
-        expect(json["has_slide"]).to eq(unit.has_slide)
 
         # Check sensitive fields are excluded
         expect(json).not_to have_key("user_id")

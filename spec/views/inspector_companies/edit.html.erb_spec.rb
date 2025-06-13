@@ -1,52 +1,43 @@
 require "rails_helper"
 
 RSpec.describe "inspector_companies/edit", type: :view do
-  let(:admin_user) { create(:user, :admin) }
-
   let(:inspector_company) { create(:inspector_company) }
 
   before do
     assign(:inspector_company, inspector_company)
-    allow(view).to receive(:current_user).and_return(admin_user)
+    setup_admin_view_context
   end
 
   it "renders edit inspector company form" do
     render
 
-    expect(rendered).to include("Edit Inspector Company")
+    expect_i18n_content("inspector_companies.titles.edit")
   end
 
   it "pre-populates form fields with existing data" do
     render
 
-    expect(rendered).to include(inspector_company.name)
-    # RPII numbers are now per-inspector, not per-company
-    expect(rendered).to include(inspector_company.email)
-    expect(rendered).to include(inspector_company.phone)
-    expect(rendered).to include(inspector_company.address)
-    expect(rendered).to include(inspector_company.city)
-    expect(rendered).to include(inspector_company.postal_code)
+    expect_model_attributes_displayed(inspector_company, :name, :email, :phone, 
+                                     :address, :city, :postal_code)
   end
 
   it "shows form for boolean fields" do
     render
 
-    expect(rendered).to include('type="checkbox"')
-    expect(rendered).to include('name="inspector_company[active]"')
+    expect_form_field("inspector_company[active]", type: "checkbox")
   end
 
   it "includes form elements" do
     render
 
-    expect(rendered).to include('type="submit"')
-    expect(rendered).to include("Update Company")
+    expect_submit_button("forms.inspector_companies")
   end
 
   it "includes admin-only notes field" do
     inspector_company.update!(notes: "Existing notes")
     render
 
-    expect(rendered).to have_content(I18n.t("inspector_companies.forms.notes"))
+    expect_i18n_content("forms.inspector_companies.fields.notes")
     expect(rendered).to have_field("inspector_company[notes]", with: "Existing notes")
   end
 

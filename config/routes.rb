@@ -32,16 +32,30 @@ Rails.application.routes.draw do
   # Inspections
   resources :inspections, except: [:new] do
     member do
-      patch "replace_dimensions"
       get "select_unit"
       patch "update_unit"
       patch "complete"
       patch "mark_draft"
+      get "unified_edit"
+      patch "unified_update"
     end
+    
+    resource :anchorage_assessment, only: [:update]
+    resource :enclosed_assessment, only: [:update]
+    resource :fan_assessment, only: [:update]
+    resource :materials_assessment, only: [:update]
+    resource :slide_assessment, only: [:update]
+    resource :structure_assessment, only: [:update]
+    resource :user_height_assessment, only: [:update]
   end
 
   # Units
-  resources :units
+  resources :units do
+    member do
+      get "unified_edit"
+      patch "unified_update"
+    end
+  end
 
   # Create unit from inspection
   get "inspections/:id/new_unit", to: "units#new_from_inspection", as: "new_unit_from_inspection"

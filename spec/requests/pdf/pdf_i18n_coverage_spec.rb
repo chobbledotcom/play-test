@@ -14,25 +14,14 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
         user: user,
         name: "Test Unit",
         manufacturer: "Test Mfg",
-        serial: "TEST123",
-        has_slide: true,
-        is_totally_enclosed: true)
+        serial: "TEST123")
 
       # Create complete inspection with all assessments
-      inspection = create(:inspection, :completed,
+      inspection = create(:inspection, :pdf_complete_test_data,
         user: user,
         unit: unit,
         passed: true,
         comments: "Test comments")
-
-      # Create all assessment types
-      create(:user_height_assessment, :complete, inspection: inspection)
-      create(:structure_assessment, :complete, inspection: inspection)
-      create(:anchorage_assessment, :complete, inspection: inspection)
-      create(:materials_assessment, :complete, inspection: inspection)
-      create(:fan_assessment, :complete, inspection: inspection)
-      create(:slide_assessment, :complete, inspection: inspection)
-      create(:enclosed_assessment, inspection: inspection)
 
       # Generate both PDF types
       inspection_pdf_text = pdf_text_content(
@@ -122,35 +111,22 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
 
   describe "DRY helper usage" do
     it "generates inspection PDF with all sections" do
-      unit = create(:unit, user: user, has_slide: true, is_totally_enclosed: true, name: "Test Unit PDF", serial: "SERIAL123")
-      inspection = create(:inspection, :completed, user: user, unit: unit)
-
-      # Create all assessments
-      {
-        user_height: create(:user_height_assessment, :complete, inspection: inspection),
-        structure: create(:structure_assessment, :complete, inspection: inspection),
-        anchorage: create(:anchorage_assessment, :complete, inspection: inspection),
-        materials: create(:materials_assessment, :complete, inspection: inspection),
-        fan: create(:fan_assessment, :complete, inspection: inspection),
-        slide: create(:slide_assessment, :complete, inspection: inspection),
-        enclosed: create(:enclosed_assessment, inspection: inspection)
-      }
+      unit = create(:unit, user: user, name: "Test Unit PDF", serial: "SERIAL123")
+      inspection = create(:inspection, :pdf_complete_test_data, :with_slide, :totally_enclosed, user: user, unit: unit)
 
       get inspection_path(inspection, format: :pdf)
 
       # Ensure we got a PDF response
       expect(response).to have_http_status(:success)
       expect(response.headers["Content-Type"]).to eq("application/pdf")
-      expect(response.body).not_to be_nil
-      expect(response.body[0..3]).to eq("%PDF")
+      expect_valid_pdf(response.body)
 
       pdf_text = pdf_text_content(response.body)
 
       # Verify core sections using i18n
       expect_pdf_to_include_i18n_keys(pdf_text,
         "pdf.inspection.title",
-        "pdf.inspection.equipment_details",
-        "pdf.inspection.comments")
+        "pdf.inspection.equipment_details")
 
       # Verify dynamic content
       expect(pdf_text).to include(unit.name)

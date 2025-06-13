@@ -1,26 +1,22 @@
-<% if unit.photo.attached? %>
-  <div class="unit-photo">
-    <%= render 'shared/image_link', 
-        image: unit.photo, 
-        alt: "Photo of #{unit.name}",
-        link_text: t('units.messages.view_full_photo') %>
-  </div>
-<% end %>
+<%= render 'shared/unit_photo', unit: unit %>
 
 <%= scrollable_table do %>
   <tr>
     <th>Name:</th>
     <td><%= unit.name %></td>
   </tr>
-  <tr>
-    <th>Has Slide:</th>
-    <td><%= unit.has_slide? ? "Yes" : "No" %></td>
-  </tr>
-  <% if unit.is_totally_enclosed? %>
-  <tr>
-    <th>Totally Enclosed:</th>
-    <td>Yes</td>
-  </tr>
+  <% last_inspection = unit.last_inspection %>
+  <% if last_inspection %>
+    <tr>
+      <th>Has Slide:</th>
+      <td><%= last_inspection.has_slide? ? "Yes" : "No" %></td>
+    </tr>
+    <% if last_inspection.is_totally_enclosed? %>
+    <tr>
+      <th>Totally Enclosed:</th>
+      <td>Yes</td>
+    </tr>
+    <% end %>
   <% end %>
   <tr>
     <th>Manufacturer:</th>
@@ -42,18 +38,20 @@
     <th>Owner:</th>
     <td><%= link_to unit.owner, units_path(owner: unit.owner) %></td>
   </tr>
-  <tr>
-    <th>Width:</th>
-    <td><%= unit.width %>m</td>
-  </tr>
-  <tr>
-    <th>Length:</th>
-    <td><%= unit.length %>m</td>
-  </tr>
-  <tr>
-    <th>Height:</th>
-    <td><%= unit.height %>m</td>
-  </tr>
+  <% if last_inspection %>
+    <tr>
+      <th>Width:</th>
+      <td><%= last_inspection.width %>m</td>
+    </tr>
+    <tr>
+      <th>Length:</th>
+      <td><%= last_inspection.length %>m</td>
+    </tr>
+    <tr>
+      <th>Height:</th>
+      <td><%= last_inspection.height %>m</td>
+    </tr>
+  <% end %>
   <% if unit.manufacture_date %>
   <tr>
     <th>Manufacture Date:</th>

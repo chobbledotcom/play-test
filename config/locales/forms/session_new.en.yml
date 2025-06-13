@@ -1,0 +1,11 @@
+en:
+  forms:
+    session_new:
+      header: "Log in"
+      sections:
+        credentials: "Login Credentials"
+      fields:
+        email: "Email"
+        password: "Password"
+        remember_me: "Remember Me"
+      submit: "Log in"

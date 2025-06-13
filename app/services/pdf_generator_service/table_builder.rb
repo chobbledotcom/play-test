@@ -87,7 +87,7 @@ class PdfGeneratorService
       inspections.each do |inspection|
         table_data << [
           inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.unit.fields.na"),
-          inspection.passed ? I18n.t("pdf.unit.fields.pass") : I18n.t("pdf.unit.fields.fail"),
+          inspection.passed ? I18n.t("shared.pass") : I18n.t("shared.fail"),
           inspection.user.name || I18n.t("pdf.unit.fields.na"),
           inspection.user.rpii_inspector_number || I18n.t("pdf.unit.fields.na"),
           inspection.inspection_location || I18n.t("pdf.unit.fields.na")
@@ -117,10 +117,10 @@ class PdfGeneratorService
         # Color and style the result column (index 1)
         (1...table_data.length).each do |i|
           result_cell = t.row(i).column(1)
-          if table_data[i][1] == I18n.t("pdf.unit.fields.pass")
+          if table_data[i][1] == I18n.t("shared.pass")
             result_cell.text_color = PASS_COLOR
             result_cell.font_style = :bold
-          elsif table_data[i][1] == I18n.t("pdf.unit.fields.fail")
+          elsif table_data[i][1] == I18n.t("shared.fail")
             result_cell.text_color = FAIL_COLOR
             result_cell.font_style = :bold
           end
@@ -139,22 +139,30 @@ class PdfGeneratorService
     end
 
     def self.build_unit_details_table(unit, context)
-      # Format dimensions consistently
+      # Get dimensions from last inspection if available
+      last_inspection = unit.last_inspection
       dimensions = []
-      dimensions << "#{I18n.t("pdf.dimensions.width")}: #{Utilities.format_dimension(unit.width)}" if unit.width.present?
-      dimensions << "#{I18n.t("pdf.dimensions.length")}: #{Utilities.format_dimension(unit.length)}" if unit.length.present?
-      dimensions << "#{I18n.t("pdf.dimensions.height")}: #{Utilities.format_dimension(unit.height)}" if unit.height.present?
+
+      if last_inspection
+        dimensions << "#{I18n.t("pdf.dimensions.width")}: #{Utilities.format_dimension(last_inspection.width)}" if last_inspection.width.present?
+        dimensions << "#{I18n.t("pdf.dimensions.length")}: #{Utilities.format_dimension(last_inspection.length)}" if last_inspection.length.present?
+        dimensions << "#{I18n.t("pdf.dimensions.height")}: #{Utilities.format_dimension(last_inspection.height)}" if last_inspection.height.present?
+      end
       dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
 
-      # Unit Type / Has Slide (use the better inspection format for both)
-      unit_type = unit.has_slide? ? I18n.t("pdf.inspection.fields.unit_with_slide") : I18n.t("pdf.inspection.fields.standard_unit")
+      # Unit Type / Has Slide - use last inspection data if available
+      unit_type = if last_inspection
+        last_inspection.has_slide? ? I18n.t("pdf.inspection.fields.unit_with_slide") : I18n.t("pdf.inspection.fields.standard_unit")
+      else
+        I18n.t("pdf.inspection.fields.standard_unit")
+      end
 
       # Use the same format for both inspection and unit PDFs (the inspection format is better)
       [
         [
           I18n.t("pdf.inspection.fields.description"),
           Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH),
-          I18n.t("pdf.inspection.fields.serial_number_asset_id"),
+          I18n.t("pdf.inspection.fields.serial"),
           unit.serial || ""
         ],
         [

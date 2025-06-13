@@ -153,7 +153,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
         get "/units/#{unit.id}.pdf"
 
         # Should contain I18n unit report title
-        pdf_text = PDF::Inspector::Text.analyze(response.body).strings.join(" ")
+        pdf_text = pdf_text_content(response.body)
         expect(pdf_text).to include(I18n.t("pdf.unit.title"))
         expect(pdf_text).to include(unit.manufacturer)
       end
@@ -165,7 +165,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
 
         expect(response).to have_http_status(:success)
 
-        pdf_text = PDF::Inspector::Text.analyze(response.body).strings.join(" ")
+        pdf_text = pdf_text_content(response.body)
         expect(pdf_text).to include(I18n.t("pdf.unit.no_completed_inspections"))
       end
 

@@ -3,10 +3,11 @@ en:
   session:
     login:
       title: "Log in"
-      email: "Email"
-      password: "Password"
-      password_label: "Password"
-      remember_me: "Remember Me"
+      fields:
+        email: "Email"
+        password: "Password"
+        password_label: "Password"
+        remember_me: "Remember Me"
       submit: "Log in"
       success: "Logged in"
       error: "Invalid email/password combination"

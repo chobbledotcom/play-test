@@ -1,24 +1,5 @@
-<%= render 'form/errors', model: @unit %>
-
-<%= form_with model: @unit,
-             local: true,
-             html: {
-               class: "unit-form",
-               multipart: true
-             } do |form| %>
-  <%= render 'shared/page_header', title: t('units.headers.unit_details') %>
-  <%= render 'shared/unit_details_form', form: form, object: @unit, i18n_base: 'units.forms', show_photo: true %>
-  <%= render 'shared/basic_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
-  <%= render 'shared/anchorage_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
-  <%= render 'shared/structure_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
-  <%= render 'shared/slide_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
-  <%= render 'shared/user_height_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
-  <%= render 'shared/enclosed_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
-  <%= render 'shared/other_dimensions_form', form: form, object: @unit, i18n_base: 'units.forms' %>
-
-  <fieldset>
-    <%= form.submit @unit.new_record? ? t('units.buttons.create') : t('units.buttons.update') %>
-  </fieldset>
+<%= render 'form/form_context', model: @unit, i18n_base: 'forms.units' do |form| %>
+  <%= render 'shared/unit_details_form', form: form, object: @unit, i18n_base: 'forms.units', show_photo: true %>
   
   <!-- Save Message Display -->
   <div id="unit_save_message"></div>

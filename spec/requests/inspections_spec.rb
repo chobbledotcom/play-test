@@ -169,12 +169,15 @@ RSpec.describe "Inspections", type: :request do
 
         it "redirects appropriately" do
           post "/inspections", params: {inspection: valid_inspection_attributes}
-          expect_redirect_with_alert(root_path)
+          expect_redirect_with_alert(inspections_path)
         end
 
-        it "redirects to unit when unit_id provided" do
-          post "/inspections", params: {inspection: valid_inspection_attributes, unit_id: unit.id}
-          expect_redirect_with_alert(unit_path(unit.id))
+        it "redirects to unit when unit_id provided and user owns it" do
+          # Create unit owned by the inactive user
+          inactive_unit = create(:unit, user: inactive_user)
+          
+          post "/inspections", params: {inspection: valid_inspection_attributes, unit_id: inactive_unit.id}
+          expect_redirect_with_alert(unit_path(inactive_unit))
         end
       end
 
@@ -188,7 +191,7 @@ RSpec.describe "Inspections", type: :request do
 
         it "redirects with alert when user is inactive" do
           post "/inspections", params: {inspection: valid_inspection_attributes}
-          expect_redirect_with_alert(root_path)
+          expect_redirect_with_alert(inspections_path)
         end
       end
 
@@ -339,22 +342,6 @@ RSpec.describe "Inspections", type: :request do
         it "handles invalid unit_id" do
           patch "/inspections/#{inspection.id}/update_unit", params: {unit_id: "invalid"}
           expect_redirect_with_alert(select_unit_inspection_path(inspection), /invalid.*unit/i)
-        end
-      end
-
-      describe "PATCH /replace_dimensions" do
-        let(:inspection_with_unit) { create(:inspection, user: user, unit: unit1) }
-
-        it "replaces dimensions from unit" do
-          patch "/inspections/#{inspection_with_unit.id}/replace_dimensions"
-          expect(response).to redirect_to(edit_inspection_path(inspection_with_unit, tab: "general"))
-          expect(flash[:notice]).to be_present
-        end
-
-        it "handles inspection without unit" do
-          patch "/inspections/#{inspection.id}/replace_dimensions"
-          expect(response).to redirect_to(edit_inspection_path(inspection, tab: "general"))
-          expect(flash[:alert]).to be_present
         end
       end
     end

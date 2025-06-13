@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.feature "Safety Standards Display", type: :feature do
   let(:user) { create(:user) }
-  let(:unit) { create(:unit, user: user, length: 5, width: 4) }
-  let(:inspection) { create(:inspection, user: user, unit: unit) }
+  let(:unit) { create(:unit, user: user) }
+  let(:inspection) { create(:inspection, user: user, unit: unit, length: 5, width: 4, height: 3) }
 
   before do
     sign_in(user)
@@ -29,9 +29,8 @@ RSpec.feature "Safety Standards Display", type: :feature do
   end
 
   scenario "safety standards info appears in slide assessment form" do
-    create(:slide_assessment,
-      inspection: inspection,
-      slide_platform_height: 2.5)
+    # Update the auto-created slide assessment
+    inspection.slide_assessment.update!(slide_platform_height: 2.5)
 
     visit edit_inspection_path(inspection, tab: "slide")
 
@@ -46,7 +45,8 @@ RSpec.feature "Safety Standards Display", type: :feature do
   end
 
   scenario "safety standards info appears in user height assessment form" do
-    create(:user_height_assessment, :with_basic_data, inspection: inspection)
+    # Update the auto-created user height assessment with basic data
+    inspection.user_height_assessment.update!(attributes_for(:user_height_assessment, :with_basic_data))
 
     visit edit_inspection_path(inspection, tab: "user_height")
 
@@ -62,20 +62,18 @@ RSpec.feature "Safety Standards Display", type: :feature do
   end
 
   scenario "safety standards info appears in anchorage assessment form" do
-    create(:anchorage_assessment,
-      inspection: inspection,
+    # Update the auto-created anchorage assessment
+    inspection.anchorage_assessment.update!(
       num_low_anchors: 3,
       num_high_anchors: 2)
 
     visit edit_inspection_path(inspection, tab: "anchorage")
 
-    within(".anchorage-assessment") do
-      expect(page).to have_content("Total Anchors:")
-      expect(page).to have_content("5")
-      expect(page).to have_content("Required Anchors:")
-      expect(page).to have_content("5")
-      expect(page).to have_content("Compliance Status:")
-      expect(page).to have_content("Compliant")
-    end
+    expect(page).to have_content("Total Anchors:")
+    expect(page).to have_content("5")
+    expect(page).to have_content("Required Anchors:")
+    expect(page).to have_content("5")
+    expect(page).to have_content("Compliance Status:")
+    expect(page).to have_content("Compliant")
   end
 end

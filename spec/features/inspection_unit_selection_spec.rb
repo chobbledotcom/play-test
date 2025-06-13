@@ -4,7 +4,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
   let(:user) { create(:user) }
   let!(:unit1) { create(:unit, user: user, name: "Bouncy Castle 1", serial: "BC001", manufacturer: "Acme", owner: "John Doe", description: "Large bouncy castle") }
   let!(:unit2) { create(:unit, user: user, name: "Bouncy Castle 2", serial: "BC002", manufacturer: "Beta Corp") }
-  let!(:unit3) { create(:unit, user: user, name: "Slide Unit", serial: "SL001", manufacturer: "Acme", has_slide: true) }
+  let!(:unit3) { create(:unit, user: user, name: "Slide Unit", serial: "SL001", manufacturer: "Acme") }
   let(:inspection) { create(:inspection, user: user, unit: unit1) }
 
   before { sign_in(user) }
@@ -70,36 +70,21 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
   end
 
   describe "selecting a unit" do
-    let(:unit_with_dimensions) do
-      unit2.tap do |u|
-        u.update!(
-          width: 5.0,
-          length: 6.0,
-          height: 3.5,
-          containing_wall_height: 2.0,
-          platform_height: 1.5
-        )
-      end
-    end
-
     before { visit select_unit_inspection_path(inspection) }
 
     it "updates the inspection with the selected unit" do
-      select_unit_button(unit_with_dimensions)
+      select_unit_button(unit2)
 
       expect(page).to have_current_path(edit_inspection_path(inspection))
-      expect(page).to have_content(I18n.t("inspections.messages.unit_changed", unit_name: unit_with_dimensions.name))
+      expect(page).to have_content(I18n.t("inspections.messages.unit_changed", unit_name: unit2.name))
 
       within ".tab-content" do
-        expect_unit_details(unit_with_dimensions)
+        expect_unit_details(unit2)
       end
 
-      # Verify dimensions were copied
+      # Verify unit was changed
       inspection.reload
-      expect(inspection.unit).to eq(unit_with_dimensions)
-      expect(inspection.width).to eq(5.0)
-      expect(inspection.length).to eq(6.0)
-      expect(inspection.height).to eq(3.5)
+      expect(inspection.unit).to eq(unit2)
     end
   end
 
@@ -164,16 +149,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
       let(:admin_user) { create(:user, :admin) }
       let(:admin_unit) { create(:unit, user: admin_user) }
       let(:admin_complete_inspection) do
-        create(:inspection, user: admin_user, unit: admin_unit, has_slide: true).tap do |insp|
-          # Create all required assessments with their appropriate passing traits
-          create(:user_height_assessment, :complete, inspection: insp)
-          create(:slide_assessment, :complete, inspection: insp)
-          create(:structure_assessment, :complete, inspection: insp)
-          create(:anchorage_assessment, :passed, inspection: insp)
-          create(:materials_assessment, :passed, inspection: insp)
-          create(:fan_assessment, :passed, inspection: insp)
-          create(:enclosed_assessment, :passed, inspection: insp) if insp.is_totally_enclosed?
-
+        create(:inspection, :with_complete_assessments, user: admin_user, unit: admin_unit).tap do |insp|
           # Mark as complete
           insp.update!(complete_date: Time.current)
         end
@@ -215,16 +191,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
   end
 
   def create_complete_inspection
-    create(:inspection, user: user, unit: unit1, has_slide: true).tap do |insp|
-      # Create all required assessments with their appropriate passing traits
-      create(:user_height_assessment, :complete, inspection: insp)
-      create(:slide_assessment, :complete, inspection: insp)
-      create(:structure_assessment, :complete, inspection: insp)
-      create(:anchorage_assessment, :passed, inspection: insp)
-      create(:materials_assessment, :passed, inspection: insp)
-      create(:fan_assessment, :passed, inspection: insp)
-      create(:enclosed_assessment, :passed, inspection: insp) if insp.is_totally_enclosed?
-
+    create(:inspection, :with_complete_assessments, user: user, unit: unit1).tap do |insp|
       # Mark as complete
       insp.update!(complete_date: Time.current)
     end

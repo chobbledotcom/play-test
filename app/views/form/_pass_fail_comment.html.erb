@@ -4,12 +4,22 @@
   #   field: Base field name (e.g., 'slip_sheet_integrity')
   # 
   # This will render:
-  #   - Pass/fail field: field (e.g., 'slip_sheet_integrity')
+  #   - Pass/fail field: field (e.g., 'slip_sheet_integrity') - Only for Inspections
   #   - Comment field: field + '_comment' (e.g., 'slip_sheet_integrity_comment')
   
   pass_fail_field = field
-  comment_field = "#{field}_comment".to_sym
+  # If field ends with _pass, strip it before adding _comment
+  base_field = field.to_s.end_with?('_pass') ? field.to_s.chomp('_pass') : field.to_s
+  comment_field = "#{base_field}_comment".to_sym
+  
+  # Get the form object to check model type
+  form = @_current_form
+  model = form.object
+  model_class_name = model.class.name
 %>
 
-<%= render 'form/pass_fail', field: pass_fail_field %>
+<% if model_class_name != 'Unit' %>
+  <%= render 'form/pass_fail', field: pass_fail_field %>
+<% end %>
+
 <%= render 'form/comment', field: comment_field %>

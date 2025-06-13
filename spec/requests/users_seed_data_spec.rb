@@ -5,7 +5,6 @@ RSpec.describe "Users Seed Data Management", type: :request do
   let(:regular_user) { create(:user) }
   let(:test_user) { create(:user) }
 
-
   describe "POST /users/:id/add_seeds" do
     context "as admin" do
       before { login_as(admin_user) }
@@ -26,7 +25,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
 
         it "does not add more data and shows failure message" do
           initial_count = test_user.units.count
-          
+
           post add_seeds_user_path(test_user)
 
           expect(response).to redirect_to(edit_user_path(test_user))
@@ -42,7 +41,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
 
       it "redirects to root with error" do
         post add_seeds_user_path(test_user)
-        
+
         expect(response).to redirect_to(root_path)
         follow_redirect!
         expect(response.body).to include("You are not authorized to access this page")
@@ -52,7 +51,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
     context "when not logged in" do
       it "redirects to login" do
         post add_seeds_user_path(test_user)
-        
+
         expect(response).to redirect_to(login_path)
       end
     end
@@ -67,7 +66,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
 
       it "deletes seed data and redirects with success message" do
         expect(test_user.has_seed_data?).to be true
-        
+
         delete delete_seeds_user_path(test_user)
 
         expect(response).to redirect_to(edit_user_path(test_user))
@@ -78,9 +77,9 @@ RSpec.describe "Users Seed Data Management", type: :request do
 
       it "preserves non-seed data" do
         regular_unit = create(:unit, user: test_user, is_seed: false)
-        
+
         delete delete_seeds_user_path(test_user)
-        
+
         expect(test_user.reload.units).to include(regular_unit)
       end
     end
@@ -93,7 +92,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
 
       it "redirects to root with error" do
         delete delete_seeds_user_path(test_user)
-        
+
         expect(response).to redirect_to(root_path)
         follow_redirect!
         expect(response.body).to include("You are not authorized to access this page")

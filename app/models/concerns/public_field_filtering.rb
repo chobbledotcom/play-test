@@ -15,6 +15,7 @@ module PublicFieldFiltering
     inspector_signature
     signature_timestamp
     inspection_id
+    is_seed
   ].freeze
 
   # Additional fields to exclude from PDFs specifically

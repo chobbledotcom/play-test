@@ -11,7 +11,7 @@ class PdfGeneratorService
       custom_text = options[:text]
 
       # Get the label
-      label = custom_label || I18n.t("inspections.assessments.#{assessment_type}.fields.#{field_name}")
+      label = custom_label || I18n.t("forms.#{assessment_type}.fields.#{field_name}")
 
       # Get the value
       value = assessment.send(field_name) unless custom_text

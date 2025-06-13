@@ -1,4 +1,3 @@
-# RPII Utility - Company credentials and branding model
 class InspectorCompany < ApplicationRecord
   include CustomIdGenerator
 

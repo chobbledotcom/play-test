@@ -3,12 +3,13 @@
   model_object = local_assigns[:model] || local_assigns[:object]
   raise ArgumentError, "model object is required for form errors" if model_object.nil?
   
-  # Get model name for i18n keys
-  model_name = model_object.class.model_name.singular
+  # Use inherited i18n_base from form context
+  i18n_base = @_current_i18n_base
+  raise ArgumentError, "i18n_base is required for form errors" if i18n_base.nil?
   
   # Custom header text or use i18n lookup - no fallbacks
   header_text = local_assigns[:header] || 
-                t("#{model_name.pluralize}.errors.header", 
+                t("#{i18n_base}.errors.header", 
                   count: model_object.errors.count, 
                   raise: true)
 %>

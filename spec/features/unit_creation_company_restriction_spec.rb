@@ -21,22 +21,45 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       expect(page).to have_current_path(new_unit_path)
       expect(page).to have_content(I18n.t("units.titles.new"))
 
-      # Fill in the form
-      fill_in I18n.t("units.forms.name"), with: "Test Unit"
-      fill_in I18n.t("units.forms.serial"), with: "TEST123"
-      fill_in I18n.t("units.forms.manufacturer"), with: "Test Manufacturer"
-      fill_in I18n.t("units.forms.owner"), with: "Test Owner"
-      fill_in I18n.t("units.forms.description"), with: "Test Description"
-      fill_in I18n.t("units.forms.width"), with: "10"
-      fill_in I18n.t("units.forms.length"), with: "10"
-      fill_in I18n.t("units.forms.height"), with: "3"
+      # Verify all expected form fields are present using our comprehensive helper
+      expect_form_fields_present("forms.units")
 
-      # Submit the form
-      click_button I18n.t("units.buttons.create")
+      # Fill in the form using our standardized form helpers
+      fill_in_form :units, :name, "Test Unit"
+      fill_in_form :units, :serial, "TEST123"
+      fill_in_form :units, :manufacturer, "Test Manufacturer"
+      fill_in_form :units, :owner, "Test Owner"
+      fill_in_form :units, :description, "Test Description"
+      
+      # Optional fields using form helpers
+      fill_in_form :units, :model, "Test Model"
+      fill_in_form :units, :notes, "Created via automated test"
+
+      # Submit the form using our helper
+      submit_form :units
 
       # Should be redirected to unit show page with success message
       expect(page).to have_content(I18n.t("units.messages.created"))
       expect(page).to have_content("Test Unit")
+    end
+
+    scenario "demonstrates comprehensive form helper usage" do
+      visit new_unit_path
+
+      # Use our comprehensive helper to verify the entire form structure matches i18n
+      expect_form_fields_present("forms.units")
+      
+      # Fill minimal required fields using our standardized helpers
+      fill_in_form :units, :name, "Helper Demo Unit"
+      fill_in_form :units, :serial, "DEMO123"
+      fill_in_form :units, :manufacturer, "Helper Corp"
+      fill_in_form :units, :owner, "Test Owner"
+      fill_in_form :units, :description, "Demonstrates form helper capabilities"
+      
+      # Submit using our standardized submit helper
+      submit_form :units
+      
+      expect(page).to have_content("Helper Demo Unit")
     end
   end
 

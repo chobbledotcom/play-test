@@ -3,7 +3,7 @@ require "pdf/inspector"
 
 RSpec.feature "PDF Generation User Workflows", type: :feature do
   let(:user) { create(:user) }
-  let(:unit) { create(:unit, user: user, manufacturer: "Test Manufacturer", serial: "TEST123", serial_number: "SN-TEST123") }
+  let(:unit) { create(:unit, user: user, manufacturer: "Test Manufacturer", serial: "TEST123") }
   let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
 
   before do
@@ -30,9 +30,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
     scenario "user generates PDF with full assessment workflow" do
       # Start with a completed inspection that has assessments
-      full_inspection = create(:inspection, :completed, user: user, unit: unit)
-      create(:user_height_assessment, inspection: full_inspection)
-      create(:structure_assessment, inspection: full_inspection)
+      full_inspection = create(:inspection, :pdf_complete_test_data, user: user, unit: unit)
 
       visit inspection_path(full_inspection)
 
@@ -40,8 +38,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       expect(page).to have_css("iframe", wait: 5)
 
       # Verify the PDF is accessible
-      page.driver.browser.get("/inspections/#{full_inspection.id}.pdf")
-      expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
+      get_pdf("/inspections/#{full_inspection.id}.pdf")
     end
 
     scenario "user shares public report link" do
@@ -51,10 +48,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       expect(page).to have_link(href: /\.pdf/)
 
       # Access public PDF directly with .pdf extension
-      page.driver.browser.get("/inspections/#{inspection.id}.pdf")
-
-      expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
-      expect(page.driver.response.body[0..3]).to eq("%PDF")
+      get_pdf("/inspections/#{inspection.id}.pdf")
     end
   end
 
@@ -76,12 +70,9 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       expect(page).to have_css("img[alt*='QR']")
 
       # Access unit report directly
-      page.driver.browser.get("/units/#{unit.id}.pdf")
-
-      expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
+      pdf_text = get_pdf_text("/units/#{unit.id}.pdf")
 
       # Should contain inspection history
-      pdf_text = PDF::Inspector::Text.analyze(page.driver.response.body).strings.join(" ")
       expect(pdf_text).to include(I18n.t("pdf.unit.inspection_history"))
     end
 
@@ -91,11 +82,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       visit unit_path(empty_unit)
 
       # Access empty unit report
-      page.driver.browser.get("/units/#{empty_unit.id}.pdf")
-
-      expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
-
-      pdf_text = PDF::Inspector::Text.analyze(page.driver.response.body).strings.join(" ")
+      pdf_text = get_pdf_text("/units/#{empty_unit.id}.pdf")
       expect(pdf_text).to include(I18n.t("pdf.unit.no_completed_inspections"))
     end
   end

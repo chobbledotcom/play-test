@@ -267,26 +267,24 @@ RSpec.describe "I18n monkey patch" do
   describe "I18n.t" do
     it "tracks keys when called" do
       # Use a key that exists in the app
-      I18n.t("shared.buttons.save")
+      I18n.t("hello")
 
-      expect(I18nUsageTracker.used_keys).to include("shared.buttons.save")
-      expect(I18nUsageTracker.used_keys).to include("shared.buttons")
-      expect(I18nUsageTracker.used_keys).to include("shared")
+      expect(I18nUsageTracker.used_keys).to include("hello")
     end
 
     it "works with scope option" do
-      I18n.t("save", scope: "shared.buttons")
+      I18n.t("save", scope: "shared.actions")
 
       expect(I18nUsageTracker.used_keys).to include("save")
-      expect(I18nUsageTracker.used_keys).to include("shared.buttons.save")
-      expect(I18nUsageTracker.used_keys).to include("shared.buttons")
+      expect(I18nUsageTracker.used_keys).to include("shared.actions.save")
+      expect(I18nUsageTracker.used_keys).to include("shared.actions")
       expect(I18nUsageTracker.used_keys).to include("shared")
     end
 
     it "does not track when tracking is disabled" do
       I18nUsageTracker.tracking_enabled = false
 
-      I18n.t("shared.buttons.save")
+      I18n.t("hello")
 
       expect(I18nUsageTracker.used_keys).to be_empty
     end
@@ -294,11 +292,9 @@ RSpec.describe "I18n monkey patch" do
 
   describe "I18n.translate" do
     it "tracks keys when called" do
-      I18n.translate("shared.buttons.save")
+      I18n.translate("hello")
 
-      expect(I18nUsageTracker.used_keys).to include("shared.buttons.save")
-      expect(I18nUsageTracker.used_keys).to include("shared.buttons")
-      expect(I18nUsageTracker.used_keys).to include("shared")
+      expect(I18nUsageTracker.used_keys).to include("hello")
     end
   end
 end

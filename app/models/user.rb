@@ -14,13 +14,11 @@ class User < ApplicationRecord
     if: :password_digest_changed?
   validates :name, presence: true, if: :validate_name?
   validates :rpii_inspector_number, presence: true
-  validates :time_display, inclusion: {in: %w[date time]}
   validates :theme, inclusion: {in: %w[light dark]}
   # Contact fields are only required for users without companies
   # when they need to generate PDFs
   # For now, we'll make them optional during signup and enforce them when needed
 
-  before_create :set_default_time_display
   before_create :set_inactive_on_signup
   before_save :downcase_email
 
@@ -130,9 +128,6 @@ class User < ApplicationRecord
     self.email = email.downcase
   end
 
-  def set_default_time_display
-    self.time_display ||= "date"
-  end
 
   def set_inactive_on_signup
     # Set active_until to yesterday so user is inactive by default

@@ -7,180 +7,155 @@ class PdfGeneratorService
     def initialize
       @current_assessment_blocks = []
       @current_assessment_fields = nil
+      @current_assessment_type = nil
+      @current_assessment = nil
     end
+
+    private
+
+    # Universal field renderer - handles all field types
+    def add(*fields, unit: nil, pass: nil)
+      # Build label from i18n
+      label = field_label(fields.first)
+      parts = ["#{label}:"]
+      
+      # Add field values
+      fields.each_with_index do |field, i|
+        value = @current_assessment.send(field)
+        
+        if field.to_s.end_with?('_pass')
+          parts << pass_fail(value)
+        else
+          parts << (unit && i == 0 ? "#{value}#{unit}" : value.to_s)
+        end
+      end
+      
+      # Add pass/fail if specified
+      if pass
+        pass_value = @current_assessment.send(pass)
+        parts << "-" << pass_fail(pass_value)
+      end
+      
+      # Add comment if exists
+      comment_field = "#{(pass || fields.first).to_s.sub(/_pass$/, '')}_comment"
+      if @current_assessment.respond_to?(comment_field)
+        comment = @current_assessment.send(comment_field)
+        parts << "- #{comment}" if comment.present?
+      end
+      
+      @current_assessment_fields << parts.join(" ")
+    end
+    
+    # Get field label from forms namespace
+    def field_label(field_name)
+      I18n.t("forms.#{@current_assessment_type}.fields.#{field_name}")
+    end
+    
+    # Format pass/fail values consistently
+    def pass_fail(value)
+      value ? I18n.t("shared.pass") : I18n.t("shared.fail")
+    end
+
+    public
 
     # Assessment section generators
     def generate_user_height_section(pdf, inspection)
-      generate_assessment_section(pdf, "user_height", inspection.user_height_assessment) do |assessment, type, fields|
+      generate_assessment_section(pdf, "tallest_user_height", inspection.user_height_assessment) do
         # Standard measurement fields
-        measurement_fields = [
-          [:containing_wall_height, "m"],
-          [:platform_height, "m"],
-          [:tallest_user_height, "m"],
-          [:play_area_length, "m"],
-          [:play_area_width, "m"]
-        ]
+        add :containing_wall_height, unit: "m"
+        add :platform_height, unit: "m"
+        add :tallest_user_height, unit: "m"
+        add :play_area_length, unit: "m"
+        add :play_area_width, unit: "m"
+        add :permanent_roof if @current_assessment.permanent_roof.present?
+        add :negative_adjustment, unit: "m²" if @current_assessment.negative_adjustment.present?
 
-        measurement_fields.each do |field, unit|
-          FieldFormatter.add_field_with_comment(fields, assessment, field, unit, type)
-        end
-
-        # Permanent Roof
-        if !assessment.permanent_roof.nil?
-          FieldFormatter.add_boolean_field_with_comment(fields, assessment, :permanent_roof, type)
-        end
-
-        # Negative Adjustment
-        if assessment.negative_adjustment.present?
-          FieldFormatter.add_field_with_comment(fields, assessment, :negative_adjustment, "m²", type)
-        end
-
-        # User Capacities - add as a section header
-        fields << "#{I18n.t("inspections.assessments.user_height.sections.user_capacities")}:"
-
-        user_capacity_heights = [1000, 1200, 1500, 1800]
-        user_capacity_heights.each do |height|
+        # User Capacities
+        @current_assessment_fields << "#{I18n.t("forms.tallest_user_height.sections.user_capacity")}:"
+        %w[1000 1200 1500 1800].each do |height|
           field_name = "users_at_#{height}mm"
-          value = assessment.send(field_name) || I18n.t("pdf.inspection.fields.na")
-          capacity_text = "• #{I18n.t("inspections.assessments.user_height.fields.#{field_name}")}: #{value}"
-          fields << capacity_text
+          value = @current_assessment.send(field_name) || "N/A"
+          @current_assessment_fields << "• #{field_label(field_name)}: #{value}"
         end
       end
     end
 
     def generate_slide_section(pdf, inspection)
-      generate_assessment_section(pdf, "slide", inspection.slide_assessment) do |assessment, type, fields|
-        # Height measurement fields
-        height_fields = [
-          [:slide_platform_height, "m"],
-          [:slide_wall_height, "m"],
-          [:slide_first_metre_height, "m"],
-          [:slide_beyond_first_metre_height, "m"]
-        ]
-
-        height_fields.each do |field, unit|
-          FieldFormatter.add_field_with_comment(fields, assessment, field, unit, type)
-        end
-
-        # Permanent Roof
-        if !assessment.slide_permanent_roof.nil?
-          FieldFormatter.add_boolean_field_with_comment(fields, assessment, :slide_permanent_roof, type)
-        end
-
-        # Pass/fail fields
-        pass_fail_fields = [:clamber_netting_pass, :slip_sheet_pass]
-        pass_fail_fields.each do |field|
-          FieldFormatter.add_pass_fail_field_with_comment(fields, assessment, field, type)
-        end
-
-        # Runout (special case with measurement and pass/fail)
-        FieldFormatter.add_measurement_pass_fail_field(fields, assessment, :runout_value, "m", :runout_pass, type)
+      generate_assessment_section(pdf, "slide", inspection.slide_assessment) do
+        # Height measurements
+        add :slide_platform_height, unit: "m"
+        add :slide_wall_height, unit: "m"
+        add :slide_first_metre_height, unit: "m"
+        add :slide_beyond_first_metre_height, unit: "m"
+        
+        add :slide_permanent_roof if @current_assessment.slide_permanent_roof.present?
+        
+        # Pass/fail checks
+        add :clamber_netting_pass
+        add :slip_sheet_pass
+        
+        # Measurement with pass/fail
+        add :runout, unit: "m", pass: :runout_pass
       end
     end
 
     def generate_structure_section(pdf, inspection)
-      generate_assessment_section(pdf, "structure", inspection.structure_assessment) do |assessment, type, fields|
-        # Simple pass/fail fields
-        pass_fail_fields = [
-          :seam_integrity_pass,
-          :lock_stitch_pass,
-          :air_loss_pass,
-          :straight_walls_pass,
-          :sharp_edges_pass,
-          :unit_stable_pass,
-          :evacuation_time_pass
-        ]
-
-        pass_fail_fields.each do |field|
-          FieldFormatter.add_pass_fail_field_with_comment(fields, assessment, field, type)
-        end
-
-        # Measurement fields with pass/fail
-        measurement_fields = [
-          [:stitch_length, "mm", :stitch_length_pass],
-          [:blower_tube_length, "m", :blower_tube_length_pass],
-          [:unit_pressure_value, "Pa", :unit_pressure_pass]
-        ]
-
-        measurement_fields.each do |value_field, unit, pass_field|
-          FieldFormatter.add_measurement_pass_fail_field(fields, assessment, value_field, unit, pass_field, type)
-        end
+      generate_assessment_section(pdf, "structure", inspection.structure_assessment) do
+        # Pass/fail checks
+        %i[seam_integrity_pass lock_stitch_pass air_loss_pass straight_walls_pass 
+           sharp_edges_pass unit_stable_pass evacuation_time_pass].each { |field| add field }
+        
+        # Measurements with pass/fail
+        add :stitch_length, unit: "mm", pass: :stitch_length_pass
+        add :blower_tube_length, unit: "m", pass: :blower_tube_length_pass
+        add :unit_pressure_value, unit: "Pa", pass: :unit_pressure_pass
       end
     end
 
     def generate_anchorage_section(pdf, inspection)
-      generate_assessment_section(pdf, "anchorage", inspection.anchorage_assessment) do |assessment, type, fields|
-        # Number of anchors with special formatting
-        label = I18n.t("inspections.assessments.anchorage.fields.num_anchors_pass")
-        anchor_text = "#{label}: #{I18n.t("inspections.assessments.anchorage.fields.num_low_anchors")}: #{assessment.num_low_anchors || I18n.t("pdf.inspection.fields.na")}, #{I18n.t("inspections.assessments.anchorage.fields.num_high_anchors")}: #{assessment.num_high_anchors || I18n.t("pdf.inspection.fields.na")}"
-        FieldFormatter.add_text_pass_fail_field(fields, anchor_text, assessment, :num_anchors_pass)
-
-        # Pass/fail fields
-        pass_fail_fields = [
-          :anchor_type_pass,
-          :pull_strength_pass,
-          :anchor_degree_pass,
-          :anchor_accessories_pass
-        ]
-
-        pass_fail_fields.each do |field|
-          FieldFormatter.add_pass_fail_field_with_comment(fields, assessment, field, type)
-        end
+      generate_assessment_section(pdf, "anchorage", inspection.anchorage_assessment) do
+        # Anchor counts with combined label
+        low = @current_assessment.num_low_anchors || "N/A"
+        high = @current_assessment.num_high_anchors || "N/A" 
+        text = "#{field_label(:num_anchors_pass)}: Low: #{low}, High: #{high}"
+        pass_value = @current_assessment.num_anchors_pass
+        text += " - #{pass_fail(pass_value)}" unless pass_value.nil?
+        @current_assessment_fields << text
+        
+        # Pass/fail checks
+        %i[anchor_type_pass pull_strength_pass anchor_degree_pass 
+           anchor_accessories_pass].each { |field| add field }
       end
     end
 
     def generate_enclosed_section(pdf, inspection)
-      generate_assessment_section(pdf, "enclosed", inspection.enclosed_assessment) do |assessment, type, fields|
+      generate_assessment_section(pdf, "enclosed", inspection.enclosed_assessment) do
         # Exit number with pass/fail
-        label = I18n.t("inspections.assessments.enclosed.fields.exit_number")
-        exit_text = "#{label}: #{assessment.exit_number || I18n.t("pdf.inspection.fields.na")}"
-        FieldFormatter.add_text_pass_fail_field(fields, exit_text, assessment, :exit_number_pass)
-
-        FieldFormatter.add_pass_fail_field_with_comment(fields, assessment, :exit_visible_pass, type)
+        add :exit_number, pass: :exit_number_pass
+        
+        # Pass/fail checks
+        add :exit_sign_always_visible_pass
       end
     end
 
     def generate_materials_section(pdf, inspection)
-      generate_assessment_section(pdf, "materials", inspection.materials_assessment) do |assessment, type, fields|
-        # Pass/fail fields
-        pass_fail_fields = [:fabric_pass, :fire_retardant_pass, :thread_pass]
-        pass_fail_fields.each do |field|
-          FieldFormatter.add_pass_fail_field_with_comment(fields, assessment, field, type)
-        end
-
-        # Rope size with measurement
-        FieldFormatter.add_measurement_pass_fail_field(fields, assessment, :rope_size, "mm", :rope_size_pass, type)
+      generate_assessment_section(pdf, "materials", inspection.materials_assessment) do
+        # Pass/fail checks
+        %i[fabric_strength_pass fire_retardant_pass thread_pass].each { |field| add field }
+        
+        # Rope size with pass/fail
+        add :ropes, unit: "mm", pass: :ropes_pass
       end
     end
 
     def generate_fan_section(pdf, inspection)
-      generate_assessment_section(pdf, "fan", inspection.fan_assessment) do |assessment, type, fields|
-        # Pass/fail fields
-        pass_fail_fields = [
-          :blower_flap_pass,
-          :blower_finger_pass,
-          :pat_pass,
-          :blower_visual_pass
-        ]
-
-        pass_fail_fields.each do |field|
-          FieldFormatter.add_pass_fail_field_with_comment(fields, assessment, field, type)
-        end
-
+      generate_assessment_section(pdf, "fan", inspection.fan_assessment) do
+        # Pass/fail checks
+        %i[blower_flap_pass blower_finger_pass pat_pass blower_visual_pass].each { |field| add field }
+        
         # Optional text fields
-        optional_fields = [
-          [:blower_serial, nil],
-          [:fan_size_comment, nil]
-        ]
-
-        optional_fields.each do |field, _|
-          if assessment.send(field).present?
-            label = I18n.t("inspections.assessments.fan.fields.#{field}")
-            value = assessment.send(field)
-            field_text = "#{label}: #{value}"
-            fields << field_text
-          end
-        end
+        add :blower_serial if @current_assessment.blower_serial.present?
+        add :fan_size_type if @current_assessment.fan_size_type.present?
       end
     end
 
@@ -191,18 +166,22 @@ class PdfGeneratorService
 
     # Generic helper methods for DRY code
     def generate_assessment_section(pdf, assessment_type, assessment)
-      title = I18n.t("inspections.assessments.#{assessment_type}.title")
+      title = I18n.t("forms.#{assessment_type}.header")
 
-      if assessment
-        # Collect all field data first
-        fields = []
-        yield(assessment, assessment_type, fields)
+      if assessment&.complete?
+        # Set up instance variables for the block
+        @current_assessment_type = assessment_type
+        @current_assessment = assessment
+        @current_assessment_fields = []
+        
+        # Execute the block
+        yield
 
         # Create a complete assessment block with title and fields
         @current_assessment_blocks ||= []
         @current_assessment_blocks << {
           title: title,
-          fields: fields
+          fields: @current_assessment_fields
         }
       else
         # For assessments with no data, still add to blocks

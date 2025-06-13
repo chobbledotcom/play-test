@@ -32,7 +32,7 @@ class InspectionCreationService
       inspection_date: Date.current,
       inspector_company_id: @user.inspection_company_id,
       inspection_location: @user.default_inspection_location
-    ).tap { |inspection| inspection.send(:copy_unit_values) }
+    )
   end
 
   def notify_if_production(inspection)

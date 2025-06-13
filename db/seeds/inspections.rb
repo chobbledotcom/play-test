@@ -6,13 +6,12 @@ def create_assessments_for_inspection(inspection, unit, passed: true)
   create_materials_assessment(inspection, passed)
   create_fan_assessment(inspection, passed)
   create_user_height_assessment(inspection, unit, passed)
-  create_slide_assessment(inspection, passed) if unit.has_slide
-  create_enclosed_assessment(inspection, passed) if unit.is_totally_enclosed
+  create_slide_assessment(inspection, passed) if inspection.has_slide
+  create_enclosed_assessment(inspection, passed) if inspection.is_totally_enclosed
 end
 
 def create_anchorage_assessment(inspection, passed)
-  AnchorageAssessment.create!(
-    inspection: inspection,
+  inspection.anchorage_assessment.update!(
     num_low_anchors: rand(6..12),
     num_high_anchors: rand(4..8),
     num_anchors_pass: passed,
@@ -25,8 +24,7 @@ def create_anchorage_assessment(inspection, passed)
 end
 
 def create_structure_assessment(inspection, passed)
-  StructureAssessment.create!(
-    inspection: inspection,
+  inspection.structure_assessment.update!(
     seam_integrity_pass: passed,
     lock_stitch_pass: passed,
     air_loss_pass: passed,
@@ -56,8 +54,7 @@ def create_structure_assessment(inspection, passed)
 end
 
 def create_materials_assessment(inspection, passed)
-  MaterialsAssessment.create!(
-    inspection: inspection,
+  inspection.materials_assessment.update!(
     rope_size: rand(18..45),
     rope_size_pass: passed,
     clamber_pass: passed,
@@ -74,14 +71,13 @@ def create_materials_assessment(inspection, passed)
 end
 
 def create_fan_assessment(inspection, passed)
-  FanAssessment.create!(
-    inspection: inspection,
+  inspection.fan_assessment.update!(
     blower_flap_pass: passed,
     blower_finger_pass: passed,
     blower_visual_pass: passed,
     pat_pass: passed,
     blower_serial: "FAN-#{rand(1000..9999)}",
-    fan_size_comment: passed ? "Fan operating correctly at optimal pressure" : "Fan requires servicing",
+    fan_size_type: passed ? "Fan operating correctly at optimal pressure" : "Fan requires servicing",
     blower_flap_comment: passed ? "Flap mechanism functioning correctly" : "Flap sticking occasionally",
     blower_finger_comment: passed ? "Guard secure, no finger trap hazards" : "Guard needs tightening",
     blower_visual_comment: passed ? "Visual inspection satisfactory" : "Some wear visible on housing",
@@ -90,8 +86,7 @@ def create_fan_assessment(inspection, passed)
 end
 
 def create_user_height_assessment(inspection, unit, passed)
-  UserHeightAssessment.create!(
-    inspection: inspection,
+  inspection.user_height_assessment.update!(
     containing_wall_height: rand(1.0..2.0).round(1),
     platform_height: rand(0.5..1.5).round(1),
     tallest_user_height: rand(1.2..1.8).round(1),
@@ -99,8 +94,8 @@ def create_user_height_assessment(inspection, unit, passed)
     users_at_1200mm: rand(2..8),
     users_at_1500mm: rand(4..10),
     users_at_1800mm: rand(2..6),
-    play_area_length: unit.length * 0.8,
-    play_area_width: unit.width * 0.8,
+    play_area_length: rand(3.0..10.0).round(1),
+    play_area_width: rand(3.0..8.0).round(1),
     negative_adjustment: rand(0..2.0).round(1),
     permanent_roof: false,
     tallest_user_height_comment: passed ? "Capacity within safe limits based on EN 14960:2019" : "Review user capacity - exceeds recommended limits",
@@ -112,11 +107,10 @@ def create_user_height_assessment(inspection, unit, passed)
 end
 
 def create_slide_assessment(inspection, passed)
-  SlideAssessment.create!(
-    inspection: inspection,
+  inspection.slide_assessment.update!(
     slide_platform_height: rand(2.0..6.0).round(1),
     slide_wall_height: rand(1.0..2.0).round(1),
-    runout_value: rand(1.5..3.0).round(1),
+    runout: rand(1.5..3.0).round(1),
     slide_first_metre_height: rand(0.3..0.8).round(1),
     slide_beyond_first_metre_height: rand(0.8..1.5).round(1),
     clamber_netting_pass: passed,
@@ -132,8 +126,7 @@ def create_slide_assessment(inspection, passed)
 end
 
 def create_enclosed_assessment(inspection, passed)
-  EnclosedAssessment.create!(
-    inspection: inspection,
+  inspection.enclosed_assessment.update!(
     exit_number: rand(1..3),
     exit_number_pass: passed,
     exit_visible_pass: passed,
@@ -154,11 +147,11 @@ recent_inspection = Inspection.create!(
   comments: "Annual inspection completed. Unit in excellent condition.",
   recommendations: "Continue regular maintenance schedule.",
   general_notes: "Client very happy with service. Park location had good access.",
-  width: $castle_standard.width,
-  length: $castle_standard.length,
-  height: $castle_standard.height,
-  has_slide: $castle_standard.has_slide,
-  is_totally_enclosed: $castle_standard.is_totally_enclosed
+  width: 4.5,
+  length: 4.5,
+  height: 3.5,
+  has_slide: false,
+  is_totally_enclosed: false
 )
 create_assessments_for_inspection(recent_inspection, $castle_standard, passed: true)
 
@@ -174,11 +167,11 @@ failed_inspection = Inspection.create!(
   comments: "Several issues identified requiring immediate attention.",
   recommendations: "1. Replace worn anchor straps\n2. Repair seam separation\n3. Reinspect within 30 days",
   general_notes: "Unit owner notified of failures. Removed from service pending repairs.",
-  width: $obstacle_course.width,
-  length: $obstacle_course.length,
-  height: $obstacle_course.height,
-  has_slide: $obstacle_course.has_slide,
-  is_totally_enclosed: $obstacle_course.is_totally_enclosed
+  width: 3.0,
+  length: 12.0,
+  height: 3.5,
+  has_slide: true,
+  is_totally_enclosed: false
 )
 create_assessments_for_inspection(failed_inspection, $obstacle_course, passed: false)
 
@@ -193,11 +186,11 @@ create_assessments_for_inspection(failed_inspection, $obstacle_course, passed: f
     complete_date: Time.current,
     passed: true,
     comments: "Routine #{(date == 1.year.ago) ? "annual" : "six-month"} inspection.",
-    width: $castle_large.width,
-    length: $castle_large.length,
-    height: $castle_large.height,
-    has_slide: $castle_large.has_slide,
-    is_totally_enclosed: $castle_large.is_totally_enclosed,
+    width: 9.0,
+    length: 9.0,
+    height: 4.5,
+    has_slide: false,
+    is_totally_enclosed: false,
     inspector_signature: "#{$test_user.email.split("@").first.titleize} (Digital Signature)",
     signature_timestamp: date
   )
@@ -211,11 +204,11 @@ Inspection.create!(
   inspection_date: Date.current,
   inspection_location: nil,
   complete_date: nil,
-  width: $giant_slide.width,
-  length: $giant_slide.length,
-  height: $giant_slide.height,
-  has_slide: $giant_slide.has_slide,
-  is_totally_enclosed: $giant_slide.is_totally_enclosed
+  width: 5.0,
+  length: 15.0,
+  height: 7.5,
+  has_slide: true,
+  is_totally_enclosed: false
 )
 
 in_progress = Inspection.create!(
@@ -226,11 +219,11 @@ in_progress = Inspection.create!(
   inspection_location: "Heaton Park, Manchester",
   unique_report_number: "ST-2025-#{rand(1000..9999)}",
   complete_date: nil,
-  width: $gladiator_duel.width,
-  length: $gladiator_duel.length,
-  height: $gladiator_duel.height,
-  has_slide: $gladiator_duel.has_slide,
-  is_totally_enclosed: $gladiator_duel.is_totally_enclosed
+  width: 6.0,
+  length: 6.0,
+  height: 1.5,
+  has_slide: false,
+  is_totally_enclosed: false
 )
 
 AnchorageAssessment.create!(
@@ -243,6 +236,21 @@ AnchorageAssessment.create!(
 )
 
 [$soft_play_unit, $castle_slide_combo, $bungee_run].each do |unit|
+  case unit
+  when $soft_play_unit
+    width, length, height = 6.0, 6.0, 2.5
+    has_slide = false
+    is_totally_enclosed = true
+  when $castle_slide_combo
+    width, length, height = 5.5, 7.0, 4.0
+    has_slide = true
+    is_totally_enclosed = false
+  when $bungee_run
+    width, length, height = 4.0, 10.0, 2.5
+    has_slide = false
+    is_totally_enclosed = false
+  end
+  
   inspection = Inspection.create!(
     user: $test_user,
     unit: unit,
@@ -253,11 +261,11 @@ AnchorageAssessment.create!(
     complete_date: Time.current,
     passed: rand(0..4) > 0,
     comments: "Regular inspection completed as scheduled.",
-    width: unit.width,
-    length: unit.length,
-    height: unit.height,
-    has_slide: unit.has_slide,
-    is_totally_enclosed: unit.is_totally_enclosed
+    width: width,
+    length: length,
+    height: height,
+    has_slide: has_slide,
+    is_totally_enclosed: is_totally_enclosed
   )
   create_assessments_for_inspection(inspection, unit, passed: inspection.passed)
 end
@@ -272,11 +280,11 @@ lead_inspection = Inspection.create!(
   complete_date: Time.current,
   passed: true,
   comments: "Six-month inspection completed.",
-  width: $castle_standard.width,
-  length: $castle_standard.length,
-  height: $castle_standard.height,
-  has_slide: $castle_standard.has_slide,
-  is_totally_enclosed: $castle_standard.is_totally_enclosed
+  width: 4.5,
+  length: 4.5,
+  height: 3.5,
+  has_slide: false,
+  is_totally_enclosed: false
 )
 create_assessments_for_inspection(lead_inspection, $castle_standard, passed: true)
 
@@ -292,11 +300,11 @@ complete_inspection = Inspection.create!(
   comments: "Annual safety inspection completed. All checks passed.",
   recommendations: "No issues found. Continue standard maintenance.",
   general_notes: "Unit used for major event. Excellent condition maintained.",
-  width: $castle_large.width,
-  length: $castle_large.length,
-  height: $castle_large.height,
-  has_slide: $castle_large.has_slide,
-  is_totally_enclosed: $castle_large.is_totally_enclosed,
+  width: 9.0,
+  length: 9.0,
+  height: 4.5,
+  has_slide: false,
+  is_totally_enclosed: false,
   inspector_signature: "Test User (Digital Signature)",
   signature_timestamp: 1.month.ago
 )

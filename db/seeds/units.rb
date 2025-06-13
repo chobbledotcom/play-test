@@ -1,6 +1,6 @@
 puts "Creating units..."
 
-def create_unit(name:, serial_prefix:, manufacturer:, model:, owner:, description:, width:, length:, height:, has_slide: false, is_totally_enclosed: false)
+def create_unit(name:, serial_prefix:, manufacturer:, model:, owner:, description:, notes: nil)
   Unit.create!(
     user: $test_user,
     name: name,
@@ -9,11 +9,9 @@ def create_unit(name:, serial_prefix:, manufacturer:, model:, owner:, descriptio
     model: model,
     owner: owner,
     description: description,
-    width: width,
-    length: length,
-    height: height,
-    has_slide: has_slide,
-    is_totally_enclosed: is_totally_enclosed
+    notes: notes,
+    manufacture_date: rand(1..5).years.ago,
+    is_seed: true
   )
 end
 
@@ -24,9 +22,7 @@ $castle_standard = create_unit(
   model: "Castle Deluxe 15",
   owner: "Stef's Castles",
   description: "15ft x 15ft medieval themed bouncy castle with turrets",
-  width: 4.5,
-  length: 4.5,
-  height: 3.5
+  notes: "Popular rental unit, well-maintained"
 )
 
 $castle_large = create_unit(
@@ -36,9 +32,7 @@ $castle_large = create_unit(
   model: "Mega Castle 30",
   owner: "Estephan Events",
   description: "30ft x 30ft large bouncy castle suitable for 20+ children",
-  width: 9.0,
-  length: 9.0,
-  height: 4.5
+  notes: "Requires 2 blowers for proper inflation"
 )
 
 $castle_slide_combo = create_unit(
@@ -48,10 +42,7 @@ $castle_slide_combo = create_unit(
   model: "Princess Combo DLX",
   owner: "Stefan's Fun Factory",
   description: "Pink princess themed castle with integrated 8ft slide",
-  width: 5.5,
-  length: 7.0,
-  height: 4.0,
-  has_slide: true
+  notes: "Slide section requires extra attention during inspection"
 )
 
 $soft_play_unit = create_unit(
@@ -61,10 +52,7 @@ $soft_play_unit = create_unit(
   model: "Soft Play Junior",
   owner: "Steff's Soft Play",
   description: "Fully enclosed soft play area for under 5s",
-  width: 6.0,
-  length: 6.0,
-  height: 2.5,
-  is_totally_enclosed: true
+  notes: "Enclosed design - check all exit points carefully"
 )
 
 $obstacle_course = create_unit(
@@ -74,10 +62,7 @@ $obstacle_course = create_unit(
   model: "Obstacle Pro 40",
   owner: "Stephan's Adventure Co",
   description: "40ft assault course with obstacles, tunnels and slide finish",
-  width: 3.0,
-  length: 12.0,
-  height: 3.5,
-  has_slide: true
+  notes: "Multiple sections require individual inspection"
 )
 
 $giant_slide = create_unit(
@@ -87,10 +72,7 @@ $giant_slide = create_unit(
   model: "Giant Slide 25",
   owner: "Stefan Family Inflatables",
   description: "25ft platform height giant inflatable slide",
-  width: 5.0,
-  length: 15.0,
-  height: 7.5,
-  has_slide: true
+  notes: "High platform - safety barriers critical"
 )
 
 $gladiator_duel = create_unit(
@@ -100,9 +82,7 @@ $gladiator_duel = create_unit(
   model: "Gladiator Arena",
   owner: "Stefano's Party Hire",
   description: "Inflatable gladiator duel platform with pedestals",
-  width: 6.0,
-  length: 6.0,
-  height: 1.5
+  notes: "Check pedestal stability and padding"
 )
 
 $bungee_run = create_unit(
@@ -112,9 +92,7 @@ $bungee_run = create_unit(
   model: "Bungee Sprint Dual",
   owner: "Stef's Fun Factory",
   description: "Two lane inflatable bungee run competition game",
-  width: 4.0,
-  length: 10.0,
-  height: 2.5
+  notes: "Bungee cords require regular inspection for wear"
 )
 
 puts "Created #{Unit.count} units."

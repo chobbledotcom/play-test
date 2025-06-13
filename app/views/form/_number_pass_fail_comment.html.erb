@@ -10,7 +10,7 @@
   # 
   # This will render:
   #   - Number field: field (e.g., 'slide_platform_height')
-  #   - Pass/fail field: field + '_pass' (e.g., 'slide_platform_height_pass')
+  #   - Pass/fail field: field + '_pass' (e.g., 'slide_platform_height_pass') - Only for Inspections
   #   - Comment field: field + '_comment' (e.g., 'slide_platform_height_comment')
   
   number_field = field
@@ -19,8 +19,17 @@
   
   # Extract number field options
   number_options = local_assigns.slice(:step, :min, :max, :required)
+  
+  # Get the form object to check model type
+  form = @_current_form
+  model = form.object
+  model_class_name = model.class.name
 %>
 
 <%= render 'form/number', field: number_field, **number_options %>
-<%= render 'form/pass_fail', field: pass_fail_field %>
+
+<% if model_class_name != 'Unit' %>
+  <%= render 'form/pass_fail', field: pass_fail_field %>
+<% end %>
+
 <%= render 'form/comment', field: comment_field %>

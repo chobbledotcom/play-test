@@ -95,7 +95,7 @@ class SeedDataService
         unit = create_unit_from_config(user, config, i)
         # Make half of units have incomplete most recent inspection
         should_have_incomplete_inspection = i.even?
-        create_inspections_for_unit(unit, user, has_incomplete_recent: should_have_incomplete_inspection)
+        create_inspections_for_unit(unit, user, config, has_incomplete_recent: should_have_incomplete_inspection)
       end
     end
 
@@ -107,20 +107,7 @@ class SeedDataService
         manufacturer: config[:manufacturer],
         model: "Model #{rand(100..999)}",
         owner: STEFAN_OWNER_NAMES.sample,
-        width: config[:width],
-        length: config[:length],
-        height: config[:height],
-        has_slide: config[:has_slide] || false,
-        is_totally_enclosed: config[:is_totally_enclosed] || false,
-        is_seed: true,
-        # Additional dimensions
-        platform_height: config[:has_slide] ? rand(1.0..2.5).round(1) : nil,
-        slide_platform_height: config[:has_slide] ? rand(2.0..6.0).round(1) : nil,
-        step_ramp_size: rand(0.3..0.8).round(1),
-        critical_fall_off_height: rand(0.5..2.0).round(1),
-        unit_pressure: rand(1.0..3.0).round(1),
-        trough_depth: rand(0.2..0.5).round(1),
-        trough_adjacent_panel_width: rand(0.3..0.8).round(1)
+        is_seed: true
       )
       
       # Attach random castle image if available
@@ -157,24 +144,24 @@ class SeedDataService
       end
     end
 
-    def create_inspections_for_unit(unit, user, has_incomplete_recent: false)
+    def create_inspections_for_unit(unit, user, config, has_incomplete_recent: false)
       offset_days = rand(INSPECTION_OFFSET_RANGE)
       
       INSPECTION_COUNT.times do |i|
-        create_single_inspection(unit, user, offset_days, i, has_incomplete_recent)
+        create_single_inspection(unit, user, config, offset_days, i, has_incomplete_recent)
       end
     end
     
-    def create_single_inspection(unit, user, offset_days, index, has_incomplete_recent)
+    def create_single_inspection(unit, user, config, offset_days, index, has_incomplete_recent)
       inspection_date = calculate_inspection_date(offset_days, index)
       passed = determine_pass_status(index)
       is_complete = !(index == 0 && has_incomplete_recent)
       
       inspection = user.inspections.create!(
-        build_inspection_attributes(unit, user, inspection_date, passed, is_complete)
+        build_inspection_attributes(unit, user, config, inspection_date, passed, is_complete)
       )
       
-      create_assessments_for_inspection(inspection, unit, passed: passed)
+      create_assessments_for_inspection(inspection, unit, config, passed: passed)
     end
     
     def calculate_inspection_date(offset_days, index)
@@ -186,7 +173,7 @@ class SeedDataService
       index == 0 ? (rand < HIGH_PASS_RATE) : (rand < NORMAL_PASS_RATE)
     end
     
-    def build_inspection_attributes(unit, user, inspection_date, passed, is_complete)
+    def build_inspection_attributes(unit, user, config, inspection_date, passed, is_complete)
       {
         unit: unit,
         inspector_company: user.inspection_company,
@@ -198,33 +185,21 @@ class SeedDataService
         passed: passed,
         comments: generate_inspection_comment(passed),
         recommendations: passed ? nil : I18n.t("seed_data.recommendations.standard"),
-        # Copy dimensions from unit
-        width: unit.width,
-        length: unit.length,
-        height: unit.height,
-        has_slide: unit.has_slide,
-        is_totally_enclosed: unit.is_totally_enclosed,
-        platform_height: unit.platform_height,
-        slide_platform_height: unit.slide_platform_height,
-        # Pass/fail fields
-        step_ramp_size: unit.step_ramp_size,
+        # Copy dimensions from config
+        width: config[:width],
+        length: config[:length],
+        height: config[:height],
+        has_slide: config[:has_slide] || false,
+        is_totally_enclosed: config[:is_totally_enclosed] || false,
+        # Pass/fail fields that remain on inspections
+        step_ramp_size: rand(0.3..0.8).round(1),
         step_ramp_size_pass: passed,
-        critical_fall_off_height: unit.critical_fall_off_height,
+        critical_fall_off_height: rand(0.5..2.0).round(1),
         critical_fall_off_height_pass: passed,
-        unit_pressure: unit.unit_pressure,
+        unit_pressure: rand(1.0..3.0).round(1),
         unit_pressure_pass: passed,
-        trough_depth: unit.trough_depth,
-        trough_adjacent_panel_width: unit.trough_adjacent_panel_width,
-        trough_pass: passed,
-        entrapment_pass: passed,
-        markings_id_pass: passed,
-        grounding_pass: passed,
-        clamber_netting_pass: passed || unit.has_slide?,
-        retention_netting_pass: passed,
-        zips_pass: passed,
-        windows_pass: passed,
-        artwork_pass: passed,
-        exit_sign_visible_pass: passed || unit.is_totally_enclosed?
+        trough_depth: rand(0.2..0.5).round(1),
+        trough_adjacent_panel_width: rand(0.3..0.8).round(1)
       }
     end
 
@@ -241,19 +216,18 @@ class SeedDataService
       end
     end
 
-    def create_assessments_for_inspection(inspection, unit, passed: true)
+    def create_assessments_for_inspection(inspection, unit, config, passed: true)
       create_anchorage_assessment(inspection, unit, passed)
       create_structure_assessment(inspection, unit, passed)
       create_materials_assessment(inspection, unit, passed)
       create_fan_assessment(inspection, unit, passed)
       create_user_height_assessment(inspection, unit, passed)
-      create_slide_assessment(inspection, unit, passed) if unit.has_slide
-      create_enclosed_assessment(inspection, unit, passed) if unit.is_totally_enclosed
+      create_slide_assessment(inspection, unit, passed) if config[:has_slide]
+      create_enclosed_assessment(inspection, unit, passed) if config[:is_totally_enclosed]
     end
 
     def create_anchorage_assessment(inspection, unit, passed)
-      AnchorageAssessment.create!(
-        inspection: inspection,
+      inspection.anchorage_assessment.update!(
         num_low_anchors: rand(6..12),
         num_high_anchors: rand(4..8),
         num_anchors_pass: passed,
@@ -266,8 +240,7 @@ class SeedDataService
     end
 
     def create_structure_assessment(inspection, unit, passed)
-      StructureAssessment.create!(
-        inspection: inspection,
+      inspection.structure_assessment.update!(
         seam_integrity_pass: passed,
         lock_stitch_pass: passed,
         air_loss_pass: passed,
@@ -297,8 +270,7 @@ class SeedDataService
     end
 
     def create_materials_assessment(inspection, unit, passed)
-      MaterialsAssessment.create!(
-        inspection: inspection,
+      inspection.materials_assessment.update!(
         rope_size: rand(18..45),
         rope_size_pass: passed,
         clamber_pass: passed,
@@ -315,14 +287,13 @@ class SeedDataService
     end
 
     def create_fan_assessment(inspection, unit, passed)
-      FanAssessment.create!(
-        inspection: inspection,
+      inspection.fan_assessment.update!(
         blower_flap_pass: passed,
         blower_finger_pass: passed,
         blower_visual_pass: passed,
         pat_pass: passed,
         blower_serial: "FAN-#{rand(1000..9999)}",
-        fan_size_comment: passed ? "Fan operating correctly at optimal pressure" : "Fan requires servicing",
+        fan_size_type: passed ? "Fan operating correctly at optimal pressure" : "Fan requires servicing",
         blower_flap_comment: passed ? "Flap mechanism functioning correctly" : "Flap sticking occasionally",
         blower_finger_comment: passed ? "Guard secure, no finger trap hazards" : "Guard needs tightening",
         blower_visual_comment: passed ? "Visual inspection satisfactory" : "Some wear visible on housing",
@@ -331,11 +302,10 @@ class SeedDataService
     end
 
     def create_user_height_assessment(inspection, unit, passed)
-      play_area_length = unit.length * 0.8
-      play_area_width = unit.width * 0.8
+      play_area_length = inspection.length * 0.8
+      play_area_width = inspection.width * 0.8
       
-      UserHeightAssessment.create!(
-        inspection: inspection,
+      inspection.user_height_assessment.update!(
         containing_wall_height: rand(1.0..2.0).round(1),
         platform_height: rand(0.5..1.5).round(1),
         tallest_user_height: rand(1.2..1.8).round(1),
@@ -356,11 +326,10 @@ class SeedDataService
     end
 
     def create_slide_assessment(inspection, unit, passed)
-      SlideAssessment.create!(
-        inspection: inspection,
+      inspection.slide_assessment.update!(
         slide_platform_height: rand(2.0..6.0).round(1),
         slide_wall_height: rand(1.0..2.0).round(1),
-        runout_value: rand(1.5..3.0).round(1),
+        runout: rand(1.5..3.0).round(1),
         slide_first_metre_height: rand(0.3..0.8).round(1),
         slide_beyond_first_metre_height: rand(0.8..1.5).round(1),
         clamber_netting_pass: passed,
@@ -376,11 +345,11 @@ class SeedDataService
     end
 
     def create_enclosed_assessment(inspection, unit, passed)
-      EnclosedAssessment.create!(
-        inspection: inspection,
+      inspection.enclosed_assessment.update!(
         exit_number: rand(1..3),
         exit_number_pass: passed,
         exit_visible_pass: passed,
+        exit_sign_visible_pass: passed,
         exit_number_comment: passed ? "Number of exits compliant with unit size" : "Additional exit required",
         exit_visible_comment: passed ? "All exits clearly marked with illuminated signage" : "Exit signage needs improvement - not clearly visible"
       )

@@ -25,18 +25,18 @@ RSpec.describe "Unit JSON inspection history", type: :request do
         expect(json["total_inspections"]).to eq(2)
 
         # Check last inspection details (should be the most recent by inspection_date)
-        expect(json["last_inspection_date"]).to eq(inspection2.inspection_date.as_json)
+        expect(json["last_inspection_date"]).to eq(inspection2.inspection_date.strftime("%Y-%m-%d"))
         expect(json["last_inspection_passed"]).to eq(false)
 
         # Check inspection history order and content
         first_in_history = json["inspection_history"].first
         expect(first_in_history).not_to have_key("id")
-        expect(first_in_history["inspection_date"]).to eq(inspection2.inspection_date.as_json)
+        expect(first_in_history["inspection_date"]).to eq(inspection2.inspection_date.strftime("%Y-%m-%d"))
         expect(first_in_history["passed"]).to eq(false)
 
         second_in_history = json["inspection_history"].second
         expect(second_in_history).not_to have_key("id")
-        expect(second_in_history["inspection_date"]).to eq(inspection1.inspection_date.as_json)
+        expect(second_in_history["inspection_date"]).to eq(inspection1.inspection_date.strftime("%Y-%m-%d"))
         expect(second_in_history["passed"]).to eq(true)
       end
     end

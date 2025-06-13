@@ -38,10 +38,7 @@ RSpec.describe "Units", type: :request do
 
   describe "When logged in" do
     before do
-      visit login_path
-      fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: "password123"
-      click_button I18n.t("session.login.submit")
+      login_user_via_form(user)
     end
 
     describe "GET /units" do
@@ -99,16 +96,6 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_content(unit.description)
       end
 
-      it "shows unit dimensions separately" do
-        visit unit_path(unit)
-        expect(page).to have_content("Width:")
-        expect(page).to have_content("#{unit.width}m")
-        expect(page).to have_content("Length:")
-        expect(page).to have_content("#{unit.length}m")
-        expect(page).to have_content("Height:")
-        expect(page).to have_content("#{unit.height}m")
-      end
-
       it "shows associated inspections section" do
         create(:inspection, unit: unit, user: user)
 
@@ -146,23 +133,7 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_http_status(:success)
         expect(page).to have_content(I18n.t("units.titles.new"))
 
-        expect(page).to have_field(I18n.t("units.forms.name"))
-        expect(page).to have_field(I18n.t("units.forms.has_slide"))
-        expect(page).to have_field(I18n.t("units.forms.manufacturer"))
-        expect(page).to have_field(I18n.t("units.forms.serial"))
-        expect(page).to have_field(I18n.t("units.forms.description"))
-        expect(page).to have_field(I18n.t("units.forms.owner"))
-        expect(page).to have_field(I18n.t("units.forms.width"))
-        expect(page).to have_field(I18n.t("units.forms.length"))
-        expect(page).to have_field(I18n.t("units.forms.height"))
-
-        expect(page).to have_button(I18n.t("units.buttons.create"))
-      end
-
-      it "shows has slide checkbox" do
-        visit new_unit_path
-
-        expect(page).to have_field(I18n.t("units.forms.has_slide"), type: "checkbox")
+        expect_form_matches_i18n("forms.units")
       end
     end
 
@@ -170,18 +141,15 @@ RSpec.describe "Units", type: :request do
       it "creates unit with valid data" do
         visit new_unit_path
 
-        fill_in I18n.t("units.forms.name"), with: "New Test Unit"
+        fill_in I18n.t("forms.units.fields.name"), with: "New Test Unit"
         # Has slide checkbox defaults to unchecked
-        fill_in I18n.t("units.forms.manufacturer"), with: "Test Manufacturer"
-        fill_in I18n.t("units.forms.model"), with: "Test Model"
-        fill_in I18n.t("units.forms.serial"), with: "NEWTEST123"
-        fill_in I18n.t("units.forms.description"), with: "Test Description"
-        fill_in I18n.t("units.forms.owner"), with: "Test Owner"
-        fill_in I18n.t("units.forms.width"), with: "5.0"
-        fill_in I18n.t("units.forms.length"), with: "4.0"
-        fill_in I18n.t("units.forms.height"), with: "3.0"
+        fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
+        fill_in I18n.t("forms.units.fields.model"), with: "Test Model"
+        fill_in I18n.t("forms.units.fields.serial"), with: "NEWTEST123"
+        fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
+        fill_in I18n.t("forms.units.fields.owner"), with: "Test Owner"
 
-        click_button I18n.t("units.buttons.create")
+        click_button I18n.t("forms.units.submit")
 
         expect(page).to have_content(I18n.t("units.messages.created"))
         expect(page).to have_content("New Test Unit")
@@ -196,10 +164,10 @@ RSpec.describe "Units", type: :request do
         visit new_unit_path
 
         # Submit form with missing required fields
-        click_button I18n.t("units.buttons.create")
+        click_button I18n.t("forms.units.submit")
 
         expect(page).to have_http_status(:unprocessable_entity)
-        expect(page).to have_content("Could not save unit because there")
+        expect_form_errors :units
       end
 
       it "handles duplicate serial validation" do
@@ -207,17 +175,13 @@ RSpec.describe "Units", type: :request do
 
         visit new_unit_path
 
-        fill_in I18n.t("units.forms.name"), with: "New Unit"
-        check I18n.t("units.forms.has_slide")
-        fill_in I18n.t("units.forms.manufacturer"), with: "Same Mfg"
-        fill_in I18n.t("units.forms.serial"), with: existing_unit.serial
-        fill_in I18n.t("units.forms.description"), with: "Test Description"
-        fill_in I18n.t("units.forms.owner"), with: "Test Owner"
-        fill_in I18n.t("units.forms.width"), with: "3.0"
-        fill_in I18n.t("units.forms.length"), with: "2.0"
-        fill_in I18n.t("units.forms.height"), with: "1.5"
+        fill_in I18n.t("forms.units.fields.name"), with: "New Unit"
+        fill_in I18n.t("forms.units.fields.manufacturer"), with: "Same Mfg"
+        fill_in I18n.t("forms.units.fields.serial"), with: existing_unit.serial
+        fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
+        fill_in I18n.t("forms.units.fields.owner"), with: "Test Owner"
 
-        click_button I18n.t("units.buttons.create")
+        click_button I18n.t("forms.units.submit")
 
         expect(page).to have_http_status(:unprocessable_entity)
         expect(page).to have_content("has already been taken")
@@ -230,10 +194,10 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_http_status(:success)
         expect(page).to have_content(I18n.t("units.titles.edit"))
 
-        expect(page).to have_field(I18n.t("units.forms.name"), with: unit.name)
-        expect(page).to have_field(I18n.t("units.forms.manufacturer"), with: unit.manufacturer)
-        expect(page).to have_field(I18n.t("units.forms.serial"), with: unit.serial)
-        expect(page).to have_button(I18n.t("units.buttons.update"))
+        expect(page).to have_field(I18n.t("forms.units.fields.name"), with: unit.name)
+        expect(page).to have_field(I18n.t("forms.units.fields.manufacturer"), with: unit.manufacturer)
+        expect(page).to have_field(I18n.t("forms.units.fields.serial"), with: unit.serial)
+        expect(page).to have_button(I18n.t("forms.units.submit"))
       end
 
       it "denies access to other user's unit" do
@@ -249,9 +213,9 @@ RSpec.describe "Units", type: :request do
       it "updates unit successfully" do
         visit edit_unit_path(unit)
 
-        fill_in I18n.t("units.forms.name"), with: "Updated Unit Name"
-        fill_in I18n.t("units.forms.description"), with: "Updated Description"
-        click_button I18n.t("units.buttons.update")
+        fill_in I18n.t("forms.units.fields.name"), with: "Updated Unit Name"
+        fill_in I18n.t("forms.units.fields.description"), with: "Updated Description"
+        click_button I18n.t("forms.units.submit")
 
         expect(page).to have_content(I18n.t("units.messages.updated"))
         expect(page).to have_content("Updated Unit Name")
@@ -264,11 +228,11 @@ RSpec.describe "Units", type: :request do
       it "handles validation errors on update" do
         visit edit_unit_path(unit)
 
-        fill_in I18n.t("units.forms.name"), with: ""
-        click_button I18n.t("units.buttons.update")
+        fill_in I18n.t("forms.units.fields.name"), with: ""
+        click_button I18n.t("forms.units.submit")
 
         expect(page).to have_http_status(:unprocessable_entity)
-        expect(page).to have_content("Could not save unit because there")
+        expect_form_errors :units
       end
 
       it "denies access to other user's unit" do
@@ -374,18 +338,6 @@ RSpec.describe "Units", type: :request do
     end
 
     describe "Unit details and business logic" do
-      it "displays unit dimensions separately" do
-        test_unit = create(:unit, user: user, width: 5.0, length: 4.0, height: 3.0)
-
-        visit unit_path(test_unit)
-
-        expect(page).to have_content("Width:")
-        expect(page).to have_content("5.0m")
-        expect(page).to have_content("Length:")
-        expect(page).to have_content("4.0m")
-        expect(page).to have_content("Height:")
-        expect(page).to have_content("3.0m")
-      end
 
       it "shows inspection history section" do
         test_unit = create(:unit, user: user)
@@ -409,23 +361,20 @@ RSpec.describe "Units", type: :request do
       it "allows photo upload during creation" do
         visit new_unit_path
 
-        fill_in I18n.t("units.forms.name"), with: "Unit with Photo"
+        fill_in I18n.t("forms.units.fields.name"), with: "Unit with Photo"
         # Has slide checkbox defaults to unchecked
-        fill_in I18n.t("units.forms.manufacturer"), with: "Test Manufacturer"
-        fill_in I18n.t("units.forms.model"), with: "Test Model"
-        fill_in I18n.t("units.forms.serial"), with: "PHOTO123"
-        fill_in I18n.t("units.forms.description"), with: "Test Description"
-        fill_in I18n.t("units.forms.owner"), with: "Test Owner"
-        fill_in I18n.t("units.forms.width"), with: "5.0"
-        fill_in I18n.t("units.forms.length"), with: "4.0"
-        fill_in I18n.t("units.forms.height"), with: "3.0"
+        fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
+        fill_in I18n.t("forms.units.fields.model"), with: "Test Model"
+        fill_in I18n.t("forms.units.fields.serial"), with: "PHOTO123"
+        fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
+        fill_in I18n.t("forms.units.fields.owner"), with: "Test Owner"
 
         # Only attach photo if the field exists
         if page.has_field?("Photo")
           attach_file "Photo", Rails.root.join("spec/fixtures/files/test_image.jpg")
         end
 
-        click_button I18n.t("units.buttons.create")
+        click_button I18n.t("forms.units.submit")
 
         expect(page).to have_content(I18n.t("units.messages.created"))
 
@@ -459,10 +408,7 @@ RSpec.describe "Units", type: :request do
 
   describe "Admin functionality" do
     before do
-      visit login_path
-      fill_in I18n.t("session.login.email"), with: admin_user.email
-      fill_in I18n.t("session.login.password"), with: "password123"
-      click_button I18n.t("session.login.submit")
+      login_user_via_form(admin_user)
     end
 
     it "admin can access all units" do
@@ -476,10 +422,7 @@ RSpec.describe "Units", type: :request do
 
   describe "Edge cases and error handling" do
     before do
-      visit login_path
-      fill_in I18n.t("session.login.email"), with: user.email
-      fill_in I18n.t("session.login.password"), with: "password123"
-      click_button I18n.t("session.login.submit")
+      login_user_via_form(user)
     end
 
     it "handles concurrent requests gracefully" do
@@ -497,43 +440,19 @@ RSpec.describe "Units", type: :request do
       visit new_unit_path
 
       # Attempt to set user_id via form manipulation would be blocked by controller
-      fill_in I18n.t("units.forms.name"), with: "Protected Unit"
+      fill_in I18n.t("forms.units.fields.name"), with: "Protected Unit"
       # Has slide checkbox defaults to unchecked
-      fill_in I18n.t("units.forms.manufacturer"), with: "Test Manufacturer"
-      fill_in I18n.t("units.forms.model"), with: "Test Model"
-      fill_in I18n.t("units.forms.serial"), with: "PROTECT123"
-      fill_in I18n.t("units.forms.description"), with: "Test Description"
-      fill_in I18n.t("units.forms.owner"), with: "Test Owner"
-      fill_in I18n.t("units.forms.width"), with: "5.0"
-      fill_in I18n.t("units.forms.length"), with: "4.0"
-      fill_in I18n.t("units.forms.height"), with: "3.0"
+      fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
+      fill_in I18n.t("forms.units.fields.model"), with: "Test Model"
+      fill_in I18n.t("forms.units.fields.serial"), with: "PROTECT123"
+      fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
+      fill_in I18n.t("forms.units.fields.owner"), with: "Test Owner"
 
-      click_button I18n.t("units.buttons.create")
+      click_button I18n.t("forms.units.submit")
 
       created_unit = user.units.find_by(serial: "PROTECT123")
       expect(created_unit).to be_present
       expect(created_unit.user).to eq(user) # Should be current user, not admin_user
-    end
-
-    it "validates numeric ranges for dimensions" do
-      visit new_unit_path
-
-      fill_in I18n.t("units.forms.name"), with: "Invalid Dimensions Unit"
-      # Has slide checkbox defaults to unchecked
-      fill_in I18n.t("units.forms.manufacturer"), with: "Test Manufacturer"
-      fill_in I18n.t("units.forms.model"), with: "Test Model"
-      fill_in I18n.t("units.forms.serial"), with: "INVALID123"
-      fill_in I18n.t("units.forms.description"), with: "Test Description"
-      fill_in I18n.t("units.forms.owner"), with: "Test Owner"
-      fill_in I18n.t("units.forms.width"), with: "-1"  # Invalid: negative
-      fill_in I18n.t("units.forms.length"), with: "300"  # Invalid: too large
-      fill_in I18n.t("units.forms.height"), with: "0"  # Invalid: zero
-
-      click_button I18n.t("units.buttons.create")
-
-      expect(page).to have_http_status(:unprocessable_entity)
-      expect(page).to have_content("must be greater than 0")
-      expect(page).to have_content("must be less than 200")
     end
   end
 
@@ -553,14 +472,12 @@ RSpec.describe "Units", type: :request do
         expect(json_response).to have_key("name")
         expect(json_response).to have_key("serial")
         expect(json_response).to have_key("manufacturer")
-        expect(json_response).to have_key("has_slide")
         expect(json_response).to have_key("urls")
 
         # Check specific values
         expect(json_response["name"]).to eq(unit.name)
         expect(json_response["serial"]).to eq(unit.serial)
         expect(json_response["manufacturer"]).to eq(unit.manufacturer)
-        expect(json_response["has_slide"]).to eq(unit.has_slide)
       end
     end
 

@@ -24,10 +24,10 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
 
     # Mock i18n translations for pass/fail labels
     allow(view).to receive(:t)
-      .with("inspections.fields.pass")
+      .with("shared.pass")
       .and_return("Pass")
     allow(view).to receive(:t)
-      .with("inspections.fields.fail")
+      .with("shared.fail")
       .and_return("Fail")
 
     # Mock form builder methods with default behavior
@@ -132,8 +132,8 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
 
   describe "i18n integration" do
     it "uses i18n for default pass/fail labels" do
-      expect(view).to receive(:t).with("inspections.fields.pass").and_return("Pass")
-      expect(view).to receive(:t).with("inspections.fields.fail").and_return("Fail")
+      expect(view).to receive(:t).with("shared.pass").and_return("Pass")
+      expect(view).to receive(:t).with("shared.fail").and_return("Fail")
 
       render_pass_fail
     end

@@ -84,13 +84,13 @@ RSpec.describe PdfGeneratorService::Utilities do
   describe ".format_pass_fail" do
     context "with true value" do
       it "returns pass translation" do
-        expect(described_class.format_pass_fail(true)).to eq(I18n.t("pdf.inspection.fields.pass"))
+        expect(described_class.format_pass_fail(true)).to eq(I18n.t("shared.pass"))
       end
     end
 
     context "with false value" do
       it "returns fail translation" do
-        expect(described_class.format_pass_fail(false)).to eq(I18n.t("pdf.inspection.fields.fail"))
+        expect(described_class.format_pass_fail(false)).to eq(I18n.t("shared.fail"))
       end
     end
 

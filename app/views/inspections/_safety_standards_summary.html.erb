@@ -7,10 +7,10 @@
     <% if inspection.anchorage_assessment.present? %>
       <section class="standards-section">
         <h4><%= t('inspections.safety_standards.anchor_requirements') %></h4>
-        <% if inspection.unit.area.present? %>
+        <% if inspection.area.present? %>
           <p><%= t('inspections.safety_standards.anchor_calculation', 
                    required: inspection.anchorage_assessment.required_anchors,
-                   area: inspection.unit.area) %></p>
+                   area: inspection.area) %></p>
           <p class="<%= inspection.anchorage_assessment.meets_anchor_requirements? ? 'text-success' : 'text-danger' %>">
             <%= t('inspections.safety_standards.anchor_status',
                   current: inspection.anchorage_assessment.total_anchors,
@@ -38,11 +38,11 @@
     <% end %>
 
     <!-- User Capacity -->
-    <% if inspection.unit.length.present? && inspection.unit.width.present? %>
+    <% if inspection.length.present? && inspection.width.present? %>
       <section class="standards-section">
         <h4><%= t('inspections.safety_standards.user_capacity') %></h4>
         <p><%= t('inspections.safety_standards.capacity_by_height') %></p>
-        <% capacity = SafetyStandard.calculate_user_capacity(inspection.unit.length, inspection.unit.width) %>
+        <% capacity = SafetyStandard.calculate_user_capacity(inspection.length, inspection.width) %>
         <ul>
           <li><%= t('inspections.safety_standards.capacity_1000mm', count: capacity[:users_1000mm]) %></li>
           <li><%= t('inspections.safety_standards.capacity_1200mm', count: capacity[:users_1200mm]) %></li>

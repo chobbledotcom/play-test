@@ -1,0 +1,34 @@
+en:
+  forms:
+    fan:
+      header: "Fan/Blower"
+      sections:
+        blower_specifications: "Blower Specifications"
+        blower_safety_checks: "Blower Safety Checks"
+        electrical_safety: "Electrical Safety"
+      fields:
+        blower_serial: "Blower Serial Number"
+        fan_size_type: "Fan Size / Type"
+        blower_flap_pass: "Blower Flap"
+        blower_finger_pass: "Finger Guards"
+        blower_visual_pass: "Visual Condition"
+        pat_pass: "PAT Test"
+      status:
+        checks_passed: "Safety Checks Passed"
+        completion: "Assessment Completion"
+      summary:
+        title: "Assessment Summary"
+        completion: "Completion"
+        safety_checks: "Safety Checks"
+        blower_checks: "Blower Checks"
+        electrical_safety: "Electrical Safety"
+        blower_serial: "Blower Serial"
+        safety_issues: "Safety Issues"
+        overall_status: "Overall Status"
+        all_checks_passed: "All safety checks passed"
+      issues:
+        blower_flap: "Blower flap check failed"
+        finger_guards: "Finger guard check failed"
+        visual_damage: "Visual damage detected"
+        pat_failure: "PAT test failed"
+      submit: "Save Assessment"

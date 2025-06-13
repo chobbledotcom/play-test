@@ -22,26 +22,34 @@ module InspectionTurboStreams
   end
 
   def progress_update_stream
-    turbo_stream.replace("inspection_progress_#{@inspection.id}",
-      html: progress_html)
+    turbo_stream.replace(
+      "inspection_progress_#{@inspection.id}",
+      html: progress_html
+    )
   end
 
   def completion_issues_stream
-    turbo_stream.replace("completion_issues_#{@inspection.id}",
+    turbo_stream.replace(
+      "completion_issues_#{@inspection.id}",
       partial: "inspections/completion_issues",
-      locals: {inspection: @inspection})
+      locals: {inspection: @inspection}
+    )
   end
 
   def save_message_stream(success:)
-    turbo_stream.replace("inspection_save_message",
+    turbo_stream.replace(
+      "inspection_save_message",
       partial: "shared/save_message",
-      locals: save_message_locals(success: success, dom_id: "inspection_save_message"))
+      locals: save_message_locals(success: success, dom_id: "inspection_save_message")
+    )
   end
 
   def assessment_save_message_stream(success:)
-    turbo_stream.replace("assessment_save_message",
+    turbo_stream.replace(
+      "form_save_message",
       partial: "shared/save_message",
-      locals: save_message_locals(success: success, dom_id: "assessment_save_message"))
+      locals: save_message_locals(success: success, dom_id: "form_save_message")
+    )
   end
 
   def progress_html

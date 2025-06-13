@@ -1,11 +1,4 @@
-<% if @inspection.unit&.photo&.attached? %>
-  <div class="unit-photo">
-    <%= render 'shared/image_link', 
-        image: @inspection.unit.photo, 
-        alt: t('inspections.messages.photo_of', name: @inspection.unit.name),
-        link_text: t('units.messages.view_full_photo') %>
-  </div>
-<% end %>
+<%= render 'shared/unit_photo', unit: @inspection.unit if @inspection.unit %>
 
 <%= scrollable_table do %>
   <tr>

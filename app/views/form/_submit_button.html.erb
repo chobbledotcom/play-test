@@ -1,9 +1,1 @@
-<%
-  # Submit button doesn't need i18n lookup, just get form object
-  form_object = local_assigns[:form] || @_current_form
-  
-  # Button text
-  button_text = local_assigns[:text] || t('buttons.submit', default: 'Submit')
-%>
-
-<%= form_object.submit button_text %>
+<%= @_current_form.submit t("#{@_current_i18n_base}.submit", raise: true) %>

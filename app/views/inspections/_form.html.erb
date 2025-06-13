@@ -1,22 +1,12 @@
-<%= render 'form/errors', model: @inspection %>
-
-<%= form_with(model: @inspection) do |form| %>
-  <%= render 'shared/page_header', title: t('inspections.headers.inspection_details') %>
-
+<%= render 'form/form_context', model: @inspection, i18n_base: 'forms.inspections' do |form| %>
   <!-- Unit Selection/Display -->
-  <%= render 'form/fieldset', legend_key: 'current_unit', i18n_base: 'inspections.fields', form: form do %>
+  <%= render 'form/fieldset', legend_key: 'current_unit' do %>
     <% if @inspection.unit.present? %>
       <%= render 'shared/unit_details_display', unit: @inspection.unit %>
       <%= link_to t('inspections.buttons.change_unit'),
           select_unit_inspection_path(@inspection),
           class: "button" %>
       <br>
-      <%= link_to t('inspections.buttons.replace_dimensions'),
-          replace_dimensions_inspection_path(@inspection),
-          data: {
-            turbo_method: :patch,
-            turbo_confirm: t('inspections.messages.dimensions_replace_confirm')
-          } %>
     <% else %>
       <p><%= t('inspections.messages.no_unit') %></p>
       <%= link_to t('inspections.buttons.select_unit'),
@@ -31,7 +21,7 @@
 
   <!-- Public Information -->
   <% unless @inspection.new_record? %>
-    <%= render 'form/fieldset', legend_key: 'public_information', i18n_base: 'inspections.fields', form: form do %>
+    <%= render 'form/fieldset', legend_key: 'public_information' do %>
       <%= render 'form/display_field', field: :id %>
 
       <div>
@@ -48,7 +38,7 @@
   <% end %>
 
   <!-- Inspection-Specific Details -->
-  <%= render 'form/fieldset', legend_key: 'inspection_details', i18n_base: 'inspections.fields', form: form do %>
+  <%= render 'form/fieldset', legend_key: 'inspection_details' do %>
     <%= render 'form/autocomplete_field', field: :inspection_location, options: @inspection_locations %>
 
     <%= render 'form/date_field', field: :inspection_date %>
@@ -79,45 +69,18 @@
   <% end %>
 
   <!-- Inspection Results -->
-  <%= render 'form/fieldset', legend_key: 'inspection_results', i18n_base: 'inspections.fields' do %>
+  <%= render 'form/fieldset', legend_key: 'inspection_results' do %>
     <%= render 'form/number', field: :step_ramp_size, min: 0 %>
     <%= render 'form/pass_fail', field: :step_ramp_size_pass %>
 
     <%= render 'form/number', field: :critical_fall_off_height, min: 0 %>
     <%= render 'form/pass_fail', field: :critical_fall_off_height_pass %>
 
-    <%= render 'form/number', field: :unit_pressure, min: 0 %>
-    <%= render 'form/pass_fail', field: :unit_pressure_pass %>
-
-    <%= render 'form/number', field: :trough_depth, min: 0 %>
-    <%= render 'form/number', field: :trough_adjacent_panel_width, min: 0 %>
-    <%= render 'form/pass_fail', field: :trough_pass %>
-
-    <%= render 'form/pass_fail', field: :entrapment_pass %>
-
-    <%= render 'form/pass_fail', field: :markings_id_pass %>
-
-    <%= render 'form/pass_fail', field: :grounding_pass %>
-
-    <%= render 'form/pass_fail', field: :clamber_netting_pass %>
-    <%= render 'form/pass_fail', field: :retention_netting_pass %>
-    <%= render 'form/pass_fail', field: :zips_pass %>
-    <%= render 'form/pass_fail', field: :windows_pass %>
-    <%= render 'form/pass_fail', field: :artwork_pass %>
-
-    <%= render 'form/pass_fail', field: :exit_sign_visible_pass %>
-
     <%= render 'form/checkbox', field: :passed %>
 
     <%= render 'form/text_area', field: :risk_assessment, rows: 3 %>
     <%= render 'form/text_area', field: :comments, rows: 3 %>
   <% end %>
-
-
-  <fieldset>
-    <%= render 'form/submit_button',
-        text: (@inspection.new_record? ? t('inspections.buttons.create') : t('inspections.buttons.update')) %>
-  </fieldset>
 
   <!-- Save Message Display -->
   <div id="inspection_save_message"></div>

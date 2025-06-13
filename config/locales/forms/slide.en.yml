@@ -1,0 +1,20 @@
+en:
+  forms:
+    slide:
+      header: "Slide Assessment"
+      sections:
+        slide_dimensions: "Slide Measurements"
+      fields:
+        slide_platform_height: "Slide Platform Height"
+        slide_wall_height: "Containing Wall Height"
+        slide_first_metre_height: "First Metre of Slide Containing Wall Height"
+        slide_beyond_first_metre_height: "Remaining Slide Containing Wall Height"
+        slide_permanent_roof: "Permanent Roof Fitted to Top of Slide?"
+        clamber_netting_pass: "Steps / Clamber Netting"
+        runout: "Slide Run Out"
+        slip_sheet_pass: "Slip Sheet Integrity"
+      status:
+        runout_requirement: "Runout Requirement"
+        checks_passed: "Checks Passed"
+        completion: "Completion"
+      submit: "Save Assessment"

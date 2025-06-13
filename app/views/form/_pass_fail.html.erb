@@ -1,22 +1,19 @@
 <%
-  # Get i18n_base from section (already validated there)
-  setup = form_field_setup(field, local_assigns)
-
   # Pass/Fail options with i18n
-  pass_label = t('inspections.fields.pass')
-  fail_label = t('inspections.fields.fail')
+  pass_label = t('shared.pass')
+  fail_label = t('shared.fail')
   options = [[pass_label, true], [fail_label, false]]
+  
+  # Get the form object
+  form = @_current_form
 %>
 
 <div>
-  <label><%= setup[:field_label] %></label>
+  <label><%= t('shared.pass') %>/<%= t('shared.fail') %></label>
   <% options.each do |option_label, option_value| %>
     <label>
-      <%= setup[:form_object].radio_button field, option_value, id: "#{field}_#{option_value}" %>
+      <%= form.radio_button field, option_value, id: "#{field}_#{option_value}" %>
       <%= option_label %>
     </label>
-  <% end %>
-  <% if setup[:field_hint].present? %>
-    <small><%= setup[:field_hint] %></small>
   <% end %>
 </div>

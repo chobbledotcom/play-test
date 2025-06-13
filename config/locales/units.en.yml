@@ -31,7 +31,7 @@ en:
 
     status:
       overdue: "Overdue"
-      
+
     sections:
       filters: "Filter Units"
       search: "Search Units"
@@ -65,57 +65,6 @@ en:
       inspection_date: "Inspection Date"
       dimensions: "Dimensions"
 
-    forms:
-      name: "Unit Name"
-      has_slide: "Has Slide"
-      manufacturer: "Manufacturer"
-      model: "Model"
-      serial: "Serial Number / Asset ID"
-      serial_number: "Manufacturer Serial Number"
-      description: "Description"
-      owner: "Owner"
-      location: "Location"
-      width: "Width (m)"
-      length: "Length (m)"
-      height: "Height (m)"
-      manufacture_date: "Manufacture Date"
-      condition: "Condition"
-      notes: "Additional Notes"
-      photo: "Photo"
-      search: "Search"
-      # Anchorage dimensions
-      num_low_anchors: "Number of Low Anchors"
-      num_high_anchors: "Number of High Anchors"
-      # Enclosed dimensions
-      exit_number: "Number of Exits"
-      # Materials dimensions
-      rope_size: "Rope Size (mm)"
-      step_ramp_size: "Step/Ramp Size (mm)"
-      critical_fall_off_height: "Critical Fall Off Height (m)"
-      unit_pressure: "Unit Pressure (kPa)"
-      trough_depth: "Trough Depth (mm)"
-      trough_adjacent_panel_width: "Trough Adjacent Panel Width (mm)"
-      risk_assessment: "Risk Assessment"
-      # Slide dimensions
-      slide_platform_height: "Slide Platform Height (m)"
-      slide_wall_height: "Slide Wall Height (m)"
-      runout_value: "Runout Length (m)"
-      slide_first_metre_height: "Height Within First Metre (m)"
-      slide_beyond_first_metre_height: "Height Beyond First Metre (m)"
-      slide_permanent_roof: "Has Permanent Roof"
-      # Structure dimensions
-      stitch_length: "Stitch Length (mm)"
-      evacuation_time: "Evacuation Time (seconds)"
-      unit_pressure_value: "Unit Pressure (Pa)"
-      blower_tube_length: "Blower Tube Length (m)"
-      step_size_value: "Step Size (mm)"
-      fall_off_height_value: "Fall-off Height (m)"
-      trough_depth_value: "Trough Depth (m)"
-      trough_width_value: "Trough Width (m)"
-      # User height dimensions
-      containing_wall_height: "Containing Wall Height (m)"
-      platform_height: "Platform Height (m)"
-      tallest_user_height: "Maximum Tallest User Height (m)"
       user_height: "Maximum Tallest User Height (m)" # Backward compatibility
       play_area_length: "Play Area Length (m)"
       play_area_width: "Play Area Width (m)"
@@ -128,26 +77,6 @@ en:
       # Enclosed unit fields
       is_totally_enclosed: "Unit is Totally Enclosed"
 
-      # Comment fields
-      width_comment: "Width Comment"
-      length_comment: "Length Comment"
-      height_comment: "Height Comment"
-      num_low_anchors_comment: "Low Anchors Comment"
-      num_high_anchors_comment: "High Anchors Comment"
-      exit_number_comment: "Exit Number Comment"
-      rope_size_comment: "Rope Size Comment"
-      slide_platform_height_comment: "Platform Height Comment"
-      slide_wall_height_comment: "Wall Height Comment"
-      runout_value_comment: "Runout Comment"
-      slide_first_metre_height_comment: "First Metre Height Comment"
-      slide_beyond_first_metre_height_comment: "Beyond First Metre Comment"
-      slide_permanent_roof_comment: "Permanent Roof Comment"
-      containing_wall_height_comment: "Containing Wall Comment"
-      platform_height_comment: "Platform Height Comment"
-      permanent_roof_comment: "Permanent Roof Comment"
-      play_area_length_comment: "Play Area Length Comment"
-      play_area_width_comment: "Play Area Width Comment"
-      negative_adjustment_comment: "Negative Adjustment Comment"
 
     conditions:
       excellent: "Excellent"
@@ -174,7 +103,7 @@ en:
       name_blank: "Name can't be blank"
       manufacturer_blank: "Manufacturer can't be blank"
       serial_blank: "Serial can't be blank"
-      serial_number_blank: "Serial number can't be blank"
+      serial: "Serial number can't be blank"
       description_blank: "Description can't be blank"
       owner_blank: "Owner can't be blank"
       location_blank: "Location can't be blank"
@@ -210,6 +139,7 @@ en:
       no_photo: "No photo"
       no_units_found: "No units found."
       view_full_photo: "View full size photo"
+      photo_of: "Photo of %{name}"
       inspection_company_required: "You must be assigned to an inspection company to create units."
       pdf_not_supported: "Your browser does not support PDFs."
       pdf_not_supported_html: "Your browser does not support PDFs."

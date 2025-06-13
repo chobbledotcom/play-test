@@ -1,27 +1,10 @@
-<%= form_with model: @unit, url: create_unit_from_inspection_path(@inspection), local: true do |form| %>
-  <%= render 'shared/page_header', title: t("units.titles.new_from_inspection") %>
+<%= render 'shared/page_header', title: t("units.titles.new_from_inspection") %>
 
-  <% if @inspection.dimensions.present? %>
-    <p>
-      <%= t("units.labels.dimensions") %>:
-      <strong><%= @inspection.dimensions %></strong>
-    </p>
-  <% end %>
-
-  <%= render "form/errors", model: @unit %>
-
-  <%= render 'form/fieldset', legend_key: 'basic_information', i18n_base: 'units.fields', form: form do %>
-    <%= render "form/text_field", field: :name, required: true %>
-    <%= render "form/text_field", field: :serial, required: true %>
-    <%= render "form/text_field", field: :manufacturer, required: true %>
-    <%= render "form/text_field", field: :description, required: true %>
-    <%= render "form/checkbox", field: :has_slide %>
-    <%= render "form/text_field", field: :model %>
-    <%= render "form/text_field", field: :owner %>
-  <% end %>
-
-  <p><%= t("units.messages.dimensions_will_be_copied") %></p>
-
-  <%= form.submit t("units.buttons.create") %>
-  <%= link_to t("shared.buttons.cancel"), inspection_path(@inspection) %>
+<%= render 'form/form_context', model: @unit, i18n_base: 'forms.units', url: create_unit_from_inspection_path(@inspection) do |form| %>
+  <%= render 'shared/unit_details_form', form: form, object: @unit, i18n_base: 'forms.units', show_photo: true %>
+  
+  <!-- Save Message Display -->
+  <div id="unit_save_message"></div>
 <% end %>
+
+<%= link_to t("shared.buttons.cancel"), inspection_path(@inspection) %>

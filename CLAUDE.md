@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Check code standards**: `rake code_standards` (reports violations)
 - **Lint modified files**: `rake code_standards:lint_modified` (StandardRB on changed files only)
 - **Full standards workflow**: `rake code_standards:fix_all` (StandardRB + standards check)
-- Run all tests: `bundle exec rspec` (WARNING: Takes ages - only run when specifically requested)  
+- Run all tests: `bundle exec rspec` (WARNING: Takes ages - only run when specifically requested)
 - **Run tests in parallel**: `bundle exec parallel_rspec spec/` (verbose output)
 - **Run parallel tests with coverage**: `bundle exec rake coverage:parallel`
 - Run single test: `bundle exec rspec spec/path/to/file_spec.rb:LINE_NUMBER`
@@ -31,13 +31,82 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Core Development Principles
 
 ### Internationalization (i18n) - ALWAYS
+
 - **EVERY string must use I18n** - no hardcoded text anywhere
 - **Split locale files** - create new files in `config/locales/` instead of growing `en.yml`
 - Organize keys logically: `users.messages.company_archived`
 - Use I18n in tests: `I18n.t("inspector_companies.buttons.archive")`
 - Structure: `controller.section.key` or `model.field.description`
 
+### Form Conventions - STRICT REQUIREMENTS
+
+All forms must follow these exact patterns:
+
+1. **Always use form_context partial** for form wrapper:
+
+   ```erb
+   <%= render 'form/form_context', model: @model, i18n_base: 'forms.form_name' do |form| %>
+   ```
+
+2. **I18n structure for forms** - ALL forms must use `forms.` namespace:
+
+   ```yaml
+   en:
+     forms:
+       form_name:
+         header: "Form Title" # Automatically rendered by form_context
+         sections:
+           section_name: "Section Title"
+         fields: # ALL field labels MUST be in .fields namespace
+           field_name: "Field Label"
+           another_field: "Another Label"
+         submit: "Submit Button Text" # Used by submit_button partial
+   ```
+
+3. **Field helpers expect translations in .fields namespace**:
+
+   - `form_field_setup` looks for labels at `#{i18n_base}.fields.#{field}`
+   - NO fallbacks - if field translation missing, it should error
+   - This ensures all forms are properly internationalized
+
+4. **Submit button automatically uses i18n**:
+
+   ```erb
+   <%= render 'form/submit_button' %>  # Looks for #{i18n_base}.submit
+   ```
+
+   - Never pass text parameter unless overriding default behavior
+   - Submit button should find text at `#{@_current_i18n_base}.submit`
+
+5. **Form partials set context automatically**:
+
+   - `form_context` sets `@_current_form` and `@_current_i18n_base`
+   - All nested partials can access these without passing parameters
+   - Field partials use `form_field_setup` to get labels from i18n
+
+6. **Standard form structure**:
+
+   ```erb
+   <%= render 'form/form_context', model: @model, i18n_base: 'forms.name' do |form| %>
+     <%= render 'form/fieldset', legend_key: 'section_name' do %>
+       <%= render 'form/text_field', field: :field_name %>
+       <%= render 'form/number_comment', field: :measurement %>
+       <%= render 'form/pass_fail_comment', field: :check_name %>
+     <% end %>
+   <% end %>
+   ```
+
+   - Submit button is AUTOMATICALLY included by form_context
+   - Never manually add submit buttons
+
+7. **Non-model forms use scope**:
+   ```erb
+   <%= render 'form/form_context', model: nil, scope: :session,
+              i18n_base: 'forms.session_new', url: login_path do |form| %>
+   ```
+
 ### Testing Approach
+
 - **Before editing ANY file** - identify what tests/test files are associated with it
 - **Write Capybara tests for ALL new code** - no exceptions
 - **No JavaScript in tests** - test the non-JS fallback behavior
@@ -50,7 +119,66 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Test both happy path and edge cases
 - Use `--fail-fast` during development to fix issues incrementally
 
+#### RSpec DSL Conventions
+
+Use the appropriate DSL based on test type:
+
+**Feature/System Tests** (user interactions in `spec/features/`):
+
+```ruby
+RSpec.feature "User login", type: :feature do
+  background do
+    # setup (same as before)
+  end
+
+  scenario "successful login" do
+    # test user interactions
+  end
+end
+```
+
+**All Other Tests** (models, controllers, services, helpers):
+
+```ruby
+RSpec.describe User, type: :model do
+  describe "#method_name" do
+    context "when condition" do
+      it "does something" do
+        # test implementation
+      end
+    end
+  end
+end
+```
+
+**DSL Mapping:**
+
+- `feature` = `describe` (for feature tests only)
+- `scenario` = `it` (for feature tests only)
+- `background` = `before` (for feature tests only)
+- Use standard RSpec DSL (`describe`, `context`, `it`, `before`) for all non-feature tests
+
+**IMPORTANT: Pattern Recognition & Batch Fixes**
+
+- **When you spot a pattern** - use `grep` to find all occurrences
+- **Fix similar issues together** - don't fix one-by-one when pattern is clear
+- **Common patterns to batch-fix**:
+  - Manual assessment creation: `grep -r "create(:.*_assessment.*inspection:" spec/`
+  - Hardcoded strings: `grep -r '"Some Text"' spec/`
+  - Missing i18n: `grep -r 'have_content("' spec/`
+- **Always verify pattern** - check a few examples before batch fixing
+- **Use tools efficiently** - `cut`, `sort`, `uniq` to identify affected files
+
+#### What's Already Tested (Avoid Duplication)
+
+- **Form i18n coverage**: `spec/features/assessment_forms_spec.rb` uses `expect_form_matches_i18n()` to verify ALL form sections and fields are rendered
+- **Form i18n structure**: `spec/lib/form_i18n_structure_spec.rb` validates form locale file structure
+- **i18n usage tracking**: `lib/i18n_usage_tracker.rb` tracks all i18n key usage and finds unused keys
+- **Helper methods available**: `expect_form_sections_present()`, `expect_form_fields_present()`, `expect_form_matches_i18n()`
+- **DON'T write tests checking specific field presence** - the i18n coverage tests already verify this comprehensively
+
 #### Helper Method Guidelines
+
 - **Only extract helper methods when they add value**:
   - Used multiple times (DRY principle)
   - Hide genuinely complex logic that obscures test intent
@@ -88,15 +216,17 @@ end
 ### Test Coverage Analysis
 
 #### Coverage Targets & Reports
+
 - **Coverage target**: 100% line and branch coverage for all files
 - **HTML report**: `coverage/index.html` (detailed view with line-by-line coverage)
 - **JSON data**: `coverage/.resultset.json` (raw coverage data from parallel test runs)
 - **Coverage thresholds**:
   - Green (>90%): Good coverage
-  - Yellow (80-90%): Needs improvement  
+  - Yellow (80-90%): Needs improvement
   - Red (<80%): Poor coverage requiring immediate attention
 
 #### Quick Coverage Commands
+
 ```bash
 # Check coverage for a specific file (extracts from HTML report)
 ruby coverage_check.rb app/models/user.rb
@@ -109,6 +239,7 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 #### Coverage Analysis Tool
 
 **File Coverage Check** (`coverage_check.rb`):
+
 - **Usage**: `ruby coverage_check.rb <file_path>`
 - **Output**: Exact same figures as SimpleCov HTML report
 - **Example output**:
@@ -121,6 +252,7 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 - **Use when**: Checking coverage after editing a specific file
 
 #### Coverage Workflow
+
 1. **After editing a file**: Run `ruby coverage_check.rb <file_path>` to check coverage
 2. **Before committing**: Ensure no coverage regression
 3. **When coverage drops**: Write tests for uncovered lines immediately
@@ -128,17 +260,20 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 5. **HTML report**: Use for detailed line-by-line analysis when needed
 
 #### Coverage Standards
+
 - **Target**: >90% line coverage, >80% branch coverage for all files
 - **Priority files**: Controllers, services, models with business logic
 - **Low coverage files**: Immediate attention required for < 80% coverage
 
 ### Code Organization
+
 - **Create partials for repeated code** - DRY principle
 - Extract common view code into partials immediately
 - Use semantic naming for partials: `_user_details.html.erb`
 - Keep partials focused on a single responsibility
 
 ### HTML & CSS Philosophy
+
 - **Semantic HTML only** - use proper tags for their intended purpose
 - **ABSOLUTELY NO CSS classes** - I hate CSS classes, never use them
 - **NO class attributes at all** - rely entirely on semantic selectors
@@ -150,6 +285,7 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 - Buttons: use `<button>` or `<input type="submit">` without any classes
 
 ### Code Quality Standards
+
 - **No defensive coding** - expect correct data, let it fail if wrong
 - **No fallbacks** - if data is missing, that's an error to fix
 - **Trust our own interfaces** - avoid `respond_to?` checks for methods we control; we know what our objects support
@@ -164,6 +300,7 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 ### Development Philosophy & Architecture
 
 ### Frontend & UI Principles
+
 - **Progressive enhancement** - HTML first, enhance with Turbo
 - **Turbo-first** - use Turbo for form submissions and navigation
   - Use `data: { turbo_method: :patch }` instead of old Rails UJS
@@ -172,6 +309,7 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 - **Accessibility** - proper labels, ARIA where needed, keyboard navigation
 
 ### Database & Models
+
 - Use descriptive field names: `inspection_location` not `location`
 - Write validations for data integrity
 - Use scopes for complex queries: `InspectorCompany.by_status("active")`
@@ -179,6 +317,7 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 - Always validate associations and required fields
 
 ### Controllers & Business Logic
+
 - Keep controllers thin - delegate to models/services
 - Use semantic parameter names: "active", "archived", "all" not true/false strings
 - Use proper HTTP methods (PATCH for updates, not GET)
@@ -200,6 +339,7 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 ### Modern Ruby Syntax Preferences (Ruby 3.0+)
 
 **Always prefer the newest, tidiest syntax available:**
+
 - **Endless methods** for simple computation: `def total = a + b`
 - **Hash shorthand** when key matches method: `{width:, height:}`
 - **Numbered parameters** in simple blocks: `map { _1.upcase }`
@@ -209,11 +349,13 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 - **Modern enumerable methods**: `Hash#except`, `Enumerable#filter_map`
 
 **Critical principle: Avoid unnecessary methods:**
+
 - **Never create methods that just return constants** - use the constant directly
 - **Use I18n for all user-facing strings** - no hardcoded English text
 - **Endless methods should perform computation** - not just return static values
 
 **String Interpolation Rule:**
+
 - **Extract variables for complex interpolations** - nothing more complex than a single word with underscores should appear between `#{}` brackets
 - Extract `#{hash[:key]}`, `#{object.method}`, `#{complex + calculation}` to variables first
 - Keep simple: `#{variable}`, `#{method_name}`, `#{simple_var}`
@@ -260,7 +402,7 @@ def basic_attributes
 end
 
 # BAD - Redundant explicit assignment
-def basic_attributes  
+def basic_attributes
   {width: width, length: length, height: height}
 end
 
@@ -273,7 +415,7 @@ def total_anchors
   (num_low_anchors || 0) + (num_high_anchors || 0)
 end
 
-# GOOD - Use numbered parameters in blocks (Ruby 2.7+)  
+# GOOD - Use numbered parameters in blocks (Ruby 2.7+)
 methods.grep(/=$/).map { _1.to_s.chomp("=") }
 attributes.map { unit.send(_1) }
 
@@ -284,7 +426,7 @@ attributes.map { |attr| unit.send(attr) }
 # GOOD - Pattern matching for complex dispatch (Ruby 3.0+)
 case calculation_type
 in "anchors" then calculate_anchors
-in "user_capacity" then calculate_user_capacity  
+in "user_capacity" then calculate_user_capacity
 in "slide_runout" then calculate_slide_runout
 else handle_unknown_type
 end
@@ -317,7 +459,7 @@ end
 # BAD - Method that just returns a string
 def fabric_requirement = "Fabric tensile strength: 1850N minimum"
 
-# GOOD - Use I18n for user-facing strings  
+# GOOD - Use I18n for user-facing strings
 I18n.t("materials_assessment.requirements.fabric_tensile")
 
 # BAD - Method that just transforms a constant
@@ -359,7 +501,7 @@ scope :search, ->(query) {
 }
 
 # BAD - Long SQL on single line
-where("serial LIKE ? OR name LIKE ? OR description LIKE ? OR manufacturer LIKE ? OR owner LIKE ?", 
+where("serial LIKE ? OR name LIKE ? OR description LIKE ? OR manufacturer LIKE ? OR owner LIKE ?",
       search_term, search_term, search_term, search_term, search_term)
 
 # BAD - All on one line when over 80 chars
@@ -367,7 +509,8 @@ LONG_FORMATS = [:pdf, :csv, :json, :xml, :html, :txt, :docx, :xlsx]
 ```
 
 **Array Ordering & Length Rules:**
-```ruby  
+
+```ruby
 # GOOD - Alphabetical order when order doesn't matter
 validates :email, :name, presence: true
 SIMPLE_ARRAY = %i[active archived inactive]
@@ -389,6 +532,7 @@ SIMPLE_ARRAY = %i[inactive active archived]
 ```
 
 ### Method Design Principles
+
 - **Maximum 20 lines per method** - if longer, extract private methods or delegate to other objects
 - **Single responsibility** - each method should do one thing well
 - **Descriptive names** - `calculate_total_tax` not `calc_tax` or `get_tax`
@@ -396,6 +540,7 @@ SIMPLE_ARRAY = %i[inactive active archived]
 - **Extract complex conditions** - use predicate methods like `user.can_edit_inspection?`
 
 ### Comments Policy
+
 - **Only comment WHY, never WHAT** - code should be self-explanatory about what it does
 - **Comments explain business context** - regulatory requirements, edge cases, non-obvious decisions
 - **No redundant comments** - `user.save # saves the user` is pointless
@@ -404,6 +549,7 @@ SIMPLE_ARRAY = %i[inactive active archived]
 - **Use British English** - in comments, variable names, and method names (colour not color, organised not organized)
 
 ### Object-Oriented Design
+
 - **Fat models, skinny controllers** - business logic belongs in models
 - **Use service objects** for complex operations that span multiple models
 - **Value objects** for data that doesn't belong in the database (calculations, transformations)
@@ -411,6 +557,7 @@ SIMPLE_ARRAY = %i[inactive active archived]
 - **Delegate appropriately** - `delegate :name, to: :company, prefix: true`
 
 ### DRY Principles (Done Right)
+
 - **DRY code, not DRY tests** - test clarity trumps test brevity
 - **Extract methods for business logic** - not just to reduce lines
 - **Partial extraction** - when the same view logic appears 3+ times
@@ -418,6 +565,7 @@ SIMPLE_ARRAY = %i[inactive active archived]
 - **Readable duplication > clever abstraction** - if it makes tests harder to understand, don't do it
 
 ### Rails Conventions (Always Follow)
+
 - **Use Rails idioms** - `find_by` not `where(...).first`
 - **Leverage ActiveRecord** - scopes, validations, callbacks where appropriate
 - **RESTful routes** - use Rails routing helpers, avoid custom routes unless necessary
@@ -425,6 +573,7 @@ SIMPLE_ARRAY = %i[inactive active archived]
 - **Rails naming conventions** - no exceptions, update old code to match
 
 ### No Backwards Compatibility Code
+
 - **Update all references** when changing method signatures
 - **Refactor immediately** - don't leave deprecated code paths
 - **Fix at the source** - don't work around old patterns
@@ -432,11 +581,19 @@ SIMPLE_ARRAY = %i[inactive active archived]
 - **Delete unused code** - if it's not called, remove it
 
 ### Factory Design (Test Data)
+
 - **Minimal factories** - only set required attributes and uniqueness constraints
 - **Use traits for variations** - `:with_company`, `:archived`, `:admin`
 - **Factory inheritance** sparingly - prefer traits over factory hierarchies
 - **Realistic but simple data** - "Test User" not "John Smith from New York"
 - **Avoid factory dependencies** - each factory should be independently creatable
+
+**IMPORTANT: Inspection Factory Behavior**
+
+- **Inspections auto-create ALL assessments** via `after_create :create_assessments` callback
+- **Use existing complete factory traits** - `:pdf_complete_test_data`, `:with_complete_assessments`
+- **NEVER manually create assessments** - they already exist, just update them
+- **Assessment factories are for standalone testing only** - not for inspection tests
 
 ### Method Length & Complexity Examples
 
@@ -504,11 +661,11 @@ FactoryBot.define do
   factory :user do
     email { "user#{rand(10000)}@example.com" }
     password { "password123" }
-    
+
     trait :admin do
       email { "admin#{rand(10000)}@example.com" }
     end
-    
+
     trait :with_company do
       association :inspection_company
     end
@@ -540,7 +697,7 @@ RSpec.describe "User archiving" do
     expect(response).to redirect_to(new_session_path)
     expect(flash[:error]).to include("account is inactive")
   end
-  
+
   it "allows login when user is active" do
     user = create(:user, active: true)
     post sessions_path, params: { email: user.email, password: "password123" }
@@ -552,7 +709,7 @@ end
 RSpec.describe "User archiving" do
   let(:user) { create(:user, active: user_active) }
   let(:expected_redirect) { user_active ? dashboard_path : new_session_path }
-  
+
   [true, false].each do |status|
     context "when user active is #{status}" do
       let(:user_active) { status }
@@ -564,56 +721,29 @@ RSpec.describe "User archiving" do
 end
 ```
 
-### Comment Examples
+### Comments
 
-```ruby
-# GOOD - Explains WHY, business context (British English)
-def calculate_inspection_deadline
-  # RPII regulations require 30-day inspection cycles for critical equipment
-  # but allow 45 days for non-critical during winter months
-  base_days = critical_equipment? ? 30 : 45
-  winter_extension = winter_season? && !critical_equipment? ? 15 : 0
-  base_days + winter_extension
-end
+## Good:
 
-# GOOD - Explains non-obvious business rule
-def organise_user_inspections
-  # Keep inspection records for 7 years per regulatory requirement
-  # but mark as archived to hide from normal views
-  inspections.update_all(archived: true, archived_at: Time.current)
-end
+- Explains WHY, business context (British English)
+- Explains non-obvious business rule
+- British English in variable names
+- No comment needed, method name is clear
 
-# GOOD - British English in variable names
-def set_equipment_colour
-  # Use manufacturer's colour specification for safety compliance
-  self.equipment_colour = manufacturer_colour_code
-end
+## Bad:
 
-# BAD - American English spelling
-def set_equipment_color
-  self.equipment_color = manufacturer_color_code
-end
-
-# BAD - Explains WHAT the code does (obvious)
-def organise_user_inspections
-  # Update all inspections to set archived to true and archived_at to current time
-  inspections.update_all(archived: true, archived_at: Time.current)
-end
-
-# GOOD - No comment needed, method name is clear
-def owns_inspection?(inspection)
-  inspection.user_id == id
-end
-```
+- American English spelling
+- Explains WHAT the code does (obvious)
 
 ## Established Patterns & Examples
 
 ### Testing Patterns
+
 ```ruby
 # Feature tests with Capybara
 RSpec.feature "Inspector Company Archiving", type: :feature do
   let(:admin_user) { create(:user, :without_company, email: "admin@testcompany.com") }
-  
+
   before do
     allow(ENV).to receive(:[]).and_call_original
     allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
@@ -631,7 +761,7 @@ end
 scope :by_status, ->(status) {
   case status&.to_s
   when "active" then active
-  when "archived" then archived  
+  when "archived" then archived
   when "all" then all
   else all # Default to all
   end
@@ -639,10 +769,11 @@ scope :by_status, ->(status) {
 ```
 
 ### Turbo Form Patterns
+
 ```erb
 <!-- Auto-submit dropdown -->
 <%= form_with url: inspector_companies_path, method: :get, data: { turbo: false } do |form| %>
-  <%= form.select :active, 
+  <%= form.select :active,
       options_for_select([
         ["All Companies", "all"],
         [t('inspector_companies.status.active'), "active"],
@@ -652,15 +783,16 @@ scope :by_status, ->(status) {
 <% end %>
 
 <!-- Action links with Turbo -->
-<%= link_to t('inspector_companies.buttons.archive'), 
-      archive_inspector_company_path(company), 
-      data: { 
-        turbo_method: :patch, 
-        turbo_confirm: "Are you sure you want to archive #{company.name}?" 
+<%= link_to t('inspector_companies.buttons.archive'),
+      archive_inspector_company_path(company),
+      data: {
+        turbo_method: :patch,
+        turbo_confirm: "Are you sure you want to archive #{company.name}?"
       } %>
 ```
 
 ### Controller Patterns
+
 ```ruby
 # Clean, chainable scopes
 def index
@@ -679,10 +811,11 @@ end
 ```
 
 ### Model Helper Methods (DRY)
+
 ```ruby
 def can_create_inspection?
-  has_inspection_company? && 
-  inspection_company_active? && 
+  has_inspection_company? &&
+  inspection_company_active? &&
   within_inspection_limit?
 end
 
@@ -702,15 +835,16 @@ end
 ```
 
 ### DRY View Partials
+
 ```erb
 <!-- app/views/inspector_companies/_archive_link.html.erb -->
 <% if inspector_company.active? %>
-  <%= link_to t('inspector_companies.buttons.archive'), 
-        archive_inspector_company_path(inspector_company), 
+  <%= link_to t('inspector_companies.buttons.archive'),
+        archive_inspector_company_path(inspector_company),
         data: { turbo_method: :patch, turbo_confirm: "Are you sure?" } %>
 <% else %>
-  <%= link_to t('inspector_companies.buttons.unarchive'), 
-        unarchive_inspector_company_path(inspector_company), 
+  <%= link_to t('inspector_companies.buttons.unarchive'),
+        unarchive_inspector_company_path(inspector_company),
         data: { turbo_method: :patch, turbo_confirm: "Are you sure?" } %>
 <% end %>
 
@@ -721,18 +855,21 @@ end
 ## Business Rules Examples
 
 ### User Access Control
+
 - Users from archived companies cannot create new inspections
 - Archived companies still appear in inspection history (data integrity)
 - Only admins can see company notes fields
 - Users can only see their own units and inspections
 
 ### Data Validation
+
 - All forms validate required fields with clear error messages
 - Use semantic field names: `inspection_location` not `location`
 - Phone numbers are normalized on save
 - Email addresses are validated and downcased
 
 ### UI/UX Patterns
+
 - Default views show all data unless filtered (better discoverability)
 - Use clear, semantic filter parameters: "active", "archived", "all"
 - Confirmation dialogs for destructive actions

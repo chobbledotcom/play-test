@@ -1,12 +1,14 @@
 class InspectionsController < ApplicationController
   include InspectionTurboStreams
   include PublicViewable
+  include UserActivityCheck
 
   skip_before_action :require_login, only: %i[show]
   before_action :set_inspection, except: %i[create index]
   before_action :check_inspection_owner, except: %i[create index show]
   before_action :validate_unit_ownership, only: %i[update]
   before_action :redirect_if_complete, except: %i[create destroy index mark_draft show]
+  before_action :require_user_active, only: %i[create edit update]
   before_action :no_index
 
   def index
@@ -46,9 +48,12 @@ class InspectionsController < ApplicationController
   end
 
   def create
-    unit_id = params[:unit_id] || inspection_params[:unit_id]
+    unit_id = params[:unit_id] || params.dig(:inspection, :unit_id)
 
-    result = InspectionCreationService.new(current_user, unit_id: unit_id).create
+    result = InspectionCreationService.new(
+      current_user,
+      unit_id: unit_id
+    ).create
 
     if result[:success]
       flash[:notice] = result[:message]
@@ -60,9 +65,6 @@ class InspectionsController < ApplicationController
   end
 
   def edit
-    # Build assessments if they don't exist yet
-    # and pre-fill with inspection attributes
-    @inspection.build_assessments_with_attributes
     load_inspection_locations
   end
 
@@ -85,24 +87,6 @@ class InspectionsController < ApplicationController
     redirect_to inspections_path, notice: I18n.t("inspections.messages.deleted")
   end
 
-  def replace_dimensions
-    if @inspection.unit
-      @inspection.copy_attributes_from(@inspection.unit)
-
-      if @inspection.save
-        flash[:notice] = t("inspections.messages.dimensions_replaced")
-      else
-        error_messages = @inspection.errors.full_messages.join(", ")
-        flash[:alert] = t("inspections.messages.dimensions_replace_failed", errors: error_messages)
-      end
-    else
-      flash[:alert] = t("inspections.messages.no_unit_for_dimensions")
-    end
-
-    tab_param = params[:tab] || "general"
-    redirect_to edit_inspection_path(@inspection, tab: tab_param)
-  end
-
   def select_unit
     @units = current_user.units
       .search(params[:search])
@@ -121,9 +105,7 @@ class InspectionsController < ApplicationController
       redirect_to select_unit_inspection_path(@inspection) and return
     end
 
-    # Update the inspection with the new unit and copy all dimensions
     @inspection.unit = unit
-    @inspection.copy_attributes_from(unit)
 
     if @inspection.save
       flash[:notice] = t("inspections.messages.unit_changed", unit_name: unit.name)
@@ -167,7 +149,46 @@ class InspectionsController < ApplicationController
     redirect_to edit_inspection_path(@inspection)
   end
 
+  def inspection_params
+    base_params = build_base_params
+    add_assessment_params(base_params)
+    base_params
+  end
+
   private
+
+  INSPECTION_SPECIFIC_PARAMS = %i[
+    comments
+    inspection_date
+    inspection_location
+    inspector_company_id
+    passed
+    unique_report_number
+    unit_id
+  ].freeze
+
+  SYSTEM_ATTRIBUTES = %w[inspection_id created_at updated_at].freeze
+
+  def build_base_params
+    params.require(:inspection).permit(*INSPECTION_SPECIFIC_PARAMS)
+  end
+
+  def add_assessment_params(base_params)
+    Inspection::ASSESSMENT_TYPES.each do |ass_type|
+      ass_key = "#{ass_type}_attributes"
+      next unless params[:inspection][ass_key].present?
+
+      ass_params = params[:inspection][ass_key]
+      permitted_ass_params = assessment_permitted_attributes(ass_type)
+      base_params[ass_key] = ass_params.permit(*permitted_ass_params)
+    end
+  end
+
+  def assessment_permitted_attributes(assessment_type)
+    model_class = "Assessments::#{assessment_type.to_s.camelize}".constantize
+    all_attributes = model_class.column_names
+    (all_attributes - SYSTEM_ATTRIBUTES).map { it.to_sym }
+  end
 
   def filtered_inspections_query_without_order = current_user.inspections
     .includes(:unit, :inspector_company)
@@ -176,8 +197,6 @@ class InspectionsController < ApplicationController
     .filter_by_unit(params[:unit_id])
     .filter_by_owner(params[:owner])
     .filter_by_inspection_location(params[:inspection_location])
-
-  def inspection_params = InspectionParamsService.new(params).permitted_params
 
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
 
@@ -305,5 +324,14 @@ class InspectionsController < ApplicationController
       .uniq
       .sort
   end
-end
 
+  def handle_inactive_user_redirect
+    # If creating inspection from a unit page, redirect back to unit
+    if action_name == "create" && params[:unit_id].present?
+      unit = current_user.units.find_by(id: params[:unit_id])
+      redirect_to unit ? unit_path(unit) : inspections_path
+    else
+      redirect_to inspections_path
+    end
+  end
+end

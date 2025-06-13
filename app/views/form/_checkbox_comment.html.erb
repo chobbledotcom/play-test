@@ -1,0 +1,15 @@
+<%
+  # Composite partial for checkbox + comment fields
+  # Required parameters:
+  #   field: Base field name (e.g., 'slide_permanent_roof')
+  # 
+  # This will render:
+  #   - Checkbox field: field (e.g., 'slide_permanent_roof')
+  #   - Comment field: field + '_comment' (e.g., 'slide_permanent_roof_comment')
+  
+  checkbox_field = field
+  comment_field = "#{field}_comment".to_sym
+%>
+
+<%= render 'form/checkbox', field: checkbox_field %>
+<%= render 'form/comment', field: comment_field %>

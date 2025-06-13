@@ -50,101 +50,21 @@ RSpec.describe InspectionsHelper, type: :helper do
     end
 
     context "with all assessments complete" do
-      before do
-        # Create all complete assessments
-        create(:user_height_assessment, :with_basic_data,
-          inspection: inspection,
-          tallest_user_height_comment: "Complete")
-
-        inspection.create_slide_assessment!(
-          slide_platform_height: 2.0,
-          slide_wall_height: 1.5,
-          runout_value: 1.0,
-          clamber_netting_pass: true,
-          runout_pass: true,
-          slip_sheet_pass: true
-        )
-
-        inspection.create_structure_assessment!(
-          # Critical checks
-          seam_integrity_pass: true,
-          lock_stitch_pass: true,
-          air_loss_pass: true,
-          straight_walls_pass: true,
-          sharp_edges_pass: true,
-          unit_stable_pass: true,
-          # Required measurements
-          stitch_length: 5.0,
-          unit_pressure_value: 250,
-          blower_tube_length: 2.0,
-          # Measurement pass/fail checks
-          stitch_length_pass: true,
-          unit_pressure_pass: true,
-          blower_tube_length_pass: true,
-          # Additional checks required for complete
-          step_size_pass: true,
-          fall_off_height_pass: true
-        )
-
-        inspection.create_anchorage_assessment!(
-          num_low_anchors: 4,
-          num_high_anchors: 4,
-          num_anchors_pass: true,
-          anchor_type_pass: true,
-          pull_strength_pass: true,
-          anchor_degree_pass: true,
-          anchor_accessories_pass: true
-        )
-
-        inspection.create_materials_assessment!(
-          rope_size: 10,
-          rope_size_pass: true,
-          clamber_pass: true,
-          retention_netting_pass: true,
-          zips_pass: true,
-          windows_pass: true,
-          artwork_pass: true,
-          thread_pass: true,
-          fabric_pass: true,
-          fire_retardant_pass: true
-        )
-
-        inspection.create_fan_assessment!(
-          blower_flap_pass: true,
-          blower_finger_pass: true,
-          blower_visual_pass: true,
-          pat_pass: true,
-          blower_serial: "FAN-12345",
-          fan_size_comment: "Standard 1.5HP blower"
-        )
-      end
+      let(:complete_inspection) { create(:inspection, :with_complete_assessments) }
 
       it "returns 100 when all assessments are complete" do
-        expect(helper.assessment_completion_percentage(inspection)).to eq(100)
+        expect(helper.assessment_completion_percentage(complete_inspection)).to eq(100)
       end
     end
 
     context "with totally enclosed unit" do
-      before do
-        unit = create(:unit, is_totally_enclosed: true)
-        inspection.update!(unit: unit)
-      end
-
       it "includes enclosed assessment in calculation" do
-        # Create all assessments including enclosed
-        create(:user_height_assessment, :with_basic_data,
-          inspection: inspection,
-          tallest_user_height_comment: "Complete")
-
-        inspection.create_enclosed_assessment!(
-          exit_number: 2,
-          exit_number_pass: true,
-          exit_visible_pass: true
-        )
+        unit = create(:unit)
+        complete_inspection = create(:inspection, :with_complete_assessments, unit: unit, is_totally_enclosed: true)
 
         # Should calculate based on 7 assessments for totally enclosed
-        percentage = helper.assessment_completion_percentage(inspection)
-        expect(percentage).to be > 0
+        percentage = helper.assessment_completion_percentage(complete_inspection)
+        expect(percentage).to eq(100)
       end
     end
   end
@@ -159,7 +79,7 @@ RSpec.describe InspectionsHelper, type: :helper do
     end
 
     it "includes enclosed tab for totally enclosed units" do
-      unit = create(:unit, is_totally_enclosed: true)
+      unit = create(:unit)
       inspection.update!(unit: unit, is_totally_enclosed: true)
 
       tabs = helper.inspection_tabs(inspection)
@@ -168,7 +88,7 @@ RSpec.describe InspectionsHelper, type: :helper do
     end
 
     it "includes slide tab for units with slides" do
-      unit = create(:unit, has_slide: true)
+      unit = create(:unit)
       inspection.update!(unit: unit, has_slide: true)
 
       tabs = helper.inspection_tabs(inspection)

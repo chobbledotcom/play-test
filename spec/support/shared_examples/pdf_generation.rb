@@ -7,6 +7,22 @@ RSpec.shared_examples "generates valid PDF structure" do |pdf_response|
   end
 end
 
+RSpec.shared_examples "generates PDF successfully" do |path|
+  it "generates a valid PDF with correct headers" do
+    pdf_data = get_pdf(path)
+    expect_valid_pdf(pdf_data)
+  end
+end
+
+RSpec.shared_examples "handles PDF edge case data" do |model, attributes|
+  it "generates PDF with edge case data" do
+    model.update(attributes)
+    pdf_path = model.is_a?(Inspection) ? "/inspections/#{model.id}.pdf" : "/units/#{model.id}.pdf"
+    pdf_data = get_pdf(pdf_path)
+    expect_valid_pdf(pdf_data)
+  end
+end
+
 RSpec.shared_examples "handles unicode in PDFs" do |inspection_or_unit|
   it "properly handles Unicode characters and emoji in PDFs" do
     # Update the object with Unicode content

@@ -1,52 +1,45 @@
 <%
-  # Require explicit i18n_base - no more guessing
-  i18n_base = local_assigns[:i18n_base]
+  # Use inherited i18n_base from form context, or explicit parameter
+  i18n_base = local_assigns[:i18n_base] || @_current_i18n_base
   raise ArgumentError, "i18n_base is required for assessment status" if i18n_base.nil?
-  
+
   # Assessment object - should be passed as 'assessment'
   assessment_obj = assessment
 %>
 
-<% if assessment_obj&.persisted? %>
-  <div class="assessment-status">
-    <h4><%= t("#{i18n_base}.sections.safety_status") %></h4>
-    
-    <% if assessment_obj.respond_to?(:meets_height_requirements?) %>
+<div class="assessment-status">
+  <h4><%= t("shared.safety_status") %></h4>
+
+  <% if assessment_obj.respond_to?(:meets_height_requirements?) %>
       <p>
         <strong><%= t("#{i18n_base}.status.height_requirement") %>:</strong>
         <span class="<%= assessment_obj.meets_height_requirements? ? 'text-success' : 'text-danger' %>">
-          <%= assessment_obj.meets_height_requirements? ? 
-              t("#{i18n_base}.status.pass") : 
-              t("#{i18n_base}.status.fail") %>
+          <%= assessment_obj.meets_height_requirements? ?
+              t("shared.pass") :
+              t("shared.fail") %>
         </span>
       </p>
     <% end %>
-    
+
     <% if assessment_obj.respond_to?(:meets_runout_requirements?) %>
       <p>
         <strong><%= t("#{i18n_base}.status.runout_requirement") %>:</strong>
         <span class="<%= assessment_obj.meets_runout_requirements? ? 'text-success' : 'text-danger' %>">
-          <%= assessment_obj.meets_runout_requirements? ? 
-              t("#{i18n_base}.status.pass") : 
-              t("#{i18n_base}.status.fail") %>
+          <%= assessment_obj.meets_runout_requirements? ?
+              t("shared.pass") :
+              t("shared.fail") %>
         </span>
       </p>
     <% end %>
-    
+
     <% if assessment_obj.respond_to?(:passed_checks_count) %>
       <p>
         <strong><%= t("#{i18n_base}.status.checks_passed") %>:</strong>
-        <%= assessment_obj.passed_checks_count %> / <%
-        if assessment_obj.is_a?(MaterialsAssessment) %><%=
-          MaterialsAssessment::SAFETY_CHECK_COUNT %><%
-        elsif assessment_obj.respond_to?(:safety_check_count) %><%=
-          assessment_obj.safety_check_count %><%
-        else %><%=
-          t("#{i18n_base}.status.unknown") %><%
-        end %>
+        <%= assessment_obj.passed_checks_count %> /
+        <%= assessment_obj.pass_columns_count %>
       </p>
     <% end %>
-    
+
     <% if assessment_obj.respond_to?(:completion_percentage) %>
       <p>
         <strong><%= t("#{i18n_base}.status.completion") %>:</strong>
@@ -54,4 +47,3 @@
       </p>
     <% end %>
   </div>
-<% end %>

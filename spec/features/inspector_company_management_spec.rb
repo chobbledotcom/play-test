@@ -12,17 +12,17 @@ RSpec.feature "Inspector Company Management", type: :feature do
 
       expect(page).to have_content(I18n.t("inspector_companies.titles.new"))
 
-      fill_in I18n.t("inspector_companies.forms.name"), with: "Test Inspection Company"
-      fill_in I18n.t("inspector_companies.forms.email"), with: "contact@testcompany.com"
-      fill_in I18n.t("inspector_companies.forms.phone"), with: "01234 567890"
-      fill_in I18n.t("inspector_companies.forms.address"), with: "123 Test Street\nTest City"
-      fill_in I18n.t("inspector_companies.forms.city"), with: "Test City"
-      fill_in I18n.t("inspector_companies.forms.postal_code"), with: "TE5 7ST"
-      fill_in I18n.t("inspector_companies.forms.country"), with: "UK"
-      check I18n.t("inspector_companies.forms.active")
-      fill_in I18n.t("inspector_companies.forms.notes"), with: "Admin notes for this company"
+      fill_in_form :inspector_companies, :name, "Test Inspection Company"
+      fill_in_form :inspector_companies, :email, "contact@testcompany.com"
+      fill_in_form :inspector_companies, :phone, "01234 567890"
+      fill_in_form :inspector_companies, :address, "123 Test Street\nTest City"
+      fill_in_form :inspector_companies, :city, "Test City"
+      fill_in_form :inspector_companies, :postal_code, "TE5 7ST"
+      fill_in_form :inspector_companies, :country, "UK"
+      check_form :inspector_companies, :active
+      fill_in_form :inspector_companies, :notes, "Admin notes for this company"
 
-      click_button I18n.t("inspector_companies.buttons.create")
+      submit_form :inspector_companies
 
       expect(page).to have_content(I18n.t("inspector_companies.messages.created"))
       expect(page).to have_content("Test Inspection Company")
@@ -42,12 +42,12 @@ RSpec.feature "Inspector Company Management", type: :feature do
       visit edit_inspector_company_path(company)
 
       expect(page).to have_content(I18n.t("inspector_companies.titles.edit"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.name"), with: "Original Company")
+      expect(page).to have_field(I18n.t("forms.inspector_companies.fields.name"), with: "Original Company")
 
-      fill_in I18n.t("inspector_companies.forms.name"), with: "Updated Company Name"
-      fill_in I18n.t("inspector_companies.forms.email"), with: "updated@example.com"
+      fill_in_form :inspector_companies, :name, "Updated Company Name"
+      fill_in_form :inspector_companies, :email, "updated@example.com"
 
-      click_button I18n.t("inspector_companies.buttons.update")
+      submit_form :inspector_companies
 
       # Should show success message and redirect to show page
       expect(page).to have_content(I18n.t("inspector_companies.messages.updated"))
@@ -64,14 +64,14 @@ RSpec.feature "Inspector Company Management", type: :feature do
 
       visit edit_inspector_company_path(company)
 
-      fill_in I18n.t("inspector_companies.forms.name"), with: ""
-      fill_in I18n.t("inspector_companies.forms.phone"), with: ""
+      fill_in_form :inspector_companies, :name, ""
+      fill_in_form :inspector_companies, :phone, ""
 
-      click_button I18n.t("inspector_companies.buttons.update")
+      submit_form :inspector_companies
 
       # Should show error message via Turbo without page reload
       expect(page).to have_content("can't be blank")
-      expect(page).to have_content("Could not save company")
+      expect_form_errors :inspector_companies, count: 2
 
       # Form should remain on edit page
       expect(page).to have_content(I18n.t("inspector_companies.titles.edit"))
@@ -80,14 +80,14 @@ RSpec.feature "Inspector Company Management", type: :feature do
     scenario "admin uploads company logo" do
       visit new_inspector_company_path
 
-      fill_in I18n.t("inspector_companies.forms.name"), with: "Logo Test Company"
-      fill_in I18n.t("inspector_companies.forms.phone"), with: "01234 567890"
-      fill_in I18n.t("inspector_companies.forms.address"), with: "Test Address"
+      fill_in_form :inspector_companies, :name, "Logo Test Company"
+      fill_in_form :inspector_companies, :phone, "01234 567890"
+      fill_in_form :inspector_companies, :address, "Test Address"
 
-      attach_file I18n.t("inspector_companies.forms.logo"),
+      attach_file I18n.t("forms.inspector_companies.fields.logo"),
         Rails.root.join("spec", "fixtures", "files", "test_image.jpg")
 
-      click_button I18n.t("inspector_companies.buttons.create")
+      submit_form :inspector_companies
 
       expect(page).to have_content(I18n.t("inspector_companies.messages.created"))
 
@@ -190,7 +190,7 @@ RSpec.feature "Inspector Company Management", type: :feature do
       visit new_inspector_company_path
 
       # Leave required fields blank
-      click_button I18n.t("inspector_companies.buttons.create")
+      submit_form :inspector_companies
 
       # Should show validation errors
       expect(page).to have_content("can't be blank")
@@ -201,13 +201,13 @@ RSpec.feature "Inspector Company Management", type: :feature do
       visit new_inspector_company_path
 
       # Country field should be pre-filled with UK
-      expect(page).to have_field(I18n.t("inspector_companies.forms.country"), with: "UK")
+      expect(page).to have_field(I18n.t("forms.inspector_companies.fields.country"), with: "UK")
 
-      fill_in I18n.t("inspector_companies.forms.name"), with: "UK Default Company"
-      fill_in I18n.t("inspector_companies.forms.phone"), with: "01234 567890"
-      fill_in I18n.t("inspector_companies.forms.address"), with: "Test Address"
+      fill_in_form :inspector_companies, :name, "UK Default Company"
+      fill_in_form :inspector_companies, :phone, "01234 567890"
+      fill_in_form :inspector_companies, :address, "Test Address"
 
-      click_button I18n.t("inspector_companies.buttons.create")
+      submit_form :inspector_companies
 
       company = InspectorCompany.find_by(name: "UK Default Company")
       expect(company.country).to eq("UK")
@@ -227,10 +227,10 @@ RSpec.feature "Inspector Company Management", type: :feature do
       expect(page).to have_content(I18n.t("inspector_companies.titles.new"))
 
       # Create company
-      fill_in I18n.t("inspector_companies.forms.name"), with: "Navigation Test Company"
-      fill_in I18n.t("inspector_companies.forms.phone"), with: "01234 567890"
-      fill_in I18n.t("inspector_companies.forms.address"), with: "Test Address"
-      click_button I18n.t("inspector_companies.buttons.create")
+      fill_in_form :inspector_companies, :name, "Navigation Test Company"
+      fill_in_form :inspector_companies, :phone, "01234 567890"
+      fill_in_form :inspector_companies, :address, "Test Address"
+      submit_form :inspector_companies
 
       # Should be on show page
       expect(page).to have_content("Navigation Test Company")
@@ -241,8 +241,8 @@ RSpec.feature "Inspector Company Management", type: :feature do
       expect(page).to have_content(I18n.t("inspector_companies.titles.edit"))
 
       # Update and verify we stay on edit page with success message
-      fill_in I18n.t("inspector_companies.forms.name"), with: "Updated Navigation Company"
-      click_button I18n.t("inspector_companies.buttons.update")
+      fill_in_form :inspector_companies, :name, "Updated Navigation Company"
+      submit_form :inspector_companies
 
       expect(page).to have_content(I18n.t("inspector_companies.messages.updated"))
       expect(page).to have_content("Updated Navigation Company")

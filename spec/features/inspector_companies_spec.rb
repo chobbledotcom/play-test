@@ -53,16 +53,16 @@ RSpec.describe "Inspector Companies", type: :feature do
       login_user_via_form(admin_user)
     end
 
-    context "with no additional companies" do
-      it "shows empty state when no extra companies exist" do
-        # Clear any existing companies except the admin user's company
-        InspectorCompany.where.not(id: admin_user.inspection_company.id).destroy_all
-
+    context "with only admin's company" do
+      it "shows the company list with minimal data" do
         visit inspector_companies_path
 
-        # Should show the admin user's company but indicate if no others exist
+        # Should show at least the admin user's company
         expect(page).to have_content(admin_user.inspection_company.name)
         expect(page).to have_button(I18n.t("inspector_companies.buttons.new_company"))
+
+        # Check the table exists
+        expect(page).to have_css("table")
       end
     end
 
@@ -118,41 +118,25 @@ RSpec.describe "Inspector Companies", type: :feature do
       visit new_inspector_company_path
 
       expect(page).to have_content(I18n.t("inspector_companies.titles.new"))
-      expect(page).to have_content(I18n.t("inspector_companies.headers.company_details"))
-      expect(page).to have_content(I18n.t("inspector_companies.headers.contact_information"))
-      expect(page).to have_content(I18n.t("inspector_companies.headers.company_status"))
 
-      expect(page).to have_field(I18n.t("inspector_companies.forms.name"))
-      # RPII field no longer exists at company level
-      expect(page).to have_field(I18n.t("inspector_companies.forms.email"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.phone"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.address"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.city"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.state"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.postal_code"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.country"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.active"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.notes"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.logo"))
-
-      expect(page).to have_button(I18n.t("inspector_companies.buttons.create"))
+      # Use our comprehensive form helper to verify all i18n is correct
+      expect_form_matches_i18n("forms.inspector_companies")
     end
 
     it "successfully creates a company with valid data" do
       visit new_inspector_company_path
 
-      fill_in I18n.t("inspector_companies.forms.name"), with: "Test Inspector Company"
-      # RPII numbers are now per-inspector, not per-company
-      fill_in I18n.t("inspector_companies.forms.email"), with: "test@example.com"
-      fill_in I18n.t("inspector_companies.forms.phone"), with: "01234567890"
-      fill_in I18n.t("inspector_companies.forms.address"), with: "123 Test Street"
-      fill_in I18n.t("inspector_companies.forms.city"), with: "Test City"
-      fill_in I18n.t("inspector_companies.forms.state"), with: "Test State"
-      fill_in I18n.t("inspector_companies.forms.postal_code"), with: "TE1 2ST"
-      check I18n.t("inspector_companies.forms.active")
-      fill_in I18n.t("inspector_companies.forms.notes"), with: "Test notes"
+      fill_in_form :inspector_companies, :name, "Test Inspector Company"
+      fill_in_form :inspector_companies, :email, "test@example.com"
+      fill_in_form :inspector_companies, :phone, "01234567890"
+      fill_in_form :inspector_companies, :address, "123 Test Street"
+      fill_in_form :inspector_companies, :city, "Test City"
+      fill_in_form :inspector_companies, :state, "Test State"
+      fill_in_form :inspector_companies, :postal_code, "TE1 2ST"
+      check_form :inspector_companies, :active
+      fill_in_form :inspector_companies, :notes, "Test notes"
 
-      click_button I18n.t("inspector_companies.buttons.create")
+      submit_form :inspector_companies
 
       expect(page).to have_current_path(%r{/inspector_companies/\w+})
       expect(page).to have_content(I18n.t("inspector_companies.messages.created"))
@@ -162,11 +146,10 @@ RSpec.describe "Inspector Companies", type: :feature do
     it "shows validation errors for missing required fields" do
       visit new_inspector_company_path
 
-      click_button I18n.t("inspector_companies.buttons.create")
+      submit_form :inspector_companies
 
-      expect(page).to have_content(I18n.t("inspector_companies.errors.header", count: 3))
+      expect_form_errors :inspector_companies, count: 3
       expect(page).to have_content("Name #{I18n.t("errors.messages.cant_be_blank")}")
-      # RPII validation is now at user level, not company level
       expect(page).to have_content("Phone #{I18n.t("errors.messages.cant_be_blank")}")
       expect(page).to have_content("Address #{I18n.t("errors.messages.cant_be_blank")}")
     end
@@ -210,18 +193,19 @@ RSpec.describe "Inspector Companies", type: :feature do
       visit edit_inspector_company_path(company)
 
       expect(page).to have_content(I18n.t("inspector_companies.titles.edit"))
-      expect(page).to have_field(I18n.t("inspector_companies.forms.name"), with: company.name)
-      # RPII field no longer exists at company level
-      expect(page).to have_button(I18n.t("inspector_companies.buttons.update"))
+      expect(page).to have_field(I18n.t("forms.inspector_companies.fields.name"), with: company.name)
+
+      # Use our comprehensive form helper to verify all i18n is correct
+      expect_form_matches_i18n("forms.inspector_companies")
     end
 
     it "successfully updates company data" do
       visit edit_inspector_company_path(company)
 
-      fill_in I18n.t("inspector_companies.forms.name"), with: "Updated Company Name"
-      fill_in I18n.t("inspector_companies.forms.phone"), with: "09876543210"
+      fill_in_form :inspector_companies, :name, "Updated Company Name"
+      fill_in_form :inspector_companies, :phone, "09876543210"
 
-      click_button I18n.t("inspector_companies.buttons.update")
+      submit_form :inspector_companies
 
       expect(page).to have_current_path(inspector_company_path(company))
       expect(page).to have_content(I18n.t("inspector_companies.messages.updated"))
@@ -234,20 +218,16 @@ RSpec.describe "Inspector Companies", type: :feature do
       login_user_via_form(admin_user)
     end
 
-    it "has proper form structure with fieldsets" do
+    it "has proper form structure with i18n" do
       visit new_inspector_company_path
 
-      expect(page).to have_css("fieldset")
-      expect(page).to have_css("fieldset legend", text: I18n.t("inspector_companies.headers.company_details"))
-      expect(page).to have_css("fieldset legend", text: I18n.t("inspector_companies.headers.contact_information"))
-      expect(page).to have_css("fieldset legend", text: I18n.t("inspector_companies.headers.company_status"))
+      expect_form_matches_i18n("forms.inspector_companies")
     end
 
     it "has required attributes on mandatory fields" do
       visit new_inspector_company_path
 
       expect(find_field(I18n.t("inspector_companies.forms.name"))["required"]).to eq("required")
-      # RPII field validation now at user level
       expect(find_field(I18n.t("inspector_companies.forms.phone"))["required"]).to eq("required")
       expect(find_field(I18n.t("inspector_companies.forms.address"))["required"]).to eq("required")
     end

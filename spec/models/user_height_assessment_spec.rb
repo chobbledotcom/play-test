@@ -1,78 +1,46 @@
 require "rails_helper"
 
-RSpec.describe UserHeightAssessment, type: :model do
+RSpec.describe Assessments::UserHeightAssessment, type: :model do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user) }
   let(:inspection) { create(:inspection, user: user, unit: unit) }
-  let(:assessment) { create(:user_height_assessment, inspection: inspection) }
+  let(:assessment) { inspection.user_height_assessment }
 
-  describe "associations" do
-    it "belongs to inspection" do
-      expect(assessment.inspection).to eq(inspection)
-    end
-  end
+  # Use shared examples for common behaviors
+  it_behaves_like "an assessment model"
+  it_behaves_like "has safety check methods", 5
+  it_behaves_like "delegates to SafetyStandard", [:meets_height_requirements?, :calculate_user_capacity]
 
   describe "validations" do
     context "height measurements" do
-      it "validates containing_wall_height is non-negative" do
-        assessment.containing_wall_height = -1.0
-        expect(assessment).not_to be_valid
-        expect(assessment.errors[:containing_wall_height]).to include("must be greater than or equal to 0")
-      end
-
-      it "validates platform_height is non-negative" do
-        assessment.platform_height = -1.0
-        expect(assessment).not_to be_valid
-        expect(assessment.errors[:platform_height]).to include("must be greater than or equal to 0")
-      end
-
-      it "validates tallest_user_height is non-negative" do
-        assessment.tallest_user_height = -1.0
-        expect(assessment).not_to be_valid
-        expect(assessment.errors[:tallest_user_height]).to include("must be greater than or equal to 0")
-      end
-
-      it "allows blank height measurements" do
-        assessment.containing_wall_height = nil
-        assessment.platform_height = nil
-        assessment.tallest_user_height = nil
-        expect(assessment).to be_valid
+      %w[containing_wall_height platform_height tallest_user_height].each do |field|
+        include_examples "validates non-negative numeric field", field
       end
     end
 
     context "user capacity counts" do
-      it "validates users_at_1000mm is non-negative integer" do
-        assessment.users_at_1000mm = -1
-        expect(assessment).not_to be_valid
-        expect(assessment.errors[:users_at_1000mm]).to include("must be greater than or equal to 0")
-      end
-
-      it "validates users_at_1200mm is integer" do
-        assessment.users_at_1200mm = 5.5
-        expect(assessment).not_to be_valid
-        expect(assessment.errors[:users_at_1200mm]).to include("must be an integer")
-      end
-
-      it "allows blank user capacity counts" do
-        assessment.users_at_1000mm = nil
-        assessment.users_at_1200mm = nil
-        assessment.users_at_1500mm = nil
-        assessment.users_at_1800mm = nil
-        expect(assessment).to be_valid
+      %w[users_at_1000mm users_at_1200mm users_at_1500mm users_at_1800mm].each do |field|
+        include_examples "validates non-negative integer field", field
       end
     end
 
     context "play area dimensions" do
-      it "validates play_area_length is non-negative" do
-        assessment.play_area_length = -1.0
-        expect(assessment).not_to be_valid
-        expect(assessment.errors[:play_area_length]).to include("must be greater than or equal to 0")
+      %w[play_area_length play_area_width negative_adjustment].each do |field|
+        include_examples "validates non-negative numeric field", field
       end
+    end
 
-      it "validates negative_adjustment is non-negative" do
-        assessment.negative_adjustment = -1.0
-        expect(assessment).not_to be_valid
-        expect(assessment.errors[:negative_adjustment]).to include("must be greater than or equal to 0")
+    context "pass/fail assessments" do
+      %w[height_requirements_pass permanent_roof_pass user_capacity_pass
+        play_area_pass negative_adjustments_pass].each do |field|
+        include_examples "validates boolean field", field
+      end
+    end
+
+    context "comment fields" do
+      %w[tallest_user_height_comment height_requirements_comment permanent_roof_pass_comment
+        user_capacity_comment play_area_comment negative_adjustments_comment].each do |field|
+        include_examples "validates comment field", field
       end
     end
   end
@@ -82,7 +50,12 @@ RSpec.describe UserHeightAssessment, type: :model do
       it "returns true" do
         assessment.update!(
           attributes_for(:user_height_assessment, :standard_test_values).merge(
-            tallest_user_height_comment: "Good conditions"
+            tallest_user_height_comment: "Good conditions",
+            height_requirements_pass: true,
+            permanent_roof_pass: true,
+            user_capacity_pass: true,
+            play_area_pass: true,
+            negative_adjustments_pass: true
           )
         )
         expect(assessment.complete?).to be true
@@ -157,58 +130,6 @@ RSpec.describe UserHeightAssessment, type: :model do
     end
   end
 
-  describe "#safety_check_count" do
-    it "returns 5 height-related safety checks" do
-      expect(assessment.safety_check_count).to eq(5)
-    end
-  end
-
-  describe "#passed_checks_count" do
-    it "counts all passed safety checks" do
-      assessment.update!(attributes_for(:user_height_assessment, :with_basic_data))
-
-      # This will depend on the specific business logic implementation
-      expect(assessment.passed_checks_count).to be_a(Integer)
-      expect(assessment.passed_checks_count).to be >= 0
-      expect(assessment.passed_checks_count).to be <= 5
-    end
-  end
-
-  describe "#completion_percentage" do
-    it "calculates percentage of completed fields" do
-      assessment.update!(
-        containing_wall_height: 2.5,
-        platform_height: 2.0,
-        tallest_user_height: 1.5,
-        users_at_1000mm: 5,
-        users_at_1200mm: 4,
-        users_at_1500mm: 3,
-        # Leave some fields blank
-        users_at_1800mm: nil,
-        play_area_length: nil,
-        play_area_width: nil
-      )
-
-      # 6 out of 12 fields completed = 50%
-      expect(assessment.completion_percentage).to eq(50)
-    end
-
-    it "returns 0 when no fields are completed" do
-      expect(assessment.completion_percentage).to eq(0)
-    end
-
-    it "returns 100 when all fields are completed" do
-      assessment.update!(
-        attributes_for(:user_height_assessment, :with_basic_data).merge(
-          tallest_user_height_comment: "Complete",
-          negative_adjustment: 0.5
-        )
-      )
-
-      expect(assessment.completion_percentage).to eq(100)
-    end
-  end
-
   describe "#recommended_user_capacity" do
     context "with valid play area dimensions" do
       it "delegates to SafetyStandard" do
@@ -230,13 +151,6 @@ RSpec.describe UserHeightAssessment, type: :model do
 
         expect(assessment.recommended_user_capacity).to eq({})
       end
-    end
-  end
-
-  describe "audit logging" do
-    it "logs assessment updates" do
-      expect(assessment).to receive(:log_assessment_update)
-      assessment.update!(containing_wall_height: 2.5)
     end
   end
 

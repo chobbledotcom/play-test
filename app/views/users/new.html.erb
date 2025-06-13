@@ -1,9 +1,5 @@
-<%= render 'shared/page_header', title: t('users.titles.register') %>
-
-<%= form_with(model: @user, url: signup_path) do |form| %>
-  <%= render 'form/errors', model: @user %>
-
-  <%= render 'form/fieldset', legend_key: 'account_details', i18n_base: 'users.forms', form: form do %>
+<%= render 'form/form_context', model: @user, i18n_base: 'forms.user_new', url: signup_path do |form| %>
+  <%= render 'form/fieldset', legend_key: 'account_details' do %>
     <%= render 'form/text_field', 
         field: :email, 
         type: :email_field,
@@ -27,7 +23,4 @@
         type: :password_field,
         required: true %>
   <% end %>
-
-  <%= render 'form/submit_button',
-      text: t('users.buttons.register') %>
 <% end %>

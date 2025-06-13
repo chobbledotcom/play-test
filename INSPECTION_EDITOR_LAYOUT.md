@@ -38,14 +38,14 @@ Judgement can be used here, but must be cautious considering over-loading and ev
 
 # Slide (if slide)
 
-- Slide platform height (m)
-- Containing wall height (m)
-- First metre of slide containing wall height (m)
-- Remaining slide containing wall height (m)
-- Permanent roof fitted to top of slide?
-- Steps / clamber netting
-- Slide run out (m)
-- Slip sheet integrity
+- number_comment: Slide platform height (m)
+- number_comment: Containing wall height (m)
+- number_comment: First metre of slide containing wall height (m)
+- number_comment: Remaining slide containing wall height (m)
+- boolean_comment: Permanent roof fitted to top of slide?
+- pass_fail_comment: Steps / clamber netting
+- number_pass_fail_comment: Slide run out (m)
+- pass_fail_field: Slip sheet integrity
 
 # Structure
 
@@ -80,7 +80,7 @@ Judgement can be used here, but must be cautious considering over-loading and ev
   - Anchors permanently closed and metal
   - Pull strength test
 
-# Totally Enclosed
+# Totally Enclosed !
 
 - with pass/fail:
   - Number of exits (count)

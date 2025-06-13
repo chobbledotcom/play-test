@@ -1,62 +1,34 @@
 require "rails_helper"
 
-RSpec.describe AnchorageAssessment, type: :model do
+RSpec.describe Assessments::AnchorageAssessment, type: :model do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user) }
   let(:inspection) { create(:inspection, user: user, unit: unit) }
-  let(:assessment) { create(:anchorage_assessment, inspection: inspection) }
+  let(:assessment) { inspection.anchorage_assessment }
 
-  describe "associations" do
-    it "belongs to inspection" do
-      expect(assessment.inspection).to eq(inspection)
-    end
-  end
+  # Use shared examples for common behaviors
+  it_behaves_like "an assessment model"
+  it_behaves_like "has safety check methods", 5
+  it_behaves_like "delegates to SafetyStandard", [:calculate_required_anchors]
 
   describe "validations" do
     context "anchor counts" do
-      %w[num_low_anchors num_high_anchors].each do |count_field|
-        it "validates #{count_field} is non-negative integer" do
-          assessment.send("#{count_field}=", -1)
-          expect(assessment).not_to be_valid
-          expect(assessment.errors[count_field.to_sym]).to include("must be greater than or equal to 0")
-        end
-
-        it "validates #{count_field} is integer" do
-          assessment.send("#{count_field}=", 5.5)
-          expect(assessment).not_to be_valid
-          expect(assessment.errors[count_field.to_sym]).to include("must be an integer")
-        end
-
-        it "allows blank #{count_field}" do
-          assessment.send("#{count_field}=", nil)
-          expect(assessment).to be_valid
-        end
+      %w[num_low_anchors num_high_anchors].each do |field|
+        include_examples "validates non-negative integer field", field
       end
     end
 
     context "pass/fail assessments" do
       %w[num_anchors_pass anchor_accessories_pass anchor_degree_pass
-        anchor_type_pass pull_strength_pass].each do |check|
-        it "validates #{check} inclusion" do
-          assessment.send("#{check}=", "not_a_boolean")
-          assessment.valid?
-          # Note: Rails converts strings to boolean, so this tests the validation message format
-          # The validation allows true/false/nil, which covers the converted boolean values
-          expect(assessment).to be_valid # String gets converted to true, which is allowed
-        end
+        anchor_type_pass pull_strength_pass].each do |field|
+        include_examples "validates boolean field", field
+      end
+    end
 
-        it "allows nil for #{check}" do
-          assessment.send("#{check}=", nil)
-          expect(assessment).to be_valid
-        end
-
-        it "allows true/false for #{check}" do
-          assessment.send("#{check}=", true)
-          expect(assessment).to be_valid
-
-          assessment.send("#{check}=", false)
-          expect(assessment).to be_valid
-        end
+    context "comment fields" do
+      %w[num_anchors_comment anchor_accessories_comment anchor_degree_comment
+        anchor_type_comment pull_strength_comment].each do |field|
+        include_examples "validates comment field", field
       end
     end
   end
@@ -105,6 +77,8 @@ RSpec.describe AnchorageAssessment, type: :model do
   describe "#meets_anchor_requirements?" do
     context "with valid data" do
       it "delegates to SafetyStandard when data is present" do
+        assessment.inspection.width = 10.0
+        assessment.inspection.height = 10.0
         assessment.num_low_anchors = 4
         assessment.num_high_anchors = 4
 
@@ -113,6 +87,8 @@ RSpec.describe AnchorageAssessment, type: :model do
       end
 
       it "returns false when anchors are insufficient" do
+        assessment.inspection.width = 10.0
+        assessment.inspection.height = 10.0
         assessment.num_low_anchors = 2
         assessment.num_high_anchors = 2
 
@@ -188,6 +164,7 @@ RSpec.describe AnchorageAssessment, type: :model do
 
   describe "#required_anchors" do
     it "delegates to SafetyStandard when area is present" do
+      inspection.update!(width: 10.0, height: 10.0) # Creates area of 100.0
       expect(SafetyStandard).to receive(:calculate_required_anchors).with(100.0).and_return(8)
       expect(assessment.required_anchors).to eq(8)
     end
@@ -214,77 +191,6 @@ RSpec.describe AnchorageAssessment, type: :model do
       allow(assessment).to receive(:meets_anchor_requirements?).and_return(false)
       allow(assessment).to receive(:required_anchors).and_return(8)
       expect(assessment.anchor_compliance_status).to eq("Non-Compliant (Requires 8 total anchors, has 4)")
-    end
-  end
-
-  describe "#safety_check_count" do
-    it "returns 5 anchor-related safety checks" do
-      expect(assessment.safety_check_count).to eq(5)
-    end
-  end
-
-  describe "#passed_checks_count" do
-    it "counts all passed safety checks" do
-      assessment.update!(
-        num_anchors_pass: true,
-        anchor_accessories_pass: false,
-        anchor_degree_pass: true,
-        anchor_type_pass: true,
-        pull_strength_pass: false
-      )
-      expect(assessment.passed_checks_count).to eq(3)
-    end
-
-    it "returns 0 when no checks are passed" do
-      assessment.update!(
-        num_anchors_pass: false,
-        anchor_accessories_pass: false,
-        anchor_degree_pass: false,
-        anchor_type_pass: false,
-        pull_strength_pass: false
-      )
-      expect(assessment.passed_checks_count).to eq(0)
-    end
-
-    it "handles nil values" do
-      assessment.update!(
-        num_anchors_pass: true,
-        anchor_accessories_pass: nil,
-        anchor_degree_pass: true,
-        anchor_type_pass: false,
-        pull_strength_pass: nil
-      )
-      expect(assessment.passed_checks_count).to eq(2)
-    end
-  end
-
-  describe "#completion_percentage" do
-    it "calculates percentage of completed fields" do
-      assessment.update!(
-        num_low_anchors: 4,
-        num_high_anchors: 4,
-        num_anchors_pass: true,
-        anchor_accessories_pass: true,
-        anchor_degree_pass: true,
-        anchor_type_pass: true,
-        pull_strength_pass: true
-      )
-      expect(assessment.completion_percentage).to eq(100)
-    end
-
-    it "returns 0 when no fields are completed" do
-      expect(assessment.completion_percentage).to eq(0)
-    end
-
-    it "calculates partial completion correctly" do
-      assessment.update!(
-        num_low_anchors: 4,
-        num_high_anchors: 4,
-        num_anchors_pass: true,
-        anchor_accessories_pass: true
-        # 4 out of 7 fields = 57% (rounded)
-      )
-      expect(assessment.completion_percentage).to eq(57)
     end
   end
 
@@ -347,19 +253,6 @@ RSpec.describe AnchorageAssessment, type: :model do
   end
 
   describe "callbacks" do
-    describe "after_update :log_assessment_update" do
-      it "logs assessment updates when changes are made" do
-        expect(assessment).to receive(:log_assessment_update)
-        assessment.update!(num_low_anchors: 5)
-      end
-
-      it "does not log when no changes are made" do
-        assessment.update!(num_low_anchors: 5)
-        expect(assessment).not_to receive(:log_assessment_update)
-        assessment.save
-      end
-    end
-
     describe "after_save :update_anchor_calculations" do
       it "triggers anchor calculations when anchor counts change" do
         expect(assessment).to receive(:update_anchor_calculations)
@@ -367,6 +260,7 @@ RSpec.describe AnchorageAssessment, type: :model do
       end
 
       it "auto-updates num_anchors_pass based on calculations" do
+        inspection.update!(width: 10.0, height: 10.0) # Creates area of 100.0
         assessment.update!(num_low_anchors: 5, num_high_anchors: 5)
         allow(SafetyStandard).to receive(:calculate_required_anchors).with(100.0).and_return(8)
 
@@ -432,17 +326,6 @@ RSpec.describe AnchorageAssessment, type: :model do
     end
   end
 
-  describe "audit logging" do
-    it "logs assessment updates" do
-      expect(assessment.inspection).to receive(:log_audit_action).with(
-        "assessment_updated",
-        assessment.inspection.user,
-        "Anchorage Assessment updated"
-      )
-      assessment.update!(num_low_anchors: 5)
-    end
-  end
-
   describe "edge cases" do
     it "handles zero anchor counts" do
       assessment.update!(num_low_anchors: 0, num_high_anchors: 0)
@@ -469,9 +352,9 @@ RSpec.describe AnchorageAssessment, type: :model do
     end
 
     it "handles very large unit areas" do
-      large_unit = create(:unit, user: user, name: "Large Unit", serial: "LARGE001", manufacturer: "Test Manufacturer", length: 50.0, width: 30.0, height: 5.0, description: "Large Unit", has_slide: false, owner: "Test Owner")
-      large_inspection = create(:inspection, user: user, unit: large_unit)
-      large_assessment = create(:anchorage_assessment, inspection: large_inspection)
+      large_unit = create(:unit, user: user, name: "Large Unit", serial: "LARGE001", manufacturer: "Test Manufacturer", description: "Large Unit", owner: "Test Owner")
+      large_inspection = create(:inspection, user: user, unit: large_unit, width: 50.0, length: 30.0, height: 5.0)
+      large_assessment = large_inspection.anchorage_assessment
 
       large_assessment.update!(num_low_anchors: 5, num_high_anchors: 3)
       expect(large_assessment.meets_anchor_requirements?).to be false  # 8 anchors not enough for 1500 sqm

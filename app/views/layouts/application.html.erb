@@ -24,43 +24,15 @@
       <% end %>
       <nav>
         <ul>
-          <li>
-            <%= link_to inspections_path do %>
-              <strong>Inspections</strong>
-            <% end %>
-          </li>
-          <li>
-            <%= link_to units_path do %>
-              <strong>Units</strong>
-            <% end %>
-          </li>
+          <li><%= nav_link_to "Inspections", inspections_path %></li>
+          <li><%= nav_link_to "Units", units_path %></li>
           <% if current_user.admin? %>
-            <li>
-              <%= link_to users_path do %>
-                <strong>Users</strong>
-              <% end %>
-            </li>
-            <li>
-              <%= link_to inspector_companies_path do %>
-                <strong><%= t('inspector_companies.titles.index') %></strong>
-              <% end %>
-            </li>
+            <li><%= nav_link_to "Users", users_path %></li>
+            <li><%= nav_link_to t('inspector_companies.titles.index'), inspector_companies_path %></li>
           <% end %>
-          <li>
-            <%= link_to change_settings_user_path(current_user) do %>
-              <strong>Settings</strong>
-            <% end %>
-          </li>
-          <li>
-            <%= link_to safety_standards_path do %>
-              <strong>Safety Standards</strong>
-            <% end %>
-          </li>
-          <li>
-            <%= link_to about_path do %>
-              <strong>About</strong>
-            <% end %>
-          </li>
+          <li><%= nav_link_to "Settings", change_settings_user_path(current_user) %></li>
+          <li><%= nav_link_to "Safety Standards", safety_standards_path %></li>
+          <li><%= nav_link_to "About", about_path %></li>
           <li>
             <%= button_to t("sessions.buttons.log_out"), logout_path, method: :delete %>
           </li>

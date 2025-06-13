@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_12_000335) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_13_075220) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -65,8 +65,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_12_000335) do
     t.integer "exit_number"
     t.boolean "exit_number_pass"
     t.text "exit_number_comment"
-    t.boolean "exit_visible_pass"
-    t.text "exit_visible_comment"
+    t.boolean "exit_sign_always_visible_pass"
+    t.text "exit_sign_always_visible_comment"
+    t.boolean "exit_sign_visible_pass"
+    t.text "exit_sign_visible_comment"
     t.index ["inspection_id"], name: "index_enclosed_assessments_on_inspection_id"
   end
 
@@ -74,7 +76,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_12_000335) do
     t.string "inspection_id", limit: 12, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "fan_size_comment"
+    t.text "fan_size_type"
     t.boolean "blower_flap_pass"
     t.text "blower_flap_comment"
     t.boolean "blower_finger_pass"
@@ -106,56 +108,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_12_000335) do
     t.decimal "width", precision: 8, scale: 2
     t.decimal "length", precision: 8, scale: 2
     t.decimal "height", precision: 8, scale: 2
-    t.integer "num_low_anchors"
-    t.integer "num_high_anchors"
-    t.integer "exit_number"
-    t.decimal "rope_size", precision: 8, scale: 2
-    t.decimal "slide_platform_height", precision: 8, scale: 2
-    t.decimal "slide_wall_height", precision: 8, scale: 2
-    t.decimal "runout_value", precision: 8, scale: 2
-    t.decimal "slide_first_metre_height", precision: 8, scale: 2
-    t.decimal "slide_beyond_first_metre_height", precision: 8, scale: 2
-    t.decimal "stitch_length", precision: 8, scale: 2
-    t.decimal "evacuation_time", precision: 8, scale: 2
-    t.decimal "unit_pressure_value", precision: 8, scale: 2
-    t.decimal "blower_tube_length", precision: 8, scale: 2
-    t.decimal "step_size_value", precision: 8, scale: 2
-    t.decimal "fall_off_height_value", precision: 8, scale: 2
-    t.decimal "trough_depth_value", precision: 8, scale: 2
-    t.decimal "trough_width_value", precision: 8, scale: 2
-    t.decimal "containing_wall_height", precision: 8, scale: 2
-    t.decimal "platform_height", precision: 8, scale: 2
-    t.decimal "tallest_user_height", precision: 8, scale: 2
-    t.integer "users_at_1000mm"
-    t.integer "users_at_1200mm"
-    t.integer "users_at_1500mm"
-    t.integer "users_at_1800mm"
-    t.decimal "play_area_length", precision: 8, scale: 2
-    t.decimal "play_area_width", precision: 8, scale: 2
-    t.decimal "negative_adjustment", precision: 8, scale: 2
-    t.boolean "slide_permanent_roof"
-    t.boolean "permanent_roof"
     t.boolean "has_slide", default: false, null: false
     t.boolean "is_totally_enclosed", default: false, null: false
     t.string "width_comment", limit: 1000
     t.string "length_comment", limit: 1000
     t.string "height_comment", limit: 1000
-    t.string "num_low_anchors_comment", limit: 1000
-    t.string "num_high_anchors_comment", limit: 1000
-    t.string "rope_size_comment", limit: 1000
-    t.string "slide_platform_height_comment", limit: 1000
-    t.string "slide_wall_height_comment", limit: 1000
-    t.string "runout_value_comment", limit: 1000
-    t.string "slide_first_metre_height_comment", limit: 1000
-    t.string "slide_beyond_first_metre_height_comment", limit: 1000
-    t.string "slide_permanent_roof_comment", limit: 1000
-    t.string "containing_wall_height_comment", limit: 1000
-    t.string "platform_height_comment", limit: 1000
-    t.string "permanent_roof_comment", limit: 1000
-    t.string "play_area_length_comment", limit: 1000
-    t.string "play_area_width_comment", limit: 1000
-    t.string "negative_adjustment_comment", limit: 1000
-    t.string "exit_number_comment", limit: 1000
     t.decimal "step_ramp_size"
     t.boolean "step_ramp_size_pass"
     t.decimal "critical_fall_off_height"
@@ -164,16 +121,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_12_000335) do
     t.boolean "unit_pressure_pass"
     t.decimal "trough_depth"
     t.decimal "trough_adjacent_panel_width"
-    t.boolean "trough_pass"
-    t.boolean "entrapment_pass"
-    t.boolean "markings_id_pass"
-    t.boolean "grounding_pass"
-    t.boolean "clamber_netting_pass"
-    t.boolean "retention_netting_pass"
-    t.boolean "zips_pass"
-    t.boolean "windows_pass"
-    t.boolean "artwork_pass"
-    t.boolean "exit_sign_visible_pass"
     t.text "risk_assessment"
     t.datetime "complete_date"
     t.boolean "is_seed", default: false, null: false
@@ -201,26 +148,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_12_000335) do
 
   create_table "materials_assessments", force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
-    t.decimal "rope_size", precision: 8, scale: 2
-    t.boolean "rope_size_pass"
-    t.boolean "clamber_pass"
+    t.decimal "ropes", precision: 8, scale: 2
+    t.boolean "ropes_pass"
+    t.boolean "clamber_netting_pass"
     t.boolean "retention_netting_pass"
     t.boolean "zips_pass"
     t.boolean "windows_pass"
     t.boolean "artwork_pass"
     t.boolean "thread_pass"
-    t.boolean "fabric_pass"
+    t.boolean "fabric_strength_pass"
     t.boolean "fire_retardant_pass"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "rope_size_comment"
-    t.text "clamber_comment"
+    t.text "ropes_comment"
+    t.text "clamber_netting_comment"
     t.text "retention_netting_comment"
     t.text "zips_comment"
     t.text "windows_comment"
     t.text "artwork_comment"
     t.text "thread_comment"
-    t.text "fabric_comment"
+    t.text "fabric_strength_comment"
     t.text "fire_retardant_comment"
     t.string "marking_comment", limit: 1000
     t.string "instructions_comment", limit: 1000
@@ -234,7 +181,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_12_000335) do
     t.string "inspection_id", limit: 12, null: false
     t.decimal "slide_platform_height", precision: 8, scale: 2
     t.decimal "slide_wall_height", precision: 8, scale: 2
-    t.decimal "runout_value", precision: 8, scale: 2
+    t.decimal "runout", precision: 8, scale: 2
     t.decimal "slide_first_metre_height", precision: 8, scale: 2
     t.decimal "slide_beyond_first_metre_height", precision: 8, scale: 2
     t.boolean "clamber_netting_pass"
@@ -312,81 +259,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_12_000335) do
 
   create_table "units", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.string "name"
-    t.string "serial"
     t.string "user_id", limit: 12, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "manufacturer"
     t.string "description"
     t.string "owner"
-    t.string "serial_number"
-    t.decimal "width", precision: 8, scale: 2
-    t.decimal "length", precision: 8, scale: 2
-    t.decimal "height", precision: 8, scale: 2
     t.text "notes"
     t.string "model"
     t.date "manufacture_date"
-    t.string "condition"
-    t.integer "num_low_anchors"
-    t.integer "num_high_anchors"
-    t.integer "exit_number"
-    t.decimal "rope_size", precision: 8, scale: 2
-    t.decimal "slide_platform_height", precision: 8, scale: 2
-    t.decimal "slide_wall_height", precision: 8, scale: 2
-    t.decimal "runout_value", precision: 8, scale: 2
-    t.decimal "slide_first_metre_height", precision: 8, scale: 2
-    t.decimal "slide_beyond_first_metre_height", precision: 8, scale: 2
-    t.decimal "stitch_length", precision: 8, scale: 2
-    t.decimal "evacuation_time", precision: 8, scale: 2
-    t.decimal "unit_pressure_value", precision: 8, scale: 2
-    t.decimal "blower_tube_length", precision: 8, scale: 2
-    t.decimal "step_size_value", precision: 8, scale: 2
-    t.decimal "fall_off_height_value", precision: 8, scale: 2
-    t.decimal "trough_depth_value", precision: 8, scale: 2
-    t.decimal "trough_width_value", precision: 8, scale: 2
-    t.decimal "containing_wall_height", precision: 8, scale: 2
-    t.decimal "platform_height", precision: 8, scale: 2
-    t.decimal "tallest_user_height", precision: 8, scale: 2
-    t.integer "users_at_1000mm"
-    t.integer "users_at_1200mm"
-    t.integer "users_at_1500mm"
-    t.integer "users_at_1800mm"
-    t.decimal "play_area_length", precision: 8, scale: 2
-    t.decimal "play_area_width", precision: 8, scale: 2
-    t.decimal "negative_adjustment", precision: 8, scale: 2
-    t.boolean "slide_permanent_roof"
-    t.boolean "permanent_roof"
-    t.boolean "is_totally_enclosed", default: false
-    t.boolean "has_slide", default: false, null: false
-    t.string "width_comment", limit: 1000
-    t.string "length_comment", limit: 1000
-    t.string "height_comment", limit: 1000
-    t.string "num_low_anchors_comment", limit: 1000
-    t.string "num_high_anchors_comment", limit: 1000
-    t.string "rope_size_comment", limit: 1000
-    t.string "slide_platform_height_comment", limit: 1000
-    t.string "slide_wall_height_comment", limit: 1000
-    t.string "runout_value_comment", limit: 1000
-    t.string "slide_first_metre_height_comment", limit: 1000
-    t.string "slide_beyond_first_metre_height_comment", limit: 1000
-    t.string "slide_permanent_roof_comment", limit: 1000
-    t.string "containing_wall_height_comment", limit: 1000
-    t.string "platform_height_comment", limit: 1000
-    t.string "permanent_roof_comment", limit: 1000
-    t.string "play_area_length_comment", limit: 1000
-    t.string "play_area_width_comment", limit: 1000
-    t.string "negative_adjustment_comment", limit: 1000
-    t.string "exit_number_comment", limit: 1000
-    t.decimal "step_ramp_size"
-    t.decimal "critical_fall_off_height"
-    t.decimal "unit_pressure"
-    t.decimal "trough_depth"
-    t.decimal "trough_adjacent_panel_width"
-    t.text "risk_assessment"
     t.boolean "is_seed", default: false, null: false
+    t.string "serial"
     t.index ["is_seed"], name: "index_units_on_is_seed"
-    t.index ["manufacturer", "serial_number"], name: "index_units_on_manufacturer_and_serial_number", unique: true
-    t.index ["serial"], name: "index_units_on_serial"
+    t.index ["manufacturer", "serial"], name: "index_units_on_manufacturer_and_serial", unique: true
     t.index ["user_id"], name: "index_units_on_user_id"
   end
 
@@ -412,6 +297,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_12_000335) do
     t.text "play_area_width_comment"
     t.text "negative_adjustment_comment"
     t.text "permanent_roof_comment"
+    t.boolean "height_requirements_pass"
+    t.boolean "permanent_roof_pass"
+    t.boolean "user_capacity_pass"
+    t.boolean "play_area_pass"
+    t.boolean "negative_adjustments_pass"
+    t.text "height_requirements_comment"
+    t.text "permanent_roof_pass_comment"
+    t.text "user_capacity_comment"
+    t.text "play_area_comment"
+    t.text "negative_adjustments_comment"
     t.index ["inspection_id"], name: "index_user_height_assessments_on_inspection_id"
   end
 
@@ -421,7 +316,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_12_000335) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "last_active_at"
-    t.string "time_display", default: "date"
     t.string "inspection_company_id"
     t.string "default_inspection_location"
     t.string "theme", default: "light"

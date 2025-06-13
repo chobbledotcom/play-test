@@ -71,15 +71,11 @@ RSpec.describe "Units PDF Generation", type: :request do
   describe "PDF download integration" do
     it "allows downloading PDF through direct link" do
       # Visit the report URL directly
-      page.driver.browser.get("/units/#{unit.id}.pdf")
-
-      # Check that it's a PDF response
-      expect(page.driver.response.headers["Content-Type"]).to include("application/pdf")
-      expect(page.driver.response.body[0..3]).to eq("%PDF")
+      pdf_data = get_pdf("/units/#{unit.id}.pdf")
     end
 
     it "sets proper filename for PDF download" do
-      page.driver.browser.get("/units/#{unit.id}.pdf")
+      get_pdf("/units/#{unit.id}.pdf")
 
       content_disposition = page.driver.response.headers["Content-Disposition"]
       expect(content_disposition).to include("#{unit.serial}.pdf")

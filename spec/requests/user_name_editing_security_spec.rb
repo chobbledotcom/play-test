@@ -11,7 +11,6 @@ RSpec.describe "User Name Editing Security", type: :request do
       patch update_settings_user_path(regular_user), params: {
         user: {
           name: "Hacked Name",
-          time_display: "time",
           default_inspection_location: "Test Location"
         }
       }
@@ -20,7 +19,6 @@ RSpec.describe "User Name Editing Security", type: :request do
       # Name should not have changed due to controller parameter restrictions
       expect(regular_user.name).to eq("Original Name")
       # But allowed fields should have changed
-      expect(regular_user.time_display).to eq("time")
       expect(regular_user.default_inspection_location).to eq("Test Location")
     end
 

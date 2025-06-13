@@ -10,7 +10,7 @@ RSpec.describe "Public Access Control", type: :request do
   describe "Public pages (should be accessible without login)" do
     before do
       # Ensure we're not logged in
-      visit logout_path if page.has_button?(I18n.t("sessions.buttons.logout"))
+      visit logout_path if page.has_button?(I18n.t("sessions.buttons.log_out"))
     end
 
     it "allows access to home page" do
@@ -121,7 +121,7 @@ RSpec.describe "Public Access Control", type: :request do
   describe "Protected pages (should redirect to login)" do
     before do
       # Ensure we're not logged in
-      visit logout_path if page.has_button?(I18n.t("sessions.buttons.logout"))
+      visit logout_path if page.has_button?(I18n.t("sessions.buttons.log_out"))
     end
 
     it "redirects inspections index to login" do
@@ -223,7 +223,7 @@ RSpec.describe "Public Access Control", type: :request do
   describe "Edge cases and security" do
     before do
       # Ensure we're not logged in
-      visit logout_path if page.has_button?(I18n.t("sessions.buttons.logout"))
+      visit logout_path if page.has_button?(I18n.t("sessions.buttons.log_out"))
     end
 
     it "returns 404 for non-existent inspection reports" do

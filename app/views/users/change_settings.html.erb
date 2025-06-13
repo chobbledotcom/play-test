@@ -1,14 +1,10 @@
 <%= render 'shared/page_header', title: t('users.titles.settings') %>
 
-<%= form_with model: @user,
+<%= render 'form/form_context', model: @user, i18n_base: 'forms.user_settings',
   url: update_settings_user_path(@user),
-  method: :patch,
-  local: false,
-  html: { data: { turbo_stream: true } } do |form|
-%>
-  <%= render 'form/errors', model: @user %>
+  method: :patch do |form| %>
 
-  <%= render 'form/fieldset', legend_key: 'contact_details', i18n_base: 'users.forms', form: form do %>
+  <%= render 'form/fieldset', legend_key: 'contact_details' do %>
     <% if @user.has_company? %>
       <%= render 'form/display_field', field: :name %>
       <%= render 'form/display_field', field: :phone %>
@@ -25,15 +21,7 @@
     <% end %>
   <% end %>
 
-  <%= render 'form/fieldset', legend_key: 'preferences', i18n_base: 'users.forms', form: form do %>
-    <%= render 'form/select',
-      field: :time_display,
-      options: options_for_select([
-        [t('users.options.time_full'), "time"],
-        [t('users.options.time_day'), "day"]
-      ], @user.time_display)
-    %>
-
+  <%= render 'form/fieldset', legend_key: 'preferences' do %>
     <%= render 'form/text_field', field: :default_inspection_location %>
 
     <%= render 'form/select',
@@ -44,8 +32,6 @@
       ], @user.theme)
     %>
   <% end %>
-
-  <%= render 'form/submit_button', text: t('users.buttons.update_settings') %>
 
   <!-- Save Message Display -->
   <div id="user_settings_save_message"></div>

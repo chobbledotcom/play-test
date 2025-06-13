@@ -30,7 +30,7 @@
 
     <!-- Completion Issues -->
     <%= turbo_frame_tag "completion_issues_#{@inspection.id}" do %>
-      <% if content = render('completion_issues', inspection: @inspection) and content.strip.present? %>
+      <% if content = render('inspections/completion_issues', inspection: @inspection) and content.strip.present? %>
         <%= content.html_safe %>
         <br>
       <% end %>
@@ -57,21 +57,21 @@
     <div class="tab-content">
       <% case current_tab %>
       <% when 'general' %>
-        <%= render 'form' %>
+        <%= render 'inspections/form' %>
       <% when 'user_height' %>
-        <%= render 'user_height_form' %>
+        <%= render 'inspections/user_height_form' %>
       <% when 'slide' %>
-        <%= render 'slide_form' %>
+        <%= render 'inspections/slide_form' %>
       <% when 'structure' %>
-        <%= render 'structure_form' %>
+        <%= render 'inspections/structure_form' %>
       <% when 'materials' %>
-        <%= render 'materials_form' %>
+        <%= render 'inspections/materials_form' %>
       <% when 'anchorage' %>
-        <%= render 'anchorage_form' %>
+        <%= render 'inspections/anchorage_form' %>
       <% when 'fan' %>
-        <%= render 'fan_form' %>
+        <%= render 'inspections/fan_form' %>
       <% when 'enclosed' %>
-        <%= render 'enclosed_form' %>
+        <%= render 'inspections/enclosed_form' %>
       <% else %>
         <div class="assessment-placeholder">
           <h3><%= t("inspections.tabs.#{current_tab}") %> Assessment</h3>

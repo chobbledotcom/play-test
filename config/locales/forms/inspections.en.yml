@@ -1,0 +1,25 @@
+en:
+  forms:
+    inspections:
+      header: "Inspection Details"
+      sections:
+        current_unit: "Current Unit"
+        public_information: "Public Information"
+        inspection_details: "Inspection Details"
+        inspection_results: "Inspection Results"
+      fields:
+        id: "Public Inspection ID"
+        inspection_location: "Inspection Location"
+        inspection_date: "Inspection Date"
+        reinspection_date: "Reinspection Date"
+        unique_report_number: "Internal ID"
+        step_ramp_size: "Step/Ramp Size (mm)"
+        critical_fall_off_height: "Critical Fall Off Height (m)"
+        passed: "Passed"
+        risk_assessment: "Risk Assessment"
+        comments: "Comments"
+      submit: "Save Inspection"
+      errors:
+        header:
+          one: "1 error prevented this inspection from being saved:"
+          other: "%{count} errors prevented this inspection from being saved:"

@@ -1,0 +1,31 @@
+<%
+  # Unified unit photo partial - always shows default size (800px) and links to full size
+  # Required locals: unit (Unit object with potential photo attachment)
+  # Optional locals: show_caption (boolean, defaults to true)
+  
+  unit = local_assigns[:unit]
+  show_caption = local_assigns.fetch(:show_caption, true)
+  
+  return unless unit&.photo&.attached? && unit.photo.blob.persisted?
+  
+  alt_text = t('units.messages.photo_of', name: unit.name)
+%>
+
+<div class="unit-photo">
+  <% begin %>
+    <%= link_to rails_blob_path(ImageProcessorService.full_size(unit.photo), disposition: "inline") do %>
+      <%= image_tag ImageProcessorService.default(unit.photo),
+          alt: alt_text,
+          width: ImageProcessorService::DEFAULT_SIZE,
+          height: ImageProcessorService::DEFAULT_SIZE,
+          style: "max-width: 100%; height: auto; object-fit: contain;",
+          loading: "lazy",
+          decoding: "async" %>
+      <% if show_caption %>
+        <p><small><%= t('units.messages.view_full_photo') %></small></p>
+      <% end %>
+    <% end %>
+  <% rescue ActiveStorage::InvariableError %>
+    <p><small><%= t('shared.messages.invalid_image_format') %></small></p>
+  <% end %>
+</div>

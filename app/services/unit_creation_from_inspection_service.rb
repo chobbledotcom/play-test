@@ -12,8 +12,6 @@ class UnitCreationFromInspectionService
     return false unless validate_inspection
 
     @unit = @user.units.build(@unit_params)
-    @unit.copy_attributes_from(@inspection)
-
     if @unit.save
       @inspection.update!(unit: @unit)
       true

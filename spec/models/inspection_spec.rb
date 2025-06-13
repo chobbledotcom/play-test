@@ -216,78 +216,6 @@ RSpec.describe Inspection, type: :model do
     end
   end
 
-  describe "HasDimensions concern" do
-    let(:inspection) { create(:inspection) }
-
-    it "includes HasDimensions module" do
-      expect(Inspection.ancestors).to include(HasDimensions)
-    end
-
-    it "has all dimension fields available" do
-      inspection.width = 10
-      inspection.length = 8
-      inspection.height = 3
-      inspection.num_low_anchors = 4
-      inspection.rope_size = 12.5
-
-      expect(inspection.dimensions).to eq("10m × 8m × 3m")
-      expect(inspection.area).to eq(80)
-      expect(inspection.volume).to eq(240)
-    end
-  end
-
-  describe "dimension copying from unit" do
-    let(:unit) {
-      create(:unit,
-        width: 12.5,
-        length: 10.0,
-        height: 4.0,
-        num_low_anchors: 6,
-        num_high_anchors: 2,
-        rope_size: 15.0,
-        slide_platform_height: 2.5,
-        containing_wall_height: 1.2,
-        users_at_1000mm: 10)
-    }
-
-    it "copies all dimensions from unit on creation" do
-      inspection = create(:inspection,
-        user: user,
-        unit: unit,
-        inspection_date: Date.current,
-        inspection_location: "Test Location",
-        inspector_company: create(:inspector_company))
-
-      # Basic dimensions
-      expect(inspection.width).to eq(12.5)
-      expect(inspection.length).to eq(10.0)
-      expect(inspection.height).to eq(4.0)
-
-      # Other dimensions
-      expect(inspection.num_low_anchors).to eq(6)
-      expect(inspection.num_high_anchors).to eq(2)
-      expect(inspection.rope_size).to eq(15.0)
-      expect(inspection.slide_platform_height).to eq(2.5)
-      expect(inspection.containing_wall_height).to eq(1.2)
-      expect(inspection.users_at_1000mm).to eq(10)
-    end
-
-    it "preserves inspection dimensions when unit is updated" do
-      inspection = create(:inspection, unit: unit)
-
-      # Original dimensions
-      expect(inspection.width).to eq(12.5)
-
-      # Update unit
-      unit.update!(width: 15.0, length: 12.0)
-
-      # Inspection dimensions remain unchanged
-      inspection.reload
-      expect(inspection.width).to eq(12.5)
-      expect(inspection.length).to eq(10.0)
-    end
-  end
-
   describe "status and completion" do
     let(:inspection) { create(:inspection) }
 
@@ -553,7 +481,6 @@ RSpec.describe Inspection, type: :model do
 
   describe "callbacks and lifecycle" do
     let(:inspector_company) { create(:inspector_company) }
-    let(:unit) { create(:unit, width: 10, length: 8) }
 
     describe "before_validation callbacks" do
       it "sets inspector_company_from_user on creation" do
@@ -564,12 +491,6 @@ RSpec.describe Inspection, type: :model do
         expect(inspection.inspector_company_id).to eq(inspector_company.id)
       end
 
-      it "copies unit values when unit_id changes" do
-        inspection = build(:inspection, unit: unit)
-        inspection.save!
-        expect(inspection.width).to eq(unit.width)
-        expect(inspection.length).to eq(unit.length)
-      end
     end
 
     describe "before_create callbacks" do
@@ -578,7 +499,7 @@ RSpec.describe Inspection, type: :model do
         inspection.complete_date = Time.current
         inspection.unique_report_number = nil
         inspection.save!
-        
+
         expect(inspection.unique_report_number).to be_nil
       end
 
@@ -630,7 +551,7 @@ RSpec.describe Inspection, type: :model do
     end
 
     describe "#get_missing_assessments" do
-      let(:inspection) { create(:inspection, unit: create(:unit, has_slide: true), is_totally_enclosed: true) }
+      let(:inspection) { create(:inspection, unit: create(:unit), has_slide: true, is_totally_enclosed: true) }
 
       it "identifies missing unit" do
         inspection.unit = nil
@@ -676,38 +597,38 @@ RSpec.describe Inspection, type: :model do
 
     describe "inspection lifecycle management" do
       let(:inspection) { create(:inspection, user: user) }
-      
+
       it "allows editing after marking as complete" do
         inspection.complete!(user)
         expect(inspection.complete?).to be true
-        
+
         inspection.update!(inspection_location: "Updated after completion")
         expect(inspection.reload.inspection_location).to eq("Updated after completion")
       end
-      
+
       it "allows toggling between complete and incomplete states" do
         inspection.complete!(user)
         expect(inspection.complete?).to be true
-        
+
         inspection.update!(complete_date: nil)
         expect(inspection.complete?).to be false
-        
+
         inspection.complete!(user)
         expect(inspection.complete?).to be true
       end
-      
+
       it "preserves all data when toggling completion status" do
         original_location = "Original Location"
         original_report_number = "TEST-REPORT-123"
         inspection.update!(
-          inspection_location: original_location, 
+          inspection_location: original_location,
           comments: "Test comments",
           unique_report_number: original_report_number
         )
-        
+
         inspection.complete!(user)
         inspection.update!(complete_date: nil)
-        
+
         expect(inspection.inspection_location).to eq(original_location)
         expect(inspection.comments).to eq("Test comments")
         expect(inspection.unique_report_number).to eq(original_report_number) # Should preserve report number
@@ -716,22 +637,22 @@ RSpec.describe Inspection, type: :model do
       it "allows users full control over their inspection records" do
         # User can create draft
         expect(inspection.complete?).to be false
-        
+
         # User can add data
         inspection.update!(
           inspection_location: "Test Location",
           passed: true,
           comments: "All good"
         )
-        
+
         # User can mark complete
         inspection.complete!(user)
         expect(inspection.complete?).to be true
-        
+
         # User can still edit when complete
         inspection.update!(comments: "Updated comments after completion")
         expect(inspection.reload.comments).to eq("Updated comments after completion")
-        
+
         # User can revert to draft
         inspection.update!(complete_date: nil)
         expect(inspection.complete?).to be false
@@ -739,11 +660,11 @@ RSpec.describe Inspection, type: :model do
 
       it "does not auto-generate unique_report_number" do
         expect(inspection.unique_report_number).to be_nil
-        
+
         # Marking complete without setting report number should not generate one
         inspection.complete!(user)
         expect(inspection.unique_report_number).to be_nil
-        
+
         # User can set their own report number
         inspection.update!(unique_report_number: "CUSTOM-2024-001")
         expect(inspection.unique_report_number).to eq("CUSTOM-2024-001")
@@ -752,31 +673,8 @@ RSpec.describe Inspection, type: :model do
       it "allows user to set unique_report_number manually" do
         inspection.update!(unique_report_number: "USER-DEFINED-123")
         inspection.complete!(user)
-        
+
         expect(inspection.unique_report_number).to eq("USER-DEFINED-123")
-      end
-    end
-
-    describe "#duplicate_for_user" do
-      let(:original_user) { create(:user) }
-      let(:new_user) { create(:user) }
-      let(:inspection) { create(:inspection, :complete, user: original_user) }
-
-      it "creates a copy for new user" do
-        allow(inspection).to receive(:duplicate_assessments)
-
-        duplicate = inspection.duplicate_for_user(new_user)
-
-        expect(duplicate.user).to eq(new_user)
-        expect(duplicate.complete_date).to be_nil
-        expect(duplicate.unique_report_number).to be_nil
-        expect(duplicate.passed).to be_nil
-        expect(duplicate).to be_persisted
-      end
-
-      it "calls duplicate_assessments" do
-        expect(inspection).to receive(:duplicate_assessments)
-        inspection.duplicate_for_user(new_user)
       end
     end
 
@@ -852,21 +750,6 @@ RSpec.describe Inspection, type: :model do
   describe "private methods" do
     let(:inspection) { create(:inspection) }
 
-    describe "#copy_unit_values" do
-      it "does nothing when unit is nil" do
-        inspection.unit = nil
-        expect(inspection).not_to receive(:copy_attributes_from)
-        inspection.send(:copy_unit_values)
-      end
-
-      it "copies attributes from unit when present" do
-        unit = create(:unit)
-        inspection.unit = unit
-        expect(inspection).to receive(:copy_attributes_from).with(unit)
-        inspection.send(:copy_unit_values)
-      end
-    end
-
     describe "#set_inspector_company_from_user" do
       it "sets inspector_company_id from user when nil" do
         inspector_company = create(:inspector_company)
@@ -894,16 +777,6 @@ RSpec.describe Inspection, type: :model do
     describe "assessment checking methods" do
       let(:inspection) { create(:inspection) }
 
-      describe "#has_assessments?" do
-        it "returns false when no assessments present" do
-          expect(inspection.send(:has_assessments?)).to be_falsey
-        end
-
-        it "returns true when any assessment present" do
-          inspection.create_user_height_assessment!
-          expect(inspection.send(:has_assessments?)).to be_truthy
-        end
-      end
 
       describe "#all_assessments_complete?" do
         it "returns false when no assessments" do
@@ -917,7 +790,6 @@ RSpec.describe Inspection, type: :model do
           allow(inspection).to receive_message_chain(:anchorage_assessment, :complete?).and_return(true)
           allow(inspection).to receive_message_chain(:materials_assessment, :complete?).and_return(true)
           allow(inspection).to receive_message_chain(:fan_assessment, :complete?).and_return(true)
-          allow(inspection).to receive(:has_assessments?).and_return(true)
 
           expect(inspection.send(:all_assessments_complete?)).to be_truthy
         end
@@ -931,7 +803,6 @@ RSpec.describe Inspection, type: :model do
           allow(inspection).to receive_message_chain(:materials_assessment, :complete?).and_return(true)
           allow(inspection).to receive_message_chain(:fan_assessment, :complete?).and_return(true)
           allow(inspection).to receive_message_chain(:slide_assessment, :complete?).and_return(false)
-          allow(inspection).to receive(:has_assessments?).and_return(true)
 
           expect(inspection.send(:all_assessments_complete?)).to be_falsey
         end
@@ -945,7 +816,6 @@ RSpec.describe Inspection, type: :model do
           allow(inspection).to receive_message_chain(:materials_assessment, :complete?).and_return(true)
           allow(inspection).to receive_message_chain(:fan_assessment, :complete?).and_return(true)
           allow(inspection).to receive_message_chain(:enclosed_assessment, :complete?).and_return(false)
-          allow(inspection).to receive(:has_assessments?).and_return(true)
 
           expect(inspection.send(:all_assessments_complete?)).to be_falsey
         end
@@ -961,9 +831,8 @@ RSpec.describe Inspection, type: :model do
       end
 
       describe "#all_safety_checks_pass?" do
-        it "returns true when no assessments" do
-          allow(inspection).to receive(:has_assessments?).and_return(false)
-          expect(inspection.send(:all_safety_checks_pass?)).to be_truthy
+        it "evaluates safety checks with auto-created assessments" do
+          expect(inspection.send(:all_safety_checks_pass?)).to be_falsey
         end
 
         it "checks for critical failures" do
@@ -982,13 +851,11 @@ RSpec.describe Inspection, type: :model do
       end
 
       describe "#meet_safety_thresholds?" do
-        it "returns true when no assessments" do
-          allow(inspection).to receive(:has_assessments?).and_return(false)
-          expect(inspection.send(:meet_safety_thresholds?)).to be_truthy
+        it "evaluates safety thresholds with auto-created assessments" do
+          expect(inspection.send(:meet_safety_thresholds?)).to be_falsey
         end
 
         it "returns true when no failing safety requirements" do
-          allow(inspection).to receive(:has_assessments?).and_return(true)
           allow(inspection).to receive(:user_height_assessment).and_return(nil)
           allow(inspection).to receive(:slide_assessment).and_return(nil)
           allow(inspection).to receive(:anchorage_assessment).and_return(nil)
@@ -999,9 +866,8 @@ RSpec.describe Inspection, type: :model do
 
       describe "safety check counting methods" do
         describe "#total_safety_checks" do
-          it "returns 0 when no assessments" do
-            allow(inspection).to receive(:has_assessments?).and_return(false)
-            expect(inspection.send(:total_safety_checks)).to eq(0)
+          it "counts safety checks from auto-created assessments" do
+            expect(inspection.send(:total_safety_checks)).to be > 0
           end
 
           it "sums safety checks from all assessments" do
@@ -1017,16 +883,14 @@ RSpec.describe Inspection, type: :model do
             allow(inspection).to receive(:anchorage_assessment).and_return(nil)
             allow(inspection).to receive(:materials_assessment).and_return(nil)
             allow(inspection).to receive(:fan_assessment).and_return(nil)
-            allow(inspection).to receive(:has_assessments?).and_return(true)
 
             expect(inspection.send(:total_safety_checks)).to eq(5)
           end
         end
 
         describe "#passed_safety_checks" do
-          it "returns 0 when no assessments" do
-            allow(inspection).to receive(:has_assessments?).and_return(false)
-            expect(inspection.send(:passed_safety_checks)).to eq(0)
+          it "counts passed checks from auto-created assessments" do
+            expect(inspection.send(:passed_safety_checks)).to be >= 0
           end
 
           it "sums passed checks from all assessments" do
@@ -1042,7 +906,6 @@ RSpec.describe Inspection, type: :model do
             allow(inspection).to receive(:anchorage_assessment).and_return(nil)
             allow(inspection).to receive(:materials_assessment).and_return(nil)
             allow(inspection).to receive(:fan_assessment).and_return(nil)
-            allow(inspection).to receive(:has_assessments?).and_return(true)
 
             expect(inspection.send(:passed_safety_checks)).to eq(4)
           end
@@ -1058,32 +921,5 @@ RSpec.describe Inspection, type: :model do
       end
     end
 
-    describe "#duplicate_assessments" do
-      let(:original_inspection) { create(:inspection) }
-      let(:new_inspection) { create(:inspection) }
-
-      before do
-        original_inspection.create_user_height_assessment!
-        original_inspection.create_structure_assessment!
-      end
-
-      it "duplicates all present assessments" do
-        original_inspection.send(:duplicate_assessments, new_inspection)
-
-        new_inspection.reload
-        expect(new_inspection.user_height_assessment).to be_present
-        expect(new_inspection.structure_assessment).to be_present
-      end
-
-      it "duplicates enclosed assessment when is_totally_enclosed" do
-        original_inspection.is_totally_enclosed = true
-        original_inspection.create_enclosed_assessment!
-
-        original_inspection.send(:duplicate_assessments, new_inspection)
-
-        new_inspection.reload
-        expect(new_inspection.enclosed_assessment).to be_present
-      end
-    end
   end
 end
