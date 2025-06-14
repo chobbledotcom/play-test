@@ -39,5 +39,4 @@ module UnitsHelper
 
     actions
   end
-
 end

@@ -11,7 +11,6 @@ RSpec.describe "Units PDF Generation", type: :request do
   end
 
   describe "GET /units/:id/report" do
-
     it "handles missing unit gracefully" do
       visit "/units/NONEXISTENT/report"
 

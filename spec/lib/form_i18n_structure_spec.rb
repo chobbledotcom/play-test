@@ -59,9 +59,9 @@ RSpec.describe "Form I18n Structure" do
     # Verify each form has the required structure
     all_keys.each do |form, keys|
       # All forms should have at least 'fields' and 'header'
-      expect(keys).to include("fields", "header"), 
+      expect(keys).to include("fields", "header"),
         "Form '#{form}' is missing required keys. Has: #{keys.join(", ")}"
-      
+
       # Forms should have a submit key
       expect(keys).to include("submit"),
         "Form '#{form}' is missing 'submit' key"

@@ -62,7 +62,7 @@ RSpec.describe User, type: :model do
     end
 
     it "requires unique RPII inspector number when present" do
-      existing_user = create(:user, rpii_inspector_number: "RPII123")
+      create(:user, rpii_inspector_number: "RPII123")
       duplicate_user = build(:user, rpii_inspector_number: "RPII123")
       expect(duplicate_user).not_to be_valid
       expect(duplicate_user.errors[:rpii_inspector_number]).to include("has already been taken")

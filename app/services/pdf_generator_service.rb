@@ -37,7 +37,6 @@ class PdfGeneratorService
         # Get the assessment type name for i18n (remove _assessment suffix)
         assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
 
-
         # Generate the section using the generic renderer
         renderer = AssessmentRenderer.new
         renderer.generate_assessment_section(pdf, assessment_type, inspection.send(assessment_name))

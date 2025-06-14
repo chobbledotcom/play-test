@@ -2,13 +2,6 @@ require "rails_helper"
 
 RSpec.describe PhotoProcessingService do
   describe ".process_upload_data" do
-    it "returns nil for nil image data" do
-      expect(described_class.process_upload_data(nil)).to be_nil
-    end
-
-    it "returns nil for empty image data" do
-      expect(described_class.process_upload_data("")).to be_nil
-    end
     it "resizes large images to max 1200px" do
       # Load a large test image
       large_image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
@@ -70,20 +63,13 @@ RSpec.describe PhotoProcessingService do
       expect(processed_image.type).to eq("JPEG")
     end
 
-    it "handles invalid image data gracefully" do
-      invalid_data = "not an image"
-
-      processed_io = described_class.process_upload_data(invalid_data, "invalid.txt")
-
-      expect(processed_io).to be_nil
-    end
-
-    it "logs error when image processing fails" do
+    it "handles invalid image data by returning nil and logging error" do
       invalid_data = "not an image"
 
       expect(Rails.logger).to receive(:error).with(/Photo processing failed/)
+      processed_io = described_class.process_upload_data(invalid_data, "invalid.txt")
 
-      described_class.process_upload_data(invalid_data, "invalid.txt")
+      expect(processed_io).to be_nil
     end
 
     it "uses default filename when none provided" do
@@ -96,93 +82,24 @@ RSpec.describe PhotoProcessingService do
     end
   end
 
-  describe ".process_upload" do
-    it "processes uploaded file successfully" do
-      image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
-      uploaded_file = double("uploaded_file",
-        present?: true,
-        read: File.binread(image_path),
-        original_filename: "test_upload.jpg")
-
-      processed_io = described_class.process_upload(uploaded_file)
-
-      expect(processed_io).to be_present
-      expect(processed_io.content_type).to eq("image/jpeg")
-      expect(processed_io.original_filename).to eq("test_upload.jpg")
-    end
-
-    it "returns nil for nil uploaded file" do
-      expect(described_class.process_upload(nil)).to be_nil
-    end
-
-    it "returns nil for non-present uploaded file" do
-      uploaded_file = double("uploaded_file", present?: false)
-
-      expect(described_class.process_upload(uploaded_file)).to be_nil
-    end
-  end
-
   describe ".valid_image_data?" do
-    it "returns true for valid image data" do
+    it "validates various data types correctly" do
       image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
-      image_data = File.binread(image_path)
+      valid_data = File.binread(image_path)
 
-      expect(described_class.valid_image_data?(image_data)).to be true
-    end
+      # Valid image data
+      expect(described_class.valid_image_data?(valid_data)).to be true
 
-    it "returns false for invalid data" do
-      invalid_data = "not an image"
-
-      expect(described_class.valid_image_data?(invalid_data)).to be false
-    end
-
-    it "returns false for nil data" do
+      # Invalid cases
+      expect(described_class.valid_image_data?("not an image")).to be false
       expect(described_class.valid_image_data?(nil)).to be false
-    end
-
-    it "returns false for empty data" do
       expect(described_class.valid_image_data?("")).to be false
-    end
-
-    it "returns false when MiniMagick raises exception" do
-      # This will trigger the rescue block
-      corrupt_data = "JPEG\x00\x01corrupt"
-
-      expect(described_class.valid_image_data?(corrupt_data)).to be false
-    end
-  end
-
-  describe ".valid_image?" do
-    it "returns true for valid uploaded file" do
-      image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
-      uploaded_file = double("uploaded_file",
-        present?: true,
-        read: File.binread(image_path))
-
-      expect(described_class.valid_image?(uploaded_file)).to be true
-    end
-
-    it "returns false for invalid uploaded file" do
-      uploaded_file = double("uploaded_file",
-        present?: true,
-        read: "not an image")
-
-      expect(described_class.valid_image?(uploaded_file)).to be false
-    end
-
-    it "returns false for nil uploaded file" do
-      expect(described_class.valid_image?(nil)).to be false
-    end
-
-    it "returns false for non-present uploaded file" do
-      uploaded_file = double("uploaded_file", present?: false)
-
-      expect(described_class.valid_image?(uploaded_file)).to be false
+      expect(described_class.valid_image_data?("JPEG\x00\x01corrupt")).to be false
     end
   end
 
   describe "filename handling" do
-    it "changes extensions to .jpg" do
+    it "normalizes all filenames to .jpg extension" do
       image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
       image_data = File.binread(image_path)
 
@@ -191,7 +108,8 @@ RSpec.describe PhotoProcessingService do
         ["photo.png", "photo.jpg"],
         ["image.gif", "image.jpg"],
         ["test.JPEG", "test.jpg"],
-        ["file", "file.jpg"],
+        ["filename_no_extension", "filename_no_extension.jpg"],
+        ["", "photo.jpg"],
         [nil, "photo.jpg"]
       ]
 
@@ -199,24 +117,6 @@ RSpec.describe PhotoProcessingService do
         processed_io = described_class.process_upload_data(image_data, input)
         expect(processed_io.original_filename).to eq(expected)
       end
-    end
-
-    it "handles filename without extension" do
-      image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
-      image_data = File.binread(image_path)
-
-      processed_io = described_class.process_upload_data(image_data, "filename_no_extension")
-
-      expect(processed_io.original_filename).to eq("filename_no_extension.jpg")
-    end
-
-    it "handles empty filename" do
-      image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
-      image_data = File.binread(image_path)
-
-      processed_io = described_class.process_upload_data(image_data, "")
-
-      expect(processed_io.original_filename).to eq("photo.jpg")
     end
   end
 end

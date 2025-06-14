@@ -161,7 +161,7 @@ class InspectionsController < ApplicationController
 
   def validate_tab_parameter
     return unless params[:tab].present?
-    
+
     valid_tabs = helpers.inspection_tabs(@inspection)
     unless valid_tabs.include?(params[:tab])
       redirect_to edit_inspection_path(@inspection), alert: I18n.t("inspections.messages.invalid_tab")

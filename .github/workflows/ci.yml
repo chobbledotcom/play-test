@@ -26,6 +26,7 @@ jobs:
         env:
           RAILS_ENV: test
         run: |
+          bundle exec rails db:migrate
           bundle exec rails parallel:prepare
           bundle exec parallel_rspec spec/
 

@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.feature "Assessment Forms", type: :feature do
   # Build all tab names from ASSESSMENT_TYPES plus the general inspection tab
-  ALL_TAB_NAMES = ["inspections", ""] + 
+  ALL_TAB_NAMES = ["inspections", ""] +
     Inspection::ASSESSMENT_TYPES.keys.map { |k| k.to_s.sub(/_assessment$/, "") }
 
   let(:admin_user) { create(:user, :without_company, email: "admin@testcompany.com") }
@@ -22,12 +22,12 @@ RSpec.feature "Assessment Forms", type: :feature do
     ALL_TAB_NAMES.each do |tab_name|
       # Skip empty string tab (same as "inspections")
       next if tab_name.empty?
-      
+
       scenario "renders #{tab_name} form without errors" do
         # Use slide_inspection for all tests since it has both slide and regular assessments
         # Use enclosed_inspection for enclosed tab
-        inspection_to_use = tab_name == "enclosed" ? enclosed_inspection : slide_inspection
-        
+        inspection_to_use = (tab_name == "enclosed") ? enclosed_inspection : slide_inspection
+
         visit edit_inspection_path(inspection_to_use, tab: tab_name)
         expect_assessment_form_rendered(tab_name)
       end
@@ -36,21 +36,21 @@ RSpec.feature "Assessment Forms", type: :feature do
     scenario "shows conditional tabs only when appropriate" do
       # Verify enclosed_inspection is actually totally enclosed
       expect(enclosed_inspection.is_totally_enclosed).to be true
-      
+
       # Enclosed tab only for totally enclosed units
       visit edit_inspection_path(enclosed_inspection)
       expect_assessment_tab("enclosed")
-      
+
       visit edit_inspection_path(inspection)
       expect_no_assessment_tab("enclosed")
-      
+
       # Verify slide_inspection actually has a slide
       expect(slide_inspection.has_slide).to be true
-      
+
       # Slide tab only for units with slides
       visit edit_inspection_path(slide_inspection)
       expect_assessment_tab("slide")
-      
+
       visit edit_inspection_path(inspection)
       expect_no_assessment_tab("slide")
     end

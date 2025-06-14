@@ -286,20 +286,20 @@ RSpec.shared_examples "an assessment form" do |assessment_type|
 
     it "displays the assessment form without errors" do
       visit edit_inspection_path(inspection, tab: assessment_type)
-      
+
       # Should have the form header
       expect(page).to have_content(I18n.t("forms.#{assessment_type}.header"))
-      
+
       # Should not have any translation missing errors
       expect(page).not_to have_content("translation missing")
-      
+
       # Should have a save button
       expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
     end
 
     it "displays assessment completion status section" do
       visit edit_inspection_path(inspection, tab: assessment_type)
-      
+
       # Should have the assessment status section
       expect(page).to have_css(".assessment-status")
       expect(page).to have_content(I18n.t("shared.assessment_completion"))
@@ -307,10 +307,10 @@ RSpec.shared_examples "an assessment form" do |assessment_type|
 
     it "saves the assessment when form is submitted" do
       visit edit_inspection_path(inspection, tab: assessment_type)
-      
+
       # Submit the form
       click_button I18n.t("inspections.buttons.save_assessment")
-      
+
       # Should show success message
       expect(page).to have_content(I18n.t("inspections.messages.updated"))
     end
