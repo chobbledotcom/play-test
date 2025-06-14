@@ -3,15 +3,15 @@ require "rails_helper"
 RSpec.describe Inspection, type: :model do
   let(:user) { create(:user) }
   let(:inspection) { create(:inspection, user: user) }
-  
+
   # Helper methods to DRY up assessment mocking
   def mock_assessment(inspection, assessment_name, complete: true)
     allow(inspection).to receive_message_chain(assessment_name, :complete?).and_return(complete)
   end
-  
+
   def mock_all_core_assessments(inspection, complete: true)
-    %i[user_height_assessment structure_assessment anchorage_assessment 
-       materials_assessment fan_assessment].each do |assessment|
+    %i[user_height_assessment structure_assessment anchorage_assessment
+      materials_assessment fan_assessment].each do |assessment|
       mock_assessment(inspection, assessment, complete: complete)
     end
   end
@@ -23,7 +23,7 @@ RSpec.describe Inspection, type: :model do
       expect(Inspection.public_send(scope_name)).not_to include(send(excluded_record))
     end
   end
-  
+
   shared_examples "a boolean method" do |method_name, attribute, truthy_value, falsy_value|
     context "when #{attribute} is #{truthy_value.class}" do
       before { inspection.send("#{attribute}=", truthy_value) }
@@ -31,7 +31,7 @@ RSpec.describe Inspection, type: :model do
         expect(inspection.send(method_name)).to be_truthy
       end
     end
-    
+
     context "when #{attribute} is #{falsy_value.inspect}" do
       before { inspection.send("#{attribute}=", falsy_value) }
       it "returns false" do
@@ -39,17 +39,17 @@ RSpec.describe Inspection, type: :model do
       end
     end
   end
-  
+
   shared_examples "a filter scope" do |filter_method, setup_matching, setup_non_matching, test_value|
     let!(:matching) { create(:inspection).tap(&setup_matching) }
     let!(:non_matching) { create(:inspection).tap(&setup_non_matching) }
-    
+
     it "filters when value present" do
       result = Inspection.send(filter_method, test_value)
       expect(result).to include(matching)
       expect(result).not_to include(non_matching)
     end
-    
+
     it "returns all when value blank" do
       expect(Inspection.send(filter_method, nil)).to eq(Inspection.all)
       expect(Inspection.send(filter_method, "")).to eq(Inspection.all)
@@ -106,7 +106,7 @@ RSpec.describe Inspection, type: :model do
       describe "##{method}" do
         context "when complete" do
           before { inspection.complete_date = Time.current }
-          
+
           it "returns inspection path" do
             result = inspection.send(method)
             if method == "primary_url_path"
@@ -117,10 +117,10 @@ RSpec.describe Inspection, type: :model do
             end
           end
         end
-        
+
         context "when draft" do
           before { inspection.complete_date = nil }
-          
+
           it "returns edit inspection path" do
             result = inspection.send(method)
             if method == "primary_url_path"
@@ -167,16 +167,16 @@ RSpec.describe Inspection, type: :model do
     describe "filter_by_unit" do
       let(:unit1) { create(:unit) }
       let(:unit2) { create(:unit) }
-      
+
       it "filters by unit_id when present" do
         matching = create(:inspection, unit: unit1)
         non_matching = create(:inspection, unit: unit2)
-        
+
         result = Inspection.filter_by_unit(unit1.id)
         expect(result).to include(matching)
         expect(result).not_to include(non_matching)
       end
-      
+
       it "returns all when unit_id is blank" do
         expect(Inspection.filter_by_unit(nil)).to eq(Inspection.all)
         expect(Inspection.filter_by_unit("")).to eq(Inspection.all)
@@ -194,12 +194,12 @@ RSpec.describe Inspection, type: :model do
           expect(missing).to include(I18n.t("forms.#{assessment}.header"))
         end
       end
-      
+
       # Test conditional assessments
       {slide: :has_slide, enclosed: :is_totally_enclosed}.each do |assessment, condition|
         context "when #{condition} is true" do
           before { inspection.send("#{condition}=", true) }
-          
+
           it "includes #{assessment} assessment when incomplete" do
             mock_assessment(inspection, "#{assessment}_assessment", complete: false)
             missing = inspection.get_missing_assessments
@@ -207,7 +207,7 @@ RSpec.describe Inspection, type: :model do
           end
         end
       end
-      
+
       it "identifies missing unit" do
         inspection.unit = nil
         missing = inspection.get_missing_assessments
@@ -258,7 +258,7 @@ RSpec.describe Inspection, type: :model do
 
       context "conditional assessments" do
         before { mock_all_core_assessments(inspection, complete: true) }
-        
+
         it "includes slide assessment when has_slide" do
           inspection.has_slide = true
           mock_assessment(inspection, :slide_assessment, complete: false)
