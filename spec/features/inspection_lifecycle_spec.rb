@@ -48,23 +48,14 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
       visit edit_inspection_path(inspection)
 
-      # Mark as complete
       click_button I18n.t("inspections.buttons.mark_complete")
 
-      # Debug: Check for error messages
-      if current_path.include?("/edit")
-        puts "Still on edit page. Checking for error messages..."
-        puts "Page content: #{page.text}"
-      end
-
-      # The inspection should be marked as complete and redirected to show page
       expect(page).to have_current_path(inspection_path(inspection))
 
       inspection.reload
       expect(inspection.complete?).to be true
 
-      # Now we can't edit, but we can mark as incomplete
-      visit inspection_path(inspection) # Show page for completed inspection
+      visit inspection_path(inspection)
       click_button I18n.t("inspections.buttons.switch_to_in_progress")
 
       inspection.reload
@@ -73,7 +64,6 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       expect(inspection.risk_assessment).to be_present
       expect(inspection.unique_report_number).to eq("ORIG-123")
 
-      # Now we can edit again
       visit edit_inspection_path(inspection)
       fill_in I18n.t("forms.inspections.fields.inspection_location"), with: "Updated after incomplete"
       click_button I18n.t("forms.inspections.submit")
@@ -175,6 +165,7 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       click_button I18n.t("inspections.buttons.mark_complete")
 
       inspection.reload
+      expect(inspection.user_height_assessment.incomplete_fields).to eq([])
       expect(inspection.complete?).to be true
       expect(inspection.unique_report_number).to eq("USER-REPORT-456")
     end

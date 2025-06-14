@@ -266,7 +266,8 @@ RSpec.describe "Seed Data", type: :model do
             expect(assessment.inspection).to be_present
             expect(assessment.num_low_anchors).to be_present
             expect(assessment.num_high_anchors).to be_present
-            expect([true, false]).to include(assessment.num_anchors_pass)
+            expect([true, false]).to include(assessment.num_low_anchors_pass)
+            expect([true, false]).to include(assessment.num_high_anchors_pass)
             expect([true, false]).to include(assessment.anchor_accessories_pass)
             expect([true, false]).to include(assessment.anchor_degree_pass)
             expect([true, false]).to include(assessment.anchor_type_pass)

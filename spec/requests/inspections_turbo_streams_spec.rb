@@ -54,7 +54,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
       context "when updating assessment data" do
         before do
-          inspection.create_user_height_assessment!(
+          inspection.user_height_assessment.update!(
             containing_wall_height: 1.0,
             platform_height: 1.0
           )
@@ -124,7 +124,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
     it "updates progress when assessment is marked complete" do
       # Create an incomplete assessment
-      inspection.create_user_height_assessment!(
+      inspection.user_height_assessment.update!(
         containing_wall_height: nil,
         platform_height: nil
       )
@@ -162,7 +162,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
     before do
       inspection.update!(complete_date: Time.current)
-      inspection.create_user_height_assessment!(
+      inspection.user_height_assessment.update!(
         containing_wall_height: 1.5,
         platform_height: 1.0,
         tallest_user_height: 1.2

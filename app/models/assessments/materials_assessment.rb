@@ -27,19 +27,8 @@ class Assessments::MaterialsAssessment < ApplicationRecord
     fabric_strength_pass fire_retardant_pass thread_pass
   ].freeze
 
-  # Validate all material checks - includes the fields moved from inspections:
-  # retention_netting_pass, zips_pass, windows_pass, artwork_pass
-  MATERIAL_CHECKS.each do |check|
-    validates check.to_sym, inclusion: {in: [true, false]}, allow_nil: true
-  end
-
   # Callbacks
   after_update :log_assessment_update, if: :saved_changes?
-
-  def has_critical_failures?
-    # Fire retardant, fabric strength, and thread are critical for safety
-    CRITICAL_MATERIAL_CHECKS.any? { send(it) == false }
-  end
 
   def material_compliance_summary
     {

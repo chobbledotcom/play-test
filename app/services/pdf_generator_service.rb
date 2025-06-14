@@ -30,16 +30,16 @@ class PdfGeneratorService
       Inspection::ASSESSMENT_TYPES.each do |assessment_name, _assessment_class|
         # Skip slide assessment if unit doesn't have a slide
         next if assessment_name == :slide_assessment && !inspection.has_slide?
-        
+
         # Skip enclosed assessment if not totally enclosed
         next if assessment_name == :enclosed_assessment && !inspection.is_totally_enclosed?
-        
+
         # Get the assessment type name for i18n (remove _assessment suffix)
         assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
-        
+
         # Special case: user_height_assessment uses "tallest_user_height" in i18n
         assessment_type = "tallest_user_height" if assessment_type == "user_height"
-        
+
         # Generate the section using the generic renderer
         renderer = AssessmentRenderer.new
         renderer.generate_assessment_section(pdf, assessment_type, inspection.send(assessment_name))
@@ -60,11 +60,19 @@ class PdfGeneratorService
   def self.generate_unit_report(unit)
     require "prawn/table"
 
+    # Preload all inspections once to avoid N+1 queries
+    completed_inspections = unit.inspections
+      .includes(:user, inspector_company: {logo_attachment: :blob})
+      .complete
+      .order(inspection_date: :desc)
+
+    last_inspection = completed_inspections.first
+
     Prawn::Document.new(page_size: "A4", page_layout: :portrait) do |pdf|
       Configuration.setup_pdf_fonts(pdf)
       HeaderGenerator.generate_unit_pdf_header(pdf, unit)
-      generate_unit_details(pdf, unit)
-      generate_unit_inspection_history(pdf, unit)
+      generate_unit_details_with_inspection(pdf, unit, last_inspection)
+      generate_unit_inspection_history_with_data(pdf, unit, completed_inspections)
       ImageProcessor.generate_qr_code_footer(pdf, unit)
     end
   end
@@ -84,13 +92,27 @@ class PdfGeneratorService
     TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.unit.details"), unit_data)
   end
 
+  def self.generate_unit_details_with_inspection(pdf, unit, last_inspection)
+    unit_data = TableBuilder.build_unit_details_table_with_inspection(unit, last_inspection, :unit)
+    TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.unit.details"), unit_data)
+  end
+
   def self.generate_unit_inspection_history(pdf, unit)
     # Check for completed inspections - preload associations to avoid N+1 queries
+    # Since all inspections belong to the same unit, we don't need to reload the unit
     completed_inspections = unit.inspections
-      .includes(:user, :inspector_company)
+      .includes(:user, inspector_company: {logo_attachment: :blob})
       .complete
       .order(inspection_date: :desc)
 
+    if completed_inspections.empty?
+      TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"), [[I18n.t("pdf.unit.no_completed_inspections"), ""]])
+    else
+      TableBuilder.create_inspection_history_table(pdf, I18n.t("pdf.unit.inspection_history"), completed_inspections)
+    end
+  end
+
+  def self.generate_unit_inspection_history_with_data(pdf, unit, completed_inspections)
     if completed_inspections.empty?
       TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"), [[I18n.t("pdf.unit.no_completed_inspections"), ""]])
     else

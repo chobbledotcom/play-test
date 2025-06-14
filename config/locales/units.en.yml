@@ -78,14 +78,13 @@ en:
       play_area_length: "Play Area Length (m)"
       play_area_width: "Play Area Width (m)"
       negative_adjustment: "Negative Adjustment (m²)"
-      permanent_roof: "Has Permanent Roof"
+      slide_permanent_roof: Slide Has Permanent Roof"
       users_at_1000mm: "Users at 1000mm Height"
       users_at_1200mm: "Users at 1200mm Height"
       users_at_1500mm: "Users at 1500mm Height"
       users_at_1800mm: "Users at 1800mm Height"
       # Enclosed unit fields
       is_totally_enclosed: "Unit is Totally Enclosed"
-
 
     conditions:
       excellent: "Excellent"

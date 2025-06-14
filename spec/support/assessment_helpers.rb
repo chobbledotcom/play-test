@@ -16,6 +16,21 @@ module AssessmentHelpers
     existing_assessment.assign_attributes(trait_attributes)
     existing_assessment
   end
+
+  # Reflection helpers for assessment fields
+  def pass_fields(assessment_class = described_class)
+    assessment_class.column_names.select { |col| col.end_with?("_pass") }
+  end
+
+  def comment_fields(assessment_class = described_class)
+    assessment_class.column_names.select { |col| col.end_with?("_comment") }
+  end
+
+  def set_all_pass_fields(assessment, value)
+    pass_fields(assessment.class).each do |field|
+      assessment.send("#{field}=", value)
+    end
+  end
 end
 
 RSpec.configure do |config|

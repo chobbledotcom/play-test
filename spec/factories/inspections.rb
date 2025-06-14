@@ -98,13 +98,14 @@ FactoryBot.define do
           critical_fall_off_height: 1.2,
           critical_fall_off_height_pass: true
         )
-        
+
         # Add some test comments
         inspection.anchorage_assessment.update!(
-          num_anchors_comment: "Additional anchors recommended for high wind area",
+          num_low_anchors_comment: "Additional low anchors recommended for high wind area",
+          num_high_anchors_comment: "High anchor count adequate",
           anchor_type_comment: "D-ring anchors in good condition"
         )
-        
+
         inspection.structure_assessment.update!(
           seam_integrity_comment: "All seams checked and secure",
           unit_stable_comment: "Unit remained stable during 60 second test"

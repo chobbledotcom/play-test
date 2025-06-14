@@ -78,25 +78,12 @@ RSpec.feature "Assessment Forms", type: :feature do
           end
         end
 
-        # Verify we're on the correct tab
         expect(current_url).to include("tab=#{tab_name}")
-
-        # Verify the form content matches i18n structure
         expect_form_matches_i18n(i18n_base)
-
-        # Verify submit button is present
         expect(page).to have_button(I18n.t("#{i18n_base}.submit"))
-
-        # Verify no missing translations
         expect(page).not_to have_content("translation missing")
-
-        # Special case for user_height - check for specific content
-        if tab_name == "user_height"
-          expect(page).to have_content("Total Capacity")
-        end
       end
 
-      # Test enclosed tab separately since it needs a different inspection
       if enclosed_inspection.is_totally_enclosed
         visit edit_inspection_path(enclosed_inspection, tab: "enclosed")
         expect(current_url).to include("tab=enclosed")

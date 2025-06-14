@@ -2,7 +2,7 @@ en:
   # Navigation
   navigation:
     inspections: "Inspections"
-    units: "Units" 
+    units: "Units"
     settings: "Settings"
     safety_standards: "Safety Standards"
 
@@ -35,6 +35,8 @@ en:
     comments: "Comments"
     pass: "Pass"
     fail: "Fail"
+    pass_pdf: "[PASS]"
+    fail_pdf: "[FAIL]"
     safety_status: "Safety Status"
     field_comment_placeholder: "%{field} comment"
 

@@ -10,10 +10,6 @@ class Assessments::SlideAssessment < ApplicationRecord
     :slide_first_metre_height, :slide_beyond_first_metre_height,
     numericality: {greater_than_or_equal_to: 0}, allow_blank: true
 
-  # Pass/fail assessments
-  validates :clamber_netting_pass, :runout_pass, :slip_sheet_pass,
-    inclusion: {in: [true, false]}, allow_nil: true
-
   def meets_runout_requirements?
     return false unless runout.present? && slide_platform_height.present?
 

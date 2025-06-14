@@ -14,7 +14,7 @@ RSpec.feature "Step Ramp Size in Structure Assessment", type: :feature do
       visit edit_inspection_path(inspection, tab: "structure")
 
       # Verify field is visible
-      expect(page).to have_content("Step Size")
+      expect(page).to have_content(I18n.t("forms.structure.fields.step_ramp_size"))
 
       # Fill and save using i18n
       fill_in I18n.t("forms.structure.fields.step_ramp_size"), with: "25"

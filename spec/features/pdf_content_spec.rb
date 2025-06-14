@@ -97,7 +97,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       end
     end
 
-    scenario "shows 'No data available' for missing assessments" do
+    scenario "shows proper handling for empty assessments" do
       inspection = create(:inspection,
         user: user,
         unit: unit,
@@ -107,8 +107,12 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       pdf_text = get_pdf_text(inspection_report_path(inspection))
 
-      # Should show no data messages for assessments
-      expect_no_assessment_messages(pdf_text, inspection)
+      # Should show assessment headers even with empty data
+      expect(pdf_text).to include(I18n.t("forms.structure.header"))
+      expect(pdf_text).to include(I18n.t("forms.tallest_user_height.header"))
+
+      # Should handle null values with [NULL] indicators
+      expect(pdf_text).to include("[NULL]")
     end
   end
 

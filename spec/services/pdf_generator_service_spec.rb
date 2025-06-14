@@ -107,8 +107,8 @@ RSpec.describe PdfGeneratorService, pdf: true do
           "pdf.unit.fields.date",
           "pdf.unit.fields.inspector",
           "pdf.unit.fields.result",
-          "shared.pass",
-          "shared.fail")
+          "shared.pass_pdf",
+          "shared.fail_pdf")
       end
     end
 
@@ -179,7 +179,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf_text = pdf_text_content(pdf.render)
 
         expect_pdf_to_include_i18n(pdf_text, "forms.slide.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass")
+        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
       end
     end
 
@@ -189,7 +189,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf_text = pdf_text_content(pdf.render)
 
         expect_pdf_to_include_i18n(pdf_text, "forms.structure.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass")
+        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
       end
     end
 
@@ -199,7 +199,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf_text = pdf_text_content(pdf.render)
 
         expect_pdf_to_include_i18n(pdf_text, "forms.anchorage.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass")
+        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
       end
     end
 
@@ -209,7 +209,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf_text = pdf_text_content(pdf.render)
 
         expect_pdf_to_include_i18n(pdf_text, "forms.enclosed.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass")
+        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
       end
     end
 
@@ -219,7 +219,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf_text = pdf_text_content(pdf.render)
 
         expect_pdf_to_include_i18n(pdf_text, "forms.materials.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass")
+        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
       end
     end
 
@@ -229,7 +229,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf_text = pdf_text_content(pdf.render)
 
         expect_pdf_to_include_i18n(pdf_text, "forms.fan.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass")
+        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
       end
     end
 
@@ -327,11 +327,11 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
     describe ".format_pass_fail" do
       it "formats true as Pass" do
-        expect(PdfGeneratorService.format_pass_fail(true)).to eq(I18n.t("shared.pass"))
+        expect(PdfGeneratorService.format_pass_fail(true)).to eq(I18n.t("shared.pass_pdf"))
       end
 
       it "formats false as Fail" do
-        expect(PdfGeneratorService.format_pass_fail(false)).to eq(I18n.t("shared.fail"))
+        expect(PdfGeneratorService.format_pass_fail(false)).to eq(I18n.t("shared.fail_pdf"))
       end
 
       it "formats nil as N/A" do

@@ -101,7 +101,6 @@ en:
       zips_pass: "Zips Pass"
       windows_pass: "Windows Pass"
       artwork_pass: "Artwork Pass"
-      exit_sign_visible_pass: "Exit Sign Visible Pass"
       risk_assessment: "Risk Assessment"
       search: "Search"
       calculated_after_save: "Will be calculated after saving"

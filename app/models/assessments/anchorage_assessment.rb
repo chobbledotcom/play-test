@@ -10,11 +10,6 @@ class Assessments::AnchorageAssessment < ApplicationRecord
     numericality: {greater_than_or_equal_to: 0, only_integer: true},
     allow_blank: true
 
-  # Pass/fail assessments
-  validates :num_anchors_pass, :anchor_accessories_pass, :anchor_degree_pass,
-    :anchor_type_pass, :pull_strength_pass,
-    inclusion: {in: [true, false]}, allow_nil: true
-
   # Callbacks
   after_update :log_assessment_update, if: :saved_changes?
   after_save :update_anchor_calculations, if: :saved_change_to_anchor_counts?
@@ -25,10 +20,6 @@ class Assessments::AnchorageAssessment < ApplicationRecord
     inspection_area = inspection.area
     required_anchors = SafetyStandard.calculate_required_anchors(inspection_area)
     total_anchors >= required_anchors
-  end
-
-  def has_critical_failures?
-    [anchor_type_pass, pull_strength_pass].any? { |check| check == false }
   end
 
   def total_anchors
@@ -88,9 +79,13 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   end
 
   def update_anchor_calculations
-    # Auto-update num_anchors_pass based on calculations
+    # Auto-update anchor pass fields based on calculations
     if anchor_counts_present? && inspection.area.present?
-      update_column(:num_anchors_pass, meets_anchor_requirements?)
+      meets_requirements = meets_anchor_requirements?
+      update_columns(
+        num_low_anchors_pass: meets_requirements,
+        num_high_anchors_pass: meets_requirements
+      )
     end
   end
 end

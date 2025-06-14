@@ -1,90 +1,83 @@
-<%= render 'form/form_context', model: @inspection.user_height_assessment, i18n_base: 'forms.tallest_user_height', url: inspection_user_height_assessment_path(@inspection) do |form| %>
+<%= render 'form/form_context',
+  model: @inspection.user_height_assessment,
+  i18n_base: 'forms.tallest_user_height',
+  url: inspection_user_height_assessment_path(@inspection) do |form|
+%>
+  <div class="assessment-form user-height-assessment">
 
-    <div class="assessment-form user-height-assessment">
+    <details class="safety-standards-reference">
+      <summary>View Safety Standards</summary>
+      <%= render 'shared/safety_standards/wall_height_requirements' %>
+      <%= render 'shared/safety_standards/user_capacity_requirements' %>
+    </details>
 
-      <!-- Safety Standards Reference -->
-      <details class="safety-standards-reference">
-        <summary>View Safety Standards</summary>
-        <%= render 'shared/safety_standards/wall_height_requirements' %>
-        <%= render 'shared/safety_standards/user_capacity_requirements' %>
-      </details>
-
-      <!-- Height Measurements Section -->
-      <%= render 'form/fieldset', legend_key: 'height_measurements' do %>
-        <%= render 'form/number', field: :containing_wall_height %>
-        <%= render 'form/number', field: :platform_height %>
-        <div class="form-group">
-          <%= render 'form/number', field: :tallest_user_height %>
-          <% if @inspection.user_height_assessment&.tallest_user_height.present? %>
-            <div class="safety-standards-info">
-              <strong>EN 14960:2019 Height Requirements:</strong>
-              <% user_height = @inspection.user_height_assessment.tallest_user_height %>
-              <% if user_height < 0.6 %>
-                No containing walls required
-              <% elsif user_height <= 3.0 %>
-                Containing walls must be at least <%= user_height %>m (equal to user height)
-              <% elsif user_height <= 6.0 %>
-                Containing walls must be at least <%= (user_height * 1.25).round(2) %>m (1.25x user height)
-              <% else %>
-                Containing walls must be at least <%= (user_height * 1.25).round(2) %>m + permanent roof required
-              <% end %>
-            </div>
-            <% if @inspection.user_height_assessment.containing_wall_height.present? %>
-              <div class="compliance-status">
-                <%= render 'shared/pass_fail_string', passed: @inspection.user_height_assessment.meets_height_requirements? %>
-              </div>
-            <% end %>
-          <% end %>
-        </div>
-        <%= render 'form/checkbox', field: :permanent_roof %>
-      <% end %>
-
-      <!-- User Capacity Section -->
-      <%= render 'form/fieldset', legend_key: 'user_capacity' do %>
-        <% if @inspection.user_height_assessment&.play_area_length.present? && @inspection.user_height_assessment&.play_area_width.present? %>
+    <%= render 'form/fieldset', legend_key: 'height_measurements' do %>
+      <%= render 'form/number_comment', field: :containing_wall_height %>
+      <%= render 'form/number_comment', field: :platform_height %>
+      <div class="form-group">
+        <%= render 'form/number_comment', field: :tallest_user_height %>
+        <% if @inspection.user_height_assessment&.tallest_user_height.present? %>
           <div class="safety-standards-info">
-            <strong>EN 14960:2019 Calculated Capacities:</strong>
-            <% capacities = @inspection.user_height_assessment.calculated_capacities %>
-            <ul>
-              <li>1.0m users: <%= capacities[:users_1000mm] %> (1.5m² per user)</li>
-              <li>1.2m users: <%= capacities[:users_1200mm] %> (2.0m² per user)</li>
-              <li>1.5m users: <%= capacities[:users_1500mm] %> (2.5m² per user)</li>
-              <li>1.8m users: <%= capacities[:users_1800mm] %> (3.0m² per user)</li>
-            </ul>
+            <strong>Height Requirements:</strong>
+            <% user_height = @inspection.user_height_assessment.tallest_user_height %>
+            <% if user_height < 0.6 %>
+              No containing walls required
+            <% elsif user_height <= 3.0 %>
+              Containing walls must be at least <%= user_height %>m (equal to user height)
+            <% elsif user_height <= 6.0 %>
+              Containing walls must be at least <%= (user_height * 1.25).round(2) %>m (1.25x user height)
+            <% else %>
+              Containing walls must be at least <%= (user_height * 1.25).round(2) %>m + permanent roof required
+            <% end %>
           </div>
+          <% if @inspection.user_height_assessment.containing_wall_height.present? %>
+            <div class="compliance-status">
+              <%= render 'shared/pass_fail_string', passed: @inspection.user_height_assessment.meets_height_requirements? %>
+            </div>
+          <% end %>
         <% end %>
-        
-        <%= render 'form/number', field: :users_at_1000mm, min: 0, step: 1 %>
-        <%= render 'form/number', field: :users_at_1200mm, min: 0, step: 1 %>
-        <%= render 'form/number', field: :users_at_1500mm, min: 0, step: 1 %>
-        <%= render 'form/number', field: :users_at_1800mm, min: 0, step: 1 %>
+      </div>
+    <% end %>
 
-        <div class="capacity-summary">
-          <strong><%= t('forms.tallest_user_height.fields.total_capacity') %>:</strong>
-          <span id="total-capacity"><%= @inspection.user_height_assessment&.total_user_capacity || 0 %></span>
+    <%= render 'form/fieldset', legend_key: 'play_area' do %>
+      <%= render 'form/number_comment', field: :play_area_length, min: 0 %>
+      <%= render 'form/number_comment', field: :play_area_width, min: 0 %>
+      <%= render 'form/number_comment', field: :negative_adjustment, min: 0 %>
+    <% end %>
+
+    <!-- User Capacity Section -->
+    <%= render 'form/fieldset', legend_key: 'user_capacity' do %>
+      <% if @inspection.user_height_assessment&.play_area_length.present? && @inspection.user_height_assessment&.play_area_width.present? %>
+        <div class="safety-standards-info">
+          <strong>Calculated Capacities:</strong>
+          <% capacities = @inspection.user_height_assessment.calculated_capacities %>
+          <ul>
+            <li>1.0m users: <%= capacities[:users_1000mm] %> (1.5m² per user)</li>
+            <li>1.2m users: <%= capacities[:users_1200mm] %> (2.0m² per user)</li>
+            <li>1.5m users: <%= capacities[:users_1500mm] %> (2.5m² per user)</li>
+            <li>1.8m users: <%= capacities[:users_1800mm] %> (3.0m² per user)</li>
+          </ul>
         </div>
       <% end %>
 
-      <!-- Play Area Section -->
-      <%= render 'form/fieldset', legend_key: 'play_area' do %>
-        <%= render 'form/number', field: :play_area_length, min: 0 %>
-        <%= render 'form/number', field: :play_area_width, min: 0 %>
-        <%= render 'form/number', field: :negative_adjustment, min: 0 %>
-      <% end %>
+      <%= render 'form/number', field: :users_at_1000mm, min: 0, step: 1 %>
+      <%= render 'form/number', field: :users_at_1200mm, min: 0, step: 1 %>
+      <%= render 'form/number', field: :users_at_1500mm, min: 0, step: 1 %>
+      <%= render 'form/number', field: :users_at_1800mm, min: 0, step: 1 %>
+    <% end %>
 
-      <!-- Comments Section -->
-      <%= render 'form/comment', field: :tallest_user_height_comment %>
+    <%= render 'form/assessment_status',
+      assessment: @inspection.user_height_assessment
+    %>
 
-        <!-- Safety Status -->
-      <%= render 'form/assessment_status', assessment: @inspection.user_height_assessment %>
-
-      </div>
+  </div>
 <% end %>
 
 <script>
   // Calculate total capacity dynamically
   document.addEventListener('DOMContentLoaded', function() {
-    const capacityFields = ['inspection_user_height_assessment_users_at_1000mm', 'inspection_user_height_assessment_users_at_1200mm', 'inspection_user_height_assessment_users_at_1500mm', 'inspection_user_height_assessment_users_at_1800mm'];
+    const capacityFields = [
+      'inspection_user_height_assessment_users_at_1000mm', 'inspection_user_height_assessment_users_at_1200mm', 'inspection_user_height_assessment_users_at_1500mm', 'inspection_user_height_assessment_users_at_1800mm'];
     const totalCapacityElement = document.getElementById('total-capacity');
 
     function updateTotalCapacity() {

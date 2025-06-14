@@ -230,7 +230,8 @@ class SeedDataService
       inspection.anchorage_assessment.update!(
         num_low_anchors: rand(6..12),
         num_high_anchors: rand(4..8),
-        num_anchors_pass: passed,
+        num_low_anchors_pass: passed,
+        num_high_anchors_pass: passed,
         anchor_accessories_pass: passed,
         anchor_degree_pass: passed,
         anchor_type_pass: passed,
@@ -316,7 +317,6 @@ class SeedDataService
         play_area_length: play_area_length,
         play_area_width: play_area_width,
         negative_adjustment: rand(0..2.0).round(1),
-        permanent_roof: false,
         tallest_user_height_comment: passed ? "Capacity within safe limits based on EN 14960:2019" : "Review user capacity - exceeds recommended limits",
         containing_wall_height_comment: "Measured from base to top of wall",
         platform_height_comment: "Platform height acceptable for age group",
@@ -349,10 +349,8 @@ class SeedDataService
         exit_number: rand(1..3),
         exit_number_pass: passed,
         exit_sign_always_visible_pass: passed,
-        exit_sign_visible_pass: passed,
         exit_number_comment: passed ? "Number of exits compliant with unit size" : "Additional exit required",
-        exit_sign_always_visible_comment: passed ? "Exit signs visible from all points" : "Exit signs obscured from some angles",
-        exit_sign_visible_comment: passed ? "All exits clearly marked with illuminated signage" : "Exit signage needs improvement - not clearly visible"
+        exit_sign_always_visible_comment: passed ? "Exit signs visible from all points" : "Exit signs obscured from some angles"
       )
     end
   end

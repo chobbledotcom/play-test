@@ -35,7 +35,6 @@ RSpec.feature "User Height Assessment", type: :feature do
       expect(page).to have_field(I18n.t("forms.tallest_user_height.fields.containing_wall_height"))
       expect(page).to have_field(I18n.t("forms.tallest_user_height.fields.platform_height"))
       expect(page).to have_field(I18n.t("forms.tallest_user_height.fields.tallest_user_height"))
-      expect(page).to have_field(I18n.t("forms.tallest_user_height.fields.permanent_roof"))
 
       # User capacity
       expect(page).to have_field(I18n.t("forms.tallest_user_height.fields.users_at_1000mm"))
@@ -57,7 +56,6 @@ RSpec.feature "User Height Assessment", type: :feature do
       fill_in_form :tallest_user_height, :containing_wall_height, "2.5"
       fill_in_form :tallest_user_height, :platform_height, "1.0"
       fill_in_form :tallest_user_height, :tallest_user_height, "1.8"
-      check_form :tallest_user_height, :permanent_roof
 
       # Fill in user capacity
       fill_in_form :tallest_user_height, :users_at_1000mm, "5"
@@ -84,7 +82,6 @@ RSpec.feature "User Height Assessment", type: :feature do
       expect(assessment.containing_wall_height).to eq(2.5)
       expect(assessment.platform_height).to eq(1.0)
       expect(assessment.tallest_user_height).to eq(1.8)
-      expect(assessment.permanent_roof).to be true
       expect(assessment.users_at_1000mm).to eq(5)
       expect(assessment.users_at_1200mm).to eq(4)
       expect(assessment.users_at_1500mm).to eq(3)

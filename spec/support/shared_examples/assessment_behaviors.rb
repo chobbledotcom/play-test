@@ -43,6 +43,20 @@ RSpec.shared_examples "an assessment model" do
       expect(assessment).to respond_to(:passed_checks_count)
     end
   end
+
+  describe "validation patterns" do
+    context "pass/fail fields" do
+      described_class.column_names.select { |col| col.end_with?("_pass") }.each do |field|
+        include_examples "validates boolean field", field
+      end
+    end
+
+    context "comment fields" do
+      described_class.column_names.select { |col| col.end_with?("_comment") }.each do |field|
+        include_examples "validates comment field", field
+      end
+    end
+  end
 end
 
 RSpec.shared_examples "validates non-negative numeric field" do |field|
@@ -160,6 +174,88 @@ RSpec.shared_examples "has safety check methods" do
       end
 
       expect(assessment.passed_checks_count).to eq(0)
+    end
+  end
+
+  describe "#failed_checks_count" do
+    it "counts only failed checks" do
+      # Set all checks to fail
+      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
+        assessment.send("#{check}=", false) if assessment.respond_to?("#{check}=")
+      end
+
+      actual_checks = assessment.class.column_names.count { |col|
+        col.end_with?("_pass") && assessment.respond_to?(col)
+      }
+
+      expect(assessment.failed_checks_count).to eq(actual_checks)
+    end
+  end
+
+  describe "#has_critical_failures?" do
+    it "returns true when any check fails" do
+      # Set first check to fail, rest to pass
+      pass_fields = assessment.class.column_names.select { |col| col.end_with?("_pass") }
+      if pass_fields.any?
+        assessment.send("#{pass_fields.first}=", false)
+        pass_fields[1..].each { |check| assessment.send("#{check}=", true) }
+        expect(assessment.has_critical_failures?).to be true
+      end
+    end
+
+    it "returns false when all checks pass" do
+      # Set all checks to pass
+      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
+        assessment.send("#{check}=", true) if assessment.respond_to?("#{check}=")
+      end
+
+      expect(assessment.has_critical_failures?).to be false
+    end
+
+    it "returns false when all checks are nil" do
+      # Set all checks to nil
+      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
+        assessment.send("#{check}=", nil) if assessment.respond_to?("#{check}=")
+      end
+
+      expect(assessment.has_critical_failures?).to be false
+    end
+  end
+
+  describe "#safety_issues_summary" do
+    it "returns no issues message when all checks pass" do
+      # Set all checks to pass
+      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
+        assessment.send("#{check}=", true) if assessment.respond_to?("#{check}=")
+      end
+
+      expect(assessment.safety_issues_summary).to eq("No safety issues")
+    end
+
+    it "returns no issues message when all checks are nil" do
+      # Set all checks to nil
+      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
+        assessment.send("#{check}=", nil) if assessment.respond_to?("#{check}=")
+      end
+
+      expect(assessment.safety_issues_summary).to eq("No safety issues")
+    end
+
+    it "lists failed checks when some checks fail" do
+      pass_fields = assessment.class.column_names.select { |col| col.end_with?("_pass") }
+      if pass_fields.any?
+        # Set first check to fail
+        assessment.send("#{pass_fields.first}=", false)
+
+        expect(assessment.safety_issues_summary).to include("Safety issues:")
+        expect(assessment.safety_issues_summary).to include(pass_fields.first.humanize)
+      end
+    end
+  end
+
+  describe "#critical_failure_summary" do
+    it "aliases safety_issues_summary" do
+      expect(assessment.critical_failure_summary).to eq(assessment.safety_issues_summary)
     end
   end
 end

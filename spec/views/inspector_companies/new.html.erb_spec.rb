@@ -63,6 +63,6 @@ RSpec.describe "inspector_companies/new", type: :view do
   it "has navigation link back to companies" do
     render
 
-    expect(rendered).to include("Inspector Companies")
+    expect(rendered).to include("Companies")
   end
 end

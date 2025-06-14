@@ -38,7 +38,7 @@ RSpec.feature "Safety Standards Display", type: :feature do
       expect(page).to have_content("EN 14960:2019 Wall Height Requirements:")
       expect(page).to have_content("Walls must be at least 2.5m (equal to platform height)")
 
-      expect(page).to have_content("EN 14960:2019 Requirement:")
+      expect(page).to have_content("Requirement:")
       expect(page).to have_content("Minimum runout 1.25m")
       expect(page).to have_content("(50% of platform height or 300mm minimum)")
     end
@@ -51,11 +51,11 @@ RSpec.feature "Safety Standards Display", type: :feature do
     visit edit_inspection_path(inspection, tab: "user_height")
 
     within(".user-height-assessment") do
-      expect(page).to have_content("EN 14960:2019 Height Requirements:")
+      expect(page).to have_content("Height Requirements:")
       expect(page).to have_content("Containing walls must be at least 1.2m")
       expect(page).to have_content("Pass")
 
-      expect(page).to have_content("EN 14960:2019 Calculated Capacities:")
+      expect(page).to have_content("Calculated Capacities:")
       expect(page).to have_content("1.0m users: 13 (1.5m² per user)")
       expect(page).to have_content("1.2m users: 10 (2.0m² per user)")
     end

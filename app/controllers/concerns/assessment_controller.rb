@@ -72,9 +72,20 @@ module AssessmentController
     @assessment = @inspection.send(assessment_association)
   end
 
-  # This method must be implemented by including controllers
+  # Default implementation that permits all attributes except sensitive ones
+  # Can be overridden in including controllers if needed
   def assessment_params
-    raise NotImplementedError, "#{self.class.name} must implement #assessment_params"
+    params.require(param_key).permit(permitted_attributes)
+  end
+
+  def param_key
+    # e.g. "FanAssessmentsController" -> :assessments_fan_assessment
+    :"assessments_#{controller_name.singularize}"
+  end
+
+  def permitted_attributes
+    # Get all attributes except sensitive ones
+    assessment_class.attribute_names - %w[id inspection_id created_at updated_at]
   end
 
   # Automatically derive from controller name
@@ -91,8 +102,8 @@ module AssessmentController
 
   # Automatically derive from controller name
   def assessment_class
-    # e.g. "MaterialsAssessmentsController" -> MaterialsAssessment
-    controller_name.singularize.camelize.constantize
+    # e.g. "MaterialsAssessmentsController" -> Assessments::MaterialsAssessment
+    "Assessments::#{controller_name.singularize.camelize}".constantize
   end
 
   def load_inspection_locations

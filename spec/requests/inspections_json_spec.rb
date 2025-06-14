@@ -75,7 +75,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
 
           # Check specific fields are included using helper
           expect_assessment_json(json, "anchorage_assessment",
-            %w[num_anchors_comment anchor_accessories_comment])
+            %w[num_low_anchors_comment num_high_anchors_comment anchor_accessories_comment])
 
           expect_assessment_json(json, "materials_assessment",
             %w[ropes_comment thread_comment])

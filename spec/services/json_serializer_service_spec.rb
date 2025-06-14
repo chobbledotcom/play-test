@@ -127,7 +127,7 @@ RSpec.describe JsonSerializerService do
       before do
         # Update existing assessments with specific test data
         inspection.structure_assessment.update!(unit_pressure: 5.0)
-        inspection.anchorage_assessment.update!(num_anchors_comment: "Private comment")
+        inspection.anchorage_assessment.update!(num_low_anchors_comment: "Private comment")
         inspection.materials_assessment.update!(ropes_comment: "Private comment")
         inspection.fan_assessment.update!(blower_serial: "PRIVATE123")
         inspection.enclosed_assessment.update!(exit_number_comment: "Private comment")
@@ -154,7 +154,8 @@ RSpec.describe JsonSerializerService do
 
         # AnchorageAssessment should include all comment fields
         anchorage = json[:assessments][:anchorage_assessment]
-        expect(anchorage).to have_key(:num_anchors_comment)
+        expect(anchorage).to have_key(:num_low_anchors_comment)
+        expect(anchorage).to have_key(:num_high_anchors_comment)
         expect(anchorage).to have_key(:anchor_accessories_comment)
 
         # MaterialsAssessment should include all fields

@@ -30,7 +30,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
     end
 
     # Users
-    create_table "users", id: {type: :string, limit: 12}, force: :cascade do |t|
+    create_table "users", id: {type: :string, limit: 8}, force: :cascade do |t|
       t.string "email"
       t.string "password_digest"
       t.datetime "created_at", null: false
@@ -52,7 +52,8 @@ class InitialSchema < ActiveRecord::Migration[8.0]
     end
 
     # Inspector Companies
-    create_table "inspector_companies", id: {type: :string, limit: 12}, force: :cascade do |t|
+    create_table "inspector_companies", id: {type: :string, limit: 8}, force: :cascade do |t|
+      t.boolean "active", default: true
       t.string "name", null: false
       t.string "email"
       t.string "phone", null: false
@@ -60,7 +61,6 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.string "city"
       t.string "postal_code"
       t.string "country", default: "UK"
-      t.boolean "active", default: true
       t.text "notes"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
@@ -68,18 +68,18 @@ class InitialSchema < ActiveRecord::Migration[8.0]
     end
 
     # Units
-    create_table "units", id: {type: :string, limit: 12}, force: :cascade do |t|
+    create_table "units", id: {type: :string, limit: 8}, force: :cascade do |t|
       t.string "name"
-      t.string "user_id", limit: 12, null: false
+      t.string "user_id", limit: 8, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
+      t.boolean "is_seed", default: false, null: false
       t.string "manufacturer"
       t.string "description"
       t.string "owner"
       t.text "notes"
       t.string "model"
       t.date "manufacture_date"
-      t.boolean "is_seed", default: false, null: false
       t.string "serial"
       t.index ["is_seed"], name: "index_units_on_is_seed"
       t.index ["manufacturer", "serial"], name: "index_units_on_manufacturer_and_serial", unique: true
@@ -87,17 +87,18 @@ class InitialSchema < ActiveRecord::Migration[8.0]
     end
 
     # Inspections
-    create_table "inspections", id: {type: :string, limit: 12}, force: :cascade do |t|
+    create_table "inspections", id: {type: :string, limit: 8}, force: :cascade do |t|
       t.datetime "inspection_date"
       t.boolean "passed"
-      t.string "user_id", limit: 12, null: false
+      t.string "unit_id", limit: 8
+      t.string "user_id", limit: 8, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
+      t.boolean "is_seed", default: false, null: false
       t.datetime "pdf_last_accessed_at"
-      t.string "unit_id"
       t.string "inspection_location"
       t.string "unique_report_number"
-      t.string "inspector_company_id"
+      t.string "inspector_company_id", limit: 8
       t.decimal "width", precision: 8, scale: 2
       t.decimal "length", precision: 8, scale: 2
       t.decimal "height", precision: 8, scale: 2
@@ -108,7 +109,6 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.string "height_comment", limit: 1000
       t.text "risk_assessment"
       t.datetime "complete_date"
-      t.boolean "is_seed", default: false, null: false
       t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
       t.index ["is_seed"], name: "index_inspections_on_is_seed"
       t.index ["unit_id"], name: "index_inspections_on_unit_id"
@@ -118,17 +118,15 @@ class InitialSchema < ActiveRecord::Migration[8.0]
 
     # Assessment Tables
     create_table "anchorage_assessments", force: :cascade do |t|
-      t.string "inspection_id", limit: 12, null: false
+      t.string "inspection_id", limit: 8, null: false
       t.integer "num_low_anchors"
       t.integer "num_high_anchors"
-      t.boolean "num_anchors_pass"
       t.boolean "anchor_accessories_pass"
       t.boolean "anchor_degree_pass"
       t.boolean "anchor_type_pass"
       t.boolean "pull_strength_pass"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.text "num_anchors_comment"
       t.text "anchor_accessories_comment"
       t.text "anchor_degree_comment"
       t.text "anchor_type_comment"
@@ -141,7 +139,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
     end
 
     create_table "enclosed_assessments", force: :cascade do |t|
-      t.string "inspection_id", limit: 12, null: false
+      t.string "inspection_id", limit: 8, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
       t.integer "exit_number"
@@ -149,13 +147,11 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.text "exit_number_comment"
       t.boolean "exit_sign_always_visible_pass"
       t.text "exit_sign_always_visible_comment"
-      t.boolean "exit_sign_visible_pass"
-      t.text "exit_sign_visible_comment"
       t.index ["inspection_id"], name: "index_enclosed_assessments_on_inspection_id"
     end
 
     create_table "fan_assessments", force: :cascade do |t|
-      t.string "inspection_id", limit: 12, null: false
+      t.string "inspection_id", limit: 8, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
       t.text "fan_size_type"
@@ -174,7 +170,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
     end
 
     create_table "materials_assessments", force: :cascade do |t|
-      t.string "inspection_id", limit: 12, null: false
+      t.string "inspection_id", limit: 8, null: false
       t.decimal "ropes", precision: 8, scale: 2
       t.boolean "ropes_pass"
       t.boolean "clamber_netting_pass"
@@ -230,7 +226,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
 
     # Structure assessments - WITHOUT step_size fields
     create_table "structure_assessments", force: :cascade do |t|
-      t.string "inspection_id", limit: 12, null: false
+      t.string "inspection_id", limit: 8, null: false
       t.boolean "seam_integrity_pass"
       t.boolean "uses_lock_stitching_pass"
       t.boolean "air_loss_pass"
@@ -292,36 +288,24 @@ class InitialSchema < ActiveRecord::Migration[8.0]
 
     create_table "user_height_assessments", force: :cascade do |t|
       t.string "inspection_id", limit: 12, null: false
+      t.datetime "created_at", null: false
+      t.datetime "updated_at", null: false
       t.decimal "containing_wall_height", precision: 8, scale: 2
+      t.text "containing_wall_height_comment"
       t.decimal "platform_height", precision: 8, scale: 2
+      t.text "platform_height_comment"
       t.decimal "tallest_user_height", precision: 8, scale: 2
+      t.text "tallest_user_height_comment"
+      t.decimal "play_area_length", precision: 8, scale: 2
+      t.text "play_area_length_comment"
+      t.decimal "play_area_width", precision: 8, scale: 2
+      t.text "play_area_width_comment"
+      t.decimal "negative_adjustment", precision: 8, scale: 2
+      t.text "negative_adjustment_comment"
       t.integer "users_at_1000mm"
       t.integer "users_at_1200mm"
       t.integer "users_at_1500mm"
       t.integer "users_at_1800mm"
-      t.decimal "play_area_length", precision: 8, scale: 2
-      t.decimal "play_area_width", precision: 8, scale: 2
-      t.decimal "negative_adjustment", precision: 8, scale: 2
-      t.boolean "permanent_roof"
-      t.text "tallest_user_height_comment"
-      t.datetime "created_at", null: false
-      t.datetime "updated_at", null: false
-      t.text "containing_wall_height_comment"
-      t.text "platform_height_comment"
-      t.text "play_area_length_comment"
-      t.text "play_area_width_comment"
-      t.text "negative_adjustment_comment"
-      t.text "permanent_roof_comment"
-      t.boolean "height_requirements_pass"
-      t.boolean "permanent_roof_pass"
-      t.boolean "user_capacity_pass"
-      t.boolean "play_area_pass"
-      t.boolean "negative_adjustments_pass"
-      t.text "height_requirements_comment"
-      t.text "permanent_roof_pass_comment"
-      t.text "user_capacity_comment"
-      t.text "play_area_comment"
-      t.text "negative_adjustments_comment"
       t.index ["inspection_id"], name: "index_user_height_assessments_on_inspection_id"
     end
 

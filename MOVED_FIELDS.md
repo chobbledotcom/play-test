@@ -1,12 +1,14 @@
 # Fields Moved from Inspections to Assessment Tables
 
 ## Anchorage Assessment Fields
+
 - `num_low_anchors`
 - `num_high_anchors`
 - `num_low_anchors_comment`
 - `num_high_anchors_comment`
 
 ## User Height Assessment Fields
+
 - `containing_wall_height`
 - `platform_height`
 - `tallest_user_height`
@@ -21,6 +23,7 @@
 - All associated comment fields
 
 ## Slide Assessment Fields
+
 - `slide_platform_height`
 - `slide_wall_height`
 - `runout`
@@ -33,6 +36,7 @@
 - All associated comment fields
 
 ## Structure Assessment Fields
+
 - `stitch_length`
 - `evacuation_time`
 - `unit_pressure_value`
@@ -47,6 +51,7 @@
 - `trough_pass`
 
 ## Materials Assessment Fields
+
 - `rope_size` (now `ropes`)
 - `artwork_pass`
 - `windows_pass`
@@ -54,13 +59,14 @@
 - `retention_netting_pass`
 
 ## Enclosed Assessment Fields
+
 - `exit_number`
-- `exit_sign_visible_pass`
 - `exit_number_comment`
 
 ## Access Pattern Changes Needed
 
 ### OLD:
+
 ```ruby
 inspection.num_low_anchors
 inspection.containing_wall_height
@@ -68,6 +74,7 @@ inspection.slide_platform_height
 ```
 
 ### NEW:
+
 ```ruby
 inspection.anchorage_assessment.num_low_anchors
 inspection.user_height_assessment.containing_wall_height

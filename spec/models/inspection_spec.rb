@@ -779,11 +779,6 @@ RSpec.describe Inspection, type: :model do
     describe "safety check methods" do
       let(:inspection) { create(:inspection) }
 
-      before do
-        inspection.create_user_height_assessment!
-        inspection.create_structure_assessment!
-      end
-
       describe "#all_safety_checks_pass?" do
         it "evaluates safety checks with auto-created assessments" do
           expect(inspection.send(:all_safety_checks_pass?)).to be_falsey

@@ -7,6 +7,7 @@ class InspectorCompaniesController < ApplicationController
 
   def index
     @inspector_companies = InspectorCompany
+      .with_attached_logo
       .by_status(params[:active])
       .search_by_term(params[:search])
       .order(:name)

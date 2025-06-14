@@ -11,19 +11,12 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
   describe "PATCH /inspections/:id with Turbo Stream" do
     context "when updating assessment data" do
       it "returns turbo stream response with progress update" do
-        # Create an assessment to update
-        assessment = inspection.create_user_height_assessment!(
-          containing_wall_height: 1.5,
-          platform_height: 1.0,
-          tallest_user_height: 1.2
-        )
-
+        inspection.user_height_assessment
         patch inspection_path(inspection),
           params: {
             inspection: {
               user_height_assessment_attributes: {
-                id: assessment.id,
-                permanent_roof: true
+                users_at_1000mm: 2
               }
             }
           },
@@ -40,7 +33,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
       it "updates progress status when assessment is updated" do
         # Start with incomplete assessment
-        assessment = inspection.create_user_height_assessment!(
+        inspection.user_height_assessment.update!(
           containing_wall_height: nil,
           platform_height: nil
         )
@@ -50,11 +43,9 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
           params: {
             inspection: {
               user_height_assessment_attributes: {
-                id: assessment.id,
                 containing_wall_height: 1.5,
                 platform_height: 1.0,
                 tallest_user_height: 1.2,
-                permanent_roof: false,
                 users_at_1000mm: 10,
                 users_at_1200mm: 8,
                 users_at_1500mm: 6,
@@ -79,11 +70,10 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         inspection.update!(complete_date: Time.current)
 
         # Create an assessment
-        inspection.create_user_height_assessment!(
+        inspection.user_height_assessment.update!(
           containing_wall_height: 1.5,
           platform_height: 1.0,
           tallest_user_height: 1.2,
-          permanent_roof: false,
           users_at_1000mm: 10,
           users_at_1200mm: 8,
           users_at_1500mm: 6,
@@ -112,14 +102,11 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
     context "when there are validation errors" do
       it "returns turbo stream with error handling" do
-        assessment = inspection.create_user_height_assessment!
-
         # Send invalid data that should cause validation errors
         patch inspection_path(inspection),
           params: {
             inspection: {
               user_height_assessment_attributes: {
-                id: assessment.id,
                 containing_wall_height: -1  # Invalid negative value
               }
             }
@@ -134,7 +121,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
   describe "Turbo Stream content validation" do
     it "produces valid turbo stream markup" do
-      assessment = inspection.create_user_height_assessment!(
+      inspection.user_height_assessment.update!(
         containing_wall_height: 1.5,
         platform_height: 1.0
       )
@@ -143,7 +130,6 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         params: {
           inspection: {
             user_height_assessment_attributes: {
-              id: assessment.id,
               tallest_user_height: 1.2
             }
           }

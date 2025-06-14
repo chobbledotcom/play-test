@@ -39,8 +39,9 @@ class PdfGeneratorService
     end
 
     def render_field_group(base_name, fields)
-      main_field = fields[:base] || fields[:pass]
-      return unless main_field && has_i18n_label?(main_field)
+      # For grouped fields, check i18n for base field; for standalone pass fields, check the pass field
+      label_field = fields[:base] || fields[:pass]
+      return unless label_field && has_i18n_label?(label_field)
 
       [render_field_line(fields), render_comment_line(fields)].compact.each do |line|
         @current_assessment_fields << line
@@ -48,10 +49,7 @@ class PdfGeneratorService
     end
 
     def has_i18n_label?(field)
-      field_label(field)
-      true
-    rescue I18n::MissingTranslationData
-      false
+      I18n.exists?("forms.#{@current_assessment_type}.fields.#{field}")
     end
 
     def determine_pass_value(fields, main_field, value)
@@ -74,7 +72,7 @@ class PdfGeneratorService
           ["[NULL]", NULL_COLOR]
         else
           [
-            "[#{pass_fail(pass_value).upcase}]",
+            pass_fail(pass_value).to_s,
             pass_value ? PASS_COLOR : FAIL_COLOR
           ]
         end
@@ -82,10 +80,14 @@ class PdfGeneratorService
     end
 
     def colored(text, color) = "<color rgb='#{color}'>#{text}</color>"
+
     def bold(text) = "<b>#{text}</b>"
+
     def italic(text) = "<i>#{text}</i>"
+
     def field_label(field_name) = I18n.t!("forms.#{@current_assessment_type}.fields.#{field_name}")
-    def pass_fail(value) = I18n.t(value ? "shared.pass" : "shared.fail")
+
+    def pass_fail(value) = I18n.t(value ? "shared.pass_pdf" : "shared.fail_pdf")
 
     public
 
@@ -116,7 +118,9 @@ class PdfGeneratorService
       return unless main_field
 
       value = @current_assessment.send(main_field)
-      label = field_label(main_field)
+      # Use base field label when available, otherwise use pass field label
+      label_field = fields[:base] || fields[:pass]
+      label = field_label(label_field)
       pass_value = determine_pass_value(fields, main_field, value)
 
       format_field_line(label, value, pass_value, main_field.to_s.end_with?("_pass"))

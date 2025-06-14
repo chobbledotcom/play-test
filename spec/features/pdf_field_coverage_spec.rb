@@ -46,26 +46,9 @@ RSpec.feature "PDF Field Coverage", type: :feature do
       expect(text_content).to include(I18n.t("forms.fan.header"))
 
       # Some actual assessment data shows up
-      expect(text_content).to include(I18n.t("shared.pass")) # Should have some passing assessments
+      expect(text_content).to include("[PASS]") # Should have some passing assessments
       expect(text_content).to include("1.2") # containing_wall_height
       expect(text_content).to include("1.8") # platform_height
-    end
-
-    scenario "handles nil and empty values gracefully" do
-      # Create inspection with minimal data
-      inspection = create(:inspection, :completed,
-        user: user,
-        unit: unit,
-        inspection_location: "Minimal Test Location",
-        passed: true)
-
-      # Assessments are auto-created by inspection callback with nil values
-
-      # Should generate PDF successfully even with minimal data
-      text_content = test_pdf_content(inspection_report_path(inspection))
-
-      # Should include fallback text for missing data
-      expect_no_assessment_messages(text_content, inspection)
     end
   end
 

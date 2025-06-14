@@ -246,7 +246,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       expected_data = [expected_header] + inspections.map { |i|
         [
           i.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.unit.fields.na"),
-          i.passed ? I18n.t("shared.pass") : I18n.t("shared.fail"),
+          i.passed ? I18n.t("shared.pass_pdf") : I18n.t("shared.fail_pdf"),
           i.user.name || I18n.t("pdf.unit.fields.na"),
           i.user.rpii_inspector_number || I18n.t("pdf.unit.fields.na"),
           i.inspection_location || I18n.t("pdf.unit.fields.na")
@@ -267,9 +267,9 @@ RSpec.describe PdfGeneratorService::TableBuilder do
           I18n.t("pdf.inspection.fields.rpii_inspector_no"),
           I18n.t("pdf.inspection.fields.inspection_location")
         ],
-        ["15/01/2024", I18n.t("shared.pass"), "John Smith", "RPII123", "Site A"],
-        ["20/02/2024", I18n.t("shared.fail"), "Jane Doe", "RPII456", "Site B"],
-        ["01/03/2024", I18n.t("shared.fail"), "John Smith", "RPII123", I18n.t("pdf.unit.fields.na")]
+        ["15/01/2024", I18n.t("shared.pass_pdf"), "John Smith", "RPII123", "Site A"],
+        ["20/02/2024", I18n.t("shared.fail_pdf"), "Jane Doe", "RPII456", "Site B"],
+        ["01/03/2024", I18n.t("shared.fail_pdf"), "John Smith", "RPII123", I18n.t("pdf.unit.fields.na")]
       ]
 
       described_class.create_inspection_history_table(pdf_double, title, inspections)

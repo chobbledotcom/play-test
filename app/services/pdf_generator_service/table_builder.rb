@@ -87,7 +87,7 @@ class PdfGeneratorService
       inspections.each do |inspection|
         table_data << [
           inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.unit.fields.na"),
-          inspection.passed ? I18n.t("shared.pass") : I18n.t("shared.fail"),
+          inspection.passed ? I18n.t("shared.pass_pdf") : I18n.t("shared.fail_pdf"),
           inspection.user.name || I18n.t("pdf.unit.fields.na"),
           inspection.user.rpii_inspector_number || I18n.t("pdf.unit.fields.na"),
           inspection.inspection_location || I18n.t("pdf.unit.fields.na")
@@ -117,10 +117,10 @@ class PdfGeneratorService
         # Color and style the result column (index 1)
         (1...table_data.length).each do |i|
           result_cell = t.row(i).column(1)
-          if table_data[i][1] == I18n.t("shared.pass")
+          if table_data[i][1] == I18n.t("shared.pass_pdf")
             result_cell.text_color = PASS_COLOR
             result_cell.font_style = :bold
-          elsif table_data[i][1] == I18n.t("shared.fail")
+          elsif table_data[i][1] == I18n.t("shared.fail_pdf")
             result_cell.text_color = FAIL_COLOR
             result_cell.font_style = :bold
           end
@@ -141,6 +141,10 @@ class PdfGeneratorService
     def self.build_unit_details_table(unit, context)
       # Get dimensions from last inspection if available
       last_inspection = unit.last_inspection
+      build_unit_details_table_with_inspection(unit, last_inspection, context)
+    end
+
+    def self.build_unit_details_table_with_inspection(unit, last_inspection, context)
       dimensions = []
 
       if last_inspection

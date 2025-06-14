@@ -7,7 +7,8 @@ FactoryBot.define do
     num_high_anchors { nil }
 
     # Pass/fail assessments
-    num_anchors_pass { nil }
+    num_low_anchors_pass { nil }
+    num_high_anchors_pass { nil }
     anchor_type_pass { nil }
     pull_strength_pass { nil }
     anchor_degree_pass { nil }
@@ -16,7 +17,8 @@ FactoryBot.define do
     trait :passed do
       num_low_anchors { 6 }
       num_high_anchors { 4 }
-      num_anchors_pass { true }
+      num_low_anchors_pass { true }
+      num_high_anchors_pass { true }
       anchor_type_pass { true }
       pull_strength_pass { true }
       anchor_degree_pass { true }
@@ -28,14 +30,12 @@ FactoryBot.define do
       num_high_anchors { 4 }
       num_low_anchors_pass { true }
       num_high_anchors_pass { true }
-      num_anchors_pass { true }
       anchor_type_pass { true }
       pull_strength_pass { true }
       anchor_degree_pass { true }
       anchor_accessories_pass { true }
       num_low_anchors_comment { "Low anchor count appropriate" }
       num_high_anchors_comment { "High anchor count adequate" }
-      num_anchors_comment { "Adequate anchor count for unit size" }
       anchor_type_comment { "Appropriate anchor type for surface" }
       pull_strength_comment { "Pull strength meets requirements" }
       anchor_degree_comment { "Anchor angle within specification" }
@@ -45,7 +45,8 @@ FactoryBot.define do
     trait :failed do
       num_low_anchors { 2 }
       num_high_anchors { 1 }
-      num_anchors_pass { false }
+      num_low_anchors_pass { false }
+      num_high_anchors_pass { false }
       anchor_type_pass { false }
       pull_strength_pass { false }
       anchor_degree_pass { true }
@@ -60,7 +61,8 @@ FactoryBot.define do
     trait :insufficient_anchors do
       num_low_anchors { 1 }
       num_high_anchors { 1 }
-      num_anchors_pass { false }
+      num_low_anchors_pass { false }
+      num_high_anchors_pass { false }
     end
   end
 end

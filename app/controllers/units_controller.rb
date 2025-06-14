@@ -24,7 +24,7 @@ class UnitsController < ApplicationController
 
   def show
     @inspections = @unit.inspections
-      .includes(:inspector_company)
+      .includes(inspector_company: {logo_attachment: :blob})
       .order(inspection_date: :desc)
 
     respond_to do |format|
@@ -138,7 +138,7 @@ class UnitsController < ApplicationController
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
 
   def set_unit
-    @unit = Unit.find_by(id: params[:id].upcase)
+    @unit = Unit.with_attached_photo.find_by(id: params[:id].upcase)
 
     unless @unit
       # Always return 404 for non-existent resources regardless of login status
@@ -154,8 +154,7 @@ class UnitsController < ApplicationController
   end
 
   def send_unit_pdf
-    # Preload photo attachment to avoid N+1 queries
-    @unit = Unit.with_attached_photo.find(@unit.id)
+    # Unit already has photo loaded from set_unit
     pdf_data = PdfGeneratorService.generate_unit_report(@unit)
 
     send_data pdf_data.render,

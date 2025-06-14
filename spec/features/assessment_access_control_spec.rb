@@ -23,7 +23,8 @@ RSpec.feature "Assessment Access Control", type: :feature do
         anchorage_assessment_attributes: {
           num_low_anchors: 10,
           num_high_anchors: 5,
-          num_anchors_pass: true
+          num_low_anchors_pass: true,
+          num_high_anchors_pass: true
         }
       }
     }

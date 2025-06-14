@@ -65,18 +65,18 @@ module PdfTestHelpers
       # Skip conditional assessments if not applicable
       next if assessment_name == :slide_assessment && !inspection.has_slide?
       next if assessment_name == :enclosed_assessment && !inspection.is_totally_enclosed?
-      
+
       # Get the i18n key for this assessment
       assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
       assessment_type = "tallest_user_height" if assessment_type == "user_height"
-      
+
       # Check header is present
       header = I18n.t("forms.#{assessment_type}.header")
       expect(pdf_text).to include(header)
-      
+
       # Get ALL field labels from i18n and verify each one appears
       fields = I18n.t("forms.#{assessment_type}.fields")
-      
+
       # Group fields to understand which are rendered together
       field_groups = {}
       fields.each_key do |field_key|
@@ -88,21 +88,21 @@ module PdfTestHelpers
         else
           field_str
         end
-        
+
         field_groups[base_field] ||= []
         field_groups[base_field] << field_key
       end
-      
+
       # Check each field group
       field_groups.each do |base_name, group_fields|
         # For grouped fields (base + _pass), we expect the base label
         # For standalone _pass fields, we expect that label
         # Comments don't render labels on their own
-        
+
         main_field = group_fields.find { |f| !f.to_s.end_with?("_comment") }
         if main_field
           label = fields[main_field]
-          expect(pdf_text).to include(label), 
+          expect(pdf_text).to include(label),
             "Missing i18n field label '#{label}' for #{assessment_type}.#{main_field}"
         end
       end

@@ -74,7 +74,8 @@ ANCHORAGE_SAMPLE_DATA = {
   num_high_anchors: 4,
 
   # Pass/fail checks
-  num_anchors_pass: true,
+  num_low_anchors_pass: true,
+  num_high_anchors_pass: true,
   anchor_accessories_pass: false,
   anchor_degree_pass: true,
   anchor_type_pass: true,
@@ -117,17 +118,13 @@ USER_HEIGHT_SAMPLE_DATA = {
   play_area_width: 5.5,
   negative_adjustment: 0.5,
 
-  # Pass/fail checks
-  height_requirements_pass: true,
-  permanent_roof_pass: false,
-  user_capacity_pass: true,
-  play_area_pass: true,
-  negative_adjustments_pass: false,
-
   # Comments
   containing_wall_height_comment: "Height adequate for tallest users",
-  permanent_roof_comment: "Temporary roof structure only",
-  negative_adjustments_comment: "Obstruction reduces usable area"
+  platform_height_comment: "Platform height verified",
+  tallest_user_height_comment: "Maximum user height checked",
+  play_area_length_comment: "Length measurement confirmed",
+  play_area_width_comment: "Width adequate for capacity",
+  negative_adjustment_comment: "Obstruction reduces usable area"
 }.freeze
 
 SLIDE_SAMPLE_DATA = {
@@ -157,11 +154,9 @@ ENCLOSED_SAMPLE_DATA = {
   # Pass/fail checks
   exit_number_pass: true,
   exit_sign_always_visible_pass: true,
-  exit_sign_visible_pass: false,
 
   # Comments
   exit_number_comment: "Three exits well distributed",
-  exit_sign_visible_comment: "Sign obscured from some angles",
   exit_sign_always_visible_comment: "Visibility confirmed from all angles"
 }.freeze
 

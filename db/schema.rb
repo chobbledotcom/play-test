@@ -43,14 +43,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_14_005014) do
     t.string "inspection_id", limit: 12, null: false
     t.integer "num_low_anchors"
     t.integer "num_high_anchors"
-    t.boolean "num_anchors_pass"
     t.boolean "anchor_accessories_pass"
     t.boolean "anchor_degree_pass"
     t.boolean "anchor_type_pass"
     t.boolean "pull_strength_pass"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "num_anchors_comment"
     t.text "anchor_accessories_comment"
     t.text "anchor_degree_comment"
     t.text "anchor_type_comment"
@@ -71,8 +69,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_14_005014) do
     t.text "exit_number_comment"
     t.boolean "exit_sign_always_visible_pass"
     t.text "exit_sign_always_visible_comment"
-    t.boolean "exit_sign_visible_pass"
-    t.text "exit_sign_visible_comment"
     t.index ["inspection_id"], name: "index_enclosed_assessments_on_inspection_id"
   end
 
@@ -272,36 +268,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_14_005014) do
 
   create_table "user_height_assessments", force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.decimal "containing_wall_height", precision: 8, scale: 2
+    t.text "containing_wall_height_comment"
     t.decimal "platform_height", precision: 8, scale: 2
+    t.text "platform_height_comment"
     t.decimal "tallest_user_height", precision: 8, scale: 2
+    t.text "tallest_user_height_comment"
+    t.decimal "play_area_length", precision: 8, scale: 2
+    t.text "play_area_length_comment"
+    t.decimal "play_area_width", precision: 8, scale: 2
+    t.text "play_area_width_comment"
+    t.decimal "negative_adjustment", precision: 8, scale: 2
+    t.text "negative_adjustment_comment"
     t.integer "users_at_1000mm"
     t.integer "users_at_1200mm"
     t.integer "users_at_1500mm"
     t.integer "users_at_1800mm"
-    t.decimal "play_area_length", precision: 8, scale: 2
-    t.decimal "play_area_width", precision: 8, scale: 2
-    t.decimal "negative_adjustment", precision: 8, scale: 2
-    t.boolean "permanent_roof"
-    t.text "tallest_user_height_comment"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text "containing_wall_height_comment"
-    t.text "platform_height_comment"
-    t.text "play_area_length_comment"
-    t.text "play_area_width_comment"
-    t.text "negative_adjustment_comment"
-    t.text "permanent_roof_comment"
-    t.boolean "height_requirements_pass"
-    t.boolean "permanent_roof_pass"
-    t.boolean "user_capacity_pass"
-    t.boolean "play_area_pass"
-    t.boolean "negative_adjustments_pass"
-    t.text "height_requirements_comment"
-    t.text "permanent_roof_pass_comment"
-    t.text "user_capacity_comment"
-    t.text "play_area_comment"
-    t.text "negative_adjustments_comment"
     t.index ["inspection_id"], name: "index_user_height_assessments_on_inspection_id"
   end
 

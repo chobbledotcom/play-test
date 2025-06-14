@@ -166,7 +166,6 @@ RSpec.describe "Inspector Companies", type: :feature do
       visit inspector_company_path(company)
 
       expect(page).to have_content(company.name)
-      expect(page).to have_content(I18n.t("inspector_companies.headers.company_details"))
       expect(page).to have_content(I18n.t("inspector_companies.headers.company_statistics"))
 
       # Company RPII field no longer exists

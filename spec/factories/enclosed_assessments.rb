@@ -7,13 +7,11 @@ FactoryBot.define do
     exit_number_comment { "Adequate emergency exits" }
     exit_sign_always_visible_pass { true }
     exit_sign_always_visible_comment { "Exits clearly marked and visible" }
-    exit_sign_visible_pass { true }
 
     trait :passed do
       exit_number { 2 }
       exit_number_pass { true }
       exit_sign_always_visible_pass { true }
-      exit_sign_visible_pass { true }
       exit_number_comment { "Adequate emergency exits" }
       exit_sign_always_visible_comment { "Exits clearly marked and visible" }
     end

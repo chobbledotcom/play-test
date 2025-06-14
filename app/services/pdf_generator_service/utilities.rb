@@ -14,8 +14,8 @@ class PdfGeneratorService
 
     def self.format_pass_fail(value)
       case value
-      when true then I18n.t("shared.pass")
-      when false then I18n.t("shared.fail")
+      when true then I18n.t("shared.pass_pdf")
+      when false then I18n.t("shared.fail_pdf")
       else I18n.t("pdf.inspection.fields.na")
       end
     end

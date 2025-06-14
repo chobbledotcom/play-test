@@ -31,9 +31,7 @@
 %>
 
 <div class="form-grid number-comment">
-  <label>
-    <%= field_data[:field_label] %>
-  </label>
+  <%= form.label number_field, field_data[:field_label] %>
 
   <%= form.number_field number_field, **number_options %>
 

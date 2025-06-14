@@ -10,7 +10,6 @@ en:
         containing_wall_height: "Containing Wall Height"
         platform_height: "Platform Height"
         tallest_user_height: "Tallest User Height"
-        permanent_roof: "Has Permanent Roof"
         users_at_1000mm: "Users at 1000mm"
         users_at_1200mm: "Users at 1200mm"
         users_at_1500mm: "Users at 1500mm"
@@ -18,7 +17,6 @@ en:
         play_area_length: "Play Area Length"
         play_area_width: "Play Area Width"
         negative_adjustment: "Negative Adjustment"
-        total_capacity: "Total Capacity"
       placeholders:
         height: "Enter height in meters"
         user_count: "Number of users"
@@ -27,7 +25,6 @@ en:
         containing_wall_height: "Height of the containing wall from ground level (meters)"
         platform_height: "Height of the platform from ground level (meters)"
         tallest_user_height: "Maximum tallest user height allowed (meters)"
-        permanent_roof: "Check if the unit has a permanent roof structure"
         play_area_dimension: "Internal dimensions of the play area (meters)"
         negative_adjustment: "Area deduction for obstacles or unusable space (square meters)"
       status:

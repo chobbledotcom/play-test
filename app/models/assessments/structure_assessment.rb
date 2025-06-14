@@ -20,16 +20,6 @@ class Assessments::StructureAssessment < ApplicationRecord
   # Pass/fail checks for measurements
   MEASUREMENT_CHECKS = %w[stitch_length_pass unit_pressure_pass blower_tube_length_pass].freeze
 
-  # Pass/fail validations
-  CRITICAL_CHECKS.each do |check|
-    validates check.to_sym, inclusion: {in: [true, false]}, allow_nil: true
-  end
-
-  # Additional pass/fail checks
-  ADDITIONAL_CHECKS.each do |check|
-    validates check.to_sym, inclusion: {in: [true, false]}, allow_nil: true
-  end
-
   # Measurements
   validates :stitch_length, :unit_pressure, :blower_tube_length,
     :step_ramp_size, :critical_fall_off_height, :trough_depth, :trough_adjacent_panel_width,
@@ -37,17 +27,6 @@ class Assessments::StructureAssessment < ApplicationRecord
 
   # Callbacks
   after_update :log_assessment_update, if: :saved_changes?
-
-  def has_critical_failures?
-    CRITICAL_CHECKS.any? { |check| send(check) == false }
-  end
-
-  def critical_failure_summary
-    failures = CRITICAL_CHECKS.select { |check| send(check) == false }
-    return "No critical failures" if failures.empty?
-
-    "Critical failures: #{failures.map(&:humanize).join(", ")}"
-  end
 
   def measurement_compliance
     {
