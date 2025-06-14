@@ -45,12 +45,11 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
           choose radio_id
         else
           # Raise error if field is not in i18n - we must have all fields defined
-          unless fields.key?(field_key)
+          unless fields.key?(field_key) || field_key.to_s.end_with?("_comment")
             raise "Field #{field_key} is in sample data but not in i18n at #{i18n_base}.fields.#{field_key}"
           end
 
           field_label = fields[field_key]
-          puts "Filling #{field_key} (#{field_label}) with #{value}" if ENV["DEBUG"]
 
           case value
           when true, false
@@ -66,11 +65,13 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
               # Find the comment field near the related field
               base_field = field_key.to_s.chomp("_comment")
               # First, ensure the comment field is visible by checking its checkbox if present
-              # The checkbox ID is: #{field}_has_comment_#{model.object_id}
+              # The checkbox ID contains: #{field}_has_comment_
               comment_checkbox = find("input[type='checkbox'][id*='#{base_field}_has_comment_']")
-              comment_checkbox.check if comment_checkbox && !comment_checkbox.checked?
-              # Then fill in the comment
-              fill_in(/#{field_key}/i, with: value)
+              comment_checkbox.check unless comment_checkbox.checked?
+              # Then fill in the comment by finding the textarea with matching ID
+              # Use visible: :all to find hidden elements
+              comment_textarea = find("textarea[id*='#{base_field}_comment_textarea_']", visible: :all)
+              comment_textarea.set(value)
             else
               fill_in field_label, with: value
             end

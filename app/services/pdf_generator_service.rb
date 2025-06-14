@@ -26,41 +26,25 @@ class PdfGeneratorService
       # Unit details section
       generate_inspection_unit_details(pdf, inspection)
 
-      # User Height/Count Assessment section
-      renderer = AssessmentRenderer.generate_user_height_section(pdf, inspection)
-      assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
-
-      # Slide Assessment section (if inspection has slide)
-      if inspection.has_slide?
-        renderer = AssessmentRenderer.generate_slide_section(pdf, inspection)
+      # Generate all assessment sections using ASSESSMENT_TYPES
+      Inspection::ASSESSMENT_TYPES.each do |assessment_name, _assessment_class|
+        # Skip slide assessment if unit doesn't have a slide
+        next if assessment_name == :slide_assessment && !inspection.has_slide?
+        
+        # Skip enclosed assessment if not totally enclosed
+        next if assessment_name == :enclosed_assessment && !inspection.is_totally_enclosed?
+        
+        # Get the assessment type name for i18n (remove _assessment suffix)
+        assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
+        
+        # Special case: user_height_assessment uses "tallest_user_height" in i18n
+        assessment_type = "tallest_user_height" if assessment_type == "user_height"
+        
+        # Generate the section using the generic renderer
+        renderer = AssessmentRenderer.new
+        renderer.generate_assessment_section(pdf, assessment_type, inspection.send(assessment_name))
         assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
       end
-
-      # Structure Assessment section
-      renderer = AssessmentRenderer.generate_structure_section(pdf, inspection)
-      assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
-
-      # Anchorage Assessment
-      renderer = AssessmentRenderer.generate_anchorage_section(pdf, inspection)
-      assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
-
-      # Totally Enclosed section (if applicable)
-      if inspection.is_totally_enclosed?
-        renderer = AssessmentRenderer.generate_enclosed_section(pdf, inspection)
-        assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
-      end
-
-      # Materials Assessment
-      renderer = AssessmentRenderer.generate_materials_section(pdf, inspection)
-      assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
-
-      # Fan/Blower Assessment
-      renderer = AssessmentRenderer.generate_fan_section(pdf, inspection)
-      assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
-
-      # Risk Assessment section
-      renderer = AssessmentRenderer.generate_risk_assessment_section(pdf, inspection)
-      assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
 
       # Render all collected assessments in newspaper-style columns
       assessment_renderer.render_all_assessments_in_columns(pdf)
@@ -101,8 +85,11 @@ class PdfGeneratorService
   end
 
   def self.generate_unit_inspection_history(pdf, unit)
-    # Check for completed inspections
-    completed_inspections = unit.inspections.complete.order(inspection_date: :desc)
+    # Check for completed inspections - preload associations to avoid N+1 queries
+    completed_inspections = unit.inspections
+      .includes(:user, :inspector_company)
+      .complete
+      .order(inspection_date: :desc)
 
     if completed_inspections.empty?
       TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"), [[I18n.t("pdf.unit.no_completed_inspections"), ""]])

@@ -60,24 +60,52 @@ module PdfTestHelpers
   end
 
   # Check that all assessment sections show proper "no data" messages
-  def expect_no_assessment_messages(pdf_text, inspection = nil)
-    assessment_types = %w[user_height structure anchorage materials fan]
-
-    # Only check for slide if inspection has a slide
-    assessment_types << "slide" if inspection&.has_slide?
-
-    # Only check for enclosed if inspection is totally enclosed
-    assessment_types << "enclosed" if inspection&.is_totally_enclosed?
-
-    assessment_types.each do |type|
-      # Map assessment types to correct form names
-      form_type = case type
-      when "user_height" then "tallest_user_height"
-      else type
+  def expect_all_i18n_fields_rendered(pdf_text, inspection)
+    Inspection::ASSESSMENT_TYPES.each do |assessment_name, _|
+      # Skip conditional assessments if not applicable
+      next if assessment_name == :slide_assessment && !inspection.has_slide?
+      next if assessment_name == :enclosed_assessment && !inspection.is_totally_enclosed?
+      
+      # Get the i18n key for this assessment
+      assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
+      assessment_type = "tallest_user_height" if assessment_type == "user_height"
+      
+      # Check header is present
+      header = I18n.t("forms.#{assessment_type}.header")
+      expect(pdf_text).to include(header)
+      
+      # Get ALL field labels from i18n and verify each one appears
+      fields = I18n.t("forms.#{assessment_type}.fields")
+      
+      # Group fields to understand which are rendered together
+      field_groups = {}
+      fields.each_key do |field_key|
+        field_str = field_key.to_s
+        base_field = if field_str.end_with?("_pass")
+          field_str.sub(/_pass$/, "")
+        elsif field_str.end_with?("_comment")
+          field_str.sub(/_comment$/, "")
+        else
+          field_str
+        end
+        
+        field_groups[base_field] ||= []
+        field_groups[base_field] << field_key
       end
-
-      title = I18n.t("forms.#{form_type}.header")
-      expect(pdf_text).to include(I18n.t("pdf.inspection.no_assessment_data", assessment_type: title))
+      
+      # Check each field group
+      field_groups.each do |base_name, group_fields|
+        # For grouped fields (base + _pass), we expect the base label
+        # For standalone _pass fields, we expect that label
+        # Comments don't render labels on their own
+        
+        main_field = group_fields.find { |f| !f.to_s.end_with?("_comment") }
+        if main_field
+          label = fields[main_field]
+          expect(pdf_text).to include(label), 
+            "Missing i18n field label '#{label}' for #{assessment_type}.#{main_field}"
+        end
+      end
     end
   end
 

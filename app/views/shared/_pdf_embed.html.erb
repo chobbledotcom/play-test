@@ -4,14 +4,14 @@
   #   - url: The URL to the PDF
   #   - title: Title for accessibility (optional, defaults to "PDF Document")
   #   - download_text: Text for download link (optional, defaults to generic message)
-  
+
   title ||= "PDF Document"
   download_text ||= t('shared.messages.pdf_not_supported')
 %>
 
 <div class="pdf-embed-container">
-  <iframe src="<%= url %>#zoom=150"
-          title="<%= title %>">
+  <iframe src="<%= url %>"
+    title="<%= title %>">
     <p>
       <%= download_text %>
       <%= link_to t('shared.buttons.download_pdf'), url %>.

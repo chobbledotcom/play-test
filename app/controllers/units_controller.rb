@@ -154,6 +154,8 @@ class UnitsController < ApplicationController
   end
 
   def send_unit_pdf
+    # Preload photo attachment to avoid N+1 queries
+    @unit = Unit.with_attached_photo.find(@unit.id)
     pdf_data = PdfGeneratorService.generate_unit_report(@unit)
 
     send_data pdf_data.render,

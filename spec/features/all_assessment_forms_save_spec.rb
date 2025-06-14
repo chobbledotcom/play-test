@@ -17,10 +17,8 @@ STRUCTURE_SAMPLE_DATA = {
   evacuation_time: 45,
   unit_pressure: 2.8,
   blower_tube_length: 1.75,
-  step_size: 0.25,
   critical_fall_off_height: 0.85,
   trough_depth: 0.15,
-  trough_width: 0.9,
   trough_adjacent_panel_width: 0.65,
   step_ramp_size: 0.3,
 
@@ -29,7 +27,6 @@ STRUCTURE_SAMPLE_DATA = {
   evacuation_time_pass: false,
   unit_pressure_pass: true,
   blower_tube_length_pass: true,
-  step_size_pass: false,
   critical_fall_off_height_pass: true,
   trough_pass: true,
   trough_depth_pass: false,
@@ -44,7 +41,6 @@ STRUCTURE_SAMPLE_DATA = {
   critical_fall_off_height_comment: "Critical fall off height comment",
   step_ramp_size_comment: "Step ramp size comment",
   trough_depth_comment: "Trough depth comment",
-  trough_width_comment: "Trough width comment",
   trough_adjacent_panel_width_comment: "Trough adjacent panel width comment",
   trough_comment: "Trough comment"
 }.freeze
@@ -94,21 +90,17 @@ ANCHORAGE_SAMPLE_DATA = {
 FAN_SAMPLE_DATA = {
   # Text fields
   blower_serial: "FAN-2024-12345",
-  blower_type: "Centrifugal 1.5HP",
-
-  # Measurements
-  fan_size: 1.5,
-  num_blowers: 2,
+  fan_size_type: "Centrifugal 1.5HP",
 
   # Pass/fail checks
   blower_flap_pass: true,
   blower_finger_pass: true,
   blower_visual_pass: false,
   pat_pass: true,
+  blower_serial_pass: true,
 
   # Comments
   blower_serial_comment: "Serial verified against manufacturer database",
-  fan_size_comment: "Adequate for unit volume",
   blower_visual_comment: "Minor damage to fan housing"
 }.freeze
 
@@ -145,23 +137,17 @@ SLIDE_SAMPLE_DATA = {
   runout: 2.8,
   slide_first_metre_height: 0.45,
   slide_beyond_first_metre_height: 0.35,
-  slide_length: 4.5,
 
   # Pass/fail checks
   clamber_netting_pass: true,
   runout_pass: false,
   slip_sheet_pass: true,
   slide_permanent_roof: true,
-  maximum_height_pass: true,
-  slide_extension_pass: true,
-  slide_angle_pass: false,
-  slide_gradient_pass: true,
-  ramp_access_pass: true,
 
   # Comments
   slide_platform_height_comment: "Platform height verified",
   runout_comment: "Insufficient runout for platform height",
-  slide_angle_comment: "Angle exceeds recommended maximum"
+  clamber_netting_comment: "Netting secure and intact"
 }.freeze
 
 ENCLOSED_SAMPLE_DATA = {
@@ -172,20 +158,11 @@ ENCLOSED_SAMPLE_DATA = {
   exit_number_pass: true,
   exit_sign_always_visible_pass: true,
   exit_sign_visible_pass: false,
-  illumination_pass: true,
-  markings_id_pass: true,
-  entrapment_pass: false,
-  exit_sign_self_lit_pass: true,
-  walls_continuous_no_obstacles_pass: true,
-  visibility_through_walls_pass: false,
-  mat_step_transition_pass: true,
-  grounding_pass: true,
 
   # Comments
   exit_number_comment: "Three exits well distributed",
   exit_sign_visible_comment: "Sign obscured from some angles",
-  entrapment_comment: "Gap found near entrance",
-  visibility_through_walls_comment: "Dark fabric reduces visibility"
+  exit_sign_always_visible_comment: "Visibility confirmed from all angles"
 }.freeze
 
 RSpec.feature "All Assessment Forms Save", type: :feature do

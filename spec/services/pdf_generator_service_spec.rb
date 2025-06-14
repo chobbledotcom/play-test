@@ -233,14 +233,15 @@ RSpec.describe PdfGeneratorService, pdf: true do
       end
     end
 
-    context "without assessments" do
+    context "with incomplete assessments" do
       let(:empty_inspection) { create(:inspection, user: user, unit: unit, has_slide: true, is_totally_enclosed: true) }
 
-      it "shows no assessment data messages" do
+      it "renders all i18n fields even when incomplete" do
         pdf = PdfGeneratorService.generate_inspection_report(empty_inspection)
         pdf_text = pdf_text_content(pdf.render)
 
-        expect_no_assessment_messages(pdf_text, empty_inspection)
+        # Use the helper that properly handles field grouping
+        expect_all_i18n_fields_rendered(pdf_text, empty_inspection)
       end
     end
 

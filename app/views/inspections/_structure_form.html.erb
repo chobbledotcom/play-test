@@ -17,12 +17,11 @@
         <%= render 'form/number_pass_fail_comment', field: :blower_tube_length %>
         <%= render 'form/pass_fail_comment', field: :unit_stable_pass %>
         <%= render 'form/number_pass_fail_comment', field: :evacuation_time %>
-        <%= render 'form/number_pass_fail_comment', field: :step_size %>
+        <%= render 'form/number_pass_fail_comment', field: :step_ramp_size %>
         <%= render 'form/number_pass_fail_comment', field: :critical_fall_off_height %>
         <%= render 'form/number_pass_fail_comment', field: :unit_pressure %>
       <% end %>
 
-      <!-- Trough Assessment -->
       <%= render 'form/fieldset', legend_key: 'trough_assessment' do %>
         <%= render 'form/number_pass_fail_comment', field: :trough_depth %>
         <%= render 'form/number_pass_fail_comment', field: :trough_adjacent_panel_width %>

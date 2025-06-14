@@ -11,7 +11,7 @@ class Assessments::StructureAssessment < ApplicationRecord
 
   # Additional pass/fail checks
   ADDITIONAL_CHECKS = %w[stitch_length_pass blower_tube_length_pass
-    step_size_pass step_ramp_size_pass critical_fall_off_height_pass unit_pressure_pass
+    step_ramp_size_pass critical_fall_off_height_pass unit_pressure_pass
     trough_depth_pass trough_adjacent_panel_width_pass trough_pass entrapment_pass markings_pass grounding_pass].freeze
 
   # Required measurements
@@ -32,7 +32,7 @@ class Assessments::StructureAssessment < ApplicationRecord
 
   # Measurements
   validates :stitch_length, :unit_pressure, :blower_tube_length,
-    :step_size, :step_ramp_size, :critical_fall_off_height, :trough_depth, :trough_width, :trough_adjacent_panel_width,
+    :step_ramp_size, :critical_fall_off_height, :trough_depth, :trough_adjacent_panel_width,
     numericality: {greater_than_or_equal_to: 0}, allow_blank: true
 
   # Callbacks

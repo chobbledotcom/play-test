@@ -2,279 +2,170 @@ class PdfGeneratorService
   class AssessmentRenderer
     include Configuration
 
+    SENSITIVE_COLUMNS = %w[id inspection_id created_at updated_at].freeze
+    PASS_COLOR = "00AA00".freeze
+    FAIL_COLOR = "CC0000".freeze
+    NULL_COLOR = "663399".freeze
+    COMMENT_COLOR = "663399".freeze
+    SECTION_TITLE_SIZE = 12
+    ASSESSMENT_TITLE_SIZE = 10
+    FIELD_TEXT_SIZE = 8
+    SECTION_MARGIN_AFTER_TITLE = 15
+    ASSESSMENT_MARGIN_AFTER_TITLE = 3
+    ASSESSMENT_MARGIN_AFTER = 16
+    SECTION_MARGIN_AFTER = 20
+    COLUMN_COUNT = 3
+    COLUMN_SPACER = 10
+
     attr_accessor :current_assessment_blocks, :current_assessment_fields
 
     def initialize
       @current_assessment_blocks = []
+      reset_assessment_context
+    end
+
+    private
+
+    def reset_assessment_context
       @current_assessment_fields = nil
       @current_assessment_type = nil
       @current_assessment = nil
     end
 
-    private
+    def render_fields_from_i18n
+      available_columns = @current_assessment.attributes.keys - SENSITIVE_COLUMNS
+      field_groups = group_assessment_fields(available_columns.map(&:to_sym))
+      field_groups.each { |base, fields| render_field_group(base, fields) }
+    end
 
-    # Universal field renderer - handles all field types
-    def add(*fields, unit: nil, pass: nil)
-      # Build label from i18n
-      label = field_label(fields.first)
-      parts = ["#{label}:"]
+    def render_field_group(base_name, fields)
+      main_field = fields[:base] || fields[:pass]
+      return unless main_field && has_i18n_label?(main_field)
 
-      # Add field values
-      fields.each_with_index do |field, i|
-        value = @current_assessment.send(field)
+      [render_field_line(fields), render_comment_line(fields)].compact.each do |line|
+        @current_assessment_fields << line
+      end
+    end
 
-        parts << if field.to_s.end_with?("_pass")
-          pass_fail(value)
+    def has_i18n_label?(field)
+      field_label(field)
+      true
+    rescue I18n::MissingTranslationData
+      false
+    end
+
+    def determine_pass_value(fields, main_field, value)
+      return @current_assessment.send(fields[:pass]) if fields[:pass]
+      return value if main_field.to_s.end_with?("_pass")
+      nil
+    end
+
+    def format_field_line(label, value, pass_value, is_pass_field)
+      parts = []
+      parts << pass_fail_indicator(pass_value)
+      parts << bold(label)
+      parts << ": #{value}" if !is_pass_field && value.present?
+      parts.join
+    end
+
+    def pass_fail_indicator(pass_value)
+      indicator, color =
+        if pass_value.nil?
+          ["[NULL]", NULL_COLOR]
         else
-          ((unit && i == 0) ? "#{value}#{unit}" : value.to_s)
+          [
+            "[#{pass_fail(pass_value).upcase}]",
+            pass_value ? PASS_COLOR : FAIL_COLOR
+          ]
         end
-      end
-
-      # Add pass/fail if specified
-      if pass
-        pass_value = @current_assessment.send(pass)
-        parts << "-" << pass_fail(pass_value)
-      end
-
-      # Add comment if exists
-      comment_field = "#{(pass || fields.first).to_s.sub(/_pass$/, "")}_comment"
-      if @current_assessment.respond_to?(comment_field)
-        comment = @current_assessment.send(comment_field)
-        parts << "- #{comment}" if comment.present?
-      end
-
-      @current_assessment_fields << parts.join(" ")
+      "<font name='Courier'>#{bold(colored(indicator, color))}</font> "
     end
 
-    # Get field label from forms namespace
-    def field_label(field_name)
-      I18n.t("forms.#{@current_assessment_type}.fields.#{field_name}")
-    end
-
-    # Format pass/fail values consistently
-    def pass_fail(value)
-      value ? I18n.t("shared.pass") : I18n.t("shared.fail")
-    end
+    def colored(text, color) = "<color rgb='#{color}'>#{text}</color>"
+    def bold(text) = "<b>#{text}</b>"
+    def italic(text) = "<i>#{text}</i>"
+    def field_label(field_name) = I18n.t!("forms.#{@current_assessment_type}.fields.#{field_name}")
+    def pass_fail(value) = I18n.t(value ? "shared.pass" : "shared.fail")
 
     public
 
-    # Assessment section generators
-    def generate_user_height_section(pdf, inspection)
-      generate_assessment_section(pdf, "tallest_user_height", inspection.user_height_assessment) do
-        # Standard measurement fields
-        add :containing_wall_height, unit: "m"
-        add :platform_height, unit: "m"
-        add :tallest_user_height, unit: "m"
-        add :play_area_length, unit: "m"
-        add :play_area_width, unit: "m"
-        add :permanent_roof if @current_assessment.permanent_roof.present?
-        add :negative_adjustment, unit: "m²" if @current_assessment.negative_adjustment.present?
+    def extract_base_field_name(field_str)
+      field_str.sub(/_(pass|comment)$/, "")
+    end
 
-        # User Capacities
-        @current_assessment_fields << "#{I18n.t("forms.tallest_user_height.sections.user_capacity")}:"
-        %w[1000 1200 1500 1800].each do |height|
-          field_name = "users_at_#{height}mm"
-          value = @current_assessment.send(field_name) || "N/A"
-          @current_assessment_fields << "• #{field_label(field_name)}: #{value}"
+    def group_assessment_fields(field_keys)
+      field_keys.each_with_object({}) do |field, groups|
+        field_str = field.to_s
+        next unless @current_assessment.respond_to?(field_str)
+
+        base_field = extract_base_field_name(field_str)
+        groups[base_field] ||= {}
+
+        field_type = case field_str
+        when /pass$/ then :pass
+        when /comment$/ then :comment
+        else :base
         end
+
+        groups[base_field][field_type] = field
       end
     end
 
-    def generate_slide_section(pdf, inspection)
-      generate_assessment_section(pdf, "slide", inspection.slide_assessment) do
-        # Height measurements
-        add :slide_platform_height, unit: "m"
-        add :slide_wall_height, unit: "m"
-        add :slide_first_metre_height, unit: "m"
-        add :slide_beyond_first_metre_height, unit: "m"
+    def render_field_line(fields)
+      main_field = fields[:base] || fields[:pass]
+      return unless main_field
 
-        add :slide_permanent_roof if @current_assessment.slide_permanent_roof.present?
+      value = @current_assessment.send(main_field)
+      label = field_label(main_field)
+      pass_value = determine_pass_value(fields, main_field, value)
 
-        # Pass/fail checks
-        add :clamber_netting_pass
-        add :slip_sheet_pass
-
-        # Measurement with pass/fail
-        add :runout, unit: "m", pass: :runout_pass
-      end
+      format_field_line(label, value, pass_value, main_field.to_s.end_with?("_pass"))
     end
 
-    def generate_structure_section(pdf, inspection)
-      generate_assessment_section(pdf, "structure", inspection.structure_assessment) do
-        # Pass/fail checks
-        %i[seam_integrity_pass uses_lock_stitching_pass air_loss_pass straight_walls_pass
-          sharp_edges_pass unit_stable_pass evacuation_time_pass].each { |field| add field }
+    def render_comment_line(fields)
+      return unless fields[:comment]
+      comment = @current_assessment.send(fields[:comment])
+      return unless comment.present?
 
-        # Measurements with pass/fail
-        add :stitch_length, unit: "mm", pass: :stitch_length_pass
-        add :blower_tube_length, unit: "m", pass: :blower_tube_length_pass
-        add :unit_pressure, unit: "Pa", pass: :unit_pressure_pass
-      end
+      "    #{colored(italic(comment), COMMENT_COLOR)}"
     end
 
-    def generate_anchorage_section(pdf, inspection)
-      generate_assessment_section(pdf, "anchorage", inspection.anchorage_assessment) do
-        # Anchor counts with combined label
-        low = @current_assessment.num_low_anchors || "N/A"
-        high = @current_assessment.num_high_anchors || "N/A"
-        text = "#{field_label(:num_anchors_pass)}: Low: #{low}, High: #{high}"
-        pass_value = @current_assessment.num_anchors_pass
-        text += " - #{pass_fail(pass_value)}" unless pass_value.nil?
-        @current_assessment_fields << text
-
-        # Pass/fail checks
-        %i[anchor_type_pass pull_strength_pass anchor_degree_pass
-          anchor_accessories_pass].each { |field| add field }
-      end
-    end
-
-    def generate_enclosed_section(pdf, inspection)
-      generate_assessment_section(pdf, "enclosed", inspection.enclosed_assessment) do
-        # Exit number with pass/fail
-        add :exit_number, pass: :exit_number_pass
-
-        # Pass/fail checks
-        add :exit_sign_always_visible_pass
-      end
-    end
-
-    def generate_materials_section(pdf, inspection)
-      generate_assessment_section(pdf, "materials", inspection.materials_assessment) do
-        # Pass/fail checks
-        %i[fabric_strength_pass fire_retardant_pass thread_pass].each { |field| add field }
-
-        # Rope size with pass/fail
-        add :ropes, unit: "mm", pass: :ropes_pass
-      end
-    end
-
-    def generate_fan_section(pdf, inspection)
-      generate_assessment_section(pdf, "fan", inspection.fan_assessment) do
-        # Pass/fail checks
-        %i[blower_flap_pass blower_finger_pass pat_pass blower_visual_pass].each { |field| add field }
-
-        # Optional text fields
-        add :blower_serial if @current_assessment.blower_serial.present?
-        add :fan_size_type if @current_assessment.fan_size_type.present?
-      end
-    end
-
-    def generate_risk_assessment_section(pdf, inspection)
-      # This section doesn't exist in the current model
-      # Placeholder for future implementation
-    end
-
-    # Generic helper methods for DRY code
     def generate_assessment_section(pdf, assessment_type, assessment)
-      title = I18n.t("forms.#{assessment_type}.header")
+      raise "Assessment missing: #{assessment_type}" unless assessment
 
-      if assessment&.complete?
-        # Set up instance variables for the block
-        @current_assessment_type = assessment_type
-        @current_assessment = assessment
-        @current_assessment_fields = []
+      @current_assessment_type = assessment_type
+      @current_assessment = assessment
+      @current_assessment_fields = []
 
-        # Execute the block
-        yield
+      render_fields_from_i18n
 
-        # Create a complete assessment block with title and fields
-        @current_assessment_blocks ||= []
-        @current_assessment_blocks << {
-          title: title,
-          fields: @current_assessment_fields
-        }
-      else
-        # For assessments with no data, still add to blocks
-        @current_assessment_blocks ||= []
-        @current_assessment_blocks << {
-          title: title,
-          fields: [I18n.t("pdf.inspection.no_assessment_data", assessment_type: title)]
-        }
-      end
+      @current_assessment_blocks << {
+        title: I18n.t("forms.#{assessment_type}.header"),
+        fields: @current_assessment_fields
+      }
     end
 
-    # New method to render all assessment blocks in newspaper-style columns
     def render_all_assessments_in_columns(pdf)
-      return if @current_assessment_blocks.nil? || @current_assessment_blocks.empty?
+      return if @current_assessment_blocks.empty?
 
-      # Add section header
-      pdf.text I18n.t("pdf.inspection.assessments_section"), size: 12, style: :bold
+      pdf.text I18n.t("pdf.inspection.assessments_section"), size: SECTION_TITLE_SIZE, style: :bold
       pdf.stroke_horizontal_rule
-      pdf.move_down 15
+      pdf.move_down SECTION_MARGIN_AFTER_TITLE
 
-      # Use Prawn's built-in column layout
-      pdf.column_box([0, pdf.cursor], columns: 3, width: pdf.bounds.width, spacer: 10) do
-        @current_assessment_blocks.each do |block|
-          render_assessment_block(pdf, block)
-        end
+      pdf.column_box([0, pdf.cursor], columns: COLUMN_COUNT, width: pdf.bounds.width, spacer: COLUMN_SPACER) do
+        @current_assessment_blocks.each { |block| render_assessment_block(pdf, block) }
       end
 
-      # Clean up
       @current_assessment_blocks = []
-      pdf.move_down 20
+      pdf.move_down SECTION_MARGIN_AFTER
     end
 
-    # Helper method to render a single assessment block
     def render_assessment_block(pdf, block)
-      # Render title
-      pdf.text block[:title], size: 10, style: :bold
-      pdf.move_down 3
+      pdf.text block[:title], size: ASSESSMENT_TITLE_SIZE, style: :bold
+      pdf.move_down ASSESSMENT_MARGIN_AFTER_TITLE
 
-      # Render fields
-      block[:fields].each do |field_text|
-        pdf.text field_text, size: 7
-      end
-
-      pdf.move_down 8  # Space between assessment blocks
-    end
-
-    # Class methods that delegate to instance methods
-    def self.generate_user_height_section(pdf, inspection)
-      renderer = new
-      renderer.generate_user_height_section(pdf, inspection)
-      renderer
-    end
-
-    def self.generate_slide_section(pdf, inspection)
-      renderer = new
-      renderer.generate_slide_section(pdf, inspection)
-      renderer
-    end
-
-    def self.generate_structure_section(pdf, inspection)
-      renderer = new
-      renderer.generate_structure_section(pdf, inspection)
-      renderer
-    end
-
-    def self.generate_anchorage_section(pdf, inspection)
-      renderer = new
-      renderer.generate_anchorage_section(pdf, inspection)
-      renderer
-    end
-
-    def self.generate_enclosed_section(pdf, inspection)
-      renderer = new
-      renderer.generate_enclosed_section(pdf, inspection)
-      renderer
-    end
-
-    def self.generate_materials_section(pdf, inspection)
-      renderer = new
-      renderer.generate_materials_section(pdf, inspection)
-      renderer
-    end
-
-    def self.generate_fan_section(pdf, inspection)
-      renderer = new
-      renderer.generate_fan_section(pdf, inspection)
-      renderer
-    end
-
-    def self.generate_risk_assessment_section(pdf, inspection)
-      renderer = new
-      renderer.generate_risk_assessment_section(pdf, inspection)
-      renderer
+      block[:fields].each { |field| pdf.text field, size: FIELD_TEXT_SIZE, inline_format: true }
+      pdf.move_down ASSESSMENT_MARGIN_AFTER
     end
   end
 end

@@ -300,10 +300,10 @@ RSpec.describe "Seed Data", type: :model do
             expect(assessment.stitch_length).to be_present
             expect(assessment.unit_pressure).to be_present
             expect(assessment.blower_tube_length).to be_present
-            expect(assessment.step_size).to be_present
+            expect(assessment.step_ramp_size).to be_present
             expect(assessment.critical_fall_off_height).to be_present
             expect(assessment.trough_depth).to be_present
-            expect(assessment.trough_width).to be_present
+            expect(assessment.trough_adjacent_panel_width).to be_present
           end
         end
 
@@ -312,10 +312,10 @@ RSpec.describe "Seed Data", type: :model do
             expect(assessment.stitch_length).to be_between(5, 20)
             expect(assessment.unit_pressure).to be_between(0.5, 5.0)
             expect(assessment.blower_tube_length).to be_between(1.0, 10.0)
-            expect(assessment.step_size).to be_between(100, 500)
+            expect(assessment.step_ramp_size).to be_between(100, 500)
             expect(assessment.critical_fall_off_height).to be_between(0.1, 3.0)
             expect(assessment.trough_depth).to be_between(0.05, 1.0)
-            expect(assessment.trough_width).to be_between(0.1, 2.0)
+            expect(assessment.trough_adjacent_panel_width).to be_between(0.1, 2.0)
           end
         end
       end

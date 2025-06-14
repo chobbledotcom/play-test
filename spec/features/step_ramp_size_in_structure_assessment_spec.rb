@@ -17,7 +17,7 @@ RSpec.feature "Step Ramp Size in Structure Assessment", type: :feature do
       expect(page).to have_content("Step Size")
 
       # Fill and save using i18n
-      fill_in I18n.t("forms.structure.fields.step_size"), with: "25"
+      fill_in I18n.t("forms.structure.fields.step_ramp_size"), with: "25"
       click_button I18n.t("forms.structure.submit")
 
       # Verify success
@@ -25,7 +25,7 @@ RSpec.feature "Step Ramp Size in Structure Assessment", type: :feature do
 
       # Verify saved
       inspection.reload
-      expect(inspection.structure_assessment.step_size).to eq(25.0)
+      expect(inspection.structure_assessment.step_ramp_size).to eq(25.0)
     end
   end
 

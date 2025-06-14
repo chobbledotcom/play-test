@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_13_205036) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_14_005014) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -206,14 +206,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_205036) do
     t.decimal "evacuation_time", precision: 8, scale: 2
     t.decimal "unit_pressure", precision: 8, scale: 2
     t.decimal "blower_tube_length", precision: 8, scale: 2
-    t.decimal "step_size", precision: 8, scale: 2
     t.decimal "critical_fall_off_height", precision: 8, scale: 2
     t.decimal "trough_depth", precision: 8, scale: 2
-    t.decimal "trough_width", precision: 8, scale: 2
     t.boolean "stitch_length_pass"
     t.boolean "blower_tube_length_pass"
     t.boolean "evacuation_time_pass"
-    t.boolean "step_size_pass"
     t.boolean "critical_fall_off_height_pass"
     t.boolean "unit_pressure_pass"
     t.boolean "trough_pass"
@@ -231,7 +228,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_205036) do
     t.text "blower_tube_length_comment"
     t.text "unit_stable_comment"
     t.text "evacuation_time_comment"
-    t.text "step_size_comment"
     t.text "critical_fall_off_height_comment"
     t.text "unit_pressure_comment"
     t.text "trough_comment"
@@ -239,7 +235,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_205036) do
     t.text "markings_comment"
     t.text "grounding_comment"
     t.string "trough_depth_comment", limit: 1000
-    t.string "trough_width_comment", limit: 1000
     t.string "tubes_present_comment", limit: 1000
     t.string "netting_comment", limit: 1000
     t.string "ventilation_comment", limit: 1000

@@ -29,7 +29,7 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
 
     context "additional pass/fail checks" do
       %w[stitch_length_pass blower_tube_length_pass
-        step_size_pass critical_fall_off_height_pass unit_pressure_pass
+        step_ramp_size_pass critical_fall_off_height_pass unit_pressure_pass
         trough_pass entrapment_pass markings_pass grounding_pass].each do |field|
         include_examples "validates boolean field", field
       end
@@ -37,14 +37,14 @@ RSpec.describe Assessments::StructureAssessment, type: :model do
 
     context "measurements" do
       %w[stitch_length unit_pressure blower_tube_length
-        step_size critical_fall_off_height trough_depth trough_width].each do |field|
+        step_ramp_size critical_fall_off_height trough_depth trough_adjacent_panel_width].each do |field|
         include_examples "validates non-negative numeric field", field
       end
     end
 
     context "comment fields" do
       (Assessments::StructureAssessment::CRITICAL_CHECKS + %w[stitch_length_pass blower_tube_length_pass
-        step_size_pass critical_fall_off_height_pass unit_pressure_pass
+        step_ramp_size_pass critical_fall_off_height_pass unit_pressure_pass
         trough_pass entrapment_pass markings_pass grounding_pass]).map { |check| check.sub("_pass", "_comment") }.each do |field|
         include_examples "validates comment field", field
       end
