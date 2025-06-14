@@ -169,7 +169,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf = PdfGeneratorService.generate_inspection_report(inspection)
         pdf_text = pdf_text_content(pdf.render)
 
-        expect_pdf_to_include_i18n(pdf_text, "forms.tallest_user_height.header")
+        expect_pdf_to_include_i18n(pdf_text, "forms.user_height.header")
       end
     end
 

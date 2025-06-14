@@ -39,7 +39,7 @@ RSpec.feature "PDF Field Coverage", type: :feature do
       expect(text_content).to include("Test Owner")
 
       # Assessment sections exist
-      expect(text_content).to include(I18n.t("forms.tallest_user_height.header"))
+      expect(text_content).to include(I18n.t("forms.user_height.header"))
       expect(text_content).to include(I18n.t("forms.structure.header"))
       expect(text_content).to include(I18n.t("forms.anchorage.header"))
       expect(text_content).to include(I18n.t("forms.materials.header"))

@@ -1,8 +1,5 @@
 <%= render 'form/form_context', model: @inspection.structure_assessment, i18n_base: 'forms.structure', url: inspection_structure_assessment_path(@inspection) do |form| %>
-
-    <div class="assessment-form structure-assessment">
-
-      <!-- Fabric and Construction -->
+  <!-- Fabric and Construction -->
       <%= render 'form/fieldset', legend_key: 'fabric_construction' do %>
         <%= render 'form/pass_fail_comment', field: :seam_integrity_pass %>
         <%= render 'form/pass_fail_comment', field: :uses_lock_stitching_pass %>
@@ -43,8 +40,6 @@
         </div>
       <% end %>
 
-      <!-- Safety Status -->
-      <%= render 'form/assessment_status', assessment: @inspection.structure_assessment %>
-
-    </div>
+  <!-- Safety Status -->
+  <%= render 'form/assessment_status', assessment: @inspection.structure_assessment %>
 <% end %>

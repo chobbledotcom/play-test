@@ -51,16 +51,27 @@ RSpec.describe User, type: :model do
       expect(duplicate_user.errors[:email]).to include("has already been taken")
     end
 
-    it "requires an RPII inspector number" do
+    it "allows nil RPII inspector number" do
       user = build(:user, rpii_inspector_number: nil)
-      expect(user).not_to be_valid
-      expect(user.errors[:rpii_inspector_number]).to include("can't be blank")
+      expect(user).to be_valid
     end
 
-    it "requires a non-blank RPII inspector number" do
-      user = build(:user, rpii_inspector_number: "")
-      expect(user).not_to be_valid
-      expect(user.errors[:rpii_inspector_number]).to include("can't be blank")
+    it "normalizes blank RPII inspector number to nil" do
+      user = create(:user, rpii_inspector_number: "")
+      expect(user.rpii_inspector_number).to be_nil
+    end
+
+    it "requires unique RPII inspector number when present" do
+      existing_user = create(:user, rpii_inspector_number: "RPII123")
+      duplicate_user = build(:user, rpii_inspector_number: "RPII123")
+      expect(duplicate_user).not_to be_valid
+      expect(duplicate_user.errors[:rpii_inspector_number]).to include("has already been taken")
+    end
+
+    it "allows multiple users with nil RPII inspector number" do
+      create(:user, rpii_inspector_number: nil)
+      user_with_nil_rpii = build(:user, rpii_inspector_number: nil)
+      expect(user_with_nil_rpii).to be_valid
     end
   end
 

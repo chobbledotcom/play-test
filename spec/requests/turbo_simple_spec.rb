@@ -59,7 +59,7 @@ RSpec.describe "Simple Turbo Stream Test", type: :request do
       allow(inspection).to receive(:has_slide).and_return(false)
 
       # This demonstrates the calculation logic without hitting the database
-      total_tabs = 6  # general, user_height, slide, structure, anchorage, materials, fan
+      total_tabs = 6  # inspections, user_height, slide, structure, anchorage, materials, fan
       completed_assessments = 1  # only user_height is complete
 
       percentage = (completed_assessments.to_f / total_tabs * 100).round(0)

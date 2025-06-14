@@ -1,11 +1,9 @@
 <%= render 'form/form_context',
   model: @inspection.user_height_assessment,
-  i18n_base: 'forms.tallest_user_height',
+  i18n_base: 'forms.user_height',
   url: inspection_user_height_assessment_path(@inspection) do |form|
 %>
-  <div class="assessment-form user-height-assessment">
-
-    <details class="safety-standards-reference">
+  <details class="safety-standards-reference">
       <summary>View Safety Standards</summary>
       <%= render 'shared/safety_standards/wall_height_requirements' %>
       <%= render 'shared/safety_standards/user_capacity_requirements' %>
@@ -60,17 +58,17 @@
         </div>
       <% end %>
 
-      <%= render 'form/number', field: :users_at_1000mm, min: 0, step: 1 %>
-      <%= render 'form/number', field: :users_at_1200mm, min: 0, step: 1 %>
-      <%= render 'form/number', field: :users_at_1500mm, min: 0, step: 1 %>
-      <%= render 'form/number', field: :users_at_1800mm, min: 0, step: 1 %>
+      <div class="user-heights">
+        <%= render 'form/number', field: :users_at_1000mm, min: 0, step: 1 %>
+        <%= render 'form/number', field: :users_at_1200mm, min: 0, step: 1 %>
+        <%= render 'form/number', field: :users_at_1500mm, min: 0, step: 1 %>
+        <%= render 'form/number', field: :users_at_1800mm, min: 0, step: 1 %>
+      </div>
     <% end %>
 
     <%= render 'form/assessment_status',
       assessment: @inspection.user_height_assessment
     %>
-
-  </div>
 <% end %>
 
 <script>

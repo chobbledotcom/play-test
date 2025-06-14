@@ -47,7 +47,7 @@ module InspectionsHelper
 
   # Tabbed inspection editing helpers
   def inspection_tabs(inspection)
-    tabs = %w[general user_height]
+    tabs = %w[inspections user_height]
 
     # Only show slide tab for inspections that have slides
     if inspection.has_slide?
@@ -63,6 +63,6 @@ module InspectionsHelper
   end
 
   def current_tab
-    params[:tab].presence || "general"
+    params[:tab].presence || "inspections"
   end
 end

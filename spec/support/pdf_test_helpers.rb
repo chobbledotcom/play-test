@@ -68,7 +68,7 @@ module PdfTestHelpers
 
       # Get the i18n key for this assessment
       assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
-      assessment_type = "tallest_user_height" if assessment_type == "user_height"
+      # No special mapping needed - form names match assessment types
 
       # Check header is present
       header = I18n.t("forms.#{assessment_type}.header")

@@ -1,7 +1,7 @@
 require "rails_helper"
 require "pdf/inspector"
 
-ASSESSMENT_FORMS = %w[tallest_user_height structure anchorage materials fan slide enclosed].freeze
+ASSESSMENT_FORMS = %w[user_height structure anchorage materials fan slide enclosed].freeze
 
 RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
   let(:user) { create(:user) }
@@ -53,7 +53,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect(pdf_text).to include(I18n.t("pdf.dimensions.height"))
 
       # Check assessment sections exist
-      expect(pdf_text).to include(I18n.t("forms.tallest_user_height.header"))
+      expect(pdf_text).to include(I18n.t("forms.user_height.header"))
       expect(pdf_text).to include(I18n.t("forms.structure.header"))
 
       # Check result
@@ -97,6 +97,24 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       end
     end
 
+    scenario "handles user without RPII number correctly" do
+      user_without_rpii = create(:user, :without_rpii)
+      inspection = create(:inspection, :completed, :pdf_complete_test_data,
+        user: user_without_rpii,
+        unit: unit)
+
+      pdf_text = get_pdf_text(inspection_report_path(inspection))
+
+      # Check PDF still generates correctly
+      expect_pdf_to_include_i18n_keys(pdf_text,
+        "pdf.inspection.title",
+        "pdf.inspection.equipment_details")
+
+      # Check user info is present but RPII is not
+      expect(pdf_text).to include(user_without_rpii.name)
+      expect(pdf_text).not_to include(I18n.t("pdf.inspection.fields.rpii_inspector_no"))
+    end
+
     scenario "shows proper handling for empty assessments" do
       inspection = create(:inspection,
         user: user,
@@ -109,7 +127,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       # Should show assessment headers even with empty data
       expect(pdf_text).to include(I18n.t("forms.structure.header"))
-      expect(pdf_text).to include(I18n.t("forms.tallest_user_height.header"))
+      expect(pdf_text).to include(I18n.t("forms.user_height.header"))
 
       # Should handle null values with [NULL] indicators
       expect(pdf_text).to include("[NULL]")
@@ -154,6 +172,120 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       expect_pdf_to_include_i18n(pdf_text, "pdf.unit.title")
       expect_pdf_to_include_i18n(pdf_text, "pdf.unit.no_completed_inspections")
+    end
+
+    scenario "handles unit with 10 prior inspections" do
+      # Create 10 inspections with varied data
+      inspections = []
+      10.times do |i|
+        inspections << create(:inspection, :completed, :pdf_complete_test_data,
+          user: user,
+          unit: unit,
+          inspection_date: i.months.ago,
+          passed: i.even?,
+          inspection_location: "Location #{i + 1}")
+      end
+
+      start_time = Time.current
+      pdf_text = get_pdf_text(unit_report_path(unit))
+      generation_time = Time.current - start_time
+
+      # Should generate within reasonable time
+      expect(generation_time).to be < 10.seconds
+
+      # Check all core i18n keys are present
+      expect_pdf_to_include_i18n_keys(pdf_text,
+        "pdf.unit.title",
+        "pdf.unit.details",
+        "pdf.unit.inspection_history")
+
+      # Check unit details
+      expect(pdf_text).to include("Test Bouncy Castle")
+      expect(pdf_text).to include("Bounce Co Ltd")
+      expect(pdf_text).to include("BCL-2024-001")
+
+      # Should include all inspection dates
+      inspections.each do |inspection|
+        expect(pdf_text).to include(inspection.inspection_date.strftime("%d/%m/%Y"))
+      end
+
+      # Should include pass/fail status for each inspection
+      inspections.each_with_index do |inspection, index|
+        if inspection.passed?
+          expect(pdf_text).to include(I18n.t("shared.pass_pdf"))
+        else
+          expect(pdf_text).to include(I18n.t("shared.fail_pdf"))
+        end
+      end
+    end
+
+    scenario "handles unit with image and 10 prior inspections" do
+      # Create unit with attached image
+      unit_with_image = create(:unit, user: user,
+        name: "Castle with Photo",
+        manufacturer: "Photo Test Co",
+        serial: "PTC-2024-IMG")
+
+      # Attach a test image to the unit
+      unit_with_image.photo.attach(
+        io: File.open(Rails.root.join("spec", "fixtures", "files", "test_image.jpg")),
+        filename: "test_castle.jpg",
+        content_type: "image/jpeg"
+      )
+
+      # Create 10 inspections with varied data
+      inspections = []
+      10.times do |i|
+        inspections << create(:inspection, :completed, :pdf_complete_test_data,
+          user: user,
+          unit: unit_with_image,
+          inspection_date: i.months.ago,
+          passed: i.even?,
+          inspection_location: "Photo Location #{i + 1}")
+      end
+
+      start_time = Time.current
+      pdf_data = get_pdf(unit_report_path(unit_with_image))
+      generation_time = Time.current - start_time
+
+      # Should generate within reasonable time even with image processing
+      expect(generation_time).to be < 15.seconds
+
+      # Verify PDF is valid and contains image data
+      expect_valid_pdf(pdf_data)
+      expect(pdf_data).to include("/Image")
+
+      # Extract text content
+      pdf_text = pdf_text_content(pdf_data)
+
+      # Check all core i18n keys are present
+      expect_pdf_to_include_i18n_keys(pdf_text,
+        "pdf.unit.title",
+        "pdf.unit.details",
+        "pdf.unit.inspection_history")
+
+      # Check unit details
+      expect(pdf_text).to include("Castle with Photo")
+      expect(pdf_text).to include("Photo Test Co")
+      expect(pdf_text).to include("PTC-2024-IMG")
+
+      # Should include all inspection dates
+      inspections.each do |inspection|
+        expect(pdf_text).to include(inspection.inspection_date.strftime("%d/%m/%Y"))
+      end
+
+      # Should include pass/fail status for each inspection
+      inspections.each_with_index do |inspection, index|
+        if inspection.passed?
+          expect(pdf_text).to include(I18n.t("shared.pass_pdf"))
+        else
+          expect(pdf_text).to include(I18n.t("shared.fail_pdf"))
+        end
+      end
+
+      # PDF should be reasonably sized even with image and 10 inspections
+      expect(pdf_data.bytesize).to be < 5.megabytes
+      expect(pdf_data.bytesize).to be > 10.kilobytes
     end
   end
 

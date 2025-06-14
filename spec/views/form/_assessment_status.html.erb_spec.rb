@@ -15,7 +15,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
   def expect_safety_header_present
     expect(rendered).to include('<div class="assessment-status">')
-    expect(rendered).to include(I18n.t("shared.safety_status"))
+    expect(rendered).to include(I18n.t("shared.assessment_completion"))
   end
 
   def expect_status_displayed(status_key, pass: true)
@@ -55,17 +55,17 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
       end
 
       it "displays height requirement status as pass" do
-        render_assessment_status(i18n_base: "forms.tallest_user_height")
+        render_assessment_status(i18n_base: "forms.user_height")
 
         expect_safety_header_present
-        expect(rendered).to include(I18n.t("forms.tallest_user_height.status.height_requirement"))
+        expect(rendered).to include(I18n.t("forms.user_height.status.height_requirement"))
         expect_status_displayed("height_requirement", pass: true)
       end
 
       it "displays height requirement status as fail when false" do
         setup_assessment_with_method(:meets_height_requirements?, false)
 
-        render_assessment_status(i18n_base: "forms.tallest_user_height")
+        render_assessment_status(i18n_base: "forms.user_height")
 
         expect_status_displayed("height_requirement", pass: false)
       end

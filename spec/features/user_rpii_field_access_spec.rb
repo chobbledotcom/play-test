@@ -116,7 +116,7 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
       expect(new_user.rpii_inspector_number).to eq("RPII-NEW-123")
     end
 
-    it "shows error when RPII is not provided during registration" do
+    it "allows registration without RPII number" do
       visit new_user_path
 
       fill_in I18n.t("users.forms.email"), with: "newuser@example.com"
@@ -127,8 +127,13 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
 
       click_button I18n.t("users.buttons.register")
 
-      expect(page).not_to have_content(I18n.t("users.messages.account_created"))
-      expect(page).to have_content("can't be blank")
+      # Should successfully create account without RPII
+      expect(page).to have_content(I18n.t("users.messages.account_created"))
+
+      # Verify user was created without RPII
+      new_user = User.find_by(email: "newuser@example.com")
+      expect(new_user).to be_present
+      expect(new_user.rpii_inspector_number).to be_nil
     end
   end
 end

@@ -40,25 +40,4 @@ module UnitsHelper
     actions
   end
 
-  # Tabbed unit editing helpers
-  def unit_tabs(unit)
-    tabs = %w[general user_height]
-
-    # Get last inspection to determine unit characteristics
-    last_inspection = unit.last_inspection
-
-    # Only show slide tab for units that have slides
-    tabs << "slide" if last_inspection&.has_slide?
-
-    tabs += %w[structure anchorage materials fan]
-
-    # Only show enclosed tab for totally enclosed units
-    tabs << "enclosed" if last_inspection&.is_totally_enclosed?
-
-    tabs
-  end
-
-  def current_tab
-    params[:tab].presence || "general"
-  end
 end

@@ -267,3 +267,52 @@ RSpec.shared_examples "delegates to SafetyStandard" do |delegated_methods|
     end
   end
 end
+
+# Shared examples for assessment form feature tests
+RSpec.shared_examples "an assessment form" do |assessment_type|
+  describe "common assessment form behaviors" do
+    it "displays the assessment tab in navigation" do
+      visit edit_inspection_path(inspection)
+      expect_assessment_tab(assessment_type)
+    end
+
+    it "navigates to the assessment form when clicking the tab" do
+      visit edit_inspection_path(inspection)
+      click_assessment_tab(assessment_type)
+
+      expect(page).to have_current_path(edit_inspection_path(inspection, tab: assessment_type))
+      expect(page).to have_content(I18n.t("forms.#{assessment_type}.header"))
+    end
+
+    it "displays the assessment form without errors" do
+      visit edit_inspection_path(inspection, tab: assessment_type)
+      
+      # Should have the form header
+      expect(page).to have_content(I18n.t("forms.#{assessment_type}.header"))
+      
+      # Should not have any translation missing errors
+      expect(page).not_to have_content("translation missing")
+      
+      # Should have a save button
+      expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
+    end
+
+    it "displays assessment completion status section" do
+      visit edit_inspection_path(inspection, tab: assessment_type)
+      
+      # Should have the assessment status section
+      expect(page).to have_css(".assessment-status")
+      expect(page).to have_content(I18n.t("shared.assessment_completion"))
+    end
+
+    it "saves the assessment when form is submitted" do
+      visit edit_inspection_path(inspection, tab: assessment_type)
+      
+      # Submit the form
+      click_button I18n.t("inspections.buttons.save_assessment")
+      
+      # Should show success message
+      expect(page).to have_content(I18n.t("inspections.messages.updated"))
+    end
+  end
+end

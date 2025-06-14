@@ -25,7 +25,7 @@ RSpec.feature "PDF Comprehensive Field Coverage", type: :feature do
 
       # Get the i18n key for this assessment
       assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
-      assessment_type = "tallest_user_height" if assessment_type == "user_height"
+      # No special mapping needed - form names match assessment types
 
       # Check header is present
       header = I18n.t("forms.#{assessment_type}.header")
@@ -95,7 +95,7 @@ RSpec.feature "PDF Comprehensive Field Coverage", type: :feature do
     pdf_content = extract_pdf_text(page.source)
 
     # Should still show all assessment headers
-    expect(pdf_content).to include(I18n.t("forms.tallest_user_height.header"))
+    expect(pdf_content).to include(I18n.t("forms.user_height.header"))
     expect(pdf_content).to include(I18n.t("forms.structure.header"))
     expect(pdf_content).to include(I18n.t("forms.anchorage.header"))
     expect(pdf_content).to include(I18n.t("forms.materials.header"))

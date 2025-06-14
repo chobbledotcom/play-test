@@ -219,7 +219,7 @@ nav.tabs span {
 }
 
 /* Mobile styles - hide diggers and limit main gif width */
-@media (max-width: 798px) {
+@media (max-width: 767px) {
   .construction-digger {
     display: none;
   }

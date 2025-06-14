@@ -24,47 +24,47 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
     it "displays all expected tabs" do
       # The current tab (general) should be a span, not a link
-      expect(page).to have_content(I18n.t("inspections.tabs.general"))
-      expect(page).to have_link(I18n.t("inspections.tabs.tallest_user_height"))
-      expect(page).to have_link(I18n.t("inspections.tabs.structure"))
-      expect(page).to have_link(I18n.t("inspections.tabs.anchorage"))
-      expect(page).to have_link(I18n.t("inspections.tabs.materials"))
-      expect(page).to have_link(I18n.t("inspections.tabs.fan"))
+      expect(page).to have_content(I18n.t("forms.inspections.header"))
+      expect_assessment_tab("user_height")
+      expect_assessment_tab("structure")
+      expect_assessment_tab("anchorage")
+      expect_assessment_tab("materials")
+      expect_assessment_tab("fan")
 
       # Slide tab should not appear for bouncy castle units
-      expect(page).not_to have_content(I18n.t("inspections.tabs.slide"))
+      expect_no_assessment_tab("slide")
     end
 
     it "shows slide tab for inspections with slides" do
       slide_inspection = create(:inspection, :with_slide, user: user, unit: unit)
 
       visit edit_inspection_path(slide_inspection)
-      expect(page).to have_link(I18n.t("inspections.tabs.slide"))
+      expect_assessment_tab("slide")
     end
 
     it "shows enclosed tab only for totally enclosed inspections" do
       regular_inspection = create(:inspection, user: user, unit: unit)
 
       visit edit_inspection_path(regular_inspection)
-      expect(page).not_to have_link(I18n.t("inspections.tabs.enclosed"))
+      expect_no_assessment_tab("enclosed")
 
       enclosed_inspection = create(:inspection, :totally_enclosed, user: user, unit: unit)
 
       visit edit_inspection_path(enclosed_inspection)
-      expect(page).to have_link(I18n.t("inspections.tabs.enclosed"))
+      expect_assessment_tab("enclosed")
     end
 
-    it "shows the general tab as active by default" do
-      expect(page).to have_css("nav.tabs span", text: I18n.t("inspections.tabs.general"))
+    it "shows the inspections tab as active by default" do
+      expect_assessment_tab_active("inspections")
     end
 
     it "can navigate between tabs" do
-      click_link I18n.t("inspections.tabs.user_height")
+      click_assessment_tab("user_height")
       expect(current_url).to include("tab=user_height")
-      expect(page).to have_content(I18n.t("forms.tallest_user_height.header"))
+      expect(page).to have_content(I18n.t("forms.user_height.header"))
 
-      click_link I18n.t("inspections.tabs.general")
-      expect(page).to have_css("nav.tabs span", text: I18n.t("inspections.tabs.general"))
+      click_link I18n.t("forms.inspections.header")
+      expect_assessment_tab_active("inspections")
     end
   end
 
@@ -169,7 +169,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
       # Navigate to user height tab (which will show placeholder)
       visit edit_inspection_path(inspection, tab: "user_height")
-      expect(page).to have_content(I18n.t("forms.tallest_user_height.header"))
+      expect(page).to have_content(I18n.t("forms.user_height.header"))
 
       # Navigate back to general tab
       visit edit_inspection_path(inspection)

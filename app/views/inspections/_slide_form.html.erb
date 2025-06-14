@@ -1,7 +1,5 @@
 <%= render 'form/form_context', model: @inspection.slide_assessment, i18n_base: 'forms.slide', url: inspection_slide_assessment_path(@inspection) do |form| %>
-
-    <div class="assessment-form slide-assessment">
-      <!-- Safety Standards Reference -->
+  <!-- Safety Standards Reference -->
       <details class="safety-standards-reference">
         <summary>View Safety Standards</summary>
         <%= render 'shared/safety_standards/slide_safety_requirements' %>
@@ -47,7 +45,6 @@
         </div>
       <% end %>
 
-      <!-- Safety Status -->
-      <%= render 'form/assessment_status', assessment: @inspection.slide_assessment %>
-    </div>
+  <!-- Safety Status -->
+  <%= render 'form/assessment_status', assessment: @inspection.slide_assessment %>
 <% end %>

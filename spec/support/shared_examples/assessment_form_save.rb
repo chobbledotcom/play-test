@@ -22,8 +22,7 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
       visit edit_inspection_path(inspection, tab: tab_name)
 
       # Get i18n base for this assessment
-      i18n_key = (assessment_type == :user_height) ? "tallest_user_height" : assessment_type.to_s
-      i18n_base = "forms.#{i18n_key}"
+      i18n_base = "forms.#{assessment_type}"
 
       # Get all field translations
       fields = I18n.t("#{i18n_base}.fields")

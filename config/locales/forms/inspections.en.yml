@@ -1,7 +1,7 @@
 en:
   forms:
     inspections:
-      header: "Inspection Details"
+      header: "General"
       sections:
         current_unit: "Current Unit"
         public_information: "Public Information"

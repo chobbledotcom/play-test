@@ -65,6 +65,7 @@ class InspectionsController < ApplicationController
   end
 
   def edit
+    validate_tab_parameter
     load_inspection_locations
   end
 
@@ -158,6 +159,15 @@ class InspectionsController < ApplicationController
 
   private
 
+  def validate_tab_parameter
+    return unless params[:tab].present?
+    
+    valid_tabs = helpers.inspection_tabs(@inspection)
+    unless valid_tabs.include?(params[:tab])
+      redirect_to edit_inspection_path(@inspection), alert: I18n.t("inspections.messages.invalid_tab")
+    end
+  end
+
   INSPECTION_SPECIFIC_PARAMS = %i[
     inspection_date
     inspection_location
@@ -166,6 +176,8 @@ class InspectionsController < ApplicationController
     risk_assessment
     unique_report_number
     unit_id
+    has_slide
+    is_totally_enclosed
   ].freeze
 
   SYSTEM_ATTRIBUTES = %w[inspection_id created_at updated_at].freeze

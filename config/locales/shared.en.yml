@@ -37,7 +37,7 @@ en:
     fail: "Fail"
     pass_pdf: "[PASS]"
     fail_pdf: "[FAIL]"
-    safety_status: "Safety Status"
+    assessment_completion: "Assessment Completion"
     field_comment_placeholder: "%{field} comment"
 
   # Common messages

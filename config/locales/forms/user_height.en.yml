@@ -1,6 +1,6 @@
 en:
   forms:
-    tallest_user_height:
+    user_height:
       header: "User Height/Count"
       sections:
         height_measurements: "Height Measurements"
@@ -29,7 +29,7 @@ en:
         negative_adjustment: "Area deduction for obstacles or unusable space (square meters)"
       status:
         height_requirement: "Height Requirement"
-        checks_passed: "Safety Checks Passed"
+        checks_passed: "Fields completed"
         completion: "Assessment Completion"
       submit: "Save Assessment"
       errors:

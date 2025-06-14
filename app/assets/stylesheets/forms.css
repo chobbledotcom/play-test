@@ -199,3 +199,22 @@
   grid-column: 1 / -1;
   margin-top: 0.5rem;
 }
+
+/* User height fields flexbox layout */
+.user-heights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Mobile: 2 columns (2 rows of 2) */
+.user-heights > * {
+  flex: 1 1 calc(50% - 0.5rem);
+}
+
+/* Desktop: 4 columns (1 row of 4) */
+@media (min-width: 768px) {
+  .user-heights > * {
+    flex: 1 1 calc(25% - 0.75rem);
+  }
+}

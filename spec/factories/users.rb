@@ -34,5 +34,9 @@ FactoryBot.define do
       country { "UK" }
       postal_code { "12345" }
     end
+
+    trait :without_rpii do
+      rpii_inspector_number { nil }
+    end
   end
 end

@@ -37,8 +37,6 @@ class PdfGeneratorService
         # Get the assessment type name for i18n (remove _assessment suffix)
         assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
 
-        # Special case: user_height_assessment uses "tallest_user_height" in i18n
-        assessment_type = "tallest_user_height" if assessment_type == "user_height"
 
         # Generate the section using the generic renderer
         renderer = AssessmentRenderer.new

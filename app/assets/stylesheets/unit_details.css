@@ -49,7 +49,7 @@
 }
 
 /* Mobile view - inline flow - scoped */
-@media (max-width: 789px) {
+@media (max-width: 767px) {
   .unit-details-wrapper .unit-details-list li {
     display: block;
     text-align: left;

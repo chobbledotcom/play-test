@@ -1,7 +1,7 @@
 en:
   forms:
     materials:
-      header: "Materials Assessment"
+      header: "Materials"
       summary:
         title: "Materials Assessment Summary"
         critical_materials: "Critical Materials Check"
@@ -23,6 +23,6 @@ en:
         fabric_strength_pass: "Fabric strength"
         fire_retardant_pass: "Fire retardent"
       status:
-        checks_passed: "Safety Checks Passed"
+        checks_passed: "Fields completed"
         completion: "Assessment Completion"
       submit: "Save Assessment"

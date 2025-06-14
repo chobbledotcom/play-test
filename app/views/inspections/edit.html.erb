@@ -42,9 +42,9 @@
         <% inspection_tabs(@inspection).each do |tab| %>
           <li>
             <% if current_tab == tab %>
-              <span><%= t("inspections.tabs.#{tab}") %></span>
+              <span><%= t("forms.#{tab}.header") %></span>
             <% else %>
-              <%= link_to t("inspections.tabs.#{tab}"), 
+              <%= link_to t("forms.#{tab}.header"), 
                   edit_inspection_path(@inspection, tab: tab, anchor: "tabs"), 
                   data: { tab: tab } %>
             <% end %>
@@ -56,7 +56,7 @@
     <!-- Tab Content -->
     <div class="tab-content">
       <% case current_tab %>
-      <% when 'general' %>
+      <% when 'inspections' %>
         <%= render 'inspections/form' %>
       <% when 'user_height' %>
         <%= render 'inspections/user_height_form' %>
@@ -72,12 +72,6 @@
         <%= render 'inspections/fan_form' %>
       <% when 'enclosed' %>
         <%= render 'inspections/enclosed_form' %>
-      <% else %>
-        <div class="assessment-placeholder">
-          <h3><%= t("inspections.tabs.#{current_tab}") %> Assessment</h3>
-          <p>This assessment form is coming soon.</p>
-          <p><%= link_to "Return to General", edit_inspection_path(@inspection), class: "btn btn-primary" %></p>
-        </div>
       <% end %>
     </div>
 

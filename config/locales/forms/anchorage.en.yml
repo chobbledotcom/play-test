@@ -1,7 +1,7 @@
 en:
   forms:
     anchorage:
-      header: "Anchorage Assessment"
+      header: "Anchorage"
       sections:
         anchor_counts: "Anchor Counts"
         anchor_quality: "Anchor Quality"
@@ -15,7 +15,7 @@ en:
         anchor_type_pass: "Anchors permanently closed and metal"
         pull_strength_pass: "Pull strength test"
       status:
-        checks_passed: "Safety Checks Passed"
+        checks_passed: "Fields completed"
         completion: "Assessment Completion"
       summary:
         title: "Assessment Summary"

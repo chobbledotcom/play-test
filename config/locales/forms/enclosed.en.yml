@@ -8,7 +8,7 @@ en:
         exit_number: "Number of Exits"
         exit_sign_always_visible_pass: "Exit Sign Always Visible"
       status:
-        checks_passed: "Safety Checks Passed"
+        checks_passed: "Fields completed"
         completion: "Assessment Completion"
       summary:
         title: "Assessment Summary"

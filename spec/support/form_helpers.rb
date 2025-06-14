@@ -144,6 +144,34 @@ module FormHelpers
       expect(page).to have_css("fieldset legend", text: legend_text)
     end
   end
+
+  # Click an assessment tab by tab name
+  # Usage: click_assessment_tab("user_height")
+  def click_assessment_tab(tab_name)
+    tab_text = I18n.t("forms.#{tab_name}.header")
+    click_link tab_text
+  end
+
+  # Check that an assessment tab is visible
+  # Usage: expect_assessment_tab("user_height")
+  def expect_assessment_tab(tab_name)
+    tab_text = I18n.t("forms.#{tab_name}.header")
+    expect(page).to have_link(tab_text)
+  end
+
+  # Check that an assessment tab is not visible
+  # Usage: expect_no_assessment_tab("enclosed")
+  def expect_no_assessment_tab(tab_name)
+    tab_text = I18n.t("forms.#{tab_name}.header")
+    expect(page).not_to have_link(tab_text)
+  end
+
+  # Check that an assessment tab is active (current)
+  # Usage: expect_assessment_tab_active("inspections")
+  def expect_assessment_tab_active(tab_name)
+    tab_text = I18n.t("forms.#{tab_name}.header")
+    expect(page).to have_css("nav.tabs span", text: tab_text)
+  end
 end
 
 RSpec.configure do |config|

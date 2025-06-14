@@ -52,7 +52,7 @@ end %>
     <div class="assessment-summary">
       <h4><%= I18n.t("#{i18n_base}.summary.title", default: "Assessment Summary") %></h4>
       <div class="safety-status">
-        <strong><%= I18n.t("#{i18n_base}.summary.safety_checks", default: "Safety Checks") %>:</strong>
+        <strong><%= I18n.t("shared.assessment_completion") %>:</strong>
         <span class="checks-count">
           <%= model.passed_checks_count %> / <%= model.pass_columns_count %>
         </span>

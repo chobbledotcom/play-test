@@ -13,7 +13,7 @@ class User < ApplicationRecord
   validates :password, presence: true, length: password_length_options,
     if: :password_digest_changed?
   validates :name, presence: true, if: :validate_name?
-  validates :rpii_inspector_number, presence: true
+  validates :rpii_inspector_number, uniqueness: true, allow_nil: true
   validates :theme, inclusion: {in: %w[light dark]}
   # Contact fields are only required for users without companies
   # when they need to generate PDFs
@@ -21,6 +21,7 @@ class User < ApplicationRecord
 
   before_create :set_inactive_on_signup
   before_save :downcase_email
+  before_save :normalize_rpii_number
 
   def is_active?
     active_until.nil? || active_until >= Date.current
@@ -126,6 +127,10 @@ class User < ApplicationRecord
 
   def downcase_email
     self.email = email.downcase
+  end
+
+  def normalize_rpii_number
+    self.rpii_inspector_number = nil if rpii_inspector_number.blank?
   end
 
   def set_inactive_on_signup

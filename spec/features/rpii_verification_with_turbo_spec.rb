@@ -92,8 +92,9 @@ RSpec.feature "RPII Verification", type: :feature do
     fill_in I18n.t("users.forms.rpii_inspector_number"), with: ""
     click_button I18n.t("users.buttons.update_user")
 
-    # Since rpii_inspector_number is required, this should show an error
-    expect(page).to have_content("can't be blank")
+    # After clearing RPII number, verify button should not be shown
+    expect(page).to have_content(I18n.t("users.messages.user_updated"))
+    expect(page).not_to have_button(I18n.t("users.buttons.verify_rpii"))
   end
 
   scenario "shows existing verification status" do

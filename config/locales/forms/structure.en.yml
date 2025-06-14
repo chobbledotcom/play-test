@@ -1,7 +1,7 @@
 en:
   forms:
     structure:
-      header: "Structure Assessment"
+      header: "Structure"
       sections:
         fabric_construction: "Fabric and Construction"
         structural_safety: "Structural Safety and Measurements"
@@ -33,7 +33,7 @@ en:
         markings_pass: "Markings"
         grounding_pass: "Grounding"
       status:
-        checks_passed: "Safety Checks Passed"
+        checks_passed: "Fields completed"
         completion: "Assessment Completion"
       summary:
         title: "Assessment Summary"

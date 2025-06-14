@@ -13,7 +13,7 @@ en:
         pat_pass: "PAT"
         blower_visual_pass: "Visual Inspection"
       status:
-        checks_passed: "Safety Checks Passed"
+        checks_passed: "Fields completed"
         completion: "Assessment Completion"
       summary:
         title: "Assessment Summary"

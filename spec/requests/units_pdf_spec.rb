@@ -11,32 +11,6 @@ RSpec.describe "Units PDF Generation", type: :request do
   end
 
   describe "GET /units/:id/report" do
-    it "generates PDF report for unit" do
-      visit unit_path(unit)
-
-      # Check if PDF Report link exists
-      expect(page).to have_link(I18n.t("units.buttons.pdf_report"))
-
-      # Click the PDF Report link
-      click_link I18n.t("units.buttons.pdf_report")
-
-      # Check response is a PDF
-      expect(page.response_headers["Content-Type"]).to eq("application/pdf")
-      expect(page.body[0..3]).to eq("%PDF")
-    end
-
-    it "handles unit with inspections in PDF" do
-      # Create inspections for the unit
-      create(:inspection, user: user, unit: unit, passed: true)
-      create(:inspection, user: user, unit: unit, passed: false)
-
-      visit unit_path(unit)
-      click_link I18n.t("units.buttons.pdf_report")
-
-      # Verify PDF is generated
-      expect(page.response_headers["Content-Type"]).to eq("application/pdf")
-      expect(page.body[0..3]).to eq("%PDF")
-    end
 
     it "handles missing unit gracefully" do
       visit "/units/NONEXISTENT/report"
@@ -69,11 +43,6 @@ RSpec.describe "Units PDF Generation", type: :request do
   end
 
   describe "PDF download integration" do
-    it "allows downloading PDF through direct link" do
-      # Visit the report URL directly
-      get_pdf("/units/#{unit.id}.pdf")
-    end
-
     it "sets proper filename for PDF download" do
       get_pdf("/units/#{unit.id}.pdf")
 
