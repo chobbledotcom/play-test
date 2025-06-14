@@ -1,3 +1,5 @@
+require_relative "seed_data"
+
 puts "Creating users..."
 
 def generate_secure_password
@@ -5,13 +7,17 @@ def generate_secure_password
 end
 
 def create_user(email:, name:, rpii_number:, company:, active_until: Date.current + 1.year)
+  password = generate_secure_password
   User.create!(
-    email: email,
-    name: name,
-    password: generate_secure_password,
-    rpii_inspector_number: rpii_number,
-    inspection_company: company,
-    active_until: active_until
+    SeedData.user_fields.merge(
+      email: email,
+      name: name,
+      password: password,
+      password_confirmation: password,
+      rpii_inspector_number: rpii_number,
+      inspection_company: company,
+      active_until: active_until
+    )
   )
 end
 

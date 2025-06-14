@@ -9,6 +9,7 @@ class InspectionsController < ApplicationController
   before_action :validate_unit_ownership, only: %i[update]
   before_action :redirect_if_complete, except: %i[create destroy index mark_draft show]
   before_action :require_user_active, only: %i[create edit update]
+  before_action :validate_inspection_completability, only: %i[show edit]
   before_action :no_index
 
   def index
@@ -166,6 +167,21 @@ class InspectionsController < ApplicationController
     unless valid_tabs.include?(params[:tab])
       redirect_to edit_inspection_path(@inspection), alert: I18n.t("inspections.messages.invalid_tab")
     end
+  end
+
+  def validate_inspection_completability
+    return unless @inspection.complete?
+    return if @inspection.can_mark_complete?
+
+    error_message = I18n.t(
+      "inspections.errors.invalid_completion_state",
+      errors: @inspection.completion_errors.join(", ")
+    )
+
+    Rails.logger.error "Inspection #{@inspection.id} is marked complete but has errors: #{@inspection.completion_errors}"
+
+    # Raise a clear exception that will show in development/test but 500 in production
+    raise "DATA INTEGRITY ERROR: #{error_message}. In tests, use create_completed_inspection helper to avoid this."
   end
 
   INSPECTION_SPECIFIC_PARAMS = %i[

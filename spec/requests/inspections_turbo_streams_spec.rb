@@ -159,24 +159,20 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
   describe "Completed inspection behavior" do
     let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
+    let(:completed_inspection) { create_completed_inspection(user: user) }
 
     before do
-      inspection.update!(complete_date: Time.current)
-      inspection.user_height_assessment.update!(
-        containing_wall_height: 1.5,
-        platform_height: 1.0,
-        tallest_user_height: 1.2
-      )
+      # completed_inspection is already properly completed
     end
 
     it "redirects when trying to update completed inspections" do
-      patch inspection_path(inspection),
+      patch inspection_path(completed_inspection),
         params: {inspection: {inspection_location: "Updated"}},
         headers: turbo_headers
 
       # Should redirect because completed inspections cannot be edited
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(inspection_path(inspection))
+      expect(response).to redirect_to(inspection_path(completed_inspection))
     end
   end
 

@@ -1,6 +1,6 @@
 # This module provides field mappings for assessments
 # Used by both seeds and tests to ensure consistency
-module AssessmentData
+module SeedData
   def self.user_fields
     {
       email: "test#{rand(1000..9999)}@example.com",

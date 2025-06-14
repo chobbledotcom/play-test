@@ -1,4 +1,5 @@
 require "rails_helper"
+require_relative "../../../db/seeds/seed_data"
 
 RSpec.describe "inspector_companies/show", type: :view do
   let(:admin_user) { create(:user, :admin) }
@@ -110,9 +111,7 @@ RSpec.describe "inspector_companies/show", type: :view do
           user: admin_user,
           unit: test_unit,
           inspector_company: inspector_company,
-          inspection_date: Date.current,
-          inspection_location: "Test Location",
-          passed: true)
+          **SeedData.inspection_fields)
       ]
     end
 
@@ -125,7 +124,7 @@ RSpec.describe "inspector_companies/show", type: :view do
 
       expect(rendered).to include("Recent Inspections")
       expect(rendered).to include("TEST001")
-      expect(rendered).to include("Test Location")
+      expect(rendered).to include(recent_inspections.first.inspection_location)
       expect(rendered).to include("Pass") # passed
     end
   end

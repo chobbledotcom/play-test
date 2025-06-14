@@ -685,7 +685,7 @@ RSpec.describe "Units", type: :request do
       it "prevents deletion of units with complete inspections" do
         # Units with complete inspections should not be deletable (defense in depth)
         unit_with_complete = create(:unit, user: user)
-        create(:inspection, :complete, unit: unit_with_complete, user: user, passed: true)
+        create(:inspection, :completed, unit: unit_with_complete, user: user, passed: true)
 
         delete unit_path(unit_with_complete)
 

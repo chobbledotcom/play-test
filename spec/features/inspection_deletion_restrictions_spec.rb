@@ -19,7 +19,7 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
     end
 
     scenario "hides delete button for complete inspections" do
-      inspection = create(:inspection, user: user, unit: unit, complete_date: Time.current)
+      inspection = create_completed_inspection(user: user, unit: unit)
 
       visit edit_inspection_path(inspection)
 
@@ -88,7 +88,7 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
 
   context "edge cases and error scenarios" do
     scenario "attempting to delete complete inspection via direct URL shows error" do
-      inspection = create(:inspection, user: user, unit: unit, complete_date: Time.current)
+      inspection = create_completed_inspection(user: user, unit: unit)
 
       # Try to delete via direct HTTP request (simulating form manipulation)
       page.driver.submit :delete, "/inspections/#{inspection.id}", {}
@@ -106,7 +106,12 @@ RSpec.feature "Inspection Deletion Restrictions", type: :feature do
       visit edit_inspection_path(inspection)
       expect(page).to have_button(I18n.t("inspections.buttons.delete"))
 
-      # Change status to complete (simulating the status change)
+      # Properly complete the inspection by filling all assessment fields
+      inspection.reload
+      Inspection::ASSESSMENT_TYPES.each do |assessment_name, _assessment_class|
+        assessment = inspection.send(assessment_name)
+        assessment.update!(attributes_for(assessment_name, :complete))
+      end
       inspection.update!(complete_date: Time.current)
 
       visit edit_inspection_path(inspection)

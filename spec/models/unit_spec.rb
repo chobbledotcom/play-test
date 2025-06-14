@@ -170,21 +170,21 @@ RSpec.describe Unit, type: :model do
 
     context "when last inspection was within the reinspection interval" do
       it "returns false" do
-        create(:inspection, :complete, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago)
+        create_completed_inspection(unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago)
         expect(unit.inspection_overdue?).to be false
       end
     end
 
     context "when last inspection was beyond the reinspection interval" do
       it "returns true" do
-        create(:inspection, :complete, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 30).days.ago)
+        create_completed_inspection(unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 30).days.ago)
         expect(unit.inspection_overdue?).to be true
       end
     end
 
     context "when last inspection was exactly at the reinspection interval" do
       it "returns false" do
-        create(:inspection, :complete, unit: unit, inspection_date: SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago)
+        create_completed_inspection(unit: unit, inspection_date: SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago)
         expect(unit.inspection_overdue?).to be false
       end
     end

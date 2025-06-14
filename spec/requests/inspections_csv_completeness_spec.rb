@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Inspections CSV Export Completeness", type: :request do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user) }
-  let!(:inspection) { create(:inspection, :complete, user: user, unit: unit) }
+  let!(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
 
   before do
     login_as(user)
@@ -80,7 +80,7 @@ RSpec.describe "Inspections CSV Export Completeness", type: :request do
     end
 
     it "handles inspections without units gracefully" do
-      inspection_without_unit = create(:inspection, :complete, user: user, unit: nil)
+      inspection_without_unit = create(:inspection, :completed, user: user, unit: nil)
 
       get inspections_path(format: :csv)
 

@@ -160,6 +160,11 @@ RSpec.describe "Inspections", type: :request do
         inspection.reload
         expect(inspection.pdf_last_accessed_at).to be_present
       end
+
+      it "inspection_path helper generates correct PDF URL" do
+        # Verify that the Rails path helper generates the expected URL
+        expect(inspection_path(inspection, format: :pdf)).to eq("/inspections/#{inspection.id}.pdf")
+      end
     end
 
     describe "POST /create" do

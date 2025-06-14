@@ -1,4 +1,5 @@
 require "rails_helper"
+require_relative "../../../db/seeds/seed_data"
 
 RSpec.describe "home/index.html.erb", type: :view do
   context "when user is not logged in" do
@@ -74,7 +75,7 @@ RSpec.describe "home/index.html.erb", type: :view do
   end
 
   context "when user is logged in" do
-    let(:user) { User.new(email: "user@example.com") }
+    let(:user) { User.new(SeedData.user_fields) }
 
     before do
       allow(view).to receive(:current_user).and_return(user)

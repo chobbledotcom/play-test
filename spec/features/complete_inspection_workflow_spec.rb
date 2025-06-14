@@ -1,5 +1,5 @@
 require "rails_helper"
-require_relative "../../db/seeds/assessment_data"
+require_relative "../../db/seeds/seed_data"
 
 # Workflow class for creating and completing inspections
 class InspectionWorkflow
@@ -56,7 +56,7 @@ class InspectionWorkflow
     visit root_path
     click_link t("users.titles.register")
 
-    user_data = AssessmentData.user_fields
+    user_data = SeedData.user_fields
     user_data.each do |field_name, value|
       next if value.nil?
       field_label = t("forms.user_new.fields.#{field_name}")
@@ -84,7 +84,7 @@ class InspectionWorkflow
     visit units_path
     click_button t("units.buttons.add_unit")
 
-    unit_data = AssessmentData.unit_fields.merge(
+    unit_data = SeedData.unit_fields.merge(
       name: "Test Bouncy Castle"
     )
 
@@ -112,7 +112,7 @@ class InspectionWorkflow
   end
 
   def fill_general_inspection_details
-    field_data = AssessmentData.inspection_fields.merge(@options)
+    field_data = SeedData.inspection_fields.merge(@options)
 
     field_data.each do |field_name, value|
       fill_inspection_field(field_name, value)
@@ -173,7 +173,7 @@ class InspectionWorkflow
 
   def fill_assessment_tab(tab_name)
     visit edit_inspection_path(@inspection, tab: tab_name)
-    field_data = AssessmentData.send(
+    field_data = SeedData.send(
       "#{tab_name}_fields",
       passed: true
     )

@@ -278,7 +278,7 @@ RSpec.describe Inspection, type: :model do
   describe "validation scopes and filters" do
     let!(:passed_inspection) { create(:inspection, :passed) }
     let!(:failed_inspection) { create(:inspection, :failed) }
-    let!(:complete_inspection) { create(:inspection, :complete) }
+    let!(:complete_inspection) { create(:inspection, :completed) }
     let!(:draft_inspection) { create(:inspection) }
 
     describe "scopes" do
@@ -400,7 +400,7 @@ RSpec.describe Inspection, type: :model do
       end
 
       it "validates unique_report_number uniqueness when provided" do
-        create(:inspection, :complete,
+        create_completed_inspection(
           unique_report_number: "TEST-123",
           inspector_company: inspector_company,
           user: user)

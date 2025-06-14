@@ -1,17 +1,20 @@
+require_relative "seed_data"
+
 puts "Creating units..."
 
 def create_unit(name:, serial_prefix:, manufacturer:, model:, owner:, description:, notes: nil)
   Unit.create!(
-    user: $test_user,
-    name: name,
-    serial: "#{serial_prefix}-#{rand(1000..9999)}",
-    manufacturer: manufacturer,
-    model: model,
-    owner: owner,
-    description: description,
-    notes: notes,
-    manufacture_date: rand(1..5).years.ago,
-    is_seed: true
+    SeedData.unit_fields.merge(
+      user: $test_user,
+      name: name,
+      serial: "#{serial_prefix}-#{rand(1000..9999)}",
+      manufacturer: manufacturer,
+      model: model,
+      owner: owner,
+      description: description,
+      notes: notes,
+      is_seed: true
+    )
   )
 end
 

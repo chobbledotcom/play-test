@@ -41,7 +41,7 @@ RSpec.describe InspectionsHelper, type: :helper do
     let(:admin_user) { create(:user, email: "admin@example.com") }
     let(:inspection) { create(:inspection, user: user) }
     let(:complete_inspection) do
-      inspection = create(:inspection, :complete, user: user)
+      inspection = create(:inspection, :completed, user: user)
       inspection
     end
 

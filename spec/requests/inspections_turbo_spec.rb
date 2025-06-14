@@ -66,28 +66,17 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
       end
 
       it "redirects when trying to update completed inspections" do
-        # Mark inspection as completed
-        inspection.update!(complete_date: Time.current)
+        # Create a properly completed inspection
+        completed_inspection = create_completed_inspection(user: user)
 
-        # Create an assessment
-        inspection.user_height_assessment.update!(
-          containing_wall_height: 1.5,
-          platform_height: 1.0,
-          tallest_user_height: 1.2,
-          users_at_1000mm: 10,
-          users_at_1200mm: 8,
-          users_at_1500mm: 6,
-          users_at_1800mm: 4,
-          play_area_length: 5.0,
-          play_area_width: 4.0,
-          tallest_user_height_comment: "Complete"
-        )
+        # Verify the user_height_assessment has data we can try to update
+        expect(completed_inspection.user_height_assessment.tallest_user_height_comment).to be_present
 
-        patch inspection_path(inspection),
+        patch inspection_path(completed_inspection),
           params: {
             inspection: {
               user_height_assessment_attributes: {
-                id: inspection.user_height_assessment.id,
+                id: completed_inspection.user_height_assessment.id,
                 tallest_user_height_comment: "Updated comment"
               }
             }
@@ -96,7 +85,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
         # Should redirect because completed inspections cannot be edited
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(inspection_path(inspection))
+        expect(response).to redirect_to(inspection_path(completed_inspection))
       end
     end
 

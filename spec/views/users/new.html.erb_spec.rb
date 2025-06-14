@@ -1,4 +1,5 @@
 require "rails_helper"
+require_relative "../../../db/seeds/seed_data"
 
 RSpec.describe "users/new.html.erb", type: :view do
   before do
@@ -34,7 +35,7 @@ RSpec.describe "users/new.html.erb", type: :view do
   end
 
   it "preserves user input on validation failure" do
-    user = User.new(email: "test@example.com")
+    user = User.new(email: SeedData.user_fields[:email])
     user.valid?
     assign(:user, user)
 

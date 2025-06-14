@@ -182,6 +182,7 @@ en:
         one: "Did not save. Fix this %{count} error and try again:"
         other: "Did not save. Fix these %{count} errors and try again:"
       unit_required: "Unit selection is required"
+      invalid_completion_state: "This inspection is marked as complete but has validation errors: %{errors}"
       invalid_unit: "Invalid unit selection"
       creation_failed: "Failed to create inspection: %{errors}"
       not_found: "Inspection record not found"

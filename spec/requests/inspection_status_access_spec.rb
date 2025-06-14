@@ -25,7 +25,7 @@ RSpec.describe "Inspection Status Access Control", type: :request do
     end
 
     context "when inspection status is 'complete'" do
-      let(:complete_inspection) { create(:inspection, :complete, user: user, unit: unit) }
+      let(:complete_inspection) { create_completed_inspection(user: user, unit: unit) }
 
       it "allows report access" do
         get inspection_path(complete_inspection, format: :pdf)
@@ -68,7 +68,7 @@ RSpec.describe "Inspection Status Access Control", type: :request do
     end
 
     context "when inspection is complete" do
-      let(:complete_inspection) { create(:inspection, :complete, user: user, unit: unit) }
+      let(:complete_inspection) { create_completed_inspection(user: user, unit: unit) }
 
       it "shows minimal PDF viewer for HTML requests" do
         # Logout first

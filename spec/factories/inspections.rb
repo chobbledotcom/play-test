@@ -31,12 +31,20 @@ FactoryBot.define do
       }
     end
 
-    trait :complete do
-      complete_date { Time.current }
-    end
-
     trait :completed do
       complete_date { Time.current }
+      
+      after(:create) do |inspection|
+        # Reload to ensure we have the latest state (in case other traits modified attributes)
+        inspection.reload
+        
+        # Loop through all assessment types and mark them as complete
+        Inspection::ASSESSMENT_TYPES.each do |assessment_name, _assessment_class|
+          assessment = inspection.send(assessment_name)
+          # Use the complete trait for all assessments
+          assessment.update!(attributes_for(assessment_name, :complete))
+        end
+      end
     end
 
     trait :draft do
@@ -66,7 +74,7 @@ FactoryBot.define do
       after(:create) do |inspection|
         # Update all assessments with complete data (assessments are already created by inspection callback)
         inspection.anchorage_assessment.update!(attributes_for(:anchorage_assessment, :complete).except(:inspection_id))
-        inspection.enclosed_assessment.update!(attributes_for(:enclosed_assessment, :passed).except(:inspection_id))
+        inspection.enclosed_assessment.update!(attributes_for(:enclosed_assessment, :complete).except(:inspection_id))
         inspection.fan_assessment.update!(attributes_for(:fan_assessment, :complete).except(:inspection_id))
         inspection.materials_assessment.update!(attributes_for(:materials_assessment, :complete).except(:inspection_id))
         inspection.slide_assessment.update!(attributes_for(:slide_assessment, :complete).except(:inspection_id))

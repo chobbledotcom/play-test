@@ -8,7 +8,7 @@ FactoryBot.define do
     exit_sign_always_visible_pass { true }
     exit_sign_always_visible_comment { "Exits clearly marked and visible" }
 
-    trait :passed do
+    trait :complete do
       exit_number { 2 }
       exit_number_pass { true }
       exit_sign_always_visible_pass { true }

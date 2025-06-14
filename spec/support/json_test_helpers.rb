@@ -63,10 +63,9 @@ module JsonTestHelpers
   end
 
   # Create inspection with complete assessments
+  # Delegates to InspectionHelpers#create_completed_inspection
   def create_complete_inspection(user: nil, unit: nil, **options)
-    user ||= create(:user)
-    unit ||= create(:unit, user: user)
-    create(:inspection, :pdf_complete_test_data, user: user, unit: unit, **options)
+    create_completed_inspection(user: user, unit: unit, **options)
   end
 
   # Verify assessment JSON structure

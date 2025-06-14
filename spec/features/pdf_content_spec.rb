@@ -1,5 +1,6 @@
 require "rails_helper"
 require "pdf/inspector"
+require_relative "../../db/seeds/seed_data"
 
 ASSESSMENT_FORMS = %w[user_height structure anchorage materials fan slide enclosed].freeze
 
@@ -9,9 +10,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
   let(:unit) do
     create(:unit,
       user: user,
-      name: "Test Bouncy Castle",
-      manufacturer: "Bounce Co Ltd",
-      serial: "BCL-2024-001")
+      **SeedData.unit_fields)
   end
 
   before do
@@ -20,24 +19,21 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
   feature "Inspection PDF Content" do
     scenario "includes all required sections" do
-      inspection = create(:inspection, :pdf_complete_test_data,
+      inspection = create_completed_inspection(
+        traits: [:pdf_complete_test_data],
         user: user,
         unit: unit)
 
       # Update the auto-created assessments
       inspection.user_height_assessment.update!(
-        containing_wall_height: 2.5,
-        tallest_user_height: 1.8,
-        users_at_1800mm: 5
+        SeedData.user_height_fields.slice(:containing_wall_height, :tallest_user_height, :users_at_1800mm)
       )
 
       inspection.structure_assessment.update!(
-        seam_integrity_pass: true,
-        uses_lock_stitching_pass: true,
-        air_loss_pass: true
+        SeedData.structure_fields.slice(:seam_integrity_pass, :uses_lock_stitching_pass, :air_loss_pass)
       )
 
-      pdf_text = get_pdf_text(inspection_report_path(inspection))
+      pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
 
       # Check all core i18n keys are present
       expect_pdf_to_include_i18n_keys(pdf_text,
@@ -46,8 +42,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       # Check dynamic content
       expect(pdf_text).to include(user.rpii_inspector_number) if user.rpii_inspector_number.present?
-      expect(pdf_text).to include("Test Bouncy Castle")
-      expect(pdf_text).to include("BCL-2024-001")
+      expect(pdf_text).to include(unit.name)
+      expect(pdf_text).to include(unit.serial)
       expect(pdf_text).to include(I18n.t("pdf.dimensions.width"))
       expect(pdf_text).to include(I18n.t("pdf.dimensions.length"))
       expect(pdf_text).to include(I18n.t("pdf.dimensions.height"))
@@ -61,7 +57,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
     end
 
     scenario "handles failed inspection correctly" do
-      failed_inspection = create(:inspection, :pdf_complete_test_data,
+      failed_inspection = create_completed_inspection(
+        traits: [:pdf_complete_test_data],
         user: user,
         unit: unit,
         passed: false,
@@ -73,7 +70,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         seam_integrity_comment: "Torn seam on left side"
       )
 
-      pdf_text = get_pdf_text(inspection_report_path(failed_inspection))
+      pdf_text = get_pdf_text(inspection_path(failed_inspection, format: :pdf))
 
       # Check for failed status
       expect_pdf_to_include_i18n(pdf_text, "pdf.inspection.failed")
@@ -85,11 +82,12 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       # Create unit with slide and totally enclosed
       special_unit = create(:unit, user: user)
 
-      inspection = create(:inspection, :completed, :pdf_complete_test_data, :with_slide, :totally_enclosed,
+      inspection = create_completed_inspection(
+        traits: [:with_slide, :totally_enclosed],
         user: user,
         unit: special_unit)
 
-      text_content = get_pdf_text(inspection_report_path(inspection))
+      text_content = get_pdf_text(inspection_path(inspection, format: :pdf))
 
       # Check all assessment sections are present
       ASSESSMENT_FORMS.each do |form|
@@ -99,11 +97,11 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
     scenario "handles user without RPII number correctly" do
       user_without_rpii = create(:user, :without_rpii)
-      inspection = create(:inspection, :completed, :pdf_complete_test_data,
+      inspection = create_completed_inspection(
         user: user_without_rpii,
         unit: unit)
 
-      pdf_text = get_pdf_text(inspection_report_path(inspection))
+      pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
 
       # Check PDF still generates correctly
       expect_pdf_to_include_i18n_keys(pdf_text,
@@ -116,14 +114,13 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
     end
 
     scenario "shows proper handling for empty assessments" do
-      inspection = create(:inspection,
+      inspection = create_completed_inspection(
         user: user,
-        unit: unit,
-        complete_date: Time.current)
+        unit: unit)
 
-      # Assessments are auto-created but have no data
+      # Assessments are auto-created and completed with data
 
-      pdf_text = get_pdf_text(inspection_report_path(inspection))
+      pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
 
       # Should show assessment headers even with empty data
       expect(pdf_text).to include(I18n.t("forms.structure.header"))
@@ -139,7 +136,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       # Create multiple inspections
       inspections = []
       3.times do |i|
-        inspections << create(:inspection, :completed, :pdf_complete_test_data,
+        inspections << create_completed_inspection(
           user: user,
           unit: unit,
           inspection_date: i.months.ago,
@@ -155,9 +152,9 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         "pdf.unit.inspection_history")
 
       # Check unit details
-      expect(pdf_text).to include("Test Bouncy Castle")
-      expect(pdf_text).to include("Bounce Co Ltd")
-      expect(pdf_text).to include("BCL-2024-001")
+      expect(pdf_text).to include(unit.name)
+      expect(pdf_text).to include(unit.manufacturer)
+      expect(pdf_text).to include(unit.serial)
 
       # Should include inspection dates
       inspections.each do |inspection|
@@ -178,7 +175,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       # Create 10 inspections with varied data
       inspections = []
       10.times do |i|
-        inspections << create(:inspection, :completed, :pdf_complete_test_data,
+        inspections << create_completed_inspection(
           user: user,
           unit: unit,
           inspection_date: i.months.ago,
@@ -200,9 +197,9 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         "pdf.unit.inspection_history")
 
       # Check unit details
-      expect(pdf_text).to include("Test Bouncy Castle")
-      expect(pdf_text).to include("Bounce Co Ltd")
-      expect(pdf_text).to include("BCL-2024-001")
+      expect(pdf_text).to include(unit.name)
+      expect(pdf_text).to include(unit.manufacturer)
+      expect(pdf_text).to include(unit.serial)
 
       # Should include all inspection dates
       inspections.each do |inspection|
@@ -236,7 +233,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       # Create 10 inspections with varied data
       inspections = []
       10.times do |i|
-        inspections << create(:inspection, :completed, :pdf_complete_test_data,
+        inspections << create_completed_inspection(
           user: user,
           unit: unit_with_image,
           inspection_date: i.months.ago,
@@ -291,25 +288,25 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
   feature "PDF Formatting" do
     scenario "uses correct fonts" do
-      inspection = create(:inspection, :completed, :pdf_complete_test_data, user: user, unit: unit)
+      inspection = create_completed_inspection( user: user, unit: unit)
 
-      pdf_data = get_pdf(inspection_report_path(inspection))
+      pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
       expect_valid_pdf(pdf_data)
     end
 
     scenario "generates valid PDF structure" do
-      inspection = create(:inspection, :completed, :pdf_complete_test_data, user: user, unit: unit)
+      inspection = create_completed_inspection( user: user, unit: unit)
 
-      pdf_data = get_pdf(inspection_report_path(inspection))
+      pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
       expect_valid_pdf(pdf_data)
     end
   end
 
   feature "QR Code Generation" do
     scenario "includes QR code in inspection report" do
-      inspection = create(:inspection, :completed, :pdf_complete_test_data, user: user, unit: unit)
+      inspection = create_completed_inspection( user: user, unit: unit)
 
-      pdf_data = get_pdf(inspection_report_path(inspection))
+      pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
 
       # PDF should contain image data (QR code)
       expect(pdf_data).to include("/Image")
@@ -322,10 +319,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
   end
 
   private
-
-  def inspection_report_path(inspection)
-    "/inspections/#{inspection.id}.pdf"
-  end
 
   def unit_report_path(unit)
     "/units/#{unit.id}.pdf"

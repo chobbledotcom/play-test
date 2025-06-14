@@ -18,7 +18,7 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
   describe "editing completed inspections" do
     it "prevents editing completed inspections" do
-      completed_inspection = create(:inspection, :complete, user: user, unit: unit)
+      completed_inspection = create(:inspection, :completed, user: user, unit: unit)
 
       visit edit_inspection_path(completed_inspection)
 
@@ -28,7 +28,7 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
     end
 
     it "allows marking complete inspection as incomplete" do
-      completed_inspection = create(:inspection, :complete, user: user, unit: unit)
+      completed_inspection = create(:inspection, :completed, user: user, unit: unit)
 
       visit edit_inspection_path(completed_inspection)
       click_button I18n.t("inspections.buttons.switch_to_in_progress")
@@ -142,7 +142,8 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
   end
 
   describe "completion workflow" do
-    let(:inspection) { create(:inspection, :with_complete_assessments, user: user, unit: nil) }
+    let(:unit) { create(:unit, user: user) }
+    let(:inspection) { create(:inspection, :with_complete_assessments, user: user, unit: unit) }
 
     it "can complete inspection without report number" do
       visit edit_inspection_path(inspection)

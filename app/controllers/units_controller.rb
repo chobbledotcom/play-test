@@ -138,7 +138,7 @@ class UnitsController < ApplicationController
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
 
   def set_unit
-    @unit = Unit.with_attached_photo.find_by(id: params[:id].upcase)
+    @unit = Unit.includes(photo_attachment: :blob).find_by(id: params[:id].upcase)
 
     unless @unit
       # Always return 404 for non-existent resources regardless of login status
@@ -190,7 +190,7 @@ class UnitsController < ApplicationController
   end
 
   def filtered_units_query
-    units = current_user.units.with_attached_photo
+    units = current_user.units.includes(photo_attachment: :blob)
     units = units.search(params[:query])
     units = units.overdue if params[:status] == "overdue"
     units = units.by_manufacturer(params[:manufacturer])

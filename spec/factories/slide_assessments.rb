@@ -18,6 +18,7 @@ FactoryBot.define do
       runout { 3.0 }
       slide_first_metre_height { 0.5 }
       slide_beyond_first_metre_height { 0.3 }
+      slide_permanent_roof { false }
       clamber_netting_pass { true }
       runout_pass { true }
       slip_sheet_pass { true }

@@ -142,18 +142,42 @@ class Inspection < ApplicationRecord
     }
   end
 
+  def can_mark_complete? = can_be_completed?
+
+  def completion_errors
+    errors = []
+    errors << "Unit is required" unless unit.present?
+    errors += get_missing_assessments.map { |assessment| "#{assessment} Assessment incomplete" }
+    errors
+  end
+
   def get_missing_assessments
     missing = []
+    
+    # Check for missing unit first
     missing << "Unit" unless unit.present?
-    missing << "User Height" unless user_height_assessment&.complete?
-    missing << "Structure" unless structure_assessment&.complete?
-    missing << "Anchorage" unless anchorage_assessment&.complete?
-    missing << "Materials" unless materials_assessment&.complete?
-    missing << "Fan" unless fan_assessment&.complete?
-    missing << "Slide" if has_slide? && !slide_assessment&.complete?
-    if is_totally_enclosed? && !enclosed_assessment&.complete?
-      missing << "Enclosed"
+    
+    # Check for missing assessments using a mapping to match expected values
+    assessment_names = {
+      user_height_assessment: "User Height",
+      structure_assessment: "Structure",
+      anchorage_assessment: "Anchorage",
+      materials_assessment: "Materials",
+      fan_assessment: "Fan",
+      slide_assessment: "Slide",
+      enclosed_assessment: "Enclosed"
+    }
+    
+    assessment_names.each do |assessment_name, display_name|
+      # Skip slide assessment if unit doesn't have a slide
+      next if assessment_name == :slide_assessment && !has_slide?
+      # Skip enclosed assessment if unit is not totally enclosed
+      next if assessment_name == :enclosed_assessment && !is_totally_enclosed?
+      
+      assessment = send(assessment_name)
+      missing << display_name unless assessment&.complete?
     end
+    
     missing
   end
 
