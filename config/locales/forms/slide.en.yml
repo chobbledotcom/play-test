@@ -1,7 +1,7 @@
 en:
   forms:
     slide:
-      header: "Slide Assessment"
+      header: "Slide"
       sections:
         slide_dimensions: "Slide Measurements"
       fields:

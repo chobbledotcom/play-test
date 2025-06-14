@@ -153,31 +153,26 @@ class Inspection < ApplicationRecord
 
   def get_missing_assessments
     missing = []
-    
+
     # Check for missing unit first
     missing << "Unit" unless unit.present?
-    
-    # Check for missing assessments using a mapping to match expected values
-    assessment_names = {
-      user_height_assessment: "User Height",
-      structure_assessment: "Structure",
-      anchorage_assessment: "Anchorage",
-      materials_assessment: "Materials",
-      fan_assessment: "Fan",
-      slide_assessment: "Slide",
-      enclosed_assessment: "Enclosed"
-    }
-    
-    assessment_names.each do |assessment_name, display_name|
+
+    # Check for missing assessments
+    ASSESSMENT_TYPES.each do |assessment_name, _|
       # Skip slide assessment if unit doesn't have a slide
       next if assessment_name == :slide_assessment && !has_slide?
       # Skip enclosed assessment if unit is not totally enclosed
       next if assessment_name == :enclosed_assessment && !is_totally_enclosed?
-      
+
       assessment = send(assessment_name)
-      missing << display_name unless assessment&.complete?
+      unless assessment&.complete?
+        # Get the assessment type without "_assessment" suffix
+        assessment_type = assessment_name.to_s.sub("_assessment", "")
+        # Get the name from the form header
+        missing << I18n.t("forms.#{assessment_type}.header")
+      end
     end
-    
+
     missing
   end
 

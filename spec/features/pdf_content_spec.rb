@@ -22,7 +22,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       inspection = create_completed_inspection(
         traits: [:pdf_complete_test_data],
         user: user,
-        unit: unit)
+        unit: unit
+      )
 
       # Update the auto-created assessments
       inspection.user_height_assessment.update!(
@@ -62,7 +63,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         user: user,
         unit: unit,
         passed: false,
-        risk_assessment: "Multiple safety issues found")
+        risk_assessment: "Multiple safety issues found"
+      )
 
       # Update the auto-created assessment
       failed_inspection.structure_assessment.update!(
@@ -85,7 +87,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       inspection = create_completed_inspection(
         traits: [:with_slide, :totally_enclosed],
         user: user,
-        unit: special_unit)
+        unit: special_unit
+      )
 
       text_content = get_pdf_text(inspection_path(inspection, format: :pdf))
 
@@ -99,7 +102,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       user_without_rpii = create(:user, :without_rpii)
       inspection = create_completed_inspection(
         user: user_without_rpii,
-        unit: unit)
+        unit: unit
+      )
 
       pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
 
@@ -116,7 +120,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
     scenario "shows proper handling for empty assessments" do
       inspection = create_completed_inspection(
         user: user,
-        unit: unit)
+        unit: unit
+      )
 
       # Assessments are auto-created and completed with data
 
@@ -140,7 +145,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
           user: user,
           unit: unit,
           inspection_date: i.months.ago,
-          passed: i.even?)
+          passed: i.even?
+        )
       end
 
       pdf_text = get_pdf_text(unit_report_path(unit))
@@ -180,7 +186,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
           unit: unit,
           inspection_date: i.months.ago,
           passed: i.even?,
-          inspection_location: "Location #{i + 1}")
+          inspection_location: "Location #{i + 1}"
+        )
       end
 
       start_time = Time.current
@@ -238,7 +245,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
           unit: unit_with_image,
           inspection_date: i.months.ago,
           passed: i.even?,
-          inspection_location: "Photo Location #{i + 1}")
+          inspection_location: "Photo Location #{i + 1}"
+        )
       end
 
       start_time = Time.current
@@ -288,14 +296,14 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
   feature "PDF Formatting" do
     scenario "uses correct fonts" do
-      inspection = create_completed_inspection( user: user, unit: unit)
+      inspection = create_completed_inspection(user: user, unit: unit)
 
       pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
       expect_valid_pdf(pdf_data)
     end
 
     scenario "generates valid PDF structure" do
-      inspection = create_completed_inspection( user: user, unit: unit)
+      inspection = create_completed_inspection(user: user, unit: unit)
 
       pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
       expect_valid_pdf(pdf_data)
@@ -304,7 +312,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
   feature "QR Code Generation" do
     scenario "includes QR code in inspection report" do
-      inspection = create_completed_inspection( user: user, unit: unit)
+      inspection = create_completed_inspection(user: user, unit: unit)
 
       pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
 

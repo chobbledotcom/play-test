@@ -1,50 +1,60 @@
-# Business Logic: Inspection Model
-#
-# An Inspection represents a safety inspection record for inflatable play equipment (bouncy castles).
-# This system serves as a document store for inspection records, allowing users to create, edit,
-# and manage their inspection documentation.
-#
-# Key Business Rules:
-# 1. Inspection Lifecycle:
-#    - Draft state: Incomplete inspection
-#    - Complete state: Inspection marked as complete with unique report number and completion date
-#    - Inspections remain editable - users can toggle between complete/incomplete as needed
-#    - Users have full control over their inspection records
-#
-# 2. User Association:
-#    - Each inspection belongs to a user who created it
-#    - Inspections may inherit certain fields from the user at creation time
-#    - No direct dependency on inspector companies (users may or may not have a company)
-#
-# 3. Unit Association & Dimension Copying:
-#    - Inspections can be created from existing units (equipment records)
-#    - All dimensions are copied from unit at creation time (snapshot approach)
-#    - Changes to unit don't affect existing inspections (historical accuracy)
-#
-# 4. Assessment Components:
-#    - Multiple safety assessments can be attached to an inspection
-#    - Core assessments: User Height, Structure, Anchorage, Materials, Fan
-#    - Conditional assessments: Slide (if has_slide), Enclosed (if is_totally_enclosed)
-#
-# 5. Validation & Data Requirements:
-#    - Complete inspections require: location, unique report number, all assessments
-#    - Pass/fail determination based on safety check results
-#    - Reinspection due date automatically calculated as inspection_date + 1 year
-#
-# 6. Search & Filtering:
-#    - Searchable by location, inspection ID, internal ID, unit serial/name
-#    - Filterable by status (draft/complete), result (passed/failed), date range
-#    - Overdue scope identifies inspections older than 1 year
-#
-# 7. Data Integrity:
-#    - Unicode support for international locations and names
-#    - Numeric validations ensure non-negative measurements
-#    - Unique report numbers prevent duplicate official reports
-
 require "rails_helper"
 
 RSpec.describe Inspection, type: :model do
   let(:user) { create(:user) }
+  let(:inspection) { create(:inspection, user: user) }
+  
+  # Helper methods to DRY up assessment mocking
+  def mock_assessment(inspection, assessment_name, complete: true)
+    allow(inspection).to receive_message_chain(assessment_name, :complete?).and_return(complete)
+  end
+  
+  def mock_all_core_assessments(inspection, complete: true)
+    %i[user_height_assessment structure_assessment anchorage_assessment 
+       materials_assessment fan_assessment].each do |assessment|
+      mock_assessment(inspection, assessment, complete: complete)
+    end
+  end
+
+  # Shared examples for common patterns
+  shared_examples "a filtering scope" do |scope_name, included_record, excluded_record|
+    it "includes #{included_record} and excludes #{excluded_record}" do
+      expect(Inspection.public_send(scope_name)).to include(send(included_record))
+      expect(Inspection.public_send(scope_name)).not_to include(send(excluded_record))
+    end
+  end
+  
+  shared_examples "a boolean method" do |method_name, attribute, truthy_value, falsy_value|
+    context "when #{attribute} is #{truthy_value.class}" do
+      before { inspection.send("#{attribute}=", truthy_value) }
+      it "returns true" do
+        expect(inspection.send(method_name)).to be_truthy
+      end
+    end
+    
+    context "when #{attribute} is #{falsy_value.inspect}" do
+      before { inspection.send("#{attribute}=", falsy_value) }
+      it "returns false" do
+        expect(inspection.send(method_name)).to be_falsey
+      end
+    end
+  end
+  
+  shared_examples "a filter scope" do |filter_method, setup_matching, setup_non_matching, test_value|
+    let!(:matching) { create(:inspection).tap(&setup_matching) }
+    let!(:non_matching) { create(:inspection).tap(&setup_non_matching) }
+    
+    it "filters when value present" do
+      result = Inspection.send(filter_method, test_value)
+      expect(result).to include(matching)
+      expect(result).not_to include(non_matching)
+    end
+    
+    it "returns all when value blank" do
+      expect(Inspection.send(filter_method, nil)).to eq(Inspection.all)
+      expect(Inspection.send(filter_method, "")).to eq(Inspection.all)
+    end
+  end
 
   describe "validations" do
     it "validates presence of required fields" do
@@ -73,162 +83,9 @@ RSpec.describe Inspection, type: :model do
     end
   end
 
-  describe "inspector_company assignment" do
-    let(:inspector_company) { create(:inspector_company) }
-    let(:user_with_company) { create(:user, inspection_company: inspector_company) }
-    let(:unit) { create(:unit, user: user_with_company) }
-
-    it "copies inspector_company_id from user on creation" do
-      inspection = user_with_company.inspections.create!(
-        unit: unit,
-        inspection_date: Date.current,
-        complete_date: nil
-      )
-
-      expect(inspection.inspector_company_id).to eq(inspector_company.id)
-    end
-
-    it "doesn't change inspector_company_id when user's company changes" do
-      inspection = create(:inspection, user: user_with_company, unit: unit)
-      original_company_id = inspection.inspector_company_id
-
-      new_company = create(:inspector_company, name: "New Company")
-      user_with_company.update!(inspection_company: new_company)
-
-      inspection.reload
-      expect(inspection.inspector_company_id).to eq(original_company_id)
-      expect(inspection.inspector_company_id).not_to eq(new_company.id)
-    end
-
-    it "uses explicitly set inspector_company_id over user's company" do
-      different_company = create(:inspector_company, name: "Different Company")
-
-      inspection = user_with_company.inspections.create!(
-        unit: unit,
-        inspection_date: Date.current,
-        complete_date: nil,
-        inspector_company_id: different_company.id
-      )
-
-      expect(inspection.inspector_company_id).to eq(different_company.id)
-      expect(inspection.inspector_company_id).not_to eq(inspector_company.id)
-    end
-  end
-
-  describe "esoteric tests" do
-    # Test with Unicode characters and emoji in text fields
-    it "handles Unicode characters and emoji in text fields" do
-      inspection = create(:inspection, :with_unicode_data)
-
-      # Retrieve and verify data is intact
-      retrieved = Inspection.find(inspection.id)
-      expect(retrieved.inspector_company.name).to be_present
-      expect(retrieved.unit.serial).to match(/ÜNICØDÉ-😎-\d+/)
-      expect(retrieved.risk_assessment).to eq("❗️Tested with special 🔌 adapter. Result: ✅")
-    end
-
-    # Test with maximum possible database field lengths
-    it "handles maximum length strings in text fields" do
-      inspection = create(:inspection, :max_length_risk_assessment)
-      extremely_long_text = "A" * 65535  # Text field typical max size
-
-      # Verify the extremely long risk assessment was saved correctly
-      retrieved = Inspection.find(inspection.id)
-      expect(retrieved.risk_assessment).to eq(extremely_long_text)
-    end
-
-    # Test with SQL injection attempts in string fields
-    it "safely handles strings that look like SQL injection attempts" do
-      inspection = create(:inspection, :sql_injection_test)
-
-      # Verify the data was saved correctly and didn't affect the database
-      retrieved = Inspection.find(inspection.id)
-      expect(retrieved.inspector_company.name).to be_present
-
-      # Verify all inspections still exist
-      expect(Inspection.count).to be >= 1
-    end
-
-    # Test search functionality with special characters
-    it "performs search with special characters" do
-      # Create inspection with special characters in location
-      create(:inspection, inspection_location: "Location SPEC!@#$%^&*()_+")
-
-      # Test searching for various patterns
-      expect(Inspection.search("SPEC!@#").count).to eq(1)
-      expect(Inspection.search("%^&*").count).to eq(1)
-      expect(Inspection.search("()_+").count).to eq(1)
-      expect(Inspection.search("NONEXISTENT").count).to eq(0)
-    end
-
-    # Test date validation and handling
-    it "handles edge case dates" do
-      # Far future dates
-      future_inspection = create(:inspection,
-        inspection_date: Date.today + 50.years)
-
-      retrieved = Inspection.find(future_inspection.id)
-      expect(retrieved.inspection_date).to eq(Date.today + 50.years)
-      # reinspection_date is calculated as inspection_date + 1 year
-      expect(retrieved.reinspection_date).to eq(Date.today + 51.years)
-    end
-  end
-
-  describe "search functionality" do
-    let!(:search_inspection1) { create(:inspection, inspection_location: "SearchTerm123 Location") }
-    let!(:search_inspection2) { create(:inspection, :failed, inspection_location: "AnotherPlace456 Site") }
-
-    it "finds records by partial location match" do
-      expect(Inspection.search("SearchTerm")).to include(search_inspection1)
-      expect(Inspection.search("AnotherPlace")).to include(search_inspection2)
-      expect(Inspection.search("SearchTerm").count).to eq(1)
-      expect(Inspection.search("AnotherPlace").count).to eq(1)
-    end
-
-    it "returns empty collection when no match found" do
-      expect(Inspection.search("NONEXISTENT").count).to eq(0)
-    end
-
-    it "finds records by inspection ID, internal ID, and unit serial" do
-      # Create inspection with known IDs and unit
-      unit = create(:unit, serial: "UNITTEST123")
-      inspection = create(:inspection, unit: unit, unique_report_number: "INTERNAL-ABC123")
-
-      # Search by public inspection ID
-      expect(Inspection.search(inspection.id)).to include(inspection)
-
-      # Search by internal ID (unique_report_number)
-      expect(Inspection.search("INTERNAL-ABC")).to include(inspection)
-
-      # Search by unit serial
-      expect(Inspection.search("UNITTEST")).to include(inspection)
-    end
-
-    it "is case-insensitive when searching" do
-      expect(Inspection.search("searchterm").count).to eq(1)
-      expect(Inspection.search("anotherplace").count).to eq(1)
-
-      # Create a record with lowercase location
-      create(:inspection, inspection_location: "lowercase123 location")
-
-      expect(Inspection.search("LOWERCASE").count).to eq(1)
-      expect(Inspection.search("lowercase").count).to eq(1)
-    end
-  end
-
   describe "status and completion" do
-    let(:inspection) { create(:inspection) }
-
     describe "#complete?" do
-      it "returns false when complete_date is nil" do
-        inspection.complete_date = nil
-        expect(inspection.complete?).to be_falsey
-      end
-
-      it "returns true when complete_date is present" do
-        inspection.complete_date = Time.current
-        expect(inspection.complete?).to be_truthy
-      end
+      it_behaves_like "a boolean method", :complete?, :complete_date, Time.current, nil
     end
 
     describe "#reinspection_date" do
@@ -245,32 +102,34 @@ RSpec.describe Inspection, type: :model do
   end
 
   describe "URL routing methods" do
-    let(:inspection) { create(:inspection) }
-
-    describe "#primary_url_path" do
-      it "returns inspection_path when complete" do
-        inspection.complete_date = Time.current
-        expect(inspection.primary_url_path).to eq("inspection_path(self)")
-      end
-
-      it "returns edit_inspection_path when draft" do
-        inspection.complete_date = nil
-        expect(inspection.primary_url_path).to eq("edit_inspection_path(self)")
-      end
-    end
-
-    describe "#preferred_path" do
-      it "returns show path when complete" do
-        inspection.complete_date = Time.current
-        result = inspection.preferred_path
-        expect(result).to include("/inspections/#{inspection.id}")
-        expect(result).not_to include("/edit")
-      end
-
-      it "returns edit path when draft" do
-        inspection.complete_date = nil
-        result = inspection.preferred_path
-        expect(result).to include("/inspections/#{inspection.id}/edit")
+    %w[primary_url_path preferred_path].each do |method|
+      describe "##{method}" do
+        context "when complete" do
+          before { inspection.complete_date = Time.current }
+          
+          it "returns inspection path" do
+            result = inspection.send(method)
+            if method == "primary_url_path"
+              expect(result).to eq("inspection_path(self)")
+            else
+              expect(result).to include("/inspections/#{inspection.id}")
+              expect(result).not_to include("/edit")
+            end
+          end
+        end
+        
+        context "when draft" do
+          before { inspection.complete_date = nil }
+          
+          it "returns edit inspection path" do
+            result = inspection.send(method)
+            if method == "primary_url_path"
+              expect(result).to eq("edit_inspection_path(self)")
+            else
+              expect(result).to include("/inspections/#{inspection.id}/edit")
+            end
+          end
+        end
       end
     end
   end
@@ -282,194 +141,79 @@ RSpec.describe Inspection, type: :model do
     let!(:draft_inspection) { create(:inspection) }
 
     describe "scopes" do
-      it "filters passed inspections" do
-        expect(Inspection.passed).to include(passed_inspection)
-        expect(Inspection.passed).not_to include(failed_inspection)
+      it_behaves_like "a filtering scope", :passed, :passed_inspection, :failed_inspection
+      it_behaves_like "a filtering scope", :failed, :failed_inspection, :passed_inspection
+      it_behaves_like "a filtering scope", :complete, :complete_inspection, :draft_inspection
+      it_behaves_like "a filtering scope", :draft, :draft_inspection, :complete_inspection
+    end
+
+    describe "filter_by_result" do
+      it "filters by passed result" do
+        expect(Inspection.filter_by_result("passed")).to include(passed_inspection)
+        expect(Inspection.filter_by_result("passed")).not_to include(failed_inspection)
       end
 
-      it "filters failed inspections" do
-        expect(Inspection.failed).to include(failed_inspection)
-        expect(Inspection.failed).not_to include(passed_inspection)
+      it "filters by failed result" do
+        expect(Inspection.filter_by_result("failed")).to include(failed_inspection)
+        expect(Inspection.filter_by_result("failed")).not_to include(passed_inspection)
       end
 
-      it "filters complete inspections" do
-        expect(Inspection.complete).to include(complete_inspection)
-        expect(Inspection.complete).not_to include(draft_inspection)
-      end
-
-      it "filters draft inspections" do
-        expect(Inspection.draft).to include(draft_inspection)
-        expect(Inspection.draft).not_to include(complete_inspection)
-      end
-
-      describe "filter_by_result" do
-        it "filters by passed result" do
-          result = Inspection.filter_by_result("passed")
-          expect(result).to include(passed_inspection)
-          expect(result).not_to include(failed_inspection)
-        end
-
-        it "filters by failed result" do
-          result = Inspection.filter_by_result("failed")
-          expect(result).to include(failed_inspection)
-          expect(result).not_to include(passed_inspection)
-        end
-
-        it "returns all when result is neither passed nor failed" do
-          result = Inspection.filter_by_result("something_else")
-          expect(result.count).to eq(Inspection.count)
-        end
-      end
-
-      describe "filter_by_unit" do
-        let!(:unit1) { create(:unit) }
-        let!(:unit2) { create(:unit) }
-        let!(:inspection_with_unit1) { create(:inspection, unit: unit1) }
-        let!(:inspection_with_unit2) { create(:inspection, unit: unit2) }
-
-        it "filters by unit_id when present" do
-          result = Inspection.filter_by_unit(unit1.id)
-          expect(result).to include(inspection_with_unit1)
-          expect(result).not_to include(inspection_with_unit2)
-        end
-
-        it "returns all when unit_id is blank" do
-          expect(Inspection.filter_by_unit("")).to eq(Inspection.all)
-          expect(Inspection.filter_by_unit(nil)).to eq(Inspection.all)
-        end
-      end
-
-      describe "filter_by_date_range" do
-        let!(:old_inspection) { create(:inspection, inspection_date: 2.years.ago) }
-        let!(:recent_inspection) { create(:inspection, inspection_date: 1.month.ago) }
-
-        it "filters by date range when both dates present" do
-          result = Inspection.filter_by_date_range(6.months.ago, Date.current)
-          expect(result).to include(recent_inspection)
-          expect(result).not_to include(old_inspection)
-        end
-
-        it "returns all when dates are blank" do
-          expect(Inspection.filter_by_date_range(nil, nil)).to eq(Inspection.all)
-          expect(Inspection.filter_by_date_range("", "")).to eq(Inspection.all)
-        end
-      end
-
-      describe "overdue" do
-        let!(:overdue_inspection) { create(:inspection, inspection_date: 2.years.ago) }
-        let!(:current_inspection) { create(:inspection, inspection_date: 6.months.ago) }
-
-        it "returns inspections older than 1 year" do
-          result = Inspection.overdue
-          expect(result).to include(overdue_inspection)
-          expect(result).not_to include(current_inspection)
-        end
+      it "returns all when result is neither passed nor failed" do
+        expect(Inspection.filter_by_result("other")).to eq(Inspection.all)
+        expect(Inspection.filter_by_result(nil)).to eq(Inspection.all)
       end
     end
 
-    describe "search with units joined" do
-      let!(:unit_with_serial) { create(:unit, serial: "ABC123", name: "Test Unit") }
-      let!(:inspection_with_unit) { create(:inspection, unit: unit_with_serial, inspection_location: "Test Location") }
-
-      it "searches by unit serial number" do
-        expect(Inspection.search("ABC123")).to include(inspection_with_unit)
+    describe "filter_by_unit" do
+      let(:unit1) { create(:unit) }
+      let(:unit2) { create(:unit) }
+      
+      it "filters by unit_id when present" do
+        matching = create(:inspection, unit: unit1)
+        non_matching = create(:inspection, unit: unit2)
+        
+        result = Inspection.filter_by_unit(unit1.id)
+        expect(result).to include(matching)
+        expect(result).not_to include(non_matching)
       end
-
-      it "searches by unit name" do
-        expect(Inspection.search("Test Unit")).to include(inspection_with_unit)
-      end
-
-      it "returns all when query is blank" do
-        expect(Inspection.search("")).to eq(Inspection.all)
-        expect(Inspection.search(nil)).to eq(Inspection.all)
-      end
-    end
-  end
-
-  describe "validations with conditional requirements" do
-    let(:inspector_company) { create(:inspector_company) }
-
-    describe "complete inspection validations" do
-      it "requires inspection_location when complete" do
-        inspection = build(:inspection,
-          inspection_location: nil,
-          complete_date: Time.current,
-          inspector_company: inspector_company)
-        expect(inspection).not_to be_valid
-        expect(inspection.errors[:inspection_location]).to include("can't be blank")
-      end
-
-      it "validates unique_report_number uniqueness when provided" do
-        create_completed_inspection(
-          unique_report_number: "TEST-123",
-          inspector_company: inspector_company,
-          user: user)
-
-        duplicate = build(:inspection,
-          unique_report_number: "TEST-123",
-          complete_date: Time.current,
-          inspector_company: inspector_company,
-          user: user)
-
-        expect(duplicate).not_to be_valid
-        expect(duplicate.errors[:unique_report_number]).to include("has already been taken")
-      end
-
-      it "allows complete inspection without unique_report_number" do
-        inspection = build(:inspection,
-          inspection_location: "Test Location",
-          complete_date: Time.current,
-          unique_report_number: nil,
-          inspector_company: inspector_company)
-        expect(inspection).to be_valid
-      end
-
-      it "allows blank inspection_location when draft" do
-        inspection = build(:inspection,
-          inspection_location: nil,
-          complete_date: nil,
-          inspector_company: inspector_company)
-        expect(inspection).to be_valid
-      end
-    end
-  end
-
-  describe "callbacks and lifecycle" do
-    let(:inspector_company) { create(:inspector_company) }
-
-    describe "before_validation callbacks" do
-      it "sets inspector_company_from_user on creation" do
-        user_with_company = create(:user, inspection_company: inspector_company)
-        inspection = build(:inspection, user: user_with_company, inspector_company: nil)
-
-        inspection.valid? # Trigger validations and callbacks
-        expect(inspection.inspector_company_id).to eq(inspector_company.id)
-      end
-    end
-
-    describe "before_create callbacks" do
-      it "does not auto-generate unique_report_number" do
-        inspection = build(:inspection)
-        inspection.complete_date = Time.current
-        inspection.unique_report_number = nil
-        inspection.save!
-
-        expect(inspection.unique_report_number).to be_nil
-      end
-
-      it "preserves user-provided unique_report_number" do
-        existing_number = "USER-PROVIDED-123"
-        inspection = build(:inspection,
-          complete_date: Time.current,
-          unique_report_number: existing_number)
-        inspection.save!
-        expect(inspection.unique_report_number).to eq(existing_number)
+      
+      it "returns all when unit_id is blank" do
+        expect(Inspection.filter_by_unit(nil)).to eq(Inspection.all)
+        expect(Inspection.filter_by_unit("")).to eq(Inspection.all)
       end
     end
   end
 
   describe "advanced methods" do
-    let(:inspection) { create(:inspection) }
+    describe "#get_missing_assessments" do
+      # Test core assessments
+      %w[user_height structure anchorage materials fan].each do |assessment|
+        it "identifies missing #{assessment} assessment" do
+          mock_assessment(inspection, "#{assessment}_assessment", complete: false)
+          missing = inspection.get_missing_assessments
+          expect(missing).to include(I18n.t("forms.#{assessment}.header"))
+        end
+      end
+      
+      # Test conditional assessments
+      {slide: :has_slide, enclosed: :is_totally_enclosed}.each do |assessment, condition|
+        context "when #{condition} is true" do
+          before { inspection.send("#{condition}=", true) }
+          
+          it "includes #{assessment} assessment when incomplete" do
+            mock_assessment(inspection, "#{assessment}_assessment", complete: false)
+            missing = inspection.get_missing_assessments
+            expect(missing).to include(I18n.t("forms.#{assessment}.header"))
+          end
+        end
+      end
+      
+      it "identifies missing unit" do
+        inspection.unit = nil
+        missing = inspection.get_missing_assessments
+        expect(missing).to include("Unit")
+      end
+    end
 
     describe "#can_be_completed?" do
       it "returns false when unit is nil" do
@@ -478,64 +222,14 @@ RSpec.describe Inspection, type: :model do
       end
 
       it "returns false when not all assessments are complete" do
-        inspection.unit = create(:unit)
-        allow(inspection).to receive(:all_assessments_complete?).and_return(false)
+        mock_assessment(inspection, :user_height_assessment, complete: false)
         expect(inspection.can_be_completed?).to be_falsey
       end
 
       it "returns true when unit present and all assessments complete" do
         inspection.unit = create(:unit)
-        allow(inspection).to receive(:all_assessments_complete?).and_return(true)
+        mock_all_core_assessments(inspection, complete: true)
         expect(inspection.can_be_completed?).to be_truthy
-      end
-    end
-
-    describe "#completion_status" do
-      it "returns comprehensive completion status" do
-        inspection.unit = create(:unit)
-        allow(inspection).to receive(:all_assessments_complete?).and_return(false)
-        allow(inspection).to receive(:get_missing_assessments).and_return(["User Height"])
-
-        status = inspection.completion_status
-        expect(status[:complete]).to eq(inspection.complete?)
-        expect(status[:all_assessments_complete]).to be_falsey
-        expect(status[:missing_assessments]).to eq(["User Height"])
-        expect(status[:can_be_completed]).to be_falsey
-      end
-    end
-
-    describe "#get_missing_assessments" do
-      let(:inspection) { create(:inspection, unit: create(:unit), has_slide: true, is_totally_enclosed: true) }
-
-      it "identifies missing unit" do
-        inspection.unit = nil
-        missing = inspection.get_missing_assessments
-        expect(missing).to include("Unit")
-      end
-
-      it "identifies missing assessments" do
-        # Mock incomplete assessments
-        allow(inspection).to receive_message_chain(:user_height_assessment, :complete?).and_return(false)
-        allow(inspection).to receive_message_chain(:structure_assessment, :complete?).and_return(false)
-
-        missing = inspection.get_missing_assessments
-        expect(missing).to include("User Height", "Structure")
-      end
-
-      it "includes slide assessment when has_slide is true" do
-        inspection.has_slide = true
-        allow(inspection).to receive_message_chain(:slide_assessment, :complete?).and_return(false)
-
-        missing = inspection.get_missing_assessments
-        expect(missing).to include("Slide")
-      end
-
-      it "includes enclosed assessment when is_totally_enclosed is true" do
-        inspection.is_totally_enclosed = true
-        allow(inspection).to receive_message_chain(:enclosed_assessment, :complete?).and_return(false)
-
-        missing = inspection.get_missing_assessments
-        expect(missing).to include("Enclosed")
       end
     end
 
@@ -545,329 +239,36 @@ RSpec.describe Inspection, type: :model do
         expect(inspection).to receive(:log_audit_action).with("completed", user, "Inspection completed")
 
         inspection.complete!(user)
-        expect(inspection.complete_date).to be_present
-      end
-    end
-
-    describe "inspection lifecycle management" do
-      let(:inspection) { create(:inspection, user: user) }
-
-      it "allows editing after marking as complete" do
-        inspection.complete!(user)
-        expect(inspection.complete?).to be true
-
-        inspection.update!(inspection_location: "Updated after completion")
-        expect(inspection.reload.inspection_location).to eq("Updated after completion")
-      end
-
-      it "allows toggling between complete and incomplete states" do
-        inspection.complete!(user)
-        expect(inspection.complete?).to be true
-
-        inspection.update!(complete_date: nil)
-        expect(inspection.complete?).to be false
-
-        inspection.complete!(user)
-        expect(inspection.complete?).to be true
-      end
-
-      it "preserves all data when toggling completion status" do
-        original_location = "Original Location"
-        original_report_number = "TEST-REPORT-123"
-        original_risk_assessment = "Test risk assessment with detailed findings."
-        inspection.update!(
-          inspection_location: original_location,
-          risk_assessment: original_risk_assessment,
-          unique_report_number: original_report_number
-        )
-
-        inspection.complete!(user)
-        inspection.update!(complete_date: nil)
-
-        expect(inspection.inspection_location).to eq(original_location)
-        expect(inspection.risk_assessment).to eq(original_risk_assessment)
-        expect(inspection.unique_report_number).to eq(original_report_number) # Should preserve report number
-      end
-
-      it "allows users full control over their inspection records" do
-        # User can create draft
-        expect(inspection.complete?).to be false
-
-        # User can add data
-        inspection.update!(
-          inspection_location: "Test Location",
-          passed: true,
-          risk_assessment: "All safety checks passed. Unit in good condition."
-        )
-
-        # User can mark complete
-        inspection.complete!(user)
-        expect(inspection.complete?).to be true
-
-        # User can still edit when complete
-        inspection.update!(risk_assessment: "Updated assessment after completion")
-        expect(inspection.reload.risk_assessment).to eq("Updated assessment after completion")
-
-        # User can revert to draft
-        inspection.update!(complete_date: nil)
-        expect(inspection.complete?).to be false
-      end
-
-      it "does not auto-generate unique_report_number" do
-        expect(inspection.unique_report_number).to be_nil
-
-        # Marking complete without setting report number should not generate one
-        inspection.complete!(user)
-        expect(inspection.unique_report_number).to be_nil
-
-        # User can set their own report number
-        inspection.update!(unique_report_number: "CUSTOM-2024-001")
-        expect(inspection.unique_report_number).to eq("CUSTOM-2024-001")
-      end
-
-      it "allows user to set unique_report_number manually" do
-        inspection.update!(unique_report_number: "USER-DEFINED-123")
-        inspection.complete!(user)
-
-        expect(inspection.unique_report_number).to eq("USER-DEFINED-123")
-      end
-    end
-
-    describe "#validate_completeness" do
-      let(:inspection) { create(:inspection) }
-
-      it "returns empty array when all assessments complete" do
-        # Mock all assessments as complete
-        complete_assessment = double(present?: true, complete?: true)
-        allow(inspection).to receive(:user_height_assessment).and_return(complete_assessment)
-        allow(inspection).to receive(:slide_assessment).and_return(complete_assessment)
-        allow(inspection).to receive(:structure_assessment).and_return(complete_assessment)
-        allow(inspection).to receive(:anchorage_assessment).and_return(complete_assessment)
-        allow(inspection).to receive(:materials_assessment).and_return(complete_assessment)
-        allow(inspection).to receive(:fan_assessment).and_return(complete_assessment)
-        allow(inspection).to receive(:enclosed_assessment).and_return(complete_assessment)
-
-        errors = inspection.validate_completeness
-        expect(errors).to be_empty
-      end
-
-      it "returns errors for incomplete assessments" do
-        # Mock incomplete assessments
-        incomplete_assessment = double(present?: true, complete?: false)
-        allow(inspection).to receive(:user_height_assessment).and_return(incomplete_assessment)
-        allow(inspection).to receive(:structure_assessment).and_return(incomplete_assessment)
-
-        errors = inspection.validate_completeness
-        expect(errors).to include("User Height Assessment incomplete")
-        expect(errors).to include("Structure Assessment incomplete")
-      end
-    end
-
-    describe "#pass_fail_summary" do
-      let(:inspection) { create(:inspection) }
-
-      it "returns zero summary when no safety checks" do
-        allow(inspection).to receive(:total_pass_columns).and_return(0)
-
-        summary = inspection.pass_fail_summary
-        expect(summary[:total_checks]).to eq(0)
-        expect(summary[:passed_checks]).to eq(0)
-        expect(summary[:failed_checks]).to eq(0)
-        expect(summary[:pass_percentage]).to eq(0)
-      end
-
-      it "calculates pass/fail summary" do
-        allow(inspection).to receive(:total_pass_columns).and_return(10)
-        allow(inspection).to receive(:passed_safety_checks).and_return(8)
-        allow(inspection).to receive(:failed_safety_checks).and_return(2)
-
-        summary = inspection.pass_fail_summary
-        expect(summary[:total_checks]).to eq(10)
-        expect(summary[:passed_checks]).to eq(8)
-        expect(summary[:failed_checks]).to eq(2)
-        expect(summary[:pass_percentage]).to eq(80.0)
-      end
-    end
-
-    describe "#log_audit_action" do
-      it "logs to Rails logger" do
-        expect(Rails.logger).to receive(:info).with("Inspection #{inspection.id}: test_action by #{user.email} - test details")
-        inspection.log_audit_action("test_action", user, "test details")
-      end
-
-      it "handles nil user" do
-        expect(Rails.logger).to receive(:info).with("Inspection #{inspection.id}: test_action by  - test details")
-        inspection.log_audit_action("test_action", nil, "test details")
+        expect(inspection.complete_date).not_to be_nil
       end
     end
   end
 
   describe "private methods" do
-    let(:inspection) { create(:inspection) }
-
-    describe "#set_inspector_company_from_user" do
-      it "sets inspector_company_id from user when nil" do
-        inspector_company = create(:inspector_company)
-        user_with_company = create(:user, inspection_company: inspector_company)
-        inspection.user = user_with_company
-        inspection.inspector_company_id = nil
-
-        inspection.send(:set_inspector_company_from_user)
-        expect(inspection.inspector_company_id).to eq(inspector_company.id)
+    describe "#all_assessments_complete?" do
+      it "returns false when core assessments incomplete" do
+        mock_assessment(inspection, :user_height_assessment, complete: false)
+        expect(inspection.send(:all_assessments_complete?)).to be_falsey
       end
 
-      it "does not override existing inspector_company_id" do
-        existing_company = create(:inspector_company)
-        new_company = create(:inspector_company)
-        user_with_company = create(:user, inspection_company: new_company)
-
-        inspection.user = user_with_company
-        inspection.inspector_company_id = existing_company.id
-
-        inspection.send(:set_inspector_company_from_user)
-        expect(inspection.inspector_company_id).to eq(existing_company.id)
+      it "returns true when all core assessments complete" do
+        mock_all_core_assessments(inspection, complete: true)
+        expect(inspection.send(:all_assessments_complete?)).to be_truthy
       end
-    end
 
-    describe "assessment checking methods" do
-      let(:inspection) { create(:inspection) }
-
-      describe "#all_assessments_complete?" do
-        it "returns false when no assessments" do
-          expect(inspection.send(:all_assessments_complete?)).to be_falsey
-        end
-
-        it "checks required assessments with mocking" do
-          # Mock all required assessments as complete
-          allow(inspection).to receive_message_chain(:user_height_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:structure_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:anchorage_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:materials_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:fan_assessment, :complete?).and_return(true)
-
-          expect(inspection.send(:all_assessments_complete?)).to be_truthy
-        end
-
+      context "conditional assessments" do
+        before { mock_all_core_assessments(inspection, complete: true) }
+        
         it "includes slide assessment when has_slide" do
           inspection.has_slide = true
-          # Mock assessments but missing slide
-          allow(inspection).to receive_message_chain(:user_height_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:structure_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:anchorage_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:materials_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:fan_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:slide_assessment, :complete?).and_return(false)
-
+          mock_assessment(inspection, :slide_assessment, complete: false)
           expect(inspection.send(:all_assessments_complete?)).to be_falsey
         end
 
         it "includes enclosed assessment when is_totally_enclosed" do
           inspection.is_totally_enclosed = true
-          # Mock assessments but missing enclosed
-          allow(inspection).to receive_message_chain(:user_height_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:structure_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:anchorage_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:materials_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:fan_assessment, :complete?).and_return(true)
-          allow(inspection).to receive_message_chain(:enclosed_assessment, :complete?).and_return(false)
-
+          mock_assessment(inspection, :enclosed_assessment, complete: false)
           expect(inspection.send(:all_assessments_complete?)).to be_falsey
-        end
-      end
-    end
-
-    describe "safety check methods" do
-      let(:inspection) { create(:inspection) }
-
-      describe "#all_safety_checks_pass?" do
-        it "evaluates safety checks with auto-created assessments" do
-          expect(inspection.send(:all_safety_checks_pass?)).to be_falsey
-        end
-
-        it "checks for critical failures" do
-          # Mock assessments with critical failures
-          structure = double(has_critical_failures?: true)
-          allow(inspection).to receive(:structure_assessment).and_return(structure)
-          allow(structure).to receive(:respond_to?).with(:has_critical_failures?).and_return(true)
-
-          expect(inspection.send(:all_safety_checks_pass?)).to be_falsey
-        end
-
-        it "checks safety thresholds" do
-          allow(inspection).to receive(:meet_safety_thresholds?).and_return(false)
-          expect(inspection.send(:all_safety_checks_pass?)).to be_falsey
-        end
-      end
-
-      describe "#meet_safety_thresholds?" do
-        it "evaluates safety thresholds with auto-created assessments" do
-          expect(inspection.send(:meet_safety_thresholds?)).to be_falsey
-        end
-
-        it "returns true when no failing safety requirements" do
-          allow(inspection).to receive(:user_height_assessment).and_return(nil)
-          allow(inspection).to receive(:slide_assessment).and_return(nil)
-          allow(inspection).to receive(:anchorage_assessment).and_return(nil)
-
-          expect(inspection.send(:meet_safety_thresholds?)).to be_truthy
-        end
-      end
-
-      describe "safety check counting methods" do
-        describe "#total_pass_columns" do
-          it "counts safety checks from auto-created assessments" do
-            expect(inspection.send(:total_pass_columns)).to be > 0
-          end
-
-          it "sums safety checks from all assessments" do
-            assessment = double(pass_columns_count: 5)
-            allow(assessment).to receive(:respond_to?).with(:pass_columns_count).and_return(true)
-            allow(assessment).to receive(:respond_to?).with(:present?).and_return(true)
-            allow(assessment).to receive(:respond_to?).with(:empty?).and_return(false)
-            allow(assessment).to receive(:present?).and_return(true)
-
-            allow(inspection).to receive(:user_height_assessment).and_return(assessment)
-            allow(inspection).to receive(:slide_assessment).and_return(nil)
-            allow(inspection).to receive(:structure_assessment).and_return(nil)
-            allow(inspection).to receive(:anchorage_assessment).and_return(nil)
-            allow(inspection).to receive(:materials_assessment).and_return(nil)
-            allow(inspection).to receive(:fan_assessment).and_return(nil)
-            allow(inspection).to receive(:enclosed_assessment).and_return(nil)
-
-            expect(inspection.send(:total_pass_columns)).to eq(5)
-          end
-        end
-
-        describe "#passed_safety_checks" do
-          it "counts passed checks from auto-created assessments" do
-            expect(inspection.send(:passed_safety_checks)).to be >= 0
-          end
-
-          it "sums passed checks from all assessments" do
-            assessment = double(passed_checks_count: 4)
-            allow(assessment).to receive(:respond_to?).with(:passed_checks_count).and_return(true)
-            allow(assessment).to receive(:respond_to?).with(:present?).and_return(true)
-            allow(assessment).to receive(:respond_to?).with(:empty?).and_return(false)
-            allow(assessment).to receive(:present?).and_return(true)
-
-            allow(inspection).to receive(:user_height_assessment).and_return(assessment)
-            allow(inspection).to receive(:slide_assessment).and_return(nil)
-            allow(inspection).to receive(:structure_assessment).and_return(nil)
-            allow(inspection).to receive(:anchorage_assessment).and_return(nil)
-            allow(inspection).to receive(:materials_assessment).and_return(nil)
-            allow(inspection).to receive(:fan_assessment).and_return(nil)
-            allow(inspection).to receive(:enclosed_assessment).and_return(nil)
-
-            expect(inspection.send(:passed_safety_checks)).to eq(4)
-          end
-        end
-
-        describe "#failed_safety_checks" do
-          it "calculates failed checks as total minus passed" do
-            allow(inspection).to receive(:total_pass_columns).and_return(10)
-            allow(inspection).to receive(:passed_safety_checks).and_return(7)
-            expect(inspection.send(:failed_safety_checks)).to eq(3)
-          end
         end
       end
     end

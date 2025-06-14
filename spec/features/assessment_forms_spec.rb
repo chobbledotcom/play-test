@@ -1,10 +1,10 @@
 require "rails_helper"
 
-RSpec.feature "Assessment Forms", type: :feature do
-  # Build all tab names from ASSESSMENT_TYPES plus the general inspection tab
-  ALL_TAB_NAMES = ["inspections", ""] +
-    Inspection::ASSESSMENT_TYPES.keys.map { |k| k.to_s.sub(/_assessment$/, "") }
+# Build all tab names from ASSESSMENT_TYPES plus the general inspection tab
+ALL_TAB_NAMES = ["inspections", ""] +
+  Inspection::ASSESSMENT_TYPES.keys.map { |k| k.to_s.sub(/_assessment$/, "") }
 
+RSpec.feature "Assessment Forms", type: :feature do
   let(:admin_user) { create(:user, :without_company, email: "admin@testcompany.com") }
   let(:inspection_company) { create(:inspector_company, name: "Test Company") }
   let(:user) { create(:user, inspection_company: inspection_company) }
@@ -214,9 +214,6 @@ RSpec.feature "Assessment Forms", type: :feature do
   describe "Form Functionality" do
     it "saves slide assessment data when form is submitted" do
       visit edit_inspection_path(slide_inspection, tab: "slide")
-
-      # Debug: Check if the slide tab is actually present
-      expect(page).to have_content("Slide Assessment")
 
       # Use field name instead of label text since label doesn't have 'for' attribute
       fill_in "assessments_slide_assessment[slide_platform_height]", with: "2.5"

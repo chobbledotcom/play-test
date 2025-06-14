@@ -1,7 +1,7 @@
 module InspectionHelpers
   # Create a properly completed inspection with all assessments filled
   # This is the recommended way to create complete inspections in tests
-  # 
+  #
   # Examples:
   #   create_completed_inspection
   #   create_completed_inspection(passed: false)
@@ -11,10 +11,10 @@ module InspectionHelpers
   def create_completed_inspection(**options)
     # Extract traits from options
     traits = options.delete(:traits) || []
-    
+
     # Always ensure :completed is included
     traits = [:completed] + Array(traits)
-    
+
     create(:inspection, *traits, **options)
   end
 end

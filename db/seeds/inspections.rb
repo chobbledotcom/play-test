@@ -148,7 +148,7 @@ Assessments::AnchorageAssessment.create!(
   end
 
   passed_status = rand(0..4) > 0
-  
+
   inspection = Inspection.create!(
     SeedData.inspection_fields.merge(
       user: $test_user,

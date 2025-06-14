@@ -33,11 +33,11 @@ FactoryBot.define do
 
     trait :completed do
       complete_date { Time.current }
-      
+
       after(:create) do |inspection|
         # Reload to ensure we have the latest state (in case other traits modified attributes)
         inspection.reload
-        
+
         # Loop through all assessment types and mark them as complete
         Inspection::ASSESSMENT_TYPES.each do |assessment_name, _assessment_class|
           assessment = inspection.send(assessment_name)
