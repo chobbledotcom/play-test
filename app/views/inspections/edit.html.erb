@@ -75,6 +75,9 @@
       <% end %>
     </div>
 
+    <!-- Complete Button (available on all tabs) -->
+    <%= render 'inspections/complete_button', inspection: @inspection %>
+
     <!-- Actions -->
     <div class="inspection-actions">
       <% if @inspection.complete? %>

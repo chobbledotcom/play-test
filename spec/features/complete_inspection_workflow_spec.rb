@@ -1,147 +1,280 @@
 require "rails_helper"
+require_relative "../../db/seeds/assessment_data"
 
-RSpec.feature "Complete Inspection Workflow", type: :feature do
-  let(:user) { create(:user) }
-  
-  before do
-    sign_in(user)
+# Workflow class for creating and completing inspections
+class InspectionWorkflow
+  include Capybara::DSL
+  include RSpec::Matchers
+  include Rails.application.routes.url_helpers
+
+  BOOLEAN_FIELDS = %w[slide_permanent_roof].freeze
+
+  attr_reader :user
+  attr_reader :unit
+  attr_reader :inspection
+  attr_reader :options
+
+  def initialize(has_slide:, is_totally_enclosed:)
+    @options = {has_slide:, is_totally_enclosed:}
   end
 
-  scenario "creates unit, fills out all inspection fields, and completes inspection" do
-    # Step 1: Create a new unit
+  def t(key, **options)
+    I18n.t(key, raise: true, **options)
+  end
+
+  def execute
+    setup_user
+    setup_unit_and_inspection
+    fill_and_verify_inspection
+    self
+  end
+
+  private
+
+  def setup_user
+    @user = register_new_user
+    verify_inactive_user_warning
+    activate_user
+    verify_no_warning_after_activation
+  end
+
+  def setup_unit_and_inspection
+    @unit = create_test_unit
+    @inspection = create_inspection_for_unit
+    verify_inspection_not_completable
+  end
+
+  def fill_and_verify_inspection
+    fill_general_inspection_details
+    verify_inspection_not_completable
+    fill_all_assessments
+    mark_inspection_complete
+    verify_inspection_complete
+  end
+
+  def register_new_user
+    visit root_path
+    click_link t("users.titles.register")
+
+    user_data = AssessmentData.user_fields
+    user_data.each do |field_name, value|
+      next if value.nil?
+      field_label = t("forms.user_new.fields.#{field_name}")
+      fill_in field_label, with: value
+    end
+
+    click_button t("forms.user_new.submit")
+    User.find_by!(email: user_data[:email])
+  end
+
+  def verify_inactive_user_warning
+    expect(page).to have_content(t("users.messages.user_inactive"))
+  end
+
+  def activate_user = @user.update!(active_until: 5.minutes.from_now)
+
+  def verify_no_warning_after_activation
+    visit current_path
+    expect(page).not_to have_content(
+      t("users.messages.user_inactive")
+    )
+  end
+
+  def create_test_unit
     visit units_path
-    click_button I18n.t("units.buttons.add_unit")
-    
-    # Fill out unit form
-    fill_in I18n.t("forms.units.fields.name"), with: "Test Bouncy Castle"
-    fill_in I18n.t("forms.units.fields.serial"), with: "TEST-#{SecureRandom.hex(4).upcase}"
-    fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
-    fill_in I18n.t("forms.units.fields.owner"), with: "Test Owner"
-    fill_in I18n.t("forms.units.fields.manufacture_date"), with: "2024-01-01"
-    fill_in I18n.t("forms.units.fields.description"), with: "A test bouncy castle for testing"
-    
-    click_button I18n.t("forms.units.submit")
-    
-    # Verify unit was created
-    expect(page).to have_content(I18n.t("units.messages.created"))
-    unit = Unit.last
-    expect(unit.name).to eq("Test Bouncy Castle")
-    
-    # Step 2: Create an inspection for this unit
-    click_button I18n.t("units.buttons.add_inspection")
-    
-    # Should be on edit inspection page
-    expect(page).to have_content(I18n.t("inspections.titles.edit"))
-    inspection = Inspection.last
-    expect(inspection.unit).to eq(unit)
-    
-    # Step 3: Fill out the general inspection tab
-    # We're already on the inspections tab by default
-    fill_in I18n.t("forms.inspections.fields.inspection_date"), with: Date.current
-    fill_in I18n.t("forms.inspections.fields.inspection_location"), with: "Test Location"
-    fill_in I18n.t("forms.inspections.fields.unique_report_number"), with: "TEST-REPORT-001"
-    fill_in I18n.t("forms.inspections.fields.risk_assessment"), with: "Low risk - all safety features functional"
-    
-    # Mark as totally enclosed and with slide to test all assessment types
-    check I18n.t("forms.inspections.fields.is_totally_enclosed")
-    check I18n.t("forms.inspections.fields.has_slide")
-    
-    # Set dimensions for calculations
-    fill_in I18n.t("forms.inspections.fields.width"), with: "5.5"
-    fill_in I18n.t("forms.inspections.fields.length"), with: "6.0"
-    fill_in I18n.t("forms.inspections.fields.height"), with: "4.5"
-    
-    click_button I18n.t("forms.inspections.submit")
-    
-    # Step 4: Go through each assessment tab and fill out all fields
-    # Get all tab names from ASSESSMENT_TYPES
-    assessment_tabs = Inspection::ASSESSMENT_TYPES.keys.map { |k| k.to_s.sub(/_assessment$/, "") }
-    
-    assessment_tabs.each do |tab_name|
-      # Skip tabs that don't apply
-      next if tab_name == "slide" && !inspection.reload.has_slide
-      next if tab_name == "enclosed" && !inspection.reload.is_totally_enclosed
-      
-      # Navigate to the tab
-      visit edit_inspection_path(inspection, tab: tab_name)
-      
-      # Get all fields for this form from i18n
-      i18n_base = "forms.#{tab_name}"
-      fields = I18n.t("#{i18n_base}.fields")
-      
-      # Fill out each field based on its type
-      fields.each do |field_key, field_label|
-        field_name = field_key.to_s
-        
-        # Determine field type and fill accordingly
-        case field_name
-        when /(_pass|_visible)$/
-          # Pass/fail radio buttons - choose pass
-          choose "#{field_label} - #{I18n.t('shared.pass')}", allow_label_click: true
-        when /_comment$/
-          # Comment fields
-          fill_in field_label, with: "Test comment for #{field_name}"
-        when /^num_/, /count$/, /number$/, /_size$/, /_height$/, /_width$/, /_length$/, /_depth$/, /_pressure$/
-          # Numeric fields
-          fill_in field_label, with: "2.5"
-        when /^users_at_/
-          # User capacity fields
-          fill_in field_label, with: "10"
-        when /serial$/
-          # Serial number fields
-          fill_in field_label, with: "SERIAL-123"
-        when /^ropes$/
-          # Special case for ropes field
-          fill_in field_label, with: "25"
+    click_button t("units.buttons.add_unit")
+
+    unit_data = AssessmentData.unit_fields.merge(
+      name: "Test Bouncy Castle"
+    )
+
+    unit_data.each do |field_name, value|
+      field_label = t("forms.units.fields.#{field_name}")
+      fill_in field_label, with: value
+    end
+
+    click_button t("forms.units.submit")
+    expect(page).to have_content(t("units.messages.created"))
+
+    Unit.find_by!(
+      name: unit_data[:name],
+      serial: unit_data[:serial]
+    )
+  end
+
+  def create_inspection_for_unit
+    click_button t("units.buttons.add_inspection")
+    expect(page).to have_content(t("inspections.titles.edit"))
+
+    @unit.inspections.order(created_at: :desc).first.tap do |inspection|
+      expect(inspection).to be_present
+    end
+  end
+
+  def fill_general_inspection_details
+    field_data = AssessmentData.inspection_fields.merge(@options)
+
+    field_data.each do |field_name, value|
+      fill_inspection_field(field_name, value)
+    end
+
+    click_button t("forms.inspections.submit")
+
+    @inspection.reload
+    expect(@inspection.has_slide).to eq(
+      @options[:has_slide]
+    )
+    expect(@inspection.is_totally_enclosed).to eq(
+      @options[:is_totally_enclosed]
+    )
+  end
+
+  def fill_inspection_field(field_name, value)
+    field_label = t("forms.inspections.fields.#{field_name}")
+
+    case field_name
+    when :is_totally_enclosed, :has_slide
+      value ? check(field_label) : uncheck(field_label)
+    when ->(n) { value.is_a?(Date) }
+      fill_in field_label, with: value
+    when ->(n) { value.is_a?(String) || value.is_a?(Numeric) }
+      fill_in field_label, with: value
+    end
+  end
+
+  def fill_all_assessments
+    applicable_tabs.each_with_index do |tab_name, index|
+      fill_assessment_tab(tab_name)
+
+      if index < applicable_tabs.length - 1
+        verify_inspection_not_completable
+      end
+    end
+  end
+
+  def applicable_tabs
+    @applicable_tabs ||= begin
+      all_tabs = Inspection::ASSESSMENT_TYPES.keys.map { |k|
+        k.to_s.sub(/_assessment$/, "")
+      }
+
+      all_tabs.select do |tab_name|
+        case tab_name
+        when "slide"
+          @inspection.has_slide
+        when "enclosed"
+          @inspection.is_totally_enclosed
         else
-          # Default to text field
-          fill_in field_label, with: "Test value"
-        end
-      end
-      
-      # Save this assessment
-      click_button I18n.t("#{i18n_base}.submit")
-      
-      # Verify we're back on the edit page
-      expect(page).to have_content(I18n.t("inspections.titles.edit"))
-    end
-    
-    # Step 5: Mark inspection as complete
-    click_button I18n.t("inspections.buttons.complete")
-    
-    # Should redirect to inspection show page
-    expect(page).to have_content(I18n.t("inspections.messages.marked_complete"))
-    
-    # Verify inspection is marked as complete
-    inspection.reload
-    expect(inspection.complete?).to be true
-    expect(inspection.complete_date).to be_present
-    
-    # Step 6: Go back to edit page and verify all assessments show complete status
-    visit edit_inspection_path(inspection)
-    
-    # For each assessment tab, verify it shows complete status
-    assessment_tabs.each do |tab_name|
-      next if tab_name == "slide" && !inspection.has_slide
-      next if tab_name == "enclosed" && !inspection.is_totally_enclosed
-      
-      visit edit_inspection_path(inspection, tab: tab_name)
-      
-      # Each assessment should show completion status
-      within(".assessment-status") do
-        # Look for "Fields completed: X/X" where both numbers are the same
-        completion_text = page.text
-        if completion_text.match(/(\d+)\s*\/\s*(\d+)/)
-          completed = $1.to_i
-          total = $2.to_i
-          expect(completed).to eq(total), "#{tab_name} assessment should show all fields completed"
-          expect(completed).to be > 0, "#{tab_name} assessment should have some fields"
+          true
         end
       end
     end
-    
-    # Final verification: PDF should generate without errors
-    visit inspection_path(inspection, format: :pdf)
+  end
+
+  def fill_assessment_tab(tab_name)
+    visit edit_inspection_path(@inspection, tab: tab_name)
+    field_data = AssessmentData.send(
+      "#{tab_name}_fields",
+      passed: true
+    )
+
+    field_data.each do |field_name, value|
+      fill_assessment_field(tab_name, field_name, value)
+    end
+
+    click_button t("forms.#{tab_name}.submit")
+    expect(page).to have_content(
+      t("inspections.messages.updated")
+    )
+
+    assessment = @inspection.reload.send("#{tab_name}_assessment")
+    expect(assessment.complete?).to be true
+  end
+
+  def fill_assessment_field(tab_name, field_name, value)
+    field_name_str = field_name.to_s
+    return if field_name_str.end_with?("_comment")
+
+    field_label = get_field_label(tab_name, field_name, field_name_str)
+
+    case field_name_str
+    when /.*_pass$/
+      choose "#{field_name}_#{value ? "true" : "false"}"
+    when ->(s) { BOOLEAN_FIELDS.include?(s) }
+      checkbox_id = "#{field_name}_checkbox"
+      value ? check(checkbox_id) : uncheck(checkbox_id)
+    when ->(s) { value.is_a?(String) && value.present? }
+      fill_in field_label, with: value
+    when ->(s) { value.is_a?(Numeric) }
+      fill_in field_label, with: value
+    end
+  end
+
+  def get_field_label(tab_name, field_name, field_name_str)
+    i18n_key = "forms.#{tab_name}.fields.#{field_name}"
+
+    begin
+      t(i18n_key)
+    rescue I18n::MissingTranslationData
+      if field_name_str.end_with?("_pass")
+        base_field_name = field_name_str.sub(/_pass$/, "")
+        base_key = "forms.#{tab_name}.fields.#{base_field_name}"
+        t(base_key)
+      else
+        raise
+      end
+    end
+  end
+
+  def verify_inspection_not_completable
+    visit edit_inspection_path(@inspection)
+    click_button t("inspections.buttons.mark_complete")
+    expect(page).to have_content(
+      "Cannot mark as complete:"
+    )
+  end
+
+  def mark_inspection_complete
+    visit edit_inspection_path(@inspection)
+    click_button t("inspections.buttons.mark_complete")
+    expect(page).to have_content(
+      t("inspections.messages.marked_complete")
+    )
+  end
+
+  def verify_inspection_complete
+    @inspection.reload
+    expect(@inspection.complete?).to be true
+    expect(@inspection.complete_date).to be_present
+
+    visit inspection_path(@inspection, format: :pdf)
     expect(page.status_code).to eq(200)
+  end
+end
+
+RSpec.feature "Complete Inspection Workflow", type: :feature do
+  scenario "from user creation to pdf - no slide or enclosure" do
+    InspectionWorkflow.new(
+      has_slide: false,
+      is_totally_enclosed: false
+    ).execute
+  end
+  scenario "from user creation to pdf - slide, no enclosure" do
+    InspectionWorkflow.new(
+      has_slide: true,
+      is_totally_enclosed: false
+    ).execute
+  end
+  scenario "from user creation to pdf - no slide, enclosure" do
+    InspectionWorkflow.new(
+      has_slide: false,
+      is_totally_enclosed: true
+    ).execute
+  end
+  scenario "from user creation to pdf - slide and enclosure" do
+    InspectionWorkflow.new(
+      has_slide: true,
+      is_totally_enclosed: true
+    ).execute
   end
 end

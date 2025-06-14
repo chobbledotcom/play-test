@@ -32,3 +32,7 @@ en:
         critical_failures: "Critical Failures"
         safety_summary: "Safety Summary"
       submit: "Save Assessment"
+      errors:
+        header:
+          one: "1 error prevented this assessment from being saved:"
+          other: "%{count} errors prevented this assessment from being saved:"

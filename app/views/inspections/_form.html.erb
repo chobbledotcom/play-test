@@ -90,13 +90,3 @@
   <!-- Save Message Display -->
   <div id="inspection_save_message"></div>
 <% end %>
-
-<!-- Completion Actions -->
-<% unless @inspection.new_record? %>
-  <section>
-    <%= button_to t('inspections.buttons.mark_complete'),
-        complete_inspection_path(@inspection),
-        method: :patch,
-        data: { turbo_confirm: t('inspections.messages.mark_complete_confirm') } %>
-  </section>
-<% end %>
