@@ -1,6 +1,0 @@
-<% if object.is_totally_enclosed? %>
-  <%= render 'form/fieldset', form: form, i18n_base: i18n_base, legend_key: 'enclosed_dimensions' do %>
-    <%= render 'form/number', field: :exit_number, min: 0, step: 1 %>
-    <%= render 'form/comment', field: :exit_number_comment %>
-  <% end %>
-<% end %>
