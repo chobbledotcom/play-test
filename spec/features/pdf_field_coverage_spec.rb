@@ -37,13 +37,9 @@ RSpec.feature "PDF Field Coverage", type: :feature do
       expect(text_content).to include(unit.owner)
 
       # Assessment sections exist - loop through all assessment types
-      Inspection::ASSESSMENT_TYPES.each do |assessment_name, _assessment_class|
-        # Skip conditional assessments if not applicable
-        next if assessment_name == :slide_assessment && !inspection.has_slide?
-        next if assessment_name == :enclosed_assessment && !inspection.is_totally_enclosed?
-
+      inspection.each_applicable_assessment do |assessment_key, _, _|
         # Get the i18n key for this assessment
-        assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
+        assessment_type = assessment_key.to_s.sub(/_assessment$/, "")
         header = I18n.t("forms.#{assessment_type}.header")
         expect(text_content).to include(header)
       end

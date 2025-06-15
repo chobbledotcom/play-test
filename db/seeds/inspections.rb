@@ -3,13 +3,24 @@ require_relative "seed_data"
 puts "Creating inspections and assessments..."
 
 def create_assessments_for_inspection(inspection, unit, passed: true)
-  create_anchorage_assessment(inspection, passed)
-  create_structure_assessment(inspection, passed)
-  create_materials_assessment(inspection, passed)
-  create_fan_assessment(inspection, passed)
-  create_user_height_assessment(inspection, unit, passed)
-  create_slide_assessment(inspection, passed) if inspection.has_slide
-  create_enclosed_assessment(inspection, passed) if inspection.is_totally_enclosed
+  inspection.each_applicable_assessment do |assessment_key, _, _|
+    case assessment_key
+    when :anchorage_assessment
+      create_anchorage_assessment(inspection, passed)
+    when :structure_assessment
+      create_structure_assessment(inspection, passed)
+    when :materials_assessment
+      create_materials_assessment(inspection, passed)
+    when :fan_assessment
+      create_fan_assessment(inspection, passed)
+    when :user_height_assessment
+      create_user_height_assessment(inspection, unit, passed)
+    when :slide_assessment
+      create_slide_assessment(inspection, passed)
+    when :enclosed_assessment
+      create_enclosed_assessment(inspection, passed)
+    end
+  end
 end
 
 def create_anchorage_assessment(inspection, passed)

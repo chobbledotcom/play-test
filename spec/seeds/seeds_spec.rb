@@ -479,7 +479,7 @@ RSpec.describe "Seed Data", type: :model do
           # Test that all foreign key relationships are valid
           User.includes(:inspection_company, :units, :inspections).all
           Unit.includes(:user, :inspections).all
-          
+
           # Build includes list dynamically from ASSESSMENT_TYPES
           assessment_associations = Inspection::ASSESSMENT_TYPES.keys
           Inspection.includes(:user, :unit, :inspector_company, *assessment_associations).all
@@ -488,20 +488,14 @@ RSpec.describe "Seed Data", type: :model do
 
       it "ensures completed inspections have all required assessment data" do
         completed_inspections = Inspection.where.not(complete_date: nil)
-        
+
         completed_inspections.each do |inspection|
           # Check that all completed inspections can be marked as complete
           expect(inspection.can_mark_complete?).to be(true),
             "Inspection ##{inspection.id} cannot be marked complete. Errors: #{inspection.completion_errors.join(", ")}"
-          
-          # Verify completion status of each assessment using the ASSESSMENT_TYPES hash
-          Inspection::ASSESSMENT_TYPES.each do |assessment_key, assessment_class|
-            assessment = inspection.send(assessment_key)
-            
-            # Skip slide assessment if no slide, skip enclosed assessment if not enclosed
-            next if assessment_key == :slide_assessment && !inspection.has_slide
-            next if assessment_key == :enclosed_assessment && !inspection.is_totally_enclosed
-            
+
+          # Verify completion status of each assessment using the helper
+          inspection.each_applicable_assessment do |assessment_key, _, assessment|
             expect(assessment.complete?).to be(true),
               "#{assessment_key.to_s.humanize} for inspection ##{inspection.id} is not complete"
           end

@@ -61,13 +61,9 @@ module PdfTestHelpers
 
   # Check that all assessment sections show proper "no data" messages
   def expect_all_i18n_fields_rendered(pdf_text, inspection)
-    Inspection::ASSESSMENT_TYPES.each do |assessment_name, _|
-      # Skip conditional assessments if not applicable
-      next if assessment_name == :slide_assessment && !inspection.has_slide?
-      next if assessment_name == :enclosed_assessment && !inspection.is_totally_enclosed?
-
+    inspection.each_applicable_assessment do |assessment_key, _, _|
       # Get the i18n key for this assessment
-      assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
+      assessment_type = assessment_key.to_s.sub(/_assessment$/, "")
       # No special mapping needed - form names match assessment types
 
       # Check header is present

@@ -9,5 +9,8 @@ config/credentials/*.yml.enc diff=rails_credentials
 config/credentials.yml.enc diff=rails_credentials
 
 # Mark coverage files as binary to avoid large diffs
-coverage/** binary
-coverage/**/* binary
+coverage/.last_run.json binary -diff
+coverage/.resultset.json binary -diff
+coverage/index.html binary -diff
+coverage/** binary -diff
+coverage/**/* binary -diff

@@ -18,13 +18,9 @@ RSpec.feature "PDF Comprehensive Field Coverage", type: :feature do
     pdf_content = extract_pdf_text(page.source)
 
     # Verify each assessment type is rendered
-    Inspection::ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
-      # Skip conditional assessments if not applicable
-      next if assessment_name == :slide_assessment && !inspection.has_slide?
-      next if assessment_name == :enclosed_assessment && !inspection.is_totally_enclosed?
-
+    inspection.each_applicable_assessment do |assessment_key, assessment_class, _|
       # Get the i18n key for this assessment
-      assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
+      assessment_type = assessment_key.to_s.sub(/_assessment$/, "")
       # No special mapping needed - form names match assessment types
 
       # Check header is present
@@ -33,7 +29,7 @@ RSpec.feature "PDF Comprehensive Field Coverage", type: :feature do
 
       # Get all field keys from i18n
       fields = I18n.t("forms.#{assessment_type}.fields")
-      assessment = inspection.send(assessment_name)
+      assessment = inspection.send(assessment_key)
 
       fields.each do |field_key, field_label|
         # Check if assessment responds to this field
