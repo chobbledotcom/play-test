@@ -27,7 +27,9 @@ class InspectionWorkflow
     setup_user
     setup_unit_and_inspection
     fill_and_verify_inspection
+    fail_to_delete_unit
     verify_second_inspection_prefilling
+    delete_second_inspection
     self
   end
 
@@ -64,7 +66,6 @@ class InspectionWorkflow
 
     user_data = SeedData.user_fields
     user_data.each do |field_name, value|
-      next if value.nil?
       field_label = t("forms.user_new.fields.#{field_name}")
       fill_in field_label, with: value
     end
@@ -89,8 +90,9 @@ class InspectionWorkflow
   end
 
   def create_test_unit
-    visit units_path
-    click_button t("units.buttons.add_unit")
+    visit root_path
+    click_link "Units"
+    click_units_button("add_unit")
 
     unit_data = SeedData.unit_fields.merge(
       name: "Test Bouncy Castle"
@@ -102,7 +104,7 @@ class InspectionWorkflow
     end
 
     click_button t("forms.units.submit")
-    expect(page).to have_content(t("units.messages.created"))
+    expect_units_message("created")
 
     Unit.find_by!(
       name: unit_data[:name],
@@ -111,7 +113,11 @@ class InspectionWorkflow
   end
 
   def create_inspection_for_unit
-    click_button t("units.buttons.add_inspection")
+    visit root_path
+    click_link "Units"
+    click_link "Test Bouncy Castle"
+
+    click_units_button("add_inspection")
     expect(page).to have_content(t("inspections.titles.edit"))
 
     @unit.inspections.order(created_at: :desc).first.tap do |inspection|
@@ -171,9 +177,7 @@ class InspectionWorkflow
     end
 
     click_button t("forms.#{tab_name}.submit")
-    expect(page).to have_content(
-      t("inspections.messages.updated")
-    )
+    expect_inspection_message("updated")
 
     assessment = @inspection.reload.send("#{tab_name}_assessment")
     expect(assessment.complete?).to be true
@@ -214,6 +218,22 @@ class InspectionWorkflow
     end
   end
 
+  def click_inspection_button(key)
+    click_button t("inspections.buttons.#{key}")
+  end
+
+  def click_units_button(key)
+    click_button t("units.buttons.#{key}")
+  end
+
+  def expect_inspection_message(key)
+    expect(page).to have_content(t("inspections.messages.#{key}"))
+  end
+
+  def expect_units_message(key)
+    expect(page).to have_content(t("units.messages.#{key}"))
+  end
+
   def verify_inspection_not_completable
     visit edit_inspection_path(@inspection)
 
@@ -229,7 +249,7 @@ class InspectionWorkflow
       )
     end
 
-    click_button t("inspections.buttons.mark_complete")
+    click_inspection_button("mark_complete")
     expect(page).to have_content(
       t("inspections.messages.cannot_complete").split(":").first
     )
@@ -237,10 +257,8 @@ class InspectionWorkflow
 
   def mark_inspection_complete
     visit edit_inspection_path(@inspection)
-    click_button t("inspections.buttons.mark_complete")
-    expect(page).to have_content(
-      t("inspections.messages.marked_complete")
-    )
+    click_inspection_button("mark_complete")
+    expect_inspection_message("marked_complete")
   end
 
   def verify_inspection_complete
@@ -271,7 +289,7 @@ class InspectionWorkflow
 
   def create_second_inspection
     visit unit_path(@unit)
-    click_button t("units.buttons.add_inspection")
+    click_units_button("add_inspection")
     @second_inspection = @unit.inspections.order(created_at: :desc).first
   end
 
@@ -300,7 +318,7 @@ class InspectionWorkflow
     applicable_tabs.each do |tab_name|
       visit edit_inspection_path(@second_inspection, tab: tab_name)
       click_button t("forms.#{tab_name}.submit")
-      expect(page).to have_content(t("inspections.messages.updated"))
+      expect_inspection_message("updated")
 
       @second_inspection.reload
       assessment = @second_inspection.send("#{tab_name}_assessment")
@@ -315,8 +333,8 @@ class InspectionWorkflow
     expect(@second_inspection.is_totally_enclosed).to eq(@options[:is_totally_enclosed])
     expect(@second_inspection.inspection_location).to eq(@inspection.inspection_location)
 
-    click_button t("inspections.buttons.mark_complete")
-    expect(page).to have_content(t("inspections.messages.marked_complete"))
+    click_inspection_button("mark_complete")
+    expect_inspection_message("marked_complete")
   end
 
   def verify_date_handling
@@ -331,6 +349,28 @@ class InspectionWorkflow
 
     expect(@inspection.inspection_date.to_date).to eq(7.days.ago.to_date)
     expect(@inspection.complete_date.to_date).to eq(7.days.ago.to_date)
+  end
+
+  def fail_to_delete_unit
+    visit root_path
+    click_link "Units"
+    click_link "Test Bouncy Castle"
+    click_link t("ui.edit")
+    expect_units_message("not_deletable")
+  end
+
+  def delete_second_inspection
+    visit edit_inspection_path(@second_inspection)
+
+    expect(page).to have_current_path(inspection_path(@second_inspection))
+    expect_inspection_message("cannot_edit_complete")
+
+    visit inspection_path(@second_inspection)
+    click_inspection_button("switch_to_in_progress")
+    expect_inspection_message("marked_in_progress")
+
+    click_inspection_button("delete")
+    expect_inspection_message("deleted")
   end
 end
 

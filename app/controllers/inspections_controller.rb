@@ -7,7 +7,7 @@ class InspectionsController < ApplicationController
   before_action :set_inspection, except: %i[create index]
   before_action :check_inspection_owner, except: %i[create index show]
   before_action :validate_unit_ownership, only: %i[update]
-  before_action :redirect_if_complete, except: %i[create destroy index mark_draft show]
+  before_action :redirect_if_complete, except: %i[create index destroy mark_draft show]
   before_action :require_user_active, only: %i[create edit update]
   before_action :validate_inspection_completability, only: %i[show edit]
   before_action :no_index
@@ -265,7 +265,7 @@ class InspectionsController < ApplicationController
   end
 
   def redirect_if_complete
-    return unless @inspection&.complete?
+    return unless @inspection.complete?
 
     flash[:notice] = I18n.t("inspections.messages.cannot_edit_complete")
     redirect_to @inspection

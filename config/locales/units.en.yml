@@ -144,6 +144,7 @@ en:
       delete_failed: "Failed to delete unit"
       not_found: "Unit not found"
       access_denied: "Access denied"
+      not_deletable: "You cannot delete this unit because it has completed inspections attached to it."
       delete_confirm: "Are you sure? This cannot be undone."
       no_photo: "No photo"
       no_units_found: "No units found."
