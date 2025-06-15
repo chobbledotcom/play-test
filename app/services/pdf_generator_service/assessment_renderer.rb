@@ -60,7 +60,7 @@ class PdfGeneratorService
 
     def format_field_line(label, value, pass_value, is_pass_field)
       parts = []
-      parts << pass_fail_indicator(pass_value)
+      parts << pass_fail_indicator(pass_value) if is_pass_field
       parts << bold(label)
       parts << ": #{value}" if !is_pass_field && value.present?
       parts.join

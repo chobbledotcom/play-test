@@ -1,6 +1,16 @@
 # This module provides field mappings for assessments
 # Used by both seeds and tests to ensure consistency
 module SeedData
+  # Helper to determine pass/fail for individual checks
+  # If inspection passed, all checks pass
+  # If inspection failed, approximately 1/10th of checks fail
+  def self.check_passed?(inspection_passed)
+    return true if inspection_passed
+
+    # For failed inspections, ~90% of individual checks still pass
+    rand < 0.9
+  end
+
   def self.user_fields
     {
       email: "test#{rand(1000..9999)}@example.com",
@@ -40,44 +50,44 @@ module SeedData
     {
       num_low_anchors: rand(6..12),
       num_high_anchors: rand(4..8),
-      num_low_anchors_pass: passed,
-      num_high_anchors_pass: passed,
-      anchor_accessories_pass: passed,
-      anchor_degree_pass: passed,
-      anchor_type_pass: passed,
-      pull_strength_pass: passed,
+      num_low_anchors_pass: check_passed?(passed),
+      num_high_anchors_pass: check_passed?(passed),
+      anchor_accessories_pass: check_passed?(passed),
+      anchor_degree_pass: check_passed?(passed),
+      anchor_type_pass: check_passed?(passed),
+      pull_strength_pass: check_passed?(passed),
       anchor_type_comment: passed ? nil : "Some wear visible on anchor points"
     }
   end
 
   def self.structure_fields(passed: true)
     {
-      seam_integrity_pass: passed,
-      uses_lock_stitching_pass: passed,
-      air_loss_pass: passed,
-      straight_walls_pass: passed,
-      sharp_edges_pass: passed,
-      unit_stable_pass: passed,
-      stitch_length_pass: passed,
-      blower_tube_length_pass: passed,
-      step_ramp_size_pass: passed,
-      critical_fall_off_height_pass: passed,
-      unit_pressure_pass: passed,
-      trough_pass: passed,
-      entrapment_pass: passed,
-      markings_pass: passed,
-      grounding_pass: passed,
+      seam_integrity_pass: check_passed?(passed),
+      uses_lock_stitching_pass: check_passed?(passed),
+      air_loss_pass: check_passed?(passed),
+      straight_walls_pass: check_passed?(passed),
+      sharp_edges_pass: check_passed?(passed),
+      unit_stable_pass: check_passed?(passed),
+      stitch_length_pass: check_passed?(passed),
+      blower_tube_length_pass: check_passed?(passed),
+      step_ramp_size_pass: check_passed?(passed),
+      critical_fall_off_height_pass: check_passed?(passed),
+      unit_pressure_pass: check_passed?(passed),
+      trough_pass: check_passed?(passed),
+      entrapment_pass: check_passed?(passed),
+      markings_pass: check_passed?(passed),
+      grounding_pass: check_passed?(passed),
       stitch_length: rand(8..12),
       unit_pressure: rand(1.0..3.0).round(1),
       blower_tube_length: rand(2.0..5.0).round(1),
       step_ramp_size: rand(200..400),
       critical_fall_off_height: rand(0.5..2.0).round(1),
       trough_depth: rand(0.1..0.5).round(1),
-      trough_depth_pass: passed,
+      trough_depth_pass: check_passed?(passed),
       trough_adjacent_panel_width: rand(0.3..1.0).round(1),
-      trough_adjacent_panel_width_pass: passed,
+      trough_adjacent_panel_width_pass: check_passed?(passed),
       evacuation_time: rand(30..90),
-      evacuation_time_pass: passed,
+      evacuation_time_pass: check_passed?(passed),
       seam_integrity_comment: passed ? "All seams in good condition" : "Minor thread loosening noted",
       uses_lock_stitching_comment: passed ? "Lock stitching intact throughout" : "Some lock stitching showing wear",
       stitch_length_comment: "Measured at regular intervals"
@@ -87,15 +97,15 @@ module SeedData
   def self.materials_fields(passed: true)
     {
       ropes: rand(18..45),
-      ropes_pass: passed,
-      clamber_netting_pass: passed,
-      retention_netting_pass: passed,
-      zips_pass: passed,
-      windows_pass: passed,
-      artwork_pass: passed,
-      thread_pass: passed,
-      fabric_strength_pass: passed,
-      fire_retardant_pass: passed,
+      ropes_pass: check_passed?(passed),
+      clamber_netting_pass: check_passed?(passed),
+      retention_netting_pass: check_passed?(passed),
+      zips_pass: check_passed?(passed),
+      windows_pass: check_passed?(passed),
+      artwork_pass: check_passed?(passed),
+      thread_pass: check_passed?(passed),
+      fabric_strength_pass: check_passed?(passed),
+      fire_retardant_pass: check_passed?(passed),
       ropes_comment: passed ? nil : "Rope shows signs of wear",
       fabric_strength_comment: passed ? "Fabric in good condition" : "Minor surface wear noted"
     }
@@ -103,11 +113,11 @@ module SeedData
 
   def self.fan_fields(passed: true)
     {
-      blower_flap_pass: passed,
-      blower_finger_pass: passed,
-      blower_visual_pass: passed,
-      pat_pass: passed,
-      blower_serial_pass: passed,
+      blower_flap_pass: check_passed?(passed),
+      blower_finger_pass: check_passed?(passed),
+      blower_visual_pass: check_passed?(passed),
+      pat_pass: check_passed?(passed),
+      blower_serial_pass: check_passed?(passed),
       blower_serial: "FAN-#{rand(1000..9999)}",
       fan_size_type: passed ? "Fan operating correctly at optimal pressure" : "Fan requires servicing",
       blower_flap_comment: passed ? "Flap mechanism functioning correctly" : "Flap sticking occasionally",
@@ -145,9 +155,9 @@ module SeedData
       runout: rand(1.5..3.0).round(1),
       slide_first_metre_height: rand(0.3..0.8).round(1),
       slide_beyond_first_metre_height: rand(0.8..1.5).round(1),
-      clamber_netting_pass: passed,
-      runout_pass: passed,
-      slip_sheet_pass: passed,
+      clamber_netting_pass: check_passed?(passed),
+      runout_pass: check_passed?(passed),
+      slip_sheet_pass: check_passed?(passed),
       slide_permanent_roof: false,
       slide_platform_height_comment: passed ? "Platform height compliant with EN 14960:2019" : "Platform height exceeds recommended limits",
       slide_wall_height_comment: "Wall height measured from slide bed",
@@ -160,8 +170,8 @@ module SeedData
   def self.enclosed_fields(passed: true)
     {
       exit_number: rand(1..3),
-      exit_number_pass: passed,
-      exit_sign_always_visible_pass: passed,
+      exit_number_pass: check_passed?(passed),
+      exit_sign_always_visible_pass: check_passed?(passed),
       exit_number_comment: passed ? "Number of exits compliant with unit size" : "Additional exit required",
       exit_sign_always_visible_comment: passed ? "Exit signs visible from all points" : "Exit signs obscured from some angles"
     }

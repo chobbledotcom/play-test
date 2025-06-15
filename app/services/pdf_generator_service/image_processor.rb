@@ -32,17 +32,22 @@ class PdfGeneratorService
     end
 
     # Process image to handle EXIF orientation data
-    def self.process_image_with_orientation(photo)
-      image = create_image(photo)
+    def self.process_image_with_orientation(attachment)
+      image = create_image(attachment)
       ImageOrientationProcessor.process_with_orientation(image)
     end
 
     # Add entity photo in footer area (below QR code)
     def self.add_entity_photo_footer(pdf, entity, qr_x, qr_y)
-      return unless entity&.photo&.attached?
+      # Early return if entity is nil or photo is not properly loaded
+      return unless entity&.photo
+
+      # Check if attachment is loaded to avoid N+1
+      attachment = entity.photo
+      return unless attachment.blob
 
       # Create image object once and reuse it
-      image = create_image(entity.photo)
+      image = create_image(attachment)
 
       # Get original image dimensions
       original_width, original_height = ImageOrientationProcessor.get_dimensions(image)
@@ -57,8 +62,9 @@ class PdfGeneratorService
       pdf.image StringIO.new(processed_image), at: [photo_x, photo_y], width: photo_width, height: photo_height
     end
 
-    def self.create_image(photo)
-      image_data = photo.download
+    def self.create_image(attachment)
+      # Download blob data only once
+      image_data = attachment.blob.download
       MiniMagick::Image.read(image_data)
     end
   end
