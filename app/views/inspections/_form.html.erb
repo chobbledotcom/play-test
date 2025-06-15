@@ -27,12 +27,10 @@
       <div>
         <%= link_to t('inspections.buttons.download_pdf'),
             inspection_path(@inspection, format: :pdf),
-            target: '_blank',
-            class: 'button' %> /
+            target: '_blank' %> /
         <%= link_to t('inspections.buttons.download_qr_code'),
             inspection_path(@inspection, format: :png),
-            download: "inspection-#{@inspection.id}-qr.png",
-            class: 'button secondary' %>
+            download: "inspection-#{@inspection.id}-qr.png" %>
       </div>
     <% end %>
   <% end %>
@@ -77,13 +75,13 @@
 
   <!-- Unit Configuration -->
   <%= render 'form/fieldset', legend_key: 'unit_configuration' do %>
-    <%= render 'form/checkbox', field: :has_slide %>
-    <%= render 'form/checkbox', field: :is_totally_enclosed %>
+    <%= render 'form/yes_no_radio', field: :has_slide %>
+    <%= render 'form/yes_no_radio', field: :is_totally_enclosed %>
   <% end %>
 
   <!-- Inspection Results -->
   <%= render 'form/fieldset', legend_key: 'inspection_results' do %>
-    <%= render 'form/checkbox', field: :passed %>
+    <%= render 'form/yes_no_radio', field: :passed %>
     <%= render 'form/text_area', field: :risk_assessment, rows: 3 %>
   <% end %>
 

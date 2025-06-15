@@ -127,7 +127,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     end
 
     it "can toggle pass/fail status" do
-      check_form :inspections, :passed
+      check_form_radio :inspections, :passed
       submit_form :inspections
 
       inspection.reload
@@ -195,7 +195,8 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     it "has proper form labels for accessibility" do
       # When inspection has a unit, unit_id field is not shown
       expect(page).to have_css('label[for*="inspection_location"]')
-      expect(page).to have_css('label[for*="inspection_passed"]')
+      # Radio buttons have labels for _true and _false variants
+      expect(page).to have_css('label[for="passed_true"]')
     end
 
     it "shows completion status in overview" do

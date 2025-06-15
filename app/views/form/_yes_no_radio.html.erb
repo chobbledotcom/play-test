@@ -1,0 +1,25 @@
+<%
+  # Simple Yes/No radio button partial with grid layout
+  # Required parameters:
+  #   field: Field name (e.g., 'has_slide')
+  
+  # Get the form object
+  form = @_current_form
+  
+  # Get field label from i18n (will raise if missing)
+  field_data = form_field_setup(field, local_assigns)
+%>
+
+<div class="form-grid yes-no-radio">
+  <label><%= field_data[:field_label] %></label>
+  
+  <label for="<%= field %>_true">
+    <%= t('shared.yes') %>
+    <%= form.radio_button field, true %>
+  </label>
+  
+  <label for="<%= field %>_false">
+    <%= form.radio_button field, false %>
+    <%= t('shared.no') %>
+  </label>
+</div>

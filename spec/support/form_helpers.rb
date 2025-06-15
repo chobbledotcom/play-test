@@ -30,6 +30,21 @@ module FormHelpers
     uncheck field_label
   end
 
+  # Select "Yes" for a radio button in a form
+  # Usage: check_form_radio :units, :has_slide
+  # Translates to: forms.units.fields.has_slide
+  def check_form_radio(form_name, field_name)
+    field_label = I18n.t("forms.#{form_name}.fields.#{field_name}")
+    check_radio field_label
+  end
+
+  # Select "No" for a radio button in a form
+  # Usage: uncheck_form_radio :units, :has_slide
+  def uncheck_form_radio(form_name, field_name)
+    field_label = I18n.t("forms.#{form_name}.fields.#{field_name}")
+    uncheck_radio field_label
+  end
+
   # Checks that all expected i18n keys are present in the rendered form
   # by looking for the translated text on the page
   def expect_form_sections_present(i18n_base)

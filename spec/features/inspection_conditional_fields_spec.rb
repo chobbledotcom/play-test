@@ -17,18 +17,23 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     # Should be on edit inspection page for the new inspection
     expect(page).to have_content(I18n.t("inspections.titles.edit"))
 
-    # Check the "Is totally enclosed" checkbox
-    check I18n.t("forms.inspections.fields.is_totally_enclosed")
+    # Choose "Yes" for the "Is totally enclosed" radio button
+    check_radio I18n.t("forms.inspections.fields.is_totally_enclosed")
 
     # Save the inspection
     click_button I18n.t("forms.inspections.submit")
 
+    # After save, we should be on the show page
+    expect(page).to have_content("Inspection updated successfully")
+
     # Verify it was saved
-    created_inspection = Inspection.last
+    created_inspection = unit.inspections.last
     expect(created_inspection.is_totally_enclosed).to be true
 
-    # Go back to edit page to verify enclosed tab appears
-    visit edit_inspection_path(created_inspection)
+    # Go back to edit page using the Update Inspection link
+    click_link "Update Inspection"
+
+    # Now we should see the enclosed tab
     expect(page).to have_link(I18n.t("forms.enclosed.header"))
   end
 
@@ -40,18 +45,23 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     # Should be on edit inspection page for the new inspection
     expect(page).to have_content(I18n.t("inspections.titles.edit"))
 
-    # Check the "Has slide" checkbox
-    check I18n.t("forms.inspections.fields.has_slide")
+    # Choose "Yes" for the "Has slide" radio button
+    check_radio I18n.t("forms.inspections.fields.has_slide")
 
     # Save the inspection
     click_button I18n.t("forms.inspections.submit")
 
+    # After save, we should be on the show page
+    expect(page).to have_content("Inspection updated successfully")
+
     # Verify it was saved
-    created_inspection = Inspection.last
+    created_inspection = unit.inspections.last
     expect(created_inspection.has_slide).to be true
 
-    # Go back to edit page to verify slide tab appears
-    visit edit_inspection_path(created_inspection)
+    # Go back to edit page using the Update Inspection link
+    click_link "Update Inspection"
+
+    # Now we should see the slide tab
     expect(page).to have_link(I18n.t("forms.slide.header"))
   end
 
@@ -64,8 +74,8 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     # Should not see enclosed tab initially
     expect(page).not_to have_link(I18n.t("forms.enclosed.header"))
 
-    # Check the checkbox
-    check I18n.t("forms.inspections.fields.is_totally_enclosed")
+    # Choose "Yes" for the radio button
+    check_radio I18n.t("forms.inspections.fields.is_totally_enclosed")
 
     # Save the inspection
     click_button I18n.t("forms.inspections.submit")
@@ -90,8 +100,8 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     # Should not see slide tab initially
     expect(page).not_to have_link(I18n.t("forms.slide.header"))
 
-    # Check the checkbox
-    check I18n.t("forms.inspections.fields.has_slide")
+    # Choose "Yes" for the radio button
+    check_radio I18n.t("forms.inspections.fields.has_slide")
 
     # Save the inspection
     click_button I18n.t("forms.inspections.submit")
@@ -115,20 +125,25 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     # Should be on edit inspection page for the new inspection
     expect(page).to have_content(I18n.t("inspections.titles.edit"))
 
-    # Check both checkboxes
-    check I18n.t("forms.inspections.fields.is_totally_enclosed")
-    check I18n.t("forms.inspections.fields.has_slide")
+    # Choose "Yes" for both radio buttons
+    check_radio I18n.t("forms.inspections.fields.is_totally_enclosed")
+    check_radio I18n.t("forms.inspections.fields.has_slide")
 
     # Save the inspection
     click_button I18n.t("forms.inspections.submit")
 
+    # After save, we should be on the show page
+    expect(page).to have_content("Inspection updated successfully")
+
     # Verify both were saved
-    created_inspection = Inspection.last
+    created_inspection = unit.inspections.last
     expect(created_inspection.is_totally_enclosed).to be true
     expect(created_inspection.has_slide).to be true
 
-    # Go back to edit page to verify both tabs appear
-    visit edit_inspection_path(created_inspection)
+    # Go back to edit page using the Update Inspection link
+    click_link "Update Inspection"
+
+    # Now we should see both tabs
     expect(page).to have_link(I18n.t("forms.enclosed.header"))
     expect(page).to have_link(I18n.t("forms.slide.header"))
   end
@@ -147,9 +162,9 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     expect(page).to have_link(I18n.t("forms.enclosed.header"))
     expect(page).to have_link(I18n.t("forms.slide.header"))
 
-    # Uncheck both
-    uncheck I18n.t("forms.inspections.fields.is_totally_enclosed")
-    uncheck I18n.t("forms.inspections.fields.has_slide")
+    # Choose "No" for both radio buttons
+    uncheck_radio I18n.t("forms.inspections.fields.is_totally_enclosed")
+    uncheck_radio I18n.t("forms.inspections.fields.has_slide")
 
     # Save
     click_button I18n.t("forms.inspections.submit")

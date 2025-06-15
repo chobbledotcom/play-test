@@ -105,10 +105,44 @@
   gap: 0.5rem;
 }
 
+/* Yes/No radio grid layout (similar to pass/fail but no comment) */
+.yes-no-radio {
+  grid-template-areas:
+    "label label"
+    "yes-label no-label";
+  grid-template-columns: auto 1fr;
+}
+@media (min-width: 768px) {
+  .yes-no-radio {
+    grid-template-areas: "label yes-label no-label";
+    grid-template-columns: max-content auto 1fr;
+  }
+}
+
+.yes-no-radio > label:first-child {
+  grid-area: label;
+}
+
+.yes-no-radio > label[for$="_true"] {
+  grid-area: yes-label;
+}
+
+.yes-no-radio > label[for$="_false"] {
+  grid-area: no-label;
+}
+
 /* Pass/Fail + Comment grid layout */
 .pass-fail-comment {
-  grid-template-areas: "label pass-label fail-label comment-space comment-label";
-  grid-template-columns: max-content auto auto 1fr auto;
+  grid-template-areas:
+    "label label label label"
+    "pass-label fail-label comment-space comment-label";
+  grid-template-columns: auto auto 1fr auto;
+}
+@media (min-width: 768px) {
+  .pass-fail-comment {
+    grid-template-areas: "label pass-label fail-label comment-space comment-label";
+    grid-template-columns: max-content auto auto 1fr auto;
+  }
 }
 
 .pass-fail-comment > label:first-child {
@@ -135,8 +169,16 @@
 
 /* Number + Pass/Fail + Comment grid layout (extends base) */
 .pass-fail-comment.with-number {
-  grid-template-areas: "number-label pass-label fail-label comment-space comment-label";
-  grid-template-columns: max-content auto auto 1fr auto;
+  grid-template-areas:
+    "number-label number-label number-label number-label"
+    "pass-label fail-label comment-space comment-label";
+  grid-template-columns: auto auto 1fr auto;
+}
+@media (min-width: 768px) {
+  .pass-fail-comment.with-number {
+    grid-template-areas: "number-label pass-label fail-label comment-space comment-label";
+    grid-template-columns: max-content auto auto 1fr auto;
+  }
 }
 
 .pass-fail-comment.with-number > label:first-child {
@@ -145,8 +187,16 @@
 
 /* Number + Comment grid layout */
 .number-comment {
-  grid-template-areas: "label number comment-space comment-label";
-  grid-template-columns: max-content 6rem 1fr auto;
+  grid-template-areas:
+    "label label label"
+    "number comment-space comment-label";
+  grid-template-columns: 5rem 1fr auto;
+}
+@media (min-width: 768px) {
+  .number-comment {
+    grid-template-areas: "label number comment-space comment-label";
+    grid-template-columns: max-content 6rem 1fr auto;
+  }
 }
 
 .number-comment > label:first-child {
@@ -169,30 +219,40 @@
 /* Checkbox + Comment grid layout (similar to pass-fail-comment) */
 .checkbox-comment {
   display: grid;
-  grid-template-columns: max-content auto auto auto auto;
   gap: 0.5rem;
   align-items: center;
   margin-bottom: 1rem;
+  grid-template-areas:
+    "label label label label label"
+    "check1 label2 check2 comment-space comment-label";
+  grid-template-columns: auto auto auto 1fr auto;
+}
+
+@media (min-width: 768px) {
+  .checkbox-comment {
+    grid-template-areas: "label check1 label2 check2 comment-label";
+    grid-template-columns: max-content auto auto auto auto;
+  }
 }
 
 .checkbox-comment > label:first-child {
-  grid-column: 1;
+  grid-area: label;
 }
 
 .checkbox-comment > input[type="checkbox"]:first-of-type {
-  grid-column: 2;
+  grid-area: check1;
 }
 
 .checkbox-comment > label:nth-of-type(2) {
-  grid-column: 3;
+  grid-area: label2;
 }
 
 .checkbox-comment > input[type="checkbox"]:last-of-type {
-  grid-column: 4;
+  grid-area: check2;
 }
 
 .checkbox-comment > label:last-of-type {
-  grid-column: 5;
+  grid-area: comment-label;
 }
 
 .checkbox-comment > textarea {

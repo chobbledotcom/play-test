@@ -1,0 +1,56 @@
+<%
+  # Composite partial for radio + comment fields with grid layout
+  # Required parameters:
+  #   field: Base field name (e.g., 'permanent_roof')
+  # 
+  # This will render:
+  #   - Radio field: field with Yes (true) / No (false) options
+  #   - Comment field: field + '_comment' (e.g., 'permanent_roof_comment')
+  
+  radio_field = field
+  comment_field = "#{field}_comment".to_sym
+  
+  # Get the form object
+  form = @_current_form
+  model = form.object
+  
+  # Get field label from i18n (will raise if missing) 
+  field_data = form_field_setup(field, local_assigns)
+  
+  # Generate unique ID for comment checkbox
+  comment_checkbox_id = "#{field}_has_comment_#{model.object_id}"
+  comment_textarea_id = "#{field}_comment_textarea_#{model.object_id}"
+%>
+
+<div class="form-grid pass-fail-comment">
+  <!-- Label -->
+  <label><%= field_data[:field_label] %></label>
+  
+  <!-- Yes radio -->
+  <label for="<%= radio_field %>_true">
+    <%= form.radio_button radio_field, true %>
+    <%= t('shared.yes') %>
+  </label>
+  
+  <!-- No radio -->
+  <label for="<%= radio_field %>_false">
+    <%= form.radio_button radio_field, false %>
+    <%= t('shared.no') %>
+  </label>
+  
+  <!-- Comment checkbox -->
+  <label for="<%= comment_checkbox_id %>">
+    <input type="checkbox" 
+           id="<%= comment_checkbox_id %>" 
+           <%= 'checked' if model.send(comment_field).present? %>
+           onchange="document.getElementById('<%= comment_textarea_id %>').style.display = this.checked ? 'block' : 'none';">
+    <%= t('shared.comment') %>
+  </label>
+  
+  <!-- Comment textarea (hidden by default, spans full width) -->
+  <%= form.text_area comment_field,
+      rows: 2,
+      placeholder: t('shared.field_comment_placeholder', field: field_data[:field_label]),
+      id: comment_textarea_id,
+      style: "display: #{model.send(comment_field).present? ? 'block' : 'none'};" %>
+</div>

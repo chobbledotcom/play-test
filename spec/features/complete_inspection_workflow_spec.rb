@@ -6,8 +6,9 @@ class InspectionWorkflow
   include Capybara::DSL
   include RSpec::Matchers
   include Rails.application.routes.url_helpers
+  include RadioButtonHelpers
 
-  BOOLEAN_FIELDS = %w[slide_permanent_roof].freeze
+  BOOLEAN_FIELDS = %w[has_slide is_totally_enclosed slide_permanent_roof].freeze
 
   attr_reader :user
   attr_reader :unit
@@ -132,12 +133,11 @@ class InspectionWorkflow
   def fill_inspection_field(field_name, value)
     field_label = t("forms.inspections.fields.#{field_name}")
 
-    case field_name
-    when :is_totally_enclosed, :has_slide
-      value ? check(field_label) : uncheck(field_label)
-    when ->(n) { value.is_a?(Date) }
+    if BOOLEAN_FIELDS.include?(field_name.to_s)
+      value ? check_radio(field_label) : uncheck_radio(field_label)
+    elsif value.is_a?(Date)
       fill_in field_label, with: value
-    when ->(n) { value.is_a?(String) || value.is_a?(Numeric) }
+    elsif value.is_a?(String) || value.is_a?(Numeric)
       fill_in field_label, with: value
     end
   end
@@ -201,8 +201,8 @@ class InspectionWorkflow
     when /.*_pass$/
       choose "#{field_name}_#{value ? "true" : "false"}"
     when ->(s) { BOOLEAN_FIELDS.include?(s) }
-      checkbox_id = "#{field_name}_checkbox"
-      value ? check(checkbox_id) : uncheck(checkbox_id)
+      field_label = get_field_label(tab_name, field_name, field_name_str)
+      value ? check_radio(field_label) : uncheck_radio(field_label)
     when ->(s) { value.is_a?(String) && value.present? }
       fill_in field_label, with: value
     when ->(s) { value.is_a?(Numeric) }

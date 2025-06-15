@@ -52,15 +52,8 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
 
           case value
           when true, false
-            # For boolean fields that aren't _pass fields, try checkbox first
-            if has_css?("input[type='checkbox'][id='#{field_key}_checkbox']", visible: :all)
-              checkbox_element = find("input[type='checkbox'][id='#{field_key}_checkbox']", visible: :all)
-              value ? checkbox_element.check : checkbox_element.uncheck
-            else
-              # Fallback to radio button
-              radio_id = "#{field_key}_#{value}"
-              choose radio_id
-            end
+            # For boolean fields that aren't _pass fields, use radio buttons
+            value ? check_radio(field_label) : uncheck_radio(field_label)
           when Numeric
             # For number fields
             fill_in field_label, with: value.to_s
