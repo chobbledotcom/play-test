@@ -63,9 +63,9 @@
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'unit_dimensions' do %>
-    <%= render 'form/number_comment', field: :width %>
-    <%= render 'form/number_comment', field: :length %>
-    <%= render 'form/number_comment', field: :height %>
+    <%= render 'form/decimal_comment', field: :width %>
+    <%= render 'form/decimal_comment', field: :length %>
+    <%= render 'form/decimal_comment', field: :height %>
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'unit_configuration' do %>

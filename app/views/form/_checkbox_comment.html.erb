@@ -2,24 +2,24 @@
   # Composite partial for checkbox + comment fields with grid layout
   # Required parameters:
   #   field: Base field name (e.g., 'uses_lock_stitching')
-  # 
+  #
   # This will render:
   #   - Checkbox field: field (e.g., 'uses_lock_stitching')
   #   - Comment field: field + '_comment' (e.g., 'uses_lock_stitching_comment')
-  
+
   checkbox_field = field
   comment_field = "#{field}_comment".to_sym
-  
+
   # Get the form object
   form = @_current_form
   model = form.object
-  
-  # Get field label from i18n (will raise if missing) 
+
+  # Get field label from i18n (will raise if missing)
   field_data = form_field_setup(field, local_assigns)
-  
+
   # Get comment field options
   comment_info = comment_field_options(form, comment_field, field_data[:field_label])
-  
+
   # Generate unique ID for comment checkbox
   comment_checkbox_id = comment_info[:checkbox_id]
   comment_textarea_id = comment_info[:options][:id]
@@ -30,25 +30,25 @@
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
     <label><%= field_data[:field_label] %></label>
   <% end %>
-  
+
   <!-- Main checkbox -->
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'checkbox' do %>
-    <%= form.check_box checkbox_field, 
+    <%= form.check_box checkbox_field,
         id: "#{checkbox_field}_checkbox" %>
   <% end %>
-  
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'checkbox-label' do %>
+
+  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'yes-label' do %>
     <label for="<%= checkbox_field %>_checkbox"><%= t('shared.yes') %></label>
   <% end %>
-  
+
   <!-- Comment checkbox -->
-  <%= render 'form/comment_checkbox', 
+  <%= render 'form/comment_checkbox',
       comment_field: comment_field,
       checkbox_id: comment_checkbox_id,
       textarea_id: comment_textarea_id,
       has_comment: comment_info[:has_comment],
       prefilled: comment_info[:prefilled] %>
-  
+
   <!-- Comment textarea (hidden by default, spans full width) -->
   <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled], wrapper_class: 'comment' do %>
     <%= form.text_area comment_field, comment_info[:options] %>

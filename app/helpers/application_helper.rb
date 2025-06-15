@@ -85,6 +85,17 @@ module ApplicationHelper
     [resolved[:value], resolved[:prefilled]]
   end
 
+  def format_numeric_value(value)
+    return value unless value.is_a?(Numeric) || (value.is_a?(String) && value.match?(/\A-?\d*\.?\d+\z/))
+    
+    numeric_value = value.is_a?(Numeric) ? value : Float(value)
+    # Convert to string and remove trailing zeros (e.g., 5.0 -> "5", 5.012000 -> "5.012")
+    formatted = numeric_value.to_s.sub(/\.0+\z/, '').sub(/(\.\d*?)0+\z/, '\1')
+    formatted
+  rescue ArgumentError, TypeError
+    value
+  end
+
   def resolve_field_value(model, field, current_value = nil)
     field_str = field.to_s
     if field_str.include?("password") || field_str == "password_confirmation"
@@ -95,7 +106,8 @@ module ApplicationHelper
 
     # If there's no previous inspection, use current value
     if !@previous_inspection
-      return {value: actual_current_value, prefilled: false}
+      formatted_value = format_numeric_value(actual_current_value)
+      return {value: formatted_value, prefilled: false}
     end
 
     # For boolean fields (true/false), nil means "not set yet"
@@ -106,10 +118,12 @@ module ApplicationHelper
         model,
         field
       )
-      {value: previous_value, prefilled: true}
+      formatted_value = format_numeric_value(previous_value)
+      {value: formatted_value, prefilled: true}
     else
       # Field has been explicitly set (even if false), so use current value
-      {value: actual_current_value, prefilled: false}
+      formatted_value = format_numeric_value(actual_current_value)
+      {value: formatted_value, prefilled: false}
     end
   end
 

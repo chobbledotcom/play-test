@@ -1,5 +1,6 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails"
+import "./decimal_fields"
 
 // Number input sanitization function
 function sanitizeNumberInput(input) {
@@ -41,7 +42,58 @@ function sanitizeNumberInput(input) {
   return false; // No sanitization needed
 }
 
+const DirtyForms = {
+  indicator: null,
+  form: null,
+  initialState: null,
+
+  init() {
+    this.createIndicator();
+    document.querySelectorAll('form').forEach(form => this.setupTracking(form));
+  },
+
+  createIndicator() {
+    if (this.indicator) return;
+    this.indicator = document.createElement('div');
+    this.indicator.id = 'dirty-form-indicator';
+    this.indicator.innerHTML = '<div class="dirty-form-content"><span>Unsaved changes</span><button>Save</button></div>';
+    this.indicator.style.display = 'none';
+    document.body.appendChild(this.indicator);
+    this.indicator.querySelector('button').onclick = () => this.form?.requestSubmit();
+  },
+
+  captureState(form) {
+    const data = new FormData(form);
+    const state = {};
+    for (let [key, value] of data.entries()) state[key] = value;
+    return JSON.stringify(state);
+  },
+
+  isDirty(form) {
+    return this.initialState && this.captureState(form) !== this.initialState;
+  },
+
+  show() {
+    if (this.indicator) this.indicator.style.display = 'block';
+  },
+
+  hide() {
+    if (this.indicator) this.indicator.style.display = 'none';
+  },
+
+  setupTracking(form) {
+    if (!form.querySelector('#form_save_message')) return;
+    this.form = form;
+    this.initialState = this.captureState(form);
+    ['input', 'change'].forEach(event => {
+      form.addEventListener(event, () => this.isDirty(form) ? this.show() : this.hide());
+    });
+    form.addEventListener('submit', () => this.hide());
+  }
+};
+
 document.addEventListener("turbo:load", function() {
+  DirtyForms.init();
   const forms = document.querySelectorAll('form');
   
   forms.forEach(form => {

@@ -18,10 +18,10 @@
 
   # Get field label from i18n (will raise if missing)
   field_data = form_field_setup(field, local_assigns)
-  
+
   # Get comment field options
   comment_info = comment_field_options(form, comment_field, field_data[:field_label])
-  
+
   # Check the prefilled value if needed
   checked_value = field_data[:prefilled] ? field_data[:value] : nil
 %>
@@ -33,19 +33,19 @@
     </label>
   <% end %>
 
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'radio-pass' do %>
+  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'pass' do %>
     <label for="<%= pass_fail_field %>_true">
       <%= t('shared.pass') %>
-      <%= form.radio_button pass_fail_field, true, 
+      <%= form.radio_button pass_fail_field, true,
           { id: "#{pass_fail_field}_true" }.merge(
             radio_button_options(field_data[:prefilled], checked_value, true)
           ) %>
     </label>
   <% end %>
 
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'radio-fail' do %>
+  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'fail' do %>
     <label for="<%= pass_fail_field %>_false">
-      <%= form.radio_button pass_fail_field, false, 
+      <%= form.radio_button pass_fail_field, false,
           { id: "#{pass_fail_field}_false" }.merge(
             radio_button_options(field_data[:prefilled], checked_value, false)
           ) %>
@@ -53,7 +53,7 @@
     </label>
   <% end %>
 
-  <%= render 'form/comment_checkbox', 
+  <%= render 'form/comment_checkbox',
       comment_field: comment_field,
       checkbox_id: comment_info[:checkbox_id],
       textarea_id: comment_info[:options][:id],

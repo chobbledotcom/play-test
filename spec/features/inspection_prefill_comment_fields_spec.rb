@@ -56,7 +56,7 @@ RSpec.feature "Inspection Prefilling Comment Fields", type: :feature do
     # Verify step/ramp size field and comment are prefilled
     verify_field_and_comment(
       I18n.t("forms.structure.fields.step_ramp_size"),
-      12.5,
+      "12.5",
       "Measured at steepest angle"
     )
     
@@ -66,14 +66,14 @@ RSpec.feature "Inspection Prefilling Comment Fields", type: :feature do
     # Verify width field and comment are prefilled
     verify_field_and_comment(
       I18n.t("forms.inspection.fields.width"),
-      5.0,
+      "5",
       "Custom width measurement"
     )
     
     # Verify length field and comment are prefilled
     verify_field_and_comment(
       I18n.t("forms.inspection.fields.length"),
-      4.0,
+      "4",
       "Length includes platform"
     )
     

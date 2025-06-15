@@ -10,10 +10,10 @@
     </details>
 
     <%= render 'form/fieldset', legend_key: 'height_measurements' do %>
-      <%= render 'form/number_comment', field: :containing_wall_height %>
-      <%= render 'form/number_comment', field: :platform_height %>
+      <%= render 'form/decimal_comment', field: :containing_wall_height %>
+      <%= render 'form/decimal_comment', field: :platform_height %>
       <div class="form-group">
-        <%= render 'form/number_comment', field: :tallest_user_height %>
+        <%= render 'form/decimal_comment', field: :tallest_user_height %>
         <% if @inspection.user_height_assessment&.tallest_user_height.present? %>
           <div class="safety-standards-info">
             <strong>Height Requirements:</strong>
@@ -38,9 +38,9 @@
     <% end %>
 
     <%= render 'form/fieldset', legend_key: 'play_area' do %>
-      <%= render 'form/number_comment', field: :play_area_length, min: 0 %>
-      <%= render 'form/number_comment', field: :play_area_width, min: 0 %>
-      <%= render 'form/number_comment', field: :negative_adjustment, min: 0 %>
+      <%= render 'form/decimal_comment', field: :play_area_length, min: 0 %>
+      <%= render 'form/decimal_comment', field: :play_area_width, min: 0 %>
+      <%= render 'form/decimal_comment', field: :negative_adjustment, min: 0 %>
     <% end %>
 
     <!-- User Capacity Section -->

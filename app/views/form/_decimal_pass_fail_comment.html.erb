@@ -1,24 +1,21 @@
 <%
-  # Composite partial for number + pass/fail + comment fields
+  # Composite partial for decimal + pass/fail + comment fields
   # Required parameters:
-  #   field: Base field name (e.g., 'slide_platform_height')
-  # Optional parameters (passed through to number field):
-  #   step: Step value for number input (default: 0.01)
+  #   field: Base field name (e.g., 'runout')
+  # Optional parameters:
   #   min: Minimum value
   #   max: Maximum value
-  #   required: Whether the number field is required
+  #   required: Whether the decimal field is required
+  #   placeholder: Placeholder text
   #
   # This will render:
-  #   - Number field: field (e.g., 'slide_platform_height')
-  #   - Pass/fail field: field + '_pass' (e.g., 'slide_platform_height_pass')
-  #   - Comment field: field + '_comment' (e.g., 'slide_platform_height_comment')
+  #   - Decimal field: field (e.g., 'runout')
+  #   - Pass/fail field: field + '_pass' (e.g., 'runout_pass')
+  #   - Comment field: field + '_comment' (e.g., 'runout_comment')
 
-  number_field = field
+  decimal_field = field
   pass_fail_field = "#{field}_pass".to_sym
   comment_field = "#{field}_comment".to_sym
-
-  # Extract number field options
-  number_options = local_assigns.slice(:step, :min, :max, :required)
 
   # Get the form object
   form = @_current_form
@@ -26,43 +23,50 @@
 
   # Get field label from i18n
   field_data = form_field_setup(field, local_assigns)
-
+  
+  # Build decimal field options
+  decimal_options = {
+    inputmode: "decimal",
+    pattern: "[0-9]*[.]?[0-9]*",
+    placeholder: field_data[:field_placeholder] || local_assigns[:placeholder],
+    required: local_assigns[:required] || false,
+    class: "decimal-input"
+  }
+  
+  # Add prefilled value if needed
+  if field_data[:prefilled]
+    decimal_options[:value] = field_data[:value]
+  end
+  
+  # Add data attributes for validation
+  decimal_options[:data] = {}
+  decimal_options[:data][:min] = local_assigns[:min] if local_assigns[:min]
+  decimal_options[:data][:max] = local_assigns[:max] if local_assigns[:max]
+  
   # Get pass/fail field data - don't use form_field_setup as it doesn't have its own label
   pass_fail_value, pass_fail_prefilled = get_field_value_and_prefilled_status(form, pass_fail_field)
   pass_fail_checked = pass_fail_prefilled ? pass_fail_value : nil
-
+  
   # Get comment field options
   comment_info = comment_field_options(form, comment_field, field_data[:field_label])
-
-  # Add prefilled value to number options if needed
-  if field_data[:prefilled]
-    number_options[:value] = field_data[:value]
-  end
 %>
 
 <div class="form-grid number-pass-fail-comment">
-  <!-- Label with number field -->
+  <!-- Label -->
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'number-label' do %>
-    <label for="<%= form.field_id(number_field) %>">
+    <label for="<%= form.field_id(decimal_field) %>">
       <%= field_data[:field_label] %>
     </label>
   <% end %>
 
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'number' do %>
-    <%= form.number_field number_field,
-      id: form.field_id(number_field),
-      step: number_options[:step] || 0.01,
-      min: number_options[:min],
-      max: number_options[:max],
-      required: number_options[:required],
-      placeholder: field_data[:field_placeholder],
-      value: number_options[:value] %>
+    <%= form.text_field decimal_field, decimal_options.merge(id: form.field_id(decimal_field)) %>
   <% end %>
 
   <%= render 'form/field_wrapper', prefilled: pass_fail_prefilled, wrapper_class: 'radio-pass' do %>
     <label for="<%= pass_fail_field %>_true">
       <%= t('shared.pass') %>
-      <%= form.radio_button pass_fail_field, true,
+      <%= form.radio_button pass_fail_field, true, 
           { id: "#{pass_fail_field}_true" }.merge(
             radio_button_options(pass_fail_prefilled, pass_fail_checked, true)
           ) %>
@@ -71,7 +75,7 @@
 
   <%= render 'form/field_wrapper', prefilled: pass_fail_prefilled, wrapper_class: 'radio-fail' do %>
     <label for="<%= pass_fail_field %>_false">
-      <%= form.radio_button pass_fail_field, false,
+      <%= form.radio_button pass_fail_field, false, 
           { id: "#{pass_fail_field}_false" }.merge(
             radio_button_options(pass_fail_prefilled, pass_fail_checked, false)
           ) %>
@@ -79,7 +83,7 @@
     </label>
   <% end %>
 
-  <%= render 'form/comment_checkbox',
+  <%= render 'form/comment_checkbox', 
       comment_field: comment_field,
       checkbox_id: comment_info[:checkbox_id],
       textarea_id: comment_info[:options][:id],

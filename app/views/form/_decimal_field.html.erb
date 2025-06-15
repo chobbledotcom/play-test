@@ -1,0 +1,39 @@
+<%
+  # Decimal text field optimized for numeric input
+  # Required parameters:
+  #   field: Field name
+  # Optional parameters:
+  #   min: Minimum value (for validation)
+  #   max: Maximum value (for validation)
+  #   required: Whether field is required
+  #   placeholder: Placeholder text
+
+  # Get field setup
+  setup = form_field_setup(field, local_assigns)
+
+  # Build field options
+  field_options = {
+    inputmode: "decimal",
+    pattern: "[0-9]*[.]?[0-9]*",
+    placeholder: setup[:field_placeholder] || local_assigns[:placeholder],
+    required: local_assigns[:required] || false,
+    class: "decimal-input"
+  }
+
+  # Add value if prefilled
+  if setup[:prefilled]
+    field_options[:value] = setup[:value]
+  elsif local_assigns[:value]
+    field_options[:value] = local_assigns[:value]
+  end
+
+  # Add data attributes for validation
+  field_options[:data] = {}
+  field_options[:data][:min] = local_assigns[:min] if local_assigns[:min]
+  field_options[:data][:max] = local_assigns[:max] if local_assigns[:max]
+%>
+
+<%= render 'form/field_wrapper', prefilled: setup[:prefilled], wrapper_class: 'number-field' do %>
+  <%= setup[:form_object].label field, setup[:field_label] %>
+  <%= setup[:form_object].text_field field, field_options %>
+<% end %>

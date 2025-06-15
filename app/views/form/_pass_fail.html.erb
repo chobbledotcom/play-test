@@ -2,18 +2,17 @@
   # Get field setup with proper i18n lookup (will raise if missing)
   field_data = form_field_setup(field, local_assigns)
   form = field_data[:form_object]
-  
+
   # Pass/Fail options with i18n
   pass_label = t('shared.pass')
   fail_label = t('shared.fail')
   options = [[pass_label, true], [fail_label, false]]
-  
+
   # Check the prefilled value if needed
   checked_value = field_data[:prefilled] ? field_data[:value] : nil
 %>
 
-<%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'pass-fail-field' do %>
-<div>
+<%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
   <label><%= field_data[:field_label] %></label>
   <% options.each do |option_label, option_value| %>
     <label>
@@ -24,5 +23,4 @@
       <%= option_label %>
     </label>
   <% end %>
-</div>
 <% end %>
