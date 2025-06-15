@@ -218,46 +218,56 @@ class SeedDataService
     end
 
     def create_assessments_for_inspection(inspection, unit, config, passed: true)
-      create_anchorage_assessment(inspection, unit, passed)
-      create_structure_assessment(inspection, unit, passed)
-      create_materials_assessment(inspection, unit, passed)
-      create_fan_assessment(inspection, unit, passed)
-      create_user_height_assessment(inspection, unit, passed)
-      create_slide_assessment(inspection, unit, passed) if config[:has_slide]
-      create_enclosed_assessment(inspection, unit, passed) if config[:is_totally_enclosed]
+      is_incomplete = inspection.complete_date.nil?
+
+      Inspection::ASSESSMENT_TYPES.each do |assessment_key, assessment_class|
+        # Skip slide assessment if unit doesn't have a slide
+        next if assessment_key == :slide_assessment && !config[:has_slide]
+        # Skip enclosed assessment if not totally enclosed
+        next if assessment_key == :enclosed_assessment && !config[:is_totally_enclosed]
+
+        assessment_type = assessment_key.to_s.sub(/_assessment$/, "")
+
+        create_assessment(
+          inspection,
+          assessment_key,
+          assessment_type,
+          passed,
+          is_incomplete
+        )
+      end
     end
 
-    def create_anchorage_assessment(inspection, unit, passed)
-      inspection.anchorage_assessment.update!(SeedData.anchorage_fields(passed: passed))
+    def create_assessment(
+      inspection,
+      assessment_key,
+      assessment_type,
+      passed,
+      is_incomplete
+    )
+      fields = SeedData.send("#{assessment_type}_fields", passed: passed)
+
+      if assessment_key == :user_height_assessment && inspection.length && inspection.width
+        fields[:play_area_length] = inspection.length * 0.8
+        fields[:play_area_width] = inspection.width * 0.8
+      end
+
+      fields = randomly_remove_fields(fields, is_incomplete)
+      inspection.send(assessment_key).update!(fields)
     end
 
-    def create_structure_assessment(inspection, unit, passed)
-      inspection.structure_assessment.update!(SeedData.structure_fields(passed: passed))
-    end
+    def randomly_remove_fields(fields, is_incomplete)
+      return fields unless is_incomplete
 
-    def create_materials_assessment(inspection, unit, passed)
-      inspection.materials_assessment.update!(SeedData.materials_fields(passed: passed))
-    end
+      removable_fields = fields.keys
 
-    def create_fan_assessment(inspection, unit, passed)
-      inspection.fan_assessment.update!(SeedData.fan_fields(passed: passed))
-    end
+      percentage_to_remove = rand(0.2..0.4)
+      num_to_remove = (removable_fields.size * percentage_to_remove).round
+      fields_to_remove = removable_fields.sample(num_to_remove)
 
-    def create_user_height_assessment(inspection, unit, passed)
-      # Override play area dimensions based on inspection dimensions
-      fields = SeedData.user_height_fields(passed: passed)
-      fields[:play_area_length] = inspection.length * 0.8
-      fields[:play_area_width] = inspection.width * 0.8
+      fields_to_remove.each { |field| fields[field] = nil }
 
-      inspection.user_height_assessment.update!(fields)
-    end
-
-    def create_slide_assessment(inspection, unit, passed)
-      inspection.slide_assessment.update!(SeedData.slide_fields(passed: passed))
-    end
-
-    def create_enclosed_assessment(inspection, unit, passed)
-      inspection.enclosed_assessment.update!(SeedData.enclosed_fields(passed: passed))
+      fields
     end
   end
 end

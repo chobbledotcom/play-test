@@ -247,7 +247,7 @@ class InspectionsController < ApplicationController
         :slide_assessment,
         :structure_assessment,
         :user_height_assessment,
-        unit: {photo_attachment: [:blob, :variant_records]}
+        unit: {photo_attachment: :blob}
       )
       .find_by(id: params[:id]&.upcase)
 
