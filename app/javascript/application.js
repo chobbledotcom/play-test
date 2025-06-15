@@ -1,6 +1,101 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails";
 
+// Decimal field enhancement (self-contained)
+(function() {
+  function formatNumberValue(value) {
+    if (value === '' || value === null || value === undefined) return value;
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) return value;
+    return numValue.toString(); // Automatically removes trailing zeros
+  }
+  
+  function initializeDecimalFields() {
+    // Handle both decimal inputs and regular number inputs
+    const numberInputs = document.querySelectorAll('.decimal-input, input[type="number"]');
+    
+    numberInputs.forEach(function(input) {
+      // Skip if already initialized
+      if (input.dataset.decimalInitialized) return;
+      input.dataset.decimalInitialized = 'true';
+      
+      // Format initial value on load to remove trailing zeros
+      if (input.value) {
+        input.value = formatNumberValue(input.value);
+      }
+      
+      // Format and trim trailing zeros on blur
+      input.addEventListener('blur', function() {
+        let value = this.value.trim();
+        if (value === '') return;
+        
+        const numValue = parseFloat(value);
+        if (!isNaN(numValue)) {
+          // Convert to string to remove trailing zeros
+          this.value = numValue.toString();
+        }
+      });
+      
+      // Clean input as user types (for decimal inputs only)
+      if (input.classList.contains('decimal-input')) {
+        input.addEventListener('input', function() {
+          const value = this.value;
+          const min = parseFloat(this.dataset.min);
+          const max = parseFloat(this.dataset.max);
+          
+          // Remove invalid characters (keep digits, one dot, one minus at start)
+          let cleaned = value.replace(/[^0-9.-]/g, '');
+          
+          // Handle minus sign (only at start)
+          const minusCount = (cleaned.match(/-/g) || []).length;
+          if (minusCount > 1) {
+            cleaned = (cleaned.charAt(0) === '-' ? '-' : '') + cleaned.replace(/-/g, '');
+          } else if (cleaned.includes('-') && cleaned.charAt(0) !== '-') {
+            cleaned = cleaned.replace(/-/g, '');
+          }
+          
+          // Handle decimal point (only one allowed)
+          const dotCount = (cleaned.match(/\./g) || []).length;
+          if (dotCount > 1) {
+            const firstDotIndex = cleaned.indexOf('.');
+            cleaned = cleaned.substring(0, firstDotIndex + 1) + 
+                     cleaned.substring(firstDotIndex + 1).replace(/\./g, '');
+          }
+          
+          this.value = cleaned;
+          
+          // Validate range if specified
+          const numValue = parseFloat(cleaned);
+          if (!isNaN(numValue)) {
+            if (!isNaN(min) && numValue < min) {
+              this.setCustomValidity(`Value must be at least ${min}`);
+            } else if (!isNaN(max) && numValue > max) {
+              this.setCustomValidity(`Value must be at most ${max}`);
+            } else {
+              this.setCustomValidity('');
+            }
+          } else if (cleaned !== '' && cleaned !== '-') {
+            this.setCustomValidity('Please enter a valid number');
+          } else {
+            this.setCustomValidity('');
+          }
+        });
+      }
+    });
+  }
+  
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeDecimalFields);
+  } else {
+    initializeDecimalFields();
+  }
+  
+  // Re-initialize after Turbo navigations
+  document.addEventListener('turbo:load', initializeDecimalFields);
+  document.addEventListener('turbo:frame-load', initializeDecimalFields);
+})();
+
 // Number input sanitization function
 function sanitizeNumberInput(input) {
   const originalValue = input.value;
