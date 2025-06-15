@@ -120,7 +120,7 @@ RSpec.describe ApplicationHelper, type: :helper do
   end
 
   describe "#form_field_setup" do
-    let(:mock_form) { double("FormBuilder") }
+    let(:mock_form) { double("FormBuilder", object: nil) }
     let(:field) { :name }
     let(:local_assigns) { {} }
     let(:result) { helper.form_field_setup(field, local_assigns) }
@@ -239,7 +239,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "raises ArgumentError" do
-        expect { result }.to raise_error(ArgumentError, "no @_current_form in form_field_setup")
+        expect { result }.to raise_error(ArgumentError, "no @_current_i18n_base in form_field_setup")
       end
     end
 
@@ -250,7 +250,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "raises ArgumentError" do
-        expect { result }.to raise_error(ArgumentError, "no @_current_i18n_base in form_field_setup")
+        expect { result }.to raise_error(ArgumentError, "no @_current_form in form_field_setup")
       end
     end
 

@@ -1,4 +1,4 @@
-<%= render 'form/form_context', model: @inspection, i18n_base: 'forms.inspections' do |form| %>
+<%= render 'form/form_context', model: @inspection, i18n_base: 'forms.inspection' do |form| %>
   <%= render 'form/fieldset', legend_key: 'current_unit' do %>
     <% if @inspection.unit.present? %>
       <%= render 'shared/unit_details_display', unit: @inspection.unit %>

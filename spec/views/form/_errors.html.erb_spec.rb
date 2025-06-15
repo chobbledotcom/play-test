@@ -17,7 +17,7 @@ RSpec.describe "form/_errors.html.erb", type: :view do
     allow(view).to receive(:pluralize).and_call_original
 
     # Set up form context that errors partial expects
-    view.instance_variable_set(:@_current_i18n_base, "forms.inspections")
+    view.instance_variable_set(:@_current_i18n_base, "forms.inspection")
 
     # Add i18n translations for form errors (this should exist in real forms)
     I18n.backend.store_translations(:en, {
@@ -89,7 +89,7 @@ RSpec.describe "form/_errors.html.erb", type: :view do
     context "with model-specific i18n lookup" do
       it "attempts model-specific translation first" do
         allow(view).to receive(:t)
-          .with("forms.inspections.errors.header", hash_including(count: 2, raise: true))
+          .with("forms.inspection.errors.header", hash_including(count: 2, raise: true))
           .and_return("Test Model Error Header")
 
         render_errors
@@ -98,7 +98,7 @@ RSpec.describe "form/_errors.html.erb", type: :view do
 
       it "falls back to generic errors.header translation" do
         allow(view).to receive(:t)
-          .with("forms.inspections.errors.header", hash_including(count: 2, raise: true))
+          .with("forms.inspection.errors.header", hash_including(count: 2, raise: true))
           .and_return("Generic Error Header")
 
         render_errors
@@ -107,8 +107,8 @@ RSpec.describe "form/_errors.html.erb", type: :view do
 
       it "raises error when translation is missing (no fallback)" do
         allow(view).to receive(:t)
-          .with("forms.inspections.errors.header", hash_including(count: 2, raise: true))
-          .and_raise(I18n::MissingTranslationData.new(:en, "forms.inspections.errors.header"))
+          .with("forms.inspection.errors.header", hash_including(count: 2, raise: true))
+          .and_raise(I18n::MissingTranslationData.new(:en, "forms.inspection.errors.header"))
 
         expect { render_errors }.to raise_error(ActionView::Template::Error)
       end

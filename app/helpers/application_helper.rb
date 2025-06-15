@@ -1,15 +1,7 @@
 module ApplicationHelper
-  def render_time(datetime)
-    return nil if datetime.nil?
+  def render_time(datetime) = datetime&.strftime("%b %d, %Y")
 
-    datetime.strftime("%b %d, %Y")
-  end
-
-  def date_for_form(datetime)
-    return nil if datetime.nil?
-
-    datetime.to_date
-  end
+  def date_for_form(datetime) = datetime&.to_date
 
   def scrollable_table(html_options = {}, &block)
     content_tag(:div, class: "table-container") do
@@ -50,10 +42,10 @@ module ApplicationHelper
     form_object = @_current_form
     i18n_base = @_current_i18n_base
 
-    if i18n_base.nil?
-      raise ArgumentError, "no @_current_form in form_field_setup"
-    elsif form_object.nil?
-      raise ArgumentError, "no @_current_i18n_base in form_field_setup"
+    case [i18n_base, form_object]
+    in [nil, _] then raise ArgumentError, "no @_current_i18n_base in form_field_setup"
+    in [_, nil] then raise ArgumentError, "no @_current_form in form_field_setup"
+    else # both present, continue
     end
 
     # Look for field label in the fields namespace
@@ -86,7 +78,7 @@ module ApplicationHelper
   # Get field value and prefilled status
   def get_field_value_and_prefilled_status(form_object, field)
     # Return early if form doesn't have an object
-    return [nil, false] unless form_object.respond_to?(:object) && form_object.object
+    return [nil, false] unless form_object&.object
 
     model = form_object.object
     resolved = resolve_field_value(model, field)
@@ -146,31 +138,31 @@ module ApplicationHelper
     # Get base field name by removing _comment suffix
     base_field = comment_field.to_s.chomp("_comment")
     
+    # Extract complex interpolations to variables
+    placeholder_text = t('shared.field_comment_placeholder', field: base_field_label)
+    textarea_id = "#{base_field}_comment_textarea_#{model.object_id}"
+    checkbox_id = "#{base_field}_has_comment_#{model.object_id}"
+    display_style = has_comment ? 'block' : 'none'
+    
     options = {
       rows: 2,
-      placeholder: t('shared.field_comment_placeholder', field: base_field_label),
-      id: "#{base_field}_comment_textarea_#{model.object_id}",
-      style: "display: #{has_comment ? 'block' : 'none'};"
+      placeholder: placeholder_text,
+      id: textarea_id,
+      style: "display: #{display_style};"
     }
     
-    if comment_prefilled
-      options[:value] = comment_value
-    end
+    options[:value] = comment_value if comment_prefilled
     
     {
       options: options,
       prefilled: comment_prefilled,
       has_comment: has_comment,
-      checkbox_id: "#{base_field}_has_comment_#{model.object_id}"
+      checkbox_id: checkbox_id
     }
   end
 
   def radio_button_options(prefilled, checked_value, expected_value)
-    options = {}
-    if prefilled && checked_value == expected_value
-      options[:checked] = true
-    end
-    options
+    prefilled && checked_value == expected_value ? {checked: true} : {}
   end
 
   private

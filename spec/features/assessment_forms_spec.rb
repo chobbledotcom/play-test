@@ -1,7 +1,7 @@
 require "rails_helper"
 
 # Build all tab names from ASSESSMENT_TYPES plus the general inspection tab
-ALL_TAB_NAMES = ["inspections", ""] +
+ALL_TAB_NAMES = ["inspection", ""] +
   Inspection::ASSESSMENT_TYPES.keys.map { |k| k.to_s.sub(/_assessment$/, "") }
 
 RSpec.feature "Assessment Forms", type: :feature do
@@ -59,7 +59,7 @@ RSpec.feature "Assessment Forms", type: :feature do
   describe "Assessment Navigation" do
     it "allows switching between different assessment tabs" do
       # Define tabs to test
-      tabs_to_test = %w[user_height structure materials anchorage fan inspections]
+      tabs_to_test = %w[user_height structure materials anchorage fan inspection]
 
       # Add slide tab if inspection has slide
       if slide_inspection.has_slide

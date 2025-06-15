@@ -1,7 +1,7 @@
 module InspectionsHelper
   def format_inspection_count(user)
     count = user.inspections.count
-    "#{count} inspections"
+    t("inspections.count", count: count)
   end
 
   def inspection_result_badge(inspection)
@@ -47,12 +47,10 @@ module InspectionsHelper
 
   # Tabbed inspection editing helpers
   def inspection_tabs(inspection)
-    # Use the model's applicable_tabs method but rename "inspection" to "inspections" 
-    # for consistency with existing view code
-    inspection.applicable_tabs.map { |tab| tab == "inspection" ? "inspections" : tab }
+    inspection.applicable_tabs
   end
 
   def current_tab
-    params[:tab].presence || "inspections"
+    params[:tab].presence || "inspection"
   end
 end

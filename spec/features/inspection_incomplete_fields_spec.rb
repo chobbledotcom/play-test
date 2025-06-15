@@ -26,7 +26,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
       expand_incomplete_fields
       
       expect(page).to have_content(I18n.t("assessments.incomplete_fields.description_universal"))
-      expect(page).to have_content(I18n.t("forms.inspections.fields.inspection_location"))
+      expect(page).to have_content(I18n.t("forms.inspection.fields.inspection_location"))
       
       expect(page).to have_button(I18n.t("inspections.buttons.mark_complete"))
     end
@@ -40,7 +40,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     expect_incomplete_fields_display
     expand_incomplete_fields
     
-    expect(page).to have_content(I18n.t("forms.inspections.fields.inspection_location"))
+    expect(page).to have_content(I18n.t("forms.inspection.fields.inspection_location"))
     
     section_name = I18n.t("forms.user_height.header")
     field_name = I18n.t("forms.user_height.fields.tallest_user_height")

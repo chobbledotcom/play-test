@@ -28,7 +28,7 @@ RSpec.feature "Inspection Prefilling", type: :feature do
     expect(page).to have_content(I18n.t("inspections.titles.edit"))
     
     # Check that fields are prefilled
-    location_field = find_field(I18n.t("forms.inspections.fields.inspection_location"))
+    location_field = find_field(I18n.t("forms.inspection.fields.inspection_location"))
     expect(location_field.value).to eq("Test Location")
     
     # Check that the field has the prefilled class
@@ -36,12 +36,12 @@ RSpec.feature "Inspection Prefilling", type: :feature do
     expect(field_wrapper[:class]).to include("set-previous")
     
     # Check dimension fields
-    width_field = find_field(I18n.t("forms.inspections.fields.width"))
+    width_field = find_field(I18n.t("forms.inspection.fields.width"))
     expect(width_field.value).to eq("5.0")
     
     # For now, just verify that we can save the form without errors
     # The radio button prefilling appears to have some issues we can fix later
-    click_button I18n.t("forms.inspections.submit")
+    click_button I18n.t("forms.inspection.submit")
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
   end
 end

@@ -1,6 +1,11 @@
 en:
   # Inspections Management
   inspections:
+    count:
+      zero: "No inspections"
+      one: "1 inspection"
+      other: "%{count} inspections"
+    
     titles:
       edit: "Edit Inspection"
       new: "New Inspection"

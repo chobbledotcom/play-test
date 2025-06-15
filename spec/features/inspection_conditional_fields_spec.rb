@@ -18,10 +18,10 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     expect(page).to have_content(I18n.t("inspections.titles.edit"))
 
     # Choose "Yes" for the "Is totally enclosed" radio button
-    check_radio I18n.t("forms.inspections.fields.is_totally_enclosed")
+    check_radio I18n.t("forms.inspection.fields.is_totally_enclosed")
 
     # Save the inspection
-    click_button I18n.t("forms.inspections.submit")
+    click_button I18n.t("forms.inspection.submit")
 
     # After save, we should be on the show page
     expect(page).to have_content("Inspection updated successfully")
@@ -46,10 +46,10 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     expect(page).to have_content(I18n.t("inspections.titles.edit"))
 
     # Choose "Yes" for the "Has slide" radio button
-    check_radio I18n.t("forms.inspections.fields.has_slide")
+    check_radio I18n.t("forms.inspection.fields.has_slide")
 
     # Save the inspection
-    click_button I18n.t("forms.inspections.submit")
+    click_button I18n.t("forms.inspection.submit")
 
     # After save, we should be on the show page
     expect(page).to have_content("Inspection updated successfully")
@@ -75,10 +75,10 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     expect(page).not_to have_link(I18n.t("forms.enclosed.header"))
 
     # Choose "Yes" for the radio button
-    check_radio I18n.t("forms.inspections.fields.is_totally_enclosed")
+    check_radio I18n.t("forms.inspection.fields.is_totally_enclosed")
 
     # Save the inspection
-    click_button I18n.t("forms.inspections.submit")
+    click_button I18n.t("forms.inspection.submit")
 
     # Verify it was saved
     inspection.reload
@@ -101,10 +101,10 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     expect(page).not_to have_link(I18n.t("forms.slide.header"))
 
     # Choose "Yes" for the radio button
-    check_radio I18n.t("forms.inspections.fields.has_slide")
+    check_radio I18n.t("forms.inspection.fields.has_slide")
 
     # Save the inspection
-    click_button I18n.t("forms.inspections.submit")
+    click_button I18n.t("forms.inspection.submit")
 
     # Verify it was saved
     inspection.reload
@@ -126,11 +126,11 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     expect(page).to have_content(I18n.t("inspections.titles.edit"))
 
     # Choose "Yes" for both radio buttons
-    check_radio I18n.t("forms.inspections.fields.is_totally_enclosed")
-    check_radio I18n.t("forms.inspections.fields.has_slide")
+    check_radio I18n.t("forms.inspection.fields.is_totally_enclosed")
+    check_radio I18n.t("forms.inspection.fields.has_slide")
 
     # Save the inspection
-    click_button I18n.t("forms.inspections.submit")
+    click_button I18n.t("forms.inspection.submit")
 
     # After save, we should be on the show page
     expect(page).to have_content("Inspection updated successfully")
@@ -163,11 +163,11 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
     expect(page).to have_link(I18n.t("forms.slide.header"))
 
     # Choose "No" for both radio buttons
-    uncheck_radio I18n.t("forms.inspections.fields.is_totally_enclosed")
-    uncheck_radio I18n.t("forms.inspections.fields.has_slide")
+    uncheck_radio I18n.t("forms.inspection.fields.is_totally_enclosed")
+    uncheck_radio I18n.t("forms.inspection.fields.has_slide")
 
     # Save
-    click_button I18n.t("forms.inspections.submit")
+    click_button I18n.t("forms.inspection.submit")
 
     # Verify they were saved as false
     totally_enclosed_slide_inspection.reload

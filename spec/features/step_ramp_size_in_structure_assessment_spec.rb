@@ -52,7 +52,7 @@ RSpec.feature "Step Ramp Size in Structure Assessment", type: :feature do
     it "no longer shows step/ramp size in the main inspection form" do
       # Should not be in the general tab anymore as a field
       expect(page).not_to have_field("inspection[step_ramp_size]")
-      expect(page).not_to have_field(I18n.t("forms.inspections.fields.step_ramp_size", default: "Step/Ramp Size"))
+      expect(page).not_to have_field(I18n.t("forms.inspection.fields.step_ramp_size", default: "Step/Ramp Size"))
     end
   end
 end

@@ -1,6 +1,6 @@
 en:
   forms:
-    inspections:
+    inspection:
       header: "General"
       sections:
         current_unit: "Current Unit"

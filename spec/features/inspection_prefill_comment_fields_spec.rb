@@ -61,24 +61,24 @@ RSpec.feature "Inspection Prefilling Comment Fields", type: :feature do
     )
     
     # Go back to main inspection form
-    click_link I18n.t("forms.inspections.header")
+    click_link I18n.t("forms.inspection.header")
     
     # Verify width field and comment are prefilled
     verify_field_and_comment(
-      I18n.t("forms.inspections.fields.width"),
+      I18n.t("forms.inspection.fields.width"),
       5.0,
       "Custom width measurement"
     )
     
     # Verify length field and comment are prefilled
     verify_field_and_comment(
-      I18n.t("forms.inspections.fields.length"),
+      I18n.t("forms.inspection.fields.length"),
       4.0,
       "Length includes platform"
     )
     
     # Verify form can be saved successfully with all the prefilled data
-    click_button I18n.t("forms.inspections.submit")
+    click_button I18n.t("forms.inspection.submit")
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
   end
 end

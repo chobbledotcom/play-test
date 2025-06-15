@@ -261,7 +261,7 @@ class Inspection < ApplicationRecord
     if inspection_location.blank?
       fields << {
         field: :inspection_location,
-        label: I18n.t("forms.inspections.fields.inspection_location"),
+        label: I18n.t("forms.inspection.fields.inspection_location"),
         type: :text
       }
     end

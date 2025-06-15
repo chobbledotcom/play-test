@@ -24,7 +24,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
     it "displays all expected tabs" do
       # The current tab (general) should be a span, not a link
-      expect(page).to have_content(I18n.t("forms.inspections.header"))
+      expect(page).to have_content(I18n.t("forms.inspection.header"))
       expect_assessment_tab("user_height")
       expect_assessment_tab("structure")
       expect_assessment_tab("anchorage")
@@ -55,7 +55,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     end
 
     it "shows the inspections tab as active by default" do
-      expect_assessment_tab_active("inspections")
+      expect_assessment_tab_active("inspection")
     end
 
     it "can navigate between tabs" do
@@ -63,8 +63,8 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       expect(current_url).to include("tab=user_height")
       expect(page).to have_content(I18n.t("forms.user_height.header"))
 
-      click_link I18n.t("forms.inspections.header")
-      expect_assessment_tab_active("inspections")
+      click_link I18n.t("forms.inspection.header")
+      expect_assessment_tab_active("inspection")
     end
   end
 
@@ -79,7 +79,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       # When inspection has a unit, it shows unit details rather than select field
       expect(page).to have_content(I18n.t("inspections.headers.current_unit"))
 
-      expect_form_matches_i18n("forms.inspections")
+      expect_form_matches_i18n("forms.inspection")
 
       # These are read-only calculated fields, not form inputs
       expect(page).to have_content(I18n.t("inspections.fields.reinspection_date"))
@@ -99,10 +99,10 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     end
 
     it "can update basic inspection fields" do
-      fill_in_form :inspections, :inspection_location, "Updated Location"
-      fill_in_form :inspections, :risk_assessment, "Updated risk assessment"
+      fill_in_form :inspection, :inspection_location, "Updated Location"
+      fill_in_form :inspection, :risk_assessment, "Updated risk assessment"
 
-      submit_form :inspections
+      submit_form :inspection
 
       expect(page).to have_content(I18n.t("inspections.messages.updated"))
 
@@ -127,8 +127,8 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     end
 
     it "can toggle pass/fail status" do
-      check_form_radio :inspections, :passed
-      submit_form :inspections
+      check_form_radio :inspection, :passed
+      submit_form :inspection
 
       inspection.reload
       expect(inspection.passed).to be true
@@ -136,11 +136,11 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
 
     it "validates required fields" do
       # Clear required fields (inspection_date is always required)
-      fill_in_form :inspections, :inspection_date, ""
+      fill_in_form :inspection, :inspection_date, ""
 
-      submit_form :inspections
+      submit_form :inspection
 
-      expect_form_errors :inspections, count: 1
+      expect_form_errors :inspection, count: 1
     end
 
     it "can change unit selection via change unit link" do
@@ -163,9 +163,9 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
     before { visit edit_inspection_path(inspection) }
 
     it "preserves form data when switching tabs" do
-      fill_in_form :inspections, :inspection_location, "Test Location Data"
+      fill_in_form :inspection, :inspection_location, "Test Location Data"
       # Save the form first
-      submit_form :inspections
+      submit_form :inspection
 
       # Navigate to user height tab (which will show placeholder)
       visit edit_inspection_path(inspection, tab: "user_height")
@@ -174,7 +174,7 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       # Navigate back to general tab
       visit edit_inspection_path(inspection)
 
-      expect(page).to have_field(I18n.t("forms.inspections.fields.inspection_location"), with: "Test Location Data")
+      expect(page).to have_field(I18n.t("forms.inspection.fields.inspection_location"), with: "Test Location Data")
     end
 
     it "includes delete button" do
@@ -213,8 +213,8 @@ RSpec.feature "Inspection Tabbed Editing", type: :feature do
       inspection.update!(complete_date: nil, inspection_location: "Original Location")
       visit edit_inspection_path(inspection)
 
-      fill_in_form :inspections, :inspection_location, ""
-      submit_form :inspections
+      fill_in_form :inspection, :inspection_location, ""
+      submit_form :inspection
 
       # For draft inspections, location is not required, so let's test a different validation
       # Actually, let's verify that empty location is allowed for drafts

@@ -65,8 +65,8 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       expect(inspection.unique_report_number).to eq("ORIG-123")
 
       visit edit_inspection_path(inspection)
-      fill_in I18n.t("forms.inspections.fields.inspection_location"), with: "Updated after incomplete"
-      click_button I18n.t("forms.inspections.submit")
+      fill_in I18n.t("forms.inspection.fields.inspection_location"), with: "Updated after incomplete"
+      click_button I18n.t("forms.inspection.submit")
 
       expect(inspection.reload.inspection_location).to eq("Updated after incomplete")
     end
@@ -78,8 +78,8 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
     it "allows manual entry of unique report number" do
       visit edit_inspection_path(inspection)
 
-      fill_in I18n.t("forms.inspections.fields.unique_report_number"), with: "CUSTOM-2024-001"
-      click_button I18n.t("forms.inspections.submit")
+      fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "CUSTOM-2024-001"
+      click_button I18n.t("forms.inspection.submit")
 
       expect(page).to have_content(I18n.t("inspections.messages.updated"))
       expect(inspection.reload.unique_report_number).to eq("CUSTOM-2024-001")
@@ -102,7 +102,7 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       fill_in I18n.t("inspections.fields.unique_report_number"), with: inspection.id
 
       # Save the form
-      click_button I18n.t("forms.inspections.submit")
+      click_button I18n.t("forms.inspection.submit")
 
       # Check the value was saved
       expect(inspection.reload.unique_report_number).to eq(inspection.id)
@@ -130,7 +130,7 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
       # Clear the field
       fill_in I18n.t("inspections.fields.unique_report_number"), with: ""
-      click_button I18n.t("forms.inspections.submit")
+      click_button I18n.t("forms.inspection.submit")
 
       # Verify it was cleared
       expect(inspection.reload.unique_report_number).to eq("")
@@ -159,7 +159,7 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       visit edit_inspection_path(inspection)
 
       fill_in I18n.t("inspections.fields.unique_report_number"), with: "USER-REPORT-456"
-      click_button I18n.t("forms.inspections.submit")
+      click_button I18n.t("forms.inspection.submit")
 
       # The mark complete button is shown on the general tab
       visit edit_inspection_path(inspection)
