@@ -220,10 +220,7 @@ class SeedDataService
     def create_assessments_for_inspection(inspection, unit, config, passed: true)
       is_incomplete = inspection.complete_date.nil?
 
-      Inspection::ASSESSMENT_TYPES.each do |assessment_key, assessment_class|
-        next if assessment_key == :slide_assessment && !config[:has_slide]
-        next if assessment_key == :enclosed_assessment && !config[:is_totally_enclosed]
-
+      inspection.each_applicable_assessment do |assessment_key, assessment_class, _|
         assessment_type = assessment_key.to_s.sub(/_assessment$/, "")
 
         create_assessment(

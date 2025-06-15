@@ -23,7 +23,7 @@
     <% end %>
 
     <!-- Slide Requirements -->
-    <% if inspection.slide_assessment.present? && inspection.slide_assessment.slide_platform_height.present? %>
+    <% if inspection.assessment_applicable?(:slide_assessment) && inspection.slide_assessment.present? && inspection.slide_assessment.slide_platform_height.present? %>
       <section class="standards-section">
         <h4><%= t('inspections.safety_standards.slide_requirements') %></h4>
         <p><%= t('inspections.safety_standards.runout_requirement',

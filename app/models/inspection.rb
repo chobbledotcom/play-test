@@ -35,7 +35,6 @@ class Inspection < ApplicationRecord
 
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
-  before_save :auto_determine_pass_fail, if: :all_assessments_complete?
   after_create :create_assessments
 
   # Scopes
@@ -138,13 +137,13 @@ class Inspection < ApplicationRecord
     tabs = ["inspection", "user_height"]
 
     # Only show slide tab for inspections that have slides
-    tabs << "slide" if has_slide?
+    tabs << "slide" if assessment_applicable?(:slide_assessment)
 
     # Add the core assessment tabs in UI order
     tabs += %w[structure anchorage materials fan]
 
     # Only show enclosed tab for totally enclosed inspections
-    tabs << "enclosed" if is_totally_enclosed?
+    tabs << "enclosed" if assessment_applicable?(:enclosed_assessment)
 
     tabs
   end
@@ -234,10 +233,9 @@ class Inspection < ApplicationRecord
 
   def validate_completeness
     assessment_validation_data.filter_map do |name, assessment, message|
-      # Skip slide assessment if unit doesn't have a slide
-      next if name == :slide && !has_slide?
-      # Skip enclosed assessment if unit is not totally enclosed
-      next if name == :enclosed && !is_totally_enclosed?
+      # Convert the symbol name (e.g., :slide) to assessment key (e.g., :slide_assessment)
+      assessment_key = "#{name}_assessment".to_sym
+      next unless assessment_applicable?(assessment_key)
 
       message if assessment&.present? && !assessment.complete?
     end
@@ -285,14 +283,10 @@ class Inspection < ApplicationRecord
       }
     end
 
-    ASSESSMENT_TYPES.each do |assessment_name, _|
-      next if assessment_name == :slide_assessment && !has_slide?
-      next if assessment_name == :enclosed_assessment && !is_totally_enclosed?
-
-      assessment = send(assessment_name)
+    each_applicable_assessment do |assessment_key, _, assessment|
       next unless assessment
 
-      assessment_type = assessment_name.to_s.sub("_assessment", "")
+      assessment_type = assessment_key.to_s.sub("_assessment", "")
       section_name = I18n.t("forms.#{assessment_type}.header")
 
       assessment.incomplete_fields.each do |field_info|
@@ -344,28 +338,6 @@ class Inspection < ApplicationRecord
     applicable_assessments.map { |assessment_key, _| send(assessment_key) }
   end
 
-  def auto_determine_pass_fail
-    self.passed = all_safety_checks_pass?
-  end
-
-  def all_safety_checks_pass?
-    # Business logic to determine overall pass/fail
-    critical_failures = [
-      structure_assessment&.has_critical_failures?,
-      anchorage_assessment&.has_critical_failures?,
-      materials_assessment&.has_critical_failures?
-    ].any?
-
-    !critical_failures && meet_safety_thresholds?
-  end
-
-  def meet_safety_thresholds?
-    height_ok = user_height_assessment&.meets_height_requirements? != false
-    runout_ok = slide_assessment&.meets_runout_requirements? != false
-    anchor_ok = anchorage_assessment&.meets_anchor_requirements? != false
-
-    height_ok && runout_ok && anchor_ok
-  end
 
   def total_pass_columns
     all_assessments.compact.sum(&:pass_columns_count)
