@@ -7,14 +7,22 @@
   pass_label = t('shared.pass')
   fail_label = t('shared.fail')
   options = [[pass_label, true], [fail_label, false]]
+  
+  # Check the prefilled value if needed
+  checked_value = field_data[:prefilled] ? field_data[:value] : nil
 %>
 
+<%= render 'form/field_wrapper', prefilled: field_data[:prefilled] do %>
 <div>
   <label><%= field_data[:field_label] %></label>
   <% options.each do |option_label, option_value| %>
     <label>
-      <%= form.radio_button field, option_value, id: "#{field}_#{option_value}" %>
+      <%= form.radio_button field, option_value, 
+          { id: "#{field}_#{option_value}" }.merge(
+            radio_button_options(field_data[:prefilled], checked_value, option_value)
+          ) %>
       <%= option_label %>
     </label>
   <% end %>
 </div>
+<% end %>

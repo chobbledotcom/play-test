@@ -24,29 +24,30 @@
 
   # Get field label from i18n (will raise if missing)
   field_data = form_field_setup(field, local_assigns)
-
-  # Generate unique ID for comment checkbox
-  comment_checkbox_id = "#{field}_has_comment_#{model.object_id}"
-  comment_textarea_id = "#{field}_comment_textarea_#{model.object_id}"
+  
+  # Add prefilled value if needed
+  if field_data[:prefilled]
+    number_options[:value] = field_data[:value]
+  end
+  
+  # Get comment field options
+  comment_info = comment_field_options(form, comment_field, field_data[:field_label])
 %>
 
 <div class="form-grid number-comment">
-  <%= form.label number_field, field_data[:field_label] %>
+  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled] do %>
+    <%= form.label number_field, field_data[:field_label] %>
+    <%= form.number_field number_field, **number_options %>
+  <% end %>
 
-  <%= form.number_field number_field, **number_options %>
+  <%= render 'form/comment_checkbox', 
+      comment_field: comment_field,
+      checkbox_id: comment_info[:checkbox_id],
+      textarea_id: comment_info[:options][:id],
+      has_comment: comment_info[:has_comment],
+      prefilled: comment_info[:prefilled] %>
 
-  <label for="<%= comment_checkbox_id %>">
-    <input type="checkbox"
-      id="<%= comment_checkbox_id %>"
-      <%= 'checked' if model.send(comment_field).present? %>
-      onchange="document.getElementById('<%= comment_textarea_id %>').style.display = this.checked ? 'block' : 'none';"
-    >
-    <%= t('shared.comment') %>
-  </label>
-
-  <%= form.text_area comment_field,
-      rows: 2,
-      placeholder: t('shared.field_comment_placeholder', field: field_data[:field_label]),
-      id: comment_textarea_id,
-      style: "display: #{model.send(comment_field).present? ? 'block' : 'none'};" %>
+  <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled] do %>
+    <%= form.text_area comment_field, comment_info[:options] %>
+  <% end %>
 </div>

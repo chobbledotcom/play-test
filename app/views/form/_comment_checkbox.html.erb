@@ -1,0 +1,20 @@
+<%
+  # Partial for comment checkbox
+  # Required parameters:
+  #   comment_field: The comment field name (e.g., :width_comment)
+  #   checkbox_id: Unique ID for the checkbox
+  #   textarea_id: ID of the textarea to show/hide
+  #   has_comment: Whether comment exists
+  #   prefilled: Whether the comment is prefilled
+%>
+
+<%= render 'form/field_wrapper', prefilled: prefilled do %>
+  <label for="<%= checkbox_id %>">
+    <input type="checkbox"
+      id="<%= checkbox_id %>"
+      <%= 'checked' if has_comment %>
+      onchange="document.getElementById('<%= textarea_id %>').style.display = this.checked ? 'block' : 'none';"
+    >
+    <%= t('shared.comment') %>
+  </label>
+<% end %>

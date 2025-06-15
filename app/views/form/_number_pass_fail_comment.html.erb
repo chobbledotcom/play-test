@@ -26,49 +26,64 @@
 
   # Get field label from i18n
   field_data = form_field_setup(field, local_assigns)
-
-  # Generate unique ID for comment checkbox
-  comment_checkbox_id = "#{field}_has_comment_#{model.object_id}"
-  comment_textarea_id = "#{field}_comment_textarea_#{model.object_id}"
+  
+  # Get pass/fail field data - don't use form_field_setup as it doesn't have its own label
+  pass_fail_value, pass_fail_prefilled = get_field_value_and_prefilled_status(form, pass_fail_field)
+  pass_fail_checked = pass_fail_prefilled ? pass_fail_value : nil
+  
+  # Get comment field options
+  comment_info = comment_field_options(form, comment_field, field_data[:field_label])
+  
+  # Add prefilled value to number options if needed
+  if field_data[:prefilled]
+    number_options[:value] = field_data[:value]
+  end
 %>
 
 <div class="form-grid pass-fail-comment with-number">
   <!-- Label -->
-  <label for="<%= form.field_id(number_field) %>">
-    <%= field_data[:field_label] %>
-    <%= form.number_field number_field,
-        id: form.field_id(number_field),
-        step: number_options[:step] || 0.01,
-        min: number_options[:min],
-        max: number_options[:max],
-        required: number_options[:required],
-        placeholder: field_data[:field_placeholder] %>
-  </label>
+  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled] do %>
+    <label for="<%= form.field_id(number_field) %>">
+      <%= field_data[:field_label] %>
+      <%= form.number_field number_field,
+          id: form.field_id(number_field),
+          step: number_options[:step] || 0.01,
+          min: number_options[:min],
+          max: number_options[:max],
+          required: number_options[:required],
+          placeholder: field_data[:field_placeholder],
+          value: number_options[:value] %>
+    </label>
+  <% end %>
 
-  <label for="<%= pass_fail_field %>_true">
-    <%= t('shared.pass') %>
-    <%= form.radio_button pass_fail_field, true,
-        id: "#{pass_fail_field}_true" %>
-  </label>
+  <%= render 'form/field_wrapper', prefilled: pass_fail_prefilled do %>
+    <label for="<%= pass_fail_field %>_true">
+      <%= t('shared.pass') %>
+      <%= form.radio_button pass_fail_field, true, 
+          { id: "#{pass_fail_field}_true" }.merge(
+            radio_button_options(pass_fail_prefilled, pass_fail_checked, true)
+          ) %>
+    </label>
+  <% end %>
 
-  <label for="<%= pass_fail_field %>_false">
-    <%= form.radio_button pass_fail_field, false,
-        id: "#{pass_fail_field}_false" %>
-    <%= t('shared.fail') %>
-  </label>
+  <%= render 'form/field_wrapper', prefilled: pass_fail_prefilled do %>
+    <label for="<%= pass_fail_field %>_false">
+      <%= form.radio_button pass_fail_field, false, 
+          { id: "#{pass_fail_field}_false" }.merge(
+            radio_button_options(pass_fail_prefilled, pass_fail_checked, false)
+          ) %>
+      <%= t('shared.fail') %>
+    </label>
+  <% end %>
 
-  <label for="<%= comment_checkbox_id %>">
-    <input type="checkbox"
-      id="<%= comment_checkbox_id %>"
-      <%= 'checked' if model.send(comment_field).present? %>
-      onchange="document.getElementById('<%= comment_textarea_id %>').style.display = this.checked ? 'block' : 'none';"
-    >
-    <%= t('shared.comment') %>
-  </label>
+  <%= render 'form/comment_checkbox', 
+      comment_field: comment_field,
+      checkbox_id: comment_info[:checkbox_id],
+      textarea_id: comment_info[:options][:id],
+      has_comment: comment_info[:has_comment],
+      prefilled: comment_info[:prefilled] %>
 
-  <%= form.text_area comment_field,
-      rows: 2,
-      placeholder: t('shared.field_comment_placeholder', field: field_data[:field_label]),
-      id: comment_textarea_id,
-      style: "display: #{model.send(comment_field).present? ? 'block' : 'none'};" %>
+  <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled] do %>
+    <%= form.text_area comment_field, comment_info[:options] %>
+  <% end %>
 </div>

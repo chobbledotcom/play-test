@@ -8,18 +8,23 @@
   
   # Get field label from i18n (will raise if missing)
   field_data = form_field_setup(field, local_assigns)
+  
+  # Check the prefilled value if needed
+  checked_value = field_data[:prefilled] ? field_data[:value] : nil
 %>
 
+<%= render 'form/field_wrapper', prefilled: field_data[:prefilled] do %>
 <div class="form-grid yes-no-radio">
   <label><%= field_data[:field_label] %></label>
   
   <label for="<%= field %>_true">
     <%= t('shared.yes') %>
-    <%= form.radio_button field, true %>
+    <%= form.radio_button field, true, radio_button_options(field_data[:prefilled], checked_value, true) %>
   </label>
   
   <label for="<%= field %>_false">
-    <%= form.radio_button field, false %>
+    <%= form.radio_button field, false, radio_button_options(field_data[:prefilled], checked_value, false) %>
     <%= t('shared.no') %>
   </label>
 </div>
+<% end %>

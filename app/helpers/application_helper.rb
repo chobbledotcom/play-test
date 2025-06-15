@@ -128,6 +128,43 @@ module ApplicationHelper
     nil
   end
 
+  def comment_field_options(form, comment_field, base_field_label)
+    model = form.object
+    comment_value, comment_prefilled = get_field_value_and_prefilled_status(form, comment_field)
+    
+    actual_value = comment_prefilled ? comment_value : model.send(comment_field)
+    has_comment = actual_value.present? || (comment_prefilled && comment_value.present?)
+    
+    # Get base field name by removing _comment suffix
+    base_field = comment_field.to_s.chomp("_comment")
+    
+    options = {
+      rows: 2,
+      placeholder: t('shared.field_comment_placeholder', field: base_field_label),
+      id: "#{base_field}_comment_textarea_#{model.object_id}",
+      style: "display: #{has_comment ? 'block' : 'none'};"
+    }
+    
+    if comment_prefilled
+      options[:value] = comment_value
+    end
+    
+    {
+      options: options,
+      prefilled: comment_prefilled,
+      has_comment: has_comment,
+      checkbox_id: "#{base_field}_has_comment_#{model.object_id}"
+    }
+  end
+
+  def radio_button_options(prefilled, checked_value, expected_value)
+    options = {}
+    if prefilled && checked_value == expected_value
+      options[:checked] = true
+    end
+    options
+  end
+
   private
 
   def controller_matches?(path)

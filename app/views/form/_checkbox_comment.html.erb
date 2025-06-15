@@ -17,9 +17,12 @@
   # Get field label from i18n (will raise if missing) 
   field_data = form_field_setup(field, local_assigns)
   
+  # Get comment field options
+  comment_info = comment_field_options(form, comment_field, field_data[:field_label])
+  
   # Generate unique ID for comment checkbox
-  comment_checkbox_id = "#{field}_has_comment_#{model.object_id}"
-  comment_textarea_id = "#{field}_comment_textarea_#{model.object_id}"
+  comment_checkbox_id = comment_info[:checkbox_id]
+  comment_textarea_id = comment_info[:options][:id]
 %>
 
 <div class="checkbox-comment">
@@ -27,21 +30,22 @@
   <label><%= field_data[:field_label] %></label>
   
   <!-- Main checkbox -->
-  <%= form.check_box checkbox_field, 
-      id: "#{checkbox_field}_checkbox" %>
-  <label for="<%= checkbox_field %>_checkbox"><%= t('shared.yes') %></label>
+  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled] do %>
+    <%= form.check_box checkbox_field, 
+        id: "#{checkbox_field}_checkbox" %>
+    <label for="<%= checkbox_field %>_checkbox"><%= t('shared.yes') %></label>
+  <% end %>
   
   <!-- Comment checkbox -->
-  <input type="checkbox" 
-         id="<%= comment_checkbox_id %>" 
-         <%= 'checked' if model.send(comment_field).present? %>
-         onchange="document.getElementById('<%= comment_textarea_id %>').style.display = this.checked ? 'block' : 'none';">
-  <label for="<%= comment_checkbox_id %>"><%= t('shared.comment') %></label>
+  <%= render 'form/comment_checkbox', 
+      comment_field: comment_field,
+      checkbox_id: comment_checkbox_id,
+      textarea_id: comment_textarea_id,
+      has_comment: comment_info[:has_comment],
+      prefilled: comment_info[:prefilled] %>
   
   <!-- Comment textarea (hidden by default, spans full width) -->
-  <%= form.text_area comment_field,
-      rows: 2,
-      placeholder: "Add comment...",
-      id: comment_textarea_id,
-      style: "display: #{model.send(comment_field).present? ? 'block' : 'none'};" %>
+  <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled] do %>
+    <%= form.text_area comment_field, comment_info[:options] %>
+  <% end %>
 </div>

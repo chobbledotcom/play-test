@@ -3,6 +3,17 @@ require "rails_helper"
 RSpec.describe "form/_pass_fail.html.erb", type: :view do
   let(:mock_form) { double("FormBuilder") }
   let(:field) { :status }
+  let(:field_config) do
+    {
+      form_object: mock_form,
+      i18n_base: "test.forms",
+      field_label: "Status",
+      field_hint: nil,
+      field_placeholder: nil,
+      value: nil,
+      prefilled: false
+    }
+  end
 
   # Default render method with common setup
   def render_pass_fail(locals = {})
@@ -10,87 +21,99 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
   end
 
   before do
-    # Set the form context as form_context would
-    view.instance_variable_set(:@_current_form, mock_form)
-    view.instance_variable_set(:@_current_i18n_base, "forms.test")
-
+    # Mock the form field setup helper
+    allow(view).to receive(:form_field_setup).and_return(field_config)
+    
+    # Mock the radio_button_options helper
+    allow(view).to receive(:radio_button_options).and_return({})
+    
     # Mock i18n translations
     allow(view).to receive(:t).and_call_original
-
-    # Mock field label lookup
-    allow(view).to receive(:t)
-      .with("forms.test.fields.#{field}", raise: true)
-      .and_return("Status")
-
-    # Mock pass/fail labels
-    allow(view).to receive(:t)
-      .with("shared.pass")
-      .and_return("Pass")
-    allow(view).to receive(:t)
-      .with("shared.fail")
-      .and_return("Fail")
-
-    # Mock form builder methods with default behavior
-    allow(mock_form).to receive(:radio_button)
-      .with(field, true, id: "#{field}_true")
-      .and_return('<input type="radio" name="status" value="true" id="status_true" />'.html_safe)
-
-    allow(mock_form).to receive(:radio_button)
-      .with(field, false, id: "#{field}_false")
-      .and_return('<input type="radio" name="status" value="false" id="status_false" />'.html_safe)
+    allow(view).to receive(:t).with('shared.pass').and_return('Pass')
+    allow(view).to receive(:t).with('shared.fail').and_return('Fail')
+    
+    # Mock form builder radio_button method
+    allow(mock_form).to receive(:radio_button) do |field, value, options = {}|
+      id = options[:id] || "#{field}_#{value}"
+      checked = options[:checked] ? ' checked="checked"' : ''
+      %(<input type="radio" name="#{field}" value="#{value}" id="#{id}"#{checked} />).html_safe
+    end
   end
 
   describe "basic rendering" do
     it "renders a complete pass/fail radio group" do
       render_pass_fail
-
+      
       expect(rendered).to have_css("div")
       expect(rendered).to have_css("label", text: "Status") # Field label
       expect(rendered).to have_css('input[type="radio"][name="status"][value="true"][id="status_true"]')
       expect(rendered).to have_css('input[type="radio"][name="status"][value="false"][id="status_false"]')
-      expect(rendered).to have_css("label", text: I18n.t("shared.pass"))
-      expect(rendered).to have_css("label", text: I18n.t("shared.fail"))
+      expect(rendered).to have_css("label", text: "Pass")
+      expect(rendered).to have_css("label", text: "Fail")
     end
 
     it "nests radio buttons inside their labels" do
       render_pass_fail
+      
       # Check that radio buttons are inside labels
-      within("div") do
-        labels_with_pass = all("label", text: I18n.t("shared.pass"))
-        pass_label = labels_with_pass.find { |l| l.has_css?('input[type="radio"]') }
-        expect(pass_label).to have_css('input[type="radio"][value="true"]')
+      doc = Nokogiri::HTML(rendered)
+      pass_labels = doc.css('label').select { |l| l.text.include?("Pass") }
+      pass_label_with_input = pass_labels.find { |l| l.css('input[type="radio"]').any? }
+      expect(pass_label_with_input).not_to be_nil
+      expect(pass_label_with_input.css('input[value="true"]')).not_to be_empty
 
-        labels_with_fail = all("label", text: I18n.t("shared.fail"))
-        fail_label = labels_with_fail.find { |l| l.has_css?('input[type="radio"]') }
-        expect(fail_label).to have_css('input[type="radio"][value="false"]')
-      end
+      fail_labels = doc.css('label').select { |l| l.text.include?("Fail") }
+      fail_label_with_input = fail_labels.find { |l| l.css('input[type="radio"]').any? }
+      expect(fail_label_with_input).not_to be_nil
+      expect(fail_label_with_input.css('input[value="false"]')).not_to be_empty
     end
 
     it "generates proper radio button IDs for accessibility" do
       render_pass_fail
-
+      
       expect(rendered).to have_css('input#status_true[type="radio"]')
       expect(rendered).to have_css('input#status_false[type="radio"]')
+    end
+  end
+
+  describe "with prefilled value" do
+    it "checks the appropriate radio button when prefilled" do
+      # Setup field_config with prefilled data
+      allow(view).to receive(:form_field_setup).and_return(
+        field_config.merge(value: true, prefilled: true)
+      )
+      
+      # Mock radio_button_options to return checked for true
+      allow(view).to receive(:radio_button_options).with(true, true, true).and_return({checked: true})
+      allow(view).to receive(:radio_button_options).with(true, true, false).and_return({})
+      
+      render_pass_fail
+      
+      expect(rendered).to have_css('input[type="radio"][value="true"][checked="checked"]')
+      expect(rendered).not_to have_css('input[type="radio"][value="false"][checked="checked"]')
+    end
+
+    it "adds prefilled wrapper class when field is prefilled" do
+      allow(view).to receive(:form_field_setup).and_return(
+        field_config.merge(value: false, prefilled: true)
+      )
+      
+      render_pass_fail
+      
+      expect(rendered).to have_css('div.set-previous')
     end
   end
 
   describe "different field contexts" do
     shared_examples "renders correctly for field" do |field_name|
       it "handles #{field_name} field" do
-        # Mock field label lookup for this field
-        allow(view).to receive(:t)
-          .with("forms.test.fields.#{field_name}", raise: true)
-          .and_return(field_name.to_s.humanize)
-
-        # Mock for the new field
-        allow(mock_form).to receive(:radio_button)
-          .with(field_name, true, id: "#{field_name}_true")
-          .and_return('<input type="radio" />'.html_safe)
-        allow(mock_form).to receive(:radio_button)
-          .with(field_name, false, id: "#{field_name}_false")
-          .and_return('<input type="radio" />'.html_safe)
-
-        render_pass_fail(field: field_name)
+        # Mock the form_field_setup method for this field
+        allow(view).to receive(:form_field_setup).and_return(
+          field_config.merge(field_label: field_name.to_s.humanize)
+        )
+        
+        render partial: "form/pass_fail", locals: {field: field_name}
+        
         expect(rendered).to have_css("div")
         expect(rendered).to have_css("label", text: field_name.to_s.humanize)
       end
@@ -104,10 +127,17 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
   end
 
   describe "i18n integration" do
-    it "uses i18n for default pass/fail labels" do
-      expect(view).to receive(:t).with("shared.pass").and_return("Pass")
-      expect(view).to receive(:t).with("shared.fail").and_return("Fail")
-
+    it "uses i18n for pass/fail labels" do
+      render_pass_fail
+      
+      expect(rendered).to have_content("Pass")
+      expect(rendered).to have_content("Fail")
+    end
+    
+    it "calls t() for pass/fail translations" do
+      expect(view).to receive(:t).with('shared.pass').and_return('Pass')
+      expect(view).to receive(:t).with('shared.fail').and_return('Fail')
+      
       render_pass_fail
     end
   end
@@ -115,27 +145,25 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
   describe "accessibility and semantic structure" do
     it "properly associates radio buttons with their labels through nesting" do
       render_pass_fail
-
+      
       # Labels contain the radio buttons
-      within("div") do
-        labels_with_pass = all("label", text: I18n.t("shared.pass"))
-        pass_label = labels_with_pass.find { |l| l.has_css?('input[type="radio"]') }
-        expect(pass_label).to have_css('input[type="radio"][value="true"]')
+      doc = Nokogiri::HTML(rendered)
+      pass_labels = doc.css('label').select { |l| l.text.include?("Pass") }
+      pass_label_with_input = pass_labels.find { |l| l.css('input[type="radio"]').any? }
+      expect(pass_label_with_input).not_to be_nil
+      expect(pass_label_with_input.css('input[value="true"]')).not_to be_empty
 
-        labels_with_fail = all("label", text: I18n.t("shared.fail"))
-        fail_label = labels_with_fail.find { |l| l.has_css?('input[type="radio"]') }
-        expect(fail_label).to have_css('input[type="radio"][value="false"]')
-      end
+      fail_labels = doc.css('label').select { |l| l.text.include?("Fail") }
+      fail_label_with_input = fail_labels.find { |l| l.css('input[type="radio"]').any? }
+      expect(fail_label_with_input).not_to be_nil
+      expect(fail_label_with_input.css('input[value="false"]')).not_to be_empty
     end
 
     it "uses boolean values for pass/fail" do
       render_pass_fail
+      
       expect(rendered).to have_css('input[type="radio"][value="true"]')
       expect(rendered).to have_css('input[type="radio"][value="false"]')
-    end
-
-    it "includes hint for additional context when present" do
-      render_pass_fail
     end
   end
 end

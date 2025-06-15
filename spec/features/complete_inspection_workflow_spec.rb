@@ -14,6 +14,7 @@ class InspectionWorkflow
   attr_reader :unit
   attr_reader :inspection
   attr_reader :options
+  attr_reader :applicable_tabs
 
   def initialize(has_slide:, is_totally_enclosed:)
     @options = {has_slide:, is_totally_enclosed:}
@@ -28,6 +29,25 @@ class InspectionWorkflow
     setup_unit_and_inspection
     fill_and_verify_inspection
     self
+  end
+
+  def applicable_tabs
+    @applicable_tabs ||= begin
+      all_tabs = Inspection::ASSESSMENT_TYPES.keys.map { |k|
+        k.to_s.sub(/_assessment$/, "")
+      }
+
+      all_tabs.select do |tab_name|
+        case tab_name
+        when "slide"
+          @inspection.has_slide
+        when "enclosed"
+          @inspection.is_totally_enclosed
+        else
+          true
+        end
+      end
+    end
   end
 
   private
@@ -148,25 +168,6 @@ class InspectionWorkflow
 
       if index < applicable_tabs.length - 1
         verify_inspection_not_completable
-      end
-    end
-  end
-
-  def applicable_tabs
-    @applicable_tabs ||= begin
-      all_tabs = Inspection::ASSESSMENT_TYPES.keys.map { |k|
-        k.to_s.sub(/_assessment$/, "")
-      }
-
-      all_tabs.select do |tab_name|
-        case tab_name
-        when "slide"
-          @inspection.has_slide
-        when "enclosed"
-          @inspection.is_totally_enclosed
-        else
-          true
-        end
       end
     end
   end
@@ -307,5 +308,89 @@ RSpec.feature "Complete Inspection Workflow", type: :feature do
     
     field_parent = location_field.find(:xpath, '..')
     expect(field_parent[:class]).to include("set-previous")
+  end
+
+  scenario "second inspection prefills all assessments", :focus do
+    workflow = InspectionWorkflow.new(
+      has_slide: true,
+      is_totally_enclosed: true
+    ).execute
+    
+    # Update the first inspection to have dates from the past
+    workflow.inspection.update!(
+      inspection_date: 7.days.ago,
+      complete_date: 7.days.ago
+    )
+
+    visit unit_path(workflow.unit)
+    click_button I18n.t("units.buttons.add_inspection")
+    
+    second_inspection = workflow.unit.inspections.order(created_at: :desc).first
+    
+    # For now, manually set these values to match the first inspection
+    # TODO: These should be prefilled but aren't yet
+    choose_yes_no(I18n.t("forms.inspections.fields.has_slide"), true)
+    choose_yes_no(I18n.t("forms.inspections.fields.is_totally_enclosed"), true)
+    
+    click_button I18n.t("forms.inspections.submit")
+    
+    visit edit_inspection_path(second_inspection)
+    
+    # The incomplete count includes ALL fields from ALL assessments
+    second_inspection.reload
+    total_incomplete = second_inspection.incomplete_fields.count
+    puts "\nTotal incomplete fields in second inspection: #{total_incomplete}"
+    
+    # Count how many fields we filled manually (inspection location was prefilled)
+    manually_filled = 2  # has_slide and is_totally_enclosed
+    expected_prefilled = total_incomplete - manually_filled
+    puts "Expected to be prefilled (excluding manually filled): #{expected_prefilled}"
+    
+    workflow.applicable_tabs.each_with_index do |tab_name, index|
+      puts "\nProcessing #{tab_name} assessment..."
+      visit edit_inspection_path(second_inspection, tab: tab_name)
+      
+      # Debug: check if we're on the right page
+      if page.has_content?(I18n.t("forms.#{tab_name}.header"))
+        puts "Found #{tab_name} form header"
+      else
+        puts "WARNING: Could not find #{tab_name} form header"
+        puts "Page text includes: #{page.text[0..200]}..."
+      end
+      
+      click_button I18n.t("forms.#{tab_name}.submit")
+      expect(page).to have_content(I18n.t("inspections.messages.updated"))
+      
+      second_inspection.reload
+      assessment = second_inspection.send("#{tab_name}_assessment")
+      is_complete = assessment.complete?
+      puts "#{tab_name} assessment complete: #{is_complete}"
+      if !is_complete
+        puts "Incomplete fields: #{assessment.incomplete_fields.join(', ')}"
+      end
+      
+      expect(assessment.complete?).to be true
+    end
+    
+    # Navigate back to the main inspection page to mark it complete
+    visit edit_inspection_path(second_inspection)
+    click_button I18n.t("inspections.buttons.mark_complete")
+    expect(page).to have_content(I18n.t("inspections.messages.marked_complete"))
+    
+    # Verify the complete_date is today, not the previous inspection's date
+    second_inspection.reload
+    first_inspection = workflow.inspection
+    
+    expect(second_inspection.complete_date).to be_present
+    expect(second_inspection.complete_date.to_date).to eq(Date.current)
+    expect(second_inspection.complete_date).not_to eq(first_inspection.complete_date)
+    
+    # Verify inspection_date is set to today by the creation service, not copied from previous
+    expect(second_inspection.inspection_date).to eq(Date.current)
+    expect(second_inspection.inspection_date).not_to eq(first_inspection.inspection_date)
+    
+    # The first inspection should have dates from the past
+    expect(first_inspection.inspection_date.to_date).to eq(7.days.ago.to_date)
+    expect(first_inspection.complete_date.to_date).to eq(7.days.ago.to_date)
   end
 end

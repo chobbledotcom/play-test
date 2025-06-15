@@ -278,3 +278,8 @@
     flex: 1 1 calc(25% - 0.75rem);
   }
 }
+
+.set-previous input,
+.set-previous textarea {
+  border-color: green;
+}
