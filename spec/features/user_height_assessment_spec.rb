@@ -97,32 +97,4 @@ RSpec.feature "User Height Assessment", type: :feature do
       expect(assessment.containing_wall_height).not_to eq(-1)
     end
   end
-
-  describe "viewing assessment status" do
-    let(:inspection_with_data) { create(:inspection, :with_complete_assessments, user: user, unit: unit) }
-
-    before do
-      visit edit_inspection_path(inspection_with_data, tab: "user_height")
-    end
-
-    it "displays the assessment completion section" do
-      expect(page).to have_content(I18n.t("forms.user_height.status.height_requirement"))
-      expect(page).to have_content(I18n.t("forms.user_height.status.checks_passed"))
-      expect(page).to have_content(I18n.t("shared.assessment_completion"))
-    end
-
-    it "shows pass/fail status for height requirement" do
-      expect(page).to have_css(".assessment-status")
-
-      within(".assessment-status") do
-        # With factory data: containing_wall_height: 1.2, tallest_user_height: 1.8
-        # This should fail since wall height < user height
-        expect(page).to have_content(I18n.t("forms.user_height.status.height_requirement"))
-        expect(page).to have_css(".text-danger", text: I18n.t("shared.fail"))
-      end
-    end
-  end
-
-  # JavaScript tests would require selenium-webdriver which is not available
-  # The JavaScript functionality is tested manually
 end

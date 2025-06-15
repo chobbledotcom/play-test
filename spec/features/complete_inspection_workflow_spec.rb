@@ -14,7 +14,6 @@ class InspectionWorkflow
   attr_reader :inspection
   attr_reader :second_inspection
   attr_reader :options
-  attr_reader :applicable_tabs
 
   def initialize(has_slide:, is_totally_enclosed:)
     @options = {has_slide:, is_totally_enclosed:}
@@ -217,19 +216,19 @@ class InspectionWorkflow
 
   def verify_inspection_not_completable
     visit edit_inspection_path(@inspection)
-    
+
     incomplete_fields = @inspection.incomplete_fields
     if incomplete_fields.any?
       expect(page).to have_content(
         t("assessments.incomplete_fields.show_details", count: incomplete_fields.count)
       )
-      
+
       find("details#incomplete_fields_inspection summary").click
       expect(page).to have_content(
-        t("assessments.incomplete_fields.description_universal")
+        t("assessments.incomplete_fields.description")
       )
     end
-    
+
     click_button t("inspections.buttons.mark_complete")
     expect(page).to have_content(
       t("inspections.messages.cannot_complete").split(":").first
@@ -281,7 +280,7 @@ class InspectionWorkflow
       has_slide_yes = find('input[type="radio"][name="inspection[has_slide]"][value="true"]')
       expect(has_slide_yes).to be_checked
     end
-    
+
     if @options[:is_totally_enclosed]
       is_enclosed_yes = find('input[type="radio"][name="inspection[is_totally_enclosed]"][value="true"]')
       expect(is_enclosed_yes).to be_checked
@@ -295,14 +294,14 @@ class InspectionWorkflow
   def verify_assessments_prefill_and_complete
     visit edit_inspection_path(@second_inspection)
     @second_inspection.reload
-    
+
     applicable_tabs = @second_inspection.applicable_tabs.reject { |tab| tab == "inspection" }
-    
+
     applicable_tabs.each do |tab_name|
       visit edit_inspection_path(@second_inspection, tab: tab_name)
       click_button t("forms.#{tab_name}.submit")
       expect(page).to have_content(t("inspections.messages.updated"))
-      
+
       @second_inspection.reload
       assessment = @second_inspection.send("#{tab_name}_assessment")
       expect(assessment.complete?).to be true
@@ -311,25 +310,25 @@ class InspectionWorkflow
 
   def mark_second_inspection_complete
     visit edit_inspection_path(@second_inspection)
-    
+
     expect(@second_inspection.has_slide).to eq(@options[:has_slide])
     expect(@second_inspection.is_totally_enclosed).to eq(@options[:is_totally_enclosed])
     expect(@second_inspection.inspection_location).to eq(@inspection.inspection_location)
-    
+
     click_button t("inspections.buttons.mark_complete")
     expect(page).to have_content(t("inspections.messages.marked_complete"))
   end
 
   def verify_date_handling
     @second_inspection.reload
-    
+
     expect(@second_inspection.complete_date).to be_present
     expect(@second_inspection.complete_date.to_date).to eq(Date.current)
     expect(@second_inspection.complete_date).not_to eq(@inspection.complete_date)
-    
+
     expect(@second_inspection.inspection_date).to eq(Date.current)
     expect(@second_inspection.inspection_date).not_to eq(@inspection.inspection_date)
-    
+
     expect(@inspection.inspection_date.to_date).to eq(7.days.ago.to_date)
     expect(@inspection.complete_date.to_date).to eq(7.days.ago.to_date)
   end
@@ -342,21 +341,21 @@ RSpec.feature "Complete Inspection Workflow", type: :feature do
       is_totally_enclosed: false
     ).execute
   end
-  
+
   scenario "complete workflow with prefilling - slide, no enclosure" do
     InspectionWorkflow.new(
       has_slide: true,
       is_totally_enclosed: false
     ).execute
   end
-  
+
   scenario "complete workflow with prefilling - no slide, enclosure" do
     InspectionWorkflow.new(
       has_slide: false,
       is_totally_enclosed: true
     ).execute
   end
-  
+
   scenario "complete workflow with prefilling - slide and enclosure" do
     InspectionWorkflow.new(
       has_slide: true,

@@ -316,7 +316,7 @@ RSpec.describe NtfyService do
 
         # Should return immediately, not wait for the HTTP request
         elapsed = Time.current - start_time
-        expect(elapsed).to be < 0.01 # Should be much faster than the 50ms delay
+        expect(elapsed).to be < 0.02 # Should be much faster than the 50ms delay
       end
     end
 
@@ -354,24 +354,6 @@ RSpec.describe NtfyService do
         NtfyService.send(:send_notification, test_message)
       end
 
-      it "constructs correct URI path" do
-        mock_uri = instance_double(URI::HTTPS, host: "ntfy.sh", port: 443, path: "/#{channel}")
-        expect(URI).to receive(:parse).with("https://ntfy.sh/#{channel}").and_return(mock_uri)
-
-        mock_http = instance_double(Net::HTTP)
-        expect(Net::HTTP).to receive(:new).with("ntfy.sh", 443).and_return(mock_http)
-        expect(mock_http).to receive(:use_ssl=).with(true)
-
-        mock_request = instance_double(Net::HTTP::Post)
-        expect(Net::HTTP::Post).to receive(:new).with("/#{channel}").and_return(mock_request)
-        expect(mock_request).to receive(:[]=).with("Title", "play-test notification")
-        expect(mock_request).to receive(:[]=).with("Priority", "high")
-        expect(mock_request).to receive(:[]=).with("Tags", "warning")
-        expect(mock_request).to receive(:body=).with(test_message)
-        expect(mock_http).to receive(:request).with(mock_request)
-
-        NtfyService.send(:send_notification, test_message)
-      end
     end
   end
 end

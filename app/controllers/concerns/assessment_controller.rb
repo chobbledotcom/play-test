@@ -1,6 +1,7 @@
 module AssessmentController
   extend ActiveSupport::Concern
   include UserActivityCheck
+  include InspectionTurboStreams
 
   included do
     before_action :set_inspection
@@ -18,7 +19,7 @@ module AssessmentController
           redirect_to @inspection
         end
         format.json { render json: {status: I18n.t("shared.api.success"), inspection: @inspection} }
-        format.turbo_stream { render_save_message(I18n.t("inspections.messages.updated")) }
+        format.turbo_stream { render turbo_stream: success_turbo_streams }
       end
     else
       respond_to do |format|
@@ -32,7 +33,7 @@ module AssessmentController
           render "inspections/edit", status: :unprocessable_entity
         end
         format.json { render json: {errors: @assessment.errors}, status: :unprocessable_entity }
-        format.turbo_stream { render_error_message(@assessment.errors.full_messages.join(", ")) }
+        format.turbo_stream { render turbo_stream: error_turbo_streams }
       end
     end
   end
@@ -113,15 +114,6 @@ module AssessmentController
     @inspection_locations = []
   end
 
-  def render_save_message(message, type: "success")
-    render turbo_stream: turbo_stream.replace("form_save_message",
-      partial: "shared/save_message",
-      locals: {message: message, type: type})
-  end
-
-  def render_error_message(message)
-    render_save_message(message, type: "error")
-  end
 
   def set_previous_inspection
     return unless @inspection.unit

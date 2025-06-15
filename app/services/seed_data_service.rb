@@ -23,6 +23,7 @@ class SeedDataService
 
   # Load seed helpers
   require Rails.root.join("lib", "test_data_helpers")
+  require Rails.root.join("db", "seeds", "seed_data")
 
   class << self
     def add_seeds_for_user(user)
@@ -227,131 +228,36 @@ class SeedDataService
     end
 
     def create_anchorage_assessment(inspection, unit, passed)
-      inspection.anchorage_assessment.update!(
-        num_low_anchors: rand(6..12),
-        num_high_anchors: rand(4..8),
-        num_low_anchors_pass: passed,
-        num_high_anchors_pass: passed,
-        anchor_accessories_pass: passed,
-        anchor_degree_pass: passed,
-        anchor_type_pass: passed,
-        pull_strength_pass: passed,
-        anchor_type_comment: passed ? nil : I18n.t("seed_data.assessment_comments.anchor_wear")
-      )
+      inspection.anchorage_assessment.update!(SeedData.anchorage_fields(passed: passed))
     end
 
     def create_structure_assessment(inspection, unit, passed)
-      inspection.structure_assessment.update!(
-        seam_integrity_pass: passed,
-        uses_lock_stitching_pass: passed,
-        air_loss_pass: passed,
-        straight_walls_pass: passed,
-        sharp_edges_pass: passed,
-        unit_stable_pass: passed,
-        stitch_length_pass: passed,
-        blower_tube_length_pass: passed,
-        step_ramp_size_pass: passed,
-        critical_fall_off_height_pass: passed,
-        unit_pressure_pass: passed,
-        trough_pass: passed,
-        entrapment_pass: passed,
-        markings_pass: passed,
-        grounding_pass: passed,
-        stitch_length: rand(8..12),
-        unit_pressure: rand(1.0..3.0).round(1),
-        blower_tube_length: rand(2.0..5.0).round(1),
-        step_ramp_size: rand(200..400),
-        critical_fall_off_height: rand(0.5..2.0).round(1),
-        trough_depth: rand(0.1..0.5).round(1),
-        trough_adjacent_panel_width: rand(0.3..1.0).round(1),
-        seam_integrity_comment: passed ? "All seams in good condition" : "Minor thread loosening noted",
-        uses_lock_stitching_comment: passed ? "Lock stitching intact throughout" : "Some lock stitching showing wear",
-        stitch_length_comment: "Measured at regular intervals"
-      )
+      inspection.structure_assessment.update!(SeedData.structure_fields(passed: passed))
     end
 
     def create_materials_assessment(inspection, unit, passed)
-      inspection.materials_assessment.update!(
-        ropes: rand(18..45),
-        ropes_pass: passed,
-        clamber_netting_pass: passed,
-        retention_netting_pass: passed,
-        zips_pass: passed,
-        windows_pass: passed,
-        artwork_pass: passed,
-        thread_pass: passed,
-        fabric_strength_pass: passed,
-        fire_retardant_pass: passed,
-        ropes_comment: passed ? nil : "Rope shows signs of wear",
-        thread_comment: passed ? "Thread in good condition" : "Minor thread wear noted"
-      )
+      inspection.materials_assessment.update!(SeedData.materials_fields(passed: passed))
     end
 
     def create_fan_assessment(inspection, unit, passed)
-      inspection.fan_assessment.update!(
-        blower_flap_pass: passed,
-        blower_finger_pass: passed,
-        blower_visual_pass: passed,
-        pat_pass: passed,
-        blower_serial: "FAN-#{rand(1000..9999)}",
-        fan_size_type: passed ? "Fan operating correctly at optimal pressure" : "Fan requires servicing",
-        blower_flap_comment: passed ? "Flap mechanism functioning correctly" : "Flap sticking occasionally",
-        blower_finger_comment: passed ? "Guard secure, no finger trap hazards" : "Guard needs tightening",
-        blower_visual_comment: passed ? "Visual inspection satisfactory" : "Some wear visible on housing",
-        pat_comment: passed ? "PAT test valid until #{(Date.current + 6.months).strftime("%B %Y")}" : "PAT test overdue"
-      )
+      inspection.fan_assessment.update!(SeedData.fan_fields(passed: passed))
     end
 
     def create_user_height_assessment(inspection, unit, passed)
-      play_area_length = inspection.length * 0.8
-      play_area_width = inspection.width * 0.8
+      # Override play area dimensions based on inspection dimensions
+      fields = SeedData.user_height_fields(passed: passed)
+      fields[:play_area_length] = inspection.length * 0.8
+      fields[:play_area_width] = inspection.width * 0.8
 
-      inspection.user_height_assessment.update!(
-        containing_wall_height: rand(1.0..2.0).round(1),
-        platform_height: rand(0.5..1.5).round(1),
-        tallest_user_height: rand(1.2..1.8).round(1),
-        users_at_1000mm: rand(0..5),
-        users_at_1200mm: rand(2..8),
-        users_at_1500mm: rand(4..10),
-        users_at_1800mm: rand(2..6),
-        play_area_length: play_area_length,
-        play_area_width: play_area_width,
-        negative_adjustment: rand(0..2.0).round(1),
-        tallest_user_height_comment: passed ? "Capacity within safe limits based on EN 14960:2019" : "Review user capacity - exceeds recommended limits",
-        containing_wall_height_comment: "Measured from base to top of wall",
-        platform_height_comment: "Platform height acceptable for age group",
-        play_area_length_comment: "Effective play area after deducting obstacles",
-        play_area_width_comment: "Width measured at narrowest point"
-      )
+      inspection.user_height_assessment.update!(fields)
     end
 
     def create_slide_assessment(inspection, unit, passed)
-      inspection.slide_assessment.update!(
-        slide_platform_height: rand(2.0..6.0).round(1),
-        slide_wall_height: rand(1.0..2.0).round(1),
-        runout: rand(1.5..3.0).round(1),
-        slide_first_metre_height: rand(0.3..0.8).round(1),
-        slide_beyond_first_metre_height: rand(0.8..1.5).round(1),
-        clamber_netting_pass: passed,
-        runout_pass: passed,
-        slip_sheet_pass: passed,
-        slide_permanent_roof: false,
-        slide_platform_height_comment: passed ? "Platform height compliant with EN 14960:2019" : "Platform height exceeds recommended limits",
-        slide_wall_height_comment: "Wall height measured from slide bed",
-        runout_comment: passed ? "Runout area clear and adequate" : "Runout area needs extending",
-        clamber_netting_comment: passed ? "Netting secure with no gaps" : "Some gaps in netting need attention",
-        slip_sheet_comment: passed ? "Slip sheet in good condition" : "Slip sheet showing wear"
-      )
+      inspection.slide_assessment.update!(SeedData.slide_fields(passed: passed))
     end
 
     def create_enclosed_assessment(inspection, unit, passed)
-      inspection.enclosed_assessment.update!(
-        exit_number: rand(1..3),
-        exit_number_pass: passed,
-        exit_sign_always_visible_pass: passed,
-        exit_number_comment: passed ? "Number of exits compliant with unit size" : "Additional exit required",
-        exit_sign_always_visible_comment: passed ? "Exit signs visible from all points" : "Exit signs obscured from some angles"
-      )
+      inspection.enclosed_assessment.update!(SeedData.enclosed_fields(passed: passed))
     end
   end
 end

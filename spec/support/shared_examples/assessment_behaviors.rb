@@ -297,14 +297,6 @@ RSpec.shared_examples "an assessment form" do |assessment_type|
       expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
     end
 
-    it "displays assessment completion status section" do
-      visit edit_inspection_path(inspection, tab: assessment_type)
-
-      # Should have the assessment status section
-      expect(page).to have_css(".assessment-status")
-      expect(page).to have_content(I18n.t("shared.assessment_completion"))
-    end
-
     it "saves the assessment when form is submitted" do
       visit edit_inspection_path(inspection, tab: assessment_type)
 

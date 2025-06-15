@@ -105,21 +105,21 @@ class Inspection < ApplicationRecord
   def complete?
     complete_date.present?
   end
-  
+
   # Get list of applicable assessment tabs based on inspection configuration
   # Returns tabs in the order they appear in the UI
   def applicable_tabs
     tabs = ["inspection", "user_height"]
-    
+
     # Only show slide tab for inspections that have slides
     tabs << "slide" if has_slide?
-    
+
     # Add the core assessment tabs in UI order
     tabs += %w[structure anchorage materials fan]
-    
+
     # Only show enclosed tab for totally enclosed inspections
     tabs << "enclosed" if is_totally_enclosed?
-    
+
     tabs
   end
 
@@ -257,34 +257,32 @@ class Inspection < ApplicationRecord
 
   def incomplete_fields
     fields = []
-    
+
     if inspection_location.blank?
       fields << {
         field: :inspection_location,
-        label: I18n.t("forms.inspection.fields.inspection_location"),
-        type: :text
+        label: I18n.t("forms.inspection.fields.inspection_location")
       }
     end
-    
+
     ASSESSMENT_TYPES.each do |assessment_name, _|
       next if assessment_name == :slide_assessment && !has_slide?
       next if assessment_name == :enclosed_assessment && !is_totally_enclosed?
-      
+
       assessment = send(assessment_name)
       next unless assessment
-      
+
       assessment_type = assessment_name.to_s.sub("_assessment", "")
       section_name = I18n.t("forms.#{assessment_type}.header")
-      
+
       assessment.incomplete_fields.each do |field_info|
         fields << {
           field: field_info[:field],
-          label: "#{section_name}: #{field_info[:label]}",
-          type: field_info[:type]
+          label: "#{section_name}: #{field_info[:label]}"
         }
       end
     end
-    
+
     fields
   end
 

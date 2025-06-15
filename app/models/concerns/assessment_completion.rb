@@ -31,8 +31,7 @@ module AssessmentCompletion
   def field_info(field_name)
     {
       field: field_name,
-      label: field_label(field_name),
-      type: field_type(field_name)
+      label: field_label(field_name)
     }
   end
 
@@ -46,15 +45,5 @@ module AssessmentCompletion
 
     # Fall back to humanized field name if translation not found
     translation || field_name.to_s.humanize
-  end
-
-  def field_type(field_name)
-    if field_name.to_s.end_with?("_pass")
-      :pass_fail
-    elsif field_name.to_s.start_with?("num_")
-      :number
-    else
-      :text
-    end
   end
 end

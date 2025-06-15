@@ -28,13 +28,6 @@
       </div>
     </div>
 
-    <!-- Completion Issues -->
-    <%= turbo_frame_tag "completion_issues_#{@inspection.id}" do %>
-      <% if content = render('inspections/completion_issues', inspection: @inspection) and content.strip.present? %>
-        <%= content.html_safe %>
-        <br>
-      <% end %>
-    <% end %>
 
     <!-- Tab Navigation -->
     <nav class="tabs" id="tabs" data-inspection-id="<%= @inspection.id %>">
@@ -44,8 +37,8 @@
             <% if current_tab == tab %>
               <span><%= t("forms.#{tab}.header") %></span>
             <% else %>
-              <%= link_to t("forms.#{tab}.header"), 
-                  edit_inspection_path(@inspection, tab: tab, anchor: "tabs"), 
+              <%= link_to t("forms.#{tab}.header"),
+                  edit_inspection_path(@inspection, tab: tab, anchor: "tabs"),
                   data: { tab: tab } %>
             <% end %>
           </li>
@@ -76,32 +69,23 @@
     </div>
 
     <!-- Mark as Complete Section -->
-    <div id="mark-as-complete">
-      <% if !@inspection.complete? %>
-        <%= render 'shared/incomplete_fields',
-                   object: @inspection,
-                   object_type: 'inspection',
-                   description_key: 'assessments.incomplete_fields.description_universal' %>
-      <% end %>
-
-      <%= render 'inspections/complete_button', inspection: @inspection %>
-    </div>
+    <%= render 'inspections/mark_complete_section', inspection: @inspection %>
 
     <!-- Actions -->
     <div class="inspection-actions">
       <% if @inspection.complete? %>
         <p><%= t('inspections.messages.complete_inspection_notice') %></p>
-        <%= button_to t('inspections.buttons.switch_to_in_progress'), 
-            mark_draft_inspection_path(@inspection), 
-            method: :patch, 
+        <%= button_to t('inspections.buttons.switch_to_in_progress'),
+            mark_draft_inspection_path(@inspection),
+            method: :patch,
             data: { turbo_confirm: t('inspections.messages.mark_in_progress_confirm') } %>
       <% elsif !@inspection.complete? || current_user.admin? %>
-        <%= button_to t('inspections.buttons.delete'), 
-            inspection_path(@inspection), 
-            method: :delete, 
+        <%= button_to t('inspections.buttons.delete'),
+            inspection_path(@inspection),
+            method: :delete,
             data: { turbo_confirm: t('inspections.messages.delete_confirm') } %>
       <% end %>
-      
+
     </div>
   </div>
 </article>

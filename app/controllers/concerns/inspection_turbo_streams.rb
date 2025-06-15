@@ -6,7 +6,7 @@ module InspectionTurboStreams
   def success_turbo_streams
     [
       progress_update_stream,
-      completion_issues_stream,
+      mark_complete_section_stream,
       save_message_stream(success: true),
       assessment_save_message_stream(success: true)
     ]
@@ -15,7 +15,7 @@ module InspectionTurboStreams
   def error_turbo_streams
     [
       progress_update_stream,
-      completion_issues_stream,
+      mark_complete_section_stream,
       save_message_stream(success: false),
       assessment_save_message_stream(success: false)
     ]
@@ -29,10 +29,10 @@ module InspectionTurboStreams
     )
   end
 
-  def completion_issues_stream
+  def mark_complete_section_stream
     turbo_stream.replace(
-      "completion_issues_#{@inspection.id}",
-      partial: "inspections/completion_issues",
+      "mark_complete_section_#{@inspection.id}",
+      partial: "inspections/mark_complete_section",
       locals: {inspection: @inspection}
     )
   end

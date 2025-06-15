@@ -4,8 +4,8 @@ en:
       show_details:
         one: "Show 1 incomplete field"
         other: "Show %{count} incomplete fields"
-      description: "The following fields must be completed before this assessment can be marked as finished:"
-      description_universal: "The following fields must be completed to mark this page as finished:"
+      description: "The following fields must be completed to mark this page as finished:"
+      overall: "Overall completion"
       needs_assessment: "Needs pass/fail assessment"
       needs_number: "Needs numeric value"
       needs_value: "Needs to be filled in"

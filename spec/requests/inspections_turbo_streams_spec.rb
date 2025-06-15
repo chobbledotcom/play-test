@@ -49,7 +49,6 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
           params: {inspection: {inspection_location: "Test"}},
           headers: turbo_headers
 
-        expect(response.body).to include("target=\"completion_issues_#{inspection.id}\"")
       end
 
       context "when updating assessment data" do

@@ -28,7 +28,6 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         # Check that the response contains turbo stream elements
         expect(response.body).to include("turbo-stream")
         expect(response.body).to include("inspection_progress_#{inspection.id}")
-        expect(response.body).to include("completion_issues_#{inspection.id}")
       end
 
       it "updates progress status when assessment is updated" do

@@ -181,8 +181,13 @@ class InspectionsController < ApplicationController
 
     Rails.logger.error "Inspection #{@inspection.id} is marked complete but has errors: #{@inspection.completion_errors}"
 
-    # Raise a clear exception that will show in development/test but 500 in production
-    raise "DATA INTEGRITY ERROR: #{error_message}. In tests, use create_completed_inspection helper to avoid this."
+    # Only raise error in development/test environments
+    if Rails.env.development? || Rails.env.test?
+      raise "DATA INTEGRITY ERROR: #{error_message}. In tests, use create_completed_inspection helper to avoid this."
+    else
+      # In production, log the error but continue
+      Rails.logger.error "DATA INTEGRITY ERROR: #{error_message}"
+    end
   end
 
   INSPECTION_SPECIFIC_PARAMS = %i[

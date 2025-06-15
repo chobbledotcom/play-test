@@ -16,8 +16,7 @@ RSpec.feature "Inspection Prefilling", type: :feature do
       is_totally_enclosed: false,
       width: 5.0,
       length: 4.0,
-      height: 3.0
-    )
+      height: 3.0)
     first_inspection.update!(complete_date: Time.current)
 
     # Create a second inspection from the unit page
@@ -32,7 +31,7 @@ RSpec.feature "Inspection Prefilling", type: :feature do
     expect(location_field.value).to eq("Test Location")
 
     # Check that the field has the prefilled class
-    field_wrapper = location_field.find(:xpath, '..')
+    field_wrapper = location_field.find(:xpath, "..")
     expect(field_wrapper[:class]).to include("set-previous")
 
     # Check dimension fields

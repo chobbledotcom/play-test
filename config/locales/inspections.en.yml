@@ -21,6 +21,7 @@ en:
       inspection_results: "Inspection Results"
       report_pdf_link: "Report PDF Link"
       report_json_link: "Report JSON Link"
+      completion_status: "Completion Status"
 
     headings:
       in_progress: "In Progress"
@@ -181,6 +182,9 @@ en:
       mark_in_progress_failed: "Failed to mark as in progress: %{errors}"
       cannot_edit_complete: "Completed inspections cannot be edited. You must mark it as in progress first."
       complete_inspection_notice: "You can't update or delete inspections that are marked as complete."
+      incomplete_assessments: "The following assessments are not yet complete:"
+      note: "Note"
+      complete_required_assessments: "You can mark this inspection as complete once these assessments have been completed."
 
     errors:
       header:

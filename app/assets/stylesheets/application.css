@@ -235,11 +235,22 @@ nav.tabs span {
   right: 20px;
   z-index: 1000;
   background: white;
-  border: 2px solid var(--color-accent);
-  border-radius: var(--border-radius);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 12px 16px;
-  font-size: 0.9em;
+  border: 2px solid var(--color-link);
+  border-radius: 3px;
+  padding: 0.5rem 1rem;
+  font-size: smaller;
+}
+
+@media (max-width: 769px) {
+  #dirty-form-indicator {
+    bottom: 0;
+    top: auto;
+    left: 50%;
+    right: auto;
+    padding-bottom: 0;
+    border-bottom: 0;
+    transform: translatex(-50%);
+  }
 }
 
 .dirty-form-content {
@@ -254,16 +265,8 @@ nav.tabs span {
 }
 
 .dirty-form-content button {
-  background: var(--color-accent);
-  color: white;
   border: none;
   padding: 6px 12px;
-  border-radius: calc(var(--border-radius) / 2);
   font-size: 0.8em;
   cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.dirty-form-content button:hover {
-  background: var(--color-accent-hover);
 }

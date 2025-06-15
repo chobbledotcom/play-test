@@ -8,9 +8,6 @@ RSpec.describe "Simple Turbo Stream Test", type: :request do
         <turbo-stream action="replace" target="inspection_progress_123">
           <template><span class="value">75%</span></template>
         </turbo-stream>
-        <turbo-stream action="replace" target="completion_issues_123">
-          <template><div>Issues resolved!</div></template>
-        </turbo-stream>
       HTML
 
       # Validate the structure is what we expect

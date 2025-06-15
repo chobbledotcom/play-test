@@ -82,8 +82,8 @@ RSpec.describe InspectionsController, type: :controller do
       # Keep inspection as draft so we can update it
       patch :update, params: {id: inspection.id, inspection: {comments: "Test"}}
 
-      # Should render the completion issues partial
-      expect(response.body).to include("completion_issues_#{inspection.id}")
+      # Should render the mark complete section partial
+      expect(response.body).to include("mark_complete_section_#{inspection.id}")
     end
   end
 

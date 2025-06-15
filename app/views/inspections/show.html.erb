@@ -34,12 +34,7 @@
       <%= render 'shared/action_buttons', actions: inspection_actions(@inspection) %>
     <% end %>
 
-    <% if content = render('completion_issues', inspection: @inspection) and content.strip.present? %>
-      <hr>
-      <%= content.html_safe %>
-    <% else %>
-      <hr>
-    <% end %>
+    <hr>
 
     <h4>Inspection Report</h4>
     <% unless @inspection.complete? %>

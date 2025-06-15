@@ -176,6 +176,14 @@ RSpec.describe "Seed Data", type: :model do
         expect(Inspection.where.not(complete_date: nil).count).to be >= 1
       end
 
+      it "ensures all completed inspections pass can_mark_complete validation" do
+        completed_inspections = Inspection.where.not(complete_date: nil)
+        completed_inspections.each do |inspection|
+          expect(inspection.can_mark_complete?).to be(true),
+            "Inspection ##{inspection.id} is marked complete but fails can_mark_complete? validation. Errors: #{inspection.completion_errors.join(", ")}"
+        end
+      end
+
       it "creates passed and failed inspections" do
         complete_inspections = Inspection.where.not(complete_date: nil)
         expect(complete_inspections.where(passed: true).count).to be >= 1
@@ -208,33 +216,13 @@ RSpec.describe "Seed Data", type: :model do
     describe "Assessment Data" do
       let(:complete_inspections) { Inspection.where.not(complete_date: nil) }
 
-      it "creates anchorage assessments for complete inspections" do
-        complete_inspections.each do |inspection|
-          expect(inspection.anchorage_assessment).to be_present
-        end
-      end
-
-      it "creates structure assessments for complete inspections" do
-        complete_inspections.each do |inspection|
-          expect(inspection.structure_assessment).to be_present
-        end
-      end
-
-      it "creates materials assessments for complete inspections" do
-        complete_inspections.each do |inspection|
-          expect(inspection.materials_assessment).to be_present
-        end
-      end
-
-      it "creates fan assessments for complete inspections" do
-        complete_inspections.each do |inspection|
-          expect(inspection.fan_assessment).to be_present
-        end
-      end
-
-      it "creates user height assessments for complete inspections" do
-        complete_inspections.each do |inspection|
-          expect(inspection.user_height_assessment).to be_present
+      # Test each assessment type dynamically
+      Inspection::ASSESSMENT_TYPES.each do |assessment_key, assessment_class|
+        it "creates #{assessment_key} assessments for complete inspections" do
+          complete_inspections.each do |inspection|
+            assessment = inspection.send(assessment_key)
+            expect(assessment).to be_present
+          end
         end
       end
 
@@ -491,10 +479,33 @@ RSpec.describe "Seed Data", type: :model do
           # Test that all foreign key relationships are valid
           User.includes(:inspection_company, :units, :inspections).all
           Unit.includes(:user, :inspections).all
-          Inspection.includes(:user, :unit, :inspector_company, :anchorage_assessment,
-            :structure_assessment, :materials_assessment, :fan_assessment,
-            :user_height_assessment, :slide_assessment, :enclosed_assessment).all
+          
+          # Build includes list dynamically from ASSESSMENT_TYPES
+          assessment_associations = Inspection::ASSESSMENT_TYPES.keys
+          Inspection.includes(:user, :unit, :inspector_company, *assessment_associations).all
         }.not_to raise_error
+      end
+
+      it "ensures completed inspections have all required assessment data" do
+        completed_inspections = Inspection.where.not(complete_date: nil)
+        
+        completed_inspections.each do |inspection|
+          # Check that all completed inspections can be marked as complete
+          expect(inspection.can_mark_complete?).to be(true),
+            "Inspection ##{inspection.id} cannot be marked complete. Errors: #{inspection.completion_errors.join(", ")}"
+          
+          # Verify completion status of each assessment using the ASSESSMENT_TYPES hash
+          Inspection::ASSESSMENT_TYPES.each do |assessment_key, assessment_class|
+            assessment = inspection.send(assessment_key)
+            
+            # Skip slide assessment if no slide, skip enclosed assessment if not enclosed
+            next if assessment_key == :slide_assessment && !inspection.has_slide
+            next if assessment_key == :enclosed_assessment && !inspection.is_totally_enclosed
+            
+            expect(assessment.complete?).to be(true),
+              "#{assessment_key.to_s.humanize} for inspection ##{inspection.id} is not complete"
+          end
+        end
       end
 
       it "ensures all created records are valid" do
@@ -563,26 +574,12 @@ RSpec.describe "Seed Data", type: :model do
       it "ensures assessment data consistency with inspection results" do
         # Test that inspections and assessments are properly linked
         Inspection.where.not(complete_date: nil).each do |inspection|
-          if inspection.anchorage_assessment
-            expect(inspection.anchorage_assessment.inspection).to eq(inspection)
-          end
-          if inspection.structure_assessment
-            expect(inspection.structure_assessment.inspection).to eq(inspection)
-          end
-          if inspection.materials_assessment
-            expect(inspection.materials_assessment.inspection).to eq(inspection)
-          end
-          if inspection.fan_assessment
-            expect(inspection.fan_assessment.inspection).to eq(inspection)
-          end
-          if inspection.user_height_assessment
-            expect(inspection.user_height_assessment.inspection).to eq(inspection)
-          end
-          if inspection.slide_assessment
-            expect(inspection.slide_assessment.inspection).to eq(inspection)
-          end
-          if inspection.enclosed_assessment
-            expect(inspection.enclosed_assessment.inspection).to eq(inspection)
+          Inspection::ASSESSMENT_TYPES.each do |assessment_key, assessment_class|
+            assessment = inspection.send(assessment_key)
+            if assessment
+              expect(assessment.inspection).to eq(inspection),
+                "#{assessment_key.to_s.humanize} is not properly linked to inspection ##{inspection.id}"
+            end
           end
         end
       end

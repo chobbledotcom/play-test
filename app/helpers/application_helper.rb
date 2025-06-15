@@ -86,12 +86,11 @@ module ApplicationHelper
   end
 
   def format_numeric_value(value)
-    return value unless value.is_a?(Numeric) || (value.is_a?(String) && value.match?(/\A-?\d*\.?\d+\z/))
-    
+    return value if !value.is_a?(Numeric) && !(value.is_a?(String) && value.match?(/\A-?\d*\.?\d+\z/))
+
     numeric_value = value.is_a?(Numeric) ? value : Float(value)
     # Convert to string and remove trailing zeros (e.g., 5.0 -> "5", 5.012000 -> "5.012")
-    formatted = numeric_value.to_s.sub(/\.0+\z/, '').sub(/(\.\d*?)0+\z/, '\1')
-    formatted
+    numeric_value.to_s.sub(/\.0+\z/, "").sub(/(\.\d*?)0+\z/, '\1')
   rescue ArgumentError, TypeError
     value
   end
@@ -119,7 +118,7 @@ module ApplicationHelper
         field
       )
       formatted_value = format_numeric_value(previous_value)
-      {value: formatted_value, prefilled: true}
+      {value: formatted_value, prefilled: formatted_value != nil}
     else
       # Field has been explicitly set (even if false), so use current value
       formatted_value = format_numeric_value(actual_current_value)

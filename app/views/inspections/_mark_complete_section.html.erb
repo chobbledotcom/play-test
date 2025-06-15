@@ -1,0 +1,15 @@
+<%# Mark as Complete Section - dynamically updates via Turbo %>
+<%= turbo_frame_tag "mark_complete_section_#{inspection.id}" do %>
+  <div id="mark-as-complete">
+    <h2><%= t("assessments.incomplete_fields.overall") %></h2>
+    <%= render 'shared/incomplete_fields',
+      object: inspection,
+      object_type: 'inspection',
+      description_key: 'assessments.incomplete_fields.description' %>
+    <%= button_to t('inspections.buttons.mark_complete'),
+      complete_inspection_path(inspection),
+      method: :patch,
+      data: { turbo_confirm: t('inspections.messages.mark_complete_confirm')}
+    %>
+  </div>
+<% end %>
