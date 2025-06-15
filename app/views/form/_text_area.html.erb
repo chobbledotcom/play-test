@@ -12,10 +12,16 @@
     placeholder: setup[:field_placeholder],
     required: required
   }.compact
+  
+  if setup[:prefilled]
+    field_options[:value] = setup[:value]
+  end
 %>
 
-<%= setup[:form_object].label field, setup[:field_label] %>
-<%= setup[:form_object].text_area field, field_options %>
-<% if setup[:field_hint].present? %>
-  <small><%= setup[:field_hint] %></small>
+<%= render 'form/field_wrapper', prefilled: setup[:prefilled] do %>
+  <%= setup[:form_object].label field, setup[:field_label] %>
+  <%= setup[:form_object].text_area field, field_options %>
+  <% if setup[:field_hint].present? %>
+    <small><%= setup[:field_hint] %></small>
+  <% end %>
 <% end %>

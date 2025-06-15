@@ -68,6 +68,7 @@ class InspectionsController < ApplicationController
   def edit
     validate_tab_parameter
     load_inspection_locations
+    set_previous_inspection
   end
 
   def update
@@ -362,5 +363,10 @@ class InspectionsController < ApplicationController
     else
       redirect_to inspections_path
     end
+  end
+
+  def set_previous_inspection
+    return unless @inspection.unit
+    @previous_inspection = @inspection.unit.last_inspection
   end
 end

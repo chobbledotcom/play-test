@@ -9,19 +9,28 @@
   required ||= false
   css_class ||= "form-control"
   wrapper_class ||= "form-group"
-%>
-
-<div class="<%= wrapper_class %>">
-  <%= setup[:form_object].label field, setup[:field_label] %>
-  <%= setup[:form_object].number_field field, {
+  
+  # Build field options
+  field_options = {
     step: step,
     min: min,
     max: max,
     required: required,
     placeholder: setup[:field_placeholder],
     class: css_class
-  }.compact %>
-  <% if setup[:field_hint].present? %>
-    <small class="form-text"><%= setup[:field_hint] %></small>
-  <% end %>
-</div>
+  }
+  
+  if setup[:prefilled]
+    field_options[:value] = setup[:value]
+  end
+%>
+
+<%= render 'form/field_wrapper', prefilled: setup[:prefilled] do %>
+  <div class="<%= wrapper_class %>">
+    <%= setup[:form_object].label field, setup[:field_label] %>
+    <%= setup[:form_object].number_field field, field_options.compact %>
+    <% if setup[:field_hint].present? %>
+      <small class="form-text"><%= setup[:field_hint] %></small>
+    <% end %>
+  </div>
+<% end %>

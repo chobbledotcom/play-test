@@ -1,21 +1,20 @@
 <%= render 'form/form_context', model: @inspection, i18n_base: 'forms.inspections' do |form| %>
-  <!-- Unit Selection/Display -->
   <%= render 'form/fieldset', legend_key: 'current_unit' do %>
     <% if @inspection.unit.present? %>
       <%= render 'shared/unit_details_display', unit: @inspection.unit %>
       <%= link_to t('inspections.buttons.change_unit'),
-          select_unit_inspection_path(@inspection),
-          class: "button" %>
+        select_unit_inspection_path(@inspection),
+        class: "button" %>
       <br>
     <% else %>
       <p><%= t('inspections.messages.no_unit') %></p>
       <%= link_to t('inspections.buttons.select_unit'),
-          select_unit_inspection_path(@inspection),
-          class: "button" %>
+        select_unit_inspection_path(@inspection),
+        class: "button" %>
       <br><br>
       <%= link_to t('inspections.buttons.create_unit_from_inspection'),
-          new_unit_from_inspection_path(@inspection),
-          class: "button secondary" %>
+        new_unit_from_inspection_path(@inspection),
+        class: "button secondary" %>
     <% end %>
   <% end %>
 
@@ -23,19 +22,17 @@
   <% unless @inspection.new_record? %>
     <%= render 'form/fieldset', legend_key: 'public_information' do %>
       <%= render 'form/display_field', field: :id %>
-
       <div>
         <%= link_to t('inspections.buttons.download_pdf'),
-            inspection_path(@inspection, format: :pdf),
-            target: '_blank' %> /
+          inspection_path(@inspection, format: :pdf),
+          target: '_blank' %> /
         <%= link_to t('inspections.buttons.download_qr_code'),
-            inspection_path(@inspection, format: :png),
-            download: "inspection-#{@inspection.id}-qr.png" %>
+          inspection_path(@inspection, format: :png),
+          download: "inspection-#{@inspection.id}-qr.png" %>
       </div>
     <% end %>
   <% end %>
 
-  <!-- Inspection-Specific Details -->
   <%= render 'form/fieldset', legend_key: 'inspection_details' do %>
     <%= render 'form/autocomplete_field', field: :inspection_location, options: @inspection_locations %>
 
@@ -49,14 +46,13 @@
       </p>
     </div>
 
-
     <div id="unique_report_number_section">
       <%= form.label :unique_report_number, t('inspections.fields.unique_report_number') %>
       <%= form.text_field :unique_report_number %>
       <% if @inspection.unique_report_number.blank? && @inspection.persisted? %>
         <button type="button"
-                onclick="document.getElementById('inspection_unique_report_number').value = '<%= @inspection.id %>'; this.style.display = 'none';"
-                class="button secondary small">
+          onclick="document.getElementById('inspection_unique_report_number').value = '<%= @inspection.id %>'; this.style.display = 'none';"
+          class="button secondary small">
           <%= t('inspections.buttons.use_suggested_id', id: @inspection.id) %>
         </button>
       <% end %>
@@ -66,25 +62,19 @@
     </div>
   <% end %>
 
-  <!-- Unit Dimensions -->
   <%= render 'form/fieldset', legend_key: 'unit_dimensions' do %>
     <%= render 'form/number_comment', field: :width %>
     <%= render 'form/number_comment', field: :length %>
     <%= render 'form/number_comment', field: :height %>
   <% end %>
 
-  <!-- Unit Configuration -->
   <%= render 'form/fieldset', legend_key: 'unit_configuration' do %>
     <%= render 'form/yes_no_radio', field: :has_slide %>
     <%= render 'form/yes_no_radio', field: :is_totally_enclosed %>
   <% end %>
 
-  <!-- Inspection Results -->
   <%= render 'form/fieldset', legend_key: 'inspection_results' do %>
     <%= render 'form/yes_no_radio', field: :passed %>
     <%= render 'form/text_area', field: :risk_assessment, rows: 3 %>
   <% end %>
-
-  <!-- Save Message Display -->
-  <div id="inspection_save_message"></div>
 <% end %>

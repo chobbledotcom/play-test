@@ -228,6 +228,19 @@ class InspectionWorkflow
 
   def verify_inspection_not_completable
     visit edit_inspection_path(@inspection)
+    
+    incomplete_fields = @inspection.incomplete_fields
+    if incomplete_fields.any?
+      expect(page).to have_content(
+        t("assessments.incomplete_fields.show_details", count: incomplete_fields.count)
+      )
+      
+      find("details#incomplete_fields_inspection summary").click
+      expect(page).to have_content(
+        t("assessments.incomplete_fields.description_universal")
+      )
+    end
+    
     click_button t("inspections.buttons.mark_complete")
     expect(page).to have_content(
       "Cannot mark as complete:"
@@ -276,5 +289,23 @@ RSpec.feature "Complete Inspection Workflow", type: :feature do
       has_slide: true,
       is_totally_enclosed: true
     ).execute
+  end
+
+  scenario "second inspection should prefill from previous inspection" do
+    workflow = InspectionWorkflow.new(
+      has_slide: false,
+      is_totally_enclosed: false
+    ).execute
+
+    visit unit_path(workflow.unit)
+    click_button I18n.t("units.buttons.add_inspection")
+    
+    location_field_label = I18n.t("forms.inspections.fields.inspection_location")
+    location_field = find_field(location_field_label)
+    
+    expect(location_field.value).to eq(workflow.inspection.inspection_location)
+    
+    field_parent = location_field.find(:xpath, '..')
+    expect(field_parent[:class]).to include("set-previous")
   end
 end

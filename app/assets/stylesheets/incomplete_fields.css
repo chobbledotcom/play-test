@@ -59,3 +59,23 @@
   margin-left: 1rem;
   white-space: nowrap;
 }
+
+#mark-as-complete {
+  border: 2px solid var(--color-bg-secondary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow) var(--color-shadow);
+  max-width: var(--width-card-wide);
+  min-width: var(--width-card);
+  padding: 1.5rem;
+  text-align: var(--justify-normal);
+  margin: 2rem auto;
+  background: #ecccec;
+}
+
+#mark-as-complete .incomplete-fields-details {
+  border: 2px solid var(--color-bg-secondary);
+}
+
+#mark-as-complete form.button_to {
+  margin-bottom: 0;
+}

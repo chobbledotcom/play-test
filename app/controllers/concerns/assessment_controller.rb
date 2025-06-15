@@ -7,6 +7,7 @@ module AssessmentController
     before_action :check_inspection_owner
     before_action :require_user_active
     before_action :set_assessment
+    before_action :set_previous_inspection
   end
 
   def update
@@ -120,5 +121,10 @@ module AssessmentController
 
   def render_error_message(message)
     render_save_message(message, type: "error")
+  end
+
+  def set_previous_inspection
+    return unless @inspection.unit
+    @previous_inspection = @inspection.unit.last_inspection
   end
 end

@@ -69,13 +69,63 @@ module ApplicationHelper
     field_hint = t(hint_key, default: nil)
     field_placeholder = t(placeholder_key, default: nil)
 
+    # Get value and prefilled status
+    value, prefilled = get_field_value_and_prefilled_status(form_object, field)
+
     {
       form_object:,
       i18n_base:,
       field_label:,
       field_hint:,
-      field_placeholder:
+      field_placeholder:,
+      value:,
+      prefilled:
     }
+  end
+
+  # Get field value and prefilled status
+  def get_field_value_and_prefilled_status(form_object, field)
+    # Return early if form doesn't have an object
+    return [nil, false] unless form_object.respond_to?(:object) && form_object.object
+
+    model = form_object.object
+    resolved = resolve_field_value(model, field)
+    [resolved[:value], resolved[:prefilled]]
+  end
+
+  def resolve_field_value(model, field, current_value = nil)
+    field_str = field.to_s
+    if field_str.include?("password") || field_str == "password_confirmation"
+      return { value: nil, prefilled: false }
+    end
+
+    actual_current_value = model.send(field) if model.respond_to?(field)
+
+    if actual_current_value.present? || !@previous_inspection
+      return { value: actual_current_value, prefilled: false }
+    else
+      previous_value = extract_previous_value(
+        @previous_inspection,
+        model,
+        field
+      )
+      return { value: previous_value, prefilled: true }
+    end
+  end
+
+  # Extract value from previous inspection, handling nested associations
+  def extract_previous_value(previous_inspection, current_model, field)
+    # If current model is an assessment, find the matching assessment type
+    if current_model.class.name.include?("Assessment")
+      assessment_type = current_model.class.name.demodulize.underscore
+      previous_model = previous_inspection.send(assessment_type)
+      previous_model&.send(field) if previous_model&.respond_to?(field)
+    else
+      # Direct inspection field
+      previous_inspection.send(field) if previous_inspection.respond_to?(field)
+    end
+  rescue
+    nil
   end
 
   private

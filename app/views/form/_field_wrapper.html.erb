@@ -1,0 +1,12 @@
+<%
+  # Field wrapper that adds visual indication for prefilled fields
+  # Required parameters:
+  #   prefilled: Boolean indicating if the field was prefilled from previous inspection
+  # Yields the field content
+  
+  css_class = prefilled ? "set-previous" : ""
+%>
+
+<div class="<%= css_class %>">
+  <%= yield %>
+</div>

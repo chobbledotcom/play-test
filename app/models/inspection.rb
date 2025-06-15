@@ -238,6 +238,39 @@ class Inspection < ApplicationRecord
     Rails.logger.info(message)
   end
 
+  def incomplete_fields
+    fields = []
+    
+    if inspection_location.blank?
+      fields << {
+        field: :inspection_location,
+        label: I18n.t("forms.inspections.fields.inspection_location"),
+        type: :text
+      }
+    end
+    
+    ASSESSMENT_TYPES.each do |assessment_name, _|
+      next if assessment_name == :slide_assessment && !has_slide?
+      next if assessment_name == :enclosed_assessment && !is_totally_enclosed?
+      
+      assessment = send(assessment_name)
+      next unless assessment
+      
+      assessment_type = assessment_name.to_s.sub("_assessment", "")
+      section_name = I18n.t("forms.#{assessment_type}.header")
+      
+      assessment.incomplete_fields.each do |field_info|
+        fields << {
+          field: field_info[:field],
+          label: "#{section_name}: #{field_info[:label]}",
+          type: field_info[:type]
+        }
+      end
+    end
+    
+    fields
+  end
+
   private
 
   def generate_unique_report_number

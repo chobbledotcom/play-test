@@ -75,8 +75,17 @@
       <% end %>
     </div>
 
-    <!-- Complete Button (available on all tabs) -->
-    <%= render 'inspections/complete_button', inspection: @inspection %>
+    <!-- Mark as Complete Section -->
+    <div id="mark-as-complete">
+      <% if !@inspection.complete? %>
+        <%= render 'shared/incomplete_fields',
+                   object: @inspection,
+                   object_type: 'inspection',
+                   description_key: 'assessments.incomplete_fields.description_universal' %>
+      <% end %>
+
+      <%= render 'inspections/complete_button', inspection: @inspection %>
+    </div>
 
     <!-- Actions -->
     <div class="inspection-actions">

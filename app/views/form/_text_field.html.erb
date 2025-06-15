@@ -9,11 +9,17 @@
   # Build field options
   field_options = { required: required }
   field_options[:accept] = local_assigns[:accept] if local_assigns[:accept]
-  field_options[:value] = local_assigns[:value] if local_assigns[:value]
+  if local_assigns.key?(:value)
+    field_options[:value] = local_assigns[:value]
+  elsif setup[:prefilled]
+    field_options[:value] = setup[:value]
+  end
 %>
 
-<%= setup[:form_object].label field, setup[:field_label] %>
-<%= setup[:form_object].send(field_type, field, field_options) %>
-<% if local_assigns[:help_text] %>
-  <small class="help-text"><%= local_assigns[:help_text] %></small>
+<%= render 'form/field_wrapper', prefilled: setup[:prefilled] do %>
+  <%= setup[:form_object].label field, setup[:field_label] %>
+  <%= setup[:form_object].send(field_type, field, field_options) %>
+  <% if local_assigns[:help_text] %>
+    <small class="help-text"><%= local_assigns[:help_text] %></small>
+  <% end %>
 <% end %>

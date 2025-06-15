@@ -44,7 +44,7 @@
     <% if assessment_obj.respond_to?(:complete?) && !assessment_obj.complete? %>
       <% assessment_type = i18n_base.split('.').last %>
       <%= render 'shared/incomplete_fields', 
-                 assessment: assessment_obj,
-                 assessment_type: assessment_type %>
+                 object: assessment_obj,
+                 object_type: assessment_type %>
     <% end %>
   </div>
