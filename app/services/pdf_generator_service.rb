@@ -26,20 +26,14 @@ class PdfGeneratorService
       # Unit details section
       generate_inspection_unit_details(pdf, inspection)
 
-      # Generate all assessment sections using ASSESSMENT_TYPES
-      Inspection::ASSESSMENT_TYPES.each do |assessment_name, _assessment_class|
-        # Skip slide assessment if unit doesn't have a slide
-        next if assessment_name == :slide_assessment && !inspection.has_slide?
-
-        # Skip enclosed assessment if not totally enclosed
-        next if assessment_name == :enclosed_assessment && !inspection.is_totally_enclosed?
-
+      # Generate all assessment sections using the inspection's applicable assessments
+      inspection.each_applicable_assessment do |assessment_key, _, assessment|
         # Get the assessment type name for i18n (remove _assessment suffix)
-        assessment_type = assessment_name.to_s.sub(/_assessment$/, "")
+        assessment_type = assessment_key.to_s.sub(/_assessment$/, "")
 
         # Generate the section using the generic renderer
         renderer = AssessmentRenderer.new
-        renderer.generate_assessment_section(pdf, assessment_type, inspection.send(assessment_name))
+        renderer.generate_assessment_section(pdf, assessment_type, assessment)
         assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
       end
 

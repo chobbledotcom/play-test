@@ -106,14 +106,9 @@ class JsonSerializerService
 
     assessments = {}
 
-    ASSESSMENT_TYPES.each do |name, klass|
-      assessment = inspection.send(name)
-      if !assessment ||
-          (name == :slide_assessment && !inspection.has_slide?) ||
-          (name == :enclosed_assessment && !inspection.is_totally_enclosed?)
-        next
-      else
-        assessments[name] = serialize_assessment(assessment, klass)
+    inspection.each_applicable_assessment do |assessment_key, assessment_class, assessment|
+      if assessment
+        assessments[assessment_key] = serialize_assessment(assessment, assessment_class)
       end
     end
 

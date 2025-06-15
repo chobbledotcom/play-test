@@ -221,9 +221,7 @@ class SeedDataService
       is_incomplete = inspection.complete_date.nil?
 
       Inspection::ASSESSMENT_TYPES.each do |assessment_key, assessment_class|
-        # Skip slide assessment if unit doesn't have a slide
         next if assessment_key == :slide_assessment && !config[:has_slide]
-        # Skip enclosed assessment if not totally enclosed
         next if assessment_key == :enclosed_assessment && !config[:is_totally_enclosed]
 
         assessment_type = assessment_key.to_s.sub(/_assessment$/, "")

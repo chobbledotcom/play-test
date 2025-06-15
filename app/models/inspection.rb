@@ -107,6 +107,32 @@ class Inspection < ApplicationRecord
   end
 
   # Get list of applicable assessment tabs based on inspection configuration
+  def applicable_assessments
+    ASSESSMENT_TYPES.select do |assessment_key, _|
+      case assessment_key
+      when :slide_assessment
+        has_slide?
+      when :enclosed_assessment
+        is_totally_enclosed?
+      else
+        true
+      end
+    end
+  end
+
+  # Iterate over only applicable assessments with a block
+  def each_applicable_assessment
+    applicable_assessments.each do |assessment_key, assessment_class|
+      assessment = send(assessment_key)
+      yield(assessment_key, assessment_class, assessment) if block_given?
+    end
+  end
+
+  # Check if a specific assessment is applicable
+  def assessment_applicable?(assessment_key)
+    applicable_assessments.key?(assessment_key)
+  end
+
   # Returns tabs in the order they appear in the UI
   def applicable_tabs
     tabs = ["inspection", "user_height"]
@@ -174,17 +200,11 @@ class Inspection < ApplicationRecord
     # Check for missing unit first
     missing << "Unit" unless unit.present?
 
-    # Check for missing assessments
-    ASSESSMENT_TYPES.each do |assessment_name, _|
-      # Skip slide assessment if unit doesn't have a slide
-      next if assessment_name == :slide_assessment && !has_slide?
-      # Skip enclosed assessment if unit is not totally enclosed
-      next if assessment_name == :enclosed_assessment && !is_totally_enclosed?
-
-      assessment = send(assessment_name)
+    # Check for missing assessments using the new helper
+    each_applicable_assessment do |assessment_key, _, assessment|
       unless assessment&.complete?
         # Get the assessment type without "_assessment" suffix
-        assessment_type = assessment_name.to_s.sub("_assessment", "")
+        assessment_type = assessment_key.to_s.sub("_assessment", "")
         # Get the name from the form header
         missing << I18n.t("forms.#{assessment_type}.header")
       end
@@ -315,30 +335,13 @@ class Inspection < ApplicationRecord
   end
 
   def required_assessment_completions
-    base_completions = [
-      anchorage_assessment&.complete?,
-      fan_assessment&.complete?,
-      materials_assessment&.complete?,
-      structure_assessment&.complete?,
-      user_height_assessment&.complete?
-    ]
-
-    base_completions << slide_assessment&.complete? if has_slide?
-    base_completions << enclosed_assessment&.complete? if is_totally_enclosed?
-    base_completions
+    applicable_assessments.map do |assessment_key, _|
+      send(assessment_key)&.complete?
+    end
   end
 
   def all_assessments
-    base_assessments = [
-      anchorage_assessment,
-      fan_assessment,
-      materials_assessment,
-      slide_assessment,
-      structure_assessment,
-      user_height_assessment
-    ]
-    base_assessments << enclosed_assessment if is_totally_enclosed?
-    base_assessments
+    applicable_assessments.map { |assessment_key, _| send(assessment_key) }
   end
 
   def auto_determine_pass_fail
@@ -375,7 +378,7 @@ class Inspection < ApplicationRecord
   def failed_safety_checks = total_pass_columns - passed_safety_checks
 
   def duplicate_assessments(new_inspection)
-    assessments_to_duplicate.each do |assessment|
+    all_assessments.compact.each do |assessment|
       duplicate_single_assessment(assessment, new_inspection)
     end
   end
@@ -401,12 +404,7 @@ class Inspection < ApplicationRecord
   end
 
   def assessments_to_duplicate
-    assessments = [
-      user_height_assessment, slide_assessment, structure_assessment,
-      anchorage_assessment, materials_assessment, fan_assessment
-    ]
-    assessments << enclosed_assessment if is_totally_enclosed?
-    assessments.compact
+    all_assessments.compact
   end
 
   def duplicate_single_assessment(assessment, new_inspection)
