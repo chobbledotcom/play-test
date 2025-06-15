@@ -31,7 +31,7 @@
   <!-- Yes radio -->
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled] do %>
     <label for="<%= radio_field %>_true">
-      <%= form.radio_button radio_field, true, 
+      <%= form.radio_button radio_field, true,
           radio_button_options(field_data[:prefilled], checked_value, true) %>
       <%= t('shared.yes') %>
     </label>
@@ -40,7 +40,7 @@
   <!-- No radio -->
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled] do %>
     <label for="<%= radio_field %>_false">
-      <%= form.radio_button radio_field, false, 
+      <%= form.radio_button radio_field, false,
           radio_button_options(field_data[:prefilled], checked_value, false) %>
       <%= t('shared.no') %>
     </label>

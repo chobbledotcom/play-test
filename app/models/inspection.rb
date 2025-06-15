@@ -105,6 +105,23 @@ class Inspection < ApplicationRecord
   def complete?
     complete_date.present?
   end
+  
+  # Get list of applicable assessment tabs based on inspection configuration
+  # Returns tabs in the order they appear in the UI
+  def applicable_tabs
+    tabs = ["inspection", "user_height"]
+    
+    # Only show slide tab for inspections that have slides
+    tabs << "slide" if has_slide?
+    
+    # Add the core assessment tabs in UI order
+    tabs += %w[structure anchorage materials fan]
+    
+    # Only show enclosed tab for totally enclosed inspections
+    tabs << "enclosed" if is_totally_enclosed?
+    
+    tabs
+  end
 
   # URL routing based on completion status
   def primary_url_path

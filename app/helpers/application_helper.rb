@@ -101,15 +101,23 @@ module ApplicationHelper
 
     actual_current_value = model.send(field) if model.respond_to?(field)
 
-    if actual_current_value.present? || !@previous_inspection
+    # If there's no previous inspection, use current value
+    if !@previous_inspection
       return { value: actual_current_value, prefilled: false }
-    else
+    end
+    
+    # For boolean fields (true/false), nil means "not set yet" 
+    # so we should prefill from previous inspection
+    if actual_current_value.nil?
       previous_value = extract_previous_value(
         @previous_inspection,
         model,
         field
       )
       return { value: previous_value, prefilled: true }
+    else
+      # Field has been explicitly set (even if false), so use current value
+      return { value: actual_current_value, prefilled: false }
     end
   end
 

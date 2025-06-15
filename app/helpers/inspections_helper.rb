@@ -47,19 +47,9 @@ module InspectionsHelper
 
   # Tabbed inspection editing helpers
   def inspection_tabs(inspection)
-    tabs = %w[inspections user_height]
-
-    # Only show slide tab for inspections that have slides
-    if inspection.has_slide?
-      tabs << "slide"
-    end
-
-    tabs += %w[structure anchorage materials fan]
-
-    # Only show enclosed tab for totally enclosed inspections
-    tabs << "enclosed" if inspection.is_totally_enclosed?
-
-    tabs
+    # Use the model's applicable_tabs method but rename "inspection" to "inspections" 
+    # for consistency with existing view code
+    inspection.applicable_tabs.map { |tab| tab == "inspection" ? "inspections" : tab }
   end
 
   def current_tab

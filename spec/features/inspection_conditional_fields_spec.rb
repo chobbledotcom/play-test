@@ -66,8 +66,8 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
   end
 
   scenario "updates is_totally_enclosed field on existing inspection" do
-    # Start with a regular inspection
-    expect(inspection.is_totally_enclosed).to be false
+    # Start with a regular inspection (no default value means nil)
+    expect(inspection.is_totally_enclosed).to be_nil
 
     visit edit_inspection_path(inspection)
 
@@ -92,8 +92,8 @@ RSpec.feature "Inspection Conditional Fields", type: :feature do
   end
 
   scenario "updates has_slide field on existing inspection" do
-    # Start with a non-slide inspection
-    expect(inspection.has_slide).to be false
+    # Start with a non-slide inspection (no default value means nil)
+    expect(inspection.has_slide).to be_nil
 
     visit edit_inspection_path(inspection)
 

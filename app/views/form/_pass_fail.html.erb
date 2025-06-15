@@ -17,7 +17,7 @@
   <label><%= field_data[:field_label] %></label>
   <% options.each do |option_label, option_value| %>
     <label>
-      <%= form.radio_button field, option_value, 
+      <%= form.radio_button field, option_value,
           { id: "#{field}_#{option_value}" }.merge(
             radio_button_options(field_data[:prefilled], checked_value, option_value)
           ) %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_14_005014) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -105,8 +105,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_14_005014) do
     t.decimal "width", precision: 8, scale: 2
     t.decimal "length", precision: 8, scale: 2
     t.decimal "height", precision: 8, scale: 2
-    t.boolean "has_slide", default: false, null: false
-    t.boolean "is_totally_enclosed", default: false, null: false
+    t.boolean "has_slide"
+    t.boolean "is_totally_enclosed"
     t.string "width_comment", limit: 1000
     t.string "length_comment", limit: 1000
     t.string "height_comment", limit: 1000
