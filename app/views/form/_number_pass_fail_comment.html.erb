@@ -41,8 +41,8 @@
 %>
 
 <div class="form-grid pass-fail-comment with-number">
-  <!-- Label -->
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled] do %>
+  <!-- Label with number field -->
+  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'number-label' do %>
     <label for="<%= form.field_id(number_field) %>">
       <%= field_data[:field_label] %>
       <%= form.number_field number_field,
@@ -56,7 +56,7 @@
     </label>
   <% end %>
 
-  <%= render 'form/field_wrapper', prefilled: pass_fail_prefilled do %>
+  <%= render 'form/field_wrapper', prefilled: pass_fail_prefilled, wrapper_class: 'radio-pass' do %>
     <label for="<%= pass_fail_field %>_true">
       <%= t('shared.pass') %>
       <%= form.radio_button pass_fail_field, true, 
@@ -66,7 +66,7 @@
     </label>
   <% end %>
 
-  <%= render 'form/field_wrapper', prefilled: pass_fail_prefilled do %>
+  <%= render 'form/field_wrapper', prefilled: pass_fail_prefilled, wrapper_class: 'radio-fail' do %>
     <label for="<%= pass_fail_field %>_false">
       <%= form.radio_button pass_fail_field, false, 
           { id: "#{pass_fail_field}_false" }.merge(
@@ -83,7 +83,7 @@
       has_comment: comment_info[:has_comment],
       prefilled: comment_info[:prefilled] %>
 
-  <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled] do %>
+  <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled], wrapper_class: 'comment' do %>
     <%= form.text_area comment_field, comment_info[:options] %>
   <% end %>
 </div>

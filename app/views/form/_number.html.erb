@@ -25,7 +25,7 @@
   end
 %>
 
-<%= render 'form/field_wrapper', prefilled: setup[:prefilled] do %>
+<%= render 'form/field_wrapper', prefilled: setup[:prefilled], wrapper_class: 'number-field' do %>
   <div class="<%= wrapper_class %>">
     <%= setup[:form_object].label field, setup[:field_label] %>
     <%= setup[:form_object].number_field field, field_options.compact %>

@@ -15,7 +15,7 @@
   end
 %>
 
-<%= render 'form/field_wrapper', prefilled: setup[:prefilled] do %>
+<%= render 'form/field_wrapper', prefilled: setup[:prefilled], wrapper_class: 'autocomplete-field' do %>
   <%= setup[:form_object].label field, setup[:field_label] %>
   <%= setup[:form_object].text_field field, field_options %>
   <datalist id="<%= field_options[:list] %>">

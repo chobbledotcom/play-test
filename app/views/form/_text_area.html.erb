@@ -18,7 +18,7 @@
   end
 %>
 
-<%= render 'form/field_wrapper', prefilled: setup[:prefilled] do %>
+<%= render 'form/field_wrapper', prefilled: setup[:prefilled], wrapper_class: 'text-area' do %>
   <%= setup[:form_object].label field, setup[:field_label] %>
   <%= setup[:form_object].text_area field, field_options %>
   <% if setup[:field_hint].present? %>

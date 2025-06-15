@@ -119,15 +119,15 @@
   }
 }
 
-.yes-no-radio > label:first-child {
+.yes-no-radio > .label {
   grid-area: label;
 }
 
-.yes-no-radio > label[for$="_true"] {
+.yes-no-radio > .radio-yes {
   grid-area: yes-label;
 }
 
-.yes-no-radio > label[for$="_false"] {
+.yes-no-radio > .radio-no {
   grid-area: no-label;
 }
 
@@ -145,24 +145,27 @@
   }
 }
 
-.pass-fail-comment > label:first-child {
+.pass-fail-comment > .label {
   grid-area: label;
+}
+
+.pass-fail-comment > .label label {
   flex-direction: column;
 }
 
-.pass-fail-comment > label[for$="_true"] {
+.pass-fail-comment > .radio-pass {
   grid-area: pass-label;
 }
 
-.pass-fail-comment > label[for$="_false"] {
+.pass-fail-comment > .radio-fail {
   grid-area: fail-label;
 }
 
-.pass-fail-comment > label:last-of-type {
+.pass-fail-comment > .comment-checkbox {
   grid-area: comment-label;
 }
 
-.pass-fail-comment > textarea {
+.pass-fail-comment > .comment {
   grid-column: 1 / -1;
   margin-top: 0.5rem;
 }
@@ -181,7 +184,7 @@
   }
 }
 
-.pass-fail-comment.with-number > label:first-child {
+.pass-fail-comment.with-number > .number-label {
   grid-area: number-label;
 }
 
@@ -199,19 +202,19 @@
   }
 }
 
-.number-comment > label:first-child {
+.number-comment > .label {
   grid-area: label;
 }
 
-.number-comment > input[type="number"] {
+.number-comment > .number {
   grid-area: number;
 }
 
-.number-comment > label:last-of-type {
+.number-comment > .comment-checkbox {
   grid-area: comment-label;
 }
 
-.number-comment > textarea {
+.number-comment > .comment {
   grid-column: 1 / -1;
   margin-top: 0.5rem;
 }
@@ -223,39 +226,35 @@
   align-items: center;
   margin-bottom: 1rem;
   grid-template-areas:
-    "label label label label label"
-    "check1 label2 check2 comment-space comment-label";
-  grid-template-columns: auto auto auto 1fr auto;
+    "label label label label"
+    "check1 label2 comment-space comment-label";
+  grid-template-columns: auto auto 1fr auto;
 }
 
 @media (min-width: 768px) {
   .checkbox-comment {
-    grid-template-areas: "label check1 label2 check2 comment-label";
-    grid-template-columns: max-content auto auto auto auto;
+    grid-template-areas: "label check1 label2 comment-label";
+    grid-template-columns: max-content auto auto auto;
   }
 }
 
-.checkbox-comment > label:first-child {
+.checkbox-comment > .label {
   grid-area: label;
 }
 
-.checkbox-comment > input[type="checkbox"]:first-of-type {
+.checkbox-comment > .checkbox {
   grid-area: check1;
 }
 
-.checkbox-comment > label:nth-of-type(2) {
+.checkbox-comment > .checkbox-label {
   grid-area: label2;
 }
 
-.checkbox-comment > input[type="checkbox"]:last-of-type {
-  grid-area: check2;
-}
-
-.checkbox-comment > label:last-of-type {
+.checkbox-comment > .comment-checkbox {
   grid-area: comment-label;
 }
 
-.checkbox-comment > textarea {
+.checkbox-comment > .comment {
   grid-column: 1 / -1;
   margin-top: 0.5rem;
 }
@@ -277,6 +276,9 @@
   .user-heights > * {
     flex: 1 1 calc(25% - 0.75rem);
   }
+}
+
+.set-previous label {
 }
 
 .set-previous input,

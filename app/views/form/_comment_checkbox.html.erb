@@ -8,7 +8,7 @@
   #   prefilled: Whether the comment is prefilled
 %>
 
-<%= render 'form/field_wrapper', prefilled: prefilled do %>
+<%= render 'form/field_wrapper', prefilled: prefilled, wrapper_class: 'comment-checkbox' do %>
   <label for="<%= checkbox_id %>">
     <input type="checkbox"
       id="<%= checkbox_id %>"

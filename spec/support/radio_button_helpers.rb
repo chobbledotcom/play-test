@@ -6,9 +6,10 @@ module RadioButtonHelpers
   }.freeze
   # Choose Yes/No radio button for boolean fields
   def choose_yes_no(field_label, value)
-    # First, find all labels that contain the field label text
-    # Then find the Yes/No radio button within the same container
-    within(:xpath, "//label[contains(., '#{field_label}')]/..") do
+    # Find the form-grid container that contains the field label
+    # The structure is now: div.form-grid > div > label[text="Field Label"]
+    # Then find the Yes/No radio button within the same form-grid
+    within(:xpath, "//div[contains(@class, 'form-grid')][.//label[normalize-space(.)='#{field_label}']]") do
       if value
         choose I18n.t("shared.yes")
       else
@@ -20,7 +21,7 @@ module RadioButtonHelpers
   # Convert field label to just the field name (without model prefix)
   def field_label_to_field_name(field_label)
     BOOLEANS_BY_FORM.each do |model, fields|
-      form_type = (model == :inspection) ? :inspections : :slide
+      form_type = (model == :inspection) ? :inspection : :slide
       fields.each do |field|
         return field.to_s if field_label == I18n.t("forms.#{form_type}.fields.#{field}")
       end
@@ -31,7 +32,7 @@ module RadioButtonHelpers
   # Convert field label to form field name
   def field_label_to_name(field_label)
     BOOLEANS_BY_FORM.each do |model, fields|
-      form_type = (model == :inspection) ? :inspections : :slide
+      form_type = (model == :inspection) ? :inspection : :slide
       fields.each do |field|
         return "#{model}[#{field}]" if field_label == I18n.t("forms.#{form_type}.fields.#{field}")
       end

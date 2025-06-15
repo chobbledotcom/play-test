@@ -16,7 +16,7 @@
   end
 %>
 
-<%= render 'form/field_wrapper', prefilled: setup[:prefilled] do %>
+<%= render 'form/field_wrapper', prefilled: setup[:prefilled], wrapper_class: 'text-field' do %>
   <%= setup[:form_object].label field, setup[:field_label] %>
   <%= setup[:form_object].send(field_type, field, field_options) %>
   <% if local_assigns[:help_text] %>

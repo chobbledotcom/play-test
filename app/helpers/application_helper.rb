@@ -88,17 +88,17 @@ module ApplicationHelper
   def resolve_field_value(model, field, current_value = nil)
     field_str = field.to_s
     if field_str.include?("password") || field_str == "password_confirmation"
-      return { value: nil, prefilled: false }
+      return {value: nil, prefilled: false}
     end
 
     actual_current_value = model.send(field) if model.respond_to?(field)
 
     # If there's no previous inspection, use current value
     if !@previous_inspection
-      return { value: actual_current_value, prefilled: false }
+      return {value: actual_current_value, prefilled: false}
     end
-    
-    # For boolean fields (true/false), nil means "not set yet" 
+
+    # For boolean fields (true/false), nil means "not set yet"
     # so we should prefill from previous inspection
     if actual_current_value.nil?
       previous_value = extract_previous_value(
@@ -106,10 +106,10 @@ module ApplicationHelper
         model,
         field
       )
-      return { value: previous_value, prefilled: true }
+      {value: previous_value, prefilled: true}
     else
       # Field has been explicitly set (even if false), so use current value
-      return { value: actual_current_value, prefilled: false }
+      {value: actual_current_value, prefilled: false}
     end
   end
 
@@ -120,9 +120,9 @@ module ApplicationHelper
       assessment_type = current_model.class.name.demodulize.underscore
       previous_model = previous_inspection.send(assessment_type)
       previous_model&.send(field) if previous_model&.respond_to?(field)
-    else
+    elsif previous_inspection.respond_to?(field)
       # Direct inspection field
-      previous_inspection.send(field) if previous_inspection.respond_to?(field)
+      previous_inspection.send(field)
     end
   rescue
     nil
@@ -131,28 +131,28 @@ module ApplicationHelper
   def comment_field_options(form, comment_field, base_field_label)
     model = form.object
     comment_value, comment_prefilled = get_field_value_and_prefilled_status(form, comment_field)
-    
+
     actual_value = comment_prefilled ? comment_value : model.send(comment_field)
     has_comment = actual_value.present? || (comment_prefilled && comment_value.present?)
-    
+
     # Get base field name by removing _comment suffix
     base_field = comment_field.to_s.chomp("_comment")
-    
+
     # Extract complex interpolations to variables
-    placeholder_text = t('shared.field_comment_placeholder', field: base_field_label)
+    placeholder_text = t("shared.field_comment_placeholder", field: base_field_label)
     textarea_id = "#{base_field}_comment_textarea_#{model.object_id}"
     checkbox_id = "#{base_field}_has_comment_#{model.object_id}"
-    display_style = has_comment ? 'block' : 'none'
-    
+    display_style = has_comment ? "block" : "none"
+
     options = {
       rows: 2,
       placeholder: placeholder_text,
       id: textarea_id,
       style: "display: #{display_style};"
     }
-    
+
     options[:value] = comment_value if comment_prefilled
-    
+
     {
       options: options,
       prefilled: comment_prefilled,
@@ -162,7 +162,7 @@ module ApplicationHelper
   end
 
   def radio_button_options(prefilled, checked_value, expected_value)
-    prefilled && checked_value == expected_value ? {checked: true} : {}
+    (prefilled && checked_value == expected_value) ? {checked: true} : {}
   end
 
   private

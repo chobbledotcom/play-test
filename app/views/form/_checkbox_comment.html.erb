@@ -27,12 +27,17 @@
 
 <div class="checkbox-comment">
   <!-- Label -->
-  <label><%= field_data[:field_label] %></label>
+  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
+    <label><%= field_data[:field_label] %></label>
+  <% end %>
   
   <!-- Main checkbox -->
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled] do %>
+  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'checkbox' do %>
     <%= form.check_box checkbox_field, 
         id: "#{checkbox_field}_checkbox" %>
+  <% end %>
+  
+  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'checkbox-label' do %>
     <label for="<%= checkbox_field %>_checkbox"><%= t('shared.yes') %></label>
   <% end %>
   
@@ -45,7 +50,7 @@
       prefilled: comment_info[:prefilled] %>
   
   <!-- Comment textarea (hidden by default, spans full width) -->
-  <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled] do %>
+  <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled], wrapper_class: 'comment' do %>
     <%= form.text_area comment_field, comment_info[:options] %>
   <% end %>
 </div>

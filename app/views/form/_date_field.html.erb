@@ -15,7 +15,7 @@
   field_options[:value] = local_assigns[:value] if local_assigns[:value]
 %>
 
-<%= render 'form/field_wrapper', prefilled: false do %>
+<%= render 'form/field_wrapper', prefilled: false, wrapper_class: 'date-field' do %>
   <%= setup[:form_object].label field, setup[:field_label] %>
   <%= setup[:form_object].send(:date_field, field, field_options) %>
   <% if setup[:field_hint].present? %>
