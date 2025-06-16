@@ -79,8 +79,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
           user: user,
           unit: unit,
           inspector_company: inspector_company,
-          inspection_location: "Complete Location"
-        )
+          inspection_location: "Complete Location")
 
         visit inspections_path
 

@@ -21,8 +21,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
     scenario "includes all required sections" do
       inspection = create(:inspection, :completed,
         user: user,
-        unit: unit
-      )
+        unit: unit)
 
       # Update the auto-created assessments
       inspection.user_height_assessment.update!(
@@ -61,8 +60,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         user: user,
         unit: unit,
         passed: false,
-        risk_assessment: "Multiple safety issues found"
-      )
+        risk_assessment: "Multiple safety issues found")
 
       # Update the auto-created assessment
       failed_inspection.structure_assessment.update!(
@@ -84,8 +82,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       inspection = create(:inspection, :completed,
         user: user,
-        unit: special_unit
-      )
+        unit: special_unit)
 
       text_content = get_pdf_text(inspection_path(inspection, format: :pdf))
 
@@ -99,8 +96,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       user_without_rpii = create(:user, :without_rpii)
       inspection = create(:inspection, :completed,
         user: user_without_rpii,
-        unit: unit
-      )
+        unit: unit)
 
       pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
 
@@ -117,8 +113,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
     scenario "shows proper handling for empty assessments" do
       inspection = create(:inspection, :completed,
         user: user,
-        unit: unit
-      )
+        unit: unit)
 
       # Assessments are auto-created and completed with data
 
@@ -142,8 +137,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
           user: user,
           unit: unit,
           inspection_date: i.months.ago,
-          passed: i.even?
-        )
+          passed: i.even?)
       end
 
       pdf_text = get_pdf_text(unit_report_path(unit))
@@ -183,8 +177,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
           unit: unit,
           inspection_date: i.months.ago,
           passed: i.even?,
-          inspection_location: "Location #{i + 1}"
-        )
+          inspection_location: "Location #{i + 1}")
       end
 
       start_time = Time.current
@@ -242,8 +235,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
           unit: unit_with_image,
           inspection_date: i.months.ago,
           passed: i.even?,
-          inspection_location: "Photo Location #{i + 1}"
-        )
+          inspection_location: "Photo Location #{i + 1}")
       end
 
       start_time = Time.current

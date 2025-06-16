@@ -11,8 +11,7 @@ RSpec.feature "Inspections CSV Export", type: :feature do
       unit: unit1,
       passed: true,
       inspection_location: "Test Location 1",
-      inspection_date: Date.current
-    )
+      inspection_date: Date.current)
   end
 
   let!(:inspection2) do

@@ -67,6 +67,10 @@ module InspectionTestHelpers
     expect_access_denied
   end
 
+  def expect_cannot_complete_message
+    expect(page).to have_content(I18n.t("inspections.messages.cannot_complete").split(":").first)
+  end
+
   # Button expectations
   def expect_suggested_id_button(inspection)
     expected_text = I18n.t("inspections.buttons.use_suggested_id", id: inspection.id)

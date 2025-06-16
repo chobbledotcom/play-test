@@ -1,6 +1,6 @@
 module InspectionHelpers
   include DeprecationHelper
-  
+
   # DEPRECATED: Use create(:inspection, :completed) instead
   def create_completed_inspection(**options)
     print_deprecation(

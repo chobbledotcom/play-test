@@ -135,7 +135,7 @@ class InspectionWorkflow
       fill_inspection_field(field_name, value)
     end
 
-    click_button t("forms.inspection.submit")
+    click_submit_button
 
     @inspection.reload
     expect(@inspection.has_slide).to eq(
@@ -147,6 +147,14 @@ class InspectionWorkflow
   end
 
   def fill_inspection_field(field_name, value)
+    if field_name == :inspection_location
+      fill_in_location(value)
+      return
+    elsif field_name == :unique_report_number
+      fill_in_report_number(value)
+      return
+    end
+
     field_label = t("forms.inspection.fields.#{field_name}")
 
     if BOOLEAN_FIELDS.include?(field_name.to_s)
@@ -180,7 +188,7 @@ class InspectionWorkflow
     end
 
     click_button t("forms.#{tab_name}.submit")
-    expect_inspection_message("updated")
+    expect_updated_message
 
     assessment = @inspection.reload.send("#{tab_name}_assessment")
     expect(assessment.complete?).to be true
@@ -221,16 +229,8 @@ class InspectionWorkflow
     end
   end
 
-  def click_inspection_button(key)
-    click_button t("inspections.buttons.#{key}")
-  end
-
   def click_units_button(key)
     click_button t("units.buttons.#{key}")
-  end
-
-  def expect_inspection_message(key)
-    expect(page).to have_content(t("inspections.messages.#{key}"))
   end
 
   def expect_units_message(key)
@@ -252,16 +252,14 @@ class InspectionWorkflow
       )
     end
 
-    click_inspection_button("mark_complete")
-    expect(page).to have_content(
-      t("inspections.messages.cannot_complete").split(":").first
-    )
+    click_mark_complete_button
+    expect_cannot_complete_message
   end
 
   def mark_inspection_complete
     visit edit_inspection_path(@inspection)
-    click_inspection_button("mark_complete")
-    expect_inspection_message("marked_complete")
+    click_mark_complete_button
+    expect_marked_complete_message
   end
 
   def verify_inspection_complete
@@ -309,7 +307,7 @@ class InspectionWorkflow
   end
 
   def save_main_form
-    click_button t("forms.inspection.submit")
+    click_submit_button
   end
 
   def verify_assessments_prefill_and_complete
@@ -321,7 +319,7 @@ class InspectionWorkflow
     applicable_tabs.each do |tab_name|
       visit edit_inspection_path(@second_inspection, tab: tab_name)
       click_button t("forms.#{tab_name}.submit")
-      expect_inspection_message("updated")
+      expect_updated_message
 
       @second_inspection.reload
       assessment = @second_inspection.send("#{tab_name}_assessment")
@@ -336,8 +334,8 @@ class InspectionWorkflow
     expect(@second_inspection.is_totally_enclosed).to eq(@options[:is_totally_enclosed])
     expect(@second_inspection.inspection_location).to eq(@inspection.inspection_location)
 
-    click_inspection_button("mark_complete")
-    expect_inspection_message("marked_complete")
+    click_mark_complete_button
+    expect_marked_complete_message
   end
 
   def verify_date_handling
@@ -381,14 +379,14 @@ class InspectionWorkflow
     visit edit_inspection_path(@second_inspection)
 
     expect(page).to have_current_path(inspection_path(@second_inspection))
-    expect_inspection_message("cannot_edit_complete")
+    expect_cannot_edit_complete_message
 
     visit inspection_path(@second_inspection)
-    click_inspection_button("switch_to_in_progress")
-    expect_inspection_message("marked_in_progress")
+    click_switch_to_in_progress_button
+    expect_marked_in_progress_message
 
-    click_inspection_button("delete")
-    expect_inspection_message("deleted")
+    click_delete_button
+    expect_deleted_message
   end
 end
 
