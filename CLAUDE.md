@@ -258,7 +258,6 @@ end
 ```ruby
 # GOOD - Helper method used multiple times
 def sign_in_as_admin
-  allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
   sign_in(admin_user)
 end
 
@@ -810,11 +809,9 @@ end
 ```ruby
 # Feature tests with Capybara
 RSpec.feature "Inspector Company Archiving", type: :feature do
-  let(:admin_user) { create(:user, :without_company, email: "admin@testcompany.com") }
+  let(:admin_user) { create(:user, :admin) }
 
   before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
     sign_in(admin_user)
   end
 

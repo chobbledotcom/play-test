@@ -1,14 +1,12 @@
 require "rails_helper"
 
 RSpec.feature "RPII Verification", type: :feature do
-  let(:admin_user) { create(:user, email: "admin@testcompany.com") }
-  let(:user_with_valid_rpii) { create(:user, name: "Chris Winters", rpii_inspector_number: "AI0025") } # Chris Winters
+  let(:admin_user) { create(:user, :admin) }
+  let(:user_with_valid_rpii) { create(:user, name: "Chris Winters", rpii_inspector_number: "AI0025") }
   let(:user_with_invalid_rpii) { create(:user, rpii_inspector_number: "9999") }
   let(:user_without_rpii) { create(:user, rpii_inspector_number: "TEMP123").tap { |u| u.update_column(:rpii_inspector_number, "") } }
 
   before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
     sign_in(admin_user)
   end
 

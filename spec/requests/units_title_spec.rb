@@ -32,14 +32,14 @@ RSpec.describe "Units Index Title", type: :request do
     it "includes owner in title when filtered" do
       get units_path(owner: "Stef's Rentals")
 
-      # Check for the actual HTML that appears in the page
+
       expect(response.body).to include("<h1>Units - Stef&#39;s Rentals</h1>")
     end
 
     it "combines multiple filters in title" do
       get units_path(status: "overdue", manufacturer: "Bouncy Co", owner: "John's Events")
 
-      # Check for the actual HTML that appears in the page
+
       expect(response.body).to include("<h1>Units - Overdue - Bouncy Co - John&#39;s Events</h1>")
     end
 

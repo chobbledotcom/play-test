@@ -1,40 +1,5 @@
 require "rails_helper"
 
-# Users Controller Behavior Documentation
-# =====================================
-#
-# The Users controller manages user account operations with three distinct authorization levels:
-#
-# PUBLIC ACCESS (no login required):
-# - GET /signup - Shows new user registration form
-# - POST /signup - Creates new user account, auto-logs them in, sends production notifications
-#
-# USER ACCESS (must be logged in as the specific user):
-# - GET /users/:id/change_password - Shows password change form (only for own account)
-# - PATCH /users/:id/update_password - Updates password after verifying current password
-# - GET /users/:id/change_settings - Shows settings form (only for own account)
-# - PATCH /users/:id/update_settings - Updates user preferences like theme
-#
-# ADMIN ACCESS (must be logged in as admin):
-# - GET /users - Lists all users with inspection counts and background job status
-# - GET /users/:id/edit - Shows admin user edit form
-# - PATCH /users/:id - Updates any user (admins can set inspection_limit)
-# - DELETE /users/:id - Destroys user account
-# - POST /users/:id/impersonate - Logs in as another user for support purposes
-#
-# AUTHORIZATION FLOW:
-# 1. All actions except signup require login (ApplicationController#require_login)
-# 2. Admin actions protected by require_admin before_action
-# 3. Personal actions (password/settings) protected by require_correct_user
-# 4. User creation auto-promotes first user to admin
-# 5. Production environment sends notifications for new signups
-#
-# ERROR HANDLING:
-# - Validation failures render forms with :unprocessable_entity status
-# - Authorization failures redirect to root_path with danger flash
-# - Password changes require current password verification
-# - Settings only allow valid theme values ("light" or "dark")
-
 RSpec.describe "Users", type: :request do
   describe "GET /signup" do
     it "returns http success" do
@@ -45,11 +10,7 @@ RSpec.describe "Users", type: :request do
     it "displays registration form" do
       visit "/signup"
       expect(page).to have_content(I18n.t("users.titles.register"))
-      expect(page).to have_field(I18n.t("users.forms.email"))
-      expect(page).to have_field(I18n.t("users.forms.name"))
-      expect(page).to have_field(I18n.t("users.forms.rpii_inspector_number"))
-      expect(page).to have_field(I18n.t("users.forms.password"))
-      expect(page).to have_field(I18n.t("users.forms.password_confirmation"))
+      expect_form_fields_present("forms.user_new")
       expect(page).to have_button(I18n.t("users.buttons.register"))
     end
   end
@@ -109,7 +70,7 @@ RSpec.describe "Users", type: :request do
 
         expect(page).to have_current_path(root_path)
 
-        # Verify password was changed
+
         user.reload
         expect(user.authenticate("newpassword")).to be_truthy
       end
@@ -123,7 +84,7 @@ RSpec.describe "Users", type: :request do
 
         expect(page).to have_http_status(:unprocessable_entity)
 
-        # Verify password was not changed
+
         user.reload
         expect(user.authenticate(I18n.t("test.password"))).to be_truthy
       end
@@ -474,7 +435,7 @@ RSpec.describe "Users", type: :request do
     end
 
     it "handles impersonation when admin flag is present" do
-      # Ensure admin? returns true
+
       allow_any_instance_of(User).to receive(:admin?).and_return(true)
 
       post impersonate_user_path(target_user)
@@ -497,7 +458,7 @@ RSpec.describe "Users", type: :request do
           rpii_inspector_number: "RPII-REG-123",
           password: "password123",
           password_confirmation: "password123",
-          # These admin-only fields should be ignored
+
           active_until: Date.current + 1.year,
           inspection_company_id: company.id
         }
@@ -505,22 +466,22 @@ RSpec.describe "Users", type: :request do
 
       created_user = User.find_by(email: "newuser@example.com")
       expect(created_user).to be_present
-      # RPII should be accepted during registration
+
       expect(created_user.rpii_inspector_number).to eq("RPII-REG-123")
-      # Admin-only fields should be ignored
+
       expect(created_user.active_until).to eq(Date.current - 1.day) # Default inactive
       expect(created_user.inspection_company_id).to be_nil
     end
 
     it "handles impersonation without existing admin session" do
       login_as(regular_user)
-      # Simulate a non-admin user somehow reaching impersonate action
-      # (this would normally be blocked by before_action, but testing the method itself)
+
+
       allow_any_instance_of(User).to receive(:admin?).and_return(false)
 
       post impersonate_user_path(regular_user)
 
-      # Should be redirected due to admin requirement
+
       expect(response).to redirect_to(root_path)
     end
 
@@ -530,7 +491,7 @@ RSpec.describe "Users", type: :request do
       end
 
       it "allows updating settings even if name is empty" do
-        # Create user with empty name (bypassing validation)
+
         regular_user.update_column(:name, nil)
 
         settings_attrs = {

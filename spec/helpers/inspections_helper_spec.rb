@@ -40,17 +40,11 @@ RSpec.describe InspectionsHelper, type: :helper do
 
   describe "#inspection_actions" do
     let(:user) { create(:user) }
-    let(:admin_user) { create(:user, email: "admin@example.com") }
+    let(:admin_user) { create(:user, :admin) }
     let(:inspection) { create(:inspection, user: user) }
     let(:complete_inspection) do
       inspection = create(:inspection, :completed, user: user)
       inspection
-    end
-
-    before do
-      # Set up admin pattern
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
     end
 
     context "for non-complete inspections" do

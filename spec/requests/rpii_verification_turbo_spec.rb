@@ -1,12 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "RPII Verification Turbo Streams", type: :request do
-  let(:admin_user) { create(:user, email: "admin@example.com", name: "Admin User") }
+  let(:admin_user) { create(:user, :admin) }
   let(:user) { create(:user, name: "John Smith", rpii_inspector_number: "12345") }
 
   before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("ADMIN_EMAILS_PATTERN").and_return("admin@")
     login_as(admin_user)
   end
 
