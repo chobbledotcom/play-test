@@ -7,6 +7,7 @@ class InspectionWorkflow
   include Rails.application.routes.url_helpers
   include RadioButtonHelpers
   include FactoryBot::Syntax::Methods
+  include InspectionTestHelpers
 
   BOOLEAN_FIELDS = %w[has_slide is_totally_enclosed slide_permanent_roof].freeze
 
