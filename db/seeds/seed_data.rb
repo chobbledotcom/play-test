@@ -1,13 +1,13 @@
 # This module provides field mappings for assessments
 # Used by both seeds and tests to ensure consistency
 module SeedData
-  # Helper to determine pass/fail for individual checks
-  # If inspection passed, all checks pass
-  # If inspection failed, approximately 1/10th of checks fail
+
+
+
   def self.check_passed?(inspection_passed)
     return true if inspection_passed
 
-    # For failed inspections, ~90% of individual checks still pass
+
     rand < 0.9
   end
 

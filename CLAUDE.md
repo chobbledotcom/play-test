@@ -658,7 +658,6 @@ SIMPLE_ARRAY = %i[inactive active archived]
 
 **IMPORTANT: Inspection Factory Behavior**
 
-- **Inspections auto-create ALL assessments** via `after_create :create_assessments` callback
 - **NEVER manually create assessments** - they already exist, just update them
 - **Assessment factories are for standalone testing only** - not for inspection tests
 

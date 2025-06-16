@@ -221,20 +221,6 @@ class Inspection < ApplicationRecord
     log_audit_action("marked_incomplete", user, "Inspection completed")
   end
 
-  def duplicate_for_user(user)
-    new_inspection = dup
-    new_inspection.user = user
-    new_inspection.complete_date = nil
-    new_inspection.unique_report_number = nil
-    new_inspection.passed = nil
-    new_inspection.save!
-
-    # Duplicate all assessments
-    duplicate_assessments(new_inspection)
-
-    new_inspection
-  end
-
   def validate_completeness
     assessment_validation_data.filter_map do |name, assessment, message|
       # Convert the symbol name (e.g., :slide) to assessment key (e.g., :slide_assessment)
@@ -243,32 +229,6 @@ class Inspection < ApplicationRecord
 
       message if assessment&.present? && !assessment.complete?
     end
-  end
-
-  def pass_fail_summary
-    total_checks = total_pass_columns
-    return zero_summary if total_checks == 0
-
-    passed_checks = passed_safety_checks
-    failed_checks = failed_safety_checks
-    percentage = passed_checks.to_f / total_checks * 100
-    pass_percentage = percentage.round(2)
-
-    {
-      failed_checks:,
-      pass_percentage:,
-      passed_checks:,
-      total_checks:
-    }
-  end
-
-  def zero_summary
-    {
-      failed_checks: 0,
-      pass_percentage: 0,
-      passed_checks: 0,
-      total_checks: 0
-    }
   end
 
   def log_audit_action(action, user, details)
@@ -306,22 +266,14 @@ class Inspection < ApplicationRecord
 
   private
 
-  def generate_unique_report_number
-    return if unique_report_number.present?
-
-    date_part = Date.current.strftime("%Y%m%d")
-    hex_part = SecureRandom.hex(4).upcase
-    self.unique_report_number = "RPII-#{date_part}-#{hex_part}"
-  end
-
   def create_assessments
-    create_user_height_assessment! unless user_height_assessment
-    create_slide_assessment! unless slide_assessment
-    create_structure_assessment! unless structure_assessment
-    create_anchorage_assessment! unless anchorage_assessment
-    create_materials_assessment! unless materials_assessment
-    create_fan_assessment! unless fan_assessment
-    create_enclosed_assessment! unless enclosed_assessment
+    create_user_height_assessment!
+    create_slide_assessment!
+    create_structure_assessment!
+    create_anchorage_assessment!
+    create_materials_assessment!
+    create_fan_assessment!
+    create_enclosed_assessment!
   end
 
   def set_inspector_company_from_user
@@ -352,12 +304,6 @@ class Inspection < ApplicationRecord
 
   def failed_safety_checks = total_pass_columns - passed_safety_checks
 
-  def duplicate_assessments(new_inspection)
-    all_assessments.compact.each do |assessment|
-      duplicate_single_assessment(assessment, new_inspection)
-    end
-  end
-
   private
 
   def assessment_validation_data
@@ -375,17 +321,6 @@ class Inspection < ApplicationRecord
       assessment = send("#{type}_assessment")
       message = I18n.t("inspections.validation.#{type}_incomplete")
       [type, assessment, message]
-    end
-  end
-
-  def assessments_to_duplicate
-    all_assessments.compact
-  end
-
-  def duplicate_single_assessment(assessment, new_inspection)
-    assessment.dup.tap do |duplicated|
-      duplicated.inspection = new_inspection
-      duplicated.save!
     end
   end
 end
