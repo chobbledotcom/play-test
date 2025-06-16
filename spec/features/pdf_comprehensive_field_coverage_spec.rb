@@ -67,7 +67,7 @@ RSpec.feature "PDF Comprehensive Field Coverage", type: :feature do
               if [true, false].include?(value)
                 expected_indicator = value ? "[PASS]" : "[FAIL]"
                 expect(pdf_content).to include(expected_indicator),
-                  "Missing boolean indicator for #{assessment_type}.#{field_key}"
+                  "Missing boolean indicator for #{assessment_type}.#{field_key} - #{value.inspect}"
               else
                 expect(pdf_content).to include(value.to_s),
                   "Missing value '#{value}' for #{assessment_type}.#{field_key}"

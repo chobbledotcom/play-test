@@ -2,7 +2,6 @@ module AssessmentLogging
   extend ActiveSupport::Concern
 
   included do
-    # Add audit logging callback to all assessment models
     after_update :log_assessment_update, if: :saved_changes?
   end
 

@@ -48,7 +48,7 @@
       <% if @inspection.user_height_assessment&.play_area_length.present? && @inspection.user_height_assessment&.play_area_width.present? %>
         <div class="safety-standards-info">
           <strong>Calculated Capacities:</strong>
-          <% capacities = @inspection.user_height_assessment.calculated_capacities %>
+          <% capacities = @inspection.user_height_assessment.recommended_user_capacity %>
           <ul>
             <li>1.0m users: <%= capacities[:users_1000mm] %> (1.5m² per user)</li>
             <li>1.2m users: <%= capacities[:users_1200mm] %> (2.0m² per user)</li>

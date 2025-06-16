@@ -5,14 +5,16 @@ class Assessments::SlideAssessment < ApplicationRecord
 
   belongs_to :inspection
 
-  # Slide measurements
-  validates :slide_platform_height, :slide_wall_height, :runout,
-    :slide_first_metre_height, :slide_beyond_first_metre_height,
-    numericality: {greater_than_or_equal_to: 0}, allow_blank: true
+  validates :slide_platform_height,
+    :slide_wall_height,
+    :runout,
+    :slide_first_metre_height,
+    :slide_beyond_first_metre_height,
+    numericality: {greater_than_or_equal_to: 0},
+    allow_blank: true
 
   def meets_runout_requirements?
     return false unless runout.present? && slide_platform_height.present?
-
     SafetyStandard.meets_runout_requirements?(runout, slide_platform_height)
   end
 
@@ -23,13 +25,10 @@ class Assessments::SlideAssessment < ApplicationRecord
 
   def runout_compliance_status
     return "Not Assessed" unless runout.present?
-
     if meets_runout_requirements?
       "Compliant"
     else
       "Non-Compliant (Requires #{required_runout_length}m minimum)"
     end
   end
-
-  private
 end
