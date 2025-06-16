@@ -3,6 +3,7 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   include SafetyCheckMethods
   include AssessmentCompletion
 
+  self.primary_key = "inspection_id"
   belongs_to :inspection
 
   validates :num_high_anchors,

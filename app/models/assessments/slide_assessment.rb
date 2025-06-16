@@ -3,6 +3,8 @@ class Assessments::SlideAssessment < ApplicationRecord
   include SafetyCheckMethods
   include AssessmentCompletion
 
+  self.primary_key = "inspection_id"
+
   belongs_to :inspection
 
   validates :slide_platform_height,

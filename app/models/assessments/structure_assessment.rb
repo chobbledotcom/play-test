@@ -3,6 +3,8 @@ class Assessments::StructureAssessment < ApplicationRecord
   include SafetyCheckMethods
   include AssessmentCompletion
 
+  self.primary_key = "inspection_id"
+
   belongs_to :inspection
 
   validates :stitch_length,

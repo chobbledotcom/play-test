@@ -131,9 +131,8 @@ in_progress = Inspection.create!(
   )
 )
 
-Assessments::AnchorageAssessment.create!(
+in_progress.anchorage_assessment.update!(
   SeedData.anchorage_fields(passed: true).merge(
-    inspection: in_progress,
     num_low_anchors: 8,
     num_high_anchors: 0
   )

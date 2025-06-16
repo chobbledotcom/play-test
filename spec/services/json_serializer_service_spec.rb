@@ -236,7 +236,7 @@ RSpec.describe JsonSerializerService do
       %w[inspection_date inspection_location passed complete_date].each do |field|
         expect(json).to have_key(field.to_sym)
       end
-      
+
       # Verify unique_report_number is NOT included
       expect(json).not_to have_key(:unique_report_number)
     end

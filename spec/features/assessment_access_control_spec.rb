@@ -64,9 +64,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
     sign_in(user1)
     visit inspection_path(inspection2, format: :json)
 
-    # Should receive JSON data, not be denied access
-    expect(page).to have_content(inspection2.unique_report_number)
-    expect(page).to have_content("\"inspection_date\"")
+    expect(page).to have_content(inspection2.inspection_location)
     expect(page).not_to have_content(I18n.t("inspections.errors.access_denied"))
   end
 

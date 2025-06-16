@@ -62,6 +62,7 @@ RSpec.describe PublicFieldFiltering do
           inspector_company_id
           inspection_id
           is_seed
+          unique_report_number
         ]
 
         expect(described_class::EXCLUDED_FIELDS).to eq(expected_fields)
@@ -77,7 +78,6 @@ RSpec.describe PublicFieldFiltering do
         expected_fields = %w[
           complete_date
           inspection_date
-          unique_report_number
           inspection_location
         ]
 
