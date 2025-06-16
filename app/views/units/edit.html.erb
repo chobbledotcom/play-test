@@ -7,14 +7,13 @@
 
 <article>
   <%= render 'form' %>
-  
-  <!-- Actions -->
   <% if @unit.deletable? %>
-    <div class="unit-actions">
-      <%= button_to t('units.buttons.delete'), 
-          unit_path(@unit), 
-          method: :delete, 
-          data: { turbo_confirm: t('units.messages.delete_confirm') } %>
-    </div>
+    <%= button_to t('units.buttons.delete'), 
+      unit_path(@unit), 
+      method: :delete, 
+      data: { turbo_confirm: t('units.messages.delete_confirm') }
+    %>
+  <% else %>
+    <%= t("units.messages.not_deletable") %>
   <% end %>
 </article>

@@ -3,10 +3,7 @@ require "rails_helper"
 RSpec.feature "PDF Comprehensive Field Coverage", type: :feature do
   let(:user) { create(:user, name: "Test User", email: "test@example.com") }
   let(:unit) { create(:unit, serial: "TEST123", name: "Test Unit") }
-  let(:inspection) do
-    create(:inspection, :pdf_complete_test_data, user: user, unit: unit,
-      has_slide: true, is_totally_enclosed: true)
-  end
+  let(:inspection) { create_completed_inspection(user:, unit:) }
 
   before do
     sign_in user
@@ -63,8 +60,12 @@ RSpec.feature "PDF Comprehensive Field Coverage", type: :feature do
                 "Missing pass/fail indicator for #{assessment_type}.#{field_key}"
             elsif !value.nil? && !field_key.to_s.end_with?("_comment")
               # For non-comment fields with values, check the value appears
-              # Boolean false should appear as [FAIL], true as [PASS]
-              if [true, false].include?(value)
+              # Boolean fields that are not pass/fail show as "Yes" or "No"
+              if [true, false].include?(value) && !field_key.to_s.end_with?("_pass")
+                expected_value = value ? "Yes" : "No"
+                expect(pdf_content).to include(expected_value),
+                  "Missing boolean value for #{assessment_type}.#{field_key} - expected '#{expected_value}'"
+              elsif [true, false].include?(value)
                 expected_indicator = value ? "[PASS]" : "[FAIL]"
                 expect(pdf_content).to include(expected_indicator),
                   "Missing boolean indicator for #{assessment_type}.#{field_key} - #{value.inspect}"

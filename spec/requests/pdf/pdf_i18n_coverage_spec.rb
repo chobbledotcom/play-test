@@ -17,7 +17,7 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
         serial: "TEST123")
 
       # Create complete inspection with all assessments
-      inspection = create(:inspection, :pdf_complete_test_data,
+      inspection = create(:inspection,
         user: user,
         unit: unit,
         passed: true,
@@ -138,7 +138,7 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
   describe "DRY helper usage" do
     it "generates inspection PDF with all sections" do
       unit = create(:unit, user: user, name: "Test Unit PDF", serial: "SERIAL123")
-      inspection = create(:inspection, :pdf_complete_test_data, :with_slide, :totally_enclosed, user: user, unit: unit)
+      inspection = create(:inspection, :with_slide, :totally_enclosed, user: user, unit: unit)
 
       get inspection_path(inspection, format: :pdf)
 

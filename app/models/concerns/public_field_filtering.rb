@@ -14,13 +14,13 @@ module PublicFieldFiltering
     inspector_company_id
     inspection_id
     is_seed
+    unique_report_number
   ].freeze
 
   # Additional fields to exclude from PDFs specifically
   PDF_EXCLUDED_FIELDS = %w[
     complete_date
     inspection_date
-    unique_report_number
     inspection_location
   ].freeze
 

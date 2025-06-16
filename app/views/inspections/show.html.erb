@@ -3,8 +3,9 @@
     <%= render 'shared/page_header', title: t('inspections.titles.show') %>
 
     <%= render 'shared/pdf_embed', 
-               url: inspection_path(@inspection, format: :pdf),
-               title: "Inspection #{@inspection.id} Report" %>
+      url: inspection_path(@inspection, format: :pdf),
+      title: "Inspection #{@inspection.id} Report"
+    %>
   </article>
 <% else %>
   <article class="view-inspection">
@@ -14,7 +15,10 @@
       <aside class="notice">
         <h4><%= t("inspections.labels.no_unit") %></h4>
         <p><%= t("inspections.messages.no_unit_description") %></p>
-        <%= link_to t("inspections.buttons.create_unit"), new_unit_from_inspection_path(@inspection), class: "button" %>
+        <%= link_to t("inspections.buttons.create_unit"),
+          new_unit_from_inspection_path(@inspection),
+          class: "button"
+        %>
       </aside>
     <% end %>
 
@@ -26,9 +30,9 @@
       <section>
         <p><%= t('inspections.messages.complete_inspection_notice') %></p>
         <%= button_to t('inspections.buttons.switch_to_in_progress'),
-            mark_draft_inspection_path(@inspection),
-            method: :patch,
-            data: { turbo_confirm: t('inspections.messages.mark_in_progress_confirm') } %>
+          mark_draft_inspection_path(@inspection),
+          method: :patch,
+          data: { turbo_confirm: t('inspections.messages.mark_in_progress_confirm') } %>
       </section>
     <% else %>
       <%= render 'shared/action_buttons', actions: inspection_actions(@inspection) %>
@@ -43,7 +47,7 @@
       </div>
     <% end %>
     <%= render 'shared/pdf_embed', 
-               url: inspection_path(@inspection, format: :pdf),
-               title: "Inspection #{@inspection.id} Report" %>
+      url: inspection_path(@inspection, format: :pdf),
+      title: "Inspection #{@inspection.id} Report" %>
   </article>
 <% end %>

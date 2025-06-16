@@ -48,7 +48,6 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
         patch inspection_path(inspection),
           params: {inspection: {inspection_location: "Test"}},
           headers: turbo_headers
-
       end
 
       context "when updating assessment data" do

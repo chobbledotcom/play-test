@@ -1,41 +1,38 @@
 <% if !logged_in? || (current_user && @unit.user_id != current_user.id) %>
   <article class="view-unit">
-    <%= render 'shared/page_header', title: t('units.titles.show') %>
-    
-    <%= render 'shared/pdf_embed', 
-               url: unit_path(@unit, format: :pdf),
-               title: "Unit #{@unit.serial} Report" %>
+    <%= render 'shared/page_header',
+      title: t('units.titles.show')
+    %>
+    <%= render 'shared/pdf_embed',
+      url: unit_path(@unit, format: :pdf),
+      title: "Unit #{@unit.serial} Report"
+    %>
   </article>
 <% else %>
   <article class="view-unit">
     <%= render 'shared/page_header', title: t('units.titles.show') %>
-
     <%= render 'unit_details', unit: @unit %>
-
     <hr>
-
     <%= render 'shared/action_buttons', actions: unit_actions(@unit) %>
-
     <hr>
-
     <h4><%= t('units.headers.inspection_history') %></h4>
     <% if @inspections.any? %>
       <%= render 'inspections/inspections_table', 
-          inspections: @inspections, 
-          unit: @unit,
-          show_name: @inspections.any? { |i| i.unit&.name != @unit.name },
-          show_serial: false,
-          show_location: true,
-          show_inspector: true %>
+        inspections: @inspections, 
+        unit: @unit,
+        show_name: @inspections.any? { |i| i.unit&.name != @unit.name },
+        show_serial: false,
+        show_location: true,
+        show_inspector: true
+      %>
     <% else %>
       <p><%= t('units.messages.no_inspections') %></p>
     <% end %>
-
     <hr>
 <% end %>
 
   <h4><%= t('units.headers.unit_report') %></h4>
   <%= render 'shared/pdf_embed', 
-             url: unit_path(@unit, format: :pdf),
-             title: "Unit #{@unit.serial} Report" %>
+    url: unit_path(@unit, format: :pdf),
+    title: "Unit #{@unit.serial} Report" %>
 </article>

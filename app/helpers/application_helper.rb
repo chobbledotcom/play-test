@@ -118,7 +118,7 @@ module ApplicationHelper
         field
       )
       formatted_value = format_numeric_value(previous_value)
-      {value: formatted_value, prefilled: formatted_value != nil}
+      {value: formatted_value, prefilled: !formatted_value.nil?}
     else
       # Field has been explicitly set (even if false), so use current value
       formatted_value = format_numeric_value(actual_current_value)

@@ -1,20 +1,18 @@
 module InspectionHelpers
-  # Create a properly completed inspection with all assessments filled
-  # This is the recommended way to create complete inspections in tests
-  #
-  # Examples:
-  #   create_completed_inspection
-  #   create_completed_inspection(passed: false)
-  #   create_completed_inspection(user: existing_user)
-  #   create_completed_inspection(unit: existing_unit)
-  #   create_completed_inspection(traits: [:with_slide])
+  # DEPRECATED: Use create(:inspection, :completed) instead
   def create_completed_inspection(**options)
-    # Extract traits from options
+    warn <<~MSG
+      [DEPRECATION] create_completed_inspection is deprecated and will be removed in the next version.
+      Use create(:inspection, :completed) instead.
+      
+      Examples:
+        create(:inspection, :completed)
+        create(:inspection, :completed, user: user)
+        create(:inspection, :completed, :without_slide)
+    MSG
+
     traits = options.delete(:traits) || []
-
-    # Always ensure :completed is included
     traits = [:completed] + Array(traits)
-
     create(:inspection, *traits, **options)
   end
 end

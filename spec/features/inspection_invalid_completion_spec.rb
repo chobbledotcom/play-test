@@ -11,7 +11,7 @@ RSpec.feature "Invalid inspection completion validation", type: :feature do
 
   scenario "prevents viewing an inspection marked complete with validation errors" do
     # Manually mark inspection as complete without filling assessments
-    # NOTE: In normal usage, use create_completed_inspection helper instead
+    # NOTE: In normal usage, use create(:inspection, :completed) helper instead
     inspection.update_column(:complete_date, Time.current)
 
     # Attempt to view the inspection - should raise DATA INTEGRITY ERROR
@@ -22,7 +22,7 @@ RSpec.feature "Invalid inspection completion validation", type: :feature do
 
   scenario "prevents editing an inspection marked complete with validation errors" do
     # Manually mark inspection as complete without filling assessments
-    # NOTE: In normal usage, use create_completed_inspection helper instead
+    # NOTE: In normal usage, use create(:inspection, :completed) helper instead
     inspection.update_column(:complete_date, Time.current)
 
     # Attempt to edit the inspection - should raise DATA INTEGRITY ERROR

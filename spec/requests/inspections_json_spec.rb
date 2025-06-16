@@ -46,7 +46,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
       end
 
       context "with assessments" do
-        let(:inspection) { create(:inspection, :pdf_complete_test_data, :with_slide, :totally_enclosed, user: user, unit: unit) }
+        let(:inspection) { create_completed_inspection }
 
         it "includes assessment data" do
           get "/inspections/#{inspection.id}.json"

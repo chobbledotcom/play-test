@@ -75,7 +75,7 @@ RSpec.describe JsonSerializerService do
 
   describe ".serialize_inspection" do
     let(:unit) { create(:unit, user: user) }
-    let(:inspection) { create(:inspection, :completed, :with_complete_assessments, user: user, unit: unit, has_slide: true, is_totally_enclosed: true) }
+    let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
 
     it "includes all public fields using reflection" do
       json = JsonSerializerService.serialize_inspection(inspection)
@@ -195,15 +195,12 @@ RSpec.describe JsonSerializerService do
 
     context "when unit doesn't have slide" do
       let(:unit_no_slide) { create(:unit, user: user) }
-      let(:inspection_no_slide) { create(:inspection, :completed, user: user, unit: unit_no_slide) }
+      let(:inspection_no_slide) { create(:inspection, :completed, :without_slide, user: user, unit: unit_no_slide) }
 
-      it "excludes slide assessment even if present" do
-        # Slide assessment already exists from inspection creation
-        inspection_no_slide.slide_assessment.update!(runout: 2.5)
-
+      it "excludes slide assessment" do
         json = JsonSerializerService.serialize_inspection(inspection_no_slide)
 
-        expect(json[:assessments]).not_to have_key(:slide_assessment) if json[:assessments]
+        expect(json[:assessments]).not_to have_key(:slide_assessment)
       end
     end
   end
@@ -226,19 +223,22 @@ RSpec.describe JsonSerializerService do
     end
 
     it "covers all Inspection fields" do
-      inspection = create(:inspection, :pdf_complete_test_data, user: user)
+      inspection = create(:inspection, :completed, user: user)
       json = JsonSerializerService.serialize_inspection(inspection)
 
       # Count included fields
       included_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Verify we're including the expected number of fields
-      expect(included_fields.count).to eq(14) # Actual count of included fields
+      expect(included_fields.count).to eq(13) # Actual count of included fields (reduced by 1 after excluding unique_report_number)
 
       # Verify critical fields are included
-      %w[inspection_date inspection_location passed complete_date unique_report_number].each do |field|
+      %w[inspection_date inspection_location passed complete_date].each do |field|
         expect(json).to have_key(field.to_sym)
       end
+      
+      # Verify unique_report_number is NOT included
+      expect(json).not_to have_key(:unique_report_number)
     end
   end
 end

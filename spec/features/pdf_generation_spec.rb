@@ -24,7 +24,7 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
     scenario "user generates PDF with full assessment workflow" do
       # Start with a completed inspection that has assessments
-      full_inspection = create(:inspection, :pdf_complete_test_data, user: user, unit: unit)
+      full_inspection = create(:inspection, user: user, unit: unit)
 
       visit inspection_path(full_inspection)
 

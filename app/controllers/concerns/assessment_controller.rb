@@ -114,7 +114,6 @@ module AssessmentController
     @inspection_locations = []
   end
 
-
   def set_previous_inspection
     return unless @inspection.unit
     @previous_inspection = @inspection.unit.last_inspection

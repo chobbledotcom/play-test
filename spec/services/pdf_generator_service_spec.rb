@@ -162,7 +162,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
   describe "assessment sections" do
     let(:user) { create(:user) }
     let(:unit) { create(:unit, user: user) }
-    let(:inspection) { create(:inspection, :pdf_complete_test_data, user: user, unit: unit, has_slide: true, is_totally_enclosed: true) }
+    let(:inspection) { create(:inspection, :completed, user:, unit:) }
 
     context "with user height assessment" do
       it "includes user height assessment data" do

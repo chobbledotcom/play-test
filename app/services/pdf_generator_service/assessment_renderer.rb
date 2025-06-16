@@ -60,9 +60,16 @@ class PdfGeneratorService
 
     def format_field_line(label, value, pass_value, is_pass_field)
       parts = []
-      parts << pass_fail_indicator(pass_value)
-      parts << bold(label)
-      parts << ": #{value}" if !is_pass_field && value.present?
+      # For boolean fields that aren't pass/fail fields, don't show pass/fail indicator
+      if [true, false].include?(value) && !is_pass_field && pass_value.nil?
+        # Just show the label and value for regular boolean fields
+        parts << bold(label)
+        parts << ": #{value ? "Yes" : "No"}"
+      else
+        parts << pass_fail_indicator(pass_value)
+        parts << bold(label)
+        parts << ": #{value}" if !is_pass_field && value.present?
+      end
       parts.join
     end
 

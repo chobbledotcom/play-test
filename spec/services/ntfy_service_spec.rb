@@ -353,7 +353,6 @@ RSpec.describe NtfyService do
         allow(mock_request).to receive(:body=)
         NtfyService.send(:send_notification, test_message)
       end
-
     end
   end
 end

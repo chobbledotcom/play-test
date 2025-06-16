@@ -14,25 +14,27 @@ RSpec.describe InspectionsHelper, type: :helper do
 
     it "returns standard tabs for regular units" do
       tabs = helper.inspection_tabs(inspection)
-      expect(tabs).to eq(%w[inspection user_height structure anchorage materials fan])
+      expect(tabs).to eq(%w[
+        inspection
+        user_height
+        slide
+        structure
+        anchorage
+        materials
+        fan enclosed
+      ])
     end
 
-    it "includes enclosed tab for totally enclosed units" do
-      unit = create(:unit)
-      inspection.update!(unit: unit, is_totally_enclosed: true)
-
+    it "excludes enclosed tab when not needed" do
+      inspection.update!(is_totally_enclosed: false)
       tabs = helper.inspection_tabs(inspection)
-      expect(tabs).to include("enclosed")
-      expect(tabs.count).to eq(7) # Standard tabs plus enclosed
+      expect(tabs).not_to include("enclosed")
     end
 
-    it "includes slide tab for units with slides" do
-      unit = create(:unit)
-      inspection.update!(unit: unit, has_slide: true)
-
+    it "excludes slide tab when not needed" do
+      inspection.update!(has_slide: false)
       tabs = helper.inspection_tabs(inspection)
-      expect(tabs).to include("slide")
-      expect(tabs).to eq(%w[inspection user_height slide structure anchorage materials fan])
+      expect(tabs).not_to include("slide")
     end
   end
 

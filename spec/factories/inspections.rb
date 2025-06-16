@@ -8,6 +8,8 @@ FactoryBot.define do
 
     inspection_location { "Test Location" }
     passed { true }
+    has_slide { true }
+    is_totally_enclosed { true }
     inspection_date { Date.current }
     unique_report_number { nil } # User provides this manually
     complete_date { nil }
@@ -35,13 +37,9 @@ FactoryBot.define do
       complete_date { Time.current }
 
       after(:create) do |inspection|
-        # Reload to ensure we have the latest state (in case other traits modified attributes)
         inspection.reload
-
-        # Loop through all assessment types and mark them as complete
         Inspection::ASSESSMENT_TYPES.each do |assessment_name, _assessment_class|
           assessment = inspection.send(assessment_name)
-          # Use the complete trait for all assessments
           assessment.update!(attributes_for(assessment_name, :complete))
         end
       end
@@ -66,6 +64,10 @@ FactoryBot.define do
     end
 
     trait :with_complete_assessments do
+      after(:build) do |_inspection|
+        warn "[DEPRECATION] The :with_complete_assessments trait is deprecated as inspections are totally enclosed by default. Remove this trait from your test and use create(:inspection) instead."
+      end
+
       # Dimensions needed for calculations
       width { 5.5 }
       length { 6.0 }
@@ -83,44 +85,6 @@ FactoryBot.define do
       end
     end
 
-    trait :pdf_complete_test_data do
-      complete_date { Time.current }
-      inspection_location { "Happy Kids Play Centre" }
-      passed { true }
-      unique_report_number { "RPII-20250609-#{SecureRandom.alphanumeric(6).upcase}" }
-
-      # Risk assessment
-      risk_assessment { "Low risk assessment notes" }
-
-      # Use the complete assessments trait
-      with_complete_assessments
-
-      after(:create) do |inspection|
-        inspection.structure_assessment.update!(
-          step_ramp_size: 0.3,
-          step_ramp_size_pass: true,
-          trough_depth: 0.1,
-          trough_adjacent_panel_width: 0.8,
-          unit_pressure: 2.5,
-          unit_pressure_pass: true,
-          critical_fall_off_height: 1.2,
-          critical_fall_off_height_pass: true
-        )
-
-        # Add some test comments
-        inspection.anchorage_assessment.update!(
-          num_low_anchors_comment: "Additional low anchors recommended for high wind area",
-          num_high_anchors_comment: "High anchor count adequate",
-          anchor_type_comment: "D-ring anchors in good condition"
-        )
-
-        inspection.structure_assessment.update!(
-          seam_integrity_comment: "All seams checked and secure",
-          unit_stable_comment: "Unit remained stable during 60 second test"
-        )
-      end
-    end
-
     trait :sql_injection_test do
       inspection_location { "Location'); UPDATE users SET admin=true; --" }
     end
@@ -134,11 +98,25 @@ FactoryBot.define do
       risk_assessment { "A" * 65535 }
     end
 
+    trait :not_totally_enclosed do
+      is_totally_enclosed { false }
+    end
+
+    trait :without_slide do
+      has_slide { false }
+    end
+
     trait :totally_enclosed do
+      after(:build) do |_inspection|
+        warn "[DEPRECATION] The :totally_enclosed trait is deprecated as inspections are totally enclosed by default. Remove this trait from your test, or use :not_totally_enclosed if you want the opposite."
+      end
       is_totally_enclosed { true }
     end
 
     trait :with_slide do
+      after(:build) do |_inspection|
+        warn "[DEPRECATION] The :with_slide trait is deprecated as inspections have slides by default. Remove this trait from your test, or use :without_slide if you want the opposite."
+      end
       has_slide { true }
     end
   end

@@ -43,7 +43,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   bin/rspec-find spec/features/       # Run only feature specs
   bin/rspec-find spec/models/user_spec.rb  # Run specific file
   ```
-- **Output**: 
+- **Output**:
   - File path, line number, and test description
   - Full error message and backtrace
   - Complete test method code (with line numbers)
@@ -63,21 +63,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `-w, --write`: Write changes to file if tests pass and line count is reasonable
   - `-h, --help`: Show help message
 - **Examples**:
+
   ```bash
   # Single line replacement (test only)
   bin/rspec-replace spec/models/user_spec.rb:42 'it "works" do; expect(true).to be true; end'
-  
+
   # Multi-line replacement (test only)
   bin/rspec-replace spec/models/user_spec.rb:42 'it "validates email format" do
     user = build(:user, email: "invalid")
     expect(user).not_to be_valid
   end'
-  
+
   # Automatically write changes if tests pass
   bin/rspec-replace --write spec/models/user_spec.rb:42 'it "fixed test" do
     # Fixed implementation
   end'
   ```
+
 - **Features**:
   - Automatically detects test boundaries (it/scenario/describe/context blocks)
   - Preserves proper indentation
@@ -658,7 +660,6 @@ SIMPLE_ARRAY = %i[inactive active archived]
 **IMPORTANT: Inspection Factory Behavior**
 
 - **Inspections auto-create ALL assessments** via `after_create :create_assessments` callback
-- **Use existing complete factory traits** - `:pdf_complete_test_data`, `:with_complete_assessments`
 - **NEVER manually create assessments** - they already exist, just update them
 - **Assessment factories are for standalone testing only** - not for inspection tests
 

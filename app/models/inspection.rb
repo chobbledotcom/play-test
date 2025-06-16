@@ -15,7 +15,6 @@ class Inspection < ApplicationRecord
   belongs_to :unit, optional: true
   belongs_to :inspector_company, optional: true
 
-  # Assessment associations (normalized from single table)
   ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
     has_one assessment_name,
       class_name: assessment_class.name,
@@ -234,7 +233,7 @@ class Inspection < ApplicationRecord
   def validate_completeness
     assessment_validation_data.filter_map do |name, assessment, message|
       # Convert the symbol name (e.g., :slide) to assessment key (e.g., :slide_assessment)
-      assessment_key = "#{name}_assessment".to_sym
+      assessment_key = :"#{name}_assessment"
       next unless assessment_applicable?(assessment_key)
 
       message if assessment&.present? && !assessment.complete?
@@ -337,7 +336,6 @@ class Inspection < ApplicationRecord
   def all_assessments
     applicable_assessments.map { |assessment_key, _| send(assessment_key) }
   end
-
 
   def total_pass_columns
     all_assessments.compact.sum(&:pass_columns_count)

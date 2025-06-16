@@ -20,7 +20,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
   feature "Inspection PDF Content" do
     scenario "includes all required sections" do
       inspection = create_completed_inspection(
-        traits: [:pdf_complete_test_data],
         user: user,
         unit: unit
       )
@@ -59,7 +58,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
     scenario "handles failed inspection correctly" do
       failed_inspection = create_completed_inspection(
-        traits: [:pdf_complete_test_data],
         user: user,
         unit: unit,
         passed: false,

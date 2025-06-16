@@ -4,8 +4,8 @@ puts "Creating inspections and assessments..."
 
 def create_assessments_for_inspection(inspection, unit, passed: true)
   inspection.each_applicable_assessment do |assessment_key, _, _|
-    method_name = "create_#{assessment_key}".to_sym
-    
+    method_name = :"create_#{assessment_key}"
+
     if assessment_key == :user_height_assessment
       send(method_name, inspection, unit, passed)
     else
