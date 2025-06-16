@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.feature "Inspection Deletion Security", type: :feature do
+  include InspectionTestHelpers
   let(:user) { create(:user) }
 
   before { sign_in(user) }
@@ -22,23 +23,21 @@ RSpec.feature "Inspection Deletion Security", type: :feature do
     }.to change(Inspection, :count).by(-1)
 
     expect(current_path).to eq(inspections_path)
-    expect(page).to have_content(I18n.t("inspections.messages.deleted"))
+    expect_deleted_message
   end
 
   scenario "prevents non-owners from accessing edit page" do
     other_inspection = create(:inspection, user: create(:user))
     visit edit_inspection_path(other_inspection)
 
-    expect(current_path).to eq(inspections_path)
-    expect(page).to have_content(I18n.t("inspections.errors.access_denied"))
+    expect_access_denied
   end
 
   scenario "prevents non-owners from deleting via direct DELETE request" do
     other_inspection = create(:inspection, user: create(:user))
     page.driver.submit :delete, "/inspections/#{other_inspection.id}", {}
 
-    expect(current_path).to eq(inspections_path)
-    expect(page).to have_content(I18n.t("inspections.errors.access_denied"))
+    expect_access_denied
     expect(Inspection.exists?(other_inspection.id)).to be true
   end
 
@@ -59,19 +58,10 @@ RSpec.feature "Inspection Deletion Security", type: :feature do
 
     expect(page).to have_button(I18n.t("inspections.buttons.delete"))
 
-    complete_all_assessments(inspection)
+    fill_assessments_with_complete_data(inspection)
     inspection.update!(complete_date: Time.current)
 
     visit edit_inspection_path(inspection)
     expect(page).not_to have_button(I18n.t("inspections.buttons.delete"))
-  end
-
-  private
-
-  def complete_all_assessments(inspection)
-    inspection.reload
-    Inspection::ASSESSMENT_TYPES.each do |assessment_name, _|
-      inspection.send(assessment_name).update!(attributes_for(assessment_name, :complete))
-    end
   end
 end

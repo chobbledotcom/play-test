@@ -10,7 +10,6 @@ RSpec.feature "Structure Assessment Form", type: :feature do
   scenario "user can fill and save structure assessment form" do
     visit edit_inspection_path(inspection, tab: "structure")
 
-    # Fill in some critical safety checks
     choose "seam_integrity_pass_true"
     choose "uses_lock_stitching_pass_false"
     choose "air_loss_pass_true"
@@ -18,28 +17,22 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     choose "sharp_edges_pass_false"
     choose "unit_stable_pass_true"
 
-    # Fill in some measurements
     fill_in "Stitch Length", with: "15.5"
     fill_in "Unit Pressure", with: "2.8"
     fill_in "Blower Tube Length", with: "1.75"
 
-    # Fill in corresponding pass/fail for measurements
     choose "stitch_length_pass_true"
     choose "unit_pressure_pass_true"
     choose "blower_tube_length_pass_true"
 
-    # Fill in some additional checks
     choose "entrapment_pass_false"
     choose "markings_pass_true"
     choose "grounding_pass_true"
 
-    # Submit the form
     click_button I18n.t("forms.structure.submit")
 
-    # Verify success message
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+    expect_updated_message
 
-    # Verify data was saved
     inspection.reload
     structure = inspection.structure_assessment
 

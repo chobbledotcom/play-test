@@ -8,7 +8,6 @@ RSpec.feature "Unit Inspection Association", type: :feature do
     sign_in(user)
   end
 
-  # Helper to fill unit form fields with i18n lookup
   def fill_unit_field(field, value)
     fill_in I18n.t("forms.units.fields.#{field}"), with: value
   end
@@ -41,10 +40,8 @@ RSpec.feature "Unit Inspection Association", type: :feature do
       fill_unit_field(:owner, "Inspection Owner Ltd")
       click_button I18n.t("forms.units.submit")
 
-      # First check if we see the success message
       expect(page).to have_content(I18n.t("units.messages.created_from_inspection"))
 
-      # Then verify we're on the inspection page
       expect(current_path).to eq(inspection_path(inspection))
 
       unit = user.units.find_by(serial: "UFI-2024-001")

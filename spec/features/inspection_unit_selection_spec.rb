@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.feature "Inspection Unit Selection", type: :feature do
+  include InspectionTestHelpers
   let(:user) { create(:user) }
   let!(:unit1) { create(:unit, user: user, name: "Bouncy Castle 1", serial: "BC001", manufacturer: "Acme", owner: "John Doe", description: "Large bouncy castle") }
   let!(:unit2) { create(:unit, user: user, name: "Bouncy Castle 2", serial: "BC002", manufacturer: "Beta Corp") }
@@ -82,7 +83,6 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
         expect_unit_details(unit2)
       end
 
-      # Verify unit was changed
       inspection.reload
       expect(inspection.unit).to eq(unit2)
     end
@@ -125,7 +125,6 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
     end
 
     it "prevents selecting units from other users" do
-      # Try to directly update with another user's unit ID
       page.driver.submit :patch, update_unit_inspection_path(inspection, unit_id: other_unit.id), {}
 
       inspection.reload
@@ -141,7 +140,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
         visit select_unit_inspection_path(complete_inspection)
 
         expect(page).to have_current_path(inspection_path(complete_inspection))
-        expect(page).to have_content(I18n.t("inspections.messages.cannot_edit_complete"))
+        expect_cannot_edit_complete_message
       end
     end
 
@@ -160,7 +159,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
         visit select_unit_inspection_path(admin_complete_inspection)
 
         expect(page).to have_current_path(inspection_path(admin_complete_inspection))
-        expect(page).to have_content(I18n.t("inspections.messages.cannot_edit_complete"))
+        expect_cannot_edit_complete_message
       end
     end
   end

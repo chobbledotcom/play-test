@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.feature "Assessment Access Control", type: :feature do
+  include InspectionTestHelpers
   let(:user1) { create(:user) }
   let(:user2) { create(:user) }
   let(:unit1) { create(:unit, user: user1) }
@@ -29,8 +30,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
       }
     }
 
-    expect(page).to have_content(I18n.t("inspections.errors.access_denied"))
-    expect(current_path).to eq(inspections_path)
+    expect_access_denied
 
     inspection2.reload
     expect(inspection2.anchorage_assessment.num_low_anchors).not_to eq(10)
@@ -50,8 +50,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
       }
     }
 
-    expect(page).to have_content(I18n.t("inspections.errors.access_denied"))
-    expect(current_path).to eq(inspections_path)
+    expect_access_denied
 
     inspection2.reload
     assessment = inspection2.user_height_assessment
@@ -60,10 +59,8 @@ RSpec.feature "Assessment Access Control", type: :feature do
   end
 
   scenario "allows public access to inspection JSON data" do
-    # JSON format is intentionally public for sharing reports
     sign_in(user1)
     visit inspection_path(inspection2, format: :json)
-
     expect(page).to have_content(inspection2.inspection_location)
     expect(page).not_to have_content(I18n.t("inspections.errors.access_denied"))
   end
@@ -73,11 +70,11 @@ RSpec.feature "Assessment Access Control", type: :feature do
     visit edit_inspection_path(inspection1, tab: "anchorage")
     expect(page).to have_content("Edit Inspection")
 
-    fill_in I18n.t("forms.anchorage.fields.num_low_anchors"), with: "8"
-    fill_in I18n.t("forms.anchorage.fields.num_high_anchors"), with: "6"
+    fill_in_form(:anchorage, :num_low_anchors, "8")
+    fill_in_form(:anchorage, :num_high_anchors, "6")
     click_button I18n.t("inspections.buttons.save_assessment")
 
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+    expect_updated_message
 
     inspection1.reload
     expect(inspection1.anchorage_assessment.num_low_anchors).to eq(8)
@@ -89,7 +86,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
     visit edit_inspection_path(inspection1, tab: "user_height")
     fill_in I18n.t("forms.user_height.fields.containing_wall_height"), with: "2.5"
     click_button I18n.t("inspections.buttons.save_assessment")
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+    expect_updated_message
 
     click_button I18n.t("sessions.buttons.log_out")
     sign_in(user2)
@@ -102,12 +99,5 @@ RSpec.feature "Assessment Access Control", type: :feature do
     inspection2.reload
     expect(inspection1.user_height_assessment.containing_wall_height).to eq(2.5)
     expect(inspection2.user_height_assessment.containing_wall_height).not_to eq(2.5)
-  end
-
-  private
-
-  def expect_access_denied
-    expect(page).to have_content(I18n.t("inspections.errors.access_denied"))
-    expect(current_path).to eq(inspections_path)
   end
 end

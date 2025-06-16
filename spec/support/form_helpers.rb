@@ -45,6 +45,10 @@ module FormHelpers
     uncheck_radio field_label
   end
 
+  def find_form_field(form_name, field_name)
+    find_field(I18n.t("forms.#{form_name}.fields.#{field_name}"))
+  end
+
   # Checks that all expected i18n keys are present in the rendered form
   # by looking for the translated text on the page
   def expect_form_sections_present(i18n_base)

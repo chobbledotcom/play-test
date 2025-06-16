@@ -1,11 +1,11 @@
 require "rails_helper"
 
 RSpec.feature "Inspections Index Page", type: :feature do
+  include InspectionTestHelpers
   let(:inspector_company) { create(:inspector_company) }
   let(:user) { create(:user, inspection_company: inspector_company) }
   let(:unit) { create(:unit, user: user) }
 
-  # Helper method to create inspections for the current user
   def create_user_inspection(attributes = {})
     defaults = {
       user: user,
@@ -15,7 +15,6 @@ RSpec.feature "Inspections Index Page", type: :feature do
     create(:inspection, defaults.merge(attributes))
   end
 
-  # Helper method to create inspections for other users
   def create_other_user_inspection(other_user, other_unit, attributes = {})
     defaults = {
       user: other_user,
@@ -57,24 +56,21 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
       it "shows inspection date in readable format" do
         visit inspections_path
-        # The date should be displayed in a readable format (abbreviated)
+
         expect(page).to have_content(Date.current.strftime("%b %d, %Y"))
       end
 
       it "makes list items clickable and routes to edit for non-complete inspections" do
         visit inspections_path
 
-        # Find the list item containing the inspection data
         inspection_item = page.find("li", text: unit.name)
         inspection_link = inspection_item.find("a.table-list-link")
 
-        # Click the link should navigate to edit page for non-complete inspection
         inspection_link.click
         expect(current_path).to eq(edit_inspection_path(inspection))
       end
 
       it "routes to view page for complete inspections" do
-        # Create a complete inspection
         complete_inspection = create(:inspection, :completed,
           user: user,
           unit: unit,
@@ -83,12 +79,10 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
         visit inspections_path
 
-        # Find the list item and click the link
         inspection_item = page.find("li", text: "Complete Location")
         inspection_link = inspection_item.find("a.table-list-link")
         inspection_link.click
 
-        # Should navigate to view page for complete inspection
         expect(current_path).to eq(inspection_path(complete_inspection))
       end
     end
@@ -104,8 +98,6 @@ RSpec.feature "Inspections Index Page", type: :feature do
       it "handles missing location data gracefully" do
         visit inspections_path
 
-        # Should not crash when location fields are blank
-        # Check that the inspection appears even without location data
         expect(page).to have_content(unit.name)
       end
     end
@@ -138,7 +130,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
     it "includes column headers" do
       visit inspections_path
-      # On desktop, headers are visible
+
       expect(page).to have_css(".table-list-header", text: "Name")
       expect(page).to have_css(".table-list-header", text: "Serial")
     end
@@ -173,15 +165,11 @@ RSpec.feature "Inspections Index Page", type: :feature do
     it "creates inspection without unit when Add Inspection is clicked" do
       visit inspections_path
 
-      # Note: Capybara's RackTest driver doesn't support JavaScript confirmations
-      # In a real browser test, this would show the confirmation dialog
-      click_button I18n.t("inspections.buttons.add_inspection")
+      click_add_inspection_on_index_button
 
-      # Should redirect to edit page for new inspection
       expect(current_path).to match(/\/inspections\/\w+\/edit/)
       expect(page).to have_content(I18n.t("inspections.messages.created_without_unit"))
 
-      # Verify inspection was created without unit
       inspection = user.inspections.where(unit_id: nil).order(:created_at).last
       expect(inspection).to be_present
       expect(inspection.unit).to be_nil
@@ -207,7 +195,6 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
         visit inspections_path
 
-        # Find all draft inspection locations in order
         draft_table = page.find("h2", text: "In Progress").sibling(".table-list")
         draft_rows = draft_table.all(".table-list-items li")
 
@@ -237,9 +224,6 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
         visit inspections_path
 
-        # Find all completed inspection locations in order
-        # When there are no draft inspections, the Completed heading isn't shown
-        # so we look for the table directly after the filter form
         complete_table = if page.has_css?("h2", text: "Completed")
           page.find("h2", text: "Completed").sibling(".table-list")
         else

@@ -27,7 +27,6 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
     scenario "Admin edit form includes all admin-only fields" do
       visit edit_user_path(regular_user)
 
-      # Admin-only fields should be present
       expect(page).to have_field("user_name")
       expect(page).to have_field("user_email")
       expect(page).to have_field("user_rpii_inspector_number")
@@ -49,11 +48,9 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
     scenario "Regular user cannot edit name in settings form" do
       visit change_settings_user_path(regular_user)
 
-      # Name should be displayed as read-only
       expect(page).to have_content("Original Name")
       expect(page).not_to have_field("user_name")
 
-      # Other editable fields should be present for users without company
       expect(page).to have_field("user_phone")
       expect(page).to have_field("user_address")
       expect(page).to have_field("user_country")
@@ -64,7 +61,6 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       regular_user.update!(inspection_company: inspector_company)
       visit change_settings_user_path(regular_user)
 
-      # All contact details should be read-only for users with company
       expect(page).to have_content("Original Name")
       expect(page).not_to have_field("user_name")
       expect(page).not_to have_field("user_phone")
@@ -78,11 +74,9 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
     scenario "Regular user can still edit preferences but not name" do
       visit change_settings_user_path(regular_user)
 
-      # Should be able to edit preferences
       expect(page).to have_field("user_default_inspection_location")
       expect(page).to have_select("user_theme")
 
-      # Update preferences
       select I18n.t("users.options.theme_dark"), from: "user_theme"
       fill_in "user_default_inspection_location", with: "Test Location"
       click_button I18n.t("users.buttons.update_settings")
@@ -92,7 +86,7 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       regular_user.reload
       expect(regular_user.theme).to eq("dark")
       expect(regular_user.default_inspection_location).to eq("Test Location")
-      # Name should remain unchanged
+
       expect(regular_user.name).to eq("Original Name")
     end
   end

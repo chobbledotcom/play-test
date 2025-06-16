@@ -29,7 +29,6 @@ RSpec.feature "Inspector Company Management", type: :feature do
       expect(page).to have_content("contact@testcompany.com")
       expect(page).to have_content("01234567890")
 
-      # Verify company was created in database
       company = InspectorCompany.find_by(name: "Test Inspection Company")
       expect(company).to be_present
       expect(company.active).to be true
@@ -49,11 +48,9 @@ RSpec.feature "Inspector Company Management", type: :feature do
 
       submit_form :inspector_companies
 
-      # Should show success message and redirect to show page
       expect(page).to have_content(I18n.t("inspector_companies.messages.updated"))
       expect(page).to have_content("Updated Company Name")
 
-      # Verify database was updated
       company.reload
       expect(company.name).to eq("Updated Company Name")
       expect(company.email).to eq("updated@example.com")
@@ -69,11 +66,9 @@ RSpec.feature "Inspector Company Management", type: :feature do
 
       submit_form :inspector_companies
 
-      # Should show error message via Turbo without page reload
       expect(page).to have_content("can't be blank")
       expect_form_errors :inspector_companies, count: 2
 
-      # Form should remain on edit page
       expect(page).to have_content(I18n.t("inspector_companies.titles.edit"))
     end
 
@@ -101,12 +96,10 @@ RSpec.feature "Inspector Company Management", type: :feature do
 
       visit inspector_companies_path
 
-      # Check that filtering UI is present
       expect(page).to have_select("active")
       expect(page).to have_content(I18n.t("inspector_companies.status.active"))
       expect(page).to have_content(I18n.t("inspector_companies.status.archived"))
 
-      # Test filtering via direct URL visit (more reliable than JS dropdown)
       visit inspector_companies_path(active: "active")
       expect(page).to have_content("Filter Active Company")
 
@@ -121,7 +114,7 @@ RSpec.feature "Inspector Company Management", type: :feature do
       visit inspector_companies_path
 
       fill_in "search", with: "ABC"
-      # Since we can't simulate Enter key in tests, visit the URL with search params
+
       visit inspector_companies_path(search: "ABC")
 
       expect(page).to have_content("ABC Inspections")
@@ -189,10 +182,8 @@ RSpec.feature "Inspector Company Management", type: :feature do
     scenario "admin creates company with missing required fields" do
       visit new_inspector_company_path
 
-      # Leave required fields blank
       submit_form :inspector_companies
 
-      # Should show validation errors
       expect(page).to have_content("can't be blank")
       expect(page).to have_content(I18n.t("inspector_companies.titles.new"))
     end
@@ -200,7 +191,6 @@ RSpec.feature "Inspector Company Management", type: :feature do
     scenario "admin creates company with default country" do
       visit new_inspector_company_path
 
-      # Country field should be pre-filled with UK
       expect(page).to have_field(I18n.t("forms.inspector_companies.fields.country"), with: "UK")
 
       fill_in_form :inspector_companies, :name, "UK Default Company"
@@ -218,29 +208,23 @@ RSpec.feature "Inspector Company Management", type: :feature do
     before { sign_in(admin_user) }
 
     scenario "admin navigates through company management workflow" do
-      # Start from index
       visit inspector_companies_path
       expect(page).to have_content(I18n.t("inspector_companies.titles.index"))
 
-      # Go to new company (now a button instead of link)
       click_button I18n.t("inspector_companies.buttons.new_company")
       expect(page).to have_content(I18n.t("inspector_companies.titles.new"))
 
-      # Create company
       fill_in_form :inspector_companies, :name, "Navigation Test Company"
       fill_in_form :inspector_companies, :phone, "01234 567890"
       fill_in_form :inspector_companies, :address, "Test Address"
       submit_form :inspector_companies
 
-      # Should be on show page
       expect(page).to have_content("Navigation Test Company")
       expect(page).to have_link(I18n.t("ui.edit"))
 
-      # Go to edit
       click_link I18n.t("ui.edit")
       expect(page).to have_content(I18n.t("inspector_companies.titles.edit"))
 
-      # Update and verify we stay on edit page with success message
       fill_in_form :inspector_companies, :name, "Updated Navigation Company"
       submit_form :inspector_companies
 

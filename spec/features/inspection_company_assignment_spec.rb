@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.feature "User Active Status Management", type: :feature do
+  include InspectionTestHelpers
   let(:admin_user) { create(:user, :admin) }
   let(:regular_user) { create(:user, :inactive_user, email: "user@example.com") }
   let!(:inspector_company) { create(:inspector_company, active: true) }
@@ -46,7 +47,7 @@ RSpec.feature "User Active Status Management", type: :feature do
         unit = create(:unit, user: regular_user)
 
         visit unit_path(unit)
-        click_button I18n.t("units.buttons.add_inspection")
+        click_add_inspection_button
 
         expect(page).to have_content(regular_user.inactive_user_message)
         expect(current_path).to eq(unit_path(unit))
@@ -71,9 +72,8 @@ RSpec.feature "User Active Status Management", type: :feature do
         unit = create(:unit, user: regular_user)
 
         visit unit_path(unit)
-        click_button I18n.t("units.buttons.add_inspection")
+        click_add_inspection_button
 
-        # Should redirect to edit page for the new inspection
         expect(current_path).to match(/\/inspections\/\w+\/edit/)
         expect(page).not_to have_content(regular_user.inactive_user_message)
       end
@@ -82,7 +82,7 @@ RSpec.feature "User Active Status Management", type: :feature do
         unit = create(:unit, user: regular_user)
 
         visit unit_path(unit)
-        click_button I18n.t("units.buttons.add_inspection")
+        click_add_inspection_button
 
         inspection = regular_user.inspections.find_by(unit_id: unit.id)
         expect(inspection).to be_present
@@ -120,7 +120,6 @@ RSpec.feature "User Active Status Management", type: :feature do
       scenario "Admin does not see inspector company field on inspection edit" do
         visit edit_inspection_path(admin_inspection)
 
-        # Inspector company is not shown on inspection edit page
         expect(page).not_to have_content(I18n.t("inspections.fields.inspector_company"))
         expect(page).not_to have_select("inspection_inspector_company_id")
       end

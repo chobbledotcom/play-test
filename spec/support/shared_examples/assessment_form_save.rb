@@ -80,8 +80,7 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
       # Submit the form
       click_button I18n.t("#{i18n_base}.submit")
 
-      # Verify success message
-      expect(page).to have_content(I18n.t("inspections.messages.updated"))
+      expect_updated_message
 
       # Reload and get the assessment
       inspection.reload

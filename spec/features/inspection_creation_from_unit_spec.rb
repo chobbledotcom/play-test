@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.feature "Creating Inspection from Unit Page", type: :feature do
+  include InspectionTestHelpers
   let(:inspector_company) { create(:inspector_company) }
   let(:user) { create(:user, :without_company, inspection_company: inspector_company) }
   let(:unit) { create(:unit, user: user) }
@@ -14,7 +15,7 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       visit unit_path(unit)
       expect(page).to have_button(I18n.t("units.buttons.add_inspection"))
 
-      click_button I18n.t("units.buttons.add_inspection")
+      click_add_inspection_button
 
       expect(page).to have_current_path(/\/inspections\/[A-Z0-9]+\/edit/)
       expect(page).to have_content(I18n.t("inspections.messages.created"))
@@ -38,7 +39,7 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       user.update!(active_until: Date.current - 1.day)
       visit unit_path(unit)
 
-      click_button I18n.t("units.buttons.add_inspection")
+      click_add_inspection_button
 
       expect(page).to have_content(I18n.t("users.messages.user_inactive"))
       expect(user.inspections.count).to eq(0)
@@ -50,7 +51,6 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
 
       visit unit_path(other_unit)
 
-      # Should show PDF viewer for non-owner
       expect(page).to have_current_path(unit_path(other_unit))
       expect(page.html).to include("<iframe")
       expect(page).not_to have_button(I18n.t("units.buttons.add_inspection"))
@@ -61,7 +61,7 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
   describe "unit selection workflow" do
     scenario "shows unit details in inspection overview after creation" do
       visit unit_path(unit)
-      click_button I18n.t("units.buttons.add_inspection")
+      click_add_inspection_button
 
       expect(page).to have_content(unit.name)
       expect(page).to have_content(unit.serial)

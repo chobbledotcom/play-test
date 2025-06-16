@@ -14,41 +14,33 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
     scenario "user accesses PDF from inspection show page" do
       visit inspection_path(inspection)
 
-      # PDF should always be embedded (even for draft inspections)
       expect(page).to have_css("iframe", wait: 5)
 
-      # Verify the iframe points to the correct inspection PDF
       expect(page).to have_css("iframe[src*='#{inspection.id}']")
       expect(page).to have_css("iframe[src*='pdf']")
     end
 
     scenario "user generates PDF with full assessment workflow" do
-      # Start with a completed inspection that has assessments
       full_inspection = create(:inspection, user: user, unit: unit)
 
       visit inspection_path(full_inspection)
 
-      # Should have PDF embedded for completed inspection
       expect(page).to have_css("iframe", wait: 5)
 
-      # Verify the PDF is accessible
       get_pdf("/inspections/#{full_inspection.id}.pdf")
     end
 
     scenario "user shares public report link" do
       visit inspection_path(inspection)
 
-      # Should have PDF link visible
       expect(page).to have_link(href: /\.pdf/)
 
-      # Access public PDF directly with .pdf extension
       get_pdf("/inspections/#{inspection.id}.pdf")
     end
   end
 
   feature "User workflow: Unit history reports" do
     scenario "user generates unit report from unit show page" do
-      # Create some inspection history
       3.times do |i|
         create(:inspection, :completed,
           user: user,
@@ -59,14 +51,11 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
       visit unit_path(unit)
 
-      # Should have QR code link in the reports section
       expect(page).to have_content(I18n.t("units.fields.qr_code"))
       expect(page).to have_link(I18n.t("units.fields.qr_code"), href: unit_path(unit, format: :png))
 
-      # Access unit report directly
       pdf_text = get_pdf_text("/units/#{unit.id}.pdf")
 
-      # Should contain inspection history
       expect(pdf_text).to include(I18n.t("pdf.unit.inspection_history"))
     end
 
@@ -75,7 +64,6 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
       visit unit_path(empty_unit)
 
-      # Access empty unit report
       pdf_text = get_pdf_text("/units/#{empty_unit.id}.pdf")
       expect(pdf_text).to include(I18n.t("pdf.unit.no_completed_inspections"))
     end
@@ -83,20 +71,16 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
   feature "User workflow: Navigation and discovery" do
     scenario "user discovers PDF functionality through inspection list" do
-      # Create multiple inspections
       inspections = create_list(:inspection, 3, :completed, user: user)
 
       visit inspections_path
 
-      # Should see inspections in list (by unit name/serial, not ID)
       inspections.each do |insp|
         expect(page).to have_content(insp.unit.name) if insp.unit
       end
 
-      # Click through to specific inspection (using unit name)
       click_link inspections.first.unit.name
 
-      # Should reach inspection show with PDF
       expect(current_path).to eq(inspection_path(inspections.first))
       expect(page).to have_css("iframe", wait: 5)
     end
@@ -109,14 +93,11 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
       visit inspections_path
 
-      # Use search functionality
       fill_in "query", with: "Unique Test"
       click_button "Search" if page.has_button?("Search")
 
-      # Should find the inspection by location
       expect(page).to have_content("Unique Test Location")
 
-      # Access the found inspection (by unit name)
       click_link searchable_inspection.unit.name
       expect(page).to have_css("iframe", wait: 5)
     end
@@ -126,7 +107,6 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
     scenario "user encounters missing inspection gracefully" do
       visit "/inspections/NONEXISTENT"
 
-      # Should return 404 for non-existent resources
       expect(page.status_code).to eq(404)
     end
 
@@ -136,7 +116,6 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
       visit inspection_path(other_inspection)
 
-      # Should show PDF viewer for non-owner
       expect(current_path).to eq(inspection_path(other_inspection))
       expect(page.html).to include("<iframe")
       expect(page.html).to include(inspection_path(other_inspection, format: :pdf))
@@ -147,7 +126,6 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
       visit inspection_path(draft_inspection)
 
-      # Draft inspections also show PDFs
       expect(page).to have_css("iframe", wait: 5)
       expect(page).to have_content("draft report")
     end
@@ -155,13 +133,10 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
   feature "Mobile and responsive PDF access" do
     scenario "user accesses PDFs on mobile-like viewport" do
-      # Skip JS test due to selenium driver issues, just test regular viewport
       visit inspection_path(inspection)
 
-      # PDF should be accessible via iframe
       expect(page).to have_css("iframe", wait: 5)
 
-      # Verify the iframe contains the PDF URL
       expect(page).to have_css("iframe[src*='#{inspection.id}']")
       expect(page).to have_css("iframe[src*='pdf']")
     end

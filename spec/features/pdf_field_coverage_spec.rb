@@ -19,32 +19,26 @@ RSpec.feature "PDF Field Coverage", type: :feature do
     scenario "includes all inspection model fields except system/metadata fields" do
       inspection = create(:inspection, :completed, user: user, unit: unit)
 
-      # Just check that the PDF actually has the important stuff
       text_content = get_pdf_text(inspection_path(inspection, format: :pdf))
 
-      # Core inspection info
       expect(text_content).to include(unit.name)
       expect(text_content).to include(unit.serial)
       expect(text_content).to include(inspection.inspection_date.strftime("%d/%m/%Y"))
       expect(text_content).to include(inspection.passed? ? I18n.t("pdf.inspection.passed") : I18n.t("pdf.inspection.failed"))
       expect(text_content).to include("#{I18n.t("pdf.inspection.fields.report_id")}: #{inspection.id}")
 
-      # Unit details (the stuff we just fixed)
       expect(text_content).to include(I18n.t("pdf.dimensions.width"))
       expect(text_content).to include(I18n.t("pdf.dimensions.length"))
       expect(text_content).to include(I18n.t("pdf.dimensions.height"))
       expect(text_content).to include(unit.manufacturer)
       expect(text_content).to include(unit.owner)
 
-      # Assessment sections exist - loop through all assessment types
       inspection.each_applicable_assessment do |assessment_key, _, _|
-        # Get the i18n key for this assessment
         assessment_type = assessment_key.to_s.sub(/_assessment$/, "")
         header = I18n.t("forms.#{assessment_type}.header")
         expect(text_content).to include(header)
       end
 
-      # Some actual assessment data shows up
       expect(text_content).to include("[PASS]") # Should have some passing assessments
       expect(text_content).to include("1.2") # containing_wall_height
       expect(text_content).to include("1.8") # platform_height

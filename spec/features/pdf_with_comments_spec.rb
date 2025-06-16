@@ -5,10 +5,8 @@ RSpec.feature "PDF with Comments", type: :feature do
   let(:unit) { create(:unit) }
 
   scenario "renders assessment comments in purple italics" do
-    # Create inspection with specific comments
     inspection = create(:inspection, user: user, unit: unit)
 
-    # Add comments to anchorage assessment
     inspection.anchorage_assessment.update!(
       num_low_anchors: 4,
       num_low_anchors_pass: false,
@@ -18,7 +16,6 @@ RSpec.feature "PDF with Comments", type: :feature do
       anchor_type_comment: "D-ring anchors properly installed"
     )
 
-    # Add comments to structure assessment
     inspection.structure_assessment.update!(
       seam_integrity_pass: true,
       seam_integrity_comment: "All seams double-stitched",
@@ -31,13 +28,11 @@ RSpec.feature "PDF with Comments", type: :feature do
 
     pdf_content = extract_pdf_text(page.source)
 
-    # Verify comments appear in PDF
     expect(pdf_content).to include("Need 2 more low anchors for safety")
     expect(pdf_content).to include("D-ring anchors properly installed")
     expect(pdf_content).to include("All seams double-stitched")
     expect(pdf_content).to include("Passed 90 second stability test")
 
-    # Verify [PASS]/[FAIL] indicators
     expect(pdf_content).to include("[FAIL]")
     expect(pdf_content).to include("[PASS]")
   end

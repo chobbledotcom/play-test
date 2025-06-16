@@ -23,7 +23,6 @@ RSpec.feature "RPII Verification", type: :feature do
     expect(page).to have_content(I18n.t("users.messages.rpii_verified"))
     expect(page).to have_content("✓")
 
-    # Verify the date was saved
     user_with_valid_rpii.reload
     expect(user_with_valid_rpii.rpii_verified?).to be true
     expect(user_with_valid_rpii.rpii_verified_date).to be_within(1.minute).of(Time.current)
@@ -37,7 +36,6 @@ RSpec.feature "RPII Verification", type: :feature do
     expect(page).to have_content(I18n.t("users.messages.rpii_not_found"))
     expect(page).not_to have_content("✓")
 
-    # Verify the date was cleared
     user_with_invalid_rpii.reload
     expect(user_with_invalid_rpii.rpii_verified?).to be false
     expect(user_with_invalid_rpii.rpii_verified_date).to be_nil
@@ -50,12 +48,10 @@ RSpec.feature "RPII Verification", type: :feature do
   end
 
   scenario "previously verified date is cleared when verification fails" do
-    # Set up a user with a previously verified date
     user_with_invalid_rpii.update!(rpii_verified_date: 1.day.ago)
 
     visit edit_user_path(user_with_invalid_rpii)
 
-    # Should show the old verification date
     expect(page).to have_content("✓")
 
     click_button I18n.t("users.buttons.verify_rpii")
@@ -63,7 +59,6 @@ RSpec.feature "RPII Verification", type: :feature do
     expect(page).to have_content(I18n.t("users.messages.rpii_not_found"))
     expect(page).not_to have_content("✓")
 
-    # Verify the date was cleared
     user_with_invalid_rpii.reload
     expect(user_with_invalid_rpii.rpii_verified_date).to be_nil
   end
@@ -71,10 +66,8 @@ RSpec.feature "RPII Verification", type: :feature do
   scenario "non-admin users cannot access verification" do
     sign_in(user_with_valid_rpii)
 
-    # Try to access another user's edit page
     visit edit_user_path(user_with_invalid_rpii)
 
-    # Should be redirected
     expect(page).not_to have_current_path(edit_user_path(user_with_invalid_rpii))
     expect(page).to have_content(I18n.t("authorization.admin_required"))
   end
@@ -84,23 +77,19 @@ RSpec.feature "RPII Verification", type: :feature do
 
     click_button I18n.t("users.buttons.verify_rpii")
 
-    # Should be redirected back to edit page
     expect(page).to have_current_path(edit_user_path(user_with_valid_rpii))
     expect(page).to have_content(I18n.t("users.messages.rpii_verified"))
   end
 
   scenario "admin can compare verification details with user details" do
-    # Create a user with a different name than the RPII record
     user_with_mismatch = create(:user, name: "John Smith", rpii_inspector_number: "AI0025")
 
     visit edit_user_path(user_with_mismatch)
 
-    # User's name in form
     expect(page).to have_field(I18n.t("users.forms.name"), with: "John Smith")
 
     click_button I18n.t("users.buttons.verify_rpii")
 
-    # Should show name mismatch error
     expect(page).to have_content(I18n.t("users.messages.rpii_name_mismatch", user_name: "John Smith", inspector_name: "Chris Winters"))
   end
 end

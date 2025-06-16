@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.feature "Inspection incomplete fields display", type: :feature do
+  include InspectionTestHelpers
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user:) }
   let(:inspection) { create(:inspection, unit:, user:, inspection_location: nil) }

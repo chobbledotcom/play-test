@@ -7,40 +7,39 @@ RSpec.feature "Inspection Prefilling", type: :feature do
   before { sign_in(user) }
 
   scenario "prefills fields from previous inspection" do
-    # Create a completed first inspection
-    first_inspection = create(:inspection, :completed,
+    create(:inspection, :completed,
       user: user,
+      inspection_date: 365.days.ago,
       unit: unit,
-      inspection_location: "Test Location",
-      has_slide: true,
-      is_totally_enclosed: false,
-      width: 5.0,
-      length: 4.0,
-      height: 3.0)
-    first_inspection.update!(complete_date: Time.current)
+      width: 5)
 
-    # Create a second inspection from the unit page
     visit unit_path(unit)
     click_button I18n.t("units.buttons.add_inspection")
 
-    # Verify we're on the edit page for the new inspection
     expect(page).to have_content(I18n.t("inspections.titles.edit"))
 
-    # Check that fields are prefilled
-    location_field = find_field(I18n.t("forms.inspection.fields.inspection_location"))
+    new_inspection = unit.inspections.order(:inspection_date).last
+    expect(new_inspection.width).to eq(nil)
+    expect(page).to have_current_path(edit_inspection_path(new_inspection))
+
+    location_field = find_form_field(:inspection, :inspection_location)
     expect(location_field.value).to eq("Test Location")
 
-    # Check that the field has the prefilled class
     field_wrapper = location_field.find(:xpath, "..")
     expect(field_wrapper[:class]).to include("set-previous")
 
-    # Check dimension fields
-    width_field = find_field(I18n.t("forms.inspection.fields.width"))
+    width_field = find_form_field(:inspection, :width)
     expect(width_field.value).to eq("5")
 
-    # For now, just verify that we can save the form without errors
-    # The radio button prefilling appears to have some issues we can fix later
     click_button I18n.t("forms.inspection.submit")
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+    expect_updated_message
+
+    visit edit_inspection_path(new_inspection)
+    width_field = find_form_field(:inspection, :width)
+    expect(width_field.value).to eq("5")
+
+    location_field = find_form_field(:inspection, :inspection_location)
+    field_wrapper = location_field.find(:xpath, "..")
+    expect(field_wrapper[:class]).not_to include("set-previous")
   end
 end

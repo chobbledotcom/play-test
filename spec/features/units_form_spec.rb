@@ -26,7 +26,7 @@ RSpec.describe "Units Form", type: :feature do
 
       expect(page).to have_content("Test Bouncy Castle")
       expect(page).to have_content("JumpCo")
-      # Should redirect to the unit show page
+
       expect(current_path).to match(%r{^/units/[A-Z0-9]{8}$})
     end
 

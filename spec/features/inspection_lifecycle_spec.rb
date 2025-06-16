@@ -22,7 +22,6 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
       visit edit_inspection_path(completed_inspection)
 
-      # Should redirect to show page with message
       expect(page).to have_current_path(inspection_path(completed_inspection))
       expect_cannot_edit_complete_message
     end
@@ -38,7 +37,6 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
     end
 
     it "preserves all data when toggling completion status" do
-      # Create inspection with complete data but not yet marked as complete
       inspection = create(:inspection,
         user: user,
         unit: unit,
@@ -95,20 +93,14 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
     it "fills field with inspection ID when suggestion button is clicked" do
       visit edit_inspection_path(inspection)
 
-      # Verify button is present when unique_report_number is blank
       expect_suggested_id_button(inspection)
 
-      # Since JavaScript doesn't execute in rack-test, we'll simulate what the JS would do
-      # by directly filling in the field with the inspection ID
       fill_in_report_number(inspection.id)
 
-      # Save the form
       click_submit_button
 
-      # Check the value was saved
       expect(inspection.reload.unique_report_number).to eq(inspection.id)
 
-      # Verify the button is no longer shown after saving with a value
       visit edit_inspection_path(inspection)
       expect_no_suggested_id_button(inspection)
     end
@@ -129,14 +121,11 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
       visit edit_inspection_path(inspection)
 
-      # Clear the field
       fill_in_report_number("")
       click_submit_button
 
-      # Verify it was cleared
       expect(inspection.reload.unique_report_number).to eq("")
 
-      # Visit edit page again to see the button
       visit edit_inspection_path(inspection)
       expect_suggested_id_button(inspection)
     end
@@ -164,7 +153,6 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       fill_in_report_number("USER-REPORT-456")
       click_submit_button
 
-      # The mark complete button is shown on the general tab
       visit edit_inspection_path(inspection)
       click_mark_complete_button
 
@@ -181,19 +169,15 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       user_with_company = create(:user, inspection_company: inspector_company)
       unit_for_company_user = create(:unit, user: user_with_company)
 
-      # Verify the user has the correct company
       expect(user_with_company.inspection_company_id).to eq(inspector_company.id)
 
       login_user_via_form(user_with_company)
 
-      # Get initial inspection count
       initial_count = user_with_company.inspections.count
 
-      # Navigate to unit and create inspection
       visit unit_path(unit_for_company_user)
       click_add_inspection_button
 
-      # Find the newly created inspection
       expect(user_with_company.inspections.count).to eq(initial_count + 1)
       new_inspection = user_with_company.inspections.order(:created_at).last
 
@@ -207,14 +191,11 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
       login_user_via_form(user_without_company)
 
-      # Get initial inspection count
       initial_count = user_without_company.inspections.count
 
-      # Navigate to unit and create inspection
       visit unit_path(unit_for_user)
       click_add_inspection_button
 
-      # Find the newly created inspection
       expect(user_without_company.inspections.count).to eq(initial_count + 1)
       new_inspection = user_without_company.inspections.order(:created_at).last
 

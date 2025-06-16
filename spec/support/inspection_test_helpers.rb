@@ -21,6 +21,10 @@ module InspectionTestHelpers
     click_button I18n.t("units.buttons.add_inspection")
   end
 
+  def click_add_inspection_on_index_button
+    click_button I18n.t("inspections.buttons.add_inspection")
+  end
+
   def click_delete_button
     click_button I18n.t("inspections.buttons.delete")
   end
@@ -65,6 +69,11 @@ module InspectionTestHelpers
 
   def expect_access_denied_message
     expect_access_denied
+  end
+
+  def expect_access_denied
+    expect(page).to have_content(I18n.t("inspections.errors.access_denied"))
+    expect(current_path).to eq(inspections_path)
   end
 
   def expect_cannot_complete_message

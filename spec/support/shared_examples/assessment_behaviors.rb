@@ -303,8 +303,7 @@ RSpec.shared_examples "an assessment form" do |assessment_type|
       # Submit the form
       click_button I18n.t("inspections.buttons.save_assessment")
 
-      # Should show success message
-      expect(page).to have_content(I18n.t("inspections.messages.updated"))
+      expect_updated_message
     end
   end
 end

@@ -52,7 +52,6 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
   feature "Numeric precision and edge values" do
     scenario "handles extreme numeric precision" do
-      # Update only the specific fields with extreme values, keeping other required fields intact
       inspection.user_height_assessment.update!(
         containing_wall_height: 999.999999,
         platform_height: 0.000001,
@@ -66,8 +65,6 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
     end
 
     scenario "handles nil and blank numeric values" do
-      # For this test, we want to test PDF generation with some nil values
-      # but keep the inspection valid by only nullifying optional fields
       inspection.user_height_assessment.update!(
         platform_height_comment: nil,
         containing_wall_height_comment: "",
@@ -77,18 +74,15 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
       pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
       expect(pdf_text).to be_present
-      # The PDF should handle these edge cases gracefully
     end
   end
 
   feature "Large data sets and performance" do
     scenario "handles inspection with all assessment types and maximum data" do
-      # Create unit with all features
       full_unit = create(:unit, :with_all_fields, user: user)
 
       full_inspection = create(:inspection, :completed, user: user, unit: full_unit)
 
-      # Add maximum length comments to all assessments
       long_comment = "Detailed assessment comment " * 50
       full_inspection.user_height_assessment.update(
         containing_wall_height_comment: long_comment,
@@ -102,7 +96,6 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
       expect(generation_time).to be < 10.seconds  # Should generate within 10 seconds
 
-      # Verify PDF contains all sections
       %w[User\ Height Slide Structure Anchorage Materials Fan/Blower Totally\ Enclosed].each do |section|
         expect(pdf_text).to include(section)
       end
@@ -122,10 +115,8 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       threads = []
       results = []
 
-      # Simulate 5 concurrent PDF generation requests
       5.times do |i|
         threads << Thread.new do
-          # Each thread uses a fresh browser session
           new_page = Capybara::Session.new(:rack_test, Capybara.app)
           new_page.driver.browser.get(inspection_path(inspection, format: :pdf))
 
@@ -139,7 +130,6 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
       threads.each(&:join)
 
-      # All requests should succeed
       expect(results.size).to eq(5)
       results.each do |result|
         expect(result[:status]).to eq(200)
@@ -151,17 +141,14 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
   feature "Memory and resource management" do
     scenario "cleans up temporary files during PDF generation" do
-      # Monitor temporary file creation more specifically for this process
       process_pattern = "/tmp/*qr_code*#{inspection.id}_#{Process.pid}*"
 
       10.times do
         temp_files_before = Dir.glob(process_pattern).size
         get_pdf(inspection_path(inspection, format: :pdf))
 
-        # Allow a brief moment for cleanup
         sleep(0.01)
 
-        # Should not leave files for this specific process/inspection combo
         temp_files_after = Dir.glob(process_pattern).size
         expect(temp_files_after).to eq(temp_files_before)
       end
@@ -170,17 +157,14 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
 
   feature "Error recovery" do
     scenario "handles corrupted assessment data gracefully" do
-      # Create assessment with potentially problematic data
       assessment = build(:user_height_assessment, inspection: inspection)
       assessment.save!(validate: false)  # Bypass validations
 
-      # Manually corrupt some data in the database
       assessment.update_columns(
         containing_wall_height: "invalid_number",
         users_at_1000mm: -999
       )
 
-      # Should still generate PDF, just with "N/A" or safe defaults
       pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
       expect_valid_pdf(pdf_data)
     end

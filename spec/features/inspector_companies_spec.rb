@@ -57,11 +57,9 @@ RSpec.describe "Inspector Companies", type: :feature do
       it "shows the company list with minimal data" do
         visit inspector_companies_path
 
-        # Should show at least the admin user's company
         expect(page).to have_content(admin_user.inspection_company.name)
         expect(page).to have_button(I18n.t("inspector_companies.buttons.new_company"))
 
-        # Check the table exists
         expect(page).to have_css("table")
       end
     end
@@ -83,7 +81,7 @@ RSpec.describe "Inspector Companies", type: :feature do
         visit inspector_companies_path
 
         fill_in I18n.t("inspector_companies.search.placeholder"), with: "Test Company 1"
-        # Since we can't simulate Enter key in tests, visit the URL with search params
+
         visit inspector_companies_path(search: "Test Company 1")
 
         expect(page).to have_content(company1.name)
@@ -119,7 +117,6 @@ RSpec.describe "Inspector Companies", type: :feature do
 
       expect(page).to have_content(I18n.t("inspector_companies.titles.new"))
 
-      # Use our comprehensive form helper to verify all i18n is correct
       expect_form_matches_i18n("forms.inspector_companies")
     end
 
@@ -168,7 +165,6 @@ RSpec.describe "Inspector Companies", type: :feature do
       expect(page).to have_content(company.name)
       expect(page).to have_content(I18n.t("inspector_companies.headers.company_statistics"))
 
-      # Company RPII field no longer exists
       expect(page).to have_content(company.phone)
       expect(page).to have_content(company.email)
     end
@@ -194,7 +190,6 @@ RSpec.describe "Inspector Companies", type: :feature do
       expect(page).to have_content(I18n.t("inspector_companies.titles.edit"))
       expect(page).to have_field(I18n.t("forms.inspector_companies.fields.name"), with: company.name)
 
-      # Use our comprehensive form helper to verify all i18n is correct
       expect_form_matches_i18n("forms.inspector_companies")
     end
 

@@ -11,22 +11,18 @@ RSpec.describe "Unit Inspection History", type: :feature do
 
   describe "viewing unit inspection history" do
     it "displays inspection history table without errors" do
-      # Create an inspection to ensure the table has data
       inspection
 
       visit unit_path(unit)
 
-      # This should reproduce the error: undefined method 'inspector' for Inspection
       expect { page.has_content?("Inspector") }.not_to raise_error
 
-      # The page should display inspection history without crashing
       expect(page).to have_content(I18n.t("inspections.fields.last_inspection"))
       expect(page).to have_content(I18n.t("inspections.fields.inspector"))
       expect(page).to have_content(I18n.t("inspections.fields.result"))
     end
 
     it "displays inspection with assigned company" do
-      # Inspector company should always be assigned
       expect(inspection.inspector_company).to be_present
 
       visit unit_path(unit)

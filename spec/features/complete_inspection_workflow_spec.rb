@@ -369,7 +369,6 @@ class InspectionWorkflow
     expect(page).to have_current_path(select_unit_inspection_path(@inspection))
     expect(page).to have_content(other_unit.name)
 
-    # Verify can't see other users' units
     other_user_unit = create(:unit, user: create(:user), name: "Other User's Unit")
     visit current_path
     expect(page).not_to have_content(other_user_unit.name)

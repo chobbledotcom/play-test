@@ -69,7 +69,6 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
     end
 
     it "cannot update RPII inspector number via form submission" do
-      # Attempt to submit RPII data directly
       page.driver.submit :patch, user_path(regular_user), {
         user: {
           email: regular_user.email,
@@ -123,14 +122,11 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
       fill_in I18n.t("users.forms.name"), with: "New Test User"
       fill_in I18n.t("users.forms.password"), with: "password123"
       fill_in I18n.t("users.forms.password_confirmation"), with: "password123"
-      # Intentionally not filling RPII field
 
       click_button I18n.t("users.buttons.register")
 
-      # Should successfully create account without RPII
       expect(page).to have_content(I18n.t("users.messages.account_created"))
 
-      # Verify user was created without RPII
       new_user = User.find_by(email: "newuser@example.com")
       expect(new_user).to be_present
       expect(new_user.rpii_inspector_number).to be_nil
