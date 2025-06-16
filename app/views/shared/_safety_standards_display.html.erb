@@ -1,0 +1,23 @@
+<%#
+  Safety Standards Display Partial
+  
+  Parameters:
+  - reference_partials: Array of partials to render in the collapsible reference section
+  - dynamic_content: Block for dynamic safety information specific to each assessment
+  - show_reference: Whether to show the collapsible reference section (default: true)
+%>
+<% show_reference = local_assigns.fetch(:show_reference, true) %>
+<% reference_partials = local_assigns.fetch(:reference_partials, []) %>
+
+<% if show_reference && reference_partials.any? %>
+  <details class="safety-standards-reference">
+    <summary><%= t('shared.safety_standards.view_standards') %></summary>
+    <% reference_partials.each do |partial| %>
+      <%= render partial %>
+    <% end %>
+  </details>
+<% end %>
+
+<% if local_assigns[:dynamic_content] %>
+  <%= capture(&dynamic_content) %>
+<% end %>

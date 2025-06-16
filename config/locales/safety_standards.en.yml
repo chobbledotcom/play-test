@@ -1,9 +1,50 @@
 en:
-  # Safety Standards Reference Page
-  safety_standards_reference:
+  safety_standards:
     title: "Safety Standards Reference"
     subtitle: "EN 14960:2019 Requirements for Inflatable Play Equipment"
-    
+    compliant: "Compliant"
+
+    anchor_requirements:
+      title: "Anchor Requirements"
+      description: "Anchors must be calculated based on the play area to ensure adequate ground restraint."
+      unit_area: "Unit Area (m²)"
+      required_anchors: "Required Anchors"
+      under_70: "Under 70m²"
+      70_to_100: "70-100m²"
+      100_to_125: "100-125m²"
+      125_to_150: "125-150m²"
+      150_to_175: "150-175m²"
+      175_to_200: "175-200m²"
+      over_200: "Over 200m²"
+      add_one_per_15: "Add 1 per 15m²"
+      total_anchors: "Total Anchors:"
+      required: "Required Anchors:"
+      compliance_status: "Compliance Status:"
+
+    slide_requirements:
+      title: "EN 14960:2019 Slide Requirements"
+      wall_height_requirements: "Wall Height Requirements:"
+      platform_height_requirement: "EN 14960:2019 Requirement:"
+      minimum_runout: "Minimum runout"
+      runout_formula: "(50% of platform height or 300mm minimum)"
+      no_walls_required: "No containing walls required"
+      walls_equal_height: "Walls must be at least %{height}m (equal to platform height)"
+      walls_125_height: "Walls must be at least %{height}m (1.25x platform height)"
+      walls_125_plus_roof: "Walls must be at least %{height}m + permanent roof required"
+
+    user_height:
+      title: "User Height Requirements"
+      height_requirements: "Height Requirements:"
+      no_walls_required: "No containing walls required"
+      walls_equal_user_height: "Containing walls must be at least %{height}m (equal to user height)"
+      walls_125_user_height: "Containing walls must be at least %{height}m (1.25x user height)"
+      walls_125_plus_roof_required: "Containing walls must be at least %{height}m + permanent roof required"
+      calculated_capacities: "Calculated Capacities:"
+      capacity_1000mm: "1.0m users: %{count} (1.5m² per user)"
+      capacity_1200mm: "1.2m users: %{count} (2.0m² per user)"
+      capacity_1500mm: "1.5m users: %{count} (2.5m² per user)"
+      capacity_1800mm: "1.8m users: %{count} (3.0m² per user)"
+
     calculators:
       anchor:
         title: "Calculate Required Anchors"
@@ -15,7 +56,7 @@ en:
         area_result: "Area:"
         required_result: "Required Anchors:"
         calculation_result: "Calculation:"
-        
+
       user_capacity:
         title: "Calculate User Capacity"
         description: "Based on age-appropriate space allocation per user by height category."
@@ -32,7 +73,7 @@ en:
         negative_adjustment_result: "Negative Adjustment:"
         usable_area_result: "Usable Area:"
         capacities_result: "User Capacities:"
-        
+
       runout:
         title: "Calculate Required Runout Length"
         height_label: "Platform Height (m):"
@@ -42,7 +83,7 @@ en:
         platform_height_result: "Platform Height:"
         required_runout_result: "Required Runout:"
         calculation_breakdown: "Calculation:"
-        
+
       wall_height:
         title: "Calculate Wall Height Requirements"
         user_height_label: "Tallest User Height (m):"
@@ -52,7 +93,7 @@ en:
         user_height_result: "Tallest User Height:"
         requirement_result: "Requirement:"
         additional_result: "Additional:"
-        
+
     errors:
       invalid_area: "Please enter a valid area greater than 0"
       invalid_length: "Please enter a valid length greater than 0"

@@ -1,27 +1,31 @@
 <%= render 'form/form_context', model: @inspection.anchorage_assessment, i18n_base: 'forms.anchorage', url: inspection_anchorage_assessment_path(@inspection) do |form| %>
   <!-- Anchor Counts -->
-      <%= render 'form/fieldset', legend_key: 'anchor_counts' do %>
-        <%= render 'form/number_pass_fail_comment', field: :num_low_anchors %>
-        <%= render 'form/number_pass_fail_comment', field: :num_high_anchors %>
-      <% end %>
+  <%= render 'form/fieldset', legend_key: 'anchor_counts' do %>
+    <%= render 'form/number_pass_fail_comment', field: :num_low_anchors %>
+    <%= render 'form/number_pass_fail_comment', field: :num_high_anchors %>
+  <% end %>
 
-      <!-- Anchor Quality -->
-      <%= render 'form/fieldset', legend_key: 'anchor_quality' do %>
-        <%= render 'form/pass_fail_comment', field: :anchor_accessories_pass %>
-        <%= render 'form/pass_fail_comment', field: :anchor_degree_pass %>
-        <%= render 'form/pass_fail_comment', field: :anchor_type_pass %>
-        <%= render 'form/pass_fail_comment', field: :pull_strength_pass %>
-      <% end %>
+  <!-- Anchor Quality -->
+  <%= render 'form/fieldset', legend_key: 'anchor_quality' do %>
+    <%= render 'form/pass_fail_comment', field: :anchor_accessories_pass %>
+    <%= render 'form/pass_fail_comment', field: :anchor_degree_pass %>
+    <%= render 'form/pass_fail_comment', field: :anchor_type_pass %>
+    <%= render 'form/pass_fail_comment', field: :pull_strength_pass %>
+  <% end %>
 
-      <!-- Dynamic Safety Standards Info -->
-      <% if @inspection.anchorage_assessment&.total_anchors&.positive? %>
-        <div class="safety-standards-info">
-          <strong>Total Anchors:</strong> <%= @inspection.anchorage_assessment.total_anchors %>
-          <br>
-          <strong>Required Anchors:</strong> <%= @inspection.anchorage_assessment.required_anchors %>
-          <br>
-          <strong>Compliance Status:</strong> <%= @inspection.anchorage_assessment.anchor_compliance_status %>
-        </div>
+  <!-- Safety Standards Reference and Results -->
+  <%= render 'shared/safety_standards_display',
+      reference_partials: ['shared/safety_standards/anchor_requirements'],
+      dynamic_content: -> do %>
+    <% if @inspection.anchorage_assessment&.total_anchors&.positive? %>
+      <%= render 'shared/safety_info_box',
+          title: t('safety_standards.anchor_requirements.title'),
+          content: -> do %>
+        <strong><%= t('safety_standards.anchor_requirements.total_anchors') %></strong> <%= @inspection.anchorage_assessment.total_anchors %><br>
+        <strong><%= t('safety_standards.anchor_requirements.required') %></strong> <%= @inspection.anchorage_assessment.required_anchors %><br><br>
+        <%= render 'shared/pass_fail_string', passed: @inspection.anchorage_assessment.meets_anchor_requirements? %>
+        <%= @inspection.anchorage_assessment.anchor_compliance_status %>
       <% end %>
-
+    <% end %>
+  <% end %>
 <% end %>

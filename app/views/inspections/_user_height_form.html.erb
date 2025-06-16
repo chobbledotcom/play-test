@@ -3,69 +3,92 @@
   i18n_base: 'forms.user_height',
   url: inspection_user_height_assessment_path(@inspection) do |form|
 %>
-  <details class="safety-standards-reference">
-      <summary>View Safety Standards</summary>
-      <%= render 'shared/safety_standards/wall_height_requirements' %>
-      <%= render 'shared/safety_standards/user_capacity_requirements' %>
-    </details>
-
-    <%= render 'form/fieldset', legend_key: 'height_measurements' do %>
+  <%= render 'form/fieldset', legend_key: 'height_measurements' do %>
       <%= render 'form/decimal_comment', field: :containing_wall_height %>
       <%= render 'form/decimal_comment', field: :platform_height %>
-      <div class="form-group">
-        <%= render 'form/decimal_comment', field: :tallest_user_height %>
-        <% if @inspection.user_height_assessment&.tallest_user_height.present? %>
-          <div class="safety-standards-info">
-            <strong>Height Requirements:</strong>
-            <% user_height = @inspection.user_height_assessment.tallest_user_height %>
-            <% if user_height < 0.6 %>
-              No containing walls required
-            <% elsif user_height <= 3.0 %>
-              Containing walls must be at least <%= user_height %>m (equal to user height)
-            <% elsif user_height <= 6.0 %>
-              Containing walls must be at least <%= (user_height * 1.25).round(2) %>m (1.25x user height)
-            <% else %>
-              Containing walls must be at least <%= (user_height * 1.25).round(2) %>m + permanent roof required
-            <% end %>
-          </div>
-          <% if @inspection.user_height_assessment.containing_wall_height.present? %>
-            <div class="compliance-status">
-              <%= render 'shared/pass_fail_string', passed: @inspection.user_height_assessment.meets_height_requirements? %>
-            </div>
-          <% end %>
+    <%= render 'form/decimal_comment', field: :tallest_user_height %>
+  <% end %>
+
+  <%= render 'form/fieldset', legend_key: 'play_area' do %>
+    <%= render 'form/decimal_comment', field: :play_area_length, min: 0 %>
+    <%= render 'form/decimal_comment', field: :play_area_width, min: 0 %>
+    <%= render 'form/decimal_comment', field: :negative_adjustment, min: 0 %>
+  <% end %>
+
+  <%= render 'form/fieldset', legend_key: 'user_capacity' do %>
+    <div class="user-heights">
+      <%= render 'form/number', field: :users_at_1000mm, min: 0, step: 1 %>
+      <%= render 'form/number', field: :users_at_1200mm, min: 0, step: 1 %>
+      <%= render 'form/number', field: :users_at_1500mm, min: 0, step: 1 %>
+      <%= render 'form/number', field: :users_at_1800mm, min: 0, step: 1 %>
+    </div>
+  <% end %>
+
+  <%= render 'shared/safety_standards_display',
+    reference_partials: [
+      'shared/safety_standards/wall_height_requirements', 'shared/safety_standards/user_capacity_requirements'
+    ],
+    dynamic_content: -> do
+  %>
+    <%= render 'shared/safety_info_box',
+      title: t('safety_standards.user_height.title'),
+      content: -> do
+    %>
+      <% if @inspection.user_height_assessment&.tallest_user_height.present? %>
+        <% user_height = @inspection.user_height_assessment.tallest_user_height %>
+        <strong>
+          <%= t('safety_standards.user_height.height_requirements') %>
+        </strong>
+        <% if user_height < 0.6 %>
+          <%= t('safety_standards.user_height.no_walls_required') %>
+        <% elsif user_height <= 3.0 %>
+          <%= t('safety_standards.user_height.walls_equal_user_height', height: user_height) %>
+        <% elsif user_height <= 6.0 %>
+          <%= t('safety_standards.user_height.walls_125_user_height', height: (user_height * 1.25).round(2)) %>
+        <% else %>
+          <%= t('safety_standards.user_height.walls_125_plus_roof_required', height: (user_height * 1.25).round(2)) %>
         <% end %>
-      </div>
-    <% end %>
 
-    <%= render 'form/fieldset', legend_key: 'play_area' do %>
-      <%= render 'form/decimal_comment', field: :play_area_length, min: 0 %>
-      <%= render 'form/decimal_comment', field: :play_area_width, min: 0 %>
-      <%= render 'form/decimal_comment', field: :negative_adjustment, min: 0 %>
-    <% end %>
-
-    <!-- User Capacity Section -->
-    <%= render 'form/fieldset', legend_key: 'user_capacity' do %>
-      <% if @inspection.user_height_assessment&.play_area_length.present? && @inspection.user_height_assessment&.play_area_width.present? %>
-        <div class="safety-standards-info">
-          <strong>Calculated Capacities:</strong>
-          <% capacities = @inspection.user_height_assessment.recommended_user_capacity %>
-          <ul>
-            <li>1.0m users: <%= capacities[:users_1000mm] %> (1.5m² per user)</li>
-            <li>1.2m users: <%= capacities[:users_1200mm] %> (2.0m² per user)</li>
-            <li>1.5m users: <%= capacities[:users_1500mm] %> (2.5m² per user)</li>
-            <li>1.8m users: <%= capacities[:users_1800mm] %> (3.0m² per user)</li>
-          </ul>
-        </div>
+        <% if @inspection.user_height_assessment.containing_wall_height.present? %>
+          <p>
+            <%= render 'shared/pass_fail_string', passed: @inspection.user_height_assessment.meets_height_requirements? %>
+            <%= t('safety_standards.compliant') %>
+          </p>
+        <% end %>
       <% end %>
 
-      <div class="user-heights">
-        <%= render 'form/number', field: :users_at_1000mm, min: 0, step: 1 %>
-        <%= render 'form/number', field: :users_at_1200mm, min: 0, step: 1 %>
-        <%= render 'form/number', field: :users_at_1500mm, min: 0, step: 1 %>
-        <%= render 'form/number', field: :users_at_1800mm, min: 0, step: 1 %>
-      </div>
+      <% if @inspection.user_height_assessment&.play_area_length.present? && @inspection.user_height_assessment&.play_area_width.present? %>
+        <p>
+          <strong>
+            <%= t('safety_standards.user_height.calculated_capacities') %>
+          </strong>
+        </p>
+        <% capacities = @inspection.user_height_assessment.recommended_user_capacity %>
+        <ul>
+          <li>
+            <%= t('safety_standards.user_height.capacity_1000mm',
+              count: capacities[:users_1000mm])
+            %>
+          </li>
+          <li>
+            <%= t('safety_standards.user_height.capacity_1200mm',
+              count: capacities[:users_1200mm])
+            %>
+          </li>
+          <li>
+            <%= t('safety_standards.user_height.capacity_1500mm',
+              count: capacities[:users_1500mm])
+            %>
+          </li>
+          <li>
+            <%= t('safety_standards.user_height.capacity_1800mm',
+              count: capacities[:users_1800mm])
+            %>
+          </li>
+        </ul>
+      <% end %>
     <% end %>
-
+  <% end %>
 <% end %>
 
 <script>

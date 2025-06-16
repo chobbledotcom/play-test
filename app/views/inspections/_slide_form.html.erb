@@ -1,48 +1,47 @@
 <%= render 'form/form_context', model: @inspection.slide_assessment, i18n_base: 'forms.slide', url: inspection_slide_assessment_path(@inspection) do |form| %>
-  <!-- Safety Standards Reference -->
-      <details class="safety-standards-reference">
-        <summary>View Safety Standards</summary>
-        <%= render 'shared/safety_standards/slide_safety_requirements' %>
-      </details>
+  <!-- Slide Dimensions -->
+  <%= render 'form/fieldset', legend_key: 'slide_dimensions' do %>
+    <%= render 'form/decimal_comment', field: :slide_platform_height, min: 0 %>
+    <%= render 'form/decimal_comment', field: :slide_wall_height, min: 0 %>
+    <%= render 'form/decimal_comment', field: :slide_first_metre_height, min: 0 %>
+    <%= render 'form/decimal_comment', field: :slide_beyond_first_metre_height, min: 0 %>
+    <%= render 'form/radio_comment', field: :slide_permanent_roof %>
+    <%= render 'form/pass_fail_comment', field: :clamber_netting_pass %>
+    <%= render 'form/decimal_pass_fail_comment', field: :runout, min: 0 %>
+    <%= render 'form/pass_fail_comment', field: :slip_sheet_pass %>
+  <% end %>
 
-      <!-- Slide Dimensions -->
-      <%= render 'form/fieldset', legend_key: 'slide_dimensions' do %>
-        <%= render 'form/decimal_comment', field: :slide_platform_height, min: 0 %>
-        <%= render 'form/decimal_comment', field: :slide_wall_height, min: 0 %>
-        <%= render 'form/decimal_comment', field: :slide_first_metre_height, min: 0 %>
-        <%= render 'form/decimal_comment', field: :slide_beyond_first_metre_height, min: 0 %>
-        <%= render 'form/radio_comment', field: :slide_permanent_roof %>
-        <%= render 'form/pass_fail_comment', field: :clamber_netting_pass %>
-        <%= render 'form/decimal_pass_fail_comment', field: :runout, min: 0 %>
-        <%= render 'form/pass_fail_comment', field: :slip_sheet_pass %>
-      <% end %>
-
-      <!-- Safety standards info (kept for reference) -->
-      <% if @inspection.slide_assessment&.slide_platform_height.present? %>
-        <div class="safety-standards-info">
-          <strong>EN 14960:2019 Wall Height Requirements:</strong>
-          <% platform_height = @inspection.slide_assessment.slide_platform_height %>
-          <% if platform_height < 0.6 %>
-            No containing walls required
-          <% elsif platform_height <= 3.0 %>
-            Walls must be at least <%= platform_height %>m (equal to platform height)
-          <% elsif platform_height <= 6.0 %>
-            Walls must be at least <%= (platform_height * 1.25).round(2) %>m (1.25x platform height)
-          <% else %>
-            Walls must be at least <%= (platform_height * 1.25).round(2) %>m + permanent roof required
-          <% end %>
-        </div>
-      <% end %>
-
-      <% if @inspection.slide_assessment&.persisted? && @inspection.slide_assessment.slide_platform_height.present? %>
-        <div class="safety-standards-info">
-          <strong>EN 14960:2019 Requirement:</strong> 
-          Minimum runout <%= @inspection.slide_assessment.required_runout_length&.round(2) %>m
-          (50% of platform height or 300mm minimum)
-        </div>
-        <div class="runout-status <%= @inspection.slide_assessment.meets_runout_requirements? ? 'text-success' : 'text-danger' %>">
+  <!-- Safety Standards Reference and Results -->
+  <%= render 'shared/safety_standards_display',
+      reference_partials: ['shared/safety_standards/slide_safety_requirements'],
+      dynamic_content: -> do %>
+    <% if @inspection.slide_assessment&.slide_platform_height.present? %>
+      <% platform_height = @inspection.slide_assessment.slide_platform_height %>
+      <% runout_length = @inspection.slide_assessment.required_runout_length&.round(2) if @inspection.slide_assessment&.persisted? %>
+      
+      <%= render 'shared/safety_info_box', 
+          title: t('safety_standards.slide_requirements.title'),
+          content: -> do %>
+        <strong><%= t('safety_standards.slide_requirements.wall_height_requirements') %></strong>
+        <% if platform_height < 0.6 %>
+          <%= t('safety_standards.slide_requirements.no_walls_required') %>
+        <% elsif platform_height <= 3.0 %>
+          <%= t('safety_standards.slide_requirements.walls_equal_height', height: platform_height) %>
+        <% elsif platform_height <= 6.0 %>
+          <%= t('safety_standards.slide_requirements.walls_125_height', height: (platform_height * 1.25).round(2)) %>
+        <% else %>
+          <%= t('safety_standards.slide_requirements.walls_125_plus_roof', height: (platform_height * 1.25).round(2)) %>
+        <% end %>
+        
+        <% if runout_length %>
+          <br><br>
+          <strong><%= t('safety_standards.slide_requirements.platform_height_requirement') %></strong>
+          <%= t('safety_standards.slide_requirements.minimum_runout') %> <%= runout_length %>m <%= t('safety_standards.slide_requirements.runout_formula') %>
+          <br><br>
+          <%= render 'shared/pass_fail_string', passed: @inspection.slide_assessment.meets_runout_requirements? %>
           <%= @inspection.slide_assessment.runout_compliance_status %>
-        </div>
+        <% end %>
       <% end %>
-
+    <% end %>
+  <% end %>
 <% end %>

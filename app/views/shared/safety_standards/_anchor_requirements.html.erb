@@ -1,17 +1,43 @@
 <div class="safety-standard-info">
-  <h4>EN 14960:2019 Anchor Requirements</h4>
-  <p>The number of anchors required is calculated based on the total area of the equipment.</p>
+  <h4><%= t('safety_standards.anchor_requirements.title') %></h4>
+  <p><%= t('safety_standards.anchor_requirements.description') %></p>
   
-  <div class="formula-box">
-    <strong>Formula:</strong> <code>Required Anchors = (Area × 2.15) rounded up</code>
-    <br><em>Example: 20m² equipment requires ⌈20 × 2.15⌉ = 43 anchors</em>
-  </div>
-
-  <h5>Anchor Specifications:</h5>
-  <ul>
-    <li>Ground-level anchoring points (low anchors)</li>
-    <li>Elevated anchoring points for tall structures (high anchors)</li>
-    <li>30° to 45° angle to ground</li>
-    <li>1600 Newton pull strength minimum</li>
-  </ul>
+  <table>
+    <thead>
+      <tr>
+        <th><%= t('safety_standards.anchor_requirements.unit_area') %></th>
+        <th><%= t('safety_standards.anchor_requirements.required_anchors') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><%= t('safety_standards.anchor_requirements.under_70') %></td>
+        <td>6</td>
+      </tr>
+      <tr>
+        <td><%= t('safety_standards.anchor_requirements.70_to_100') %></td>
+        <td>8</td>
+      </tr>
+      <tr>
+        <td><%= t('safety_standards.anchor_requirements.100_to_125') %></td>
+        <td>10</td>
+      </tr>
+      <tr>
+        <td><%= t('safety_standards.anchor_requirements.125_to_150') %></td>
+        <td>12</td>
+      </tr>
+      <tr>
+        <td><%= t('safety_standards.anchor_requirements.150_to_175') %></td>
+        <td>14</td>
+      </tr>
+      <tr>
+        <td><%= t('safety_standards.anchor_requirements.175_to_200') %></td>
+        <td>16</td>
+      </tr>
+      <tr>
+        <td><%= t('safety_standards.anchor_requirements.over_200') %></td>
+        <td><%= t('safety_standards.anchor_requirements.add_one_per_15') %></td>
+      </tr>
+    </tbody>
+  </table>
 </div>

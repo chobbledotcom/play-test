@@ -58,7 +58,7 @@ class SafetyStandardsController < ApplicationController
   end
 
   def set_anchor_error
-    @anchor_error = t("safety_standards_reference.errors.invalid_area")
+    @anchor_error = t("safety_standards.errors.invalid_area")
   end
 
   def build_anchor_result(area)
@@ -89,7 +89,7 @@ class SafetyStandardsController < ApplicationController
   end
 
   def set_capacity_error
-    @capacity_error = t("safety_standards_reference.errors.invalid_dimensions")
+    @capacity_error = t("safety_standards.errors.invalid_dimensions")
   end
 
   def build_capacity_result(length, width, negative_adjustment)
@@ -116,7 +116,7 @@ class SafetyStandardsController < ApplicationController
   end
 
   def set_runout_error
-    @runout_error = t("safety_standards_reference.errors.invalid_height")
+    @runout_error = t("safety_standards.errors.invalid_height")
   end
 
   def build_runout_result(platform_height)
@@ -144,7 +144,7 @@ class SafetyStandardsController < ApplicationController
   end
 
   def set_wall_height_error
-    @wall_height_error = t("safety_standards_reference.errors.invalid_height")
+    @wall_height_error = t("safety_standards.errors.invalid_height")
   end
 
   def build_wall_height_result(user_height)

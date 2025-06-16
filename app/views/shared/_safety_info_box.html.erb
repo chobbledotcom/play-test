@@ -1,0 +1,26 @@
+<%#
+  Safety Info Box Partial
+  
+  Parameters:
+  - title: Title for the info box
+  - items: Array of info items to display (optional)
+  - content: Block for custom content (optional)
+%>
+<% title = local_assigns[:title] %>
+<% items = local_assigns.fetch(:items, []) %>
+
+<div class="safety-standards-info">
+  <% if title.present? %>
+    <strong><%= title %></strong>
+  <% end %>
+  
+  <% if items.any? %>
+    <% items.each do |item| %>
+      <%= item %><br>
+    <% end %>
+  <% end %>
+  
+  <% if local_assigns[:content] %>
+    <%= capture(&content) %>
+  <% end %>
+</div>

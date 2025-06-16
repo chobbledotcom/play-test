@@ -4,12 +4,12 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
   scenario "calculating anchor requirements" do
     visit safety_standards_path
 
-    within(".calculator-form", text: I18n.t("safety_standards_reference.calculators.anchor.title")) do
-      fill_in I18n.t("safety_standards_reference.calculators.anchor.area_label"), with: "25.0"
-      click_button I18n.t("safety_standards_reference.calculators.anchor.submit")
+    within(".calculator-form", text: I18n.t("safety_standards.calculators.anchor.title")) do
+      fill_in I18n.t("safety_standards.calculators.anchor.area_label"), with: "25.0"
+      click_button I18n.t("safety_standards.calculators.anchor.submit")
     end
 
-    expect(page).to have_content(I18n.t("safety_standards_reference.calculators.anchor.result_title"))
+    expect(page).to have_content(I18n.t("safety_standards.calculators.anchor.result_title"))
     expect(page).to have_content("25.0m²")
 
     expected_anchors = SafetyStandard.calculate_required_anchors(25.0)
@@ -121,7 +121,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     expect(page).to have_content("Method: calculate_required_anchors")
     expect(page).to have_content("Source: app/models/safety_standard.rb")
 
-    within(".calculator-form", text: I18n.t("safety_standards_reference.calculators.anchor.title")) do
+    within(".calculator-form", text: I18n.t("safety_standards.calculators.anchor.title")) do
       fill_in "Area (m²):", with: "16.0"
       click_button "Calculate Anchors"
     end
@@ -150,7 +150,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
   scenario "handling invalid input gracefully" do
     visit safety_standards_path
 
-    within(".calculator-form", text: I18n.t("safety_standards_reference.calculators.anchor.title")) do
+    within(".calculator-form", text: I18n.t("safety_standards.calculators.anchor.title")) do
       fill_in "Area (m²):", with: "0"
       click_button "Calculate Anchors"
     end
@@ -174,7 +174,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     test_areas.each do |area|
       visit safety_standards_path
 
-      within(".calculator-form", text: I18n.t("safety_standards_reference.calculators.anchor.title")) do
+      within(".calculator-form", text: I18n.t("safety_standards.calculators.anchor.title")) do
         fill_in "Area (m²):", with: area.to_s
         click_button "Calculate Anchors"
       end

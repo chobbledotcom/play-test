@@ -91,6 +91,11 @@ module InspectionTestHelpers
     expect(page).not_to have_button(expected_text)
   end
 
+  def expect_safety_standard(table, key, **args)
+    string = I18n.t("safety_standards.#{table}.#{key}", **args)
+    expect(page).to have_content(string)
+  end
+
   # Data helpers
   def fill_assessments_with_complete_data(inspection)
     inspection.reload

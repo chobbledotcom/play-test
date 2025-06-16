@@ -113,7 +113,7 @@ RSpec.describe "Public Access Control", type: :request do
       it "allows access to safety standards page" do
         visit safety_standards_path
         expect(page).to have_http_status(:success)
-        expect(page).to have_content(I18n.t("safety_standards_reference.title"))
+        expect(page).to have_content(I18n.t("safety_standards.title"))
       end
     end
   end
@@ -268,7 +268,7 @@ RSpec.describe "Public Access Control", type: :request do
       visit "#{safety_standards_path}?calculation[type]=invalid&calculation[value]=test"
       expect(page).to have_http_status(:success)
       # Page should still render even with invalid params
-      expect(page).to have_content(I18n.t("safety_standards_reference.title"))
+      expect(page).to have_content(I18n.t("safety_standards.title"))
     end
   end
 

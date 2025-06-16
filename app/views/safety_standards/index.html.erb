@@ -1,7 +1,7 @@
 <article class="safety-standards-reference">
   <header>
-    <h1><%= t('safety_standards_reference.title') %></h1>
-    <p><%= t('safety_standards_reference.subtitle') %></p>
+    <h1><%= t('safety_standards.title') %></h1>
+    <p><%= t('safety_standards.subtitle') %></p>
   </header>
 
   <!-- Anchor Requirements -->
@@ -28,23 +28,23 @@
 
     <!-- Interactive Calculator -->
     <div class="calculator-form">
-      <h4><%= t('safety_standards_reference.calculators.anchor.title') %></h4>
+      <h4><%= t('safety_standards.calculators.anchor.title') %></h4>
       <%= form_with url: safety_standards_path, method: :post, local: false do |form| %>
         <%= form.hidden_field "calculation[type]", value: "anchors" %>
         <div class="form-group">
-          <%= form.label "calculation[area]", t('safety_standards_reference.calculators.anchor.area_label') %>
-          <%= form.number_field "calculation[area]", step: 0.1, min: 0.1, value: params.dig(:calculation, :area), placeholder: t('safety_standards_reference.calculators.anchor.area_placeholder') %>
+          <%= form.label "calculation[area]", t('safety_standards.calculators.anchor.area_label') %>
+          <%= form.number_field "calculation[area]", step: 0.1, min: 0.1, value: params.dig(:calculation, :area), placeholder: t('safety_standards.calculators.anchor.area_placeholder') %>
         </div>
-        <%= form.submit t('safety_standards_reference.calculators.anchor.submit'), class: "button" %>
+        <%= form.submit t('safety_standards.calculators.anchor.submit'), class: "button" %>
       <% end %>
 
       <div id="anchors-result">
         <% if @anchor_result %>
           <div class="calculation-result">
-            <h5><%= t('safety_standards_reference.calculators.anchor.result_title') %></h5>
-            <p><strong><%= t('safety_standards_reference.calculators.anchor.area_result') %></strong> <%= @anchor_result[:area] %>m²</p>
-            <p><strong><%= t('safety_standards_reference.calculators.anchor.required_result') %></strong> <%= @anchor_result[:required_anchors] %></p>
-            <p><strong><%= t('safety_standards_reference.calculators.anchor.calculation_result') %></strong> <%= @anchor_result[:formula_breakdown] %></p>
+            <h5><%= t('safety_standards.calculators.anchor.result_title') %></h5>
+            <p><strong><%= t('safety_standards.calculators.anchor.area_result') %></strong> <%= @anchor_result[:area] %>m²</p>
+            <p><strong><%= t('safety_standards.calculators.anchor.required_result') %></strong> <%= @anchor_result[:required_anchors] %></p>
+            <p><strong><%= t('safety_standards.calculators.anchor.calculation_result') %></strong> <%= @anchor_result[:formula_breakdown] %></p>
           </div>
         <% elsif @anchor_error %>
           <div class="calculation-error">
@@ -86,24 +86,24 @@
 
     <!-- Interactive Calculator -->
     <div class="calculator-form">
-      <h4><%= t('safety_standards_reference.calculators.wall_height.title') %></h4>
+      <h4><%= t('safety_standards.calculators.wall_height.title') %></h4>
       <%= form_with url: safety_standards_path, method: :post, local: false do |form| %>
         <%= form.hidden_field "calculation[type]", value: "wall_height" %>
         <div class="form-group">
-          <%= form.label "calculation[user_height]", t('safety_standards_reference.calculators.wall_height.user_height_label') %>
-          <%= form.number_field "calculation[user_height]", step: 0.1, min: 0.1, value: params.dig(:calculation, :user_height), placeholder: t('safety_standards_reference.calculators.wall_height.user_height_placeholder') %>
+          <%= form.label "calculation[user_height]", t('safety_standards.calculators.wall_height.user_height_label') %>
+          <%= form.number_field "calculation[user_height]", step: 0.1, min: 0.1, value: params.dig(:calculation, :user_height), placeholder: t('safety_standards.calculators.wall_height.user_height_placeholder') %>
         </div>
-        <%= form.submit t('safety_standards_reference.calculators.wall_height.submit'), class: "button" %>
+        <%= form.submit t('safety_standards.calculators.wall_height.submit'), class: "button" %>
       <% end %>
 
       <div id="wall-height-result">
         <% if @wall_height_result %>
           <div class="calculation-result">
-            <h5><%= t('safety_standards_reference.calculators.wall_height.result_title') %></h5>
-            <p><strong><%= t('safety_standards_reference.calculators.wall_height.user_height_result') %></strong> <%= @wall_height_result[:user_height] %>m</p>
-            <p><strong><%= t('safety_standards_reference.calculators.wall_height.requirement_result') %></strong> <%= @wall_height_result[:requirement] %></p>
+            <h5><%= t('safety_standards.calculators.wall_height.result_title') %></h5>
+            <p><strong><%= t('safety_standards.calculators.wall_height.user_height_result') %></strong> <%= @wall_height_result[:user_height] %>m</p>
+            <p><strong><%= t('safety_standards.calculators.wall_height.requirement_result') %></strong> <%= @wall_height_result[:requirement] %></p>
             <% if @wall_height_result[:requires_roof] %>
-              <p><strong><%= t('safety_standards_reference.calculators.wall_height.additional_result') %></strong> Permanent roof required</p>
+              <p><strong><%= t('safety_standards.calculators.wall_height.additional_result') %></strong> Permanent roof required</p>
             <% end %>
           </div>
         <% elsif @wall_height_error %>
@@ -163,23 +163,23 @@
     </details>
 
     <div class="calculator-form">
-      <h4><%= t('safety_standards_reference.calculators.runout.title') %></h4>
+      <h4><%= t('safety_standards.calculators.runout.title') %></h4>
       <%= form_with url: safety_standards_path, method: :post, local: false do |form| %>
         <%= form.hidden_field "calculation[type]", value: "slide_runout" %>
         <div class="form-group">
-          <%= form.label "calculation[platform_height]", t('safety_standards_reference.calculators.runout.height_label') %>
-          <%= form.number_field "calculation[platform_height]", step: 0.1, min: 0.1, value: params.dig(:calculation, :platform_height), placeholder: t('safety_standards_reference.calculators.runout.height_placeholder') %>
+          <%= form.label "calculation[platform_height]", t('safety_standards.calculators.runout.height_label') %>
+          <%= form.number_field "calculation[platform_height]", step: 0.1, min: 0.1, value: params.dig(:calculation, :platform_height), placeholder: t('safety_standards.calculators.runout.height_placeholder') %>
         </div>
-        <%= form.submit t('safety_standards_reference.calculators.runout.submit'), class: "button" %>
+        <%= form.submit t('safety_standards.calculators.runout.submit'), class: "button" %>
       <% end %>
 
       <div id="runout-result">
         <% if @runout_result %>
           <div class="calculation-result">
-            <h5><%= t('safety_standards_reference.calculators.runout.result_title') %></h5>
-            <p><strong><%= t('safety_standards_reference.calculators.runout.platform_height_result') %></strong> <%= @runout_result[:platform_height] %>m</p>
-            <p><strong><%= t('safety_standards_reference.calculators.runout.required_runout_result') %></strong> <%= @runout_result[:required_runout] %>m</p>
-            <p><strong><%= t('safety_standards_reference.calculators.runout.calculation_breakdown') %></strong> <%= @runout_result[:calculation] %></p>
+            <h5><%= t('safety_standards.calculators.runout.result_title') %></h5>
+            <p><strong><%= t('safety_standards.calculators.runout.platform_height_result') %></strong> <%= @runout_result[:platform_height] %>m</p>
+            <p><strong><%= t('safety_standards.calculators.runout.required_runout_result') %></strong> <%= @runout_result[:required_runout] %>m</p>
+            <p><strong><%= t('safety_standards.calculators.runout.calculation_breakdown') %></strong> <%= @runout_result[:calculation] %></p>
           </div>
         <% elsif @runout_error %>
           <div class="calculation-error">
@@ -250,35 +250,35 @@
     </details>
 
     <div class="calculator-form">
-      <h4><%= t('safety_standards_reference.calculators.user_capacity.title') %></h4>
+      <h4><%= t('safety_standards.calculators.user_capacity.title') %></h4>
       <%= form_with url: safety_standards_path, method: :post, local: false do |form| %>
         <%= form.hidden_field "calculation[type]", value: "user_capacity" %>
         <div class="form-group">
-          <%= form.label "calculation[length]", t('safety_standards_reference.calculators.user_capacity.length_label') %>
-          <%= form.number_field "calculation[length]", step: 0.1, min: 0.1, value: params.dig(:calculation, :length), placeholder: t('safety_standards_reference.calculators.user_capacity.length_placeholder') %>
+          <%= form.label "calculation[length]", t('safety_standards.calculators.user_capacity.length_label') %>
+          <%= form.number_field "calculation[length]", step: 0.1, min: 0.1, value: params.dig(:calculation, :length), placeholder: t('safety_standards.calculators.user_capacity.length_placeholder') %>
         </div>
         <div class="form-group">
-          <%= form.label "calculation[width]", t('safety_standards_reference.calculators.user_capacity.width_label') %>
-          <%= form.number_field "calculation[width]", step: 0.1, min: 0.1, value: params.dig(:calculation, :width), placeholder: t('safety_standards_reference.calculators.user_capacity.width_placeholder') %>
+          <%= form.label "calculation[width]", t('safety_standards.calculators.user_capacity.width_label') %>
+          <%= form.number_field "calculation[width]", step: 0.1, min: 0.1, value: params.dig(:calculation, :width), placeholder: t('safety_standards.calculators.user_capacity.width_placeholder') %>
         </div>
         <div class="form-group">
-          <%= form.label "calculation[negative_adjustment]", t('safety_standards_reference.calculators.user_capacity.adjustment_label') %>
-          <%= form.number_field "calculation[negative_adjustment]", step: 0.1, min: 0, value: params.dig(:calculation, :negative_adjustment), placeholder: t('safety_standards_reference.calculators.user_capacity.adjustment_placeholder') %>
+          <%= form.label "calculation[negative_adjustment]", t('safety_standards.calculators.user_capacity.adjustment_label') %>
+          <%= form.number_field "calculation[negative_adjustment]", step: 0.1, min: 0, value: params.dig(:calculation, :negative_adjustment), placeholder: t('safety_standards.calculators.user_capacity.adjustment_placeholder') %>
         </div>
-        <%= form.submit t('safety_standards_reference.calculators.user_capacity.submit'), class: "button" %>
+        <%= form.submit t('safety_standards.calculators.user_capacity.submit'), class: "button" %>
       <% end %>
 
       <div id="capacity-result">
         <% if @capacity_result %>
           <div class="calculation-result">
-            <h5><%= t('safety_standards_reference.calculators.user_capacity.result_title') %></h5>
-            <p><strong><%= t('safety_standards_reference.calculators.user_capacity.dimensions_result') %></strong> <%= @capacity_result[:length] %>m × <%= @capacity_result[:width] %>m</p>
-            <p><strong><%= t('safety_standards_reference.calculators.user_capacity.total_area_result') %></strong> <%= @capacity_result[:area] %>m²</p>
+            <h5><%= t('safety_standards.calculators.user_capacity.result_title') %></h5>
+            <p><strong><%= t('safety_standards.calculators.user_capacity.dimensions_result') %></strong> <%= @capacity_result[:length] %>m × <%= @capacity_result[:width] %>m</p>
+            <p><strong><%= t('safety_standards.calculators.user_capacity.total_area_result') %></strong> <%= @capacity_result[:area] %>m²</p>
             <% if @capacity_result[:negative_adjustment] > 0 %>
-              <p><strong><%= t('safety_standards_reference.calculators.user_capacity.negative_adjustment_result') %></strong> -<%= @capacity_result[:negative_adjustment] %>m²</p>
+              <p><strong><%= t('safety_standards.calculators.user_capacity.negative_adjustment_result') %></strong> -<%= @capacity_result[:negative_adjustment] %>m²</p>
             <% end %>
-            <p><strong><%= t('safety_standards_reference.calculators.user_capacity.usable_area_result') %></strong> <%= @capacity_result[:usable_area] %>m²</p>
-            <p><strong><%= t('safety_standards_reference.calculators.user_capacity.capacities_result') %></strong></p>
+            <p><strong><%= t('safety_standards.calculators.user_capacity.usable_area_result') %></strong> <%= @capacity_result[:usable_area] %>m²</p>
+            <p><strong><%= t('safety_standards.calculators.user_capacity.capacities_result') %></strong></p>
             <ul>
               <li>1.0m users: <%= @capacity_result[:capacities][:users_1000mm] %> (young children)</li>
               <li>1.2m users: <%= @capacity_result[:capacities][:users_1200mm] %> (children)</li>

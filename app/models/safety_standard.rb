@@ -531,11 +531,11 @@ class SafetyStandard
     end
 
     def anchor_calculation_description
-      I18n.t("safety_standards_reference.calculators.anchor.description")
+      I18n.t("safety_standards.calculators.anchor.description")
     end
 
     def user_capacity_description
-      I18n.t("safety_standards_reference.calculators.user_capacity.description")
+      I18n.t("safety_standards.calculators.user_capacity.description")
     end
 
     def extract_method_lines(lines, start_line, method_name)
