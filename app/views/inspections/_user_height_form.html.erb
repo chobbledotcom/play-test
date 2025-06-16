@@ -90,32 +90,3 @@
     <% end %>
   <% end %>
 <% end %>
-
-<script>
-  // Calculate total capacity dynamically
-  document.addEventListener('DOMContentLoaded', function() {
-    const capacityFields = [
-      'inspection_user_height_assessment_users_at_1000mm', 'inspection_user_height_assessment_users_at_1200mm', 'inspection_user_height_assessment_users_at_1500mm', 'inspection_user_height_assessment_users_at_1800mm'];
-    const totalCapacityElement = document.getElementById('total-capacity');
-
-    function updateTotalCapacity() {
-      let total = 0;
-      capacityFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field && field.value) {
-          total += parseInt(field.value) || 0;
-        }
-      });
-      if (totalCapacityElement) {
-        totalCapacityElement.textContent = total;
-      }
-    }
-
-    capacityFields.forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field) {
-        field.addEventListener('input', updateTotalCapacity);
-      }
-    });
-  });
-</script>
