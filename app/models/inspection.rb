@@ -267,13 +267,9 @@ class Inspection < ApplicationRecord
   private
 
   def create_assessments
-    create_user_height_assessment!
-    create_slide_assessment!
-    create_structure_assessment!
-    create_anchorage_assessment!
-    create_materials_assessment!
-    create_fan_assessment!
-    create_enclosed_assessment!
+    ASSESSMENT_TYPES.each_key do |assessment_type|
+      send("create_#{assessment_type}!")
+    end
   end
 
   def set_inspector_company_from_user
