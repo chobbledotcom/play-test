@@ -48,7 +48,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
   end
 
   scenario "does not show incomplete fields when inspection is complete" do
-    completed_inspection = create_completed_inspection(unit:, user:)
+    completed_inspection = create(:inspection, :completed, unit:, user:)
 
     visit edit_inspection_path(completed_inspection)
 

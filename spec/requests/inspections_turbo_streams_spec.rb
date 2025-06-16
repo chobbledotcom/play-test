@@ -157,7 +157,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
   describe "Completed inspection behavior" do
     let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
-    let(:completed_inspection) { create_completed_inspection(user: user) }
+    let(:completed_inspection) { create(:inspection, :completed, user: user) }
 
     before do
       # completed_inspection is already properly completed

@@ -8,7 +8,7 @@ RSpec.feature "Inspection Prefilling", type: :feature do
 
   scenario "prefills fields from previous inspection" do
     # Create a completed first inspection
-    first_inspection = create(:inspection, :with_complete_assessments,
+    first_inspection = create(:inspection, :completed,
       user: user,
       unit: unit,
       inspection_location: "Test Location",

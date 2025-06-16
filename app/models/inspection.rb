@@ -216,6 +216,11 @@ class Inspection < ApplicationRecord
     log_audit_action("completed", user, "Inspection completed")
   end
 
+  def un_complete!(user)
+    update!(complete_date: nil)
+    log_audit_action("marked_incomplete", user, "Inspection completed")
+  end
+
   def duplicate_for_user(user)
     new_inspection = dup
     new_inspection.user = user

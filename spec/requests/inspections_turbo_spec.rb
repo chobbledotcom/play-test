@@ -66,7 +66,7 @@ RSpec.describe "Inspections Turbo Streams", type: :request do
 
       it "redirects when trying to update completed inspections" do
         # Create a properly completed inspection
-        completed_inspection = create_completed_inspection(user: user)
+        completed_inspection = create(:inspection, :completed, user: user)
 
         # Verify the user_height_assessment has data we can try to update
         expect(completed_inspection.user_height_assessment.tallest_user_height_comment).to be_present

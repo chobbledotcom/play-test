@@ -65,7 +65,10 @@ FactoryBot.define do
 
     trait :with_complete_assessments do
       after(:build) do |_inspection|
-        warn "[DEPRECATION] The :with_complete_assessments trait is deprecated as inspections are totally enclosed by default. Remove this trait from your test and use create(:inspection) instead."
+        print_deprecation(
+          "The :with_complete_assessments trait is deprecated. Inspections now auto-create all assessments. Use create(:inspection, :completed) instead.",
+          trait_name: :with_complete_assessments
+        )
       end
 
       # Dimensions needed for calculations
@@ -108,14 +111,20 @@ FactoryBot.define do
 
     trait :totally_enclosed do
       after(:build) do |_inspection|
-        warn "[DEPRECATION] The :totally_enclosed trait is deprecated as inspections are totally enclosed by default. Remove this trait from your test, or use :not_totally_enclosed if you want the opposite."
+        print_deprecation(
+          "Inspections are totally enclosed by default. Remove this trait, or use :not_totally_enclosed for the opposite.",
+          trait_name: :totally_enclosed
+        )
       end
       is_totally_enclosed { true }
     end
 
     trait :with_slide do
       after(:build) do |_inspection|
-        warn "[DEPRECATION] The :with_slide trait is deprecated as inspections have slides by default. Remove this trait from your test, or use :without_slide if you want the opposite."
+        print_deprecation(
+          "Inspections have slides by default. Remove this trait, or use :without_slide for the opposite.",
+          trait_name: :with_slide
+        )
       end
       has_slide { true }
     end

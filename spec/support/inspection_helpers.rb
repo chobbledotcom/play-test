@@ -1,15 +1,11 @@
 module InspectionHelpers
+  include DeprecationHelper
+  
   # DEPRECATED: Use create(:inspection, :completed) instead
   def create_completed_inspection(**options)
-    warn <<~MSG
-      [DEPRECATION] create_completed_inspection is deprecated and will be removed in the next version.
-      Use create(:inspection, :completed) instead.
-      
-      Examples:
-        create(:inspection, :completed)
-        create(:inspection, :completed, user: user)
-        create(:inspection, :completed, :without_slide)
-    MSG
+    print_deprecation(
+      "create_completed_inspection is deprecated. Use create(:inspection, :completed) instead."
+    )
 
     traits = options.delete(:traits) || []
     traits = [:completed] + Array(traits)

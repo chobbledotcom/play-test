@@ -6,7 +6,7 @@ RSpec.feature "Inspections CSV Export", type: :feature do
   let(:unit2) { create(:unit, user: user, name: "Test Unit 2", serial: "TU002", manufacturer: "Test Mfg") }
 
   let!(:inspection1) do
-    create_completed_inspection(
+    create(:inspection, :completed,
       user: user,
       unit: unit1,
       passed: true,

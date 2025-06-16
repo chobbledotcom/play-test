@@ -17,7 +17,7 @@ RSpec.feature "PDF Field Coverage", type: :feature do
 
   feature "Inspection PDF renders all relevant model fields" do
     scenario "includes all inspection model fields except system/metadata fields" do
-      inspection = create(:inspection, :with_slide, :totally_enclosed, :completed, user: user, unit: unit)
+      inspection = create(:inspection, :completed, user: user, unit: unit)
 
       # Just check that the PDF actually has the important stuff
       text_content = get_pdf_text(inspection_path(inspection, format: :pdf))

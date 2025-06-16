@@ -39,12 +39,19 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
     it "preserves all data when toggling completion status" do
       # Create inspection with complete data but not yet marked as complete
-      inspection = create(:inspection, :with_complete_assessments,
+      inspection = create(:inspection,
         user: user,
         unit: unit,
         inspection_location: "Original Location",
         risk_assessment: "Original risk assessment with detailed findings.",
         unique_report_number: "ORIG-123")
+
+      # Update assessments to have complete data
+      inspection.reload
+      Inspection::ASSESSMENT_TYPES.each do |assessment_name, _|
+        assessment = inspection.send(assessment_name)
+        assessment.update!(attributes_for(assessment_name, :complete))
+      end
 
       visit edit_inspection_path(inspection)
 
@@ -143,13 +150,15 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
   describe "completion workflow" do
     let(:unit) { create(:unit, user: user) }
-    let(:inspection) { create(:inspection, :with_complete_assessments, user: user, unit: unit) }
+    let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
+
+    before do
+      inspection.un_complete!(user)
+    end
 
     it "can complete inspection without report number" do
       visit edit_inspection_path(inspection)
-
       click_button I18n.t("inspections.buttons.mark_complete")
-
       expect(page).to have_content(I18n.t("inspections.messages.marked_complete"))
       expect(inspection.reload.complete?).to be true
       expect(inspection.unique_report_number).to be_nil

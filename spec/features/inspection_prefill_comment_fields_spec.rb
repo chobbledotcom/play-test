@@ -29,7 +29,7 @@ RSpec.feature "Inspection Prefilling Comment Fields", type: :feature do
 
   scenario "prefills comment fields from previous inspection" do
     # Create a completed first inspection with comments
-    first_inspection = create(:inspection, :with_complete_assessments,
+    first_inspection = create(:inspection, :completed,
       user: user,
       unit: unit,
       width: 5.0,

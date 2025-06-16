@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.feature "PDF Comprehensive Field Coverage", type: :feature do
   let(:user) { create(:user, name: "Test User", email: "test@example.com") }
   let(:unit) { create(:unit, serial: "TEST123", name: "Test Unit") }
-  let(:inspection) { create_completed_inspection(user:, unit:) }
+  let(:inspection) { create(:inspection, :completed, user:, unit:) }
 
   before do
     sign_in user

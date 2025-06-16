@@ -75,7 +75,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
       it "routes to view page for complete inspections" do
         # Create a complete inspection
-        complete_inspection = create_completed_inspection(
+        complete_inspection = create(:inspection, :completed,
           user: user,
           unit: unit,
           inspector_company: inspector_company,

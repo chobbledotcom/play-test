@@ -149,7 +149,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
       let(:admin_user) { create(:user, :admin) }
       let(:admin_unit) { create(:unit, user: admin_user) }
       let(:admin_complete_inspection) do
-        create_completed_inspection(user: admin_user, unit: admin_unit)
+        create(:inspection, :completed, user: admin_user, unit: admin_unit)
       end
 
       before do
@@ -188,6 +188,6 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
   end
 
   def create_complete_inspection
-    create_completed_inspection(user: user, unit: unit1)
+    create(:inspection, :completed, user: user, unit: unit1)
   end
 end

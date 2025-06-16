@@ -34,7 +34,7 @@ RSpec.feature "Invalid inspection completion validation", type: :feature do
   scenario "allows viewing properly completed inspections" do
     # Create a properly completed inspection using factory
     # This uses the :completed trait which ensures all assessments are complete
-    completed_inspection = create_completed_inspection(unit:, user:)
+    completed_inspection = create(:inspection, :completed, unit:, user:)
 
     # Should be able to view without errors
     visit inspection_path(completed_inspection)

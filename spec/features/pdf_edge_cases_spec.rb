@@ -2,7 +2,7 @@ require "rails_helper"
 require "pdf/inspector"
 
 RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
-  let(:inspection) { create_completed_inspection }
+  let(:inspection) { create(:inspection, :completed) }
   let(:user) { inspection.user }
   let(:unit) { inspection.unit }
 
@@ -86,7 +86,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       # Create unit with all features
       full_unit = create(:unit, :with_all_fields, user: user)
 
-      full_inspection = create_completed_inspection(traits: [:with_complete_assessments, :with_slide, :totally_enclosed], user: user, unit: full_unit)
+      full_inspection = create(:inspection, :completed, user: user, unit: full_unit)
 
       # Add maximum length comments to all assessments
       long_comment = "Detailed assessment comment " * 50

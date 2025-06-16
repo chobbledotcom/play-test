@@ -19,7 +19,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
   feature "Inspection PDF Content" do
     scenario "includes all required sections" do
-      inspection = create_completed_inspection(
+      inspection = create(:inspection, :completed,
         user: user,
         unit: unit
       )
@@ -57,7 +57,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
     end
 
     scenario "handles failed inspection correctly" do
-      failed_inspection = create_completed_inspection(
+      failed_inspection = create(:inspection, :completed,
         user: user,
         unit: unit,
         passed: false,
@@ -82,8 +82,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       # Create unit with slide and totally enclosed
       special_unit = create(:unit, user: user)
 
-      inspection = create_completed_inspection(
-        traits: [:with_slide, :totally_enclosed],
+      inspection = create(:inspection, :completed,
         user: user,
         unit: special_unit
       )
@@ -98,7 +97,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
     scenario "handles user without RPII number correctly" do
       user_without_rpii = create(:user, :without_rpii)
-      inspection = create_completed_inspection(
+      inspection = create(:inspection, :completed,
         user: user_without_rpii,
         unit: unit
       )
@@ -116,7 +115,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
     end
 
     scenario "shows proper handling for empty assessments" do
-      inspection = create_completed_inspection(
+      inspection = create(:inspection, :completed,
         user: user,
         unit: unit
       )
@@ -139,7 +138,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       # Create multiple inspections
       inspections = []
       3.times do |i|
-        inspections << create_completed_inspection(
+        inspections << create(:inspection, :completed,
           user: user,
           unit: unit,
           inspection_date: i.months.ago,
@@ -179,7 +178,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       # Create 10 inspections with varied data
       inspections = []
       10.times do |i|
-        inspections << create_completed_inspection(
+        inspections << create(:inspection, :completed,
           user: user,
           unit: unit,
           inspection_date: i.months.ago,
@@ -238,7 +237,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       # Create 10 inspections with varied data
       inspections = []
       10.times do |i|
-        inspections << create_completed_inspection(
+        inspections << create(:inspection, :completed,
           user: user,
           unit: unit_with_image,
           inspection_date: i.months.ago,
@@ -294,14 +293,14 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
   feature "PDF Formatting" do
     scenario "uses correct fonts" do
-      inspection = create_completed_inspection(user: user, unit: unit)
+      inspection = create(:inspection, :completed, user: user, unit: unit)
 
       pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
       expect_valid_pdf(pdf_data)
     end
 
     scenario "generates valid PDF structure" do
-      inspection = create_completed_inspection(user: user, unit: unit)
+      inspection = create(:inspection, :completed, user: user, unit: unit)
 
       pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
       expect_valid_pdf(pdf_data)
@@ -310,7 +309,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
   feature "QR Code Generation" do
     scenario "includes QR code in inspection report" do
-      inspection = create_completed_inspection(user: user, unit: unit)
+      inspection = create(:inspection, :completed, user: user, unit: unit)
 
       pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
 
