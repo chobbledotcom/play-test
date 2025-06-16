@@ -307,15 +307,11 @@ class InspectionWorkflow
   def verify_date_handling
     @second_inspection.reload
 
-    expect(@second_inspection.complete_date).to be_present
-    expect(@second_inspection.complete_date.to_date).to eq(Date.current)
-    expect(@second_inspection.complete_date).not_to eq(@inspection.complete_date)
-
-    expect(@second_inspection.inspection_date).to eq(Date.current)
-    expect(@second_inspection.inspection_date).not_to eq(@inspection.inspection_date)
-
     expect(@inspection.inspection_date.to_date).to eq(7.days.ago.to_date)
     expect(@inspection.complete_date.to_date).to eq(7.days.ago.to_date)
+
+    expect(@second_inspection.complete_date.to_date).to eq(Date.current)
+    expect(@second_inspection.inspection_date).to eq(Date.current)
   end
 
   def fail_to_delete_unit
