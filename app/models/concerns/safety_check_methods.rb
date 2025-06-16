@@ -23,19 +23,4 @@ module SafetyCheckMethods
       col.end_with?("_pass") && send(col) == false
     }
   end
-
-  def has_critical_failures?
-    self.class.column_names.any? { |col| col.end_with?("_pass") && send(col) == false }
-  end
-
-  def safety_issues_summary
-    failures = self.class.column_names.select { |col| col.end_with?("_pass") && send(col) == false }
-    return "No safety issues" if failures.empty?
-
-    "Safety issues: #{failures.map(&:humanize).join(", ")}"
-  end
-
-  def critical_failure_summary
-    safety_issues_summary
-  end
 end

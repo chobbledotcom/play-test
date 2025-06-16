@@ -1,0 +1,29 @@
+<%# Slide Safety Standards Results Partial %>
+<% if @assessment&.slide_platform_height.present? %>
+  <% platform_height = @assessment.slide_platform_height %>
+  <% runout_length = @assessment.required_runout_length&.round(2) if @assessment&.persisted? %>
+  
+  <%= render 'shared/safety_info_box', 
+      title: t('safety_standards.slide_requirements.title'),
+      content: -> do %>
+    <strong><%= t('safety_standards.slide_requirements.wall_height_requirements') %></strong>
+    <% if platform_height < 0.6 %>
+      <%= t('safety_standards.slide_requirements.no_walls_required') %>
+    <% elsif platform_height <= 3.0 %>
+      <%= t('safety_standards.slide_requirements.walls_equal_height', height: platform_height) %>
+    <% elsif platform_height <= 6.0 %>
+      <%= t('safety_standards.slide_requirements.walls_125_height', height: (platform_height * 1.25).round(2)) %>
+    <% else %>
+      <%= t('safety_standards.slide_requirements.walls_125_plus_roof', height: (platform_height * 1.25).round(2)) %>
+    <% end %>
+    
+    <% if runout_length %>
+      <br><br>
+      <strong><%= t('safety_standards.slide_requirements.platform_height_requirement') %></strong>
+      <%= t('safety_standards.slide_requirements.minimum_runout') %> <%= runout_length %>m <%= t('safety_standards.slide_requirements.runout_formula') %>
+      <br><br>
+      <%= render 'shared/pass_fail_string', passed: @assessment.meets_runout_requirements? %>
+      <%= @assessment.runout_compliance_status %>
+    <% end %>
+  <% end %>
+<% end %>

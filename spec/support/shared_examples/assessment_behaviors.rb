@@ -185,68 +185,6 @@ RSpec.shared_examples "has safety check methods" do
       expect(assessment.failed_checks_count).to eq(actual_checks)
     end
   end
-
-  describe "#has_critical_failures?" do
-    it "returns true when any check fails" do
-      pass_fields = assessment.class.column_names.select { |col| col.end_with?("_pass") }
-      if pass_fields.any?
-        assessment.send("#{pass_fields.first}=", false)
-        pass_fields[1..].each { |check| assessment.send("#{check}=", true) }
-        expect(assessment.has_critical_failures?).to be true
-      end
-    end
-
-    it "returns false when all checks pass" do
-      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
-        assessment.send("#{check}=", true) if assessment.respond_to?("#{check}=")
-      end
-
-      expect(assessment.has_critical_failures?).to be false
-    end
-
-    it "returns false when all checks are nil" do
-      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
-        assessment.send("#{check}=", nil) if assessment.respond_to?("#{check}=")
-      end
-
-      expect(assessment.has_critical_failures?).to be false
-    end
-  end
-
-  describe "#safety_issues_summary" do
-    it "returns no issues message when all checks pass" do
-      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
-        assessment.send("#{check}=", true) if assessment.respond_to?("#{check}=")
-      end
-
-      expect(assessment.safety_issues_summary).to eq("No safety issues")
-    end
-
-    it "returns no issues message when all checks are nil" do
-      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
-        assessment.send("#{check}=", nil) if assessment.respond_to?("#{check}=")
-      end
-
-      expect(assessment.safety_issues_summary).to eq("No safety issues")
-    end
-
-    it "lists failed checks when some checks fail" do
-      pass_fields = assessment.class.column_names.select { |col| col.end_with?("_pass") }
-      if pass_fields.any?
-
-        assessment.send("#{pass_fields.first}=", false)
-
-        expect(assessment.safety_issues_summary).to include("Safety issues:")
-        expect(assessment.safety_issues_summary).to include(pass_fields.first.humanize)
-      end
-    end
-  end
-
-  describe "#critical_failure_summary" do
-    it "aliases safety_issues_summary" do
-      expect(assessment.critical_failure_summary).to eq(assessment.safety_issues_summary)
-    end
-  end
 end
 
 RSpec.shared_examples "delegates to SafetyStandard" do |delegated_methods|

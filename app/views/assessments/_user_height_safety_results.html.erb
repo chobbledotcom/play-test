@@ -1,0 +1,61 @@
+<%# User Height Safety Standards Results Partial %>
+<%= render 'shared/safety_info_box',
+  title: t('safety_standards.user_height.title'),
+  content: -> do %>
+  <% if @assessment.tallest_user_height.present? %>
+    <% user_height = @assessment.tallest_user_height %>
+    <strong>
+      <%= t('safety_standards.user_height.height_requirements') %>
+    </strong>
+    <% if user_height < 0.6 %>
+      <%= t('safety_standards.user_height.no_walls_required') %>
+    <% elsif user_height <= 3.0 %>
+      <%= t('safety_standards.user_height.walls_equal_user_height', height: user_height) %>
+    <% elsif user_height <= 6.0 %>
+      <%= t('safety_standards.user_height.walls_125_user_height', height: (user_height * 1.25).round(2)) %>
+    <% else %>
+      <%= t('safety_standards.user_height.walls_125_plus_roof_required', height: (user_height * 1.25).round(2)) %>
+    <% end %>
+
+    <% if @assessment.containing_wall_height.present? %>
+      <p>
+        <%= render 'shared/pass_fail_string', passed: @assessment.meets_height_requirements? %>
+        <%= t('safety_standards.compliant') %>
+      </p>
+    <% end %>
+  <% end %>
+
+  <% if @assessment.play_area_length.present? && @assessment.play_area_width.present? %>
+    <% if @assessment.tallest_user_height.present? %>
+      <br>
+    <% end %>
+    <p>
+      <strong>
+        <%= t('safety_standards.user_height.calculated_capacities') %>
+      </strong>
+    </p>
+    <% capacities = @assessment.recommended_user_capacity %>
+    <ul>
+      <li>
+        <%= t('safety_standards.user_height.capacity_1000mm',
+          count: capacities[:users_1000mm])
+        %>
+      </li>
+      <li>
+        <%= t('safety_standards.user_height.capacity_1200mm',
+          count: capacities[:users_1200mm])
+        %>
+      </li>
+      <li>
+        <%= t('safety_standards.user_height.capacity_1500mm',
+          count: capacities[:users_1500mm])
+        %>
+      </li>
+      <li>
+        <%= t('safety_standards.user_height.capacity_1800mm',
+          count: capacities[:users_1800mm])
+        %>
+      </li>
+    </ul>
+  <% end %>
+<% end %>

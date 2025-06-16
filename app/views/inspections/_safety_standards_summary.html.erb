@@ -3,12 +3,11 @@
   <p><%= t('inspections.safety_standards.description') %></p>
 
   <% if inspection.unit.present? %>
-    <!-- Anchor Requirements -->
     <% if inspection.anchorage_assessment.present? %>
       <section class="standards-section">
         <h4><%= t('inspections.safety_standards.anchor_requirements') %></h4>
         <% if inspection.area.present? %>
-          <p><%= t('inspections.safety_standards.anchor_calculation', 
+          <p><%= t('inspections.safety_standards.anchor_calculation',
                    required: inspection.anchorage_assessment.required_anchors,
                    area: inspection.area) %></p>
           <p class="<%= inspection.anchorage_assessment.meets_anchor_requirements? ? 'text-success' : 'text-danger' %>">
@@ -22,12 +21,14 @@
       </section>
     <% end %>
 
-    <!-- Slide Requirements -->
-    <% if inspection.assessment_applicable?(:slide_assessment) && inspection.slide_assessment.present? && inspection.slide_assessment.slide_platform_height.present? %>
+    <% if inspection.assessment_applicable?(:slide_assessment) && inspection.slide_assessment&.slide_platform_height %>
       <section class="standards-section">
         <h4><%= t('inspections.safety_standards.slide_requirements') %></h4>
-        <p><%= t('inspections.safety_standards.runout_requirement',
-                 required: inspection.slide_assessment.required_runout_length&.round(2)) %></p>
+        <p>
+          <%= t('inspections.safety_standards.runout_requirement',
+            required: inspection.slide_assessment.required_runout_length&.round(2))
+          %>
+        </p>
         <% if inspection.slide_assessment.runout_value.present? %>
           <p class="<%= inspection.slide_assessment.meets_runout_requirements? ? 'text-success' : 'text-danger' %>">
             <%= t('inspections.safety_standards.runout_status',
@@ -52,7 +53,6 @@
       </section>
     <% end %>
 
-    <!-- Material Requirements -->
     <section class="standards-section">
       <h4><%= t('inspections.safety_standards.material_requirements') %></h4>
       <ul>
@@ -61,7 +61,6 @@
       </ul>
     </section>
 
-    <!-- Electrical Requirements -->
     <section class="standards-section">
       <h4><%= t('inspections.safety_standards.electrical_requirements') %></h4>
       <ul>

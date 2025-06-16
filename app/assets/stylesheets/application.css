@@ -270,3 +270,15 @@ nav.tabs span {
   font-size: 0.8em;
   cursor: pointer;
 }
+
+.text-success,
+.text-danger {
+  font-weight: bold;
+}
+
+.text-success {
+  color: #00cc00;
+}
+.text-danger {
+  color: #cc0000;
+}

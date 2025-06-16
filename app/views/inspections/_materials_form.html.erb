@@ -1,4 +1,8 @@
-<%= render 'form/form_context', model: @inspection.materials_assessment, i18n_base: 'forms.materials', url: inspection_materials_assessment_path(@inspection) do |form| %>
+<%= render 'form/form_context',
+  model: @inspection.materials_assessment,
+  i18n_base: 'forms.materials',
+  url: inspection_materials_assessment_path(@inspection) do |form|
+%>
   <%= render 'form/fieldset', legend_key: 'materials_assessment' do %>
     <%= render 'form/number_pass_fail_comment', field: :ropes %>
     <%= render 'form/pass_fail_comment', field: :clamber_netting_pass %>
@@ -10,5 +14,4 @@
     <%= render 'form/pass_fail_comment', field: :fabric_strength_pass %>
     <%= render 'form/pass_fail_comment', field: :fire_retardant_pass %>
   <% end %>
-
 <% end %>

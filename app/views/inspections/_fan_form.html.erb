@@ -1,4 +1,8 @@
-<%= render 'form/form_context', model: @inspection.fan_assessment, i18n_base: 'forms.fan', url: inspection_fan_assessment_path(@inspection) do |form| %>
+<%= render 'form/form_context',
+  model: @inspection.fan_assessment,
+  i18n_base: 'forms.fan',
+  url: inspection_fan_assessment_path(@inspection) do |form|
+%>
   <%= render 'form/fieldset', legend_key: 'fan_assessment' do %>
     <%= render 'form/text_field', field: :fan_size_type %>
     <%= render 'form/text_field', field: :blower_serial %>
@@ -8,5 +12,4 @@
     <%= render 'form/pass_fail_comment', field: :pat_pass %>
     <%= render 'form/pass_fail_comment', field: :blower_visual_pass %>
   <% end %>
-  
 <% end %>
