@@ -8,8 +8,6 @@ class RpiiVerificationService
   USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
   class << self
-    # Search for an inspector by their membership number
-    # Returns an array of matching inspectors with their details
     def search(inspector_number)
       return [] if inspector_number.blank?
 
@@ -42,12 +40,9 @@ class RpiiVerificationService
       end
     end
 
-    # Verify if a specific inspector number is valid
-    # Returns true/false and optionally the inspector details
     def verify(inspector_number)
       results = search(inspector_number)
 
-      # Look for exact match
       inspector = results.find { |r| r[:number]&.to_s == inspector_number.to_s }
 
       if inspector
@@ -60,7 +55,6 @@ class RpiiVerificationService
     private
 
     def parse_response(response)
-      # Handle the response format: {"0":"suggestions","suggestions":[...]}
       if response.is_a?(Hash) && response["suggestions"]
         suggestions = response["suggestions"]
       elsif response.is_a?(Array)
@@ -75,11 +69,8 @@ class RpiiVerificationService
         value = item["value"] || ""
         data = item["data"]
 
-        # Parse different formats:
-        # Format 1: "Name (Qualification Type)"
-        # Format 2: "Name (Number) - Qualifications"
         if value =~ /^(.+?)\s*\((.+?)\)$/
-          # Just name and qualification in parentheses
+
           {
             name: $1.strip,
             number: data,  # The data field contains the inspector number
@@ -88,7 +79,7 @@ class RpiiVerificationService
             raw_value: value
           }
         elsif value =~ /^(.+?)\s*\((\d+)\)\s*-\s*(.+)$/
-          # Name, number in parentheses, then qualifications
+
           {
             name: $1.strip,
             number: $2,

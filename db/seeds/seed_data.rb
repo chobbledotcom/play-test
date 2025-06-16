@@ -1,12 +1,8 @@
 # This module provides field mappings for assessments
 # Used by both seeds and tests to ensure consistency
 module SeedData
-
-
-
   def self.check_passed?(inspection_passed)
     return true if inspection_passed
-
 
     rand < 0.9
   end

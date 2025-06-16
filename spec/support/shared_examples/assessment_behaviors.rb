@@ -9,7 +9,6 @@ RSpec.shared_examples "an assessment model" do
 
   describe "audit logging" do
     it "logs assessment updates when changes are made" do
-      # Find a changeable field
       changeable_field = assessment.class.column_names.find { |col|
         col.end_with?("_comment", "_pass") && assessment.respond_to?("#{col}=")
       }
@@ -146,7 +145,6 @@ end
 RSpec.shared_examples "has safety check methods" do
   describe "#pass_columns_count" do
     it "returns the correct number of pass/fail checks" do
-      # Count actual columns from the database that end with _pass
       actual_pass_columns = assessment.class.column_names.count { |col| col.end_with?("_pass") }
       expect(assessment.pass_columns_count).to eq(actual_pass_columns)
     end
@@ -154,12 +152,10 @@ RSpec.shared_examples "has safety check methods" do
 
   describe "#passed_checks_count" do
     it "counts only passed checks" do
-      # Set all checks to pass
       assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
         assessment.send("#{check}=", true) if assessment.respond_to?("#{check}=")
       end
 
-      # Count how many we actually set
       actual_checks = assessment.class.column_names.count { |col|
         col.end_with?("_pass") && assessment.respond_to?(col)
       }
@@ -168,7 +164,6 @@ RSpec.shared_examples "has safety check methods" do
     end
 
     it "returns 0 when no checks are passed" do
-      # Set all checks to fail
       assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
         assessment.send("#{check}=", false) if assessment.respond_to?("#{check}=")
       end
@@ -179,7 +174,6 @@ RSpec.shared_examples "has safety check methods" do
 
   describe "#failed_checks_count" do
     it "counts only failed checks" do
-      # Set all checks to fail
       assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
         assessment.send("#{check}=", false) if assessment.respond_to?("#{check}=")
       end
@@ -194,7 +188,6 @@ RSpec.shared_examples "has safety check methods" do
 
   describe "#has_critical_failures?" do
     it "returns true when any check fails" do
-      # Set first check to fail, rest to pass
       pass_fields = assessment.class.column_names.select { |col| col.end_with?("_pass") }
       if pass_fields.any?
         assessment.send("#{pass_fields.first}=", false)
@@ -204,7 +197,6 @@ RSpec.shared_examples "has safety check methods" do
     end
 
     it "returns false when all checks pass" do
-      # Set all checks to pass
       assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
         assessment.send("#{check}=", true) if assessment.respond_to?("#{check}=")
       end
@@ -213,7 +205,6 @@ RSpec.shared_examples "has safety check methods" do
     end
 
     it "returns false when all checks are nil" do
-      # Set all checks to nil
       assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
         assessment.send("#{check}=", nil) if assessment.respond_to?("#{check}=")
       end
@@ -224,7 +215,6 @@ RSpec.shared_examples "has safety check methods" do
 
   describe "#safety_issues_summary" do
     it "returns no issues message when all checks pass" do
-      # Set all checks to pass
       assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
         assessment.send("#{check}=", true) if assessment.respond_to?("#{check}=")
       end
@@ -233,7 +223,6 @@ RSpec.shared_examples "has safety check methods" do
     end
 
     it "returns no issues message when all checks are nil" do
-      # Set all checks to nil
       assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
         assessment.send("#{check}=", nil) if assessment.respond_to?("#{check}=")
       end
@@ -244,7 +233,7 @@ RSpec.shared_examples "has safety check methods" do
     it "lists failed checks when some checks fail" do
       pass_fields = assessment.class.column_names.select { |col| col.end_with?("_pass") }
       if pass_fields.any?
-        # Set first check to fail
+
         assessment.send("#{pass_fields.first}=", false)
 
         expect(assessment.safety_issues_summary).to include("Safety issues:")
@@ -287,20 +276,16 @@ RSpec.shared_examples "an assessment form" do |assessment_type|
     it "displays the assessment form without errors" do
       visit edit_inspection_path(inspection, tab: assessment_type)
 
-      # Should have the form header
       expect(page).to have_content(I18n.t("forms.#{assessment_type}.header"))
 
-      # Should not have any translation missing errors
       expect(page).not_to have_content("translation missing")
 
-      # Should have a save button
       expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
     end
 
     it "saves the assessment when form is submitted" do
       visit edit_inspection_path(inspection, tab: assessment_type)
 
-      # Submit the form
       click_button I18n.t("inspections.buttons.save_assessment")
 
       expect_updated_message

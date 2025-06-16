@@ -8,6 +8,7 @@ class InspectionWorkflow
   include RadioButtonHelpers
   include FactoryBot::Syntax::Methods
   include InspectionTestHelpers
+  include FormHelpers
 
   BOOLEAN_FIELDS = %w[has_slide is_totally_enclosed slide_permanent_roof].freeze
 
@@ -69,11 +70,10 @@ class InspectionWorkflow
 
     user_data = SeedData.user_fields
     user_data.each do |field_name, value|
-      field_label = t("forms.user_new.fields.#{field_name}")
-      fill_in field_label, with: value
+      fill_in_form :user_new, field_name, value
     end
 
-    click_button t("forms.user_new.submit")
+    submit_form :user_new
     User.find_by!(email: user_data[:email])
   end
 
@@ -102,11 +102,10 @@ class InspectionWorkflow
     )
 
     unit_data.each do |field_name, value|
-      field_label = t("forms.units.fields.#{field_name}")
-      fill_in field_label, with: value
+      fill_in_form :units, field_name, value
     end
 
-    click_button t("forms.units.submit")
+    submit_form :units
     expect_units_message("created")
 
     Unit.find_by!(
@@ -147,22 +146,10 @@ class InspectionWorkflow
   end
 
   def fill_inspection_field(field_name, value)
-    if field_name == :inspection_location
-      fill_in_location(value)
-      return
-    elsif field_name == :unique_report_number
-      fill_in_report_number(value)
-      return
-    end
-
-    field_label = t("forms.inspection.fields.#{field_name}")
-
     if BOOLEAN_FIELDS.include?(field_name.to_s)
-      value ? check_radio(field_label) : uncheck_radio(field_label)
-    elsif value.is_a?(Date)
-      fill_in field_label, with: value
-    elsif value.is_a?(String) || value.is_a?(Numeric)
-      fill_in field_label, with: value
+      value ? check_form_radio(:inspection, field_name) : uncheck_form_radio(:inspection, field_name)
+    else
+      fill_in_form :inspection, field_name, value
     end
   end
 
@@ -187,7 +174,7 @@ class InspectionWorkflow
       fill_assessment_field(tab_name, field_name, value)
     end
 
-    click_button t("forms.#{tab_name}.submit")
+    submit_form tab_name.to_sym
     expect_updated_message
 
     assessment = @inspection.reload.send("#{tab_name}_assessment")
@@ -198,34 +185,13 @@ class InspectionWorkflow
     field_name_str = field_name.to_s
     return if field_name_str.end_with?("_comment")
 
-    field_label = get_field_label(tab_name, field_name, field_name_str)
-
     case field_name_str
     when /.*_pass$/
       choose "#{field_name}_#{value ? "true" : "false"}"
     when ->(s) { BOOLEAN_FIELDS.include?(s) }
-      field_label = get_field_label(tab_name, field_name, field_name_str)
-      value ? check_radio(field_label) : uncheck_radio(field_label)
-    when ->(s) { value.is_a?(String) && value.present? }
-      fill_in field_label, with: value
-    when ->(s) { value.is_a?(Numeric) }
-      fill_in field_label, with: value
-    end
-  end
-
-  def get_field_label(tab_name, field_name, field_name_str)
-    i18n_key = "forms.#{tab_name}.fields.#{field_name}"
-
-    begin
-      t(i18n_key)
-    rescue I18n::MissingTranslationData
-      if field_name_str.end_with?("_pass")
-        base_field_name = field_name_str.sub(/_pass$/, "")
-        base_key = "forms.#{tab_name}.fields.#{base_field_name}"
-        t(base_key)
-      else
-        raise
-      end
+      value ? check_form_radio(tab_name.to_sym, field_name) : uncheck_form_radio(tab_name.to_sym, field_name)
+    when ->(s) { value.present? }
+      fill_in_form tab_name.to_sym, field_name, value
     end
   end
 
@@ -318,7 +284,7 @@ class InspectionWorkflow
 
     applicable_tabs.each do |tab_name|
       visit edit_inspection_path(@second_inspection, tab: tab_name)
-      click_button t("forms.#{tab_name}.submit")
+      submit_form tab_name.to_sym
       expect_updated_message
 
       @second_inspection.reload

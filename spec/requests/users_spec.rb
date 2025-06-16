@@ -31,7 +31,7 @@ RSpec.describe "Users", type: :request do
   describe "POST /signup" do
     it "creates a user and redirects" do
       visit "/signup"
-      
+
       user_data = SeedData.user_fields.merge(rpii_inspector_number: "RPII123")
       fill_and_submit_form(:user_new, user_data)
 
@@ -107,7 +107,7 @@ RSpec.describe "Users", type: :request do
 
   describe "settings functionality" do
     let(:user) { create(:user) }
-    let(:settings_params) { { user: { theme: "dark" } } }
+    let(:settings_params) { {user: {theme: "dark"}} }
 
     context "when logged in as the user" do
       before { login_as(user) }
@@ -119,14 +119,14 @@ RSpec.describe "Users", type: :request do
 
       it "updates the user's settings" do
         patch update_settings_user_path(user), params: settings_params
-        
+
         expect_redirect_with_notice(response, root_path)
         expect(user.reload.theme).to eq("dark")
       end
 
       it "renders error when settings update fails" do
         allow_any_instance_of(User).to receive(:update).and_return(false)
-        
+
         patch update_settings_user_path(user), params: settings_params
         expect(response).to have_http_status(:unprocessable_entity)
       end
@@ -168,19 +168,19 @@ RSpec.describe "Users", type: :request do
   end
 
   shared_examples "admin actions" do |allowed|
-    it "#{allowed ? 'allows' : 'denies'} access to users index" do
+    it "#{allowed ? "allows" : "denies"} access to users index" do
       get users_path
       allowed ? expect_access_allowed(response) : expect_access_denied(response)
     end
 
-    it "#{allowed ? 'allows' : 'denies'} editing a user" do
+    it "#{allowed ? "allows" : "denies"} editing a user" do
       get edit_user_path(target_user)
       allowed ? expect_access_allowed(response) : expect_access_denied(response)
     end
 
-    it "#{allowed ? 'allows' : 'denies'} updating other users" do
+    it "#{allowed ? "allows" : "denies"} updating other users" do
       patch user_path(target_user), params: update_user_params
-      
+
       if allowed
         expect_redirect_with_notice(response)
         expect(target_user.reload.email).to eq("updated@example.com")
@@ -189,9 +189,9 @@ RSpec.describe "Users", type: :request do
       end
     end
 
-    it "#{allowed ? 'allows' : 'denies'} destroying other users" do
+    it "#{allowed ? "allows" : "denies"} destroying other users" do
       delete user_path(target_user)
-      
+
       if allowed
         expect_redirect_with_notice(response)
         expect { target_user.reload }.to raise_error(ActiveRecord::RecordNotFound)
@@ -200,9 +200,9 @@ RSpec.describe "Users", type: :request do
       end
     end
 
-    it "#{allowed ? 'allows' : 'denies'} impersonating other users" do
+    it "#{allowed ? "allows" : "denies"} impersonating other users" do
       post impersonate_user_path(target_user)
-      
+
       if allowed
         expect(response).to redirect_to(root_path)
         expect(flash[:notice]).to include("impersonating")
@@ -219,7 +219,7 @@ RSpec.describe "Users", type: :request do
     context "when logged in as admin" do
       before { login_as(admin) }
       let(:target_user) { regular_user }
-      
+
       include_examples "admin actions", true
 
       it "renders error when user update fails" do
@@ -231,14 +231,14 @@ RSpec.describe "Users", type: :request do
     context "when logged in as regular user" do
       before { login_as(regular_user) }
       let(:target_user) { admin }
-      
+
       include_examples "admin actions", false
     end
   end
 
   def valid_user_params(overrides = {})
     user_data = SeedData.user_fields.merge(rpii_inspector_number: "RPII123")
-    { user: user_data.merge(overrides) }
+    {user: user_data.merge(overrides)}
   end
 
   def expect_validation_error(field)
@@ -257,18 +257,18 @@ RSpec.describe "Users", type: :request do
 
       it "sends notification in production environment" do
         allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
-        
+
         params = valid_user_params
         post "/signup", params: params
-        
+
         expect(NtfyService).to have_received(:notify).with("new user: #{params[:user][:email]}")
       end
 
       it "does not send notification in non-production environment" do
         allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("development"))
-        
+
         post "/signup", params: valid_user_params
-        
+
         expect(NtfyService).not_to have_received(:notify)
       end
     end
@@ -288,7 +288,7 @@ RSpec.describe "Users", type: :request do
 
     it "handles duplicate email" do
       create(:user, email: "existing@example.com")
-      
+
       post "/signup", params: valid_user_params(email: "existing@example.com")
       expect_validation_error(:email)
     end
@@ -307,7 +307,7 @@ RSpec.describe "Users", type: :request do
           password_confirmation: "short"
         }
       }
-      
+
       patch update_password_user_path(user), params: password_params
       expect(response).to have_http_status(:unprocessable_entity)
     end
@@ -369,7 +369,6 @@ RSpec.describe "Users", type: :request do
     end
 
     it "handles impersonation when admin flag is present" do
-
       allow_any_instance_of(User).to receive(:admin?).and_return(true)
 
       post impersonate_user_path(target_user)
@@ -390,7 +389,7 @@ RSpec.describe "Users", type: :request do
         active_until: Date.current + 1.year,
         inspection_company_id: company.id
       )
-      
+
       post "/signup", params: params
 
       created_user = User.find_by(email: params[:user][:email])
@@ -404,11 +403,9 @@ RSpec.describe "Users", type: :request do
     it "handles impersonation without existing admin session" do
       login_as(regular_user)
 
-
       allow_any_instance_of(User).to receive(:admin?).and_return(false)
 
       post impersonate_user_path(regular_user)
-
 
       expect(response).to redirect_to(root_path)
     end
@@ -419,7 +416,6 @@ RSpec.describe "Users", type: :request do
       end
 
       it "allows updating settings even if name is empty" do
-
         regular_user.update_column(:name, nil)
 
         settings_attrs = {
