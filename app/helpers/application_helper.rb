@@ -84,9 +84,9 @@ module ApplicationHelper
 
   def format_numeric_value(value)
     if value.is_a?(String) &&
-      value.match?(/\A-?\d*\.?\d+\z/) &&
-      (float_value = Float(value, exception: false))
-        value = float_value
+        value.match?(/\A-?\d*\.?\d+\z/) &&
+        (float_value = Float(value, exception: false))
+      value = float_value
     end
 
     return value unless value.is_a?(Numeric)
@@ -114,7 +114,7 @@ module ApplicationHelper
       field
     )
 
-    if actual_current_value.nil? && previous_value != nil
+    if actual_current_value.nil? && !previous_value.nil?
       {
         value: format_numeric_value(previous_value),
         prefilled: !previous_value.nil?

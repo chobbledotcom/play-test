@@ -6,10 +6,10 @@ class SessionsController < ApplicationController
 
   def create
     sleep(rand(0.5..2.5)) unless Rails.env.test?
-    
+
     email = params.dig(:session, :email)
     password = params.dig(:session, :password)
-    
+
     if (user = authenticate_user(email, password))
       should_remember = params.dig(:session, :remember_me) == "1"
       create_user_session(user, should_remember)
