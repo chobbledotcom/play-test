@@ -25,17 +25,12 @@ class RpiiVerificationService
         search: inspector_number.to_s.strip
       })
 
-      begin
-        response = http.request(request)
+      response = http.request(request)
 
-        if response.code == "200"
-          parse_response(JSON.parse(response.body))
-        else
-          Rails.logger.error "RPII verification failed: #{response.code} - #{response.body}"
-          []
-        end
-      rescue => e
-        Rails.logger.error "RPII verification error: #{e.message}"
+      if response.code == "200"
+        parse_response(JSON.parse(response.body))
+      else
+        Rails.logger.error "RPII verification failed: #{response.code} - #{response.body}"
         []
       end
     end

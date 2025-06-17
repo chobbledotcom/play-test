@@ -181,8 +181,6 @@ class SafetyStandard
       else
         method_lines.join("")
       end
-    rescue => e
-      "Error retrieving source: #{e.message}"
     end
 
     def get_related_constants(method_name)

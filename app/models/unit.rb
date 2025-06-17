@@ -142,36 +142,34 @@ class Unit < ApplicationRecord
     return if @photo_processed # Prevent infinite loops
 
     # Check if photo needs processing (not already processed)
-    begin
-      image = PdfGeneratorService::ImageProcessor.create_image(photo)
-      needs_processing = image.width > ImageProcessorService::FULL_SIZE ||
-        image.height > ImageProcessorService::FULL_SIZE ||
-        PdfGeneratorService::ImageOrientationProcessor.needs_orientation_correction?(image) ||
-        photo.content_type != "image/jpeg"
+    image = PdfGeneratorService::ImageProcessor.create_image(photo)
+    needs_processing = image.width > ImageProcessorService::FULL_SIZE ||
+      image.height > ImageProcessorService::FULL_SIZE ||
+      PdfGeneratorService::ImageOrientationProcessor.needs_orientation_correction?(image) ||
+      photo.content_type != "image/jpeg"
 
-      return unless needs_processing
+    return unless needs_processing
 
-      # Get the uploaded file data
-      uploaded_file_data = photo.download
+    # Get the uploaded file data
+    uploaded_file_data = photo.download
 
-      # Process the photo
-      processed_io = PhotoProcessingService.process_upload_data(uploaded_file_data, photo.filename.to_s)
+    # Process the photo
+    processed_io = PhotoProcessingService.process_upload_data(uploaded_file_data, photo.filename.to_s)
 
-      if processed_io
-        @photo_processed = true
-        # Replace the attachment with processed version
-        photo.detach
-        photo.attach(
-          io: processed_io,
-          filename: processed_io.original_filename,
-          content_type: processed_io.content_type
-        )
-        @photo_processed = false
-      end
-    rescue => e
-      Rails.logger.error "Photo processing failed: #{e.message}"
-      # For invalid images, detach them
+    if processed_io
+      @photo_processed = true
+      # Replace the attachment with processed version
       photo.detach
+      photo.attach(
+        io: processed_io,
+        filename: processed_io.original_filename,
+        content_type: processed_io.content_type
+      )
+      @photo_processed = false
     end
+  rescue MiniMagick::Error, MiniMagick::Invalid
+    # Invalid image file - detach it
+    photo.detach
+    Rails.logger.error "Failed to process photo for unit #{id}: Invalid image file"
   end
 end

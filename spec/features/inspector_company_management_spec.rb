@@ -174,9 +174,10 @@ RSpec.feature "Inspector Company Management", type: :feature do
 
     scenario "admin tries to access non-existent company" do
       visit inspector_company_path("nonexistent-id")
-
-      expect(page).to have_content(I18n.t("inspector_companies.messages.not_found"))
-      expect(page).to have_current_path(inspector_companies_path)
+      
+      # Should see Rails error page with RecordNotFound
+      expect(page).to have_content("ActiveRecord::RecordNotFound")
+      expect(page).to have_content("Couldn't find InspectorCompany")
     end
 
     scenario "admin creates company with missing required fields" do

@@ -78,9 +78,6 @@ class InspectorCompaniesController < ApplicationController
 
   def set_inspector_company
     @inspector_company = InspectorCompany.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    flash[:alert] = t("inspector_companies.messages.not_found")
-    redirect_to inspector_companies_path
   end
 
   def inspector_company_params

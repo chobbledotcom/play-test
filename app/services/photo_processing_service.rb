@@ -46,14 +46,12 @@ class PhotoProcessingService
   def self.valid_image_data?(image_data)
     return false if image_data.nil? || image_data.empty?
 
-    begin
-      image = MiniMagick::Image.read(image_data)
-      # Try to get basic image properties to ensure it's valid
-      image.width && image.height
-      true
-    rescue
-      false
-    end
+    image = MiniMagick::Image.read(image_data)
+    # Try to get basic image properties to ensure it's valid
+    image.width && image.height
+    true
+  rescue MiniMagick::Error, MiniMagick::Invalid
+    false
   end
 
   # Validate that uploaded file is a processable image

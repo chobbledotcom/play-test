@@ -258,22 +258,19 @@ RSpec.describe "InspectorCompanies", type: :request do
   describe "Edge cases" do
     before { login_as(admin_user) }
 
-    it "handles missing inspector company gracefully on show" do
+    it "returns 404 for missing inspector company on show" do
       get inspector_company_path("nonexistent")
-      expect(response).to redirect_to(inspector_companies_path)
-      expect(flash[:alert]).to be_present
+      expect(response).to have_http_status(:not_found)
     end
 
-    it "handles missing inspector company gracefully on edit" do
+    it "returns 404 for missing inspector company on edit" do
       get edit_inspector_company_path("nonexistent")
-      expect(response).to redirect_to(inspector_companies_path)
-      expect(flash[:alert]).to be_present
+      expect(response).to have_http_status(:not_found)
     end
 
-    it "handles missing inspector company gracefully on update" do
+    it "returns 404 for missing inspector company on update" do
       patch inspector_company_path("nonexistent"), params: {inspector_company: {name: "Test"}}
-      expect(response).to redirect_to(inspector_companies_path)
-      expect(flash[:alert]).to be_present
+      expect(response).to have_http_status(:not_found)
     end
   end
 end
