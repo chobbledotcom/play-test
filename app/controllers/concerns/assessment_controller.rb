@@ -13,32 +13,44 @@ module AssessmentController
 
   def update
     if @assessment.update(assessment_params)
-      respond_to do |format|
-        format.html do
-          flash[:notice] = I18n.t("inspections.messages.updated")
-          redirect_to @inspection
-        end
-        format.json { render json: {status: I18n.t("shared.api.success"), inspection: @inspection} }
-        format.turbo_stream { render turbo_stream: success_turbo_streams }
-      end
+      handle_successful_update
     else
-      respond_to do |format|
-        format.html do
-          # Set the correct tab for the edit view
-          params[:tab] = assessment_type
-          # Ensure the inspection has the assessment with errors
-          @inspection.association(assessment_association).target = @assessment
-          # Load necessary data for the edit view
-          load_inspection_locations
-          render "inspections/edit", status: :unprocessable_entity
-        end
-        format.json { render json: {errors: @assessment.errors}, status: :unprocessable_entity }
-        format.turbo_stream { render turbo_stream: error_turbo_streams }
-      end
+      handle_failed_update
     end
   end
 
   private
+
+  def handle_successful_update
+    respond_to do |format|
+      format.html do
+        flash[:notice] = I18n.t("inspections.messages.updated")
+        redirect_to @inspection
+      end
+      format.json do
+        success_response = {status: I18n.t("shared.api.success"), inspection: @inspection}
+        render json: success_response
+      end
+      format.turbo_stream { render turbo_stream: success_turbo_streams }
+    end
+  end
+
+  def handle_failed_update
+    respond_to do |format|
+      format.html { render_edit_with_errors }
+      format.json do
+        render json: {errors: @assessment.errors}, status: :unprocessable_entity
+      end
+      format.turbo_stream { render turbo_stream: error_turbo_streams }
+    end
+  end
+
+  def render_edit_with_errors
+    params[:tab] = assessment_type
+    @inspection.association(assessment_association).target = @assessment
+    load_inspection_locations
+    render "inspections/edit", status: :unprocessable_entity
+  end
 
   def set_inspection
     @inspection = Inspection

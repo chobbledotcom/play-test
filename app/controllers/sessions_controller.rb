@@ -5,26 +5,20 @@ class SessionsController < ApplicationController
   end
 
   def create
+    sleep(rand(0.5..2.5)) unless Rails.env.test?
+    
     email = params.dig(:session, :email)
     password = params.dig(:session, :password)
-
-    if email.present?
-      user = User.find_by(email: email.downcase)
-      if user&.authenticate(password)
-        log_in user
-        if params[:session][:remember_me] == "1"
-          cookies.permanent.signed[:user_id] = user.id
-        else
-          cookies.delete(:user_id)
-        end
-        flash[:notice] = I18n.t("session.login.success")
-        redirect_to inspections_path
-        return
-      end
+    
+    if (user = authenticate_user(email, password))
+      should_remember = params.dig(:session, :remember_me) == "1"
+      create_user_session(user, should_remember)
+      flash[:notice] = I18n.t("session.login.success")
+      redirect_to inspections_path
+    else
+      flash.now[:alert] = I18n.t("session.login.error")
+      render :new, status: :unprocessable_entity
     end
-
-    flash.now[:alert] = I18n.t("session.login.error")
-    render :new, status: :unprocessable_entity
   end
 
   def destroy

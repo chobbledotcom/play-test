@@ -1,79 +1,43 @@
-# This file is copied to spec/ when you run 'rails generate rspec:install'
 require "spec_helper"
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
-# Prevent database truncation if the environment is production
+
 abort("The Rails environment is running in production mode!") if Rails.env.production?
-# Uncomment the line below in case you have `--require rails_helper` in the `.rspec` file
-# that will avoid rails generators crashing because migrations haven't been run yet
-# return unless Rails.env.test?
+
 require "rspec/rails"
-# Add additional requires below this line. Rails is not loaded until this point!
 require "factory_bot_rails"
 require "capybara/rspec"
-
-# Load I18n usage tracker for locale key tracking
 require_relative "../lib/i18n_usage_tracker"
 
-# Enable tracking if requested via environment variable
+Capybara.raise_server_errors = true
+
 if ENV["I18N_TRACKING_ENABLED"] == "true"
   I18nUsageTracker.reset!
   I18nUsageTracker.tracking_enabled = true
 end
 
-# Requires supporting ruby files with custom matchers and macros, etc, in
-# spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
-# run as spec files by default. This means that files in spec/support that end
-# in _spec.rb will both be required and run as specs, causing the specs to be
-# run twice. It is recommended that you do not name files matching this glob to
-# end with _spec.rb. You can configure this pattern with the --pattern
-# option on the command line or in ~/.rspec, .rspec or `.rspec-local`.
-#
-# The following line is provided for convenience purposes. It has the downside
-# of increasing the boot-up time by auto-requiring all files in the support
-# directory. Alternatively, in the individual `*_spec.rb` files, manually
-# require only the support files necessary.
-#
 Rails.root.glob("spec/support/**/*.rb").sort_by(&:to_s).each { |f| require f }
 
-# Checks for pending migrations and applies them before tests are run.
-# If you are not using ActiveRecord, you can remove these lines.
 begin
   ActiveRecord::Migration.maintain_test_schema!
 rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 RSpec.configure do |config|
-  # Set admin emails pattern for test environment
   config.before(:each) do
     ENV["ADMIN_EMAILS_PATTERN"] = "^admin\\d*@example\\.com$"
   end
 
-  # Include FactoryBot methods
   config.include FactoryBot::Syntax::Methods
-
-  # Include Capybara DSL in view specs
   config.include Capybara::RSpecMatchers, type: :view
-
-  # Include Capybara DSL in feature specs
   config.include Capybara::DSL, type: :feature
-
-  # Include Capybara DSL in request specs for integration testing
   config.include Capybara::DSL, type: :request
+  config.include FormHelpers, type: :feature
 
-  # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_paths = [
-    Rails.root.join("spec/fixtures")
-  ]
-
-  # If you're not using ActiveRecord, or you'd prefer not to run each of your
-  # examples within a transaction, remove the following line or assign false
-  # instead of true.
+  config.fixture_paths = [Rails.root.join("spec/fixtures")]
   config.use_transactional_fixtures = true
 
-  # Database cleaner configuration for parallel tests
   config.before(:suite) do
-    # Ensure database is properly set up for parallel tests
     if ENV["TEST_ENV_NUMBER"]
       ActiveRecord::Base.establish_connection(
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env).first
@@ -81,31 +45,5 @@ RSpec.configure do |config|
     end
   end
 
-  # You can uncomment this line to turn off ActiveRecord support entirely.
-  # config.use_active_record = false
-
-  # RSpec Rails uses metadata to mix in different behaviours to your tests,
-  # for example enabling you to call `get` and `post` in request specs. e.g.:
-  #
-  #     RSpec.describe UsersController, type: :request do
-  #       # ...
-  #     end
-  #
-  # The different available types are documented in the features, such as in
-  # https://rspec.info/features/7-1/rspec-rails
-  #
-  # You can also this infer these behaviours automatically by location, e.g.
-  # /spec/models would pull in the same behaviour as `type: :model` but this
-  # behaviour is considered legacy and will be removed in a future version.
-  #
-  # To enable this behaviour uncomment the line below.
-  # config.infer_spec_type_from_file_location!
-
-  # Include form helpers for all feature tests
-  config.include FormHelpers, type: :feature
-
-  # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
-  # arbitrary gems may also be filtered via:
-  # config.filter_gems_from_backtrace("gem name")
 end

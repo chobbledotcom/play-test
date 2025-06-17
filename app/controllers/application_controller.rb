@@ -15,7 +15,8 @@ class ApplicationController < ActionController::Base
 
   rescue_from StandardError do |exception|
     if Rails.env.production?
-      user_info = current_user ? "User: #{current_user.email}" : "User: Not logged in"
+      user_email = current_user&.email || "Not logged in"
+      user_info = "User: #{user_email}"
 
       message = <<~MESSAGE
         500 Error in play-test
@@ -69,7 +70,8 @@ class ApplicationController < ActionController::Base
   end
 
   def seed_data_action?
-    controller_name == "users" && %w[add_seeds delete_seeds].include?(action_name)
+    seed_actions = %w[add_seeds delete_seeds]
+    controller_name == "users" && seed_actions.include?(action_name)
   end
 
   def impersonating?
@@ -82,9 +84,12 @@ class ApplicationController < ActionController::Base
     @debug_start_time = Time.current
     @debug_sql_queries = []
 
-    ActiveSupport::Notifications.unsubscribe(@debug_subscription) if @debug_subscription
+    if @debug_subscription
+      ActiveSupport::Notifications.unsubscribe(@debug_subscription)
+    end
 
-    @debug_subscription = ActiveSupport::Notifications.subscribe("sql.active_record") do |name, start, finish, id, payload|
+    @debug_subscription = ActiveSupport::Notifications
+      .subscribe("sql.active_record") do |name, start, finish, id, payload|
       unless payload[:name] == "SCHEMA" || payload[:sql] =~ /^PRAGMA/
         @debug_sql_queries << {
           sql: payload[:sql],
@@ -116,12 +121,15 @@ class ApplicationController < ActionController::Base
 
     table_query_counts.each do |table, count|
       if count > 5
-        Rails.logger.error "N+1 query detected: #{table} was queried #{count} times"
+        error_message = "N+1 query detected: #{table} was queried #{count} times"
+        Rails.logger.error error_message
         Rails.logger.error "Queries for #{table}:"
-        debug_sql_queries.select { |q| table_from_query(q[:sql]) == table }.each_with_index do |query, i|
+        table_queries = debug_sql_queries.select { |q| table_from_query(q[:sql]) == table }
+        table_queries.each_with_index do |query, i|
           Rails.logger.error "  #{i + 1}. #{query[:name]}: #{query[:sql]}"
         end
-        raise "N+1 query detected: #{table} table was queried #{count} times (limit: 5)"
+        message = "N+1 query detected: #{table} table was queried #{count} times"
+        raise "#{message} (limit: 5)"
       end
     end
   end

@@ -13,10 +13,20 @@ class InspectionsController < ApplicationController
   before_action :no_index
 
   def index
-    # Load all inspections in one query to avoid N+1
     all_inspections = filtered_inspections_query_without_order.to_a
+    partition_inspections(all_inspections)
+    
+    @title = build_index_title
+    @has_any_inspections = all_inspections.any?
+    load_inspection_locations
 
-    # Partition into draft and complete in memory
+    respond_to do |format|
+      format.html
+      format.csv { send_inspections_csv }
+    end
+  end
+
+  def partition_inspections(all_inspections)
     @draft_inspections = all_inspections
       .select { it.complete_date.nil? }
       .sort_by(&:created_at)
@@ -24,19 +34,11 @@ class InspectionsController < ApplicationController
     @complete_inspections = all_inspections
       .select { it.complete_date.present? }
       .sort_by { -it.created_at.to_i }
+  end
 
-    @title = build_index_title
-    @has_any_inspections = all_inspections.any?
-    load_inspection_locations
-
-    respond_to do |format|
-      format.html
-      format.csv do
-        csv_data = InspectionCsvExportService.new(@complete_inspections).generate
-        send_data csv_data,
-          filename: "inspections-#{Date.today}.csv"
-      end
-    end
+  def send_inspections_csv
+    csv_data = InspectionCsvExportService.new(@complete_inspections).generate
+    send_data csv_data, filename: "inspections-#{Date.today}.csv"
   end
 
   def show

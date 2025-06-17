@@ -2,22 +2,34 @@ class User < ApplicationRecord
   include CustomIdGenerator
 
   has_secure_password
+
   has_many :inspections, dependent: :destroy
   has_many :units, dependent: :destroy
-  belongs_to :inspection_company, class_name: "InspectorCompany", optional: true
 
-  email_format_options = {with: URI::MailTo::EMAIL_REGEXP}
-  validates :email, presence: true, uniqueness: true,
-    format: email_format_options
-  password_length_options = {minimum: 6}
-  validates :password, presence: true, length: password_length_options,
+  belongs_to :inspection_company,
+    class_name: "InspectorCompany",
+    optional: true
+
+  validates :email,
+    presence: true,
+    uniqueness: true,
+    format: {with: URI::MailTo::EMAIL_REGEXP}
+
+  validates :password,
+    presence: true,
+    length: {minimum: 6},
     if: :password_digest_changed?
-  validates :name, presence: true, if: :validate_name?
-  validates :rpii_inspector_number, uniqueness: true, allow_nil: true
-  validates :theme, inclusion: {in: %w[light dark]}
-  # Contact fields are only required for users without companies
-  # when they need to generate PDFs
-  # For now, we'll make them optional during signup and enforce them when needed
+
+  validates :name,
+    presence: true,
+    if: :validate_name?
+
+  validates :rpii_inspector_number,
+    uniqueness: true,
+    allow_nil: true
+
+  validates :theme,
+    inclusion: {in: %w[light dark]}
 
   before_create :set_inactive_on_signup
   before_save :downcase_email
@@ -27,7 +39,6 @@ class User < ApplicationRecord
     active_until.nil? || active_until >= Date.current
   end
 
-  # Temporary alias - will be removed later
   alias_method :can_create_inspection?, :is_active?
 
   def inactive_user_message
@@ -72,21 +83,16 @@ class User < ApplicationRecord
   end
 
   def verify_rpii_inspector_number
-    return {valid: false, error: :blank_number} if rpii_inspector_number.blank?
-    return {valid: false, error: :blank_name} if name.blank?
+    if rpii_inspector_number.blank?
+      return {valid: false, error: :blank_number}
+    elsif name.blank?
+      return {valid: false, error: :blank_name}
+    end
 
     result = RpiiVerificationService.verify(rpii_inspector_number)
 
     if result[:valid]
-      inspector = result[:inspector]
-      # Check if the inspector name matches the user's name
-      if inspector[:name].present? && names_match?(name, inspector[:name])
-        update(rpii_verified_date: Time.current)
-        {valid: true, inspector: inspector}
-      else
-        update(rpii_verified_date: nil)
-        {valid: false, error: :name_mismatch, inspector: inspector}
-      end
+      handle_valid_rpii_result(result[:inspector])
     else
       update(rpii_verified_date: nil)
       {valid: false, error: :not_found}
@@ -97,31 +103,33 @@ class User < ApplicationRecord
     rpii_verified_date.present?
   end
 
+  def handle_valid_rpii_result(inspector)
+    if inspector[:name].present? && names_match?(name, inspector[:name])
+      update(rpii_verified_date: Time.current)
+      {valid: true, inspector: inspector}
+    else
+      update(rpii_verified_date: nil)
+      {valid: false, error: :name_mismatch, inspector: inspector}
+    end
+  end
+
   def has_seed_data?
     units.seed_data.exists? || inspections.seed_data.exists?
   end
 
-  private
-
   def validate_name?
-    # Skip name validation if we're only updating settings fields
-    # Name is required for new records and when explicitly being updated
     new_record? || name_changed?
   end
 
   def names_match?(user_name, inspector_name)
-    # Normalize names for comparison - case insensitive and trimmed
     normalized_user = user_name.to_s.strip.downcase
     normalized_inspector = inspector_name.to_s.strip.downcase
 
-    # Exact match
     return true if normalized_user == normalized_inspector
 
-    # Check if all parts of user name are in inspector name (handles middle names)
     user_parts = normalized_user.split(/\s+/)
     inspector_parts = normalized_inspector.split(/\s+/)
 
-    # All parts of user name should be in inspector name
     user_parts.all? { |part| inspector_parts.include?(part) }
   end
 
@@ -134,9 +142,6 @@ class User < ApplicationRecord
   end
 
   def set_inactive_on_signup
-    # Set active_until to yesterday so user is inactive by default
-    # Admin will need to extend this date for user to become active
-    # Only set default if active_until was not explicitly provided
     unless instance_variable_get(:@active_until_explicitly_set)
       self.active_until = Date.current - 1.day
     end
