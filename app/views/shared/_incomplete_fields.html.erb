@@ -24,8 +24,9 @@
     <ul class="incomplete-fields-list">
       <% incomplete_fields.each do |field_info| %>
         <li class="incomplete-field-item">
-          <strong><%= field_info[:label] %></strong>
-          <span class="field-type"><%= t("assessments.incomplete_fields.needs_value") %></span>
+          <a href="<%= field_info[:url] %>">
+            <%= field_info[:label] %>
+          </a>
         </li>
       <% end %>
     </ul>

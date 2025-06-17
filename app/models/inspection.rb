@@ -11,6 +11,26 @@ class Inspection < ApplicationRecord
     user_height_assessment: Assessments::UserHeightAssessment
   }.freeze
 
+  USER_EDITABLE_PARAMS = %i[
+    has_slide
+    height
+    inspection_date
+    inspection_location
+    is_totally_enclosed
+    length
+    passed
+    risk_assessment
+    unique_report_number
+    unit_id
+    width
+  ].freeze
+
+  REQUIRED_TO_COMPLETE_FIELDS =
+    USER_EDITABLE_PARAMS - %i[
+      risk_assessment
+      unique_report_number
+    ]
+
   belongs_to :user
   belongs_to :unit, optional: true
   belongs_to :inspector_company, optional: true
@@ -26,7 +46,6 @@ class Inspection < ApplicationRecord
   # Accept nested attributes for all assessments
   accepts_nested_attributes_for(*ASSESSMENT_TYPES.keys)
 
-  # Validations - allow drafts to be incomplete
   validates :inspection_location, presence: true, if: :complete?
   validates :inspection_date, presence: true
   validates :unique_report_number,
@@ -240,10 +259,10 @@ class Inspection < ApplicationRecord
   def incomplete_fields
     fields = []
 
-    if inspection_location.blank?
+    REQUIRED_TO_COMPLETE_FIELDS.each do |field|
       fields << {
-        field: :inspection_location,
-        label: I18n.t("forms.inspection.fields.inspection_location")
+        field: field,
+        label: I18n.t("forms.inspection.fields.#{field}")
       }
     end
 

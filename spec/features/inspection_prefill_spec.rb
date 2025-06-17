@@ -11,7 +11,7 @@ RSpec.feature "Inspection Prefilling", type: :feature do
       user: user,
       inspection_date: 365.days.ago,
       unit: unit,
-      width: 5)
+      width: 55555)
 
     visit unit_path(unit)
     click_button I18n.t("units.buttons.add_inspection")
@@ -29,14 +29,14 @@ RSpec.feature "Inspection Prefilling", type: :feature do
     expect(field_wrapper[:class]).to include("set-previous")
 
     width_field = find_form_field(:inspection, :width)
-    expect(width_field.value).to eq("5")
+    expect(width_field.value).to eq("55555")
 
     click_button I18n.t("forms.inspection.submit")
     expect_updated_message
 
     visit edit_inspection_path(new_inspection)
     width_field = find_form_field(:inspection, :width)
-    expect(width_field.value).to eq("5")
+    expect(width_field.value).to eq("55555.0")
 
     location_field = find_form_field(:inspection, :inspection_location)
     field_wrapper = location_field.find(:xpath, "..")

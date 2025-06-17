@@ -13,7 +13,8 @@
     <input type="checkbox"
       id="<%= checkbox_id %>"
       <%= 'checked' if has_comment %>
-      onchange="document.getElementById('<%= textarea_id %>').style.display = this.checked ? 'block' : 'none';"
+      data-comment-toggle="<%= textarea_id %>"
+      data-comment-container="<%= textarea_id %>"
     >
     <%= t('shared.comment') %>
   </label>

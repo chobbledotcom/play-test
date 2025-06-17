@@ -190,22 +190,11 @@ class InspectionsController < ApplicationController
     end
   end
 
-  INSPECTION_SPECIFIC_PARAMS = %i[
-    inspection_date
-    inspection_location
-    inspector_company_id
-    passed
-    risk_assessment
-    unique_report_number
-    unit_id
-    has_slide
-    is_totally_enclosed
-  ].freeze
 
   SYSTEM_ATTRIBUTES = %w[inspection_id created_at updated_at].freeze
 
   def build_base_params
-    params.require(:inspection).permit(*INSPECTION_SPECIFIC_PARAMS)
+    params.require(:inspection).permit(*Inspection::USER_EDITABLE_PARAMS)
   end
 
   def add_assessment_params(base_params)

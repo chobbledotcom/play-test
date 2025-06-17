@@ -22,6 +22,7 @@ en:
         is_totally_enclosed: "Is totally enclosed"
         passed: "Passed"
         risk_assessment: "Risk Assessment"
+        unit_id: "Unit Selection"
       submit: "Save Inspection"
       errors:
         header:

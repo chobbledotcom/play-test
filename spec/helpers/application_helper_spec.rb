@@ -239,7 +239,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "raises ArgumentError" do
-        expect { result }.to raise_error(ArgumentError, "no @_current_i18n_base in form_field_setup")
+        expect { result }.to raise_error(ArgumentError, "missing i18n_base")
       end
     end
 
@@ -250,7 +250,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       end
 
       it "raises ArgumentError" do
-        expect { result }.to raise_error(ArgumentError, "no @_current_form in form_field_setup")
+        expect { result }.to raise_error(ArgumentError, "missing form_object")
       end
     end
 
