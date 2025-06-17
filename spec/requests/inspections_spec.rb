@@ -371,12 +371,13 @@ RSpec.describe "Inspections", type: :request do
           expect_redirect_with_alert(edit_inspection_path(inspection), /Missing data/)
         end
 
-        it "handles completion errors" do
+        it "lets errors bubble up when completion fails" do
           allow_any_instance_of(Inspection).to receive(:validate_completeness).and_return([])
-          allow_any_instance_of(Inspection).to receive(:complete!).and_raise("Error")
+          allow_any_instance_of(Inspection).to receive(:complete!).and_raise(StandardError, "Unexpected error")
 
-          patch "/inspections/#{inspection.id}/complete"
-          expect_redirect_with_alert(edit_inspection_path(inspection), /Error/)
+          expect {
+            patch "/inspections/#{inspection.id}/complete"
+          }.to raise_error(StandardError, "Unexpected error")
         end
       end
 

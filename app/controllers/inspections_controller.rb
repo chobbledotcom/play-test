@@ -15,7 +15,7 @@ class InspectionsController < ApplicationController
   def index
     all_inspections = filtered_inspections_query_without_order.to_a
     partition_inspections(all_inspections)
-    
+
     @title = build_index_title
     @has_any_inspections = all_inspections.any?
     load_inspection_locations
@@ -24,21 +24,6 @@ class InspectionsController < ApplicationController
       format.html
       format.csv { send_inspections_csv }
     end
-  end
-
-  def partition_inspections(all_inspections)
-    @draft_inspections = all_inspections
-      .select { it.complete_date.nil? }
-      .sort_by(&:created_at)
-
-    @complete_inspections = all_inspections
-      .select { it.complete_date.present? }
-      .sort_by { -it.created_at.to_i }
-  end
-
-  def send_inspections_csv
-    csv_data = InspectionCsvExportService.new(@complete_inspections).generate
-    send_data csv_data, filename: "inspections-#{Date.today}.csv"
   end
 
   def show
@@ -124,7 +109,6 @@ class InspectionsController < ApplicationController
   end
 
   def complete
-    # Check if inspection can be completed
     validation_errors = @inspection.validate_completeness
 
     if validation_errors.any?
@@ -134,15 +118,9 @@ class InspectionsController < ApplicationController
       return
     end
 
-    begin
-      @inspection.complete!(current_user)
-      flash[:notice] = t("inspections.messages.marked_complete")
-      redirect_to @inspection
-    rescue => e
-      error_message = e.message
-      flash[:alert] = t("inspections.messages.completion_failed", error: error_message)
-      redirect_to edit_inspection_path(@inspection)
-    end
+    @inspection.complete!(current_user)
+    flash[:notice] = t("inspections.messages.marked_complete")
+    redirect_to @inspection
   end
 
   def mark_draft
@@ -162,6 +140,21 @@ class InspectionsController < ApplicationController
   end
 
   private
+
+  def partition_inspections(all_inspections)
+    @draft_inspections = all_inspections
+      .select { it.complete_date.nil? }
+      .sort_by(&:created_at)
+
+    @complete_inspections = all_inspections
+      .select { it.complete_date.present? }
+      .sort_by { -it.created_at.to_i }
+  end
+
+  def send_inspections_csv
+    csv_data = InspectionCsvExportService.new(@complete_inspections).generate
+    send_data csv_data, filename: "inspections-#{Date.today}.csv"
+  end
 
   def validate_tab_parameter
     return unless params[:tab].present?
@@ -191,7 +184,6 @@ class InspectionsController < ApplicationController
       Rails.logger.error "DATA INTEGRITY ERROR: #{error_message}"
     end
   end
-
 
   SYSTEM_ATTRIBUTES = %w[inspection_id created_at updated_at].freeze
 
