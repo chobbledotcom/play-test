@@ -62,25 +62,11 @@
       value: number_options[:value] %>
   <% end %>
 
-  <%= render 'form/field_wrapper', prefilled: pass_fail_prefilled, wrapper_class: 'radio-pass' do %>
-    <label for="<%= pass_fail_field %>_true">
-      <%= t('shared.pass') %>
-      <%= form.radio_button pass_fail_field, true,
-          { id: "#{pass_fail_field}_true" }.merge(
-            radio_button_options(pass_fail_prefilled, pass_fail_checked, true)
-          ) %>
-    </label>
-  <% end %>
-
-  <%= render 'form/field_wrapper', prefilled: pass_fail_prefilled, wrapper_class: 'radio-fail' do %>
-    <label for="<%= pass_fail_field %>_false">
-      <%= form.radio_button pass_fail_field, false,
-          { id: "#{pass_fail_field}_false" }.merge(
-            radio_button_options(pass_fail_prefilled, pass_fail_checked, false)
-          ) %>
-      <%= t('shared.fail') %>
-    </label>
-  <% end %>
+  <%= render 'form/radio_pass_fail',
+    field: pass_fail_field,
+    prefilled: pass_fail_prefilled,
+    checked_value: pass_fail_checked
+  %>
 
   <%= render 'form/comment_checkbox',
       comment_field: comment_field,

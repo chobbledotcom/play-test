@@ -133,11 +133,11 @@
   grid-area: label;
 }
 
-.yes-no-radio > .radio-yes {
+.yes-no-radio > .yes {
   grid-area: yes-label;
 }
 
-.yes-no-radio > .radio-no {
+.yes-no-radio > .no {
   grid-area: no-label;
 }
 
@@ -163,11 +163,11 @@
   flex-direction: column;
 }
 
-.pass-fail-comment > .radio-pass {
+.pass-fail-comment > .pass {
   grid-area: pass-label;
 }
 
-.pass-fail-comment > .radio-fail {
+.pass-fail-comment > .fail {
   grid-area: fail-label;
 }
 
@@ -200,11 +200,11 @@
   grid-area: number;
 }
 
-.number-pass-fail-comment > .radio-pass {
+.number-pass-fail-comment > .pass {
   grid-area: pass-label;
 }
 
-.number-pass-fail-comment > .radio-fail {
+.number-pass-fail-comment > .fail {
   grid-area: fail-label;
 }
 

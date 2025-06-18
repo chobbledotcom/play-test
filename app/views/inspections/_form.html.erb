@@ -74,7 +74,7 @@
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'inspection_results' do %>
-    <%= render 'form/yes_no_radio', field: :passed %>
+    <%= render 'form/pass_fail', field: :passed %>
     <%= render 'form/text_area', field: :risk_assessment, rows: 3 %>
   <% end %>
 <% end %>

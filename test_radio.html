@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* Copy of the radio button styles */
+input[type="radio"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  margin: 0;
+  font: inherit;
+  color: currentColor;
+  width: 1.15em;
+  height: 1.15em;
+  border: 0.15em solid currentColor;
+  border-radius: 50%;
+  transform: translateY(-0.075em);
+  display: inline-grid;
+  place-content: center;
+  cursor: pointer;
+}
+
+input[type="radio"]::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  border-radius: 50%;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em #118bee;
+  background-color: currentColor;
+}
+
+input[type="radio"]:checked::before {
+  transform: scale(1);
+}
+
+label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  cursor: pointer;
+  line-height: 1.1;
+  position: relative;
+  margin: 1em;
+}
+</style>
+</head>
+<body>
+<h2>Test Radio Buttons</h2>
+
+<h3>Test 1: Radio after text (Pass style)</h3>
+<label for="test1_true">
+  Pass
+  <input type="radio" name="test1" id="test1_true" value="true">
+</label>
+<label for="test1_false">
+  <input type="radio" name="test1" id="test1_false" value="false">
+  Fail
+</label>
+
+<h3>Test 2: Without for attribute</h3>
+<label>
+  Pass
+  <input type="radio" name="test2" value="true">
+</label>
+<label>
+  <input type="radio" name="test2" value="false">
+  Fail
+</label>
+
+<h3>Test 3: Check if label clicking works</h3>
+<p>Click on the text "Pass" or "Fail" above - the radio should select.</p>
+
+<script>
+// Add click logging
+document.querySelectorAll('label').forEach(label => {
+  label.addEventListener('click', (e) => {
+    console.log('Label clicked:', e.target);
+  });
+});
+
+document.querySelectorAll('input[type="radio"]').forEach(radio => {
+  radio.addEventListener('click', (e) => {
+    console.log('Radio clicked:', e.target);
+    e.stopPropagation(); // Prevent double events
+  });
+});
+</script>
+</body>
+</html>

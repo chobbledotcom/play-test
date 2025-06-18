@@ -1,0 +1,30 @@
+<%
+  form = @_current_form
+  yes_no ||= false
+%>
+
+<%= render 'form/field_wrapper',
+  prefilled: prefilled,
+  wrapper_class: "pass" do
+%>
+  <label>
+    <%= t("shared.#{yes_no ? "yes" : "pass"}") %>
+    <%= form.radio_button field,
+      true,
+      radio_button_options(prefilled, checked_value, true)
+    %>
+  </label>
+<% end %>
+
+<%= render 'form/field_wrapper',
+  prefilled: prefilled,
+  wrapper_class: "fail" do
+%>
+  <label>
+    <%= form.radio_button field,
+      false,
+      radio_button_options(prefilled, checked_value, false)
+    %>
+    <%= t("shared.#{yes_no ? "no" : "fail"}") %>
+  </label>
+<% end %>

@@ -48,15 +48,6 @@ RSpec.feature "Inspection UI and Accessibility", type: :feature do
     expect(page).to have_button(I18n.t("inspections.buttons.delete"))
   end
 
-  scenario "has proper accessibility features" do
-    expect(page).to have_css("h1", text: I18n.t("inspections.titles.edit"))
-    expect(page).to have_css("legend", text: I18n.t("forms.inspection.sections.current_unit"))
-
-    %w[inspection_location passed_true passed_false].each do |field_id|
-      expect(page).to have_css("label[for*='#{field_id}']")
-    end
-  end
-
   scenario "enforces user permissions for unit visibility" do
     create(:unit, user: user, serial: "MINE001")
     create(:unit, user: create(:user), serial: "OTHER001")

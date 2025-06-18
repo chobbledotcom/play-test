@@ -1,43 +1,46 @@
 require "rails_helper"
 
 RSpec.describe "form/_pass_fail.html.erb", type: :view do
-  let(:mock_form) { double("FormBuilder") }
-  let(:field) { :status }
-  let(:field_config) do
-    {
-      form_object: mock_form,
-      i18n_base: "test.forms",
-      field_label: "Status",
-      field_hint: nil,
-      field_placeholder: nil,
-      value: nil,
-      prefilled: false
-    }
+  class TestModel
+    include ActiveModel::Model
+    attr_accessor :status, :passed, :meets_requirements, :satisfactory,
+      :compliant, :approved
+
+    def persisted? = false
   end
 
-  # Default render method with common setup
-  def render_pass_fail(locals = {})
-    render partial: "form/pass_fail", locals: {field: field}.merge(locals)
-  end
+  let(:test_model) { TestModel.new }
+  let(:field) { :status }
 
   before do
-    # Mock the form field setup helper
-    allow(view).to receive(:form_field_setup).and_return(field_config)
-
-    # Mock the radio_button_options helper
-    allow(view).to receive(:radio_button_options).and_return({})
-
-    # Mock i18n translations
-    allow(view).to receive(:t).and_call_original
-    allow(view).to receive(:t).with("shared.pass").and_return("Pass")
-    allow(view).to receive(:t).with("shared.fail").and_return("Fail")
-
-    # Mock form builder radio_button method
-    allow(mock_form).to receive(:radio_button) do |field, value, options = {}|
-      id = options[:id] || "#{field}_#{value}"
-      checked = options[:checked] ? ' checked="checked"' : ""
-      %(<input type="radio" name="#{field}" value="#{value}" id="#{id}"#{checked} />).html_safe
+    view.form_with(model: test_model, url: "/", local: true) do |f|
+      @_current_form = f
+      ""
     end
+    @_current_i18n_base = "test.forms"
+
+    I18n.backend.store_translations(:en, {
+      test: {
+        forms: {
+          fields: {
+            approved: "Approved",
+            compliant: "Compliant",
+            meets_requirements: "Meets Requirements",
+            passed: "Passed",
+            satisfactory: "Satisfactory",
+            status: "Status"
+          }
+        }
+      },
+      shared: {
+        fail: "Fail",
+        pass: "Pass"
+      }
+    })
+  end
+
+  def render_pass_fail(locals = {})
+    render partial: "form/pass_fail", locals: {field:}.merge(locals)
   end
 
   describe "basic rendering" do
@@ -46,8 +49,8 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
 
       expect(rendered).to have_css("div")
       expect(rendered).to have_css("label", text: "Status") # Field label
-      expect(rendered).to have_css('input[type="radio"][name="status"][value="true"][id="status_true"]')
-      expect(rendered).to have_css('input[type="radio"][name="status"][value="false"][id="status_false"]')
+      expect(rendered).to have_css('input[type="radio"][name="test_model[status]"][value="true"]')
+      expect(rendered).to have_css('input[type="radio"][name="test_model[status]"][value="false"]')
       expect(rendered).to have_css("label", text: "Pass")
       expect(rendered).to have_css("label", text: "Fail")
     end
@@ -71,21 +74,18 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
     it "generates proper radio button IDs for accessibility" do
       render_pass_fail
 
-      expect(rendered).to have_css('input#status_true[type="radio"]')
-      expect(rendered).to have_css('input#status_false[type="radio"]')
+      expect(rendered).to have_css('input#test_model_status_true[type="radio"]')
+      expect(rendered).to have_css('input#test_model_status_false[type="radio"]')
     end
   end
 
   describe "with prefilled value" do
     it "checks the appropriate radio button when prefilled" do
-      # Setup field_config with prefilled data
-      allow(view).to receive(:form_field_setup).and_return(
-        field_config.merge(value: true, prefilled: true)
-      )
-
-      # Mock radio_button_options to return checked for true
-      allow(view).to receive(:radio_button_options).with(true, true, true).and_return({checked: true})
-      allow(view).to receive(:radio_button_options).with(true, true, false).and_return({})
+      # Set the current value to nil to trigger prefill from previous
+      test_model.status = nil
+      
+      # Set up the previous inspection context
+      @previous_inspection = TestModel.new(status: true)
 
       render_pass_fail
 
@@ -94,36 +94,41 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
     end
 
     it "adds prefilled wrapper class when field is prefilled" do
-      allow(view).to receive(:form_field_setup).and_return(
-        field_config.merge(value: false, prefilled: true)
-      )
+      # Set the current value to nil and provide a previous inspection
+      test_model.status = nil
+      
+      # Set up the previous inspection context that the helper expects
+      @previous_inspection = TestModel.new(status: false)
 
       render_pass_fail
 
-      expect(rendered).to have_css("div.set-previous")
+      # The set-previous class is added to the field wrapper divs
+      expect(rendered).to have_css("div.pass.set-previous")
+      expect(rendered).to have_css("div.fail.set-previous")
     end
   end
 
   describe "different field contexts" do
-    shared_examples "renders correctly for field" do |field_name|
+    shared_examples "renders correctly for field" do |field_name, expected_label|
       it "handles #{field_name} field" do
-        # Mock the form_field_setup method for this field
-        allow(view).to receive(:form_field_setup).and_return(
-          field_config.merge(field_label: field_name.to_s.humanize)
-        )
+        # The test model already has all these fields as attributes
+        form_html = view.form_with(model: test_model, url: "/", local: true) do |f|
+          @_current_form = f
+          ""
+        end
 
         render partial: "form/pass_fail", locals: {field: field_name}
 
         expect(rendered).to have_css("div")
-        expect(rendered).to have_css("label", text: field_name.to_s.humanize)
+        expect(rendered).to have_css("label", text: expected_label)
       end
     end
 
-    include_examples "renders correctly for field", :passed
-    include_examples "renders correctly for field", :meets_requirements
-    include_examples "renders correctly for field", :satisfactory
-    include_examples "renders correctly for field", :compliant
-    include_examples "renders correctly for field", :approved
+    include_examples "renders correctly for field", :passed, "Passed"
+    include_examples "renders correctly for field", :meets_requirements, "Meets Requirements"
+    include_examples "renders correctly for field", :satisfactory, "Satisfactory"
+    include_examples "renders correctly for field", :compliant, "Compliant"
+    include_examples "renders correctly for field", :approved, "Approved"
   end
 
   describe "i18n integration" do
@@ -134,11 +139,19 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
       expect(rendered).to have_content("Fail")
     end
 
-    it "calls t() for pass/fail translations" do
-      expect(view).to receive(:t).with("shared.pass").and_return("Pass")
-      expect(view).to receive(:t).with("shared.fail").and_return("Fail")
+    it "uses the correct i18n keys" do
+      # Temporarily change translations to verify correct keys are used
+      I18n.backend.store_translations(:en, {
+        shared: {
+          pass: "CustomPass",
+          fail: "CustomFail"
+        }
+      })
 
       render_pass_fail
+      
+      expect(rendered).to have_content("CustomPass")
+      expect(rendered).to have_content("CustomFail")
     end
   end
 

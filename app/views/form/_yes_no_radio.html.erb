@@ -1,15 +1,6 @@
 <%
-  # Simple Yes/No radio button partial with grid layout
-  # Required parameters:
-  #   field: Field name (e.g., 'has_slide')
-
-  # Get the form object
   form = @_current_form
-
-  # Get field label from i18n (will raise if missing)
   field_data = form_field_setup(field, local_assigns)
-
-  # Check the prefilled value if needed
   checked_value = field_data[:prefilled] ? field_data[:value] : nil
 %>
 
@@ -21,29 +12,10 @@
     <label id="<%= field %>"><%= field_data[:field_label] %></label>
   <% end %>
 
-  <%= render 'form/field_wrapper',
+  <%= render 'form/radio_pass_fail',
+    field: field,
     prefilled: field_data[:prefilled],
-    wrapper_class: 'yes' do
+    checked_value: checked_value,
+    yes_no: true
   %>
-    <label for="<%= field %>_true">
-      <%= t('shared.yes') %>
-      <%= form.radio_button field,
-        true,
-        radio_button_options(field_data[:prefilled], checked_value, true)
-      %>
-    </label>
-  <% end %>
-
-  <%= render 'form/field_wrapper',
-    prefilled: field_data[:prefilled],
-    wrapper_class: 'no' do
-  %>
-    <label for="<%= field %>_false">
-      <%= form.radio_button field,
-        false,
-        radio_button_options(field_data[:prefilled], checked_value, false)
-      %>
-      <%= t('shared.no') %>
-    </label>
-  <% end %>
 </div>

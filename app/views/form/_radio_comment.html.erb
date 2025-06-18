@@ -10,17 +10,17 @@
   radio_field = field
   comment_field = "#{field}_comment".to_sym
 
-  # Get the form object
   form = @_current_form
   model = form.object
 
-  # Get field label from i18n (will raise if missing)
   field_data = form_field_setup(field, local_assigns)
 
-  # Get comment field options
-  comment_info = comment_field_options(form, comment_field, field_data[:field_label])
+  comment_info = comment_field_options(
+    form,
+    comment_field,
+    field_data[:field_label]
+  )
 
-  # Check the prefilled value if needed
   checked_value = field_data[:prefilled] ? field_data[:value] : nil
 %>
 
@@ -30,34 +30,24 @@
     <label><%= field_data[:field_label] %></label>
   <% end %>
 
-  <!-- Yes radio -->
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'pass' do %>
-    <label for="<%= radio_field %>_true">
-      <%= form.radio_button radio_field, true,
-          radio_button_options(field_data[:prefilled], checked_value, true) %>
-      <%= t('shared.yes') %>
-    </label>
-  <% end %>
+  <%= render 'form/radio_pass_fail',
+    field: radio_field,
+    prefilled: field_data[:prefilled],
+    checked_value: checked_value
+  %>
 
-  <!-- No radio -->
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'fail' do %>
-    <label for="<%= radio_field %>_false">
-      <%= form.radio_button radio_field, false,
-          radio_button_options(field_data[:prefilled], checked_value, false) %>
-      <%= t('shared.no') %>
-    </label>
-  <% end %>
-
-  <!-- Comment checkbox -->
   <%= render 'form/comment_checkbox',
-      comment_field: comment_field,
-      checkbox_id: comment_info[:checkbox_id],
-      textarea_id: comment_info[:options][:id],
-      has_comment: comment_info[:has_comment],
-      prefilled: comment_info[:prefilled] %>
+    comment_field: comment_field,
+    checkbox_id: comment_info[:checkbox_id],
+    textarea_id: comment_info[:options][:id],
+    has_comment: comment_info[:has_comment],
+    prefilled: comment_info[:prefilled]
+  %>
 
-  <!-- Comment textarea (hidden by default, spans full width) -->
-  <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled], wrapper_class: 'comment' do %>
+  <%= render 'form/field_wrapper',
+    prefilled: comment_info[:prefilled],
+    wrapper_class: 'comment' do
+  %>
     <%= form.text_area comment_field, comment_info[:options] %>
   <% end %>
 </div>
