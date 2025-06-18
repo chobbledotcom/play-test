@@ -58,15 +58,14 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
     it "nests radio buttons inside their labels" do
       render_pass_fail
 
-      # Check that radio buttons are inside labels
       doc = Nokogiri::HTML(rendered)
-      pass_labels = doc.css("label").select { |l| l.text.include?("Pass") }
-      pass_label_with_input = pass_labels.find { |l| l.css('input[type="radio"]').any? }
+      pass_labels = doc.css("label").select { _1.text.include?("Pass") }
+      pass_label_with_input = pass_labels.find { _1.css('input[type="radio"]').any? }
       expect(pass_label_with_input).not_to be_nil
       expect(pass_label_with_input.css('input[value="true"]')).not_to be_empty
 
-      fail_labels = doc.css("label").select { |l| l.text.include?("Fail") }
-      fail_label_with_input = fail_labels.find { |l| l.css('input[type="radio"]').any? }
+      fail_labels = doc.css("label").select { _1.text.include?("Fail") }
+      fail_label_with_input = fail_labels.find { _1.css('input[type="radio"]').any? }
       expect(fail_label_with_input).not_to be_nil
       expect(fail_label_with_input.css('input[value="false"]')).not_to be_empty
     end
@@ -81,10 +80,7 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
 
   describe "with prefilled value" do
     it "checks the appropriate radio button when prefilled" do
-      # Set the current value to nil to trigger prefill from previous
       test_model.status = nil
-      
-      # Set up the previous inspection context
       @previous_inspection = TestModel.new(status: true)
 
       render_pass_fail
@@ -94,15 +90,11 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
     end
 
     it "adds prefilled wrapper class when field is prefilled" do
-      # Set the current value to nil and provide a previous inspection
       test_model.status = nil
-      
-      # Set up the previous inspection context that the helper expects
       @previous_inspection = TestModel.new(status: false)
 
       render_pass_fail
 
-      # The set-previous class is added to the field wrapper divs
       expect(rendered).to have_css("div.pass.set-previous")
       expect(rendered).to have_css("div.fail.set-previous")
     end
@@ -111,8 +103,7 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
   describe "different field contexts" do
     shared_examples "renders correctly for field" do |field_name, expected_label|
       it "handles #{field_name} field" do
-        # The test model already has all these fields as attributes
-        form_html = view.form_with(model: test_model, url: "/", local: true) do |f|
+        view.form_with(model: test_model, url: "/", local: true) do |f|
           @_current_form = f
           ""
         end
@@ -124,11 +115,11 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
       end
     end
 
-    include_examples "renders correctly for field", :passed, "Passed"
-    include_examples "renders correctly for field", :meets_requirements, "Meets Requirements"
-    include_examples "renders correctly for field", :satisfactory, "Satisfactory"
-    include_examples "renders correctly for field", :compliant, "Compliant"
     include_examples "renders correctly for field", :approved, "Approved"
+    include_examples "renders correctly for field", :compliant, "Compliant"
+    include_examples "renders correctly for field", :meets_requirements, "Meets Requirements"
+    include_examples "renders correctly for field", :passed, "Passed"
+    include_examples "renders correctly for field", :satisfactory, "Satisfactory"
   end
 
   describe "i18n integration" do
@@ -140,7 +131,6 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
     end
 
     it "uses the correct i18n keys" do
-      # Temporarily change translations to verify correct keys are used
       I18n.backend.store_translations(:en, {
         shared: {
           pass: "CustomPass",
@@ -149,7 +139,7 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
       })
 
       render_pass_fail
-      
+
       expect(rendered).to have_content("CustomPass")
       expect(rendered).to have_content("CustomFail")
     end
@@ -159,15 +149,14 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
     it "properly associates radio buttons with their labels through nesting" do
       render_pass_fail
 
-      # Labels contain the radio buttons
       doc = Nokogiri::HTML(rendered)
-      pass_labels = doc.css("label").select { |l| l.text.include?("Pass") }
-      pass_label_with_input = pass_labels.find { |l| l.css('input[type="radio"]').any? }
+      pass_labels = doc.css("label").select { _1.text.include?("Pass") }
+      pass_label_with_input = pass_labels.find { _1.css('input[type="radio"]').any? }
       expect(pass_label_with_input).not_to be_nil
       expect(pass_label_with_input.css('input[value="true"]')).not_to be_empty
 
-      fail_labels = doc.css("label").select { |l| l.text.include?("Fail") }
-      fail_label_with_input = fail_labels.find { |l| l.css('input[type="radio"]').any? }
+      fail_labels = doc.css("label").select { _1.text.include?("Fail") }
+      fail_label_with_input = fail_labels.find { _1.css('input[type="radio"]').any? }
       expect(fail_label_with_input).not_to be_nil
       expect(fail_label_with_input.css('input[value="false"]')).not_to be_empty
     end

@@ -6,7 +6,7 @@
   <%= render 'form/fieldset', legend_key: 'fabric_construction' do %>
     <%= render 'form/pass_fail_comment', field: :seam_integrity_pass %>
     <%= render 'form/pass_fail_comment', field: :uses_lock_stitching_pass %>
-    <%= render 'form/number_pass_fail_comment', field: :stitch_length %>
+    <%= render 'form/number_pass_fail_comment', field: :stitch_length, step: 1 %>
     <%= render 'form/pass_fail_comment', field: :air_loss_pass %>
     <%= render 'form/pass_fail_comment', field: :straight_walls_pass %>
     <%= render 'form/pass_fail_comment', field: :sharp_edges_pass %>
@@ -15,15 +15,15 @@
   <%= render 'form/fieldset', legend_key: 'structural_safety' do %>
     <%= render 'form/number_pass_fail_comment', field: :blower_tube_length %>
     <%= render 'form/pass_fail_comment', field: :unit_stable_pass %>
-    <%= render 'form/number_pass_fail_comment', field: :evacuation_time %>
-    <%= render 'form/number_pass_fail_comment', field: :step_ramp_size %>
-    <%= render 'form/number_pass_fail_comment', field: :critical_fall_off_height %>
-    <%= render 'form/number_pass_fail_comment', field: :unit_pressure %>
+    <%= render 'form/number_pass_fail_comment', field: :evacuation_time, step: 1 %>
+    <%= render 'form/number_pass_fail_comment', field: :step_ramp_size, step: 1 %>
+    <%= render 'form/number_pass_fail_comment', field: :critical_fall_off_height, step: 0.1 %>
+    <%= render 'form/number_pass_fail_comment', field: :unit_pressure, step: 1 %>
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'trough_assessment' do %>
-    <%= render 'form/number_pass_fail_comment', field: :trough_depth %>
-    <%= render 'form/number_pass_fail_comment', field: :trough_adjacent_panel_width %>
+    <%= render 'form/number_pass_fail_comment', field: :trough_depth, step: 1 %>
+    <%= render 'form/number_pass_fail_comment', field: :trough_adjacent_panel_width, step: 0.1 %>
     <%= render 'form/pass_fail_comment', field: :trough_pass %>
   <% end %>
 

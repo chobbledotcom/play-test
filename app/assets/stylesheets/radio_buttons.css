@@ -40,7 +40,6 @@ input[type="radio"]::before {
   border-radius: 50%;
   transform: scale(0);
   transition: 120ms transform ease-in-out;
-  box-shadow: inset 1em 1em var(--color-primary, #118bee);
   /* Use currentColor for IE fallback */
   background-color: currentColor;
 }
@@ -67,6 +66,7 @@ label:has(input[type="radio"]) {
   line-height: 1.1;
   /* Ensure label remains clickable */
   position: relative;
+  display: flex;
 }
 
 label > input[type="radio"] {
@@ -74,13 +74,11 @@ label > input[type="radio"] {
   margin-right: 0;
 }
 
-.pass input[type="radio"]::before,
-.yes input[type="radio"]::before {
+.pass input[type="radio"]::before {
   box-shadow: inset 1em 1em var(--color-pass, #00a94f);
 }
 
-.fail input[type="radio"]::before,
-.no input[type="radio"]::before {
+.fail input[type="radio"]::before {
   box-shadow: inset 1em 1em var(--color-fail, #d32f2f);
 }
 

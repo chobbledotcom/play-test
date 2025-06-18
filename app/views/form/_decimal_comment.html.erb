@@ -21,26 +21,25 @@
 
   # Get field label from i18n (will raise if missing)
   field_data = form_field_setup(field, local_assigns)
-  
+
   # Build decimal field options
   decimal_options = {
     inputmode: "decimal",
     pattern: "[0-9]*[.]?[0-9]*",
     placeholder: field_data[:field_placeholder] || local_assigns[:placeholder],
-    required: local_assigns[:required] || false,
-    class: "decimal-input"
+    required: local_assigns[:required] || false
   }
-  
+
   # Add prefilled value if needed
   if field_data[:prefilled]
     decimal_options[:value] = field_data[:value]
   end
-  
+
   # Add data attributes for validation
   decimal_options[:data] = {}
   decimal_options[:data][:min] = local_assigns[:min] if local_assigns[:min]
   decimal_options[:data][:max] = local_assigns[:max] if local_assigns[:max]
-  
+
   # Get comment field options
   comment_info = comment_field_options(form, comment_field, field_data[:field_label])
 %>
@@ -49,12 +48,12 @@
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
     <%= form.label decimal_field, field_data[:field_label] %>
   <% end %>
-  
+
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'number' do %>
     <%= form.text_field decimal_field, decimal_options %>
   <% end %>
 
-  <%= render 'form/comment_checkbox', 
+  <%= render 'form/comment_checkbox',
       comment_field: comment_field,
       checkbox_id: comment_info[:checkbox_id],
       textarea_id: comment_info[:options][:id],

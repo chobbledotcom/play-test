@@ -13,6 +13,7 @@ module AssessmentController
 
   def update
     if @assessment.update(assessment_params)
+      @assessment.reload  # Ensure we have fresh data for turbo streams
       handle_successful_update
     else
       handle_failed_update

@@ -5,14 +5,14 @@ en:
       sections:
         slide_dimensions: "Slide Measurements"
       fields:
-        slide_platform_height: "Slide Platform Height"
-        slide_wall_height: "Containing Wall Height"
-        slide_first_metre_height: "First Metre of Slide Containing Wall Height"
-        slide_beyond_first_metre_height: "Remaining Slide Containing Wall Height"
+        slide_platform_height: "Slide Platform Height (m)"
+        slide_wall_height: "Containing Wall Height (m)"
+        slide_first_metre_height: "First Metre of Slide Containing Wall Height (m)"
+        slide_beyond_first_metre_height: "Remaining Slide Containing Wall Height (m)"
         slide_permanent_roof: "Permanent Roof Fitted to Top of Slide?"
         clamber_netting_pass: "Steps / Clamber Netting"
-        runout: "Slide Run Out"
-        runout_pass: "Slide Run Out"
+        runout: "Slide Run Out (m)"
+        runout_pass: "Slide Run Out (m)"
         slip_sheet_pass: "Slip Sheet Integrity"
       status:
         runout_requirement: "Runout Requirement"

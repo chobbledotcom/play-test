@@ -1,16 +1,12 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails";
 import "comment_toggles";
-import "decimal_fields";
 import "details_links";
 import "dirty_forms";
 import "share_buttons";
 
-
-
 // Initialize features on Turbo navigation
 function initializeFeatures() {
-
   // Handle unit selection in inspection form
   const unitSelect = document.querySelector(
     'select[name="inspection[unit_id]"]',
@@ -30,7 +26,6 @@ function initializeFeatures() {
       }
     });
   }
-
 }
 
 // Initialize on first load

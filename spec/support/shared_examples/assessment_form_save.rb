@@ -118,7 +118,7 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
     end
 
     def fill_comment_in_context(base_key, base_label, value)
-      containers = ["form-grid", "pass-fail-comment", "number-pass-fail-comment"]
+      containers = ["form-grid", "radio-comment", "number-radio-comment"]
       filled = false
 
       containers.each do |container|

@@ -8,6 +8,11 @@ module SafetyStandardsTurboStreams
   end
 
   def safety_standards_turbo_streams
+    Rails.logger.debug "=== SafetyStandardsTurboStreams Debug ==="
+    Rails.logger.debug "Assessment: #{@assessment.inspect}"
+    Rails.logger.debug "Partial: #{safety_results_partial}"
+    Rails.logger.debug "========================================"
+    
     [turbo_stream.replace(safety_results_frame_id, partial: safety_results_partial)]
   end
 

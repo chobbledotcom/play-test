@@ -3,7 +3,6 @@
 pin "application"
 pin "@hotwired/turbo-rails", to: "turbo.min.js"
 pin "comment_toggles"
-pin "decimal_fields"
 pin "details_links"
 pin "dirty_forms"
 pin "share_buttons"

@@ -43,7 +43,7 @@
   )
 %>
 
-<div class="form-grid number-pass-fail-comment">
+<div class="form-grid number-radio-comment">
   <!-- Label with number field -->
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
     <label for="<%= form.field_id(number_field) %>">
@@ -54,7 +54,7 @@
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'number' do %>
     <%= form.number_field number_field,
       id: form.field_id(number_field),
-      step: number_options[:step] || 0.01,
+      step: number_options[:step] || 0.1,
       min: number_options[:min],
       max: number_options[:max],
       required: number_options[:required],

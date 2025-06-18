@@ -17,66 +17,68 @@
   pass_fail_field = "#{field}_pass".to_sym
   comment_field = "#{field}_comment".to_sym
 
-  # Get the form object
   form = @_current_form
   model = form.object
 
-  # Get field label from i18n
   field_data = form_field_setup(field, local_assigns)
 
-  # Build decimal field options
   decimal_options = {
     inputmode: "decimal",
     pattern: "[0-9]*[.]?[0-9]*",
     placeholder: field_data[:field_placeholder] || local_assigns[:placeholder],
-    required: local_assigns[:required] || false,
-    class: "decimal-input"
+    required: local_assigns[:required] || false
   }
 
-  # Add prefilled value if needed
   if field_data[:prefilled]
     decimal_options[:value] = field_data[:value]
   end
 
-  # Add data attributes for validation
   decimal_options[:data] = {}
   decimal_options[:data][:min] = local_assigns[:min] if local_assigns[:min]
   decimal_options[:data][:max] = local_assigns[:max] if local_assigns[:max]
 
-  # Get pass/fail field data - don't use form_field_setup as it doesn't have its own label
-  pass_fail_value, pass_fail_prefilled = get_field_value_and_prefilled_status(form, pass_fail_field)
-  pass_fail_checked = pass_fail_prefilled ? pass_fail_value : nil
+  pass_fail_value, pass_fail_prefilled =
+    get_field_value_and_prefilled_status(form, pass_fail_field)
 
-  # Get comment field options
-  comment_info = comment_field_options(form, comment_field, field_data[:field_label])
+  comment_info =
+    comment_field_options(form, comment_field, field_data[:field_label])
 %>
 
-<div class="form-grid number-pass-fail-comment">
-  <!-- Label -->
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
+<div class="form-grid number-radio-comment">
+  <%= render 'form/field_wrapper',
+    prefilled: field_data[:prefilled],
+    wrapper_class: 'label' do
+  %>
     <label for="<%= form.field_id(decimal_field) %>">
       <%= field_data[:field_label] %>
     </label>
   <% end %>
 
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'number' do %>
-    <%= form.text_field decimal_field, decimal_options.merge(id: form.field_id(decimal_field)) %>
+  <%= render 'form/field_wrapper',
+    prefilled: field_data[:prefilled],
+    wrapper_class: 'number' do
+  %>
+    <%= form.text_field decimal_field, decimal_options %>
   <% end %>
 
   <%= render 'form/radio_pass_fail',
     field: pass_fail_field,
     prefilled: pass_fail_prefilled,
-    checked_value: pass_fail_checked
+    checked_value: pass_fail_value
   %>
 
   <%= render 'form/comment_checkbox',
-      comment_field: comment_field,
-      checkbox_id: comment_info[:checkbox_id],
-      textarea_id: comment_info[:options][:id],
-      has_comment: comment_info[:has_comment],
-      prefilled: comment_info[:prefilled] %>
+    comment_field: comment_field,
+    checkbox_id: comment_info[:checkbox_id],
+    textarea_id: comment_info[:options][:id],
+    has_comment: comment_info[:has_comment],
+    prefilled: comment_info[:prefilled]
+  %>
 
-  <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled], wrapper_class: 'comment' do %>
+  <%= render 'form/field_wrapper',
+    prefilled: comment_info[:prefilled],
+    wrapper_class: 'comment' do
+  %>
     <%= form.text_area comment_field, comment_info[:options] %>
   <% end %>
 </div>

@@ -24,7 +24,7 @@
   checked_value = field_data[:prefilled] ? field_data[:value] : nil
 %>
 
-<div class="form-grid pass-fail-comment">
+<div class="form-grid radio-comment">
   <!-- Label -->
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
     <label><%= field_data[:field_label] %></label>
