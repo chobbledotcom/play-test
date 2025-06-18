@@ -19,4 +19,8 @@ en:
         height_requirement: "Height Requirement"
         checks_passed: "Checks Passed"
         completion: "Completion"
+      compliance:
+        not_assessed: "Not Assessed"
+        compliant: "Compliant"
+        non_compliant: "Non-Compliant (Requires %{required}m minimum)"
       submit: "Save Assessment"

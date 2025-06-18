@@ -78,13 +78,12 @@ FactoryBot.define do
 
       after(:create) do |inspection|
         # Update all assessments with complete data (assessments are already created by inspection callback)
-        inspection.anchorage_assessment.update!(attributes_for(:anchorage_assessment, :complete).except(:inspection_id))
-        inspection.enclosed_assessment.update!(attributes_for(:enclosed_assessment, :complete).except(:inspection_id))
-        inspection.fan_assessment.update!(attributes_for(:fan_assessment, :complete).except(:inspection_id))
-        inspection.materials_assessment.update!(attributes_for(:materials_assessment, :complete).except(:inspection_id))
-        inspection.slide_assessment.update!(attributes_for(:slide_assessment, :complete).except(:inspection_id))
-        inspection.structure_assessment.update!(attributes_for(:structure_assessment, :complete).except(:inspection_id))
-        inspection.user_height_assessment.update!(attributes_for(:user_height_assessment, :complete).except(:inspection_id))
+        Inspection::ASSESSMENT_TYPES.each_key do |assessment_type|
+          assessment = inspection.send(assessment_type)
+          assessment_factory = assessment_type.to_s.sub(/_assessment$/, "").to_sym
+          complete_attrs = attributes_for("#{assessment_factory}_assessment".to_sym, :complete)
+          assessment.update!(complete_attrs.except(:inspection_id))
+        end
       end
     end
 

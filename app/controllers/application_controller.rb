@@ -1,8 +1,4 @@
 class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges,
-  # import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
-
   include SessionsHelper
 
   before_action :require_login
@@ -20,15 +16,15 @@ class ApplicationController < ActionController::Base
 
       message = <<~MESSAGE
         500 Error in play-test
-        
+
         #{exception.class}: #{exception.message}
-        
+
         #{user_info}
         Controller: #{controller_name}##{action_name}
         Path: #{request.fullpath}
         Method: #{request.request_method}
         IP: #{request.remote_ip}
-        
+
         Backtrace (first 5 lines):
         #{exception.backtrace.first(5).join("\n")}
       MESSAGE
@@ -75,8 +71,6 @@ class ApplicationController < ActionController::Base
   end
 
   def impersonating?
-    # Check if we have an original admin ID stored
-    # (indicating impersonation is active)
     session[:original_admin_id].present?
   end
 

@@ -32,14 +32,14 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   end
 
   def anchor_compliance_status
-    return "Not Assessed" unless total_anchors.present?
+    return I18n.t("forms.anchorage.compliance.not_assessed") unless total_anchors.present?
 
     if meets_anchor_requirements?
-      "Compliant"
+      I18n.t("forms.anchorage.compliance.compliant")
     else
-      required = required_anchors
-      actual = total_anchors
-      "Non-Compliant (Requires #{required} total anchors, has #{actual})"
+      I18n.t("forms.anchorage.compliance.non_compliant",
+        required: required_anchors,
+        actual: total_anchors)
     end
   end
 

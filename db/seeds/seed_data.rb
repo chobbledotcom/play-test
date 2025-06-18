@@ -145,10 +145,24 @@ module SeedData
   end
 
   def self.slide_fields(passed: true)
+    platform_height = rand(2.0..6.0).round(1)
+    
+    # Calculate runout based on whether it should pass or fail
+    # Required runout = max(platform_height * 0.5, 0.3)
+    required_runout = [platform_height * 0.5, 0.3].max
+    
+    runout = if passed
+      # Add some margin to ensure it passes
+      (required_runout + rand(0.5..1.5)).round(1)
+    else
+      # Make it fail by being under the requirement
+      (required_runout - rand(0.1..0.5)).round(1).clamp(0.1, required_runout - 0.1)
+    end
+    
     {
-      slide_platform_height: rand(2.0..6.0).round(1),
+      slide_platform_height: platform_height,
       slide_wall_height: rand(1.0..2.0).round(1),
-      runout: rand(1.5..3.0).round(1),
+      runout: runout,
       slide_first_metre_height: rand(0.3..0.8).round(1),
       slide_beyond_first_metre_height: rand(0.8..1.5).round(1),
       clamber_netting_pass: check_passed?(passed),

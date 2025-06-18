@@ -26,11 +26,11 @@ class Assessments::SlideAssessment < ApplicationRecord
   end
 
   def runout_compliance_status
-    return "Not Assessed" unless runout.present?
+    return I18n.t("forms.slide.compliance.not_assessed") unless runout.present?
     if meets_runout_requirements?
-      "Compliant"
+      I18n.t("forms.slide.compliance.compliant")
     else
-      "Non-Compliant (Requires #{required_runout_length}m minimum)"
+      I18n.t("forms.slide.compliance.non_compliant", required: required_runout_length)
     end
   end
 end

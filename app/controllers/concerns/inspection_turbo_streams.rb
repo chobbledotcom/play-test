@@ -22,7 +22,8 @@ module InspectionTurboStreams
   end
 
   def progress_update_stream
-    status = @inspection.complete? ? I18n.t("inspections.status.complete") : I18n.t("inspections.status.in_progress")
+    status_key = @inspection.complete? ? "complete" : "in_progress"
+    status = I18n.t("inspections.status.#{status_key}")
     turbo_stream.replace(
       "inspection_progress_#{@inspection.id}",
       html: "<span class='value'>#{status}</span>"

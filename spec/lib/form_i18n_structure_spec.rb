@@ -1,6 +1,6 @@
 require "rails_helper"
 
-ALLOWED_TOP_LEVEL_KEYS = %w[header sections fields placeholders hints status summary submit issues errors].freeze
+ALLOWED_TOP_LEVEL_KEYS = %w[header sections fields placeholders hints status summary submit issues errors compliance].freeze
 
 RSpec.describe "Form I18n Structure" do
   def check_form_locale_file(file_path)

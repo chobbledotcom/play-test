@@ -28,7 +28,10 @@ module AssessmentController
         redirect_to @inspection
       end
       format.json do
-        success_response = {status: I18n.t("shared.api.success"), inspection: @inspection}
+        success_response = {
+          status: I18n.t("shared.api.success"),
+          inspection: @inspection
+        }
         render json: success_response
       end
       format.turbo_stream { render turbo_stream: success_turbo_streams }
@@ -58,13 +61,7 @@ module AssessmentController
         :user,
         :inspector_company,
         :unit,
-        :anchorage_assessment,
-        :user_height_assessment,
-        :slide_assessment,
-        :structure_assessment,
-        :materials_assessment,
-        :fan_assessment,
-        :enclosed_assessment
+        *Inspection::ASSESSMENT_TYPES.keys
       )
       .find(params[:inspection_id])
   end
@@ -77,8 +74,13 @@ module AssessmentController
         flash[:alert] = I18n.t("inspections.errors.access_denied")
         redirect_to inspections_path
       end
-      format.json { render json: {error: I18n.t("inspections.errors.access_denied")}, status: :forbidden }
-      format.turbo_stream { render_error_message(I18n.t("inspections.errors.access_denied")) }
+      format.json do
+        error_msg = I18n.t("inspections.errors.access_denied")
+        render json: {error: error_msg}, status: :forbidden
+      end
+      format.turbo_stream do
+        render_error_message(I18n.t("inspections.errors.access_denied"))
+      end
     end
   end
 
@@ -99,7 +101,8 @@ module AssessmentController
 
   def permitted_attributes
     # Get all attributes except sensitive ones
-    assessment_class.attribute_names - %w[id inspection_id created_at updated_at]
+    excluded_attrs = %w[id inspection_id created_at updated_at]
+    assessment_class.attribute_names - excluded_attrs
   end
 
   # Automatically derive from controller name
@@ -129,5 +132,9 @@ module AssessmentController
   def set_previous_inspection
     return unless @inspection.unit
     @previous_inspection = @inspection.unit.last_inspection
+  end
+
+  def handle_inactive_user_redirect
+    redirect_to edit_inspection_path(@inspection)
   end
 end

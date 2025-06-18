@@ -15,18 +15,6 @@ module JsonTestHelpers
     complete
   ].freeze
 
-  # Assessment types we expect
-  ASSESSMENT_TYPES = %w[
-    user_height_assessment
-    structure_assessment
-    anchorage_assessment
-    materials_assessment
-    fan_assessment
-    enclosed_assessment
-    slide_assessment
-  ].freeze
-
-  # System fields that should not appear in assessments
   ASSESSMENT_EXCLUDED_FIELDS = %w[
     inspection_id
     created_at

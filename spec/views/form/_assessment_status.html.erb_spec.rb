@@ -44,7 +44,8 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
     it "shows fail status for runout requirements" do
       slide_assessment.update!(
         SeedData.slide_fields(passed: false).merge(
-          runout: 1.5,
+          slide_platform_height: 4.0,  # Requires 2.0m runout
+          runout: 1.5,                 # Only has 1.5m
           runout_pass: false
         )
       )

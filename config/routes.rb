@@ -40,13 +40,9 @@ Rails.application.routes.draw do
       patch "unified_update"
     end
 
-    resource :anchorage_assessment, only: [:update]
-    resource :enclosed_assessment, only: [:update]
-    resource :fan_assessment, only: [:update]
-    resource :materials_assessment, only: [:update]
-    resource :slide_assessment, only: [:update]
-    resource :structure_assessment, only: [:update]
-    resource :user_height_assessment, only: [:update]
+    Inspection::ASSESSMENT_TYPES.each_key do |assessment_type|
+      resource assessment_type, only: [:update]
+    end
   end
 
   # Units

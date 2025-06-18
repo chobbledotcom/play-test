@@ -1,5 +1,4 @@
 class JsonSerializerService
-  # Helper to format value for JSON, especially dates
   def self.format_value(value)
     case value
     when Date, Time, DateTime
@@ -12,7 +11,6 @@ class JsonSerializerService
   def self.serialize_unit(unit, include_inspections: true)
     return nil unless unit
 
-    # Use reflection to get all columns except excluded ones
     unit_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS - PublicFieldFiltering::UNIT_EXCLUDED_FIELDS
 
     data = {}
@@ -21,7 +19,6 @@ class JsonSerializerService
       data[field.to_sym] = format_value(value) unless value.nil?
     end
 
-    # Include inspection history if requested
     if include_inspections
       completed_inspections = unit.inspections.complete.order(inspection_date: :desc)
 
@@ -43,7 +40,6 @@ class JsonSerializerService
       end
     end
 
-    # Add public URLs
     base_url = ENV["BASE_URL"] || Rails.application.routes.default_url_options[:host] || "localhost:3000"
     data[:urls] = {
       report_pdf: "#{base_url}/units/#{unit.id}.pdf",
@@ -54,20 +50,9 @@ class JsonSerializerService
     data
   end
 
-  ASSESSMENT_TYPES = {
-    user_height_assessment: Assessments::UserHeightAssessment,
-    slide_assessment: Assessments::SlideAssessment,
-    structure_assessment: Assessments::StructureAssessment,
-    anchorage_assessment: Assessments::AnchorageAssessment,
-    materials_assessment: Assessments::MaterialsAssessment,
-    fan_assessment: Assessments::FanAssessment,
-    enclosed_assessment: Assessments::EnclosedAssessment
-  }
-
   def self.serialize_inspection(inspection)
     return nil unless inspection
 
-    # Use reflection to get all columns except excluded ones
     inspection_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
     data = {}
@@ -76,17 +61,14 @@ class JsonSerializerService
       data[field.to_sym] = format_value(value) unless value.nil?
     end
 
-    # Add computed fields
     data[:complete] = inspection.complete?
     data[:passed] = inspection.passed? if inspection.complete?
 
-    # Add inspector info
     data[:inspector] = {
       name: inspection.user.name,
       rpii_inspector_number: inspection.user.rpii_inspector_number
     }
 
-    # Add URLs
     base_url = ENV["BASE_URL"] || Rails.application.routes.default_url_options[:host] || "localhost:3000"
     data[:urls] = {
       report_pdf: "#{base_url}/inspections/#{inspection.id}.pdf",
@@ -118,7 +100,6 @@ class JsonSerializerService
   end
 
   def self.serialize_assessment(assessment, klass)
-    # Use reflection to get fields
     assessment_fields = klass.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
     data = {}

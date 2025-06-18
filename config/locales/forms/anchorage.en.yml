@@ -29,6 +29,10 @@ en:
         safety_checks: "Safety Checks"
         critical_failures: "Critical Failures"
         safety_summary: "Safety Summary"
+      compliance:
+        not_assessed: "Not Assessed"
+        compliant: "Compliant"
+        non_compliant: "Non-Compliant (Requires %{required} total anchors, has %{actual})"
       submit: "Save Assessment"
       errors:
         header:

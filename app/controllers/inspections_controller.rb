@@ -221,23 +221,13 @@ class InspectionsController < ApplicationController
   def set_inspection
     @inspection = Inspection
       .includes(
-        :user,
-        :inspector_company,
-        :anchorage_assessment,
-        :enclosed_assessment,
-        :fan_assessment,
-        :materials_assessment,
-        :slide_assessment,
-        :structure_assessment,
-        :user_height_assessment,
+        :user, :inspector_company,
+        *Inspection::ASSESSMENT_TYPES.keys,
         unit: {photo_attachment: :blob}
       )
       .find_by(id: params[:id]&.upcase)
 
-    unless @inspection
-      # Always return 404 for non-existent resources regardless of login status
-      head :not_found
-    end
+    head :not_found unless @inspection
   end
 
   def check_inspection_owner
@@ -344,10 +334,11 @@ class InspectionsController < ApplicationController
   end
 
   def handle_inactive_user_redirect
-    # If creating inspection from a unit page, redirect back to unit
     if action_name == "create" && params[:unit_id].present?
       unit = current_user.units.find_by(id: params[:unit_id])
       redirect_to unit ? unit_path(unit) : inspections_path
+    elsif action_name.in?(%w[edit update]) && @inspection
+      redirect_to inspection_path(@inspection)
     else
       redirect_to inspections_path
     end
