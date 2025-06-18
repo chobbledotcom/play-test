@@ -154,9 +154,11 @@ module SeedData
       # Add some margin to ensure it passes
       (required_runout + rand(0.5..1.5)).round(1)
     else
-      # Make it fail but keep realistic minimum of 1.0m
+      # Make it fail by being under the requirement
+      # But ensure it's realistic (at least 0.5m) and strictly less than required
       fail_runout = (required_runout - rand(0.1..0.3)).round(1)
-      [fail_runout, 1.0].max
+      min_runout = [0.5, required_runout - 0.1].max
+      [fail_runout, min_runout].max
     end
 
     {
