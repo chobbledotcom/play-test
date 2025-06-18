@@ -13,9 +13,9 @@ module AssessmentCompletion
   end
 
   def incomplete_fields
-    (attributes.keys - SYSTEM_FIELDS).
-      select {|f| !f.end_with?("_comment")}.
-      select {|f| send(f) == nil}.
-      map {|f| f.to_sym}
+    (attributes.keys - SYSTEM_FIELDS)
+      .select { |f| !f.end_with?("_comment") }
+      .select { |f| send(f).nil? }
+      .map { |f| f.to_sym }
   end
 end

@@ -45,7 +45,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
     within ".incomplete-fields-content" do
       field_name = I18n.t("forms.user_height.fields.tallest_user_height")
-      expect(page).to have_content("#{field_name}")
+      expect(page).to have_content(field_name)
     end
   end
 

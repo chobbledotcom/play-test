@@ -121,21 +121,25 @@ class ApplicationController < ActionController::Base
 
     table_query_counts.each do |table, count|
       if count > 5
-        query_count_msg = "#{table} was queried #{count} times"
-        error_message = "N+1 query detected: #{query_count_msg}"
-        Rails.logger.error error_message
-        Rails.logger.error "Queries for #{table}:"
-        table_queries = debug_sql_queries.select { |q| 
-          table_from_query(q[:sql]) == table 
-        }
-        table_queries.each_with_index do |query, i|
-          query_log = "#{query[:name]}: #{query[:sql]}"
-          Rails.logger.error "  #{i + 1}. #{query_log}"
-        end
+        log_n_plus_one_queries(table, count)
         table_msg = "#{table} table was queried #{count} times"
         message = "N+1 query detected: #{table_msg}"
         raise "#{message} (limit: 5)"
       end
+    end
+  end
+
+  def log_n_plus_one_queries(table, count)
+    query_count_msg = "#{table} was queried #{count} times"
+    error_message = "N+1 query detected: #{query_count_msg}"
+    Rails.logger.error error_message
+    Rails.logger.error "Queries for #{table}:"
+    table_queries = debug_sql_queries.select { |q|
+      table_from_query(q[:sql]) == table
+    }
+    table_queries.each_with_index do |query, i|
+      query_log = "#{query[:name]}: #{query[:sql]}"
+      Rails.logger.error "  #{i + 1}. #{query_log}"
     end
   end
 
@@ -159,7 +163,9 @@ class ApplicationController < ActionController::Base
   end
 
   def cleanup_debug_subscription
-    ActiveSupport::Notifications.unsubscribe(@debug_subscription) if @debug_subscription
+    return unless @debug_subscription
+
+    ActiveSupport::Notifications.unsubscribe(@debug_subscription)
     @debug_subscription = nil
   end
 end

@@ -7,10 +7,12 @@ RSpec.feature "Structure Assessment Form", type: :feature do
 
   before { sign_in(user) }
 
-  FIELD_PREFIX = "forms.structure.fields"
+  def field_prefix
+    "forms.structure.fields"
+  end
 
   def get_label(field)
-    key = "#{FIELD_PREFIX}.#{field}"
+    key = "#{field_prefix}.#{field}"
     label = I18n.t(key, default: nil)
     label || I18n.t(key.gsub(/_pass$/, ""))
   end
@@ -81,7 +83,6 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     expect(structure.entrapment_pass).to be false
     expect(structure.markings_pass).to be true
     expect(structure.grounding_pass).to be true
-
 
     inspection.reload
     structure = inspection.structure_assessment

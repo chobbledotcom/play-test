@@ -1,5 +1,5 @@
 require "rails_helper"
-require_relative "../../db/seeds/seed_data"
+require_relative "../../../db/seeds/seed_data"
 
 class InspectionWorkflow
   include Capybara::DSL
@@ -185,15 +185,15 @@ class InspectionWorkflow
 
   def fill_assessment_field(tab_name, field_name, value)
     return if field_name.to_s.end_with?("_comment")
-    
+
     field_label = get_field_label(tab_name, field_name)
-    
+
     case value
     when true, false
       if field_name.to_s.end_with?("_pass")
         choose_pass_fail(field_label, value)
       elsif BOOLEAN_FIELDS.include?(field_name.to_s)
-        value ? check_form_radio(tab_name.to_sym, field_name) : 
+        value ? check_form_radio(tab_name.to_sym, field_name) :
                 uncheck_form_radio(tab_name.to_sym, field_name)
       else
         choose_yes_no(field_label, value)
@@ -202,14 +202,14 @@ class InspectionWorkflow
       fill_in_form(tab_name.to_sym, field_name, value) if value.present?
     end
   end
-  
+
   def get_field_label(tab_name, field_name)
     field_str = field_name.to_s
-    
+
     if field_str.end_with?("_pass")
       pass_key = "forms.#{tab_name}.fields.#{field_name}"
-      base_key = "forms.#{tab_name}.fields.#{field_str.chomp('_pass')}"
-      
+      base_key = "forms.#{tab_name}.fields.#{field_str.chomp("_pass")}"
+
       I18n.exists?(pass_key) ? I18n.t(pass_key) : I18n.t(base_key)
     else
       I18n.t("forms.#{tab_name}.fields.#{field_name}")

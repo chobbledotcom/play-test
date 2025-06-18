@@ -262,15 +262,15 @@ class Inspection < ApplicationRecord
   end
 
   def inspection_model_incomplete_fields
-    REQUIRED_TO_COMPLETE_FIELDS.
-      select {|f| !f.end_with?("_comment")}.
-      select {|f| send(f) == nil}
+    REQUIRED_TO_COMPLETE_FIELDS
+      .select { |f| !f.end_with?("_comment") }
+      .select { |f| send(f).nil? }
   end
 
   def incomplete_fields
     inspection_fields =
-      inspection_model_incomplete_fields.
-        map {|f| { field: f, label: field_label(:inspection, f)}}
+      inspection_model_incomplete_fields
+        .map { |f| {field: f, label: field_label(:inspection, f)} }
 
     output = []
     if inspection_fields.any?
@@ -285,8 +285,8 @@ class Inspection < ApplicationRecord
       next unless assessment
       form = assessment_key.to_s.gsub(/_assessment$/, "").to_sym
       assessment_fields =
-        assessment.incomplete_fields.
-          map {|f| { field: f, label: field_label(form, f) }}
+        assessment.incomplete_fields
+          .map { |f| {field: f, label: field_label(form, f)} }
       if assessment_fields.any?
         output << {
           tab: form,

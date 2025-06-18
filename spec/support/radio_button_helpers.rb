@@ -5,11 +5,10 @@ module RadioButtonHelpers
   }.freeze
 
   def choose_yes_no(field_label, value)
-    choose_radio_in_container(field_label, value, 
+    choose_radio_in_container(field_label, value,
       ["yes-no-radio", "pass-fail-comment"],
       yes: ["yes", "pass"],
-      no: ["no", "fail"]
-    )
+      no: ["no", "fail"])
   end
 
   def choose_pass_fail(field_label, value)
@@ -35,54 +34,57 @@ module RadioButtonHelpers
   private
 
   def choose_radio_in_container(label, value, containers, selectors)
+    found = false
+
     containers.each do |container|
+      break if found
       xpath = "//div[contains(@class, '#{container}')]"
       xpath += "[.//label[normalize-space(.)='#{label}']]"
-      
+
       begin
         within(:xpath, xpath) do
           selector = value ? selectors[:yes] : selectors[:no]
           selector.each do |class_name|
-            begin
-              within(:xpath, ".//div[contains(@class, '#{class_name}')]") do
-                find("input[type='radio']").click
-                return
-              end
-            rescue Capybara::ElementNotFound
-              next
+            within(:xpath, ".//div[contains(@class, '#{class_name}')]") do
+              find("input[type='radio']").click
+              found = true
+              break
             end
+          rescue Capybara::ElementNotFound
+            next
           end
         end
-        return
       rescue Capybara::ElementNotFound
         next
       end
     end
-    
-    raise Capybara::ElementNotFound, "Unable to find radio for '#{label}'"
+
+    raise Capybara::ElementNotFound, "Unable to find radio for '#{label}'" unless found
   end
 
   def find_and_click_radio(label, value)
     selectors = [
-      "//label[normalize-space(.)='#{label}']/following::label[contains(.,'#{value ? 'Pass' : 'Fail'}')][1]/input[@type='radio']",
+      "//label[normalize-space(.)='#{label}']/following::label[contains(.,'#{value ? "Pass" : "Fail"}')][1]/input[@type='radio']",
       "//div[.//label[normalize-space(.)='#{label}']]//input[@type='radio'][@value='#{value}']"
     ]
-    
+
+    clicked = false
     selectors.each do |selector|
-      begin
-        find(:xpath, selector).click
-        return
-      rescue Capybara::ElementNotFound
-        next
-      end
+      find(:xpath, selector).click
+      clicked = true
+      break
+    rescue Capybara::ElementNotFound
+      next
     end
-    
+
+    return if clicked
+
     raise Capybara::ElementNotFound, "Unable to find radio for '#{label}'"
   end
 
   def find_field_by_label(field_label)
     BOOLEANS_BY_FORM.each do |model, fields|
-      form_type = model == :inspection ? :inspection : :slide
+      form_type = (model == :inspection) ? :inspection : :slide
       fields.each do |field|
         i18n_key = "forms.#{form_type}.fields.#{field}"
         return yield(field, model) if field_label == I18n.t(i18n_key)

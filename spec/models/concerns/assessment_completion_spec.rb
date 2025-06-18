@@ -5,9 +5,9 @@ RSpec.describe AssessmentCompletion, type: :model do
   let(:assessment) { inspection.user_height_assessment }
   let(:incomplete) { assessment.incomplete_fields }
   let(:pass_fields) do
-    assessment.class.column_names.
-      select { |col| col.end_with?("_pass") }.
-      map(&:to_sym)
+    assessment.class.column_names
+      .select { |col| col.end_with?("_pass") }
+      .map(&:to_sym)
   end
 
   describe "#incomplete_fields" do

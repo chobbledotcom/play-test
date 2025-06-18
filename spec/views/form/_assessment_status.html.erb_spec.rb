@@ -32,9 +32,9 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
     it "renders status for complete slide assessment" do
       slide_assessment.update!(SeedData.slide_fields(passed: true))
-      
+
       render_assessment_status(assessment: slide_assessment, i18n_base: "forms.slide")
-      
+
       expect_safety_header_present
       expect(rendered).to include(I18n.t("forms.slide.status.runout_requirement"))
       expect(rendered).to include(I18n.t("forms.slide.status.checks_passed"))
@@ -44,13 +44,13 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
     it "shows fail status for runout requirements" do
       slide_assessment.update!(
         SeedData.slide_fields(passed: false).merge(
-          runout: 1.5, 
+          runout: 1.5,
           runout_pass: false
         )
       )
-      
+
       render_assessment_status(assessment: slide_assessment, i18n_base: "forms.slide")
-      
+
       expect(rendered).to include(I18n.t("forms.slide.status.runout_requirement"))
       expect_status_displayed("runout_requirement", pass: false)
     end
@@ -66,7 +66,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
           tallest_user_height: 1.5
         )
       )
-      
+
       render_assessment_status(assessment: user_height_assessment, i18n_base: "forms.user_height")
 
       expect_safety_header_present
@@ -82,7 +82,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
           tallest_user_height: 1.9
         )
       )
-      
+
       render_assessment_status(assessment: user_height_assessment, i18n_base: "forms.user_height")
 
       expect_status_displayed("height_requirement", pass: false)
@@ -94,11 +94,11 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
     it "displays checks passed count" do
       materials_assessment.update!(SeedData.materials_fields(passed: true))
-      
+
       render_assessment_status(assessment: materials_assessment, i18n_base: "forms.materials")
 
       expect(rendered).to include(I18n.t("forms.materials.status.checks_passed"))
-      
+
       passed = materials_assessment.passed_checks_count
       total = materials_assessment.pass_columns_count
       expect(rendered.gsub(/\s+/, " ")).to include("#{passed} / #{total}")
@@ -118,7 +118,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
     it "has proper semantic structure" do
       slide_assessment.update!(SeedData.slide_fields(passed: true))
-      
+
       render_assessment_status(assessment: slide_assessment, i18n_base: "forms.slide")
 
       expect_safety_header_present
