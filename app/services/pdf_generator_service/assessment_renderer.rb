@@ -66,7 +66,7 @@ class PdfGeneratorService
         parts << bold(label)
         parts << ": #{value ? "Yes" : "No"}"
       else
-        parts << pass_fail_indicator(pass_value)
+        parts << pass_fail_indicator(pass_value) unless pass_value.nil?
         parts << bold(label)
         parts << ": #{value}" if !is_pass_field && value.present?
       end
@@ -75,14 +75,10 @@ class PdfGeneratorService
 
     def pass_fail_indicator(pass_value)
       indicator, color =
-        if pass_value.nil?
-          ["[NULL]", NULL_COLOR]
-        else
-          [
-            pass_fail(pass_value).to_s,
-            pass_value ? PASS_COLOR : FAIL_COLOR
-          ]
-        end
+        [
+          pass_fail(pass_value).to_s,
+          pass_value ? PASS_COLOR : FAIL_COLOR
+        ]
       "<font name='Courier'>#{bold(colored(indicator, color))}</font> "
     end
 

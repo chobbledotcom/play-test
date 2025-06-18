@@ -98,19 +98,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect(pdf_text).to include(user_without_rpii.name)
       expect(pdf_text).not_to include(I18n.t("pdf.inspection.fields.rpii_inspector_no"))
     end
-
-    scenario "shows proper handling for empty assessments" do
-      inspection = create(:inspection, :completed,
-        user: user,
-        unit: unit)
-
-      pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
-
-      expect(pdf_text).to include(I18n.t("forms.structure.header"))
-      expect(pdf_text).to include(I18n.t("forms.user_height.header"))
-
-      expect(pdf_text).to include("[NULL]")
-    end
   end
 
   feature "Unit History PDF Content" do

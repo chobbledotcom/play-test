@@ -24,21 +24,29 @@
     <ul class="incomplete-fields-list">
       <% incomplete_fields.each do |form| %>
         <li>
-          <%= link_to t("forms.#{form[:tab]}.header"),
-            edit_inspection_path(
-              @inspection,
-              tab: form[:tab],
-              anchor: "tabs"
-            )
-          %>
+          <strong>
+            <%= link_to t("forms.#{form[:tab]}.header"),
+              edit_inspection_path(
+                @inspection,
+                tab: form[:tab],
+                anchor: "tabs"
+              )
+            %>
+          </strong>
+          <ul>
+            <% form[:fields].each do |field| %>
+              <li class="incomplete-field-item">
+                <%= link_to field[:label],
+                  edit_inspection_path(
+                    @inspection,
+                    tab: form[:tab],
+                    anchor: field[:field]
+                  )
+                %>
+              </li>
+            <% end %>
+          </ul>
         </li>
-        <% form[:fields].each do |field| %>
-          <li class="incomplete-field-item">
-            <a href="<%= field[:url] %>">
-              <%= field[:label] %>
-            </a>
-          </li>
-        <% end %>
       <% end %>
     </ul>
   </div>

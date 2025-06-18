@@ -59,13 +59,13 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
       render_pass_fail
 
       doc = Nokogiri::HTML(rendered)
-      pass_labels = doc.css("label").select { _1.text.include?("Pass") }
-      pass_label_with_input = pass_labels.find { _1.css('input[type="radio"]').any? }
+      pass_labels = doc.css("label").select { it.text.include?("Pass") }
+      pass_label_with_input = pass_labels.find { it.css('input[type="radio"]').any? }
       expect(pass_label_with_input).not_to be_nil
       expect(pass_label_with_input.css('input[value="true"]')).not_to be_empty
 
-      fail_labels = doc.css("label").select { _1.text.include?("Fail") }
-      fail_label_with_input = fail_labels.find { _1.css('input[type="radio"]').any? }
+      fail_labels = doc.css("label").select { it.text.include?("Fail") }
+      fail_label_with_input = fail_labels.find { it.css('input[type="radio"]').any? }
       expect(fail_label_with_input).not_to be_nil
       expect(fail_label_with_input.css('input[value="false"]')).not_to be_empty
     end
@@ -150,13 +150,13 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
       render_pass_fail
 
       doc = Nokogiri::HTML(rendered)
-      pass_labels = doc.css("label").select { _1.text.include?("Pass") }
-      pass_label_with_input = pass_labels.find { _1.css('input[type="radio"]').any? }
+      pass_labels = doc.css("label").select { it.text.include?("Pass") }
+      pass_label_with_input = pass_labels.find { it.css('input[type="radio"]').any? }
       expect(pass_label_with_input).not_to be_nil
       expect(pass_label_with_input.css('input[value="true"]')).not_to be_empty
 
-      fail_labels = doc.css("label").select { _1.text.include?("Fail") }
-      fail_label_with_input = fail_labels.find { _1.css('input[type="radio"]').any? }
+      fail_labels = doc.css("label").select { it.text.include?("Fail") }
+      fail_label_with_input = fail_labels.find { it.css('input[type="radio"]').any? }
       expect(fail_label_with_input).not_to be_nil
       expect(fail_label_with_input.css('input[value="false"]')).not_to be_empty
     end

@@ -2,13 +2,13 @@ class Inspection < ApplicationRecord
   include CustomIdGenerator
 
   ASSESSMENT_TYPES = {
-    anchorage_assessment: Assessments::AnchorageAssessment,
-    enclosed_assessment: Assessments::EnclosedAssessment,
-    fan_assessment: Assessments::FanAssessment,
-    materials_assessment: Assessments::MaterialsAssessment,
+    user_height_assessment: Assessments::UserHeightAssessment,
     slide_assessment: Assessments::SlideAssessment,
     structure_assessment: Assessments::StructureAssessment,
-    user_height_assessment: Assessments::UserHeightAssessment
+    anchorage_assessment: Assessments::AnchorageAssessment,
+    materials_assessment: Assessments::MaterialsAssessment,
+    enclosed_assessment: Assessments::EnclosedAssessment,
+    fan_assessment: Assessments::FanAssessment,
   }.freeze
 
   USER_EDITABLE_PARAMS = %i[

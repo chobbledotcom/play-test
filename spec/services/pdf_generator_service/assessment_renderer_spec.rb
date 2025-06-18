@@ -23,10 +23,6 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
     "<font name='Courier'><b><color rgb='CC0000'>[FAIL]</color></b></font>"
   end
 
-  def null_indicator
-    "<font name='Courier'><b><color rgb='663399'>[NULL]</color></b></font>"
-  end
-
   def bold(text)
     "<b>#{text}</b>"
   end
@@ -97,7 +93,7 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
 
         result = renderer.render_field_line(fields)
 
-        expect(result).to eq("#{null_indicator} #{bold("Low anchor points")}: 6")
+        expect(result).to eq("#{bold("Low anchor points")}: 6")
       end
     end
 
@@ -139,7 +135,7 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
 
         result = renderer.render_field_line(fields)
 
-        expect(result).to eq("#{null_indicator} #{bold("Low anchor points")}")
+        expect(result).to eq("#{bold("Low anchor points")}")
       end
     end
   end

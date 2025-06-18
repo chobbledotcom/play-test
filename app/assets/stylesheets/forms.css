@@ -113,11 +113,17 @@
   gap: 0.5rem;
 }
 
+.form-grid .label {
+  line-height: 1.1rem;
+  text-wrap: balance;
+}
+
 .radio-comment {
   grid-template-areas:
     "label label label label"
     "pass-label fail-label comment-space comment-label";
   grid-template-columns: auto auto 1fr auto;
+  align-items: center;
 }
 @media (min-width: 768px) {
   .radio-comment {
@@ -194,6 +200,7 @@
     "label label"
     "number comment-label";
   grid-template-columns: min-content auto;
+  align-items: center;
 }
 @media (min-width: 768px) {
   .number-comment {
@@ -204,6 +211,7 @@
 
 .number-comment > .label {
   grid-area: label;
+  width: 14rem;
 }
 
 .number-comment > .number {

@@ -7,7 +7,6 @@
   #   - Pass/fail field: field (e.g., 'seam_integrity_pass')
   #   - Comment field: base field + '_comment' (e.g., 'seam_integrity_comment')
 
-  pass_fail_field = field
   # If field ends with _pass, strip it before adding _comment
   base_field = field.to_s.end_with?('_pass') ? field.to_s.chomp('_pass') : field.to_s
   comment_field = "#{base_field}_comment".to_sym
@@ -26,18 +25,18 @@
   checked_value = field_data[:prefilled] ? field_data[:value] : nil
 %>
 
-<div class="form-grid radio-comment">
+<div class="form-grid radio-comment" id="<%= field %>">
   <%= render 'form/field_wrapper',
     prefilled: field_data[:prefilled],
     wrapper_class: 'label' do
   %>
-    <label id="<%= field %>">
+    <label>
       <%= field_data[:field_label] %>
     </label>
   <% end %>
 
   <%= render 'form/radio_pass_fail',
-    field: pass_fail_field,
+    field: field,
     prefilled: field_data[:prefilled],
     checked_value: checked_value
   %>

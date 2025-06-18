@@ -44,7 +44,7 @@
   comment_info = comment_field_options(form, comment_field, field_data[:field_label])
 %>
 
-<div class="form-grid number-comment">
+<div class="form-grid number-comment" id="<%= decimal_field %>">
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
     <%= form.label decimal_field, field_data[:field_label] %>
   <% end %>
