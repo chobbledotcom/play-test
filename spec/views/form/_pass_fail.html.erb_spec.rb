@@ -1,15 +1,16 @@
 require "rails_helper"
 
+# Test model for form specs
+class PassFailTestModel
+  include ActiveModel::Model
+  attr_accessor :status, :passed, :meets_requirements, :satisfactory,
+    :compliant, :approved
+
+  def persisted? = false
+end
+
 RSpec.describe "form/_pass_fail.html.erb", type: :view do
-  class TestModel
-    include ActiveModel::Model
-    attr_accessor :status, :passed, :meets_requirements, :satisfactory,
-      :compliant, :approved
-
-    def persisted? = false
-  end
-
-  let(:test_model) { TestModel.new }
+  let(:test_model) { PassFailTestModel.new }
   let(:field) { :status }
 
   before do
@@ -49,8 +50,8 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
 
       expect(rendered).to have_css("div")
       expect(rendered).to have_css("label", text: "Status") # Field label
-      expect(rendered).to have_css('input[type="radio"][name="test_model[status]"][value="true"]')
-      expect(rendered).to have_css('input[type="radio"][name="test_model[status]"][value="false"]')
+      expect(rendered).to have_css('input[type="radio"][name="pass_fail_test_model[status]"][value="true"]')
+      expect(rendered).to have_css('input[type="radio"][name="pass_fail_test_model[status]"][value="false"]')
       expect(rendered).to have_css("label", text: "Pass")
       expect(rendered).to have_css("label", text: "Fail")
     end
@@ -73,15 +74,15 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
     it "generates proper radio button IDs for accessibility" do
       render_pass_fail
 
-      expect(rendered).to have_css('input#test_model_status_true[type="radio"]')
-      expect(rendered).to have_css('input#test_model_status_false[type="radio"]')
+      expect(rendered).to have_css('input#pass_fail_test_model_status_true[type="radio"]')
+      expect(rendered).to have_css('input#pass_fail_test_model_status_false[type="radio"]')
     end
   end
 
   describe "with prefilled value" do
     it "checks the appropriate radio button when prefilled" do
       test_model.status = nil
-      @previous_inspection = TestModel.new(status: true)
+      @previous_inspection = PassFailTestModel.new(status: true)
 
       render_pass_fail
 
@@ -91,7 +92,7 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
 
     it "adds prefilled wrapper class when field is prefilled" do
       test_model.status = nil
-      @previous_inspection = TestModel.new(status: false)
+      @previous_inspection = PassFailTestModel.new(status: false)
 
       render_pass_fail
 

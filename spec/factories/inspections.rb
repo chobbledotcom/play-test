@@ -36,6 +36,11 @@ FactoryBot.define do
     trait :completed do
       complete_date { Time.current }
 
+      # Dimensions needed for a complete inspection
+      width { 5.5 }
+      length { 6.0 }
+      height { 4.5 }
+
       after(:create) do |inspection|
         inspection.reload
         Inspection::ASSESSMENT_TYPES.each do |assessment_name, _assessment_class|

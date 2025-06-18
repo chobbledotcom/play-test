@@ -8,7 +8,7 @@ class Inspection < ApplicationRecord
     anchorage_assessment: Assessments::AnchorageAssessment,
     materials_assessment: Assessments::MaterialsAssessment,
     enclosed_assessment: Assessments::EnclosedAssessment,
-    fan_assessment: Assessments::FanAssessment,
+    fan_assessment: Assessments::FanAssessment
   }.freeze
 
   USER_EDITABLE_PARAMS = %i[

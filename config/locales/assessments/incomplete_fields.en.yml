@@ -4,6 +4,9 @@ en:
       show_details:
         one: "Show 1 incomplete page"
         other: "Show %{count} incomplete pages"
+      show_fields:
+        one: "Show 1 incomplete field"
+        other: "Show %{count} incomplete fields"
       description: "The following fields must be filled in to complete this inspection:"
       overall: "Overall completion"
       needs_assessment: "Needs pass/fail assessment"

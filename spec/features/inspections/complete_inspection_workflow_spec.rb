@@ -229,8 +229,11 @@ class InspectionWorkflow
 
     incomplete_fields = @inspection.incomplete_fields
     if incomplete_fields.any?
+      # Count total fields across all forms, not just forms with incomplete fields
+      total_field_count = incomplete_fields.sum { |form| form[:fields].count }
+
       expect(page).to have_content(
-        t("assessments.incomplete_fields.show_details", count: incomplete_fields.count)
+        t("assessments.incomplete_fields.show_fields", count: total_field_count)
       )
 
       find("details#incomplete_fields_inspection summary").click

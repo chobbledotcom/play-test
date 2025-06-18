@@ -135,7 +135,7 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
 
         result = renderer.render_field_line(fields)
 
-        expect(result).to eq("#{bold("Low anchor points")}")
+        expect(result).to eq(bold("Low anchor points").to_s)
       end
     end
   end

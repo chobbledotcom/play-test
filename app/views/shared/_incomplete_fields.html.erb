@@ -9,13 +9,16 @@
   incomplete_fields = object.incomplete_fields
   return if incomplete_fields.empty?
 
+  # Count total number of incomplete fields across all forms
+  total_field_count = incomplete_fields.sum { |form| form[:fields].count }
+
   details_id = "incomplete_fields_#{object_type}"
   description_key ||= "assessments.incomplete_fields.description"
 %>
 
 <details id="<%= details_id %>" class="incomplete-fields-details">
   <summary class="incomplete-fields-summary">
-    <%= t("assessments.incomplete_fields.show_details", count: incomplete_fields.count) %>
+    <%= t("assessments.incomplete_fields.show_fields", count: total_field_count) %>
   </summary>
 
   <div class="incomplete-fields-content">
