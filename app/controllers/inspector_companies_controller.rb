@@ -39,42 +39,52 @@ class InspectorCompaniesController < ApplicationController
 
   def update
     if @inspector_company.update(inspector_company_params)
-      respond_to do |format|
-        format.html do
-          flash[:notice] = t("inspector_companies.messages.updated")
-          redirect_to @inspector_company
-        end
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.replace("form_save_message",
-              partial: "shared/save_message",
-              locals: {
-                element_id: "form_save_message",
-                message: t("inspector_companies.messages.updated"),
-                type: "success"
-              })
-          ]
-        end
-      end
+      handle_successful_update
     else
-      respond_to do |format|
-        format.html { render :edit, status: :unprocessable_entity }
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.replace("form_save_message",
-              partial: "shared/save_message",
-              locals: {
-                element_id: "form_save_message",
-                message: t("shared.messages.save_failed"),
-                type: "error"
-              })
-          ]
-        end
-      end
+      handle_failed_update
     end
   end
 
   private
+
+  def handle_successful_update
+    respond_to do |format|
+      format.html do
+        flash[:notice] = t("inspector_companies.messages.updated")
+        redirect_to @inspector_company
+      end
+      format.turbo_stream do
+        render turbo_stream: save_message_turbo_stream(
+          t("inspector_companies.messages.updated"),
+          "success"
+        )
+      end
+    end
+  end
+
+  def handle_failed_update
+    respond_to do |format|
+      format.html { render :edit, status: :unprocessable_entity }
+      format.turbo_stream do
+        render turbo_stream: save_message_turbo_stream(
+          t("shared.messages.save_failed"),
+          "error"
+        )
+      end
+    end
+  end
+
+  def save_message_turbo_stream(message, type)
+    [
+      turbo_stream.replace("form_save_message",
+        partial: "shared/save_message",
+        locals: {
+          element_id: "form_save_message",
+          message: message,
+          type: type
+        })
+    ]
+  end
 
   def set_inspector_company
     @inspector_company = InspectorCompany.find(params[:id])

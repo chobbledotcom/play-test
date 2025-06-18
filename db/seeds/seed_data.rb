@@ -147,16 +147,16 @@ module SeedData
   def self.slide_fields(passed: true)
     platform_height = rand(2.0..6.0).round(1)
 
-    # Calculate runout based on whether it should pass or fail
-    # Required runout = max(platform_height * 0.5, 0.3)
-    required_runout = [platform_height * 0.5, 0.3].max
+    # Use the actual SafetyStandard calculation for consistency
+    required_runout = SafetyStandard.calculate_required_runout(platform_height)
 
     runout = if passed
       # Add some margin to ensure it passes
       (required_runout + rand(0.5..1.5)).round(1)
     else
-      # Make it fail by being under the requirement
-      (required_runout - rand(0.1..0.5)).round(1).clamp(0.1, required_runout - 0.1)
+      # Make it fail but keep realistic minimum of 1.0m
+      fail_runout = (required_runout - rand(0.1..0.3)).round(1)
+      [fail_runout, 1.0].max
     end
 
     {

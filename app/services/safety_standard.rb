@@ -1,5 +1,5 @@
-class SafetyStandard
-  include ActiveModel::Model
+module SafetyStandard
+  extend self
 
   # Height category constants based on EN 14960:2019
   HEIGHT_CATEGORIES = {
@@ -137,8 +137,6 @@ class SafetyStandard
       }
     end
 
-    private
-
     def anchor_formula_text
       area_coeff = ANCHOR_CALCULATION_CONSTANTS[:area_coefficient]
       base_div = ANCHOR_CALCULATION_CONSTANTS[:base_divisor]
@@ -154,7 +152,17 @@ class SafetyStandard
       "#{height_ratio}% of platform height, minimum #{min_runout}mm"
     end
 
-    public
+    def calculate_required_runout(platform_height)
+      # EN 14960:2019 - Minimum runout distance calculation using
+      # RUNOUT_CALCULATION_CONSTANTS for safe landing
+      return 0 if platform_height.nil? || platform_height <= 0
+
+      # Calculate using constants from RUNOUT_CALCULATION_CONSTANTS
+      height_ratio = RUNOUT_CALCULATION_CONSTANTS[:platform_height_ratio]
+      minimum_runout = RUNOUT_CALCULATION_CONSTANTS[:minimum_runout_meters]
+
+      [platform_height * height_ratio, minimum_runout].max
+    end
 
     def get_method_source(method_name)
       method_obj = method(method_name)
@@ -307,18 +315,6 @@ class SafetyStandard
 
       required_runout = calculate_required_runout(platform_height)
       runout_length >= required_runout
-    end
-
-    def calculate_required_runout(platform_height)
-      # EN 14960:2019 - Minimum runout distance calculation using
-      # RUNOUT_CALCULATION_CONSTANTS for safe landing
-      return 0 if platform_height.nil? || platform_height <= 0
-
-      # Calculate using constants from RUNOUT_CALCULATION_CONSTANTS
-      height_ratio = RUNOUT_CALCULATION_CONSTANTS[:platform_height_ratio]
-      minimum_runout = RUNOUT_CALCULATION_CONSTANTS[:minimum_runout_meters]
-
-      [platform_height * height_ratio, minimum_runout].max
     end
 
     def calculate_required_anchors(area_m2)
@@ -512,8 +508,6 @@ class SafetyStandard
       threshold = EQUIPMENT_SAFETY_LIMITS[:multi_exit_threshold]
       user_count.present? && user_count > threshold
     end
-
-    private
 
     def wall_height_requirement
       multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]

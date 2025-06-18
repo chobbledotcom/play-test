@@ -7,7 +7,8 @@ class InspectionsController < ApplicationController
   before_action :set_inspection, except: %i[create index]
   before_action :check_inspection_owner, except: %i[create index show]
   before_action :validate_unit_ownership, only: %i[update]
-  before_action :redirect_if_complete, except: %i[create index destroy mark_draft show]
+  before_action :redirect_if_complete,
+    except: %i[create index destroy mark_draft show]
   before_action :require_user_active, only: %i[create edit update]
   before_action :validate_inspection_completability, only: %i[show edit]
   before_action :no_index
@@ -31,7 +32,9 @@ class InspectionsController < ApplicationController
       format.html { render_show_html }
       format.pdf { send_inspection_pdf }
       format.png { send_inspection_qr_code }
-      format.json { render json: JsonSerializerService.serialize_inspection(@inspection) }
+      format.json do
+        render json: JsonSerializerService.serialize_inspection(@inspection)
+      end
     end
   end
 
@@ -99,11 +102,13 @@ class InspectionsController < ApplicationController
     @inspection.unit = unit
 
     if @inspection.save
-      flash[:notice] = t("inspections.messages.unit_changed", unit_name: unit.name)
+      flash[:notice] = t("inspections.messages.unit_changed",
+        unit_name: unit.name)
       redirect_to edit_inspection_path(@inspection)
     else
       error_messages = @inspection.errors.full_messages.join(", ")
-      flash[:alert] = t("inspections.messages.unit_change_failed", errors: error_messages)
+      flash[:alert] = t("inspections.messages.unit_change_failed",
+        errors: error_messages)
       redirect_to select_unit_inspection_path(@inspection)
     end
   end
@@ -113,7 +118,8 @@ class InspectionsController < ApplicationController
 
     if validation_errors.any?
       error_list = validation_errors.join(", ")
-      flash[:alert] = t("inspections.messages.cannot_complete", errors: error_list)
+      flash[:alert] = t("inspections.messages.cannot_complete",
+        errors: error_list)
       redirect_to edit_inspection_path(@inspection)
       return
     end
@@ -128,7 +134,8 @@ class InspectionsController < ApplicationController
       flash[:notice] = t("inspections.messages.marked_in_progress")
     else
       error_messages = @inspection.errors.full_messages.join(", ")
-      flash[:alert] = t("inspections.messages.mark_in_progress_failed", errors: error_messages)
+      flash[:alert] = t("inspections.messages.mark_in_progress_failed",
+        errors: error_messages)
     end
     redirect_to edit_inspection_path(@inspection)
   end
@@ -161,7 +168,8 @@ class InspectionsController < ApplicationController
 
     valid_tabs = helpers.inspection_tabs(@inspection)
     unless valid_tabs.include?(params[:tab])
-      redirect_to edit_inspection_path(@inspection), alert: I18n.t("inspections.messages.invalid_tab")
+      redirect_to edit_inspection_path(@inspection),
+        alert: I18n.t("inspections.messages.invalid_tab")
     end
   end
 
@@ -174,11 +182,14 @@ class InspectionsController < ApplicationController
       errors: @inspection.completion_errors.join(", ")
     )
 
-    Rails.logger.error "Inspection #{@inspection.id} is marked complete but has errors: #{@inspection.completion_errors}"
+    inspection_errors = @inspection.completion_errors
+    Rails.logger.error "Inspection #{@inspection.id} is marked complete " \
+                      "but has errors: #{inspection_errors}"
 
     # Only raise error in development/test environments
     if Rails.env.development? || Rails.env.test?
-      raise "DATA INTEGRITY ERROR: #{error_message}. In tests, use create(:inspection, :completed) to avoid this."
+      test_message = "In tests, use create(:inspection, :completed) to avoid this."
+      raise "DATA INTEGRITY ERROR: #{error_message}. #{test_message}"
     else
       # In production, log the error but continue
       Rails.logger.error "DATA INTEGRITY ERROR: #{error_message}"
@@ -273,7 +284,10 @@ class InspectionsController < ApplicationController
         flash[:notice] = I18n.t("inspections.messages.updated")
         redirect_to @inspection
       end
-      format.json { render json: {status: I18n.t("shared.api.success"), inspection: @inspection} }
+      format.json do
+        render json: {status: I18n.t("shared.api.success"),
+                      inspection: @inspection}
+      end
       format.turbo_stream { render turbo_stream: success_turbo_streams }
     end
   end
