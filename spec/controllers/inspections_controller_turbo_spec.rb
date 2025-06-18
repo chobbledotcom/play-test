@@ -32,14 +32,6 @@ RSpec.describe InspectionsController, type: :controller do
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
       end
 
-      it "renders proper turbo stream elements" do
-        patch :update, params: {id: inspection.id, inspection: {comments: "Updated"}}
-
-        expect(response.body).to include("<turbo-stream")
-        expect(response.body).to include("action=\"replace\"")
-        expect(response.body).to include("target=\"inspection_progress_#{inspection.id}\"")
-      end
-
       it "handles validation errors gracefully" do
         # Force a validation error by making the inspection invalid
         inspection.update!(complete_date: nil)
@@ -70,12 +62,12 @@ RSpec.describe InspectionsController, type: :controller do
       request.headers["Accept"] = "text/vnd.turbo-stream.html"
     end
 
-    it "uses html: parameter for inline HTML" do
+    it "returns turbo streams for updates" do
       patch :update, params: {id: inspection.id, inspection: {comments: "Test"}}
 
-      # Should use html: parameter, not blocks (HTML is escaped in template)
-      expect(response.body).to match(/(&lt;span class=&#39;value&#39;&gt;|<span class='value'>)/)
-      expect(response.body).to match(/(In Progress|Complete)/)
+      # Should return turbo stream elements
+      expect(response.body).to include("<turbo-stream")
+      expect(response.body).to include("mark_complete_section")
     end
 
     it "uses partial: parameter for rendering partials" do

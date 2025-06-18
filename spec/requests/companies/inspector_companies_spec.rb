@@ -75,7 +75,7 @@ RSpec.describe "InspectorCompanies", type: :request do
     it "denies access to inspector companies index" do
       get inspector_companies_path
       expect(response).to redirect_to(root_path)
-      expect(flash[:alert]).to include(I18n.t("inspector_companies.messages.unauthorized"))
+      expect(flash[:alert]).to include(I18n.t("forms.session_new.status.admin_required"))
     end
 
     it "allows access to inspector companies show" do

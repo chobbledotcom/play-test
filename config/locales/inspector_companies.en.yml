@@ -50,7 +50,6 @@ en:
       created: "Inspector company created successfully."
       updated: "Inspector company updated successfully."
       not_found: "Inspector company not found."
-      unauthorized: "You are not authorized to access this page"
       no_companies: "No inspector companies found"
 
     errors:

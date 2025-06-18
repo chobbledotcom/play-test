@@ -44,7 +44,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
 
         expect(response).to redirect_to(root_path)
         follow_redirect!
-        expect(response.body).to include("You are not authorized to access this page")
+        expect(response.body).to include(I18n.t("forms.session_new.status.admin_required"))
       end
     end
 
@@ -95,7 +95,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
 
         expect(response).to redirect_to(root_path)
         follow_redirect!
-        expect(response.body).to include("You are not authorized to access this page")
+        expect(response.body).to include(I18n.t("forms.session_new.status.admin_required"))
         expect(test_user.reload.has_seed_data?).to be true
       end
     end

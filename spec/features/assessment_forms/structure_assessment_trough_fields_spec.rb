@@ -20,8 +20,8 @@ RSpec.feature "Trough Fields in Structure Assessment", type: :feature do
     it "saves trough field values" do
       visit edit_inspection_path(inspection, tab: "structure")
 
-      fill_in I18n.t("forms.structure.fields.trough_depth"), with: "150"
-      fill_in I18n.t("forms.structure.fields.trough_adjacent_panel_width"), with: "75"
+      fill_in_form :structure, :trough_depth, "150"
+      fill_in_form :structure, :trough_adjacent_panel_width, "75"
 
       click_button I18n.t("forms.structure.submit")
 

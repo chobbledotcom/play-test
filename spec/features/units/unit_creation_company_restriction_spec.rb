@@ -118,18 +118,18 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       visit units_path
       expect(page).to have_button(I18n.t("units.buttons.add_unit"))
 
-      visit logout_path
+      logout
       sign_in(inactive_user)
       visit units_path
       expect(page).not_to have_button(I18n.t("units.buttons.add_unit"))
 
-      visit logout_path
+      logout
       sign_in(admin_user)
       visit edit_user_path(active_user)
       fill_in "user_active_until", with: (Date.current - 1.day).strftime("%Y-%m-%d")
       click_button I18n.t("users.buttons.update_user")
 
-      visit logout_path
+      logout
       sign_in(active_user)
       visit units_path
       expect(page).not_to have_button(I18n.t("units.buttons.add_unit"))

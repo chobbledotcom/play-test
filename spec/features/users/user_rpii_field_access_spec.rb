@@ -62,7 +62,7 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
       visit edit_user_path(target_user)
 
       expect(page).to have_current_path(root_path)
-      expect(page).to have_content("You are not authorized to access this page")
+      expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
     end
 
     it "cannot update RPII inspector number via form submission" do
@@ -78,7 +78,7 @@ RSpec.feature "User RPII Field Access Control", type: :feature do
     end
 
     it "shows RPII field in new user registration form when logged out" do
-      visit logout_path
+      logout
       visit new_user_path
 
       expect_field_present :user_new, :rpii_inspector_number

@@ -31,7 +31,7 @@ RSpec.feature "Inactive User Restrictions", type: :feature do
       expect(page).to have_current_path(units_path)
 
       visit inspection_path(inspection)
-      expect(page).to have_content(inspection.unique_report_number)
+      expect(page).to have_content(inspection.inspection_location)
 
       visit edit_inspection_path(inspection)
       expect(page).to have_current_path(inspection_path(inspection))

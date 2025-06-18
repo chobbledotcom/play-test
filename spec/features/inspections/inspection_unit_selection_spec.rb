@@ -152,6 +152,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
       end
 
       before do
+        logout
         sign_in(admin_user)
       end
 

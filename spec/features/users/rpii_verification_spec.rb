@@ -62,12 +62,13 @@ RSpec.feature "RPII Verification", type: :feature do
   end
 
   scenario "non-admin users cannot access verification" do
+    logout
     sign_in(user_with_valid_rpii)
 
     visit edit_user_path(user_with_invalid_rpii)
 
     expect(page).not_to have_current_path(edit_user_path(user_with_invalid_rpii))
-    expect(page).to have_content(I18n.t("authorization.admin_required"))
+    expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
   end
 
   scenario "verification redirects back to edit page" do

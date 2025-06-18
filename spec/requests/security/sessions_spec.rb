@@ -1,37 +1,5 @@
 require "rails_helper"
 
-# Sessions Controller Behavior Documentation
-# ==========================================
-#
-# The Sessions controller manages user authentication with three main actions:
-#
-# PUBLIC ACCESS (no login required):
-# - GET /login - Shows login form
-# - POST /login - Authenticates user with email/password, handles remember_me
-#
-# AUTHENTICATED ACCESS (must be logged in):
-# - DELETE /logout - Logs out user and clears session
-#
-# AUTHENTICATION FLOW:
-# 1. User submits email/password via login form
-# 2. Controller finds user by email (case insensitive) and verifies password
-# 3. On success: sets session[:user_id], handles remember_me cookie, redirects to inspections
-# 4. On failure: shows error message and re-renders form with :unprocessable_entity
-#
-# REMEMBER ME FUNCTIONALITY:
-# - When remember_me checkbox is checked (value "1"), sets permanent signed cookie
-# - When unchecked or absent, deletes any existing remember_me cookie
-# - Remember me allows persistent login across browser sessions
-#
-# LOGOUT BEHAVIOR:
-# - Clears session[:user_id] and deletes remember_me cookie
-# - Shows success message and redirects to root path
-#
-# ERROR HANDLING:
-# - Invalid credentials show "Invalid email/password combination" via flash.now
-# - Failed login renders :new template with :unprocessable_entity status
-# - All authentication redirects go to inspections_path
-
 RSpec.describe "Sessions", type: :feature do
   let(:user) { create(:user) }
 
@@ -93,7 +61,7 @@ RSpec.describe "Sessions", type: :feature do
       expect(page).to have_content(I18n.t("session.login.success"))
     end
 
-    it "allows re-login when already logged in" do
+    it "redirects to inspections page when already logged in" do
       # First login
       visit "/login"
       fill_in_form :session_new, :email, user.email
@@ -102,14 +70,12 @@ RSpec.describe "Sessions", type: :feature do
 
       expect(page).to have_current_path(inspections_path)
 
-      # Login again
+      # Try to visit login page again while logged in
       visit "/login"
-      fill_in_form :session_new, :email, user.email
-      fill_in_form :session_new, :password, user.password
-      submit_form :session_new
 
+      # Should redirect to inspections page
       expect(page).to have_current_path(inspections_path)
-      expect(page).to have_content(I18n.t("session.login.success"))
+      expect(page).to have_content(I18n.t("forms.session_new.status.already_logged_in"))
     end
   end
 
@@ -211,24 +177,22 @@ RSpec.describe "Sessions", type: :feature do
     it "does not reveal whether email exists" do
       visit "/login"
 
-      # Try with non-existent email
       fill_in_form :session_new, :email, "nonexistent@example.com"
       fill_in_form :session_new, :password, user.password
       submit_form :session_new
 
       expect(page).to have_content(I18n.t("session.login.error"))
 
-      # Try with existing email but wrong password
       fill_in_form :session_new, :email, user.email
       fill_in_form :session_new, :password, "wrongpassword"
       submit_form :session_new
 
-      # Both should show the same error message
       expect(page).to have_content(I18n.t("session.login.error"))
     end
 
     it "normalizes email case for lookup" do
-      mixed_case_email = user.email.chars.map.with_index { |c, i| i.even? ? c.upcase : c }.join
+      mixed_case_email =
+        user.email.chars.map.with_index { |c, i| i.even? ? c.upcase : c }.join
 
       visit "/login"
       fill_in_form :session_new, :email, mixed_case_email

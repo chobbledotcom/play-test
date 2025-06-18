@@ -11,12 +11,7 @@ RSpec.feature "Inspection UI and Accessibility", type: :feature do
   end
 
   scenario "displays tabbed interface with all expected elements" do
-    within(".inspection-overview") do
-      %w[unit_name serial status progress].each do |field|
-        expect(page).to have_content(I18n.t("inspections.fields.#{field}"))
-      end
-    end
-
+    # Check that all tabs are present
     %w[inspection user_height structure anchorage materials fan slide enclosed].each do |tab|
       expect(page).to have_content(I18n.t("forms.#{tab}.header"))
     end
@@ -55,7 +50,6 @@ RSpec.feature "Inspection UI and Accessibility", type: :feature do
 
   scenario "has proper accessibility features" do
     expect(page).to have_css("h1", text: I18n.t("inspections.titles.edit"))
-    expect(page).to have_css("h2", text: I18n.t("inspections.headers.overview"))
     expect(page).to have_css("legend", text: I18n.t("forms.inspection.sections.current_unit"))
 
     %w[inspection_location passed_true passed_false].each do |field_id|

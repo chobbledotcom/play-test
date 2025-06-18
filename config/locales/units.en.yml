@@ -130,7 +130,6 @@ en:
         other: "Could not save unit because there are %{count} errors:"
       inspection_not_found: "Inspection not found"
       inspection_has_unit: "This inspection already has a unit associated with it"
-      unauthorized: "You are not authorized to access this unit"
       invalid_image: "Photo must be a valid image file"
 
     messages:

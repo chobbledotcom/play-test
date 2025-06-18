@@ -5,7 +5,6 @@ module InspectionTurboStreams
 
   def success_turbo_streams
     [
-      progress_update_stream,
       mark_complete_section_stream,
       save_message_stream(success: true),
       assessment_save_message_stream(success: true)
@@ -14,20 +13,10 @@ module InspectionTurboStreams
 
   def error_turbo_streams
     [
-      progress_update_stream,
       mark_complete_section_stream,
       save_message_stream(success: false),
       assessment_save_message_stream(success: false)
     ]
-  end
-
-  def progress_update_stream
-    status_key = @inspection.complete? ? "complete" : "in_progress"
-    status = I18n.t("inspections.status.#{status_key}")
-    turbo_stream.replace(
-      "inspection_progress_#{@inspection.id}",
-      html: "<span class='value'>#{status}</span>"
-    )
   end
 
   def mark_complete_section_stream

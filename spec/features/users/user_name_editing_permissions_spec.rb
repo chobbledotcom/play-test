@@ -12,11 +12,11 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
     scenario "Admin can edit user names through admin edit form" do
       visit edit_user_path(regular_user)
 
-      expect(page).to have_field("user_name")
-      expect(page).to have_field("user_name", with: "Original Name")
+      expect_field_present(:user_edit, :name)
+      expect(find_form_field(:user_edit, :name).value).to eq("Original Name")
 
-      fill_in "user_name", with: "New Admin Changed Name"
-      click_button I18n.t("users.buttons.update_user")
+      fill_in_form(:user_edit, :name, "New Admin Changed Name")
+      submit_form(:user_edit)
 
       expect(page).to have_content(I18n.t("users.messages.user_updated"))
 
@@ -27,11 +27,11 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
     scenario "Admin edit form includes all admin-only fields" do
       visit edit_user_path(regular_user)
 
-      expect(page).to have_field("user_name")
-      expect(page).to have_field("user_email")
-      expect(page).to have_field("user_rpii_inspector_number")
-      expect(page).to have_field("user_active_until")
-      expect(page).to have_select("user_inspection_company_id")
+      expect_field_present(:user_edit, :name)
+      expect_field_present(:user_edit, :email)
+      expect_field_present(:user_edit, :rpii_inspector_number)
+      expect_field_present(:user_edit, :active_until)
+      expect_field_present(:user_edit, :inspection_company_id)
     end
   end
 
@@ -41,7 +41,7 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
     scenario "Regular user cannot access admin edit form" do
       visit edit_user_path(regular_user)
 
-      expect(page).to have_content(I18n.t("inspector_companies.messages.unauthorized"))
+      expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
       expect(current_path).to eq(root_path)
     end
 
@@ -49,12 +49,12 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       visit change_settings_user_path(regular_user)
 
       expect(page).to have_content("Original Name")
-      expect(page).not_to have_field("user_name")
+      expect_field_not_present(:user_settings, :name)
 
-      expect(page).to have_field("user_phone")
-      expect(page).to have_field("user_address")
-      expect(page).to have_field("user_country")
-      expect(page).to have_field("user_postal_code")
+      expect_field_present(:user_settings, :phone)
+      expect_field_present(:user_settings, :address)
+      expect_field_present(:user_settings, :country)
+      expect_field_present(:user_settings, :postal_code)
     end
 
     scenario "Regular user with company sees all fields as read-only" do
@@ -62,11 +62,11 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       visit change_settings_user_path(regular_user)
 
       expect(page).to have_content("Original Name")
-      expect(page).not_to have_field("user_name")
-      expect(page).not_to have_field("user_phone")
-      expect(page).not_to have_field("user_address")
-      expect(page).not_to have_field("user_country")
-      expect(page).not_to have_field("user_postal_code")
+      expect_field_not_present(:user_settings, :name)
+      expect_field_not_present(:user_settings, :phone)
+      expect_field_not_present(:user_settings, :address)
+      expect_field_not_present(:user_settings, :country)
+      expect_field_not_present(:user_settings, :postal_code)
 
       expect(page).to have_content(I18n.t("users.messages.inherited_from_company"))
     end
@@ -74,12 +74,13 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
     scenario "Regular user can still edit preferences but not name" do
       visit change_settings_user_path(regular_user)
 
-      expect(page).to have_field("user_default_inspection_location")
-      expect(page).to have_select("user_theme")
+      expect_field_present(:user_settings, :default_inspection_location)
+      expect_field_present(:user_settings, :theme)
 
-      select I18n.t("users.options.theme_dark"), from: "user_theme"
-      fill_in "user_default_inspection_location", with: "Test Location"
-      click_button I18n.t("users.buttons.update_settings")
+      theme_field = I18n.t("forms.user_settings.fields.theme")
+      select I18n.t("users.options.theme_dark"), from: theme_field
+      fill_in_form(:user_settings, :default_inspection_location, "Test Location")
+      submit_form(:user_settings)
 
       expect(page).to have_content(I18n.t("users.messages.settings_updated"))
 

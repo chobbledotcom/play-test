@@ -171,7 +171,8 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
       expect(user_with_company.inspection_company_id).to eq(inspector_company.id)
 
-      login_user_via_form(user_with_company)
+      logout
+      sign_in(user_with_company)
 
       initial_count = user_with_company.inspections.count
 
@@ -189,7 +190,8 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       user_without_company = create(:user, inspection_company: nil)
       unit_for_user = create(:unit, user: user_without_company)
 
-      login_user_via_form(user_without_company)
+      logout
+      sign_in(user_without_company)
 
       initial_count = user_without_company.inspections.count
 

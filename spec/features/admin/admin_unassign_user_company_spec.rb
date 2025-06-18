@@ -38,17 +38,17 @@ RSpec.feature "Admin User Management", type: :feature do
   end
 
   scenario "non-admin cannot see admin fields" do
-    visit logout_path
+    logout
     sign_in(regular_user)
     visit edit_user_path(regular_user)
 
-    expect(page).to have_content(I18n.t("inspector_companies.messages.unauthorized"))
+    expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
     expect(current_path).to eq(root_path)
   end
 
   scenario "inactive user cannot create inspections" do
     regular_user.update!(active_until: Date.current - 1.day)
-    visit logout_path
+    logout
     sign_in(regular_user)
     unit = create(:unit, user: regular_user)
     visit unit_path(unit)

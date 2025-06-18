@@ -5,8 +5,6 @@ class InspectionCreationService
   end
 
   def create
-    return inactive_user_result unless @user.is_active?
-
     unit = find_and_validate_unit if @unit_id.present?
     return invalid_unit_result if @unit_id.present? && unit.nil?
 
@@ -40,14 +38,6 @@ class InspectionCreationService
     NtfyService.notify("new inspection by #{@user.email}")
   end
 
-  def inactive_user_result
-    {
-      success: false,
-      error_type: :inactive_user,
-      message: @user.inactive_user_message,
-      redirect_path: @unit_id.present? ? "/units/#{@unit_id}" : "/"
-    }
-  end
 
   def invalid_unit_result
     {

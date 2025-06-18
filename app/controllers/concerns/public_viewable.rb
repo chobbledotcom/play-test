@@ -27,12 +27,12 @@ module PublicViewable
 
   # To be implemented by including controllers
   def check_resource_owner
-    raise NotImplementedError, "Including controller must implement check_resource_owner"
+    raise NotImplementedError, I18n.t("concerns.public_viewable.check_resource_owner_missing")
   end
 
   # Determine if current user owns the resource
   def owns_resource?
-    raise NotImplementedError, "Including controller must implement owns_resource?"
+    raise NotImplementedError, I18n.t("concerns.public_viewable.owns_resource_missing")
   end
 
   # Render appropriate view for show action
@@ -48,10 +48,10 @@ module PublicViewable
 
   # To be implemented by including controllers
   def pdf_filename
-    raise NotImplementedError, "Including controller must implement pdf_filename"
+    raise NotImplementedError, I18n.t("concerns.public_viewable.pdf_filename_missing")
   end
 
   def resource_pdf_url
-    raise NotImplementedError, "Including controller must implement resource_pdf_url"
+    raise NotImplementedError, I18n.t("concerns.public_viewable.resource_pdf_url_missing")
   end
 end

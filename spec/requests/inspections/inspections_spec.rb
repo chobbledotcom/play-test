@@ -52,7 +52,7 @@ RSpec.describe "Inspections", type: :request do
         path = (action == "index") ? "/inspections" : "/inspections/#{SecureRandom.hex(6)}/edit"
         get path
         expect(response).to redirect_to(login_path)
-        expect(flash[:alert]).to include("Please log in")
+        expect(flash[:alert]).to eq(I18n.t("forms.session_new.status.login_required"))
       end
     end
 
@@ -73,7 +73,7 @@ RSpec.describe "Inspections", type: :request do
           delete "/inspections/#{inspection.id}"
         end
         expect(response).to redirect_to(login_path)
-        expect(flash[:alert]).to include("Please log in")
+        expect(flash[:alert]).to eq(I18n.t("forms.session_new.status.login_required"))
       end
     end
   end
@@ -169,11 +169,24 @@ RSpec.describe "Inspections", type: :request do
 
     describe "POST /create" do
       context "when user is inactive" do
-        let(:inactive_user) { create(:user, :inactive_user) }
-        before { login_as(inactive_user) }
+        let(:inactive_user) { create(:user, active_until: Date.current - 1.day) }
+        before do
+          logout_user  # Ensure previous user is logged out
+          login_as(inactive_user)
+        end
 
         it "redirects appropriately" do
-          post "/inspections", params: {inspection: valid_inspection_attributes}
+          # Verify the user is actually inactive
+          expect(inactive_user.active_until).to eq(Date.current - 1.day)
+          expect(inactive_user.is_active?).to be false
+          expect(inactive_user.can_create_inspection?).to be false
+
+          # This should be prevented by the before_action
+          expect {
+            post "/inspections", params: {inspection: valid_inspection_attributes}
+          }.not_to change(Inspection, :count)
+          
+          # The inactive user should be redirected and prevented from creating
           expect_redirect_with_alert(inspections_path)
         end
 
@@ -192,7 +205,10 @@ RSpec.describe "Inspections", type: :request do
           user
         end
 
-        before { login_as(user_at_limit) }
+        before do
+          logout_user  # Ensure previous user is logged out
+          login_as(user_at_limit)
+        end
 
         it "redirects with alert when user is inactive" do
           post "/inspections", params: {inspection: valid_inspection_attributes}

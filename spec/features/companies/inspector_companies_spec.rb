@@ -22,7 +22,7 @@ RSpec.describe "Inspector Companies", type: :feature do
         visit inspector_companies_path
 
         expect(page).to have_current_path(root_path)
-        expect(page).to have_content(I18n.t("inspector_companies.messages.unauthorized"))
+        expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
       end
 
       it "does not show inspector companies link in navigation" do

@@ -1,10 +1,6 @@
 # TestLog Seed Data
 # British inflatable equipment inspection system
 # Run with: rails db:seed
-#
-# SECURITY NOTE: All seed users are created with random 32-character passwords
-# to prevent unauthorized access if seed data is accidentally left in production.
-# These passwords are not logged or displayed anywhere.
 
 puts "Starting seed data creation..."
 puts "Environment: #{Rails.env}"

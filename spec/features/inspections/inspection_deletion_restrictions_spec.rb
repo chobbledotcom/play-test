@@ -42,6 +42,7 @@ RSpec.feature "Inspection Deletion Security", type: :feature do
   end
 
   scenario "admins follow same deletion rules as regular users" do
+    logout
     admin = create(:user, :admin)
     sign_in(admin)
 

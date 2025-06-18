@@ -11,21 +11,29 @@ class ApplicationController < ActionController::Base
 
   rescue_from StandardError do |exception|
     if Rails.env.production?
-      user_email = current_user&.email || "Not logged in"
-      user_info = "User: #{user_email}"
+      user_email = current_user&.email || app_i18n(:errors, :not_logged_in)
+      user_label = app_i18n(:errors, :user_label)
+      user_info = "#{user_label}: #{user_email}"
+
+      controller_label = app_i18n(:errors, :controller_label)
+      path_label = app_i18n(:errors, :path_label)
+      method_label = app_i18n(:errors, :method_label)
+      ip_label = app_i18n(:errors, :ip_label)
+      backtrace_label = app_i18n(:errors, :backtrace_label)
+      error_subject = app_i18n(:errors, :production_error_subject)
 
       message = <<~MESSAGE
-        500 Error in play-test
+        #{error_subject}
 
         #{exception.class}: #{exception.message}
 
         #{user_info}
-        Controller: #{controller_name}##{action_name}
-        Path: #{request.fullpath}
-        Method: #{request.request_method}
-        IP: #{request.remote_ip}
+        #{controller_label}: #{controller_name}##{action_name}
+        #{path_label}: #{request.fullpath}
+        #{method_label}: #{request.request_method}
+        #{ip_label}: #{request.remote_ip}
 
-        Backtrace (first 5 lines):
+        #{backtrace_label}:
         #{exception.backtrace.first(5).join("\n")}
       MESSAGE
 
@@ -37,10 +45,25 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def app_i18n(table, key, **args)
+    I18n.t("application.#{table}.#{key}", **args)
+  end
+
+  def form_i18n(form, key, **args)
+    I18n.t("forms.#{form}.#{key}", **args)
+  end
+
   def require_login
     unless logged_in?
-      flash[:alert] = I18n.t("authorization.login_required")
+      flash[:alert] = form_i18n(:session_new, "status.login_required")
       redirect_to login_path
+    end
+  end
+
+  def require_logged_out
+    if logged_in?
+      flash[:alert] = form_i18n(:session_new, "status.already_logged_in")
+      redirect_to inspections_path
     end
   end
 
@@ -52,7 +75,7 @@ class ApplicationController < ActionController::Base
 
   def require_admin
     unless current_user&.admin?
-      flash[:alert] = I18n.t("authorization.admin_required")
+      flash[:alert] = I18n.t("forms.session_new.status.admin_required")
       redirect_to root_path
     end
   end
@@ -116,23 +139,21 @@ class ApplicationController < ActionController::Base
     table_query_counts.each do |table, count|
       if count > 5
         log_n_plus_one_queries(table, count)
-        table_msg = "#{table} table was queried #{count} times"
-        message = "N+1 query detected: #{table_msg}"
-        raise "#{message} (limit: 5)"
+        message = app_i18n(:debug, :n_plus_one_with_limit, table: table, count: count, limit: 5)
+        raise message
       end
     end
   end
 
   def log_n_plus_one_queries(table, count)
-    query_count_msg = "#{table} was queried #{count} times"
-    error_message = "N+1 query detected: #{query_count_msg}"
+    error_message = app_i18n(:debug, :n_plus_one_detected, table: table, count: count)
     Rails.logger.error error_message
-    Rails.logger.error "Queries for #{table}:"
+    Rails.logger.error app_i18n(:debug, :queries_for_table, table: table)
     table_queries = debug_sql_queries.select { |q|
       table_from_query(q[:sql]) == table
     }
     table_queries.each_with_index do |query, i|
-      query_log = "#{query[:name]}: #{query[:sql]}"
+      query_log = app_i18n(:debug, :query_log_entry, name: query[:name], sql: query[:sql])
       Rails.logger.error "  #{i + 1}. #{query_log}"
     end
   end

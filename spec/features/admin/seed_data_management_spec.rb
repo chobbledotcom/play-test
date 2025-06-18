@@ -66,6 +66,7 @@ RSpec.feature "Seed Data Management", type: :feature do
   end
 
   scenario "non-admin users cannot see seed buttons" do
+    logout
     sign_in(test_user)
     visit edit_user_path(test_user)
 

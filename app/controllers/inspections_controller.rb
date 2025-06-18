@@ -334,9 +334,14 @@ class InspectionsController < ApplicationController
   end
 
   def handle_inactive_user_redirect
-    if action_name == "create" && params[:unit_id].present?
-      unit = current_user.units.find_by(id: params[:unit_id])
-      redirect_to unit ? unit_path(unit) : inspections_path
+    if action_name == "create"
+      unit_id = params[:unit_id] || params.dig(:inspection, :unit_id)
+      if unit_id.present?
+        unit = current_user.units.find_by(id: unit_id)
+        redirect_to unit ? unit_path(unit) : inspections_path
+      else
+        redirect_to inspections_path
+      end
     elsif action_name.in?(%w[edit update]) && @inspection
       redirect_to inspection_path(@inspection)
     else

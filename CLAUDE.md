@@ -113,7 +113,10 @@ All forms must follow these exact patterns:
 1. **Always use form_context partial** for form wrapper:
 
    ```erb
-   <%= render 'form/form_context', model: @model, i18n_base: 'forms.form_name' do |form| %>
+   <%= render 'form/form_context',
+     model: @model,
+     i18n_base: 'forms.form_name' do |form|
+   %>
    ```
 
 2. **I18n structure for forms** - ALL forms must use `forms.` namespace:
@@ -155,7 +158,10 @@ All forms must follow these exact patterns:
 6. **Standard form structure**:
 
    ```erb
-   <%= render 'form/form_context', model: @model, i18n_base: 'forms.name' do |form| %>
+   <%= render 'form/form_context',
+     model: @model,
+     i18n_base: 'forms.name' do |form|
+   %>
      <%= render 'form/fieldset', legend_key: 'section_name' do %>
        <%= render 'form/text_field', field: :field_name %>
        <%= render 'form/pass_fail_comment', field: :check_name %>
@@ -168,8 +174,12 @@ All forms must follow these exact patterns:
 
 7. **Non-model forms use scope**:
    ```erb
-   <%= render 'form/form_context', model: nil, scope: :session,
-              i18n_base: 'forms.session_new', url: login_path do |form| %>
+   <%= render 'form/form_context',
+     model: nil,
+     scope: :session,
+     i18n_base: 'forms.session_new',
+     url: login_path do |form|
+   %>
    ```
 
 ### Testing Approach

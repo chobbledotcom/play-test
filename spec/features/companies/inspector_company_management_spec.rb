@@ -148,14 +148,14 @@ RSpec.feature "Inspector Company Management", type: :feature do
     scenario "regular user cannot access company index" do
       visit inspector_companies_path
 
-      expect(page).to have_content(I18n.t("inspector_companies.messages.unauthorized"))
+      expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
       expect(page).to have_current_path(root_path)
     end
 
     scenario "regular user cannot access company creation" do
       visit new_inspector_company_path
 
-      expect(page).to have_content(I18n.t("inspector_companies.messages.unauthorized"))
+      expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
       expect(page).to have_current_path(root_path)
     end
 
@@ -164,7 +164,7 @@ RSpec.feature "Inspector Company Management", type: :feature do
 
       visit edit_inspector_company_path(company)
 
-      expect(page).to have_content(I18n.t("inspector_companies.messages.unauthorized"))
+      expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
       expect(page).to have_current_path(root_path)
     end
   end

@@ -90,7 +90,7 @@ class InspectorCompaniesController < ApplicationController
 
   def require_admin
     unless current_user&.admin?
-      flash[:alert] = t("inspector_companies.messages.unauthorized")
+      flash[:alert] = t("forms.session_new.status.admin_required")
       redirect_to root_path
     end
   end

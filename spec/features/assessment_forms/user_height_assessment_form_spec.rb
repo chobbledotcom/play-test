@@ -18,18 +18,18 @@ RSpec.feature "User Height Assessment", type: :feature do
     end
 
     it "displays all the required form fields" do
-      expect(page).to have_field(I18n.t("forms.user_height.fields.containing_wall_height"))
-      expect(page).to have_field(I18n.t("forms.user_height.fields.platform_height"))
-      expect(page).to have_field(I18n.t("forms.user_height.fields.tallest_user_height"))
+      expect_field_present :user_height, :containing_wall_height
+      expect_field_present :user_height, :platform_height
+      expect_field_present :user_height, :tallest_user_height
 
-      expect(page).to have_field(I18n.t("forms.user_height.fields.users_at_1000mm"))
-      expect(page).to have_field(I18n.t("forms.user_height.fields.users_at_1200mm"))
-      expect(page).to have_field(I18n.t("forms.user_height.fields.users_at_1500mm"))
-      expect(page).to have_field(I18n.t("forms.user_height.fields.users_at_1800mm"))
+      expect_field_present :user_height, :users_at_1000mm
+      expect_field_present :user_height, :users_at_1200mm
+      expect_field_present :user_height, :users_at_1500mm
+      expect_field_present :user_height, :users_at_1800mm
 
-      expect(page).to have_field(I18n.t("forms.user_height.fields.play_area_length"))
-      expect(page).to have_field(I18n.t("forms.user_height.fields.play_area_width"))
-      expect(page).to have_field(I18n.t("forms.user_height.fields.negative_adjustment"))
+      expect_field_present :user_height, :play_area_length
+      expect_field_present :user_height, :play_area_width
+      expect_field_present :user_height, :negative_adjustment
 
       expect(page).to have_field(I18n.t("shared.comment"))
     end

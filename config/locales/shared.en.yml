@@ -57,10 +57,5 @@ en:
       clear_filters: "Reset"
       cancel: "Cancel"
 
-  # Authorization messages
-  authorization:
-    login_required: "Please log in to access this page"
-    admin_required: "You are not authorized to access this page"
-
   # Test strings
   hello: "Hello world"
