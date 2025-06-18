@@ -121,14 +121,19 @@ class ApplicationController < ActionController::Base
 
     table_query_counts.each do |table, count|
       if count > 5
-        error_message = "N+1 query detected: #{table} was queried #{count} times"
+        query_count_msg = "#{table} was queried #{count} times"
+        error_message = "N+1 query detected: #{query_count_msg}"
         Rails.logger.error error_message
         Rails.logger.error "Queries for #{table}:"
-        table_queries = debug_sql_queries.select { |q| table_from_query(q[:sql]) == table }
+        table_queries = debug_sql_queries.select { |q| 
+          table_from_query(q[:sql]) == table 
+        }
         table_queries.each_with_index do |query, i|
-          Rails.logger.error "  #{i + 1}. #{query[:name]}: #{query[:sql]}"
+          query_log = "#{query[:name]}: #{query[:sql]}"
+          Rails.logger.error "  #{i + 1}. #{query_log}"
         end
-        message = "N+1 query detected: #{table} table was queried #{count} times"
+        table_msg = "#{table} table was queried #{count} times"
+        message = "N+1 query detected: #{table_msg}"
         raise "#{message} (limit: 5)"
       end
     end

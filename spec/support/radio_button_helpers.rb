@@ -1,53 +1,94 @@
-# Helper methods for interacting with radio buttons that used to be checkboxes
 module RadioButtonHelpers
   BOOLEANS_BY_FORM = {
     inspection: %i[has_slide is_totally_enclosed passed],
     slide_assessment: %i[slide_permanent_roof]
   }.freeze
-  # Choose Yes/No radio button for boolean fields
+
   def choose_yes_no(field_label, value)
-    # Find the form-grid container that contains the field label
-    # The structure is now: div.form-grid > div > label[text="Field Label"]
-    # Then find the Yes/No radio button within the same form-grid
-    within(:xpath, "//div[contains(@class, 'form-grid')][.//label[normalize-space(.)='#{field_label}']]") do
-      if value
-        choose I18n.t("shared.yes")
-      else
-        choose I18n.t("shared.no")
-      end
-    end
+    choose_radio_in_container(field_label, value, 
+      ["yes-no-radio", "pass-fail-comment"],
+      yes: ["yes", "pass"],
+      no: ["no", "fail"]
+    )
   end
 
-  # Convert field label to just the field name (without model prefix)
-  def field_label_to_field_name(field_label)
-    BOOLEANS_BY_FORM.each do |model, fields|
-      form_type = (model == :inspection) ? :inspection : :slide
-      fields.each do |field|
-        return field.to_s if field_label == I18n.t("forms.#{form_type}.fields.#{field}")
-      end
-    end
-    raise "Unknown field label: #{field_label}"
+  def choose_pass_fail(field_label, value)
+    find_and_click_radio(field_label, value)
   end
 
-  # Convert field label to form field name
-  def field_label_to_name(field_label)
-    BOOLEANS_BY_FORM.each do |model, fields|
-      form_type = (model == :inspection) ? :inspection : :slide
-      fields.each do |field|
-        return "#{model}[#{field}]" if field_label == I18n.t("forms.#{form_type}.fields.#{field}")
-      end
-    end
-    raise "Unknown field label: #{field_label}"
-  end
-
-  # Backwards compatible method for tests that use check
   def check_radio(field_label)
     choose_yes_no(field_label, true)
   end
 
-  # Backwards compatible method for tests that use uncheck
   def uncheck_radio(field_label)
     choose_yes_no(field_label, false)
+  end
+
+  def field_label_to_field_name(field_label)
+    find_field_by_label(field_label) { |field| field.to_s }
+  end
+
+  def field_label_to_name(field_label)
+    find_field_by_label(field_label) { |field, model| "#{model}[#{field}]" }
+  end
+
+  private
+
+  def choose_radio_in_container(label, value, containers, selectors)
+    containers.each do |container|
+      xpath = "//div[contains(@class, '#{container}')]"
+      xpath += "[.//label[normalize-space(.)='#{label}']]"
+      
+      begin
+        within(:xpath, xpath) do
+          selector = value ? selectors[:yes] : selectors[:no]
+          selector.each do |class_name|
+            begin
+              within(:xpath, ".//div[contains(@class, '#{class_name}')]") do
+                find("input[type='radio']").click
+                return
+              end
+            rescue Capybara::ElementNotFound
+              next
+            end
+          end
+        end
+        return
+      rescue Capybara::ElementNotFound
+        next
+      end
+    end
+    
+    raise Capybara::ElementNotFound, "Unable to find radio for '#{label}'"
+  end
+
+  def find_and_click_radio(label, value)
+    selectors = [
+      "//label[normalize-space(.)='#{label}']/following::label[contains(.,'#{value ? 'Pass' : 'Fail'}')][1]/input[@type='radio']",
+      "//div[.//label[normalize-space(.)='#{label}']]//input[@type='radio'][@value='#{value}']"
+    ]
+    
+    selectors.each do |selector|
+      begin
+        find(:xpath, selector).click
+        return
+      rescue Capybara::ElementNotFound
+        next
+      end
+    end
+    
+    raise Capybara::ElementNotFound, "Unable to find radio for '#{label}'"
+  end
+
+  def find_field_by_label(field_label)
+    BOOLEANS_BY_FORM.each do |model, fields|
+      form_type = model == :inspection ? :inspection : :slide
+      fields.each do |field|
+        i18n_key = "forms.#{form_type}.fields.#{field}"
+        return yield(field, model) if field_label == I18n.t(i18n_key)
+      end
+    end
+    raise "Unknown field label: #{field_label}"
   end
 end
 

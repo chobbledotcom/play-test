@@ -10,7 +10,7 @@ class InspectionWorkflow
   include InspectionTestHelpers
   include FormHelpers
 
-  BOOLEAN_FIELDS = %w[has_slide is_totally_enclosed slide_permanent_roof].freeze
+  BOOLEAN_FIELDS = %w[has_slide is_totally_enclosed].freeze
 
   attr_reader :user
   attr_reader :unit
@@ -147,7 +147,9 @@ class InspectionWorkflow
 
   def fill_inspection_field(field_name, value)
     if BOOLEAN_FIELDS.include?(field_name.to_s)
-      value ? check_form_radio(:inspection, field_name) : uncheck_form_radio(:inspection, field_name)
+      value ?
+        check_form_radio(:inspection, field_name) :
+        uncheck_form_radio(:inspection, field_name)
     else
       fill_in_form :inspection, field_name, value
     end
@@ -182,16 +184,35 @@ class InspectionWorkflow
   end
 
   def fill_assessment_field(tab_name, field_name, value)
-    field_name_str = field_name.to_s
-    return if field_name_str.end_with?("_comment")
-
-    case field_name_str
-    when /.*_pass$/
-      choose "#{field_name}_#{value ? "true" : "false"}"
-    when ->(s) { BOOLEAN_FIELDS.include?(s) }
-      value ? check_form_radio(tab_name.to_sym, field_name) : uncheck_form_radio(tab_name.to_sym, field_name)
-    when ->(s) { value.present? }
-      fill_in_form tab_name.to_sym, field_name, value
+    return if field_name.to_s.end_with?("_comment")
+    
+    field_label = get_field_label(tab_name, field_name)
+    
+    case value
+    when true, false
+      if field_name.to_s.end_with?("_pass")
+        choose_pass_fail(field_label, value)
+      elsif BOOLEAN_FIELDS.include?(field_name.to_s)
+        value ? check_form_radio(tab_name.to_sym, field_name) : 
+                uncheck_form_radio(tab_name.to_sym, field_name)
+      else
+        choose_yes_no(field_label, value)
+      end
+    else
+      fill_in_form(tab_name.to_sym, field_name, value) if value.present?
+    end
+  end
+  
+  def get_field_label(tab_name, field_name)
+    field_str = field_name.to_s
+    
+    if field_str.end_with?("_pass")
+      pass_key = "forms.#{tab_name}.fields.#{field_name}"
+      base_key = "forms.#{tab_name}.fields.#{field_str.chomp('_pass')}"
+      
+      I18n.exists?(pass_key) ? I18n.t(pass_key) : I18n.t(base_key)
+    else
+      I18n.t("forms.#{tab_name}.fields.#{field_name}")
     end
   end
 

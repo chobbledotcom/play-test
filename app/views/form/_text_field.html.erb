@@ -1,19 +1,14 @@
 <%
-  # Get i18n_base from section (already validated there)
   setup = form_field_setup(field, local_assigns)
 
-  # Form field options
   field_type = local_assigns[:type] || :text_field
   required ||= false
 
-  # Build field options
-  field_options = { required: required }
-  field_options[:accept] = local_assigns[:accept] if local_assigns[:accept]
-  if local_assigns.key?(:value)
-    field_options[:value] = local_assigns[:value]
-  elsif setup[:prefilled]
-    field_options[:value] = setup[:value]
-  end
+  field_options = {
+    required:,
+    accept: local_assigns[:accept],
+    value: setup[:value]
+  }
 %>
 
 <%= render 'form/field_wrapper', prefilled: setup[:prefilled], wrapper_class: 'text-field' do %>

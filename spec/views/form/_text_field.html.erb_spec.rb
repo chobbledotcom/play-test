@@ -13,16 +13,13 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
     }
   end
 
-  # Default render method with common setup
   def render_text_field(locals = {})
     render partial: "form/text_field", locals: {field: field}.merge(locals)
   end
 
   before do
-    # Mock the form field setup helper
     allow(view).to receive(:form_field_setup).and_return(field_config)
 
-    # Mock form builder methods with default behavior
     allow(mock_form).to receive(:label)
       .with(anything, anything)
       .and_return('<label for="name">Name</label>'.html_safe)
@@ -31,7 +28,6 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
       .with(anything, anything)
       .and_return('<input type="text" name="name" id="name" />'.html_safe)
 
-    # Set current i18n base for the partial
     view.instance_variable_set(:@_current_i18n_base, "test.forms")
   end
 
@@ -89,21 +85,8 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
 
     context "with placeholder" do
       it "does not pass placeholder to field (text_field partial doesn't support it)" do
-        # The _text_field partial doesn't actually use placeholder from field_config
-        # This test documents current behavior
         render_text_field
         expect(rendered).not_to include("placeholder=")
-      end
-    end
-
-    context "with custom value" do
-      it "sets the field value" do
-        allow(mock_form).to receive(:text_field)
-          .with(field, hash_including(value: "Custom Value"))
-          .and_return('<input type="text" value="Custom Value" />'.html_safe)
-
-        render_text_field(value: "Custom Value")
-        expect(rendered).to have_css('input[value="Custom Value"]')
       end
     end
 
@@ -120,13 +103,11 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
 
     context "with additional HTML attributes" do
       it "does not pass through data attributes (not supported by partial)" do
-        # The _text_field partial only supports specific attributes: required, accept, value
         render_text_field(data: {validate: "presence"})
         expect(rendered).not_to include("data-validate")
       end
 
       it "does not pass through class attribute (not supported by partial)" do
-        # The _text_field partial only supports specific attributes: required, accept, value
         render_text_field(class: "form-control custom-input")
         expect(rendered).not_to include('class="form-control')
       end
@@ -157,8 +138,6 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
   describe "error handling" do
     context "when field has errors" do
       it "does not handle error classes (not supported by partial)" do
-        # The _text_field partial doesn't add error classes
-        # Error handling would need to be implemented in the partial
         render_text_field
         expect(rendered).not_to include("field-with-errors")
       end

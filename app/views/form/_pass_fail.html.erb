@@ -12,8 +12,11 @@
   checked_value = field_data[:prefilled] ? field_data[:value] : nil
 %>
 
-<%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
-  <label><%= field_data[:field_label] %></label>
+<%= render 'form/field_wrapper',
+  prefilled: field_data[:prefilled],
+  wrapper_class: 'label' do
+%>
+  <label id="<%= field %>"><%= field_data[:field_label] %></label>
   <% options.each do |option_label, option_value| %>
     <label>
       <%= form.radio_button field, option_value,

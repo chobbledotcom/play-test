@@ -3,104 +3,152 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
     let(:user) { create(:user) }
     let(:unit) { create(:unit, user: user) }
     let(:inspection) do
-      # Create inspection with appropriate traits for assessment type
-      case assessment_type
-      when :enclosed
-        create(:inspection, :totally_enclosed, user: user, unit: unit)
-      when :slide
-        create(:inspection, user: user, unit: unit, has_slide: true)
-      else
-        create(:inspection, user: user, unit: unit)
-      end
+      options = { user: user, unit: unit }
+      options[:has_slide] = true if assessment_type == :slide
+      options.merge!(traits_for_assessment(assessment_type))
+      create(:inspection, **options)
     end
 
     before { sign_in(user) }
 
     it "saves all #{assessment_type} assessment fields correctly" do
-      # Visit the assessment tab
-      tab_name = (assessment_type == :user_height) ? "user_height" : assessment_type.to_s
-      visit edit_inspection_path(inspection, tab: tab_name)
+      visit_assessment_tab(assessment_type)
+      fill_assessment_fields(assessment_type, sample_data)
+      submit_and_verify(assessment_type, sample_data)
+    end
 
-      # Get i18n base for this assessment
-      i18n_base = "forms.#{assessment_type}"
+    private
 
-      # Get all field translations
+    def traits_for_assessment(type)
+      type == :enclosed ? { is_totally_enclosed: true } : {}
+    end
+
+    def visit_assessment_tab(type)
+      tab = type == :user_height ? "user_height" : type.to_s
+      visit edit_inspection_path(inspection, tab: tab)
+    end
+
+    def fill_assessment_fields(type, data)
+      i18n_base = "forms.#{type}"
       fields = I18n.t("#{i18n_base}.fields")
 
-      # Debug: print all radio button IDs on the page
-      if ENV["DEBUG"]
-        all('input[type="radio"]').each do |radio|
-          puts "Radio ID: #{radio[:id]}, Name: #{radio[:name]}, Value: #{radio[:value]}"
-        end
+      data.each do |field_key, value|
+        next if skip_field?(field_key, data)
+        
+        validate_field_exists(field_key, fields, i18n_base)
+        fill_field(field_key, value, fields, data)
       end
+    end
 
-      # Fill in each field based on sample data
-      sample_data.each do |field_key, value|
-        # Skip pass/fail field labels - they're handled by radio buttons
-        if field_key.to_s.end_with?("_pass")
-          # For pass/fail fields, find the radio button by ID
-          # The ID format is: field_name_true/false
-          radio_id = "#{field_key}_#{value}"
-          choose radio_id
-        else
-          # Raise error if field is not in i18n - we must have all fields defined
-          unless fields.key?(field_key) || field_key.to_s.end_with?("_comment")
-            raise "Field #{field_key} is in sample data but not in i18n at #{i18n_base}.fields.#{field_key}"
-          end
-
-          field_label = fields[field_key]
-
-          case value
-          when true, false
-            # For boolean fields that aren't _pass fields, use radio buttons
-            value ? check_radio(field_label) : uncheck_radio(field_label)
-          when Numeric
-            # For number fields
-            fill_in field_label, with: value.to_s
-          when String
-            # For text fields, handle comment fields specially
-            if field_key.to_s.end_with?("_comment")
-              # Find the comment field near the related field
-              base_field = field_key.to_s.chomp("_comment")
-              # First, ensure the comment field is visible by checking its checkbox if present
-              # The checkbox ID contains: #{field}_has_comment_
-              comment_checkbox = find("input[type='checkbox'][id*='#{base_field}_has_comment_']")
-              comment_checkbox.check unless comment_checkbox.checked?
-              # Then fill in the comment by finding the textarea with matching ID
-              # Use visible: :all to find hidden elements
-              comment_textarea = find("textarea[id*='#{base_field}_comment_textarea_']", visible: :all)
-              comment_textarea.set(value)
-            else
-              fill_in field_label, with: value
-            end
-          end
-        end
-      end
-
-      # Submit the form
-      click_button I18n.t("#{i18n_base}.submit")
-
+    def submit_and_verify(type, data)
+      click_button I18n.t("forms.#{type}.submit")
       expect_updated_message
+      verify_saved_values(inspection, type, data)
+    end
 
-      # Reload and get the assessment
+    def skip_field?(field_key, data)
+      return false unless field_key.to_s.end_with?("_pass")
+      
+      base_key = field_key.to_s.chomp("_pass").to_sym
+      data.key?(base_key) && data[base_key].is_a?(Numeric)
+    end
+
+    def validate_field_exists(field_key, fields, i18n_base)
+      return if fields.key?(field_key) || field_key.to_s.end_with?("_comment")
+      
+      raise "Field #{field_key} missing from #{i18n_base}.fields.#{field_key}"
+    end
+
+    def fill_field(field_key, value, fields, data)
+      field_label = fields[field_key]
+
+      case value
+      when true, false
+        fill_boolean_field(field_key, value, field_label, data)
+      when Numeric
+        fill_numeric_field(field_key, value, field_label, data)
+      when String
+        fill_string_field(field_key, value, fields)
+      end
+    end
+
+    def fill_boolean_field(field_key, value, label, data)
+      pass_key = "#{field_key}_pass".to_sym
+      
+      if data.key?(pass_key)
+        fill_in label, with: value.to_s
+        choose_pass_fail(label, data[pass_key])
+      else
+        choose_yes_no(label, value)
+      end
+    end
+
+    def fill_numeric_field(field_key, value, label, data)
+      fill_in label, with: value.to_s
+      
+      pass_key = "#{field_key}_pass".to_sym
+      choose_pass_fail(label, data[pass_key]) if data.key?(pass_key)
+    end
+
+    def fill_string_field(field_key, value, fields)
+      if field_key.to_s.end_with?("_comment")
+        fill_comment_field(field_key, value, fields)
+      else
+        fill_in fields[field_key], with: value
+      end
+    end
+
+    def fill_comment_field(field_key, value, fields)
+      base_key = field_key.to_s.chomp("_comment").to_sym
+      base_label = fields[base_key]
+      
+      if base_label
+        fill_comment_in_context(base_key, base_label, value)
+      else
+        fill_comment_directly(base_key, value)
+      end
+    end
+
+    def fill_comment_directly(base_key, value)
+      checkbox = find(:css, "input[type='checkbox'][id*='#{base_key}_has_comment_']")
+      checkbox.check unless checkbox.checked?
+      
+      textarea = find(:css, "textarea[id*='#{base_key}_comment_']", visible: :all)
+      textarea.set(value)
+    end
+
+    def fill_comment_in_context(base_key, base_label, value)
+      containers = ["form-grid", "pass-fail-comment", "number-pass-fail-comment"]
+      
+      containers.each do |container|
+        xpath = "//div[contains(@class, '#{container}')]"
+        xpath += "[.//label[normalize-space(.)='#{base_label}']]"
+        
+        begin
+          within(:xpath, xpath) do
+            checkbox = find(:css, "input[type='checkbox'][id*='_has_comment_']")
+            checkbox.check unless checkbox.checked?
+            
+            textarea = find(:css, "textarea[id*='_comment_']", visible: :all)
+            textarea.set(value)
+          end
+          return
+        rescue Capybara::ElementNotFound
+          next
+        end
+      end
+      
+      fill_comment_directly(base_key, value)
+    end
+
+    def verify_saved_values(inspection, assessment_type, sample_data)
       inspection.reload
       assessment = inspection.send("#{assessment_type}_assessment")
 
-      # Verify each field was saved correctly
-      sample_data.each do |field_key, expected_value|
-        actual_value = assessment.send(field_key)
-
-        case expected_value
-        when Float
-          expect(actual_value).to eq(expected_value),
-            "Expected #{field_key} to be #{expected_value} but got #{actual_value}"
-        when Integer
-          expect(actual_value).to eq(expected_value),
-            "Expected #{field_key} to be #{expected_value} but got #{actual_value}"
-        else
-          expect(actual_value).to eq(expected_value),
-            "Expected #{field_key} to be #{expected_value.inspect} but got #{actual_value.inspect}"
-        end
+      sample_data.each do |field_key, expected|
+        actual = assessment.send(field_key)
+        expect(actual).to eq(expected), 
+          "#{field_key}: expected #{expected.inspect}, got #{actual.inspect}"
       end
     end
   end

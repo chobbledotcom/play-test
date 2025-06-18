@@ -3,27 +3,23 @@ require "rails_helper"
 RSpec.describe AssessmentCompletion, type: :model do
   let(:inspection) { create(:inspection) }
   let(:assessment) { inspection.user_height_assessment }
+  let(:incomplete) { assessment.incomplete_fields }
+  let(:pass_fields) do
+    assessment.class.column_names.
+      select { |col| col.end_with?("_pass") }.
+      map(&:to_sym)
+  end
 
   describe "#incomplete_fields" do
     context "with a new assessment" do
       it "returns all required fields as incomplete" do
-        incomplete = assessment.incomplete_fields
-
-        expect(incomplete).to be_an(Array)
-        expect(incomplete).not_to be_empty
-
-        # Should include required measurements
-        expect(incomplete.map { |f| f[:field] }).to include(
+        expect(incomplete).to include(
           :containing_wall_height,
           :platform_height,
           :tallest_user_height
         )
-
-        # Should include pass/fail assessments that exist in the model
-        pass_fields = assessment.class.column_names.select { |col| col.end_with?("_pass") }.map(&:to_sym)
-        incomplete_fields = incomplete.map { |f| f[:field] }
         pass_fields.each do |field|
-          expect(incomplete_fields).to include(field)
+          expect(incomplete).to include(field)
         end
       end
     end
@@ -38,20 +34,13 @@ RSpec.describe AssessmentCompletion, type: :model do
       end
 
       it "only returns incomplete fields" do
-        incomplete = assessment.incomplete_fields
-
-        # Should not include completed measurements
-        expect(incomplete.map { |f| f[:field] }).not_to include(
+        expect(incomplete).not_to include(
           :containing_wall_height,
           :platform_height,
           :tallest_user_height
         )
-
-        # Should still include uncompleted pass/fail assessments
-        pass_fields = assessment.class.column_names.select { |col| col.end_with?("_pass") }.map(&:to_sym)
-        incomplete_fields = incomplete.map { |f| f[:field] }
         pass_fields.each do |field|
-          expect(incomplete_fields).to include(field)
+          expect(incomplete).to include(field)
         end
       end
     end
@@ -73,7 +62,6 @@ RSpec.describe AssessmentCompletion, type: :model do
       end
 
       it "returns an empty array" do
-        incomplete = assessment.incomplete_fields
         expect(incomplete).to be_empty
         expect(assessment).to be_complete
       end

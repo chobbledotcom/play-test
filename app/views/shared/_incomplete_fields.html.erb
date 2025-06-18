@@ -22,12 +22,23 @@
     <p><%= t(description_key) %></p>
 
     <ul class="incomplete-fields-list">
-      <% incomplete_fields.each do |field_info| %>
-        <li class="incomplete-field-item">
-          <a href="<%= field_info[:url] %>">
-            <%= field_info[:label] %>
-          </a>
+      <% incomplete_fields.each do |form| %>
+        <li>
+          <%= link_to t("forms.#{form[:tab]}.header"),
+            edit_inspection_path(
+              @inspection,
+              tab: form[:tab],
+              anchor: "tabs"
+            )
+          %>
         </li>
+        <% form[:fields].each do |field| %>
+          <li class="incomplete-field-item">
+            <a href="<%= field[:url] %>">
+              <%= field[:label] %>
+            </a>
+          </li>
+        <% end %>
       <% end %>
     </ul>
   </div>

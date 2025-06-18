@@ -17,12 +17,12 @@ en:
         unit_stable_pass: "Unit Stable"
         # Measurements
         stitch_length: "Stitch Length"
-        stitch_length_pass: "Stitch Length Pass/Fail"
+        stitch_length_pass: "Stitch Length"
         evacuation_time: "Evacuation Time"
-        evacuation_time_pass: "Evacuation Time Pass/Fail"
+        evacuation_time_pass: "Evacuation Time"
         unit_pressure: "Unit Pressure"
         blower_tube_length: "Blower Tube Length"
-        blower_tube_length_pass: "Blower Tube Length Pass/Fail"
+        blower_tube_length_pass: "Blower Tube Length"
         # Additional Safety Checks
         critical_fall_off_height: "Critical Fall Off Height (m)"
         step_ramp_size: "Step/Ramp Size (mm)"

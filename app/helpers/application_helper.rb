@@ -141,13 +141,13 @@ module ApplicationHelper
 
   def comment_field_options(form, comment_field, base_field_label)
     model = form.object
-    comment_value, comment_prefilled = get_field_value_and_prefilled_status(
-      form,
-      comment_field
-    )
+    comment_value, comment_prefilled =
+      get_field_value_and_prefilled_status(
+        form,
+        comment_field
+      )
 
-    actual_value = comment_prefilled ? comment_value : model.send(comment_field)
-    has_comment = actual_value.present? || (comment_prefilled && comment_value.present?)
+    has_comment = comment_value.present?
 
     base_field = comment_field.to_s.chomp("_comment")
 
@@ -156,17 +156,14 @@ module ApplicationHelper
     checkbox_id = "#{base_field}_has_comment_#{model.object_id}"
     display_style = has_comment ? "block" : "none"
 
-    options = {
-      rows: 2,
-      placeholder: placeholder_text,
-      id: textarea_id,
-      style: "display: #{display_style};"
-    }
-
-    options[:value] = comment_value if comment_prefilled
-
     {
-      options: options,
+      options: {
+        rows: 2,
+        placeholder: placeholder_text,
+        id: textarea_id,
+        style: "display: #{display_style};",
+        value: comment_value
+      },
       prefilled: comment_prefilled,
       has_comment: has_comment,
       checkbox_id: checkbox_id

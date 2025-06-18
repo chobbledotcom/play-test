@@ -1,6 +1,6 @@
 require "rails_helper"
 require "pdf/inspector"
-require_relative "../../db/seeds/seed_data"
+require_relative "../../../db/seeds/seed_data"
 
 RSpec.feature "PDF Field Coverage", type: :feature do
   let(:user) { create(:user) }

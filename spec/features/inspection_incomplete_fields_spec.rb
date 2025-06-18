@@ -43,9 +43,10 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
     expect(page).to have_content(I18n.t("forms.inspection.fields.inspection_location"))
 
-    section_name = I18n.t("forms.user_height.header")
-    field_name = I18n.t("forms.user_height.fields.tallest_user_height")
-    expect(page).to have_content("#{section_name}: #{field_name}")
+    within ".incomplete-fields-content" do
+      field_name = I18n.t("forms.user_height.fields.tallest_user_height")
+      expect(page).to have_content("#{field_name}")
+    end
   end
 
   scenario "does not show incomplete fields when inspection is complete" do

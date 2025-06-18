@@ -12,6 +12,7 @@ en:
         slide_permanent_roof: "Permanent Roof Fitted to Top of Slide?"
         clamber_netting_pass: "Steps / Clamber Netting"
         runout: "Slide Run Out"
+        runout_pass: "Slide Run Out"
         slip_sheet_pass: "Slip Sheet Integrity"
       status:
         runout_requirement: "Runout Requirement"

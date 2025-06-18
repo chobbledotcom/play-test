@@ -158,7 +158,6 @@ All forms must follow these exact patterns:
    <%= render 'form/form_context', model: @model, i18n_base: 'forms.name' do |form| %>
      <%= render 'form/fieldset', legend_key: 'section_name' do %>
        <%= render 'form/text_field', field: :field_name %>
-       <%= render 'form/number_comment', field: :measurement %>
        <%= render 'form/pass_fail_comment', field: :check_name %>
      <% end %>
    <% end %>

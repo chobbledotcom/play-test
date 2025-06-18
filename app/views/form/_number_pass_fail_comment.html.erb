@@ -26,23 +26,26 @@
 
   # Get field label from i18n
   field_data = form_field_setup(field, local_assigns)
+  number_options[:value] = field_data[:value]
 
   # Get pass/fail field data - don't use form_field_setup as it doesn't have its own label
-  pass_fail_value, pass_fail_prefilled = get_field_value_and_prefilled_status(form, pass_fail_field)
+  pass_fail_value, pass_fail_prefilled = get_field_value_and_prefilled_status(
+    form,
+    pass_fail_field
+  )
   pass_fail_checked = pass_fail_prefilled ? pass_fail_value : nil
 
   # Get comment field options
-  comment_info = comment_field_options(form, comment_field, field_data[:field_label])
-
-  # Add prefilled value to number options if needed
-  if field_data[:prefilled]
-    number_options[:value] = field_data[:value]
-  end
+  comment_info = comment_field_options(
+    form,
+    comment_field,
+    field_data[:field_label]
+  )
 %>
 
 <div class="form-grid number-pass-fail-comment">
   <!-- Label with number field -->
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'number-label' do %>
+  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
     <label for="<%= form.field_id(number_field) %>">
       <%= field_data[:field_label] %>
     </label>

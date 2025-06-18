@@ -27,38 +27,45 @@
 %>
 
 <div class="form-grid pass-fail-comment">
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
-    <label>
+  <%= render 'form/field_wrapper',
+    prefilled: field_data[:prefilled],
+    wrapper_class: 'label' do
+  %>
+    <label id="<%= field %>">
       <%= field_data[:field_label] %>
     </label>
   <% end %>
 
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'pass' do %>
+  <%= render 'form/field_wrapper',
+    prefilled: field_data[:prefilled],
+    wrapper_class: 'pass' do
+  %>
     <label for="<%= pass_fail_field %>_true">
       <%= t('shared.pass') %>
-      <%= form.radio_button pass_fail_field, true,
-          { id: "#{pass_fail_field}_true" }.merge(
-            radio_button_options(field_data[:prefilled], checked_value, true)
-          ) %>
+      <%= form.radio_button pass_fail_field,
+        true,
+        radio_button_options(field_data[:prefilled], checked_value, true)
+      %>
     </label>
   <% end %>
 
   <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'fail' do %>
     <label for="<%= pass_fail_field %>_false">
-      <%= form.radio_button pass_fail_field, false,
-          { id: "#{pass_fail_field}_false" }.merge(
-            radio_button_options(field_data[:prefilled], checked_value, false)
-          ) %>
+      <%= form.radio_button pass_fail_field,
+        false,
+        radio_button_options(field_data[:prefilled], checked_value, false)
+      %>
       <%= t('shared.fail') %>
     </label>
   <% end %>
 
   <%= render 'form/comment_checkbox',
-      comment_field: comment_field,
-      checkbox_id: comment_info[:checkbox_id],
-      textarea_id: comment_info[:options][:id],
-      has_comment: comment_info[:has_comment],
-      prefilled: comment_info[:prefilled] %>
+    comment_field: comment_field,
+    checkbox_id: comment_info[:checkbox_id],
+    textarea_id: comment_info[:options][:id],
+    has_comment: comment_info[:has_comment],
+    prefilled: comment_info[:prefilled]
+  %>
 
   <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled], wrapper_class: 'comment' do %>
     <%= form.text_area comment_field, comment_info[:options] %>

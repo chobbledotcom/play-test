@@ -2,6 +2,7 @@
 import "@hotwired/turbo-rails";
 import "comment_toggles";
 import "decimal_fields";
+import "details_links";
 import "dirty_forms";
 import "share_buttons";
 

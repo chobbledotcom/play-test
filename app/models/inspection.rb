@@ -256,31 +256,47 @@ class Inspection < ApplicationRecord
     Rails.logger.info(message)
   end
 
-  def incomplete_fields
-    fields = []
+  def field_label(form, field)
+    key = "forms.#{form}.fields.#{field}"
+    I18n.t(key, default: nil) || I18n.t(key.gsub(/_pass$/, ""))
+  end
 
-    REQUIRED_TO_COMPLETE_FIELDS.each do |field|
-      fields << {
-        field: field,
-        label: I18n.t("forms.inspection.fields.#{field}")
+  def inspection_model_incomplete_fields
+    REQUIRED_TO_COMPLETE_FIELDS.
+      select {|f| !f.end_with?("_comment")}.
+      select {|f| send(f) == nil}
+  end
+
+  def incomplete_fields
+    inspection_fields =
+      inspection_model_incomplete_fields.
+        map {|f| { field: f, label: field_label(:inspection, f)}}
+
+    output = []
+    if inspection_fields.any?
+      output << {
+        tab: :inspection,
+        name: I18n.t("forms.inspection.header"),
+        fields: inspection_fields
       }
     end
 
     each_applicable_assessment do |assessment_key, _, assessment|
       next unless assessment
-
-      assessment_type = assessment_key.to_s.sub("_assessment", "")
-      section_name = I18n.t("forms.#{assessment_type}.header")
-
-      assessment.incomplete_fields.each do |field_info|
-        fields << {
-          field: field_info[:field],
-          label: "#{section_name}: #{field_info[:label]}"
+      form = assessment_key.to_s.gsub(/_assessment$/, "").to_sym
+      assessment_fields =
+        assessment.incomplete_fields.
+          map {|f| { field: f, label: field_label(form, f) }}
+      if assessment_fields.any?
+        output << {
+          tab: form,
+          name: I18n.t("forms.inspection.header"),
+          fields: assessment_fields
         }
       end
     end
 
-    fields
+    output
   end
 
   private
