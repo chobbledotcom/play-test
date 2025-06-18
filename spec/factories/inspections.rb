@@ -81,7 +81,7 @@ FactoryBot.define do
         Inspection::ASSESSMENT_TYPES.each_key do |assessment_type|
           assessment = inspection.send(assessment_type)
           assessment_factory = assessment_type.to_s.sub(/_assessment$/, "").to_sym
-          complete_attrs = attributes_for("#{assessment_factory}_assessment".to_sym, :complete)
+          complete_attrs = attributes_for(:"#{assessment_factory}_assessment", :complete)
           assessment.update!(complete_attrs.except(:inspection_id))
         end
       end

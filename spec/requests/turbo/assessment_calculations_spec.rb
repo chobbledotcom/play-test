@@ -23,7 +23,7 @@ RSpec.describe "Assessment Safety Calculations", type: :request do
 
     it "updates slide runout calculations" do
       inspection.slide_assessment.update!(slide_platform_height: 2.0)
-      
+
       patch inspection_slide_assessment_path(inspection),
         params: {
           assessments_slide_assessment: {

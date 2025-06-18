@@ -5,7 +5,7 @@ module UserActivityCheck
 
   def require_user_active
     return if current_user.is_active?
-    
+
     flash[:alert] = current_user.inactive_user_message
     handle_inactive_user_redirect
   end

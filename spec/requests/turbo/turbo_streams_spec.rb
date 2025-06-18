@@ -46,7 +46,7 @@ RSpec.describe "Turbo Streams", type: :request do
 
     it "redirects completed inspections" do
       completed = create(:inspection, :completed, user: user)
-      
+
       patch inspection_path(completed),
         params: {inspection: {inspection_location: "Test"}},
         headers: turbo_headers
@@ -74,10 +74,10 @@ RSpec.describe "Turbo Streams", type: :request do
           patch path, params: params, headers: turbo_headers
 
           expect(response.body).to include("mark_complete_section")
-          
+
           # Only some assessments have safety results
           if %i[anchorage_assessment slide_assessment user_height_assessment].include?(assessment_type)
-            frame_name = assessment_type.to_s.gsub('_assessment', '')
+            frame_name = assessment_type.to_s.gsub("_assessment", "")
             expect(response.body).to include("#{frame_name}_safety_results")
           end
         end

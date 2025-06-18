@@ -185,7 +185,7 @@ RSpec.describe "Inspections", type: :request do
           expect {
             post "/inspections", params: {inspection: valid_inspection_attributes}
           }.not_to change(Inspection, :count)
-          
+
           # The inactive user should be redirected and prevented from creating
           expect_redirect_with_alert(inspections_path)
         end

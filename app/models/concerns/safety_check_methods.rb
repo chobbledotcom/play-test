@@ -3,7 +3,7 @@ module SafetyCheckMethods
 
   included do
     # Automatically validate all _pass fields across all assessment models
-    column_names&.select { |name| name.end_with?("_pass") }.each do |pass_field|
+    column_names&.select { |name| name.end_with?("_pass") }&.each do |pass_field|
       validates pass_field.to_sym, inclusion: {in: [true, false]}, allow_nil: true
     end
   end

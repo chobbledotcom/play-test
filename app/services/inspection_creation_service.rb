@@ -38,7 +38,6 @@ class InspectionCreationService
     NtfyService.notify("new inspection by #{@user.email}")
   end
 
-
   def invalid_unit_result
     {
       success: false,
@@ -49,21 +48,29 @@ class InspectionCreationService
   end
 
   def success_result(inspection, unit)
+    message_key = unit.nil? ? "created_without_unit" : "created"
     {
       success: true,
       inspection: inspection,
-      message: unit.nil? ? I18n.t("inspections.messages.created_without_unit") : I18n.t("inspections.messages.created"),
+      message: I18n.t("inspections.messages.#{message_key}"),
       redirect_path: "/inspections/#{inspection.id}/edit"
     }
   end
 
   def failure_result(inspection)
     error_messages = inspection.errors.full_messages.join(", ")
+    redirect_path = build_failure_redirect_path(inspection)
+
     {
       success: false,
       error_type: :validation_failed,
-      message: I18n.t("inspections.errors.creation_failed", errors: error_messages),
-      redirect_path: inspection.unit.present? ? "/units/#{inspection.unit.id}" : "/"
+      message: I18n.t("inspections.errors.creation_failed",
+        errors: error_messages),
+      redirect_path: redirect_path
     }
+  end
+
+  def build_failure_redirect_path(inspection)
+    inspection.unit.present? ? "/units/#{inspection.unit.id}" : "/"
   end
 end
