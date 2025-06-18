@@ -119,7 +119,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
 
     expect(page).to have_content("View Ruby Source Code")
     expect(page).to have_content("Method: calculate_required_anchors")
-    expect(page).to have_content("Source: app/models/safety_standard.rb")
+    expect(page).to have_content("Source: app/services/safety_standard.rb")
 
     within(".calculator-form", text: I18n.t("safety_standards.calculators.anchor.title")) do
       fill_in "Area (m²):", with: "16.0"

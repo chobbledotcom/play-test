@@ -113,7 +113,7 @@ RSpec.describe SafetyStandard, "Constants" do
   describe "no magic numbers remain" do
     it "uses constants throughout the codebase" do
       # Verify no hardcoded magic numbers in key calculations
-      source_file = File.read(Rails.root.join("app/models/safety_standard.rb"))
+      source_file = File.read(Rails.root.join("app/services/safety_standard.rb"))
 
       # These magic numbers should no longer appear in calculation methods
       # (except in the constants definitions themselves)
