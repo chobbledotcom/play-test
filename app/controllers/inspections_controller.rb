@@ -40,7 +40,6 @@ class InspectionsController < ApplicationController
 
   def create
     unit_id = params[:unit_id] || params.dig(:inspection, :unit_id)
-
     result = InspectionCreationService.new(
       current_user,
       unit_id: unit_id
@@ -387,14 +386,16 @@ class InspectionsController < ApplicationController
     is_seed
     passed
     unique_report_number
-    unit
+    unit_id
     updated_at
     user_id
   ]
 
   def set_previous_inspection
     @previous_inspection = @inspection.unit&.last_inspection
-    return unless @previous_inspection
+    if !@previous_inspection || @previous_inspection.id == @inspection.id
+      return
+    end
 
     @prefilled_fields = []
 
@@ -404,17 +405,11 @@ class InspectionsController < ApplicationController
       previous_object = @previous_inspection
       column_names = Inspection.column_names
     else
-      # Use safe mapping instead of dynamic send
       assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
-      return unless assessment_method
-
       current_object = @inspection.public_send(assessment_method)
       previous_object = @previous_inspection.public_send(assessment_method)
 
-      # Use safe class lookup instead of constantize
       assessment_class = ASSESSMENT_CLASS_MAPPING[params[:tab]]
-      return unless assessment_class
-
       column_names = assessment_class.column_names
     end
 
@@ -422,7 +417,7 @@ class InspectionsController < ApplicationController
       next if NOT_COPIED_FIELDS.include? field
 
       next if previous_object&.send(field).nil?
-      next if current_object.send(field).nil?
+      next unless current_object.send(field).nil?
 
       is_comment = field.end_with?("_comment")
       is_pass = field.end_with?("_pass")
