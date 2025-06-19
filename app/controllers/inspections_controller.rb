@@ -378,14 +378,17 @@ class InspectionsController < ApplicationController
   end
 
   NOT_COPIED_FIELDS = %w[
-    id
     complete_date
     created_at
-    updated_at
+    id
     inspection_date
     inspection_id
     inspector_company_id
+    is_seed
     passed
+    unique_report_number
+    unit
+    updated_at
     user_id
   ]
 
