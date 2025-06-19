@@ -114,8 +114,8 @@ class Inspection < ApplicationRecord
   end
 
   def area
-    return nil unless width && height
-    width * height
+    return nil unless width && length
+    width * length
   end
 
   # Check if inspection is complete (not draft)
