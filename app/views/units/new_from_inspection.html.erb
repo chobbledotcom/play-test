@@ -1,10 +1,16 @@
 <%= render 'shared/page_header', title: t("units.titles.new_from_inspection") %>
 
-<%= render 'form/form_context', model: @unit, i18n_base: 'forms.units', url: create_unit_from_inspection_path(@inspection) do |form| %>
-  <%= render 'shared/unit_details_form', form: form, object: @unit, i18n_base: 'forms.units', show_photo: true %>
-  
-  <!-- Save Message Display -->
-  <div id="unit_save_message"></div>
+<%= render 'form/form_context',
+  model: @unit,
+  i18n_base: 'forms.units',
+  url: create_unit_from_inspection_path(@inspection) do |form|
+%>
+  <%= render 'shared/unit_details_form',
+    form: form,
+    object: @unit,
+    i18n_base: 'forms.units',
+    show_photo: true
+  %>
 <% end %>
 
 <%= link_to t("shared.buttons.cancel"), inspection_path(@inspection) %>

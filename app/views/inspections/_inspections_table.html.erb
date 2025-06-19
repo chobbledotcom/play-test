@@ -1,19 +1,16 @@
 <%
-  # Options for customizing the table display
+  show_photo = local_assigns.fetch(:show_photo, false)
   show_name = local_assigns.fetch(:show_name, true)
   show_serial = local_assigns.fetch(:show_serial, true)
   show_location = local_assigns.fetch(:show_location, true)
   show_inspector = local_assigns.fetch(:show_inspector, false)
   context_unit = local_assigns[:unit] # If provided, we're showing inspections for a specific unit
-
-  # Check if any inspections are drafts
-  has_drafts = inspections.any? { |i| !i.complete? }
 %>
 
 <div class="table-list inspections-list">
   <!-- Header row -->
   <div class="table-list-header">
-    <% if has_drafts %>
+    <% if show_photo %>
       <span class="col-photo"><%= t('units.fields.photo') %></span>
     <% end %>
     <% if show_name %>
@@ -26,7 +23,6 @@
       <span class="col-location"><%= t('inspections.fields.inspection_location') %></span>
     <% end %>
     <span class="col-last-inspection"><%= t('inspections.fields.last_inspection') %></span>
-    <span class="col-next-due"><%= t('inspections.fields.next_due') %></span>
     <% if show_inspector %>
       <span class="col-inspector"><%= t('inspections.fields.inspector') %></span>
     <% end %>
@@ -37,7 +33,6 @@
   <ul class="table-list-items">
     <% inspections.each do |inspection| %>
       <%
-        # Route to edit page for draft inspections, view page for complete
         target_path =
           inspection.complete? ?
             inspection_path(inspection, anchor: "main") :
@@ -45,7 +40,7 @@
       %>
       <li>
         <%= link_to target_path, class: "table-list-link" do %>
-          <% if has_drafts %>
+          <% if show_photo %>
             <span class="col-photo" data-label="<%= t('units.fields.photo') %>">
               <% if !inspection.complete? && inspection.unit&.photo&.attached? %>
                 <%= render 'shared/image',
@@ -74,7 +69,6 @@
             <span class="col-location" data-label="<%= t('inspections.fields.inspection_location') %>"><%= inspection.inspection_location %></span>
           <% end %>
           <span class="col-last-inspection" data-label="<%= t('inspections.fields.last_inspection') %>"><%= render_time(inspection.inspection_date) %></span>
-          <span class="col-next-due" data-label="<%= t('inspections.fields.next_due') %>"><%= render_time(inspection.reinspection_date) %></span>
           <% if show_inspector %>
             <span class="col-inspector" data-label="<%= t('inspections.fields.inspector') %>"><%= inspection.inspector_company&.name %></span>
           <% end %>

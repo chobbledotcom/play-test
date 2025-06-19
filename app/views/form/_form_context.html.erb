@@ -26,7 +26,6 @@
 
 <% if model
   form_options[:model] = model
-  # For namespaced models like Assessments::SlideAssessment, use just the base name
   model_class_name = model.class.name
   if model_class_name.include?('::')
     form_options[:as] = model_class_name.demodulize.underscore.to_sym
@@ -36,21 +35,20 @@ elsif scope
 end %>
 
 <%= form_with(**form_options) do |form| %>
-  <%= render "shared/page_header", title: I18n.t("#{i18n_base}.header") %>
+  <%= render "shared/page_header",
+    title: I18n.t("#{i18n_base}.header")
+  %>
 
-  <%# Set the current form context for all child partials %>
   <% @_current_form = form %>
   <% @_current_i18n_base = i18n_base %>
 
-  <%# Automatically render errors at the top if model has errors %>
-  <% if model && model.respond_to?(:errors) && model.errors.any? %>
-    <%= render 'form/errors', model: model %>
-  <% end %>
-
-  <%# Automatically render completion stats for assessments %>
   <% if model && model.persisted? && model.respond_to?(:pass_columns_count) && model.pass_columns_count > 0 %>
     <div class="assessment-summary">
-      <h4><%= I18n.t("#{i18n_base}.summary.title", default: "Assessment Summary") %></h4>
+      <h4>
+        <%= I18n.t("#{i18n_base}.summary.title",
+          default: "Assessment Summary")
+        %>
+      </h4>
       <div class="safety-status">
         <strong><%= I18n.t("shared.assessment_completion") %>:</strong>
         <span class="checks-count">
@@ -62,7 +60,10 @@ end %>
 
   <%= yield form %>
 
-  <%# Every form needs a submit button - include it automatically %>
+  <% if model && model.respond_to?(:errors) && model.errors.any? %>
+    <%= render 'form/errors', model: model %>
+  <% end %>
+
   <fieldset>
     <%= render 'form/submit_button' %>
   </fieldset>

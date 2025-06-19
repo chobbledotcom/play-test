@@ -23,10 +23,10 @@ module UnitTurboStreams
   end
 
   def build_save_message_stream(success:, message:, errors: nil)
-    turbo_stream.replace("unit_save_message",
+    turbo_stream.replace("form_save_message",
       partial: "shared/save_message",
       locals: {
-        dom_id: "unit_save_message",
+        dom_id: "form_save_message",
         success: success,
         success_message: success ? message : nil,
         errors: errors,

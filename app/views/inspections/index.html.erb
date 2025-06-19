@@ -22,7 +22,10 @@
 
 <% if @draft_inspections.any? %>
   <h2><%= t('inspections.headings.in_progress') %></h2>
-  <%= render 'inspections_table', inspections: @draft_inspections %>
+  <%= render 'inspections_table',
+    inspections: @draft_inspections,
+    show_photo: true
+  %>
   <hr>
   <h2><%= t('inspections.headings.completed') %></h2>
 <% end %>

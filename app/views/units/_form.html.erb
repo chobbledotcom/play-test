@@ -1,6 +1,11 @@
-<%= render 'form/form_context', model: @unit, i18n_base: 'forms.units' do |form| %>
-  <%= render 'shared/unit_details_form', form: form, object: @unit, i18n_base: 'forms.units', show_photo: true %>
-  
-  <!-- Save Message Display -->
-  <div id="unit_save_message"></div>
+<%= render 'form/form_context',
+  model: @unit,
+  i18n_base: 'forms.units' do |form|
+%>
+  <%= render 'shared/unit_details_form',
+    form: form,
+    object: @unit,
+    i18n_base: 'forms.units',
+    show_photo: true
+  %>
 <% end %>

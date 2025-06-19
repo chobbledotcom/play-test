@@ -10,13 +10,16 @@ module UnitsHelper
   def unit_actions(unit)
     actions = [
       {
+        label: I18n.t("units.buttons.view"),
+        url: unit_path(unit, anchor: "inspections")
+      },
+      {
         label: I18n.t("ui.edit"),
         url: edit_unit_path(unit)
       },
       {
         label: I18n.t("units.buttons.pdf_report"),
-        url: unit_path(unit, format: :pdf),
-        target: "_blank"
+        url: unit_path(unit, format: :pdf)
       }
     ]
 

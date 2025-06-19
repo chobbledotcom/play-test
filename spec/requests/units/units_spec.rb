@@ -641,7 +641,7 @@ RSpec.describe "Units", type: :request do
 
       expect(response).to have_http_status(:success)
       expect(response.content_type).to include("turbo-stream")
-      expect(response.body).to include("unit_save_message")
+      expect(response.body).to include("form_save_message")
     end
   end
 

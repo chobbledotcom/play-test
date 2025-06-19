@@ -79,7 +79,7 @@ RSpec.describe UnitsHelper, type: :helper do
     it "returns array of action hashes" do
       actions = helper.unit_actions(unit)
       expect(actions).to be_an(Array)
-      expect(actions.length).to eq(4)
+      expect(actions.length).to eq(5)
     end
 
     it "includes edit action" do
@@ -96,7 +96,6 @@ RSpec.describe UnitsHelper, type: :helper do
 
       expect(pdf_action).to be_present
       expect(pdf_action[:url]).to eq(unit_path(unit, format: :pdf))
-      expect(pdf_action[:target]).to eq("_blank")
     end
 
     it "includes delete action with danger flag" do

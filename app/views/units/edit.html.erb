@@ -1,19 +1,19 @@
 <header>
   <h1><%= t('units.titles.edit') %></h1>
-  <nav>
-    <%= link_to t('units.buttons.pdf_report'), unit_path(@unit, format: :pdf) %>
-  </nav>
 </header>
-
-<article>
-  <%= render 'form' %>
-  <% if @unit.deletable? %>
-    <%= button_to t('units.buttons.delete'), 
-      unit_path(@unit), 
-      method: :delete, 
-      data: { turbo_confirm: t('units.messages.delete_confirm') }
-    %>
-  <% else %>
-    <%= t("units.messages.not_deletable") %>
-  <% end %>
-</article>
+<%= render 'shared/action_buttons', actions: unit_actions(@unit) %>
+<hr>
+<%= render 'unit_details', unit: @unit %>
+<hr id="form">
+<%= render 'form' %>
+<% if @unit.deletable? %>
+  <%= button_to t('units.buttons.delete'),
+    unit_path(@unit),
+    method: :delete,
+    data: { turbo_confirm: t('units.messages.delete_confirm') }
+  %>
+<% else %>
+  <div class="error">
+    <p><%= t("units.messages.not_deletable") %></p>
+  </div>
+<% end %>

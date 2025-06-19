@@ -95,6 +95,7 @@ en:
       select_prompt: "Select condition..."
 
     buttons:
+      view: "View Inspections"
       create: "Create Unit"
       update: "Update Unit"
       delete: "Delete"
