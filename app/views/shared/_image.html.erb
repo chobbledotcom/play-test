@@ -2,26 +2,28 @@
   # Shared image partial for consistent image rendering
   # Required locals: image (ActiveStorage attachment)
   # Optional locals: size (:thumbnail or :full), alt (alt text)
-  
+
   image_attachment = local_assigns[:image]
   size = local_assigns[:size] || :thumbnail
   alt_text = local_assigns[:alt] || ""
-  
+
   return unless image_attachment&.attached?
-  
-  # Don't try to display images that aren't persisted yet (validation failures)  
+
+  # Don't try to display images that aren't persisted yet (validation failures)
   return unless image_attachment.blob.persisted?
-  
+
   begin
     variant = case size
     when :full
       ImageProcessorService.full_size(image_attachment)
-    else
+    when :thumbnail
       ImageProcessorService.thumbnail(image_attachment)
+    else
+      ImageProcessorService.default(image_attachment)
     end
 %>
 
-<%= image_tag variant, 
+<%= image_tag variant,
     alt: alt_text,
     loading: "lazy",
     decoding: "async" %>

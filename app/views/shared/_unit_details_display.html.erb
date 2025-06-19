@@ -1,22 +1,21 @@
 <!-- Unit Details Display -->
 <div class="unit-details-display">
   <% if unit.photo.attached? %>
-    <div class="unit-photo-small">
-      <%= render 'shared/image',
-          image: unit.photo,
-          size: :thumbnail,
-          alt: "Photo of #{unit.name}" %>
-    </div>
+    <%= render 'shared/image',
+      image: unit.photo,
+      size: :default,
+      alt: "Photo of #{unit.name}"
+    %>
   <% end %>
 
   <p><strong><%= t('inspections.fields.name') %>:</strong> <%= link_to unit.name, edit_unit_path(unit) %></p>
   <p><strong><%= t('inspections.fields.serial') %>:</strong> <%= unit.serial %></p>
   <p><strong><%= t('inspections.fields.manufacturer') %>:</strong> <%= unit.manufacturer %></p>
-  
+
   <% if unit.owner.present? %>
     <p><strong><%= t('inspections.fields.owner') %>:</strong> <%= unit.owner %></p>
   <% end %>
-  
+
   <% if unit.description.present? %>
     <p><strong><%= t('inspections.fields.description') %>:</strong> <%= unit.description %></p>
   <% end %>

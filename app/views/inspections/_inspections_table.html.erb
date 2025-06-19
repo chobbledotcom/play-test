@@ -5,7 +5,7 @@
   show_location = local_assigns.fetch(:show_location, true)
   show_inspector = local_assigns.fetch(:show_inspector, false)
   context_unit = local_assigns[:unit] # If provided, we're showing inspections for a specific unit
-  
+
   # Check if any inspections are drafts
   has_drafts = inspections.any? { |i| !i.complete? }
 %>
@@ -32,13 +32,16 @@
     <% end %>
     <span class="col-result"><%= t('inspections.fields.result') %></span>
   </div>
-  
+
   <!-- Data rows -->
   <ul class="table-list-items">
     <% inspections.each do |inspection| %>
-      <% 
+      <%
         # Route to edit page for draft inspections, view page for complete
-        target_path = inspection.complete? ? inspection_path(inspection) : edit_inspection_path(inspection)
+        target_path =
+          inspection.complete? ?
+            inspection_path(inspection, anchor: "main") :
+            edit_inspection_path(inspection, anchor: "main")
       %>
       <li>
         <%= link_to target_path, class: "table-list-link" do %>

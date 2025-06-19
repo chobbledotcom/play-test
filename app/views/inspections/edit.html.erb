@@ -26,7 +26,21 @@
       </ul>
     </nav>
 
-    <div class="tab-content">
+    <% if @prefilled_fields&.any? %>
+      <div class="prefilled-message">
+        <p>
+          <strong>The following fields have been pre-filled from the last completed inspection for this unit:</strong>
+        </p>
+        <ul>
+          <% @prefilled_fields.each do |field| %>
+            <li><%= field %></li>
+          <% end %>
+        </ul>
+        <p>They haven't been saved to this inspection yet - you might want to change them before pressing the save button below.</p>
+      </div>
+    <% end %>
+
+    <div class="edit-inspection">
       <% case current_tab %>
       <% when 'inspection' %>
         <%= render 'inspections/form' %>

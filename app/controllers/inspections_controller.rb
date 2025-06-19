@@ -366,5 +366,42 @@ class InspectionsController < ApplicationController
   def set_previous_inspection
     return unless @inspection.unit
     @previous_inspection = @inspection.unit.last_inspection
+
+    @prefilled_fields = []
+
+    case params[:tab]
+    when "inspection", "", nil
+      current_object = @inspection
+      previous_object = @previous_inspection
+      column_names = Inspection.column_names
+    else
+      current_object = @inspection.send("#{params[:tab]}_assessment")
+      previous_object = @previous_inspection.send("#{params[:tab]}_assessment")
+      column_names =
+        "Assessments::#{params[:tab].camelize}Assessment".
+          constantize.
+          column_names
+    end
+
+    column_names.each do |field|
+      next if field == "complete_date"
+      if previous_object.send(field) != nil && current_object.send(field) == nil
+        is_comment = field.end_with?("_comment")
+        is_pass = field.end_with?("_comment")
+        field_base = field.gsub(/_(comment|pass)$/, "")
+        i18n_base = "forms.#{params[:tab]}.fields"
+
+        translated = I18n.t("#{i18n_base}.#{field_base}", default: nil)
+        translated ||= I18n.t("#{i18n_base}.#{field_base}_pass")
+
+        if is_comment
+          translated += " (#{I18n.t("shared.comment")})"
+        elsif is_pass
+          translated += " (#{I18n.t("shared.pass")}/#{I18n.t("shared.fail")})"
+        end
+
+        @prefilled_fields << translated
+      end
+    end
   end
 end

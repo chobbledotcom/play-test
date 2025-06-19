@@ -80,12 +80,12 @@ RSpec.describe ImageProcessorService do
 
   describe ".default" do
     context "when image is attached" do
-      it "returns a 600px default variant without upscaling" do
+      it "returns a 800px default variant without upscaling" do
         variant = described_class.default(unit.photo)
 
         expect(variant).to be_a(ActiveStorage::VariantWithRecord)
         expect(variant.variation.transformations).to include(
-          resize_to_limit: [600, 600],
+          resize_to_limit: [800, 800],
           format: :jpeg,
           saver: {quality: 75}
         )
@@ -112,7 +112,7 @@ RSpec.describe ImageProcessorService do
     it "has correct size constants" do
       expect(ImageProcessorService::FULL_SIZE).to eq(1200)
       expect(ImageProcessorService::THUMBNAIL_SIZE).to eq(200)
-      expect(ImageProcessorService::DEFAULT_SIZE).to eq(600)
+      expect(ImageProcessorService::DEFAULT_SIZE).to eq(800)
     end
   end
 end

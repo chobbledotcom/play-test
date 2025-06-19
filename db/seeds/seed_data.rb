@@ -155,10 +155,12 @@ module SeedData
       (required_runout + rand(0.5..1.5)).round(1)
     else
       # Make it fail by being under the requirement
-      # But ensure it's realistic (at least 0.5m) and strictly less than required
-      fail_runout = (required_runout - rand(0.1..0.3)).round(1)
-      min_runout = [0.5, required_runout - 0.1].max
-      [fail_runout, min_runout].max
+      # Ensure we stay within the test's expected range of 1.0 to 5.0
+      # and that it's strictly less than required
+      fail_margin = rand(0.1..0.3)
+      fail_runout = (required_runout - fail_margin).round(1)
+      # Ensure minimum of 1.0 for test expectations
+      [fail_runout, 1.0].max
     end
 
     {

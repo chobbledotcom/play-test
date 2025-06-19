@@ -1,7 +1,7 @@
 class ImageProcessorService
   FULL_SIZE = 1200
   THUMBNAIL_SIZE = 200
-  DEFAULT_SIZE = 600
+  DEFAULT_SIZE = 800
 
   def self.full_size(image)
     return nil unless image&.attached?

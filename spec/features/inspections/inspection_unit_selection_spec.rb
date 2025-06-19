@@ -14,7 +14,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
     before { visit edit_inspection_path(inspection) }
 
     it "shows current unit details and change unit link" do
-      within ".tab-content" do
+      within ".edit-inspection" do
         expect_unit_details(unit1)
         expect(page).to have_link(I18n.t("inspections.buttons.change_unit"))
         expect(page).to have_link(unit1.name, href: edit_unit_path(unit1))
@@ -79,7 +79,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
       expect(page).to have_current_path(edit_inspection_path(inspection))
       expect(page).to have_content(I18n.t("inspections.messages.unit_changed", unit_name: unit2.name))
 
-      within ".tab-content" do
+      within ".edit-inspection" do
         expect_unit_details(unit2)
       end
 
@@ -94,7 +94,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
     before { visit edit_inspection_path(inspection_no_unit) }
 
     it "shows select unit link instead of change unit" do
-      within ".tab-content" do
+      within ".edit-inspection" do
         expect(page).to have_content(I18n.t("inspections.messages.no_unit"))
         expect(page).to have_link(I18n.t("inspections.buttons.select_unit"))
         expect(page).not_to have_link(I18n.t("inspections.buttons.change_unit"))
