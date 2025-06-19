@@ -19,7 +19,7 @@ RSpec.feature "Inspection Prefilling", type: :feature do
     expect(page).to have_content(I18n.t("inspections.titles.edit"))
 
     new_inspection = unit.inspections.order(:inspection_date).last
-    expect(new_inspection.width).to eq(nil)
+    expect(new_inspection.width).to eq(55555)
     expect(page).to have_current_path(edit_inspection_path(new_inspection))
 
     location_field = find_form_field(:inspection, :inspection_location)
@@ -29,7 +29,7 @@ RSpec.feature "Inspection Prefilling", type: :feature do
     # Just verify the field has the prefilled value
 
     width_field = find_form_field(:inspection, :width)
-    expect(width_field.value).to eq("55555")
+    expect(width_field.value).to eq("55555.0")
 
     click_button I18n.t("forms.inspection.submit")
     expect_updated_message

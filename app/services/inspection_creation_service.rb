@@ -24,17 +24,29 @@ class InspectionCreationService
     @user.units.find_by(id: @unit_id)
   end
 
+  COPY_FROM_LAST_INSPECTION_FIELDS = %i[
+    has_slide
+    is_totally_enclosed
+    length
+    width
+    height
+  ]
+
   def build_inspection(unit)
-    has_slide = unit&.last_inspection&.has_slide
-    is_totally_enclosed = unit&.last_inspection&.is_totally_enclosed
+    last_inspection = unit&.last_inspection
+    copy_fields = {}
+    if last_inspection
+      copy_fields = COPY_FROM_LAST_INSPECTION_FIELDS.map do |field|
+        [field, last_inspection.send(field)]
+      end.to_h
+    end
 
     @user.inspections.build(
       unit: unit,
       inspection_date: Date.current,
       inspector_company_id: @user.inspection_company_id,
       inspection_location: @user.default_inspection_location,
-      has_slide:,
-      is_totally_enclosed:
+      **copy_fields
     )
   end
 

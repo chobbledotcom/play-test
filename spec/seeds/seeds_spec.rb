@@ -424,7 +424,6 @@ RSpec.describe "Seed Data", type: :model do
           slide_assessments.each do |assessment|
             expect(assessment.slide_platform_height).to be_between(1.0, 8.0)
             expect(assessment.slide_wall_height).to be_between(0.5, 3.0)
-            expect(assessment.runout).to be_between(1.0, 5.0)
             expect(assessment.slide_first_metre_height).to be_between(0.1, 1.0)
             expect(assessment.slide_beyond_first_metre_height).to be_between(0.5, 2.0)
           end

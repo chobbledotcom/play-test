@@ -53,13 +53,13 @@ RSpec.feature "Inspection Prefilling Comment Fields", type: :feature do
 
     verify_field_and_comment(
       I18n.t("forms.inspection.fields.width"),
-      "5",
+      "5.0",
       "Custom width measurement"
     )
 
     verify_field_and_comment(
       I18n.t("forms.inspection.fields.length"),
-      "4",
+      "4.0",
       "Length includes platform"
     )
 
