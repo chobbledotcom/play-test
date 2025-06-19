@@ -6,9 +6,9 @@ input[type="submit"],
 input[type="button"],
 .button,
 a[role="button"] {
-  transition: all 0.2s ease !important;
-  position: relative;
-  transform: translateY(0);
+	transition: all 0.2s ease !important;
+	position: relative;
+	transform: translateY(0);
 }
 
 /* Purple button hover effect - subtle lift and glow */
@@ -17,10 +17,10 @@ input[type="submit"]:hover:not([disabled]),
 input[type="button"]:hover:not([disabled]),
 .button:hover,
 a[role="button"]:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(118, 99, 228, 0.3) !important;
-  filter: brightness(1.1) !important;
-  cursor: pointer !important;
+	transform: translateY(-2px) !important;
+	box-shadow: 0 4px 12px rgba(118, 99, 228, 0.3) !important;
+	filter: brightness(1.1) !important;
+	cursor: pointer !important;
 }
 
 /* Button click effect - press down */
@@ -29,9 +29,9 @@ input[type="submit"]:active:not([disabled]),
 input[type="button"]:active:not([disabled]),
 .button:active,
 a[role="button"]:active {
-  transform: translateY(0) !important;
-  box-shadow: 0 2px 4px rgba(118, 99, 228, 0.2) !important;
-  filter: brightness(0.95) !important;
+	transform: translateY(0) !important;
+	box-shadow: 0 2px 4px rgba(118, 99, 228, 0.2) !important;
+	filter: brightness(0.95) !important;
 }
 
 /* Focus state for accessibility */
@@ -40,166 +40,166 @@ input[type="submit"]:focus-visible,
 input[type="button"]:focus-visible,
 .button:focus-visible,
 a[role="button"]:focus-visible {
-  outline: 3px solid rgba(118, 99, 228, 0.5);
-  outline-offset: 2px;
+	outline: 3px solid rgba(118, 99, 228, 0.5);
+	outline-offset: 2px;
 }
 
 /* Image hover effects - exclude GIFs to preserve animations */
 img:not([src$=".gif"]) {
-  transition: all 0.3s ease !important;
+	transition: all 0.3s ease !important;
 }
 
 /* Subtle zoom and shadow for clickable images */
 a img:hover,
 .clickable-image:hover,
 img[onclick]:hover {
-  transform: scale(1.05) !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
-  filter: none !important; /* Remove MVP's brightness filter */
+	transform: scale(1.05) !important;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+	filter: none !important; /* Remove MVP's brightness filter */
 }
 
 /* Non-clickable images get a subtle lift */
 img:hover:not(a img):not(.clickable-image):not([onclick]) {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-  filter: none !important; /* Remove MVP's brightness filter */
+	transform: translateY(-2px) !important;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+	filter: none !important; /* Remove MVP's brightness filter */
 }
 
 /* Image click effect */
 a img:active,
 .clickable-image:active,
 img[onclick]:active {
-  transform: scale(1.02) !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+	transform: scale(1.02) !important;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Ensure smooth transitions for file preview images */
 .file-preview img {
-  border-radius: 4px;
-  max-width: 100%;
-  height: auto;
+	border-radius: 4px;
+	max-width: 100%;
+	height: auto;
 }
 
 .file-preview img:hover {
-  cursor: zoom-in;
+	cursor: zoom-in;
 }
 
 /* Navigation links - purple button style! */
 nav a {
-  transition: all 0.2s ease !important;
-  position: relative;
-  transform: translateY(0);
-  display: inline-block;
-  padding: 0.5rem 1rem !important;
-  background-color: var(--color-link) !important;
-  border: 2px solid var(--color-link) !important;
-  color: var(--color-bg) !important;
-  border-radius: var(--border-radius) !important;
-  font-weight: 600 !important;
-  text-decoration: none !important;
+	transition: all 0.2s ease !important;
+	position: relative;
+	transform: translateY(0);
+	display: inline-block;
+	padding: 0.5rem 1rem !important;
+	background-color: var(--color-link) !important;
+	border: 2px solid var(--color-link) !important;
+	color: var(--color-bg) !important;
+	border-radius: var(--border-radius) !important;
+	font-weight: 600 !important;
+	text-decoration: none !important;
 }
 
 nav button {
-  transition: all 0.2s ease !important;
-  position: relative;
-  transform: translateY(0);
+	transition: all 0.2s ease !important;
+	position: relative;
+	transform: translateY(0);
 }
 
 nav a:hover {
-  filter: none !important; /* Remove MVP's brightness filter */
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
-  background-color: #8a0f8a !important; /* Lighter purple on hover */
-  border-color: #8a0f8a !important;
-  text-decoration: none !important;
-  color: var(--color-bg) !important;
+	filter: none !important; /* Remove MVP's brightness filter */
+	transform: translateY(-2px) !important;
+	box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
+	background-color: #8a0f8a !important; /* Lighter purple on hover */
+	border-color: #8a0f8a !important;
+	text-decoration: none !important;
+	color: var(--color-bg) !important;
 }
 
 nav a:active {
-  transform: translateY(0) !important;
-  box-shadow: 0 2px 6px rgba(108, 12, 108, 0.2) !important;
-  background-color: #4a084a !important; /* Darker purple on click */
-  border-color: #4a084a !important;
+	transform: translateY(0) !important;
+	box-shadow: 0 2px 6px rgba(108, 12, 108, 0.2) !important;
+	background-color: #4a084a !important; /* Darker purple on click */
+	border-color: #4a084a !important;
 }
 
 /* Active page styling - inverted colors */
 nav a.active,
 nav a.active:hover {
-  background-color: var(--color-bg) !important;
-  color: var(--color-link) !important;
-  border: 2px solid var(--color-link) !important;
-  font-weight: 700 !important;
+	background-color: var(--color-bg) !important;
+	color: var(--color-link) !important;
+	border: 2px solid var(--color-link) !important;
+	font-weight: 700 !important;
 }
 
 nav a.active:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
-  color: var(--color-link) !important;
+	transform: translateY(-2px) !important;
+	box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
+	color: var(--color-link) !important;
 }
 
 nav button:hover:not([disabled]) {
-  filter: none !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
+	filter: none !important;
+	transform: translateY(-2px) !important;
+	box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
 }
 
 nav button:active:not([disabled]) {
-  transform: translateY(0) !important;
-  box-shadow: 0 2px 6px rgba(108, 12, 108, 0.2) !important;
+	transform: translateY(0) !important;
+	box-shadow: 0 2px 6px rgba(108, 12, 108, 0.2) !important;
 }
 
 /* Table row hover */
 tbody tr {
-  transition: background-color 0.2s ease;
+	transition: background-color 0.2s ease;
 }
 
 tbody tr:hover {
-  background-color: rgba(118, 99, 228, 0.05);
+	background-color: rgba(118, 99, 228, 0.05);
 }
 
 /* Form field focus effects */
 input:not([type="submit"]):not([type="button"]):focus,
 textarea:focus,
 select:focus {
-  outline: 2px solid rgba(118, 99, 228, 0.5);
-  outline-offset: 0;
-  border-color: rgb(118, 99, 228);
+	outline: 2px solid rgba(118, 99, 228, 0.5);
+	outline-offset: 0;
+	border-color: rgb(118, 99, 228);
 }
 
 .share-button {
-  transition: all 0.2s ease;
+	transition: all 0.2s ease;
 }
 
 .share-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+	transform: translateY(-1px);
+	box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
 }
 
 .share-button:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(25, 118, 210, 0.2);
+	transform: translateY(0);
+	box-shadow: 0 1px 4px rgba(25, 118, 210, 0.2);
 }
 
 /* Remove default MVP aside hover effect */
 section aside:hover {
-  box-shadow: var(--box-shadow) var(--color-bg-secondary);
-  transform: none;
+	box-shadow: var(--box-shadow) var(--color-bg-secondary);
+	transform: none;
 }
 
 /* Construction banner images should not have hover effects */
 .construction-banner img {
-  transform: none !important;
-  box-shadow: none !important;
-  transition: none !important;
+	transform: none !important;
+	box-shadow: none !important;
+	transition: none !important;
 }
 
 .construction-banner img:hover {
-  transform: none !important;
-  box-shadow: none !important;
-  transition: none !important;
+	transform: none !important;
+	box-shadow: none !important;
+	transition: none !important;
 }
 
 /* Ensure GIFs are never affected by transitions */
 img[src$=".gif"] {
-  transition: none !important;
+	transition: none !important;
 }

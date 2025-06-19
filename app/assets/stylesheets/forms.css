@@ -1,309 +1,309 @@
 /* Save message styling - consistent across all forms */
 .save-message {
-  max-width: 30rem;
-  margin: 1rem auto;
-  text-align: center;
+	max-width: 30rem;
+	margin: 1rem auto;
+	text-align: center;
 }
 
 .save-message .success-message {
-  padding: 1rem;
-  background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
-  border: 1px solid #90ee90;
-  border-radius: 8px;
-  color: #2d5016;
-  font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.5s ease-in;
+	padding: 1rem;
+	background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
+	border: 1px solid #90ee90;
+	border-radius: 8px;
+	color: #2d5016;
+	font-weight: 500;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	animation: fadeIn 0.5s ease-in;
 }
 
 .save-message .error-message {
-  padding: 1rem;
-  background: linear-gradient(135deg, #ffe8e8 0%, #fff0f0 100%);
-  border: 1px solid #ffb3b3;
-  border-radius: 8px;
-  color: #cc0000;
-  font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.5s ease-in;
+	padding: 1rem;
+	background: linear-gradient(135deg, #ffe8e8 0%, #fff0f0 100%);
+	border: 1px solid #ffb3b3;
+	border-radius: 8px;
+	color: #cc0000;
+	font-weight: 500;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	animation: fadeIn 0.5s ease-in;
 }
 
 .save-message .error-message ul {
-  margin: 0.5rem 0 0 0;
-  padding: 0;
-  list-style: none;
+	margin: 0.5rem 0 0 0;
+	padding: 0;
+	list-style: none;
 }
 
 .save-message .error-message li {
-  margin: 0.25rem 0;
-  padding-left: 1rem;
-  position: relative;
+	margin: 0.25rem 0;
+	padding-left: 1rem;
+	position: relative;
 }
 
 .save-message .error-message li:before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: #cc0000;
-  font-weight: bold;
+	content: "•";
+	position: absolute;
+	left: 0;
+	color: #cc0000;
+	font-weight: bold;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .comment-field-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
 }
 
 .comment-field-container label {
-  cursor: pointer;
-  font-weight: normal;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+	cursor: pointer;
+	font-weight: normal;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
 }
 
 .comment-field-container input[type="checkbox"] {
-  margin: 0;
+	margin: 0;
 }
 
 .form-grid {
-  display: grid;
-  gap: 0.5rem;
-  align-items: end;
-  margin-bottom: 2rem;
+	display: grid;
+	gap: 0.5rem;
+	align-items: end;
+	margin-bottom: 2rem;
 }
 
 :target:not(nav) {
-  animation: highlight-fade 5s ease-out forwards;
-  border-radius: 5px;
+	animation: highlight-fade 5s ease-out forwards;
+	border-radius: 5px;
 }
 
 @keyframes highlight-fade {
-  0% {
-    background: #ffff3766;
-    outline: 20px solid #ffff3766;
-  }
-  80% {
-    background: #ffff3766;
-    outline: 20px solid #ffff3766;
-  }
-  100% {
-    background: transparent;
-    outline: 20px solid transparent;
-  }
+	0% {
+		background: #ffff3766;
+		outline: 20px solid #ffff3766;
+	}
+	80% {
+		background: #ffff3766;
+		outline: 20px solid #ffff3766;
+	}
+	100% {
+		background: transparent;
+		outline: 20px solid transparent;
+	}
 }
 
 .form-grid input,
 .form-grid label {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 .form-grid input[type="text"],
 .form-grid input[type="number"] {
-  padding: 0.4rem 0.8rem;
+	padding: 0.4rem 0.8rem;
 }
 
 .form-grid input[type="number"],
 .form-grid input[type="text"][inputmode="decimal"] {
-  width: 5rem;
-  text-align: left;
-  padding: 0.4rem;
-  font-variant-numeric: tabular-nums;
+	width: 5rem;
+	text-align: left;
+	padding: 0.4rem;
+	font-variant-numeric: tabular-nums;
 }
 
 .form-grid textarea {
-  margin: 0;
-  padding: 0.5rem 1rem;
+	margin: 0;
+	padding: 0.5rem 1rem;
 }
 
 .form-grid label {
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
+	display: flex;
+	flex-direction: row;
+	gap: 0.5rem;
 }
 
 .form-grid .label {
-  line-height: 1.1rem;
-  text-wrap: balance;
+	line-height: 1.1rem;
+	text-wrap: balance;
 }
 
 .form-grid .pass-fail {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0 1rem;
+	display: flex;
+	gap: 0.5rem;
+	padding: 0 1rem;
 }
 
 .form-grid .pass-fail label {
-  display: flex;
+	display: flex;
 }
 
 .radio-comment {
-  grid-template-areas:
-    "label label label"
-    "pass-fail comment-space comment-label";
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
+	grid-template-areas:
+		"label label label"
+		"pass-fail comment-space comment-label";
+	grid-template-columns: auto 1fr auto;
+	align-items: center;
 }
 @media (min-width: 768px) {
-  .radio-comment {
-    grid-template-areas: "label pass-fail comment-space comment-label";
-    grid-template-columns: max-content auto 1fr auto;
-  }
+	.radio-comment {
+		grid-template-areas: "label pass-fail comment-space comment-label";
+		grid-template-columns: max-content auto 1fr auto;
+	}
 }
 
 .radio-comment > .label {
-  grid-area: label;
+	grid-area: label;
 }
 
 .radio-comment > .label label {
-  flex-direction: column;
+	flex-direction: column;
 }
 
 .radio-comment > .pass-fail {
-  grid-area: pass-fail;
+	grid-area: pass-fail;
 }
 
 .radio-comment > .comment-checkbox {
-  grid-area: comment-label;
+	grid-area: comment-label;
 }
 
 .radio-comment > textarea {
-  grid-column: 1 / -1;
-  margin-top: 0.5rem;
+	grid-column: 1 / -1;
+	margin-top: 0.5rem;
 }
 
 /* Number + Pass/Fail + Comment grid layout */
 .number-radio-comment {
-  grid-template-areas:
-    "label label label label"
-    "number pass-fail comment-space comment-label";
-  grid-template-columns: auto auto 1fr auto;
+	grid-template-areas:
+		"label label label label"
+		"number pass-fail comment-space comment-label";
+	grid-template-columns: auto auto 1fr auto;
 }
 
 .number-radio-comment > .label {
-  grid-area: label;
+	grid-area: label;
 }
 
 .number-radio-comment > .label label {
-  flex-direction: column;
+	flex-direction: column;
 }
 
 .number-radio-comment > .number {
-  grid-area: number;
+	grid-area: number;
 }
 
 .number-radio-comment > .pass-fail {
-  grid-area: pass-fail;
+	grid-area: pass-fail;
 }
 
 .number-radio-comment > .comment-checkbox {
-  grid-area: comment-label;
+	grid-area: comment-label;
 }
 
 .number-radio-comment > textarea {
-  grid-column: 1 / -1;
-  margin-top: 0.5rem;
+	grid-column: 1 / -1;
+	margin-top: 0.5rem;
 }
 
 /* Number + Comment grid layout */
 .number-comment {
-  grid-template-areas:
-    "label label"
-    "number comment-label";
-  grid-template-columns: min-content auto;
-  align-items: center;
+	grid-template-areas:
+		"label label"
+		"number comment-label";
+	grid-template-columns: min-content auto;
+	align-items: center;
 }
 @media (min-width: 768px) {
-  .number-comment {
-    grid-template-areas: "label number comment-space comment-label";
-    grid-template-columns: max-content 6rem 1fr auto;
-  }
+	.number-comment {
+		grid-template-areas: "label number comment-space comment-label";
+		grid-template-columns: max-content 6rem 1fr auto;
+	}
 }
 
 .number-comment > .label {
-  grid-area: label;
-  width: 14rem;
+	grid-area: label;
+	width: 14rem;
 }
 
 .number-comment > .number {
-  grid-area: number;
+	grid-area: number;
 }
 
 .number-comment > .comment-checkbox {
-  grid-area: comment-label;
+	grid-area: comment-label;
 }
 
 .number-comment > textarea {
-  grid-column: 1 / -1;
-  margin-top: 0.5rem;
+	grid-column: 1 / -1;
+	margin-top: 0.5rem;
 }
 
 /* Checkbox + Comment grid layout (similar to radio-comment) */
 .checkbox-comment {
-  display: grid;
-  gap: 0.5rem;
-  align-items: center;
-  margin-bottom: 1rem;
-  grid-template-areas:
-    "label label label label"
-    "check1 label2 comment-space comment-label";
-  grid-template-columns: auto auto 1fr auto;
+	display: grid;
+	gap: 0.5rem;
+	align-items: center;
+	margin-bottom: 1rem;
+	grid-template-areas:
+		"label label label label"
+		"check1 label2 comment-space comment-label";
+	grid-template-columns: auto auto 1fr auto;
 }
 
 @media (min-width: 768px) {
-  .checkbox-comment {
-    grid-template-areas: "label check1 label2 comment-label";
-    grid-template-columns: max-content auto auto auto;
-  }
+	.checkbox-comment {
+		grid-template-areas: "label check1 label2 comment-label";
+		grid-template-columns: max-content auto auto auto;
+	}
 }
 
 .checkbox-comment > .label {
-  grid-area: label;
+	grid-area: label;
 }
 
 .checkbox-comment > .checkbox {
-  grid-area: check1;
+	grid-area: check1;
 }
 
 .checkbox-comment > .checkbox-label {
-  grid-area: label2;
+	grid-area: label2;
 }
 
 .checkbox-comment > .comment-checkbox {
-  grid-area: comment-label;
+	grid-area: comment-label;
 }
 
 .checkbox-comment > textarea {
-  grid-column: 1 / -1;
-  margin-top: 0.5rem;
+	grid-column: 1 / -1;
+	margin-top: 0.5rem;
 }
 
 /* User height fields flexbox layout */
 .user-heights {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
 }
 
 /* Mobile: 2 columns (2 rows of 2) */
 .user-heights > * {
-  flex: 1 1 calc(50% - 0.5rem);
+	flex: 1 1 calc(50% - 0.5rem);
 }
 
 /* Desktop: 4 columns (1 row of 4) */
 @media (min-width: 768px) {
-  .user-heights > * {
-    flex: 1 1 calc(25% - 0.75rem);
-  }
+	.user-heights > * {
+		flex: 1 1 calc(25% - 0.75rem);
+	}
 }

@@ -1,119 +1,119 @@
 /* Custom Radio Button Styles - Following https://moderncss.dev/pure-css-custom-styled-radio-buttons/ */
 
 :root {
-  --color-primary: #118bee;
-  --color-pass: #00a94f;
-  --color-fail: #d32f2f;
-  --color-disabled: #959495;
+	--color-primary: #118bee;
+	--color-pass: #00a94f;
+	--color-fail: #d32f2f;
+	--color-disabled: #959495;
 }
 
 input[type="radio"] {
-  /* Remove default appearance */
-  -webkit-appearance: none;
-  appearance: none;
-  /* For iOS < 15 */
-  background-color: transparent;
-  /* Not removed via appearance */
-  margin: 0;
+	/* Remove default appearance */
+	-webkit-appearance: none;
+	appearance: none;
+	/* For iOS < 15 */
+	background-color: transparent;
+	/* Not removed via appearance */
+	margin: 0;
 
-  /* Custom styling */
-  font: inherit;
-  color: currentColor;
-  width: 1.15em;
-  height: 1.15em;
-  border: 0.15em solid currentColor;
-  border-radius: 50%;
-  transform: translateY(-0.075em);
+	/* Custom styling */
+	font: inherit;
+	color: currentColor;
+	width: 1.15em;
+	height: 1.15em;
+	border: 0.15em solid currentColor;
+	border-radius: 50%;
+	transform: translateY(-0.075em);
 
-  /* Create the dot in the center */
-  display: inline-grid;
-  place-content: center;
+	/* Create the dot in the center */
+	display: inline-grid;
+	place-content: center;
 
-  /* Ensure the radio is clickable */
-  cursor: pointer;
+	/* Ensure the radio is clickable */
+	cursor: pointer;
 }
 
 input[type="radio"]::before {
-  content: "";
-  width: 0.65em;
-  height: 0.65em;
-  border-radius: 50%;
-  transform: scale(0);
-  transition: 120ms transform ease-in-out;
-  /* Use currentColor for IE fallback */
-  background-color: currentColor;
+	content: "";
+	width: 0.65em;
+	height: 0.65em;
+	border-radius: 50%;
+	transform: scale(0);
+	transition: 120ms transform ease-in-out;
+	/* Use currentColor for IE fallback */
+	background-color: currentColor;
 }
 
 input[type="radio"]:checked::before {
-  transform: scale(1);
+	transform: scale(1);
 }
 
 input[type="radio"]:focus {
-  outline: max(2px, 0.15em) solid currentColor;
-  outline-offset: max(2px, 0.15em);
+	outline: max(2px, 0.15em) solid currentColor;
+	outline-offset: max(2px, 0.15em);
 }
 
 input[type="radio"]:disabled {
-  color: var(--color-disabled, #959495);
-  cursor: not-allowed;
+	color: var(--color-disabled, #959495);
+	cursor: not-allowed;
 }
 
 label:has(input[type="radio"]) {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  cursor: pointer;
-  line-height: 1.1;
-  /* Ensure label remains clickable */
-  position: relative;
-  display: flex;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	cursor: pointer;
+	line-height: 1.1;
+	/* Ensure label remains clickable */
+	position: relative;
+	display: flex;
 }
 
 label > input[type="radio"] {
-  margin-left: 0;
-  margin-right: 0;
+	margin-left: 0;
+	margin-right: 0;
 }
 
 .pass-fail input[value="true"]::before {
-  box-shadow: inset 1em 1em var(--color-pass, #00a94f);
+	box-shadow: inset 1em 1em var(--color-pass, #00a94f);
 }
 
 .pass-fail input[value="false"]::before {
-  box-shadow: inset 1em 1em var(--color-fail, #d32f2f);
+	box-shadow: inset 1em 1em var(--color-fail, #d32f2f);
 }
 
 .form-grid input[type="radio"] {
-  /* Prevent the radio from affecting grid layout */
-  vertical-align: middle;
+	/* Prevent the radio from affecting grid layout */
+	vertical-align: middle;
 }
 
 label:hover input[type="radio"]:not(:disabled) {
-  border-color: var(--color-primary, #118bee);
+	border-color: var(--color-primary, #118bee);
 }
 
 input[type="radio"] {
-  transition: border-color 120ms ease-in-out;
+	transition: border-color 120ms ease-in-out;
 }
 
 @media (prefers-contrast: high) {
-  input[type="radio"] {
-    border-width: 0.2em;
-  }
+	input[type="radio"] {
+		border-width: 0.2em;
+	}
 
-  input[type="radio"]:checked::before {
-    background-color: CanvasText;
-    box-shadow: none;
-  }
+	input[type="radio"]:checked::before {
+		background-color: CanvasText;
+		box-shadow: none;
+	}
 }
 
 @media print {
-  input[type="radio"]:checked {
-    border-width: 0.1em;
-    background-color: black;
-  }
+	input[type="radio"]:checked {
+		border-width: 0.1em;
+		background-color: black;
+	}
 
-  input[type="radio"]:checked::before {
-    background-color: black;
-    box-shadow: none;
-  }
+	input[type="radio"]:checked::before {
+		background-color: black;
+		box-shadow: none;
+	}
 }

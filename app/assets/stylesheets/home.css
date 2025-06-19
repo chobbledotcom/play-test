@@ -1,18 +1,18 @@
 .home-page {
-  text-align: center;
+	text-align: center;
 
-  h1 {
-    font-size: 2.5rem;
-    text-wrap: balance;
-    text-wrap: pretty;
-  }
+	h1 {
+		font-size: 2.5rem;
+		text-wrap: balance;
+		text-wrap: pretty;
+	}
 
-  p {
-    text-wrap: balance;
-    text-wrap: pretty;
-  }
+	p {
+		text-wrap: balance;
+		text-wrap: pretty;
+	}
 
-  aside {
-    align-content: center;
-  }
+	aside {
+		align-content: center;
+	}
 }
