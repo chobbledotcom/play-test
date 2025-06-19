@@ -120,7 +120,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
       # Field links have anchors to specific fields (not #tabs)
       field_links = all("a[href*='#']").reject { |link| link[:href].end_with?("#tabs") }
       total_fields = field_links.count
-      
+
       expect(total_fields).to eq(summary_count)
 
       # Section headers have #tabs anchors

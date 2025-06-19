@@ -63,7 +63,7 @@ class PdfGeneratorService
       # Process image for orientation
       image.auto_orient
       processed_image = image.to_blob
-      
+
       pdf.image StringIO.new(processed_image), at: [photo_x, photo_y], width: photo_width, height: photo_height
     end
 

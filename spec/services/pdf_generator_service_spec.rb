@@ -12,7 +12,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
     let(:user) { create(:user) }
     let(:inspection) { create(:inspection, user: user) }
 
-
     it "uses I18n translations for PDF content" do
       pdf = PdfGeneratorService.generate_inspection_report(inspection)
       pdf_text = pdf_text_content(pdf.render)
@@ -55,7 +54,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
   describe ".generate_unit_report" do
     let(:user) { create(:user) }
     let(:unit) { create(:unit, user: user) }
-
 
     it "uses I18n translations for unit PDF content" do
       pdf = PdfGeneratorService.generate_unit_report(unit)
@@ -142,7 +140,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
       expect(pdf_text).not_to include(I18n.t("pdf.inspection.watermark.draft"))
     end
   end
-
 
   describe "unit with photo" do
     let(:user) { create(:user) }

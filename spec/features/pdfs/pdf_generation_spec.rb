@@ -130,5 +130,4 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       expect(page).to have_content("draft report")
     end
   end
-
 end

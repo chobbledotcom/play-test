@@ -198,6 +198,20 @@ class InspectionsController < ApplicationController
 
   SYSTEM_ATTRIBUTES = %w[inspection_id created_at updated_at].freeze
 
+  # Build safe mappings from Inspection::ASSESSMENT_TYPES
+  # This ensures mappings stay in sync with the model definition
+  ASSESSMENT_TAB_MAPPING = Inspection::ASSESSMENT_TYPES.each_with_object({}) do |(method_name, _), hash|
+    # Convert :user_height_assessment to "user_height"
+    tab_name = method_name.to_s.gsub(/_assessment$/, "")
+    hash[tab_name] = method_name
+  end.freeze
+
+  ASSESSMENT_CLASS_MAPPING = Inspection::ASSESSMENT_TYPES.each_with_object({}) do |(method_name, klass), hash|
+    # Convert :user_height_assessment to "user_height"
+    tab_name = method_name.to_s.gsub(/_assessment$/, "")
+    hash[tab_name] = klass
+  end.freeze
+
   def build_base_params
     params.require(:inspection).permit(*Inspection::USER_EDITABLE_PARAMS)
   end
@@ -387,27 +401,33 @@ class InspectionsController < ApplicationController
       previous_object = @previous_inspection
       column_names = Inspection.column_names
     else
-      current_object = @inspection.send("#{params[:tab]}_assessment")
-      previous_object = @previous_inspection.send("#{params[:tab]}_assessment")
-      column_names =
-        "Assessments::#{params[:tab].camelize}Assessment".
-          constantize.
-          column_names
+      # Use safe mapping instead of dynamic send
+      assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
+      return unless assessment_method
+
+      current_object = @inspection.public_send(assessment_method)
+      previous_object = @previous_inspection.public_send(assessment_method)
+
+      # Use safe class lookup instead of constantize
+      assessment_class = ASSESSMENT_CLASS_MAPPING[params[:tab]]
+      return unless assessment_class
+
+      column_names = assessment_class.column_names
     end
 
     column_names.each do |field|
       next if NOT_COPIED_FIELDS.include? field
 
-      return if previous_object&.send(field) == nil
-      return if current_object.send(field) == nil
+      next if previous_object&.send(field).nil?
+      next if current_object.send(field).nil?
 
       is_comment = field.end_with?("_comment")
-      is_pass = field.end_with?("_comment")
+      is_pass = field.end_with?("_pass")
       field_base = field.gsub(/_(comment|pass)$/, "")
       i18n_base = "forms.#{params[:tab]}.fields"
 
       translated = I18n.t("#{i18n_base}.#{field_base}", default: nil)
-      translated ||= I18n.t("#{i18n_base}.#{field_base}_pass")
+      translated ||= I18n.t("#{i18n_base}.#{field}", default: field.humanize)
 
       if is_comment
         translated += " (#{I18n.t("shared.comment")})"

@@ -43,7 +43,6 @@ RSpec.describe "PDF API Endpoints", type: :request do
         expect(response).to have_http_status(:success)
         expect(response.headers["Content-Type"]).to eq("application/pdf")
       end
-
     end
 
     describe "GET /inspections/:id.pdf" do
@@ -136,7 +135,6 @@ RSpec.describe "PDF API Endpoints", type: :request do
         pdf_text = pdf_text_content(response.body)
         expect(pdf_text).to include(I18n.t("pdf.unit.no_completed_inspections"))
       end
-
     end
 
     describe "GET /units/:id.png" do
@@ -190,7 +188,6 @@ RSpec.describe "PDF API Endpoints", type: :request do
       end
     end
   end
-
 
   private
 

@@ -77,7 +77,6 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
     end
   end
 
-
   feature "Memory and resource management" do
     scenario "cleans up temporary files during PDF generation" do
       process_pattern = "/tmp/*qr_code*#{inspection.id}_#{Process.pid}*"

@@ -136,7 +136,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect_pdf_to_include_i18n(pdf_text, "pdf.unit.no_completed_inspections")
     end
 
-
     scenario "handles unit with image and 10 prior inspections" do
       unit_with_image = create(:unit, user: user,
         name: "Castle with Photo",
@@ -195,7 +194,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect(pdf_data.bytesize).to be > 10.kilobytes
     end
   end
-
 
   private
 
