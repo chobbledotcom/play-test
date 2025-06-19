@@ -363,9 +363,21 @@ class InspectionsController < ApplicationController
     end
   end
 
+  NOT_COPIED_FIELDS = %w[
+    id
+    complete_date
+    created_at
+    updated_at
+    inspection_date
+    inspection_id
+    inspector_company_id
+    passed
+    user_id
+  ]
+
   def set_previous_inspection
-    return unless @inspection.unit
-    @previous_inspection = @inspection.unit.last_inspection
+    @previous_inspection = @inspection.unit&.last_inspection
+    return unless @previous_inspection
 
     @prefilled_fields = []
 
@@ -384,24 +396,26 @@ class InspectionsController < ApplicationController
     end
 
     column_names.each do |field|
-      next if field == "complete_date"
-      if previous_object.send(field) != nil && current_object.send(field) == nil
-        is_comment = field.end_with?("_comment")
-        is_pass = field.end_with?("_comment")
-        field_base = field.gsub(/_(comment|pass)$/, "")
-        i18n_base = "forms.#{params[:tab]}.fields"
+      next if NOT_COPIED_FIELDS.include? field
 
-        translated = I18n.t("#{i18n_base}.#{field_base}", default: nil)
-        translated ||= I18n.t("#{i18n_base}.#{field_base}_pass")
+      return if previous_object&.send(field) == nil
+      return if current_object.send(field) == nil
 
-        if is_comment
-          translated += " (#{I18n.t("shared.comment")})"
-        elsif is_pass
-          translated += " (#{I18n.t("shared.pass")}/#{I18n.t("shared.fail")})"
-        end
+      is_comment = field.end_with?("_comment")
+      is_pass = field.end_with?("_comment")
+      field_base = field.gsub(/_(comment|pass)$/, "")
+      i18n_base = "forms.#{params[:tab]}.fields"
 
-        @prefilled_fields << translated
+      translated = I18n.t("#{i18n_base}.#{field_base}", default: nil)
+      translated ||= I18n.t("#{i18n_base}.#{field_base}_pass")
+
+      if is_comment
+        translated += " (#{I18n.t("shared.comment")})"
+      elsif is_pass
+        translated += " (#{I18n.t("shared.pass")}/#{I18n.t("shared.fail")})"
       end
+
+      @prefilled_fields << translated
     end
   end
 end

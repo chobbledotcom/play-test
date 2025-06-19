@@ -34,18 +34,20 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
     end
 
     scenario "logs PDF generation time for complete inspection with photo" do
-      # Create unit with photo
       unit_with_photo = create(:unit, user: user)
       unit_with_photo.photo.attach(
         io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
         filename: "test_image.jpg",
         content_type: "image/jpeg"
       )
-      
-      # Create complete inspection with all assessments filled
-      complete_inspection = create(:inspection, :completed, user: user, unit: unit_with_photo)
-      
-      # Add some comments to make it more realistic
+
+      complete_inspection = create(
+        :inspection,
+        :completed,
+        user: user,
+        unit: unit_with_photo
+      )
+
       complete_inspection.user_height_assessment.update(
         containing_wall_height_comment: "Wall height measured from ground level",
         platform_height_comment: "Platform stable and level"
@@ -54,43 +56,16 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
         slide_platform_height_comment: "Platform height measured accurately",
         runout_comment: "Runout area clear and sufficient"
       )
-      
-      # Measure PDF generation time
+
       start_time = Time.current
-      
-      # Generate PDF
+
       pdf_data = get_pdf(inspection_path(complete_inspection, format: :pdf))
-      
+
       generation_time = Time.current - start_time
-      
-      # Log the generation time
-      Rails.logger.info "=" * 60
-      Rails.logger.info "PDF GENERATION PERFORMANCE TEST"
-      Rails.logger.info "=" * 60
-      Rails.logger.info "Inspection ID: #{complete_inspection.id}"
-      Rails.logger.info "Unit has photo: #{unit_with_photo.photo.attached?}"
-      Rails.logger.info "Photo size: #{unit_with_photo.photo.blob.byte_size} bytes" if unit_with_photo.photo.attached?
-      Rails.logger.info "PDF size: #{pdf_data.bytesize} bytes (#{(pdf_data.bytesize / 1024.0).round(2)} KB)"
-      Rails.logger.info "Generation time: #{(generation_time * 1000).round(2)} ms"
-      Rails.logger.info "=" * 60
-      
-      # Also output to console for visibility during test runs
-      puts "\n" + "=" * 60
-      puts "PDF GENERATION PERFORMANCE TEST"
-      puts "=" * 60
-      puts "Inspection ID: #{complete_inspection.id}"
-      puts "Unit has photo: #{unit_with_photo.photo.attached?}"
-      puts "Photo size: #{unit_with_photo.photo.blob.byte_size} bytes" if unit_with_photo.photo.attached?
-      puts "PDF size: #{pdf_data.bytesize} bytes (#{(pdf_data.bytesize / 1024.0).round(2)} KB)"
-      puts "Generation time: #{(generation_time * 1000).round(2)} ms"
-      puts "=" * 60 + "\n"
-      
-      # Verify PDF is valid
+
       expect_valid_pdf(pdf_data)
-      
-      # Performance expectations
-      expect(generation_time).to be < 5.seconds  # Should be faster than 5 seconds
-      expect(pdf_data.bytesize).to be < 5.megabytes  # Should be under 5MB even with photo
+      expect(generation_time).to be < 1.seconds
+      expect(pdf_data.bytesize).to be < 1.megabytes
     end
 
     scenario "generates PDFs with reasonable file sizes" do
@@ -118,5 +93,4 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       end
     end
   end
-
 end
