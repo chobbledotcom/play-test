@@ -20,7 +20,7 @@ en:
         stitch_length_pass: "Stitch Length (mm)"
         evacuation_time: "Evacuation Time (s)"
         evacuation_time_pass: "Evacuation Time (s)"
-        unit_pressure: "Unit Pressure (psi)"
+        unit_pressure: "Unit Pressure (kpa)"
         blower_tube_length: "Blower Tube Length (m)"
         blower_tube_length_pass: "Blower Tube Length (m)"
         # Additional Safety Checks
