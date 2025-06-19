@@ -151,16 +151,10 @@ module SeedData
     required_runout = SafetyStandard.calculate_required_runout(platform_height)
 
     runout = if passed
-      # Add some margin to ensure it passes
       (required_runout + rand(0.5..1.5)).round(1)
     else
-      # Make it fail by being under the requirement
-      # Ensure we stay within the test's expected range of 1.0 to 5.0
-      # and that it's strictly less than required
       fail_margin = rand(0.1..0.3)
-      fail_runout = (required_runout - fail_margin).round(1)
-      # Ensure minimum of 1.0 for test expectations
-      [fail_runout, 1.0].max
+      fail_runout = (required_runout - fail_margin)
     end
 
     {
