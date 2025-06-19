@@ -1,36 +1,28 @@
 // DirtyForms - tracks form changes and shows unsaved indicator
 class DirtyForms {
   constructor() {
-    // console.log("[DirtyForms] Constructor called");
     this.indicator = null;
     this.trackedForms = new WeakMap();
   }
 
   init() {
-    // console.log("[DirtyForms] Init called");
     this.createIndicator();
     this.trackForms();
   }
 
   createIndicator() {
-    // console.log("[DirtyForms] CreateIndicator called");
-    // Check if indicator already exists
     const existingIndicator = document.getElementById("dirty-form-indicator");
     if (existingIndicator) {
-      // console.log("[DirtyForms] Found existing indicator, reusing");
       this.indicator = existingIndicator;
-      // Re-attach event listener in case it was lost
       const button = this.indicator.querySelector("button");
       button.replaceWith(button.cloneNode(true)); // Remove old listeners
       this.indicator.querySelector("button").addEventListener("click", () => {
-        // console.log("[DirtyForms] Save button clicked");
         const dirtyForm = this.findDirtyForm();
         dirtyForm?.requestSubmit();
       });
       return;
     }
 
-    // console.log("[DirtyForms] Creating new indicator");
     this.indicator = document.createElement("div");
     this.indicator.id = "dirty-form-indicator";
     this.indicator.innerHTML = `
@@ -42,19 +34,14 @@ class DirtyForms {
     this.indicator.style.display = "none";
     document.body.appendChild(this.indicator);
 
-    // Handle save button click
     this.indicator.querySelector("button").addEventListener("click", () => {
-      // console.log("[DirtyForms] Save button clicked");
-      const dirtyForm = this.findDirtyForm();
-      dirtyForm?.requestSubmit();
+      this.findDirtyForm()?.requestSubmit();
     });
   }
 
   trackForms() {
     const forms = document.querySelectorAll("form");
-    // console.log(`[DirtyForms] TrackForms called, found ${forms.length} forms`);
     forms.forEach((form, index) => {
-      // console.log(`[DirtyForms] Processing form ${index}`);
       this.trackForm(form);
     });
   }
@@ -175,7 +162,8 @@ document.addEventListener("turbo:before-visit", (event) => {
       "You have unsaved changes. Are you sure you want to leave this page?";
     if (!confirm(message)) {
       event.preventDefault();
-    } 
+    }
+  }
 });
 
 window.addEventListener("beforeunload", (event) => {
