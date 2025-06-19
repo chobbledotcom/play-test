@@ -4,17 +4,21 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
   scenario "calculating anchor requirements" do
     visit safety_standards_path
 
-    within(".calculator-form", text: I18n.t("safety_standards.calculators.anchor.title")) do
-      fill_in I18n.t("safety_standards.calculators.anchor.area_label"), with: "25.0"
-      click_button I18n.t("safety_standards.calculators.anchor.submit")
+    within(".calculator-form", text: I18n.t("forms.safety_standards_anchors.header")) do
+      fill_in I18n.t("forms.safety_standards_anchors.fields.length"), with: "5.0"
+      fill_in I18n.t("forms.safety_standards_anchors.fields.width"), with: "5.0"
+      fill_in I18n.t("forms.safety_standards_anchors.fields.height"), with: "3.0"
+      click_button I18n.t("forms.safety_standards_anchors.submit")
     end
 
     expect(page).to have_content(I18n.t("safety_standards.calculators.anchor.result_title"))
-    expect(page).to have_content("25.0m²")
+    expect(page).to have_content("8") # Total required anchors
 
-    expected_anchors = SafetyStandard.calculate_required_anchors(25.0)
-    expect(page).to have_content(expected_anchors.to_s)
-    expect(page).to have_content("((25.0² × 114) ÷ 1600) × 1.5 = #{expected_anchors}")
+    # Check the breakdown is displayed
+    expect(page).to have_content("Front/back area")
+    expect(page).to have_content("5.0m (W) × 3.0m (H) = 15.0m²")
+    expect(page).to have_content("Total anchors")
+    expect(page).to have_content("(2 + 2) × 2 = 8")
   end
 
   scenario "calculating user capacity" do
@@ -110,24 +114,30 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
   scenario "showing calculation transparency" do
     visit safety_standards_path
 
-    expect(page).to have_content("((Area² × 114.0) ÷ 1600.0) × 1.5 safety factor")
+    expect(page).to have_content("((Area × 114.0 × 1.5) ÷ 1600.0)")
     expect(page).to have_content("50% of platform height, minimum 300mm")
     expect(page).to have_content("Usable area ÷ space requirement per age group")
 
-    expect(page).to have_content("For 25.0m² area: 67 anchors required")
+    expect(page).to have_content("For 25.0m² area: 3 anchors required")
     expect(page).to have_content("For 2.5m platform: 1.25m runout required")
 
     expect(page).to have_content("View Ruby Source Code")
     expect(page).to have_content("Method: calculate_required_anchors")
     expect(page).to have_content("Source: app/services/safety_standard.rb")
 
-    within(".calculator-form", text: I18n.t("safety_standards.calculators.anchor.title")) do
-      fill_in "Area (m²):", with: "16.0"
-      click_button "Calculate Anchors"
+    within(".calculator-form", text: I18n.t("forms.safety_standards_anchors.header")) do
+      fill_in I18n.t("forms.safety_standards_anchors.fields.length"), with: "4.0"
+      fill_in I18n.t("forms.safety_standards_anchors.fields.width"), with: "4.0"
+      fill_in I18n.t("forms.safety_standards_anchors.fields.height"), with: "3.0"
+      click_button I18n.t("forms.safety_standards_anchors.submit")
     end
 
-    expected_anchors = SafetyStandard.calculate_required_anchors(16.0)
-    expect(page).to have_content("((16.0² × 114) ÷ 1600) × 1.5 = #{expected_anchors}")
+    # For 4x4x3m unit: front/back = 4x3=12m², sides = 4x3=12m²
+    # Each side: (12 * 114 * 1.5) / 1600 = 1.2825 → 2
+    # Total: 2 * 4 = 8
+    expect(page).to have_content("8")
+    expect(page).to have_content("Front/back area")
+    expect(page).to have_content("4.0m (W) × 3.0m (H) = 12.0m²")
   end
 
   scenario "preserving form values after calculation" do
@@ -150,13 +160,15 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
   scenario "handling invalid input gracefully" do
     visit safety_standards_path
 
-    within(".calculator-form", text: I18n.t("safety_standards.calculators.anchor.title")) do
-      fill_in "Area (m²):", with: "0"
-      click_button "Calculate Anchors"
+    within(".calculator-form", text: I18n.t("forms.safety_standards_anchors.header")) do
+      fill_in I18n.t("forms.safety_standards_anchors.fields.length"), with: "0"
+      fill_in I18n.t("forms.safety_standards_anchors.fields.width"), with: "0"
+      fill_in I18n.t("forms.safety_standards_anchors.fields.height"), with: "0"
+      click_button I18n.t("forms.safety_standards_anchors.submit")
     end
 
     expect(page).to have_content("Error:")
-    expect(page).to have_content("Please enter a valid area greater than 0")
+    expect(page).to have_content(I18n.t("safety_standards.errors.invalid_dimensions"))
 
     within(".calculator-form", text: "Calculate User Capacity") do
       fill_in "Length (m):", with: "0"
@@ -169,30 +181,21 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
   end
 
   scenario "calculations match SafetyStandard model exactly" do
-    test_areas = [1.0, 5.5, 16.0, 25.0, 50.0]
+    test_dimensions = [[3.0, 3.0, 2.0], [5.0, 4.0, 3.0], [8.0, 6.0, 4.0]]
 
-    test_areas.each do |area|
+    test_dimensions.each do |length, width, height|
       visit safety_standards_path
 
-      within(".calculator-form", text: I18n.t("safety_standards.calculators.anchor.title")) do
-        fill_in "Area (m²):", with: area.to_s
-        click_button "Calculate Anchors"
+      within(".calculator-form", text: I18n.t("forms.safety_standards_anchors.header")) do
+        fill_in I18n.t("forms.safety_standards_anchors.fields.length"), with: length.to_s
+        fill_in I18n.t("forms.safety_standards_anchors.fields.width"), with: width.to_s
+        fill_in I18n.t("forms.safety_standards_anchors.fields.height"), with: height.to_s
+        click_button I18n.t("forms.safety_standards_anchors.submit")
       end
 
-      expected = SafetyStandard.calculate_required_anchors(area)
+      expected = SafetyStandard.build_anchor_result(length: length, width: width, height: height)[:required_anchors]
       expect(page).to have_content("Required Anchors: #{expected}"),
-        "Area #{area}m² should require #{expected} anchors according to SafetyStandard model"
+        "Unit #{length}x#{width}x#{height}m should require #{expected} anchors according to SafetyStandard model"
     end
-  end
-
-  scenario "demonstrates EN 14960:2019 compliance" do
-    visit safety_standards_path
-
-    expect(page).to have_content("EN 14960:2019 Requirements for Inflatable Play Equipment")
-
-    expect(page).to have_content("1850 Newtons minimum") # Fabric strength
-    expect(page).to have_content("18mm - 45mm") # Rope diameter
-    expect(page).to have_content("1600 Newton pull strength minimum") # Anchor strength
-    expect(page).to have_content("1.2m minimum from equipment edge") # Blower distance
   end
 end

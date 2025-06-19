@@ -145,16 +145,48 @@ RSpec.describe SafetyStandard, type: :model do
     end
 
     context "with valid inputs" do
-      it "calculates anchors using the formula ((Area² * 114)/1600) * 1.5, rounded up" do
-        # For 25m²: ((25² * 114)/1600) * 1.5 = (71250/1600) * 1.5 = 66.796875 → 67
-        expect(SafetyStandard.calculate_required_anchors(25)).to eq(67)
+      it "calculates anchors using the formula (Area * 114 * 1.5) / 1600, rounded up" do
+        # For 25m²: (25 * 114 * 1.5) / 1600 = 4275 / 1600 = 2.671875 → 3
+        expect(SafetyStandard.calculate_required_anchors(25)).to eq(3)
 
-        # For 10m²: ((10² * 114)/1600) * 1.5 = (11400/1600) * 1.5 = 10.6875 → 11
-        expect(SafetyStandard.calculate_required_anchors(10)).to eq(11)
+        # For 10m²: (10 * 114 * 1.5) / 1600 = 1710 / 1600 = 1.06875 → 2
+        expect(SafetyStandard.calculate_required_anchors(10)).to eq(2)
 
-        # For 5m²: ((5² * 114)/1600) * 1.5 = (2850/1600) * 1.5 = 2.671875 → 3
-        expect(SafetyStandard.calculate_required_anchors(5)).to eq(3)
+        # For 5m²: (5 * 114 * 1.5) / 1600 = 855 / 1600 = 0.534375 → 1
+        expect(SafetyStandard.calculate_required_anchors(5)).to eq(1)
       end
+    end
+  end
+
+  describe ".build_anchor_result" do
+    it "calculates anchors for all four sides of a unit" do
+      result = SafetyStandard.build_anchor_result(length: 5, width: 4, height: 3)
+
+      # Front/back area: 4m x 3m = 12m²
+      # Sides area: 5m x 3m = 15m²
+      # Front anchors: (12 * 114 * 1.5) / 1600 = 1.2825 → 2
+      # Side anchors: (15 * 114 * 1.5) / 1600 = 1.603125 → 2
+      # Total: (2 + 2) * 2 = 8
+      expect(result[:required_anchors]).to eq(8)
+      expect(result[:formula_breakdown]).to be_an(Array)
+      expect(result[:formula_breakdown].size).to eq(5)
+
+      # Check breakdown includes proper calculations
+      breakdown = result[:formula_breakdown]
+      expect(breakdown[0]).to eq(["Front/back area", "4m (W) × 3m (H) = 12m²"])
+      expect(breakdown[1]).to eq(["Sides area", "5m (L) × 3m (H) = 15m²"])
+      expect(breakdown[4]).to eq(["Total anchors", "(2 + 2) × 2 = 8"])
+    end
+
+    it "handles different unit dimensions" do
+      result = SafetyStandard.build_anchor_result(length: 10, width: 8, height: 4)
+
+      # Front/back area: 8m x 4m = 32m²
+      # Sides area: 10m x 4m = 40m²
+      # Front anchors: (32 * 114 * 1.5) / 1600 = 3.42 → 4
+      # Side anchors: (40 * 114 * 1.5) / 1600 = 4.275 → 5
+      # Total: (4 + 5) * 2 = 18
+      expect(result[:required_anchors]).to eq(18)
     end
   end
 
@@ -304,41 +336,6 @@ RSpec.describe SafetyStandard, type: :model do
         expect(result).to have_key(:runout_requirements)
         expect(result).to have_key(:safety_factors)
         expect(result[:containing_wall_heights]).to include(:under_600mm, :between_600_3000mm)
-      end
-    end
-
-    describe ".anchor_formulas" do
-      it "returns anchor calculation information" do
-        result = SafetyStandard.anchor_formulas
-
-        expect(result).to have_key(:calculation)
-        expect(result).to have_key(:description)
-        expect(result).to have_key(:example)
-        expect(result).to have_key(:requirements)
-        expect(result[:calculation]).to eq("((Area² × 114) ÷ 1600) × 1.5")
-      end
-    end
-
-    describe ".material_requirements" do
-      it "returns material requirement information" do
-        result = SafetyStandard.material_requirements
-
-        expect(result).to have_key(:fabric)
-        expect(result).to have_key(:thread)
-        expect(result).to have_key(:rope)
-        expect(result).to have_key(:netting)
-        expect(result[:fabric]).to include(:tensile_strength, :tear_strength)
-      end
-    end
-
-    describe ".electrical_requirements" do
-      it "returns electrical requirement information" do
-        result = SafetyStandard.electrical_requirements
-
-        expect(result).to have_key(:pat_testing)
-        expect(result).to have_key(:blower_requirements)
-        expect(result).to have_key(:grounding_test)
-        expect(result[:blower_requirements]).to include(:minimum_pressure)
       end
     end
   end

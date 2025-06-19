@@ -22,7 +22,7 @@
   <% end %>
 
   <%= render 'shared/safety_standards_display',
-      reference_partials: ['shared/safety_standards/anchor_requirements'],
+      reference_partials: [],
       dynamic_content: -> do %>
     <%= turbo_frame_tag "anchorage_safety_results" do %>
       <% @assessment = @inspection.anchorage_assessment %>

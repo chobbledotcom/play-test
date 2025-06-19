@@ -1,0 +1,12 @@
+<% if @runout_result %>
+  <div class="calculation-result">
+    <h2><%= t('safety_standards.calculators.runout.result_title') %></h2>
+    <p><strong><%= t('safety_standards.calculators.runout.platform_height_result') %></strong> <%= @runout_result[:platform_height] %>m</p>
+    <p><strong><%= t('safety_standards.calculators.runout.required_runout_result') %></strong> <%= @runout_result[:required_runout] %>m</p>
+    <p><strong><%= t('safety_standards.calculators.runout.calculation_breakdown') %></strong> <%= @runout_result[:calculation] %></p>
+  </div>
+<% elsif @runout_error %>
+  <div class="calculation-error">
+    <p><strong>Error:</strong> <%= @runout_error %></p>
+  </div>
+<% end %>

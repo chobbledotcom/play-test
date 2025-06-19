@@ -141,7 +141,7 @@ module SafetyStandard
       area_coeff = ANCHOR_CALCULATION_CONSTANTS[:area_coefficient]
       base_div = ANCHOR_CALCULATION_CONSTANTS[:base_divisor]
       safety_fact = ANCHOR_CALCULATION_CONSTANTS[:safety_factor]
-      "((Area² × #{area_coeff}) ÷ #{base_div}) × #{safety_fact} safety factor"
+      "((Area × #{area_coeff} × #{safety_fact}) ÷ #{base_div})"
     end
 
     def slide_runout_formula_text
@@ -327,7 +327,50 @@ module SafetyStandard
       base_div = ANCHOR_CALCULATION_CONSTANTS[:base_divisor]
       safety_mult = ANCHOR_CALCULATION_CONSTANTS[:safety_factor]
 
-      ((area_m2.to_f**2 * area_coeff) / base_div * safety_mult).ceil
+      ((area_m2.to_f * area_coeff * safety_mult) / base_div).ceil
+    end
+
+    def build_anchor_result(length:, width:, height:)
+      front_area = (width * height).round(1)
+      sides_area = (length * height).round(1)
+
+      required_front =
+        SafetyStandard.calculate_required_anchors(front_area)
+
+      required_sides =
+        SafetyStandard.calculate_required_anchors(sides_area)
+
+      total_required = (required_front + required_sides) * 2
+
+      area_coeff = ANCHOR_CALCULATION_CONSTANTS[:area_coefficient]
+      base_div = ANCHOR_CALCULATION_CONSTANTS[:base_divisor]
+      safety_mult = ANCHOR_CALCULATION_CONSTANTS[:safety_factor]
+
+      formula_front = "((#{front_area} × #{area_coeff} * #{safety_mult}) ÷ #{base_div}"
+      formula_sides = "((#{sides_area} × #{area_coeff} * #{safety_mult}) ÷ #{base_div}"
+
+      breakdown = [
+        [
+          "Front/back area", "#{width}m (W) × #{height}m (H) = #{front_area}m²"
+        ],
+        [
+          "Sides area", "#{length}m (L) × #{height}m (H) = #{sides_area}m²"
+        ],
+        [
+          "Front & back anchor counts", "#{formula_front} = #{required_front}"
+        ],
+        [
+          "Left & right anchor counts", "#{formula_sides} = #{required_sides}"
+        ],
+        [
+          "Total anchors", "(#{required_front} + #{required_sides}) × 2 = #{total_required}"
+        ]
+      ]
+
+      {
+        required_anchors: total_required,
+        formula_breakdown: breakdown
+      }
     end
 
     def calculate_user_capacity(length, width, negative_adjustment = 0)
@@ -371,97 +414,6 @@ module SafetyStandard
           first_metre_gradient: "Special requirements for first metre of slope",
           surface_requirements: "Non-slip surface material required",
           edge_protection: "Rounded edges and smooth transitions"
-        }
-      }
-    end
-
-    def anchor_formulas
-      # EN 14960:2019 - Anchoring system calculations and requirements
-      # for secure ground attachment with specified pull strength minimums
-      {
-        calculation: "((Area² × 114) ÷ 1600) × 1.5",
-        description: "Number of anchor points per side, rounded up",
-        example: "For 25m² area: ((25² × 114) ÷ 1600) × 1.5 = 6.6 → 7 anchors",
-        requirements: {
-          low_anchors: "Ground-level anchoring points",
-          high_anchors: "Elevated anchoring points for tall structures",
-          angle_requirements: "30° to 45° angle to ground",
-          strength_requirements: "1600 Newton pull strength minimum"
-        }
-      }
-    end
-
-    def material_requirements
-      # EN 14960:2019 & EN 71-3 - Material specifications using MATERIAL_STANDARDS constants
-      fabric_standards = MATERIAL_STANDARDS[:fabric]
-      thread_standards = MATERIAL_STANDARDS[:thread]
-      rope_standards = MATERIAL_STANDARDS[:rope]
-      netting_standards = MATERIAL_STANDARDS[:netting]
-
-      # Extract values for complex interpolations
-      min_tensile = fabric_standards[:min_tensile_strength]
-      min_tear = fabric_standards[:min_tear_strength]
-      fire_std = fabric_standards[:fire_standard]
-      thread_tensile = thread_standards[:min_tensile_strength]
-      min_dia = rope_standards[:min_diameter]
-      max_dia = rope_standards[:max_diameter]
-      max_swing = rope_standards[:max_swing_percentage]
-      max_vertical = netting_standards[:max_vertical_mesh]
-      max_roof = netting_standards[:max_roof_mesh]
-
-      {
-        fabric: {
-          tensile_strength: "#{min_tensile} Newtons minimum",
-          tear_strength: "#{min_tear} Newtons minimum",
-          fire_retardancy: "Must meet #{fire_std} requirements"
-        },
-        thread: {
-          material: "Non-rotting yarn required",
-          tensile_strength: "#{thread_tensile} Newtons minimum",
-          stitch_type: "Lock stitching required"
-        },
-        rope: {
-          diameter_range: "#{min_dia}mm - #{max_dia}mm",
-          material: "Non-monofilament",
-          attachment: "Fixed at both ends",
-          swing_limitation: "No greater than #{max_swing}% swing to prevent strangulation"
-        },
-        netting: {
-          vertical_mesh_size: "#{max_vertical}mm maximum for >1m height",
-          roof_mesh_size: "#{max_roof}mm maximum",
-          strength: "Support heaviest intended user"
-        }
-      }
-    end
-
-    def electrical_requirements
-      # PAT testing standards and EN 14960:2019 - Electrical safety requirements
-      # using EQUIPMENT_SAFETY_LIMITS and GROUNDING_TEST_WEIGHTS
-      safety_limits = EQUIPMENT_SAFETY_LIMITS
-      test_weights = GROUNDING_TEST_WEIGHTS
-      netting_mesh = MATERIAL_STANDARDS[:netting][:max_roof_mesh]
-
-      # Extract values for complex interpolations
-      min_pressure = safety_limits[:min_pressure]
-      min_distance = safety_limits[:min_blower_distance]
-      weight_1000 = test_weights[:height_1000mm]
-      weight_1200 = test_weights[:height_1200mm]
-      weight_1500 = test_weights[:height_1500mm]
-      weight_1800 = test_weights[:height_1800mm]
-
-      {
-        pat_testing: "Portable Appliance Test required",
-        blower_requirements: {
-          minimum_pressure: "#{min_pressure} KPA operational pressure",
-          finger_probe: "#{netting_mesh}mm probe must not contact moving/hot parts",
-          return_flap: "Required to reduce deflation time",
-          distance: "#{min_distance}m minimum from equipment edge"
-        },
-        grounding_test: {
-          "1.0m_height": "#{weight_1000}kg test weight",
-          "1.2m_height": "#{weight_1200}kg test weight",
-          "1.5m_height": "#{weight_1500}kg test weight",
-          "1.8m_height": "#{weight_1800}kg test weight"
         }
       }
     end

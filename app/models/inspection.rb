@@ -118,6 +118,11 @@ class Inspection < ApplicationRecord
     width * length
   end
 
+  def volume
+    return nil unless width && length && height
+    width * length * height
+  end
+
   # Check if inspection is complete (not draft)
   def complete?
     complete_date.present?

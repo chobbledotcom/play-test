@@ -13,11 +13,11 @@ RSpec.describe SafetyStandard, "Constants" do
     it "is used in anchor calculations" do
       # Verify the calculation uses these exact constant values
       area = 25.0
-      expected = ((area**2 * 114.0) / 1600.0 * 1.5).ceil
+      expected = ((area * 114.0 * 1.5) / 1600.0).ceil
 
       result = SafetyStandard.calculate_required_anchors(area)
       expect(result).to eq(expected)
-      expect(result).to eq(67) # Known result for 25m²
+      expect(result).to eq(3) # Known result for 25m²
     end
   end
 

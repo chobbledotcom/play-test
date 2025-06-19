@@ -1,13 +1,36 @@
-<%# Anchorage Safety Standards Results Partial %>
-<% if @assessment&.total_anchors&.positive? %>
-  <%= render 'shared/safety_info_box',
-    title: t('safety_standards.anchor_requirements.title'),
-    content: -> do %>
-    <strong><%= t('safety_standards.anchor_requirements.total_anchors') %></strong> <%= @assessment.total_anchors %><br>
-    <strong><%= t('safety_standards.anchor_requirements.required') %></strong> <%= @assessment.required_anchors %><br><br>
-    <p>
-      <%= render 'shared/pass_fail_string', passed: @assessment.meets_anchor_requirements? %>
-      <%= @assessment.anchor_compliance_status %>
-    </p>
-  <% end %>
+<%= render 'shared/safety_info_box',
+  title: t('safety_standards.anchor_requirements.title'),
+  content: -> do %>
+  <ul>
+    <% if @assessment&.total_anchors&.positive? %>
+      <li>
+        <strong>
+          <%= t('safety_standards.anchor_requirements.total_anchors') %>
+        </strong>
+        <%= @assessment.total_anchors %>
+      </li>
+    <% end %>
+    <li>
+      <strong>
+        <%= t('safety_standards.anchor_requirements.required') %>
+      </strong>
+      <%= @assessment.required_anchors %>
+    </li>
+    <li>
+      <strong>Breakdown:</strong>
+      <ul>
+        <% @assessment.anchorage_breakdown.each do |line| %>
+          <li>
+            <strong><%= line[0] %>:</strong>
+            <%= line[1] %>
+          </li>
+        <% end %>
+      </ul>
+    </li>
+    <% if @assessment&.total_anchors&.positive? %>
+      <li>
+        <%= render 'shared/pass_fail_string', passed: @assessment.meets_anchor_requirements? %>
+      </li>
+    <% end %>
+  </ul>
 <% end %>

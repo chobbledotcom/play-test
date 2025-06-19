@@ -7,14 +7,15 @@ RSpec.describe "Safety Standards API", type: :request do
 
       it "calculates anchor requirements" do
         post safety_standards_path,
-          params: {calculation: {type: "anchors", area: 25.0}}.to_json,
+          params: {calculation: {type: "anchors", length: 5.0, width: 5.0, height: 3.0}}.to_json,
           headers: headers
 
         expect(response).to have_http_status(:ok)
         json_response = JSON.parse(response.body)
         expect(json_response["success"]).to be true
-        expect(json_response["result"]["area"]).to eq 25.0
-        expect(json_response["result"]["required_anchors"]).to eq 67
+        expect(json_response["result"]["required_anchors"]).to eq 8
+        expect(json_response["result"]["formula_breakdown"]).to be_an(Array)
+        expect(json_response["result"]["formula_breakdown"].size).to eq 5
       end
 
       it "calculates user capacity" do
@@ -31,7 +32,7 @@ RSpec.describe "Safety Standards API", type: :request do
 
       it "returns error for invalid data" do
         post safety_standards_path,
-          params: {calculation: {type: "anchors", area: 0}}.to_json,
+          params: {calculation: {type: "anchors", length: 0, width: 0, height: 0}}.to_json,
           headers: headers
 
         expect(response).to have_http_status(:ok)

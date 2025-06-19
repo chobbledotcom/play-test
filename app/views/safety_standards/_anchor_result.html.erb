@@ -1,0 +1,20 @@
+<% if @anchor_result %>
+  <div class="calculation-result">
+    <h2><%= t('safety_standards.calculators.anchor.result_title') %></h2>
+    <p>
+      <strong><%= t('safety_standards.calculators.anchor.required_result') %></strong> <%= @anchor_result[:required_anchors] %>
+    </p>
+    <h3>Breakdown:</h3>
+    <ul>
+      <% @anchor_result[:formula_breakdown].each do |line| %>
+        <li>
+          <strong><%= line[0] %>:</strong> <%= line[1] %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% elsif @anchor_error %>
+  <div class="calculation-error">
+    <p><strong>Error:</strong> <%= @anchor_error %></p>
+  </div>
+<% end %>

@@ -14,36 +14,35 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   after_update :log_assessment_update, if: :saved_changes?
 
   def meets_anchor_requirements?
-    return false unless total_anchors.present? && inspection.area.present?
-    inspection_area = inspection.area
-    required_anchors = SafetyStandard.calculate_required_anchors(
-      inspection_area
-    )
-    total_anchors >= required_anchors
+    unless total_anchors &&
+        inspection.width &&
+        inspection.height &&
+        inspection.length
+      return false
+    end
+
+    total_anchors >= anchorage_result[:required_anchors]
   end
 
   def total_anchors
     (num_low_anchors || 0) + (num_high_anchors || 0)
   end
 
+  def anchorage_result
+    @anchor_result ||= SafetyStandard.build_anchor_result(
+      length: inspection.length,
+      width: inspection.width,
+      height: inspection.height
+    )
+  end
+
   def required_anchors
-    return 0 unless inspection.area.present?
-    SafetyStandard.calculate_required_anchors(inspection.area)
+    return 0 unless inspection.volume.present?
+    anchorage_result[:required_anchors]
   end
 
-  def anchor_compliance_status
-    return I18n.t("forms.anchorage.compliance.not_assessed") unless total_anchors.present?
-
-    if meets_anchor_requirements?
-      I18n.t("forms.anchorage.compliance.compliant")
-    else
-      I18n.t("forms.anchorage.compliance.non_compliant",
-        required: required_anchors,
-        actual: total_anchors)
-    end
-  end
-
-  def anchor_counts_present?
-    num_low_anchors.present? && num_high_anchors.present?
+  def anchorage_breakdown
+    return [] unless inspection.volume
+    anchorage_result[:formula_breakdown]
   end
 end

@@ -50,28 +50,17 @@ class SafetyStandardsController < ApplicationController
   end
 
   def calculate_anchors
-    area = params[:calculation][:area].to_f
+    length = params[:calculation][:length].to_f
+    width = params[:calculation][:width].to_f
+    height = params[:calculation][:height].to_f
 
-    return set_anchor_error unless area.positive?
+    return set_anchor_error unless length.positive? && width.positive? && height.positive?
 
-    @anchor_result = build_anchor_result(area)
+    @anchor_result = SafetyStandard.build_anchor_result(length: length, width: width, height: height)
   end
 
   def set_anchor_error
-    @anchor_error = t("safety_standards.errors.invalid_area")
-  end
-
-  def build_anchor_result(area)
-    required_anchors = SafetyStandard.calculate_required_anchors(area)
-    {
-      area: area,
-      required_anchors: required_anchors,
-      formula_breakdown: build_anchor_formula(area, required_anchors)
-    }
-  end
-
-  def build_anchor_formula(area, required_anchors)
-    "((#{area}² × 114) ÷ 1600) × 1.5 = #{required_anchors}"
+    @anchor_error = t("safety_standards.errors.invalid_dimensions")
   end
 
   def calculate_user_capacity

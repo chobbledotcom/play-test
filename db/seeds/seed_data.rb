@@ -154,7 +154,7 @@ module SeedData
       (required_runout + rand(0.5..1.5)).round(1)
     else
       fail_margin = rand(0.1..0.3)
-      fail_runout = (required_runout - fail_margin)
+      (required_runout - fail_margin)
     end
 
     {

@@ -6,64 +6,44 @@
 
   <!-- Anchor Requirements -->
   <% anchor_metadata = SafetyStandard.calculation_metadata[:anchors] %>
-
-    <h2><%= anchor_metadata[:title] %></h2>
-    <p><%= anchor_metadata[:description] %></p>
-
-    <div class="formula-box">
-      <h4>Calculation Formula:</h4>
-      <code><%= anchor_metadata[:formula_text] %></code>
-      <p>Example: <%= SafetyStandard.generate_example(:anchors) %></p>
+  <h2><%= anchor_metadata[:title] %></h2>
+  <p><%= anchor_metadata[:description] %></p>
+  <div class="formula-box">
+    <h4>Calculation Formula:</h4>
+    <code><%= anchor_metadata[:formula_text] %></code>
+    <p>Example: <%= SafetyStandard.generate_example(:anchors) %></p>
+  </div>
+  <details class="source-code-box">
+    <summary><strong>View Ruby Source Code</strong></summary>
+    <div class="source-code">
+      <h4>Method: <%= anchor_metadata[:method_name] %></h4>
+      <pre><code class="ruby"><%= SafetyStandard.get_method_source(anchor_metadata[:method_name]) %></code></pre>
+      <p><em>Source: app/services/safety_standard.rb</em></p>
     </div>
-
-    <!-- Ruby Source Code Display -->
-    <details class="source-code-box">
-      <summary><strong>View Ruby Source Code</strong></summary>
-      <div class="source-code">
-        <h4>Method: <%= anchor_metadata[:method_name] %></h4>
-        <pre><code class="ruby"><%= SafetyStandard.get_method_source(anchor_metadata[:method_name]) %></code></pre>
-        <p><em>Source: app/services/safety_standard.rb</em></p>
-      </div>
-    </details>
-
-    <!-- Interactive Calculator -->
-    <div class="calculator-form">
-      <h4><%= t('safety_standards.calculators.anchor.title') %></h4>
-      <%= form_with url: safety_standards_path, method: :post, local: false do |form| %>
-        <%= form.hidden_field "calculation[type]", value: "anchors" %>
-        <div class="form-group">
-          <%= form.label "calculation[area]", t('safety_standards.calculators.anchor.area_label') %>
-          <%= form.number_field "calculation[area]", step: 0.1, min: 0.1, value: params.dig(:calculation, :area), placeholder: t('safety_standards.calculators.anchor.area_placeholder') %>
-        </div>
-        <%= form.submit t('safety_standards.calculators.anchor.submit'), class: "button" %>
+  </details>
+  <div class="calculator-form">
+    <%= render 'form/form_context',
+      model: nil,
+      scope: :calculation,
+      url: safety_standards_path,
+      method: :post,
+      local: false,
+      i18n_base: 'forms.safety_standards_anchors' do |form| %>
+      <%= form.hidden_field :type, value: "anchors" %>
+      <%= render 'form/fieldset', legend_key: 'unit_dimensions' do %>
+        <%= render 'form/number', field: :length %>
+        <%= render 'form/number', field: :width %>
+        <%= render 'form/number', field: :height %>
       <% end %>
+    <% end %>
 
-      <div id="anchors-result">
-        <% if @anchor_result %>
-          <div class="calculation-result">
-            <h5><%= t('safety_standards.calculators.anchor.result_title') %></h5>
-            <p><strong><%= t('safety_standards.calculators.anchor.area_result') %></strong> <%= @anchor_result[:area] %>m²</p>
-            <p><strong><%= t('safety_standards.calculators.anchor.required_result') %></strong> <%= @anchor_result[:required_anchors] %></p>
-            <p><strong><%= t('safety_standards.calculators.anchor.calculation_result') %></strong> <%= @anchor_result[:formula_breakdown] %></p>
-          </div>
-        <% elsif @anchor_error %>
-          <div class="calculation-error">
-            <p><strong>Error:</strong> <%= @anchor_error %></p>
-          </div>
-        <% end %>
-      </div>
+    <div id="anchors-result">
+      <%= render 'anchor_result' %>
     </div>
+  </div>
+  <hr>
+    <% wall_height_metadata = SafetyStandard.calculation_metadata[:wall_height] %>
 
-    <ul>
-      <li>Ground-level anchoring points (low anchors)</li>
-      <li>Elevated anchoring points for tall structures (high anchors)</li>
-      <li>30° to 45° angle to ground</li>
-      <li>1600 Newton pull strength minimum</li>
-    </ul>
-
-
-  <!-- User Height Requirements (Wall Height Calculator) -->
-  <% wall_height_metadata = SafetyStandard.calculation_metadata[:wall_height] %>
 
     <h2><%= wall_height_metadata[:title] %></h2>
     <p><%= wall_height_metadata[:description] %></p>
@@ -84,7 +64,8 @@
       </div>
     </details>
 
-    <!-- Interactive Calculator -->
+    <hr>
+
     <div class="calculator-form">
       <h4><%= t('safety_standards.calculators.wall_height.title') %></h4>
       <%= form_with url: safety_standards_path, method: :post, local: false do |form| %>
@@ -97,20 +78,7 @@
       <% end %>
 
       <div id="wall-height-result">
-        <% if @wall_height_result %>
-          <div class="calculation-result">
-            <h5><%= t('safety_standards.calculators.wall_height.result_title') %></h5>
-            <p><strong><%= t('safety_standards.calculators.wall_height.user_height_result') %></strong> <%= @wall_height_result[:user_height] %>m</p>
-            <p><strong><%= t('safety_standards.calculators.wall_height.requirement_result') %></strong> <%= @wall_height_result[:requirement] %></p>
-            <% if @wall_height_result[:requires_roof] %>
-              <p><strong><%= t('safety_standards.calculators.wall_height.additional_result') %></strong> Permanent roof required</p>
-            <% end %>
-          </div>
-        <% elsif @wall_height_error %>
-          <div class="calculation-error">
-            <p><strong>Error:</strong> <%= @wall_height_error %></p>
-          </div>
-        <% end %>
+        <%= render 'wall_height_result' %>
       </div>
     </div>
 
@@ -141,6 +109,8 @@
       </tbody>
     </table>
 
+    <hr>
+
     <h2>Slide Safety Requirements</h2>
     <h3>Runout Requirements</h3>
 
@@ -162,6 +132,8 @@
       </div>
     </details>
 
+    <hr>
+
     <div class="calculator-form">
       <h4><%= t('safety_standards.calculators.runout.title') %></h4>
       <%= form_with url: safety_standards_path, method: :post, local: false do |form| %>
@@ -174,18 +146,7 @@
       <% end %>
 
       <div id="runout-result">
-        <% if @runout_result %>
-          <div class="calculation-result">
-            <h5><%= t('safety_standards.calculators.runout.result_title') %></h5>
-            <p><strong><%= t('safety_standards.calculators.runout.platform_height_result') %></strong> <%= @runout_result[:platform_height] %>m</p>
-            <p><strong><%= t('safety_standards.calculators.runout.required_runout_result') %></strong> <%= @runout_result[:required_runout] %>m</p>
-            <p><strong><%= t('safety_standards.calculators.runout.calculation_breakdown') %></strong> <%= @runout_result[:calculation] %></p>
-          </div>
-        <% elsif @runout_error %>
-          <div class="calculation-error">
-            <p><strong>Error:</strong> <%= @runout_error %></p>
-          </div>
-        <% end %>
+        <%= render 'runout_result' %>
       </div>
     </div>
 
@@ -269,28 +230,7 @@
       <% end %>
 
       <div id="capacity-result">
-        <% if @capacity_result %>
-          <div class="calculation-result">
-            <h5><%= t('safety_standards.calculators.user_capacity.result_title') %></h5>
-            <p><strong><%= t('safety_standards.calculators.user_capacity.dimensions_result') %></strong> <%= @capacity_result[:length] %>m × <%= @capacity_result[:width] %>m</p>
-            <p><strong><%= t('safety_standards.calculators.user_capacity.total_area_result') %></strong> <%= @capacity_result[:area] %>m²</p>
-            <% if @capacity_result[:negative_adjustment] > 0 %>
-              <p><strong><%= t('safety_standards.calculators.user_capacity.negative_adjustment_result') %></strong> -<%= @capacity_result[:negative_adjustment] %>m²</p>
-            <% end %>
-            <p><strong><%= t('safety_standards.calculators.user_capacity.usable_area_result') %></strong> <%= @capacity_result[:usable_area] %>m²</p>
-            <p><strong><%= t('safety_standards.calculators.user_capacity.capacities_result') %></strong></p>
-            <ul>
-              <li>1.0m users: <%= @capacity_result[:capacities][:users_1000mm] %> (young children)</li>
-              <li>1.2m users: <%= @capacity_result[:capacities][:users_1200mm] %> (children)</li>
-              <li>1.5m users: <%= @capacity_result[:capacities][:users_1500mm] %> (adolescents)</li>
-              <li>1.8m users: <%= @capacity_result[:capacities][:users_1800mm] %> (adults)</li>
-            </ul>
-          </div>
-        <% elsif @capacity_error %>
-          <div class="calculation-error">
-            <p><strong>Error:</strong> <%= @capacity_error %></p>
-          </div>
-        <% end %>
+        <%= render 'capacity_result' %>
       </div>
     </div>
 
@@ -430,9 +370,9 @@
       <pre>{
   "calculation": {
     "type": "anchors|user_capacity|slide_runout|wall_height",
-    "area": 25.0,              // for anchors
-    "length": 5.0,             // for user_capacity
-    "width": 4.0,              // for user_capacity
+    "length": 5.0,             // for anchors & user_capacity
+    "width": 4.0,              // for anchors & user_capacity
+    "height": 3.0,             // for anchors
     "negative_adjustment": 2.0, // for user_capacity (optional)
     "platform_height": 1.5,    // for slide_runout
     "user_height": 1.2         // for wall_height
