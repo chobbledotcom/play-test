@@ -5,17 +5,14 @@
   #   checkbox_id: Unique ID for the checkbox
   #   textarea_id: ID of the textarea to show/hide
   #   has_comment: Whether comment exists
-  #   prefilled: Whether the comment is prefilled
 %>
 
-<%= render 'form/field_wrapper', prefilled: prefilled, wrapper_class: 'comment-checkbox' do %>
-  <label for="<%= checkbox_id %>">
-    <input type="checkbox"
-      id="<%= checkbox_id %>"
-      <%= 'checked' if has_comment %>
-      data-comment-toggle="<%= textarea_id %>"
-      data-comment-container="<%= textarea_id %>"
-    >
-    <%= t('shared.comment') %>
-  </label>
-<% end %>
+<label for="<%= checkbox_id %>" class="comment-checkbox">
+  <input type="checkbox"
+    id="<%= checkbox_id %>"
+    <%= 'checked' if has_comment %>
+    data-comment-toggle="<%= textarea_id %>"
+    data-comment-container="<%= textarea_id %>"
+  >
+  <%= t('shared.comment') %>
+</label>

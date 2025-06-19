@@ -74,11 +74,11 @@ label > input[type="radio"] {
   margin-right: 0;
 }
 
-.pass input[type="radio"]::before {
+.pass-fail input[value="true"]::before {
   box-shadow: inset 1em 1em var(--color-pass, #00a94f);
 }
 
-.fail input[type="radio"]::before {
+.pass-fail input[value="false"]::before {
   box-shadow: inset 1em 1em var(--color-fail, #d32f2f);
 }
 

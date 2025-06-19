@@ -7,33 +7,27 @@
   #   - Pass/fail field: field (e.g., 'seam_integrity_pass')
   #   - Comment field: base field + '_comment' (e.g., 'seam_integrity_comment')
 
-  # If field ends with _pass, strip it before adding _comment
-  base_field = field.to_s.end_with?('_pass') ? field.to_s.chomp('_pass') : field.to_s
+  base_field = field.to_s.gsub(/_pass$/, "")
   comment_field = "#{base_field}_comment".to_sym
 
-  # Get the form object
   form = @_current_form
   model = form.object
 
-  # Get field label from i18n (will raise if missing)
   field_data = form_field_setup(field, local_assigns)
 
-  # Get comment field options
-  comment_info = comment_field_options(form, comment_field, field_data[:field_label])
+  comment_info = comment_field_options(
+    form,
+    comment_field,
+    field_data[:field_label]
+  )
 
-  # Check the prefilled value if needed
   checked_value = field_data[:prefilled] ? field_data[:value] : nil
 %>
 
 <div class="form-grid radio-comment" id="<%= field %>">
-  <%= render 'form/field_wrapper',
-    prefilled: field_data[:prefilled],
-    wrapper_class: 'label' do
-  %>
-    <label>
-      <%= field_data[:field_label] %>
-    </label>
-  <% end %>
+  <label class="label">
+    <%= field_data[:field_label] %>
+  </label>
 
   <%= render 'form/radio_pass_fail',
     field: field,
@@ -49,7 +43,5 @@
     prefilled: comment_info[:prefilled]
   %>
 
-  <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled], wrapper_class: 'comment' do %>
-    <%= form.text_area comment_field, comment_info[:options] %>
-  <% end %>
+  <%= form.text_area comment_field, comment_info[:options] %>
 </div>

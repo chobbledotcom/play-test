@@ -46,11 +46,13 @@ class PdfGeneratorService
       attachment = entity.photo
       return unless attachment.blob
 
-      # Create image object once and reuse it
-      image = create_image(attachment)
+      # Download blob data only once and create image
+      image_data = attachment.blob.download
+      image = MiniMagick::Image.read(image_data)
 
-      # Get original image dimensions
-      original_width, original_height = ImageOrientationProcessor.get_dimensions(image)
+      # Get original image dimensions (without duplicating)
+      original_width = image.width
+      original_height = image.height
 
       # Calculate photo dimensions maintaining aspect ratio
       photo_width, photo_height = PositionCalculator.footer_photo_dimensions(original_width, original_height)
@@ -58,7 +60,10 @@ class PdfGeneratorService
       # Calculate position based on photo dimensions
       photo_x, photo_y = PositionCalculator.photo_footer_position(qr_x, qr_y, photo_width, photo_height)
 
-      processed_image = ImageOrientationProcessor.process_with_orientation(image)
+      # Process image for orientation
+      image.auto_orient
+      processed_image = image.to_blob
+      
       pdf.image StringIO.new(processed_image), at: [photo_x, photo_y], width: photo_width, height: photo_height
     end
 

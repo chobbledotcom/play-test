@@ -299,6 +299,10 @@ a {
   text-decoration: underline;
 }
 
+a:not(.button):hover {
+  color: var(--color-text);
+}
+
 a b,
 a em,
 a i,

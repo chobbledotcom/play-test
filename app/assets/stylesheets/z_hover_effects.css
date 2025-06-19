@@ -166,14 +166,6 @@ select:focus {
   border-color: rgb(118, 99, 228);
 }
 
-/* Checkbox and radio hover */
-input[type="checkbox"]:hover,
-input[type="radio"]:hover {
-  cursor: pointer;
-  transform: scale(1.1);
-}
-
-/* Share button special effects */
 .share-button {
   transition: all 0.2s ease;
 }

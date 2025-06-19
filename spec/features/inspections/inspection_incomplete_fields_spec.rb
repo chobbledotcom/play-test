@@ -116,15 +116,28 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
     expand_incomplete_fields
 
-    total_fields = all(".incomplete-field-item").count
-    expect(total_fields).to eq(summary_count)
+    within(".incomplete-fields-list") do
+      # Field links have anchors to specific fields (not #tabs)
+      field_links = all("a[href*='#']").reject { |link| link[:href].end_with?("#tabs") }
+      total_fields = field_links.count
+      
+      expect(total_fields).to eq(summary_count)
 
-    sections = all(".incomplete-fields-content > ul > li")
-    expect(sections.count).to be > 1
+      # Section headers have #tabs anchors
+      section_headers = all("a[href$='#tabs']")
+      expect(section_headers.count).to be > 1
 
-    sections.each do |section|
-      fields_in_section = section.all(".incomplete-field-item").count
-      expect(fields_in_section).to be > 0
+      # Verify each section has at least one field
+      section_headers.each do |header|
+        section_name = header.text
+        # Find fields for this section by looking for links with the same tab parameter
+        tab_match = header[:href].match(/tab=(\w+)/)
+        if tab_match
+          tab_name = tab_match[1]
+          section_fields = field_links.select { |link| link[:href].include?("tab=#{tab_name}") }
+          expect(section_fields.count).to be > 0, "Section '#{section_name}' should have incomplete fields"
+        end
+      end
     end
   end
 

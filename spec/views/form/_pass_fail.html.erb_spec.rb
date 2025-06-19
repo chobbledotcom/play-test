@@ -96,8 +96,9 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
 
       render_pass_fail
 
-      expect(rendered).to have_css("div.pass.set-previous")
-      expect(rendered).to have_css("div.fail.set-previous")
+      # The simplified HTML doesn't add set-previous classes
+      # Just verify the radio button is checked correctly
+      expect(rendered).to have_css('input[type="radio"][value="false"][checked="checked"]')
     end
   end
 

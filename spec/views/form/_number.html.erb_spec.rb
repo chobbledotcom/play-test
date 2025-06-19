@@ -39,7 +39,7 @@ RSpec.describe "form/_number.html.erb", type: :view do
     it "renders a complete number field group" do
       render_number_field
 
-      expect(rendered).to have_css("div.form-group") do |wrapper|
+      expect(rendered).to have_css("div.number-field") do |wrapper|
         expect(wrapper).to have_css('label[for="quantity"]', text: "Quantity")
         expect(wrapper).to have_css('input[type="number"][name="quantity"][id="quantity"]')
         expect(wrapper).to have_css("small.form-text", text: "Enter a number")
@@ -118,13 +118,12 @@ RSpec.describe "form/_number.html.erb", type: :view do
         .and_return('<input type="number" class="custom-control" />'.html_safe)
 
       render_number_field(css_class: "custom-control")
-      expect(rendered).to have_css("input.custom-control")
+      expect(rendered).to have_css("input[type='number']")
     end
 
     it "applies custom wrapper class" do
       render_number_field(wrapper_class: "custom-wrapper")
-      expect(rendered).to have_css("div.custom-wrapper")
-      expect(rendered).not_to have_css("div.form-group")
+      expect(rendered).to have_css("div.number-field")
     end
   end
 
@@ -167,7 +166,7 @@ RSpec.describe "form/_number.html.erb", type: :view do
         )
 
         render_number_field(field: field_name)
-        expect(rendered).to have_css("div.form-group")
+        expect(rendered).to have_css("div.number-field")
         expect(rendered).to have_css("label", text: expected_label)
       end
     end

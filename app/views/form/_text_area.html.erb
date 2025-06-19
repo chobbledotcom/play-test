@@ -1,27 +1,22 @@
 <%
-  # Get i18n_base from section (already validated there)
   setup = form_field_setup(field, local_assigns)
 
-  # Form field options
   rows ||= 4
   required ||= false
 
-  # Build field options
   field_options = {
     rows: rows,
     placeholder: setup[:field_placeholder],
     required: required
   }.compact
-  
+
   if setup[:prefilled]
     field_options[:value] = setup[:value]
   end
 %>
 
-<%= render 'form/field_wrapper', prefilled: setup[:prefilled], wrapper_class: 'text-area' do %>
-  <%= setup[:form_object].label field, setup[:field_label] %>
-  <%= setup[:form_object].text_area field, field_options %>
-  <% if setup[:field_hint].present? %>
-    <small><%= setup[:field_hint] %></small>
-  <% end %>
+<%= setup[:form_object].label field, setup[:field_label] %>
+<%= setup[:form_object].text_area field, field_options %>
+<% if setup[:field_hint].present? %>
+  <small><%= setup[:field_hint] %></small>
 <% end %>

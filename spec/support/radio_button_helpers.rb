@@ -36,24 +36,35 @@ module RadioButtonHelpers
   def choose_radio_in_container(label, value, containers, selectors)
     found = false
 
-    containers.each do |container|
-      break if found
-      xpath = "//div[contains(@class, '#{container}')]"
-      xpath += "[.//label[normalize-space(.)='#{label}']]"
+    # Try to find the radio button using the simplified HTML structure
+    begin
+      # First, try to find by the main label
+      container = find(:xpath, "//div[@class='form-grid radio-comment'][.//label[@class='label'][normalize-space(.)='#{label}']]")
 
-      begin
-        within(:xpath, xpath) do
-          selector = value ? selectors[:yes] : selectors[:no]
-          selector.each do |class_name|
-            within(:xpath, ".//div[contains(@class, '#{class_name}')]") do
-              find("input[type='radio']").click
-              found = true
-              break
-            end
-          rescue Capybara::ElementNotFound
-            next
+      # Then find the pass-fail div and click the appropriate radio
+      within(container) do
+        within(".pass-fail") do
+          if value
+            # Click Yes/Pass radio
+            find("label", text: /^(Yes|Pass)$/).find("input[type='radio']").click
+          else
+            # Click No/Fail radio
+            find("label", text: /^(No|Fail)$/).find("input[type='radio']").click
           end
         end
+      end
+      found = true
+    rescue Capybara::ElementNotFound
+      # Try alternative selectors if the first approach fails
+      alt_selectors = [
+        "//label[normalize-space(.)='#{label}']/following-sibling::div[@class='pass-fail']//label[contains(.,'#{value ? "Yes" : "No"}')]/input[@type='radio']",
+        "//label[normalize-space(.)='#{label}']/following-sibling::div[@class='pass-fail']//label[contains(.,'#{value ? "Pass" : "Fail"}')]/input[@type='radio']"
+      ]
+
+      alt_selectors.each do |selector|
+        find(:xpath, selector).click
+        found = true
+        break
       rescue Capybara::ElementNotFound
         next
       end

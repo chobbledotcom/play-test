@@ -2,35 +2,28 @@
   # Get i18n_base from section (already validated there)
   setup = form_field_setup(field, local_assigns)
 
-  # Form field options
   step ||= 0.01
   min ||= nil
   max ||= nil
   required ||= false
-  css_class ||= "form-control"
-  wrapper_class ||= "form-group"
-  
-  # Build field options
+
   field_options = {
     step: step,
     min: min,
     max: max,
     required: required,
-    placeholder: setup[:field_placeholder],
-    class: css_class
+    placeholder: setup[:field_placeholder]
   }
-  
+
   if setup[:prefilled]
     field_options[:value] = setup[:value]
   end
 %>
 
-<%= render 'form/field_wrapper', prefilled: setup[:prefilled], wrapper_class: 'number-field' do %>
-  <div class="<%= wrapper_class %>">
-    <%= setup[:form_object].label field, setup[:field_label] %>
-    <%= setup[:form_object].number_field field, field_options.compact %>
-    <% if setup[:field_hint].present? %>
-      <small class="form-text"><%= setup[:field_hint] %></small>
-    <% end %>
-  </div>
-<% end %>
+<div class="number-field" id="field">
+  <%= setup[:form_object].label field, setup[:field_label] %>
+  <%= setup[:form_object].number_field field, field_options.compact %>
+  <% if setup[:field_hint].present? %>
+    <small class="form-text"><%= setup[:field_hint] %></small>
+  <% end %>
+</div>

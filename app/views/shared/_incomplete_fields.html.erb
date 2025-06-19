@@ -36,9 +36,11 @@
               )
             %>
           </strong>
+        </li>
+        <li>
           <ul>
             <% form[:fields].each do |field| %>
-              <li class="incomplete-field-item">
+              <li>
                 <%= link_to field[:label],
                   edit_inspection_path(
                     @inspection,

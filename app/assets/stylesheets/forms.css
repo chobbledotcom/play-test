@@ -83,6 +83,26 @@
   margin-bottom: 2rem;
 }
 
+:target {
+  animation: highlight-fade 5s ease-out forwards;
+  border-radius: 5px;
+}
+
+@keyframes highlight-fade {
+  0% {
+    background: #ffff3766;
+    outline: 20px solid #ffff3766;
+  }
+  80% {
+    background: #ffff3766;
+    outline: 20px solid #ffff3766;
+  }
+  100% {
+    background: transparent;
+    outline: 20px solid transparent;
+  }
+}
+
 .form-grid input,
 .form-grid label {
   margin: 0;
@@ -91,13 +111,13 @@
 
 .form-grid input[type="text"],
 .form-grid input[type="number"] {
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
 }
 
 .form-grid input[type="number"],
 .form-grid input[type="text"][inputmode="decimal"] {
-  width: 4rem;
-  text-align: center;
+  width: 5rem;
+  text-align: left;
   padding: 0.4rem;
   font-variant-numeric: tabular-nums;
 }
@@ -118,17 +138,27 @@
   text-wrap: balance;
 }
 
+.form-grid .pass-fail {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.form-grid .pass-fail label {
+  display: flex;
+}
+
 .radio-comment {
   grid-template-areas:
-    "label label label label"
-    "pass-label fail-label comment-space comment-label";
-  grid-template-columns: auto auto 1fr auto;
+    "label label label"
+    "pass-fail comment-space comment-label";
+  grid-template-columns: auto 1fr auto;
   align-items: center;
 }
 @media (min-width: 768px) {
   .radio-comment {
-    grid-template-areas: "label pass-label fail-label comment-space comment-label";
-    grid-template-columns: max-content auto auto 1fr auto;
+    grid-template-areas: "label pass-fail comment-space comment-label";
+    grid-template-columns: max-content auto 1fr auto;
   }
 }
 
@@ -140,19 +170,15 @@
   flex-direction: column;
 }
 
-.radio-comment > .pass {
-  grid-area: pass-label;
-}
-
-.radio-comment > .fail {
-  grid-area: fail-label;
+.radio-comment > .pass-fail {
+  grid-area: pass-fail;
 }
 
 .radio-comment > .comment-checkbox {
   grid-area: comment-label;
 }
 
-.radio-comment > .comment {
+.radio-comment > textarea {
   grid-column: 1 / -1;
   margin-top: 0.5rem;
 }
@@ -160,9 +186,9 @@
 /* Number + Pass/Fail + Comment grid layout */
 .number-radio-comment {
   grid-template-areas:
-    "label label label label label"
-    "number pass-label fail-label comment-space comment-label";
-  grid-template-columns: auto auto auto 1fr auto;
+    "label label label label"
+    "number pass-fail comment-space comment-label";
+  grid-template-columns: auto auto 1fr auto;
 }
 
 .number-radio-comment > .label {
@@ -177,19 +203,15 @@
   grid-area: number;
 }
 
-.number-radio-comment > .pass {
-  grid-area: pass-label;
-}
-
-.number-radio-comment > .fail {
-  grid-area: fail-label;
+.number-radio-comment > .pass-fail {
+  grid-area: pass-fail;
 }
 
 .number-radio-comment > .comment-checkbox {
   grid-area: comment-label;
 }
 
-.number-radio-comment > .comment {
+.number-radio-comment > textarea {
   grid-column: 1 / -1;
   margin-top: 0.5rem;
 }
@@ -222,7 +244,7 @@
   grid-area: comment-label;
 }
 
-.number-comment > .comment {
+.number-comment > textarea {
   grid-column: 1 / -1;
   margin-top: 0.5rem;
 }
@@ -262,7 +284,7 @@
   grid-area: comment-label;
 }
 
-.checkbox-comment > .comment {
+.checkbox-comment > textarea {
   grid-column: 1 / -1;
   margin-top: 0.5rem;
 }
@@ -284,12 +306,4 @@
   .user-heights > * {
     flex: 1 1 calc(25% - 0.75rem);
   }
-}
-
-.set-previous label {
-}
-
-.set-previous input,
-.set-previous textarea {
-  border-color: green;
 }

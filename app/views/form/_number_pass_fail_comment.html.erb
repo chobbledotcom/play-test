@@ -17,25 +17,20 @@
   pass_fail_field = "#{field}_pass".to_sym
   comment_field = "#{field}_comment".to_sym
 
-  # Extract number field options
   number_options = local_assigns.slice(:step, :min, :max, :required)
 
-  # Get the form object
   form = @_current_form
   model = form.object
 
-  # Get field label from i18n
   field_data = form_field_setup(field, local_assigns)
   number_options[:value] = field_data[:value]
 
-  # Get pass/fail field data - don't use form_field_setup as it doesn't have its own label
   pass_fail_value, pass_fail_prefilled = get_field_value_and_prefilled_status(
     form,
     pass_fail_field
   )
   pass_fail_checked = pass_fail_prefilled ? pass_fail_value : nil
 
-  # Get comment field options
   comment_info = comment_field_options(
     form,
     comment_field,
@@ -44,26 +39,20 @@
 %>
 
 <div class="form-grid number-radio-comment" id="<%= number_field %>">
-  <!-- Label with number field -->
-  <%= render 'form/field_wrapper', prefilled: field_data[:prefilled], wrapper_class: 'label' do %>
-    <label for="<%= form.field_id(number_field) %>">
-      <%= field_data[:field_label] %>
-    </label>
-  <% end %>
+  <label for="<%= form.field_id(number_field) %>" class="label">
+    <%= field_data[:field_label] %>
+  </label>
 
-  <%= render 'form/field_wrapper',
-    prefilled: field_data[:prefilled],
-    wrapper_class: 'number' do
+  <%= form.number_field number_field,
+    id: form.field_id(number_field),
+    step: number_options[:step] || 0.1,
+    min: number_options[:min],
+    max: number_options[:max],
+    required: number_options[:required],
+    placeholder: field_data[:field_placeholder],
+    value: number_options[:value],
+    class: "number"
   %>
-    <%= form.number_field number_field,
-      id: form.field_id(number_field),
-      step: number_options[:step] || 0.1,
-      min: number_options[:min],
-      max: number_options[:max],
-      required: number_options[:required],
-      placeholder: field_data[:field_placeholder],
-      value: number_options[:value] %>
-  <% end %>
 
   <%= render 'form/radio_pass_fail',
     field: pass_fail_field,
@@ -78,7 +67,7 @@
       has_comment: comment_info[:has_comment],
       prefilled: comment_info[:prefilled] %>
 
-  <%= render 'form/field_wrapper', prefilled: comment_info[:prefilled], wrapper_class: 'comment' do %>
-    <%= form.text_area comment_field, comment_info[:options] %>
-  <% end %>
+  <%= form.text_area comment_field,
+    comment_info[:options]
+  %>
 </div>
