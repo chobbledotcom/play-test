@@ -7,25 +7,25 @@ import "share_buttons";
 
 // Initialize features on Turbo navigation
 function initializeFeatures() {
-  // Handle unit selection in inspection form
-  const unitSelect = document.querySelector(
-    'select[name="inspection[unit_id]"]',
-  );
-  if (unitSelect) {
-    // Handle changes to show unit details
-    unitSelect.addEventListener("change", function () {
-      const selectedUnitId = this.value;
+	// Handle unit selection in inspection form
+	const unitSelect = document.querySelector(
+		'select[name="inspection[unit_id]"]',
+	);
+	if (unitSelect) {
+		// Handle changes to show unit details
+		unitSelect.addEventListener("change", function () {
+			const selectedUnitId = this.value;
 
-      if (selectedUnitId) {
-        // Trigger form refresh to show unit details
-        // This could be enhanced with AJAX to avoid page refresh
-        const form = this.closest("form");
-        const currentUrl = new URL(window.location);
-        currentUrl.searchParams.set("unit_id", selectedUnitId);
-        window.location.href = currentUrl.toString();
-      }
-    });
-  }
+			if (selectedUnitId) {
+				// Trigger form refresh to show unit details
+				// This could be enhanced with AJAX to avoid page refresh
+				const form = this.closest("form");
+				const currentUrl = new URL(window.location);
+				currentUrl.searchParams.set("unit_id", selectedUnitId);
+				window.location.href = currentUrl.toString();
+			}
+		});
+	}
 }
 
 // Initialize on first load

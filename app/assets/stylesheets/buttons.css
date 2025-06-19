@@ -17,3 +17,10 @@ button.button.danger:hover {
   background: #c62828;
   border-color: #c62828;
 }
+
+/* Style disabled submit buttons during form submission */
+button[type="submit"]:disabled,
+input[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

@@ -60,54 +60,40 @@ class DirtyForms {
   }
 
   trackForm(form) {
-    // Only track forms with save message element
     const hasSaveMessage = form.querySelector("#form_save_message");
-    // console.log(
-    //   `[DirtyForms] TrackForm: has save message? ${!!hasSaveMessage}`,
-    // );
     if (!hasSaveMessage) {
-      // console.log("[DirtyForms] Skipping form - no save message element");
       return;
     }
 
-    // Skip if already tracking
+    const formAction = form.action || "";
+    if (formAction.includes("/login") || formAction.includes("/users/new")) {
+      return;
+    }
+
     if (this.trackedForms.has(form)) {
-      // console.log("[DirtyForms] Skipping form - already tracking");
       return;
     }
 
-    // console.log("[DirtyForms] Tracking new form");
     const formData = {
       initialState: this.captureState(form),
     };
 
-    // Track input changes
     const inputHandler = () => {
-      // console.log("[DirtyForms] Input/change event fired");
       if (this.isDirty(form, formData.initialState)) {
-        // console.log("[DirtyForms] Form is dirty, showing indicator");
         this.show();
       } else {
-        // console.log("[DirtyForms] Form is clean, hiding indicator");
         this.hide();
       }
     };
 
-    // Add listeners
     form.addEventListener("input", inputHandler);
     form.addEventListener("change", inputHandler);
-    // console.log("[DirtyForms] Added input/change listeners");
-
-    // Reset on submit
     form.addEventListener("submit", () => {
-      // console.log("[DirtyForms] Form submitted, resetting state");
       this.hide();
       formData.initialState = this.captureState(form);
     });
 
-    // Store form data
     this.trackedForms.set(form, formData);
-    // console.log("[DirtyForms] Form tracking complete");
   }
 
   captureState(form) {
@@ -115,7 +101,6 @@ class DirtyForms {
     const state = {};
 
     for (const [key, value] of data.entries()) {
-      // Handle multiple values for same key (checkboxes, multi-select)
       if (key in state) {
         if (!Array.isArray(state[key])) {
           state[key] = [state[key]];
@@ -156,12 +141,8 @@ class DirtyForms {
   }
 
   cleanup() {
-    // console.log("[DirtyForms] Cleanup called");
-    // Clear all tracked forms for fresh start
     this.trackedForms = new WeakMap();
-    // Hide indicator
     this.hide();
-    // console.log("[DirtyForms] Cleanup complete");
   }
 
   hasDirtyForm() {
@@ -169,50 +150,34 @@ class DirtyForms {
   }
 }
 
-// Create singleton instance
 const dirtyForms = new DirtyForms();
 
-// Initialize on first load
 document.addEventListener("DOMContentLoaded", () => {
-  // console.log("[DirtyForms] DOMContentLoaded event fired");
   dirtyForms.init();
 });
 
-// Reinitialize after Turbo navigation
 document.addEventListener("turbo:load", () => {
-  // console.log("[DirtyForms] turbo:load event fired");
   dirtyForms.cleanup();
   dirtyForms.init();
 });
 
-// Track dynamically loaded forms
 document.addEventListener("turbo:frame-load", () => {
-  // console.log("[DirtyForms] turbo:frame-load event fired");
   dirtyForms.trackForms();
 });
 
-// Clean up before cache
 document.addEventListener("turbo:before-cache", () => {
-  // console.log("[DirtyForms] turbo:before-cache event fired");
   dirtyForms.hide();
 });
 
-// Intercept navigation when forms are dirty
 document.addEventListener("turbo:before-visit", (event) => {
-  // console.log("[DirtyForms] turbo:before-visit event fired");
   if (dirtyForms.hasDirtyForm()) {
     const message =
       "You have unsaved changes. Are you sure you want to leave this page?";
     if (!confirm(message)) {
-      // console.log("[DirtyForms] Navigation cancelled - dirty form");
       event.preventDefault();
-    } else {
-      // console.log("[DirtyForms] Navigation allowed despite dirty form");
-    }
-  }
+    } 
 });
 
-// Also handle browser back/forward buttons
 window.addEventListener("beforeunload", (event) => {
   if (dirtyForms.hasDirtyForm()) {
     const message =
