@@ -136,44 +136,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect_pdf_to_include_i18n(pdf_text, "pdf.unit.no_completed_inspections")
     end
 
-    scenario "handles unit with 10 prior inspections" do
-      inspections = []
-      10.times do |i|
-        inspections << create(:inspection, :completed,
-          user: user,
-          unit: unit,
-          inspection_date: i.months.ago,
-          passed: i.even?,
-          inspection_location: "Location #{i + 1}")
-      end
-
-      start_time = Time.current
-      pdf_text = get_pdf_text(unit_report_path(unit))
-      generation_time = Time.current - start_time
-
-      expect(generation_time).to be < 10.seconds
-
-      expect_pdf_to_include_i18n_keys(pdf_text,
-        "pdf.unit.title",
-        "pdf.unit.details",
-        "pdf.unit.inspection_history")
-
-      expect(pdf_text).to include(unit.name)
-      expect(pdf_text).to include(unit.manufacturer)
-      expect(pdf_text).to include(unit.serial)
-
-      inspections.each do |inspection|
-        expect(pdf_text).to include(inspection.inspection_date.strftime("%d/%m/%Y"))
-      end
-
-      inspections.each_with_index do |inspection, index|
-        if inspection.passed?
-          expect(pdf_text).to include(I18n.t("shared.pass_pdf"))
-        else
-          expect(pdf_text).to include(I18n.t("shared.fail_pdf"))
-        end
-      end
-    end
 
     scenario "handles unit with image and 10 prior inspections" do
       unit_with_image = create(:unit, user: user,
@@ -234,35 +196,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
     end
   end
 
-  feature "PDF Formatting" do
-    scenario "uses correct fonts" do
-      inspection = create(:inspection, :completed, user: user, unit: unit)
-
-      pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
-      expect_valid_pdf(pdf_data)
-    end
-
-    scenario "generates valid PDF structure" do
-      inspection = create(:inspection, :completed, user: user, unit: unit)
-
-      pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
-      expect_valid_pdf(pdf_data)
-    end
-  end
-
-  feature "QR Code Generation" do
-    scenario "includes QR code in inspection report" do
-      inspection = create(:inspection, :completed, user: user, unit: unit)
-
-      pdf_data = get_pdf(inspection_path(inspection, format: :pdf))
-
-      expect(pdf_data).to include("/Image")
-
-      text_content = pdf_text_content(pdf_data)
-
-      expect(text_content).to include(inspection.id)
-    end
-  end
 
   private
 

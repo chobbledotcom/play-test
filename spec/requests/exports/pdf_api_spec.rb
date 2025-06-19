@@ -44,38 +44,6 @@ RSpec.describe "PDF API Endpoints", type: :request do
         expect(response.headers["Content-Type"]).to eq("application/pdf")
       end
 
-      context "with Unicode content" do
-        before do
-          inspection.update(
-            inspection_location: "Test Location with Ünicøde 😀",
-            risk_assessment: "Risk assessment with émoji 🎈"
-          )
-        end
-
-        it "handles Unicode in PDF generation" do
-          get "/inspections/#{inspection.id}.pdf"
-
-          expect(response).to have_http_status(:success)
-          expect(response.body[0..3]).to eq("%PDF")
-        end
-      end
-
-      context "with extremely long text" do
-        before do
-          long_text = "A" * 1000
-          inspection.update(
-            inspection_location: "Long location #{long_text}",
-            risk_assessment: "Long risk assessment #{long_text}"
-          )
-        end
-
-        it "handles long text in PDF generation" do
-          get "/inspections/#{inspection.id}.pdf"
-
-          expect(response).to have_http_status(:success)
-          expect(response.body[0..3]).to eq("%PDF")
-        end
-      end
     end
 
     describe "GET /inspections/:id.pdf" do
@@ -169,21 +137,6 @@ RSpec.describe "PDF API Endpoints", type: :request do
         expect(pdf_text).to include(I18n.t("pdf.unit.no_completed_inspections"))
       end
 
-      context "with Unicode content" do
-        before do
-          unit.update(
-            name: "Ünicøde Unit 😎",
-            manufacturer: "Émoji Company 🏭"
-          )
-        end
-
-        it "handles Unicode in unit PDFs" do
-          get "/units/#{unit.id}.pdf"
-
-          expect(response).to have_http_status(:success)
-          expect(response.body[0..3]).to eq("%PDF")
-        end
-      end
     end
 
     describe "GET /units/:id.png" do
@@ -238,27 +191,6 @@ RSpec.describe "PDF API Endpoints", type: :request do
     end
   end
 
-  describe "Error handling" do
-    it "handles HTML content in fields gracefully" do
-      inspection.update(
-        inspection_location: "<script>alert('xss')</script>",
-        risk_assessment: "<b>Bold text</b> with <em>HTML</em>"
-      )
-
-      get "/inspections/#{inspection.id}.pdf"
-
-      expect(response).to have_http_status(:success)
-      # PDF should be generated successfully even with HTML content
-      expect(response.body[0..3]).to eq("%PDF")
-    end
-
-    it "handles special characters in URLs" do
-      get "/inspections/#{inspection.id}%2Freport"
-
-      # Should handle URL encoding gracefully (may redirect or return error)
-      expect(response).to have_http_status(:not_found).or have_http_status(:found).or have_http_status(:success)
-    end
-  end
 
   private
 

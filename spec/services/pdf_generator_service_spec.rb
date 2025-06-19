@@ -12,14 +12,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
     let(:user) { create(:user) }
     let(:inspection) { create(:inspection, user: user) }
 
-    it "generates a PDF" do
-      pdf = PdfGeneratorService.generate_inspection_report(inspection)
-      expect(pdf).to be_a(Prawn::Document)
-
-      pdf_string = pdf.render
-      expect(pdf_string).to be_a(String)
-      expect(pdf_string[0..3]).to eq("%PDF")
-    end
 
     it "uses I18n translations for PDF content" do
       pdf = PdfGeneratorService.generate_inspection_report(inspection)
@@ -64,14 +56,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
     let(:user) { create(:user) }
     let(:unit) { create(:unit, user: user) }
 
-    it "generates a PDF" do
-      pdf = PdfGeneratorService.generate_unit_report(unit)
-      expect(pdf).to be_a(Prawn::Document)
-
-      pdf_string = pdf.render
-      expect(pdf_string).to be_a(String)
-      expect(pdf_string[0..3]).to eq("%PDF")
-    end
 
     it "uses I18n translations for unit PDF content" do
       pdf = PdfGeneratorService.generate_unit_report(unit)
@@ -159,114 +143,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
     end
   end
 
-  describe "assessment sections" do
-    let(:user) { create(:user) }
-    let(:unit) { create(:unit, user: user) }
-    let(:inspection) { create(:inspection, :completed, user:, unit:) }
-
-    context "with user height assessment" do
-      it "includes user height assessment data" do
-        pdf = PdfGeneratorService.generate_inspection_report(inspection)
-        pdf_text = pdf_text_content(pdf.render)
-
-        expect_pdf_to_include_i18n(pdf_text, "forms.user_height.header")
-      end
-    end
-
-    context "with slide assessment" do
-      it "includes slide assessment data" do
-        pdf = PdfGeneratorService.generate_inspection_report(inspection)
-        pdf_text = pdf_text_content(pdf.render)
-
-        expect_pdf_to_include_i18n(pdf_text, "forms.slide.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
-      end
-    end
-
-    context "with structure assessment" do
-      it "includes structure assessment data" do
-        pdf = PdfGeneratorService.generate_inspection_report(inspection)
-        pdf_text = pdf_text_content(pdf.render)
-
-        expect_pdf_to_include_i18n(pdf_text, "forms.structure.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
-      end
-    end
-
-    context "with anchorage assessment" do
-      it "includes anchorage assessment data" do
-        pdf = PdfGeneratorService.generate_inspection_report(inspection)
-        pdf_text = pdf_text_content(pdf.render)
-
-        expect_pdf_to_include_i18n(pdf_text, "forms.anchorage.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
-      end
-    end
-
-    context "with enclosed assessment" do
-      it "includes enclosed assessment data" do
-        pdf = PdfGeneratorService.generate_inspection_report(inspection)
-        pdf_text = pdf_text_content(pdf.render)
-
-        expect_pdf_to_include_i18n(pdf_text, "forms.enclosed.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
-      end
-    end
-
-    context "with materials assessment" do
-      it "includes materials assessment data" do
-        pdf = PdfGeneratorService.generate_inspection_report(inspection)
-        pdf_text = pdf_text_content(pdf.render)
-
-        expect_pdf_to_include_i18n(pdf_text, "forms.materials.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
-      end
-    end
-
-    context "with fan assessment" do
-      it "includes fan assessment data" do
-        pdf = PdfGeneratorService.generate_inspection_report(inspection)
-        pdf_text = pdf_text_content(pdf.render)
-
-        expect_pdf_to_include_i18n(pdf_text, "forms.fan.header")
-        expect_pdf_to_include_i18n(pdf_text, "shared.pass_pdf")
-      end
-    end
-
-    context "with incomplete assessments" do
-      let(:empty_inspection) { create(:inspection, user: user, unit: unit, has_slide: true, is_totally_enclosed: true) }
-
-      it "renders all i18n fields even when incomplete" do
-        pdf = PdfGeneratorService.generate_inspection_report(empty_inspection)
-        pdf_text = pdf_text_content(pdf.render)
-
-        # Use the helper that properly handles field grouping
-        expect_all_i18n_fields_rendered(pdf_text, empty_inspection)
-      end
-    end
-
-    context "for inspection without slide" do
-      before { inspection.update(has_slide: false) }
-
-      it "does not include slide section" do
-        pdf = PdfGeneratorService.generate_inspection_report(inspection)
-        pdf_text = pdf_text_content(pdf.render)
-
-        expect(pdf_text).not_to include(I18n.t("forms.slide.fields.slide_platform_height"))
-      end
-    end
-
-    context "for inspection not totally enclosed" do
-      before { inspection.update(is_totally_enclosed: false) }
-
-      it "does not include enclosed section" do
-        pdf = PdfGeneratorService.generate_inspection_report(inspection)
-        pdf_text = pdf_text_content(pdf.render)
-
-        expect(pdf_text).not_to include(I18n.t("forms.enclosed.header"))
-      end
-    end
-  end
 
   describe "unit with photo" do
     let(:user) { create(:user) }

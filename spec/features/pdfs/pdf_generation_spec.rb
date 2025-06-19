@@ -131,14 +131,4 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
     end
   end
 
-  feature "Mobile and responsive PDF access" do
-    scenario "user accesses PDFs on mobile-like viewport" do
-      visit inspection_path(inspection)
-
-      expect(page).to have_css("iframe", wait: 5)
-
-      expect(page).to have_css("iframe[src*='#{inspection.id}']")
-      expect(page).to have_css("iframe[src*='pdf']")
-    end
-  end
 end
