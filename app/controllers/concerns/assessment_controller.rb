@@ -125,8 +125,6 @@ module AssessmentController
   end
 
   def load_inspection_locations
-    # This is needed when rendering the inspections/edit view
-    # For now, just set an empty array since we're only editing one inspection
     @inspection_locations = []
   end
 

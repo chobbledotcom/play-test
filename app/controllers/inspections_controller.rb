@@ -350,13 +350,11 @@ class InspectionsController < ApplicationController
   end
 
   def load_inspection_locations
-    # Use already loaded inspections to avoid extra query
-    all_inspections = (@draft_inspections || []) + (@complete_inspections || [])
-    @inspection_locations = all_inspections
-      .map(&:inspection_location)
-      .compact
-      .reject(&:blank?)
+    @inspection_locations = current_user
+      .inspections
+      .pluck(:inspection_location)
       .uniq
+      .compact
       .sort
   end
 

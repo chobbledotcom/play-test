@@ -1,4 +1,7 @@
-<%= render 'form/form_context', model: @inspection, i18n_base: 'forms.inspection' do |form| %>
+<%= render 'form/form_context',
+  model: @inspection,
+  i18n_base: 'forms.inspection' do |form|
+%>
   <%= render 'form/fieldset', legend_key: 'current_unit' do %>
     <% if @inspection.unit.present? %>
       <%= render 'shared/unit_details_display', unit: @inspection.unit %>
@@ -18,7 +21,6 @@
     <% end %>
   <% end %>
 
-  <!-- Public Information -->
   <% unless @inspection.new_record? %>
     <%= render 'form/fieldset', legend_key: 'public_information' do %>
       <%= render 'form/display_field', field: :id %>
@@ -34,7 +36,10 @@
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'inspection_details' do %>
-    <%= render 'form/autocomplete_field', field: :inspection_location, options: @inspection_locations %>
+    <%= render 'form/autocomplete_field',
+      field: :inspection_location,
+      options: @inspection_locations
+    %>
 
     <%= render 'form/date_field', field: :inspection_date %>
 
@@ -57,7 +62,9 @@
         </button>
       <% end %>
       <div>
-        <small class="help-text"><%= t('inspections.fields.internal_id_help') %></small>
+        <small class="help-text">
+          <%= t('inspections.fields.internal_id_help') %>
+        </small>
       </div>
     </div>
   <% end %>
