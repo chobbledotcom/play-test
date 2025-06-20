@@ -53,4 +53,22 @@ module InspectionsHelper
   def current_tab
     params[:tab].presence || "inspection"
   end
+
+  def assessment_complete?(inspection, tab)
+    case tab
+    when "inspection"
+      # For the main inspection tab, check if required fields are filled
+      inspection.inspection_model_incomplete_fields.empty?
+    else
+      # For assessment tabs, check the corresponding assessment
+      assessment_method = "#{tab}_assessment"
+      assessment = inspection.public_send(assessment_method)
+      assessment&.complete? || false
+    end
+  end
+
+  def tab_name_with_check(inspection, tab)
+    name = t("forms.#{tab}.header")
+    assessment_complete?(inspection, tab) ? "#{name} ✓" : name
+  end
 end

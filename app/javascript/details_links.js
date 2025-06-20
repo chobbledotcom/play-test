@@ -1,17 +1,18 @@
-// Prevent details element from closing when clicking links inside
 class DetailsLinks {
 	constructor() {
 		this.setupEventListeners();
 	}
 
 	setupEventListeners() {
-		// Find all links inside details elements
-		document.querySelectorAll("details a").forEach((link) => {
-			link.addEventListener("click", (e) => {
-				// Stop the click from bubbling up to the details element
-				e.stopPropagation();
-			});
-		});
+		document.addEventListener("click", (e) => {
+			const link = e.target.closest("a");
+			if (link) {
+				const details = link.closest("details");
+				if (details) {
+					e.stopPropagation();
+				}
+			}
+		}, true);
 	}
 
 	static init() {
@@ -19,9 +20,7 @@ class DetailsLinks {
 	}
 }
 
-// Initialize on Turbo navigation
 document.addEventListener("turbo:load", () => DetailsLinks.init());
 document.addEventListener("turbo:frame-load", () => DetailsLinks.init());
 
-// Export for importmap
 export default DetailsLinks;

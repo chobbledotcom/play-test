@@ -27,6 +27,7 @@ group :development, :test do
   gem "rspec-rails"
   gem "factory_bot_rails"
   gem "capybara"
+  gem "cuprite"
   gem "simplecov", require: false
   gem "pdf-inspector", require: false
   gem "parallel_tests"

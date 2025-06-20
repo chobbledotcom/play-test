@@ -14,9 +14,9 @@
         <% inspection_tabs(@inspection).each do |tab| %>
           <li>
             <% if current_tab == tab %>
-              <span><%= t("forms.#{tab}.header") %></span>
+              <span><%= tab_name_with_check(@inspection, tab) %></span>
             <% else %>
-              <%= link_to t("forms.#{tab}.header"),
+              <%= link_to tab_name_with_check(@inspection, tab),
                 edit_inspection_path(@inspection, tab: tab, anchor: "tabs"),
                 data: { tab: tab }
               %>
@@ -27,7 +27,7 @@
     </nav>
 
     <% if @prefilled_fields&.any? %>
-      <div class="prefilled-message">
+      <div class="notice">
         <p>
           <strong>The following fields have been pre-filled from the last completed inspection for this unit:</strong>
         </p>

@@ -5,369 +5,210 @@
   </header>
 
   <!-- Anchor Requirements -->
-  <% anchor_metadata = SafetyStandard.calculation_metadata[:anchors] %>
-  <h2><%= anchor_metadata[:title] %></h2>
-  <p><%= anchor_metadata[:description] %></p>
-  <div class="formula-box">
-    <h4>Calculation Formula:</h4>
-    <code><%= anchor_metadata[:formula_text] %></code>
-    <p>Example: <%= SafetyStandard.generate_example(:anchors) %></p>
-  </div>
-  <details class="source-code-box">
-    <summary><strong>View Ruby Source Code</strong></summary>
-    <div class="source-code">
-      <h4>Method: <%= anchor_metadata[:method_name] %></h4>
-      <pre><code class="ruby"><%= SafetyStandard.get_method_source(anchor_metadata[:method_name]) %></code></pre>
-      <p><em>Source: app/services/safety_standard.rb</em></p>
-    </div>
-  </details>
-  <div class="calculator-form">
-    <%= render 'form/form_context',
-      model: nil,
-      scope: :calculation,
-      url: safety_standards_path,
-      method: :post,
-      local: false,
-      i18n_base: 'forms.safety_standards_anchors' do |form| %>
-      <%= form.hidden_field :type, value: "anchors" %>
-      <%= render 'form/fieldset', legend_key: 'unit_dimensions' do %>
-        <%= render 'form/number', field: :length %>
-        <%= render 'form/number', field: :width %>
-        <%= render 'form/number', field: :height %>
-      <% end %>
-    <% end %>
-
-    <div id="anchors-result">
-      <%= render 'anchor_result' %>
-    </div>
-  </div>
+  <%= render 'calculator_form', type: :anchors %>
   <hr>
-    <% wall_height_metadata = SafetyStandard.calculation_metadata[:wall_height] %>
+  
+  <!-- Wall Height Requirements -->
+  <%= render 'calculator_form', type: :wall_height %>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>User Height</th>
+        <th>Wall Requirement</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Under 0.6m</td>
+        <td>No containing walls required</td>
+      </tr>
+      <tr>
+        <td>0.6m - 3.0m</td>
+        <td>Walls must be equal to user height</td>
+      </tr>
+      <tr>
+        <td>3.0m - 6.0m</td>
+        <td>Walls must be 1.25× user height</td>
+      </tr>
+      <tr>
+        <td>Over 6.0m</td>
+        <td>Walls 1.25× height + permanent roof required</td>
+      </tr>
+    </tbody>
+  </table>
+  <hr>
 
+  <!-- Slide Safety Requirements -->
+  <h2>Slide Safety Requirements</h2>
+  <h3>Runout Requirements</h3>
+  
+  <%= render 'calculator_form', type: :slide_runout %>
+  
+  <ul>
+    <li>Minimum length: 50% of highest platform height</li>
+    <li>Absolute minimum: 300mm in any case</li>
+    <li>Maximum inclination: Not more than 10°</li>
+    <li>If stop wall fitted: adds 50cm to required run-out length</li>
+    <li>Wall height on run-out sides: 50% of user height</li>
+  </ul>
 
-    <h2><%= wall_height_metadata[:title] %></h2>
-    <p><%= wall_height_metadata[:description] %></p>
-
-    <div class="formula-box">
-      <h4>Calculation Formula:</h4>
-      <code><%= wall_height_metadata[:formula_text] %></code>
-      <p>Example: <%= SafetyStandard.generate_example(:wall_height) %></p>
-    </div>
-
-    <!-- Ruby Source Code Display -->
-    <details class="source-code-box">
-      <summary><strong>View Ruby Source Code</strong></summary>
-      <div class="source-code">
-        <h4>Method: <%= wall_height_metadata[:method_name] %></h4>
-        <pre><code class="ruby"><%= SafetyStandard.get_method_source(wall_height_metadata[:method_name]) %></code></pre>
-        <p><em>Source: app/services/safety_standard.rb</em></p>
-      </div>
-    </details>
-
-    <hr>
-
-    <div class="calculator-form">
-      <h4><%= t('safety_standards.calculators.wall_height.title') %></h4>
-      <%= form_with url: safety_standards_path, method: :post, local: false do |form| %>
-        <%= form.hidden_field "calculation[type]", value: "wall_height" %>
-        <div class="form-group">
-          <%= form.label "calculation[user_height]", t('safety_standards.calculators.wall_height.user_height_label') %>
-          <%= form.number_field "calculation[user_height]", step: 0.1, min: 0.1, value: params.dig(:calculation, :user_height), placeholder: t('safety_standards.calculators.wall_height.user_height_placeholder') %>
-        </div>
-        <%= form.submit t('safety_standards.calculators.wall_height.submit'), class: "button" %>
-      <% end %>
-
-      <div id="wall-height-result">
-        <%= render 'wall_height_result' %>
-      </div>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>User Height</th>
-          <th>Wall Requirement</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Under 0.6m</td>
-          <td>No containing walls required</td>
-        </tr>
-        <tr>
-          <td>0.6m - 3.0m</td>
-          <td>Walls must be equal to user height</td>
-        </tr>
-        <tr>
-          <td>3.0m - 6.0m</td>
-          <td>Walls must be 1.25× user height</td>
-        </tr>
-        <tr>
-          <td>Over 6.0m</td>
-          <td>Walls 1.25× height + permanent roof required</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <hr>
-
-    <h2>Slide Safety Requirements</h2>
-    <h3>Runout Requirements</h3>
-
-    <!-- Slide Runout Calculator -->
-    <% slide_runout_metadata = SafetyStandard.calculation_metadata[:slide_runout] %>
-    <div class="formula-box">
-      <h4>Calculation Formula:</h4>
-      <code><%= slide_runout_metadata[:formula_text] %></code>
-      <p>Example: <%= SafetyStandard.generate_example(:slide_runout) %></p>
-    </div>
-
-    <!-- Ruby Source Code Display -->
-    <details class="source-code-box">
-      <summary><strong>View Ruby Source Code</strong></summary>
-      <div class="source-code">
-        <h4>Method: <%= slide_runout_metadata[:method_name] %></h4>
-        <pre><code class="ruby"><%= SafetyStandard.get_method_source(slide_runout_metadata[:method_name]) %></code></pre>
-        <p><em>Source: app/services/safety_standard.rb</em></p>
-      </div>
-    </details>
-
-    <hr>
-
-    <div class="calculator-form">
-      <h4><%= t('safety_standards.calculators.runout.title') %></h4>
-      <%= form_with url: safety_standards_path, method: :post, local: false do |form| %>
-        <%= form.hidden_field "calculation[type]", value: "slide_runout" %>
-        <div class="form-group">
-          <%= form.label "calculation[platform_height]", t('safety_standards.calculators.runout.height_label') %>
-          <%= form.number_field "calculation[platform_height]", step: 0.1, min: 0.1, value: params.dig(:calculation, :platform_height), placeholder: t('safety_standards.calculators.runout.height_placeholder') %>
-        </div>
-        <%= form.submit t('safety_standards.calculators.runout.submit'), class: "button" %>
-      <% end %>
-
-      <div id="runout-result">
-        <%= render 'runout_result' %>
-      </div>
-    </div>
-
-    <!-- Additional runout requirements -->
-    <ul>
-      <li>Minimum length: 50% of highest platform height</li>
-      <li>Absolute minimum: 300mm in any case</li>
-      <li>Maximum inclination: Not more than 10°</li>
-      <li>If stop wall fitted: adds 50cm to required run-out length</li>
-      <li>Wall height on run-out sides: 50% of user height</li>
-    </ul>
-
-    <h3>Containing Wall Heights for Slides</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Platform Height</th>
-          <th>Requirement</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Under 600mm</td>
-          <td>No containing walls required</td>
-        </tr>
-        <tr>
-          <td>600mm - 3000mm</td>
-          <td>Containing walls equal to platform height</td>
-        </tr>
-        <tr>
-          <td>3000mm - 6000mm</td>
-          <td>Containing walls 1.25 times platform height</td>
-        </tr>
-        <tr>
-          <td>Over 6000mm</td>
-          <td>Containing walls AND permanent roof required</td>
-        </tr>
-      </tbody>
-    </table>
-
+  <h3>Containing Wall Heights for Slides</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Platform Height</th>
+        <th>Requirement</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Under 600mm</td>
+        <td>No containing walls required</td>
+      </tr>
+      <tr>
+        <td>600mm - 3000mm</td>
+        <td>Containing walls equal to platform height</td>
+      </tr>
+      <tr>
+        <td>3000mm - 6000mm</td>
+        <td>Containing walls 1.25 times platform height</td>
+      </tr>
+      <tr>
+        <td>Over 6000mm</td>
+        <td>Containing walls AND permanent roof required</td>
+      </tr>
+    </tbody>
+  </table>
+  <hr>
 
   <!-- User Capacity Calculations -->
-  <% user_capacity_metadata = SafetyStandard.calculation_metadata[:user_capacity] %>
+  <%= render 'calculator_form', type: :user_capacity %>
+  
+  <p>Based on age-appropriate space allocation:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>User Height</th>
+        <th>Age Group</th>
+        <th>Space Required</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1.0m</td>
+        <td>Young children</td>
+        <td>1.5m² per user</td>
+      </tr>
+      <tr>
+        <td>1.2m</td>
+        <td>Children</td>
+        <td>2.0m² per user</td>
+      </tr>
+      <tr>
+        <td>1.5m</td>
+        <td>Adolescents</td>
+        <td>2.5m² per user</td>
+      </tr>
+      <tr>
+        <td>1.8m</td>
+        <td>Adults</td>
+        <td>3.0m² per user</td>
+      </tr>
+    </tbody>
+  </table>
+  <hr>
 
-    <h2><%= user_capacity_metadata[:title] %></h2>
-    <p><%= user_capacity_metadata[:description] %></p>
+  <h2>Material Requirements</h2>
+  <h3>Fabric</h3>
+  <ul>
+    <li>Tensile strength: 1850 Newtons minimum</li>
+    <li>Tear strength: 350 Newtons minimum</li>
+    <li>Fire retardancy: Must meet EN 71-3 requirements</li>
+  </ul>
 
-    <div class="formula-box">
-      <h4>Calculation Formula:</h4>
-      <code><%= user_capacity_metadata[:formula_text] %></code>
-      <p>Example: <%= SafetyStandard.generate_example(:user_capacity) %></p>
-    </div>
+  <h3>Thread</h3>
+  <ul>
+    <li>Material: Non-rotting yarn required</li>
+    <li>Tensile strength: 88 Newtons minimum</li>
+    <li>Stitch type: Lock stitching required</li>
+    <li>Stitch length: 3-8mm</li>
+  </ul>
 
-    <!-- Ruby Source Code Display -->
-    <details class="source-code-box">
-      <summary><strong>View Ruby Source Code</strong></summary>
-      <div class="source-code">
-        <h4>Method: <%= user_capacity_metadata[:method_name] %></h4>
-        <pre><code class="ruby"><%= SafetyStandard.get_method_source(user_capacity_metadata[:method_name]) %></code></pre>
-        <p><em>Source: app/services/safety_standard.rb</em></p>
-      </div>
-    </details>
+  <h3>Rope</h3>
+  <ul>
+    <li>Diameter range: 18mm - 45mm</li>
+    <li>Material: Non-monofilament</li>
+    <li>Attachment: Fixed at both ends</li>
+    <li>Swing limitation: No greater than 20% to prevent strangulation</li>
+  </ul>
 
-    <div class="calculator-form">
-      <h4><%= t('safety_standards.calculators.user_capacity.title') %></h4>
-      <%= form_with url: safety_standards_path, method: :post, local: false do |form| %>
-        <%= form.hidden_field "calculation[type]", value: "user_capacity" %>
-        <div class="form-group">
-          <%= form.label "calculation[length]", t('safety_standards.calculators.user_capacity.length_label') %>
-          <%= form.number_field "calculation[length]", step: 0.1, min: 0.1, value: params.dig(:calculation, :length), placeholder: t('safety_standards.calculators.user_capacity.length_placeholder') %>
-        </div>
-        <div class="form-group">
-          <%= form.label "calculation[width]", t('safety_standards.calculators.user_capacity.width_label') %>
-          <%= form.number_field "calculation[width]", step: 0.1, min: 0.1, value: params.dig(:calculation, :width), placeholder: t('safety_standards.calculators.user_capacity.width_placeholder') %>
-        </div>
-        <div class="form-group">
-          <%= form.label "calculation[negative_adjustment]", t('safety_standards.calculators.user_capacity.adjustment_label') %>
-          <%= form.number_field "calculation[negative_adjustment]", step: 0.1, min: 0, value: params.dig(:calculation, :negative_adjustment), placeholder: t('safety_standards.calculators.user_capacity.adjustment_placeholder') %>
-        </div>
-        <%= form.submit t('safety_standards.calculators.user_capacity.submit'), class: "button" %>
-      <% end %>
+  <h3>Netting</h3>
+  <ul>
+    <li>Vertical mesh size: 30mm maximum for >1m height</li>
+    <li>Roof mesh size: 8mm maximum</li>
+    <li>Strength: Support heaviest intended user</li>
+  </ul>
 
-      <div id="capacity-result">
-        <%= render 'capacity_result' %>
-      </div>
-    </div>
+  <h2>Electrical Safety Requirements</h2>
+  <ul>
+    <li>PAT (Portable Appliance Test) required</li>
+    <li>Minimum pressure: 1.0 KPA operational pressure</li>
+    <li>Finger probe: 8mm probe must not contact moving/hot parts</li>
+    <li>Return flap: Required to reduce deflation time</li>
+    <li>Blower distance: 1.2m minimum from equipment edge</li>
+  </ul>
 
-    <p>Based on age-appropriate space allocation:</p>
-    <table>
-      <thead>
-        <tr>
-          <th>User Height</th>
-          <th>Age Group</th>
-          <th>Space Required</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1.0m</td>
-          <td>Young children</td>
-          <td>1.5m² per user</td>
-        </tr>
-        <tr>
-          <td>1.2m</td>
-          <td>Children</td>
-          <td>2.0m² per user</td>
-        </tr>
-        <tr>
-          <td>1.5m</td>
-          <td>Adolescents</td>
-          <td>2.5m² per user</td>
-        </tr>
-        <tr>
-          <td>1.8m</td>
-          <td>Adults</td>
-          <td>3.0m² per user</td>
-        </tr>
-      </tbody>
-    </table>
+  <h3>Grounding Test Weights</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>User Height</th>
+        <th>Test Weight</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1.0m</td>
+        <td>25kg</td>
+      </tr>
+      <tr>
+        <td>1.2m</td>
+        <td>35kg</td>
+      </tr>
+      <tr>
+        <td>1.5m</td>
+        <td>65kg</td>
+      </tr>
+      <tr>
+        <td>1.8m</td>
+        <td>85kg</td>
+      </tr>
+    </tbody>
+  </table>
 
+  <h2>Additional Safety Requirements</h2>
+  <ul>
+    <li>Maximum evacuation time: 30 seconds</li>
+    <li>Maximum fall height: 0.6m (600mm)</li>
+    <li>Multiple exits required for >15 users</li>
+    <li>First metre gradient: Special requirements for slides</li>
+    <li>Surface requirements: Non-slip surface material required</li>
+    <li>Edge protection: Rounded edges and smooth transitions</li>
+  </ul>
 
+  <h2>API Information</h2>
+  <p>These calculations are also available via JSON API for programmatic access:</p>
+  <div class="api-info">
+    <h4>Endpoint:</h4>
+    <code>POST <%= safety_standards_url %></code>
 
-    <h2>Material Requirements</h2>
-    <h3>Fabric</h3>
-    <ul>
-      <li>Tensile strength: 1850 Newtons minimum</li>
-      <li>Tear strength: 350 Newtons minimum</li>
-      <li>Fire retardancy: Must meet EN 71-3 requirements</li>
-    </ul>
+    <h4>Headers:</h4>
+    <code>Content-Type: application/json<br>Accept: application/json</code>
 
-    <h3>Thread</h3>
-    <ul>
-      <li>Material: Non-rotting yarn required</li>
-      <li>Tensile strength: 88 Newtons minimum</li>
-      <li>Stitch type: Lock stitching required</li>
-      <li>Stitch length: 3-8mm</li>
-    </ul>
-
-    <h3>Rope</h3>
-    <ul>
-      <li>Diameter range: 18mm - 45mm</li>
-      <li>Material: Non-monofilament</li>
-      <li>Attachment: Fixed at both ends</li>
-      <li>Swing limitation: No greater than 20% to prevent strangulation</li>
-    </ul>
-
-    <h3>Netting</h3>
-    <ul>
-      <li>Vertical mesh size: 30mm maximum for >1m height</li>
-      <li>Roof mesh size: 8mm maximum</li>
-      <li>Strength: Support heaviest intended user</li>
-    </ul>
-
-
-
-    <h2>Electrical Safety Requirements</h2>
-    <ul>
-      <li>PAT (Portable Appliance Test) required</li>
-      <li>Minimum pressure: 1.0 KPA operational pressure</li>
-      <li>Finger probe: 8mm probe must not contact moving/hot parts</li>
-      <li>Return flap: Required to reduce deflation time</li>
-      <li>Blower distance: 1.2m minimum from equipment edge</li>
-    </ul>
-
-    <h3>Grounding Test Weights</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>User Height</th>
-          <th>Test Weight</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1.0m</td>
-          <td>25kg</td>
-        </tr>
-        <tr>
-          <td>1.2m</td>
-          <td>35kg</td>
-        </tr>
-        <tr>
-          <td>1.5m</td>
-          <td>65kg</td>
-        </tr>
-        <tr>
-          <td>1.8m</td>
-          <td>85kg</td>
-        </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-    <h2>Additional Safety Requirements</h2>
-    <ul>
-      <li>Maximum evacuation time: 30 seconds</li>
-      <li>Maximum fall height: 0.6m (600mm)</li>
-      <li>Multiple exits required for >15 users</li>
-      <li>First metre gradient: Special requirements for slides</li>
-      <li>Surface requirements: Non-slip surface material required</li>
-      <li>Edge protection: Rounded edges and smooth transitions</li>
-    </ul>
-
-
-
-    <h2>API Information</h2>
-    <p>These calculations are also available via JSON API for programmatic access:</p>
-    <div class="api-info">
-      <h4>Endpoint:</h4>
-      <code>POST <%= safety_standards_url %></code>
-
-      <h4>Headers:</h4>
-      <code>Content-Type: application/json<br>Accept: application/json</code>
-
-      <h4>Parameters:</h4>
-      <p>Send calculation data in the following format:</p>
-      <pre>{
+    <h4>Parameters:</h4>
+    <p>Send calculation data in the following format:</p>
+    <pre>{
   "calculation": {
     "type": "anchors|user_capacity|slide_runout|wall_height",
     "length": 5.0,             // for anchors & user_capacity
@@ -379,15 +220,22 @@
   }
 }</pre>
 
-      <h4>Response:</h4>
-      <pre>{
-  "success": true,
-  "result": {
+    <h4>Response:</h4>
+    <pre>{
+  "passed": true,          // true if calculation succeeded
+  "status": "Calculation completed successfully",
+  "result": {              // null if passed is false
     // Calculation-specific results
   }
 }</pre>
 
-      <p>All calculations use the official EN 14960:2019 standard formulas and are publicly verifiable.</p>
-    </div>
+    <h4>Error Response:</h4>
+    <pre>{
+  "passed": false,
+  "status": "Invalid dimensions provided",
+  "result": null
+}</pre>
 
+    <p>All calculations use the official EN 14960:2019 standard formulas and are publicly verifiable.</p>
+  </div>
 </article>

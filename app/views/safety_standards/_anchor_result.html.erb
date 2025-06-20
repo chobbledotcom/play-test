@@ -14,7 +14,7 @@
     </ul>
   </div>
 <% elsif @anchor_error %>
-  <div class="calculation-error">
-    <p><strong>Error:</strong> <%= @anchor_error %></p>
+  <div class="error">
+    <p><strong><%= t('shared.error') %>:</strong> <%= @anchor_error %></p>
   </div>
 <% end %>

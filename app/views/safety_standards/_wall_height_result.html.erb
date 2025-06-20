@@ -8,7 +8,7 @@
     <% end %>
   </div>
 <% elsif @wall_height_error %>
-  <div class="calculation-error">
-    <p><strong>Error:</strong> <%= @wall_height_error %></p>
+  <div class="error">
+    <p><strong><%= t('shared.error') %>:</strong> <%= @wall_height_error %></p>
   </div>
 <% end %>

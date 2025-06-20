@@ -3,7 +3,7 @@
 .notice {
   max-width: 30rem;
   margin: 2rem auto;
-  text-align: center;
+  text-align: left;
   padding: 1rem;
   border-radius: 8px;
   font-weight: 500;
@@ -18,9 +18,9 @@
 }
 
 .notice {
-  background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
-  border: 1px solid #90ee90;
-  color: #2d5016;
+  background: linear-gradient(135deg, #e8f8ff 0%, #b6f5ff 100%);
+  border: 1px solid #b8e4ff;
+  color: #505f84;
 }
 
 .error {

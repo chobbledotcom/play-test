@@ -226,6 +226,11 @@ en:
       title: "Inspection Report %{id}"
       copied: "Copied!"
 
+    export:
+      csv_filename: "inspections-%{date}.csv"
+      pdf_filename: "%{identifier}.pdf"
+      qr_filename: "%{identifier}_QR.png"
+
     validation:
       anchorage_incomplete: "Anchorage Assessment incomplete"
       enclosed_incomplete: "Totally Enclosed Assessment incomplete"

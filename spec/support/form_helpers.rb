@@ -4,9 +4,26 @@ module FormHelpers
     fill_in field_label, with: value
   end
 
+  def within_form(form_name, &block)
+    form_header = I18n.t("forms.#{form_name}.header")
+    within(".calculator-form", text: form_header, &block)
+  end
+
+  def fill_in_form_within(form_name, field_name, value)
+    within_form(form_name) do
+      fill_in_form(form_name, field_name, value)
+    end
+  end
+
   def submit_form(form_name)
     submit_text = I18n.t("forms.#{form_name}.submit")
     click_button submit_text
+  end
+
+  def submit_form_within(form_name)
+    within_form(form_name) do
+      submit_form(form_name)
+    end
   end
 
   def check_form(form_name, field_name)
@@ -30,6 +47,7 @@ module FormHelpers
   end
 
   def find_form_field(form_name, field_name)
+    expect_field_present(form_name, field_name)
     find_field(I18n.t("forms.#{form_name}.fields.#{field_name}"))
   end
 

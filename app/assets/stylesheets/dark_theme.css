@@ -1,35 +1,16 @@
 /* Dark Theme Styles */
 .dark-theme {
-	background-color: #111;
-	color: #eee;
-}
-
-/* Text elements */
-.dark-theme h1,
-.dark-theme h2,
-.dark-theme h3,
-.dark-theme h4,
-.dark-theme h5,
-.dark-theme h6 {
-	color: #eee;
-}
-
-.dark-theme p,
-.dark-theme span,
-.dark-theme div,
-.dark-theme li,
-.dark-theme td,
-.dark-theme th {
-	color: #eee;
+  background-color: #111;
+  color: #eee;
 }
 
 /* Links */
 .dark-theme a {
-	color: #eee;
+  color: #eee;
 }
 
 .dark-theme a:hover {
-	color: #ccc;
+  color: #ccc;
 }
 
 /* Forms */
@@ -42,9 +23,9 @@
 .dark-theme input[type="search"],
 .dark-theme select,
 .dark-theme textarea {
-	background-color: #222;
-	color: #eee;
-	border: 1px solid #555;
+  background-color: #222;
+  color: #eee;
+  border: 1px solid #555;
 }
 
 .dark-theme input[type="text"]:focus,
@@ -56,8 +37,8 @@
 .dark-theme input[type="search"]:focus,
 .dark-theme select:focus,
 .dark-theme textarea:focus {
-	border-color: #777;
-	background-color: #333;
+  border-color: #777;
+  background-color: #333;
 }
 
 /* Buttons */
@@ -65,175 +46,165 @@
 .dark-theme input[type="submit"],
 .dark-theme input[type="button"],
 .dark-theme .button {
-	background-color: #000;
-	color: #eee;
-	border: 1px solid #333;
+  background-color: #000;
+  color: #eee;
+  border: 1px solid #333;
 }
 
 .dark-theme button:hover,
 .dark-theme input[type="submit"]:hover,
 .dark-theme input[type="button"]:hover,
 .dark-theme .button:hover {
-	background-color: #222;
+  background-color: #222;
 }
 
 /* Tables */
 .dark-theme table {
-	background-color: #111;
+  background-color: #111;
 }
 
 .dark-theme th {
-	background-color: #222;
-	color: #eee;
+  background-color: #222;
+  color: #eee;
 }
 
 .dark-theme td {
-	border-color: #333;
+  border-color: #333;
 }
 
 .dark-theme tr:nth-child(even) {
-	background-color: #1a1a1a;
+  background-color: #1a1a1a;
 }
 
 /* Fieldsets and legends */
 .dark-theme fieldset {
-	border-color: #555;
+  border-color: #555;
 }
 
 .dark-theme legend {
-	color: #eee;
+  color: #eee;
 }
 
 /* Navigation */
 
 .dark-theme nav a {
-	color: #eee;
+  color: #eee;
 }
 
 .dark-theme nav a:hover {
-	background-color: #222;
+  background-color: #222;
 }
 
 .dark-theme nav span {
-	background-color: #f9c3f9;
+  background-color: #f9c3f9;
 }
 
 /* Sections and articles */
 .dark-theme article {
-	background-color: #111;
+  background-color: #111;
 }
 
 .dark-theme section {
-	background-color: #111;
+  background-color: #111;
 }
 
 /* Labels */
 .dark-theme label {
-	color: #eee;
+  color: #eee;
 }
 
 /* Help text and small text */
 .dark-theme small {
-	color: #ccc;
+  color: #ccc;
 }
 
 .dark-theme .help-text {
-	color: #aaa;
-}
-
-/* Status and message styling */
-.dark-theme .notice,
-.dark-theme .alert,
-.dark-theme .success,
-.dark-theme .error {
-	background-color: #222;
-	border-color: #555;
-	color: #eee;
+  color: #aaa;
 }
 
 /* Code blocks */
 .dark-theme code,
 .dark-theme pre {
-	background-color: #222;
-	color: #eee;
+  background-color: #222;
+  color: #eee;
 }
 
 /* Borders */
 .dark-theme hr {
-	border-color: #555;
+  border-color: #555;
 }
 
 /* Calculated fields */
 .dark-theme .calculated-field .calculated-value {
-	color: #ccc;
+  color: #ccc;
 }
 
 /* Company activation notice */
 .dark-theme #company-activation-notice {
-	background-color: #422;
-	border-color: #844;
-	color: #faa;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background-color: #422;
+  border-color: #844;
+  color: #faa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Dark mode box shadows - override bright shadows */
 .dark-theme {
-	--box-shadow: 2px 2px 10px;
-	--color-shadow: rgba(0, 0, 0, 0.6);
+  --box-shadow: 2px 2px 10px;
+  --color-shadow: rgba(0, 0, 0, 0.6);
 }
 
 /* Override specific bright box shadows */
 .dark-theme form,
 .dark-theme fieldset,
 .dark-theme .completion-status-notice {
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .dark-theme #company-activation-notice {
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* Hover effects with darker shadows */
 .dark-theme a:hover,
 .dark-theme button:hover,
 .dark-theme input[type="submit"]:hover {
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
 }
 
 .dark-theme tr:hover {
-	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
 .dark-theme .table-list-items a:hover {
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Unit photo container dark mode shadows */
 .dark-theme .unit-photo-container:hover {
-	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6) !important;
 }
 
 .dark-theme .unit-photo-field:hover {
-	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Share button dark mode shadow */
 .dark-theme .share-button:hover {
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* Completion status notice - nice dark blue box with white text */
 .dark-theme .completion-status-notice {
-	background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-	border: 1px solid #1a237e;
-	color: #ffffff;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  border: 1px solid #1a237e;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .dark-theme .completion-status-notice a {
-	color: #64b5f6;
+  color: #64b5f6;
 }
 
 .dark-theme .completion-status-notice a:hover {
-	color: #90caf9;
+  color: #90caf9;
 }

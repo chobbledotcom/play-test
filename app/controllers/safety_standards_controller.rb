@@ -2,6 +2,8 @@ class SafetyStandardsController < ApplicationController
   skip_before_action :require_login
   skip_before_action :verify_authenticity_token, only: [:index]
 
+  CALCULATION_TYPES = %w[anchors user_capacity slide_runout wall_height].freeze
+
   def index
     @calculation_metadata = SafetyStandard.calculation_metadata
 
@@ -35,53 +37,68 @@ class SafetyStandardsController < ApplicationController
   end
 
   def redirect_with_calculation_params
-    calculation_params = params[:calculation].to_unsafe_h
-    redirect_to safety_standards_path(calculation: calculation_params)
+    redirect_to safety_standards_path(calculation: params[:calculation].to_unsafe_h)
   end
 
   def calculate_safety_standard
-    calculation_type = params[:calculation][:type]
-    case calculation_type
-    when "anchors" then calculate_anchors
-    when "user_capacity" then calculate_user_capacity
-    when "slide_runout" then calculate_slide_runout
-    when "wall_height" then calculate_wall_height
-    end
+    type = params[:calculation][:type]
+    send("calculate_#{type}") if CALCULATION_TYPES.include?(type)
   end
 
   def calculate_anchors
-    length = params[:calculation][:length].to_f
-    width = params[:calculation][:width].to_f
-    height = params[:calculation][:height].to_f
+    dimensions = extract_dimensions(:length, :width, :height)
 
-    return set_anchor_error unless length.positive? && width.positive? && height.positive?
-
-    @anchor_result = SafetyStandard.build_anchor_result(length: length, width: width, height: height)
-  end
-
-  def set_anchor_error
-    @anchor_error = t("safety_standards.errors.invalid_dimensions")
+    if dimensions.values.all?(&:positive?)
+      @anchor_result = SafetyStandard.build_anchor_result(**dimensions)
+    else
+      set_error(:anchor, :invalid_dimensions)
+    end
   end
 
   def calculate_user_capacity
-    length = params[:calculation][:length].to_f
-    width = params[:calculation][:width].to_f
-    negative_adjustment = params[:calculation][:negative_adjustment].to_f
+    dimensions = extract_dimensions(:length, :width)
+    adjustment = param_to_float(:negative_adjustment)
 
-    return set_capacity_error unless valid_dimensions?(length, width)
-
-    @capacity_result = build_capacity_result(length, width, negative_adjustment)
+    if dimensions.values.all?(&:positive?)
+      @capacity_result = build_capacity_result(**dimensions, negative_adjustment: adjustment)
+    else
+      set_error(:capacity, :invalid_dimensions)
+    end
   end
 
-  def valid_dimensions?(length, width)
-    length.positive? && width.positive?
+  def calculate_slide_runout
+    height = param_to_float(:platform_height)
+
+    if height.positive?
+      @runout_result = build_runout_result(height)
+    else
+      set_error(:runout, :invalid_height)
+    end
   end
 
-  def set_capacity_error
-    @capacity_error = t("safety_standards.errors.invalid_dimensions")
+  def calculate_wall_height
+    height = param_to_float(:user_height)
+
+    if height.positive?
+      @wall_height_result = build_wall_height_result(height)
+    else
+      set_error(:wall_height, :invalid_height)
+    end
   end
 
-  def build_capacity_result(length, width, negative_adjustment)
+  def extract_dimensions(*keys)
+    keys.index_with { |key| param_to_float(key) }
+  end
+
+  def param_to_float(key)
+    params[:calculation][key].to_f
+  end
+
+  def set_error(type, error_key)
+    instance_variable_set("@#{type}_error", t("safety_standards.errors.#{error_key}"))
+  end
+
+  def build_capacity_result(length:, width:, negative_adjustment:)
     area = length * width
     usable_area = area - negative_adjustment
     {
@@ -90,22 +107,8 @@ class SafetyStandardsController < ApplicationController
       area: area,
       negative_adjustment: negative_adjustment,
       usable_area: usable_area,
-      capacities: SafetyStandard.calculate_user_capacity(length,
-        width,
-        negative_adjustment)
+      capacities: SafetyStandard.calculate_user_capacity(length, width, negative_adjustment)
     }
-  end
-
-  def calculate_slide_runout
-    platform_height = params[:calculation][:platform_height].to_f
-
-    return set_runout_error unless platform_height.positive?
-
-    @runout_result = build_runout_result(platform_height)
-  end
-
-  def set_runout_error
-    @runout_error = t("safety_standards.errors.invalid_height")
   end
 
   def build_runout_result(platform_height)
@@ -113,27 +116,13 @@ class SafetyStandardsController < ApplicationController
     {
       platform_height: platform_height,
       required_runout: required_runout,
-      calculation: build_runout_calculation_text(platform_height,
-        required_runout)
+      calculation: build_runout_calculation_text(platform_height, required_runout)
     }
   end
 
   def build_runout_calculation_text(platform_height, required_runout)
     half_height = platform_height * 0.5
-    "50% of #{platform_height}m = #{half_height}m, " \
-    "minimum 0.3m = #{required_runout}m"
-  end
-
-  def calculate_wall_height
-    user_height = params[:calculation][:user_height].to_f
-
-    return set_wall_height_error unless user_height.positive?
-
-    @wall_height_result = build_wall_height_result(user_height)
-  end
-
-  def set_wall_height_error
-    @wall_height_error = t("safety_standards.errors.invalid_height")
+    "50% of #{platform_height}m = #{half_height}m, minimum 0.3m = #{required_runout}m"
   end
 
   def build_wall_height_result(user_height)
@@ -146,67 +135,80 @@ class SafetyStandardsController < ApplicationController
 
   def wall_height_requirement_text(user_height)
     thresholds = SafetyStandard::SLIDE_HEIGHT_THRESHOLDS
+
     case user_height
     when 0..thresholds[:no_walls_required]
       "No containing walls required"
     when thresholds[:no_walls_required]..thresholds[:basic_walls]
       "Walls must be at least #{user_height}m (equal to user height)"
     when thresholds[:basic_walls]..thresholds[:enhanced_walls]
-      enhanced_height = calculate_enhanced_wall_height(user_height)
-      "Walls must be at least #{enhanced_height}m (1.25× user height)"
+      wall_height = enhanced_wall_height(user_height)
+      "Walls must be at least #{wall_height}m (1.25× user height)"
     when thresholds[:enhanced_walls]..thresholds[:max_safe_height]
-      enhanced_height = calculate_enhanced_wall_height(user_height)
-      "Walls must be at least #{enhanced_height}m + permanent roof required"
+      wall_height = enhanced_wall_height(user_height)
+      "Walls must be at least #{wall_height}m + permanent roof required"
     else
       "Exceeds safe height limits (>#{thresholds[:max_safe_height]}m)"
     end
   end
 
-  def calculate_enhanced_wall_height(user_height)
+  def enhanced_wall_height(user_height)
     (user_height * 1.25).round(2)
   end
 
   def build_json_response
-    calculation_type = params[:calculation][:type]
-    case calculation_type
-    when "anchors" then build_anchor_json_response
-    when "user_capacity" then build_capacity_json_response
-    when "slide_runout" then build_runout_json_response
-    when "wall_height" then build_wall_height_json_response
-    else
-      {success: false, error: "Invalid calculation type"}
+    type = params[:calculation][:type]
+
+    unless CALCULATION_TYPES.include?(type)
+      return {
+        passed: false,
+        status: "Invalid calculation type: #{type || "none provided"}",
+        result: nil
+      }
     end
+
+    build_typed_json_response(type)
+  rescue => e
+    {
+      passed: false,
+      status: "Calculation failed: #{e.message}",
+      result: nil
+    }
   end
 
-  def build_anchor_json_response
-    if @anchor_result
-      {success: true, result: @anchor_result}
-    else
-      {success: false, error: @anchor_error}
-    end
-  end
+  def build_typed_json_response(type)
+    # Ensure calculation is performed
+    calculate_safety_standard
 
-  def build_capacity_json_response
-    if @capacity_result
-      {success: true, result: @capacity_result}
-    else
-      {success: false, error: @capacity_error}
+    result_var = case type
+    when "anchors" then "@anchor_result"
+    when "user_capacity" then "@capacity_result"
+    when "slide_runout" then "@runout_result"
+    when "wall_height" then "@wall_height_result"
     end
-  end
 
-  def build_runout_json_response
-    if @runout_result
-      {success: true, result: @runout_result}
-    else
-      {success: false, error: @runout_error}
+    error_var = case type
+    when "anchors" then "@anchor_error"
+    when "user_capacity" then "@capacity_error"
+    when "slide_runout" then "@runout_error"
+    when "wall_height" then "@wall_height_error"
     end
-  end
 
-  def build_wall_height_json_response
-    if @wall_height_result
-      {success: true, result: @wall_height_result}
+    result = instance_variable_get(result_var)
+    error = instance_variable_get(error_var)
+
+    if result
+      {
+        passed: true,
+        status: "Calculation completed successfully",
+        result: result
+      }
     else
-      {success: false, error: @wall_height_error}
+      {
+        passed: false,
+        status: error || "Calculation failed with unknown error",
+        result: nil
+      }
     end
   end
 end

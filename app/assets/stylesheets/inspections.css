@@ -193,13 +193,3 @@
   list-style-type: none;
   padding: 0;
 }
-
-.prefilled-message {
-  text-align: left;
-  max-width: 30rem;
-  margin: 2rem auto;
-  border: 2px solid #3c7545;
-  padding: 1rem 2rem;
-  background: #eff9f1;
-  border-radius: 4px;
-}

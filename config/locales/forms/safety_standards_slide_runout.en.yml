@@ -1,0 +1,7 @@
+en:
+  forms:
+    safety_standards_slide_runout:
+      header: "Calculate Required Runout Length"
+      fields:
+        platform_height: "Platform Height (m)"
+      submit: "Calculate Runout"

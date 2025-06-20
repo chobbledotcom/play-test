@@ -12,7 +12,7 @@ RSpec.describe "Safety Standards API", type: :request do
 
         expect(response).to have_http_status(:ok)
         json_response = JSON.parse(response.body)
-        expect(json_response["success"]).to be true
+        expect(json_response["passed"]).to be true
         expect(json_response["result"]["required_anchors"]).to eq 8
         expect(json_response["result"]["formula_breakdown"]).to be_an(Array)
         expect(json_response["result"]["formula_breakdown"].size).to eq 5
@@ -25,7 +25,7 @@ RSpec.describe "Safety Standards API", type: :request do
 
         expect(response).to have_http_status(:ok)
         json_response = JSON.parse(response.body)
-        expect(json_response["success"]).to be true
+        expect(json_response["passed"]).to be true
         expect(json_response["result"]["usable_area"]).to eq 18.0
         expect(json_response["result"]["capacities"]["users_1200mm"]).to eq 9
       end
@@ -37,8 +37,8 @@ RSpec.describe "Safety Standards API", type: :request do
 
         expect(response).to have_http_status(:ok)
         json_response = JSON.parse(response.body)
-        expect(json_response["success"]).to be false
-        expect(json_response["error"]).to be_present
+        expect(json_response["passed"]).to be false
+        expect(json_response["status"]).to be_present
       end
     end
   end

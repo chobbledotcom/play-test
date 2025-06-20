@@ -41,6 +41,7 @@ en:
     fail_pdf: "[FAIL]"
     assessment_completion: "Assessment Completion"
     field_comment_placeholder: "%{field} comment"
+    error: "Error"
 
   # Common messages
   ui:

@@ -111,7 +111,8 @@ class UnitsController < ApplicationController
       redirect_to inspection_path(service.inspection)
     elsif service.error_message
       flash[:alert] = service.error_message
-      redirect_to service.inspection ? inspection_path(service.inspection) : root_path
+      redirect_path = service.inspection ? inspection_path(service.inspection) : root_path
+      redirect_to redirect_path
     else
       @unit = service.unit
       @inspection = service.inspection
@@ -138,7 +139,8 @@ class UnitsController < ApplicationController
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
 
   def set_unit
-    @unit = Unit.includes(photo_attachment: :blob).find_by(id: params[:id].upcase)
+    @unit = Unit.includes(photo_attachment: :blob)
+      .find_by(id: params[:id].upcase)
 
     unless @unit
       # Always return 404 for non-existent resources regardless of login status

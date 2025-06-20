@@ -101,15 +101,21 @@ class InspectionsController < ApplicationController
     @inspection.unit = unit
 
     if @inspection.save
-      flash[:notice] = t("inspections.messages.unit_changed",
-        unit_name: unit.name)
-      redirect_to edit_inspection_path(@inspection)
+      handle_successful_unit_update(unit)
     else
-      error_messages = @inspection.errors.full_messages.join(", ")
-      flash[:alert] = t("inspections.messages.unit_change_failed",
-        errors: error_messages)
-      redirect_to select_unit_inspection_path(@inspection)
+      handle_failed_unit_update
     end
+  end
+
+  def handle_successful_unit_update(unit)
+    flash[:notice] = t("inspections.messages.unit_changed", unit_name: unit.name)
+    redirect_to edit_inspection_path(@inspection)
+  end
+
+  def handle_failed_unit_update
+    error_messages = @inspection.errors.full_messages.join(", ")
+    flash[:alert] = t("inspections.messages.unit_change_failed", errors: error_messages)
+    redirect_to select_unit_inspection_path(@inspection)
   end
 
   def complete
@@ -159,7 +165,8 @@ class InspectionsController < ApplicationController
 
   def send_inspections_csv
     csv_data = InspectionCsvExportService.new(@complete_inspections).generate
-    send_data csv_data, filename: "inspections-#{Date.today}.csv"
+    filename = I18n.t("inspections.export.csv_filename", date: Date.today)
+    send_data csv_data, filename: filename
   end
 
   def validate_tab_parameter
@@ -195,21 +202,27 @@ class InspectionsController < ApplicationController
     end
   end
 
-  SYSTEM_ATTRIBUTES = %w[inspection_id created_at updated_at].freeze
+  ASSESSMENT_SYSTEM_ATTRIBUTES = %w[
+    inspection_id
+    created_at
+    updated_at
+  ].freeze
 
   # Build safe mappings from Inspection::ASSESSMENT_TYPES
   # This ensures mappings stay in sync with the model definition
-  ASSESSMENT_TAB_MAPPING = Inspection::ASSESSMENT_TYPES.each_with_object({}) do |(method_name, _), hash|
-    # Convert :user_height_assessment to "user_height"
-    tab_name = method_name.to_s.gsub(/_assessment$/, "")
-    hash[tab_name] = method_name
-  end.freeze
+  ASSESSMENT_TAB_MAPPING = Inspection::ASSESSMENT_TYPES
+    .each_with_object({}) do |(method_name, _), hash|
+      # Convert :user_height_assessment to "user_height"
+      tab_name = method_name.to_s.gsub(/_assessment$/, "")
+      hash[tab_name] = method_name
+    end.freeze
 
-  ASSESSMENT_CLASS_MAPPING = Inspection::ASSESSMENT_TYPES.each_with_object({}) do |(method_name, klass), hash|
-    # Convert :user_height_assessment to "user_height"
-    tab_name = method_name.to_s.gsub(/_assessment$/, "")
-    hash[tab_name] = klass
-  end.freeze
+  ASSESSMENT_CLASS_MAPPING = Inspection::ASSESSMENT_TYPES
+    .each_with_object({}) do |(method_name, klass), hash|
+      # Convert :user_height_assessment to "user_height"
+      tab_name = method_name.to_s.gsub(/_assessment$/, "")
+      hash[tab_name] = klass
+    end.freeze
 
   def build_base_params
     params.require(:inspection).permit(*Inspection::USER_EDITABLE_PARAMS)
@@ -229,7 +242,7 @@ class InspectionsController < ApplicationController
   def assessment_permitted_attributes(assessment_type)
     model_class = "Assessments::#{assessment_type.to_s.camelize}".constantize
     all_attributes = model_class.column_names
-    (all_attributes - SYSTEM_ATTRIBUTES).map { it.to_sym }
+    (all_attributes - ASSESSMENT_SYSTEM_ATTRIBUTES).map { it.to_sym }
   end
 
   def filtered_inspections_query_without_order = current_user.inspections
@@ -318,7 +331,7 @@ class InspectionsController < ApplicationController
     @inspection.update(pdf_last_accessed_at: Time.current)
 
     send_data pdf_data.render,
-      filename: "#{@inspection.unit&.serial || @inspection.id}.pdf",
+      filename: pdf_filename,
       type: "application/pdf",
       disposition: "inline"
   end
@@ -327,7 +340,7 @@ class InspectionsController < ApplicationController
     qr_code_png = QrCodeService.generate_qr_code(@inspection)
 
     send_data qr_code_png,
-      filename: "#{@inspection.unit&.serial || @inspection.id}_QR.png",
+      filename: qr_code_filename,
       type: "image/png",
       disposition: "inline"
   end
@@ -342,7 +355,13 @@ class InspectionsController < ApplicationController
   end
 
   def pdf_filename
-    "#{@inspection.unit&.serial || @inspection.id}.pdf"
+    identifier = @inspection.unit&.serial || @inspection.id
+    I18n.t("inspections.export.pdf_filename", identifier: identifier)
+  end
+
+  def qr_code_filename
+    identifier = @inspection.unit&.serial || @inspection.id
+    I18n.t("inspections.export.qr_filename", identifier: identifier)
   end
 
   def resource_pdf_url
@@ -383,6 +402,7 @@ class InspectionsController < ApplicationController
     inspector_company_id
     is_seed
     passed
+    pdf_last_accessed_at
     unique_report_number
     unit_id
     updated_at
@@ -391,47 +411,50 @@ class InspectionsController < ApplicationController
 
   def set_previous_inspection
     @previous_inspection = @inspection.unit&.last_inspection
-    if !@previous_inspection || @previous_inspection.id == @inspection.id
-      return
-    end
+    return if !@previous_inspection || @previous_inspection.id == @inspection.id
 
     @prefilled_fields = []
-
-    case params[:tab]
-    when "inspection", "", nil
-      current_object = @inspection
-      previous_object = @previous_inspection
-      column_names = Inspection.column_names
-    else
-      assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
-      current_object = @inspection.public_send(assessment_method)
-      previous_object = @previous_inspection.public_send(assessment_method)
-
-      assessment_class = ASSESSMENT_CLASS_MAPPING[params[:tab]]
-      column_names = assessment_class.column_names
-    end
+    current_object, previous_object, column_names = get_prefill_objects
 
     column_names.each do |field|
-      next if NOT_COPIED_FIELDS.include? field
-
+      next if NOT_COPIED_FIELDS.include?(field)
       next if previous_object&.send(field).nil?
       next unless current_object.send(field).nil?
 
-      is_comment = field.end_with?("_comment")
-      is_pass = field.end_with?("_pass")
-      field_base = field.gsub(/_(comment|pass)$/, "")
-      i18n_base = "forms.#{params[:tab]}.fields"
-
-      translated = I18n.t("#{i18n_base}.#{field_base}", default: nil)
-      translated ||= I18n.t("#{i18n_base}.#{field}", default: field.humanize)
-
-      if is_comment
-        translated += " (#{I18n.t("shared.comment")})"
-      elsif is_pass
-        translated += " (#{I18n.t("shared.pass")}/#{I18n.t("shared.fail")})"
-      end
-
-      @prefilled_fields << translated
+      @prefilled_fields << translate_field_name(field)
     end
+  end
+
+  def get_prefill_objects
+    case params[:tab]
+    when "inspection", "", nil
+      [@inspection, @previous_inspection, Inspection.column_names]
+    else
+      assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
+      assessment_class = ASSESSMENT_CLASS_MAPPING[params[:tab]]
+      [
+        @inspection.public_send(assessment_method),
+        @previous_inspection.public_send(assessment_method),
+        assessment_class.column_names
+      ]
+    end
+  end
+
+  def translate_field_name(field)
+    is_comment = field.end_with?("_comment")
+    is_pass = field.end_with?("_pass")
+    field_base = field.gsub(/_(comment|pass)$/, "")
+    i18n_base = "forms.#{params[:tab]}.fields"
+
+    translated = I18n.t("#{i18n_base}.#{field_base}", default: nil)
+    translated ||= I18n.t("#{i18n_base}.#{field}", default: field.humanize)
+
+    if is_comment
+      translated += " (#{I18n.t("shared.comment")})"
+    elsif is_pass
+      translated += " (#{I18n.t("shared.pass")}/#{I18n.t("shared.fail")})"
+    end
+
+    translated
   end
 end

@@ -1,22 +1,12 @@
-<% case params[:calculation][:type] %>
-<% when 'anchors' %>
-  <%= turbo_stream.update "anchors-result" do %>
-    <%= render 'anchor_result' %>
-  <% end %>
+<% type = params[:calculation][:type].to_sym %>
+<% result_id = type.to_s.dasherize + "-result" %>
+<% partial_name = case type
+    when :anchors then "anchor_result"
+    when :user_capacity then "capacity_result"
+    when :slide_runout then "runout_result"
+    when :wall_height then "wall_height_result"
+    end %>
 
-<% when 'user_capacity' %>
-  <%= turbo_stream.update "capacity-result" do %>
-    <%= render 'capacity_result' %>
-  <% end %>
-
-<% when 'slide_runout' %>
-  <%= turbo_stream.update "runout-result" do %>
-    <%= render 'runout_result' %>
-  <% end %>
-
-<% when 'wall_height' %>
-  <%= turbo_stream.update "wall-height-result" do %>
-    <%= render 'wall_height_result' %>
-  <% end %>
-
+<%= turbo_stream.update result_id do %>
+  <%= render partial_name %>
 <% end %>
