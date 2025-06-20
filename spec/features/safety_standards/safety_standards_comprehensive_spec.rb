@@ -58,7 +58,10 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
 
       scenario "capacity calculation updates without reload" do
         visit safety_standards_path
-
+        
+        # Navigate to user capacity tab
+        click_link "User Capacity"
+        
         fill_capacity_form(**valid_capacity_params)
         submit_capacity_form
 
@@ -67,6 +70,9 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
 
       scenario "runout calculation updates without reload" do
         visit safety_standards_path
+        
+        # Navigate to slides tab
+        click_link "Slides"
 
         fill_runout_form(**valid_runout_params)
         submit_runout_form
@@ -76,6 +82,9 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
 
       scenario "wall height calculation updates without reload" do
         visit safety_standards_path
+        
+        # Navigate to wall heights tab
+        click_link "Wall Heights"
 
         fill_wall_height_form(**valid_wall_params)
         submit_wall_height_form
@@ -96,6 +105,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         end
 
         # Check capacity form
+        click_link "User Capacity"
         within(".calculator-form", text: I18n.t("forms.safety_standards_user_capacity.header")) do
           length_input = find_field(I18n.t("forms.safety_standards_user_capacity.fields.length"))
           expect(length_input["min"]).to eq("1.0")
@@ -111,19 +121,32 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         fill_anchor_form(**valid_anchor_params)
         submit_anchor_form
 
+        click_link "User Capacity"
         fill_capacity_form(**valid_capacity_params)
         submit_capacity_form
 
+        click_link "Slides"
         fill_runout_form(**valid_runout_params)
         submit_runout_form
 
+        click_link "Wall Heights"
         fill_wall_height_form(**valid_wall_params)
         submit_wall_height_form
+        # Wait for result to appear
+        expect_wall_height_result("1.5m")
 
-        # All results should be visible
+        # Check all results by navigating to each tab
+        click_link "Anchorage"
         expect_anchor_result(8)
+        
+        click_link "User Capacity"
         expect_capacity_result(usable_area: 18.0)
+        
+        click_link "Slides"
         expect_runout_result(required_runout: 1.25)
+        
+        # Go back to Wall Heights tab
+        click_link "Wall Heights"
         expect_wall_height_result("1.5m")
       end
 

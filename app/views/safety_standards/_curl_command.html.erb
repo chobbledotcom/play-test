@@ -1,0 +1,4 @@
+curl -X POST <%= url %> \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '<%= { calculation: SafetyStandard::API_EXAMPLE_PARAMS[type] }.to_json %>'

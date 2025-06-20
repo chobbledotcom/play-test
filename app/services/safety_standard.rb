@@ -87,6 +87,83 @@ module SafetyStandard
   # Reinspection interval
   REINSPECTION_INTERVAL_DAYS = 365  # days
 
+  # API Example Parameters
+  API_EXAMPLE_PARAMS = {
+    anchors: {
+      type: "anchors",
+      length: 5.0,
+      width: 5.0,
+      height: 3.0
+    },
+    user_capacity: {
+      type: "user_capacity",
+      length: 5.0,
+      width: 4.0,
+      negative_adjustment: 2.0
+    },
+    slide_runout: {
+      type: "slide_runout",
+      platform_height: 2.5
+    },
+    wall_height: {
+      type: "wall_height",
+      user_height: 1.5
+    }
+  }.freeze
+
+  # API Example Responses
+  API_EXAMPLE_RESPONSES = {
+    anchors: {
+      passed: true,
+      status: "Calculation completed successfully",
+      result: {
+        required_anchors: 8,
+        formula_breakdown: [
+          ["Front/back area", "5.0m (W) × 3.0m (H) = 15.0m²"],
+          ["Sides area", "5.0m (L) × 3.0m (H) = 15.0m²"],
+          ["Front & back anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
+          ["Left & right anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
+          ["Total anchors", "(2 + 2) × 2 = 8"]
+        ]
+      }
+    },
+    user_capacity: {
+      passed: true,
+      status: "Calculation completed successfully",
+      result: {
+        length: 5.0,
+        width: 4.0,
+        area: 20.0,
+        negative_adjustment: 2.0,
+        usable_area: 18.0,
+        capacities: {
+          users_1000mm: 12,
+          users_1200mm: 9,
+          users_1500mm: 7,
+          users_1800mm: 6
+        }
+      }
+    },
+    slide_runout: {
+      passed: true,
+      status: "Calculation completed successfully",
+      result: {
+        platform_height: 2.5,
+        required_runout: 1.25,
+        calculation: "50% of 2.5m = 1.25m, minimum 0.3m = 1.25m"
+      }
+    },
+    wall_height: {
+      passed: true,
+      status: "Calculation completed successfully",
+      result: {
+        user_height: 1.5,
+        requirement: "Walls must be at least 1.5m (equal to user height)",
+        requires_roof: false
+      }
+    }
+  }.freeze
+
   class << self
     def height_categories
       HEIGHT_CATEGORIES

@@ -4,238 +4,230 @@
     <p><%= t('safety_standards.subtitle') %></p>
   </header>
 
-  <!-- Anchor Requirements -->
-  <%= render 'calculator_form', type: :anchors %>
-  <hr>
-  
-  <!-- Wall Height Requirements -->
-  <%= render 'calculator_form', type: :wall_height %>
-  
-  <table>
-    <thead>
-      <tr>
-        <th>User Height</th>
-        <th>Wall Requirement</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Under 0.6m</td>
-        <td>No containing walls required</td>
-      </tr>
-      <tr>
-        <td>0.6m - 3.0m</td>
-        <td>Walls must be equal to user height</td>
-      </tr>
-      <tr>
-        <td>3.0m - 6.0m</td>
-        <td>Walls must be 1.25× user height</td>
-      </tr>
-      <tr>
-        <td>Over 6.0m</td>
-        <td>Walls 1.25× height + permanent roof required</td>
-      </tr>
-    </tbody>
-  </table>
-  <hr>
+  <nav class="tab-navigation">
+    <ul>
+      <li><a href="#anchorage">Anchorage</a></li>
+      <li><a href="#wall-heights">Wall Heights</a></li>
+      <li><a href="#slides">Slides</a></li>
+      <li><a href="#user-capacity">User Capacity</a></li>
+      <li><a href="#material">Material</a></li>
+      <li><a href="#fan">Fan</a></li>
+      <li><a href="#additional">Additional</a></li>
+    </ul>
+  </nav>
 
-  <!-- Slide Safety Requirements -->
-  <h2>Slide Safety Requirements</h2>
-  <h3>Runout Requirements</h3>
-  
-  <%= render 'calculator_form', type: :slide_runout %>
-  
-  <ul>
-    <li>Minimum length: 50% of highest platform height</li>
-    <li>Absolute minimum: 300mm in any case</li>
-    <li>Maximum inclination: Not more than 10°</li>
-    <li>If stop wall fitted: adds 50cm to required run-out length</li>
-    <li>Wall height on run-out sides: 50% of user height</li>
-  </ul>
+  <div class="tab-content">
+    <!-- Anchorage Tab -->
+    <article id="anchorage" class="tab-panel">
+      <h2>Anchor Requirements</h2>
+      <%= render 'calculator_form', type: :anchors %>
+    </article>
 
-  <h3>Containing Wall Heights for Slides</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Platform Height</th>
-        <th>Requirement</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Under 600mm</td>
-        <td>No containing walls required</td>
-      </tr>
-      <tr>
-        <td>600mm - 3000mm</td>
-        <td>Containing walls equal to platform height</td>
-      </tr>
-      <tr>
-        <td>3000mm - 6000mm</td>
-        <td>Containing walls 1.25 times platform height</td>
-      </tr>
-      <tr>
-        <td>Over 6000mm</td>
-        <td>Containing walls AND permanent roof required</td>
-      </tr>
-    </tbody>
-  </table>
-  <hr>
+    <!-- Wall Heights Tab -->
+    <article id="wall-heights" class="tab-panel">
+      <h2>Wall Height Requirements</h2>
+      <%= render 'calculator_form', type: :wall_height %>
+      
+      <h3>Requirements by User Height</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User Height</th>
+            <th>Wall Requirement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Under 0.6m</td>
+            <td>No containing walls required</td>
+          </tr>
+          <tr>
+            <td>0.6m - 3.0m</td>
+            <td>Walls must be equal to user height</td>
+          </tr>
+          <tr>
+            <td>3.0m - 6.0m</td>
+            <td>Walls must be 1.25× user height</td>
+          </tr>
+          <tr>
+            <td>Over 6.0m</td>
+            <td>Walls 1.25× height + permanent roof required</td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
 
-  <!-- User Capacity Calculations -->
-  <%= render 'calculator_form', type: :user_capacity %>
-  
-  <p>Based on age-appropriate space allocation:</p>
-  <table>
-    <thead>
-      <tr>
-        <th>User Height</th>
-        <th>Age Group</th>
-        <th>Space Required</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1.0m</td>
-        <td>Young children</td>
-        <td>1.5m² per user</td>
-      </tr>
-      <tr>
-        <td>1.2m</td>
-        <td>Children</td>
-        <td>2.0m² per user</td>
-      </tr>
-      <tr>
-        <td>1.5m</td>
-        <td>Adolescents</td>
-        <td>2.5m² per user</td>
-      </tr>
-      <tr>
-        <td>1.8m</td>
-        <td>Adults</td>
-        <td>3.0m² per user</td>
-      </tr>
-    </tbody>
-  </table>
-  <hr>
+    <!-- Slides Tab -->
+    <article id="slides" class="tab-panel">
+      <h2>Slide Safety Requirements</h2>
+      
+      <h3>Runout Requirements</h3>
+      <%= render 'calculator_form', type: :slide_runout %>
+      
+      <ul>
+        <li>Minimum length: 50% of highest platform height</li>
+        <li>Absolute minimum: 300mm in any case</li>
+        <li>Maximum inclination: Not more than 10°</li>
+        <li>If stop wall fitted: adds 50cm to required run-out length</li>
+        <li>Wall height on run-out sides: 50% of user height</li>
+      </ul>
 
-  <h2>Material Requirements</h2>
-  <h3>Fabric</h3>
-  <ul>
-    <li>Tensile strength: 1850 Newtons minimum</li>
-    <li>Tear strength: 350 Newtons minimum</li>
-    <li>Fire retardancy: Must meet EN 71-3 requirements</li>
-  </ul>
+      <h3>Containing Wall Heights for Slides</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Platform Height</th>
+            <th>Requirement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Under 600mm</td>
+            <td>No containing walls required</td>
+          </tr>
+          <tr>
+            <td>600mm - 3000mm</td>
+            <td>Containing walls equal to platform height</td>
+          </tr>
+          <tr>
+            <td>3000mm - 6000mm</td>
+            <td>Containing walls 1.25 times platform height</td>
+          </tr>
+          <tr>
+            <td>Over 6000mm</td>
+            <td>Containing walls AND permanent roof required</td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
 
-  <h3>Thread</h3>
-  <ul>
-    <li>Material: Non-rotting yarn required</li>
-    <li>Tensile strength: 88 Newtons minimum</li>
-    <li>Stitch type: Lock stitching required</li>
-    <li>Stitch length: 3-8mm</li>
-  </ul>
+    <!-- User Capacity Tab -->
+    <article id="user-capacity" class="tab-panel">
+      <h2>User Capacity Calculations</h2>
+      <%= render 'calculator_form', type: :user_capacity %>
+      
+      <h3>Space Allocation by Age Group</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User Height</th>
+            <th>Age Group</th>
+            <th>Space Required</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1.0m</td>
+            <td>Young children</td>
+            <td>1.5m² per user</td>
+          </tr>
+          <tr>
+            <td>1.2m</td>
+            <td>Children</td>
+            <td>2.0m² per user</td>
+          </tr>
+          <tr>
+            <td>1.5m</td>
+            <td>Adolescents</td>
+            <td>2.5m² per user</td>
+          </tr>
+          <tr>
+            <td>1.8m</td>
+            <td>Adults</td>
+            <td>3.0m² per user</td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
 
-  <h3>Rope</h3>
-  <ul>
-    <li>Diameter range: 18mm - 45mm</li>
-    <li>Material: Non-monofilament</li>
-    <li>Attachment: Fixed at both ends</li>
-    <li>Swing limitation: No greater than 20% to prevent strangulation</li>
-  </ul>
+    <!-- Material Tab -->
+    <article id="material" class="tab-panel">
+      <h2>Material Requirements</h2>
+      
+      <h3>Fabric</h3>
+      <ul>
+        <li>Tensile strength: 1850 Newtons minimum</li>
+        <li>Tear strength: 350 Newtons minimum</li>
+        <li>Fire retardancy: Must meet EN 71-3 requirements</li>
+      </ul>
 
-  <h3>Netting</h3>
-  <ul>
-    <li>Vertical mesh size: 30mm maximum for >1m height</li>
-    <li>Roof mesh size: 8mm maximum</li>
-    <li>Strength: Support heaviest intended user</li>
-  </ul>
+      <h3>Thread</h3>
+      <ul>
+        <li>Material: Non-rotting yarn required</li>
+        <li>Tensile strength: 88 Newtons minimum</li>
+        <li>Stitch type: Lock stitching required</li>
+        <li>Stitch length: 3-8mm</li>
+      </ul>
 
-  <h2>Electrical Safety Requirements</h2>
-  <ul>
-    <li>PAT (Portable Appliance Test) required</li>
-    <li>Minimum pressure: 1.0 KPA operational pressure</li>
-    <li>Finger probe: 8mm probe must not contact moving/hot parts</li>
-    <li>Return flap: Required to reduce deflation time</li>
-    <li>Blower distance: 1.2m minimum from equipment edge</li>
-  </ul>
+      <h3>Rope</h3>
+      <ul>
+        <li>Diameter range: 18mm - 45mm</li>
+        <li>Material: Non-monofilament</li>
+        <li>Attachment: Fixed at both ends</li>
+        <li>Swing limitation: No greater than 20% to prevent strangulation</li>
+      </ul>
 
-  <h3>Grounding Test Weights</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>User Height</th>
-        <th>Test Weight</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1.0m</td>
-        <td>25kg</td>
-      </tr>
-      <tr>
-        <td>1.2m</td>
-        <td>35kg</td>
-      </tr>
-      <tr>
-        <td>1.5m</td>
-        <td>65kg</td>
-      </tr>
-      <tr>
-        <td>1.8m</td>
-        <td>85kg</td>
-      </tr>
-    </tbody>
-  </table>
+      <h3>Netting</h3>
+      <ul>
+        <li>Vertical mesh size: 30mm maximum for >1m height</li>
+        <li>Roof mesh size: 8mm maximum</li>
+        <li>Strength: Support heaviest intended user</li>
+      </ul>
+    </article>
 
-  <h2>Additional Safety Requirements</h2>
-  <ul>
-    <li>Maximum evacuation time: 30 seconds</li>
-    <li>Maximum fall height: 0.6m (600mm)</li>
-    <li>Multiple exits required for >15 users</li>
-    <li>First metre gradient: Special requirements for slides</li>
-    <li>Surface requirements: Non-slip surface material required</li>
-    <li>Edge protection: Rounded edges and smooth transitions</li>
-  </ul>
+    <!-- Fan Tab -->
+    <article id="fan" class="tab-panel">
+      <h2>Electrical Safety Requirements</h2>
+      
+      <h3>General Requirements</h3>
+      <ul>
+        <li>PAT (Portable Appliance Test) required</li>
+        <li>Minimum pressure: 1.0 KPA operational pressure</li>
+        <li>Finger probe: 8mm probe must not contact moving/hot parts</li>
+        <li>Return flap: Required to reduce deflation time</li>
+        <li>Blower distance: 1.2m minimum from equipment edge</li>
+      </ul>
 
-  <h2>API Information</h2>
-  <p>These calculations are also available via JSON API for programmatic access:</p>
-  <div class="api-info">
-    <h4>Endpoint:</h4>
-    <code>POST <%= safety_standards_url %></code>
+      <h3>Grounding Test Weights</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User Height</th>
+            <th>Test Weight</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1.0m</td>
+            <td>25kg</td>
+          </tr>
+          <tr>
+            <td>1.2m</td>
+            <td>35kg</td>
+          </tr>
+          <tr>
+            <td>1.5m</td>
+            <td>65kg</td>
+          </tr>
+          <tr>
+            <td>1.8m</td>
+            <td>85kg</td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
 
-    <h4>Headers:</h4>
-    <code>Content-Type: application/json<br>Accept: application/json</code>
-
-    <h4>Parameters:</h4>
-    <p>Send calculation data in the following format:</p>
-    <pre>{
-  "calculation": {
-    "type": "anchors|user_capacity|slide_runout|wall_height",
-    "length": 5.0,             // for anchors & user_capacity
-    "width": 4.0,              // for anchors & user_capacity
-    "height": 3.0,             // for anchors
-    "negative_adjustment": 2.0, // for user_capacity (optional)
-    "platform_height": 1.5,    // for slide_runout
-    "user_height": 1.2         // for wall_height
-  }
-}</pre>
-
-    <h4>Response:</h4>
-    <pre>{
-  "passed": true,          // true if calculation succeeded
-  "status": "Calculation completed successfully",
-  "result": {              // null if passed is false
-    // Calculation-specific results
-  }
-}</pre>
-
-    <h4>Error Response:</h4>
-    <pre>{
-  "passed": false,
-  "status": "Invalid dimensions provided",
-  "result": null
-}</pre>
-
-    <p>All calculations use the official EN 14960:2019 standard formulas and are publicly verifiable.</p>
+    <!-- Additional Tab -->
+    <article id="additional" class="tab-panel">
+      <h2>Additional Safety Requirements</h2>
+      <ul>
+        <li>Maximum evacuation time: 30 seconds</li>
+        <li>Maximum fall height: 0.6m (600mm)</li>
+        <li>Multiple exits required for >15 users</li>
+        <li>First metre gradient: Special requirements for slides</li>
+        <li>Surface requirements: Non-slip surface material required</li>
+        <li>Edge protection: Rounded edges and smooth transitions</li>
+      </ul>
+    </article>
   </div>
 </article>

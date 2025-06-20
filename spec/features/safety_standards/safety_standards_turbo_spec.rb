@@ -38,6 +38,8 @@ RSpec.feature "Safety Standards with Turbo", js: true do
 
   describe "user capacity calculator" do
     it "updates results without page reload via Turbo" do
+      click_link "User Capacity"
+      
       within(".calculator-form", text: I18n.t("forms.safety_standards_user_capacity.header")) do
         fill_in I18n.t("forms.safety_standards_user_capacity.fields.length"), with: 5.0
         fill_in I18n.t("forms.safety_standards_user_capacity.fields.width"), with: 4.0
@@ -56,6 +58,8 @@ RSpec.feature "Safety Standards with Turbo", js: true do
 
   describe "slide runout calculator" do
     it "updates results without page reload via Turbo" do
+      click_link "Slides"
+      
       within(".calculator-form", text: I18n.t("forms.safety_standards_slide_runout.header")) do
         fill_in I18n.t("forms.safety_standards_slide_runout.fields.platform_height"), with: 2.5
         click_button I18n.t("forms.safety_standards_slide_runout.submit")
@@ -71,6 +75,8 @@ RSpec.feature "Safety Standards with Turbo", js: true do
 
   describe "wall height calculator" do
     it "updates results without page reload via Turbo" do
+      click_link "Wall Heights"
+      
       within(".calculator-form", text: I18n.t("forms.safety_standards_wall_height.header")) do
         fill_in I18n.t("forms.safety_standards_wall_height.fields.user_height"), with: 1.5
         click_button I18n.t("forms.safety_standards_wall_height.submit")
@@ -97,6 +103,8 @@ RSpec.feature "Safety Standards with Turbo", js: true do
         expect(page).to have_content("8")
       end
 
+      click_link "User Capacity"
+      
       within(".calculator-form", text: I18n.t("forms.safety_standards_user_capacity.header")) do
         fill_in I18n.t("forms.safety_standards_user_capacity.fields.length"), with: 5.0
         fill_in I18n.t("forms.safety_standards_user_capacity.fields.width"), with: 4.0
@@ -108,6 +116,8 @@ RSpec.feature "Safety Standards with Turbo", js: true do
         expect(page).to have_content("Usable Area: 18.0m²")
       end
 
+      click_link "Anchorage"
+      
       within("#anchors-result") do
         expect(page).to have_content("8")
       end

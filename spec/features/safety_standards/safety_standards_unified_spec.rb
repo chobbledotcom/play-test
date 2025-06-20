@@ -142,6 +142,8 @@ RSpec.describe "Safety Standards Unified Tests" do
           expect(page).to have_content("Required Anchors: 8")
         end
 
+        click_link "User Capacity"
+        
         fill_in_form_within("safety_standards_user_capacity", :length, 5.0)
         fill_in_form_within("safety_standards_user_capacity", :width, 4.0)
         fill_in_form_within("safety_standards_user_capacity", :negative_adjustment, 2.0)
@@ -151,6 +153,8 @@ RSpec.describe "Safety Standards Unified Tests" do
           expect(page).to have_content("Usable Area: 18.0m²")
         end
 
+        click_link "Anchorage"
+        
         within("#anchors-result") do
           expect(page).to have_content("Required Anchors: 8")
         end

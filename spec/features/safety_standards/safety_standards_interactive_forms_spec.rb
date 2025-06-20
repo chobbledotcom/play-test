@@ -86,7 +86,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     expect(page).to have_content("For 25.0m² area: 3 anchors required")
     expect(page).to have_content("For 2.5m platform: 1.25m runout required")
 
-    expect(page).to have_content("View Ruby Source Code")
+    expect(page).to have_content("Ruby Source Code")
     expect(page).to have_content("Method: calculate_required_anchors")
     expect(page).to have_content("Source: app/services/safety_standard.rb")
 

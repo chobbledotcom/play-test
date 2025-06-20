@@ -42,19 +42,46 @@
   font-size: 1rem;
 }
 
-.formula-box {
-  background-color: #f8f9fa;
+.formula-box,
+.source-code-box,
+.api-details-box {
+  margin: 0.75rem 0;
   border: 1px solid #dee2e6;
   border-radius: 4px;
+  max-width: 50rem;
+  margin: 1rem auto;
+}
+
+.formula-box summary,
+.source-code-box summary,
+.api-details-box summary {
   padding: 0.75rem;
-  margin: 0.75rem 0;
-  font-family: "Courier New", monospace;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  user-select: none;
+}
+
+.formula-box summary:hover,
+.source-code-box summary:hover,
+.api-details-box summary:hover {
+  background-color: #e9ecef;
+}
+
+.formula-box > div,
+.source-code-box > div,
+.api-details-box > div {
+  padding: 1rem;
+  background-color: #fff;
+  border-top: 1px solid #dee2e6;
 }
 
 .formula-box code {
-  background-color: transparent;
+  background-color: #f8f9fa;
   color: #e83e8c;
   font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-family: "Courier New", monospace;
 }
 
 .safety-standard-info table {
@@ -93,4 +120,151 @@
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   background-color: #f9f9f9;
+}
+
+.source-code pre {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+}
+
+.api-details pre {
+  background-color: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  margin: 1rem auto;
+  text-align: left;
+}
+
+.api-details h4 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.api-details h4:first-child {
+  margin-top: 0;
+}
+
+.curl-command {
+  background-color: #263238;
+  color: #aed581;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: "Courier New", monospace;
+}
+
+/* Tab Content */
+.tab-content {
+  padding: 2rem 0;
+}
+
+.tab-panel {
+  display: none;
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Show first tab by default */
+.tab-panel:first-of-type {
+  display: block;
+}
+
+/* Hide all panels when any target is active */
+.tab-content:has(.tab-panel:target) .tab-panel {
+  display: none;
+}
+
+/* Show targeted panel */
+.tab-panel:target {
+  display: block;
+}
+
+/* Active tab styling - when no hash, first tab is active */
+.tab-navigation a[href="#anchorage"] {
+  background-color: #fff;
+  border-bottom: 2px solid #fff;
+  color: #212529;
+  font-weight: 600;
+}
+
+/* Active tab styling - use :has() on parent */
+.safety-standards-reference:has(#anchorage:target)
+  .tab-navigation
+  a[href="#anchorage"],
+.safety-standards-reference:has(#wall-heights:target)
+  .tab-navigation
+  a[href="#wall-heights"],
+.safety-standards-reference:has(#slides:target)
+  .tab-navigation
+  a[href="#slides"],
+.safety-standards-reference:has(#user-capacity:target)
+  .tab-navigation
+  a[href="#user-capacity"],
+.safety-standards-reference:has(#material:target)
+  .tab-navigation
+  a[href="#material"],
+.safety-standards-reference:has(#fan:target) .tab-navigation a[href="#fan"],
+.safety-standards-reference:has(#additional:target)
+  .tab-navigation
+  a[href="#additional"] {
+  background-color: #fff;
+  border-bottom: 2px solid #fff;
+  color: #212529;
+  font-weight: 600;
+}
+
+/* Remove default active state when any tab is targeted */
+.safety-standards-reference:has(.tab-panel:target)
+  .tab-navigation
+  a[href="#anchorage"] {
+  background-color: #f8f9fa;
+  border-bottom: none;
+  color: #495057;
+  font-weight: normal;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive tab navigation */
+@media (max-width: 768px) {
+  .tab-navigation ul {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .tab-navigation a {
+    border-radius: 0;
+    border: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: -1px;
+    bottom: 0;
+  }
+
+  .tab-navigation li:first-child a {
+    border-radius: 4px 4px 0 0;
+  }
+
+  .tab-navigation li:last-child a {
+    border-radius: 0 0 4px 4px;
+    margin-bottom: 0;
+  }
+
+  .tab-content {
+    padding-top: 1rem;
+  }
 }

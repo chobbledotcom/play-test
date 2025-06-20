@@ -4,6 +4,7 @@ import "comment_toggles";
 import "details_links";
 import "dirty_forms";
 import "share_buttons";
+import "safety_standards_tabs";
 
 // Initialize features on Turbo navigation
 function initializeFeatures() {
