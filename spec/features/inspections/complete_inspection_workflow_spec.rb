@@ -159,14 +159,14 @@ class InspectionWorkflow
     applicable_tabs.each_with_index do |tab_name, index|
       # Before filling this tab, verify check marks are correct
       verify_assessment_check_marks(completed_tabs: applicable_tabs[0...index])
-      
+
       fill_assessment_tab(tab_name)
 
       if index < applicable_tabs.length - 1
         verify_inspection_not_completable
       end
     end
-    
+
     # After all assessments are complete, verify all tabs have check marks
     verify_assessment_check_marks(completed_tabs: applicable_tabs)
   end
@@ -254,7 +254,7 @@ class InspectionWorkflow
 
   def verify_assessment_check_marks(completed_tabs:)
     visit edit_inspection_path(@inspection)
-    
+
     # Main inspection tab always has check mark (it's completed in fill_general_inspection_details)
     within("nav.tabs") do
       # Check if inspection tab is current (span) or link
@@ -263,11 +263,11 @@ class InspectionWorkflow
       else
         expect(page).to have_link("#{t("forms.inspection.header")} ✓")
       end
-      
+
       # Check each assessment tab
       applicable_tabs.each do |tab_name|
         tab_text = t("forms.#{tab_name}.header")
-        
+
         if completed_tabs.include?(tab_name)
           # Should have check mark
           if page.has_css?("span", text: tab_text)
@@ -275,15 +275,13 @@ class InspectionWorkflow
           else
             expect(page).to have_link("#{tab_text} ✓")
           end
-        else
+        elsif page.has_css?("span", text: tab_text)
           # Should NOT have check mark
-          if page.has_css?("span", text: tab_text)
-            expect(page).to have_css("span", text: tab_text)
-            expect(page).not_to have_css("span", text: "#{tab_text} ✓")
-          else
-            expect(page).to have_link(tab_text)
-            expect(page).not_to have_link("#{tab_text} ✓")
-          end
+          expect(page).to have_css("span", text: tab_text)
+          expect(page).not_to have_css("span", text: "#{tab_text} ✓")
+        else
+          expect(page).to have_link(tab_text)
+          expect(page).not_to have_link("#{tab_text} ✓")
         end
       end
     end

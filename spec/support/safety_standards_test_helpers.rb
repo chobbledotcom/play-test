@@ -41,8 +41,11 @@ module SafetyStandardsTestHelpers
   end
 
   def submit_anchor_form = submit_calculator_form(:anchors)
+
   def submit_capacity_form = submit_calculator_form(:capacity)
+
   def submit_runout_form = submit_calculator_form(:runout)
+
   def submit_wall_height_form = submit_calculator_form(:wall_height)
 
   def within_result(type, &block)
@@ -72,12 +75,12 @@ module SafetyStandardsTestHelpers
   def expect_capacity_details(length:, width:, adjustment:)
     expected = SafetyStandard.calculate_user_capacity(length, width, adjustment)
     area = length * width
-    
+
     within_result(:capacity) do
       expect(page).to have_content("Dimensions: #{length}m × #{width}m")
       expect(page).to have_content("Total Area: #{area}m²")
       expect(page).to have_content("Negative Adjustment: -#{adjustment}m²") if adjustment > 0
-      
+
       %i[users_1000mm users_1200mm users_1500mm users_1800mm].zip(
         ["young children", "children", "adolescents", "adults"],
         ["1.0m", "1.2m", "1.5m", "1.8m"]

@@ -8,7 +8,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     submit_anchor_form
 
     expect_anchor_result(8)
-    
+
     within("#anchors-result") do
       expect(page).to have_content("Front/back area")
       expect(page).to have_content("5.0m (W) × 3.0m (H) = 15.0m²")
@@ -34,7 +34,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     submit_runout_form
 
     expect_runout_result(required_runout: 1.25)
-    
+
     within("#slide-runout-result") do
       expect(page).to have_content("Platform Height: 2.5m")
       expect(page).to have_content("50% of 2.5m = 1.25m, minimum 0.3m = 1.25m")
@@ -94,20 +94,19 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     submit_anchor_form
 
     expect_anchor_result(8)
-    
+
     within("#anchors-result") do
       expect(page).to have_content("Front/back area")
       expect(page).to have_content("4.0m (W) × 3.0m (H) = 12.0m²")
     end
   end
 
-
   scenario "handling invalid input gracefully" do
     visit safety_standards_path
-    
+
     fill_anchor_form(length: 1.0, width: 1.0, height: 1.0)
     submit_anchor_form
-    
+
     expect_anchor_result(4)
   end
 
@@ -123,7 +122,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
       expected = SafetyStandard.build_anchor_result(
         length: length, width: width, height: height
       )[:required_anchors]
-      
+
       expect_anchor_result(expected)
     end
   end
