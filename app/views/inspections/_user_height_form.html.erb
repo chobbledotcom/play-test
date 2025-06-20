@@ -26,7 +26,7 @@
 
   <%= render 'shared/safety_standards_display',
     reference_partials: [
-      'shared/safety_standards/wall_height_requirements', 'shared/safety_standards/user_capacity_requirements'
+      'shared/safety_standards/wall_height_requirements'
     ],
     dynamic_content: -> do %>
     <%= turbo_frame_tag "user_height_safety_results" do %>

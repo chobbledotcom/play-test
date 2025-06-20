@@ -18,17 +18,6 @@ RSpec.describe "Safety Standards API", type: :request do
         expect(json_response["result"]["formula_breakdown"].size).to eq 5
       end
 
-      it "calculates user capacity" do
-        post safety_standards_path,
-          params: {calculation: {type: "user_capacity", length: 5.0, width: 4.0, negative_adjustment: 2.0}}.to_json,
-          headers: headers
-
-        expect(response).to have_http_status(:ok)
-        json_response = JSON.parse(response.body)
-        expect(json_response["passed"]).to be true
-        expect(json_response["result"]["usable_area"]).to eq 18.0
-        expect(json_response["result"]["capacities"]["users_1200mm"]).to eq 9
-      end
 
       it "returns error for invalid data" do
         post safety_standards_path,

@@ -2,7 +2,6 @@
 <% result_id = type.to_s.dasherize + "-result" %>
 <% partial_name = case type
     when :anchors then "anchor_result"
-    when :user_capacity then "capacity_result"
     when :slide_runout then "runout_result"
     when :wall_height then "wall_height_result"
     end %>

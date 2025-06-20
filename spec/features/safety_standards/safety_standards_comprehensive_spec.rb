@@ -6,8 +6,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
     let(:valid_anchor_params) { {length: 5.0, width: 5.0, height: 3.0} }
     let(:invalid_anchor_params) { {length: 0, width: 0, height: 0} }
 
-    let(:valid_capacity_params) { {length: 5.0, width: 4.0, adjustment: 2.0} }
-    let(:invalid_capacity_params) { {length: 0, width: 0, adjustment: 0} }
 
     let(:valid_runout_params) { {height: 2.5} }
     let(:invalid_runout_params) { {height: 0} }
@@ -56,17 +54,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         expect(current_url).to eq(url_before)
       end
 
-      scenario "capacity calculation updates without reload" do
-        visit safety_standards_path
-        
-        # Navigate to user capacity tab
-        click_link "User Capacity"
-        
-        fill_capacity_form(**valid_capacity_params)
-        submit_capacity_form
-
-        expect_capacity_result(usable_area: 18.0)
-      end
 
       scenario "runout calculation updates without reload" do
         visit safety_standards_path
@@ -104,12 +91,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
           expect(length_input["min"]).to eq("1.0")
         end
 
-        # Check capacity form
-        click_link "User Capacity"
-        within(".calculator-form", text: I18n.t("forms.safety_standards_user_capacity.header")) do
-          length_input = find_field(I18n.t("forms.safety_standards_user_capacity.fields.length"))
-          expect(length_input["min"]).to eq("1.0")
-        end
       end
     end
 
@@ -121,9 +102,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         fill_anchor_form(**valid_anchor_params)
         submit_anchor_form
 
-        click_link "User Capacity"
-        fill_capacity_form(**valid_capacity_params)
-        submit_capacity_form
 
         click_link "Slides"
         fill_runout_form(**valid_runout_params)
@@ -139,8 +117,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         click_link "Anchorage"
         expect_anchor_result(8)
         
-        click_link "User Capacity"
-        expect_capacity_result(usable_area: 18.0)
         
         click_link "Slides"
         expect_runout_result(required_runout: 1.25)
@@ -215,7 +191,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
       it "returns different targets for different calculations" do
         targets = {
           "anchors" => "anchors-result",
-          "user_capacity" => "user-capacity-result",
           "slide_runout" => "slide-runout-result",
           "wall_height" => "wall-height-result"
         }
@@ -223,8 +198,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         targets.each do |type, target|
           params = case type
           when "anchors" then {type: type, **valid_anchor_params}
-          when "user_capacity"
-            {type: type, length: 5, width: 4, negative_adjustment: 2}
           when "slide_runout" then {type: type, platform_height: 2.5}
           when "wall_height" then {type: type, user_height: 1.5}
           end
@@ -248,20 +221,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
       expect(response.body).to include(I18n.t("safety_standards.errors.invalid_dimensions"))
     end
 
-    it "handles capacity errors via POST" do
-      post safety_standards_path, params: {
-        calculation: {
-          type: "user_capacity",
-          length: 0,
-          width: 0,
-          negative_adjustment: 0
-        }
-      }
-
-      follow_redirect!
-      expect(response.body).to include("Error:")
-      expect(response.body).to include(I18n.t("safety_standards.errors.invalid_dimensions"))
-    end
   end
 
   describe "Edge cases", type: :feature do

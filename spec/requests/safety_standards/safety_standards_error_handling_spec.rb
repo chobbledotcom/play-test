@@ -19,10 +19,6 @@ RSpec.describe "Safety Standards Error Handling", type: :request do
       include_examples "error response", "invalid_dimensions"
     end
 
-    context "user capacity calculations" do
-      let(:params) { {calculation: {type: "user_capacity", length: -5, width: 0, negative_adjustment: 0}} }
-      include_examples "error response", "invalid_dimensions"
-    end
 
     context "slide runout calculations" do
       let(:params) { {calculation: {type: "slide_runout", platform_height: 0}} }

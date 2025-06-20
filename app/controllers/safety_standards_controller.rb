@@ -2,7 +2,7 @@ class SafetyStandardsController < ApplicationController
   skip_before_action :require_login
   skip_before_action :verify_authenticity_token, only: [:index]
 
-  CALCULATION_TYPES = %w[anchors user_capacity slide_runout wall_height].freeze
+  CALCULATION_TYPES = %w[anchors slide_runout wall_height].freeze
 
   def index
     @calculation_metadata = SafetyStandard.calculation_metadata
@@ -55,16 +55,6 @@ class SafetyStandardsController < ApplicationController
     end
   end
 
-  def calculate_user_capacity
-    dimensions = extract_dimensions(:length, :width)
-    adjustment = param_to_float(:negative_adjustment)
-
-    if dimensions.values.all?(&:positive?)
-      @capacity_result = build_capacity_result(**dimensions, negative_adjustment: adjustment)
-    else
-      set_error(:capacity, :invalid_dimensions)
-    end
-  end
 
   def calculate_slide_runout
     height = param_to_float(:platform_height)
@@ -98,18 +88,6 @@ class SafetyStandardsController < ApplicationController
     instance_variable_set("@#{type}_error", t("safety_standards.errors.#{error_key}"))
   end
 
-  def build_capacity_result(length:, width:, negative_adjustment:)
-    area = length * width
-    usable_area = area - negative_adjustment
-    {
-      length: length,
-      width: width,
-      area: area,
-      negative_adjustment: negative_adjustment,
-      usable_area: usable_area,
-      capacities: SafetyStandard.calculate_user_capacity(length, width, negative_adjustment)
-    }
-  end
 
   def build_runout_result(platform_height)
     required_runout = SafetyStandard.calculate_required_runout(platform_height)
@@ -182,14 +160,12 @@ class SafetyStandardsController < ApplicationController
 
     result_var = case type
     when "anchors" then "@anchor_result"
-    when "user_capacity" then "@capacity_result"
     when "slide_runout" then "@runout_result"
     when "wall_height" then "@wall_height_result"
     end
 
     error_var = case type
     when "anchors" then "@anchor_error"
-    when "user_capacity" then "@capacity_error"
     when "slide_runout" then "@runout_error"
     when "wall_height" then "@wall_height_error"
     end

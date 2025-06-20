@@ -130,36 +130,6 @@ RSpec.describe "Safety Standards Unified Tests" do
         expect(page).to have_current_path(safety_standards_path)
       end
     end
-
-    describe "multiple form interactions" do
-      it "updates each form independently" do
-        fill_in_form_within("safety_standards_anchors", :length, 5.0)
-        fill_in_form_within("safety_standards_anchors", :width, 5.0)
-        fill_in_form_within("safety_standards_anchors", :height, 3.0)
-        submit_form_within("safety_standards_anchors")
-
-        within("#anchors-result") do
-          expect(page).to have_content("Required Anchors: 8")
-        end
-
-        click_link "User Capacity"
-        
-        fill_in_form_within("safety_standards_user_capacity", :length, 5.0)
-        fill_in_form_within("safety_standards_user_capacity", :width, 4.0)
-        fill_in_form_within("safety_standards_user_capacity", :negative_adjustment, 2.0)
-        submit_form_within("safety_standards_user_capacity")
-
-        within("#user-capacity-result") do
-          expect(page).to have_content("Usable Area: 18.0m²")
-        end
-
-        click_link "Anchorage"
-        
-        within("#anchors-result") do
-          expect(page).to have_content("Required Anchors: 8")
-        end
-      end
-    end
   end
 
   describe "GET requests", type: :request do

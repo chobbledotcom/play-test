@@ -24,13 +24,6 @@ module SafetyStandard
     safety_factor: 1.5           # Safety factor multiplier
   }.freeze
 
-  # User space requirements by age group (EN 14960:2019)
-  USER_SPACE_REQUIREMENTS = {
-    young_children_1000mm: 1.5,  # 1.5m² per young child (1.0m height)
-    children_1200mm: 2.0,        # 2.0m² per child (1.2m height)
-    adolescents_1500mm: 2.5,     # 2.5m² per adolescent (1.5m height)
-    adults_1800mm: 3.0           # 3.0m² per adult (1.8m height)
-  }.freeze
 
   # Slide runout calculation constants (EN 14960:2019)
   RUNOUT_CALCULATION_CONSTANTS = {
@@ -95,12 +88,6 @@ module SafetyStandard
       width: 5.0,
       height: 3.0
     },
-    user_capacity: {
-      type: "user_capacity",
-      length: 5.0,
-      width: 4.0,
-      negative_adjustment: 2.0
-    },
     slide_runout: {
       type: "slide_runout",
       platform_height: 2.5
@@ -125,23 +112,6 @@ module SafetyStandard
           ["Left & right anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
           ["Total anchors", "(2 + 2) × 2 = 8"]
         ]
-      }
-    },
-    user_capacity: {
-      passed: true,
-      status: "Calculation completed successfully",
-      result: {
-        length: 5.0,
-        width: 4.0,
-        area: 20.0,
-        negative_adjustment: 2.0,
-        usable_area: 18.0,
-        capacities: {
-          users_1000mm: 12,
-          users_1200mm: 9,
-          users_1500mm: 7,
-          users_1800mm: 6
-        }
       }
     },
     slide_runout: {
@@ -179,16 +149,6 @@ module SafetyStandard
           input_unit: "m²",
           output_unit: "anchors",
           formula_text: anchor_formula_text,
-          standard_reference: "EN 14960:2019"
-        },
-        user_capacity: {
-          title: "User Capacity Calculations",
-          description: user_capacity_description,
-          method_name: :calculate_user_capacity,
-          example_input: [5.0, 4.0, 2.0],
-          input_unit: ["length (m)", "width (m)", "negative adjustment (m²)"],
-          output_unit: "users per category",
-          formula_text: "Usable area ÷ space requirement per age group",
           standard_reference: "EN 14960:2019"
         },
         slide_runout: {
@@ -272,8 +232,6 @@ module SafetyStandard
       case method_name
       when :calculate_required_anchors
         ["ANCHOR_CALCULATION_CONSTANTS"]
-      when :calculate_user_capacity
-        ["USER_SPACE_REQUIREMENTS"]
       when :calculate_required_runout
         ["RUNOUT_CALCULATION_CONSTANTS"]
       when :meets_height_requirements?
@@ -322,13 +280,6 @@ module SafetyStandard
         area_input = "#{area}#{input_unit} area"
         output_unit = metadata[:output_unit]
         "For #{area_input}: #{result} #{output_unit} required"
-      when :user_capacity
-        length, width, negative_adj = metadata[:example_input]
-        result = calculate_user_capacity(length, width, negative_adj)
-        usable_area = (length * width) - negative_adj
-        area_desc = "#{length}m × #{width}m (#{usable_area}m² usable)"
-        user_count = result[:users_1200mm]
-        "For #{area_desc}: #{user_count} children (1.2m category)"
       when :slide_runout
         platform_height = metadata[:example_input]
         result = calculate_required_runout(platform_height)
@@ -450,26 +401,6 @@ module SafetyStandard
       }
     end
 
-    def calculate_user_capacity(length, width, negative_adjustment = 0)
-      # EN 14960:2019 - User capacity based on age-appropriate space allocation
-      return {} if length.nil? || width.nil?
-
-      usable_area = (length * width) - (negative_adjustment || 0)
-      return {} if usable_area <= 0
-
-      # Standard capacity calculation using constants from USER_SPACE_REQUIREMENTS
-      space_1000 = USER_SPACE_REQUIREMENTS[:young_children_1000mm]
-      space_1200 = USER_SPACE_REQUIREMENTS[:children_1200mm]
-      space_1500 = USER_SPACE_REQUIREMENTS[:adolescents_1500mm]
-      space_1800 = USER_SPACE_REQUIREMENTS[:adults_1800mm]
-
-      {
-        users_1000mm: (usable_area / space_1000).floor,
-        users_1200mm: (usable_area / space_1200).floor,
-        users_1500mm: (usable_area / space_1500).floor,
-        users_1800mm: (usable_area / space_1800).floor
-      }
-    end
 
     def slide_calculations
       # EN 14960:2019 - Comprehensive slide safety requirements
@@ -555,9 +486,6 @@ module SafetyStandard
       I18n.t("safety_standards.calculators.anchor.description")
     end
 
-    def user_capacity_description
-      I18n.t("safety_standards.calculators.user_capacity.description")
-    end
 
     def extract_method_lines(lines, start_line, method_name)
       method_lines = []

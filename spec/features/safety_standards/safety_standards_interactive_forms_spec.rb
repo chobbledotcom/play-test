@@ -17,16 +17,6 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     end
   end
 
-  scenario "calculating user capacity" do
-    visit safety_standards_path
-
-    fill_capacity_form(length: 5.0, width: 4.0, adjustment: 2.0)
-    submit_capacity_form
-
-    expect_capacity_result(usable_area: 18.0)
-    expect_capacity_details(length: 5.0, width: 4.0, adjustment: 2.0)
-  end
-
   scenario "calculating slide runout requirements" do
     visit safety_standards_path
 
@@ -81,7 +71,6 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
 
     expect(page).to have_content("((Area × 114.0 × 1.5) ÷ 1600.0)")
     expect(page).to have_content("50% of platform height, minimum 300mm")
-    expect(page).to have_content("Usable area ÷ space requirement per age group")
 
     expect(page).to have_content("For 25.0m² area: 3 anchors required")
     expect(page).to have_content("For 2.5m platform: 1.25m runout required")

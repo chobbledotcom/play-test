@@ -21,30 +21,6 @@ RSpec.describe SafetyStandard, "Constants" do
     end
   end
 
-  describe "USER_SPACE_REQUIREMENTS" do
-    it "defines expected user space values" do
-      constants = SafetyStandard::USER_SPACE_REQUIREMENTS
-
-      expect(constants[:young_children_1000mm]).to eq(1.5)
-      expect(constants[:children_1200mm]).to eq(2.0)
-      expect(constants[:adolescents_1500mm]).to eq(2.5)
-      expect(constants[:adults_1800mm]).to eq(3.0)
-    end
-
-    it "is used in user capacity calculations" do
-      length, width = 5.0, 4.0
-      usable_area = 18.0 # (5 * 4) - 2
-      negative_adjustment = 2.0
-
-      result = SafetyStandard.calculate_user_capacity(length, width, negative_adjustment)
-
-      # Verify calculations use the exact constant values
-      expect(result[:users_1000mm]).to eq((usable_area / 1.5).floor)
-      expect(result[:users_1200mm]).to eq((usable_area / 2.0).floor)
-      expect(result[:users_1500mm]).to eq((usable_area / 2.5).floor)
-      expect(result[:users_1800mm]).to eq((usable_area / 3.0).floor)
-    end
-  end
 
   describe "RUNOUT_CALCULATION_CONSTANTS" do
     it "defines expected runout calculation values" do

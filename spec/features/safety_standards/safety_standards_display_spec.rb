@@ -13,7 +13,7 @@ RSpec.feature "Safety Standards Display", type: :feature do
     expect(page).to have_content(I18n.t("safety_standards.title"))
     expect(page).to have_content(I18n.t("safety_standards.subtitle"))
 
-    %w[anchor user_capacity runout wall_height].each do |calculator|
+    %w[anchor runout wall_height].each do |calculator|
       expect(page).to have_content(I18n.t("safety_standards.calculators.#{calculator}.title"))
     end
   end
@@ -56,7 +56,6 @@ RSpec.feature "Safety Standards Display", type: :feature do
       expect_safety_standard(:user_height, :height_requirements)
       expect_safety_standard(:user_height, :walls_equal_user_height, height: 1.2)
       expect(page).to have_content(I18n.t("shared.pass"))
-      expect_safety_standard(:user_height, :calculated_capacities)
     end
   end
 

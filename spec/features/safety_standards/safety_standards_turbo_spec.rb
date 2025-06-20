@@ -36,25 +36,6 @@ RSpec.feature "Safety Standards with Turbo", js: true do
     end
   end
 
-  describe "user capacity calculator" do
-    it "updates results without page reload via Turbo" do
-      click_link "User Capacity"
-      
-      within(".calculator-form", text: I18n.t("forms.safety_standards_user_capacity.header")) do
-        fill_in I18n.t("forms.safety_standards_user_capacity.fields.length"), with: 5.0
-        fill_in I18n.t("forms.safety_standards_user_capacity.fields.width"), with: 4.0
-        fill_in I18n.t("forms.safety_standards_user_capacity.fields.negative_adjustment"), with: 2.0
-        click_button I18n.t("forms.safety_standards_user_capacity.submit")
-      end
-
-      within("#user-capacity-result") do
-        expect(page).to have_content("Usable Area: 18.0m²")
-        expect(page).to have_content("1.2m users:")
-      end
-
-      expect(page).to have_current_path(safety_standards_path)
-    end
-  end
 
   describe "slide runout calculator" do
     it "updates results without page reload via Turbo" do
@@ -103,17 +84,15 @@ RSpec.feature "Safety Standards with Turbo", js: true do
         expect(page).to have_content("8")
       end
 
-      click_link "User Capacity"
+      click_link "Slides"
       
-      within(".calculator-form", text: I18n.t("forms.safety_standards_user_capacity.header")) do
-        fill_in I18n.t("forms.safety_standards_user_capacity.fields.length"), with: 5.0
-        fill_in I18n.t("forms.safety_standards_user_capacity.fields.width"), with: 4.0
-        fill_in I18n.t("forms.safety_standards_user_capacity.fields.negative_adjustment"), with: 2.0
-        click_button I18n.t("forms.safety_standards_user_capacity.submit")
+      within(".calculator-form", text: I18n.t("forms.safety_standards_slide_runout.header")) do
+        fill_in I18n.t("forms.safety_standards_slide_runout.fields.platform_height"), with: 2.5
+        click_button I18n.t("forms.safety_standards_slide_runout.submit")
       end
 
-      within("#user-capacity-result") do
-        expect(page).to have_content("Usable Area: 18.0m²")
+      within("#slide-runout-result") do
+        expect(page).to have_content("1.25m")
       end
 
       click_link "Anchorage"

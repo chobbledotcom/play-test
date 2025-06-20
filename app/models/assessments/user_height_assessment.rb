@@ -33,12 +33,4 @@ class Assessments::UserHeightAssessment < ApplicationRecord
     SafetyStandard.meets_height_requirements?(tallest_user_height, containing_wall_height)
   end
 
-  def recommended_user_capacity
-    return {} unless play_area_length.present? && play_area_width.present?
-    SafetyStandard.calculate_user_capacity(
-      play_area_length,
-      play_area_width,
-      negative_adjustment
-    )
-  end
 end

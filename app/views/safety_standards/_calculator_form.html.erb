@@ -25,13 +25,6 @@
         <%= render 'form/number', field: :height, min: 1.0, required: true %>
       <% end %>
       
-    <% when :user_capacity %>
-      <%= render 'form/fieldset', legend_key: 'dimensions' do %>
-        <%= render 'form/number', field: :length, min: 1.0, required: true %>
-        <%= render 'form/number', field: :width, min: 1.0, required: true %>
-        <%= render 'form/number', field: :negative_adjustment, min: 0 %>
-      <% end %>
-      
     <% when :slide_runout %>
       <%= render 'form/number', field: :platform_height, min: 1.0, required: true %>
       
@@ -41,7 +34,6 @@
     
     <% result_partial_mapping = {
       anchors: "anchor_result",
-      user_capacity: "capacity_result",
       slide_runout: "runout_result",
       wall_height: "wall_height_result"
     } %>

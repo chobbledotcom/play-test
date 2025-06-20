@@ -25,37 +25,4 @@
     <% end %>
   <% end %>
 
-  <% if @assessment.play_area_length.present? && @assessment.play_area_width.present? %>
-    <% if @assessment.tallest_user_height.present? %>
-      <br>
-    <% end %>
-    <p>
-      <strong>
-        <%= t('safety_standards.user_height.calculated_capacities') %>
-      </strong>
-    </p>
-    <% capacities = @assessment.recommended_user_capacity %>
-    <ul>
-      <li>
-        <%= t('safety_standards.user_height.capacity_1000mm',
-          count: capacities[:users_1000mm])
-        %>
-      </li>
-      <li>
-        <%= t('safety_standards.user_height.capacity_1200mm',
-          count: capacities[:users_1200mm])
-        %>
-      </li>
-      <li>
-        <%= t('safety_standards.user_height.capacity_1500mm',
-          count: capacities[:users_1500mm])
-        %>
-      </li>
-      <li>
-        <%= t('safety_standards.user_height.capacity_1800mm',
-          count: capacities[:users_1800mm])
-        %>
-      </li>
-    </ul>
-  <% end %>
 <% end %>

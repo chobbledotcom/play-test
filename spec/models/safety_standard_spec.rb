@@ -190,59 +190,6 @@ RSpec.describe SafetyStandard, type: :model do
     end
   end
 
-  describe ".calculate_user_capacity" do
-    context "with nil inputs" do
-      it "returns empty hash for nil length" do
-        expect(SafetyStandard.calculate_user_capacity(nil, 5.0)).to eq({})
-      end
-
-      it "returns empty hash for nil width" do
-        expect(SafetyStandard.calculate_user_capacity(10.0, nil)).to eq({})
-      end
-    end
-
-    context "with invalid area" do
-      it "returns empty hash when usable area is zero or negative" do
-        expect(SafetyStandard.calculate_user_capacity(5.0, 4.0, 20.0)).to eq({}) # 20-20=0
-        expect(SafetyStandard.calculate_user_capacity(5.0, 4.0, 25.0)).to eq({}) # 20-25=-5
-      end
-    end
-
-    context "with valid inputs" do
-      it "calculates capacity for each age group" do
-        result = SafetyStandard.calculate_user_capacity(10.0, 5.0) # 50m² area
-
-        expect(result).to eq({
-          users_1000mm: 33,  # 50 / 1.5 = 33.33 → 33
-          users_1200mm: 25,  # 50 / 2.0 = 25
-          users_1500mm: 20,  # 50 / 2.5 = 20
-          users_1800mm: 16   # 50 / 3.0 = 16.67 → 16
-        })
-      end
-
-      it "accounts for negative adjustments" do
-        result = SafetyStandard.calculate_user_capacity(10.0, 5.0, 5.0) # 45m² usable
-
-        expect(result).to eq({
-          users_1000mm: 30,  # 45 / 1.5 = 30
-          users_1200mm: 22,  # 45 / 2.0 = 22.5 → 22
-          users_1500mm: 18,  # 45 / 2.5 = 18
-          users_1800mm: 15   # 45 / 3.0 = 15
-        })
-      end
-
-      it "handles nil negative adjustment" do
-        result = SafetyStandard.calculate_user_capacity(6.0, 4.0, nil) # 24m² area
-
-        expect(result).to eq({
-          users_1000mm: 16,  # 24 / 1.5 = 16
-          users_1200mm: 12,  # 24 / 2.0 = 12
-          users_1500mm: 9,   # 24 / 2.5 = 9.6 → 9
-          users_1800mm: 8    # 24 / 3.0 = 8
-        })
-      end
-    end
-  end
 
   describe "validation methods" do
     describe ".valid_stitch_length?" do
