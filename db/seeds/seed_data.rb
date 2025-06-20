@@ -28,7 +28,7 @@ module SeedData
     }
   end
 
-  def self.inspection_fields
+  def self.inspection_fields(passed: true)
     {
       inspection_date: Date.current,
       inspection_location: "Test Location #{rand(1..5)}",
@@ -38,7 +38,8 @@ module SeedData
       has_slide: [true, false].sample,
       width: rand(4.0..8.0).round(1),
       length: rand(5.0..10.0).round(1),
-      height: rand(3.0..6.0).round(1)
+      height: rand(3.0..6.0).round(1),
+      passed: passed
     }
   end
 

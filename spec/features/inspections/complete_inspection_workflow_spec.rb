@@ -10,7 +10,7 @@ class InspectionWorkflow
   include InspectionTestHelpers
   include FormHelpers
 
-  BOOLEAN_FIELDS = %w[has_slide is_totally_enclosed].freeze
+  BOOLEAN_FIELDS = %w[has_slide is_totally_enclosed passed].freeze
 
   attr_reader :user
   attr_reader :unit
@@ -128,7 +128,7 @@ class InspectionWorkflow
   end
 
   def fill_general_inspection_details
-    field_data = SeedData.inspection_fields.merge(@options)
+    field_data = SeedData.inspection_fields(passed: true).merge(@options)
 
     field_data.each do |field_name, value|
       fill_inspection_field(field_name, value)
@@ -236,18 +236,20 @@ class InspectionWorkflow
         t("assessments.incomplete_fields.show_fields", count: total_field_count)
       )
 
-      find("details#incomplete_fields_inspection summary").click
+      find("details#incomplete_fields summary").click
       expect(page).to have_content(
         t("assessments.incomplete_fields.description")
       )
-    end
 
-    click_mark_complete_button
-    expect_cannot_complete_message
+      # The button should not be visible when there are incomplete fields
+      expect(page).not_to have_button(t("inspections.buttons.mark_complete"))
+    end
   end
 
   def mark_inspection_complete
     visit edit_inspection_path(@inspection)
+    # Verify the button is now visible since there are no incomplete fields
+    expect(page).to have_button(t("inspections.buttons.mark_complete"))
     click_mark_complete_button
     expect_marked_complete_message
   end

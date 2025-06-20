@@ -117,8 +117,8 @@ class InspectionsController < ApplicationController
 
     if validation_errors.any?
       error_list = validation_errors.join(", ")
-      flash[:alert] = t("inspections.messages.cannot_complete",
-        errors: error_list)
+      flash[:alert] =
+        t("inspections.messages.cannot_complete", errors: error_list)
       redirect_to edit_inspection_path(@inspection)
       return
     end

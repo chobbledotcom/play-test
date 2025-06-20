@@ -5,7 +5,7 @@ en:
       zero: "No inspections"
       one: "1 inspection"
       other: "%{count} inspections"
-    
+
     titles:
       edit: "Edit Inspection"
       new: "New Inspection"
@@ -172,7 +172,7 @@ en:
       unit_changed: "Unit changed to '%{unit_name}' successfully."
       pdf_not_supported_html: "Your browser does not support PDFs."
       unit_change_failed: "Failed to change unit: %{errors}"
-      mark_complete_confirm: "Are you sure you want to mark this inspection as complete? This will validate all assessments are complete."
+      mark_complete_confirm: "Are you sure you want to mark this inspection as complete?"
       mark_in_progress_confirm: "Are you sure you want to mark this inspection as in progress? This will allow further editing."
       marked_complete: "Inspection marked as complete successfully."
       marked_incomplete: "Inspection marked as incomplete successfully."

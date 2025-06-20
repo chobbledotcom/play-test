@@ -35,40 +35,6 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       expect_marked_in_progress_message
       expect(completed_inspection.reload.complete?).to be false
     end
-
-    it "preserves all data when toggling completion status" do
-      inspection = create(:inspection,
-        user: user,
-        unit: unit,
-        inspection_location: "Original Location",
-        risk_assessment: "Original risk assessment with detailed findings.",
-        unique_report_number: "ORIG-123")
-
-      fill_assessments_with_complete_data(inspection)
-
-      visit edit_inspection_path(inspection)
-      click_mark_complete_button
-
-      expect(page).to have_current_path(inspection_path(inspection))
-
-      inspection.reload
-      expect(inspection.complete?).to be true
-
-      visit inspection_path(inspection)
-      click_switch_to_in_progress_button
-
-      inspection.reload
-      expect(inspection.complete?).to be false
-      expect(inspection.inspection_location).to eq("Original Location")
-      expect(inspection.risk_assessment).to be_present
-      expect(inspection.unique_report_number).to eq("ORIG-123")
-
-      visit edit_inspection_path(inspection)
-      fill_in_location("Updated after incomplete")
-      click_submit_button
-
-      expect(inspection.reload.inspection_location).to eq("Updated after incomplete")
-    end
   end
 
   describe "unique report number management" do

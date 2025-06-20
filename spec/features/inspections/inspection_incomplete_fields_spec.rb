@@ -5,7 +5,16 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user:) }
-  let(:inspection) { create(:inspection, unit:, user:, inspection_location: nil) }
+  let(:inspection) {
+    create(:inspection,
+      unit:,
+      user:,
+      inspection_location: nil,
+      passed: true,
+      width: 5.0,
+      length: 10.0,
+      height: 3.0)
+  }
 
   before { sign_in(user) }
 
@@ -14,7 +23,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     expect(page).to have_css("summary.incomplete-fields-summary", text: summary_text)
   end
 
-  def expand_incomplete_fields = find("details#incomplete_fields_inspection summary").click
+  def expand_incomplete_fields = find("summary.incomplete-fields-summary").click
 
   def expect_incomplete_field(form_name, field_name)
     field_label = I18n.t("forms.#{form_name}.fields.#{field_name}")
@@ -43,7 +52,8 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
       expect(page).to have_content(I18n.t("assessments.incomplete_fields.description"))
       expect_incomplete_section("inspection")
       expect_incomplete_field("inspection", "inspection_location")
-      expect(page).to have_button(I18n.t("inspections.buttons.mark_complete"))
+      # Button should NOT be visible when there are incomplete fields
+      expect(page).not_to have_button(I18n.t("inspections.buttons.mark_complete"))
     end
   end
 
@@ -53,6 +63,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
       unit: complete_unit,
       user:,
       inspection_location: nil,
+      passed: true,
       height: 3.0,
       length: 10.0,
       width: 8.0)
@@ -78,7 +89,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     visit edit_inspection_path(completed_inspection)
 
     # A truly completed inspection should have no incomplete fields
-    expect(page).not_to have_css("details#incomplete_fields_inspection")
+    expect(page).not_to have_css("details#incomplete_fields")
     expect(page).to have_button(I18n.t("inspections.buttons.mark_complete"))
   end
 
@@ -170,6 +181,6 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     visit edit_inspection_path(completed)
 
     # Should not have any incomplete fields section
-    expect(page).not_to have_css("details#incomplete_fields_inspection")
+    expect(page).not_to have_css("details#incomplete_fields")
   end
 end

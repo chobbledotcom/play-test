@@ -85,7 +85,7 @@
   margin-bottom: 2rem;
 }
 
-:target:not(nav) {
+form *:target {
   animation: highlight-fade 5s ease-out forwards;
   border-radius: 5px;
 }
