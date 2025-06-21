@@ -446,4 +446,90 @@ RSpec.feature "Complete Inspection Workflow", type: :feature do
       is_totally_enclosed: true
     ).execute
   end
+
+  scenario "prevents duplicate unique report numbers for same user" do
+    user = create(:user)
+    sign_in(user)
+
+    # Create first inspection with a unique report number
+    unit1 = create(:unit, user: user)
+    inspection1 = create(:inspection, unit: unit1, user: user)
+    
+    visit edit_inspection_path(inspection1)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
+    click_button I18n.t("forms.inspection.submit")
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+
+    # Create second inspection and try to use same report number
+    unit2 = create(:unit, user: user)
+    inspection2 = create(:inspection, unit: unit2, user: user)
+    
+    visit edit_inspection_path(inspection2)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
+    click_button I18n.t("forms.inspection.submit")
+    
+    # Should show validation error in form
+    expect(page).to have_content("has already been taken")
+    expect(page).to have_css(".form-errors")
+    
+    # Fix by using different report number
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-002"
+    click_button I18n.t("forms.inspection.submit")
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+  end
+
+  scenario "allows multiple inspections with blank unique report numbers" do
+    user = create(:user)
+    sign_in(user)
+
+    # Create first inspection with blank unique report number
+    unit1 = create(:unit, user: user)
+    inspection1 = create(:inspection, unit: unit1, user: user)
+    
+    visit edit_inspection_path(inspection1)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: ""
+    click_button I18n.t("forms.inspection.submit")
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+
+    # Create second inspection also with blank unique report number
+    unit2 = create(:unit, user: user)
+    inspection2 = create(:inspection, unit: unit2, user: user)
+    
+    visit edit_inspection_path(inspection2)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: ""
+    click_button I18n.t("forms.inspection.submit")
+    
+    # Should save successfully - blank values are allowed
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+    expect(page).not_to have_css(".form-errors")
+  end
+
+  scenario "different users can use the same unique report number" do
+    user1 = create(:user)
+    user2 = create(:user)
+
+    # User 1 creates inspection with report number
+    sign_in(user1)
+    unit1 = create(:unit, user: user1)
+    inspection1 = create(:inspection, unit: unit1, user: user1)
+    
+    visit edit_inspection_path(inspection1)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
+    click_button I18n.t("forms.inspection.submit")
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+    logout
+
+    # User 2 can use the same report number
+    sign_in(user2)
+    unit2 = create(:unit, user: user2)
+    inspection2 = create(:inspection, unit: unit2, user: user2)
+    
+    visit edit_inspection_path(inspection2)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
+    click_button I18n.t("forms.inspection.submit")
+    
+    # Should save successfully - different users can have same report number
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+    expect(page).not_to have_css(".form-errors")
+  end
 end

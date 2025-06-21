@@ -1,6 +1,7 @@
 .success,
 .error,
-.notice {
+.notice,
+.alert {
   max-width: 30rem;
   margin: 2rem auto;
   text-align: left;
@@ -27,6 +28,12 @@
   background: linear-gradient(135deg, #ffe8e8 0%, #fff0f0 100%);
   border: 1px solid #ffb3b3;
   color: #cc0000;
+}
+
+.alert {
+  background: linear-gradient(135deg, #fff3cd 0%, #fffae5 100%);
+  border: 1px solid #ffd700;
+  color: #856404;
 }
 
 .error ul {

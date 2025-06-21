@@ -274,14 +274,18 @@ nav.tabs span {
 	cursor: pointer;
 }
 
-.text-success,
-.text-danger {
+.text-notice,
+.text-error,
+.text-alert {
 	font-weight: bold;
 }
 
-.text-success {
+.text-notice {
 	color: #00cc00;
 }
-.text-danger {
+.text-error {
 	color: #cc0000;
+}
+.text-alert {
+	color: #ff9900;
 }

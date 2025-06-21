@@ -13,7 +13,7 @@
   <% if assessment_obj.respond_to?(:meets_height_requirements?) %>
       <p>
         <strong><%= t("#{i18n_base}.status.height_requirement") %>:</strong>
-        <span class="<%= assessment_obj.meets_height_requirements? ? 'text-success' : 'text-danger' %>">
+        <span class="<%= assessment_obj.meets_height_requirements? ? 'text-notice' : 'text-error' %>">
           <%= assessment_obj.meets_height_requirements? ?
               t("shared.pass") :
               t("shared.fail") %>
@@ -24,7 +24,7 @@
     <% if assessment_obj.respond_to?(:meets_runout_requirements?) %>
       <p>
         <strong><%= t("#{i18n_base}.status.runout_requirement") %>:</strong>
-        <span class="<%= assessment_obj.meets_runout_requirements? ? 'text-success' : 'text-danger' %>">
+        <span class="<%= assessment_obj.meets_runout_requirements? ? 'text-notice' : 'text-error' %>">
           <%= assessment_obj.meets_runout_requirements? ?
               t("shared.pass") :
               t("shared.fail") %>

@@ -10,13 +10,13 @@
           <p><%= t('inspections.safety_standards.anchor_calculation',
                    required: inspection.anchorage_assessment.required_anchors,
                    area: inspection.area) %></p>
-          <p class="<%= inspection.anchorage_assessment.meets_anchor_requirements? ? 'text-success' : 'text-danger' %>">
+          <p class="<%= inspection.anchorage_assessment.meets_anchor_requirements? ? 'text-notice' : 'text-error' %>">
             <%= t('inspections.safety_standards.anchor_status',
                   current: inspection.anchorage_assessment.total_anchors,
                   required: inspection.anchorage_assessment.required_anchors) %>
           </p>
         <% else %>
-          <p class="text-warning">Unit area not specified - cannot calculate anchor requirements</p>
+          <p class="text-alert">Unit area not specified - cannot calculate anchor requirements</p>
         <% end %>
       </section>
     <% end %>
@@ -30,7 +30,7 @@
           %>
         </p>
         <% if inspection.slide_assessment.runout_value.present? %>
-          <p class="<%= inspection.slide_assessment.meets_runout_requirements? ? 'text-success' : 'text-danger' %>">
+          <p class="<%= inspection.slide_assessment.meets_runout_requirements? ? 'text-notice' : 'text-error' %>">
             <%= t('inspections.safety_standards.runout_status',
                   current: inspection.slide_assessment.runout_value) %>
           </p>
@@ -69,6 +69,6 @@
       </ul>
     </section>
   <% else %>
-    <p class="text-warning">No unit associated with this inspection - safety standards calculations require unit dimensions</p>
+    <p class="text-alert">No unit associated with this inspection - safety standards calculations require unit dimensions</p>
   <% end %>
 </div>

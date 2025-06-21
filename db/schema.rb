@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_21_192933) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -39,7 +39,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "anchorage_assessments", force: :cascade do |t|
+  create_table "anchorage_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
     t.integer "num_low_anchors"
     t.integer "num_high_anchors"
@@ -47,8 +47,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.boolean "anchor_degree_pass"
     t.boolean "anchor_type_pass"
     t.boolean "pull_strength_pass"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.text "anchor_accessories_comment"
     t.text "anchor_degree_comment"
     t.text "anchor_type_comment"
@@ -57,25 +55,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.text "num_high_anchors_comment"
     t.boolean "num_low_anchors_pass"
     t.boolean "num_high_anchors_pass"
-    t.index ["inspection_id"], name: "index_anchorage_assessments_on_inspection_id"
-  end
-
-  create_table "enclosed_assessments", force: :cascade do |t|
-    t.string "inspection_id", limit: 12, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "anchorage_assessments_new_pkey", unique: true
+  end
+
+  create_table "enclosed_assessments", id: false, force: :cascade do |t|
+    t.string "inspection_id", limit: 12, null: false
     t.integer "exit_number"
     t.boolean "exit_number_pass"
     t.text "exit_number_comment"
     t.boolean "exit_sign_always_visible_pass"
     t.text "exit_sign_always_visible_comment"
-    t.index ["inspection_id"], name: "index_enclosed_assessments_on_inspection_id"
-  end
-
-  create_table "fan_assessments", force: :cascade do |t|
-    t.string "inspection_id", limit: 12, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "enclosed_assessments_new_pkey", unique: true
+  end
+
+  create_table "fan_assessments", id: false, force: :cascade do |t|
+    t.string "inspection_id", limit: 12, null: false
     t.text "fan_size_type"
     t.boolean "blower_flap_pass"
     t.text "blower_flap_comment"
@@ -88,7 +86,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.string "blower_serial"
     t.boolean "blower_serial_pass"
     t.text "blower_serial_comment"
-    t.index ["inspection_id"], name: "index_fan_assessments_on_inspection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "fan_assessments_new_pkey", unique: true
   end
 
   create_table "inspections", id: { type: :string, limit: 12 }, force: :cascade do |t|
@@ -116,7 +116,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
     t.index ["is_seed"], name: "index_inspections_on_is_seed"
     t.index ["unit_id"], name: "index_inspections_on_unit_id"
-    t.index ["user_id", "unique_report_number"], name: "index_inspections_on_user_and_report_number", unique: true
+    t.index ["user_id", "unique_report_number"], name: "index_inspections_on_user_and_report_number"
     t.index ["user_id"], name: "index_inspections_on_user_id"
   end
 
@@ -135,7 +135,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.index ["active"], name: "index_inspector_companies_on_active"
   end
 
-  create_table "materials_assessments", force: :cascade do |t|
+  create_table "materials_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
     t.decimal "ropes", precision: 8, scale: 2
     t.boolean "ropes_pass"
@@ -147,8 +147,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.boolean "thread_pass"
     t.boolean "fabric_strength_pass"
     t.boolean "fire_retardant_pass"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.text "ropes_comment"
     t.text "clamber_netting_comment"
     t.text "retention_netting_comment"
@@ -163,10 +161,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.string "inflated_stability_comment", limit: 1000
     t.string "protrusions_comment", limit: 1000
     t.string "critical_defects_comment", limit: 1000
-    t.index ["inspection_id"], name: "index_materials_assessments_on_inspection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "materials_assessments_new_pkey", unique: true
   end
 
-  create_table "slide_assessments", force: :cascade do |t|
+  create_table "slide_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
     t.decimal "slide_platform_height", precision: 8, scale: 2
     t.decimal "slide_wall_height", precision: 8, scale: 2
@@ -178,8 +178,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.boolean "slip_sheet_pass"
     t.boolean "slide_permanent_roof"
     t.text "slide_platform_height_comment"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.text "slide_wall_height_comment"
     t.text "slide_first_metre_height_comment"
     t.text "slide_beyond_first_metre_height_comment"
@@ -187,10 +185,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.text "clamber_netting_comment"
     t.text "runout_comment"
     t.text "slip_sheet_comment"
-    t.index ["inspection_id"], name: "index_slide_assessments_on_inspection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "slide_assessments_new_pkey", unique: true
   end
 
-  create_table "structure_assessments", force: :cascade do |t|
+  create_table "structure_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
     t.boolean "seam_integrity_pass"
     t.boolean "uses_lock_stitching_pass"
@@ -213,8 +213,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.boolean "entrapment_pass"
     t.boolean "markings_pass"
     t.boolean "grounding_pass"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.text "seam_integrity_comment"
     t.text "uses_lock_stitching_comment"
     t.text "stitch_length_comment"
@@ -245,7 +243,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.decimal "step_ramp_size", precision: 8, scale: 2
     t.boolean "step_ramp_size_pass"
     t.text "step_ramp_size_comment"
-    t.index ["inspection_id"], name: "index_structure_assessments_on_inspection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "structure_assessments_new_pkey", unique: true
   end
 
   create_table "units", id: { type: :string, limit: 12 }, force: :cascade do |t|
@@ -266,10 +266,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.index ["user_id"], name: "index_units_on_user_id"
   end
 
-  create_table "user_height_assessments", force: :cascade do |t|
+  create_table "user_height_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.decimal "containing_wall_height", precision: 8, scale: 2
     t.text "containing_wall_height_comment"
     t.decimal "platform_height", precision: 8, scale: 2
@@ -286,7 +284,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_15_131716) do
     t.integer "users_at_1200mm"
     t.integer "users_at_1500mm"
     t.integer "users_at_1800mm"
-    t.index ["inspection_id"], name: "index_user_height_assessments_on_inspection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "user_height_assessments_new_pkey", unique: true
   end
 
   create_table "users", id: { type: :string, limit: 12 }, force: :cascade do |t|

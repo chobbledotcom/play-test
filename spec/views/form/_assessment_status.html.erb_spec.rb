@@ -23,7 +23,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
   end
 
   def expect_status_displayed(status_key, pass: true)
-    expect(rendered).to include(pass ? "text-success" : "text-danger")
+    expect(rendered).to include(pass ? "text-notice" : "text-error")
     expect(rendered).to include(I18n.t(pass ? "shared.pass" : "shared.fail"))
   end
 
