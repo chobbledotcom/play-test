@@ -399,7 +399,7 @@ main form {
   text-align: var(--justify-normal);
   margin: 2rem auto;
   margin-block: auto;
-  padding: 0.5rem;
+  padding: 0rem;
 
   @media (min-width: 789px) {
     padding: 1.5rem;
@@ -407,7 +407,7 @@ main form {
 }
 
 form header {
-  margin: -1.5rem -1.5rem 1.5rem;
+  margin: 0 0 1.5rem 0;
   padding: 1.5rem;
   background: var(--color-bg-secondary);
   color: var(--color-bg);

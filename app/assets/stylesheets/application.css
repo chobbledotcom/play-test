@@ -74,8 +74,14 @@ nav form.button_to {
 
 fieldset {
 	padding: 1.5rem;
-	margin: 2rem 0 0;
+	margin: 2rem 0.5rem 0.5rem;
 	box-shadow: none;
+	border: 2px dashed #70127044;
+}
+
+fieldset legend {
+  font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+  color: #6c0c6c;
 }
 
 footer {

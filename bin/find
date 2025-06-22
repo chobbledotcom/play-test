@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Join all arguments into a single search string
+search_term="$*"
+
+# Run ripgrep with Rails-appropriate exclusions and nice formatting
+rg "$search_term" \
+  -C 2 \
+  --heading \
+  --line-number \
+  --color always \
+  -g '!{tmp,log,coverage,node_modules,public/assets,public/packs,vendor,storage,.git}/*' \
+  -g '!*.{log,cache}' \
+  -g '!{.bundle,db/*.sqlite3,db/*.sqlite3-*}' \
+  --type-add 'rails:*.{rb,erb,haml,slim,rake,yml,yaml,js,jsx,ts,tsx,css,scss,sass}' \
+  -t rails
