@@ -26,10 +26,14 @@
       <% end %>
       
     <% when :slide_runout %>
-      <%= render 'form/number', field: :platform_height, min: 1.0, required: true %>
+      <%= render 'form/fieldset', legend_key: 'input' do %>
+        <%= render 'form/number', field: :platform_height, min: 1.0, required: true %>
+      <% end %>
       
     <% when :wall_height %>
-      <%= render 'form/number', field: :user_height, min: 1.0, required: true %>
+      <%= render 'form/fieldset', legend_key: 'input' do %>
+        <%= render 'form/number', field: :user_height, min: 1.0, required: true %>
+      <% end %>
     <% end %>
     
     <% result_partial_mapping = {

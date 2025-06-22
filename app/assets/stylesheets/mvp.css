@@ -413,10 +413,6 @@ form header {
   color: var(--color-bg);
 }
 
-form > header:nth-child(2) {
-  margin-top: -1.5rem;
-}
-
 input,
 label,
 select,
