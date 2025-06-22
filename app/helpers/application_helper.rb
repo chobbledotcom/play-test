@@ -108,7 +108,7 @@ module ApplicationHelper
     end
 
     actual_current_value = model.send(field) if model.respond_to?(field)
-    
+
     # Check if this field should be excluded from prefilling
     # Use the same exclusion list as the controller
     if InspectionsController::NOT_COPIED_FIELDS.include?(field_str)
@@ -117,7 +117,7 @@ module ApplicationHelper
         prefilled: false
       }
     end
-    
+
     previous_value = extract_previous_value(
       @previous_inspection,
       model,

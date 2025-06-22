@@ -2,6 +2,50 @@
   model: @inspection,
   i18n_base: 'forms.results' do |form|
 %>
+  <%= render 'form/fieldset', legend_key: 'comments' do %>
+    <% comments_found = false %>
+    <% comment_items = [] %>
+    
+    <% # Get all comment fields from the inspection itself %>
+    <% @inspection.attributes.each do |field_name, value| %>
+      <% if field_name.end_with?('_comment') && value.present? %>
+        <% comments_found = true %>
+        <% base_field = field_name.chomp('_comment') %>
+        <% label = @inspection.field_label(:inspection, base_field) %>
+        <% comment_items << { label: label, value: value } %>
+      <% end %>
+    <% end %>
+
+    <% # Get all comment fields from assessments %>
+    <% @inspection.applicable_assessments.each do |assessment_key, assessment_class| %>
+      <% assessment = @inspection.send(assessment_key) %>
+      <% next unless assessment %>
+      
+      <% assessment.attributes.each do |field_name, value| %>
+        <% if field_name.end_with?('_comment') && value.present? %>
+          <% comments_found = true %>
+          <% form_name = assessment_key.to_s.gsub(/_assessment$/, '') %>
+          <% base_field = field_name.chomp('_comment') %>
+          <% label = @inspection.field_label(form_name, base_field) %>
+          <% comment_items << { label: label, value: value } %>
+        <% end %>
+      <% end %>
+    <% end %>
+    
+    <% if comments_found %>
+      <ul>
+        <% comment_items.each do |item| %>
+          <li>
+            <strong><%= item[:label] %>:</strong>
+            <%= item[:value] %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p><em><%= t("forms.results.messages.no_comments") %></em></p>
+    <% end %>
+  <% end %>
+
   <%= render 'form/fieldset', legend_key: 'inspection_results' do %>
     <%= render 'form/pass_fail', field: :passed %>
     <%= render 'form/text_area', field: :risk_assessment, rows: 3 %>

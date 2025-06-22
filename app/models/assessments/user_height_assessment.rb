@@ -32,5 +32,4 @@ class Assessments::UserHeightAssessment < ApplicationRecord
 
     SafetyStandard.meets_height_requirements?(tallest_user_height, containing_wall_height)
   end
-
 end

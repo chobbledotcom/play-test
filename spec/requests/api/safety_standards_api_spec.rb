@@ -18,7 +18,6 @@ RSpec.describe "Safety Standards API", type: :request do
         expect(json_response["result"]["formula_breakdown"].size).to eq 5
       end
 
-
       it "returns error for invalid data" do
         post safety_standards_path,
           params: {calculation: {type: "anchors", length: 0, width: 0, height: 0}}.to_json,

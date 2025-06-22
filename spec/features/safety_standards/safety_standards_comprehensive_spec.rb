@@ -6,7 +6,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
     let(:valid_anchor_params) { {length: 5.0, width: 5.0, height: 3.0} }
     let(:invalid_anchor_params) { {length: 0, width: 0, height: 0} }
 
-
     let(:valid_runout_params) { {height: 2.5} }
     let(:invalid_runout_params) { {height: 0} }
 
@@ -54,10 +53,9 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         expect(current_url).to eq(url_before)
       end
 
-
       scenario "runout calculation updates without reload" do
         visit safety_standards_path
-        
+
         # Navigate to slides tab
         click_link "Slides"
 
@@ -69,7 +67,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
 
       scenario "wall height calculation updates without reload" do
         visit safety_standards_path
-        
+
         # Navigate to wall heights tab
         click_link "Wall Heights"
 
@@ -90,7 +88,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
           length_input = find_field(I18n.t("forms.safety_standards_anchors.fields.length"))
           expect(length_input["min"]).to eq("1.0")
         end
-
       end
     end
 
@@ -101,7 +98,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         # Submit all forms
         fill_anchor_form(**valid_anchor_params)
         submit_anchor_form
-
 
         click_link "Slides"
         fill_runout_form(**valid_runout_params)
@@ -116,11 +112,10 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         # Check all results by navigating to each tab
         click_link "Anchorage"
         expect_anchor_result(8)
-        
-        
+
         click_link "Slides"
         expect_runout_result(required_runout: 1.25)
-        
+
         # Go back to Wall Heights tab
         click_link "Wall Heights"
         expect_wall_height_result("1.5m")
@@ -220,7 +215,6 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
       expect(response.body).to include("Error:")
       expect(response.body).to include(I18n.t("safety_standards.errors.invalid_dimensions"))
     end
-
   end
 
   describe "Edge cases", type: :feature do

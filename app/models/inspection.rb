@@ -266,7 +266,19 @@ class Inspection < ApplicationRecord
 
   def field_label(form, field)
     key = "forms.#{form}.fields.#{field}"
-    I18n.t(key, default: nil) || I18n.t(key.gsub(/_pass$/, ""))
+    # Try the field as-is first
+    label = I18n.t(key, default: nil)
+    # Try removing _pass and/or _comment suffixes
+    if label.nil?
+      base_field = field.to_s.gsub(/_pass$|_comment$/, "")
+      label = I18n.t("forms.#{form}.fields.#{base_field}", default: nil)
+    end
+    # Try adding _pass suffix
+    if label.nil? && !field.to_s.end_with?("_pass")
+      label = I18n.t("#{key}_pass", default: nil)
+    end
+    # If still not found, raise for the original key
+    label || I18n.t(key)
   end
 
   def inspection_model_incomplete_fields

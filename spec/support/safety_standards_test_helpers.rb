@@ -26,7 +26,6 @@ module SafetyStandardsTestHelpers
     fill_calculator_form(:anchors, length: length, width: width, height: height)
   end
 
-
   def fill_runout_form(height:)
     fill_calculator_form(:runout, platform_height: height)
   end
@@ -36,7 +35,6 @@ module SafetyStandardsTestHelpers
   end
 
   def submit_anchor_form = submit_calculator_form(:anchors)
-
 
   def submit_runout_form = submit_calculator_form(:runout)
 
@@ -54,7 +52,6 @@ module SafetyStandardsTestHelpers
     expect_result_content(:anchors, "Required Anchors: #{count}")
   end
 
-
   def expect_runout_result(required_runout:)
     expect_result_content(:runout, "Required Runout: #{required_runout}m")
   end
@@ -62,7 +59,6 @@ module SafetyStandardsTestHelpers
   def expect_wall_height_result(text)
     expect_result_content(:wall_height, text)
   end
-
 end
 
 RSpec.configure do |config|

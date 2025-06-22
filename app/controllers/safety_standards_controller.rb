@@ -55,7 +55,6 @@ class SafetyStandardsController < ApplicationController
     end
   end
 
-
   def calculate_slide_runout
     height = param_to_float(:platform_height)
 
@@ -87,7 +86,6 @@ class SafetyStandardsController < ApplicationController
   def set_error(type, error_key)
     instance_variable_set("@#{type}_error", t("safety_standards.errors.#{error_key}"))
   end
-
 
   def build_runout_result(platform_height)
     required_runout = SafetyStandard.calculate_required_runout(platform_height)

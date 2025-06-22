@@ -190,7 +190,6 @@ RSpec.describe SafetyStandard, type: :model do
     end
   end
 
-
   describe "validation methods" do
     describe ".valid_stitch_length?" do
       it "returns true for valid stitch lengths (3-8mm)" do

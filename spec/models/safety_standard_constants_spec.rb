@@ -21,7 +21,6 @@ RSpec.describe SafetyStandard, "Constants" do
     end
   end
 
-
   describe "RUNOUT_CALCULATION_CONSTANTS" do
     it "defines expected runout calculation values" do
       constants = SafetyStandard::RUNOUT_CALCULATION_CONSTANTS

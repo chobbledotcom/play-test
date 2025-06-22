@@ -24,7 +24,6 @@ module SafetyStandard
     safety_factor: 1.5           # Safety factor multiplier
   }.freeze
 
-
   # Slide runout calculation constants (EN 14960:2019)
   RUNOUT_CALCULATION_CONSTANTS = {
     platform_height_ratio: 0.5, # 50% of platform height
@@ -401,7 +400,6 @@ module SafetyStandard
       }
     end
 
-
     def slide_calculations
       # EN 14960:2019 - Comprehensive slide safety requirements
       {
@@ -485,7 +483,6 @@ module SafetyStandard
     def anchor_calculation_description
       I18n.t("safety_standards.calculators.anchor.description")
     end
-
 
     def extract_method_lines(lines, start_line, method_name)
       method_lines = []

@@ -357,7 +357,7 @@ class InspectionWorkflow
 
     applicable_tabs.each do |tab_name|
       visit edit_inspection_path(@second_inspection, tab: tab_name)
-      
+
       if tab_name == "results"
         # The passed field is not prefilled, so we need to fill it manually
         # This is correct behavior - each inspection's pass/fail must be determined independently
@@ -366,7 +366,7 @@ class InspectionWorkflow
           fill_assessment_field(tab_name, field_name, value)
         end
       end
-      
+
       submit_form tab_name.to_sym
       expect_updated_message
 

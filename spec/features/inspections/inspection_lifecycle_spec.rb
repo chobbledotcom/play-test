@@ -132,31 +132,30 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
   describe "passed field prefill behavior" do
     it "does not prefill passed field from previous inspection" do
       # Create a completed inspection with passed = true
-      previous_inspection = create(:inspection, :completed, 
-        user: user, 
-        unit: unit, 
+      create(:inspection, :completed,
+        user: user,
+        unit: unit,
         passed: true,
-        risk_assessment: "Previous risk assessment text"
-      )
-      
+        risk_assessment: "Previous risk assessment text")
+
       # Create a new inspection for the same unit
       visit unit_path(unit)
       click_add_inspection_button
-      
+
       # Navigate to the results tab
       new_inspection = user.inspections.order(:created_at).last
       visit edit_inspection_path(new_inspection, tab: "results")
-      
+
       # Check that passed field is NOT pre-filled
       # The pass/fail radio buttons should not have any selection
       within ".form-grid#passed" do
         pass_radio = find('input[type="radio"][value="true"]')
         fail_radio = find('input[type="radio"][value="false"]')
-        
+
         expect(pass_radio).not_to be_checked
         expect(fail_radio).not_to be_checked
       end
-      
+
       # But risk_assessment should be pre-filled
       risk_field = find_field(I18n.t("forms.results.fields.risk_assessment"))
       expect(risk_field.value).to eq("Previous risk assessment text")
