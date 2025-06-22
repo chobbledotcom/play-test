@@ -431,7 +431,8 @@ class InspectionsController < ApplicationController
       [@inspection, @previous_inspection, Inspection.column_names]
     when "results"
       # Results tab uses inspection fields directly, not an assessment
-      [@inspection, @previous_inspection, ["passed", "risk_assessment"]]
+      # Only risk_assessment should be prefilled, not passed
+      [@inspection, @previous_inspection, ["risk_assessment"]]
     else
       assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
       assessment_class = ASSESSMENT_CLASS_MAPPING[params[:tab]]
