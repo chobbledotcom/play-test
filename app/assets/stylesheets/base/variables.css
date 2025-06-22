@@ -1,0 +1,76 @@
+/* CSS Variables - Single source of truth */
+/* This file must be loaded before all other CSS files */
+
+:root {
+  /* Layout variables */
+  --active-brightness: 0.85;
+  --border-radius: 3px;
+  --box-shadow: 2px 2px 10px;
+  --hover-brightness: 1.2;
+  --justify-normal: left;
+  --line-height: 1.5;
+  --width-card: 285px;
+  --width-card-medium: 460px;
+  --width-card-wide: 800px;
+  --width-content: 1200px;
+  
+  /* Light mode colors (default) */
+  --color-accent: #118bee15;
+  --color-bg: #fff;
+  --color-bg-secondary: #6c0c6c;
+  --color-bg-secondary-faded: #6c0c6c;
+  --color-bg-neutral: #f5f5f5;
+  --color-border: #ddd;
+  --color-error: #cc0000;
+  --color-link: #6c0c6c;
+  --color-secondary: #920de9;
+  --color-secondary-accent: #920de90b;
+  --color-shadow: #f4f4f4;
+  --color-table: #9d2c9d;
+  --color-text: #000;
+  --color-text-secondary: #999;
+  --color-scrollbar: #cacae8;
+  
+  /* Custom colors for radio buttons and status */
+  --color-primary: #118bee;
+  --color-pass: #00a94f;
+  --color-fail: #d32f2f;
+  --color-disabled: #959495;
+  
+  /* Font variables */
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Dark mode base colors */
+:root {
+  --dark-bg-primary: #1f1f1f;
+  --dark-bg-accent: #3c2c4f;
+  --dark-text: #dedede;
+  --dark-border: #949896;
+  --dark-highlight: #66a67c;
+}
+
+/* Dark mode colors when .dark-theme class is present */
+.dark-theme {
+  --color-accent: #3c2c4f15;
+  --color-bg: #1f1f1f;
+  --color-bg-secondary: #3c2c4f;
+  --color-bg-secondary-faded: #3c2c4f;
+  --color-bg-neutral: #2a2a2a;
+  --color-border: #949896;
+  --color-error: #ff6b6b;
+  --color-link: #66a67c;
+  --color-secondary: #e20de9;
+  --color-secondary-accent: #3c2c4f4f;
+  --color-shadow: rgba(0, 0, 0, 0.4);
+  --color-table: #66a67c;
+  --color-text: #dedede;
+  --color-text-secondary: #aaa;
+  
+  /* Maintain status colors in dark mode */
+  --color-pass: #66a67c;
+  --color-fail: #d32f2f;
+  --color-disabled: #959495;
+}
+
+/* Dark mode is handled by .dark-theme class only */

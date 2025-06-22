@@ -50,6 +50,7 @@ Rails.application.routes.draw do
     member do
       get "unified_edit"
       patch "unified_update"
+      get "log"
     end
   end
 

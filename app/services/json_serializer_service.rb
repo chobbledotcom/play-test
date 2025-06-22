@@ -11,7 +11,7 @@ class JsonSerializerService
   def self.serialize_unit(unit, include_inspections: true)
     return nil unless unit
 
-    unit_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS - PublicFieldFiltering::UNIT_EXCLUDED_FIELDS
+    unit_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
     data = {}
     unit_fields.each do |field|

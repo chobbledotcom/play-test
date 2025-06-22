@@ -7,6 +7,7 @@ en:
       index: "Units"
       show: "Unit Details"
       new_from_inspection: "Create Unit from Inspection"
+      log: "Activity Log - %{unit}"
 
     search:
       placeholder: "Serial number or name"
@@ -60,7 +61,6 @@ en:
       height: "Height"
       size_unit: "Size"
       manufacture_date: "Manufacture Date"
-      notes: "Notes"
       reports: "Reports"
       qr_code: "QR Code"
       latest_inspection: "Latest Inspection"
@@ -73,6 +73,10 @@ en:
       inspection_location: "Inspection Location"
       inspection_date: "Inspection Date"
       dimensions: "Dimensions"
+      all_count: "All (%{count})"
+      from_last_inspection: "(from last inspection)"
+      unit_reports: "Unit"
+      last_inspection_reports: "Last Inspection"
 
       user_height: "Maximum Tallest User Height (m)" # Backward compatibility
       play_area_length: "Play Area Length (m)"
@@ -136,6 +140,7 @@ en:
     messages:
       add_inspection_confirm: "Create a new inspection for this unit?"
       no_inspections: "No inspections recorded for this unit."
+      no_complete_inspections: "No complete inspections are saved for this unit"
       created_from_inspection: "Unit created successfully and linked to inspection."
       dimensions_will_be_copied: "Dimensions will be automatically copied from the inspection."
       created: "Unit created"
@@ -164,3 +169,7 @@ en:
 
     forms:
       search: "Search units..."
+    
+    links:
+      back_to_unit: "Back to Unit"
+      view_log: "View Activity Log"

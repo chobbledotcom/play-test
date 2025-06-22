@@ -4,13 +4,13 @@ RSpec.describe JsonSerializerService do
   let(:user) { create(:user) }
 
   describe ".serialize_unit" do
-    let(:unit) { create(:unit, user: user, notes: "Private notes") }
+    let(:unit) { create(:unit, user: user) }
 
     it "includes all public fields using reflection" do
       json = JsonSerializerService.serialize_unit(unit)
 
       # Get expected fields using same reflection as service
-      expected_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS - PublicFieldFiltering::UNIT_EXCLUDED_FIELDS
+      expected_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Check all expected fields are present (if they have values)
       expected_fields.each do |field|
@@ -21,7 +21,7 @@ RSpec.describe JsonSerializerService do
       end
 
       # Check excluded fields are not present
-      (PublicFieldFiltering::EXCLUDED_FIELDS + PublicFieldFiltering::UNIT_EXCLUDED_FIELDS).each do |field|
+      PublicFieldFiltering::EXCLUDED_FIELDS.each do |field|
         expect(json).not_to have_key(field.to_sym), "Field '#{field}' should be excluded from JSON"
       end
     end
@@ -30,7 +30,6 @@ RSpec.describe JsonSerializerService do
       json = JsonSerializerService.serialize_unit(unit)
 
       expect(json).not_to have_key(:user_id)
-      expect(json).not_to have_key(:notes)
       expect(json).not_to have_key(:created_at)
       expect(json).not_to have_key(:updated_at)
     end
@@ -211,7 +210,7 @@ RSpec.describe JsonSerializerService do
       json = JsonSerializerService.serialize_unit(unit)
 
       # Count included fields
-      included_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS - PublicFieldFiltering::UNIT_EXCLUDED_FIELDS
+      included_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Verify we're including the expected number of fields
       expect(included_fields.count).to eq(7) # Units have 13 fields minus 6 excluded

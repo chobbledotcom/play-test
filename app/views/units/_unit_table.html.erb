@@ -19,7 +19,10 @@
                   size: :thumbnail,
                   alt: "#{item.name} photo" %>
             <% else %>
-              <span style="color: #ccc;"><%= t('units.messages.no_photo') %></span>
+              <%= image_tag "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='system-ui' font-size='10'%3ENo Photo%3C/text%3E%3C/svg%3E",
+                  alt: t('units.messages.no_photo'),
+                  width: 60,
+                  height: 60 %>
             <% end %>
           </span>
           <span class="col-name" data-label="<%= t('units.fields.name') %>">

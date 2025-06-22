@@ -6,9 +6,9 @@ module InspectionsHelper
 
   def inspection_result_badge(inspection)
     if inspection.passed
-      content_tag(:mark, "PASS")
+      content_tag(:span, "PASS", class: "pass-badge")
     else
-      content_tag(:mark, "FAIL", style: "background-color:#f2dede;color:#a94442;")
+      content_tag(:span, "FAIL", class: "fail-badge")
     end
   end
 

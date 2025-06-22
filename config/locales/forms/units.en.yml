@@ -4,6 +4,8 @@ en:
       header: "Unit Form"
       sections:
         unit_details: "Unit Details"
+        manufacture: "Manufacture"
+        data: "Data"
       fields:
         name: "Unit Name"
         serial: "Manufacturer Serial Number"
@@ -12,7 +14,6 @@ en:
         description: "Description"
         owner: "Owner"
         manufacture_date: "Manufacture Date"
-        notes: "Additional Notes"
         photo: "Photo"
       submit: "Save Unit"
       errors:

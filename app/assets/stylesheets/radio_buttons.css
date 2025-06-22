@@ -1,11 +1,6 @@
 /* Custom Radio Button Styles - Following https://moderncss.dev/pure-css-custom-styled-radio-buttons/ */
 
-:root {
-	--color-primary: #118bee;
-	--color-pass: #00a94f;
-	--color-fail: #d32f2f;
-	--color-disabled: #959495;
-}
+/* Color variables are now defined in variables.css */
 
 input[type="radio"] {
 	/* Remove default appearance */

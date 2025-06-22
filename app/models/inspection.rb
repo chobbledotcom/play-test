@@ -261,9 +261,16 @@ class Inspection < ApplicationRecord
   end
 
   def log_audit_action(action, user, details)
-    # Simple logging for now - could be enhanced with audit log table later
-    message = "Inspection #{id}: #{action} by #{user&.email} - #{details}"
-    Rails.logger.info(message)
+    Event.log(
+      user: user,
+      action: action,
+      resource: self,
+      details: details
+    )
+  rescue => e
+    # Fallback to logging if Event creation fails
+    Rails.logger.error("Failed to create event: #{e.message}")
+    Rails.logger.info("Inspection #{id}: #{action} by #{user&.email} - #{details}")
   end
 
   def field_label(form, field)

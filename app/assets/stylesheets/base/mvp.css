@@ -1,48 +1,5 @@
 /* MVP.css v1.17.2 - https://github.com/andybrewer/mvp */
-
-:root {
-  --active-brightness: 0.85;
-  --border-radius: 3px;
-  --box-shadow: 2px 2px 10px;
-  --color-accent: #118bee15;
-  --color-bg: #fff;
-  --color-bg-secondary: #6c0c6c;
-  --color-bg-secondary-faded: #6c0c6c;
-  --color-link: #6c0c6c;
-  --color-secondary: #920de9;
-  --color-error: #cc0000;
-  --color-secondary-accent: #920de90b;
-  --color-shadow: #f4f4f4;
-  --color-table: #9d2c9d;
-  --color-text: #000;
-  --color-text-secondary: #999;
-  --color-scrollbar: #cacae8;
-  --font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu,
-    Cantarell, "Helvetica Neue", sans-serif;
-  --hover-brightness: 1.2;
-  --justify-normal: left;
-  --line-height: 1.5;
-  --width-card: 285px;
-  --width-card-medium: 460px;
-  --width-card-wide: 800px;
-  --width-content: 1200px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root[color-mode="user"] {
-    --color-accent: #0097fc4f;
-    --color-bg: #333;
-    --color-bg-secondary: #555;
-    --color-link: #0097fc;
-    --color-secondary: #e20de9;
-    --color-secondary-accent: #e20de94f;
-    --color-shadow: #bbbbbb20;
-    --color-table: #0097fc;
-    --color-text: #f7f7f7;
-    --color-text-secondary: #aaa;
-  }
-}
+/* CSS variables are now defined in variables.css */
 
 * {
   box-sizing: border-box;
@@ -406,7 +363,7 @@ form header {
   margin: 0 0 1.5rem 0;
   padding: 1.5rem;
   background: var(--color-bg-secondary);
-  color: var(--color-bg);
+  color: white;
 }
 
 input,

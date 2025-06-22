@@ -1,0 +1,33 @@
+<%
+  # Field with optional link to the right
+  # Required locals:
+  #   - field_type: :text_field or :autocomplete_field
+  #   - field: field name
+  #   - required: boolean
+  # Optional locals:
+  #   - link_url: URL for the link
+  #   - link_text: Text for the link
+  #   - options: options for autocomplete_field
+  
+  field_type = local_assigns[:field_type] || :text_field
+  field = local_assigns[:field]
+  required = local_assigns[:required] || false
+  link_url = local_assigns[:link_url]
+  link_text = local_assigns[:link_text]
+  options = local_assigns[:options] || []
+  
+  has_link = link_url.present? && link_text.present?
+  css_classes = has_link ? "field field-with-link" : "field"
+%>
+
+<div class="<%= css_classes %>">
+  <% if field_type == :autocomplete_field %>
+    <%= render 'form/autocomplete_field', field: field, required: required, options: options %>
+  <% else %>
+    <%= render 'form/text_field', field: field, required: required %>
+  <% end %>
+  
+  <% if has_link %>
+    <%= link_to link_text, link_url %>
+  <% end %>
+</div>

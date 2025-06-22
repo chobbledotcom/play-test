@@ -27,7 +27,6 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       fill_in_form :units, :description, "Test Description"
 
       fill_in_form :units, :model, "Test Model"
-      fill_in_form :units, :notes, "Created via automated test"
 
       submit_form :units
 

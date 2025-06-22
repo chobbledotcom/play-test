@@ -333,3 +333,20 @@ form *:target {
     flex: 1 1 calc(25% - 0.75rem);
   }
 }
+
+/* Field with link container */
+.field.field-with-link {
+  position: relative;
+}
+
+.field.field-with-link a {
+  position: absolute;
+  right: 10px;
+  top: 35px;
+  font-size: 0.9em;
+}
+
+/* Report links section */
+.report-links {
+  margin: 0.5em 0;
+}

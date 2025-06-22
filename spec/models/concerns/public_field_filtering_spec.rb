@@ -42,7 +42,6 @@ RSpec.describe PublicFieldFiltering do
           created_at
           updated_at
           user_id
-          notes
           description
         ]
       end
@@ -111,16 +110,6 @@ RSpec.describe PublicFieldFiltering do
         expect(described_class::EXCLUDED_COMPUTED_FIELDS).to be_frozen
       end
     end
-
-    describe "UNIT_EXCLUDED_FIELDS" do
-      it "contains unit-specific excluded fields" do
-        expect(described_class::UNIT_EXCLUDED_FIELDS).to eq(%w[notes])
-      end
-
-      it "is frozen to prevent modification" do
-        expect(described_class::UNIT_EXCLUDED_FIELDS).to be_frozen
-      end
-    end
   end
 
   describe "class methods" do
@@ -147,18 +136,10 @@ RSpec.describe PublicFieldFiltering do
           allow(unit_class).to receive(:==).with(Unit).and_return(true)
         end
 
-        it "excludes both EXCLUDED_FIELDS and UNIT_EXCLUDED_FIELDS" do
+        it "excludes EXCLUDED_FIELDS" do
           expected_fields = %w[name serial manufacturer description]
 
           expect(unit_class.public_fields).to eq(expected_fields)
-        end
-
-        it "filters out unit-specific fields" do
-          public_fields = unit_class.public_fields
-
-          described_class::UNIT_EXCLUDED_FIELDS.each do |excluded_field|
-            expect(public_fields).not_to include(excluded_field)
-          end
         end
       end
     end
@@ -203,18 +184,15 @@ RSpec.describe PublicFieldFiltering do
       # Verify that constants don't accidentally overlap inappropriately
       general_exclusions = described_class::EXCLUDED_FIELDS
       pdf_exclusions = described_class::PDF_EXCLUDED_FIELDS
-      unit_exclusions = described_class::UNIT_EXCLUDED_FIELDS
 
       # These should be distinct sets (no unintended overlap)
       expect(pdf_exclusions & general_exclusions).to be_empty
-      expect(unit_exclusions & general_exclusions).to be_empty
     end
 
     it "ensures all constant arrays contain strings" do
       [
         described_class::EXCLUDED_FIELDS,
         described_class::PDF_EXCLUDED_FIELDS,
-        described_class::UNIT_EXCLUDED_FIELDS,
         described_class::EXCLUDED_COMPUTED_FIELDS
       ].each do |field_array|
         expect(field_array).to all(be_a(String))

@@ -1,16 +1,16 @@
 /* Dark Theme Styles */
 .dark-theme {
-  background-color: #111;
-  color: #eee;
+  background-color: var(--dark-bg-primary);
+  color: var(--dark-text);
 }
 
 /* Links */
 .dark-theme a {
-  color: #eee;
+  color: var(--dark-text);
 }
 
 .dark-theme a:hover {
-  color: #ccc;
+  color: var(--dark-highlight);
 }
 
 /* Forms */
@@ -23,9 +23,9 @@
 .dark-theme input[type="search"],
 .dark-theme select,
 .dark-theme textarea {
-  background-color: #222;
-  color: #eee;
-  border: 1px solid #555;
+  background-color: var(--dark-bg-primary);
+  color: var(--dark-text);
+  border: 1px solid var(--dark-border);
 }
 
 .dark-theme input[type="text"]:focus,
@@ -37,8 +37,8 @@
 .dark-theme input[type="search"]:focus,
 .dark-theme select:focus,
 .dark-theme textarea:focus {
-  border-color: #777;
-  background-color: #333;
+  border-color: var(--dark-highlight);
+  background-color: var(--dark-bg-accent);
 }
 
 /* Buttons */
@@ -46,104 +46,127 @@
 .dark-theme input[type="submit"],
 .dark-theme input[type="button"],
 .dark-theme .button {
-  background-color: #000;
-  color: #eee;
-  border: 1px solid #333;
+  background-color: var(--dark-bg-accent);
+  color: var(--dark-text);
+  border: 1px solid var(--dark-border);
 }
 
 .dark-theme button:hover,
 .dark-theme input[type="submit"]:hover,
 .dark-theme input[type="button"]:hover,
 .dark-theme .button:hover {
-  background-color: #222;
+  background-color: var(--dark-highlight);
+  color: var(--dark-bg-primary);
 }
 
 /* Tables */
 .dark-theme table {
-  background-color: #111;
+  background-color: var(--dark-bg-primary);
 }
 
 .dark-theme th {
-  background-color: #222;
-  color: #eee;
+  background-color: var(--dark-bg-accent);
+  color: var(--dark-text);
 }
 
 .dark-theme td {
-  border-color: #333;
+  border-color: var(--dark-border);
 }
 
 .dark-theme tr:nth-child(even) {
-  background-color: #1a1a1a;
+  background-color: var(--dark-bg-accent);
+  background-color: color-mix(in srgb, var(--dark-bg-accent) 30%, var(--dark-bg-primary));
 }
 
 /* Fieldsets and legends */
 .dark-theme fieldset {
-  border-color: #555;
+  border-color: var(--dark-border);
 }
 
 .dark-theme legend {
-  color: #eee;
+  color: var(--dark-text);
 }
 
 /* Navigation */
 
 .dark-theme nav a {
-  color: #eee;
+  background-color: var(--dark-highlight) !important;
+  border-color: var(--dark-highlight) !important;
+  color: var(--dark-bg-primary) !important;
 }
 
 .dark-theme nav a:hover {
-  background-color: #222;
+  background-color: var(--dark-bg-accent) !important;
+  border-color: var(--dark-bg-accent) !important;
+  color: var(--dark-text) !important;
+}
+
+.dark-theme nav button {
+  background-color: var(--dark-highlight) !important;
+  border-color: var(--dark-highlight) !important;
+  color: var(--dark-bg-primary) !important;
+}
+
+.dark-theme nav button:hover {
+  background-color: var(--dark-bg-accent) !important;
+  border-color: var(--dark-bg-accent) !important;
+  color: var(--dark-text) !important;
 }
 
 .dark-theme nav span {
-  background-color: #f9c3f9;
+  background-color: transparent;
+  border: 2px solid var(--dark-highlight);
+  color: var(--dark-highlight);
 }
 
 /* Sections and articles */
 .dark-theme article {
-  background-color: #111;
+  background-color: var(--dark-bg-primary);
 }
 
 .dark-theme section {
-  background-color: #111;
+  background-color: var(--dark-bg-primary);
 }
 
 /* Labels */
 .dark-theme label {
-  color: #eee;
+  color: var(--dark-text);
 }
 
 /* Help text and small text */
 .dark-theme small {
-  color: #ccc;
+  color: var(--dark-text);
+  opacity: 0.8;
 }
 
 .dark-theme .help-text {
-  color: #aaa;
+  color: var(--dark-text);
+  opacity: 0.7;
 }
 
 /* Code blocks */
 .dark-theme code,
 .dark-theme pre {
-  background-color: #222;
-  color: #eee;
+  background-color: var(--dark-bg-accent);
+  color: var(--dark-text);
 }
 
 /* Borders */
 .dark-theme hr {
-  border-color: #555;
+  border-color: var(--dark-border);
 }
 
 /* Calculated fields */
 .dark-theme .calculated-field .calculated-value {
-  color: #ccc;
+  color: var(--dark-text);
+  opacity: 0.8;
 }
 
 /* Company activation notice */
 .dark-theme #company-activation-notice {
-  background-color: #422;
-  border-color: #844;
-  color: #faa;
+  background-color: color-mix(in srgb, #d32f2f 20%, var(--dark-bg-primary));
+  border-color: #d32f2f;
+  color: var(--dark-text);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -176,7 +199,17 @@
 }
 
 .dark-theme .table-list-items a:hover {
+  background-color: var(--dark-bg-accent) !important;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Table list alternating rows in dark mode */
+.dark-theme .table-list-items li:nth-child(odd) a {
+  background-color: var(--dark-bg-primary);
+}
+
+.dark-theme .table-list-items li:nth-child(even) a {
+  background-color: color-mix(in srgb, var(--dark-bg-accent) 20%, var(--dark-bg-primary));
 }
 
 /* Unit photo container dark mode shadows */
@@ -195,16 +228,100 @@
 
 /* Completion status notice - nice dark blue box with white text */
 .dark-theme .completion-status-notice {
-  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-  border: 1px solid #1a237e;
-  color: #ffffff;
+  background: var(--dark-bg-accent);
+  border: 1px solid var(--dark-border);
+  color: var(--dark-text);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .dark-theme .completion-status-notice a {
-  color: #64b5f6;
+  color: var(--dark-highlight);
 }
 
 .dark-theme .completion-status-notice a:hover {
-  color: #90caf9;
+  color: var(--dark-text);
+  text-decoration: underline;
+}
+
+/* Pass/Fail badges dark mode */
+.dark-theme .pass-badge {
+  background-color: var(--dark-highlight);
+  color: var(--dark-bg-primary);
+  border: 1px solid var(--dark-highlight);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .fail-badge {
+  background-color: #d32f2f;
+  color: var(--dark-text);
+  border: 1px solid #d32f2f;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Safety standards reference summary elements */
+.dark-theme .safety-standards-reference summary {
+  background-color: var(--dark-bg-accent);
+  color: var(--dark-text);
+}
+
+.dark-theme .safety-standards-reference summary:hover {
+  background-color: var(--dark-highlight);
+  color: var(--dark-bg-primary);
+}
+
+.dark-theme .formula-box summary,
+.dark-theme .source-code-box summary,
+.dark-theme .api-details-box summary {
+  background-color: var(--dark-bg-accent);
+  color: var(--dark-text);
+}
+
+.dark-theme .formula-box summary:hover,
+.dark-theme .source-code-box summary:hover,
+.dark-theme .api-details-box summary:hover {
+  background-color: var(--dark-highlight);
+  color: var(--dark-bg-primary);
+}
+
+/* Incomplete fields styling */
+.dark-theme .incomplete-fields-details {
+  border-color: var(--dark-border);
+  background-color: var(--dark-bg-primary);
+}
+
+.dark-theme .incomplete-fields-summary {
+  color: var(--dark-highlight);
+  background-color: var(--dark-bg-accent);
+}
+
+.dark-theme .incomplete-fields-summary:hover {
+  background-color: var(--dark-highlight);
+  color: var(--dark-bg-primary);
+}
+
+.dark-theme .incomplete-fields-summary::marker {
+  color: var(--dark-highlight);
+}
+
+.dark-theme .incomplete-fields-content {
+  background-color: var(--dark-bg-primary);
+  border-top-color: var(--dark-border);
+}
+
+.dark-theme .incomplete-fields-list li {
+  border-bottom-color: var(--dark-border);
+}
+
+.dark-theme .field-type {
+  color: var(--dark-text);
+  opacity: 0.7;
+}
+
+.dark-theme #mark-as-complete {
+  background: var(--dark-bg-accent);
+  border-color: var(--dark-border);
+}
+
+.dark-theme #mark-as-complete .incomplete-fields-details {
+  border-color: var(--dark-border);
 }

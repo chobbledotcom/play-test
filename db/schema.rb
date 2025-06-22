@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_22_174638) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_22_205728) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -70,6 +70,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_22_174638) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "enclosed_assessments_new_pkey", unique: true
+  end
+
+  create_table "events", force: :cascade do |t|
+    t.string "user_id", limit: 12, null: false
+    t.string "action", null: false
+    t.string "resource_type", null: false
+    t.string "resource_id", limit: 12
+    t.text "details"
+    t.json "changed_data"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.index ["action"], name: "index_events_on_action"
+    t.index ["created_at"], name: "index_events_on_created_at"
+    t.index ["resource_type", "resource_id"], name: "index_events_on_resource_type_and_resource_id"
+    t.index ["user_id", "created_at"], name: "index_events_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_events_on_user_id"
   end
 
   create_table "fan_assessments", id: false, force: :cascade do |t|
@@ -256,7 +272,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_22_174638) do
     t.string "manufacturer"
     t.string "description"
     t.string "owner"
-    t.text "notes"
     t.string "model"
     t.date "manufacture_date"
     t.boolean "is_seed", default: false, null: false
@@ -316,6 +331,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_22_174638) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "anchorage_assessments", "inspections"
   add_foreign_key "enclosed_assessments", "inspections"
+  add_foreign_key "events", "users"
   add_foreign_key "fan_assessments", "inspections"
   add_foreign_key "inspections", "inspector_companies"
   add_foreign_key "inspections", "units"

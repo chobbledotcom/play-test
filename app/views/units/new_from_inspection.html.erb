@@ -1,16 +1,7 @@
 <%= render 'shared/page_header', title: t("units.titles.new_from_inspection") %>
 
-<%= render 'form/form_context',
-  model: @unit,
-  i18n_base: 'forms.units',
-  url: create_unit_from_inspection_path(@inspection) do |form|
-%>
-  <%= render 'shared/unit_details_form',
-    form: form,
-    object: @unit,
-    i18n_base: 'forms.units',
-    show_photo: true
-  %>
-<% end %>
+<%= render 'units/form', 
+    unit: @unit,
+    form_url: create_unit_from_inspection_path(@inspection) %>
 
 <%= link_to t("shared.buttons.cancel"), inspection_path(@inspection) %>

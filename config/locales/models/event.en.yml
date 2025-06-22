@@ -1,0 +1,42 @@
+en:
+  activerecord:
+    models:
+      event:
+        one: Event
+        other: Events
+    attributes:
+      event:
+        user: User
+        action: Action
+        resource_type: Resource type
+        resource_id: Resource ID
+        details: Details
+        changed_data: Changes
+        metadata: Metadata
+        created_at: Created at
+  
+  events:
+    actions:
+      created: Created
+      updated: Updated
+      deleted: Deleted
+      viewed: Viewed
+      downloaded: Downloaded
+      completed: Completed
+      archived: Archived
+      restored: Restored
+      login: Logged in
+      logout: Logged out
+      exported: Exported
+      imported: Imported
+    messages:
+      logged_successfully: Event logged successfully
+      no_events_found: No events found
+    labels:
+      recent_activity: Recent Activity
+      filter_by_action: Filter by action
+      filter_by_user: Filter by user
+      filter_by_resource: Filter by resource
+      today: Today
+      this_week: This week
+      all_time: All time

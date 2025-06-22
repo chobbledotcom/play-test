@@ -32,14 +32,9 @@ module PublicFieldFiltering
     reinspection_date
   ].freeze
 
-  # Unit-specific exclusions
-  UNIT_EXCLUDED_FIELDS = %w[
-    notes
-  ].freeze
-
   class_methods do
     def public_fields
-      column_names - EXCLUDED_FIELDS - ((self == Unit) ? UNIT_EXCLUDED_FIELDS : [])
+      column_names - EXCLUDED_FIELDS
     end
 
     def excluded_fields_for_assessment(klass_name)

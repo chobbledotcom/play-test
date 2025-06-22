@@ -2,7 +2,7 @@ require_relative "seed_data"
 
 Rails.logger.debug "Creating units..."
 
-def create_unit(name:, serial_prefix:, manufacturer:, model:, owner:, description:, notes: nil)
+def create_unit(name:, serial_prefix:, manufacturer:, model:, owner:, description:)
   Unit.create!(
     SeedData.unit_fields.merge(
       user: $test_user,
@@ -12,7 +12,6 @@ def create_unit(name:, serial_prefix:, manufacturer:, model:, owner:, descriptio
       model: model,
       owner: owner,
       description: description,
-      notes: notes,
       is_seed: true
     )
   )
@@ -24,8 +23,7 @@ $castle_standard = create_unit(
   manufacturer: "Airquee Manufacturing Ltd",
   model: "Castle Deluxe 15",
   owner: "Stef's Castles",
-  description: "15ft x 15ft medieval themed bouncy castle with turrets",
-  notes: "Popular rental unit, well-maintained"
+  description: "15ft x 15ft medieval themed bouncy castle with turrets"
 )
 
 $castle_large = create_unit(
@@ -34,8 +32,7 @@ $castle_large = create_unit(
   manufacturer: "Bouncy Castle Boys",
   model: "Mega Castle 30",
   owner: "Estephan Events",
-  description: "30ft x 30ft large bouncy castle suitable for 20+ children",
-  notes: "Requires 2 blowers for proper inflation"
+  description: "30ft x 30ft large bouncy castle suitable for 20+ children"
 )
 
 $castle_slide_combo = create_unit(
@@ -44,8 +41,7 @@ $castle_slide_combo = create_unit(
   manufacturer: "Jump4Joy Inflatables",
   model: "Princess Combo DLX",
   owner: "Stefan's Fun Factory",
-  description: "Pink princess themed castle with integrated 8ft slide",
-  notes: "Slide section requires extra attention during inspection"
+  description: "Pink princess themed castle with integrated 8ft slide"
 )
 
 $soft_play_unit = create_unit(
@@ -54,8 +50,7 @@ $soft_play_unit = create_unit(
   manufacturer: "Custom Inflatables UK",
   model: "Soft Play Junior",
   owner: "Steff's Soft Play",
-  description: "Fully enclosed soft play area for under 5s",
-  notes: "Enclosed design - check all exit points carefully"
+  description: "Fully enclosed soft play area for under 5s"
 )
 
 $obstacle_course = create_unit(
@@ -64,8 +59,7 @@ $obstacle_course = create_unit(
   manufacturer: "Inflatable World Ltd",
   model: "Obstacle Pro 40",
   owner: "Stephan's Adventure Co",
-  description: "40ft assault course with obstacles, tunnels and slide finish",
-  notes: "Multiple sections require individual inspection"
+  description: "40ft assault course with obstacles, tunnels and slide finish"
 )
 
 $giant_slide = create_unit(
@@ -74,8 +68,7 @@ $giant_slide = create_unit(
   manufacturer: "Airquee Manufacturing Ltd",
   model: "Giant Slide 25",
   owner: "Stefan Family Inflatables",
-  description: "25ft platform height giant inflatable slide",
-  notes: "High platform - safety barriers critical"
+  description: "25ft platform height giant inflatable slide"
 )
 
 $gladiator_duel = create_unit(
@@ -84,8 +77,7 @@ $gladiator_duel = create_unit(
   manufacturer: "Happy Hop Europe",
   model: "Gladiator Arena",
   owner: "Stefano's Party Hire",
-  description: "Inflatable gladiator duel platform with pedestals",
-  notes: "Check pedestal stability and padding"
+  description: "Inflatable gladiator duel platform with pedestals"
 )
 
 $bungee_run = create_unit(
@@ -94,8 +86,7 @@ $bungee_run = create_unit(
   manufacturer: "Party Castle Manufacturers",
   model: "Bungee Sprint Dual",
   owner: "Stef's Fun Factory",
-  description: "Two lane inflatable bungee run competition game",
-  notes: "Bungee cords require regular inspection for wear"
+  description: "Two lane inflatable bungee run competition game"
 )
 
 Rails.logger.debug { "Created #{Unit.count} units." }

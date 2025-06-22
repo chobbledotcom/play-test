@@ -20,7 +20,6 @@ RSpec.describe "Units Form", type: :feature do
       fill_in_form :units, :description, "Large bouncy castle for events"
       fill_in_form :units, :owner, "Test Company Ltd"
       fill_in_form :units, :manufacture_date, "2023-01-15"
-      fill_in_form :units, :notes, "Recently purchased, excellent condition"
 
       submit_form :units
 

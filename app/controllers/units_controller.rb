@@ -4,8 +4,9 @@ class UnitsController < ApplicationController
   include UserActivityCheck
 
   skip_before_action :require_login, only: %i[show]
-  before_action :set_unit, only: %i[destroy edit show update]
+  before_action :set_unit, only: %i[destroy edit log show update]
   before_action :check_unit_owner, only: %i[destroy edit update]
+  before_action :check_log_access, only: %i[log]
   before_action :require_user_active, only: %i[create new edit update]
   before_action :no_index
 
@@ -16,6 +17,7 @@ class UnitsController < ApplicationController
     respond_to do |format|
       format.html
       format.csv do
+        log_unit_event("exported", nil, "Exported #{@units.count} units to CSV")
         csv_data = UnitCsvExportService.new(@units).generate
         send_data csv_data, filename: "units-#{Time.zone.today}.csv"
       end
@@ -43,6 +45,7 @@ class UnitsController < ApplicationController
     @unit = current_user.units.build(unit_params)
 
     if @unit.save
+      log_unit_event("created", @unit, "Created unit: #{@unit.name}")
       flash[:notice] = I18n.t("units.messages.created")
       redirect_to @unit
     else
@@ -54,6 +57,7 @@ class UnitsController < ApplicationController
 
   def update
     if @unit.update(unit_params)
+      log_unit_event("updated", @unit, "Updated unit: #{@unit.name}")
       respond_to do |format|
         format.html do
           flash[:notice] = I18n.t("units.messages.updated")
@@ -74,6 +78,7 @@ class UnitsController < ApplicationController
 
   def destroy
     if @unit.destroy
+      log_unit_event("deleted", @unit, "Deleted unit: #{@unit.name}")
       flash[:notice] = I18n.t("units.messages.deleted")
       redirect_to units_path
     else
@@ -81,6 +86,11 @@ class UnitsController < ApplicationController
       flash[:alert] = error_message
       redirect_to @unit
     end
+  end
+
+  def log
+    @events = Event.for_resource(@unit).recent.includes(:user)
+    @title = I18n.t("units.titles.log", unit: @unit.name)
   end
 
   def new_from_inspection
@@ -107,6 +117,7 @@ class UnitsController < ApplicationController
     )
 
     if service.create
+      log_unit_event("created", service.unit, "Created unit from inspection: #{service.unit.name}")
       flash[:notice] = I18n.t("units.messages.created_from_inspection")
       redirect_to inspection_path(service.inspection)
     elsif service.error_message
@@ -122,6 +133,29 @@ class UnitsController < ApplicationController
 
   private
 
+  def log_unit_event(action, unit, details = nil)
+    return unless current_user
+
+    if unit
+      Event.log(
+        user: current_user,
+        action: action,
+        resource: unit,
+        details: details
+      )
+    else
+      # For events without a specific unit (like CSV export)
+      Event.log_system_event(
+        user: current_user,
+        action: action,
+        details: details,
+        metadata: {resource_type: "Unit"}
+      )
+    end
+  rescue => e
+    Rails.logger.error "Failed to log unit event: #{e.message}"
+  end
+
   def unit_params
     params.require(:unit).permit(*%i[
       description
@@ -129,7 +163,6 @@ class UnitsController < ApplicationController
       manufacturer
       model
       name
-      notes
       owner
       photo
       serial
@@ -153,6 +186,15 @@ class UnitsController < ApplicationController
       flash[:alert] = I18n.t("units.messages.access_denied")
       redirect_to units_path and return
     end
+  end
+
+  def check_log_access
+    # Only admins and unit owners can view logs
+    # Return 404 for everyone else
+    is_owner = current_user && @unit.user_id == current_user.id
+    is_admin = current_user&.admin?
+
+    head :not_found unless is_owner || is_admin
   end
 
   def send_unit_pdf

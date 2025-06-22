@@ -133,7 +133,12 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_http_status(:success)
         expect(page).to have_content(I18n.t("units.titles.new"))
 
-        expect_form_matches_i18n("forms.units")
+        # Check for sections that are present in new form
+        expect(page).to have_content(I18n.t("forms.units.sections.unit_details"))
+        expect(page).to have_content(I18n.t("forms.units.sections.manufacture"))
+
+        # Check for form fields
+        expect_form_fields_present("forms.units")
       end
     end
 

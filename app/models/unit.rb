@@ -56,7 +56,7 @@ class Unit < ApplicationRecord
   # Instance methods
 
   def last_inspection
-    inspections.merge(Inspection.complete).order(complete_date: :desc).first
+    @last_inspection ||= inspections.merge(Inspection.complete).order(complete_date: :desc).first
   end
 
   def last_inspection_status

@@ -1,11 +1,117 @@
-<%= render 'form/form_context',
-  model: @unit,
-  i18n_base: 'forms.units' do |form|
+<%
+  # Determine form context
+  unit = @unit || local_assigns[:unit]
+  form_url = local_assigns[:form_url] || nil
 %>
-  <%= render 'shared/unit_details_form',
-    form: form,
-    object: @unit,
-    i18n_base: 'forms.units',
-    show_photo: true
-  %>
+
+<%= render 'form/form_context',
+  model: unit,
+  i18n_base: 'forms.units',
+  url: form_url do |form|
+%>
+  <%= render 'form/fieldset', legend_key: 'unit_details' do %>
+    <%= render 'form/text_field', field: :name, required: true %>
+    
+    <%# Owner with optional count link %>
+    <% if unit.persisted? && unit.owner.present? %>
+      <% owner_count = current_user.units.where(owner: unit.owner).count %>
+      <% if owner_count > 0 %>
+        <%= render 'form/field_with_link',
+            field_type: :autocomplete_field,
+            field: :owner,
+            required: true,
+            options: owner_options(current_user),
+            link_url: units_path(owner: unit.owner),
+            link_text: t('units.labels.all_count', count: owner_count) %>
+      <% else %>
+        <%= render 'form/autocomplete_field', field: :owner, required: true, options: owner_options(current_user) %>
+      <% end %>
+    <% else %>
+      <%= render 'form/autocomplete_field', field: :owner, required: true, options: owner_options(current_user) %>
+    <% end %>
+    
+    <%# Photo upload %>
+    <div id="unit_photo_preview">
+      <%= render 'form/file_field', field: :photo, accept: "image/*" %>
+    </div>
+  <% end %>
+  
+  <%= render 'form/fieldset', legend_key: 'manufacture' do %>
+    <%= render 'form/date_field', field: :manufacture_date %>
+    
+    <%# Manufacturer with optional count link %>
+    <% if unit.persisted? && unit.manufacturer.present? %>
+      <% manufacturer_count = current_user.units.where(manufacturer: unit.manufacturer).count %>
+      <% if manufacturer_count > 0 %>
+        <%= render 'form/field_with_link', 
+            field_type: :text_field,
+            field: :manufacturer, 
+            required: true,
+            link_url: units_path(manufacturer: unit.manufacturer),
+            link_text: t('units.labels.all_count', count: manufacturer_count) %>
+      <% else %>
+        <%= render 'form/text_field', field: :manufacturer, required: true %>
+      <% end %>
+    <% else %>
+      <%= render 'form/text_field', field: :manufacturer, required: true %>
+    <% end %>
+    
+    <%= render 'form/text_field', field: :model %>
+    <%= render 'form/text_field', field: :serial, required: true %>
+    <%= render 'form/text_area', field: :description, required: true %>
+  <% end %>
+  
+  <%# Only show data fieldset if unit is persisted %>
+  <% if unit.persisted? %>
+    <%= render 'form/fieldset', legend_key: 'data' do %>
+      <%# Display size from last inspection (read-only) %>
+      <% if unit.last_inspection %>
+        <div>
+          <label><%= t("units.fields.size_unit") %></label>
+          <p style="margin: 0.5em 0; padding: 0.5em; background-color: #f5f5f5;">
+            <%= unit.last_inspection.width %>m × <%= unit.last_inspection.length %>m × <%= unit.last_inspection.height %>m
+            <em><%= t("units.labels.from_last_inspection") %></em>
+          </p>
+        </div>
+      <% end %>
+      
+      <%# Unit report links %>
+      <div>
+        <label><%= t("units.fields.reports") %></label>
+        <ul class="report-links">
+          <li>
+            <strong><%= t("units.labels.unit_reports") %>:</strong>
+            <%= link_to "PDF", unit_path(unit, format: :pdf), target: "_blank" %>
+            <%= render 'shared/share_button', 
+                       url: unit_url(unit, format: :pdf),
+                       title: "Unit #{unit.serial} Report",
+                       copied_text: t("shared.messages.link_copied"),
+                       button_text: t("shared.buttons.share") %>
+            /
+            <%= link_to t("units.fields.qr_code"), unit_path(unit, format: :png), target: "_blank" %>
+            /
+            <%= link_to "JSON", unit_path(unit, format: :json), target: "_blank" %>
+          </li>
+          
+          <li>
+            <strong><%= t("units.labels.last_inspection_reports") %>:</strong>
+            <% if unit.last_inspection %>
+              <%= link_to "PDF", inspection_path(unit.last_inspection, format: :pdf), target: "_blank" %>
+              <%= render 'shared/share_button', 
+                         url: inspection_url(unit.last_inspection, format: :pdf),
+                         title: "Inspection #{unit.last_inspection.id} Report",
+                         copied_text: t("shared.messages.link_copied"),
+                         button_text: t("shared.buttons.share") %>
+              /
+              <%= link_to t("units.fields.qr_code"), inspection_path(unit.last_inspection, format: :png), target: "_blank" %>
+              /
+              <%= link_to "JSON", inspection_path(unit.last_inspection, format: :json), target: "_blank" %>
+            <% else %>
+              <em><%= t("units.messages.no_complete_inspections") %></em>
+            <% end %>
+          </li>
+        </ul>
+      </div>
+    <% end %>
+  <% end %>
 <% end %>

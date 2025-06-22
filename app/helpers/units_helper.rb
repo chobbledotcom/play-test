@@ -23,6 +23,14 @@ module UnitsHelper
       }
     ]
 
+    # Add activity log link for admins and unit owners
+    if current_user && (current_user.admin? || unit.user_id == current_user.id)
+      actions << {
+        label: I18n.t("units.links.view_log"),
+        url: log_unit_path(unit)
+      }
+    end
+
     if unit.deletable?
       actions << {
         label: I18n.t("units.buttons.delete"),

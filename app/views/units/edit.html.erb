@@ -2,8 +2,6 @@
   <h1><%= t('units.titles.edit') %></h1>
 </header>
 <%= render 'shared/action_buttons', actions: unit_actions(@unit) %>
-<hr>
-<%= render 'unit_details', unit: @unit %>
 <hr id="form">
 <%= render 'form' %>
 <% if @unit.deletable? %>

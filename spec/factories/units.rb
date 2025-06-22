@@ -8,7 +8,6 @@ FactoryBot.define do
     owner { "Test Owner" }
     model { "Test Model" }
     manufacture_date { 1.year.ago }
-    notes { "Test notes" }
     is_seed { false }
 
     # Variation with different values
@@ -20,7 +19,6 @@ FactoryBot.define do
       description { "A different test unit" }
       owner { "Different Owner Ltd" }
       manufacture_date { Date.new(2024, 2, 20) }
-      notes { "Different test notes" }
     end
 
     # Size-related descriptions (no actual dimensions anymore)
@@ -49,7 +47,6 @@ FactoryBot.define do
       description { "Premium bouncy castle with all features" }
       owner { "Test Events Company" }
       manufacture_date { Date.new(2024, 1, 15) }
-      notes { "Well-maintained unit, regular inspections completed" }
     end
   end
 end

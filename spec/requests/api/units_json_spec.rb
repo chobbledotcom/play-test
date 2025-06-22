@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "Unit JSON endpoints", type: :request do
   let(:user) { create(:user) }
-  let(:unit) { create(:unit, user: user, notes: "Private notes") }
+  let(:unit) { create(:unit, user: user) }
 
   describe "GET /units/:id.json" do
     context "when unit exists" do
@@ -21,7 +21,6 @@ RSpec.describe "Unit JSON endpoints", type: :request do
 
         # Check sensitive fields are excluded
         expect(json).not_to have_key("user_id")
-        expect(json).not_to have_key("notes")
         expect(json).not_to have_key("created_at")
         expect(json).not_to have_key("updated_at")
 
@@ -85,7 +84,7 @@ RSpec.describe "Unit JSON endpoints", type: :request do
       json = JSON.parse(response.body)
 
       # Get expected fields using same reflection as service
-      excluded_fields = %w[id created_at updated_at user_id notes]
+      excluded_fields = %w[id created_at updated_at user_id]
       expected_fields = Unit.column_names - excluded_fields
 
       # Check all expected fields are present (if they have values)

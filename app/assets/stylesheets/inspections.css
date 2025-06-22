@@ -9,7 +9,6 @@
 
 /* Table-list styling - reusable for all table conversions */
 .table-list {
-  border: 1px solid var(--color-bg-secondary);
   border-radius: 5px;
   overflow: hidden;
   margin: 1rem 0;
@@ -46,28 +45,37 @@
   border-bottom: none;
 }
 
+/* Alternating row colors */
+.table-list-items li:nth-child(odd) a {
+  background-color: var(--color-bg);
+}
+
+.table-list-items li:nth-child(even) a {
+  background-color: var(--color-bg-neutral);
+}
+
 .table-list-items a {
   display: block;
   padding: 1rem;
   text-decoration: none;
   color: inherit;
-  transition:
-    background-color 0.2s ease,
-    color 0.3s ease;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .table-list-items a:hover {
-  background-color: #e6a2e6;
+  background-color: #e6a2e6 !important;
+  box-shadow: 0 4px 10px rgba(108, 12, 108, 0.2);
 }
 
 /* Mobile view - stacked layout */
-.table-list-items a span,
+.table-list-items a > span,
 .table-list-content span {
   display: block;
   padding: 0.25rem 0;
 }
 
-.table-list-items a span:before,
+.table-list-items a > span:before,
 .table-list-content span:before {
   content: attr(data-label) ": ";
   font-weight: bold;
@@ -192,4 +200,28 @@
 .completion-status-notice ul {
   list-style-type: none;
   padding: 0;
+}
+
+/* Pass/Fail badges */
+.pass-badge,
+.fail-badge {
+  display: inline-block;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85em;
+  font-weight: bold;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+}
+
+.pass-badge {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.fail-badge {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
