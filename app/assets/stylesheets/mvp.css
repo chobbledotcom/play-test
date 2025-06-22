@@ -400,10 +400,6 @@ main form {
   margin: 2rem auto;
   margin-block: auto;
   padding: 0rem;
-
-  @media (min-width: 789px) {
-    padding: 1.5rem;
-  }
 }
 
 form header {
