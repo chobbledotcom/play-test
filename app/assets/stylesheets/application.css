@@ -79,6 +79,12 @@ fieldset {
 	border: 2px dashed #70127044;
 }
 
+@media (min-width: 789px) {
+	fieldset {
+		margin: 2rem 1rem 1rem;
+	}
+}
+
 fieldset legend {
   font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
   color: #6c0c6c;
