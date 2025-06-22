@@ -12,6 +12,11 @@ class PdfGeneratorService
       value.to_s.sub(/\.0$/, "")
     end
 
+    def self.format_date(date)
+      return I18n.t("pdf.inspection.fields.na") if date.nil?
+      date.strftime("%-d %B, %Y")
+    end
+
     def self.format_pass_fail(value)
       case value
       when true then I18n.t("shared.pass_pdf")

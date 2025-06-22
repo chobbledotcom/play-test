@@ -123,7 +123,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect(pdf_text).to include(unit.serial)
 
       inspections.each do |inspection|
-        expect(pdf_text).to include(inspection.inspection_date.strftime("%d/%m/%Y"))
+        expect(pdf_text).to include(inspection.inspection_date.strftime("%-d %B, %Y"))
       end
     end
 
@@ -179,7 +179,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect(pdf_text).to include("PTC-2024-IMG")
 
       inspections.each do |inspection|
-        expect(pdf_text).to include(inspection.inspection_date.strftime("%d/%m/%Y"))
+        expect(pdf_text).to include(inspection.inspection_date.strftime("%-d %B, %Y"))
       end
 
       inspections.each_with_index do |inspection, index|

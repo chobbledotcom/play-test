@@ -86,7 +86,7 @@ class PdfGeneratorService
       # Data rows
       inspections.each do |inspection|
         table_data << [
-          inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.unit.fields.na"),
+          Utilities.format_date(inspection.inspection_date),
           inspection.passed ? I18n.t("shared.pass_pdf") : I18n.t("shared.fail_pdf"),
           inspection.user.name || I18n.t("pdf.unit.fields.na"),
           inspection.user.rpii_inspector_number || I18n.t("pdf.unit.fields.na"),

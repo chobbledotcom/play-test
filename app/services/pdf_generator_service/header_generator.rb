@@ -6,7 +6,7 @@ class PdfGeneratorService
       # Line 1: Inspection Report - Unit Name - Status/Date
       unit_name = inspection.unit&.name || I18n.t("pdf.inspection.fields.na")
       status_date = if inspection.complete?
-        "#{I18n.t("pdf.inspection.fields.issued")} #{inspection.inspection_date&.strftime("%d/%m/%Y") || I18n.t("pdf.inspection.fields.na")}"
+        "#{I18n.t("pdf.inspection.fields.issued")} #{Utilities.format_date(inspection.inspection_date)}"
       else
         I18n.t("pdf.inspection.fields.incomplete")
       end
