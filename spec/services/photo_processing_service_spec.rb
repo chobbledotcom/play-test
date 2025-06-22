@@ -4,7 +4,7 @@ RSpec.describe PhotoProcessingService do
   describe ".process_upload_data" do
     it "resizes large images to max 1200px" do
       # Load a large test image
-      large_image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
+      large_image_path = Rails.root.join("spec/fixtures/files/large_landscape.jpg")
       image_data = File.binread(large_image_path)
 
       # Process the image
@@ -25,7 +25,7 @@ RSpec.describe PhotoProcessingService do
 
     it "applies EXIF orientation correction" do
       # Load an image that needs rotation
-      rotated_image_path = Rails.root.join("spec", "fixtures", "files", "orientation_6_rotate_90_cw.jpg")
+      rotated_image_path = Rails.root.join("spec/fixtures/files/orientation_6_rotate_90_cw.jpg")
       image_data = File.binread(rotated_image_path)
 
       # Process the image
@@ -48,7 +48,7 @@ RSpec.describe PhotoProcessingService do
 
     it "converts images to JPEG with 75% quality" do
       # Test with any image format
-      image_path = Rails.root.join("spec", "fixtures", "files", "orientation_1_normal.jpg")
+      image_path = Rails.root.join("spec/fixtures/files/orientation_1_normal.jpg")
       image_data = File.binread(image_path)
 
       # Process the image
@@ -73,7 +73,7 @@ RSpec.describe PhotoProcessingService do
     end
 
     it "uses default filename when none provided" do
-      image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
+      image_path = Rails.root.join("spec/fixtures/files/large_landscape.jpg")
       image_data = File.binread(image_path)
 
       processed_io = described_class.process_upload_data(image_data)
@@ -84,7 +84,7 @@ RSpec.describe PhotoProcessingService do
 
   describe ".valid_image_data?" do
     it "validates various data types correctly" do
-      image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
+      image_path = Rails.root.join("spec/fixtures/files/large_landscape.jpg")
       valid_data = File.binread(image_path)
 
       # Valid image data
@@ -100,7 +100,7 @@ RSpec.describe PhotoProcessingService do
 
   describe "filename handling" do
     it "normalizes all filenames to .jpg extension" do
-      image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
+      image_path = Rails.root.join("spec/fixtures/files/large_landscape.jpg")
       image_data = File.binread(image_path)
 
       # Test various input filenames

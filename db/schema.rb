@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_21_192933) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_22_174638) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -263,6 +263,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_21_192933) do
     t.string "serial"
     t.index ["is_seed"], name: "index_units_on_is_seed"
     t.index ["manufacturer", "serial"], name: "index_units_on_manufacturer_and_serial", unique: true
+    t.index ["serial", "user_id"], name: "index_units_on_serial_and_user_id", unique: true
     t.index ["user_id"], name: "index_units_on_user_id"
   end
 
@@ -306,8 +307,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_21_192933) do
     t.string "country"
     t.string "postal_code"
     t.datetime "rpii_verified_date"
-    t.index ["email"], name: "index_users_on_email"
+    t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["inspection_company_id"], name: "index_users_on_inspection_company_id"
+    t.index ["rpii_inspector_number"], name: "index_users_on_rpii_inspector_number", unique: true, where: "rpii_inspector_number IS NOT NULL"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

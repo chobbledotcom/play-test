@@ -34,6 +34,7 @@ group :development, :test do
 
   # Ruby code formatter and linter
   gem "standard", require: false
+  gem "standard-rails"
 end
 
 # PDF generation

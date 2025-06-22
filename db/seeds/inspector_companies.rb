@@ -1,4 +1,4 @@
-puts "Creating inspector companies..."
+Rails.logger.debug "Creating inspector companies..."
 
 def create_inspector_company(name:, email:, city:, active:, notes:)
   InspectorCompany.create!(
@@ -38,4 +38,4 @@ $steve_inflatable = create_inspector_company(
   notes: "Company ceased trading in 2023. Records maintained for historical purposes."
 )
 
-puts "Created #{InspectorCompany.count} inspector companies."
+Rails.logger.debug { "Created #{InspectorCompany.count} inspector companies." }

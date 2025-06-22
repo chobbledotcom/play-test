@@ -143,7 +143,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         serial: "PTC-2024-IMG")
 
       unit_with_image.photo.attach(
-        io: File.open(Rails.root.join("spec", "fixtures", "files", "test_image.jpg")),
+        io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
         filename: "test_castle.jpg",
         content_type: "image/jpeg"
       )

@@ -3,7 +3,7 @@ class PhotoProcessingService
 
   # Process uploaded photo data: resize to max 1200px, convert to JPEG 75% quality, apply EXIF orientation
   def self.process_upload_data(image_data, original_filename = "photo")
-    return nil if image_data.nil? || image_data.empty?
+    return nil if image_data.blank?
 
     begin
       # Create MiniMagick image from data
@@ -38,13 +38,13 @@ class PhotoProcessingService
 
   # Process uploaded file (for backward compatibility)
   def self.process_upload(uploaded_file)
-    return nil unless uploaded_file.present?
+    return nil if uploaded_file.blank?
     process_upload_data(uploaded_file.read, uploaded_file.original_filename)
   end
 
   # Validate that data is a processable image
   def self.valid_image_data?(image_data)
-    return false if image_data.nil? || image_data.empty?
+    return false if image_data.blank?
 
     image = MiniMagick::Image.read(image_data)
     # Try to get basic image properties to ensure it's valid
@@ -56,12 +56,12 @@ class PhotoProcessingService
 
   # Validate that uploaded file is a processable image
   def self.valid_image?(uploaded_file)
-    return false unless uploaded_file.present?
+    return false if uploaded_file.blank?
     valid_image_data?(uploaded_file.read)
   end
 
   def self.change_extension_to_jpg(filename)
-    return "photo.jpg" unless filename.present?
+    return "photo.jpg" if filename.blank?
 
     basename = File.basename(filename, ".*")
     "#{basename}.jpg"

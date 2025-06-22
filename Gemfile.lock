@@ -363,6 +363,9 @@ GEM
     standard-performance (1.8.0)
       lint_roller (~> 1.1)
       rubocop-performance (~> 1.25.0)
+    standard-rails (1.4.0)
+      lint_roller (~> 1.0)
+      rubocop-rails (~> 2.31.0)
     stringio (3.1.7)
     thor (1.3.2)
     timeout (0.4.3)
@@ -423,6 +426,7 @@ DEPENDENCIES
   sprockets-rails
   sqlite3 (>= 1.4)
   standard
+  standard-rails
   turbo-rails (~> 2.0)
   tzinfo-data
 

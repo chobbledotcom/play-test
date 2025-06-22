@@ -165,12 +165,12 @@ class InspectionsController < ApplicationController
 
   def send_inspections_csv
     csv_data = InspectionCsvExportService.new(@complete_inspections).generate
-    filename = I18n.t("inspections.export.csv_filename", date: Date.today)
+    filename = I18n.t("inspections.export.csv_filename", date: Time.zone.today)
     send_data csv_data, filename: filename
   end
 
   def validate_tab_parameter
-    return unless params[:tab].present?
+    return if params[:tab].blank?
 
     valid_tabs = helpers.inspection_tabs(@inspection)
     unless valid_tabs.include?(params[:tab])
@@ -193,7 +193,7 @@ class InspectionsController < ApplicationController
                       "but has errors: #{inspection_errors}"
 
     # Only raise error in development/test environments
-    if Rails.env.development? || Rails.env.test?
+    if Rails.env.local?
       test_message = "In tests, use create(:inspection, :completed) to avoid this."
       raise "DATA INTEGRITY ERROR: #{error_message}. #{test_message}"
     else
@@ -231,7 +231,7 @@ class InspectionsController < ApplicationController
   def add_assessment_params(base_params)
     Inspection::ASSESSMENT_TYPES.each do |ass_type, _ass_class|
       ass_key = "#{ass_type}_attributes"
-      next unless params[:inspection][ass_key].present?
+      next if params[:inspection][ass_key].blank?
 
       ass_params = params[:inspection][ass_key]
       permitted_ass_params = assessment_permitted_attributes(ass_type)

@@ -36,7 +36,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
     scenario "logs PDF generation time for complete inspection with photo" do
       unit_with_photo = create(:unit, user: user)
       unit_with_photo.photo.attach(
-        io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+        io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
         filename: "test_image.jpg",
         content_type: "image/jpeg"
       )

@@ -48,8 +48,10 @@ class Inspection < ApplicationRecord
 
   validates :inspection_location, presence: true, if: :complete?
   validates :inspection_date, presence: true
+  # rubocop:disable Rails/UniqueValidationWithoutIndex
   validates :unique_report_number,
     uniqueness: {scope: :user_id, allow_blank: true}
+  # rubocop:enable Rails/UniqueValidationWithoutIndex
 
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
@@ -81,7 +83,7 @@ class Inspection < ApplicationRecord
   }
   scope :filter_by_owner, ->(owner) {
     if owner.present?
-      joins(:unit).where("units.owner = ?", owner)
+      joins(:unit).where(units: {owner: owner})
     else
       all
     end
@@ -93,7 +95,7 @@ class Inspection < ApplicationRecord
     range = start_date..end_date
     where(inspection_date: range) if both_dates_present?(start_date, end_date)
   }
-  scope :overdue, -> { where("inspection_date < ?", Date.today - 1.year) }
+  scope :overdue, -> { where("inspection_date < ?", Time.zone.today - 1.year) }
 
   # Helper methods for scopes
   def self.search_conditions
@@ -109,7 +111,7 @@ class Inspection < ApplicationRecord
 
   # Calculated fields
   def reinspection_date
-    return nil unless inspection_date.present?
+    return nil if inspection_date.blank?
     inspection_date + 1.year
   end
 
@@ -214,7 +216,7 @@ class Inspection < ApplicationRecord
 
   def completion_errors
     errors = []
-    errors << "Unit is required" unless unit.present?
+    errors << "Unit is required" if unit.blank?
     errors += get_missing_assessments.map { |assessment| "#{assessment} Assessment incomplete" }
     errors
   end
@@ -223,7 +225,7 @@ class Inspection < ApplicationRecord
     missing = []
 
     # Check for missing unit first
-    missing << "Unit" unless unit.present?
+    missing << "Unit" if unit.blank?
 
     # Check for missing assessments using the new helper
     each_applicable_assessment do |assessment_key, _, assessment|

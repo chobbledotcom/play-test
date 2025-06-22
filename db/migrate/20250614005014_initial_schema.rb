@@ -23,11 +23,13 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
     end
 
+    # rubocop:disable Rails/CreateTableWithTimestamps
     create_table "active_storage_variant_records", force: :cascade do |t|
       t.bigint "blob_id", null: false
       t.string "variation_digest", null: false
       t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
     end
+    # rubocop:enable Rails/CreateTableWithTimestamps
 
     # Users
     create_table "users", id: {type: :string, limit: 8}, force: :cascade do |t|

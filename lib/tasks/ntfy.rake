@@ -1,7 +1,7 @@
 namespace :ntfy do
   desc "Send a test notification to ntfy.sh"
   task test: :environment do
-    message = "Test notification from PatLog at #{Time.now}"
+    message = "Test notification from PatLog at #{Time.zone.now}"
     puts "Sending test notification to ntfy.sh channel: #{ENV["NTFY_CHANNEL"]}"
     puts "Message: #{message}"
 

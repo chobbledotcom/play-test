@@ -5,6 +5,13 @@ module PublicViewable
     before_action :check_resource_access, only: %i[show]
   end
 
+  def show
+    # Implemented by including controllers, but we call render_show_html for HTML format
+    if request.format.html?
+      render_show_html
+    end
+  end
+
   private
 
   # Access Rules:

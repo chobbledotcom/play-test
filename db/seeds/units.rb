@@ -1,6 +1,6 @@
 require_relative "seed_data"
 
-puts "Creating units..."
+Rails.logger.debug "Creating units..."
 
 def create_unit(name:, serial_prefix:, manufacturer:, model:, owner:, description:, notes: nil)
   Unit.create!(
@@ -98,4 +98,4 @@ $bungee_run = create_unit(
   notes: "Bungee cords require regular inspection for wear"
 )
 
-puts "Created #{Unit.count} units."
+Rails.logger.debug { "Created #{Unit.count} units." }

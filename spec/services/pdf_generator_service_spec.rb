@@ -148,7 +148,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
     context "with attached photo" do
       before do
         unit.photo.attach(
-          io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+          io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
           filename: "test_image.jpg",
           content_type: "image/jpeg"
         )

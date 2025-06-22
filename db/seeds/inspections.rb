@@ -1,6 +1,6 @@
 require_relative "seed_data"
 
-puts "Creating inspections and assessments..."
+Rails.logger.debug "Creating inspections and assessments..."
 
 def create_assessments_for_inspection(inspection, unit, passed: true)
   inspection.each_applicable_assessment do |assessment_key, _, _|
@@ -201,4 +201,4 @@ create_assessments_for_inspection(complete_inspection, $castle_large, passed: tr
 
 complete_inspection.reload
 
-puts "Created #{Inspection.count} inspections with assessments."
+Rails.logger.debug { "Created #{Inspection.count} inspections with assessments." }

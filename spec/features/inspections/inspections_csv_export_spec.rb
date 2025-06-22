@@ -34,7 +34,7 @@ RSpec.feature "Inspections CSV Export", type: :feature do
       click_link "Export CSV"
 
       expect(page.response_headers["Content-Type"]).to include("text/csv")
-      expect(page.response_headers["Content-Disposition"]).to include("inspections-#{Date.today}.csv")
+      expect(page.response_headers["Content-Disposition"]).to include("inspections-#{Time.zone.today}.csv")
 
       csv_content = page.body
       csv_lines = CSV.parse(csv_content, headers: true)

@@ -16,7 +16,7 @@ class NtfyService
 
     def send_notification(message)
       channel = ENV["NTFY_CHANNEL"]
-      return unless channel.present?
+      return if channel.blank?
 
       uri = URI.parse("https://ntfy.sh/#{channel}")
       http = Net::HTTP.new(uri.host, uri.port)

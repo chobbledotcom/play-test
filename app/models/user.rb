@@ -31,9 +31,9 @@ class User < ApplicationRecord
   validates :theme,
     inclusion: {in: %w[light dark]}
 
-  before_create :set_inactive_on_signup
   before_save :downcase_email
   before_save :normalize_rpii_number
+  before_create :set_inactive_on_signup
 
   def is_active?
     active_until.nil? || active_until >= Date.current

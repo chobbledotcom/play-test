@@ -5,13 +5,13 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
   let(:unit) { create(:unit, user: user) }
 
   def create_raw_image(filename)
-    image_data = File.binread(Rails.root.join("spec", "fixtures", "files", filename))
+    image_data = Rails.root.join("spec", "fixtures", "files", filename).binread
     MiniMagick::Image.read(image_data)
   end
 
   before do
     unit.photo.attach(
-      io: File.open(Rails.root.join("spec", "fixtures", "files", "test_image.jpg")),
+      io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
       filename: "test_image.jpg",
       content_type: "image/jpeg"
     )
@@ -281,7 +281,7 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
       # Create another unit with photo
       unit2 = create(:unit, user: user)
       unit2.photo.attach(
-        io: File.open(Rails.root.join("spec", "fixtures", "files", "test_image.jpg")),
+        io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
         filename: "test_image2.jpg",
         content_type: "image/jpeg"
       )

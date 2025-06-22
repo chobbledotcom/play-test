@@ -132,7 +132,7 @@ class PdfGeneratorService
     def render_comment_line(fields)
       return unless fields[:comment]
       comment = @current_assessment.send(fields[:comment])
-      return unless comment.present?
+      return if comment.blank?
 
       "    #{colored(italic(comment), COMMENT_COLOR)}"
     end

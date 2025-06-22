@@ -494,7 +494,7 @@ RSpec.describe "Units", type: :request do
         get units_path(format: :csv)
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("text/csv")
-        expect(response.headers["Content-Disposition"]).to include("units-#{Date.today}.csv")
+        expect(response.headers["Content-Disposition"]).to include("units-#{Time.zone.today}.csv")
       end
     end
   end

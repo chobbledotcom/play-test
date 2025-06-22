@@ -12,7 +12,7 @@ namespace :locale do
     success = system("bundle exec rspec --format progress")
 
     # Read tracking results from saved file
-    results_file = Rails.root.join("tmp", "i18n_tracking_results.json")
+    results_file = Rails.root.join("tmp/i18n_tracking_results.json")
     if File.exist?(results_file)
       used_keys = JSON.parse(File.read(results_file))
       I18nUsageTracker.instance_variable_set(:@used_keys, Set.new(used_keys))
@@ -44,7 +44,7 @@ namespace :locale do
       end
 
       # Save detailed report to file
-      report_file = Rails.root.join("tmp", "unused_locale_keys.txt")
+      report_file = Rails.root.join("tmp/unused_locale_keys.txt")
       File.write(report_file, report[:unused_key_list].sort.join("\n"))
       puts "\n" + "-" * 80
       puts "Full list saved to: #{report_file}"
@@ -66,7 +66,7 @@ namespace :locale do
     system("bundle exec rspec --format progress > /dev/null 2>&1")
 
     # Read tracking results from saved file
-    results_file = Rails.root.join("tmp", "i18n_tracking_results.json")
+    results_file = Rails.root.join("tmp/i18n_tracking_results.json")
     if File.exist?(results_file)
       used_keys = JSON.parse(File.read(results_file))
       I18nUsageTracker.instance_variable_set(:@used_keys, Set.new(used_keys))
@@ -83,7 +83,7 @@ namespace :locale do
       report[:unused_key_list].sort.each { |key| puts key }
 
       # Save to file
-      report_file = Rails.root.join("tmp", "unused_locale_keys.txt")
+      report_file = Rails.root.join("tmp/unused_locale_keys.txt")
       File.write(report_file, report[:unused_key_list].sort.join("\n"))
       puts "\nFull list saved to: #{report_file}"
     else

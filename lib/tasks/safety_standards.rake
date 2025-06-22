@@ -5,8 +5,8 @@ namespace :safety_standards do
     require "uri"
 
     pdf_url = "https://nobelcert.com/DataFiles/FreeUpload/EN%2014960-1%20(2019).pdf"
-    pdf_path = Rails.root.join("tmp", "EN_14960-1_2019.pdf")
-    txt_path = Rails.root.join("tmp", "EN_14960-1_2019.txt")
+    pdf_path = Rails.root.join("tmp/EN_14960-1_2019.pdf")
+    txt_path = Rails.root.join("tmp/EN_14960-1_2019.txt")
 
     puts "📥 Downloading EN 14960-1 (2019) PDF..."
 
@@ -201,8 +201,8 @@ namespace :safety_standards do
 
   desc "Generate detailed safety standards verification report"
   task generate_verification_report: :environment do
-    txt_path = Rails.root.join("tmp", "EN_14960-1_2019.txt")
-    report_path = Rails.root.join("tmp", "safety_standards_verification_report.md")
+    txt_path = Rails.root.join("tmp/EN_14960-1_2019.txt")
+    report_path = Rails.root.join("tmp/safety_standards_verification_report.md")
 
     unless File.exist?(txt_path)
       puts "❌ Text file not found. Run 'rake safety_standards:download_and_convert' first."

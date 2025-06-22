@@ -1,10 +1,10 @@
 module UnitsHelper
   def manufacturer_options(user)
-    user.units.distinct.pluck(:manufacturer).compact.reject(&:blank?).sort
+    user.units.distinct.pluck(:manufacturer).compact.compact_blank.sort
   end
 
   def owner_options(user)
-    user.units.distinct.pluck(:owner).compact.reject(&:blank?).sort
+    user.units.distinct.pluck(:owner).compact.compact_blank.sort
   end
 
   def unit_actions(unit)

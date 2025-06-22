@@ -8,7 +8,6 @@ class Assessments::UserHeightAssessment < ApplicationRecord
   belongs_to :inspection
 
   validates :inspection_id,
-    presence: true,
     uniqueness: true
 
   validates :containing_wall_height,

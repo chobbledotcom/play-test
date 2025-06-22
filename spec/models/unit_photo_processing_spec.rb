@@ -7,7 +7,7 @@ RSpec.describe "Unit Photo Processing", type: :model do
   describe "photo processing" do
     it "processes large images to maximum size and converts to JPEG" do
       # Attach a large test image
-      large_image_path = Rails.root.join("spec", "fixtures", "files", "large_landscape.jpg")
+      large_image_path = Rails.root.join("spec/fixtures/files/large_landscape.jpg")
       unit.photo.attach(
         io: File.open(large_image_path),
         filename: "large_landscape.jpg",
@@ -32,7 +32,7 @@ RSpec.describe "Unit Photo Processing", type: :model do
 
     it "bakes EXIF orientation into processed images" do
       # Attach an image that needs rotation
-      rotated_image_path = Rails.root.join("spec", "fixtures", "files", "orientation_6_rotate_90_cw.jpg")
+      rotated_image_path = Rails.root.join("spec/fixtures/files/orientation_6_rotate_90_cw.jpg")
       unit.photo.attach(
         io: File.open(rotated_image_path),
         filename: "orientation_6_rotate_90_cw.jpg",
@@ -58,7 +58,7 @@ RSpec.describe "Unit Photo Processing", type: :model do
 
     it "handles invalid uploads by detaching the file after processing" do
       # Try to attach a non-image file
-      text_file_path = Rails.root.join("spec", "fixtures", "files", "test.txt")
+      text_file_path = Rails.root.join("spec/fixtures/files/test.txt")
       unit.photo.attach(
         io: File.open(text_file_path),
         filename: "test.txt",

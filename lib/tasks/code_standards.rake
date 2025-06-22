@@ -16,7 +16,7 @@ namespace :code_standards do
       lib
     ]
     def ruby_files_in(directory)
-      Dir.glob("#{Rails.root}/#{directory}/**/*.rb")
+      Dir.glob(Rails.root.join("#{directory}/**/*.rb").to_s)
     end
 
     def extract_methods_from_file(file_path)
@@ -85,7 +85,7 @@ namespace :code_standards do
 
     directories_to_check.each do |directory|
       ruby_files_in(directory).each do |file_path|
-        relative_path = file_path.sub("#{Rails.root}/", "")
+        relative_path = file_path.sub(Rails.root.join("").to_s, "")
         file_content = File.read(file_path)
         file_lines = file_content.lines
         methods = extract_methods_from_file(file_path)

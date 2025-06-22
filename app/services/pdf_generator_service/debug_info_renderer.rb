@@ -3,7 +3,7 @@ class PdfGeneratorService
     include Configuration
 
     def self.add_debug_info_page(pdf, queries)
-      return unless queries.present?
+      return if queries.blank?
 
       # Start a new page for debug info
       pdf.start_new_page

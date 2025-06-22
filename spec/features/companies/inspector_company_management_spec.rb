@@ -80,7 +80,7 @@ RSpec.feature "Inspector Company Management", type: :feature do
       fill_in_form :inspector_companies, :address, "Test Address"
 
       attach_file I18n.t("forms.inspector_companies.fields.logo"),
-        Rails.root.join("spec", "fixtures", "files", "test_image.jpg")
+        Rails.root.join("spec/fixtures/files/test_image.jpg")
 
       submit_form :inspector_companies
 

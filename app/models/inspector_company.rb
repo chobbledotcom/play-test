@@ -78,7 +78,7 @@ class InspectorCompany < ApplicationRecord
   private
 
   def normalize_phone_number
-    return unless phone.present?
+    return if phone.blank?
 
     # Remove all non-digit characters
     self.phone = phone.gsub(/\D/, "")

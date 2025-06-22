@@ -11,7 +11,9 @@ class Unit < ApplicationRecord
   has_one_attached :photo
 
   # Callbacks
-  before_destroy :check_for_complete_inspections
+  before_create :generate_custom_id
+  before_destroy :check_complete_inspections
+  before_destroy :destroy_draft_inspections
   after_commit :process_photo_upload, on: [:create, :update]
 
   # All fields are required for Units
@@ -50,9 +52,6 @@ class Unit < ApplicationRecord
       .group("units.id")
       .having("MAX(inspections.complete_date) + INTERVAL #{SafetyStandard::REINSPECTION_INTERVAL_DAYS} DAY <= CURRENT_DATE")
   }
-
-  # Callbacks
-  before_create :generate_custom_id
 
   # Instance methods
 
@@ -105,19 +104,20 @@ class Unit < ApplicationRecord
     !complete_inspections.exists?
   end
 
-  def destroy
-    # Check if unit can be deleted before attempting destroy
+  private
+
+  def check_complete_inspections
     if complete_inspections.exists?
       errors.add(:base, :has_complete_inspections)
-      return false
+      throw(:abort)
     end
-
-    # Manually destroy draft inspections first
-    draft_inspections.destroy_all
-
-    # Then destroy the unit
-    super
   end
+
+  def destroy_draft_inspections
+    draft_inspections.destroy_all
+  end
+
+  public
 
   def self.overdue
     # Find units where their most recent inspection is older than the interval

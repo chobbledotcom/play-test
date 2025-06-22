@@ -22,8 +22,8 @@ class SeedDataService
   ].freeze
 
   # Load seed helpers
-  require Rails.root.join("lib", "test_data_helpers")
-  require Rails.root.join("db", "seeds", "seed_data")
+  require Rails.root.join("lib/test_data_helpers")
+  require Rails.root.join("db/seeds/seed_data")
 
   class << self
     def add_seeds_for_user(user)

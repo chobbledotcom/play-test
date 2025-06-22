@@ -37,7 +37,7 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   end
 
   def required_anchors
-    return 0 unless inspection.volume.present?
+    return 0 if inspection.volume.blank?
     anchorage_result[:required_anchors]
   end
 

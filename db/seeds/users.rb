@@ -1,6 +1,6 @@
 require_relative "seed_data"
 
-puts "Creating users..."
+Rails.logger.debug "Creating users..."
 
 def generate_secure_password
   SecureRandom.alphanumeric(32)
@@ -64,4 +64,4 @@ create_user(
   active_until: Date.current - 1.day
 )
 
-puts "Created #{User.count} users."
+Rails.logger.debug { "Created #{User.count} users." }

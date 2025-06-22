@@ -1,5 +1,5 @@
 if Rails.env.development?
-  puts "Cleaning up development data..."
+  Rails.logger.debug "Cleaning up development data..."
 
   # Destroy assessments
   Inspection::ASSESSMENT_TYPES.each do |_, assessment_class|
@@ -13,8 +13,8 @@ if Rails.env.development?
   InspectorCompany.destroy_all
 
   # Clean active storage
-  ActiveStorage::Attachment.all.each(&:purge)
-  ActiveStorage::Blob.all.each(&:purge)
+  ActiveStorage::Attachment.all.find_each(&:purge)
+  ActiveStorage::Blob.all.find_each(&:purge)
 
-  puts "Development data cleanup complete."
+  Rails.logger.debug "Development data cleanup complete."
 end

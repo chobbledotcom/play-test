@@ -49,7 +49,7 @@ module I18nUsageTracker
         keys = Set.new
 
         # Load all locale files
-        locale_files = Dir[Rails.root.join("config", "locales", "**", "*.yml")]
+        locale_files = Rails.root.glob("config/locales/**/*.yml")
 
         locale_files.each do |file|
           yaml_content = YAML.load_file(file)
@@ -105,7 +105,7 @@ module I18nUsageTracker
   # Add at_exit hook to save tracking results if enabled
   at_exit do
     if tracking_enabled && used_keys.any?
-      File.write(Rails.root.join("tmp", "i18n_tracking_results.json"), used_keys.to_a.to_json)
+      Rails.root.join("tmp/i18n_tracking_results.json").write(used_keys.to_a.to_json)
     end
   end
 end

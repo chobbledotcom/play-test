@@ -34,4 +34,3 @@ RSpec.describe "PDF Debug Info for Impersonation", type: :request do
     end
   end
 end
-

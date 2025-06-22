@@ -17,7 +17,7 @@ class UnitsController < ApplicationController
       format.html
       format.csv do
         csv_data = UnitCsvExportService.new(@units).generate
-        send_data csv_data, filename: "units-#{Date.today}.csv"
+        send_data csv_data, filename: "units-#{Time.zone.today}.csv"
       end
     end
   end
