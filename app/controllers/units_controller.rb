@@ -157,7 +157,11 @@ class UnitsController < ApplicationController
 
   def send_unit_pdf
     # Unit already has photo loaded from set_unit
-    pdf_data = PdfGeneratorService.generate_unit_report(@unit)
+    pdf_data = PdfGeneratorService.generate_unit_report(
+      @unit,
+      debug_enabled: admin_debug_enabled?,
+      debug_queries: debug_sql_queries
+    )
 
     send_data pdf_data.render,
       filename: "#{@unit.serial}.pdf",

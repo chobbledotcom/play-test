@@ -8,10 +8,11 @@ class PdfGeneratorService
   require_relative "pdf_generator_service/position_calculator"
   require_relative "pdf_generator_service/image_orientation_processor"
   require_relative "pdf_generator_service/image_processor"
+  require_relative "pdf_generator_service/debug_info_renderer"
 
   include Configuration
 
-  def self.generate_inspection_report(inspection)
+  def self.generate_inspection_report(inspection, debug_enabled: false, debug_queries: [])
     require "prawn/table"
 
     Prawn::Document.new(page_size: "A4", page_layout: :portrait) do |pdf|
@@ -45,10 +46,15 @@ class PdfGeneratorService
 
       # Add DRAFT watermark overlay for draft inspections
       Utilities.add_draft_watermark(pdf) unless inspection.complete?
+
+      # Add debug info page if enabled (admins only)
+      if debug_enabled && debug_queries.present?
+        DebugInfoRenderer.add_debug_info_page(pdf, debug_queries)
+      end
     end
   end
 
-  def self.generate_unit_report(unit)
+  def self.generate_unit_report(unit, debug_enabled: false, debug_queries: [])
     require "prawn/table"
 
     # Preload all inspections once to avoid N+1 queries
@@ -65,6 +71,11 @@ class PdfGeneratorService
       generate_unit_details_with_inspection(pdf, unit, last_inspection)
       generate_unit_inspection_history_with_data(pdf, unit, completed_inspections)
       ImageProcessor.generate_qr_code_footer(pdf, unit)
+
+      # Add debug info page if enabled (admins only)
+      if debug_enabled && debug_queries.present?
+        DebugInfoRenderer.add_debug_info_page(pdf, debug_queries)
+      end
     end
   end
 

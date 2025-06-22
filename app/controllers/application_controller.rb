@@ -139,8 +139,11 @@ class ApplicationController < ActionController::Base
     table_query_counts.each do |table, count|
       if count > 5
         log_n_plus_one_queries(table, count)
-        message = app_i18n(:debug, :n_plus_one_with_limit, table: table, count: count, limit: 5)
-        raise message
+        # Only raise exception in development and test environments
+        if Rails.env.development? || Rails.env.test?
+          message = app_i18n(:debug, :n_plus_one_with_limit, table: table, count: count, limit: 5)
+          raise message
+        end
       end
     end
   end
