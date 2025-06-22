@@ -44,44 +44,22 @@ a[role="button"]:focus-visible {
   outline-offset: 2px;
 }
 
-/* Image hover effects - exclude GIFs to preserve animations */
-img:not([src$=".gif"]) {
-  transition: all 0.3s ease !important;
+/* Remove all image hover effects */
+img {
+  transition: none !important;
 }
 
-/* Subtle zoom and shadow for clickable images */
-a img:hover,
-.clickable-image:hover,
-img[onclick]:hover {
-  transform: scale(1.05) !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
-  filter: none !important; /* Remove MVP's brightness filter */
+img:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
 }
 
-/* Non-clickable images get a subtle lift */
-img:hover:not(a img):not(.clickable-image):not([onclick]) {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-  filter: none !important; /* Remove MVP's brightness filter */
-}
-
-/* Image click effect */
-a img:active,
-.clickable-image:active,
-img[onclick]:active {
-  transform: scale(1.02) !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Ensure smooth transitions for file preview images */
+/* Ensure file preview images still display properly */
 .file-preview img {
   border-radius: 4px;
   max-width: 100%;
   height: auto;
-}
-
-.file-preview img:hover {
-  cursor: zoom-in;
 }
 
 /* Navigation links - purple button style! */

@@ -6,7 +6,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    sleep(rand(0.5..2.5)) unless Rails.env.test?
+    sleep(rand(0.5..1.0)) unless Rails.env.test?
 
     email = params.dig(:session, :email)
     password = params.dig(:session, :password)
