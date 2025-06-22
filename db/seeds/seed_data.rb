@@ -33,13 +33,18 @@ module SeedData
       inspection_date: Date.current,
       inspection_location: "Test Location #{rand(1..5)}",
       unique_report_number: "RPT-#{Date.current.year}-#{rand(1000..9999)}",
-      risk_assessment: "Low risk - all safety features functional and tested",
       is_totally_enclosed: [true, false].sample,
       has_slide: [true, false].sample,
       width: rand(4.0..8.0).round(1),
       length: rand(5.0..10.0).round(1),
-      height: rand(3.0..6.0).round(1),
-      passed: passed
+      height: rand(3.0..6.0).round(1)
+    }
+  end
+
+  def self.results_fields(passed: true)
+    {
+      passed: passed,
+      risk_assessment: "Low risk - all safety features functional and tested"
     }
   end
 

@@ -43,7 +43,8 @@ module InspectionTestHelpers
   end
 
   def fill_in_risk_assessment(value)
-    fill_in_form(:inspection, :risk_assessment, value)
+    # Risk assessment is now on the results tab
+    fill_in_form(:results, :risk_assessment, value)
   end
 
   # Expectations for messages

@@ -21,7 +21,9 @@ RSpec.describe InspectionsHelper, type: :helper do
         structure
         anchorage
         materials
-        fan enclosed
+        fan
+        enclosed
+        results
       ])
     end
 

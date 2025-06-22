@@ -185,8 +185,14 @@ class InspectionWorkflow
     submit_form tab_name.to_sym
     expect_updated_message
 
-    assessment = @inspection.reload.send("#{tab_name}_assessment")
-    expect(assessment.complete?).to be true
+    if tab_name == "results"
+      # Results tab doesn't have an assessment model, check the inspection fields directly
+      @inspection.reload
+      expect(@inspection.passed).to be true
+    else
+      assessment = @inspection.reload.send("#{tab_name}_assessment")
+      expect(assessment.complete?).to be true
+    end
   end
 
   def fill_assessment_field(tab_name, field_name, value)
@@ -196,7 +202,7 @@ class InspectionWorkflow
 
     case value
     when true, false
-      if field_name.to_s.end_with?("_pass")
+      if field_name.to_s.end_with?("_pass") || field_name.to_s == "passed"
         choose_pass_fail(field_label, value)
       elsif BOOLEAN_FIELDS.include?(field_name.to_s)
         value ? check_form_radio(tab_name.to_sym, field_name) :
@@ -355,8 +361,13 @@ class InspectionWorkflow
       expect_updated_message
 
       @second_inspection.reload
-      assessment = @second_inspection.send("#{tab_name}_assessment")
-      expect(assessment.complete?).to be true
+      if tab_name == "results"
+        # Results tab doesn't have an assessment model
+        expect(@second_inspection.passed).to be true
+      else
+        assessment = @second_inspection.send("#{tab_name}_assessment")
+        expect(assessment.complete?).to be true
+      end
     end
   end
 
@@ -454,7 +465,7 @@ RSpec.feature "Complete Inspection Workflow", type: :feature do
     # Create first inspection with a unique report number
     unit1 = create(:unit, user: user)
     inspection1 = create(:inspection, unit: unit1, user: user)
-    
+
     visit edit_inspection_path(inspection1)
     fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
     click_button I18n.t("forms.inspection.submit")
@@ -463,15 +474,15 @@ RSpec.feature "Complete Inspection Workflow", type: :feature do
     # Create second inspection and try to use same report number
     unit2 = create(:unit, user: user)
     inspection2 = create(:inspection, unit: unit2, user: user)
-    
+
     visit edit_inspection_path(inspection2)
     fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
     click_button I18n.t("forms.inspection.submit")
-    
+
     # Should show validation error in form
     expect(page).to have_content("has already been taken")
     expect(page).to have_css(".form-errors")
-    
+
     # Fix by using different report number
     fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-002"
     click_button I18n.t("forms.inspection.submit")
@@ -485,7 +496,7 @@ RSpec.feature "Complete Inspection Workflow", type: :feature do
     # Create first inspection with blank unique report number
     unit1 = create(:unit, user: user)
     inspection1 = create(:inspection, unit: unit1, user: user)
-    
+
     visit edit_inspection_path(inspection1)
     fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: ""
     click_button I18n.t("forms.inspection.submit")
@@ -494,11 +505,11 @@ RSpec.feature "Complete Inspection Workflow", type: :feature do
     # Create second inspection also with blank unique report number
     unit2 = create(:unit, user: user)
     inspection2 = create(:inspection, unit: unit2, user: user)
-    
+
     visit edit_inspection_path(inspection2)
     fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: ""
     click_button I18n.t("forms.inspection.submit")
-    
+
     # Should save successfully - blank values are allowed
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
     expect(page).not_to have_css(".form-errors")
@@ -512,7 +523,7 @@ RSpec.feature "Complete Inspection Workflow", type: :feature do
     sign_in(user1)
     unit1 = create(:unit, user: user1)
     inspection1 = create(:inspection, unit: unit1, user: user1)
-    
+
     visit edit_inspection_path(inspection1)
     fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
     click_button I18n.t("forms.inspection.submit")
@@ -523,11 +534,11 @@ RSpec.feature "Complete Inspection Workflow", type: :feature do
     sign_in(user2)
     unit2 = create(:unit, user: user2)
     inspection2 = create(:inspection, unit: unit2, user: user2)
-    
+
     visit edit_inspection_path(inspection2)
     fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
     click_button I18n.t("forms.inspection.submit")
-    
+
     # Should save successfully - different users can have same report number
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
     expect(page).not_to have_css(".form-errors")

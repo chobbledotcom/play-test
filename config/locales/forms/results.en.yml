@@ -1,0 +1,10 @@
+en:
+  forms:
+    results:
+      header: "Results"
+      sections:
+        inspection_results: "Inspection Results"
+      fields:
+        passed: "Passed"
+        risk_assessment: "Risk Assessment"
+      submit: "Save Results"

@@ -57,8 +57,11 @@ module InspectionsHelper
   def assessment_complete?(inspection, tab)
     case tab
     when "inspection"
-      # For the main inspection tab, check if required fields are filled
-      inspection.inspection_model_incomplete_fields.empty?
+      # For the main inspection tab, check if required fields are filled (excluding passed)
+      inspection.inspection_tab_incomplete_fields.empty?
+    when "results"
+      # For results tab, check if passed field is filled (risk_assessment is optional)
+      inspection.passed.present?
     else
       # For assessment tabs, check the corresponding assessment
       assessment_method = "#{tab}_assessment"

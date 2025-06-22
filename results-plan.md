@@ -15,19 +15,13 @@ Create a new "Results" tab that contains only the "passed" and "risk_assessment"
    ```
 
 ### Phase 2: Create the Results Tab Infrastructure
-1. **Update `inspection_tabs` helper** in `app/helpers/inspections_helper.rb`:
+1. **Update `inspection_tabs` method** in `app/models/inspection.rb`:
    - Add "results" tab after all assessment tabs
    - Ensure proper ordering (after "enclosed" if present)
 
-2. **Create results assessment model** `app/models/results_assessment.rb`:
-   - Include `AssessmentCompletion` concern
-   - Define fields: `passed` and `risk_assessment`
-   - Add to inspection's assessment associations
-
-3. **Create migration** for `results_assessments` table:
-   - Fields: `passed` (boolean), `risk_assessment` (text)
-   - Foreign key to inspection
-   - Migrate existing data from inspections table
+2. **Update `assessment_complete?` helper** in `app/helpers/inspections_helper.rb`:
+   - Add special case for "results" tab
+   - Check if `passed` field is present (risk_assessment is optional)
 
 ### Phase 3: Create Results Form View
 1. **Create `app/views/inspections/_results_form.html.erb`**:
@@ -43,15 +37,14 @@ Create a new "Results" tab that contains only the "passed" and "risk_assessment"
    - Ensure results tab appears in correct position
    - Add completion checkmark logic
 
-### Phase 4: Update Inspection Model
+### Phase 4: Update Main Inspection Form
 1. **Remove fields from main form** (`_form.html.erb`):
-   - Remove "Inspection Results" fieldset
+   - Remove "Inspection Results" fieldset containing `passed` and `risk_assessment`
    - Keep all other fields intact
 
-2. **Update inspection model**:
-   - Delegate `passed` and `risk_assessment` to results_assessment
-   - Update `REQUIRED_TO_COMPLETE_FIELDS` if needed
-   - Ensure `incomplete_fields` checks results_assessment
+2. **Update inspection model completion logic**:
+   - Ensure `inspection_model_incomplete_fields` excludes `passed` from the main tab check (since it's moving to results tab)
+   - The `passed` field remains required for overall completion
 
 ### Phase 5: Update Controllers
 1. **Add results tab handling** to `inspections_controller.rb`:
@@ -76,14 +69,8 @@ Create a new "Results" tab that contains only the "passed" and "risk_assessment"
    - Modify helpers that fill in inspection forms
    - Add navigation to results tab where needed
 
-### Phase 7: Data Migration
-1. **Create data migration**:
-   - Copy existing `passed` and `risk_assessment` values
-   - Ensure all inspections have results_assessment records
-
-2. **Remove old columns** (after verification):
-   - Drop columns from inspections table
-   - Update any remaining references
+### Phase 7: No Data Migration Needed
+Since `passed` and `risk_assessment` remain on the Inspection model, no data migration is required. The fields are simply being displayed in a different tab.
 
 ### Testing Strategy
 - Run focused tests after each small change

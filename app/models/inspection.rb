@@ -168,6 +168,9 @@ class Inspection < ApplicationRecord
     # Only show enclosed tab for totally enclosed inspections
     tabs << "enclosed" if assessment_applicable?(:enclosed_assessment)
 
+    # Add results tab at the end
+    tabs << "results"
+
     tabs
   end
 
@@ -272,17 +275,38 @@ class Inspection < ApplicationRecord
       .select { |f| send(f).nil? }
   end
 
+  def inspection_tab_incomplete_fields
+    # Fields required for the inspection tab specifically (excludes passed which is on results tab)
+    fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
+    fields
+      .select { |f| !f.end_with?("_comment") }
+      .select { |f| send(f).nil? }
+  end
+
   def incomplete_fields
-    inspection_fields =
-      inspection_model_incomplete_fields
+    # Get incomplete fields for the inspection tab (excluding passed)
+    inspection_tab_fields =
+      inspection_tab_incomplete_fields
         .map { |f| {field: f, label: field_label(:inspection, f)} }
 
+    # Get incomplete fields for the results tab
+    results_fields = []
+    results_fields << {field: :passed, label: field_label(:results, :passed)} if passed.nil?
+
     output = []
-    if inspection_fields.any?
+    if inspection_tab_fields.any?
       output << {
         tab: :inspection,
         name: I18n.t("forms.inspection.header"),
-        fields: inspection_fields
+        fields: inspection_tab_fields
+      }
+    end
+
+    if results_fields.any?
+      output << {
+        tab: :results,
+        name: I18n.t("forms.results.header"),
+        fields: results_fields
       }
     end
 
