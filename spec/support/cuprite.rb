@@ -9,7 +9,8 @@ Capybara.register_driver :cuprite do |app|
       "disable-dev-shm-usage": nil
     },
     headless: true,
-    timeout: 10)
+    timeout: 10,
+    process_timeout: 20)
 end
 
 # Only use Cuprite for tests tagged with js: true
