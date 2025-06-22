@@ -24,7 +24,7 @@ class PdfGeneratorService
 
       queries.each do |query|
         table_data << [
-          Utilities.truncate_text(query[:sql], 80),
+          query[:sql],
           "#{query[:duration]} ms",
           query[:name] || ""
         ]
