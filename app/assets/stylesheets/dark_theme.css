@@ -89,24 +89,14 @@
 
 /* Navigation */
 
-.dark-theme nav a {
-  background-color: var(--dark-highlight) !important;
-  border-color: var(--dark-highlight) !important;
-  color: var(--dark-bg-primary) !important;
-}
-
-.dark-theme nav a:hover {
-  background-color: var(--dark-bg-accent) !important;
-  border-color: var(--dark-bg-accent) !important;
-  color: var(--dark-text) !important;
-}
-
+.dark-theme nav a,
 .dark-theme nav button {
   background-color: var(--dark-highlight) !important;
   border-color: var(--dark-highlight) !important;
   color: var(--dark-bg-primary) !important;
 }
 
+.dark-theme nav a:hover,
 .dark-theme nav button:hover {
   background-color: var(--dark-bg-accent) !important;
   border-color: var(--dark-bg-accent) !important;

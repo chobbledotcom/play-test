@@ -348,7 +348,9 @@ input[type="submit"][disabled]:hover {
 }
 
 main form {
-  border: 2px solid var(--color-bg-secondary);
+  border-top: 0;
+  border: 5px solid var(--color-bg-secondary);
+  border-image: linear-gradient(to right, var(--color-bg-secondary) 0%, #bf49bf 100%) 1;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow) var(--color-shadow);
   display: block;
@@ -362,9 +364,15 @@ main form {
 
 form header {
   margin: 0 0 1.5rem 0;
-  padding: 1.5rem;
+  padding: 0.5rem 1.5rem;
   background: var(--color-bg-secondary);
   color: white;
+  background: linear-gradient(to right, var(--color-bg-secondary) 0%, #bf49bf 100%);
+}
+
+form header h1 {
+  padding: 0;
+  margin: 0;
 }
 
 input,
