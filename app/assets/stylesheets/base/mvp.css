@@ -363,7 +363,7 @@ main form {
 }
 
 form header {
-  margin: 0 0 1.5rem 0;
+  margin: -1px 0 1.5rem 0;
   padding: 0.5rem 1.5rem;
   background: var(--color-bg-secondary);
   color: white;
