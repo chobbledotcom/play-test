@@ -203,6 +203,7 @@ h6 {
     monospace;
   line-height: var(--line-height);
   text-wrap: balance;
+  margin-top: 3rem;
 }
 
 mark {

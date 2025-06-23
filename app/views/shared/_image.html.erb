@@ -12,21 +12,23 @@
   # Don't try to display images that aren't persisted yet (validation failures)
   return unless image_attachment.blob.persisted?
 
-  begin
-    variant = case size
-    when :full
-      ImageProcessorService.full_size(image_attachment)
-    when :thumbnail
-      ImageProcessorService.thumbnail(image_attachment)
-    else
-      ImageProcessorService.default(image_attachment)
-    end
+  variant = case size
+  when :full
+    ImageProcessorService.full_size(image_attachment)
+  when :thumbnail
+    ImageProcessorService.thumbnail(image_attachment)
+  else
+    ImageProcessorService.default(image_attachment)
+  end
+  
+  # Get actual dimensions based on metadata
+  metadata = image_attachment.blob.analyzed? ? image_attachment.blob.metadata : nil
+  dimensions = ImageProcessorService.calculate_dimensions(metadata, size)
 %>
 
 <%= image_tag variant,
     alt: alt_text,
+    width: dimensions[:width],
+    height: dimensions[:height],
     loading: "lazy",
     decoding: "async" %>
-<% rescue ActiveStorage::InvariableError %>
-  <p><small>Cannot display: invalid image format</small></p>
-<% end %>

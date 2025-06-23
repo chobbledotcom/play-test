@@ -58,23 +58,6 @@
   min-width: 200px;
 }
 
-/* Unit photo styling */
-.unit-photo {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.unit-photo img {
-  width: 100%;
-  max-height: auto;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.unit-details-display img {
-  width: 100%;
-}
-
 .safety-standards-info {
   margin: 2rem 0;
 }

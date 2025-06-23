@@ -1,9 +1,7 @@
 
 <%= render 'shared/page_header', title: t('units.titles.show') %>
 <%= render 'shared/action_buttons', actions: unit_actions(@unit) %>
-<hr>
 <%= render 'unit_details', unit: @unit %>
-<hr>
 <h4 id="inspections"><%= t('units.headers.inspection_history') %></h4>
 <% if @inspections.any? %>
   <%= render 'inspections/inspections_table',
@@ -18,8 +16,6 @@
 <% else %>
   <p><%= t('units.messages.no_inspections') %></p>
 <% end %>
-<hr>
-
 <h4><%= t('units.headers.unit_report') %></h4>
 <%= render 'shared/pdf_embed',
   url: unit_path(@unit, format: :pdf),

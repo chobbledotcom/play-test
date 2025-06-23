@@ -32,4 +32,31 @@ class ImageProcessorService
       saver: {quality: 75}
     )
   end
+
+  # Calculate actual dimensions after resize_to_limit transformation
+  # Pass in metadata hash with "width" and "height" keys
+  # Size can be :full, :thumbnail, or :default (defaults to :default)
+  def self.calculate_dimensions(metadata, size = :default)
+    max_size = case size
+    when :full
+      FULL_SIZE
+    when :thumbnail
+      THUMBNAIL_SIZE
+    else
+      DEFAULT_SIZE
+    end
+
+    original_width = metadata["width"].to_f
+    original_height = metadata["height"].to_f
+
+    # Calculate dimensions maintaining aspect ratio with resize_to_limit
+    ratio = max_size / [original_width, original_height].max
+
+    # Only scale down if image is larger than max_size
+    if ratio < 1
+      {width: (original_width * ratio).round, height: (original_height * ratio).round}
+    else
+      {width: original_width.to_i, height: original_height.to_i}
+    end
+  end
 end
