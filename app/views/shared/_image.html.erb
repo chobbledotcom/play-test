@@ -22,7 +22,9 @@
   end
   
   # Get actual dimensions based on metadata
-  metadata = image_attachment.blob.analyzed? ? image_attachment.blob.metadata : nil
+  # Ensure blob is analyzed before trying to get dimensions
+  image_attachment.blob.analyze unless image_attachment.blob.analyzed?
+  metadata = image_attachment.blob.metadata
   dimensions = ImageProcessorService.calculate_dimensions(metadata, size)
 %>
 

@@ -54,6 +54,9 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
       allow(attachment).to receive(:attached?).and_return(true)
       allow(attachment).to receive(:blob).and_return(blob)
       allow(blob).to receive(:persisted?).and_return(true)
+      allow(blob).to receive(:analyzed?).and_return(true)
+      allow(blob).to receive(:analyze)
+      allow(blob).to receive(:metadata).and_return({"width" => 100, "height" => 100})
       allow(mock_object).to receive(:respond_to?).with(:photo).and_return(true)
       allow(mock_object).to receive(:photo).and_return(attachment)
     end
