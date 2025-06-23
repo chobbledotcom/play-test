@@ -1,8 +1,14 @@
 .unit-photo {
+	display: block;
 	max-width: 20rem;
 	margin: 0 auto 2rem auto;
 	overflow: hidden;
 	text-align: center;
+	text-decoration: none;
+}
+
+.unit-photo:hover small {
+	color: var(--color-link);
 }
 
 .unit-photo img {
@@ -10,4 +16,5 @@
 	width: 100%;
 	height: auto;
 	display: block;
+	margin-bottom: 0.5rem;
 }

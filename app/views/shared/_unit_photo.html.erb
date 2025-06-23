@@ -11,14 +11,13 @@
   alt_text = t('units.messages.photo_of', name: unit.name)
 %>
 
-<div class="unit-photo">
-  <%= link_to rails_blob_path(ImageProcessorService.full_size(unit.photo), disposition: "inline") do %>
-    <%= render 'shared/image',
-        image: unit.photo,
-        size: :default,
-        alt: alt_text %>
-    <% if show_caption %>
-      <p><small><%= t('units.messages.view_full_photo') %></small></p>
-    <% end %>
+<%= link_to rails_blob_path(ImageProcessorService.full_size(unit.photo), disposition: "inline"),
+    class: "unit-photo" do %>
+  <%= render 'shared/image',
+      image: unit.photo,
+      size: :default,
+      alt: alt_text %>
+  <% if show_caption %>
+    <small><%= t('units.messages.view_full_photo') %></small>
   <% end %>
-</div>
+<% end %>
