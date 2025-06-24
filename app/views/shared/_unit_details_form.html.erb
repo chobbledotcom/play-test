@@ -76,7 +76,7 @@
     <%= form.label :photo, t("#{i18n_base}.fields.photo") %>
     <%= form.file_field :photo, accept: "image/*" %>
     <div id="unit_photo_preview">
-      <%= render 'shared/unit_photo', unit: object, show_caption: false %>
+      <%= render 'shared/attached_image', attachment: object.photo %>
     </div>
   <% end %>
 <% end %>

@@ -106,7 +106,7 @@ RSpec.describe "Units", type: :request do
       it "provides edit and delete actions" do
         visit unit_path(unit)
         expect(page).to have_link("Edit", href: edit_unit_path(unit))
-        expect(page).to have_link("Delete", href: unit_path(unit))
+        expect(page).to have_button("Delete")
       end
 
       it "displays manufacturer and owner information" do

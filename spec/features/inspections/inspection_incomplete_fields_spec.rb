@@ -114,6 +114,61 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     expect(field_link[:href]).to include("tab=inspection", "#inspection_location")
   end
 
+  scenario "clicking incomplete field links navigates to correct tab" do
+    visit edit_inspection_path(inspection)
+    expand_incomplete_fields
+
+    # Click on a field link from a different tab within the incomplete fields section
+    within(".incomplete-fields-content") do
+      structure_link = find_link(I18n.t("forms.structure.header"))
+      structure_link.click
+    end
+
+    # Verify we're on the structure tab
+    expect(page).to have_current_path(edit_inspection_path(inspection, tab: "structure"))
+
+    # Go back and click on a specific field link
+    visit edit_inspection_path(inspection)
+    expand_incomplete_fields
+
+    within(".incomplete-fields-content") do
+      field_link = find_link(I18n.t("forms.inspection.fields.inspection_location"))
+      field_link.click
+    end
+
+    # Verify we're on the inspection tab with the field anchor
+    expect(page).to have_current_path(edit_inspection_path(inspection, tab: "inspection"))
+  end
+
+  scenario "displays incomplete fields in correct tab order" do
+    # The inspection fixture already has incomplete fields in multiple tabs
+    # Just verify they appear in the correct order
+
+    visit edit_inspection_path(inspection)
+    expand_incomplete_fields
+
+    # Get all section headers in order
+    section_headers = all(".incomplete-fields-content strong a").map(&:text)
+
+    # Verify the first item is always "General" (inspection tab)
+    expect(section_headers.first).to eq(I18n.t("forms.inspection.header"))
+
+    # Verify Results appears last if present
+    if section_headers.include?(I18n.t("forms.results.header"))
+      expect(section_headers.last).to eq(I18n.t("forms.results.header"))
+    end
+
+    # Verify the order matches the tab order from applicable_tabs
+    # The exact tabs shown depend on which have incomplete fields
+    tab_order = inspection.applicable_tabs
+    tab_headers = tab_order.map { |tab| I18n.t("forms.#{tab}.header") }
+
+    # Filter to only tabs that actually appear in the incomplete fields
+    expected_headers = tab_headers.select { |header| section_headers.include?(header) }
+
+    expect(section_headers).to eq(expected_headers)
+  end
+
   scenario "counts total incomplete fields across all pages" do
     visit edit_inspection_path(inspection)
 

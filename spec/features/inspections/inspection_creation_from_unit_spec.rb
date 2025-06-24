@@ -26,6 +26,11 @@ RSpec.feature "Creating Inspection from Unit Page", type: :feature do
       expect(inspection.user).to eq(user)
       expect(inspection.complete?).to be_falsey
       expect(inspection.inspection_date).to eq(Date.current)
+
+      # Verify event was logged
+      event = Event.where(resource_type: "Inspection", resource_id: inspection.id, action: "created").first
+      expect(event).to be_present
+      expect(event.user).to eq(user)
     end
 
     scenario "shows confirmation data attribute on button" do

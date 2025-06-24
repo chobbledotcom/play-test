@@ -45,7 +45,7 @@ class UnitsController < ApplicationController
     @unit = current_user.units.build(unit_params)
 
     if @unit.save
-      log_unit_event("created", @unit, "Created unit: #{@unit.name}")
+      log_unit_event("created", @unit)
       flash[:notice] = I18n.t("units.messages.created")
       redirect_to @unit
     else
@@ -56,8 +56,14 @@ class UnitsController < ApplicationController
   def edit = nil
 
   def update
+    # Capture the changes before update
+    previous_attributes = @unit.attributes.dup
+
     if @unit.update(unit_params)
-      log_unit_event("updated", @unit, "Updated unit: #{@unit.name}")
+      # Calculate what changed
+      changed_data = calculate_changes(previous_attributes, @unit.attributes, unit_params.keys)
+
+      log_unit_event("updated", @unit, nil, changed_data)
       respond_to do |format|
         format.html do
           flash[:notice] = I18n.t("units.messages.updated")
@@ -77,8 +83,23 @@ class UnitsController < ApplicationController
   end
 
   def destroy
+    # Capture unit details before deletion for the audit log
+    unit_details = {
+      name: @unit.name,
+      serial: @unit.serial,
+      owner: @unit.owner,
+      manufacturer: @unit.manufacturer
+    }
+
     if @unit.destroy
-      log_unit_event("deleted", @unit, "Deleted unit: #{@unit.name}")
+      # Log the deletion with the unit details in metadata
+      Event.log(
+        user: current_user,
+        action: "deleted",
+        resource: @unit,
+        details: nil,
+        metadata: unit_details
+      )
       flash[:notice] = I18n.t("units.messages.deleted")
       redirect_to units_path
     else
@@ -117,7 +138,7 @@ class UnitsController < ApplicationController
     )
 
     if service.create
-      log_unit_event("created", service.unit, "Created unit from inspection: #{service.unit.name}")
+      log_unit_event("created", service.unit)
       flash[:notice] = I18n.t("units.messages.created_from_inspection")
       redirect_to inspection_path(service.inspection)
     elsif service.error_message
@@ -133,7 +154,7 @@ class UnitsController < ApplicationController
 
   private
 
-  def log_unit_event(action, unit, details = nil)
+  def log_unit_event(action, unit, details = nil, changed_data = nil)
     return unless current_user
 
     if unit
@@ -141,7 +162,8 @@ class UnitsController < ApplicationController
         user: current_user,
         action: action,
         resource: unit,
-        details: details
+        details: details,
+        changed_data: changed_data
       )
     else
       # For events without a specific unit (like CSV export)
@@ -154,6 +176,24 @@ class UnitsController < ApplicationController
     end
   rescue => e
     Rails.logger.error "Failed to log unit event: #{e.message}"
+  end
+
+  def calculate_changes(previous_attributes, current_attributes, changed_keys)
+    changes = {}
+
+    changed_keys.map(&:to_s).each do |key|
+      previous_value = previous_attributes[key]
+      current_value = current_attributes[key]
+
+      if previous_value != current_value
+        changes[key] = {
+          "from" => previous_value,
+          "to" => current_value
+        }
+      end
+    end
+
+    changes.presence
   end
 
   def unit_params

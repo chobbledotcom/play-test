@@ -31,10 +31,11 @@
         [t('users.options.theme_dark'), "dark"]
       ], @user.theme)
     %>
-  <% end %>
 
-  <!-- Save Message Display -->
-  <div id="user_settings_save_message"></div>
+    <div id="user_logo_preview">
+      <%= render 'form/file_field', field: :logo, accept: "image/*" %>
+    </div>
+  <% end %>
 <% end %>
 
 <div class="margins center">

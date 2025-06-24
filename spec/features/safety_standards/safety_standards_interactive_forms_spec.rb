@@ -61,7 +61,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     fill_runout_form(height: 1.0)
     submit_runout_form
 
-    expected_runout = SafetyStandard.calculate_required_runout(1.0)
+    expected_runout = SafetyStandards::SlideCalculator.calculate_required_runout(1.0)
     expect_runout_result(required_runout: expected_runout)
     expect(expected_runout).to eq(0.5)
   end
@@ -77,7 +77,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
 
     expect(page).to have_content("Ruby Source Code")
     expect(page).to have_content("Method: calculate_required_anchors")
-    expect(page).to have_content("Source: app/services/safety_standard.rb")
+    expect(page).to have_content("Source: SafetyStandards::AnchorCalculator")
 
     fill_anchor_form(length: 4.0, width: 4.0, height: 3.0)
     submit_anchor_form
@@ -108,7 +108,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
       fill_anchor_form(length: length, width: width, height: height)
       submit_anchor_form
 
-      expected = SafetyStandard.build_anchor_result(
+      expected = SafetyStandards::AnchorCalculator.calculate(
         length: length, width: width, height: height
       )[:required_anchors]
 

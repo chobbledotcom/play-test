@@ -12,5 +12,5 @@ class Assessments::MaterialsAssessment < ApplicationRecord
 
   after_update :log_assessment_update, if: :saved_changes?
 
-  def ropes_compliant? = SafetyStandard.valid_rope_diameter?(ropes)
+  def ropes_compliant? = SafetyStandards::MaterialValidator.valid_rope_diameter?(ropes)
 end

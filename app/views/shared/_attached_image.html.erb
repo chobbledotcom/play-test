@@ -1,0 +1,18 @@
+<%
+  # Unified attached image partial for any ActiveStorage attachment
+  # Required locals: attachment (ActiveStorage attachment)
+  # Optional locals: size (symbol, defaults to :default)
+  
+  attachment = local_assigns[:attachment]
+  size = local_assigns[:size] || :default
+  
+  return unless attachment&.attached? && attachment.blob.persisted?
+%>
+
+<%= link_to rails_blob_path(ImageProcessorService.full_size(attachment), disposition: "inline") do %>
+  <%= render 'shared/image',
+      image: attachment,
+      size: size,
+      alt: "" %>
+  <small><%= t('units.messages.view_full_photo') %></small>
+<% end %>

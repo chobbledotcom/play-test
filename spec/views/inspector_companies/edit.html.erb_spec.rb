@@ -48,6 +48,7 @@ RSpec.describe "inspector_companies/edit", type: :view do
       allow(logo_attachment).to receive(:attached?).and_return(true)
       allow(logo_attachment).to receive(:image?).and_return(true)
       allow(logo_attachment).to receive(:filename).and_return("logo.png")
+      allow(logo_attachment).to receive(:variant).and_return("variant_image")
 
       # Mock for the image rendering
       blob = double("blob")

@@ -12,6 +12,7 @@ en:
       show: "Inspection Details"
       index: "Inspections"
       select_unit: "Select Unit for Inspection"
+      log: "Activity Log - Inspection %{inspection}"
 
     headers:
       overview: "Inspection Overview"
@@ -122,6 +123,9 @@ en:
       complete: "Complete"
       passed: "Passed"
       failed: "Failed"
+      pass: "Pass"
+      fail: "Fail"
+      pending: "Pending"
 
     labels:
       no_unit: "No Unit"
@@ -147,6 +151,7 @@ en:
       qr_and_pdf: "QR Codes & PDF"
       download_qr_code: "Download QR Code"
       use_suggested_id: "Use its public ID - %{id}"
+      log: "Log"
 
     messages:
       no_unit: "No unit selected"
@@ -208,10 +213,11 @@ en:
       runout_status: "Current runout: %{current}m"
       user_capacity: "User Capacity"
       capacity_by_height: "Capacity by user height:"
-      capacity_1000mm: "1.0m users: %{count} (1.5m² per user)"
-      capacity_1200mm: "1.2m users: %{count} (2.0m² per user)"
-      capacity_1500mm: "1.5m users: %{count} (2.5m² per user)"
-      capacity_1800mm: "1.8m users: %{count} (3.0m² per user)"
+      capacity_1000mm: "1.0m users: %{count} (1 per m²)"
+      capacity_1200mm: "1.2m users: %{count} (0.75 per m²)"
+      capacity_1500mm: "1.5m users: %{count} (0.60 per m²)"
+      capacity_1800mm: "1.8m users: %{count} (0.5 per m²)"
+      max_user_height_note: "Capacity calculated for users up to %{height}m tall"
       wall_height_requirements: "Wall Height Requirements"
       wall_height_status: "Platform %{platform}m requires %{required}"
       material_requirements: "Material Requirements"
@@ -239,3 +245,6 @@ en:
       slide_incomplete: "Slide Assessment incomplete"
       structure_incomplete: "Structure Assessment incomplete"
       user_height_incomplete: "User Height Assessment incomplete"
+
+    links:
+      back_to_inspection: "Back to Inspection"

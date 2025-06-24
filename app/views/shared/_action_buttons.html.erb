@@ -1,9 +1,9 @@
 <div class="actions">
   <% actions.each do |action| %>
-    <% if action[:method] == :post %>
+    <% if action[:button] || action[:method].in?([:post, :patch, :put, :delete]) %>
       <%= button_to action[:label],
                     action[:url], 
-                    method: :post,
+                    method: action[:method] || :post,
                     params: action[:params] || {},
                     class: "button #{action[:danger] ? 'danger' : ''}",
                     data: { turbo_confirm: action[:confirm] } %>
@@ -12,9 +12,7 @@
                   action[:url], 
                   class: "button #{action[:danger] ? 'danger' : ''}",
                   target: action[:target],
-                  data: action[:method] == :delete ? 
-                        { turbo_method: :delete, turbo_confirm: action[:confirm] || "Are you sure? This cannot be undone." } : 
-                        action[:data] %>
+                  data: action[:data] %>
     <% end %>
   <% end %>
 </div>

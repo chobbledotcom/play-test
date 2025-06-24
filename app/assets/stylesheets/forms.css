@@ -2,7 +2,8 @@
 .error,
 .notice,
 .alert {
-  max-width: 30rem;
+  width: 30rem;
+  max-width: 90%;
   margin: 2rem auto;
   text-align: left;
   padding: 1rem;

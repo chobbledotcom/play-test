@@ -5,8 +5,6 @@
   # Form field options
   accept = local_assigns[:accept] || "image/*"
   preview_size = local_assigns[:preview_size] || 200
-  show_preview = local_assigns.has_key?(:show_preview) ? local_assigns[:show_preview] : true
-  show_filename = local_assigns[:show_filename] || false
   model = setup[:form_object].object
   current_file = model.send(field) if model.respond_to?(field)
 %>
@@ -15,19 +13,15 @@
 <%= setup[:form_object].file_field field, accept: accept %>
 
 <% if current_file&.attached? %>
-  <% if (show_preview && current_file.image?) || show_filename %>
-    <div class="file-preview" style="margin-top: 10px;">
-      <% if show_preview && current_file.image? %>
-        <%= render 'shared/image',
-            image: current_file,
-            size: :thumbnail,
-            alt: "Current #{setup[:field_label].downcase}" %>
-        <p><small>Current <%= setup[:field_label].downcase %></small></p>
-      <% elsif show_filename %>
-        <p>Current <%= setup[:field_label].downcase %>: <%= current_file.filename %></p>
-      <% end %>
-    </div>
-  <% end %>
+  <div class="file-preview" style="margin-top: 10px;">
+    <% if current_file.image? %>
+      <%= image_tag current_file.variant(resize_to_limit: [preview_size, preview_size]),
+          alt: "Current #{setup[:field_label].downcase}" %>
+      <p><small>Current <%= setup[:field_label].downcase %>: <strong><%= current_file.filename %></strong></small></p>
+    <% else %>
+      <p>Current <%= setup[:field_label].downcase %>: <strong><%= current_file.filename %></strong></p>
+    <% end %>
+  </div>
 <% end %>
 
 <% if setup[:field_hint].present? %>

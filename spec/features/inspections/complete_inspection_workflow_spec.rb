@@ -308,6 +308,28 @@ class InspectionWorkflow
 
     visit inspection_path(@inspection, format: :pdf)
     expect(page.status_code).to eq(200)
+
+    verify_log_functionality
+  end
+
+  def verify_log_functionality
+    # Check that log link appears on inspection show page
+    visit inspection_path(@inspection)
+    expect(page).to have_link(t("inspections.buttons.log"))
+
+    # Visit the log page
+    click_link t("inspections.buttons.log")
+    expect(page).to have_current_path(log_inspection_path(@inspection))
+    expect(page).to have_content(t("inspections.titles.log", inspection: @inspection.id))
+
+    # Verify events are shown
+    expect(page).to have_content("Created")
+    expect(page).to have_content("Updated")
+    expect(page).to have_content("Completed")
+
+    # Navigate back to inspection
+    click_link t("inspections.links.back_to_inspection")
+    expect(page).to have_current_path(inspection_path(@inspection))
   end
 
   def verify_second_inspection_prefilling
@@ -445,6 +467,25 @@ RSpec.feature "Complete Inspection Workflow", type: :feature do
       has_slide: false,
       is_totally_enclosed: false
     ).execute
+  end
+
+  scenario "inspection log access control" do
+    user = create(:user)
+    other_user = create(:user)
+    unit = create(:unit, user: user)
+    inspection = create(:inspection, user: user, unit: unit)
+
+    # Owner can view log
+    sign_in(user)
+    visit log_inspection_path(inspection)
+    expect(page).to have_content(I18n.t("inspections.titles.log", inspection: inspection.id))
+
+    # Use direct navigation instead of logout/login
+    # Non-owner cannot view log
+    page.driver.browser.clear_cookies
+    sign_in(other_user)
+    visit log_inspection_path(inspection)
+    expect(page.status_code).to eq(404)
   end
 
   scenario "complete workflow with prefilling - slide, no enclosure" do

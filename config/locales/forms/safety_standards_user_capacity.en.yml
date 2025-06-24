@@ -1,0 +1,12 @@
+en:
+  forms:
+    safety_standards_user_capacity:
+      header: "Calculate User Capacity"
+      sections:
+        dimensions: "Playing Area Dimensions"
+        result: "Calculation Results"
+      fields:
+        length: "Length"
+        width: "Width"
+        max_user_height: "Maximum User Height (optional)"
+      submit: "Calculate Capacity"

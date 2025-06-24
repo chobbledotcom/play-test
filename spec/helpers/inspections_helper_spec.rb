@@ -75,7 +75,7 @@ RSpec.describe InspectionsHelper, type: :helper do
         allow(helper).to receive(:current_user).and_return(user)
       end
 
-      it "includes no actions for complete inspections" do
+      it "includes appropriate actions for complete inspections" do
         actions = helper.inspection_actions(complete_inspection)
 
         expect(actions).not_to include(
@@ -84,7 +84,12 @@ RSpec.describe InspectionsHelper, type: :helper do
         expect(actions).not_to include(
           hash_including(label: I18n.t("inspections.buttons.delete"))
         )
-        expect(actions).to be_empty
+        expect(actions).to include(
+          hash_including(label: I18n.t("inspections.buttons.switch_to_in_progress"))
+        )
+        expect(actions).to include(
+          hash_including(label: I18n.t("inspections.buttons.log"))
+        )
       end
     end
 
@@ -93,19 +98,55 @@ RSpec.describe InspectionsHelper, type: :helper do
         allow(helper).to receive(:current_user).and_return(admin_user)
       end
 
-      it "includes only delete action for complete inspections" do
+      it "includes same actions as regular users for complete inspections" do
         actions = helper.inspection_actions(complete_inspection)
 
         expect(actions).not_to include(
           hash_including(label: I18n.t("inspections.buttons.update"))
         )
-        expect(actions).to include(
-          hash_including(
-            label: I18n.t("inspections.buttons.delete"),
-            method: :delete,
-            danger: true
-          )
+        expect(actions).not_to include(
+          hash_including(label: I18n.t("inspections.buttons.delete"))
         )
+        expect(actions).to include(
+          hash_including(label: I18n.t("inspections.buttons.switch_to_in_progress"))
+        )
+        expect(actions).to include(
+          hash_including(label: I18n.t("inspections.buttons.log"))
+        )
+      end
+    end
+  end
+
+  describe "#inspection_result_badge" do
+    let(:inspection) { build(:inspection) }
+
+    context "when inspection passed is true" do
+      before { inspection.passed = true }
+
+      it "returns a pass badge with i18n text" do
+        result = helper.inspection_result_badge(inspection)
+        expect(result).to include("pass-badge")
+        expect(result).to include(I18n.t("inspections.status.pass"))
+      end
+    end
+
+    context "when inspection passed is false" do
+      before { inspection.passed = false }
+
+      it "returns a fail badge with i18n text" do
+        result = helper.inspection_result_badge(inspection)
+        expect(result).to include("fail-badge")
+        expect(result).to include(I18n.t("inspections.status.fail"))
+      end
+    end
+
+    context "when inspection passed is nil" do
+      before { inspection.passed = nil }
+
+      it "returns a pending badge with i18n text" do
+        result = helper.inspection_result_badge(inspection)
+        expect(result).to include("pending-badge")
+        expect(result).to include(I18n.t("inspections.status.pending"))
       end
     end
   end

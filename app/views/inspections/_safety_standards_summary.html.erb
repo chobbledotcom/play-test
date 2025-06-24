@@ -43,13 +43,25 @@
       <section class="standards-section">
         <h4><%= t('inspections.safety_standards.user_capacity') %></h4>
         <p><%= t('inspections.safety_standards.capacity_by_height') %></p>
-        <% capacity = SafetyStandard.calculate_user_capacity(inspection.length, inspection.width) %>
+        <% max_height = inspection.user_height_assessment&.tallest_user_height %>
+        <% capacity = SafetyStandards::UserCapacityCalculator.calculate(inspection.length, inspection.width, max_height) %>
         <ul>
-          <li><%= t('inspections.safety_standards.capacity_1000mm', count: capacity[:users_1000mm]) %></li>
-          <li><%= t('inspections.safety_standards.capacity_1200mm', count: capacity[:users_1200mm]) %></li>
-          <li><%= t('inspections.safety_standards.capacity_1500mm', count: capacity[:users_1500mm]) %></li>
-          <li><%= t('inspections.safety_standards.capacity_1800mm', count: capacity[:users_1800mm]) %></li>
+          <% if capacity[:users_1000mm] > 0 %>
+            <li><%= t('inspections.safety_standards.capacity_1000mm', count: capacity[:users_1000mm]) %></li>
+          <% end %>
+          <% if capacity[:users_1200mm] > 0 %>
+            <li><%= t('inspections.safety_standards.capacity_1200mm', count: capacity[:users_1200mm]) %></li>
+          <% end %>
+          <% if capacity[:users_1500mm] > 0 %>
+            <li><%= t('inspections.safety_standards.capacity_1500mm', count: capacity[:users_1500mm]) %></li>
+          <% end %>
+          <% if capacity[:users_1800mm] > 0 %>
+            <li><%= t('inspections.safety_standards.capacity_1800mm', count: capacity[:users_1800mm]) %></li>
+          <% end %>
         </ul>
+        <% if max_height.present? %>
+          <p><em><%= t('inspections.safety_standards.max_user_height_note', height: max_height) %></em></p>
+        <% end %>
       </section>
     <% end %>
 

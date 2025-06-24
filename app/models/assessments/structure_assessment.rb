@@ -20,11 +20,11 @@ class Assessments::StructureAssessment < ApplicationRecord
   after_update :log_assessment_update, if: :saved_changes?
 
   def stitch_length_compliant? =
-    SafetyStandard.valid_stitch_length?(stitch_length)
+    SafetyStandards::MaterialValidator.valid_stitch_length?(stitch_length)
 
   def unit_pressure_compliant? =
-    SafetyStandard.valid_pressure?(unit_pressure)
+    SafetyStandards::EquipmentValidator.valid_pressure?(unit_pressure)
 
   def fall_off_height_compliant? =
-    SafetyStandard.valid_fall_height?(critical_fall_off_height)
+    SafetyStandards::EquipmentValidator.valid_fall_height?(critical_fall_off_height)
 end

@@ -55,6 +55,13 @@ RSpec.feature "Inspections CSV Export", type: :feature do
 
       draft_row = csv_lines.find { |row| row["unit_serial"] == "TU002" }
       expect(draft_row).to be_nil
+
+      # Verify event was logged
+      event = Event.where(resource_type: "System", action: "exported").first
+      expect(event).to be_present
+      expect(event.user).to eq(user)
+      expect(event.details).to eq("Exported 1 inspections to CSV")
+      expect(event.metadata["resource_type"]).to eq("Inspection")
     end
 
     it "exports filtered inspections when result filter is applied" do

@@ -36,7 +36,8 @@ module UnitsHelper
         label: I18n.t("units.buttons.delete"),
         url: unit,
         method: :delete,
-        danger: true
+        danger: true,
+        confirm: I18n.t("units.messages.delete_confirm")
       }
     end
 

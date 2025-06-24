@@ -1,0 +1,71 @@
+<%
+  # General audit log partial
+  # Required locals:
+  #   - events: collection of Event objects
+  #   - resource_name: string - name of the resource type for i18n
+  # Optional locals:
+  #   - show_user: boolean - whether to show user column (auto-determined if not provided)
+  
+  # Auto-determine whether to show user column based on whether all events have the same user
+  if local_assigns.key?(:show_user)
+    show_user = local_assigns[:show_user]
+  else
+    unique_users = events.map(&:user_id).uniq
+    show_user = unique_users.size > 1
+  end
+%>
+
+<% if events.any? %>
+  <%= scrollable_table do %>
+    <thead>
+      <tr>
+        <th><%= I18n.t("activerecord.attributes.event.created_at") %></th>
+        <% if show_user %>
+          <th><%= I18n.t("activerecord.attributes.event.user") %></th>
+        <% end %>
+        <th><%= I18n.t("activerecord.attributes.event.details") %></th>
+        <th><%= I18n.t("activerecord.attributes.event.changed_data") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% events.each do |event| %>
+        <tr>
+          <td><%= l(event.created_at, format: :long) %></td>
+          <% if show_user %>
+            <td><%= event.user.email %></td>
+          <% end %>
+          <td>
+            <%= I18n.t("events.actions.#{event.action}", default: event.action) %>
+            <% if event.action == "deleted" && event.metadata.present? %>
+              <% unit_info = [event.metadata["name"], event.metadata["serial"]].compact.join(" - ") %>
+              <% if unit_info.present? %>
+                (<%= unit_info %>)
+              <% end %>
+            <% end %>
+          </td>
+          <td>
+            <% if event.changed_data.present? %>
+              <details>
+                <summary><%= I18n.t("events.messages.view_changes") %></summary>
+                <ul>
+                  <% event.changed_data.each do |field, changes| %>
+                    <li>
+                      <strong><%= I18n.t("activerecord.attributes.#{resource_name}.#{field}", default: field.humanize) %>:</strong>
+                      <%= I18n.t("events.messages.changed_from_to", 
+                                from: changes["from"] || I18n.t("events.messages.empty"),
+                                to: changes["to"] || I18n.t("events.messages.empty")) %>
+                    </li>
+                  <% end %>
+                </ul>
+              </details>
+            <% else %>
+              -
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  <% end %>
+<% else %>
+  <p><%= I18n.t("events.messages.no_events_found") %></p>
+<% end %>

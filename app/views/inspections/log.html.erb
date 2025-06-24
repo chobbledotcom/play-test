@@ -1,0 +1,11 @@
+<header>
+  <h1><%= @title %></h1>
+</header>
+
+<nav>
+  <%= link_to I18n.t("inspections.links.back_to_inspection"), @inspection %>
+</nav>
+
+<%= render 'shared/audit_log', 
+    events: @events, 
+    resource_name: 'inspection' %>

@@ -85,6 +85,12 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
 
       inspection.reload
       expect(inspection.unit).to eq(unit2)
+
+      # Verify event was logged
+      event = Event.where(resource_type: "Inspection", resource_id: inspection.id, action: "unit_changed").first
+      expect(event).to be_present
+      expect(event.user).to eq(user)
+      expect(event.details).to eq("Unit changed to #{unit2.name}")
     end
   end
 

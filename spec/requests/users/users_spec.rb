@@ -120,7 +120,7 @@ RSpec.describe "Users", type: :request do
       it "updates the user's settings" do
         patch update_settings_user_path(user), params: settings_params
 
-        expect_redirect_with_notice(response, root_path)
+        expect_redirect_with_notice(response, change_settings_user_path(user))
         expect(user.reload.theme).to eq("dark")
       end
 

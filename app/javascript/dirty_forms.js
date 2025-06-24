@@ -3,6 +3,7 @@ class DirtyForms {
   constructor() {
     this.indicator = null;
     this.trackedForms = new WeakMap();
+    this.beforeUnloadHandler = null;
   }
 
   init() {
@@ -61,7 +62,10 @@ class DirtyForms {
       return;
     }
 
+    // If already tracking, just update the initial state
     if (this.trackedForms.has(form)) {
+      const formData = this.trackedForms.get(form);
+      formData.initialState = this.captureState(form);
       return;
     }
 
@@ -79,10 +83,16 @@ class DirtyForms {
 
     form.addEventListener("input", inputHandler);
     form.addEventListener("change", inputHandler);
-    form.addEventListener("submit", () => {
+    
+    const handleFormSubmit = () => {
+      // Just hide the indicator when submitting, don't update state yet
+      // State will be updated when we get a successful response
       this.hide();
-      formData.initialState = this.captureState(form);
-    });
+    };
+    
+    // Listen to both submit and formdata events to catch all submission methods
+    form.addEventListener("submit", handleFormSubmit);
+    form.addEventListener("formdata", handleFormSubmit);
 
     this.trackedForms.set(form, formData);
   }
@@ -139,9 +149,44 @@ class DirtyForms {
   hasDirtyForm() {
     return this.findDirtyForm() !== null;
   }
+  
+  resetFormState(form = null) {
+    if (form) {
+      // Reset specific form
+      const formData = this.trackedForms.get(form);
+      if (formData) {
+        formData.initialState = this.captureState(form);
+      }
+    } else {
+      // Reset all forms
+      const forms = document.querySelectorAll("form");
+      forms.forEach(f => {
+        const formData = this.trackedForms.get(f);
+        if (formData) {
+          formData.initialState = this.captureState(f);
+        }
+      });
+    }
+    this.hide();
+    this.unload();
+  }
+  
+  unload() {
+    // Remove the beforeunload event listener to prevent the browser warning
+    if (this.beforeUnloadHandler) {
+      window.removeEventListener("beforeunload", this.beforeUnloadHandler);
+      // Re-add it after a short delay to handle new changes
+      setTimeout(() => {
+        window.addEventListener("beforeunload", this.beforeUnloadHandler);
+      }, 100);
+    }
+  }
 }
 
 const dirtyForms = new DirtyForms();
+
+// Expose resetFormState globally so it can be called from Turbo responses
+window.resetFormState = () => dirtyForms.resetFormState();
 
 document.addEventListener("DOMContentLoaded", () => {
   dirtyForms.init();
@@ -170,11 +215,28 @@ document.addEventListener("turbo:before-visit", (event) => {
   }
 });
 
-window.addEventListener("beforeunload", (event) => {
+// Reset form state after successful Turbo submission
+document.addEventListener("turbo:submit-end", (event) => {
+  if (event.detail.success) {
+    // Form submission succeeded, reset the form's tracked state
+    const form = event.target;
+    // Small delay to ensure Turbo streams have updated the DOM
+    setTimeout(() => {
+      dirtyForms.resetFormState(form);
+    }, 100);
+  }
+});
+
+
+
+// Store the handler so we can remove it later
+dirtyForms.beforeUnloadHandler = (event) => {
   if (dirtyForms.hasDirtyForm()) {
     const message =
       "You have unsaved changes. Are you sure you want to leave this page?";
     event.returnValue = message;
     return message;
   }
-});
+};
+
+window.addEventListener("beforeunload", dirtyForms.beforeUnloadHandler);

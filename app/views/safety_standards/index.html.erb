@@ -8,6 +8,7 @@
     <ul>
       <li><a href="#anchorage">Anchorage</a></li>
       <li><a href="#wall-heights">Wall Heights</a></li>
+      <li><a href="#user-capacity">User Capacity</a></li>
       <li><a href="#slides">Slides</a></li>
       <li><a href="#material">Material</a></li>
       <li><a href="#fan">Fan</a></li>
@@ -54,6 +55,55 @@
           </tr>
         </tbody>
       </table>
+    </article>
+
+    <!-- User Capacity Tab -->
+    <article id="user-capacity" class="tab-panel">
+      <h2>User Capacity Calculation</h2>
+      <%= render 'calculator_form', type: :user_capacity %>
+      
+      <h3>Capacity Guidelines</h3>
+      <p>User capacity is calculated based on the play area and the height of users. Taller users require more space for safe play.</p>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>User Height</th>
+            <th>Space Required</th>
+            <th>Users per m²</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1.0m</td>
+            <td>1.0 m² per user</td>
+            <td>1.0</td>
+          </tr>
+          <tr>
+            <td>1.2m</td>
+            <td>1.33 m² per user</td>
+            <td>0.75</td>
+          </tr>
+          <tr>
+            <td>1.5m</td>
+            <td>1.66 m² per user</td>
+            <td>0.60</td>
+          </tr>
+          <tr>
+            <td>1.8m</td>
+            <td>2.0 m² per user</td>
+            <td>0.50</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h3>Important Notes</h3>
+      <ul>
+        <li>Only calculate capacity for user heights that are allowed on the unit</li>
+        <li>If a unit has a maximum user height restriction, do not calculate capacity for taller users</li>
+        <li>Always round down fractional users for safety</li>
+        <li>Consider obstacles and unusable areas when calculating total play area</li>
+      </ul>
     </article>
 
     <!-- Slides Tab -->

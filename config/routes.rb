@@ -38,6 +38,7 @@ Rails.application.routes.draw do
       patch "mark_draft"
       get "unified_edit"
       patch "unified_update"
+      get "log"
     end
 
     Inspection::ASSESSMENT_TYPES.each_key do |assessment_type|

@@ -140,12 +140,21 @@ class ApplicationController < ActionController::Base
       if count > 5
         log_n_plus_one_queries(table, count)
         # Only raise exception in development and test environments
-        if Rails.env.local?
+        # Skip if we're processing images (which legitimately needs multiple blob queries)
+        if Rails.env.local? && !processing_image_upload?
           message = app_i18n(:debug, :n_plus_one_with_limit, table: table, count: count, limit: 5)
           raise message
         end
       end
     end
+  end
+
+  def processing_image_upload?
+    # Check if we're in a controller action that processes image uploads
+    return true if controller_name == "users" && action_name == "update_settings" && params.dig(:user, :logo).present?
+    return true if controller_name == "units" && (action_name == "create" || action_name == "update") && params.dig(:unit, :photo).present?
+    return true if controller_name == "inspector_companies" && (action_name == "create" || action_name == "update") && params.dig(:inspector_company, :logo).present?
+    false
   end
 
   def log_n_plus_one_queries(table, count)

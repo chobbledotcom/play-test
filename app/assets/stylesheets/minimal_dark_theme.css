@@ -230,7 +230,7 @@
   color: var(--minimal-hover);
 }
 
-/* Pass/Fail badges - minimal */
+/* Pass/Fail/Pending badges - minimal */
 .minimal-dark-theme .pass-badge {
   background-color: transparent;
   color: var(--color-pass);
@@ -241,6 +241,12 @@
   background-color: transparent;
   color: var(--color-fail);
   border: 1px solid var(--color-fail);
+}
+
+.minimal-dark-theme .pending-badge {
+  background-color: transparent;
+  color: #f9a825;
+  border: 1px solid #f9a825;
 }
 
 /* Company activation notice - minimal */

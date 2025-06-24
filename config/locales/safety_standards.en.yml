@@ -40,10 +40,11 @@ en:
       walls_125_user_height: "Containing walls must be at least %{height}m (1.25x user height)"
       walls_125_plus_roof_required: "Containing walls must be at least %{height}m + permanent roof required"
       calculated_capacities: "Calculated Capacities:"
-      capacity_1000mm: "1.0m users: %{count} (1.5m² per user)"
-      capacity_1200mm: "1.2m users: %{count} (2.0m² per user)"
-      capacity_1500mm: "1.5m users: %{count} (2.5m² per user)"
-      capacity_1800mm: "1.8m users: %{count} (3.0m² per user)"
+      capacity_1000mm: "1.0m users: %{count} (1 per m²)"
+      capacity_1200mm: "1.2m users: %{count} (0.75 per m²)"
+      capacity_1500mm: "1.5m users: %{count} (0.60 per m²)"
+      capacity_1800mm: "1.8m users: %{count} (0.5 per m²)"
+      max_user_height_note: "Capacity calculated for users up to %{height}m tall"
 
     calculators:
       anchor:

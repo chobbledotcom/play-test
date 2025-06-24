@@ -7,6 +7,7 @@
   #   scope: The form scope for non-model forms (e.g., :session)
   #   url: Form submission URL (defaults to model's update path)
   #   method: HTTP method (defaults to :patch for models, :post for scoped forms)
+  #   local: Use standard form submission instead of Turbo (defaults to false)
 
   if model
     url ||= url_for(model)
@@ -15,14 +16,23 @@
     # Non-model forms need explicit URL and default to POST
     method ||= :post
   end
+  
+  # Check if local form submission is requested
+  use_local = local_assigns[:local] || false
 %>
 
 <% form_options = {
   url: url,
   method: method,
-  local: false,
-  html: { data: { turbo_stream: true } }
+  local: use_local,
+  html: { 
+    multipart: true
+  }
 } %>
+
+<% unless use_local %>
+  <% form_options[:html][:data] = { turbo_stream: true } %>
+<% end %>
 
 <% if model
   form_options[:model] = model

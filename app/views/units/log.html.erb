@@ -6,27 +6,6 @@
   <%= link_to I18n.t("units.links.back_to_unit"), @unit %>
 </nav>
 
-<% if @events.any? %>
-  <table>
-    <thead>
-      <tr>
-        <th><%= I18n.t("activerecord.attributes.event.created_at") %></th>
-        <th><%= I18n.t("activerecord.attributes.event.user") %></th>
-        <th><%= I18n.t("activerecord.attributes.event.action") %></th>
-        <th><%= I18n.t("activerecord.attributes.event.details") %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @events.each do |event| %>
-        <tr>
-          <td><%= l(event.created_at, format: :long) %></td>
-          <td><%= event.user.email %></td>
-          <td><%= I18n.t("events.actions.#{event.action}", default: event.action) %></td>
-          <td><%= event.details %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% else %>
-  <p><%= I18n.t("events.messages.no_events_found") %></p>
-<% end %>
+<%= render 'shared/audit_log', 
+    events: @events, 
+    resource_name: 'unit' %>

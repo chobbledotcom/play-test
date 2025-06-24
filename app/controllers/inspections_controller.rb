@@ -8,7 +8,7 @@ class InspectionsController < ApplicationController
   before_action :check_inspection_owner, except: %i[create index show]
   before_action :validate_unit_ownership, only: %i[update]
   before_action :redirect_if_complete,
-    except: %i[create index destroy mark_draft show]
+    except: %i[create index destroy mark_draft show log]
   before_action :require_user_active, only: %i[create edit update]
   before_action :validate_inspection_completability, only: %i[show edit]
   before_action :no_index
@@ -23,7 +23,10 @@ class InspectionsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.csv { send_inspections_csv }
+      format.csv do
+        log_inspection_event("exported", nil, "Exported #{@complete_inspections.count} inspections to CSV")
+        send_inspections_csv
+      end
     end
   end
 
@@ -46,6 +49,7 @@ class InspectionsController < ApplicationController
     ).create
 
     if result[:success]
+      log_inspection_event("created", result[:inspection])
       flash[:notice] = result[:message]
       redirect_to edit_inspection_path(result[:inspection])
     else
@@ -61,7 +65,13 @@ class InspectionsController < ApplicationController
   end
 
   def update
+    # Capture the changes before update
+    previous_attributes = @inspection.attributes.dup
+
     if @inspection.update(inspection_params)
+      # Calculate what changed
+      changed_data = calculate_changes(previous_attributes, @inspection.attributes, inspection_params.keys)
+      log_inspection_event("updated", @inspection, nil, changed_data)
       handle_successful_update
     else
       handle_failed_update
@@ -75,7 +85,24 @@ class InspectionsController < ApplicationController
       return
     end
 
+    # Capture inspection details before deletion for the audit log
+    inspection_details = {
+      unique_report_number: @inspection.unique_report_number,
+      inspection_date: @inspection.inspection_date,
+      unit_serial: @inspection.unit&.serial,
+      unit_name: @inspection.unit&.name,
+      complete_date: @inspection.complete_date
+    }
+
     @inspection.destroy
+    # Log the deletion with the inspection details in metadata
+    Event.log(
+      user: current_user,
+      action: "deleted",
+      resource: @inspection,
+      details: nil,
+      metadata: inspection_details
+    )
     redirect_to inspections_path, notice: I18n.t("inspections.messages.deleted")
   end
 
@@ -108,6 +135,7 @@ class InspectionsController < ApplicationController
   end
 
   def handle_successful_unit_update(unit)
+    log_inspection_event("unit_changed", @inspection, "Unit changed to #{unit.name}")
     flash[:notice] = t("inspections.messages.unit_changed", unit_name: unit.name)
     redirect_to edit_inspection_path(@inspection)
   end
@@ -130,12 +158,14 @@ class InspectionsController < ApplicationController
     end
 
     @inspection.complete!(current_user)
+    log_inspection_event("completed", @inspection)
     flash[:notice] = t("inspections.messages.marked_complete")
     redirect_to @inspection
   end
 
   def mark_draft
     if @inspection.update(complete_date: nil)
+      log_inspection_event("marked_draft", @inspection)
       flash[:notice] = t("inspections.messages.marked_in_progress")
     else
       error_messages = @inspection.errors.full_messages.join(", ")
@@ -143,6 +173,11 @@ class InspectionsController < ApplicationController
         errors: error_messages)
     end
     redirect_to edit_inspection_path(@inspection)
+  end
+
+  def log
+    @events = Event.for_resource(@inspection).recent.includes(:user)
+    @title = I18n.t("inspections.titles.log", inspection: @inspection.id)
   end
 
   def inspection_params
@@ -270,8 +305,7 @@ class InspectionsController < ApplicationController
   def check_inspection_owner
     return if current_user && @inspection.user_id == current_user.id
 
-    flash[:alert] = I18n.t("inspections.errors.access_denied")
-    redirect_to inspections_path
+    head :not_found
   end
 
   def redirect_if_complete
@@ -464,5 +498,47 @@ class InspectionsController < ApplicationController
     end
 
     translated
+  end
+
+  def log_inspection_event(action, inspection, details = nil, changed_data = nil)
+    return unless current_user
+
+    if inspection
+      Event.log(
+        user: current_user,
+        action: action,
+        resource: inspection,
+        details: details,
+        changed_data: changed_data
+      )
+    else
+      # For events without a specific inspection (like CSV export)
+      Event.log_system_event(
+        user: current_user,
+        action: action,
+        details: details,
+        metadata: {resource_type: "Inspection"}
+      )
+    end
+  rescue => e
+    Rails.logger.error "Failed to log inspection event: #{e.message}"
+  end
+
+  def calculate_changes(previous_attributes, current_attributes, changed_keys)
+    changes = {}
+
+    changed_keys.map(&:to_s).each do |key|
+      previous_value = previous_attributes[key]
+      current_value = current_attributes[key]
+
+      if previous_value != current_value
+        changes[key] = {
+          "from" => previous_value,
+          "to" => current_value
+        }
+      end
+    end
+
+    changes.presence
   end
 end

@@ -29,6 +29,6 @@ class Assessments::UserHeightAssessment < ApplicationRecord
   def meets_height_requirements?
     return false unless tallest_user_height.present? && containing_wall_height.present?
 
-    SafetyStandard.meets_height_requirements?(tallest_user_height, containing_wall_height)
+    SafetyStandards::SlideCalculator.meets_height_requirements?(tallest_user_height, containing_wall_height)
   end
 end

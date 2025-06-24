@@ -49,14 +49,20 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
   context "when file is attached" do
     let(:attachment) { double("attachment") }
     let(:blob) { double("blob") }
+    let(:service) { double("service") }
 
     before do
       allow(attachment).to receive(:attached?).and_return(true)
       allow(attachment).to receive(:blob).and_return(blob)
+      allow(attachment).to receive(:variant).and_return("variant_image")
+      allow(attachment).to receive(:filename).and_return("test.jpg")
       allow(blob).to receive(:persisted?).and_return(true)
       allow(blob).to receive(:analyzed?).and_return(true)
       allow(blob).to receive(:analyze)
       allow(blob).to receive(:metadata).and_return({"width" => 100, "height" => 100})
+      allow(blob).to receive(:service).and_return(service)
+      allow(blob).to receive(:key).and_return("test_key")
+      allow(service).to receive(:exist?).and_return(true)
       allow(mock_object).to receive(:respond_to?).with(:photo).and_return(true)
       allow(mock_object).to receive(:photo).and_return(attachment)
     end
@@ -82,17 +88,8 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
 
         render "form/file_field", field: field, preview_size: 150
 
-        expect(ImageProcessorService).to have_received(:thumbnail).with(attachment)
-        expect(rendered).to include("max-width: 150px")
-      end
-
-      it "can disable preview" do
-        render "form/file_field", field: field, show_preview: false
-
-        expect(rendered).to include("Photo")
-        expect(rendered).to include('<input type="file" name="photo">')
-        expect(rendered).not_to include("<img")
-        expect(rendered).not_to include("file-preview")
+        expect(attachment).to have_received(:variant).with(resize_to_limit: [150, 150])
+        expect(rendered).to include('<img src="test.jpg"')
       end
     end
 
@@ -102,16 +99,10 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
         allow(attachment).to receive(:filename).and_return("document.pdf")
       end
 
-      it "does not show image preview by default" do
+      it "shows filename for non-image file" do
         render "form/file_field", field: field
 
         expect(rendered).not_to include("<img")
-        expect(rendered).not_to include("document.pdf")
-      end
-
-      it "shows filename when enabled" do
-        render "form/file_field", field: field, show_filename: true
-
         expect(rendered).to include("document.pdf")
         expect(rendered).to include("Current photo")
       end

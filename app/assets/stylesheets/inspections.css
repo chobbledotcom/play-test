@@ -202,9 +202,10 @@
   padding: 0;
 }
 
-/* Pass/Fail badges */
+/* Pass/Fail/Pending badges */
 .pass-badge,
-.fail-badge {
+.fail-badge,
+.pending-badge {
   display: inline-block;
   padding: 0.4rem 0.6rem;
   font-size: 0.85em;
@@ -224,4 +225,10 @@
   background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
+}
+
+.pending-badge {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
 }

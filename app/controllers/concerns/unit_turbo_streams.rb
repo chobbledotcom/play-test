@@ -7,8 +7,8 @@ module UnitTurboStreams
     render turbo_stream: [
       build_save_message_stream(success: true, message: t("units.messages.updated")),
       turbo_stream.replace("unit_photo_preview",
-        partial: "shared/unit_photo_preview",
-        locals: {unit: @unit})
+        partial: "shared/attached_image",
+        locals: {attachment: @unit.photo, size: :thumbnail})
     ]
   end
 
@@ -26,11 +26,8 @@ module UnitTurboStreams
     turbo_stream.replace("form_save_message",
       partial: "shared/save_message",
       locals: {
-        dom_id: "form_save_message",
-        success: success,
-        success_message: success ? message : nil,
-        errors: errors,
-        error_message: success ? nil : message
+        message: message,
+        errors: errors
       })
   end
 end

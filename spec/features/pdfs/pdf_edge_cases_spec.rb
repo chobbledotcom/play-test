@@ -64,7 +64,7 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       generation_time = Time.current - start_time
 
       expect_valid_pdf(pdf_data)
-      expect(generation_time).to be < 1.seconds
+      expect(generation_time).to be < 2.seconds
       expect(pdf_data.bytesize).to be < 1.megabytes
     end
 

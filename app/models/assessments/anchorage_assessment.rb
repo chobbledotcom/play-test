@@ -29,7 +29,7 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   end
 
   def anchorage_result
-    @anchor_result ||= SafetyStandard.build_anchor_result(
+    @anchor_result ||= SafetyStandards::AnchorCalculator.calculate(
       length: inspection.length,
       width: inspection.width,
       height: inspection.height

@@ -305,44 +305,56 @@ class Inspection < ApplicationRecord
   end
 
   def incomplete_fields
-    # Get incomplete fields for the inspection tab (excluding passed)
-    inspection_tab_fields =
-      inspection_tab_incomplete_fields
-        .map { |f| {field: f, label: field_label(:inspection, f)} }
-
-    # Get incomplete fields for the results tab
-    results_fields = []
-    results_fields << {field: :passed, label: field_label(:results, :passed)} if passed.nil?
-
     output = []
-    if inspection_tab_fields.any?
-      output << {
-        tab: :inspection,
-        name: I18n.t("forms.inspection.header"),
-        fields: inspection_tab_fields
-      }
-    end
 
-    if results_fields.any?
-      output << {
-        tab: :results,
-        name: I18n.t("forms.results.header"),
-        fields: results_fields
-      }
-    end
+    # Process tabs in the same order as applicable_tabs
+    applicable_tabs.each do |tab|
+      case tab
+      when "inspection"
+        # Get incomplete fields for the inspection tab (excluding passed)
+        inspection_tab_fields =
+          inspection_tab_incomplete_fields
+            .map { |f| {field: f, label: field_label(:inspection, f)} }
 
-    each_applicable_assessment do |assessment_key, _, assessment|
-      next unless assessment
-      form = assessment_key.to_s.gsub(/_assessment$/, "").to_sym
-      assessment_fields =
-        assessment.incomplete_fields
-          .map { |f| {field: f, label: field_label(form, f)} }
-      if assessment_fields.any?
-        output << {
-          tab: form,
-          name: I18n.t("forms.inspection.header"),
-          fields: assessment_fields
-        }
+        if inspection_tab_fields.any?
+          output << {
+            tab: :inspection,
+            name: I18n.t("forms.inspection.header"),
+            fields: inspection_tab_fields
+          }
+        end
+
+      when "results"
+        # Get incomplete fields for the results tab
+        results_fields = []
+        results_fields << {field: :passed, label: field_label(:results, :passed)} if passed.nil?
+
+        if results_fields.any?
+          output << {
+            tab: :results,
+            name: I18n.t("forms.results.header"),
+            fields: results_fields
+          }
+        end
+
+      else
+        # All other tabs are assessment tabs
+        assessment_key = :"#{tab}_assessment"
+        assessment = send(assessment_key) if respond_to?(assessment_key)
+
+        if assessment&.respond_to?(:incomplete_fields)
+          assessment_fields =
+            assessment.incomplete_fields
+              .map { |f| {field: f, label: field_label(tab.to_sym, f)} }
+
+          if assessment_fields.any?
+            output << {
+              tab: tab.to_sym,
+              name: I18n.t("forms.#{tab}.header"),
+              fields: assessment_fields
+            }
+          end
+        end
       end
     end
 

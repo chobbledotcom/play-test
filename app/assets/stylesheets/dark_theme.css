@@ -233,7 +233,7 @@
   text-decoration: underline;
 }
 
-/* Pass/Fail badges dark mode */
+/* Pass/Fail/Pending badges dark mode */
 .dark-theme .pass-badge {
   background-color: var(--dark-highlight);
   color: var(--dark-bg-primary);
@@ -245,6 +245,13 @@
   background-color: #d32f2f;
   color: var(--dark-text);
   border: 1px solid #d32f2f;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .pending-badge {
+  background-color: #f9a825;
+  color: var(--dark-bg-primary);
+  border: 1px solid #f9a825;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 

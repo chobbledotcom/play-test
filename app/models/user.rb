@@ -5,6 +5,8 @@ class User < ApplicationRecord
 
   has_many :inspections, dependent: :destroy
   has_many :units, dependent: :destroy
+  has_one_attached :logo
+  validate :logo_must_be_image
 
   belongs_to :inspection_company,
     class_name: "InspectorCompany",
@@ -144,6 +146,15 @@ class User < ApplicationRecord
   def set_inactive_on_signup
     unless instance_variable_get(:@active_until_explicitly_set)
       self.active_until = Date.current - 1.day
+    end
+  end
+
+  def logo_must_be_image
+    return unless logo.attached?
+
+    unless logo.blob.content_type.start_with?("image/")
+      errors.add(:logo, "must be an image file")
+      logo.purge
     end
   end
 end

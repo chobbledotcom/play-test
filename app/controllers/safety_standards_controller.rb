@@ -2,7 +2,7 @@ class SafetyStandardsController < ApplicationController
   skip_before_action :require_login
   skip_before_action :verify_authenticity_token, only: [:index]
 
-  CALCULATION_TYPES = %w[anchors slide_runout wall_height].freeze
+  CALCULATION_TYPES = %w[anchors slide_runout wall_height user_capacity].freeze
 
   def index
     @calculation_metadata = SafetyStandard.calculation_metadata
@@ -49,7 +49,7 @@ class SafetyStandardsController < ApplicationController
     dimensions = extract_dimensions(:length, :width, :height)
 
     if dimensions.values.all?(&:positive?)
-      @anchor_result = SafetyStandard.build_anchor_result(**dimensions)
+      @anchor_result = SafetyStandards::AnchorCalculator.calculate(**dimensions)
     else
       set_error(:anchor, :invalid_dimensions)
     end
@@ -75,6 +75,28 @@ class SafetyStandardsController < ApplicationController
     end
   end
 
+  def calculate_user_capacity
+    length = param_to_float(:length)
+    width = param_to_float(:width)
+    max_user_height = param_to_float(:max_user_height)
+    max_user_height = nil if max_user_height.zero?
+
+    if length.positive? && width.positive?
+      capacities = SafetyStandards::UserCapacityCalculator.calculate(
+        length, width, max_user_height
+      )
+      @capacity_result = {
+        length: length,
+        width: width,
+        area: (length * width).round(2),
+        max_user_height: max_user_height,
+        capacities: capacities
+      }
+    else
+      @capacity_result = {error: t("safety_standards.errors.invalid_dimensions")}
+    end
+  end
+
   def extract_dimensions(*keys)
     keys.index_with { |key| param_to_float(key) }
   end
@@ -88,7 +110,7 @@ class SafetyStandardsController < ApplicationController
   end
 
   def build_runout_result(platform_height)
-    required_runout = SafetyStandard.calculate_required_runout(platform_height)
+    required_runout = SafetyStandards::SlideCalculator.calculate_required_runout(platform_height)
     {
       platform_height: platform_height,
       required_runout: required_runout,
@@ -105,12 +127,12 @@ class SafetyStandardsController < ApplicationController
     {
       user_height: user_height,
       requirement: wall_height_requirement_text(user_height),
-      requires_roof: SafetyStandard.requires_permanent_roof?(user_height)
+      requires_roof: SafetyStandards::SlideCalculator.requires_permanent_roof?(user_height)
     }
   end
 
   def wall_height_requirement_text(user_height)
-    thresholds = SafetyStandard::SLIDE_HEIGHT_THRESHOLDS
+    thresholds = SafetyStandards::SlideCalculator::SLIDE_HEIGHT_THRESHOLDS
 
     case user_height
     when 0..thresholds[:no_walls_required]
@@ -160,12 +182,14 @@ class SafetyStandardsController < ApplicationController
     when "anchors" then "@anchor_result"
     when "slide_runout" then "@runout_result"
     when "wall_height" then "@wall_height_result"
+    when "user_capacity" then "@capacity_result"
     end
 
     error_var = case type
     when "anchors" then "@anchor_error"
     when "slide_runout" then "@runout_error"
     when "wall_height" then "@wall_height_error"
+    when "user_capacity" then "@capacity_error"
     end
 
     result = instance_variable_get(result_var)

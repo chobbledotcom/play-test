@@ -34,6 +34,11 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
       expect_marked_in_progress_message
       expect(completed_inspection.reload.complete?).to be false
+
+      # Verify event was logged
+      event = Event.where(resource_type: "Inspection", resource_id: completed_inspection.id, action: "marked_draft").first
+      expect(event).to be_present
+      expect(event.user).to eq(user)
     end
   end
 
@@ -48,6 +53,14 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
       expect_updated_message
       expect(inspection.reload.unique_report_number).to eq("CUSTOM-2024-001")
+
+      # Verify event was logged with change data
+      event = Event.where(resource_type: "Inspection", resource_id: inspection.id, action: "updated").first
+      expect(event).to be_present
+      expect(event.user).to eq(user)
+      expect(event.changed_data).to be_present
+      expect(event.changed_data["unique_report_number"]["from"]).to be_nil
+      expect(event.changed_data["unique_report_number"]["to"]).to eq("CUSTOM-2024-001")
     end
 
     it "shows suggestion button when unique report number is empty" do
@@ -111,6 +124,11 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       expect_marked_complete_message
       expect(inspection.reload.complete?).to be true
       expect(inspection.unique_report_number).to be_nil
+
+      # Verify event was logged
+      event = Event.where(resource_type: "Inspection", resource_id: inspection.id, action: "completed").first
+      expect(event).to be_present
+      expect(event.user).to eq(user)
     end
 
     it "can complete inspection with user-provided report number" do

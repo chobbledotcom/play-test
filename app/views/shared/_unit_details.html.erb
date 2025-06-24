@@ -17,7 +17,7 @@
 <div class="unit-details-wrapper">
   <%# Unit Photo at the top %>
   <% if unit %>
-    <%= render 'shared/unit_photo', unit: unit %>
+    <%= render 'shared/attached_image', attachment: unit.photo %>
   <% end %>
   
   <% if show_inspection_fields && inspection %>

@@ -15,6 +15,13 @@ class PhotoProcessingService
       # Resize to maximum 1200px on longest side
       image.resize "#{ImageProcessorService::FULL_SIZE}x#{ImageProcessorService::FULL_SIZE}>"
 
+      # Replace transparency with white background before converting to JPEG
+      image.combine_options do |c|
+        c.background "white"
+        c.alpha "remove"
+        c.alpha "off"
+      end
+
       # Convert to JPEG with 75% quality
       image.format "jpeg"
       image.quality "75"

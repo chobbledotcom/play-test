@@ -18,26 +18,38 @@ RSpec.feature "Inspection Deletion Security", type: :feature do
   scenario "allows deletion of draft inspections via direct DELETE request" do
     inspection = create(:inspection, user: user)
 
+    # Capture inspection details before deletion
+    inspection_id = inspection.id
+    report_number = inspection.unique_report_number
+    inspection_date = inspection.inspection_date
+
     expect {
       page.driver.submit :delete, "/inspections/#{inspection.id}", {}
     }.to change(Inspection, :count).by(-1)
 
     expect(current_path).to eq(inspections_path)
     expect_deleted_message
+
+    # Verify event was logged with metadata
+    event = Event.where(resource_type: "Inspection", resource_id: inspection_id, action: "deleted").first
+    expect(event).to be_present
+    expect(event.user).to eq(user)
+    expect(event.metadata["unique_report_number"]).to eq(report_number)
+    expect(event.metadata["inspection_date"]).to eq(inspection_date.iso8601(3))
   end
 
   scenario "prevents non-owners from accessing edit page" do
     other_inspection = create(:inspection, user: create(:user))
     visit edit_inspection_path(other_inspection)
 
-    expect_access_denied
+    expect(page.status_code).to eq(404)
   end
 
   scenario "prevents non-owners from deleting via direct DELETE request" do
     other_inspection = create(:inspection, user: create(:user))
     page.driver.submit :delete, "/inspections/#{other_inspection.id}", {}
 
-    expect_access_denied
+    expect(page.status_code).to eq(404)
     expect(Inspection.exists?(other_inspection.id)).to be true
   end
 

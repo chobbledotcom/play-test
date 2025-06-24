@@ -102,7 +102,7 @@ RSpec.describe "Inspections", type: :request do
           delete "/inspections/#{other_inspection.id}"
         end
 
-        expect_redirect_with_alert(inspections_path, /Access denied/)
+        expect(response).to have_http_status(:not_found)
       end
     end
 

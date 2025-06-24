@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe SafetyStandard, "Constants" do
   describe "ANCHOR_CALCULATION_CONSTANTS" do
     it "defines expected anchor calculation values" do
-      constants = SafetyStandard::ANCHOR_CALCULATION_CONSTANTS
+      constants = SafetyStandards::AnchorCalculator::ANCHOR_CALCULATION_CONSTANTS
 
       expect(constants[:area_coefficient]).to eq(114.0)
       expect(constants[:base_divisor]).to eq(1600.0)
@@ -15,7 +15,7 @@ RSpec.describe SafetyStandard, "Constants" do
       area = 25.0
       expected = ((area * 114.0 * 1.5) / 1600.0).ceil
 
-      result = SafetyStandard.calculate_required_anchors(area)
+      result = SafetyStandards::AnchorCalculator.calculate_required_anchors(area)
       expect(result).to eq(expected)
       expect(result).to eq(3) # Known result for 25m²
     end
@@ -23,7 +23,7 @@ RSpec.describe SafetyStandard, "Constants" do
 
   describe "RUNOUT_CALCULATION_CONSTANTS" do
     it "defines expected runout calculation values" do
-      constants = SafetyStandard::RUNOUT_CALCULATION_CONSTANTS
+      constants = SafetyStandards::SlideCalculator::RUNOUT_CALCULATION_CONSTANTS
 
       expect(constants[:platform_height_ratio]).to eq(0.5)
       expect(constants[:minimum_runout_meters]).to eq(0.3)
@@ -33,7 +33,7 @@ RSpec.describe SafetyStandard, "Constants" do
       platform_height = 2.5
       expected = [platform_height * 0.5, 0.3].max
 
-      result = SafetyStandard.calculate_required_runout(platform_height)
+      result = SafetyStandards::SlideCalculator.calculate_required_runout(platform_height)
       expect(result).to eq(expected)
       expect(result).to eq(1.25)
     end
@@ -41,7 +41,7 @@ RSpec.describe SafetyStandard, "Constants" do
 
   describe "WALL_HEIGHT_CONSTANTS" do
     it "defines expected wall height multiplier" do
-      constants = SafetyStandard::WALL_HEIGHT_CONSTANTS
+      constants = SafetyStandards::SlideCalculator::WALL_HEIGHT_CONSTANTS
 
       expect(constants[:enhanced_height_multiplier]).to eq(1.25)
     end
@@ -50,19 +50,19 @@ RSpec.describe SafetyStandard, "Constants" do
       user_height = 4.0 # In the enhanced walls range
       containing_wall_height = 5.0 # 4.0 * 1.25 = 5.0
 
-      result = SafetyStandard.meets_height_requirements?(user_height, containing_wall_height)
+      result = SafetyStandards::SlideCalculator.meets_height_requirements?(user_height, containing_wall_height)
       expect(result).to be true
 
       # Test that it fails with insufficient wall height
       insufficient_wall = 4.9 # Just under 4.0 * 1.25
-      result = SafetyStandard.meets_height_requirements?(user_height, insufficient_wall)
+      result = SafetyStandards::SlideCalculator.meets_height_requirements?(user_height, insufficient_wall)
       expect(result).to be false
     end
   end
 
   describe "source code transparency" do
     it "includes constants in method source display" do
-      source = SafetyStandard.get_method_source(:calculate_required_anchors)
+      source = SafetyStandard.get_method_source(:calculate_required_anchors, SafetyStandards::AnchorCalculator)
 
       # Verify constants are shown
       expect(source).to include("ANCHOR_CALCULATION_CONSTANTS")
@@ -76,7 +76,7 @@ RSpec.describe SafetyStandard, "Constants" do
     end
 
     it "shows multiple constants for methods that use them" do
-      source = SafetyStandard.get_method_source(:meets_height_requirements?)
+      source = SafetyStandard.get_method_source(:meets_height_requirements?, SafetyStandards::SlideCalculator)
 
       # Should include both constant definitions
       expect(source).to include("SLIDE_HEIGHT_THRESHOLDS")
@@ -120,21 +120,21 @@ RSpec.describe SafetyStandard, "Constants" do
 
     it "validates new constants exist and are used" do
       # Check new constants are defined
-      expect(SafetyStandard::MATERIAL_STANDARDS).to be_present
-      expect(SafetyStandard::EQUIPMENT_SAFETY_LIMITS).to be_present
+      expect(SafetyStandards::MaterialValidator::MATERIAL_STANDARDS).to be_present
+      expect(SafetyStandards::EquipmentValidator::EQUIPMENT_SAFETY_LIMITS).to be_present
       expect(SafetyStandard::GROUNDING_TEST_WEIGHTS).to be_present
       expect(SafetyStandard::REINSPECTION_INTERVAL_DAYS).to eq(365)
 
       # Check validation methods use constants
-      expect(SafetyStandard.valid_stitch_length?(5)).to be true
-      expect(SafetyStandard.valid_stitch_length?(2)).to be false # Below min
-      expect(SafetyStandard.valid_stitch_length?(9)).to be false # Above max
+      expect(SafetyStandards::MaterialValidator.valid_stitch_length?(5)).to be true
+      expect(SafetyStandards::MaterialValidator.valid_stitch_length?(2)).to be false # Below min
+      expect(SafetyStandards::MaterialValidator.valid_stitch_length?(9)).to be false # Above max
 
-      expect(SafetyStandard.valid_pressure?(1.5)).to be true
-      expect(SafetyStandard.valid_pressure?(0.5)).to be false # Below min
+      expect(SafetyStandards::EquipmentValidator.valid_pressure?(1.5)).to be true
+      expect(SafetyStandards::EquipmentValidator.valid_pressure?(0.5)).to be false # Below min
 
-      expect(SafetyStandard.requires_multiple_exits?(20)).to be true
-      expect(SafetyStandard.requires_multiple_exits?(10)).to be false # Below threshold
+      expect(SafetyStandards::EquipmentValidator.requires_multiple_exits?(20)).to be true
+      expect(SafetyStandards::EquipmentValidator.requires_multiple_exits?(10)).to be false # Below threshold
     end
 
     it "generates consistent formula descriptions from constants" do

@@ -51,7 +51,23 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
       it "shows inspection result" do
         visit inspections_path
-        expect(page).to have_content("PASS")
+        expect(page).to have_content(I18n.t("inspections.status.pass"))
+      end
+
+      it "shows pending status for inspections without result" do
+        # Create an inspection with null passed value
+        create(:inspection,
+          user: user,
+          unit: unit,
+          inspector_company: inspector_company,
+          inspection_location: "Pending Location",
+          passed: nil)
+
+        visit inspections_path
+
+        within("li", text: "Pending Location") do
+          expect(page).to have_content(I18n.t("inspections.status.pending"))
+        end
       end
 
       it "shows inspection date in readable format" do

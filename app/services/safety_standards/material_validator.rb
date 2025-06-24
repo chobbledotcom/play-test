@@ -1,0 +1,52 @@
+module SafetyStandards
+  module MaterialValidator
+    extend self
+
+    # Material safety standards (EN 14960:2019 & EN 71-3)
+    MATERIAL_STANDARDS = {
+      fabric: {
+        min_tensile_strength: 1850,    # Newtons minimum
+        min_tear_strength: 350,        # Newtons minimum
+        fire_standard: "EN 71-3"       # Fire retardancy standard
+      },
+      thread: {
+        min_tensile_strength: 88,      # Newtons minimum
+        stitch_length_min: 3,          # mm minimum
+        stitch_length_max: 8           # mm maximum
+      },
+      rope: {
+        min_diameter: 18,              # mm minimum
+        max_diameter: 45,              # mm maximum
+        max_swing_percentage: 20       # % maximum swing
+      },
+      netting: {
+        max_vertical_mesh: 30,         # mm maximum for >1m height
+        max_roof_mesh: 8               # mm maximum
+      }
+    }.freeze
+
+    def valid_stitch_length?(length_mm)
+      # EN 14960:2019 - Stitch length must be within specified range to ensure
+      # adequate seam strength while maintaining fabric integrity
+      min_length = MATERIAL_STANDARDS[:thread][:stitch_length_min]
+      max_length = MATERIAL_STANDARDS[:thread][:stitch_length_max]
+      length_mm.present? && length_mm.between?(min_length, max_length)
+    end
+
+    def valid_rope_diameter?(diameter_mm)
+      # EN 14960:2019 - Rope diameter range prevents finger entrapment while
+      # ensuring adequate grip and structural strength
+      min_diameter = MATERIAL_STANDARDS[:rope][:min_diameter]
+      max_diameter = MATERIAL_STANDARDS[:rope][:max_diameter]
+      diameter_mm.present? && diameter_mm.between?(min_diameter, max_diameter)
+    end
+
+    def fabric_tensile_requirement(fabric_standards = MATERIAL_STANDARDS[:fabric])
+      "#{fabric_standards[:min_tensile_strength]} Newtons minimum"
+    end
+
+    def fabric_tear_requirement(fabric_standards = MATERIAL_STANDARDS[:fabric])
+      "#{fabric_standards[:min_tear_strength]} Newtons minimum"
+    end
+  end
+end

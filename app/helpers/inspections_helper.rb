@@ -5,33 +5,41 @@ module InspectionsHelper
   end
 
   def inspection_result_badge(inspection)
-    if inspection.passed
-      content_tag(:span, "PASS", class: "pass-badge")
-    else
-      content_tag(:span, "FAIL", class: "fail-badge")
+    case inspection.passed
+    when true
+      content_tag(:span, t("inspections.status.pass"), class: "pass-badge")
+    when false
+      content_tag(:span, t("inspections.status.fail"), class: "fail-badge")
+    when nil
+      content_tag(:span, t("inspections.status.pending"), class: "pending-badge")
     end
   end
 
   def inspection_actions(inspection)
     actions = []
 
-    # Regular users cannot edit or delete complete inspections
     if inspection.complete?
-      # Only admins can delete complete inspections
-      if current_user&.admin?
-        actions << {
-          label: t("inspections.buttons.delete"),
-          url: inspection_path(inspection),
-          method: :delete,
-          confirm: t("inspections.messages.delete_confirm"),
-          danger: true
-        }
-      end
+      # Complete inspections: Switch to In Progress / Log
+      actions << {
+        label: t("inspections.buttons.switch_to_in_progress"),
+        url: mark_draft_inspection_path(inspection),
+        method: :patch,
+        confirm: t("inspections.messages.mark_in_progress_confirm"),
+        button: true
+      }
+      actions << {
+        label: t("inspections.buttons.log"),
+        url: log_inspection_path(inspection)
+      }
     else
-      # Non-complete inspections can be edited and deleted
+      # Incomplete inspections: Update Inspection / Log / Delete Inspection
       actions << {
         label: t("inspections.buttons.update"),
         url: edit_inspection_path(inspection)
+      }
+      actions << {
+        label: t("inspections.buttons.log"),
+        url: log_inspection_path(inspection)
       }
       actions << {
         label: t("inspections.buttons.delete"),

@@ -13,7 +13,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
     sign_in(user1)
     visit edit_inspection_path(inspection2)
 
-    expect_access_denied
+    expect(page.status_code).to eq(404)
   end
 
   scenario "prevents submitting assessment data via direct POST" do
@@ -30,7 +30,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
       }
     }
 
-    expect_access_denied
+    expect(page.status_code).to eq(404)
 
     inspection2.reload
     expect(inspection2.anchorage_assessment.num_low_anchors).not_to eq(10)
@@ -50,7 +50,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
       }
     }
 
-    expect_access_denied
+    expect(page.status_code).to eq(404)
 
     inspection2.reload
     assessment = inspection2.user_height_assessment

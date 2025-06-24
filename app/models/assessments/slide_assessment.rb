@@ -17,12 +17,12 @@ class Assessments::SlideAssessment < ApplicationRecord
 
   def meets_runout_requirements?
     return false unless runout.present? && slide_platform_height.present?
-    SafetyStandard.meets_runout_requirements?(runout, slide_platform_height)
+    SafetyStandards::SlideCalculator.meets_runout_requirements?(runout, slide_platform_height)
   end
 
   def required_runout_length
     return nil if slide_platform_height.blank?
-    SafetyStandard.calculate_required_runout(slide_platform_height)
+    SafetyStandards::SlideCalculator.calculate_required_runout(slide_platform_height)
   end
 
   def runout_compliance_status

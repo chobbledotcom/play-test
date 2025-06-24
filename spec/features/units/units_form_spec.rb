@@ -27,6 +27,13 @@ RSpec.describe "Units Form", type: :feature do
       expect(page).to have_content("JumpCo")
 
       expect(current_path).to match(%r{^/units/[A-Z0-9]{8}$})
+
+      # Check audit log shows creation
+      click_link I18n.t("units.links.view_log")
+      expect(page).to have_content(I18n.t("events.actions.created"))
+
+      # Creation events shouldn't have changes
+      expect(page).not_to have_content(I18n.t("events.messages.view_changes"))
     end
 
     it "shows validation errors for missing required fields" do
@@ -68,7 +75,7 @@ RSpec.describe "Units Form", type: :feature do
       expect(page).to have_button(I18n.t("forms.units.submit"))
     end
 
-    it "successfully updates unit with new data" do
+    it "successfully updates unit with new data and creates audit log" do
       fill_in_form :units, :name, "Updated Name"
       fill_in_form :units, :description, "Updated description"
 
@@ -76,6 +83,27 @@ RSpec.describe "Units Form", type: :feature do
 
       expect(page).to have_current_path(unit_path(unit))
       expect(page).to have_content("Updated Name")
+
+      # Check audit log was created
+      click_link I18n.t("units.links.view_log")
+
+      # Check audit log shows the update
+      expect(page).to have_content(I18n.t("events.actions.updated"))
+
+      # First check if there's a changes column with content
+      changes_cell = find("tbody tr td:last-child")
+
+      # If changes were recorded, there should be a details element
+      if changes_cell.text.strip != "-"
+        within(changes_cell) do
+          find("summary").click
+          expect(page).to have_content("Original Name → Updated Name")
+          expect(page).to have_content("Test Bouncy Castle → Updated description")
+        end
+      else
+        # If no changes recorded, fail the test with helpful message
+        fail "No changes were recorded in the audit log"
+      end
     end
   end
 end

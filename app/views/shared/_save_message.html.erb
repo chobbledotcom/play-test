@@ -3,15 +3,14 @@
   # Handle the message and type parameters
   message_text = local_assigns[:message]
   message_type = local_assigns[:type] || (local_assigns[:errors].present? ? "error" : "success")
-  element_id = local_assigns[:element_id] || "save_message"
 %>
 
 <% if message_type == "error" %>
-  <div class="error" id="<%= element_id %>">
+  <div class="error" id="form_save_message">
     <%= message_text || t('shared.messages.save_failed') %>
   </div>
 <% else %>
-  <div class="success" id="<%= element_id %>">
+  <div class="success" id="form_save_message">
     <%= message_text || t('shared.messages.saved_successfully') %>
   </div>
 <% end %>
