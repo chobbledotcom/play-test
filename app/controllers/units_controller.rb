@@ -222,10 +222,7 @@ class UnitsController < ApplicationController
   end
 
   def check_unit_owner
-    unless current_user && @unit.user_id == current_user.id
-      flash[:alert] = I18n.t("units.messages.access_denied")
-      redirect_to units_path and return
-    end
+    head :not_found unless current_user && @unit.user_id == current_user.id
   end
 
   def check_log_access

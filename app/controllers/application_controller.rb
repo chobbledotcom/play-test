@@ -150,11 +150,14 @@ class ApplicationController < ActionController::Base
   end
 
   def processing_image_upload?
-    # Check if we're in a controller action that processes image uploads
-    return true if controller_name == "users" && action_name == "update_settings" && params.dig(:user, :logo).present?
-    return true if controller_name == "units" && (action_name == "create" || action_name == "update") && params.dig(:unit, :photo).present?
-    return true if controller_name == "inspector_companies" && (action_name == "create" || action_name == "update") && params.dig(:inspector_company, :logo).present?
-    false
+    case controller_name
+    when "users"
+      action_name == "update_settings" && params.dig(:user, :logo).present?
+    when "units"
+      %w[create update].include?(action_name) && params.dig(:unit, :photo).present?
+    else
+      false
+    end
   end
 
   def log_n_plus_one_queries(table, count)

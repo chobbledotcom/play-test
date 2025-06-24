@@ -68,21 +68,7 @@ module AssessmentController
   end
 
   def check_inspection_owner
-    return if @inspection.user == current_user
-
-    respond_to do |format|
-      format.html do
-        flash[:alert] = I18n.t("inspections.errors.access_denied")
-        redirect_to inspections_path
-      end
-      format.json do
-        error_msg = I18n.t("inspections.errors.access_denied")
-        render json: {error: error_msg}, status: :forbidden
-      end
-      format.turbo_stream do
-        render_error_message(I18n.t("inspections.errors.access_denied"))
-      end
-    end
+    head :not_found unless @inspection.user == current_user
   end
 
   def set_assessment

@@ -290,12 +290,6 @@ class Inspection < ApplicationRecord
     label || I18n.t(key)
   end
 
-  def inspection_model_incomplete_fields
-    REQUIRED_TO_COMPLETE_FIELDS
-      .select { |f| !f.end_with?("_comment") }
-      .select { |f| send(f).nil? }
-  end
-
   def inspection_tab_incomplete_fields
     # Fields required for the inspection tab specifically (excludes passed which is on results tab)
     fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
@@ -342,18 +336,16 @@ class Inspection < ApplicationRecord
         assessment_key = :"#{tab}_assessment"
         assessment = send(assessment_key) if respond_to?(assessment_key)
 
-        if assessment&.respond_to?(:incomplete_fields)
-          assessment_fields =
-            assessment.incomplete_fields
-              .map { |f| {field: f, label: field_label(tab.to_sym, f)} }
+        assessment_fields =
+          assessment.incomplete_fields
+            .map { |f| {field: f, label: field_label(tab.to_sym, f)} }
 
-          if assessment_fields.any?
-            output << {
-              tab: tab.to_sym,
-              name: I18n.t("forms.#{tab}.header"),
-              fields: assessment_fields
-            }
-          end
+       if assessment_fields.any?
+          output << {
+            tab: tab.to_sym,
+            name: I18n.t("forms.#{tab}.header"),
+            fields: assessment_fields
+          }
         end
       end
     end

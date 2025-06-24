@@ -209,8 +209,7 @@ RSpec.describe "Units", type: :request do
         other_unit = create(:unit)
 
         visit edit_unit_path(other_unit)
-        expect(page).to have_current_path(units_path)
-        expect(page).to have_content("Access denied")
+        expect(page.status_code).to eq(404)
       end
     end
 
@@ -243,9 +242,9 @@ RSpec.describe "Units", type: :request do
       it "denies access to other user's unit" do
         other_unit = create(:unit)
 
+        # First try to visit edit page - should get 404
         visit edit_unit_path(other_unit)
-        expect(page).to have_current_path(units_path)
-        expect(page).to have_content("Access denied")
+        expect(page.status_code).to eq(404)
       end
     end
 
@@ -274,8 +273,7 @@ RSpec.describe "Units", type: :request do
         # Try to delete another user's unit
         page.driver.submit :delete, unit_path(other_unit), {}
 
-        expect(page).to have_current_path(units_path)
-        expect(page).to have_content("Access denied")
+        expect(page.status_code).to eq(404)
 
         # Verify the unit wasn't deleted
         expect { other_unit.reload }.not_to raise_error
