@@ -20,9 +20,8 @@ RSpec.describe "User Settings Turbo Updates", type: :request do
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
 
-        # Check that both turbo streams are present
+        # Check that save message turbo stream is present
         expect(response.body).to include('turbo-stream action="replace" target="form_save_message"')
-        expect(response.body).to include('turbo-stream action="replace" target="user_logo_preview"')
 
         # Check success message
         expect(response.body).to include(I18n.t("users.messages.settings_updated"))
@@ -44,8 +43,8 @@ RSpec.describe "User Settings Turbo Updates", type: :request do
         user.reload
         expect(user.logo).to be_attached
 
-        # Response should update logo preview
-        expect(response.body).to include('turbo-stream action="replace" target="user_logo_preview"')
+        # Response should show success message
+        expect(response.body).to include('turbo-stream action="replace" target="form_save_message"')
       end
 
       it "returns error turbo streams on validation failure" do
@@ -61,9 +60,8 @@ RSpec.describe "User Settings Turbo Updates", type: :request do
         expect(response).to have_http_status(:ok)  # It succeeds but the file is removed
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
 
-        # Should still return both turbo streams
+        # Should return save message turbo stream
         expect(response.body).to include('turbo-stream action="replace" target="form_save_message"')
-        expect(response.body).to include('turbo-stream action="replace" target="user_logo_preview"')
 
         # File should not be attached (removed by processing)
         user.reload

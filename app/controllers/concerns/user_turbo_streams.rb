@@ -4,24 +4,24 @@ module UserTurboStreams
   private
 
   def render_user_update_success_stream
-    render turbo_stream: [
-      build_save_message_stream(success: true, message: t("users.messages.settings_updated")),
-      turbo_stream.replace("user_logo_preview",
-        partial: "shared/attached_image",
-        locals: {attachment: @user.logo, size: :thumbnail})
-    ]
+    render turbo_stream: build_user_turbo_streams(
+      success: true,
+      message: t("users.messages.settings_updated")
+    )
   end
 
   def render_user_update_error_stream
-    render turbo_stream: [
-      build_save_message_stream(
-        success: false,
-        errors: @user.errors.full_messages,
-        message: t("shared.messages.save_failed")
-      ),
-      turbo_stream.replace("user_logo_preview",
-        partial: "shared/attached_image",
-        locals: {attachment: @user.logo, size: :thumbnail})
+    render turbo_stream: build_user_turbo_streams(
+      success: false,
+      message: t("shared.messages.save_failed"),
+      errors: @user.errors.full_messages
+    )
+  end
+
+  def build_user_turbo_streams(success:, message:, errors: nil)
+    [
+      build_save_message_stream(success: success, message: message, errors: errors)
+      # Don't replace the file field - it stays as is after save
     ]
   end
 

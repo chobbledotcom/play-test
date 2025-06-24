@@ -71,15 +71,20 @@ RSpec.feature "Unit edit dirty form", js: true do
     # Unsaved changes indicator should be hidden
     expect(page).not_to have_css("#dirty-form-indicator", visible: true)
 
-    # Now make another change to verify the form tracking was reset
+    # Verify the form state was properly reset by navigating away without warning
+    visit units_path
+    expect(page).to have_current_path(units_path)
+
+    # Go back and make another change to verify form tracking still works
+    visit edit_unit_path(unit)
     fill_in_form :units, :name, "Name After Save"
 
     # Should show unsaved changes again
     expect(page).to have_css("#dirty-form-indicator", visible: true)
 
-    # Navigate away - should get warning for the new unsaved changes
+    # Now navigating away should show warning
     dismiss_confirm do
-      visit units_path
+      click_link I18n.t("units.buttons.view")
     end
 
     # Should still be on edit page

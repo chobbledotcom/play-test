@@ -4,21 +4,24 @@ module UnitTurboStreams
   private
 
   def render_unit_update_success_stream
-    render turbo_stream: [
-      build_save_message_stream(success: true, message: t("units.messages.updated")),
-      turbo_stream.replace("unit_photo_preview",
-        partial: "shared/attached_image",
-        locals: {attachment: @unit.photo, size: :thumbnail})
-    ]
+    render turbo_stream: build_unit_turbo_streams(
+      success: true,
+      message: t("units.messages.updated")
+    )
   end
 
   def render_unit_update_error_stream
-    render turbo_stream: [
-      build_save_message_stream(
-        success: false,
-        errors: @unit.errors.full_messages,
-        message: t("shared.messages.save_failed")
-      )
+    render turbo_stream: build_unit_turbo_streams(
+      success: false,
+      message: t("shared.messages.save_failed"),
+      errors: @unit.errors.full_messages
+    )
+  end
+
+  def build_unit_turbo_streams(success:, message:, errors: nil)
+    [
+      build_save_message_stream(success: success, message: message, errors: errors)
+      # Don't replace the file field - it stays as is after save
     ]
   end
 
