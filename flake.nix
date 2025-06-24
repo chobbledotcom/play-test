@@ -37,9 +37,6 @@
             # Add bin directory to PATH for easy access to scripts
             export PATH=$PWD/bin:$PATH
 
-            echo "Installing dependencies from Gemfile..."
-            gem install bundler
-            bundle install
             echo "Ruby $(ruby --version) with Rails $(rails --version)"
             echo ""
             echo "Scripts available:"
