@@ -2,7 +2,7 @@
   setup = form_field_setup(field, local_assigns)
 
   field_options = {
-    required: field_options&.dig(:required),
+    required: local_assigns[:required] || false,
     list: "#{field}_autocomplete_#{setup[:form_object].object.object_id}",
     value: setup[:value]
   }
