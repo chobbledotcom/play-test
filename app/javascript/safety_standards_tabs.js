@@ -1,5 +1,5 @@
 function initializeTabs() {
-  const tabLinks = document.querySelectorAll('.tab-navigation a');
+  const tabLinks = document.querySelectorAll('#safety-standard-tabs a');
   const tabPanels = document.querySelectorAll('.tab-panel');
   
   // Exit if not on safety standards page
@@ -68,7 +68,7 @@ function initializeTabs() {
         setTimeout(() => {
           const target = document.querySelector(this.getAttribute('href'));
           if (target) {
-            const navHeight = document.querySelector('.tab-navigation').offsetHeight;
+            const navHeight = document.querySelector('#safety-standard-tabs').offsetHeight;
             const targetPosition = target.offsetTop - navHeight - 20;
             
             window.scrollTo({

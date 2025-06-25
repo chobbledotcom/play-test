@@ -1,29 +1,26 @@
 class UsersController < ApplicationController
   include UserTurboStreams
 
-  skip_before_action :require_login, only: [:new, :create]
-  skip_before_action :update_last_active_at, only: [:update_settings]
-  before_action :require_admin, only: %i[add_seeds delete_seeds destroy edit impersonate index update verify_rpii]
-  before_action :set_user, only: %i[
-    add_seeds
-    change_password
+  NON_ADMIN_PATHS = %i[
     change_settings
-    delete_seeds
-    destroy
-    edit
-    impersonate
-    update
-    update_password
+    change_password
     update_settings
-    verify_rpii
+    update_password
   ]
-  before_action :require_correct_user, only: %i[
-    change_password change_settings update_password update_settings
+
+  LOGGED_OUT_PATHS = %i[
+    create
+    new
   ]
+
+  skip_before_action :require_login, only: LOGGED_OUT_PATHS
+  skip_before_action :update_last_active_at, only: [:update_settings]
+  before_action :set_user, except: %i[ index new create ]
+  before_action :require_admin, except: NON_ADMIN_PATHS + LOGGED_OUT_PATHS
+  before_action :require_correct_user, only: NON_ADMIN_PATHS
 
   def index
     @users = User.all
-    # Get inspection counts for all users in one query
     @inspection_counts = Inspection
       .where(user_id: @users.pluck(:id))
       .group(:user_id)
@@ -211,14 +208,11 @@ class UsersController < ApplicationController
       ]
       params.require(:user).permit(admin_permitted_params)
     elsif action_name == "create"
-      # Allow name and RPII number during user registration
       params.require(:user).permit(:email, :name, :rpii_inspector_number, :password, :password_confirmation)
     else
       params.require(:user).permit(:email, :password, :password_confirmation)
     end
   end
-
-  # Using require_admin from ApplicationController
 
   def require_correct_user
     unless current_user == @user

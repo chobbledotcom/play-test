@@ -169,7 +169,7 @@ module FormHelpers
 
   def expect_assessment_tab_active(tab_name)
     tab_text = I18n.t("forms.#{tab_name}.header")
-    expect(page).to have_css("nav.tabs span", text: tab_text)
+    expect(page).to have_css("nav#tabs span", text: tab_text)
   end
 end
 

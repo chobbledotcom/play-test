@@ -16,11 +16,11 @@ RSpec.feature "Inspection UI and Accessibility", type: :feature do
       expect(page).to have_content(I18n.t("forms.#{tab}.header"))
     end
 
-    within("nav.tabs") { expect(page).to have_css("span", text: I18n.t("forms.inspection.header")) }
+    within("nav#tabs") { expect(page).to have_css("span", text: I18n.t("forms.inspection.header")) }
 
     click_link I18n.t("forms.user_height.header")
     expect(current_url).to include("tab=user_height")
-    within("nav.tabs") { expect(page).to have_css("span", text: I18n.t("forms.user_height.header")) }
+    within("nav#tabs") { expect(page).to have_css("span", text: I18n.t("forms.user_height.header")) }
   end
 
   scenario "conditionally shows tabs based on unit configuration" do

@@ -4,7 +4,7 @@ RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
   before { visit safety_standards_path }
 
   scenario "displays tab navigation" do
-    within(".tab-navigation") do
+    within("#safety-standard-tabs") do
       expect(page).to have_link("Anchorage", href: "#anchorage")
       expect(page).to have_link("Wall Heights", href: "#wall-heights")
       expect(page).to have_link("Slides", href: "#slides")
@@ -16,7 +16,7 @@ RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
 
   scenario "shows anchorage tab by default" do
     within("#anchorage") do
-      expect(page).to have_content("Anchor Requirements")
+      expect(page).to have_content("Calculate Required Anchors")
     end
 
     # Other tabs should not be visible
@@ -33,7 +33,7 @@ RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
     expect(page).to have_css("#wall-heights", visible: true, wait: 2)
 
     within("#wall-heights") do
-      expect(page).to have_content("Wall Height Requirements")
+      expect(page).to have_content("Calculate Wall Height Requirements")
       expect(page).to have_content("Requirements by User Height")
     end
   end
@@ -44,8 +44,8 @@ RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
     expect(current_url).to include("#slides")
 
     within("#slides") do
-      expect(page).to have_content("Slide Safety Requirements")
-      expect(page).to have_content("Runout Requirements")
+      expect(page).to have_content("Calculate Required Runout Length")
+      expect(page).to have_content("Minimum length: 50% of highest platform height")
       expect(page).to have_content("Containing Wall Heights for Slides")
     end
   end

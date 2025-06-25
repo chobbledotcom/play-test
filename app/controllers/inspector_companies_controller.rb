@@ -97,11 +97,4 @@ class InspectorCompaniesController < ApplicationController
       :active, :notes, :logo
     )
   end
-
-  def require_admin
-    unless current_user&.admin?
-      flash[:alert] = t("forms.session_new.status.admin_required")
-      redirect_to root_path
-    end
-  end
 end

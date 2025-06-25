@@ -186,7 +186,7 @@ All forms must follow these exact patterns:
 
 - **Before editing ANY file** - identify what tests/test files are associated with it
 - **Write Capybara tests for ALL new code** - no exceptions
-- **No JavaScript in tests** - test the non-JS fallback behavior
+- **JavaScript tests are supported** - use `js: true` for tests requiring JavaScript behavior
 - **Run tests immediately after editing** - run associated tests as soon as you edit a file
 - **Never build up a backlog** - fix broken tests immediately, don't accumulate issues
 - **NEVER delete tests unless 100% unnecessary** - fix rather than delete tests

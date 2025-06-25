@@ -262,7 +262,7 @@ class InspectionWorkflow
     visit edit_inspection_path(@inspection)
 
     # Main inspection tab always has check mark (it's completed in fill_general_inspection_details)
-    within("nav.tabs") do
+    within("nav#tabs") do
       # Check if inspection tab is current (span) or link
       if page.has_css?("span", text: t("forms.inspection.header"))
         expect(page).to have_css("span", text: "#{t("forms.inspection.header")} ✓")
