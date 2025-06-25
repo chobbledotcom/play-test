@@ -91,9 +91,11 @@ en:
         user_height_placeholder: "e.g. 1.5"
         submit: "Calculate Wall Height"
         result_title: "Result:"
+        platform_height_result: "Platform Height:"
         user_height_result: "Tallest User Height:"
         requirement_result: "Requirement:"
         additional_result: "Additional:"
+        roof_required: "Permanent roof required"
 
     errors:
       invalid_area: "Please enter a valid area greater than 0"

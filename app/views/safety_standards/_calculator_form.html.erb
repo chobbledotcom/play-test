@@ -32,13 +32,17 @@
       
     <% when :wall_height %>
       <%= render 'form/fieldset', legend_key: 'input' do %>
-        <%= render 'form/number', field: :user_height, min: 1.0, required: true %>
+        <%= render 'form/number', field: :platform_height, min: 0.0, required: true %>
+        <%= render 'form/number', field: :user_height, min: 0.0, required: true %>
       <% end %>
       
     <% when :user_capacity %>
       <%= render 'form/fieldset', legend_key: 'dimensions' do %>
         <%= render 'form/number', field: :length, min: 1.0, required: true %>
         <%= render 'form/number', field: :width, min: 1.0, required: true %>
+      <% end %>
+      
+      <%= render 'form/fieldset', legend_key: 'user_height' do %>
         <%= render 'form/number', field: :max_user_height, min: 0.0, required: false %>
       <% end %>
     <% end %>

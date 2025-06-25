@@ -58,6 +58,7 @@ RSpec.feature "Safety Standards with Turbo", js: true do
       click_link "Wall Heights"
 
       within(".calculator-form", text: I18n.t("forms.safety_standards_wall_height.header")) do
+        fill_in I18n.t("forms.safety_standards_wall_height.fields.platform_height"), with: 2.0
         fill_in I18n.t("forms.safety_standards_wall_height.fields.user_height"), with: 1.5
         click_button I18n.t("forms.safety_standards_wall_height.submit")
       end

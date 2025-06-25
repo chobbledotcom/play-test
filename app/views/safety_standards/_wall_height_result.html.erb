@@ -1,10 +1,11 @@
 <% if @wall_height_result %>
   <div class="calculation-result">
     <h2><%= t('safety_standards.calculators.wall_height.result_title') %></h2>
+    <p><strong><%= t('safety_standards.calculators.wall_height.platform_height_result') %></strong> <%= @wall_height_result[:platform_height] %>m</p>
     <p><strong><%= t('safety_standards.calculators.wall_height.user_height_result') %></strong> <%= @wall_height_result[:user_height] %>m</p>
     <p><strong><%= t('safety_standards.calculators.wall_height.requirement_result') %></strong> <%= @wall_height_result[:requirement] %></p>
     <% if @wall_height_result[:requires_roof] %>
-      <p><strong><%= t('safety_standards.calculators.wall_height.additional_result') %></strong> Permanent roof required</p>
+      <p><strong><%= t('safety_standards.calculators.wall_height.additional_result') %></strong> <%= t('safety_standards.calculators.wall_height.roof_required') %></p>
     <% end %>
   </div>
 <% elsif @wall_height_error %>

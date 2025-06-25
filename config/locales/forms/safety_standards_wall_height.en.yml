@@ -5,5 +5,6 @@ en:
       sections:
         input: "Input Parameters"
       fields:
+        platform_height: "Platform Height (m)"
         user_height: "User Height (m)"
       submit: "Calculate Wall Height"

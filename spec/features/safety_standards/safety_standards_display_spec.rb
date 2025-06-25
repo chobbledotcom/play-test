@@ -43,6 +43,7 @@ RSpec.feature "Safety Standards Display", type: :feature do
 
   scenario "safety standards info appears in user height assessment form" do
     inspection.user_height_assessment.update!(
+      platform_height: 2.0,
       tallest_user_height: 1.2,
       containing_wall_height: 1.3,
       play_area_length: 5,

@@ -66,10 +66,11 @@ class SafetyStandardsController < ApplicationController
   end
 
   def calculate_wall_height
-    height = param_to_float(:user_height)
+    platform_height = param_to_float(:platform_height)
+    user_height = param_to_float(:user_height)
 
-    if height.positive?
-      @wall_height_result = build_wall_height_result(height)
+    if platform_height.positive? && user_height.positive?
+      @wall_height_result = build_wall_height_result(platform_height, user_height)
     else
       set_error(:wall_height, :invalid_height)
     end
@@ -123,18 +124,19 @@ class SafetyStandardsController < ApplicationController
     "50% of #{platform_height}m = #{half_height}m, minimum 0.3m = #{required_runout}m"
   end
 
-  def build_wall_height_result(user_height)
+  def build_wall_height_result(platform_height, user_height)
     {
+      platform_height: platform_height,
       user_height: user_height,
-      requirement: wall_height_requirement_text(user_height),
-      requires_roof: SafetyStandards::SlideCalculator.requires_permanent_roof?(user_height)
+      requirement: wall_height_requirement_text(platform_height, user_height),
+      requires_roof: SafetyStandards::SlideCalculator.requires_permanent_roof?(platform_height)
     }
   end
 
-  def wall_height_requirement_text(user_height)
+  def wall_height_requirement_text(platform_height, user_height)
     thresholds = SafetyStandards::SlideCalculator::SLIDE_HEIGHT_THRESHOLDS
 
-    case user_height
+    case platform_height
     when 0..thresholds[:no_walls_required]
       "No containing walls required"
     when thresholds[:no_walls_required]..thresholds[:basic_walls]

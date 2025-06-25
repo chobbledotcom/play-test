@@ -33,14 +33,14 @@ module SafetyStandards
       [platform_height * height_ratio, minimum_runout].max
     end
 
-    def meets_height_requirements?(user_height, containing_wall_height)
+    def meets_height_requirements?(platform_height, user_height, containing_wall_height)
       # EN 14960:2019 - Containing wall heights must scale with user height
-      # using WALL_HEIGHT_CONSTANTS
-      return false if user_height.nil? || containing_wall_height.nil?
+      # based on platform height thresholds
+      return false if platform_height.nil? || user_height.nil? || containing_wall_height.nil?
 
       enhanced_multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
 
-      case user_height
+      case platform_height
       when 0..SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
         true # No containing walls required
       when (SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]..
@@ -75,11 +75,11 @@ module SafetyStandards
       "#{height_ratio}% of platform height, minimum #{min_runout}mm"
     end
 
-    def requires_permanent_roof?(user_height)
-      # EN 14960:2019 - Permanent roof mandatory for user heights above
+    def requires_permanent_roof?(platform_height)
+      # EN 14960:2019 - Permanent roof mandatory for platform heights above
       # enhanced walls threshold to prevent users from being thrown clear
       threshold = SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
-      user_height.present? && user_height > threshold
+      platform_height.present? && platform_height > threshold
     end
 
     def wall_height_requirement

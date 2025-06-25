@@ -4,9 +4,10 @@ en:
       header: "Calculate User Capacity"
       sections:
         dimensions: "Playing Area Dimensions"
+        user_height: "User Height Limit"
         result: "Calculation Results"
       fields:
-        length: "Length"
-        width: "Width"
-        max_user_height: "Maximum User Height (optional)"
+        length: "Length (m)"
+        width: "Width (m)"
+        max_user_height: "Maximum User Height (m)"
       submit: "Calculate Capacity"

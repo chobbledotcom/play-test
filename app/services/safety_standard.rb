@@ -34,6 +34,7 @@ module SafetyStandard
     },
     wall_height: {
       type: "wall_height",
+      platform_height: 2.0,
       user_height: 1.5
     },
     user_capacity: {
@@ -73,6 +74,7 @@ module SafetyStandard
       passed: true,
       status: "Calculation completed successfully",
       result: {
+        platform_height: 2.0,
         user_height: 1.5,
         requirement: "Walls must be at least 1.5m (equal to user height)",
         requires_roof: false
@@ -127,13 +129,13 @@ module SafetyStandard
         },
         wall_height: {
           title: "Wall Height Requirements",
-          description: "Containing wall heights must scale with user height.",
+          description: "Containing wall heights must scale with user height based on platform height thresholds.",
           method_name: :meets_height_requirements?,
           module_name: SafetyStandards::SlideCalculator,
-          example_input: 1.2,
+          example_input: {platform_height: 2.0, user_height: 1.5},
           input_unit: "m",
           output_unit: "requirement text",
-          formula_text: "Tiered requirements based on user height thresholds",
+          formula_text: "Tiered requirements based on platform height thresholds",
           standard_reference: "EN 14960:2019"
         },
         user_capacity: {
@@ -232,9 +234,11 @@ module SafetyStandard
         output_unit = metadata[:output_unit]
         "For #{platform_desc}: #{result}#{output_unit} runout required"
       when :wall_height
-        user_height = metadata[:example_input]
+        example = metadata[:example_input]
+        platform_height = example[:platform_height]
+        user_height = example[:user_height]
         thresholds = SafetyStandards::SlideCalculator::SLIDE_HEIGHT_THRESHOLDS
-        case user_height
+        case platform_height
         when 0..thresholds[:no_walls_required]
           requirement = "No containing walls required"
         when (thresholds[:no_walls_required]..thresholds[:basic_walls])
@@ -247,8 +251,7 @@ module SafetyStandard
           requirement = "Walls must be at least #{wall_height}m #{height_desc}"
         end
         input_unit = metadata[:input_unit]
-        height_desc = "#{user_height}#{input_unit} user height"
-        "For #{height_desc}: #{requirement}"
+        "For platform height #{platform_height}#{input_unit}, user height #{user_height}#{input_unit}: #{requirement}"
       when :user_capacity
         example = metadata[:example_input]
         length = example[:length]

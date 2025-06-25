@@ -1,10 +1,11 @@
 <% if @capacity_result %>
-  <h3><%= t('forms.safety_standards_user_capacity.sections.result') %></h3>
-  
-  <% if @capacity_result[:error] %>
-    <p class="error"><%= @capacity_result[:error] %></p>
-  <% else %>
-    <table>
+  <div class="calculation-result">
+    <h3><%= t('forms.safety_standards_user_capacity.sections.result') %></h3>
+    
+    <% if @capacity_result[:error] %>
+      <p class="error"><%= @capacity_result[:error] %></p>
+    <% else %>
+      <table>
       <tbody>
         <tr>
           <th><%= t('forms.safety_standards_user_capacity.fields.length') %>:</th>
@@ -68,4 +69,5 @@
       </p>
     <% end %>
   <% end %>
+  </div>
 <% end %>

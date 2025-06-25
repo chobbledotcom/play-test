@@ -30,8 +30,14 @@ module SafetyStandardsTestHelpers
     fill_calculator_form(:runout, platform_height: height)
   end
 
-  def fill_wall_height_form(height:)
-    fill_calculator_form(:wall_height, user_height: height)
+  def fill_wall_height_form(height: nil, platform_height: nil, user_height: nil)
+    # Support both old signature (height:) and new signature (platform_height:, user_height:)
+    if height && !platform_height && !user_height
+      # Old signature - assume reasonable defaults
+      fill_calculator_form(:wall_height, platform_height: 2.0, user_height: height)
+    else
+      fill_calculator_form(:wall_height, platform_height: platform_height, user_height: user_height)
+    end
   end
 
   def submit_anchor_form = submit_calculator_form(:anchors)
