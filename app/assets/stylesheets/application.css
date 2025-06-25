@@ -55,8 +55,7 @@ form.button_to {
 	width: fit-content;
 }
 
-.actions form.button_to,
-nav form.button_to {
+.actions form.button_to {
 	margin: 0;
 	min-width: fit-content;
 }
@@ -75,10 +74,14 @@ nav form.button_to {
 }
 
 fieldset {
-	padding: 1.5rem;
-	margin: 2rem 0.5rem 0.5rem;
+	padding: 0.5rem;
+	margin: 1rem 0.5rem 0.5rem;
 	box-shadow: none;
 	border: 2px dashed #70127044;
+}
+
+fieldset > input[type="submit"] {
+	margin: 0;
 }
 
 @media (min-width: 789px) {
@@ -122,57 +125,12 @@ h4 {
 	font-size: 1.2rem;
 }
 
-nav a strong,
-nav button {
-	padding: 0.5rem 1rem;
-}
 
 .table-container {
 	max-width: 100%;
 	overflow-x: auto;
 }
 
-/* Tab Navigation */
-nav.tabs {
-	margin: 2rem auto;
-	width: fit-content;
-}
-
-nav.tabs ul {
-	display: flex;
-	list-style: none;
-	padding: 0;
-	margin: 0;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 1rem;
-}
-
-nav.tabs li {
-	margin: 0;
-	padding: 0;
-}
-
-nav.tabs a,
-nav.tabs span {
-	display: block;
-	padding: 0.5rem 1rem;
-	text-decoration: underline;
-	width: 15rem;
-	text-align: center;
-	box-sizing: border-box;
-}
-
-nav.tabs a:hover {
-	text-decoration: none;
-}
-
-nav.tabs span {
-	color: var(--color-link);
-	border: 2px solid var(--color-link);
-	text-decoration: none;
-	cursor: default;
-}
 
 #company-activation-notice {
 	max-width: 45rem;

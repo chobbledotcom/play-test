@@ -4,8 +4,6 @@
   result_id = "#{type.to_s.dasherize}-result"
 %>
 
-<p><%= metadata[:description] %></p>
-
 <div class="calculator-form">
   <%= render 'form/form_context',
     model: nil,
@@ -16,6 +14,8 @@
     i18n_base: i18n_base do |form| %>
     
     <%= form.hidden_field :type, value: type.to_s %>
+
+    <p><%= metadata[:description] %></p>
     
     <% case type %>
     <% when :anchors %>

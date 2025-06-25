@@ -136,26 +136,6 @@
   box-shadow: none;
 }
 
-/* Navigation - minimal style */
-.minimal-dark-theme nav a,
-.minimal-dark-theme nav button {
-  background-color: transparent !important;
-  border: none !important;
-  color: var(--color-text) !important;
-  box-shadow: none !important;
-}
-
-.minimal-dark-theme nav a:hover,
-.minimal-dark-theme nav button:hover {
-  color: var(--minimal-hover) !important;
-}
-
-.minimal-dark-theme nav span {
-  background-color: transparent;
-  border: none;
-  color: var(--minimal-hover);
-  text-decoration: underline;
-}
 
 /* Tables - minimal styling */
 .minimal-dark-theme table {

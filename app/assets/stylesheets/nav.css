@@ -1,0 +1,194 @@
+nav ul {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 50rem;
+  max-width: 90%;
+  margin: 2rem auto;
+  padding: 0;
+  list-style: none;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+}
+
+nav ul li {
+  padding: 0;
+}
+
+nav ul li,
+nav ul li a,
+nav ul li button {
+  display: block;
+  margin: 0;
+  position: relative;
+}
+
+/* Navigation Images */
+header nav img {
+  margin: 1rem 0;
+}
+
+/* Navigation Dropdowns */
+nav ul li:hover ul {
+  display: block;
+}
+
+nav ul li ul {
+  background: var(--color-bg);
+  border: 1px solid var(--color-bg-secondary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow) var(--color-shadow);
+  display: none;
+  height: auto;
+  left: -2px;
+  padding: 0.5rem 1rem;
+  position: absolute;
+  top: 1.7rem;
+  white-space: nowrap;
+  width: auto;
+  z-index: 1;
+}
+
+nav ul li ul::before {
+  /* fill gap above to make mousing over them easier */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -0.5rem;
+  height: 0.5rem;
+}
+
+nav ul li ul li,
+nav ul li ul li a {
+  display: block;
+}
+
+/* Navigation Forms (from application.css) */
+nav form.button_to {
+  margin: 0;
+  min-width: fit-content;
+}
+
+/* Navigation Links & Buttons (from z_hover_effects.css) */
+nav a {
+  transition: all 0.2s ease !important;
+  position: relative;
+  transform: translateY(0);
+  display: inline-block;
+  padding: 0.5rem 1rem !important;
+  background-color: var(--color-link) !important;
+  border: 2px solid var(--color-link) !important;
+  color: var(--color-bg) !important;
+  border-radius: var(--border-radius) !important;
+  text-decoration: none !important;
+}
+
+nav button {
+  transition: all 0.2s ease !important;
+  position: relative;
+  transform: translateY(0);
+  padding: 0.5rem 1rem;
+}
+
+nav a strong,
+nav button {
+  padding: 0.5rem 1rem;
+}
+
+/* Navigation Hover States */
+nav a:hover {
+  filter: none !important; /* Remove MVP's brightness filter */
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
+  background-color: #8a0f8a !important; /* Lighter purple on hover */
+  border-color: #8a0f8a !important;
+  text-decoration: none !important;
+  color: var(--color-bg) !important;
+}
+
+nav a:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 6px rgba(108, 12, 108, 0.2) !important;
+  background-color: #4a084a !important; /* Darker purple on click */
+  border-color: #4a084a !important;
+}
+
+nav button:hover:not([disabled]) {
+  filter: none !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
+}
+
+nav button:active:not([disabled]) {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 6px rgba(108, 12, 108, 0.2) !important;
+}
+
+/* Active Page Styling */
+nav a.active,
+nav a.active:hover {
+  background-color: var(--color-bg) !important;
+  color: var(--color-link) !important;
+  border: 2px solid var(--color-link) !important;
+}
+
+nav a.active:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
+  color: var(--color-link) !important;
+}
+
+nav span {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: var(--color-link);
+  border: 2px solid var(--color-link);
+  text-decoration: none;
+  cursor: default;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.dark-theme nav a,
+.dark-theme nav button {
+  background-color: var(--dark-highlight) !important;
+  border-color: var(--dark-highlight) !important;
+  color: var(--dark-bg-primary) !important;
+}
+
+.dark-theme nav a:hover,
+.dark-theme nav button:hover {
+  background-color: var(--dark-bg-accent) !important;
+  border-color: var(--dark-bg-accent) !important;
+  color: var(--dark-text) !important;
+}
+
+.dark-theme nav span {
+  background-color: transparent;
+  border: 2px solid var(--dark-highlight);
+  color: var(--dark-highlight);
+}
+
+.minimal-dark-theme nav a,
+.minimal-dark-theme nav button {
+  background-color: transparent !important;
+  border: none !important;
+  color: var(--color-text) !important;
+  box-shadow: none !important;
+}
+
+.minimal-dark-theme nav a:hover,
+.minimal-dark-theme nav button:hover {
+  color: var(--minimal-hover) !important;
+}
+
+.minimal-dark-theme nav span {
+  background-color: transparent;
+  border: none;
+  color: var(--minimal-hover);
+  text-decoration: underline;
+}
+

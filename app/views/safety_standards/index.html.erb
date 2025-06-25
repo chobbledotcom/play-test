@@ -4,7 +4,7 @@
     <p><%= t('safety_standards.subtitle') %></p>
   </header>
 
-  <nav class="tab-navigation">
+  <nav>
     <ul>
       <li><a href="#anchorage">Anchorage</a></li>
       <li><a href="#wall-heights">Wall Heights</a></li>
@@ -17,15 +17,11 @@
   </nav>
 
   <div class="tab-content">
-    <!-- Anchorage Tab -->
     <article id="anchorage" class="tab-panel">
-      <h2>Anchor Requirements</h2>
       <%= render 'calculator_form', type: :anchors %>
     </article>
 
-    <!-- Wall Heights Tab -->
     <article id="wall-heights" class="tab-panel">
-      <h2>Wall Height Requirements</h2>
       <%= render 'calculator_form', type: :wall_height %>
       
       <h3>Requirements by User Height</h3>
@@ -57,9 +53,7 @@
       </table>
     </article>
 
-    <!-- User Capacity Tab -->
     <article id="user-capacity" class="tab-panel">
-      <h2>User Capacity Calculation</h2>
       <%= render 'calculator_form', type: :user_capacity %>
       
       <h3>Capacity Guidelines</h3>
@@ -106,11 +100,7 @@
       </ul>
     </article>
 
-    <!-- Slides Tab -->
     <article id="slides" class="tab-panel">
-      <h2>Slide Safety Requirements</h2>
-      
-      <h3>Runout Requirements</h3>
       <%= render 'calculator_form', type: :slide_runout %>
       
       <ul>
@@ -151,7 +141,6 @@
     </article>
 
 
-    <!-- Material Tab -->
     <article id="material" class="tab-panel">
       <h2>Material Requirements</h2>
       
@@ -186,7 +175,6 @@
       </ul>
     </article>
 
-    <!-- Fan Tab -->
     <article id="fan" class="tab-panel">
       <h2>Electrical Safety Requirements</h2>
       
@@ -228,7 +216,6 @@
       </table>
     </article>
 
-    <!-- Additional Tab -->
     <article id="additional" class="tab-panel">
       <h2>Additional Safety Requirements</h2>
       <ul>

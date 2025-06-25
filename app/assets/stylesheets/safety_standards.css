@@ -178,49 +178,6 @@
   display: block;
 }
 
-/* Active tab styling - when no hash, first tab is active */
-.tab-navigation a[href="#anchorage"] {
-  background-color: #fff;
-  border-bottom: 2px solid #fff;
-  color: #212529;
-  font-weight: 600;
-}
-
-/* Active tab styling - use :has() on parent */
-.safety-standards-reference:has(#anchorage:target)
-  .tab-navigation
-  a[href="#anchorage"],
-.safety-standards-reference:has(#wall-heights:target)
-  .tab-navigation
-  a[href="#wall-heights"],
-.safety-standards-reference:has(#slides:target)
-  .tab-navigation
-  a[href="#slides"],
-.safety-standards-reference:has(#user-capacity:target)
-  .tab-navigation
-  a[href="#user-capacity"],
-.safety-standards-reference:has(#material:target)
-  .tab-navigation
-  a[href="#material"],
-.safety-standards-reference:has(#fan:target) .tab-navigation a[href="#fan"],
-.safety-standards-reference:has(#additional:target)
-  .tab-navigation
-  a[href="#additional"] {
-  background-color: #fff;
-  border-bottom: 2px solid #fff;
-  color: #212529;
-  font-weight: 600;
-}
-
-/* Remove default active state when any tab is targeted */
-.safety-standards-reference:has(.tab-panel:target)
-  .tab-navigation
-  a[href="#anchorage"] {
-  background-color: #f8f9fa;
-  border-bottom: none;
-  color: #495057;
-  font-weight: normal;
-}
 
 @keyframes fadeIn {
   from {
@@ -233,29 +190,7 @@
   }
 }
 
-/* Responsive tab navigation */
 @media (max-width: 768px) {
-  .tab-navigation ul {
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .tab-navigation a {
-    border-radius: 0;
-    border: 1px solid #dee2e6;
-    border-bottom: 1px solid #dee2e6;
-    margin-bottom: -1px;
-    bottom: 0;
-  }
-
-  .tab-navigation li:first-child a {
-    border-radius: 4px 4px 0 0;
-  }
-
-  .tab-navigation li:last-child a {
-    border-radius: 0 0 4px 4px;
-    margin-bottom: 0;
-  }
 
   .tab-content {
     padding-top: 1rem;
