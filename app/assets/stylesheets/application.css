@@ -74,7 +74,7 @@ form.button_to {
 }
 
 fieldset {
-	padding: 0.5rem;
+	padding: 0.5rem 0.5rem 0.5rem;
 	margin: 1rem 0.5rem 0.5rem;
 	box-shadow: none;
 	border: 2px dashed #70127044;

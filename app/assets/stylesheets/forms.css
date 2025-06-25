@@ -94,7 +94,15 @@
   display: grid;
   gap: 1rem;
   align-items: end;
-  margin-bottom: 2rem;
+  padding-top: 1rem;
+}
+
+.form-grid:last-child {
+  margin-bottom: -0.5rem;
+}
+
+legend + .form-grid {
+  border-top: none;
 }
 
 form *:target {
