@@ -5,7 +5,7 @@
 %>
 
 <% if incomplete_fields.any? %>
-  <details id="incomplete_fields" class="incomplete-fields-details" <%= "open" if Rails.env.test? %>>
+  <details id="incomplete_fields" class="incomplete-fields-details">
     <summary class="incomplete-fields-summary">
       <%= t("assessments.incomplete_fields.show_fields", count: total_field_count) %>
     </summary>
