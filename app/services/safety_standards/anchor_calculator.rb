@@ -2,15 +2,21 @@ module SafetyStandards
   module AnchorCalculator
     extend self
 
-    # Anchor calculation constants (EN 14960:2019)
+    # Anchor calculation constants from EN 14960-1:2019
+    # Line 450: Each anchor must withstand 1600N force
+    # Lines 441-442: Minimum 6 anchorage points required
+    # Lines 1194-1199: Cw=1.5, ρ=1.24 kg/m³, V=11.1 m/s
+    # Pre-calculated: 0.5 × 1.5 × 1.24 × 11.1² ≈ 114
     ANCHOR_CALCULATION_CONSTANTS = {
-      area_coefficient: 114.0,     # Area coefficient in anchor formula
-      base_divisor: 1600.0,        # Base divisor for anchor calculation
-      safety_factor: 1.5           # Safety factor multiplier
+      area_coefficient: 114.0,     # Pre-calculated wind force coefficient
+      base_divisor: 1600.0,        # Force per anchor in Newtons (Line 450)
+      safety_factor: 1.5,          # Safety factor multiplier
+      minimum_anchors: 6           # Minimum required anchors (Lines 441-442)
     }.freeze
 
     # Test examples for anchor calculations
     # Formula: (Area * 114 * 1.5) / 1600, rounded up
+    # EN 14960-1:2019 Lines 441-442: Minimum 6 anchors required
     ANCHOR_TEST_EXAMPLES = {
       # Basic area calculations
       basic: {
@@ -46,6 +52,10 @@ module SafetyStandards
 
       # Full unit calculations
       units: {
+        small_unit: {
+          dimensions: {length: 1, width: 1, height: 1},
+          expected_anchors: 6 # Front/back: 1m² → 1, Sides: 1m² → 1, Total: (1+1)*2 = 4, Min: 6
+        },
         standard_unit: {
           dimensions: {length: 5, width: 4, height: 3},
           expected_anchors: 8 # Front/back: 12m² → 2, Sides: 15m² → 2, Total: (2+2)*2 = 8
@@ -84,7 +94,8 @@ module SafetyStandards
       total_required = (required_front + required_sides) * 2
 
       # EN 14960-1:2019 Lines 441-442 - "Each inflatable shall have at least six anchorage points"
-      total_required = [total_required, 6].max
+      minimum = ANCHOR_CALCULATION_CONSTANTS[:minimum_anchors]
+      total_required = [total_required, minimum].max
 
       area_coeff = ANCHOR_CALCULATION_CONSTANTS[:area_coefficient]
       base_div = ANCHOR_CALCULATION_CONSTANTS[:base_divisor]
@@ -121,10 +132,10 @@ module SafetyStandards
       ]
 
       # Add minimum requirement note if applicable
-      if calculated_total < 6
+      if calculated_total < minimum
         breakdown << [
           "EN 14960 minimum",
-          "Minimum 6 anchors required, using 6"
+          "Minimum #{minimum} anchors required, using #{minimum}"
         ]
       end
 
