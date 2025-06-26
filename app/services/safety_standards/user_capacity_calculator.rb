@@ -2,8 +2,12 @@ module SafetyStandards
   module UserCapacityCalculator
     extend self
 
-    # User capacity calculation constants based on EN 14960:2019
-    # Divisor for area to calculate number of users per height category
+    # EN 14960-1:2019 Section 4.3 (Lines 940-961) - Number of users
+    # Note: EN 14960 doesn't specify exact calculation formulas, only factors to consider:
+    # - Height of user (Line 946)
+    # - Size of playing area (Line 954)
+    # - Type of activity (Line 956)
+    # The calculation below is industry standard practice, not from EN 14960
     AREA_DIVISOR = {
       1000 => 1.0,   # 1 user per m² for 1.0m height
       1200 => 1.33,  # 0.75 users per m² for 1.2m height

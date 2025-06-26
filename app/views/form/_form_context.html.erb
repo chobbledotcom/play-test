@@ -52,22 +52,6 @@ end %>
   <% @_current_form = form %>
   <% @_current_i18n_base = i18n_base %>
 
-  <% if model && model.persisted? && model.respond_to?(:pass_columns_count) && model.pass_columns_count > 0 %>
-    <div class="assessment-summary">
-      <h4>
-        <%= I18n.t("#{i18n_base}.summary.title",
-          default: "Assessment Summary")
-        %>
-      </h4>
-      <div class="safety-status">
-        <strong><%= I18n.t("shared.assessment_completion") %>:</strong>
-        <span class="checks-count">
-          <%= model.passed_checks_count %> / <%= model.pass_columns_count %>
-        </span>
-      </div>
-    </div>
-  <% end %>
-
   <%= yield form %>
 
   <% if model && model.respond_to?(:errors) && model.errors.any? %>

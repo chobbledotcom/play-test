@@ -340,7 +340,7 @@ class Inspection < ApplicationRecord
           assessment.incomplete_fields
             .map { |f| {field: f, label: field_label(tab.to_sym, f)} }
 
-       if assessment_fields.any?
+        if assessment_fields.any?
           output << {
             tab: tab.to_sym,
             name: I18n.t("forms.#{tab}.header"),

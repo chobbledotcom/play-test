@@ -6,7 +6,7 @@ RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
   scenario "displays tab navigation" do
     within("#safety-standard-tabs") do
       expect(page).to have_link("Anchorage", href: "#anchorage")
-      expect(page).to have_link("Wall Heights", href: "#wall-heights")
+      expect(page).to have_link("User Capacity", href: "#user-capacity")
       expect(page).to have_link("Slides", href: "#slides")
       expect(page).to have_link("Material", href: "#material")
       expect(page).to have_link("Fan", href: "#fan")
@@ -20,22 +20,8 @@ RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
     end
 
     # Other tabs should not be visible
-    expect(page).not_to have_css("#wall-heights", visible: true)
+    expect(page).not_to have_css("#user-capacity", visible: true)
     expect(page).not_to have_css("#slides", visible: true)
-  end
-
-  scenario "navigating to wall heights tab" do
-    click_link "Wall Heights"
-
-    expect(current_url).to include("#wall-heights")
-
-    # Wait for JavaScript to show the tab
-    expect(page).to have_css("#wall-heights", visible: true, wait: 2)
-
-    within("#wall-heights") do
-      expect(page).to have_content("Calculate Wall Height Requirements")
-      expect(page).to have_content("Requirements by User Height")
-    end
   end
 
   scenario "navigating to slides tab" do
@@ -44,9 +30,9 @@ RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
     expect(current_url).to include("#slides")
 
     within("#slides") do
-      expect(page).to have_content("Calculate Required Runout Length")
-      expect(page).to have_content("Minimum length: 50% of highest platform height")
-      expect(page).to have_content("Containing Wall Heights for Slides")
+      expect(page).to have_content(I18n.t("safety_standards.calculators.runout.title"))
+      expect(page).to have_content(I18n.t("safety_standards.calculators.wall_height.title"))
+      expect(page).to have_content(I18n.t("safety_standards.wall_heights.requirements_by_platform"))
     end
   end
 
@@ -91,7 +77,7 @@ RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
     # Navigate to slides tab and test calculator there
     click_link "Slides"
 
-    within("#slides .calculator-form") do
+    within(".calculator-form", text: I18n.t("forms.safety_standards_slide_runout.header")) do
       fill_in I18n.t("forms.safety_standards_slide_runout.fields.platform_height"), with: 2.5
       click_button I18n.t("forms.safety_standards_slide_runout.submit")
     end

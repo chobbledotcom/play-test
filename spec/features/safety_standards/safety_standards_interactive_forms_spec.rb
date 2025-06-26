@@ -100,7 +100,8 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     fill_anchor_form(length: 1.0, width: 1.0, height: 1.0)
     submit_anchor_form
 
-    expect_anchor_result(4)
+    # EN 14960 requires minimum 6 anchors
+    expect_anchor_result(6)
   end
 
   scenario "calculations match SafetyStandard model exactly" do

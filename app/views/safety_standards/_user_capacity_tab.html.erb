@@ -1,0 +1,46 @@
+<article id="user-capacity" class="tab-panel">
+  <%= render 'calculator_form', type: :user_capacity %>
+  
+  <h3><%= t('safety_standards.user_capacity_section.capacity_guidelines') %></h3>
+  <p><%= t('safety_standards.user_capacity_section.capacity_description') %></p>
+  
+  <table>
+    <thead>
+      <tr>
+        <th><%= t('safety_standards.user_capacity_section.user_height') %></th>
+        <th><%= t('safety_standards.user_capacity_section.space_required') %></th>
+        <th><%= t('safety_standards.user_capacity_section.users_per_m2') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1.0m</td>
+        <td>1.0 m² per user</td>
+        <td>1.0</td>
+      </tr>
+      <tr>
+        <td>1.2m</td>
+        <td>1.33 m² per user</td>
+        <td>0.75</td>
+      </tr>
+      <tr>
+        <td>1.5m</td>
+        <td>1.66 m² per user</td>
+        <td>0.60</td>
+      </tr>
+      <tr>
+        <td>1.8m</td>
+        <td>2.0 m² per user</td>
+        <td>0.50</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h3><%= t('safety_standards.user_capacity_section.important_notes') %></h3>
+  <ul>
+    <li><%= t('safety_standards.user_capacity_section.notes.allowed_heights') %></li>
+    <li><%= t('safety_standards.user_capacity_section.notes.height_restriction') %></li>
+    <li><%= t('safety_standards.user_capacity_section.notes.round_down') %></li>
+    <li><%= t('safety_standards.user_capacity_section.notes.consider_obstacles') %></li>
+  </ul>
+</article>

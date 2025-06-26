@@ -68,8 +68,8 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
       scenario "wall height calculation updates without reload" do
         visit safety_standards_path
 
-        # Navigate to wall heights tab
-        click_link "Wall Heights"
+        # Navigate to slides tab for wall height calculator
+        click_link "Slides"
 
         fill_wall_height_form(**valid_wall_params)
         submit_wall_height_form
@@ -103,11 +103,13 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         fill_runout_form(**valid_runout_params)
         submit_runout_form
 
-        click_link "Wall Heights"
-        fill_wall_height_form(**valid_wall_params)
-        submit_wall_height_form
-        # Wait for result to appear
-        expect_wall_height_result("1.5m")
+        # Wall height calculator is now in Slides tab
+        within("#slides") do
+          fill_wall_height_form(**valid_wall_params)
+          submit_wall_height_form
+          # Wait for result to appear
+          expect_wall_height_result("1.5m")
+        end
 
         # Check all results by navigating to each tab
         click_link "Anchorage"
@@ -116,9 +118,10 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         click_link "Slides"
         expect_runout_result(required_runout: 1.25)
 
-        # Go back to Wall Heights tab
-        click_link "Wall Heights"
-        expect_wall_height_result("1.5m")
+        # Wall height calculator is also in Slides tab
+        within("#slides") do
+          expect_wall_height_result("1.5m")
+        end
       end
 
       scenario "form values persist after submission" do

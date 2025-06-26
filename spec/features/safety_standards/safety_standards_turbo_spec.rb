@@ -55,7 +55,7 @@ RSpec.feature "Safety Standards with Turbo", js: true do
 
   describe "wall height calculator" do
     it "updates results without page reload via Turbo" do
-      click_link "Wall Heights"
+      click_link "Slides"
 
       within(".calculator-form", text: I18n.t("forms.safety_standards_wall_height.header")) do
         fill_in I18n.t("forms.safety_standards_wall_height.fields.platform_height"), with: 2.0

@@ -25,6 +25,34 @@ module SafetyStandards
       }
     }.freeze
 
+    # Test examples for material validation
+    MATERIAL_TEST_EXAMPLES = {
+      stitch_length: {
+        valid: {
+          minimum: 3,      # mm - minimum allowed
+          medium: 5,       # mm - middle of range
+          maximum: 8       # mm - maximum allowed
+        },
+        invalid: {
+          too_short: 2,    # mm - below minimum
+          too_long: 9,     # mm - above maximum
+          nil_value: nil   # nil not allowed
+        }
+      },
+      rope_diameter: {
+        valid: {
+          minimum: 18,     # mm - minimum allowed
+          medium: 30,      # mm - middle of range
+          maximum: 45      # mm - maximum allowed
+        },
+        invalid: {
+          too_thin: 15,    # mm - below minimum
+          too_thick: 50,   # mm - above maximum
+          nil_value: nil   # nil not allowed
+        }
+      }
+    }.freeze
+
     def valid_stitch_length?(length_mm)
       # EN 14960:2019 - Stitch length must be within specified range to ensure
       # adequate seam strength while maintaining fabric integrity

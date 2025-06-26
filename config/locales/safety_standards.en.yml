@@ -104,3 +104,33 @@ en:
       invalid_height: "Please enter a valid height greater than 0"
       invalid_dimensions: "Please enter valid dimensions greater than 0"
       calculation_failed: "Calculation failed - please check your inputs"
+    
+    wall_heights:
+      requirements_by_platform: "Requirements by Platform Height"
+      platform_height: "Platform Height"
+      wall_requirement: "Wall Requirement"
+      under_600mm: "Under 0.6m"
+      no_walls_required: "No containing walls required"
+      600mm_to_3m: "0.6m - 3.0m"
+      walls_equal_user_height: "Walls must be equal to user height"
+      3m_to_6m: "3.0m - 6.0m"
+      walls_125x_user_height: "Walls must be 1.25× user height"
+      over_6m: "Over 6.0m"
+      walls_125x_plus_roof: "Walls 1.25× user height + permanent roof required"
+    
+    slides:
+      runout_calculator_title: "Slide Runout Calculator"
+      wall_height_calculator_title: "Wall Height Calculator"
+    
+    user_capacity_section:
+      capacity_guidelines: "Capacity Guidelines"
+      capacity_description: "User capacity is calculated based on the play area and the height of users. Taller users require more space for safe play."
+      user_height: "User Height"
+      space_required: "Space Required"
+      users_per_m2: "Users per m²"
+      important_notes: "Important Notes"
+      notes:
+        allowed_heights: "Only calculate capacity for user heights that are allowed on the unit"
+        height_restriction: "If a unit has a maximum user height restriction, do not calculate capacity for taller users"
+        round_down: "Always round down fractional users for safety"
+        consider_obstacles: "Consider obstacles and unusable areas when calculating total play area"

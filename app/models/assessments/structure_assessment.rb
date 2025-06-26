@@ -21,10 +21,4 @@ class Assessments::StructureAssessment < ApplicationRecord
 
   def stitch_length_compliant? =
     SafetyStandards::MaterialValidator.valid_stitch_length?(stitch_length)
-
-  def unit_pressure_compliant? =
-    SafetyStandards::EquipmentValidator.valid_pressure?(unit_pressure)
-
-  def fall_off_height_compliant? =
-    SafetyStandards::EquipmentValidator.valid_fall_height?(critical_fall_off_height)
 end

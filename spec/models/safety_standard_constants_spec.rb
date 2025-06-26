@@ -47,15 +47,16 @@ RSpec.describe SafetyStandard, "Constants" do
     end
 
     it "is used in wall height calculations" do
-      user_height = 4.0 # In the enhanced walls range
+      platform_height = 4.0 # In the enhanced walls range (3.0m - 6.0m)
+      user_height = 4.0
       containing_wall_height = 5.0 # 4.0 * 1.25 = 5.0
 
-      result = SafetyStandards::SlideCalculator.meets_height_requirements?(user_height, containing_wall_height)
+      result = SafetyStandards::SlideCalculator.meets_height_requirements?(platform_height, user_height, containing_wall_height)
       expect(result).to be true
 
       # Test that it fails with insufficient wall height
       insufficient_wall = 4.9 # Just under 4.0 * 1.25
-      result = SafetyStandards::SlideCalculator.meets_height_requirements?(user_height, insufficient_wall)
+      result = SafetyStandards::SlideCalculator.meets_height_requirements?(platform_height, user_height, insufficient_wall)
       expect(result).to be false
     end
   end
@@ -121,7 +122,6 @@ RSpec.describe SafetyStandard, "Constants" do
     it "validates new constants exist and are used" do
       # Check new constants are defined
       expect(SafetyStandards::MaterialValidator::MATERIAL_STANDARDS).to be_present
-      expect(SafetyStandards::EquipmentValidator::EQUIPMENT_SAFETY_LIMITS).to be_present
       expect(SafetyStandard::GROUNDING_TEST_WEIGHTS).to be_present
       expect(SafetyStandard::REINSPECTION_INTERVAL_DAYS).to eq(365)
 
@@ -130,11 +130,6 @@ RSpec.describe SafetyStandard, "Constants" do
       expect(SafetyStandards::MaterialValidator.valid_stitch_length?(2)).to be false # Below min
       expect(SafetyStandards::MaterialValidator.valid_stitch_length?(9)).to be false # Above max
 
-      expect(SafetyStandards::EquipmentValidator.valid_pressure?(1.5)).to be true
-      expect(SafetyStandards::EquipmentValidator.valid_pressure?(0.5)).to be false # Below min
-
-      expect(SafetyStandards::EquipmentValidator.requires_multiple_exits?(20)).to be true
-      expect(SafetyStandards::EquipmentValidator.requires_multiple_exits?(10)).to be false # Below threshold
     end
 
     it "generates consistent formula descriptions from constants" do
