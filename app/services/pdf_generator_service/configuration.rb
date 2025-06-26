@@ -13,7 +13,7 @@ class PdfGeneratorService
     STATUS_SPACING = 15
     SECTION_TITLE_SIZE = 14
     COMMENTS_PADDING = 20
-    
+
     # Header table constants
     LOGO_HEIGHT = 50
     HEADER_TABLE_PADDING = [5, 0]

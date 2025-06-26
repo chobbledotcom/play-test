@@ -122,7 +122,6 @@ class SafetyStandardsController < ApplicationController
     SafetyStandards::SlideCalculator.calculate_wall_height_requirements(platform_height, user_height)
   end
 
-
   def build_json_response
     type = params[:calculation][:type]
 

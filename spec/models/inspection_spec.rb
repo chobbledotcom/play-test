@@ -42,7 +42,6 @@ RSpec.describe Inspection, type: :model do
     end
   end
 
-
   describe "scopes" do
     let!(:passed) { create(:inspection, :passed) }
     let!(:failed) { create(:inspection, :failed) }

@@ -155,7 +155,7 @@ class PdfGeneratorService
       dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
 
       # Get inspector details from current inspection (for inspection PDF) or last inspection (for unit PDF)
-      inspection = context == :inspection ? last_inspection : unit.last_inspection
+      inspection = (context == :inspection) ? last_inspection : unit.last_inspection
       inspector_name = inspection&.user&.name || ""
       rpii_number = inspection&.user&.rpii_inspector_number
       inspection_location = inspection&.inspection_location || ""

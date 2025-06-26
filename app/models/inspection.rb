@@ -176,7 +176,6 @@ class Inspection < ApplicationRecord
     tabs
   end
 
-
   # Advanced methods
   def can_be_completed?
     unit.present? && all_assessments_complete?

@@ -203,10 +203,10 @@ module SafetyStandards
 
       # Get requirement details and breakdown
       requirement_details = get_wall_height_requirement_details(platform_height, user_height)
-      
+
       # Extract the required wall height from the details
       required_height = extract_required_wall_height(platform_height, user_height)
-      
+
       CalculatorResponse.new(
         value: required_height,
         value_suffix: "m",
@@ -215,13 +215,13 @@ module SafetyStandards
     end
 
     private
-    
+
     def extract_required_wall_height(platform_height, user_height)
       no_walls_threshold = SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
       basic_threshold = SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
       enhanced_threshold = SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
       enhanced_multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
-      
+
       case platform_height
       when 0..no_walls_threshold
         0 # No walls required
