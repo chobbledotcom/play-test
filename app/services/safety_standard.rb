@@ -79,10 +79,12 @@ module SafetyStandard
       passed: true,
       status: "Calculation completed successfully",
       result: {
-        platform_height: 2.0,
-        user_height: 1.5,
-        requirement: "Walls must be at least 1.5m (equal to user height)",
-        requires_roof: false
+        value: 1.5,
+        value_suffix: "m",
+        breakdown: [
+          ["Height range", "0.6m - 3.0m"],
+          ["Calculation", "1.5m (user height)"]
+        ]
       }
     },
     user_capacity: {

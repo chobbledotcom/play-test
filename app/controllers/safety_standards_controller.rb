@@ -119,36 +119,9 @@ class SafetyStandardsController < ApplicationController
   end
 
   def build_wall_height_result(platform_height, user_height)
-    {
-      platform_height: platform_height,
-      user_height: user_height,
-      requirement: wall_height_requirement_text(platform_height, user_height),
-      requires_roof: SafetyStandards::SlideCalculator.requires_permanent_roof?(platform_height)
-    }
+    SafetyStandards::SlideCalculator.calculate_wall_height_requirements(platform_height, user_height)
   end
 
-  def wall_height_requirement_text(platform_height, user_height)
-    thresholds = SafetyStandards::SlideCalculator::SLIDE_HEIGHT_THRESHOLDS
-
-    case platform_height
-    when 0..thresholds[:no_walls_required]
-      "No containing walls required"
-    when thresholds[:no_walls_required]..thresholds[:basic_walls]
-      "Walls must be at least #{user_height}m (equal to user height)"
-    when thresholds[:basic_walls]..thresholds[:enhanced_walls]
-      wall_height = enhanced_wall_height(user_height)
-      "Walls must be at least #{wall_height}m (1.25× user height)"
-    when thresholds[:enhanced_walls]..thresholds[:max_safe_height]
-      wall_height = enhanced_wall_height(user_height)
-      "Walls must be at least #{wall_height}m + permanent roof required"
-    else
-      "Exceeds safe height limits (>#{thresholds[:max_safe_height]}m)"
-    end
-  end
-
-  def enhanced_wall_height(user_height)
-    (user_height * 1.25).round(2)
-  end
 
   def build_json_response
     type = params[:calculation][:type]

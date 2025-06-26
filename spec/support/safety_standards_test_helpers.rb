@@ -65,6 +65,44 @@ module SafetyStandardsTestHelpers
   def expect_wall_height_result(text)
     expect_result_content(:wall_height, text)
   end
+
+  # Navigation helpers
+  def navigate_to_tab(tab_name)
+    click_link tab_name
+  end
+
+  # Form validation helpers
+  def expect_form_field_min_value(form_name, field_name, expected_min)
+    within_form(form_name) do
+      field = find_form_field(form_name, field_name)
+      expect(field["min"]).to eq(expected_min)
+    end
+  end
+
+  # Form persistence helpers
+  def expect_form_values_persist(form_name, expected_values)
+    within_form(form_name) do
+      expected_values.each do |field_name, expected_value|
+        field = find_form_field(form_name, field_name)
+        expect(field.value).to eq(expected_value)
+      end
+    end
+  end
+
+  # Combined fill and submit helper
+  def submit_form_with_values(type, values)
+    case type
+    when :anchors
+      fill_anchor_form(**values)
+      submit_anchor_form
+    when :runout
+      fill_runout_form(**values)
+      submit_runout_form
+    when :wall_height
+      fill_wall_height_form(**values)
+      submit_wall_height_form
+    end
+  end
 end
 
 RSpec.configure do |config|

@@ -115,6 +115,7 @@ en:
         requirement_result: "Requirement:"
         additional_result: "Additional:"
         roof_required: "Permanent roof required"
+        required_wall_height_result: "Required Wall Height"
 
     errors:
       invalid_area: "Please enter a valid area greater than 0"
@@ -145,6 +146,7 @@ en:
       walls_125_user_height: "Walls must be at least %{height}m (1.25× user height)"
       walls_125x_user_height: "Walls 1.25× user height"
       walls_125x_plus_roof: "Walls 1.25× user height + permanent roof required"
+      walls_125_plus_roof_required: "Walls must be at least %{height}m + permanent roof required"
     
     slides:
       runout_calculator_title: "Slide Runout Calculator"

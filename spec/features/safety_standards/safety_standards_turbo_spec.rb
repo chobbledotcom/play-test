@@ -64,7 +64,9 @@ RSpec.feature "Safety Standards with Turbo", js: true do
       end
 
       within("#wall-height-result") do
-        expect(page).to have_content("Walls must be at least 1.5m")
+        expect(page).to have_content("Required Wall Height: 1.5m")
+        expect(page).to have_content("0.6m - 3.0m")
+        expect(page).to have_content("1.5m (user height)")
       end
 
       expect(page).to have_current_path(safety_standards_path)

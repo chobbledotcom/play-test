@@ -55,9 +55,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
 
       scenario "runout calculation updates without reload" do
         visit safety_standards_path
-
-        # Navigate to slides tab
-        click_link "Slides"
+        navigate_to_tab("Slides")
 
         fill_runout_form(**valid_runout_params)
         submit_runout_form
@@ -67,14 +65,12 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
 
       scenario "wall height calculation updates without reload" do
         visit safety_standards_path
-
-        # Navigate to slides tab for wall height calculator
-        click_link "Slides"
+        navigate_to_tab("Slides")
 
         fill_wall_height_form(**valid_wall_params)
         submit_wall_height_form
 
-        expect_wall_height_result("1.5m")
+        expect_wall_height_result("Required Wall Height: 1.5m")
       end
     end
 
@@ -83,11 +79,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         visit safety_standards_path
 
         # The forms have min values that prevent submitting zeros
-        # Check anchor form
-        within(".calculator-form", text: I18n.t("forms.safety_standards_anchors.header")) do
-          length_input = find_field(I18n.t("forms.safety_standards_anchors.fields.length"))
-          expect(length_input["min"]).to eq("1.0")
-        end
+        expect_form_field_min_value("safety_standards_anchors", "length", "1.0")
       end
     end
 
@@ -95,33 +87,21 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
       scenario "all forms work independently" do
         visit safety_standards_path
 
-        # Submit all forms
-        fill_anchor_form(**valid_anchor_params)
-        submit_anchor_form
+        # Submit anchor form
+        submit_form_with_values(:anchors, valid_anchor_params)
 
-        click_link "Slides"
-        fill_runout_form(**valid_runout_params)
-        submit_runout_form
+        # Submit slide forms
+        navigate_to_tab("Slides")
+        submit_form_with_values(:runout, valid_runout_params)
+        submit_form_with_values(:wall_height, valid_wall_params)
 
-        # Wall height calculator is now in Slides tab
-        within("#slides") do
-          fill_wall_height_form(**valid_wall_params)
-          submit_wall_height_form
-          # Wait for result to appear
-          expect_wall_height_result("1.5m")
-        end
-
-        # Check all results by navigating to each tab
-        click_link "Anchorage"
+        # Verify all results
+        navigate_to_tab("Anchorage")
         expect_anchor_result(8)
 
-        click_link "Slides"
+        navigate_to_tab("Slides")
         expect_runout_result(required_runout: 1.25)
-
-        # Wall height calculator is also in Slides tab
-        within("#slides") do
-          expect_wall_height_result("1.5m")
-        end
+        expect_wall_height_result("Required Wall Height: 1.5m")
       end
 
       scenario "form values persist after submission" do
@@ -130,11 +110,11 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         fill_anchor_form(**valid_anchor_params)
         submit_anchor_form
 
-        within(".calculator-form", text: I18n.t("forms.safety_standards_anchors.header")) do
-          expect(find_field(I18n.t("forms.safety_standards_anchors.fields.length")).value).to eq("5.0")
-          expect(find_field(I18n.t("forms.safety_standards_anchors.fields.width")).value).to eq("5.0")
-          expect(find_field(I18n.t("forms.safety_standards_anchors.fields.height")).value).to eq("3.0")
-        end
+        expect_form_values_persist("safety_standards_anchors", {
+          length: "5.0",
+          width: "5.0",
+          height: "3.0"
+        })
       end
     end
   end

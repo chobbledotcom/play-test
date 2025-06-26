@@ -1,13 +1,7 @@
 <% if @wall_height_result %>
-  <div class="calculation-result">
-    <h2><%= t('safety_standards.calculators.wall_height.result_title') %></h2>
-    <p><strong><%= t('safety_standards.calculators.wall_height.platform_height_result') %></strong> <%= @wall_height_result[:platform_height] %>m</p>
-    <p><strong><%= t('safety_standards.calculators.wall_height.user_height_result') %></strong> <%= @wall_height_result[:user_height] %>m</p>
-    <p><strong><%= t('safety_standards.calculators.wall_height.requirement_result') %></strong> <%= @wall_height_result[:requirement] %></p>
-    <% if @wall_height_result[:requires_roof] %>
-      <p><strong><%= t('safety_standards.calculators.wall_height.additional_result') %></strong> <%= t('safety_standards.calculators.wall_height.roof_required') %></p>
-    <% end %>
-  </div>
+  <%= render 'result_with_breakdown',
+    result_label: t('safety_standards.calculators.wall_height.required_wall_height_result'),
+    result: @wall_height_result %>
 <% elsif @wall_height_error %>
   <div class="error">
     <p><strong><%= t('shared.error') %>:</strong> <%= @wall_height_error %></p>

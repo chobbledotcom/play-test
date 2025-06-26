@@ -37,24 +37,38 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     # Platform < 0.6m: No walls required
     fill_wall_height_form(platform_height: 0.5, user_height: 1.5)
     submit_wall_height_form
-    expect_wall_height_result("No containing walls required")
+    within("#wall-height-result") do
+      expect(page).to have_content("Required Wall Height: 0m")
+      expect(page).to have_content("Under 0.6m")
+      expect(page).to have_content("No containing walls required")
+    end
 
     # Platform 0.6-3.0m: Walls equal to user height
     fill_wall_height_form(platform_height: 2.0, user_height: 1.5)
     submit_wall_height_form
-    expect_wall_height_result("Walls must be at least 1.5m (equal to user height)")
+    within("#wall-height-result") do
+      expect(page).to have_content("Required Wall Height: 1.5m")
+      expect(page).to have_content("0.6m - 3.0m")
+      expect(page).to have_content("1.5m (user height)")
+    end
 
     # Platform 3.0-6.0m: Walls 1.25× user height
     fill_wall_height_form(platform_height: 4.0, user_height: 2.0)
     submit_wall_height_form
-    expect_wall_height_result("Walls must be at least 2.5m (1.25× user height)")
+    within("#wall-height-result") do
+      expect(page).to have_content("Required Wall Height: 2.5m")
+      expect(page).to have_content("3.0m - 6.0m")
+      expect(page).to have_content("2.0m × 1.25 = 2.5m")
+    end
 
     # Platform > 6.0m: Walls 1.25× user height + roof required
     fill_wall_height_form(platform_height: 7.0, user_height: 2.0)
     submit_wall_height_form
 
     within("#wall-height-result") do
-      expect(page).to have_content("Walls must be at least 2.5m + permanent roof required")
+      expect(page).to have_content("Required Wall Height: 2.5m")
+      expect(page).to have_content("Over 6.0m")
+      expect(page).to have_content("2.0m × 1.25 = 2.5m")
       expect(page).to have_content("Permanent roof required")
     end
   end

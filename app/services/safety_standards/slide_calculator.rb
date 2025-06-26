@@ -197,27 +197,42 @@ module SafetyStandards
       "#{height_ratio}% of platform height, minimum #{min_runout}mm"
     end
 
-    def calculate_wall_height_requirements(platform_height, user_height, containing_wall_height)
-      # Wrapper method that uses existing meets_height_requirements? and adds breakdown
-      return {result: nil, breakdown: []} if platform_height.nil? || user_height.nil?
-
-      # Use existing validation logic
-      meets_requirements = meets_height_requirements?(platform_height, user_height, containing_wall_height)
+    def calculate_wall_height_requirements(platform_height, user_height)
+      # EN 14960-1:2019 Section 4.2.9 (Lines 854-887) - Containment requirements
+      return CalculatorResponse.new(value: 0, value_suffix: "m", breakdown: []) if platform_height.nil? || user_height.nil? || platform_height <= 0 || user_height <= 0
 
       # Get requirement details and breakdown
       requirement_details = get_wall_height_requirement_details(platform_height, user_height)
-
-      {
-        result: {
-          meets_requirements: meets_requirements,
-          requirement_text: requirement_details[:text],
-          containing_wall_height: containing_wall_height
-        },
+      
+      # Extract the required wall height from the details
+      required_height = extract_required_wall_height(platform_height, user_height)
+      
+      CalculatorResponse.new(
+        value: required_height,
+        value_suffix: "m",
         breakdown: requirement_details[:breakdown]
-      }
+      )
     end
 
     private
+    
+    def extract_required_wall_height(platform_height, user_height)
+      no_walls_threshold = SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
+      basic_threshold = SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
+      enhanced_threshold = SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
+      enhanced_multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
+      
+      case platform_height
+      when 0..no_walls_threshold
+        0 # No walls required
+      when (no_walls_threshold..basic_threshold)
+        user_height # Equal to user height
+      when (basic_threshold..enhanced_threshold), (enhanced_threshold..SLIDE_HEIGHT_THRESHOLDS[:max_safe_height])
+        (user_height * enhanced_multiplier).round(2) # 1.25× user height
+      else
+        0 # Exceeds safe limits
+      end
+    end
 
     def get_wall_height_requirement_details(platform_height, user_height)
       no_walls_threshold = SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
