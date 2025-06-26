@@ -2,357 +2,356 @@
 .error,
 .notice,
 .alert {
-  width: 30rem;
-  max-width: 90%;
-  margin: 2rem auto;
-  text-align: left;
-  padding: 1rem;
-  border-radius: 8px;
-  font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.5s ease-in;
+	width: 30rem;
+	max-width: 90%;
+	margin: 2rem auto;
+	text-align: left;
+	padding: 1rem;
+	border-radius: 8px;
+	font-weight: 500;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	animation: fadeIn 0.5s ease-in;
 }
 
 .success {
-  background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
-  border: 1px solid #90ee90;
-  color: #2d5016;
+	background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
+	border: 1px solid #90ee90;
+	color: #2d5016;
 }
 
 .notice {
-  background: linear-gradient(135deg, #e8f8ff 0%, #b6f5ff 100%);
-  border: 1px solid #b8e4ff;
-  color: #505f84;
+	background: linear-gradient(135deg, #e8f8ff 0%, #b6f5ff 100%);
+	border: 1px solid #b8e4ff;
+	color: #505f84;
 }
 
 .error {
-  background: linear-gradient(135deg, #ffe8e8 0%, #fff0f0 100%);
-  border: 1px solid #ffb3b3;
-  color: #cc0000;
+	background: linear-gradient(135deg, #ffe8e8 0%, #fff0f0 100%);
+	border: 1px solid #ffb3b3;
+	color: #cc0000;
 }
 
 .alert {
-  background: linear-gradient(135deg, #fff3cd 0%, #fffae5 100%);
-  border: 1px solid #ffd700;
-  color: #856404;
+	background: linear-gradient(135deg, #fff3cd 0%, #fffae5 100%);
+	border: 1px solid #ffd700;
+	color: #856404;
 }
 
 .error ul {
-  margin: 0.5rem 0 0 0;
-  padding: 0;
-  list-style: none;
+	margin: 0.5rem 0 0 0;
+	padding: 0;
+	list-style: none;
 }
 
 .error li {
-  margin: 0.25rem 0;
-  padding-left: 1rem;
-  position: relative;
+	margin: 0.25rem 0;
+	padding-left: 1rem;
+	position: relative;
 }
 
 .error li:before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  color: #cc0000;
-  font-weight: bold;
+	content: "•";
+	position: absolute;
+	left: 0;
+	color: #cc0000;
+	font-weight: bold;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
-
 .comment-field-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
 }
 
 .comment-field-container label {
-  cursor: pointer;
-  font-weight: normal;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+	cursor: pointer;
+	font-weight: normal;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
 }
 
 .comment-field-container input[type="checkbox"] {
-  margin: 0;
+	margin: 0;
 }
 
 .form-grid {
-  display: grid;
-  gap: 1rem;
-  align-items: end;
-  padding-top: 1rem;
+	display: grid;
+	gap: 1rem;
+	align-items: end;
+	padding-top: 1rem;
 }
 
 .form-grid:last-child {
-  margin-bottom: -0.5rem;
+	margin-bottom: -0.5rem;
 }
 
 legend + .form-grid {
-  border-top: none;
+	border-top: none;
 }
 
 form *:target {
-  animation: highlight-fade 5s ease-out forwards;
-  border-radius: 5px;
+	animation: highlight-fade 5s ease-out forwards;
+	border-radius: 5px;
 }
 
 @keyframes highlight-fade {
-  0% {
-    background: #ffff3766;
-    outline: 20px solid #ffff3766;
-  }
-  80% {
-    background: #ffff3766;
-    outline: 20px solid #ffff3766;
-  }
-  100% {
-    background: transparent;
-    outline: 20px solid transparent;
-  }
+	0% {
+		background: #ffff3766;
+		outline: 20px solid #ffff3766;
+	}
+	80% {
+		background: #ffff3766;
+		outline: 20px solid #ffff3766;
+	}
+	100% {
+		background: transparent;
+		outline: 20px solid transparent;
+	}
 }
 
 .form-grid input,
 .form-grid label {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 .form-grid input[type="text"],
 .form-grid input[type="number"] {
-  padding: 0.4rem 0.8rem;
+	padding: 0.4rem 0.8rem;
 }
 
 .form-grid input[type="number"],
 .form-grid input[type="text"][inputmode="decimal"] {
-  width: 5rem;
-  text-align: left;
-  padding: 0.4rem;
-  font-variant-numeric: tabular-nums;
+	width: 5rem;
+	text-align: left;
+	padding: 0.4rem;
+	font-variant-numeric: tabular-nums;
 }
 
 .form-grid textarea {
-  margin: 0;
-  padding: 0.5rem 1rem;
+	margin: 0;
+	padding: 0.5rem 1rem;
 }
 
 .form-grid label {
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
+	display: flex;
+	flex-direction: row;
+	gap: 0.5rem;
 }
 
 .form-grid .label {
-  line-height: 1.1rem;
-  text-wrap: balance;
+	line-height: 1.1rem;
+	text-wrap: balance;
 }
 
 .form-grid .pass-fail {
-  display: flex;
-  gap: 0.5rem;
+	display: flex;
+	gap: 0.5rem;
 }
 
 .form-grid .pass-fail label {
-  display: flex;
+	display: flex;
 }
 
 .radio-comment {
-  grid-template-areas:
-    "label label"
-    "pass-fail comment-label"
-    "comment comment";
-  grid-template-columns: auto 1fr;
-  align-items: center;
+	grid-template-areas:
+		"label label"
+		"pass-fail comment-label"
+		"comment comment";
+	grid-template-columns: auto 1fr;
+	align-items: center;
 }
 @media (min-width: 768px) {
-  .radio-comment {
-    grid-template-areas:
-      "label pass-fail comment-space comment-label"
-      "comment comment comment comment";
-    grid-template-columns: max-content auto 1fr auto;
-  }
+	.radio-comment {
+		grid-template-areas:
+			"label pass-fail comment-space comment-label"
+			"comment comment comment comment";
+		grid-template-columns: max-content auto 1fr auto;
+	}
 }
 
 .radio-comment > .label {
-  grid-area: label;
+	grid-area: label;
 }
 
 .radio-comment > .label label {
-  flex-direction: column;
+	flex-direction: column;
 }
 
 .radio-comment > .pass-fail {
-  grid-area: pass-fail;
+	grid-area: pass-fail;
 }
 
 .radio-comment > .comment-checkbox {
-  grid-area: comment-label;
+	grid-area: comment-label;
 }
 
 .radio-comment > textarea {
-  grid-area: comment;
+	grid-area: comment;
 }
 
 /* Number + Pass/Fail + Comment grid layout */
 .number-radio-comment {
-  grid-template-areas:
-    "label label"
-    "number pass-fail"
-    "comment-label comment-space"
-    "comment comment";
-  grid-template-columns: auto 1fr;
+	grid-template-areas:
+		"label label"
+		"number pass-fail"
+		"comment-label comment-space"
+		"comment comment";
+	grid-template-columns: auto 1fr;
 }
 @media (min-width: 768px) {
-  .number-radio-comment {
-    grid-template-areas:
-      "label label label label"
-      "number pass-fail comment-space comment-label"
-      "comment comment comment comment";
-    grid-template-columns: auto auto 1fr auto;
-  }
+	.number-radio-comment {
+		grid-template-areas:
+			"label label label label"
+			"number pass-fail comment-space comment-label"
+			"comment comment comment comment";
+		grid-template-columns: auto auto 1fr auto;
+	}
 }
 
 .number-radio-comment > .label {
-  grid-area: label;
+	grid-area: label;
 }
 
 .number-radio-comment > .label label {
-  flex-direction: column;
+	flex-direction: column;
 }
 
 .number-radio-comment > .number {
-  grid-area: number;
+	grid-area: number;
 }
 
 .number-radio-comment > .pass-fail {
-  grid-area: pass-fail;
+	grid-area: pass-fail;
 }
 
 .number-radio-comment > .comment-checkbox {
-  grid-area: comment-label;
+	grid-area: comment-label;
 }
 
 .number-radio-comment > textarea {
-  grid-area: comment;
+	grid-area: comment;
 }
 
 /* Number + Comment grid layout */
 .number-comment {
-  grid-template-areas:
-    "label label"
-    "number comment-label"
-    "comment comment";
-  grid-template-columns: min-content auto;
-  align-items: center;
+	grid-template-areas:
+		"label label"
+		"number comment-label"
+		"comment comment";
+	grid-template-columns: min-content auto;
+	align-items: center;
 }
 @media (min-width: 768px) {
-  .number-comment {
-    grid-template-areas:
-      "label number comment-space comment-label"
-      "comment comment comment comment";
-    grid-template-columns: max-content 6rem 1fr auto;
-  }
+	.number-comment {
+		grid-template-areas:
+			"label number comment-space comment-label"
+			"comment comment comment comment";
+		grid-template-columns: max-content 6rem 1fr auto;
+	}
 }
 
 .number-comment > .label {
-  grid-area: label;
-  width: 14rem;
+	grid-area: label;
+	width: 14rem;
 }
 
 .number-comment > .number {
-  grid-area: number;
+	grid-area: number;
 }
 
 .number-comment > .comment-checkbox {
-  grid-area: comment-label;
+	grid-area: comment-label;
 }
 
 .number-comment > textarea {
-  grid-area: comment;
+	grid-area: comment;
 }
 
 /* Checkbox + Comment grid layout (similar to radio-comment) */
 .checkbox-comment {
-  display: grid;
-  gap: 0.5rem;
-  align-items: center;
-  margin-bottom: 1rem;
-  grid-template-areas:
-    "label label label label"
-    "check1 label2 comment-space comment-label";
-  grid-template-columns: auto auto 1fr auto;
+	display: grid;
+	gap: 0.5rem;
+	align-items: center;
+	margin-bottom: 1rem;
+	grid-template-areas:
+		"label label label label"
+		"check1 label2 comment-space comment-label";
+	grid-template-columns: auto auto 1fr auto;
 }
 
 @media (min-width: 768px) {
-  .checkbox-comment {
-    grid-template-areas: "label check1 label2 comment-label";
-    grid-template-columns: max-content auto auto auto;
-  }
+	.checkbox-comment {
+		grid-template-areas: "label check1 label2 comment-label";
+		grid-template-columns: max-content auto auto auto;
+	}
 }
 
 .checkbox-comment > .label {
-  grid-area: label;
+	grid-area: label;
 }
 
 .checkbox-comment > .checkbox {
-  grid-area: check1;
+	grid-area: check1;
 }
 
 .checkbox-comment > .checkbox-label {
-  grid-area: label2;
+	grid-area: label2;
 }
 
 .checkbox-comment > .comment-checkbox {
-  grid-area: comment-label;
+	grid-area: comment-label;
 }
 
 .checkbox-comment > textarea {
-  grid-column: 1 / -1;
-  margin-top: 0.5rem;
+	grid-column: 1 / -1;
+	margin-top: 0.5rem;
 }
 
 /* User height fields flexbox layout */
 .user-heights {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
 }
 
 /* Mobile: 2 columns (2 rows of 2) */
 .user-heights > * {
-  flex: 1 1 calc(50% - 0.5rem);
+	flex: 1 1 calc(50% - 0.5rem);
 }
 
 /* Desktop: 4 columns (1 row of 4) */
 @media (min-width: 768px) {
-  .user-heights > * {
-    flex: 1 1 calc(25% - 0.75rem);
-  }
+	.user-heights > * {
+		flex: 1 1 calc(25% - 0.75rem);
+	}
 }
 
 /* Field with link container */
 .field.field-with-link {
-  position: relative;
+	position: relative;
 }
 
 .field.field-with-link a {
-  position: absolute;
-  right: 10px;
-  top: 35px;
-  font-size: 0.9em;
+	position: absolute;
+	right: 10px;
+	top: 35px;
+	font-size: 0.9em;
 }
 
 /* Report links section */
 .report-links {
-  margin: 0.5em 0;
+	margin: 0.5em 0;
 }

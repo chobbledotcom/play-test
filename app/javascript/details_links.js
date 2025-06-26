@@ -4,15 +4,19 @@ class DetailsLinks {
 	}
 
 	setupEventListeners() {
-		document.addEventListener("click", (e) => {
-			const link = e.target.closest("a");
-			if (link) {
-				const details = link.closest("details");
-				if (details) {
-					e.stopPropagation();
+		document.addEventListener(
+			"click",
+			(e) => {
+				const link = e.target.closest("a");
+				if (link) {
+					const details = link.closest("details");
+					if (details) {
+						e.stopPropagation();
+					}
 				}
-			}
-		}, true);
+			},
+			true,
+		);
 	}
 
 	static init() {

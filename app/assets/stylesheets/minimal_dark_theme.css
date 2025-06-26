@@ -2,39 +2,39 @@
 /* #ddd text, #222 background, #d07ed2 accent/hover */
 
 .minimal-dark-theme {
-  /* Override CSS variables */
-  --color-accent: transparent;
-  --color-bg: #222;
-  --color-bg-secondary: #222;
-  --color-bg-secondary-faded: #222;
-  --color-bg-neutral: #222;
-  --color-border: #444;
-  --color-error: #d07ed2;
-  --color-link: #ddd;
-  --color-secondary: #d07ed2;
-  --color-secondary-accent: transparent;
-  --color-shadow: transparent;
-  --color-table: #ddd;
-  --color-text: #ddd;
-  --color-text-secondary: #999;
-  --color-scrollbar: #444;
-  
-  /* Status colors */
-  --color-primary: #d07ed2;
-  --color-pass: #d07ed2;
-  --color-fail: #999;
-  --color-disabled: #666;
-  
-  /* Additional minimal theme variables */
-  --minimal-border: #333;
-  --minimal-hover: #d07ed2;
-  
-  /* Remove box shadows */
-  --box-shadow: none;
-  
-  /* Base styles */
-  background-color: var(--color-bg);
-  color: var(--color-text);
+	/* Override CSS variables */
+	--color-accent: transparent;
+	--color-bg: #222;
+	--color-bg-secondary: #222;
+	--color-bg-secondary-faded: #222;
+	--color-bg-neutral: #222;
+	--color-border: #444;
+	--color-error: #d07ed2;
+	--color-link: #ddd;
+	--color-secondary: #d07ed2;
+	--color-secondary-accent: transparent;
+	--color-shadow: transparent;
+	--color-table: #ddd;
+	--color-text: #ddd;
+	--color-text-secondary: #999;
+	--color-scrollbar: #444;
+
+	/* Status colors */
+	--color-primary: #d07ed2;
+	--color-pass: #d07ed2;
+	--color-fail: #999;
+	--color-disabled: #666;
+
+	/* Additional minimal theme variables */
+	--minimal-border: #333;
+	--minimal-hover: #d07ed2;
+
+	/* Remove box shadows */
+	--box-shadow: none;
+
+	/* Base styles */
+	background-color: var(--color-bg);
+	color: var(--color-text);
 }
 
 /* Remove all backgrounds and borders except essentials */
@@ -42,46 +42,46 @@
 .minimal-dark-theme section,
 .minimal-dark-theme fieldset,
 .minimal-dark-theme form {
-  background-color: transparent;
-  border: none;
-  box-shadow: none;
+	background-color: transparent;
+	border: none;
+	box-shadow: none;
 }
 
 .minimal-dark-theme * {
-  text-align: left !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+	text-align: left !important;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
 }
 
 .minimal-dark-theme a,
 .minimal-dark-theme .button {
-  display: inline !important;
-  text-decoration: underline !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: none !important;
+	display: inline !important;
+	text-decoration: underline !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border: none !important;
 }
 
 /* Minimal fieldset styling - just a subtle separator */
 .minimal-dark-theme fieldset {
-  border-top: 1px solid var(--minimal-border);
-  margin-top: 2rem;
-  padding-top: 1rem;
+	border-top: 1px solid var(--minimal-border);
+	margin-top: 2rem;
+	padding-top: 1rem;
 }
 
 .minimal-dark-theme fieldset:first-child {
-  border-top: none;
-  margin-top: 0;
+	border-top: none;
+	margin-top: 0;
 }
 
 /* Links */
 .minimal-dark-theme a {
-  color: var(--color-link);
-  text-decoration: none;
+	color: var(--color-link);
+	text-decoration: none;
 }
 
 .minimal-dark-theme a:hover {
-  color: var(--minimal-hover);
+	color: var(--minimal-hover);
 }
 
 /* Forms - minimal styling */
@@ -94,11 +94,11 @@
 .minimal-dark-theme input[type="search"],
 .minimal-dark-theme select,
 .minimal-dark-theme textarea {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  border: none;
-  border-bottom: 1px solid var(--color-border);
-  box-shadow: none;
+	background-color: var(--color-bg);
+	color: var(--color-text);
+	border: none;
+	border-bottom: 1px solid var(--color-border);
+	box-shadow: none;
 }
 
 .minimal-dark-theme input[type="text"]:focus,
@@ -110,9 +110,9 @@
 .minimal-dark-theme input[type="search"]:focus,
 .minimal-dark-theme select:focus,
 .minimal-dark-theme textarea:focus {
-  border-bottom-color: var(--minimal-hover);
-  background-color: var(--color-bg);
-  outline: none;
+	border-bottom-color: var(--minimal-hover);
+	background-color: var(--color-bg);
+	outline: none;
 }
 
 /* Buttons - minimal flat design */
@@ -120,219 +120,218 @@
 .minimal-dark-theme input[type="submit"],
 .minimal-dark-theme input[type="button"],
 .minimal-dark-theme .button {
-  background-color: transparent;
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-  box-shadow: none;
+	background-color: transparent;
+	color: var(--color-text);
+	border: 1px solid var(--color-border);
+	box-shadow: none;
 }
 
 .minimal-dark-theme button:hover,
 .minimal-dark-theme input[type="submit"]:hover,
 .minimal-dark-theme input[type="button"]:hover,
 .minimal-dark-theme .button:hover {
-  background-color: transparent;
-  color: var(--minimal-hover);
-  border-color: var(--minimal-hover);
-  box-shadow: none;
+	background-color: transparent;
+	color: var(--minimal-hover);
+	border-color: var(--minimal-hover);
+	box-shadow: none;
 }
-
 
 /* Tables - minimal styling */
 .minimal-dark-theme table {
-  background-color: transparent;
+	background-color: transparent;
 }
 
 .minimal-dark-theme th {
-  background-color: transparent;
-  color: var(--color-text);
-  border-bottom: 1px solid var(--color-border);
+	background-color: transparent;
+	color: var(--color-text);
+	border-bottom: 1px solid var(--color-border);
 }
 
 .minimal-dark-theme td {
-  border: none;
-  border-bottom: 1px solid var(--minimal-border);
+	border: none;
+	border-bottom: 1px solid var(--minimal-border);
 }
 
 .minimal-dark-theme tr:hover {
-  background-color: transparent;
-  box-shadow: none !important;
+	background-color: transparent;
+	box-shadow: none !important;
 }
 
 .minimal-dark-theme tr:nth-child(even) {
-  background-color: transparent;
+	background-color: transparent;
 }
 
 /* Labels and text */
 .minimal-dark-theme label {
-  color: var(--color-text);
+	color: var(--color-text);
 }
 
 .minimal-dark-theme small,
 .minimal-dark-theme .help-text {
-  color: var(--color-text-secondary);
-  opacity: 1;
+	color: var(--color-text-secondary);
+	opacity: 1;
 }
 
 /* Code blocks - minimal */
 .minimal-dark-theme code,
 .minimal-dark-theme pre {
-  background-color: var(--minimal-border);
-  color: var(--color-text);
-  border: none;
+	background-color: var(--minimal-border);
+	color: var(--color-text);
+	border: none;
 }
 
 /* HR - subtle separator */
 .minimal-dark-theme hr {
-  border: none;
-  border-top: 1px solid var(--minimal-border);
+	border: none;
+	border-top: 1px solid var(--minimal-border);
 }
 
 /* Calculated fields */
 .minimal-dark-theme .calculated-field .calculated-value {
-  color: var(--color-text-secondary);
-  opacity: 1;
+	color: var(--color-text-secondary);
+	opacity: 1;
 }
 
 /* Remove all box shadows */
 .minimal-dark-theme *,
 .minimal-dark-theme *:hover {
-  box-shadow: none !important;
+	box-shadow: none !important;
 }
 
 /* Completion status notice - minimal */
 .minimal-dark-theme .completion-status-notice {
-  background: transparent;
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
+	background: transparent;
+	border: 1px solid var(--color-border);
+	color: var(--color-text);
 }
 
 .minimal-dark-theme .completion-status-notice a {
-  color: var(--minimal-hover);
+	color: var(--minimal-hover);
 }
 
 /* Pass/Fail/Pending badges - minimal */
 .minimal-dark-theme .pass-badge {
-  background-color: transparent;
-  color: var(--color-pass);
-  border: 1px solid var(--color-pass);
+	background-color: transparent;
+	color: var(--color-pass);
+	border: 1px solid var(--color-pass);
 }
 
 .minimal-dark-theme .fail-badge {
-  background-color: transparent;
-  color: var(--color-fail);
-  border: 1px solid var(--color-fail);
+	background-color: transparent;
+	color: var(--color-fail);
+	border: 1px solid var(--color-fail);
 }
 
 .minimal-dark-theme .pending-badge {
-  background-color: transparent;
-  color: #f9a825;
-  border: 1px solid #f9a825;
+	background-color: transparent;
+	color: #f9a825;
+	border: 1px solid #f9a825;
 }
 
 /* Company activation notice - minimal */
 .minimal-dark-theme #company-activation-notice {
-  background-color: transparent;
-  border: 1px solid var(--minimal-hover);
-  color: var(--color-text);
+	background-color: transparent;
+	border: 1px solid var(--minimal-hover);
+	color: var(--color-text);
 }
 
 /* Details/Summary elements - minimal */
 .minimal-dark-theme summary {
-  background-color: transparent;
-  color: var(--color-text);
+	background-color: transparent;
+	color: var(--color-text);
 }
 
 .minimal-dark-theme summary:hover {
-  color: var(--minimal-hover);
+	color: var(--minimal-hover);
 }
 
 /* Incomplete fields - minimal */
 .minimal-dark-theme .incomplete-fields-details {
-  border: 1px solid var(--color-border);
-  background-color: transparent;
+	border: 1px solid var(--color-border);
+	background-color: transparent;
 }
 
 .minimal-dark-theme .incomplete-fields-summary {
-  color: var(--color-text);
-  background-color: transparent;
+	color: var(--color-text);
+	background-color: transparent;
 }
 
 .minimal-dark-theme .incomplete-fields-summary:hover {
-  color: var(--minimal-hover);
-  background-color: transparent;
+	color: var(--minimal-hover);
+	background-color: transparent;
 }
 
 .minimal-dark-theme .incomplete-fields-content {
-  background-color: transparent;
-  border-top: 1px solid var(--minimal-border);
+	background-color: transparent;
+	border-top: 1px solid var(--minimal-border);
 }
 
 .minimal-dark-theme .incomplete-fields-list li {
-  border-bottom: 1px solid var(--minimal-border);
+	border-bottom: 1px solid var(--minimal-border);
 }
 
 /* Table list items - minimal */
 .minimal-dark-theme .table-list-items li a {
-  background-color: transparent;
+	background-color: transparent;
 }
 
 .minimal-dark-theme .table-list-items li:hover a {
-  color: var(--minimal-hover);
-  background-color: transparent !important;
+	color: var(--minimal-hover);
+	background-color: transparent !important;
 }
 
 /* Unit photos - minimal */
 .minimal-dark-theme .unit-photo img {
-  border: 1px solid var(--minimal-border);
+	border: 1px solid var(--minimal-border);
 }
 
 .minimal-dark-theme .unit-photo:hover img {
-  border-color: var(--minimal-hover);
+	border-color: var(--minimal-hover);
 }
 
 /* Share button - minimal */
 .minimal-dark-theme .share-button {
-  background-color: transparent;
-  border: 1px solid var(--color-border);
+	background-color: transparent;
+	border: 1px solid var(--color-border);
 }
 
 .minimal-dark-theme .share-button:hover {
-  border-color: var(--minimal-hover);
-  color: var(--minimal-hover);
+	border-color: var(--minimal-hover);
+	color: var(--minimal-hover);
 }
 
 /* Legend styling - minimal */
 .minimal-dark-theme legend {
-  color: var(--color-text-secondary);
-  font-weight: normal;
+	color: var(--color-text-secondary);
+	font-weight: normal;
 }
 
 /* Radio buttons and checkboxes - minimal accent */
 .minimal-dark-theme input[type="radio"]:checked,
 .minimal-dark-theme input[type="checkbox"]:checked {
-  accent-color: var(--minimal-hover);
+	accent-color: var(--minimal-hover);
 }
 
 /* File inputs - minimal */
 .minimal-dark-theme input[type="file"] {
-  color: var(--color-text);
+	color: var(--color-text);
 }
 
 /* Tabs - minimal */
 .minimal-dark-theme .tabs {
-  border-bottom: 1px solid var(--minimal-border);
+	border-bottom: 1px solid var(--minimal-border);
 }
 
 .minimal-dark-theme .tabs a {
-  border: none;
-  color: var(--color-text-secondary);
+	border: none;
+	color: var(--color-text-secondary);
 }
 
 .minimal-dark-theme .tabs a:hover {
-  color: var(--minimal-hover);
+	color: var(--minimal-hover);
 }
 
 .minimal-dark-theme .tabs span {
-  color: var(--minimal-hover);
-  border-bottom: 2px solid var(--minimal-hover);
+	color: var(--minimal-hover);
+	border-bottom: 2px solid var(--minimal-hover);
 }
