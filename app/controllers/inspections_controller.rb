@@ -53,6 +53,26 @@ class InspectionsController < ApplicationController
       flash[:notice] = result[:message]
       redirect_to edit_inspection_path(result[:inspection])
     else
+      # Loud error logging in development/test
+      if Rails.env.development? || Rails.env.test?
+        Rails.logger.error "=" * 80
+        Rails.logger.error "INSPECTION CREATION FAILED!"
+        Rails.logger.error "Message: #{result[:message]}"
+        Rails.logger.error "Unit ID: #{unit_id}"
+        Rails.logger.error "User: #{current_user&.email}"
+        Rails.logger.error "Result: #{result.inspect}"
+        Rails.logger.error "=" * 80
+        
+        # Also output to STDOUT for visibility in tests
+        puts "=" * 80
+        puts "INSPECTION CREATION FAILED!"
+        puts "Message: #{result[:message]}"
+        puts "Unit ID: #{unit_id}"
+        puts "User: #{current_user&.email}"
+        puts "Result: #{result.inspect}"
+        puts "=" * 80
+      end
+      
       flash[:alert] = result[:message]
       redirect_to result[:redirect_path]
     end
@@ -65,15 +85,33 @@ class InspectionsController < ApplicationController
   end
 
   def update
-    # Capture the changes before update
     previous_attributes = @inspection.attributes.dup
-
     if @inspection.update(inspection_params)
-      # Calculate what changed
-      changed_data = calculate_changes(previous_attributes, @inspection.attributes, inspection_params.keys)
+      changed_data = calculate_changes(
+        previous_attributes,
+        @inspection.attributes,
+        inspection_params.keys
+      )
       log_inspection_event("updated", @inspection, nil, changed_data)
       handle_successful_update
     else
+      if Rails.env.development? || Rails.env.test?
+        Rails.logger.error "=" * 80
+        Rails.logger.error "INSPECTION UPDATE FAILED!"
+        Rails.logger.error "Errors: #{@inspection.errors.full_messages.join(', ')}"
+        Rails.logger.error "Params: #{inspection_params.inspect}"
+        Rails.logger.error "Inspection ID: #{@inspection.id}"
+        Rails.logger.error "=" * 80
+        
+        # Also output to STDOUT for visibility in tests
+        puts "=" * 80
+        puts "INSPECTION UPDATE FAILED!"
+        puts "Errors: #{@inspection.errors.full_messages.join(', ')}"
+        puts "Params: #{inspection_params.inspect}"
+        puts "Inspection ID: #{@inspection.id}"
+        puts "=" * 80
+      end
+      
       handle_failed_update
     end
   end

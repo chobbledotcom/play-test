@@ -3,8 +3,11 @@ en:
   navigation:
     inspections: "Inspections"
     units: "Units"
+    users: "Users"
     settings: "Settings"
     safety_standards: "Safety Standards"
+    guides: "Guides"
+    about: "About"
 
   # Shared UI elements
   shared:

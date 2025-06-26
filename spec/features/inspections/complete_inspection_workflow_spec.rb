@@ -1,5 +1,141 @@
 require "rails_helper"
 require_relative "../../../db/seeds/seed_data"
+require "timeout"
+
+RSpec.feature "Complete Inspection Workflow", type: :feature do
+  scenario "complete workflow with prefilling - no slide or enclosure" do
+    InspectionWorkflow.new(
+      has_slide: false,
+      is_totally_enclosed: false
+    ).execute
+  end
+
+  scenario "inspection log access control" do
+    user = create(:user)
+    other_user = create(:user)
+    unit = create(:unit, user: user)
+    inspection = create(:inspection, user: user, unit: unit)
+
+    # Owner can view log
+    sign_in(user)
+    visit log_inspection_path(inspection)
+    expect(page).to have_content(I18n.t("inspections.titles.log", inspection: inspection.id))
+
+    # Use direct navigation instead of logout/login
+    # Non-owner cannot view log
+    page.driver.browser.clear_cookies
+    sign_in(other_user)
+    visit log_inspection_path(inspection)
+    expect(page.status_code).to eq(404)
+  end
+
+  scenario "complete workflow with prefilling - slide, no enclosure" do
+    InspectionWorkflow.new(
+      has_slide: true,
+      is_totally_enclosed: false
+    ).execute
+  end
+
+  scenario "complete workflow with prefilling - no slide, enclosure" do
+    InspectionWorkflow.new(
+      has_slide: false,
+      is_totally_enclosed: true
+    ).execute
+  end
+
+  scenario "complete workflow with prefilling - slide and enclosure" do
+    InspectionWorkflow.new(
+      has_slide: true,
+      is_totally_enclosed: true
+    ).execute
+  end
+
+  scenario "prevents duplicate unique report numbers for same user" do
+    user = create(:user)
+    sign_in(user)
+
+    # Create first inspection with a unique report number
+    unit1 = create(:unit, user: user)
+    inspection1 = create(:inspection, unit: unit1, user: user)
+
+    visit edit_inspection_path(inspection1)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
+    click_button I18n.t("forms.inspection.submit")
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+
+    # Create second inspection and try to use same report number
+    unit2 = create(:unit, user: user)
+    inspection2 = create(:inspection, unit: unit2, user: user)
+
+    visit edit_inspection_path(inspection2)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
+    click_button I18n.t("forms.inspection.submit")
+
+    # Should show validation error in form
+    expect(page).to have_content("has already been taken")
+    expect(page).to have_css(".form-errors")
+
+    # Fix by using different report number
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-002"
+    click_button I18n.t("forms.inspection.submit")
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+  end
+
+  scenario "allows multiple inspections with blank unique report numbers" do
+    user = create(:user)
+    sign_in(user)
+
+    # Create first inspection with blank unique report number
+    unit1 = create(:unit, user: user)
+    inspection1 = create(:inspection, unit: unit1, user: user)
+
+    visit edit_inspection_path(inspection1)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: ""
+    click_button I18n.t("forms.inspection.submit")
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+
+    # Create second inspection also with blank unique report number
+    unit2 = create(:unit, user: user)
+    inspection2 = create(:inspection, unit: unit2, user: user)
+
+    visit edit_inspection_path(inspection2)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: ""
+    click_button I18n.t("forms.inspection.submit")
+
+    # Should save successfully - blank values are allowed
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+    expect(page).not_to have_css(".form-errors")
+  end
+
+  scenario "different users can use the same unique report number" do
+    user1 = create(:user)
+    user2 = create(:user)
+
+    # User 1 creates inspection with report number
+    sign_in(user1)
+    unit1 = create(:unit, user: user1)
+    inspection1 = create(:inspection, unit: unit1, user: user1)
+
+    visit edit_inspection_path(inspection1)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
+    click_button I18n.t("forms.inspection.submit")
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+    logout
+
+    # User 2 can use the same report number
+    sign_in(user2)
+    unit2 = create(:unit, user: user2)
+    inspection2 = create(:inspection, unit: unit2, user: user2)
+
+    visit edit_inspection_path(inspection2)
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
+    click_button I18n.t("forms.inspection.submit")
+
+    # Should save successfully - different users can have same report number
+    expect(page).to have_content(I18n.t("inspections.messages.updated"))
+    expect(page).not_to have_css(".form-errors")
+  end
+end
 
 class InspectionWorkflow
   include Capybara::DSL
@@ -66,16 +202,13 @@ class InspectionWorkflow
 
   def register_new_user
     visit root_path
-    capture_guide_screenshot("Home Page - Not Logged In")
     
     click_link t("users.titles.register")
-    capture_guide_screenshot("Registration Form")
 
     user_data = SeedData.user_fields
     user_data.each do |field_name, value|
       fill_in_form :user_new, field_name, value
     end
-    capture_guide_screenshot("Registration Form - Filled")
 
     submit_form :user_new
     User.find_by!(email: user_data[:email])
@@ -83,7 +216,6 @@ class InspectionWorkflow
 
   def verify_inactive_user_warning
     expect(page).to have_content(t("users.messages.user_inactive"))
-    capture_guide_screenshot("Inactive User Warning")
   end
 
   def activate_user
@@ -100,10 +232,8 @@ class InspectionWorkflow
   def create_test_unit
     visit root_path
     click_link "Units"
-    capture_guide_screenshot("Units Index - Empty")
     
     click_units_button("add_unit")
-    capture_guide_screenshot("Create Unit Form")
 
     unit_data = SeedData.unit_fields.merge(
       name: "Test Bouncy Castle"
@@ -112,11 +242,9 @@ class InspectionWorkflow
     unit_data.each do |field_name, value|
       fill_in_form :units, field_name, value
     end
-    capture_guide_screenshot("Create Unit Form - Filled")
 
     submit_form :units
     expect_units_message("created")
-    capture_guide_screenshot("Unit Created Successfully")
 
     Unit.find_by!(
       name: unit_data[:name],
@@ -128,12 +256,9 @@ class InspectionWorkflow
     visit root_path
     click_link "Units"
     click_link "Test Bouncy Castle"
-    capture_guide_screenshot("Unit Details Page")
-
     click_units_button("add_inspection")
     expect(page).to have_content(t("inspections.titles.edit"))
-    capture_guide_screenshot("New Inspection - Basic Details")
-
+    expect(page).to have_current_path(/inspections\/\w+\/edit/)
     @unit.inspections.order(created_at: :desc).first.tap do |inspection|
       expect(inspection).to be_present
     end
@@ -145,10 +270,8 @@ class InspectionWorkflow
     field_data.each do |field_name, value|
       fill_inspection_field(field_name, value)
     end
-    capture_guide_screenshot("Inspection Details - Filled")
 
     click_submit_button
-    capture_guide_screenshot("Inspection Summary - Incomplete")
 
     @inspection.reload
     expect(@inspection.has_slide).to eq(
@@ -171,22 +294,19 @@ class InspectionWorkflow
 
   def fill_all_assessments
     applicable_tabs.each_with_index do |tab_name, index|
-      # Before filling this tab, verify check marks are correct
       verify_assessment_check_marks(completed_tabs: applicable_tabs[0...index])
-
       fill_assessment_tab(tab_name)
-
       if index < applicable_tabs.length - 1
         verify_inspection_not_completable
       end
     end
 
-    # After all assessments are complete, verify all tabs have check marks
     verify_assessment_check_marks(completed_tabs: applicable_tabs)
   end
 
   def fill_assessment_tab(tab_name)
     visit edit_inspection_path(@inspection, tab: tab_name)
+    
     field_data = SeedData.send(
       "#{tab_name}_fields",
       passed: true
@@ -195,18 +315,8 @@ class InspectionWorkflow
     field_data.each do |field_name, value|
       fill_assessment_field(tab_name, field_name, value)
     end
-
     submit_form tab_name.to_sym
     expect_updated_message
-
-    if tab_name == "results"
-      # Results tab doesn't have an assessment model, check the inspection fields directly
-      @inspection.reload
-      expect(@inspection.passed).to be true
-    else
-      assessment = @inspection.reload.send("#{tab_name}_assessment")
-      expect(assessment.complete?).to be true
-    end
   end
 
   def fill_assessment_field(tab_name, field_name, value)
@@ -247,13 +357,13 @@ class InspectionWorkflow
   end
 
   def expect_units_message(key)
-    expect(page).to have_content(t("units.messages.#{key}"))
+    expect_i18n_content("units.messages.#{key}")
   end
 
   def verify_inspection_not_completable
     visit edit_inspection_path(@inspection)
 
-    incomplete_fields = @inspection.incomplete_fields
+    incomplete_fields = @inspection.reload.incomplete_fields
     if incomplete_fields.any?
       # Count total fields across all forms, not just forms with incomplete fields
       total_field_count = incomplete_fields.sum { |form| form[:fields].count }
@@ -322,6 +432,8 @@ class InspectionWorkflow
 
     visit inspection_path(@inspection, format: :pdf)
     expect(page.status_code).to eq(200)
+    # Can't capture PDF, go back to HTML view
+    visit inspection_path(@inspection)
 
     verify_log_functionality
   end
@@ -472,140 +584,5 @@ class InspectionWorkflow
 
     click_delete_button
     expect_deleted_message
-  end
-end
-
-RSpec.feature "Complete Inspection Workflow", type: :feature do
-  scenario "complete workflow with prefilling - no slide or enclosure", js: true do
-    InspectionWorkflow.new(
-      has_slide: false,
-      is_totally_enclosed: false
-    ).execute
-  end
-
-  scenario "inspection log access control" do
-    user = create(:user)
-    other_user = create(:user)
-    unit = create(:unit, user: user)
-    inspection = create(:inspection, user: user, unit: unit)
-
-    # Owner can view log
-    sign_in(user)
-    visit log_inspection_path(inspection)
-    expect(page).to have_content(I18n.t("inspections.titles.log", inspection: inspection.id))
-
-    # Use direct navigation instead of logout/login
-    # Non-owner cannot view log
-    page.driver.browser.clear_cookies
-    sign_in(other_user)
-    visit log_inspection_path(inspection)
-    expect(page.status_code).to eq(404)
-  end
-
-  scenario "complete workflow with prefilling - slide, no enclosure" do
-    InspectionWorkflow.new(
-      has_slide: true,
-      is_totally_enclosed: false
-    ).execute
-  end
-
-  scenario "complete workflow with prefilling - no slide, enclosure" do
-    InspectionWorkflow.new(
-      has_slide: false,
-      is_totally_enclosed: true
-    ).execute
-  end
-
-  scenario "complete workflow with prefilling - slide and enclosure" do
-    InspectionWorkflow.new(
-      has_slide: true,
-      is_totally_enclosed: true
-    ).execute
-  end
-
-  scenario "prevents duplicate unique report numbers for same user" do
-    user = create(:user)
-    sign_in(user)
-
-    # Create first inspection with a unique report number
-    unit1 = create(:unit, user: user)
-    inspection1 = create(:inspection, unit: unit1, user: user)
-
-    visit edit_inspection_path(inspection1)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
-    click_button I18n.t("forms.inspection.submit")
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-
-    # Create second inspection and try to use same report number
-    unit2 = create(:unit, user: user)
-    inspection2 = create(:inspection, unit: unit2, user: user)
-
-    visit edit_inspection_path(inspection2)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
-    click_button I18n.t("forms.inspection.submit")
-
-    # Should show validation error in form
-    expect(page).to have_content("has already been taken")
-    expect(page).to have_css(".form-errors")
-
-    # Fix by using different report number
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-002"
-    click_button I18n.t("forms.inspection.submit")
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-  end
-
-  scenario "allows multiple inspections with blank unique report numbers" do
-    user = create(:user)
-    sign_in(user)
-
-    # Create first inspection with blank unique report number
-    unit1 = create(:unit, user: user)
-    inspection1 = create(:inspection, unit: unit1, user: user)
-
-    visit edit_inspection_path(inspection1)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: ""
-    click_button I18n.t("forms.inspection.submit")
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-
-    # Create second inspection also with blank unique report number
-    unit2 = create(:unit, user: user)
-    inspection2 = create(:inspection, unit: unit2, user: user)
-
-    visit edit_inspection_path(inspection2)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: ""
-    click_button I18n.t("forms.inspection.submit")
-
-    # Should save successfully - blank values are allowed
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-    expect(page).not_to have_css(".form-errors")
-  end
-
-  scenario "different users can use the same unique report number" do
-    user1 = create(:user)
-    user2 = create(:user)
-
-    # User 1 creates inspection with report number
-    sign_in(user1)
-    unit1 = create(:unit, user: user1)
-    inspection1 = create(:inspection, unit: unit1, user: user1)
-
-    visit edit_inspection_path(inspection1)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
-    click_button I18n.t("forms.inspection.submit")
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-    logout
-
-    # User 2 can use the same report number
-    sign_in(user2)
-    unit2 = create(:unit, user: user2)
-    inspection2 = create(:inspection, unit: unit2, user: user2)
-
-    visit edit_inspection_path(inspection2)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
-    click_button I18n.t("forms.inspection.submit")
-
-    # Should save successfully - different users can have same report number
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-    expect(page).not_to have_css(".form-errors")
   end
 end

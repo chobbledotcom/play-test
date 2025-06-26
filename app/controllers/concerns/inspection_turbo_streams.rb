@@ -48,13 +48,13 @@ module InspectionTurboStreams
       {
         dom_id: dom_id,
         success: true,
-        success_message: t("inspections.messages.updated")
+        message: t("inspections.messages.updated")
       }
     else
       {
         dom_id: dom_id,
         errors: @inspection.errors.full_messages,
-        error_message: t("shared.messages.save_failed")
+        message: t("shared.messages.save_failed")
       }
     end
   end

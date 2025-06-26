@@ -171,6 +171,146 @@ module FormHelpers
     tab_text = I18n.t("forms.#{tab_name}.header")
     expect(page).to have_css("nav#tabs span", text: tab_text)
   end
+
+  # Generic I18n helpers
+  def click_i18n_button(key, **interpolations)
+    click_button I18n.t(key, **interpolations)
+  end
+
+  def expect_i18n_content(key, **interpolations)
+    expect(page).to have_content(I18n.t(key, **interpolations))
+  end
+
+  def click_i18n_link(key, **interpolations)
+    click_link I18n.t(key, **interpolations)
+  end
+
+  # Smart field filling that handles all field types
+  def smart_fill_field(form_name, field_name, value)
+    field_str = field_name.to_s
+    
+    # Skip comment fields entirely - matching original behavior
+    return if field_str.end_with?("_comment")
+    
+    case value
+    when true, false
+      if field_str.end_with?("_pass") || field_str == "passed"
+        field_label = get_field_label(form_name, field_name)
+        choose_pass_fail(field_label, value)
+      elsif %w[has_slide is_totally_enclosed passed slide_permanent_roof].include?(field_str)
+        value ? check_form_radio(form_name.to_sym, field_name) :
+                uncheck_form_radio(form_name.to_sym, field_name)
+      else
+        field_label = get_field_label(form_name, field_name)
+        choose_yes_no(field_label, value)
+      end
+    when nil, ""
+      # Skip nil or empty values
+    else
+      fill_in_form(form_name.to_sym, field_name, value)
+    end
+  end
+
+  def get_field_label(form_name, field_name)
+    field_str = field_name.to_s
+    
+    if field_str.end_with?("_pass")
+      pass_key = "forms.#{form_name}.fields.#{field_name}"
+      base_key = "forms.#{form_name}.fields.#{field_str.chomp("_pass")}"
+      
+      I18n.exists?(pass_key) ? I18n.t(pass_key) : I18n.t(base_key)
+    else
+      I18n.t("forms.#{form_name}.fields.#{field_name}")
+    end
+  end
+
+  # Assessment helpers
+  def fill_assessment_form(assessment_type, data)
+    data.each do |field_name, value|
+      smart_fill_field(assessment_type, field_name, value)
+    end
+  end
+
+  def expect_assessment_complete(inspection, assessment_type)
+    if assessment_type == "results"
+      expect(inspection.reload.passed).to be true
+    else
+      assessment = inspection.reload.send("#{assessment_type}_assessment")
+      expect(assessment.complete?).to be true
+    end
+  end
+
+  def fill_comment_field(form_name, field_name, value)
+    # Comment fields use a checkbox toggle pattern
+    # First, check the comment checkbox to show the field
+    checkbox = find("input[type='checkbox'][data-comment-toggle='#{form_name}_#{field_name}']")
+    checkbox.check unless checkbox.checked?
+    
+    # Then fill in the text field
+    text_field_id = "#{form_name}_#{field_name}"
+    fill_in text_field_id, with: value
+  end
+
+  def expect_assessment_check_mark(tab_name, has_check: true)
+    tab_text = I18n.t("forms.#{tab_name}.header")
+    
+    within("nav#tabs") do
+      if has_check
+        if page.has_css?("span", text: tab_text)
+          expect(page).to have_css("span", text: "#{tab_text} ✓")
+        else
+          expect(page).to have_link("#{tab_text} ✓")
+        end
+      else
+        if page.has_css?("span", text: tab_text)
+          expect(page).to have_css("span", text: tab_text)
+          expect(page).not_to have_css("span", text: "#{tab_text} ✓")
+        else
+          expect(page).to have_link(tab_text)
+          expect(page).not_to have_link("#{tab_text} ✓")
+        end
+      end
+    end
+  end
+
+  # User/Unit creation helpers
+  def create_and_register_user(user_data, activate: false)
+    visit root_path
+    click_i18n_link("users.titles.register")
+    
+    user_data.each do |field_name, value|
+      fill_in_form :user_new, field_name, value
+    end
+    
+    submit_form :user_new
+    
+    user = User.find_by!(email: user_data[:email])
+    user.update!(active_until: 5.minutes.from_now) if activate
+    user
+  end
+
+  def create_unit_via_ui(name:, **attributes)
+    visit units_path
+    click_i18n_button("units.buttons.add_unit")
+    
+    attributes.merge(name: name).each do |field_name, value|
+      fill_in_form :units, field_name, value
+    end
+    
+    submit_form :units
+    expect_i18n_content("units.messages.created")
+    
+    Unit.find_by!(name: name)
+  end
+
+  def create_inspection_via_ui(unit)
+    visit unit_path(unit)
+    # Accept the confirmation dialog when clicking Add Inspection
+    accept_confirm(I18n.t("units.messages.add_inspection_confirm")) do
+      click_i18n_button("units.buttons.add_inspection")
+    end
+    unit.inspections.order(created_at: :desc).first
+  end
 end
 
 RSpec.configure do |config|

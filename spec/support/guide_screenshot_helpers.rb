@@ -2,7 +2,7 @@ module GuideScreenshotHelpers
   GUIDE_SCREENSHOTS_ROOT = Rails.root.join("public", "guide_screenshots")
 
   def capture_guide_screenshot(caption, options = {})
-    return unless ENV["CAPTURE_GUIDE_SCREENSHOTS"] == "true"
+    # return unless ENV["CAPTURE_GUIDE_SCREENSHOTS"] == "true"
 
     # Generate folder structure based on spec file path
     spec_path = RSpec.current_example.file_path
@@ -42,7 +42,7 @@ module GuideScreenshotHelpers
       raise "Guide screenshots require js: true on the test scenario"
     end
     
-    save_screenshot(filepath.to_s)
+    save_screenshot(filepath.to_s, full: true)
 
     # Add to metadata
     metadata["screenshots"] << {

@@ -31,6 +31,7 @@ group :development, :test do
   gem "simplecov", require: false
   gem "pdf-inspector", require: false
   gem "parallel_tests"
+  gem "database_cleaner-active_record"
 
   # Ruby code formatter and linter
   gem "standard", require: false

@@ -84,7 +84,7 @@ module SeedData
       blower_tube_length: rand(2.0..5.0).round(1),
       step_ramp_size: rand(200..400),
       critical_fall_off_height: rand(0.5..2.0).round(1),
-      trough_depth: rand(0.1..0.5).round(1),
+      trough_depth: rand(30..80).round(1),
       trough_depth_pass: check_passed?(passed),
       trough_adjacent_panel_width: rand(0.3..1.0).round(1),
       trough_adjacent_panel_width_pass: check_passed?(passed),

@@ -12,6 +12,14 @@ module AssessmentController
   end
 
   def update
+    # Debug logging for test environment
+    if Rails.env.test?
+      puts "=== ASSESSMENT UPDATE DEBUG ==="
+      puts "Assessment type: #{assessment_type}"
+      puts "Assessment ID: #{@assessment.id}"
+      puts "Params: #{assessment_params.inspect}"
+    end
+    
     if @assessment.update(assessment_params)
       @assessment.reload  # Ensure we have fresh data for turbo streams
       handle_successful_update

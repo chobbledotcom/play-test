@@ -7,9 +7,11 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require "rspec/rails"
 require "factory_bot_rails"
 require "capybara/rspec"
+require "database_cleaner/active_record"
 require_relative "../lib/i18n_usage_tracker"
 
 Capybara.raise_server_errors = true
+Capybara.default_max_wait_time = 5
 
 if ENV["I18N_TRACKING_ENABLED"] == "true"
   I18nUsageTracker.reset!
@@ -26,6 +28,19 @@ end
 RSpec.configure do |config|
   config.before(:each) do
     ENV["ADMIN_EMAILS_PATTERN"] = "^admin\\d*@example\\.com$"
+    DatabaseCleaner.strategy = :transaction
+  end
+
+  config.before(:each, js: true) do
+    DatabaseCleaner.strategy = :truncation
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
   end
 
   config.include FactoryBot::Syntax::Methods
@@ -35,9 +50,10 @@ RSpec.configure do |config|
   config.include FormHelpers, type: :feature
 
   config.fixture_paths = [Rails.root.join("spec/fixtures")]
-  config.use_transactional_fixtures = true
+  config.use_transactional_fixtures = false
 
   config.before(:suite) do
+    DatabaseCleaner.clean_with(:truncation)
     if ENV["TEST_ENV_NUMBER"]
       ActiveRecord::Base.establish_connection(
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env).first
