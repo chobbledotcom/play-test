@@ -121,7 +121,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
 
         # Should contain I18n unit report title
         pdf_text = pdf_text_content(response.body)
-        expect(pdf_text).to include(I18n.t("pdf.unit.title"))
+        expect(pdf_text).to include(I18n.t("pdf.unit.fields.unit_id"))
         expect(pdf_text).to include(unit.manufacturer)
       end
 

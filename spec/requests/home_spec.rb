@@ -210,7 +210,7 @@ RSpec.describe "Home", type: :request do
   describe "accessibility and SEO" do
     it "includes proper page title" do
       visit root_path
-      expect(page).to have_title("play-test | Professional Inspection Management | play-test.co.uk")
+      expect(page).to have_title("play-test | BS EN 14960 Inspection Logger & Database | play-test.co.uk")
     end
 
     it "has semantic HTML structure for screen readers" do

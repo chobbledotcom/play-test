@@ -123,7 +123,7 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
       pdf_text = pdf_text_content(response.body)
 
       expect_pdf_to_include_i18n_keys(pdf_text,
-        "pdf.unit.title",
+        "pdf.unit.fields.unit_id",
         "pdf.unit.details",
         "pdf.unit.inspection_history")
     end

@@ -59,7 +59,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
       pdf_text = pdf_text_content(pdf.render)
 
       # Check that I18n translations are used
-      expect(pdf_text).to include(I18n.t("pdf.unit.title"))
+      expect(pdf_text).to include(I18n.t("pdf.unit.fields.unit_id"))
       expect(pdf_text).to include(I18n.t("pdf.unit.details"))
     end
 

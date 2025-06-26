@@ -25,14 +25,15 @@ Currently in alpha testing at [play-test.co.uk](https://play-test.co.uk).
 - Generate PDF reports with QR codes
 - Built-in safety calculations (anchor points, user capacity, etc.)
 
-### 👥 Multi-Inspector Support
-- Company accounts with logos and branding
+### 👥 Company Management
+- Company accounts with branding
 - User management and access control
-- Export data as CSV or JSON
+- Upload your logo for PDF reports
 - Works on phones, tablets, and desktops
 
 ### 🛠️ Technical Features
-- Progressive Web App (works offline)
+- Export any unit or inspection as PDF or JSON
+- Shows safety standards right where you need them
 - Dark/light theme
 - Minimal dependencies
 - Full internationalisation support
@@ -73,7 +74,7 @@ rails server
 ### Traditional Setup
 
 ```bash
-# Requires Ruby 3.0+ and PostgreSQL
+# Requires Ruby 3.0+ and SQLite
 bundle install
 rails db:setup
 rails server
@@ -97,7 +98,7 @@ open coverage/index.html
 ## Tech Stack
 
 - **Rails 8.0+** - Keeping it simple with minimal gems
-- **PostgreSQL** - Rock solid database
+- **SQLite** - Simple, reliable database
 - **RSpec & Capybara** - Comprehensive test suite
 - **Semantic HTML + MVP.css** - No CSS framework bloat
 - **Turbo** - Snappy interactions without the JavaScript complexity

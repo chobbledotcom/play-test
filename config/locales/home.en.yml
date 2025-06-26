@@ -34,11 +34,11 @@ en:
     
     what_it_is:
       title: "What is play-test?"
-      content: "play-test is a digital inspection management system for inflatable playground equipment. It helps inspection companies ensure compliance with EN 14960:2019 safety standards by digitising the inspection process and generating PDF reports with QR codes."
+      content: "play-test is a BS EN 14960 inspection logger and database for inflatable playground equipment. It helps inspectors ensure compliance with BS EN 14960:2019 safety standards by digitising the inspection process and generating PDF reports with QR codes for easy verification."
     
     key_features:
       title: "Key Features"
-      content: "Track equipment with serial numbers and dimensions. Perform seven comprehensive safety assessments including structure, anchorage, materials, electrical (PAT), slide safety, user height, and enclosed unit checks. Automatically calculate pass/fail status based on EN 14960:2019 requirements. Generate PDF inspection reports with QR codes for easy client access. Manage multiple inspection companies with data isolation. Access from any device with progressive web app support."
+      content: "Track equipment with serial numbers and dimensions. Perform seven comprehensive safety assessments including structure, anchorage, materials, electrical (PAT), slide safety, user height, and enclosed unit checks. Automatically calculate pass/fail status based on BS EN 14960:2019 requirements. Generate PDF or JSON reports for every unit and inspection. Upload your company logo for branded PDF reports. Safety standards displayed at relevant points during inspection. Export data in multiple formats. Works on any device with a web browser."
     
     attribution:
       title: "Attribution & Licensing"

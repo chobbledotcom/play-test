@@ -25,7 +25,8 @@ class PdfGeneratorService
     NICE_TABLE_CELL_PADDING = [4, 8]
     NICE_TABLE_TEXT_SIZE = 10
 
-    # Inspection history table colors
+    # Inspection history table styling
+    HISTORY_TABLE_TEXT_SIZE = 8
     HISTORY_TABLE_HEADER_COLOR = "F5F5F5"
     HISTORY_TABLE_ROW_COLOR = "FAFAFA"
     HISTORY_TABLE_ALT_ROW_COLOR = "F0F0F0"
@@ -35,11 +36,10 @@ class PdfGeneratorService
     SUBTITLE_COLOR = "666666"  # Gray
 
     # Inspection history table column widths
-    HISTORY_DATE_COLUMN_WIDTH = 80      # Date column (DD/MM/YYYY)
-    HISTORY_RESULT_COLUMN_WIDTH = 60    # Result column (PASS/FAIL)
-    HISTORY_RPII_COLUMN_WIDTH = 80      # RPII Inspector No column
-    HISTORY_INSPECTOR_WIDTH_PERCENT = 0.4  # 40% of remaining space
-    HISTORY_LOCATION_WIDTH_PERCENT = 0.6   # 60% of remaining space
+    HISTORY_DATE_COLUMN_WIDTH = 90      # Date column (DD/MM/YYYY) - slightly wider
+    HISTORY_RESULT_COLUMN_WIDTH = 45    # Result column (PASS/FAIL) - narrower
+    HISTORY_INSPECTOR_WIDTH_PERCENT = 0.5  # 50% of remaining space
+    HISTORY_LOCATION_WIDTH_PERCENT = 0.5   # 50% of remaining space
 
     # Assessment layout constants
     ASSESSMENT_COLUMNS_COUNT = 3

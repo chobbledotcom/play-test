@@ -239,16 +239,22 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         I18n.t("pdf.unit.fields.date"),
         I18n.t("pdf.unit.fields.result"),
         I18n.t("pdf.unit.fields.inspector"),
-        I18n.t("pdf.inspection.fields.rpii_inspector_no"),
         I18n.t("pdf.inspection.fields.inspection_location")
       ]
 
       expected_data = [expected_header] + inspections.map { |i|
+        inspector_name = i.user.name || I18n.t("pdf.unit.fields.na")
+        rpii_number = i.user.rpii_inspector_number
+        inspector_text = if rpii_number.present?
+          "#{inspector_name} (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} #{rpii_number})"
+        else
+          inspector_name
+        end
+        
         [
           PdfGeneratorService::Utilities.format_date(i.inspection_date),
           i.passed ? I18n.t("shared.pass_pdf") : I18n.t("shared.fail_pdf"),
-          i.user.name || I18n.t("pdf.unit.fields.na"),
-          i.user.rpii_inspector_number || I18n.t("pdf.unit.fields.na"),
+          inspector_text,
           i.inspection_location || I18n.t("pdf.unit.fields.na")
         ]
       }
@@ -264,12 +270,11 @@ RSpec.describe PdfGeneratorService::TableBuilder do
           I18n.t("pdf.unit.fields.date"),
           I18n.t("pdf.unit.fields.result"),
           I18n.t("pdf.unit.fields.inspector"),
-          I18n.t("pdf.inspection.fields.rpii_inspector_no"),
           I18n.t("pdf.inspection.fields.inspection_location")
         ],
-        ["15 January, 2024", I18n.t("shared.pass_pdf"), "John Smith", "RPII123", "Site A"],
-        ["20 February, 2024", I18n.t("shared.fail_pdf"), "Jane Doe", "RPII456", "Site B"],
-        ["1 March, 2024", I18n.t("shared.fail_pdf"), "John Smith", "RPII123", I18n.t("pdf.unit.fields.na")]
+        ["15 January, 2024", I18n.t("shared.pass_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)", "Site A"],
+        ["20 February, 2024", I18n.t("shared.fail_pdf"), "Jane Doe (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII456)", "Site B"],
+        ["1 March, 2024", I18n.t("shared.fail_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)", I18n.t("pdf.unit.fields.na")]
       ]
 
       described_class.create_inspection_history_table(pdf_double, title, inspections)
@@ -281,7 +286,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       described_class.create_inspection_history_table(pdf_double, title, inspections)
 
       expect(cells_double).to have_received(:padding=).with(PdfGeneratorService::Configuration::NICE_TABLE_CELL_PADDING)
-      expect(cells_double).to have_received(:size=).with(PdfGeneratorService::Configuration::NICE_TABLE_TEXT_SIZE)
+      expect(cells_double).to have_received(:size=).with(PdfGeneratorService::Configuration::HISTORY_TABLE_TEXT_SIZE)
       expect(cells_double).to have_received(:border_width=).with(0.5)
       expect(cells_double).to have_received(:border_color=).with("CCCCCC")
     end
@@ -304,8 +309,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
 
     it "sets column widths correctly" do
       remaining_width = 500 - PdfGeneratorService::Configuration::HISTORY_DATE_COLUMN_WIDTH -
-        PdfGeneratorService::Configuration::HISTORY_RESULT_COLUMN_WIDTH -
-        PdfGeneratorService::Configuration::HISTORY_RPII_COLUMN_WIDTH
+        PdfGeneratorService::Configuration::HISTORY_RESULT_COLUMN_WIDTH
       inspector_width = remaining_width * PdfGeneratorService::Configuration::HISTORY_INSPECTOR_WIDTH_PERCENT
       location_width = remaining_width * PdfGeneratorService::Configuration::HISTORY_LOCATION_WIDTH_PERCENT
 
@@ -313,7 +317,6 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         PdfGeneratorService::Configuration::HISTORY_DATE_COLUMN_WIDTH,
         PdfGeneratorService::Configuration::HISTORY_RESULT_COLUMN_WIDTH,
         inspector_width,
-        PdfGeneratorService::Configuration::HISTORY_RPII_COLUMN_WIDTH,
         location_width
       ]
 
@@ -330,7 +333,6 @@ RSpec.describe PdfGeneratorService::TableBuilder do
           I18n.t("pdf.unit.fields.date"),
           I18n.t("pdf.unit.fields.result"),
           I18n.t("pdf.unit.fields.inspector"),
-          I18n.t("pdf.inspection.fields.rpii_inspector_no"),
           I18n.t("pdf.inspection.fields.inspection_location")
         ]]
 

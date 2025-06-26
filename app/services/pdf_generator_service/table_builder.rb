@@ -43,19 +43,31 @@ class PdfGeneratorService
       pdf.stroke_horizontal_rule
       pdf.move_down 10
 
+      # Check if it's a 2-column table (unit PDF) or 4-column table (inspection PDF)
+      is_unit_pdf = data.first.length == 2
+
       table = pdf.table(data, width: pdf.bounds.width) do |t|
         t.cells.borders = []
         t.cells.padding = UNIT_TABLE_CELL_PADDING
         t.cells.size = UNIT_TABLE_TEXT_SIZE
-        # Make label columns (0 and 2) bold
-        t.columns(0).font_style = :bold
-        t.columns(2).font_style = :bold
-        # Set column widths - labels just fit content, values take remaining space
-        t.columns(0).width = UNIT_LABEL_COLUMN_WIDTH   # Description label
-        t.columns(2).width = UNIT_LABEL_COLUMN_WIDTH   # Serial/Type/Owner labels
-        remaining_width = pdf.bounds.width - (UNIT_LABEL_COLUMN_WIDTH * 2)  # Total minus both label columns
-        t.columns(1).width = remaining_width / 2  # Description value
-        t.columns(3).width = remaining_width / 2  # Serial/Type/Owner values
+        
+        if is_unit_pdf
+          # Simple 2-column layout for unit PDFs
+          t.columns(0).font_style = :bold
+          t.columns(0).width = UNIT_LABEL_COLUMN_WIDTH
+        else
+          # 4-column layout for inspection PDFs
+          # Make label columns (0 and 2) bold
+          t.columns(0).font_style = :bold
+          t.columns(2).font_style = :bold
+          # Set column widths - labels just fit content, values take remaining space
+          t.columns(0).width = UNIT_LABEL_COLUMN_WIDTH   # Description label
+          t.columns(2).width = UNIT_LABEL_COLUMN_WIDTH   # Serial/Type/Owner labels
+          remaining_width = pdf.bounds.width - (UNIT_LABEL_COLUMN_WIDTH * 2)  # Total minus both label columns
+          t.columns(1).width = remaining_width / 2  # Description value
+          t.columns(3).width = remaining_width / 2  # Serial/Type/Owner values
+        end
+        
         t.row(0..data.length - 1).background_color = "EEEEEE"
         t.row(0..data.length - 1).borders = [:bottom]
         t.row(0..data.length - 1).border_color = "DDDDDD"
@@ -79,17 +91,25 @@ class PdfGeneratorService
         I18n.t("pdf.unit.fields.date"),
         I18n.t("pdf.unit.fields.result"),
         I18n.t("pdf.unit.fields.inspector"),
-        I18n.t("pdf.inspection.fields.rpii_inspector_no"),
         I18n.t("pdf.inspection.fields.inspection_location")
       ]
 
       # Data rows
       inspections.each do |inspection|
+        inspector_name = inspection.user.name || I18n.t("pdf.unit.fields.na")
+        rpii_number = inspection.user.rpii_inspector_number
+        
+        # Combine inspector name with RPII number if present
+        inspector_text = if rpii_number.present?
+          "#{inspector_name} (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} #{rpii_number})"
+        else
+          inspector_name
+        end
+        
         table_data << [
           Utilities.format_date(inspection.inspection_date),
           inspection.passed ? I18n.t("shared.pass_pdf") : I18n.t("shared.fail_pdf"),
-          inspection.user.name || I18n.t("pdf.unit.fields.na"),
-          inspection.user.rpii_inspector_number || I18n.t("pdf.unit.fields.na"),
+          inspector_text,
           inspection.inspection_location || I18n.t("pdf.unit.fields.na")
         ]
       end
@@ -97,7 +117,7 @@ class PdfGeneratorService
       # Create table with enhanced styling
       table = pdf.table(table_data, width: pdf.bounds.width) do |t|
         t.cells.padding = NICE_TABLE_CELL_PADDING
-        t.cells.size = NICE_TABLE_TEXT_SIZE
+        t.cells.size = HISTORY_TABLE_TEXT_SIZE
         t.cells.border_width = 0.5
         t.cells.border_color = "CCCCCC"
 
@@ -126,12 +146,12 @@ class PdfGeneratorService
           end
         end
 
-        # Column widths - specific widths for date, result, RPII number; others fill remaining space
-        remaining_width = pdf.bounds.width - HISTORY_DATE_COLUMN_WIDTH - HISTORY_RESULT_COLUMN_WIDTH - HISTORY_RPII_COLUMN_WIDTH
+        # Column widths - specific widths for date and result; others fill remaining space
+        remaining_width = pdf.bounds.width - HISTORY_DATE_COLUMN_WIDTH - HISTORY_RESULT_COLUMN_WIDTH
         inspector_width = remaining_width * HISTORY_INSPECTOR_WIDTH_PERCENT
         location_width = remaining_width * HISTORY_LOCATION_WIDTH_PERCENT
 
-        t.column_widths = [HISTORY_DATE_COLUMN_WIDTH, HISTORY_RESULT_COLUMN_WIDTH, inspector_width, HISTORY_RPII_COLUMN_WIDTH, location_width]
+        t.column_widths = [HISTORY_DATE_COLUMN_WIDTH, HISTORY_RESULT_COLUMN_WIDTH, inspector_width, location_width]
       end
 
       pdf.move_down 15
@@ -141,7 +161,31 @@ class PdfGeneratorService
     def self.build_unit_details_table(unit, context)
       # Get dimensions from last inspection if available
       last_inspection = unit.last_inspection
-      build_unit_details_table_with_inspection(unit, last_inspection, context)
+      if context == :unit
+        build_unit_details_table_for_unit_pdf(unit, last_inspection)
+      else
+        build_unit_details_table_with_inspection(unit, last_inspection, context)
+      end
+    end
+
+    def self.build_unit_details_table_for_unit_pdf(unit, last_inspection)
+      dimensions = []
+
+      if last_inspection
+        dimensions << "#{I18n.t("pdf.dimensions.width")}: #{Utilities.format_dimension(last_inspection.width)}" if last_inspection.width.present?
+        dimensions << "#{I18n.t("pdf.dimensions.length")}: #{Utilities.format_dimension(last_inspection.length)}" if last_inspection.length.present?
+        dimensions << "#{I18n.t("pdf.dimensions.height")}: #{Utilities.format_dimension(last_inspection.height)}" if last_inspection.height.present?
+      end
+      dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
+
+      # Build simple two-column table for unit PDFs
+      [
+        [I18n.t("pdf.inspection.fields.description"), Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH)],
+        [I18n.t("pdf.inspection.fields.manufacturer"), unit.manufacturer.presence || ""],
+        [I18n.t("pdf.inspection.fields.owner"), unit.owner.presence || ""],
+        [I18n.t("pdf.inspection.fields.serial"), unit.serial || ""],
+        [I18n.t("pdf.inspection.fields.size_m"), dimensions_text]
+      ]
     end
 
     def self.build_unit_details_table_with_inspection(unit, last_inspection, context)
@@ -158,6 +202,14 @@ class PdfGeneratorService
       inspection = (context == :inspection) ? last_inspection : unit.last_inspection
       inspector_name = inspection&.user&.name || ""
       rpii_number = inspection&.user&.rpii_inspector_number
+      
+      # Combine inspector name with RPII number if present
+      inspector_text = if rpii_number.present?
+        "#{inspector_name} (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} #{rpii_number})"
+      else
+        inspector_name
+      end
+      
       inspection_location = inspection&.inspection_location || ""
       issued_date = inspection&.inspection_date ? Utilities.format_date(inspection.inspection_date) : ""
 
@@ -167,7 +219,7 @@ class PdfGeneratorService
           I18n.t("pdf.inspection.fields.description"),
           Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH),
           I18n.t("pdf.inspection.fields.inspected_by"),
-          inspector_name
+          inspector_text
         ],
         [
           I18n.t("pdf.inspection.fields.manufacturer"),
@@ -188,17 +240,6 @@ class PdfGeneratorService
           issued_date
         ]
       ]
-
-      # Add RPII row if inspector has RPII number
-      if rpii_number.present?
-        # Insert RPII number after inspector name (after first row)
-        table_rows.insert(1, [
-          "",
-          "",
-          I18n.t("pdf.inspection.fields.rpii_inspector_no"),
-          rpii_number
-        ])
-      end
 
       table_rows
     end

@@ -112,7 +112,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       pdf_text = get_pdf_text(unit_report_path(unit))
 
       expect_pdf_to_include_i18n_keys(pdf_text,
-        "pdf.unit.title",
+        "pdf.unit.fields.unit_id",
         "pdf.unit.details",
         "pdf.unit.inspection_history")
 
@@ -130,7 +130,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       pdf_text = get_pdf_text(unit_report_path(empty_unit))
 
-      expect_pdf_to_include_i18n(pdf_text, "pdf.unit.title")
+      expect_pdf_to_include_i18n(pdf_text, "pdf.unit.fields.unit_id")
       expect_pdf_to_include_i18n(pdf_text, "pdf.unit.no_completed_inspections")
     end
 
@@ -168,7 +168,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       pdf_text = pdf_text_content(pdf_data)
 
       expect_pdf_to_include_i18n_keys(pdf_text,
-        "pdf.unit.title",
+        "pdf.unit.fields.unit_id",
         "pdf.unit.details",
         "pdf.unit.inspection_history")
 

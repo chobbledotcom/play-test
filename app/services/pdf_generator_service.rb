@@ -94,7 +94,7 @@ class PdfGeneratorService
   end
 
   def self.generate_unit_details_with_inspection(pdf, unit, last_inspection)
-    unit_data = TableBuilder.build_unit_details_table_with_inspection(unit, last_inspection, :unit)
+    unit_data = TableBuilder.build_unit_details_table(unit, :unit)
     TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.unit.details"), unit_data)
   end
 
