@@ -250,7 +250,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         else
           inspector_name
         end
-        
+
         [
           PdfGeneratorService::Utilities.format_date(i.inspection_date),
           i.passed ? I18n.t("shared.pass_pdf") : I18n.t("shared.fail_pdf"),

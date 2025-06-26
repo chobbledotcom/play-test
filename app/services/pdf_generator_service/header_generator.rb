@@ -19,7 +19,7 @@ class PdfGeneratorService
       # Calculate logo space if logo is present
       logo_width = 0
       logo_temp = nil
-      
+
       if inspector_user&.logo&.attached?
         logo_data = inspector_user.logo.download
         logo_height = LOGO_HEIGHT
@@ -39,7 +39,7 @@ class PdfGeneratorService
           pdf.text report_id_text, size: HEADER_TEXT_SIZE, style: :bold
           pdf.text status_text, size: HEADER_TEXT_SIZE, style: :bold, color: status_color
         end
-        
+
         # Right side logo (if present)
         if logo_temp
           pdf.bounding_box([pdf.bounds.width - logo_width + 10, pdf.bounds.top], width: logo_width - 10) do
@@ -66,7 +66,7 @@ class PdfGeneratorService
       # Calculate logo space if logo is present
       logo_width = 0
       logo_temp = nil
-      
+
       if user&.logo&.attached?
         logo_data = user.logo.download
         logo_height = LOGO_HEIGHT
@@ -85,7 +85,7 @@ class PdfGeneratorService
         pdf.bounding_box([0, pdf.bounds.top], width: pdf.bounds.width - logo_width) do
           pdf.text unit_id_text, size: HEADER_TEXT_SIZE, style: :bold
         end
-        
+
         # Right side logo (if present)
         if logo_temp
           pdf.bounding_box([pdf.bounds.width - logo_width + 10, pdf.bounds.top], width: logo_width - 10) do

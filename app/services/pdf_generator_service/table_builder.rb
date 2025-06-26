@@ -50,15 +50,14 @@ class PdfGeneratorService
         t.cells.borders = []
         t.cells.padding = UNIT_TABLE_CELL_PADDING
         t.cells.size = UNIT_TABLE_TEXT_SIZE
-        
+
+        t.columns(0).font_style = :bold
         if is_unit_pdf
           # Simple 2-column layout for unit PDFs
-          t.columns(0).font_style = :bold
           t.columns(0).width = UNIT_LABEL_COLUMN_WIDTH
         else
           # 4-column layout for inspection PDFs
           # Make label columns (0 and 2) bold
-          t.columns(0).font_style = :bold
           t.columns(2).font_style = :bold
           # Set column widths - labels just fit content, values take remaining space
           t.columns(0).width = UNIT_LABEL_COLUMN_WIDTH   # Description label
@@ -67,7 +66,7 @@ class PdfGeneratorService
           t.columns(1).width = remaining_width / 2  # Description value
           t.columns(3).width = remaining_width / 2  # Serial/Type/Owner values
         end
-        
+
         t.row(0..data.length - 1).background_color = "EEEEEE"
         t.row(0..data.length - 1).borders = [:bottom]
         t.row(0..data.length - 1).border_color = "DDDDDD"
@@ -98,14 +97,14 @@ class PdfGeneratorService
       inspections.each do |inspection|
         inspector_name = inspection.user.name || I18n.t("pdf.unit.fields.na")
         rpii_number = inspection.user.rpii_inspector_number
-        
+
         # Combine inspector name with RPII number if present
         inspector_text = if rpii_number.present?
           "#{inspector_name} (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} #{rpii_number})"
         else
           inspector_name
         end
-        
+
         table_data << [
           Utilities.format_date(inspection.inspection_date),
           inspection.passed ? I18n.t("shared.pass_pdf") : I18n.t("shared.fail_pdf"),
@@ -202,19 +201,19 @@ class PdfGeneratorService
       inspection = (context == :inspection) ? last_inspection : unit.last_inspection
       inspector_name = inspection&.user&.name || ""
       rpii_number = inspection&.user&.rpii_inspector_number
-      
+
       # Combine inspector name with RPII number if present
       inspector_text = if rpii_number.present?
         "#{inspector_name} (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} #{rpii_number})"
       else
         inspector_name
       end
-      
+
       inspection_location = inspection&.inspection_location || ""
       issued_date = inspection&.inspection_date ? Utilities.format_date(inspection.inspection_date) : ""
 
       # Build the table rows
-      table_rows = [
+      [
         [
           I18n.t("pdf.inspection.fields.description"),
           Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH),
@@ -240,8 +239,6 @@ class PdfGeneratorService
           issued_date
         ]
       ]
-
-      table_rows
     end
   end
 end
