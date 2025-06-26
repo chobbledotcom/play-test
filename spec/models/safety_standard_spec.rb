@@ -148,7 +148,6 @@ RSpec.describe SafetyStandard, type: :model do
       end
     end
 
-
     describe ".valid_rope_diameter?" do
       # Test valid rope diameters
       SafetyStandards::MaterialValidator::MATERIAL_TEST_EXAMPLES[:rope_diameter][:valid].each do |scenario, value|
@@ -177,7 +176,6 @@ RSpec.describe SafetyStandard, type: :model do
         expect(SafetyStandards::SlideCalculator.requires_permanent_roof?(nil)).to be false
       end
     end
-
   end
 
   describe "informational methods" do

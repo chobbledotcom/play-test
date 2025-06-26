@@ -148,7 +148,7 @@ module SafetyStandards
 
     def requires_permanent_roof?(platform_height)
       # EN 14960-1:2019 Section 4.2.9 (Lines 865-866)
-      # "Inflatables with a platform height over 6,0 m shall have containing 
+      # "Inflatables with a platform height over 6,0 m shall have containing
       # walls and a permanent roof fitted"
       threshold = SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
       platform_height.present? && platform_height > threshold

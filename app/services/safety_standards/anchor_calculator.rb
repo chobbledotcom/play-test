@@ -82,7 +82,7 @@ module SafetyStandards
 
       # EN 14960-1:2019 Line 1204 - Calculate for each side
       total_required = (required_front + required_sides) * 2
-      
+
       # EN 14960-1:2019 Lines 441-442 - "Each inflatable shall have at least six anchorage points"
       total_required = [total_required, 6].max
 
@@ -96,7 +96,7 @@ module SafetyStandards
       formula_sides += base_div.to_s
 
       calculated_total = (required_front + required_sides) * 2
-      
+
       breakdown = [
         [
           "Front/back area",
@@ -119,7 +119,7 @@ module SafetyStandards
           "(#{required_front} + #{required_sides}) × 2 = #{calculated_total}"
         ]
       ]
-      
+
       # Add minimum requirement note if applicable
       if calculated_total < 6
         breakdown << [
