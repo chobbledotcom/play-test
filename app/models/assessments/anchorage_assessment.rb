@@ -21,7 +21,7 @@ class Assessments::AnchorageAssessment < ApplicationRecord
       return false
     end
 
-    total_anchors >= anchorage_result[:required_anchors]
+    total_anchors >= anchorage_result.value
   end
 
   def total_anchors
@@ -38,11 +38,11 @@ class Assessments::AnchorageAssessment < ApplicationRecord
 
   def required_anchors
     return 0 if inspection.volume.blank?
-    anchorage_result[:required_anchors]
+    anchorage_result.value
   end
 
   def anchorage_breakdown
     return [] unless inspection.volume
-    anchorage_result[:formula_breakdown]
+    anchorage_result.breakdown
   end
 end

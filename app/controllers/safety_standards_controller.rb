@@ -57,9 +57,10 @@ class SafetyStandardsController < ApplicationController
 
   def calculate_slide_runout
     height = param_to_float(:platform_height)
+    has_stop_wall = params[:calculation][:has_stop_wall] == "1"
 
     if height.positive?
-      @runout_result = build_runout_result(height)
+      @runout_result = build_runout_result(height, has_stop_wall)
     else
       set_error(:runout, :invalid_height)
     end
@@ -110,18 +111,11 @@ class SafetyStandardsController < ApplicationController
     instance_variable_set("@#{type}_error", t("safety_standards.errors.#{error_key}"))
   end
 
-  def build_runout_result(platform_height)
-    required_runout = SafetyStandards::SlideCalculator.calculate_required_runout(platform_height)
-    {
-      platform_height: platform_height,
-      required_runout: required_runout,
-      calculation: build_runout_calculation_text(platform_height, required_runout)
-    }
-  end
-
-  def build_runout_calculation_text(platform_height, required_runout)
-    half_height = platform_height * 0.5
-    "50% of #{platform_height}m = #{half_height}m, minimum 0.3m = #{required_runout}m"
+  def build_runout_result(platform_height, has_stop_wall)
+    SafetyStandards::SlideCalculator.calculate_required_runout(
+      platform_height,
+      has_stop_wall: has_stop_wall
+    )
   end
 
   def build_wall_height_result(platform_height, user_height)

@@ -28,7 +28,7 @@ RSpec.describe "Safety Standards API examples", type: :request do
             actual_value = actual_response[:result][result_key]
 
             # Special handling for formula_breakdown array
-            if result_key == :formula_breakdown && expected_result_value.is_a?(Array)
+            if result_key == :breakdown && expected_result_value.is_a?(Array)
               expect(actual_value).to be_an(Array)
               expect(actual_value.size).to eq(expected_result_value.size)
 

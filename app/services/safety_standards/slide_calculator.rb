@@ -13,7 +13,8 @@ module SafetyStandards
     # Slide runout calculation constants (EN 14960:2019)
     RUNOUT_CALCULATION_CONSTANTS = {
       platform_height_ratio: 0.5, # 50% of platform height
-      minimum_runout_meters: 0.3   # Absolute minimum 300mm (0.3m)
+      minimum_runout_meters: 0.3,  # Absolute minimum 300mm (0.3m)
+      stop_wall_addition: 0.5      # 50cm addition when stop-wall fitted (Line 936)
     }.freeze
 
     # Wall height calculation constants (EN 14960:2019)
@@ -87,17 +88,67 @@ module SafetyStandards
       }
     }.freeze
 
-    def calculate_required_runout(platform_height)
+    # Simple calculation method that returns just the numeric value
+    def calculate_runout_value(platform_height, has_stop_wall: false)
+      return 0 if platform_height.nil? || platform_height <= 0
+
+      height_ratio = RUNOUT_CALCULATION_CONSTANTS[:platform_height_ratio]
+      minimum_runout = RUNOUT_CALCULATION_CONSTANTS[:minimum_runout_meters]
+      stop_wall_add = RUNOUT_CALCULATION_CONSTANTS[:stop_wall_addition]
+
+      calculated_runout = platform_height * height_ratio
+      base_runout = [calculated_runout, minimum_runout].max
+
+      has_stop_wall ? base_runout + stop_wall_add : base_runout
+    end
+
+    def calculate_required_runout(platform_height, has_stop_wall: false)
       # EN 14960-1:2019 Section 4.2.11 (Lines 930-939) - Runout requirements
       # Line 934-935: "shall be a minimum of 50 % of the height of the highest platform
       # of the slide, measured from the ground and in any case, a minimum of 300 mm"
-      return 0 if platform_height.nil? || platform_height <= 0
+      # Line 936: "When a stop-wall is fitted at the end of the run-out section,
+      # 50 cm shall be added to the length of the run-out"
+      return CalculatorResponse.new(value: 0, value_suffix: "m", breakdown: []) if platform_height.nil? || platform_height <= 0
 
-      # Calculate using constants from RUNOUT_CALCULATION_CONSTANTS
+      # Get constants
       height_ratio = RUNOUT_CALCULATION_CONSTANTS[:platform_height_ratio]
       minimum_runout = RUNOUT_CALCULATION_CONSTANTS[:minimum_runout_meters]
+      stop_wall_add = RUNOUT_CALCULATION_CONSTANTS[:stop_wall_addition]
 
-      [platform_height * height_ratio, minimum_runout].max
+      # Calculate values using the shared method
+      calculated_runout = platform_height * height_ratio
+      base_runout = calculate_runout_value(platform_height, has_stop_wall: false)
+      final_runout = calculate_runout_value(platform_height, has_stop_wall: has_stop_wall)
+
+      # Build breakdown
+      breakdown = [
+        [
+          I18n.t("safety_standards.calculators.runout.calculation_label"),
+          "#{platform_height}m × 0.5 = #{calculated_runout}m"
+        ],
+        [
+          I18n.t("safety_standards.calculators.runout.minimum_label"),
+          "#{minimum_runout}m (300mm)"
+        ],
+        [
+          I18n.t("safety_standards.calculators.runout.base_runout_label"),
+          "#{I18n.t("safety_standards.calculators.runout.maximum_of")} #{calculated_runout}m #{I18n.t("safety_standards.calculators.runout.and")} #{minimum_runout}m = #{base_runout}m"
+        ]
+      ]
+
+      # Add stop-wall if applicable
+      if has_stop_wall
+        breakdown << [
+          I18n.t("safety_standards.calculators.runout.stop_wall_addition_label"),
+          "#{base_runout}m + #{stop_wall_add}m = #{final_runout}m"
+        ]
+      end
+
+      CalculatorResponse.new(
+        value: final_runout,
+        value_suffix: "m",
+        breakdown: breakdown
+      )
     end
 
     def meets_height_requirements?(platform_height, user_height, containing_wall_height)
@@ -128,13 +179,13 @@ module SafetyStandards
       end
     end
 
-    def meets_runout_requirements?(runout_length, platform_height)
+    def meets_runout_requirements?(runout_length, platform_height, has_stop_wall: false)
       # EN 14960-1:2019 Section 4.2.11 (Lines 930-939) - Runout requirements
       # Lines 934-935: Runout must be minimum 50% of platform height or 300mm,
       # whichever is greater, to ensure safe deceleration
       return false if runout_length.nil? || platform_height.nil?
 
-      required_runout = calculate_required_runout(platform_height)
+      required_runout = calculate_runout_value(platform_height, has_stop_wall: has_stop_wall)
       runout_length >= required_runout
     end
 
@@ -145,6 +196,113 @@ module SafetyStandards
       min_runout = (min_constant * 1000).to_i
       "#{height_ratio}% of platform height, minimum #{min_runout}mm"
     end
+
+    def calculate_wall_height_requirements(platform_height, user_height, containing_wall_height)
+      # Wrapper method that uses existing meets_height_requirements? and adds breakdown
+      return {result: nil, breakdown: []} if platform_height.nil? || user_height.nil?
+
+      # Use existing validation logic
+      meets_requirements = meets_height_requirements?(platform_height, user_height, containing_wall_height)
+
+      # Get requirement details and breakdown
+      requirement_details = get_wall_height_requirement_details(platform_height, user_height)
+
+      {
+        result: {
+          meets_requirements: meets_requirements,
+          requirement_text: requirement_details[:text],
+          containing_wall_height: containing_wall_height
+        },
+        breakdown: requirement_details[:breakdown]
+      }
+    end
+
+    private
+
+    def get_wall_height_requirement_details(platform_height, user_height)
+      no_walls_threshold = SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
+      basic_threshold = SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
+      enhanced_threshold = SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
+      max_threshold = SLIDE_HEIGHT_THRESHOLDS[:max_safe_height]
+      enhanced_multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
+
+      case platform_height
+      when 0..no_walls_threshold
+        {
+          text: I18n.t("safety_standards.wall_heights.no_walls_required"),
+          breakdown: [
+            [
+              I18n.t("safety_standards.wall_heights.height_range"),
+              I18n.t("safety_standards.wall_heights.under_600mm")
+            ],
+            [
+              I18n.t("safety_standards.wall_heights.requirement"),
+              I18n.t("safety_standards.wall_heights.no_walls_required")
+            ]
+          ]
+        }
+      when (no_walls_threshold..basic_threshold)
+        {
+          text: I18n.t("safety_standards.wall_heights.walls_equal_user_height", height: user_height),
+          breakdown: [
+            [
+              I18n.t("safety_standards.wall_heights.height_range"),
+              I18n.t("safety_standards.wall_heights.600mm_to_3m")
+            ],
+            [
+              I18n.t("safety_standards.wall_heights.calculation"),
+              I18n.t("safety_standards.wall_heights.equal_to_user_height", height: user_height)
+            ]
+          ]
+        }
+      when (basic_threshold..enhanced_threshold)
+        required_height = (user_height * enhanced_multiplier).round(2)
+        {
+          text: I18n.t("safety_standards.wall_heights.walls_125_user_height", height: required_height),
+          breakdown: [
+            [
+              I18n.t("safety_standards.wall_heights.height_range"),
+              I18n.t("safety_standards.wall_heights.3m_to_6m")
+            ],
+            [
+              I18n.t("safety_standards.wall_heights.calculation"),
+              "#{user_height}m × #{enhanced_multiplier} = #{required_height}m"
+            ]
+          ]
+        }
+      when (enhanced_threshold..max_threshold)
+        required_height = (user_height * enhanced_multiplier).round(2)
+        {
+          text: I18n.t("safety_standards.wall_heights.walls_125_plus_roof_required", height: required_height),
+          breakdown: [
+            [
+              I18n.t("safety_standards.wall_heights.height_range"),
+              I18n.t("safety_standards.wall_heights.over_6m")
+            ],
+            [
+              I18n.t("safety_standards.wall_heights.calculation"),
+              "#{user_height}m × #{enhanced_multiplier} = #{required_height}m"
+            ],
+            [
+              I18n.t("safety_standards.wall_heights.additional_requirement"),
+              I18n.t("safety_standards.wall_heights.permanent_roof_required")
+            ]
+          ]
+        }
+      else
+        {
+          text: I18n.t("safety_standards.wall_heights.exceeds_safe_limits"),
+          breakdown: [
+            [
+              I18n.t("safety_standards.wall_heights.status"),
+              I18n.t("safety_standards.wall_heights.exceeds_safe_limits")
+            ]
+          ]
+        }
+      end
+    end
+
+    public
 
     def requires_permanent_roof?(platform_height)
       # EN 14960-1:2019 Section 4.2.9 (Lines 865-866)

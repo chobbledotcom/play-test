@@ -154,7 +154,7 @@ module SeedData
     platform_height = rand(2.0..6.0).round(1)
 
     # Use the actual SafetyStandard calculation for consistency
-    required_runout = SafetyStandards::SlideCalculator.calculate_required_runout(platform_height)
+    required_runout = SafetyStandards::SlideCalculator.calculate_runout_value(platform_height)
 
     runout = if passed
       (required_runout + rand(0.5..1.5)).round(1)

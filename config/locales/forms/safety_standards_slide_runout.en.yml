@@ -6,4 +6,5 @@ en:
         input: "Input Parameters"
       fields:
         platform_height: "Platform Height (m)"
+        has_stop_wall: "Stop-wall fitted at end of runout"
       submit: "Calculate Runout"

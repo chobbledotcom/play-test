@@ -10,9 +10,9 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     expect_anchor_result(8)
 
     within("#anchors-result") do
-      expect(page).to have_content("Front/back area")
+      expect(page).to have_content(I18n.t("safety_standards.calculators.anchor.front_back_area_label"))
       expect(page).to have_content("5.0m (W) × 3.0m (H) = 15.0m²")
-      expect(page).to have_content("Total anchors")
+      expect(page).to have_content(I18n.t("safety_standards.calculators.anchor.total_anchors_label"))
       expect(page).to have_content("(2 + 2) × 2 = 8")
     end
   end
@@ -26,8 +26,8 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     expect_runout_result(required_runout: 1.25)
 
     within("#slide-runout-result") do
-      expect(page).to have_content("Platform Height: 2.5m")
-      expect(page).to have_content("50% of 2.5m = 1.25m, minimum 0.3m = 1.25m")
+      expect(page).to have_content("#{I18n.t("safety_standards.calculators.runout.calculation_label")}: 2.5m × 0.5 = 1.25m")
+      expect(page).to have_content("#{I18n.t("safety_standards.calculators.runout.minimum_label")}: 0.3m (300mm)")
     end
   end
 
@@ -66,8 +66,8 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     submit_runout_form
 
     expected_runout = SafetyStandards::SlideCalculator.calculate_required_runout(1.0)
-    expect_runout_result(required_runout: expected_runout)
-    expect(expected_runout).to eq(0.5)
+    expect_runout_result(required_runout: expected_runout.value)
+    expect(expected_runout.value).to eq(0.5)
   end
 
   scenario "showing calculation transparency" do
@@ -76,7 +76,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     expect(page).to have_content("((Area × 114.0 × 1.5) ÷ 1600.0)")
     expect(page).to have_content("50% of platform height, minimum 300mm")
 
-    expect(page).to have_content("For 25.0m² area: 3 anchors required")
+    expect(page).to have_content("For 25.0m² area: 8 anchors required")
     expect(page).to have_content("For 2.5m platform: 1.25m runout required")
 
     expect(page).to have_content("Ruby Source Code")
@@ -89,7 +89,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     expect_anchor_result(8)
 
     within("#anchors-result") do
-      expect(page).to have_content("Front/back area")
+      expect(page).to have_content(I18n.t("safety_standards.calculators.anchor.front_back_area_label"))
       expect(page).to have_content("4.0m (W) × 3.0m (H) = 12.0m²")
     end
   end
@@ -115,7 +115,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
 
       expected = SafetyStandards::AnchorCalculator.calculate(
         length: length, width: width, height: height
-      )[:required_anchors]
+      ).value
 
       expect_anchor_result(expected)
     end

@@ -241,7 +241,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
 
         expected = SafetyStandards::AnchorCalculator.calculate(
           length: l, width: w, height: h
-        )[:required_anchors]
+        ).value
 
         expect_anchor_result(expected)
       end

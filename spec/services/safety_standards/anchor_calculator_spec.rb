@@ -6,30 +6,30 @@ RSpec.describe SafetyStandards::AnchorCalculator do
     context "minimum anchor requirements" do
       it "returns at least 6 anchors for small inflatables" do
         result = described_class.calculate(length: 1, width: 1, height: 1)
-        expect(result[:required_anchors]).to eq(6)
+        expect(result.value).to eq(6)
 
         # Should include minimum requirement note
-        expect(result[:formula_breakdown]).to include(
-          ["EN 14960 minimum", "Minimum 6 anchors required, using 6"]
+        expect(result.breakdown).to include(
+          [I18n.t("safety_standards.calculators.anchor.en_minimum_label"), I18n.t("safety_standards.calculators.anchor.minimum_required", minimum: 6)]
         )
       end
 
       it "returns at least 6 anchors for tiny inflatables" do
         result = described_class.calculate(length: 0.5, width: 0.5, height: 0.5)
-        expect(result[:required_anchors]).to eq(6)
+        expect(result.value).to eq(6)
 
         # Should include minimum requirement note
-        expect(result[:formula_breakdown]).to include(
-          ["EN 14960 minimum", "Minimum 6 anchors required, using 6"]
+        expect(result.breakdown).to include(
+          [I18n.t("safety_standards.calculators.anchor.en_minimum_label"), I18n.t("safety_standards.calculators.anchor.minimum_required", minimum: 6)]
         )
       end
 
       it "does not apply minimum when calculated anchors exceed 6" do
         result = described_class.calculate(length: 5, width: 4, height: 3)
-        expect(result[:required_anchors]).to eq(8)
+        expect(result.value).to eq(8)
 
         # Should NOT include minimum requirement note
-        expect(result[:formula_breakdown]).not_to include(
+        expect(result.breakdown).not_to include(
           ["EN 14960 minimum", "Minimum 6 anchors required, using 6"]
         )
       end
@@ -49,7 +49,7 @@ RSpec.describe SafetyStandards::AnchorCalculator do
         # Front anchors: ceil((12 × 114 × 1.5) / 1600) = ceil(1.28) = 2
         # Side anchors: ceil((15 × 114 × 1.5) / 1600) = ceil(1.60) = 2
         # Total: (2 + 2) × 2 = 8
-        expect(result[:required_anchors]).to eq(8)
+        expect(result.value).to eq(8)
       end
 
       it "calculates anchors for larger inflatables" do
@@ -61,7 +61,7 @@ RSpec.describe SafetyStandards::AnchorCalculator do
         # Front anchors: ceil((32 × 114 × 1.5) / 1600) = ceil(3.42) = 4
         # Side anchors: ceil((40 × 114 × 1.5) / 1600) = ceil(4.28) = 5
         # Total: (4 + 5) × 2 = 18
-        expect(result[:required_anchors]).to eq(18)
+        expect(result.value).to eq(18)
       end
     end
 
@@ -70,9 +70,9 @@ RSpec.describe SafetyStandards::AnchorCalculator do
       it "provides detailed calculation breakdown" do
         result = described_class.calculate(length: 5, width: 4, height: 3)
 
-        expect(result[:formula_breakdown]).to include(
-          ["Front/back area", "4m (W) × 3m (H) = 12m²"],
-          ["Sides area", "5m (L) × 3m (H) = 15m²"]
+        expect(result.breakdown).to include(
+          [I18n.t("safety_standards.calculators.anchor.front_back_area_label"), "4m (W) × 3m (H) = 12m²"],
+          [I18n.t("safety_standards.calculators.anchor.sides_area_label"), "5m (L) × 3m (H) = 15m²"]
         )
       end
     end
@@ -106,19 +106,19 @@ RSpec.describe SafetyStandards::AnchorCalculator do
       it "calculates anchors for all four sides" do
         result = described_class.calculate(length: 5, width: 4, height: 3)
 
-        breakdown = result[:formula_breakdown]
+        breakdown = result.breakdown
         expect(breakdown).to include(
-          ["Front & back anchor counts", "((12 × 114.0 * 1.5) ÷ 1600.0 = 2"],
-          ["Left & right anchor counts", "((15 × 114.0 * 1.5) ÷ 1600.0 = 2"]
+          [I18n.t("safety_standards.calculators.anchor.front_back_anchors_label"), "((12 × 114.0 * 1.5) ÷ 1600.0 = 2"],
+          [I18n.t("safety_standards.calculators.anchor.left_right_anchors_label"), "((15 × 114.0 * 1.5) ÷ 1600.0 = 2"]
         )
       end
 
       it "multiplies by 2 for both front/back and left/right sides" do
         result = described_class.calculate(length: 5, width: 4, height: 3)
 
-        breakdown = result[:formula_breakdown]
+        breakdown = result.breakdown
         expect(breakdown).to include(
-          ["Total anchors", "(2 + 2) × 2 = 8"]
+          [I18n.t("safety_standards.calculators.anchor.total_anchors_label"), "(2 + 2) × 2 = 8"]
         )
       end
     end

@@ -51,8 +51,9 @@ module SafetyStandard
       passed: true,
       status: "Calculation completed successfully",
       result: {
-        required_anchors: 8,
-        formula_breakdown: [
+        value: 8,
+        value_suffix: "",
+        breakdown: [
           ["Front/back area", "5.0m (W) × 3.0m (H) = 15.0m²"],
           ["Sides area", "5.0m (L) × 3.0m (H) = 15.0m²"],
           ["Front & back anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
@@ -65,9 +66,13 @@ module SafetyStandard
       passed: true,
       status: "Calculation completed successfully",
       result: {
-        platform_height: 2.5,
-        required_runout: 1.25,
-        calculation: "50% of 2.5m = 1.25m, minimum 0.3m = 1.25m"
+        value: 1.25,
+        value_suffix: "m",
+        breakdown: [
+          ["50% calculation", "2.5m × 0.5 = 1.25m"],
+          ["Minimum requirement", "0.3m (300mm)"],
+          ["Base runout", "Maximum of 1.25m and 0.3m = 1.25m"]
+        ]
       }
     },
     wall_height: {
@@ -221,14 +226,21 @@ module SafetyStandard
       case calculation_type
       when :anchors
         area = metadata[:example_input]
-        result = SafetyStandards::AnchorCalculator.calculate_required_anchors(area)
+        # Create dimensions that result in the example area (assuming square for simplicity)
+        side_length = Math.sqrt(area).round(1)
+        height = 3.0 # Standard height
+        result = SafetyStandards::AnchorCalculator.calculate(
+          length: side_length,
+          width: side_length,
+          height: height
+        ).value
         input_unit = metadata[:input_unit]
         area_input = "#{area}#{input_unit} area"
         output_unit = metadata[:output_unit]
         "For #{area_input}: #{result} #{output_unit} required"
       when :slide_runout
         platform_height = metadata[:example_input]
-        result = SafetyStandards::SlideCalculator.calculate_required_runout(platform_height)
+        result = SafetyStandards::SlideCalculator.calculate_required_runout(platform_height).value
         input_unit = metadata[:input_unit]
         platform_desc = "#{platform_height}#{input_unit} platform"
         output_unit = metadata[:output_unit]

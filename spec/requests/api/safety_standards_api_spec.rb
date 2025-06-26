@@ -13,9 +13,9 @@ RSpec.describe "Safety Standards API", type: :request do
         expect(response).to have_http_status(:ok)
         json_response = JSON.parse(response.body)
         expect(json_response["passed"]).to be true
-        expect(json_response["result"]["required_anchors"]).to eq 8
-        expect(json_response["result"]["formula_breakdown"]).to be_an(Array)
-        expect(json_response["result"]["formula_breakdown"].size).to eq 5
+        expect(json_response["result"]["value"]).to eq 8
+        expect(json_response["result"]["breakdown"]).to be_an(Array)
+        expect(json_response["result"]["breakdown"].size).to eq 5
       end
 
       it "returns error for invalid data" do

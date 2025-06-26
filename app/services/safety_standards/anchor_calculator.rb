@@ -110,23 +110,23 @@ module SafetyStandards
 
       breakdown = [
         [
-          "Front/back area",
+          I18n.t("safety_standards.calculators.anchor.front_back_area_label"),
           "#{width}m (W) × #{height}m (H) = #{front_area}m²"
         ],
         [
-          "Sides area",
+          I18n.t("safety_standards.calculators.anchor.sides_area_label"),
           "#{length}m (L) × #{height}m (H) = #{sides_area}m²"
         ],
         [
-          "Front & back anchor counts",
+          I18n.t("safety_standards.calculators.anchor.front_back_anchors_label"),
           "#{formula_front} = #{required_front}"
         ],
         [
-          "Left & right anchor counts",
+          I18n.t("safety_standards.calculators.anchor.left_right_anchors_label"),
           "#{formula_sides} = #{required_sides}"
         ],
         [
-          "Total anchors",
+          I18n.t("safety_standards.calculators.anchor.total_anchors_label"),
           "(#{required_front} + #{required_sides}) × 2 = #{calculated_total}"
         ]
       ]
@@ -134,15 +134,16 @@ module SafetyStandards
       # Add minimum requirement note if applicable
       if calculated_total < minimum
         breakdown << [
-          "EN 14960 minimum",
-          "Minimum #{minimum} anchors required, using #{minimum}"
+          I18n.t("safety_standards.calculators.anchor.en_minimum_label"),
+          I18n.t("safety_standards.calculators.anchor.minimum_required", minimum: minimum)
         ]
       end
 
-      {
-        required_anchors: total_required,
-        formula_breakdown: breakdown
-      }
+      CalculatorResponse.new(
+        value: total_required,
+        value_suffix: "",
+        breakdown: breakdown
+      )
     end
 
     def anchor_formula_text

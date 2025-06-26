@@ -81,24 +81,25 @@ RSpec.describe SafetyStandard, type: :model do
   describe ".calculate_required_runout" do
     context "with nil or invalid inputs" do
       it "returns 0 for nil platform_height" do
-        expect(calculate_required_runout(nil)).to eq(0)
+        result = calculate_required_runout(nil)
+        expect(result.value).to eq(0)
       end
 
       it "returns 0 for zero or negative platform_height" do
-        expect(calculate_required_runout(0)).to eq(0)
-        expect(calculate_required_runout(-1.0)).to eq(0)
+        expect(calculate_required_runout(0).value).to eq(0)
+        expect(calculate_required_runout(-1.0).value).to eq(0)
       end
     end
 
     context "with valid inputs" do
       it "calculates 50% of platform height" do
-        expect(calculate_required_runout(2.0)).to eq(1.0)
-        expect(calculate_required_runout(4.0)).to eq(2.0)
+        expect(calculate_required_runout(2.0).value).to eq(1.0)
+        expect(calculate_required_runout(4.0).value).to eq(2.0)
       end
 
       it "enforces minimum 300mm (0.3m)" do
-        expect(calculate_required_runout(0.4)).to eq(0.3) # 50% would be 0.2m
-        expect(calculate_required_runout(0.1)).to eq(0.3) # 50% would be 0.05m
+        expect(calculate_required_runout(0.4).value).to eq(0.3) # 50% would be 0.2m
+        expect(calculate_required_runout(0.1).value).to eq(0.3) # 50% would be 0.05m
       end
     end
   end
@@ -124,9 +125,8 @@ RSpec.describe SafetyStandard, type: :model do
     SafetyStandards::AnchorCalculator::ANCHOR_TEST_EXAMPLES[:units].each do |scenario, data|
       it "calculates total anchors correctly for #{scenario}" do
         result = SafetyStandards::AnchorCalculator.calculate(**data[:dimensions])
-        expect(result[:required_anchors]).to eq(data[:expected_anchors])
-        expect(result[:formula_breakdown]).to be_an(Array)
-        expect(result[:formula_breakdown].size).to eq(5)
+        expect(result.value).to eq(data[:expected_anchors])
+        expect(result.breakdown).to be_an(Array)
       end
     end
   end

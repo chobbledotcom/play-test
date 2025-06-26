@@ -68,7 +68,7 @@ RSpec.describe "Safety Standards Unified Tests" do
         json = JSON.parse(response.body)
         expect(json["passed"]).to be true
         expect(json["status"]).to eq("Calculation completed successfully")
-        expect(json["result"]["required_anchors"]).to eq(8)
+        expect(json["result"]["value"]).to eq(8)
       end
 
       it "returns passed: false with status for invalid input" do

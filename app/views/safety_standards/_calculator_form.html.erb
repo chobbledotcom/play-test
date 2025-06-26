@@ -28,6 +28,7 @@
     <% when :slide_runout %>
       <%= render 'form/fieldset', legend_key: 'input' do %>
         <%= render 'form/number', field: :platform_height, min: 1.0, required: true %>
+        <%= render 'form/checkbox', field: :has_stop_wall %>
       <% end %>
       
     <% when :wall_height %>

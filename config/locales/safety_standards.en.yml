@@ -47,6 +47,10 @@ en:
       max_user_height_note: "Capacity calculated for users up to %{height}m tall"
 
     calculators:
+      result_title: "Result"
+      result: "Result"
+      breakdown_title: "Breakdown"
+      
       anchor:
         title: "Calculate Required Anchors"
         description: "Anchors must be calculated based on the play area to ensure adequate ground restraint for wind loads."
@@ -55,8 +59,15 @@ en:
         submit: "Calculate Anchors"
         result_title: "Result:"
         area_result: "Area:"
-        required_result: "Required Anchors:"
+        required_result: "Required Anchors"
         calculation_result: "Calculation:"
+        front_back_area_label: "Front/back area"
+        sides_area_label: "Sides area"
+        front_back_anchors_label: "Front & back anchor counts"
+        left_right_anchors_label: "Left & right anchor counts"
+        total_anchors_label: "Total anchors"
+        en_minimum_label: "EN 14960 minimum"
+        minimum_required: "Minimum %{minimum} anchors required, using %{minimum}"
 
       user_capacity:
         title: "Calculate User Capacity"
@@ -82,8 +93,16 @@ en:
         submit: "Calculate Runout"
         result_title: "Result:"
         platform_height_result: "Platform Height:"
-        required_runout_result: "Required Runout:"
+        stop_wall_status: "Stop-wall:"
+        stop_wall_fitted: "Fitted (adds 0.5m)"
+        required_runout_result: "Required Runout"
         calculation_breakdown: "Calculation:"
+        calculation_label: "50% calculation"
+        minimum_label: "Minimum requirement"
+        base_runout_label: "Base runout"
+        stop_wall_addition_label: "Stop-wall addition"
+        maximum_of: "Maximum of"
+        and: "and"
 
       wall_height:
         title: "Calculate Wall Height Requirements"
@@ -112,10 +131,19 @@ en:
       under_600mm: "Under 0.6m"
       no_walls_required: "No containing walls required"
       600mm_to_3m: "0.6m - 3.0m"
-      walls_equal_user_height: "Walls must be equal to user height"
       3m_to_6m: "3.0m - 6.0m"
-      walls_125x_user_height: "Walls must be 1.25× user height"
       over_6m: "Over 6.0m"
+      height_range: "Height range"
+      requirement: "Requirement"
+      calculation: "Calculation"
+      equal_to_user_height: "%{height}m (user height)"
+      additional_requirement: "Additional requirement"
+      permanent_roof_required: "Permanent roof required"
+      exceeds_safe_limits: "Platform height exceeds safe limits"
+      status: "Status"
+      walls_equal_user_height: "Walls must be at least %{height}m (equal to user height)"
+      walls_125_user_height: "Walls must be at least %{height}m (1.25× user height)"
+      walls_125x_user_height: "Walls 1.25× user height"
       walls_125x_plus_roof: "Walls 1.25× user height + permanent roof required"
     
     slides:

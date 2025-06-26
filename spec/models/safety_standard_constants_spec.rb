@@ -8,16 +8,18 @@ RSpec.describe SafetyStandard, "Constants" do
       expect(constants[:area_coefficient]).to eq(114.0)
       expect(constants[:base_divisor]).to eq(1600.0)
       expect(constants[:safety_factor]).to eq(1.5)
+      expect(constants[:minimum_anchors]).to eq(6)
     end
 
     it "is used in anchor calculations" do
       # Verify the calculation uses these exact constant values
-      area = 25.0
-      expected = ((area * 114.0 * 1.5) / 1600.0).ceil
+      # For a 5x5x3 unit (25m² base area)
+      length = 5.0
+      width = 5.0
+      height = 3.0
 
-      result = SafetyStandards::AnchorCalculator.calculate_required_anchors(area)
-      expect(result).to eq(expected)
-      expect(result).to eq(3) # Known result for 25m²
+      result = SafetyStandards::AnchorCalculator.calculate(length: length, width: width, height: height)
+      expect(result.value).to eq(8) # Known result for 5x5x3 unit
     end
   end
 
@@ -27,6 +29,7 @@ RSpec.describe SafetyStandard, "Constants" do
 
       expect(constants[:platform_height_ratio]).to eq(0.5)
       expect(constants[:minimum_runout_meters]).to eq(0.3)
+      expect(constants[:stop_wall_addition]).to eq(0.5)
     end
 
     it "is used in runout calculations" do
@@ -34,8 +37,12 @@ RSpec.describe SafetyStandard, "Constants" do
       expected = [platform_height * 0.5, 0.3].max
 
       result = SafetyStandards::SlideCalculator.calculate_required_runout(platform_height)
-      expect(result).to eq(expected)
-      expect(result).to eq(1.25)
+      expect(result.value).to eq(expected)
+      expect(result.value).to eq(1.25)
+
+      # Test with stop-wall
+      result_with_wall = SafetyStandards::SlideCalculator.calculate_required_runout(platform_height, has_stop_wall: true)
+      expect(result_with_wall.value).to eq(1.75) # 1.25 + 0.5
     end
   end
 
@@ -63,17 +70,19 @@ RSpec.describe SafetyStandard, "Constants" do
 
   describe "source code transparency" do
     it "includes constants in method source display" do
-      source = SafetyStandard.get_method_source(:calculate_required_anchors, SafetyStandards::AnchorCalculator)
+      source = SafetyStandard.get_method_source(:calculate, SafetyStandards::AnchorCalculator)
 
       # Verify constants are shown
       expect(source).to include("ANCHOR_CALCULATION_CONSTANTS")
       expect(source).to include("area_coefficient: 114.0")
       expect(source).to include("base_divisor: 1600.0")
       expect(source).to include("safety_factor: 1.5")
+      expect(source).to include("minimum_anchors: 6")
 
       # Verify method implementation is shown
-      expect(source).to include("def calculate_required_anchors")
+      expect(source).to include("def calculate")
       expect(source).to include("ANCHOR_CALCULATION_CONSTANTS[:area_coefficient]")
+      expect(source).to include("ANCHOR_CALCULATION_CONSTANTS[:minimum_anchors]")
     end
 
     it "shows multiple constants for methods that use them" do

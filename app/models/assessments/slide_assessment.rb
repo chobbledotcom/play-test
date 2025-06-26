@@ -22,7 +22,7 @@ class Assessments::SlideAssessment < ApplicationRecord
 
   def required_runout_length
     return nil if slide_platform_height.blank?
-    SafetyStandards::SlideCalculator.calculate_required_runout(slide_platform_height)
+    SafetyStandards::SlideCalculator.calculate_runout_value(slide_platform_height)
   end
 
   def runout_compliance_status

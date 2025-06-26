@@ -1,18 +1,7 @@
 <% if @anchor_result %>
-  <div class="calculation-result">
-    <h2><%= t('safety_standards.calculators.anchor.result_title') %></h2>
-    <p>
-      <strong><%= t('safety_standards.calculators.anchor.required_result') %></strong> <%= @anchor_result[:required_anchors] %>
-    </p>
-    <h3>Breakdown:</h3>
-    <ul>
-      <% @anchor_result[:formula_breakdown].each do |line| %>
-        <li>
-          <strong><%= line[0] %>:</strong> <%= line[1] %>
-        </li>
-      <% end %>
-    </ul>
-  </div>
+  <%= render 'result_with_breakdown',
+    result_label: t('safety_standards.calculators.anchor.required_result'),
+    result: @anchor_result %>
 <% elsif @anchor_error %>
   <div class="error">
     <p><strong><%= t('shared.error') %>:</strong> <%= @anchor_error %></p>

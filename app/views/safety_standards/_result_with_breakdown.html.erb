@@ -1,0 +1,15 @@
+<div class="calculation-result">
+  <h2><%= t('safety_standards.calculators.result_title') %></h2>
+  
+  <p class="primary-result">
+    <strong><%= result_label %>:</strong>
+    <%= result.value %><%= result.value_suffix %>
+  </p>
+  
+  <h3><%= t('safety_standards.calculators.breakdown_title') %></h3>
+  <ul>
+    <% result.breakdown.each do |step| %>
+      <li><strong><%= step[0] %>:</strong> <%= step[1] %></li>
+    <% end %>
+  </ul>
+</div>
