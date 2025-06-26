@@ -24,18 +24,7 @@
 	border-radius: 4px;
 }
 
-.actions {
-	margin-bottom: 3rem;
-	display: flex;
-	gap: 0.5rem;
-	flex-wrap: wrap;
-	justify-content: center;
-
-	a strong,
-	button {
-		padding: 0.5rem 1rem;
-	}
-}
+/* Removed .actions styles - using nav instead */
 
 .button.small {
 	padding: 0.25rem 0.5rem;

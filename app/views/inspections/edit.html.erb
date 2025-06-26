@@ -65,6 +65,7 @@
         <%= button_to t('inspections.buttons.delete'),
           inspection_path(@inspection),
           method: :delete,
+          class: "danger",
           data: {
             turbo_confirm: t('inspections.messages.delete_confirm')
           }

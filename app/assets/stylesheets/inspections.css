@@ -24,6 +24,7 @@
 	display: none; /* Hidden on mobile by default */
 	background-color: var(--color-bg-secondary);
 	padding: 1rem;
+	font-family: var(--font-family-secondary);
 	font-weight: bold;
 	border-bottom: 2px solid var(--color);
 	color: white;

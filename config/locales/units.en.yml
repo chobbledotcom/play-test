@@ -49,7 +49,7 @@ en:
 
     fields:
       name: "Unit Name"
-      serial: "Serial Number / Asset ID"
+      serial: "Serial"
       manufacturer: "Manufacturer"
       has_slide: "Has Slide"
       model: "Model"

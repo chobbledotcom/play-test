@@ -1,11 +1,4 @@
 <article id="additional" class="tab-panel">
-  <h2>Additional Safety Requirements</h2>
-  <ul>
-    <li>Maximum evacuation time: 30 seconds</li>
-    <li>Maximum fall height: 0.6m (600mm)</li>
-    <li>Multiple exits required for >15 users</li>
-    <li>First metre gradient: Special requirements for slides</li>
-    <li>Surface requirements: Non-slip surface material required</li>
-    <li>Edge protection: Rounded edges and smooth transitions</li>
-  </ul>
+  <h2><%= t('safety_standards_tabs.additional.title') %></h2>
+  <%= render 'shared/safety_card', i18n_key: 'additional.requirements' %>
 </article>

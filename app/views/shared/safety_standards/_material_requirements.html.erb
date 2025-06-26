@@ -1,33 +1,41 @@
 <div class="safety-standard-info">
-  <h4>EN 14960:2019 Material Requirements</h4>
+  <h4><%= t('safety_standards_tabs.material.title') %></h4>
   
-  <h5>Fabric Requirements:</h5>
-  <ul>
-    <li>Tensile strength: 1850 Newtons minimum</li>
-    <li>Tear strength: 350 Newtons minimum</li>
-    <li>Fire retardancy: Must meet EN 71-3 requirements</li>
-  </ul>
+  <div class="safety-card">
+    <h5><%= t('safety_standards_tabs.material.fabric_requirements.title') %></h5>
+    <ul>
+      <li><%= t('safety_standards_tabs.material.fabric_requirements.tensile_strength') %></li>
+      <li><%= t('safety_standards_tabs.material.fabric_requirements.tear_strength') %></li>
+      <li><%= t('safety_standards_tabs.material.fabric_requirements.fire_retardancy') %></li>
+    </ul>
+  </div>
 
-  <h5>Thread Requirements:</h5>
-  <ul>
-    <li>Material: Non-rotting yarn required</li>
-    <li>Tensile strength: 88 Newtons minimum</li>
-    <li>Stitch type: Lock stitching required</li>
-    <li>Stitch length: 3-8mm</li>
-  </ul>
+  <div class="safety-card">
+    <h5><%= t('safety_standards_tabs.material.thread_requirements.title') %></h5>
+    <ul>
+      <li><%= t('safety_standards_tabs.material.thread_requirements.material') %></li>
+      <li><%= t('safety_standards_tabs.material.thread_requirements.tensile_strength') %></li>
+      <li><%= t('safety_standards_tabs.material.thread_requirements.stitch_type') %></li>
+      <li><%= t('safety_standards_tabs.material.thread_requirements.stitch_length') %></li>
+    </ul>
+  </div>
 
-  <h5>Rope Requirements:</h5>
-  <ul>
-    <li>Diameter range: 18mm - 45mm</li>
-    <li>Material: Non-monofilament</li>
-    <li>Attachment: Fixed at both ends</li>
-    <li>Swing limitation: No greater than 20% to prevent strangulation</li>
-  </ul>
+  <div class="safety-card">
+    <h5><%= t('safety_standards_tabs.material.rope_requirements.title') %></h5>
+    <ul>
+      <li><%= t('safety_standards_tabs.material.rope_requirements.diameter_range') %></li>
+      <li><%= t('safety_standards_tabs.material.rope_requirements.material') %></li>
+      <li><%= t('safety_standards_tabs.material.rope_requirements.attachment') %></li>
+      <li><%= t('safety_standards_tabs.material.rope_requirements.swing_limitation') %></li>
+    </ul>
+  </div>
 
-  <h5>Netting Requirements:</h5>
-  <ul>
-    <li>Vertical mesh size: 30mm maximum for >1m height</li>
-    <li>Roof mesh size: 8mm maximum</li>
-    <li>Strength: Support heaviest intended user</li>
-  </ul>
+  <div class="safety-card">
+    <h5><%= t('safety_standards_tabs.material.netting_requirements.title') %></h5>
+    <ul>
+      <li><%= t('safety_standards_tabs.material.netting_requirements.vertical_mesh') %></li>
+      <li><%= t('safety_standards_tabs.material.netting_requirements.roof_mesh') %></li>
+      <li><%= t('safety_standards_tabs.material.netting_requirements.strength') %></li>
+    </ul>
+  </div>
 </div>

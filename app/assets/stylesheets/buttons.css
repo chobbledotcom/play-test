@@ -1,26 +1,128 @@
-/* General button styling for standalone buttons - minimal overrides */
-a.button,
-button.button {
+/* Default button styles for all button types */
+
+/* Base button styles */
+button,
+input[type="submit"],
+input[type="button"],
+a[role="button"] {
+	/* Typography */
+	font-family: var(--font-family-secondary);
+	font-size: medium;
 	font-weight: bold;
+	line-height: var(--line-height);
 	text-decoration: none;
+	
+	/* Layout */
+	display: inline-block;
+	margin: 0.5rem 0;
+	padding: 0.5rem 1rem;
+	
+	/* Appearance */
+	background-color: var(--color-link);
+	border: 2px solid var(--color-link);
+	border-radius: var(--border-radius);
+	color: var(--color-bg);
+	
+	/* Interaction */
+	cursor: pointer;
+	transition: all 0.2s ease;
+	position: relative;
+	transform: translateY(0);
 }
 
-/* Danger variant */
-a.button.danger,
-button.button.danger {
-	background: var(--color-error);
-	border-color: var(--color-error);
+/* Hover state */
+button:hover:not([disabled]),
+input[type="submit"]:hover:not([disabled]),
+input[type="button"]:hover:not([disabled]),
+a[role="button"]:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(118, 99, 228, 0.3);
+	filter: brightness(1.1);
 }
 
-a.button.danger:hover,
-button.button.danger:hover {
-	background: #c62828;
-	border-color: #c62828;
+/* Active/click state */
+button:active:not([disabled]),
+input[type="submit"]:active:not([disabled]),
+input[type="button"]:active:not([disabled]),
+a[role="button"]:active {
+	transform: translateY(0);
+	box-shadow: 0 2px 4px rgba(118, 99, 228, 0.2);
+	filter: brightness(0.95);
 }
 
-/* Style disabled submit buttons during form submission */
-button[type="submit"]:disabled,
-input[type="submit"]:disabled {
+/* Focus state for accessibility */
+button:focus-visible,
+input[type="submit"]:focus-visible,
+input[type="button"]:focus-visible,
+a[role="button"]:focus-visible {
+	outline: 3px solid rgba(118, 99, 228, 0.5);
+	outline-offset: 2px;
+}
+
+/* Disabled state */
+button:disabled,
+input[type="submit"]:disabled,
+input[type="button"]:disabled {
 	opacity: 0.6;
 	cursor: not-allowed;
+	transform: none;
+}
+
+/* Button variants */
+
+/* Danger/destructive actions */
+button.danger,
+input[type="submit"].danger {
+	background: var(--color-error) !important;
+	border-color: var(--color-error) !important;
+}
+
+button.danger:hover:not([disabled]),
+input[type="submit"].danger:hover:not([disabled]) {
+	background: #c62828 !important;
+	border-color: #c62828 !important;
+	color: var(--color-bg);
+}
+
+/* Navigation context - different styling */
+nav a,
+nav button {
+	/* Reset general button styles for nav */
+	background: none;
+	border: none;
+	color: var(--color-link);
+	text-decoration: underline;
+	font-weight: normal;
+	font-family: var(--font-family-secondary);
+	padding: 0.5rem;
+	margin: 0;
+}
+
+nav a:hover,
+nav button:hover {
+	transform: none;
+	box-shadow: none;
+	filter: none;
+}
+
+/* Special nav disabled state */
+nav span {
+	display: block;
+	padding: 0.5rem;
+	color: var(--color-link);
+	border: 2px solid var(--color-link);
+	text-decoration: none;
+	cursor: default;
+	text-align: center;
+	box-sizing: border-box;
+}
+
+/* Rails button_to forms */
+form.button_to {
+	display: inline-block;
+	margin: 0;
+}
+
+nav form.button_to {
+	min-width: fit-content;
 }

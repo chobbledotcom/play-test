@@ -7,6 +7,7 @@
 <% if @unit.deletable? %>
   <%= button_to t('units.buttons.delete'),
     unit_path(@unit),
+    class: "danger",
     method: :delete,
     data: { turbo_confirm: t('units.messages.delete_confirm') }
   %>

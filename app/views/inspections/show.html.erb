@@ -16,8 +16,7 @@
         <h4><%= t("inspections.labels.no_unit") %></h4>
         <p><%= t("inspections.messages.no_unit_description") %></p>
         <%= link_to t("inspections.buttons.create_unit"),
-          new_unit_from_inspection_path(@inspection),
-          class: "button"
+          new_unit_from_inspection_path(@inspection)
         %>
       </aside>
     <% end %>

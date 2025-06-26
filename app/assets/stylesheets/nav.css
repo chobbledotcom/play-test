@@ -1,11 +1,5 @@
 nav {
-	font-family:
-		Menlo,
-		Consolas,
-		Monaco,
-		Liberation Mono,
-		Lucida Console,
-		monospace;
+	font-family: var(--font-family-secondary);
 }
 
 nav ul {
@@ -43,13 +37,7 @@ nav ul li button {
 	text-decoration: underline;
 	position: relative;
 	font-weight: normal;
-	font-family:
-		Menlo,
-		Consolas,
-		Monaco,
-		Liberation Mono,
-		Lucida Console,
-		monospace;
+	font-family: var(--font-family-secondary);
 }
 
 nav ul li a:hover,
@@ -63,9 +51,10 @@ nav form.button_to {
 	min-width: fit-content;
 }
 
+/* Nav-specific button styles - these override the general button styles */
 nav a,
 nav button {
-	transition: all 0.2s ease !important;
+	/* transition moved to buttons.css */
 	position: relative;
 	transform: translateY(0);
 	display: inline-block;

@@ -134,6 +134,7 @@ details {
 
 details summary {
 	font-weight: bold;
+	font-family: var(--font-family-secondary);
 	cursor: pointer;
 }
 
@@ -143,13 +144,7 @@ h3,
 h4,
 h5,
 h6 {
-	font-family:
-		Menlo,
-		Consolas,
-		Monaco,
-		Liberation Mono,
-		Lucida Console,
-		monospace;
+	font-family: var(--font-family-secondary);
 	line-height: var(--line-height);
 	text-wrap: balance;
 	margin-top: 3rem;
@@ -210,6 +205,8 @@ a:not(.button):hover {
 	color: var(--color-text);
 }
 
+/* Button styles moved to buttons.css */
+/*
 a b,
 a em,
 a i,
@@ -224,13 +221,7 @@ input[type="submit"] {
 	line-height: var(--line-height);
 	margin: 0.5rem 0;
 	padding: 0.5rem 1rem;
-	font-family:
-		Menlo,
-		Consolas,
-		Monaco,
-		Liberation Mono,
-		Lucida Console,
-		monospace;
+	font-family: var(--font-family-secondary);
 }
 
 button,
@@ -260,6 +251,23 @@ input[type="submit"] {
 	background-color: var(--color-link);
 	border: 2px solid var(--color-link);
 	color: var(--color-bg);
+}
+*/
+
+/* Keep link styling for a b, a strong, a em, a i */
+a b,
+a strong {
+	background-color: var(--color-link);
+	border: 2px solid var(--color-link);
+	color: var(--color-bg);
+	border-radius: var(--border-radius);
+	display: inline-block;
+	font-size: medium;
+	font-weight: bold;
+	line-height: var(--line-height);
+	margin: 0.5rem 0;
+	padding: 0.5rem 1rem;
+	font-family: var(--font-family-secondary);
 }
 
 a em,
@@ -488,6 +496,7 @@ table thead {
 	color: var(--color-bg);
 	margin: 0;
 	padding: 0;
+	font-family: var(--font-family-secondary);
 }
 
 table thead tr:first-child th:first-child {

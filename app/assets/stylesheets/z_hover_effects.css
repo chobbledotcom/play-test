@@ -1,6 +1,7 @@
 /* Custom hover and click effects for buttons and images */
 
-/* Button effects */
+/* Button effects moved to buttons.css */
+/*
 button,
 input[type="submit"],
 input[type="button"],
@@ -11,7 +12,6 @@ a[role="button"] {
 	transform: translateY(0);
 }
 
-/* Purple button hover effect - subtle lift and glow */
 button:hover:not([disabled]),
 input[type="submit"]:hover:not([disabled]),
 input[type="button"]:hover:not([disabled]),
@@ -23,7 +23,6 @@ a[role="button"]:hover {
 	cursor: pointer !important;
 }
 
-/* Button click effect - press down */
 button:active:not([disabled]),
 input[type="submit"]:active:not([disabled]),
 input[type="button"]:active:not([disabled]),
@@ -34,7 +33,6 @@ a[role="button"]:active {
 	filter: brightness(0.95) !important;
 }
 
-/* Focus state for accessibility */
 button:focus-visible,
 input[type="submit"]:focus-visible,
 input[type="button"]:focus-visible,
@@ -43,6 +41,7 @@ a[role="button"]:focus-visible {
 	outline: 3px solid rgba(118, 99, 228, 0.5);
 	outline-offset: 2px;
 }
+*/
 
 /* Remove all image hover effects */
 img {

@@ -1,41 +1,9 @@
 <article id="slides" class="tab-panel">
   <%= render 'calculator_form', type: :slide_runout %>
   
-  <ul>
-    <li>Minimum length: 50% of highest platform height</li>
-    <li>Absolute minimum: 300mm in any case</li>
-    <li>Maximum inclination: Not more than 10°</li>
-    <li>If stop wall fitted: adds 50cm to required run-out length</li>
-    <li>Wall height on run-out sides: 50% of user height</li>
-  </ul>
+  <%= render 'shared/safety_card', i18n_key: 'slides.runout_requirements' %>
 
   <%= render 'calculator_form', type: :wall_height %>
   
-  <h3><%= t('safety_standards.wall_heights.requirements_by_platform') %></h3>
-  <table>
-    <thead>
-      <tr>
-        <th><%= t('safety_standards.wall_heights.platform_height') %></th>
-        <th><%= t('safety_standards.wall_heights.wall_requirement') %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><%= t('safety_standards.wall_heights.under_600mm') %></td>
-        <td><%= t('safety_standards.wall_heights.no_walls_required') %></td>
-      </tr>
-      <tr>
-        <td><%= t('safety_standards.wall_heights.600mm_to_3m') %></td>
-        <td><%= t('safety_standards.wall_heights.walls_equal_user_height') %></td>
-      </tr>
-      <tr>
-        <td><%= t('safety_standards.wall_heights.3m_to_6m') %></td>
-        <td><%= t('safety_standards.wall_heights.walls_125x_user_height') %></td>
-      </tr>
-      <tr>
-        <td><%= t('safety_standards.wall_heights.over_6m') %></td>
-        <td><%= t('safety_standards.wall_heights.walls_125x_plus_roof') %></td>
-      </tr>
-    </tbody>
-  </table>
+  <%= render 'shared/safety_card', i18n_key: 'slides.wall_requirements' %>
 </article>

@@ -1,45 +1,50 @@
 <div class="safety-standard-info">
-  <h4>EN 14960:2019 Slide Safety Requirements</h4>
+  <h4><%= t('safety_standards_tabs.slide_safety.title') %></h4>
   
-  <h5>Runout Requirements:</h5>
-  <div class="formula-box">
-    <strong>Formula:</strong> <code>Required Runout = max(Platform Height × 0.5, 0.3m)</code>
-    <br><em>Example: 2.5m platform requires max(2.5 × 0.5, 0.3) = 1.25m runout</em>
+  <div class="safety-card">
+    <h5><%= t('safety_standards_tabs.slide_safety.runout_requirements.title') %></h5>
+    <div class="formula-box">
+      <strong><%= t('safety_standards_tabs.slide_safety.runout_requirements.formula') %></strong> 
+      <code><%= t('safety_standards_tabs.slide_safety.runout_requirements.formula_text') %></code>
+      <br><em><%= t('safety_standards_tabs.slide_safety.runout_requirements.example') %></em>
+    </div>
+
+    <ul>
+      <li><%= t('safety_standards_tabs.slide_safety.runout_requirements.minimum_length') %></li>
+      <li><%= t('safety_standards_tabs.slide_safety.runout_requirements.absolute_minimum') %></li>
+      <li><%= t('safety_standards_tabs.slide_safety.runout_requirements.maximum_inclination') %></li>
+      <li><%= t('safety_standards_tabs.slide_safety.runout_requirements.stop_wall') %></li>
+      <li><%= t('safety_standards_tabs.slide_safety.runout_requirements.wall_height_runout') %></li>
+    </ul>
   </div>
 
-  <ul>
-    <li>Minimum length: 50% of highest platform height</li>
-    <li>Absolute minimum: 300mm in any case</li>
-    <li>Maximum inclination: Not more than 10°</li>
-    <li>If stop wall fitted: adds 50cm to required run-out length</li>
-    <li>Wall height on run-out sides: 50% of user height</li>
-  </ul>
-
-  <h5>Containing Wall Heights for Slides:</h5>
-  <table>
-    <thead>
-      <tr>
-        <th>Platform Height</th>
-        <th>Requirement</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Under 600mm</td>
-        <td>No containing walls required</td>
-      </tr>
-      <tr>
-        <td>600mm - 3000mm</td>
-        <td>Containing walls equal to platform height</td>
-      </tr>
-      <tr>
-        <td>3000mm - 6000mm</td>
-        <td>Containing walls 1.25 times platform height</td>
-      </tr>
-      <tr>
-        <td>Over 6000mm</td>
-        <td>Containing walls AND permanent roof required</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="safety-card">
+    <h5><%= t('safety_standards_tabs.slide_safety.containing_wall_heights.title') %></h5>
+    <table>
+      <thead>
+        <tr>
+          <th><%= t('safety_standards_tabs.slide_safety.containing_wall_heights.platform_height') %></th>
+          <th><%= t('safety_standards_tabs.slide_safety.containing_wall_heights.requirement') %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= t('safety_standards_tabs.slide_safety.containing_wall_heights.under_600mm') %></td>
+          <td><%= t('safety_standards_tabs.slide_safety.containing_wall_heights.no_walls') %></td>
+        </tr>
+        <tr>
+          <td><%= t('safety_standards_tabs.slide_safety.containing_wall_heights.600mm_to_3000mm') %></td>
+          <td><%= t('safety_standards_tabs.slide_safety.containing_wall_heights.walls_equal') %></td>
+        </tr>
+        <tr>
+          <td><%= t('safety_standards_tabs.slide_safety.containing_wall_heights.3000mm_to_6000mm') %></td>
+          <td><%= t('safety_standards_tabs.slide_safety.containing_wall_heights.walls_125') %></td>
+        </tr>
+        <tr>
+          <td><%= t('safety_standards_tabs.slide_safety.containing_wall_heights.over_6000mm') %></td>
+          <td><%= t('safety_standards_tabs.slide_safety.containing_wall_heights.walls_and_roof') %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

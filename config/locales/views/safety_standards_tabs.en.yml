@@ -1,0 +1,110 @@
+en:
+  safety_standards_tabs:
+    slide_safety:
+      title: "EN 14960:2019 Slide Safety Requirements"
+      runout_requirements:
+        title: "Runout Requirements:"
+        formula: "Formula:"
+        formula_text: "Required Runout = max(Platform Height × 0.5, 0.3m)"
+        example: "Example: 2.5m platform requires max(2.5 × 0.5, 0.3) = 1.25m runout"
+        minimum_length: "Minimum length: 50% of highest platform height"
+        absolute_minimum: "Absolute minimum: 300mm in any case"
+        maximum_inclination: "Maximum inclination: Not more than 10°"
+        stop_wall: "If stop wall fitted: adds 50cm to required run-out length"
+        wall_height_runout: "Wall height on run-out sides: 50% of user height"
+      containing_wall_heights:
+        title: "Containing Wall Heights for Slides:"
+        platform_height: "Platform Height"
+        requirement: "Requirement"
+        under_600mm: "Under 600mm"
+        no_walls: "No containing walls required"
+        600mm_to_3000mm: "600mm - 3000mm"
+        walls_equal: "Containing walls equal to platform height"
+        3000mm_to_6000mm: "3000mm - 6000mm"
+        walls_125: "Containing walls 1.25 times platform height"
+        over_6000mm: "Over 6000mm"
+        walls_and_roof: "Containing walls AND permanent roof required"
+    
+    material:
+      title: "Material Requirements"
+      fabric:
+        title: "Fabric"
+        items:
+          - "Tensile strength: 1850 Newtons minimum"
+          - "Tear strength: 350 Newtons minimum"
+          - "Fire retardancy: Must meet EN 71-3 requirements"
+      thread:
+        title: "Thread"
+        items:
+          - "Material: Non-rotting yarn required"
+          - "Tensile strength: 88 Newtons minimum"
+          - "Stitch type: Lock stitching required"
+          - "Stitch length: 3-8mm"
+      rope:
+        title: "Rope"
+        items:
+          - "Diameter range: 18mm - 45mm"
+          - "Material: Non-monofilament"
+          - "Attachment: Fixed at both ends"
+          - "Swing limitation: No greater than 20% to prevent strangulation"
+      netting:
+        title: "Netting"
+        items:
+          - "Vertical mesh size: 30mm maximum for >1m height"
+          - "Roof mesh size: 8mm maximum"
+          - "Strength: Support heaviest intended user"
+    fan:
+      title: "Electrical Safety Requirements"
+      general_requirements:
+        title: "General Requirements"
+        items:
+          - "PAT (Portable Appliance Test) required"
+          - "Minimum pressure: 1.0 KPA operational pressure"
+          - "Finger probe: 8mm probe must not contact moving/hot parts"
+          - "Return flap: Required to reduce deflation time"
+          - "Blower distance: 1.2m minimum from equipment edge"
+      grounding_test:
+        title: "Grounding Test Weights"
+        table:
+          headers:
+            - "User Height"
+            - "Test Weight"
+          rows:
+            - ["1.0m", "25kg"]
+            - ["1.2m", "35kg"]
+            - ["1.5m", "65kg"]
+            - ["1.8m", "85kg"]
+    
+    additional:
+      title: "Additional Safety Requirements"
+      requirements:
+        title: "Additional Safety Requirements"
+        items:
+          - "Maximum evacuation time: 30 seconds"
+          - "Maximum fall height: 0.6m (600mm)"
+          - "Multiple exits required for >15 users"
+          - "First metre gradient: Special requirements for slides"
+          - "Surface requirements: Non-slip surface material required"
+          - "Edge protection: Rounded edges and smooth transitions"
+    
+    slides:
+      title: "Slide Safety Requirements"
+      runout_requirements:
+        title: "Runout Requirements"
+        items:
+          - "Minimum length: 50% of highest platform height"
+          - "Absolute minimum: 300mm in any case"
+          - "Maximum inclination: Not more than 10°"
+          - "If stop wall fitted: adds 50cm to required run-out length"
+          - "Wall height on run-out sides: 50% of user height"
+      wall_requirements:
+        title: "Requirements by Platform Height"
+        table:
+          headers:
+            - "Platform Height"
+            - "Wall Requirement"
+          rows:
+            - ["Under 600mm", "No containing walls required"]
+            - ["600mm - 3000mm", "Containing walls equal to platform height"]
+            - ["3000mm - 6000mm", "Containing walls 1.25 times platform height"]
+            - ["Over 6000mm", "Containing walls AND permanent roof required"]

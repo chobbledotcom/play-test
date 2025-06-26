@@ -36,7 +36,6 @@
             <%= button_to t('units.actions.select'),
                 update_unit_inspection_path(inspection, unit_id: item.id),
                 method: :patch,
-                class: "button",
                 data: {
                   turbo_confirm: t('inspections.messages.unit_selection_confirm', unit_name: item.name)
                 } %>

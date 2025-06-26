@@ -6,18 +6,15 @@
     <% if @inspection.unit.present? %>
       <%= render 'shared/unit_details_display', unit: @inspection.unit %>
       <%= link_to t('inspections.buttons.change_unit'),
-        select_unit_inspection_path(@inspection),
-        class: "button" %>
+        select_unit_inspection_path(@inspection) %>
       <br>
     <% else %>
       <p><%= t('inspections.messages.no_unit') %></p>
       <%= link_to t('inspections.buttons.select_unit'),
-        select_unit_inspection_path(@inspection),
-        class: "button" %>
+        select_unit_inspection_path(@inspection) %>
       <br><br>
       <%= link_to t('inspections.buttons.create_unit_from_inspection'),
-        new_unit_from_inspection_path(@inspection),
-        class: "button secondary" %>
+        new_unit_from_inspection_path(@inspection) %>
     <% end %>
   <% end %>
 
@@ -56,8 +53,7 @@
       <%= form.text_field :unique_report_number %>
       <% if @inspection.unique_report_number.blank? && @inspection.persisted? %>
         <button type="button"
-          onclick="document.getElementById('inspection_unique_report_number').value = '<%= @inspection.id %>'; this.style.display = 'none';"
-          class="button secondary small">
+          onclick="document.getElementById('inspection_unique_report_number').value = '<%= @inspection.id %>'; this.style.display = 'none';">
           <%= t('inspections.buttons.use_suggested_id', id: @inspection.id) %>
         </button>
       <% end %>

@@ -55,10 +55,7 @@ form.button_to {
 	width: fit-content;
 }
 
-.actions form.button_to {
-	margin: 0;
-	min-width: fit-content;
-}
+/* Removed .actions styles - using nav instead */
 
 .view-inspection {
 	text-align: center;
@@ -91,13 +88,7 @@ fieldset > input[type="submit"] {
 }
 
 fieldset legend {
-	font-family:
-		Menlo,
-		Consolas,
-		Monaco,
-		Liberation Mono,
-		Lucida Console,
-		monospace;
+	font-family: var(--font-family-secondary);
 	color: #6c0c6c;
 }
 

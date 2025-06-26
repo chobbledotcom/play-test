@@ -2,9 +2,7 @@
 
 <% if current_user&.admin? %>
   <%= link_to t('ui.edit'),
-    edit_inspector_company_path(@inspector_company),
-    class: "button"
-  %>
+    edit_inspector_company_path(@inspector_company) %>
 <% end %>
 
 <table>
