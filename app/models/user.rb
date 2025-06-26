@@ -31,7 +31,7 @@ class User < ApplicationRecord
     allow_nil: true
 
   validates :theme,
-    inclusion: {in: %w[light dark]}
+    inclusion: {in: %w[default light dark]}
 
   before_save :downcase_email
   before_save :normalize_rpii_number

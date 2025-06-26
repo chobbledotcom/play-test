@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -i bash -p biome
+#! nix-shell -i bash -I nixpkgs=channel:nixpkgs-unstable -p biome
 
 biome \
   format \

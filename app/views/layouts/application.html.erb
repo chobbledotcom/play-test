@@ -13,7 +13,7 @@
     <script data-goatcounter="https://analytics.play-test.co.uk/count"
       async src="https://analytics.play-test.co.uk/count.js"></script>
   </head>
-  <body<% if current_user&.theme == "dark" %> class="dark-theme"<% end %>>
+  <body class="<%= current_user&.theme %>">
     <%= render 'shared/construction_banner' %>
     <%= render 'shared/header_logo' %>
     <% if current_user %>

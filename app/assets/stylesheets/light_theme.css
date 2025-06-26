@@ -1,0 +1,41 @@
+.light nav a,
+.light nav button {
+  background-color: var(--color-link) !important;
+  border: 2px solid var(--color-link) !important;
+  color: var(--color-bg) !important;
+  border-radius: var(--border-radius) !important;
+  text-decoration: none !important;
+  &:hover {
+  filter: none !important; /* Remove MVP's brightness filter */
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
+  background-color: #8a0f8a !important; /* Lighter purple on hover */
+  border-color: #8a0f8a !important;
+  text-decoration: none !important;
+  color: var(--color-bg) !important;
+}
+}
+
+
+.light nav a:active,
+.light nav button:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 6px rgba(108, 12, 108, 0.2) !important;
+  background-color: #4a084a !important; /* Darker purple on click */
+  border-color: #4a084a !important;
+}
+
+.light nav a.active,
+.light nav a.active:hover,
+.light nav button:hover {
+  background-color: var(--color-bg) !important;
+  color: var(--color-link) !important;
+  border: 2px solid var(--color-link) !important;
+  text-decoration: none !important;
+}
+
+.light nav a.active:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3) !important;
+  color: var(--color-link) !important;
+}

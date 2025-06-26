@@ -112,6 +112,7 @@ en:
       time_day: "Show Day Only"
       theme_light: "Light"
       theme_dark: "Dark"
+      theme_default: "Default"
 
     verification:
       details_header: "RPII Verification Details"
