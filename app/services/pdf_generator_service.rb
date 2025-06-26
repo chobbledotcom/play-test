@@ -82,7 +82,7 @@ class PdfGeneratorService
     unit = inspection.unit
 
     if unit
-      unit_data = TableBuilder.build_unit_details_table(unit, :inspection)
+      unit_data = TableBuilder.build_unit_details_table_with_inspection(unit, inspection, :inspection)
       TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.inspection.equipment_details"), unit_data)
     end
     # Hide the table entirely when no unit is associated

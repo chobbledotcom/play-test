@@ -18,7 +18,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
       # Check that I18n translations are used
       expect_pdf_to_include_i18n_keys(pdf_text,
-        "pdf.inspection.title",
         "pdf.inspection.equipment_details",
         "pdf.inspection.assessments_section")
     end
@@ -71,8 +70,6 @@ RSpec.describe PdfGeneratorService, pdf: true do
       expect(pdf_text).to include(I18n.t("pdf.inspection.fields.description"))
       expect(pdf_text).to include(I18n.t("pdf.inspection.fields.serial"))
       expect(pdf_text).to include(I18n.t("pdf.inspection.fields.manufacturer"))
-      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.has_slide"))
-      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.totally_enclosed"))
       expect(pdf_text).to include(I18n.t("pdf.inspection.fields.owner"))
     end
 

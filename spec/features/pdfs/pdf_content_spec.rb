@@ -34,7 +34,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
 
       expect_pdf_to_include_i18n_keys(pdf_text,
-        "pdf.inspection.title",
         "pdf.inspection.equipment_details")
 
       expect(pdf_text).to include(user.rpii_inspector_number) if user.rpii_inspector_number.present?
@@ -92,7 +91,6 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
 
       expect_pdf_to_include_i18n_keys(pdf_text,
-        "pdf.inspection.title",
         "pdf.inspection.equipment_details")
 
       expect(pdf_text).to include(user_without_rpii.name)

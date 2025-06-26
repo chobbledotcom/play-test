@@ -79,9 +79,9 @@ class InspectionsController < ApplicationController
   end
 
   def destroy
-    if @inspection.complete? && !current_user.admin?
+    if @inspection.complete?
       alert_message = I18n.t("inspections.messages.delete_complete_denied")
-      redirect_to @inspection.preferred_path, alert: alert_message
+      redirect_to inspection_path(@inspection), alert: alert_message
       return
     end
 

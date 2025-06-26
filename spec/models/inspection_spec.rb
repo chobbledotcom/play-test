@@ -42,18 +42,6 @@ RSpec.describe Inspection, type: :model do
     end
   end
 
-  describe "#preferred_path" do
-    it "returns show path for completed inspections" do
-      inspection.complete_date = Time.current
-      expect(inspection.preferred_path).to include("/inspections/#{inspection.id}")
-      expect(inspection.preferred_path).not_to include("/edit")
-    end
-
-    it "returns edit path for draft inspections" do
-      inspection.complete_date = nil
-      expect(inspection.preferred_path).to include("/inspections/#{inspection.id}/edit")
-    end
-  end
 
   describe "scopes" do
     let!(:passed) { create(:inspection, :passed) }

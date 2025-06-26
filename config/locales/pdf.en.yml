@@ -2,10 +2,9 @@ en:
   # PDF Generator
   pdf:
     inspection:
-      title: "Inspection Report"
       passed: "PASSED"
       failed: "FAILED"
-      equipment_details: "Unit Details"
+      equipment_details: "Inspection Overview"
       assessments_section: "Assessment Results"
       no_assessment_data: "No %{assessment_type} data available"
       watermark:
@@ -13,15 +12,15 @@ en:
       fields:
         serial: "Serial Number"
         manufacturer: "Manufacturer"
-        inspection_location: "Location of Inspection"
+        inspection_location: "Inspection Location"
         inspector: "Inspector"
+        inspected_by: "Inspected by"
         issued: "Issued"
+        issued_date: "Issued Date"
         rpii_inspector_no: "RPII Inspector No"
         report_id: "Report ID"
         description: "Description"
         owner: "Owner"
-        has_slide: "Has slide"
-        totally_enclosed: "Totally enclosed"
         size_m: "Size (m)"
         passed: "PASSED"
         failed: "FAILED"

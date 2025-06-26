@@ -154,17 +154,20 @@ class PdfGeneratorService
       end
       dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
 
-      # Has slide and totally enclosed values from last inspection
-      has_slide = last_inspection&.has_slide? ? I18n.t("shared.yes") : I18n.t("shared.no")
-      totally_enclosed = last_inspection&.is_totally_enclosed? ? I18n.t("shared.yes") : I18n.t("shared.no")
+      # Get inspector details from current inspection (for inspection PDF) or last inspection (for unit PDF)
+      inspection = context == :inspection ? last_inspection : unit.last_inspection
+      inspector_name = inspection&.user&.name || ""
+      rpii_number = inspection&.user&.rpii_inspector_number
+      inspection_location = inspection&.inspection_location || ""
+      issued_date = inspection&.inspection_date ? Utilities.format_date(inspection.inspection_date) : ""
 
-      # Use the same format for both inspection and unit PDFs (the inspection format is better)
-      [
+      # Build the table rows
+      table_rows = [
         [
           I18n.t("pdf.inspection.fields.description"),
           Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH),
-          I18n.t("pdf.inspection.fields.serial"),
-          unit.serial || ""
+          I18n.t("pdf.inspection.fields.inspected_by"),
+          inspector_name
         ],
         [
           I18n.t("pdf.inspection.fields.manufacturer"),
@@ -173,18 +176,31 @@ class PdfGeneratorService
           unit.owner.presence || ""
         ],
         [
-          I18n.t("pdf.inspection.fields.has_slide"),
-          has_slide,
-          I18n.t("pdf.inspection.fields.totally_enclosed"),
-          totally_enclosed
-        ],
-        [
           I18n.t("pdf.inspection.fields.size_m"),
           dimensions_text,
-          "",
-          ""
+          I18n.t("pdf.inspection.fields.inspection_location"),
+          inspection_location
+        ],
+        [
+          I18n.t("pdf.inspection.fields.serial"),
+          unit.serial || "",
+          I18n.t("pdf.inspection.fields.issued_date"),
+          issued_date
         ]
       ]
+
+      # Add RPII row if inspector has RPII number
+      if rpii_number.present?
+        # Insert RPII number after inspector name (after first row)
+        table_rows.insert(1, [
+          "",
+          "",
+          I18n.t("pdf.inspection.fields.rpii_inspector_no"),
+          rpii_number
+        ])
+      end
+
+      table_rows
     end
   end
 end

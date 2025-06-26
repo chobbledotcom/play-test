@@ -176,22 +176,6 @@ class Inspection < ApplicationRecord
     tabs
   end
 
-  # URL routing based on completion status
-  def primary_url_path
-    if complete?
-      "inspection_path(self)"
-    else
-      "edit_inspection_path(self)"
-    end
-  end
-
-  def preferred_path
-    if complete?
-      Rails.application.routes.url_helpers.inspection_path(self)
-    else
-      Rails.application.routes.url_helpers.edit_inspection_path(self)
-    end
-  end
 
   # Advanced methods
   def can_be_completed?

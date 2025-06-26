@@ -1,10 +1,10 @@
 class PdfGeneratorService
   module Configuration
     # Unit table constants
-    UNIT_LABEL_COLUMN_WIDTH = 90
+    UNIT_LABEL_COLUMN_WIDTH = 100
     UNIT_NAME_MAX_LENGTH = 30
-    UNIT_TABLE_CELL_PADDING = [4, 8]
-    UNIT_TABLE_TEXT_SIZE = 10
+    UNIT_TABLE_CELL_PADDING = [6, 4]
+    UNIT_TABLE_TEXT_SIZE = 9
 
     # General text and spacing constants
     HEADER_TEXT_SIZE = 12
@@ -13,6 +13,11 @@ class PdfGeneratorService
     STATUS_SPACING = 15
     SECTION_TITLE_SIZE = 14
     COMMENTS_PADDING = 20
+    
+    # Header table constants
+    LOGO_HEIGHT = 50
+    HEADER_TABLE_PADDING = [5, 0]
+    LOGO_COLUMN_WIDTH_RATIO = 1.0 / 3.0
 
     # Table constants
     TABLE_CELL_PADDING = [5, 10]
@@ -26,6 +31,8 @@ class PdfGeneratorService
     HISTORY_TABLE_ALT_ROW_COLOR = "F0F0F0"
     PASS_COLOR = "008000"  # Green
     FAIL_COLOR = "CC0000"  # Red
+    HEADER_COLOR = "663399"  # Purple
+    SUBTITLE_COLOR = "666666"  # Gray
 
     # Inspection history table column widths
     HISTORY_DATE_COLUMN_WIDTH = 80      # Date column (DD/MM/YYYY)
