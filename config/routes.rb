@@ -6,6 +6,8 @@ Rails.application.routes.draw do
 
   root "home#index"
   get "about", to: "home#about"
+  get "guides", to: "guides#index"
+  get "guides/*path", to: "guides#show", as: :guide
   get "safety_standards", to: "safety_standards#index"
   post "safety_standards", to: "safety_standards#index"
 

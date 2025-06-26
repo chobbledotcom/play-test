@@ -66,12 +66,16 @@ class InspectionWorkflow
 
   def register_new_user
     visit root_path
+    capture_guide_screenshot("Home Page - Not Logged In")
+    
     click_link t("users.titles.register")
+    capture_guide_screenshot("Registration Form")
 
     user_data = SeedData.user_fields
     user_data.each do |field_name, value|
       fill_in_form :user_new, field_name, value
     end
+    capture_guide_screenshot("Registration Form - Filled")
 
     submit_form :user_new
     User.find_by!(email: user_data[:email])
@@ -79,6 +83,7 @@ class InspectionWorkflow
 
   def verify_inactive_user_warning
     expect(page).to have_content(t("users.messages.user_inactive"))
+    capture_guide_screenshot("Inactive User Warning")
   end
 
   def activate_user
@@ -95,7 +100,10 @@ class InspectionWorkflow
   def create_test_unit
     visit root_path
     click_link "Units"
+    capture_guide_screenshot("Units Index - Empty")
+    
     click_units_button("add_unit")
+    capture_guide_screenshot("Create Unit Form")
 
     unit_data = SeedData.unit_fields.merge(
       name: "Test Bouncy Castle"
@@ -104,9 +112,11 @@ class InspectionWorkflow
     unit_data.each do |field_name, value|
       fill_in_form :units, field_name, value
     end
+    capture_guide_screenshot("Create Unit Form - Filled")
 
     submit_form :units
     expect_units_message("created")
+    capture_guide_screenshot("Unit Created Successfully")
 
     Unit.find_by!(
       name: unit_data[:name],
@@ -118,9 +128,11 @@ class InspectionWorkflow
     visit root_path
     click_link "Units"
     click_link "Test Bouncy Castle"
+    capture_guide_screenshot("Unit Details Page")
 
     click_units_button("add_inspection")
     expect(page).to have_content(t("inspections.titles.edit"))
+    capture_guide_screenshot("New Inspection - Basic Details")
 
     @unit.inspections.order(created_at: :desc).first.tap do |inspection|
       expect(inspection).to be_present
@@ -133,8 +145,10 @@ class InspectionWorkflow
     field_data.each do |field_name, value|
       fill_inspection_field(field_name, value)
     end
+    capture_guide_screenshot("Inspection Details - Filled")
 
     click_submit_button
+    capture_guide_screenshot("Inspection Summary - Incomplete")
 
     @inspection.reload
     expect(@inspection.has_slide).to eq(
@@ -462,7 +476,7 @@ class InspectionWorkflow
 end
 
 RSpec.feature "Complete Inspection Workflow", type: :feature do
-  scenario "complete workflow with prefilling - no slide or enclosure" do
+  scenario "complete workflow with prefilling - no slide or enclosure", js: true do
     InspectionWorkflow.new(
       has_slide: false,
       is_totally_enclosed: false

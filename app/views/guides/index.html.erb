@@ -1,0 +1,22 @@
+<h1><%= I18n.t("guides.titles.index") %></h1>
+
+<% if @guides.empty? %>
+  <p><%= I18n.t("guides.messages.no_guides") %></p>
+<% else %>
+  <article>
+    <% @guides.each do |guide| %>
+      <h2><%= link_to guide[:title], guide_path(guide[:path]) %></h2>
+      <p>
+        <%= I18n.t("guides.labels.screenshots", count: guide[:screenshot_count]) %>
+        <br>
+        <%= I18n.t("guides.labels.updated") %>: <%= l(Time.parse(guide[:updated_at]), format: :short) %>
+      </p>
+      <% if guide[:first_screenshot] %>
+        <%= link_to guide_path(guide[:path]) do %>
+          <%= image_tag "/guide_screenshots/#{guide[:path]}/#{guide[:first_screenshot]['filename']}", 
+              alt: guide[:first_screenshot]['caption'] %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </article>
+<% end %>

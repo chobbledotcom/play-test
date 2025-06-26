@@ -13,7 +13,7 @@
     <script data-goatcounter="https://analytics.play-test.co.uk/count"
       async src="https://analytics.play-test.co.uk/count.js"></script>
   </head>
-  <body class="<%= current_user&.theme %>">
+  <body class="<%= current_user&.theme || "light" %>">
     <%= render 'shared/construction_banner' %>
     <%= render 'shared/header_logo' %>
     <% if current_user %>
@@ -32,6 +32,7 @@
           <% end %>
           <li><%= nav_link_to "Settings", change_settings_user_path(current_user) %></li>
           <li><%= nav_link_to "Safety Standards", safety_standards_path %></li>
+          <li><%= nav_link_to "Guides", guides_path %></li>
           <li><%= nav_link_to "About", about_path %></li>
           <li>
             <%= button_to t("sessions.buttons.log_out"), logout_path, method: :delete %>

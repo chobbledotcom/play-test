@@ -1,0 +1,16 @@
+<h1><%= @guide_title %></h1>
+
+<p><%= link_to I18n.t("guides.links.back_to_index"), guides_path %></p>
+
+<article>
+  <% @guide_data["screenshots"].each do |screenshot| %>
+    <h2><%= screenshot["caption"] %></h2>
+    
+    <%= image_tag "/guide_screenshots/#{@guide_path}/#{screenshot['filename']}", 
+        alt: screenshot["caption"] %>
+    
+    <p><%= screenshot["example_description"] %></p>
+  <% end %>
+</article>
+
+<p><%= link_to I18n.t("guides.links.back_to_index"), guides_path %></p>

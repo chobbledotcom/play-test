@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Run RSpec tests using rspec-quicker with slow test detection
+# Fails if any test takes more than 0.5 seconds
+#
+# Usage: bin/rspec-slow [rspec arguments]
+#
+# Examples:
+#   bin/rspec-slow                      # Run all tests, fail on slow
+#   bin/rspec-slow spec/models/         # Run model tests, fail on slow
+#   bin/rspec-slow --no-fail            # Run tests, warn but don't fail on slow
+
+# Colors for output
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Check for --no-fail flag
+fail_on_slow="true"
+args=()
+for arg in "$@"; do
+  if [[ "$arg" == "--no-fail" ]]; then
+    fail_on_slow="false"
+  else
+    args+=("$arg")
+  fi
+done
+
+# Show banner
+echo -e "${YELLOW}⚡ RSpec Slow Detector${NC} - Fast parallel tests with timing checks"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "  ${RED}⏱${NC}  Threshold: 0.5s per test/class"
+if [[ "$fail_on_slow" == "true" ]]; then
+  echo -e "  ${RED}✗${NC}  Will fail if slow tests detected"
+else
+  echo -e "  ${YELLOW}!${NC}  Will warn but not fail on slow tests"
+fi
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+
+# Run rspec-quicker with FAIL_ON_SLOW_TESTS environment variable
+FAIL_ON_SLOW_TESTS="$fail_on_slow" exec bin/rspec-quicker "${args[@]}"
