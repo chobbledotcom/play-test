@@ -121,6 +121,7 @@ nav span {
 form.button_to {
 	display: inline-block;
 	margin: 0;
+	min-width: fit-content;
 }
 
 nav form.button_to {
