@@ -1,0 +1,51 @@
+.dark pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+.dark code.hljs {
+  padding: 3px 5px
+}
+/*
+
+Dark style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+
+*/
+.dark .hljs {
+  color: #ddd;
+  background: #303030
+}
+.dark .hljs-keyword,
+.dark .hljs-selector-tag,
+.dark .hljs-literal,
+.dark .hljs-section,
+.dark .hljs-link {
+  color: white
+}
+.dark .hljs-subst {
+  /* default */
+  
+}
+.dark .hljs-string,
+.dark .hljs-title,
+.dark .hljs-name,
+.dark .hljs-type,
+.dark .hljs-attribute,
+.dark .hljs-symbol,
+.dark .hljs-bullet,
+.dark .hljs-built_in,
+.dark .hljs-addition,
+.dark .hljs-variable,
+.dark .hljs-template-tag,
+.dark .hljs-template-variable {
+  color: #d88
+}
+.dark .hljs-comment,
+.dark .hljs-quote,
+.dark .hljs-deletion,
+.dark .hljs-meta {
+  color: #979797
+}
+.dark .hljs-emphasis {
+  font-style: italic
+}

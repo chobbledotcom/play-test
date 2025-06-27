@@ -33,30 +33,30 @@ module SafetyStandards
 
         # Basic walls (0.6m - 3.0m) - wall height >= user height
         basic_walls_exact: [1.5, 1.5, 1.5],
-        basic_walls_exceeds: [2.0, 2.0, 2.5],
+        basic_walls_exceeds: [2, 2, 2.5],
 
         # Enhanced walls (3.0m - 6.0m) - wall height >= 1.25x user height
-        enhanced_walls: [4.0, 4.0, 5.0], # 4.0 * 1.25 = 5.0
-        enhanced_walls_exact: [5.0, 5.0, 6.25], # 5.0 * 1.25 = 6.25
+        enhanced_walls: [4, 4, 5], # 4 * 1.25 = 5
+        enhanced_walls_exact: [5, 5, 6.25], # 5 * 1.25 = 6.25
 
         # Maximum height (6.0m - 8.0m) - wall height >= 1.25x user height + roof
-        max_height_with_roof: [7.0, 7.0, 8.75] # 7.0 * 1.25 = 8.75
+        max_height_with_roof: [7, 7, 8.75] # 7 * 1.25 = 8.75
       },
 
       # Invalid scenarios
       invalid: {
         # Nil values
-        nil_user_height: [1.0, nil, 2.0],
-        nil_wall_height: [1.0, 1.5, nil],
+        nil_user_height: [1, nil, 2],
+        nil_wall_height: [1, 1.5, nil],
 
         # Insufficient wall heights
-        basic_walls_too_low: [2.0, 2.0, 1.8],
-        enhanced_walls_too_low: [4.0, 4.0, 4.8], # Needs 5.0m
-        max_height_too_low: [7.0, 7.0, 8.0], # Needs 8.75m
+        basic_walls_too_low: [2, 2, 1.8],
+        enhanced_walls_too_low: [4, 4, 4.8], # Needs 5m
+        max_height_too_low: [7, 7, 8], # Needs 8.75m
 
         # Exceeds safe limits (over 8.0m)
-        exceeds_safe_height: [9.0, 7.0, 12.0],
-        exceeds_safe_height_high: [10.0, 7.0, 15.0]
+        exceeds_safe_height: [9, 7, 12],
+        exceeds_safe_height_high: [10, 7, 15]
       }
     }.freeze
 
@@ -66,8 +66,8 @@ module SafetyStandards
       # Valid scenarios
       valid: {
         # Runout is 50% of platform height
-        runout_exact: [1.0, 2.0],
-        runout_half: [0.5, 1.0],
+        runout_exact: [1, 2],
+        runout_half: [0.5, 1],
 
         # Minimum runout (0.3m)
         runout_minimum: [0.3, 0.1] # Platform needs 0.05m but minimum is 0.3m
@@ -76,12 +76,12 @@ module SafetyStandards
       # Invalid scenarios
       invalid: {
         # Nil values
-        runout_nil: [nil, 2.0],
+        runout_nil: [nil, 2],
         platform_nil: [1.5, nil],
 
         # Insufficient runout
-        runout_too_short: [0.8, 2.0], # Needs 1.0m
-        runout_insufficient: [0.2, 1.0], # Needs 0.5m
+        runout_too_short: [0.8, 2], # Needs 1m
+        runout_insufficient: [0.2, 1], # Needs 0.5m
 
         # Below minimum
         runout_below_min: [0.25, 0.1] # Below 0.3m minimum
@@ -104,10 +104,10 @@ module SafetyStandards
 
     def calculate_required_runout(platform_height, has_stop_wall: false)
       # EN 14960-1:2019 Section 4.2.11 (Lines 930-939) - Runout requirements
-      # Line 934-935: "shall be a minimum of 50 % of the height of the highest platform
-      # of the slide, measured from the ground and in any case, a minimum of 300 mm"
-      # Line 936: "When a stop-wall is fitted at the end of the run-out section,
-      # 50 cm shall be added to the length of the run-out"
+      # Line 934-935: The runout distance must be at least half the height of the slide's
+      # highest platform (measured from ground level), with an absolute minimum of 300mm
+      # Line 936: If a stop-wall is installed at the runout's end, an additional 
+      # 50cm must be added to the total runout length
       return CalculatorResponse.new(value: 0, value_suffix: "m", breakdown: []) if platform_height.nil? || platform_height <= 0
 
       # Get constants
@@ -153,10 +153,10 @@ module SafetyStandards
 
     def meets_height_requirements?(platform_height, user_height, containing_wall_height)
       # EN 14960-1:2019 Section 4.2.9 (Lines 854-887) - Containment requirements
-      # Lines 859-860: Walls required when platform height > 0.6m
-      # Lines 861-862: 0.6m-3.0m requires wall height ≥ user height
-      # Lines 863-864: 3.0m-6.0m requires wall height ≥ 1.25 × user height
-      # Lines 865-866: >6.0m requires walls AND permanent roof
+      # Lines 859-860: Containing walls become mandatory for platforms exceeding 0.6m in height
+      # Lines 861-862: Platforms between 0.6m and 3.0m need walls at least as tall as the maximum user height
+      # Lines 863-864: Platforms between 3.0m and 6.0m require walls at least 1.25 times the maximum user height
+      # Lines 865-866: Platforms over 6.0m must have both containing walls and a permanent roof structure
       return false if platform_height.nil? || user_height.nil? || containing_wall_height.nil?
 
       enhanced_multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
@@ -181,8 +181,8 @@ module SafetyStandards
 
     def meets_runout_requirements?(runout_length, platform_height, has_stop_wall: false)
       # EN 14960-1:2019 Section 4.2.11 (Lines 930-939) - Runout requirements
-      # Lines 934-935: Runout must be minimum 50% of platform height or 300mm,
-      # whichever is greater, to ensure safe deceleration
+      # Lines 934-935: The runout area must extend at least half the platform's height
+      # or 300mm (whichever is greater) to allow users to decelerate safely
       return false if runout_length.nil? || platform_height.nil?
 
       required_runout = calculate_runout_value(platform_height, has_stop_wall: has_stop_wall)
@@ -321,8 +321,8 @@ module SafetyStandards
 
     def requires_permanent_roof?(platform_height)
       # EN 14960-1:2019 Section 4.2.9 (Lines 865-866)
-      # "Inflatables with a platform height over 6,0 m shall have containing
-      # walls and a permanent roof fitted"
+      # Inflatable structures with platforms higher than 6.0m must be equipped
+      # with both containing walls and a permanent roof
       threshold = SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
       platform_height.present? && platform_height > threshold
     end

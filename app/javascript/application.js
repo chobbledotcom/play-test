@@ -6,8 +6,15 @@ import "dirty_forms";
 import "share_buttons";
 import "safety_standards_tabs";
 
+// external libs
+import "highlight.js"
+
 // Initialize features on Turbo navigation
 function initializeFeatures() {
+	// Initialize highlight.js for code blocks
+	if (window.hljs) {
+		window.hljs.highlightAll();
+	}
 	// Handle unit selection in inspection form
 	const unitSelect = document.querySelector(
 		'select[name="inspection[unit_id]"]',

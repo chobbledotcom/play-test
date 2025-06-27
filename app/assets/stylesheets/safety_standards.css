@@ -115,16 +115,12 @@
 }
 
 .source-code pre {
-	background-color: #f8f9fa;
-	padding: 1rem;
 	border-radius: 4px;
 	overflow-x: auto;
 	font-size: 0.9rem;
 }
 
 .api-details pre {
-	background-color: #f8f9fa;
-	padding: 0.75rem;
 	border-radius: 4px;
 	overflow-x: auto;
 	font-size: 0.85rem;
@@ -144,9 +140,6 @@
 }
 
 .curl-command {
-	background-color: #263238;
-	color: #aed581;
-	padding: 1rem;
 	border-radius: 4px;
 	overflow-x: auto;
 	font-family: "Courier New", monospace;

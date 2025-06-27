@@ -127,6 +127,7 @@ module SafetyStandard
           title: "Slide Runout Requirements",
           description: "Minimum runout distance for safe slide deceleration.",
           method_name: :calculate_required_runout,
+          additional_methods: [:calculate_runout_value],
           module_name: SafetyStandards::SlideCalculator,
           example_input: 2.5,
           input_unit: "m",
@@ -159,7 +160,8 @@ module SafetyStandard
       }
     end
 
-    def get_method_source(method_name, module_name)
+    def get_method_source(method_name, module_name, additional_methods = [])
+      # Get the source file from the first method
       method_obj = module_name.method(method_name)
       source_location = method_obj.source_location
 
@@ -171,19 +173,46 @@ module SafetyStandard
       lines = File.readlines(file_path)
 
       # Get constants from the module file first
-      constants_section = ""
+      constants_code = ""
       module_constants = get_module_constants(module_name, method_name)
 
       if module_constants.any?
-        constants_section = "# Related Constants:\n"
         module_constants.each do |constant_name|
-          constants_section += extract_constant_definition(lines, constant_name)
+          constant_def = extract_constant_definition(lines, constant_name)
+          # Strip indentation from each constant separately
+          constants_code += strip_consistent_indentation(constant_def) + "\n"
         end
-        constants_section += "\n# Method Implementation:\n"
       end
 
+      # Get all method implementations
+      methods_code = ""
+      
+      # First, get any additional methods
+      additional_methods.each do |additional_method|
+        if module_name.respond_to?(additional_method)
+          additional_obj = module_name.method(additional_method)
+          additional_location = additional_obj.source_location
+          if additional_location && additional_location[0] == file_path
+            additional_lines = extract_method_lines(lines, additional_location[1] - 1, additional_method)
+            methods_code += strip_consistent_indentation(additional_lines.join("")) + "\n\n"
+          end
+        end
+      end
+      
+      # Then get the main method
       method_lines = extract_method_lines(lines, line_number - 1, method_name)
-      constants_section + method_lines.join("")
+      methods_code += strip_consistent_indentation(method_lines.join(""))
+      
+      # Now build the final output with headers
+      output = ""
+      if constants_code.strip.length > 0
+        output += "# Related Constants:\n"
+        output += constants_code
+        output += "\n# Method Implementation:\n"
+      end
+      output += methods_code
+      
+      output
     end
 
     def get_module_constants(module_name, method_name)
@@ -202,13 +231,13 @@ module SafetyStandard
       lines.each_with_index do |line, index|
         if line.strip.start_with?("#{constant_name} =")
           in_constant = true
-          constant_lines << "#{index + 1}: #{line}"
+          constant_lines << line
           brace_count += line.count("{") - line.count("}")
           next
         end
 
         if in_constant
-          constant_lines << "#{index + 1}: #{line}"
+          constant_lines << line
           brace_count += line.count("{") - line.count("}")
 
           # Check if we've closed all braces and reached the end
@@ -316,7 +345,7 @@ module SafetyStandard
         line = lines[current_line]
         if line.strip.start_with?("def #{method_name}")
           indent_level = line.index("def")
-          method_lines << "#{current_line + 1}: #{line}"
+          method_lines << line
           current_line += 1
           break
         end
@@ -328,7 +357,7 @@ module SafetyStandard
       # Extract method body until we reach the same or lesser indentation with 'end'
       while current_line < lines.length
         line = lines[current_line]
-        method_lines << "#{current_line + 1}: #{line}"
+        method_lines << line
 
         # Check if we've reached the end of the method
         if line.strip == "end" && (line.index(/\S/) || 0) <= indent_level
@@ -339,6 +368,16 @@ module SafetyStandard
       end
 
       method_lines
+    end
+    
+    def strip_consistent_indentation(source_code)
+      lines = source_code.split("\n")
+      
+      # Find minimum indentation (excluding empty lines)
+      min_indent = lines.reject(&:empty?).map { |line| line.match(/^(\s*)/)[1].length }.min || 0
+      
+      # Remove minimum indentation from all lines
+      lines.map { |line| line.empty? ? line : line[min_indent..] || "" }.join("\n")
     end
   end
 end
