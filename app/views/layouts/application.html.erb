@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>play-test | BS EN 14960 Inspection Logger & Database | play-test.co.uk</title>
+    <title><%= content_for?(:title) ? yield(:title) : "play-test | BS EN 14960 Inspection Logger & Database | play-test.co.uk" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>

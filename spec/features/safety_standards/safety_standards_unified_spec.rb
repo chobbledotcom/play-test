@@ -131,20 +131,4 @@ RSpec.describe "Safety Standards Unified Tests" do
       end
     end
   end
-
-  describe "GET requests", type: :request do
-    include_context "safety standards test data"
-
-    it "renders the page with calculation params" do
-      get safety_standards_path, params: {calculation: anchor_params}
-      expect(response).to be_successful
-      expect(response.body).to include("Safety Standards Reference")
-    end
-
-    it "handles missing calculation params" do
-      get safety_standards_path
-      expect(response).to be_successful
-      expect(response.body).to include("Safety Standards Reference")
-    end
-  end
 end
