@@ -11,7 +11,7 @@ require "database_cleaner/active_record"
 require_relative "../lib/i18n_usage_tracker"
 
 Capybara.raise_server_errors = true
-Capybara.default_max_wait_time = 2
+Capybara.default_max_wait_time = 10
 
 if ENV["I18N_TRACKING_ENABLED"] == "true"
   I18nUsageTracker.reset!

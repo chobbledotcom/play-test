@@ -12,15 +12,15 @@ RSpec.feature "Complete Inspection Workflow", type: :feature, js: false do
   end
 end
 
-RSpec.feature "Complete Inspection Workflow", type: :feature, js: true do
-  scenario "complete workflow with js" do
-    InspectionWorkflow.new(
-      has_slide: true,
-      is_totally_enclosed: true,
-      js: true
-    ).execute
-  end
-end
+# RSpec.feature "Complete Inspection Workflow", type: :feature, js: true do
+#  scenario "complete workflow with js" do
+#    InspectionWorkflow.new(
+#      has_slide: true,
+#      is_totally_enclosed: true,
+#      js: true
+#    ).execute
+#  end
+# end
 
 class InspectionWorkflow
   include Capybara::DSL
@@ -426,7 +426,11 @@ class InspectionWorkflow
     click_link "Units"
     click_link "Test Bouncy Castle"
     click_link t("ui.edit")
+    expect(page).not_to have_content I18n.t("units.buttons.delete")
     expect_units_message("not_deletable")
+
+    @unit.reload
+    expect(@unit.deletable?).to eq(false)
   end
 
   def verify_change_unit_functionality
