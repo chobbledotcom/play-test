@@ -1,7 +1,7 @@
 {
   "spec_file": "./spec/features/inspections/inspection_screenshots_spec.rb",
-  "created_at": "2025-06-26T22:22:55Z",
-  "updated_at": "2025-06-26T22:22:55Z",
+  "created_at": "2025-06-27T00:13:27Z",
+  "updated_at": "2025-06-27T00:13:27Z",
   "screenshots": [
     {
       "sequence": 1,
@@ -9,7 +9,7 @@
       "caption": "Home Page - Not Logged In",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:22:55Z",
+      "timestamp": "2025-06-27T00:13:27Z",
       "options": {}
     },
     {
@@ -18,7 +18,7 @@
       "caption": "Registration Form",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:22:55Z",
+      "timestamp": "2025-06-27T00:13:28Z",
       "options": {}
     },
     {
@@ -27,7 +27,7 @@
       "caption": "Registration Form - Filled",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:22:56Z",
+      "timestamp": "2025-06-27T00:13:28Z",
       "options": {}
     },
     {
@@ -36,7 +36,7 @@
       "caption": "Inactive User Warning",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:22:56Z",
+      "timestamp": "2025-06-27T00:13:28Z",
       "options": {}
     },
     {
@@ -45,7 +45,7 @@
       "caption": "Units Index - Empty",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:22:57Z",
+      "timestamp": "2025-06-27T00:13:29Z",
       "options": {}
     },
     {
@@ -54,7 +54,7 @@
       "caption": "Create Unit Form",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:22:57Z",
+      "timestamp": "2025-06-27T00:13:30Z",
       "options": {}
     },
     {
@@ -63,7 +63,7 @@
       "caption": "Create Unit Form - Filled",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:22:58Z",
+      "timestamp": "2025-06-27T00:13:30Z",
       "options": {}
     },
     {
@@ -72,7 +72,7 @@
       "caption": "Unit Created Successfully",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:22:59Z",
+      "timestamp": "2025-06-27T00:13:31Z",
       "options": {}
     },
     {
@@ -81,7 +81,7 @@
       "caption": "Unit Details Page",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:00Z",
+      "timestamp": "2025-06-27T00:13:32Z",
       "options": {}
     },
     {
@@ -90,7 +90,7 @@
       "caption": "New Inspection - Basic Details",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:01Z",
+      "timestamp": "2025-06-27T00:13:33Z",
       "options": {}
     },
     {
@@ -99,7 +99,7 @@
       "caption": "Inspection Details - Filled",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:02Z",
+      "timestamp": "2025-06-27T00:13:34Z",
       "options": {}
     },
     {
@@ -108,7 +108,7 @@
       "caption": "Inspection Summary - Incomplete",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:02Z",
+      "timestamp": "2025-06-27T00:13:35Z",
       "options": {}
     },
     {
@@ -117,7 +117,7 @@
       "caption": "User height Assessment Form",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:03Z",
+      "timestamp": "2025-06-27T00:13:35Z",
       "options": {}
     },
     {
@@ -126,7 +126,7 @@
       "caption": "User height Assessment - Filled",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:04Z",
+      "timestamp": "2025-06-27T00:13:36Z",
       "options": {}
     },
     {
@@ -135,169 +135,223 @@
       "caption": "User height Assessment - Saved",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:04Z",
+      "timestamp": "2025-06-27T00:13:36Z",
       "options": {}
     },
     {
       "sequence": 16,
-      "filename": "016_structure_assessment_form.png",
-      "caption": "Structure Assessment Form",
+      "filename": "016_slide_assessment_form.png",
+      "caption": "Slide Assessment Form",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:05Z",
+      "timestamp": "2025-06-27T00:13:37Z",
       "options": {}
     },
     {
       "sequence": 17,
-      "filename": "017_structure_assessment_filled.png",
-      "caption": "Structure Assessment - Filled",
+      "filename": "017_slide_assessment_filled.png",
+      "caption": "Slide Assessment - Filled",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:08Z",
+      "timestamp": "2025-06-27T00:13:42Z",
       "options": {}
     },
     {
       "sequence": 18,
-      "filename": "018_structure_assessment_saved.png",
-      "caption": "Structure Assessment - Saved",
+      "filename": "018_slide_assessment_saved.png",
+      "caption": "Slide Assessment - Saved",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:09Z",
+      "timestamp": "2025-06-27T00:13:43Z",
       "options": {}
     },
     {
       "sequence": 19,
-      "filename": "019_anchorage_assessment_form.png",
-      "caption": "Anchorage Assessment Form",
+      "filename": "019_structure_assessment_form.png",
+      "caption": "Structure Assessment Form",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:09Z",
+      "timestamp": "2025-06-27T00:13:43Z",
       "options": {}
     },
     {
       "sequence": 20,
-      "filename": "020_anchorage_assessment_filled.png",
-      "caption": "Anchorage Assessment - Filled",
+      "filename": "020_structure_assessment_filled.png",
+      "caption": "Structure Assessment - Filled",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:10Z",
+      "timestamp": "2025-06-27T00:13:46Z",
       "options": {}
     },
     {
       "sequence": 21,
-      "filename": "021_anchorage_assessment_saved.png",
-      "caption": "Anchorage Assessment - Saved",
+      "filename": "021_structure_assessment_saved.png",
+      "caption": "Structure Assessment - Saved",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:11Z",
+      "timestamp": "2025-06-27T00:13:47Z",
       "options": {}
     },
     {
       "sequence": 22,
-      "filename": "022_materials_assessment_form.png",
-      "caption": "Materials Assessment Form",
+      "filename": "022_anchorage_assessment_form.png",
+      "caption": "Anchorage Assessment Form",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:11Z",
+      "timestamp": "2025-06-27T00:13:47Z",
       "options": {}
     },
     {
       "sequence": 23,
-      "filename": "023_materials_assessment_filled.png",
-      "caption": "Materials Assessment - Filled",
+      "filename": "023_anchorage_assessment_filled.png",
+      "caption": "Anchorage Assessment - Filled",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:13Z",
+      "timestamp": "2025-06-27T00:13:48Z",
       "options": {}
     },
     {
       "sequence": 24,
-      "filename": "024_materials_assessment_saved.png",
-      "caption": "Materials Assessment - Saved",
+      "filename": "024_anchorage_assessment_saved.png",
+      "caption": "Anchorage Assessment - Saved",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:13Z",
+      "timestamp": "2025-06-27T00:13:49Z",
       "options": {}
     },
     {
       "sequence": 25,
-      "filename": "025_fan_assessment_form.png",
-      "caption": "Fan Assessment Form",
+      "filename": "025_materials_assessment_form.png",
+      "caption": "Materials Assessment Form",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:13Z",
+      "timestamp": "2025-06-27T00:13:49Z",
       "options": {}
     },
     {
       "sequence": 26,
-      "filename": "026_fan_assessment_filled.png",
-      "caption": "Fan Assessment - Filled",
+      "filename": "026_materials_assessment_filled.png",
+      "caption": "Materials Assessment - Filled",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:14Z",
+      "timestamp": "2025-06-27T00:13:50Z",
       "options": {}
     },
     {
       "sequence": 27,
-      "filename": "027_fan_assessment_saved.png",
-      "caption": "Fan Assessment - Saved",
+      "filename": "027_materials_assessment_saved.png",
+      "caption": "Materials Assessment - Saved",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:15Z",
+      "timestamp": "2025-06-27T00:13:51Z",
       "options": {}
     },
     {
       "sequence": 28,
-      "filename": "028_results_assessment_form.png",
-      "caption": "Results Assessment Form",
+      "filename": "028_fan_assessment_form.png",
+      "caption": "Fan Assessment Form",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:15Z",
+      "timestamp": "2025-06-27T00:13:51Z",
       "options": {}
     },
     {
       "sequence": 29,
-      "filename": "029_results_assessment_filled.png",
-      "caption": "Results Assessment - Filled",
+      "filename": "029_fan_assessment_filled.png",
+      "caption": "Fan Assessment - Filled",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:15Z",
+      "timestamp": "2025-06-27T00:13:52Z",
       "options": {}
     },
     {
       "sequence": 30,
-      "filename": "030_results_assessment_saved.png",
-      "caption": "Results Assessment - Saved",
+      "filename": "030_fan_assessment_saved.png",
+      "caption": "Fan Assessment - Saved",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:16Z",
+      "timestamp": "2025-06-27T00:13:52Z",
       "options": {}
     },
     {
       "sequence": 31,
-      "filename": "031_inspection_summary_all_complete.png",
-      "caption": "Inspection Summary - All Complete",
+      "filename": "031_enclosed_assessment_form.png",
+      "caption": "Enclosed Assessment Form",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:16Z",
+      "timestamp": "2025-06-27T00:13:53Z",
       "options": {}
     },
     {
       "sequence": 32,
-      "filename": "032_inspection_marked_complete.png",
-      "caption": "Inspection Marked Complete",
+      "filename": "032_enclosed_assessment_filled.png",
+      "caption": "Enclosed Assessment - Filled",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:17Z",
+      "timestamp": "2025-06-27T00:13:53Z",
       "options": {}
     },
     {
       "sequence": 33,
-      "filename": "033_completed_inspection_view.png",
+      "filename": "033_enclosed_assessment_saved.png",
+      "caption": "Enclosed Assessment - Saved",
+      "example_description": "complete workflow with prefilling - no slide or enclosure",
+      "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
+      "timestamp": "2025-06-27T00:13:53Z",
+      "options": {}
+    },
+    {
+      "sequence": 34,
+      "filename": "034_results_assessment_form.png",
+      "caption": "Results Assessment Form",
+      "example_description": "complete workflow with prefilling - no slide or enclosure",
+      "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
+      "timestamp": "2025-06-27T00:13:54Z",
+      "options": {}
+    },
+    {
+      "sequence": 35,
+      "filename": "035_results_assessment_filled.png",
+      "caption": "Results Assessment - Filled",
+      "example_description": "complete workflow with prefilling - no slide or enclosure",
+      "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
+      "timestamp": "2025-06-27T00:13:54Z",
+      "options": {}
+    },
+    {
+      "sequence": 36,
+      "filename": "036_results_assessment_saved.png",
+      "caption": "Results Assessment - Saved",
+      "example_description": "complete workflow with prefilling - no slide or enclosure",
+      "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
+      "timestamp": "2025-06-27T00:13:54Z",
+      "options": {}
+    },
+    {
+      "sequence": 37,
+      "filename": "037_inspection_summary_all_complete.png",
+      "caption": "Inspection Summary - All Complete",
+      "example_description": "complete workflow with prefilling - no slide or enclosure",
+      "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
+      "timestamp": "2025-06-27T00:13:55Z",
+      "options": {}
+    },
+    {
+      "sequence": 38,
+      "filename": "038_inspection_marked_complete.png",
+      "caption": "Inspection Marked Complete",
+      "example_description": "complete workflow with prefilling - no slide or enclosure",
+      "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
+      "timestamp": "2025-06-27T00:13:56Z",
+      "options": {}
+    },
+    {
+      "sequence": 39,
+      "filename": "039_completed_inspection_view.png",
       "caption": "Completed Inspection View",
       "example_description": "complete workflow with prefilling - no slide or enclosure",
       "full_description": "Complete Inspection Workflow complete workflow with prefilling - no slide or enclosure",
-      "timestamp": "2025-06-26T22:23:17Z",
+      "timestamp": "2025-06-27T00:13:56Z",
       "options": {}
     }
   ]

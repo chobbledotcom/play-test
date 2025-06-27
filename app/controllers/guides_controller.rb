@@ -8,7 +8,7 @@ class GuidesController < ApplicationController
   def show
     guide_path = params[:path]
     metadata_file = guide_screenshots_root.join(guide_path, "metadata.json")
-    
+
     if metadata_file.exist?
       @guide_data = JSON.parse(metadata_file.read)
       @guide_path = guide_path
@@ -21,17 +21,17 @@ class GuidesController < ApplicationController
   private
 
   def guide_screenshots_root
-    Rails.root.join("public", "guide_screenshots")
+    Rails.public_path.join("guide_screenshots")
   end
 
   def collect_guides
     guides = []
-    
+
     # Find all metadata.json files
     Dir.glob(guide_screenshots_root.join("**", "metadata.json")).each do |metadata_path|
       relative_path = Pathname.new(metadata_path).relative_path_from(guide_screenshots_root).dirname.to_s
       metadata = JSON.parse(File.read(metadata_path))
-      
+
       guides << {
         path: relative_path,
         title: humanize_guide_title(relative_path),
@@ -40,7 +40,7 @@ class GuidesController < ApplicationController
         first_screenshot: metadata["screenshots"].first
       }
     end
-    
+
     guides.sort_by { |g| g[:title] }
   end
 

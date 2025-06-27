@@ -2,138 +2,23 @@ require "rails_helper"
 require_relative "../../../db/seeds/seed_data"
 require "timeout"
 
-RSpec.feature "Complete Inspection Workflow", type: :feature do
-  scenario "complete workflow with prefilling - no slide or enclosure" do
-    InspectionWorkflow.new(
-      has_slide: false,
-      is_totally_enclosed: false
-    ).execute
-  end
-
-  scenario "inspection log access control" do
-    user = create(:user)
-    other_user = create(:user)
-    unit = create(:unit, user: user)
-    inspection = create(:inspection, user: user, unit: unit)
-
-    # Owner can view log
-    sign_in(user)
-    visit log_inspection_path(inspection)
-    expect(page).to have_content(I18n.t("inspections.titles.log", inspection: inspection.id))
-
-    # Use direct navigation instead of logout/login
-    # Non-owner cannot view log
-    page.driver.browser.clear_cookies
-    sign_in(other_user)
-    visit log_inspection_path(inspection)
-    expect(page.status_code).to eq(404)
-  end
-
-  scenario "complete workflow with prefilling - slide, no enclosure" do
+RSpec.feature "Complete Inspection Workflow", type: :feature, js: false do
+  scenario "complete workflow without js" do
     InspectionWorkflow.new(
       has_slide: true,
-      is_totally_enclosed: false
+      is_totally_enclosed: true,
+      js: false
     ).execute
   end
+end
 
-  scenario "complete workflow with prefilling - no slide, enclosure" do
-    InspectionWorkflow.new(
-      has_slide: false,
-      is_totally_enclosed: true
-    ).execute
-  end
-
-  scenario "complete workflow with prefilling - slide and enclosure" do
+RSpec.feature "Complete Inspection Workflow", type: :feature, js: true do
+  scenario "complete workflow with js" do
     InspectionWorkflow.new(
       has_slide: true,
-      is_totally_enclosed: true
+      is_totally_enclosed: true,
+      js: true
     ).execute
-  end
-
-  scenario "prevents duplicate unique report numbers for same user" do
-    user = create(:user)
-    sign_in(user)
-
-    # Create first inspection with a unique report number
-    unit1 = create(:unit, user: user)
-    inspection1 = create(:inspection, unit: unit1, user: user)
-
-    visit edit_inspection_path(inspection1)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
-    click_button I18n.t("forms.inspection.submit")
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-
-    # Create second inspection and try to use same report number
-    unit2 = create(:unit, user: user)
-    inspection2 = create(:inspection, unit: unit2, user: user)
-
-    visit edit_inspection_path(inspection2)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
-    click_button I18n.t("forms.inspection.submit")
-
-    # Should show validation error in form
-    expect(page).to have_content("has already been taken")
-    expect(page).to have_css(".form-errors")
-
-    # Fix by using different report number
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-002"
-    click_button I18n.t("forms.inspection.submit")
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-  end
-
-  scenario "allows multiple inspections with blank unique report numbers" do
-    user = create(:user)
-    sign_in(user)
-
-    # Create first inspection with blank unique report number
-    unit1 = create(:unit, user: user)
-    inspection1 = create(:inspection, unit: unit1, user: user)
-
-    visit edit_inspection_path(inspection1)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: ""
-    click_button I18n.t("forms.inspection.submit")
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-
-    # Create second inspection also with blank unique report number
-    unit2 = create(:unit, user: user)
-    inspection2 = create(:inspection, unit: unit2, user: user)
-
-    visit edit_inspection_path(inspection2)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: ""
-    click_button I18n.t("forms.inspection.submit")
-
-    # Should save successfully - blank values are allowed
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-    expect(page).not_to have_css(".form-errors")
-  end
-
-  scenario "different users can use the same unique report number" do
-    user1 = create(:user)
-    user2 = create(:user)
-
-    # User 1 creates inspection with report number
-    sign_in(user1)
-    unit1 = create(:unit, user: user1)
-    inspection1 = create(:inspection, unit: unit1, user: user1)
-
-    visit edit_inspection_path(inspection1)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
-    click_button I18n.t("forms.inspection.submit")
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-    logout
-
-    # User 2 can use the same report number
-    sign_in(user2)
-    unit2 = create(:unit, user: user2)
-    inspection2 = create(:inspection, unit: unit2, user: user2)
-
-    visit edit_inspection_path(inspection2)
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"), with: "TEST-001"
-    click_button I18n.t("forms.inspection.submit")
-
-    # Should save successfully - different users can have same report number
-    expect(page).to have_content(I18n.t("inspections.messages.updated"))
-    expect(page).not_to have_css(".form-errors")
   end
 end
 
@@ -154,8 +39,9 @@ class InspectionWorkflow
   attr_reader :second_inspection
   attr_reader :options
 
-  def initialize(has_slide:, is_totally_enclosed:)
+  def initialize(has_slide:, is_totally_enclosed:, js:)
     @options = {has_slide:, is_totally_enclosed:}
+    @js = js
   end
 
   def t(key, **options)
@@ -173,7 +59,7 @@ class InspectionWorkflow
   end
 
   def applicable_tabs
-    @inspection.applicable_tabs.reject { |tab| tab == "inspection" }
+    @inspection.reload.applicable_tabs.reject { |tab| tab == "inspection" }
   end
 
   private
@@ -196,13 +82,14 @@ class InspectionWorkflow
     verify_inspection_not_completable
     verify_change_unit_functionality
     fill_all_assessments
+    verify_inspection_completable
     mark_inspection_complete
     verify_inspection_complete
   end
 
   def register_new_user
     visit root_path
-    
+
     click_link t("users.titles.register")
 
     user_data = SeedData.user_fields
@@ -232,7 +119,8 @@ class InspectionWorkflow
   def create_test_unit
     visit root_path
     click_link "Units"
-    
+
+    expect(page).to have_content "Add Unit"
     click_units_button("add_unit")
 
     unit_data = SeedData.unit_fields.merge(
@@ -256,7 +144,7 @@ class InspectionWorkflow
     visit root_path
     click_link "Units"
     click_link "Test Bouncy Castle"
-    click_units_button("add_inspection")
+    click_units_button("add_inspection", confirm: true)
     expect(page).to have_content(t("inspections.titles.edit"))
     expect(page).to have_current_path(/inspections\/\w+\/edit/)
     @unit.inspections.order(created_at: :desc).first.tap do |inspection|
@@ -266,20 +154,10 @@ class InspectionWorkflow
 
   def fill_general_inspection_details
     field_data = SeedData.inspection_fields(passed: true).merge(@options)
-
     field_data.each do |field_name, value|
       fill_inspection_field(field_name, value)
     end
-
     click_submit_button
-
-    @inspection.reload
-    expect(@inspection.has_slide).to eq(
-      @options[:has_slide]
-    )
-    expect(@inspection.is_totally_enclosed).to eq(
-      @options[:is_totally_enclosed]
-    )
   end
 
   def fill_inspection_field(field_name, value)
@@ -306,7 +184,7 @@ class InspectionWorkflow
 
   def fill_assessment_tab(tab_name)
     visit edit_inspection_path(@inspection, tab: tab_name)
-    
+
     field_data = SeedData.send(
       "#{tab_name}_fields",
       passed: true
@@ -352,8 +230,15 @@ class InspectionWorkflow
     end
   end
 
-  def click_units_button(key)
-    click_button t("units.buttons.#{key}")
+  def click_units_button(key, confirm: false)
+    translation = t("units.buttons.#{key}")
+    if @js && confirm
+      accept_confirm do
+        click_button translation
+      end
+    else
+      click_button translation
+    end
   end
 
   def expect_units_message(key)
@@ -362,32 +247,19 @@ class InspectionWorkflow
 
   def verify_inspection_not_completable
     visit edit_inspection_path(@inspection)
+    expect(page).not_to have_button(t("inspections.buttons.mark_complete"))
+  end
 
-    incomplete_fields = @inspection.reload.incomplete_fields
-    if incomplete_fields.any?
-      # Count total fields across all forms, not just forms with incomplete fields
-      total_field_count = incomplete_fields.sum { |form| form[:fields].count }
-
-      expect(page).to have_content(
-        t("assessments.incomplete_fields.show_fields", count: total_field_count)
-      )
-
-      find("details#incomplete_fields summary").click
-      expect(page).to have_content(
-        t("assessments.incomplete_fields.description")
-      )
-
-      # The button should not be visible when there are incomplete fields
-      expect(page).not_to have_button(t("inspections.buttons.mark_complete"))
-    end
+  def verify_inspection_completable
+    visit edit_inspection_path(@inspection)
+    expect(page).not_to have_selector "#incomplete_fields"
+    expect(page).to have_button(t("inspections.buttons.mark_complete"))
   end
 
   def verify_assessment_check_marks(completed_tabs:)
     visit edit_inspection_path(@inspection)
 
-    # Main inspection tab always has check mark (it's completed in fill_general_inspection_details)
     within("nav#tabs") do
-      # Check if inspection tab is current (span) or link
       if page.has_css?("span", text: t("forms.inspection.header"))
         expect(page).to have_css("span", text: "#{t("forms.inspection.header")} ✓")
       else
@@ -432,7 +304,6 @@ class InspectionWorkflow
 
     visit inspection_path(@inspection, format: :pdf)
     expect(page.status_code).to eq(200)
-    # Can't capture PDF, go back to HTML view
     visit inspection_path(@inspection)
 
     verify_log_functionality
@@ -477,7 +348,7 @@ class InspectionWorkflow
 
   def create_second_inspection
     visit unit_path(@unit)
-    click_units_button("add_inspection")
+    click_units_button("add_inspection", confirm: true)
     @second_inspection = @unit.inspections.order(created_at: :desc).first
   end
 

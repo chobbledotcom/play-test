@@ -5,8 +5,8 @@ require "timeout"
 RSpec.feature "Complete Inspection Workflow", type: :feature do
   scenario "complete workflow with prefilling - no slide or enclosure", js: true do
     InspectionWorkflow.new(
-      has_slide: false,
-      is_totally_enclosed: false
+      has_slide: true,
+      is_totally_enclosed: true
     ).execute
   end
 end
@@ -48,7 +48,7 @@ class InspectionWorkflow
   end
 
   def applicable_tabs
-    @inspection.applicable_tabs.reject { |tab| tab == "inspection" }
+    @inspection.reload.applicable_tabs.reject { |tab| tab == "inspection" }
   end
 
   private
@@ -75,7 +75,7 @@ class InspectionWorkflow
   def register_new_user
     visit root_path
     capture_guide_screenshot("Home Page - Not Logged In")
-    
+
     click_link t("users.titles.register")
     capture_guide_screenshot("Registration Form")
 
@@ -105,7 +105,7 @@ class InspectionWorkflow
     visit root_path
     click_link "Units"
     capture_guide_screenshot("Units Index - Empty")
-    
+
     click_units_button("add_unit")
     capture_guide_screenshot("Create Unit Form")
 
@@ -160,9 +160,7 @@ class InspectionWorkflow
   end
 
   def fill_all_assessments
-    puts "=== DEBUG: Applicable tabs: #{applicable_tabs.inspect}"
     applicable_tabs.each do |tab_name|
-      puts "=== DEBUG: Filling tab: #{tab_name}"
       fill_assessment_tab(tab_name)
     end
   end
@@ -170,7 +168,7 @@ class InspectionWorkflow
   def fill_assessment_tab(tab_name)
     visit edit_inspection_path(@inspection, tab: tab_name)
     capture_guide_screenshot("#{tab_name.humanize} Assessment Form")
-    
+
     field_data = SeedData.send(
       "#{tab_name}_fields",
       passed: true
@@ -281,7 +279,6 @@ class InspectionWorkflow
 
   def mark_second_inspection_complete
     visit edit_inspection_path(@second_inspection)
-
 
     click_mark_complete_button
   end

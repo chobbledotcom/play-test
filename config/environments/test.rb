@@ -26,7 +26,7 @@ Rails.application.configure do
   config.cache_store = :null_store
 
   config.assets.debug = false
-  
+
   # Render exception templates for rescuable exceptions and raise for other exceptions.
   config.action_dispatch.show_exceptions = :rescuable
 

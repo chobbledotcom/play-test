@@ -188,10 +188,10 @@ module FormHelpers
   # Smart field filling that handles all field types
   def smart_fill_field(form_name, field_name, value)
     field_str = field_name.to_s
-    
+
     # Skip comment fields entirely - matching original behavior
     return if field_str.end_with?("_comment")
-    
+
     case value
     when true, false
       if field_str.end_with?("_pass") || field_str == "passed"
@@ -213,11 +213,11 @@ module FormHelpers
 
   def get_field_label(form_name, field_name)
     field_str = field_name.to_s
-    
+
     if field_str.end_with?("_pass")
       pass_key = "forms.#{form_name}.fields.#{field_name}"
       base_key = "forms.#{form_name}.fields.#{field_str.chomp("_pass")}"
-      
+
       I18n.exists?(pass_key) ? I18n.t(pass_key) : I18n.t(base_key)
     else
       I18n.t("forms.#{form_name}.fields.#{field_name}")
@@ -245,7 +245,7 @@ module FormHelpers
     # First, check the comment checkbox to show the field
     checkbox = find("input[type='checkbox'][data-comment-toggle='#{form_name}_#{field_name}']")
     checkbox.check unless checkbox.checked?
-    
+
     # Then fill in the text field
     text_field_id = "#{form_name}_#{field_name}"
     fill_in text_field_id, with: value
@@ -253,7 +253,7 @@ module FormHelpers
 
   def expect_assessment_check_mark(tab_name, has_check: true)
     tab_text = I18n.t("forms.#{tab_name}.header")
-    
+
     within("nav#tabs") do
       if has_check
         if page.has_css?("span", text: tab_text)
@@ -261,14 +261,12 @@ module FormHelpers
         else
           expect(page).to have_link("#{tab_text} ✓")
         end
+      elsif page.has_css?("span", text: tab_text)
+        expect(page).to have_css("span", text: tab_text)
+        expect(page).not_to have_css("span", text: "#{tab_text} ✓")
       else
-        if page.has_css?("span", text: tab_text)
-          expect(page).to have_css("span", text: tab_text)
-          expect(page).not_to have_css("span", text: "#{tab_text} ✓")
-        else
-          expect(page).to have_link(tab_text)
-          expect(page).not_to have_link("#{tab_text} ✓")
-        end
+        expect(page).to have_link(tab_text)
+        expect(page).not_to have_link("#{tab_text} ✓")
       end
     end
   end
@@ -277,13 +275,13 @@ module FormHelpers
   def create_and_register_user(user_data, activate: false)
     visit root_path
     click_i18n_link("users.titles.register")
-    
+
     user_data.each do |field_name, value|
       fill_in_form :user_new, field_name, value
     end
-    
+
     submit_form :user_new
-    
+
     user = User.find_by!(email: user_data[:email])
     user.update!(active_until: 5.minutes.from_now) if activate
     user
@@ -292,14 +290,14 @@ module FormHelpers
   def create_unit_via_ui(name:, **attributes)
     visit units_path
     click_i18n_button("units.buttons.add_unit")
-    
+
     attributes.merge(name: name).each do |field_name, value|
       fill_in_form :units, field_name, value
     end
-    
+
     submit_form :units
     expect_i18n_content("units.messages.created")
-    
+
     Unit.find_by!(name: name)
   end
 

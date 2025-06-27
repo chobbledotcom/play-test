@@ -1,5 +1,5 @@
 module GuideScreenshotHelpers
-  GUIDE_SCREENSHOTS_ROOT = Rails.root.join("public", "guide_screenshots")
+  GUIDE_SCREENSHOTS_ROOT = Rails.public_path.join("guide_screenshots")
 
   def capture_guide_screenshot(caption, options = {})
     # return unless ENV["CAPTURE_GUIDE_SCREENSHOTS"] == "true"
@@ -7,24 +7,24 @@ module GuideScreenshotHelpers
     # Generate folder structure based on spec file path
     spec_path = RSpec.current_example.file_path
     spec_root = Rails.root.join("spec")
-    
+
     # Get the relative path from spec directory
-    if spec_path.start_with?(spec_root.to_s)
-      relative_path = spec_path.sub(spec_root.to_s + "/", "")
+    relative_path = if spec_path.start_with?(spec_root.to_s)
+      spec_path.sub(spec_root.to_s + "/", "")
     else
-      relative_path = spec_path
+      spec_path
     end
-    
+
     # Convert spec/features/inspections/create_spec.rb to features/inspections/create_spec
     folder_path = relative_path.gsub(/\.rb$/, "").gsub(/^\//, "")
     screenshot_dir = GUIDE_SCREENSHOTS_ROOT.join(folder_path)
-    
+
     # Clear existing screenshots for this spec on first capture
     if !@guide_screenshots_initialized
       FileUtils.rm_rf(screenshot_dir) if screenshot_dir.exist?
       @guide_screenshots_initialized = true
     end
-    
+
     # Ensure directory exists
     FileUtils.mkdir_p(screenshot_dir)
 
@@ -41,8 +41,10 @@ module GuideScreenshotHelpers
     unless page.driver.respond_to?(:save_screenshot)
       raise "Guide screenshots require js: true on the test scenario"
     end
-    
-    save_screenshot(filepath.to_s, full: true)
+
+    # rubocop:disable Lint/Debugger
+    page.save_screenshot(filepath.to_s, full: true) if Rails.env.test?
+    # rubocop:enable Lint/Debugger
 
     # Add to metadata
     metadata["screenshots"] << {
