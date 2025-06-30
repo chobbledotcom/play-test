@@ -59,7 +59,7 @@ RSpec.describe "PDF Viewer Template", type: :request do
         expect(response.body).to include("Log Out")
         expect(response.body).to include("nav")
         # Should use the main application layout, not the minimal pdf_viewer layout
-        expect(response.body).to include("play-test | BS EN 14960 Inspection Logger & Database")
+        expect(response.body).to include("play-test | BS EN 14960 Inspection Logger &amp; Database")
       end
 
       it "renders the normal unit view for HTML" do
@@ -70,7 +70,7 @@ RSpec.describe "PDF Viewer Template", type: :request do
         expect(response.body).to include("Log Out")
         expect(response.body).to include("nav")
         # Should use the main application layout, not the minimal pdf_viewer layout
-        expect(response.body).to include("play-test | BS EN 14960 Inspection Logger & Database")
+        expect(response.body).to include("play-test | BS EN 14960 Inspection Logger &amp; Database")
       end
     end
 

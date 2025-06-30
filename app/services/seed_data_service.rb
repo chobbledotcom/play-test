@@ -253,15 +253,8 @@ class SeedDataService
 
     def randomly_remove_fields(fields, is_incomplete)
       return fields unless is_incomplete
-
-      removable_fields = fields.keys
-
-      percentage_to_remove = rand(0.2..0.4)
-      num_to_remove = (removable_fields.size * percentage_to_remove).round
-      fields_to_remove = removable_fields.sample(num_to_remove)
-
-      fields_to_remove.each { |field| fields[field] = nil }
-
+      return fields unless rand(0..1) == 0 # empty 50% of assessments
+      fields.keys.each { |field| fields[field] = nil }
       fields
     end
   end

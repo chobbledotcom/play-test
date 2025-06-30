@@ -74,7 +74,12 @@
   <div class="source-code">
     <h4>Method: <%= metadata[:method_name] %></h4>
     <pre><code class="language-ruby"><%= SafetyStandard.get_method_source(metadata[:method_name], metadata[:module_name], metadata[:additional_methods] || []) %></code></pre>
-    <p><em>Source: <%= metadata[:module_name].name %></em></p>
+    <% 
+      # Convert module name to file path
+      file_path = metadata[:module_name].name.underscore.gsub('::', '/')
+      git_url = "https://git.chobble.com/chobble/play-test/src/branch/main/app/services/#{file_path}.rb"
+    %>
+    <p><em>Source: <%= link_to metadata[:module_name].name, git_url, target: "_blank", rel: "noopener" %></em></p>
   </div>
 </details>
 
