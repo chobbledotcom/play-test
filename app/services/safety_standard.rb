@@ -186,7 +186,7 @@ module SafetyStandard
 
       # Get all method implementations
       methods_code = ""
-      
+
       # First, get any additional methods
       additional_methods.each do |additional_method|
         if module_name.respond_to?(additional_method)
@@ -198,11 +198,11 @@ module SafetyStandard
           end
         end
       end
-      
+
       # Then get the main method
       method_lines = extract_method_lines(lines, line_number - 1, method_name)
       methods_code += strip_consistent_indentation(method_lines.join(""))
-      
+
       # Now build the final output with headers
       output = ""
       if constants_code.strip.length > 0
@@ -211,7 +211,7 @@ module SafetyStandard
         output += "\n# Method Implementation:\n"
       end
       output += methods_code
-      
+
       output
     end
 
@@ -369,13 +369,13 @@ module SafetyStandard
 
       method_lines
     end
-    
+
     def strip_consistent_indentation(source_code)
       lines = source_code.split("\n")
-      
+
       # Find minimum indentation (excluding empty lines)
       min_indent = lines.reject(&:empty?).map { |line| line.match(/^(\s*)/)[1].length }.min || 0
-      
+
       # Remove minimum indentation from all lines
       lines.map { |line| line.empty? ? line : line[min_indent..] || "" }.join("\n")
     end

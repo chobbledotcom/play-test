@@ -106,7 +106,7 @@ module SafetyStandards
       # EN 14960-1:2019 Section 4.2.11 (Lines 930-939) - Runout requirements
       # Line 934-935: The runout distance must be at least half the height of the slide's
       # highest platform (measured from ground level), with an absolute minimum of 300mm
-      # Line 936: If a stop-wall is installed at the runout's end, an additional 
+      # Line 936: If a stop-wall is installed at the runout's end, an additional
       # 50cm must be added to the total runout length
       return CalculatorResponse.new(value: 0, value_suffix: "m", breakdown: []) if platform_height.nil? || platform_height <= 0
 
