@@ -3,21 +3,9 @@
 <p><%= link_to I18n.t("guides.links.back_to_index"), guides_path %></p>
 
 <article class="guide-slider">
-  <nav class="guide-controls">
-    <button type="button" class="slider-prev" aria-label="Previous slide">←</button>
-    
-    <select class="slider-select" aria-label="Select slide">
-      <% @guide_data["screenshots"].each_with_index do |screenshot, index| %>
-        <option value="<%= index %>">
-          <%= index + 1 %>. <%= screenshot["caption"] %>
-        </option>
-      <% end %>
-    </select>
-    
-    <button type="button" class="slider-next" aria-label="Next slide">→</button>
-  </nav>
+  <%= render 'guides/controls', guide_data: @guide_data %>
   
-  <div class="slider-container">
+  <div class="guide-image">
     <% @guide_data["screenshots"].each_with_index do |screenshot, index| %>
       <div class="slide" data-slide-index="<%= index %>" <%= index == 0 ? '' : 'style="display: none;"' %>>
         <h2><%= screenshot["caption"] %></h2>
@@ -30,19 +18,7 @@
     <% end %>
   </div>
   
-  <nav class="guide-controls">
-    <button type="button" class="slider-prev" aria-label="Previous slide">←</button>
-    
-    <select class="slider-select" aria-label="Select slide">
-      <% @guide_data["screenshots"].each_with_index do |screenshot, index| %>
-        <option value="<%= index %>">
-          <%= index + 1 %>. <%= screenshot["caption"] %>
-        </option>
-      <% end %>
-    </select>
-    
-    <button type="button" class="slider-next" aria-label="Next slide">→</button>
-  </nav>
+  <%= render 'guides/controls', guide_data: @guide_data %>
 </article>
 
 <p><%= link_to I18n.t("guides.links.back_to_index"), guides_path %></p>

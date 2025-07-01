@@ -6,3 +6,16 @@
   align-items: center;
   margin: 0 auto 2rem auto;
 }
+
+.guide-controls select {
+  margin: 0;
+}
+
+.guide-controls button {
+  
+}
+
+.guide-image img {
+  border: 2px solid var(--color-link);
+  border-radius: 5px;
+}

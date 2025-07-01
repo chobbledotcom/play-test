@@ -42,14 +42,30 @@ module GuideScreenshotHelpers
       raise "Guide screenshots require js: true on the test scenario"
     end
 
-    # Hide footer if this is the inspection screenshots spec
+    # Hide footer and disable animations if this is the inspection screenshots spec
     if spec_path.include?("inspection_screenshots_spec")
       page.execute_script("
         var existingStyle = document.getElementById('guide-screenshot-style');
         if (!existingStyle) {
           var style = document.createElement('style');
           style.id = 'guide-screenshot-style';
-          style.textContent = 'footer, #footer-rule { display: none !important; }';
+          style.textContent = `
+            footer, #footer-rule { display: none !important; }
+            
+            /* Disable all animations and transitions for cleaner screenshots */
+            *, *::before, *::after {
+              animation-duration: 0s !important;
+              animation-delay: 0s !important;
+              transition-duration: 0s !important;
+              transition-delay: 0s !important;
+            }
+            
+            /* Ensure flash messages are fully visible */
+            .notice, .alert, .success, .error {
+              opacity: 1 !important;
+              transform: none !important;
+            }
+          `;
           document.head.appendChild(style);
         }
       ")
