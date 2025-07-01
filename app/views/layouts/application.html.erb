@@ -16,7 +16,8 @@
     <% end %>
   </head>
   <body class="<%= current_user&.theme || "light" %>">
-    <%= render 'shared/construction_banner' %>
+    <%= #render 'shared/construction_banner'
+    %>
     <%= render 'shared/header_logo' %>
     <% if current_user %>
       <% if !current_user.is_active? %>
