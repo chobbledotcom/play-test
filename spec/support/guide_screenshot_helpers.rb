@@ -42,6 +42,19 @@ module GuideScreenshotHelpers
       raise "Guide screenshots require js: true on the test scenario"
     end
 
+    # Hide footer if this is the inspection screenshots spec
+    if spec_path.include?("inspection_screenshots_spec")
+      page.execute_script("
+        var existingStyle = document.getElementById('guide-screenshot-style');
+        if (!existingStyle) {
+          var style = document.createElement('style');
+          style.id = 'guide-screenshot-style';
+          style.textContent = 'footer, #footer-rule { display: none !important; }';
+          document.head.appendChild(style);
+        }
+      ")
+    end
+
     # rubocop:disable Lint/Debugger
     page.save_screenshot(filepath.to_s, full: true) if Rails.env.test?
     # rubocop:enable Lint/Debugger

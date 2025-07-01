@@ -5,6 +5,7 @@ import "details_links";
 import "dirty_forms";
 import "share_buttons";
 import "safety_standards_tabs";
+import "guides_slider";
 
 // external libs
 import "highlight.js"

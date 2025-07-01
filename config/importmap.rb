@@ -7,6 +7,7 @@ pin "details_links"
 pin "dirty_forms"
 pin "share_buttons"
 pin "safety_standards_tabs"
+pin "guides_slider"
 
 # external libs
 pin "highlight.js", to: "highlight.js"

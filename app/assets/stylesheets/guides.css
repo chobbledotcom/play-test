@@ -1,0 +1,8 @@
+.guide-controls {
+  display: flex;
+  max-width: 30rem;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 2rem auto;
+}
