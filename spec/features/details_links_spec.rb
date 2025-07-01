@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.feature "Details element link behavior", js: true do
+RSpec.feature "Details element link behavior" do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user:) }
   let(:inspection) do

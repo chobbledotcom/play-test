@@ -2,7 +2,7 @@ module GuideScreenshotHelpers
   GUIDE_SCREENSHOTS_ROOT = Rails.public_path.join("guide_screenshots")
 
   def capture_guide_screenshot(caption, options = {})
-    # return unless ENV["CAPTURE_GUIDE_SCREENSHOTS"] == "true"
+    return unless ENV["CAPTURE_GUIDE_SCREENSHOTS"] == "true"
 
     # Generate folder structure based on spec file path
     spec_path = RSpec.current_example.file_path
