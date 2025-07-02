@@ -38,6 +38,7 @@ a[role="button"]:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 4px 12px rgba(118, 99, 228, 0.3);
 	filter: brightness(1.1);
+	color: var(--color-bg);
 }
 
 /* Active/click state */

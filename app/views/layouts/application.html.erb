@@ -77,5 +77,11 @@
     </main>
     <%= #render 'shared/construction_banner'
     %>
+    <% if current_user %>
+      <a href="https://feedback.chobble.com" target="_blank" rel="noopener" role="button" class="feedback-button">
+        <span class="heart">🤍</span>
+        <%= t('navigation.feedback') %>
+      </a>
+    <% end %>
   </body>
 </html>
