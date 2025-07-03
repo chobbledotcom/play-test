@@ -48,7 +48,7 @@ RSpec.feature "Safety Standards Display", type: :feature do
       expect(page).to have_content("Breakdown")
       expect(page).to have_content("Height range: 0.6m - 3.0m")
       expect(page).to have_content("Pass")
-      
+
       # Runout requirements section
       expect(page).to have_content("Runout Requirements")
       expect(page).to have_content("Required Runout: 1.25m")

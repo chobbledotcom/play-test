@@ -28,7 +28,7 @@ class Assessments::UserHeightAssessment < ApplicationRecord
 
   def meets_height_requirements?
     return false unless platform_height.present? && tallest_user_height.present? && containing_wall_height.present?
-    
+
     permanent_roof = permanent_roof_status
     return false if permanent_roof.nil?
 

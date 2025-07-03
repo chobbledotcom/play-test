@@ -224,24 +224,6 @@ module SafetyStandards
       no_walls_threshold = SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
       basic_threshold = SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
       enhanced_threshold = SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
-      enhanced_multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
-
-      case platform_height
-      when 0..no_walls_threshold
-        0 # No walls required
-      when (no_walls_threshold..basic_threshold)
-        user_height # Equal to user height
-      when (basic_threshold..enhanced_threshold), (enhanced_threshold..SLIDE_HEIGHT_THRESHOLDS[:max_safe_height])
-        (user_height * enhanced_multiplier).round(2) # 1.25× user height
-      else
-        0 # Exceeds safe limits
-      end
-    end
-
-    def get_wall_height_requirement_details(platform_height, user_height, has_permanent_roof)
-      no_walls_threshold = SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
-      basic_threshold = SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
-      enhanced_threshold = SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
       max_threshold = SLIDE_HEIGHT_THRESHOLDS[:max_safe_height]
       enhanced_multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
 

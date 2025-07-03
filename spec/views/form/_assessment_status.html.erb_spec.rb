@@ -63,7 +63,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
     it "displays height requirement status as pass" do
       # Set up slide assessment with permanent roof value
       inspection.slide_assessment.update!(slide_permanent_roof: false)
-      
+
       user_height_assessment.update!(
         SeedData.user_height_fields(passed: true).merge(
           containing_wall_height: 2.0,
@@ -81,7 +81,7 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
     it "displays height requirement status as fail" do
       # Set up slide assessment with permanent roof value
       inspection.slide_assessment.update!(slide_permanent_roof: false)
-      
+
       user_height_assessment.update!(
         SeedData.user_height_fields(passed: false).merge(
           containing_wall_height: 1.0,
