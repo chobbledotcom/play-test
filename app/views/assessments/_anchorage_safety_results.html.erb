@@ -1,36 +1,15 @@
 <%= render 'shared/safety_info_box',
-  title: t('safety_standards.anchor_requirements.title'),
   content: -> do %>
-  <ul>
-    <% if @assessment&.total_anchors&.positive? %>
-      <li>
-        <strong>
-          <%= t('safety_standards.anchor_requirements.total_anchors') %>
-        </strong>
-        <%= @assessment.total_anchors %>
-      </li>
-    <% end %>
-    <li>
-      <strong>
-        <%= t('safety_standards.anchor_requirements.required') %>
-      </strong>
-      <%= @assessment.required_anchors %>
-    </li>
-    <li>
-      <strong>Breakdown:</strong>
-      <ul>
-        <% @assessment.anchorage_breakdown.each do |line| %>
-          <li>
-            <strong><%= line[0] %>:</strong>
-            <%= line[1] %>
-          </li>
-        <% end %>
-      </ul>
-    </li>
-    <% if @assessment&.total_anchors&.positive? %>
-      <li>
-        <%= render 'shared/pass_fail_string', passed: @assessment.meets_anchor_requirements? %>
-      </li>
-    <% end %>
-  </ul>
+  <% if @assessment.required_anchors > 0 %>
+    <% # Build the anchorage details in the expected format %>
+    <% anchor_details = {
+         text: "#{t('safety_standards.anchor_requirements.required')} #{@assessment.required_anchors}",
+         breakdown: @assessment.anchorage_breakdown
+       } %>
+    
+    <%= render 'shared/safety_standard_with_breakdown',
+        title: t('safety_standards.anchor_requirements.title'),
+        calculator_result: anchor_details,
+        passed: @assessment.total_anchors&.positive? ? @assessment.meets_anchor_requirements? : nil %>
+  <% end %>
 <% end %>

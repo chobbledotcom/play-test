@@ -39,13 +39,15 @@ RSpec.describe "Assessment Safety Calculations", type: :request do
       patch inspection_user_height_assessment_path(inspection),
         params: {
           assessments_user_height_assessment: {
+            platform_height: 2.0,
             containing_wall_height: 1,
             tallest_user_height: 1.99
           }
         },
         headers: turbo_headers
 
-      expect(response.body).to include("1.99")
+      expect(response.body).to include("Height Requirements")
+      expect(response.body).to include("1.99m")
     end
   end
 end

@@ -14,7 +14,7 @@ RSpec.feature "Safety Standards with Turbo", js: true do
 
       within("#anchors-result") do
         expect(page).to have_content("8")
-        expect(page).to have_content("Total anchors")
+        expect(page).to have_content("Required anchors")
       end
 
       expect(page).to have_current_path(safety_standards_path)

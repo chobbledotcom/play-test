@@ -59,7 +59,7 @@ module SafetyStandard
           ["Sides area", "5.0m (L) × 3.0m (H) = 15.0m²"],
           ["Front & back anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
           ["Left & right anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
-          ["Total anchors", "(2 + 2) × 2 = 8"]
+          ["Required anchors", "(2 + 2) × 2 = 8"]
         ]
       }
     },

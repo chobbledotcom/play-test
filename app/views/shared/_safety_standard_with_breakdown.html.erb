@@ -1,0 +1,26 @@
+<%# 
+  Shared partial for displaying safety standards with detailed breakdown
+  
+  Parameters:
+  - title: The section title (e.g., "Wall Height Requirements:")
+  - calculator_result: The result object with :text and :breakdown from calculator
+  - passed: Boolean indicating if the requirement is met
+  - show_compliance: (optional) Show compliance status text
+%>
+
+<h4><%= title %></h4>
+
+<p><%= calculator_result[:text] %></p>
+
+<h5><%= t('safety_standards.calculators.breakdown_title') %></h5>
+<ul>
+  <% calculator_result[:breakdown].each do |step| %>
+    <li><strong><%= step[0] %>:</strong> <%= step[1] %></li>
+  <% end %>
+</ul>
+
+<%= render 'shared/pass_fail_string', passed: passed %>
+
+<% if local_assigns[:show_compliance] && show_compliance %>
+  <%= @assessment.runout_compliance_status %>
+<% end %>

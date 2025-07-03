@@ -28,16 +28,33 @@ RSpec.feature "Safety Standards Display", type: :feature do
 
   scenario "safety standards info appears in slide assessment form" do
     inspection.update!(has_slide: true)
-    inspection.slide_assessment.update!(slide_platform_height: 2.5)
+    inspection.slide_assessment.update!(
+      slide_platform_height: 2.5,
+      slide_wall_height: 2.5,
+      slide_permanent_roof: false,
+      runout: 1.5
+    )
+    inspection.user_height_assessment.update!(
+      tallest_user_height: 2.0
+    )
 
     visit_inspection_edit(inspection)
     click_link I18n.t("forms.slide.header")
 
     within(".safety-standards-info") do
-      expect_safety_standard(:slide_requirements, :wall_height_requirements)
-      expect_safety_standard(:slide_requirements, :walls_equal_height, height: 2.5)
-      expect_safety_standard(:slide_requirements, :minimum_runout)
-      expect(page).to have_content("1.25m")
+      # Wall height requirements section
+      expect(page).to have_content("Wall Height Requirements")
+      expect(page).to have_content("Walls must be at least 2.0m (equal to user height)")
+      expect(page).to have_content("Breakdown")
+      expect(page).to have_content("Height range: 0.6m - 3.0m")
+      expect(page).to have_content("Pass")
+      
+      # Runout requirements section
+      expect(page).to have_content("Runout Requirements")
+      expect(page).to have_content("Required Runout: 1.25m")
+      expect(page).to have_content("50% calculation: 2.5m × 0.5 = 1.25m")
+      expect(page).to have_content("Minimum requirement: 0.3m (300mm)")
+      expect(page).to have_content("Pass") # 1.5m runout exceeds 1.25m requirement
     end
   end
 
@@ -55,9 +72,36 @@ RSpec.feature "Safety Standards Display", type: :feature do
     click_link I18n.t("forms.user_height.header")
 
     within(".safety-standards-info") do
-      expect_safety_standard(:user_height, :height_requirements)
-      expect_safety_standard(:user_height, :walls_equal_user_height, height: 1.2)
-      expect(page).to have_content(I18n.t("shared.pass"))
+      expect(page).to have_content("Height Requirements")
+      expect(page).to have_content("Walls must be at least 1.2m (equal to user height)")
+      expect(page).to have_content("Breakdown")
+      expect(page).to have_content("Height range: 0.6m - 3.0m")
+      expect(page).to have_content("Calculation: 1.2m (user height)")
+      expect(page).to have_content("Pass")
+    end
+  end
+
+  scenario "user height assessment shows permanent roof requirement for high platforms" do
+    inspection.user_height_assessment.update!(
+      platform_height: 4.0,
+      tallest_user_height: 1.8,
+      containing_wall_height: 2.3,
+      play_area_length: 5,
+      play_area_width: 4
+    )
+    inspection.slide_assessment.update!(slide_permanent_roof: true)
+
+    visit_inspection_edit(inspection)
+    click_link I18n.t("forms.user_height.header")
+
+    within(".safety-standards-info") do
+      expect(page).to have_content("Height Requirements")
+      expect(page).to have_content("Walls must be at least 2.25m (1.25× user height)")
+      expect(page).to have_content("Breakdown")
+      expect(page).to have_content("Height range: 3.0m - 6.0m")
+      expect(page).to have_content("Alternative requirement: Permanent roof")
+      expect(page).to have_content("Permanent roof: Fitted ✓")
+      expect(page).to have_content("Pass")
     end
   end
 
@@ -72,10 +116,12 @@ RSpec.feature "Safety Standards Display", type: :feature do
     click_link I18n.t("forms.anchorage.header")
 
     within(".safety-standards-info") do
-      expect_safety_standard(:anchor_requirements, :total_anchors)
-      expect(page).to have_content("8") # 5 + 3
-      expect_safety_standard(:anchor_requirements, :required)
-      expect(page).to have_content("8") # Required anchors
+      expect(page).to have_content("Anchor Requirements")
+      expect(page).to have_content("Required Anchors: 8")
+      expect(page).to have_content("Breakdown")
+      expect(page).to have_content("Front/back area: 4.0m (W) × 3.0m (H) = 12.0m²")
+      expect(page).to have_content("Required anchors: (2 + 2) × 2 = 8")
+      expect(page).to have_content("Pass")
     end
   end
 end

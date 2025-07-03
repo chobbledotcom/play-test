@@ -23,7 +23,8 @@ en:
 
     slide_requirements:
       title: "EN 14960:2019 Slide Requirements"
-      wall_height_requirements: "Wall Height Requirements:"
+      wall_height_requirements: "Wall Height Requirements"
+      runout_requirements: "Runout Requirements"
       platform_height_requirement: "EN 14960:2019 Requirement:"
       minimum_runout: "Minimum runout"
       runout_formula: "(50% of platform height or 300mm minimum)"
@@ -34,7 +35,7 @@ en:
 
     user_height:
       title: "User Height Requirements"
-      height_requirements: "Height Requirements:"
+      height_requirements: "Height Requirements"
       no_walls_required: "No containing walls required"
       walls_equal_user_height: "Containing walls must be at least %{height}m (equal to user height)"
       walls_125_user_height: "Containing walls must be at least %{height}m (1.25x user height)"
@@ -66,7 +67,7 @@ en:
         sides_area_label: "Sides area"
         front_back_anchors_label: "Front & back anchor counts"
         left_right_anchors_label: "Left & right anchor counts"
-        total_anchors_label: "Total anchors"
+        total_anchors_label: "Required anchors"
         en_minimum_label: "EN 14960 minimum"
         minimum_required: "Minimum %{minimum} anchors required, using %{minimum}"
 

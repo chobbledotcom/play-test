@@ -1,37 +1,22 @@
 <%# User Height Safety Standards Results Partial %>
 <%= render 'shared/safety_info_box',
-  title: t('safety_standards.user_height.title'),
   content: -> do %>
-  <% if @assessment.tallest_user_height.present? %>
+  <% if @assessment.platform_height.present? && @assessment.tallest_user_height.present? && @assessment.containing_wall_height.present? %>
+    <% platform_height = @assessment.platform_height %>
     <% user_height = @assessment.tallest_user_height %>
-    <strong>
-      <%= t('safety_standards.user_height.height_requirements') %>
-    </strong>
-    <% if user_height < 0.6 %>
-      <%= t('safety_standards.user_height.no_walls_required') %>
-    <% elsif user_height <= 3.0 %>
-      <%= t('safety_standards.user_height.walls_equal_user_height', height: user_height) %>
-    <% elsif user_height <= 6.0 %>
-      <%= t('safety_standards.user_height.walls_125_user_height', height: (user_height * 1.25).round(2)) %>
-    <% else %>
-      <%= t('safety_standards.user_height.walls_125_plus_roof_required', height: (user_height * 1.25).round(2)) %>
-    <% end %>
-
-    <% if @assessment.containing_wall_height.present? %>
-      <p>
-        <%= render 'shared/pass_fail_string', passed: @assessment.meets_height_requirements? %>
-        <%= t('safety_standards.compliant') %>
-      </p>
-      
-      <% # Show roof status if applicable %>
-      <% slide_assessment = @assessment.inspection.slide_assessment %>
-      <% if slide_assessment && !slide_assessment.slide_permanent_roof.nil? %>
-        <p>
-          <strong><%= t('safety_standards.user_height.roof_status') %>:</strong>
-          <%= slide_assessment.slide_permanent_roof ? t('shared.yes') : t('shared.no') %>
-        </p>
-      <% end %>
-    <% end %>
+    <% slide_assessment = @assessment.inspection.slide_assessment %>
+    <% has_permanent_roof = slide_assessment&.slide_permanent_roof %>
+    
+    <% wall_details = SafetyStandards::SlideCalculator.get_wall_height_requirement_details(
+         platform_height, 
+         user_height, 
+         has_permanent_roof
+       ) %>
+    
+    <%= render 'shared/safety_standard_with_breakdown',
+        title: t('safety_standards.user_height.height_requirements'),
+        calculator_result: wall_details,
+        passed: @assessment.meets_height_requirements? %>
   <% end %>
 
 <% end %>
