@@ -6,8 +6,7 @@ RSpec.feature "Complete Inspection Workflow", type: :feature, js: false do
   scenario "complete workflow without js" do
     InspectionWorkflow.new(
       has_slide: true,
-      is_totally_enclosed: true,
-      js: false
+      is_totally_enclosed: true
     ).execute
   end
 end
@@ -39,9 +38,8 @@ class InspectionWorkflow
   attr_reader :second_inspection
   attr_reader :options
 
-  def initialize(has_slide:, is_totally_enclosed:, js:)
+  def initialize(has_slide:, is_totally_enclosed:)
     @options = {has_slide:, is_totally_enclosed:}
-    @js = js
   end
 
   def t(key, **options)
