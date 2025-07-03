@@ -51,7 +51,6 @@ RSpec.describe AssessmentCompletion, type: :model do
           containing_wall_height: 2.5,
           platform_height: 1.5,
           tallest_user_height: 1.8,
-          has_permanent_roof: false,
           users_at_1000mm: 5,
           users_at_1200mm: 10,
           users_at_1500mm: 8,

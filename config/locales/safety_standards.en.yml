@@ -39,6 +39,7 @@ en:
       walls_equal_user_height: "Containing walls must be at least %{height}m (equal to user height)"
       walls_125_user_height: "Containing walls must be at least %{height}m (1.25x user height)"
       walls_125_plus_roof_required: "Containing walls must be at least %{height}m + permanent roof required"
+      roof_status: "Permanent Roof"
       calculated_capacities: "Calculated Capacities:"
       capacity_1000mm: "1.0m users: %{count} (1 per m²)"
       capacity_1200mm: "1.2m users: %{count} (0.75 per m²)"

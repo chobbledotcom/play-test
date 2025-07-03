@@ -20,8 +20,6 @@ FactoryBot.define do
       platform_height_comment { "Platform height meets standards" }
       tallest_user_height { 1.8 }
       tallest_user_height_comment { "User height appropriate" }
-      has_permanent_roof { false }
-      has_permanent_roof_comment { "No permanent roof fitted" }
       play_area_length { 5.0 }
       play_area_length_comment { "Length meets capacity requirements" }
       play_area_width { 4.0 }

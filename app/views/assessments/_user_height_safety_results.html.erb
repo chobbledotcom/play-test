@@ -22,6 +22,15 @@
         <%= render 'shared/pass_fail_string', passed: @assessment.meets_height_requirements? %>
         <%= t('safety_standards.compliant') %>
       </p>
+      
+      <% # Show roof status if applicable %>
+      <% slide_assessment = @assessment.inspection.slide_assessment %>
+      <% if slide_assessment && !slide_assessment.slide_permanent_roof.nil? %>
+        <p>
+          <strong><%= t('safety_standards.user_height.roof_status') %>:</strong>
+          <%= slide_assessment.slide_permanent_roof ? t('shared.yes') : t('shared.no') %>
+        </p>
+      <% end %>
     <% end %>
   <% end %>
 

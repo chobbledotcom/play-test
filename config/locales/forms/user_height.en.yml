@@ -10,7 +10,6 @@ en:
         containing_wall_height: "Containing Wall Height"
         platform_height: "Platform Height (m)"
         tallest_user_height: "Tallest User Height (m)"
-        has_permanent_roof: "Has Permanent Roof"
         users_at_1000mm: "Users at 1m"
         users_at_1200mm: "Users at 1.2m"
         users_at_1500mm: "Users at 1.5m"
