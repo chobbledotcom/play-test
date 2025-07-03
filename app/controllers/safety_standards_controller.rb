@@ -82,20 +82,15 @@ class SafetyStandardsController < ApplicationController
     width = param_to_float(:width)
     max_user_height = param_to_float(:max_user_height)
     max_user_height = nil if max_user_height.zero?
+    negative_adjustment_area = param_to_float(:negative_adjustment_area)
 
     if length.positive? && width.positive?
-      capacities = SafetyStandards::UserCapacityCalculator.calculate(
-        length, width, max_user_height
+      @capacity_result = SafetyStandards::UserCapacityCalculator.calculate(
+        length, width, max_user_height, negative_adjustment_area
       )
-      @capacity_result = {
-        length: length,
-        width: width,
-        area: (length * width).round(2),
-        max_user_height: max_user_height,
-        capacities: capacities
-      }
     else
-      @capacity_result = {error: t("safety_standards.errors.invalid_dimensions")}
+      @capacity_result = nil
+      @capacity_error = t("safety_standards.errors.invalid_dimensions")
     end
   end
 
@@ -164,10 +159,34 @@ class SafetyStandardsController < ApplicationController
     error = instance_variable_get(error_var)
 
     if result
+      # For user capacity, we need to extract the capacities from the CalculatorResponse
+      if type == "user_capacity" && result.is_a?(CalculatorResponse)
+        capacities = result.value
+        # Extract input parameters for backwards compatibility
+        length = param_to_float(:length)
+        width = param_to_float(:width)
+        max_user_height = param_to_float(:max_user_height)
+        max_user_height = nil if max_user_height.zero?
+        negative_adjustment_area = param_to_float(:negative_adjustment_area)
+
+        json_result = {
+          length: length,
+          width: width,
+          area: (length * width).round(2),
+          negative_adjustment_area: negative_adjustment_area,
+          usable_area: [(length * width) - negative_adjustment_area, 0].max.round(2),
+          max_user_height: max_user_height,
+          capacities: capacities,
+          breakdown: result.breakdown
+        }
+      else
+        json_result = result
+      end
+
       {
         passed: true,
         status: "Calculation completed successfully",
-        result: result
+        result: json_result
       }
     else
       {

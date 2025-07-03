@@ -1,16 +1,16 @@
 FactoryBot.define do
   factory :user do
-    sequence(:email) { |n| "user#{n}@example.com" }
+    sequence(:email) { |n| "user#{n}_#{SecureRandom.hex(4)}@example.com" }
     sequence(:name) { |n| "Test User #{n}" }
     password { "password123" }
     password_confirmation { "password123" }
-    sequence(:rpii_inspector_number) { |n| "RPII#{n.to_s.rjust(3, "0")}" }
+    sequence(:rpii_inspector_number) { |n| "RPII#{n.to_s.rjust(3, "0")}_#{SecureRandom.hex(2)}" }
     # Default factory creates active users for tests - real signups will be inactive
     active_until { Date.current + 1.year }
     association :inspection_company, factory: :inspector_company
 
     trait :admin do
-      sequence(:email) { |n| "admin#{n}@example.com" }
+      sequence(:email) { |n| "admin#{n}_#{SecureRandom.hex(4)}@example.com" }
     end
 
     trait :active_user do

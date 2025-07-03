@@ -80,7 +80,8 @@ failed_inspection = Inspection.create!(
     width: 3.0,
     length: 12.0,
     height: 3.5,
-    has_slide: true
+    has_slide: true,
+    is_totally_enclosed: false
   )
 )
 create_assessments_for_inspection(failed_inspection, $obstacle_course, passed: false)

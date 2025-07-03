@@ -135,6 +135,7 @@ module SeedData
       containing_wall_height: rand(1.0..2.0).round(1),
       platform_height: rand(0.5..1.5).round(1),
       tallest_user_height: rand(1.2..1.8).round(1),
+      has_permanent_roof: [true, false].sample,
       users_at_1000mm: rand(0..5),
       users_at_1200mm: rand(2..8),
       users_at_1500mm: rand(4..10),
@@ -145,6 +146,7 @@ module SeedData
       tallest_user_height_comment: passed ? "Capacity within safe limits based on EN 14960:2019" : "Review user capacity - exceeds recommended limits",
       containing_wall_height_comment: "Measured from base to top of wall",
       platform_height_comment: "Platform height acceptable for age group",
+      has_permanent_roof_comment: "Permanent roof structure assessed",
       play_area_length_comment: "Effective play area after deducting obstacles",
       play_area_width_comment: "Width measured at narrowest point"
     }

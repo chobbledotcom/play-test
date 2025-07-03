@@ -27,8 +27,8 @@ class Assessments::UserHeightAssessment < ApplicationRecord
     numericality: {greater_than_or_equal_to: 0}, allow_blank: true
 
   def meets_height_requirements?
-    return false unless platform_height.present? && tallest_user_height.present? && containing_wall_height.present?
+    return false unless platform_height.present? && tallest_user_height.present? && containing_wall_height.present? && !has_permanent_roof.nil?
 
-    SafetyStandards::SlideCalculator.meets_height_requirements?(platform_height, tallest_user_height, containing_wall_height)
+    SafetyStandards::SlideCalculator.meets_height_requirements?(platform_height, tallest_user_height, containing_wall_height, has_permanent_roof)
   end
 end

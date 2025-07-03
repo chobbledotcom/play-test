@@ -41,7 +41,7 @@ class PdfGeneratorService
     def render_field_group(base_name, fields)
       # For grouped fields, check i18n for base field; for standalone pass fields, check the pass field
       label_field = fields[:base] || fields[:pass]
-      return unless label_field && has_i18n_label?(label_field)
+      return unless label_field && has_any_i18n_label?(base_name, fields)
 
       [render_field_line(fields), render_comment_line(fields)].compact.each do |line|
         @current_assessment_fields << line
@@ -50,6 +50,14 @@ class PdfGeneratorService
 
     def has_i18n_label?(field)
       I18n.exists?("forms.#{@current_assessment_type}.fields.#{field}")
+    end
+
+    def has_any_i18n_label?(base_name, fields)
+      # Check if any of the field variants have an i18n label
+      # Priority: base field, pass field, then base name
+      fields[:base] && has_i18n_label?(fields[:base]) ||
+        fields[:pass] && has_i18n_label?(fields[:pass]) ||
+        has_i18n_label?(base_name)
     end
 
     def determine_pass_value(fields, main_field, value)
@@ -121,12 +129,24 @@ class PdfGeneratorService
       return unless main_field
 
       value = @current_assessment.send(main_field)
-      # Use base field label when available, otherwise use pass field label
-      label_field = fields[:base] || fields[:pass]
-      label = field_label(label_field)
+      # Try to get label in priority order: base field, pass field, base name
+      label = get_field_label(fields)
       pass_value = determine_pass_value(fields, main_field, value)
 
       format_field_line(label, value, pass_value, main_field.to_s.end_with?("_pass"))
+    end
+
+    def get_field_label(fields)
+      base_name = extract_base_field_name(fields[:pass].to_s) if fields[:pass]
+
+      # Try in order: base field, pass field, base name
+      if fields[:base] && has_i18n_label?(fields[:base])
+        field_label(fields[:base])
+      elsif fields[:pass] && has_i18n_label?(fields[:pass])
+        field_label(fields[:pass])
+      else
+        field_label(base_name)
+      end
     end
 
     def render_comment_line(fields)

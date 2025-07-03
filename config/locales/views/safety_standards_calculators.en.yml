@@ -5,3 +5,9 @@ en:
         description: "Calculate required anchors for a given inflatable area based on EN 14960:2019 standards."
       user_capacity:
         description: "Calculate the maximum number of users based on playing area dimensions and user height restrictions."
+        total_area: "Total area"
+        obstacles_adjustments: "Obstacles/adjustments"
+        usable_area: "Usable area"
+        capacity_calculations: "Capacity calculations"
+        based_on_usable: "Based on usable area"
+        not_allowed: "Not allowed (exceeds height limit)"

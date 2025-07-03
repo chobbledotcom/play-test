@@ -66,15 +66,21 @@ RSpec.feature "Inspection Deletion Security", type: :feature do
   end
 
   scenario "delete button disappears when inspection becomes complete" do
-    inspection = create(:inspection, user: user)
-    visit edit_inspection_path(inspection)
+    # Create a complete inspection properly
+    inspection = create(:inspection, :completed, user: user)
 
-    expect(page).to have_button(I18n.t("inspections.buttons.delete"))
+    # Visit the show page (can't visit edit page for completed inspections)
+    visit inspection_path(inspection)
 
-    fill_assessments_with_complete_data(inspection)
-    inspection.update!(complete_date: Time.current)
-
-    visit edit_inspection_path(inspection)
+    # The show page should not have a delete button
     expect(page).not_to have_button(I18n.t("inspections.buttons.delete"))
+    expect(page).to have_button(I18n.t("inspections.buttons.switch_to_in_progress"))
+
+    # Switch back to in-progress
+    click_button I18n.t("inspections.buttons.switch_to_in_progress")
+
+    # Now we should be on the edit page with a delete button
+    expect(page).to have_current_path(edit_inspection_path(inspection))
+    expect(page).to have_button(I18n.t("inspections.buttons.delete"))
   end
 end

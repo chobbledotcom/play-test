@@ -9,5 +9,6 @@ en:
       fields:
         length: "Length (m)"
         width: "Width (m)"
+        negative_adjustment_area: "Obstacle/Adjustment Area (m²)"
         max_user_height: "Maximum User Height (m)"
       submit: "Calculate Capacity"

@@ -57,14 +57,19 @@ RSpec.describe SafetyStandard, "Constants" do
       platform_height = 4.0 # In the enhanced walls range (3.0m - 6.0m)
       user_height = 4.0
       containing_wall_height = 5.0 # 4.0 * 1.25 = 5.0
+      has_permanent_roof = false
 
-      result = SafetyStandards::SlideCalculator.meets_height_requirements?(platform_height, user_height, containing_wall_height)
+      result = SafetyStandards::SlideCalculator.meets_height_requirements?(platform_height, user_height, containing_wall_height, has_permanent_roof)
       expect(result).to be true
 
-      # Test that it fails with insufficient wall height
+      # Test that it fails with insufficient wall height (and no roof)
       insufficient_wall = 4.9 # Just under 4.0 * 1.25
-      result = SafetyStandards::SlideCalculator.meets_height_requirements?(platform_height, user_height, insufficient_wall)
+      result = SafetyStandards::SlideCalculator.meets_height_requirements?(platform_height, user_height, insufficient_wall, has_permanent_roof)
       expect(result).to be false
+
+      # Test that roof provides an alternative for enhanced walls range
+      result_with_roof = SafetyStandards::SlideCalculator.meets_height_requirements?(platform_height, user_height, insufficient_wall, true)
+      expect(result_with_roof).to be true
     end
   end
 
@@ -92,6 +97,8 @@ RSpec.describe SafetyStandard, "Constants" do
       expect(source).to include("SLIDE_HEIGHT_THRESHOLDS")
       expect(source).to include("WALL_HEIGHT_CONSTANTS")
       expect(source).to include("enhanced_height_multiplier: 1.25")
+      # Should show the updated method signature with roof parameter
+      expect(source).to include("has_permanent_roof")
     end
   end
 

@@ -147,6 +147,13 @@ en:
       walls_125x_user_height: "Walls 1.25× user height"
       walls_125x_plus_roof: "Walls 1.25× user height + permanent roof required"
       walls_125_plus_roof_required: "Walls must be at least %{height}m + permanent roof required"
+      alternative_requirement: "Alternative requirement"
+      permanent_roof_alternative: "Permanent roof (can replace heightened walls)"
+      permanent_roof: "Permanent roof"
+      roof_fitted: "Fitted ✓"
+      roof_not_fitted: "Not fitted ✗"
+      roof_required_and_fitted: "Required and fitted ✓"
+      roof_required_but_not_fitted: "Required but not fitted ✗"
     
     slides:
       runout_calculator_title: "Slide Runout Calculator"

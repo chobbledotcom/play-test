@@ -1,73 +1,25 @@
-<% if @capacity_result %>
+<% if @capacity_result || @capacity_error %>
   <div class="calculation-result">
     <h3><%= t('forms.safety_standards_user_capacity.sections.result') %></h3>
     
-    <% if @capacity_result[:error] %>
-      <p class="error"><%= @capacity_result[:error] %></p>
-    <% else %>
-      <table>
-      <tbody>
-        <tr>
-          <th><%= t('forms.safety_standards_user_capacity.fields.length') %>:</th>
-          <td><%= @capacity_result[:length] %>m</td>
-        </tr>
-        <tr>
-          <th><%= t('forms.safety_standards_user_capacity.fields.width') %>:</th>
-          <td><%= @capacity_result[:width] %>m</td>
-        </tr>
-        <tr>
-          <th>Total Area:</th>
-          <td><%= @capacity_result[:area] %>m²</td>
-        </tr>
-        <% if @capacity_result[:max_user_height] %>
-          <tr>
-            <th><%= t('forms.safety_standards_user_capacity.fields.max_user_height') %>:</th>
-            <td><%= @capacity_result[:max_user_height] %>m</td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-    
-    <h4>User Capacities:</h4>
-    <table>
-      <thead>
-        <tr>
-          <th>User Height</th>
-          <th>Capacity</th>
-          <th>Density</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @capacity_result[:capacities].each do |height_key, count| %>
-          <% if count > 0 %>
-            <% height_mm = height_key.to_s.match(/(\d+)mm/)[1].to_i %>
-            <% height_m = height_mm / 1000.0 %>
-            <tr>
-              <td><%= height_m %>m</td>
-              <td><%= count %> users</td>
-              <td>
-                <% case height_mm %>
-                <% when 1000 %>
-                  1 per m²
-                <% when 1200 %>
-                  0.75 per m²
-                <% when 1500 %>
-                  0.60 per m²
-                <% when 1800 %>
-                  0.50 per m²
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-        <% end %>
-      </tbody>
-    </table>
-    
-    <% if @capacity_result[:max_user_height] %>
-      <p class="note">
-        <em>Capacity calculated for users up to <%= @capacity_result[:max_user_height] %>m tall</em>
-      </p>
+    <% if @capacity_error %>
+      <p class="error"><%= @capacity_error %></p>
+    <% elsif @capacity_result %>
+      <% if @capacity_result.breakdown %>
+        <h4>Calculation Breakdown:</h4>
+        <table>
+          <tbody>
+            <% @capacity_result.breakdown.each do |label, value| %>
+              <tr>
+                <th><%= label %>:</th>
+                <td><%= value %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p class="error"><%= t('safety_standards.errors.calculation_failed') %></p>
+      <% end %>
     <% end %>
-  <% end %>
   </div>
 <% end %>

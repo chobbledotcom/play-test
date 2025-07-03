@@ -50,11 +50,22 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
     end
 
     scenario "handles failed inspection correctly" do
-      failed_inspection = create(:inspection, :completed,
+      # Create a completed failed inspection
+      failed_inspection = create(:inspection,
         user: user,
         unit: unit,
         passed: false,
+        complete_date: Time.current,
+        width: 5.5,
+        length: 6.0,
+        height: 4.5,
         risk_assessment: "Multiple safety issues found")
+
+      # Update all assessments to be complete
+      Inspection::ASSESSMENT_TYPES.each do |assessment_name, _assessment_class|
+        assessment = failed_inspection.send(assessment_name)
+        assessment.update!(attributes_for(assessment_name, :complete))
+      end
 
       failed_inspection.structure_assessment.update!(
         seam_integrity_pass: false,

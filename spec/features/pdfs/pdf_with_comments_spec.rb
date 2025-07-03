@@ -5,7 +5,7 @@ RSpec.feature "PDF with Comments", type: :feature do
   let(:unit) { create(:unit) }
 
   scenario "renders assessment comments in purple italics" do
-    inspection = create(:inspection, user: user, unit: unit)
+    inspection = create(:inspection, :completed, user: user, unit: unit)
 
     inspection.anchorage_assessment.update!(
       num_low_anchors: 4,

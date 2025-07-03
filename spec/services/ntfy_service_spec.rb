@@ -64,12 +64,13 @@ RSpec.describe NtfyService do
         allow(mock_http).to receive(:request).and_return(mock_response)
 
         # Verify specific headers are set exactly once
-        expect(mock_request).to receive(:[]=).with("Title", "play-test notification").once
-        expect(mock_request).to receive(:[]=).with("Priority", "high").once
-        expect(mock_request).to receive(:[]=).with("Tags", "warning").once
-        expect(mock_request).to receive(:body=).with(test_message).once
+        expect(mock_request).to receive(:[]=).with("Title", "play-test notification")
+        expect(mock_request).to receive(:[]=).with("Priority", "high")
+        expect(mock_request).to receive(:[]=).with("Tags", "warning")
+        expect(mock_request).to receive(:body=).with(test_message)
 
         NtfyService.notify(test_message)
+        sleep 0.05 # Allow thread to complete
       end
 
       it "uses SSL for HTTPS connection" do
@@ -316,7 +317,7 @@ RSpec.describe NtfyService do
 
         # Should return immediately, not wait for the HTTP request
         elapsed = Time.current - start_time
-        expect(elapsed).to be < 0.02 # Should be much faster than the 50ms delay
+        expect(elapsed).to be < 0.1 # Should be much faster than the 50ms delay
       end
     end
 

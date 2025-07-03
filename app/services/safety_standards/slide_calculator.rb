@@ -23,40 +23,45 @@ module SafetyStandards
     }.freeze
 
     # Test examples for height requirements validation
-    # Format: [platform_height, user_height, containing_wall_height]
+    # Format: [platform_height, user_height, containing_wall_height, has_permanent_roof]
     HEIGHT_TEST_EXAMPLES = {
       # Valid scenarios
       valid: {
         # No walls required (under 0.6m)
-        no_walls_required: [0.5, 1.5, 0],
-        no_walls_required_low: [0.3, 1.5, 0],
+        no_walls_required: [0.5, 1.5, 0, false],
+        no_walls_required_low: [0.3, 1.5, 0, false],
 
         # Basic walls (0.6m - 3.0m) - wall height >= user height
-        basic_walls_exact: [1.5, 1.5, 1.5],
-        basic_walls_exceeds: [2, 2, 2.5],
+        basic_walls_exact: [1.5, 1.5, 1.5, false],
+        basic_walls_exceeds: [2, 2, 2.5, false],
 
-        # Enhanced walls (3.0m - 6.0m) - wall height >= 1.25x user height
-        enhanced_walls: [4, 4, 5], # 4 * 1.25 = 5
-        enhanced_walls_exact: [5, 5, 6.25], # 5 * 1.25 = 6.25
+        # Enhanced walls (3.0m - 6.0m) - wall height >= 1.25x user height OR roof
+        enhanced_walls: [4, 4, 5, false], # 4 * 1.25 = 5
+        enhanced_walls_exact: [5, 5, 6.25, false], # 5 * 1.25 = 6.25
+        enhanced_walls_with_roof: [4, 4, 3, true], # Insufficient walls but has roof
+        enhanced_walls_roof_alternative: [5, 5, 5, true], # Has roof, walls don't need to be 1.25x
 
-        # Maximum height (6.0m - 8.0m) - wall height >= 1.25x user height + roof
-        max_height_with_roof: [7, 7, 8.75] # 7 * 1.25 = 8.75
+        # Maximum height (6.0m - 8.0m) - wall height >= 1.25x user height AND roof
+        max_height_with_roof: [7, 7, 8.75, true], # 7 * 1.25 = 8.75 AND has roof
+        max_height_exact_with_roof: [6.5, 6.5, 8.125, true] # 6.5 * 1.25 = 8.125 AND has roof
       },
 
       # Invalid scenarios
       invalid: {
         # Nil values
-        nil_user_height: [1, nil, 2],
-        nil_wall_height: [1, 1.5, nil],
+        nil_user_height: [1, nil, 2, false],
+        nil_wall_height: [1, 1.5, nil, false],
+        nil_roof: [1, 1.5, 2, nil],
 
         # Insufficient wall heights
-        basic_walls_too_low: [2, 2, 1.8],
-        enhanced_walls_too_low: [4, 4, 4.8], # Needs 5m
-        max_height_too_low: [7, 7, 8], # Needs 8.75m
+        basic_walls_too_low: [2, 2, 1.8, false],
+        enhanced_walls_too_low: [4, 4, 4.8, false], # Needs 5m or roof
+        max_height_too_low: [7, 7, 8, true], # Needs 8.75m even with roof
+        max_height_no_roof: [7, 7, 8.75, false], # Has correct walls but needs roof
 
         # Exceeds safe limits (over 8.0m)
-        exceeds_safe_height: [9, 7, 12],
-        exceeds_safe_height_high: [10, 7, 15]
+        exceeds_safe_height: [9, 7, 12, true],
+        exceeds_safe_height_high: [10, 7, 15, true]
       }
     }.freeze
 
@@ -106,7 +111,7 @@ module SafetyStandards
       # EN 14960-1:2019 Section 4.2.11 (Lines 930-939) - Runout requirements
       # Line 934-935: The runout distance must be at least half the height of the slide's
       # highest platform (measured from ground level), with an absolute minimum of 300mm
-      # Line 936: If a stop-wall is installed at the runout's end, an additional 
+      # Line 936: If a stop-wall is installed at the runout's end, an additional
       # 50cm must be added to the total runout length
       return CalculatorResponse.new(value: 0, value_suffix: "m", breakdown: []) if platform_height.nil? || platform_height <= 0
 
@@ -151,13 +156,13 @@ module SafetyStandards
       )
     end
 
-    def meets_height_requirements?(platform_height, user_height, containing_wall_height)
+    def meets_height_requirements?(platform_height, user_height, containing_wall_height, has_permanent_roof)
       # EN 14960-1:2019 Section 4.2.9 (Lines 854-887) - Containment requirements
       # Lines 859-860: Containing walls become mandatory for platforms exceeding 0.6m in height
       # Lines 861-862: Platforms between 0.6m and 3.0m need walls at least as tall as the maximum user height
-      # Lines 863-864: Platforms between 3.0m and 6.0m require walls at least 1.25 times the maximum user height
+      # Lines 863-864: Platforms between 3.0m and 6.0m require walls at least 1.25 times the maximum user height OR a permanent roof
       # Lines 865-866: Platforms over 6.0m must have both containing walls and a permanent roof structure
-      return false if platform_height.nil? || user_height.nil? || containing_wall_height.nil?
+      return false if platform_height.nil? || user_height.nil? || containing_wall_height.nil? || has_permanent_roof.nil?
 
       enhanced_multiplier = WALL_HEIGHT_CONSTANTS[:enhanced_height_multiplier]
 
@@ -169,11 +174,12 @@ module SafetyStandards
         containing_wall_height >= user_height
       when (SLIDE_HEIGHT_THRESHOLDS[:basic_walls]..
             SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls])
-        containing_wall_height >= (user_height * enhanced_multiplier)
+        # EITHER walls at 1.25x user height OR permanent roof
+        has_permanent_roof || containing_wall_height >= (user_height * enhanced_multiplier)
       when (SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]..
             SLIDE_HEIGHT_THRESHOLDS[:max_safe_height])
-        # Plus permanent roof required
-        containing_wall_height >= (user_height * enhanced_multiplier)
+        # BOTH containing walls AND permanent roof required
+        has_permanent_roof && containing_wall_height >= (user_height * enhanced_multiplier)
       else
         false # Exceeds safe height limits
       end
@@ -197,12 +203,12 @@ module SafetyStandards
       "#{height_ratio}% of platform height, minimum #{min_runout}mm"
     end
 
-    def calculate_wall_height_requirements(platform_height, user_height)
+    def calculate_wall_height_requirements(platform_height, user_height, has_permanent_roof = nil)
       # EN 14960-1:2019 Section 4.2.9 (Lines 854-887) - Containment requirements
       return CalculatorResponse.new(value: 0, value_suffix: "m", breakdown: []) if platform_height.nil? || user_height.nil? || platform_height <= 0 || user_height <= 0
 
       # Get requirement details and breakdown
-      requirement_details = get_wall_height_requirement_details(platform_height, user_height)
+      requirement_details = get_wall_height_requirement_details(platform_height, user_height, has_permanent_roof)
 
       # Extract the required wall height from the details
       required_height = extract_required_wall_height(platform_height, user_height)
@@ -234,7 +240,7 @@ module SafetyStandards
       end
     end
 
-    def get_wall_height_requirement_details(platform_height, user_height)
+    def get_wall_height_requirement_details(platform_height, user_height, has_permanent_roof = nil)
       no_walls_threshold = SLIDE_HEIGHT_THRESHOLDS[:no_walls_required]
       basic_threshold = SLIDE_HEIGHT_THRESHOLDS[:basic_walls]
       enhanced_threshold = SLIDE_HEIGHT_THRESHOLDS[:enhanced_walls]
@@ -272,37 +278,75 @@ module SafetyStandards
         }
       when (basic_threshold..enhanced_threshold)
         required_height = (user_height * enhanced_multiplier).round(2)
+        breakdown = [
+          [
+            I18n.t("safety_standards.wall_heights.height_range"),
+            I18n.t("safety_standards.wall_heights.3m_to_6m")
+          ],
+          [
+            I18n.t("safety_standards.wall_heights.calculation"),
+            "#{user_height}m × #{enhanced_multiplier} = #{required_height}m"
+          ],
+          [
+            I18n.t("safety_standards.wall_heights.alternative_requirement"),
+            I18n.t("safety_standards.wall_heights.permanent_roof_alternative")
+          ]
+        ]
+
+        # Add roof status if known
+        if !has_permanent_roof.nil?
+          breakdown << if has_permanent_roof
+            [
+              I18n.t("safety_standards.wall_heights.permanent_roof"),
+              I18n.t("safety_standards.wall_heights.roof_fitted")
+            ]
+          else
+            [
+              I18n.t("safety_standards.wall_heights.permanent_roof"),
+              I18n.t("safety_standards.wall_heights.roof_not_fitted")
+            ]
+          end
+        end
+
         {
           text: I18n.t("safety_standards.wall_heights.walls_125_user_height", height: required_height),
-          breakdown: [
-            [
-              I18n.t("safety_standards.wall_heights.height_range"),
-              I18n.t("safety_standards.wall_heights.3m_to_6m")
-            ],
-            [
-              I18n.t("safety_standards.wall_heights.calculation"),
-              "#{user_height}m × #{enhanced_multiplier} = #{required_height}m"
-            ]
-          ]
+          breakdown: breakdown
         }
       when (enhanced_threshold..max_threshold)
         required_height = (user_height * enhanced_multiplier).round(2)
+        breakdown = [
+          [
+            I18n.t("safety_standards.wall_heights.height_range"),
+            I18n.t("safety_standards.wall_heights.over_6m")
+          ],
+          [
+            I18n.t("safety_standards.wall_heights.calculation"),
+            "#{user_height}m × #{enhanced_multiplier} = #{required_height}m"
+          ],
+          [
+            I18n.t("safety_standards.wall_heights.additional_requirement"),
+            I18n.t("safety_standards.wall_heights.permanent_roof_required")
+          ]
+        ]
+
+        # Add roof status if known
+        if !has_permanent_roof.nil?
+          breakdown << if has_permanent_roof
+            [
+              I18n.t("safety_standards.wall_heights.permanent_roof"),
+              I18n.t("safety_standards.wall_heights.roof_required_and_fitted")
+            ]
+          else
+            [
+              I18n.t("safety_standards.wall_heights.permanent_roof"),
+              I18n.t("safety_standards.wall_heights.roof_required_but_not_fitted")
+            ]
+          end
+        end
+
         {
           text: I18n.t("safety_standards.wall_heights.walls_125_plus_roof_required", height: required_height),
-          breakdown: [
-            [
-              I18n.t("safety_standards.wall_heights.height_range"),
-              I18n.t("safety_standards.wall_heights.over_6m")
-            ],
-            [
-              I18n.t("safety_standards.wall_heights.calculation"),
-              "#{user_height}m × #{enhanced_multiplier} = #{required_height}m"
-            ],
-            [
-              I18n.t("safety_standards.wall_heights.additional_requirement"),
-              I18n.t("safety_standards.wall_heights.permanent_roof_required")
-            ]
-          ]
+          breakdown: breakdown
         }
       else
         {

@@ -178,7 +178,16 @@ class Inspection < ApplicationRecord
 
   # Advanced methods
   def can_be_completed?
-    unit.present? && all_assessments_complete?
+    unit.present? &&
+      all_assessments_complete? &&
+      inspection_location.present? &&
+      !passed.nil? &&
+      inspection_date.present? &&
+      width.present? &&
+      length.present? &&
+      height.present? &&
+      !has_slide.nil? &&
+      !is_totally_enclosed.nil?
   end
 
   def completion_status

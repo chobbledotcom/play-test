@@ -41,6 +41,7 @@ module SafetyStandard
       type: "user_capacity",
       length: 10.0,
       width: 8.0,
+      negative_adjustment_area: 15.0,
       max_user_height: 1.5
     }
   }.freeze
@@ -94,13 +95,25 @@ module SafetyStandard
         length: 10.0,
         width: 8.0,
         area: 80.0,
+        negative_adjustment_area: 15.0,
+        usable_area: 65.0,
         max_user_height: 1.5,
         capacities: {
-          users_1000mm: 80,
-          users_1200mm: 60,
-          users_1500mm: 48,
+          users_1000mm: 65,
+          users_1200mm: 48,
+          users_1500mm: 39,
           users_1800mm: 0
-        }
+        },
+        breakdown: [
+          ["Total area", "10m × 8m = 80m²"],
+          ["Obstacles/adjustments", "- 15m²"],
+          ["Usable area", "65m²"],
+          ["Capacity calculations", "Based on usable area"],
+          ["1m users", "65 ÷ 1 = 65 users"],
+          ["1.2m users", "65 ÷ 1.3 = 48 users"],
+          ["1.5m users", "65 ÷ 1.7 = 39 users"],
+          ["1.8m users", "Not allowed (exceeds height limit)"]
+        ]
       }
     }
   }.freeze
@@ -186,7 +199,7 @@ module SafetyStandard
 
       # Get all method implementations
       methods_code = ""
-      
+
       # First, get any additional methods
       additional_methods.each do |additional_method|
         if module_name.respond_to?(additional_method)
@@ -198,11 +211,11 @@ module SafetyStandard
           end
         end
       end
-      
+
       # Then get the main method
       method_lines = extract_method_lines(lines, line_number - 1, method_name)
       methods_code += strip_consistent_indentation(method_lines.join(""))
-      
+
       # Now build the final output with headers
       output = ""
       if constants_code.strip.length > 0
@@ -211,7 +224,7 @@ module SafetyStandard
         output += "\n# Method Implementation:\n"
       end
       output += methods_code
-      
+
       output
     end
 
@@ -299,9 +312,10 @@ module SafetyStandard
         example = metadata[:example_input]
         length = example[:length]
         width = example[:width]
-        capacity = SafetyStandards::UserCapacityCalculator.calculate(length, width)
+        result = SafetyStandards::UserCapacityCalculator.calculate(length, width, nil, 15.0)
+        capacity = result.value
         area = length * width
-        "For #{area}m² area (#{length}m × #{width}m): " \
+        "For #{area}m² area (#{length}m × #{width}m) with 15m² adjustment: " \
           "1.0m users: #{capacity[:users_1000mm]}, " \
           "1.2m users: #{capacity[:users_1200mm]}, " \
           "1.5m users: #{capacity[:users_1500mm]}, " \
@@ -369,13 +383,13 @@ module SafetyStandard
 
       method_lines
     end
-    
+
     def strip_consistent_indentation(source_code)
       lines = source_code.split("\n")
-      
+
       # Find minimum indentation (excluding empty lines)
       min_indent = lines.reject(&:empty?).map { |line| line.match(/^(\s*)/)[1].length }.min || 0
-      
+
       # Remove minimum indentation from all lines
       lines.map { |line| line.empty? ? line : line[min_indent..] || "" }.join("\n")
     end

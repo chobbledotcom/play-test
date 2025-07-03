@@ -51,7 +51,7 @@ module GuideScreenshotHelpers
           style.id = 'guide-screenshot-style';
           style.textContent = `
             footer, #footer-rule { display: none !important; }
-            
+
             /* Disable all animations and transitions for cleaner screenshots */
             *, *::before, *::after {
               animation-duration: 0s !important;
@@ -59,7 +59,7 @@ module GuideScreenshotHelpers
               transition-duration: 0s !important;
               transition-delay: 0s !important;
             }
-            
+
             /* Ensure flash messages are fully visible */
             .notice, .alert, .success, .error {
               opacity: 1 !important;

@@ -2,7 +2,7 @@ require "rails_helper"
 require_relative "../../../db/seeds/seed_data"
 require "timeout"
 
-RSpec.feature "Complete Inspection Workflow", type: :feature do
+RSpec.feature "Complete Inspection Workflow", type: :feature, screenshot: true do
   scenario "complete workflow with prefilling - no slide or enclosure", js: true do
     InspectionWorkflow.new(
       has_slide: true,
@@ -106,7 +106,7 @@ class InspectionWorkflow
     click_link "Units"
     capture_guide_screenshot("Units Index - Empty")
 
-    click_units_button("add_unit")
+    click_button t("units.buttons.add_unit")
     capture_guide_screenshot("Create Unit Form")
 
     unit_data = SeedData.unit_fields.merge(
@@ -132,9 +132,19 @@ class InspectionWorkflow
     click_link "Units"
     click_link "Test Bouncy Castle"
     capture_guide_screenshot("Unit Details Page")
-    click_units_button("add_inspection")
-    capture_guide_screenshot("New Inspection - Basic Details")
+
+    # Click the add inspection button
+    click_button t("units.buttons.add_inspection")
+
+    # Wait for the page to redirect to edit page
+    expect(page).to have_current_path(/inspections\/\w+\/edit/, wait: 10)
+
+    # The inspection should have been created
     @inspection = @user.inspections.last
+    raise "Inspection was not created" if @inspection.nil?
+
+    capture_guide_screenshot("New Inspection - Basic Details")
+    @inspection
   end
 
   def fill_general_inspection_details
@@ -251,8 +261,14 @@ class InspectionWorkflow
 
   def create_second_inspection
     visit unit_path(@unit)
-    click_units_button("add_inspection")
+    click_button t("units.buttons.add_inspection")
+
+    # Wait for redirect
+    expect(page).to have_current_path(/inspections\/\w+\/edit/, wait: 10)
+
     @second_inspection = @unit.inspections.order(created_at: :desc).first
+    raise "Second inspection was not created" if @second_inspection.nil?
+    @second_inspection
   end
 
   def save_main_form

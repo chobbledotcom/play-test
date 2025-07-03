@@ -46,6 +46,7 @@ RSpec.feature "Safety Standards Display", type: :feature do
       platform_height: 2.0,
       tallest_user_height: 1.2,
       containing_wall_height: 1.3,
+      has_permanent_roof: false,
       play_area_length: 5,
       play_area_width: 4
     )

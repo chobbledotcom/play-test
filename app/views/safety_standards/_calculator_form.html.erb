@@ -41,6 +41,7 @@
       <%= render 'form/fieldset', legend_key: 'dimensions' do %>
         <%= render 'form/number', field: :length, min: 1.0, required: true %>
         <%= render 'form/number', field: :width, min: 1.0, required: true %>
+        <%= render 'form/number', field: :negative_adjustment_area, min: 0.0, required: false %>
       <% end %>
       
       <%= render 'form/fieldset', legend_key: 'user_height' do %>

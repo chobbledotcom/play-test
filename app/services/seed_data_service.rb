@@ -176,7 +176,7 @@ class SeedDataService
         complete_date: is_complete ? inspection_date.to_time + rand(INSPECTION_DURATION_RANGE).hours : nil,
         unique_report_number: generate_report_number(user.inspection_company, inspection_date),
         is_seed: true,
-        passed: nil,
+        passed: is_complete ? passed : nil,
         risk_assessment: generate_risk_assessment(passed),
         # Copy dimensions from config
         width: config[:width],

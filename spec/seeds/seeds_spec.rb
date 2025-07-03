@@ -180,6 +180,26 @@ RSpec.describe "Seed Data", type: :model do
       it "ensures all completed inspections pass can_mark_complete validation" do
         completed_inspections = Inspection.where.not(complete_date: nil)
         completed_inspections.each do |inspection|
+          # Debug output for failing inspections
+          unless inspection.can_mark_complete?
+            puts "\nInspection #{inspection.id} debug info:"
+            puts "  unit: #{inspection.unit.present?}"
+            puts "  all_assessments_complete?: #{inspection.send(:all_assessments_complete?)}"
+            puts "  inspection_location: #{inspection.inspection_location.present?}"
+            puts "  passed: #{inspection.passed.inspect}"
+            puts "  inspection_date: #{inspection.inspection_date.present?}"
+            puts "  width: #{inspection.width.present?}"
+            puts "  length: #{inspection.length.present?}"
+            puts "  height: #{inspection.height.present?}"
+            puts "  has_slide: #{inspection.has_slide.inspect}"
+            puts "  is_totally_enclosed: #{inspection.is_totally_enclosed.inspect}"
+
+            # Check individual assessments
+            inspection.each_applicable_assessment do |assessment_key, _, assessment|
+              puts "  #{assessment_key} complete?: #{assessment&.complete?}"
+            end
+          end
+
           expect(inspection.can_mark_complete?).to be(true),
             "Inspection ##{inspection.id} is marked complete but fails can_mark_complete? validation. Errors: #{inspection.completion_errors.join(", ")}"
         end
@@ -490,6 +510,19 @@ RSpec.describe "Seed Data", type: :model do
         completed_inspections = Inspection.where.not(complete_date: nil)
 
         completed_inspections.each do |inspection|
+          # Debug output
+          if !inspection.can_mark_complete?
+            puts "Inspection #{inspection.id} cannot be marked complete:"
+            puts "  passed: #{inspection.passed.inspect}"
+            puts "  unit: #{inspection.unit.present?}"
+            puts "  location: #{inspection.inspection_location.present?}"
+            puts "  date: #{inspection.inspection_date.present?}"
+            puts "  dimensions: W:#{inspection.width} L:#{inspection.length} H:#{inspection.height}"
+            puts "  has_slide: #{inspection.has_slide.inspect}"
+            puts "  is_totally_enclosed: #{inspection.is_totally_enclosed.inspect}"
+            puts "  all_assessments_complete?: #{inspection.send(:all_assessments_complete?)}"
+          end
+
           # Check that all completed inspections can be marked as complete
           expect(inspection.can_mark_complete?).to be(true),
             "Inspection ##{inspection.id} cannot be marked complete. Errors: #{inspection.completion_errors.join(", ")}"
