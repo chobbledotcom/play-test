@@ -11,6 +11,18 @@
 
     <%= favicon_link_tag asset_path("favicon.svg") %>
     <% unless Rails.env.test? %>
+      <script>
+        window.goatcounter = {no_onload: true}
+        const trackPageView = () => {
+          if (typeof window.goatcounter.count === 'function') {
+            window.goatcounter.count({
+              path: location.pathname + location.search + location.hash,
+            });
+          }
+        };
+        document.addEventListener("DOMContentLoaded", trackPageView);
+        document.addEventListener("turbo:load", trackPageView);
+      </script>
       <script data-goatcounter="https://analytics.play-test.co.uk/count"
         async src="https://analytics.play-test.co.uk/count.js"></script>
     <% end %>
