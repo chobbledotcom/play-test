@@ -1,6 +1,5 @@
 class Assessments::SlideAssessment < ApplicationRecord
   include AssessmentLogging
-  include SafetyCheckMethods
   include AssessmentCompletion
 
   self.primary_key = "inspection_id"

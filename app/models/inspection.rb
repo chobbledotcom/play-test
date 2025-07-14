@@ -371,16 +371,6 @@ class Inspection < ApplicationRecord
     applicable_assessments.map { |assessment_key, _| send(assessment_key) }
   end
 
-  def total_pass_columns
-    all_assessments.compact.sum(&:pass_columns_count)
-  end
-
-  def passed_safety_checks
-    all_assessments.compact.sum(&:passed_checks_count)
-  end
-
-  def failed_safety_checks = total_pass_columns - passed_safety_checks
-
   private
 
   def assessment_validation_data

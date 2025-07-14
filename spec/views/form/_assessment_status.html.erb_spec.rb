@@ -37,7 +37,6 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
 
       expect_safety_header_present
       expect(rendered).to include(I18n.t("forms.slide.status.runout_requirement"))
-      expect(rendered).to include(I18n.t("forms.slide.status.checks_passed"))
       expect(rendered).not_to include("incomplete-fields")
     end
 
@@ -93,22 +92,6 @@ RSpec.describe "form/_assessment_status.html.erb", type: :view do
       render_assessment_status(assessment: user_height_assessment, i18n_base: "forms.user_height")
 
       expect_status_displayed("height_requirement", pass: false)
-    end
-  end
-
-  context "with materials assessment" do
-    let(:materials_assessment) { inspection.materials_assessment }
-
-    it "displays checks passed count" do
-      materials_assessment.update!(SeedData.materials_fields(passed: true))
-
-      render_assessment_status(assessment: materials_assessment, i18n_base: "forms.materials")
-
-      expect(rendered).to include(I18n.t("forms.materials.status.checks_passed"))
-
-      passed = materials_assessment.passed_checks_count
-      total = materials_assessment.pass_columns_count
-      expect(rendered.gsub(/\s+/, " ")).to include("#{passed} / #{total}")
     end
   end
 

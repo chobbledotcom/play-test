@@ -33,14 +33,6 @@ RSpec.shared_examples "an assessment model" do
     it "responds to #complete?" do
       expect(assessment).to respond_to(:complete?)
     end
-
-    it "has pass_columns_count method" do
-      expect(assessment).to respond_to(:pass_columns_count)
-    end
-
-    it "responds to #passed_checks_count" do
-      expect(assessment).to respond_to(:passed_checks_count)
-    end
   end
 
   describe "validation patterns" do
@@ -139,51 +131,6 @@ RSpec.shared_examples "validates comment field" do |field|
   it "allows text in #{field}" do
     assessment.send("#{field}=", "Test comment")
     expect(assessment).to be_valid
-  end
-end
-
-RSpec.shared_examples "has safety check methods" do
-  describe "#pass_columns_count" do
-    it "returns the correct number of pass/fail checks" do
-      actual_pass_columns = assessment.class.column_names.count { |col| col.end_with?("_pass") }
-      expect(assessment.pass_columns_count).to eq(actual_pass_columns)
-    end
-  end
-
-  describe "#passed_checks_count" do
-    it "counts only passed checks" do
-      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
-        assessment.send("#{check}=", true) if assessment.respond_to?("#{check}=")
-      end
-
-      actual_checks = assessment.class.column_names.count { |col|
-        col.end_with?("_pass") && assessment.respond_to?(col)
-      }
-
-      expect(assessment.passed_checks_count).to eq(actual_checks)
-    end
-
-    it "returns 0 when no checks are passed" do
-      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
-        assessment.send("#{check}=", false) if assessment.respond_to?("#{check}=")
-      end
-
-      expect(assessment.passed_checks_count).to eq(0)
-    end
-  end
-
-  describe "#failed_checks_count" do
-    it "counts only failed checks" do
-      assessment.class.column_names.select { |col| col.end_with?("_pass") }.each do |check|
-        assessment.send("#{check}=", false) if assessment.respond_to?("#{check}=")
-      end
-
-      actual_checks = assessment.class.column_names.count { |col|
-        col.end_with?("_pass") && assessment.respond_to?(col)
-      }
-
-      expect(assessment.failed_checks_count).to eq(actual_checks)
-    end
   end
 end
 
