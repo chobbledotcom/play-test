@@ -14,7 +14,6 @@ en:
         materials_assessment: "Materials Assessment"
       fields:
         ropes: "Ropes (mm)"
-        clamber_netting_pass: "Clamber netting"
         retention_netting_pass: "Retention netting"
         zips_pass: "Zips"
         windows_pass: "Windows"
@@ -26,3 +25,5 @@ en:
         checks_passed: "Fields completed"
         completion: "Assessment Completion"
       submit: "Save Assessment"
+      errors:
+        header: "Please fix the following errors:"

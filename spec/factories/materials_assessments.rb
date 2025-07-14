@@ -12,7 +12,6 @@ FactoryBot.define do
     thread_pass { nil }
 
     # Additional material checks
-    clamber_netting_pass { nil }
     retention_netting_pass { nil }
     zips_pass { nil }
     windows_pass { nil }
@@ -24,7 +23,6 @@ FactoryBot.define do
       fabric_strength_pass { true }
       fire_retardant_pass { true }
       thread_pass { true }
-      clamber_netting_pass { true }
       retention_netting_pass { true }
       zips_pass { true }
       windows_pass { true }
@@ -37,7 +35,6 @@ FactoryBot.define do
       fabric_strength_pass { true }
       fire_retardant_pass { true }
       thread_pass { true }
-      clamber_netting_pass { true }
       retention_netting_pass { true }
       zips_pass { true }
       windows_pass { true }
@@ -54,7 +51,6 @@ FactoryBot.define do
       fabric_strength_pass { false }
       fire_retardant_pass { false }
       thread_pass { false }
-      clamber_netting_pass { false }
       retention_netting_pass { false }
     end
 
