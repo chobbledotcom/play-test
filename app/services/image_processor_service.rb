@@ -44,8 +44,6 @@ class ImageProcessorService
     resize_dimensions(original_width, original_height, max_size)
   end
 
-  private
-
   def self.max_size_for(size)
     case size
     when :full then FULL_SIZE
