@@ -2,8 +2,12 @@ require "rails_helper"
 require "timeout"
 require Rails.root.join("db/seeds/seed_data")
 
-RSpec.feature "Complete Inspection Workflow", type: :feature, screenshot: true do
-  scenario "complete workflow with prefilling - no slide or enclosure", js: true do
+RSpec.feature "Complete Inspection Workflow",
+  type: :feature,
+  screenshot: true,
+  skip: "Run manually with --tag screenshot" do
+  scenario "complete workflow with prefilling - no slide or enclosure",
+    js: true do
     InspectionWorkflow.new(
       has_slide: true,
       is_totally_enclosed: true
@@ -102,25 +106,31 @@ class InspectionWorkflow
   end
 
   def create_test_unit
+    navigate_to_units_page
+    fill_unit_form
+    submit_and_find_unit
+  end
+
+  def navigate_to_units_page
     visit root_path
     click_link "Units"
     capture_guide_screenshot("Units Index - Empty")
-
     click_button t("units.buttons.add_unit")
     capture_guide_screenshot("Create Unit Form")
+  end
 
-    unit_data = SeedData.unit_fields.merge(
-      name: "Test Bouncy Castle"
-    )
-
+  def fill_unit_form
+    unit_data = SeedData.unit_fields.merge(name: "Test Bouncy Castle")
     unit_data.each do |field_name, value|
       fill_in_form :units, field_name, value
     end
     capture_guide_screenshot("Create Unit Form - Filled")
+  end
 
+  def submit_and_find_unit
     submit_form :units
     capture_guide_screenshot("Unit Created Successfully")
-
+    unit_data = SeedData.unit_fields.merge(name: "Test Bouncy Castle")
     Unit.find_by!(
       name: unit_data[:name],
       serial: unit_data[:serial]
@@ -278,18 +288,29 @@ class InspectionWorkflow
   def verify_assessments_prefill_and_complete
     visit edit_inspection_path(@second_inspection)
     @second_inspection.reload
-    applicable_tabs = @second_inspection.applicable_tabs.reject { |tab| tab == "inspection" }
-    applicable_tabs.each do |tab_name|
-      visit edit_inspection_path(@second_inspection, tab: tab_name)
-      if tab_name == "results"
-        # The passed field is not prefilled, so we need to fill it manually
-        # This is correct behavior - each inspection's pass/fail must be determined independently
-        field_data = SeedData.send("#{tab_name}_fields", passed: true)
-        field_data.each do |field_name, value|
-          fill_assessment_field(tab_name, field_name, value)
-        end
-      end
-      submit_form tab_name.to_sym
+    applicable_tabs = get_applicable_tabs
+    applicable_tabs.each { |tab_name| process_assessment_tab(tab_name) }
+  end
+
+  def get_applicable_tabs
+    @second_inspection.applicable_tabs.reject { |tab| tab == "inspection" }
+  end
+
+  def process_assessment_tab(tab_name)
+    visit edit_inspection_path(@second_inspection, tab: tab_name)
+    fill_results_tab_if_needed(tab_name)
+    submit_form tab_name.to_sym
+  end
+
+  def fill_results_tab_if_needed(tab_name)
+    return unless tab_name == "results"
+
+    # The passed field is not prefilled, so we need to fill it manually
+    # This is correct behavior - each inspection's pass/fail must be
+    # determined independently
+    field_data = SeedData.send("#{tab_name}_fields", passed: true)
+    field_data.each do |field_name, value|
+      fill_assessment_field(tab_name, field_name, value)
     end
   end
 

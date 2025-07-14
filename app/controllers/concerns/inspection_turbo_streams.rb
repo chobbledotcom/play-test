@@ -31,7 +31,10 @@ module InspectionTurboStreams
     turbo_stream.replace(
       "inspection_save_message",
       partial: "shared/save_message",
-      locals: save_message_locals(success: success, dom_id: "inspection_save_message")
+      locals: save_message_locals(
+        success: success,
+        dom_id: "inspection_save_message"
+      )
     )
   end
 

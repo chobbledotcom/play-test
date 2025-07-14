@@ -4,7 +4,8 @@ class Event < ApplicationRecord
 
   validates :action, presence: true
   validates :resource_type, presence: true
-  validates :resource_id, presence: true, unless: -> { resource_type == "System" }
+  validates :resource_id, presence: true,
+    unless: -> { resource_type == "System" }
 
   # Scopes for common queries
   scope :recent, -> { order(created_at: :desc) }
@@ -15,7 +16,8 @@ class Event < ApplicationRecord
   scope :this_week, -> { where(created_at: Date.current.all_week) }
 
   # Helper to create events easily
-  def self.log(user:, action:, resource:, details: nil, changed_data: nil, metadata: nil)
+  def self.log(user:, action:, resource:, details: nil,
+    changed_data: nil, metadata: nil)
     create!(
       user: user,
       action: action,

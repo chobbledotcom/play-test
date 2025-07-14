@@ -20,7 +20,11 @@ module UserTurboStreams
 
   def build_user_turbo_streams(success:, message:, errors: nil)
     [
-      build_save_message_stream(success: success, message: message, errors: errors)
+      build_save_message_stream(
+        success: success,
+        message: message,
+        errors: errors
+      )
       # Don't replace the file field - it stays as is after save
     ]
   end

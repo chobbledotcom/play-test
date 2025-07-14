@@ -6,7 +6,8 @@ module PublicViewable
   end
 
   def show
-    # Implemented by including controllers, but we call render_show_html for HTML format
+    # Implemented by including controllers, but we call render_show_html
+    # for HTML format
     if request.format.html?
       render_show_html
     end
@@ -34,12 +35,14 @@ module PublicViewable
 
   # To be implemented by including controllers
   def check_resource_owner
-    raise NotImplementedError, I18n.t("concerns.public_viewable.check_resource_owner_missing")
+    key = "concerns.public_viewable.check_resource_owner_missing"
+    raise NotImplementedError, I18n.t(key)
   end
 
   # Determine if current user owns the resource
   def owns_resource?
-    raise NotImplementedError, I18n.t("concerns.public_viewable.owns_resource_missing")
+    key = "concerns.public_viewable.owns_resource_missing"
+    raise NotImplementedError, I18n.t(key)
   end
 
   # Render appropriate view for show action
@@ -55,10 +58,12 @@ module PublicViewable
 
   # To be implemented by including controllers
   def pdf_filename
-    raise NotImplementedError, I18n.t("concerns.public_viewable.pdf_filename_missing")
+    key = "concerns.public_viewable.pdf_filename_missing"
+    raise NotImplementedError, I18n.t(key)
   end
 
   def resource_pdf_url
-    raise NotImplementedError, I18n.t("concerns.public_viewable.resource_pdf_url_missing")
+    key = "concerns.public_viewable.resource_pdf_url_missing"
+    raise NotImplementedError, I18n.t(key)
   end
 end

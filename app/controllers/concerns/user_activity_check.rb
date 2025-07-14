@@ -12,6 +12,8 @@ module UserActivityCheck
 
   # Override this method in controllers to provide custom redirect logic
   def handle_inactive_user_redirect
-    raise NotImplementedError, I18n.t("concerns.user_activity_check.handle_inactive_redirect_missing")
+    key = "concerns.user_activity_check.handle_inactive_redirect_missing"
+    error_message = I18n.t(key)
+    raise NotImplementedError, error_message
   end
 end
