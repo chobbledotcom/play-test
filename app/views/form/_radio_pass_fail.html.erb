@@ -1,21 +1,43 @@
 <%
   form = @_current_form
   yes_no ||= false
+  
+  # Check if this field is an enum by looking at the model
+  model = form.object
+  is_enum = model.class.respond_to?(:defined_enums) && model.class.defined_enums.key?(field.to_s)
+  
+  if is_enum
+    pass_value = "pass"
+    fail_value = "fail"
+    na_value = "na"
+  else
+    pass_value = true
+    fail_value = false
+  end
 %>
 
 <div class="pass-fail" id="<%= field %>">
   <label>
     <%= t("shared.#{yes_no ? "yes" : "pass"}") %>
     <%= form.radio_button field,
-      true,
-      radio_button_options(prefilled, checked_value, true)
+      pass_value,
+      radio_button_options(prefilled, checked_value, pass_value)
     %>
   </label>
   <label>
     <%= form.radio_button field,
-      false,
-      radio_button_options(prefilled, checked_value, false)
+      fail_value,
+      radio_button_options(prefilled, checked_value, fail_value)
     %>
     <%= t("shared.#{yes_no ? "no" : "fail"}") %>
   </label>
+  <% if is_enum %>
+    <label>
+      <%= form.radio_button field,
+        na_value,
+        radio_button_options(prefilled, checked_value, na_value)
+      %>
+      <%= t("shared.not_applicable") %>
+    </label>
+  <% end %>
 </div>

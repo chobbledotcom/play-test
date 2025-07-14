@@ -1,3 +1,8 @@
+/* N/A toggle styling */
+.muted {
+	opacity: 0.4;
+}
+
 .success,
 .error,
 .notice,

@@ -74,14 +74,14 @@ RSpec.describe "Assessment Controllers", type: :request do
       patch inspection_slide_assessment_path(inspection), params: {
         assessments_slide_assessment: {
           slide_platform_height: 2.5,
-          clamber_netting_pass: true
+          clamber_netting_pass: :pass
         }
       }
 
       expect(response).to redirect_to(inspection_path(inspection))
       inspection.reload
       expect(inspection.slide_assessment.slide_platform_height).to eq(2.5)
-      expect(inspection.slide_assessment.clamber_netting_pass).to be true
+      expect(inspection.slide_assessment.clamber_netting_pass).to eq "pass"
     end
   end
 end

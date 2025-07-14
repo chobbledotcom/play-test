@@ -6,6 +6,8 @@ class Assessments::MaterialsAssessment < ApplicationRecord
 
   belongs_to :inspection
 
+  enum :ropes_pass, Inspection::PASS_FAIL_NA
+
   validates :ropes,
     numericality: {greater_than_or_equal_to: 0}, allow_blank: true
 

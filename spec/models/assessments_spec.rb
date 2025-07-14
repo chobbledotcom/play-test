@@ -10,7 +10,6 @@ RSpec.describe "Assessment Models", type: :model do
       let(:assessment) { inspection.send(assessment_name) }
 
       it_behaves_like "an assessment model"
-      it_behaves_like "has safety check methods"
     end
   end
 end

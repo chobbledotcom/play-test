@@ -41,6 +41,7 @@ en:
     comments: "Comments"
     pass: "Pass"
     fail: "Fail"
+    not_applicable: "Not Applicable"
     pass_pdf: "[PASS]"
     fail_pdf: "[FAIL]"
     assessment_completion: "Assessment Completion"

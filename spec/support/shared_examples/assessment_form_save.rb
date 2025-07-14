@@ -68,7 +68,11 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
       when Numeric
         fill_numeric_field(field_key, value, field_label, data)
       when String
-        fill_string_field(field_key, value, fields)
+        if enum_pass_field?(field_key, value)
+          find_and_click_radio(field_label, value)
+        else
+          fill_string_field(field_key, value, fields)
+        end
       end
     end
 
@@ -107,6 +111,10 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
       else
         fill_comment_directly(base_key, value)
       end
+    end
+
+    def enum_pass_field?(field_key, value)
+      field_key.to_s.end_with?("_pass") && %w[pass fail na].include?(value)
     end
 
     def fill_comment_directly(base_key, value)

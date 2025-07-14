@@ -1,5 +1,9 @@
 # Shared examples for common assessment model behaviors
 
+def enum_field?(assessment_class, field)
+  assessment_class.respond_to?(:defined_enums) && assessment_class.defined_enums.key?(field.to_s)
+end
+
 RSpec.shared_examples "an assessment model" do
   describe "associations" do
     it "belongs to inspection" do
@@ -15,7 +19,15 @@ RSpec.shared_examples "an assessment model" do
 
       if changeable_field
         expect(assessment).to receive(:log_assessment_update)
-        test_value = changeable_field.end_with?("_pass") || "new value"
+        test_value = if changeable_field.end_with?("_pass")
+          if enum_field?(assessment.class, changeable_field)
+            "pass"
+          else
+            true
+          end
+        else
+          "new value"
+        end
         assessment.update!(changeable_field => test_value)
       else
         pending "No changeable field found for audit logging test"
@@ -109,12 +121,20 @@ RSpec.shared_examples "validates boolean field" do |field|
   end
 
   it "allows true for #{field}" do
-    assessment.send("#{field}=", true)
+    if enum_field?(assessment.class, field)
+      assessment.send("#{field}=", "pass")
+    else
+      assessment.send("#{field}=", true)
+    end
     expect(assessment).to be_valid
   end
 
   it "allows false for #{field}" do
-    assessment.send("#{field}=", false)
+    if enum_field?(assessment.class, field)
+      assessment.send("#{field}=", "fail")
+    else
+      assessment.send("#{field}=", false)
+    end
     expect(assessment).to be_valid
   end
 end

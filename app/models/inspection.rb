@@ -1,6 +1,8 @@
 class Inspection < ApplicationRecord
   include CustomIdGenerator
 
+  PASS_FAIL_NA = {fail: 0, pass: 1, na: 2}.freeze
+
   ASSESSMENT_TYPES = {
     user_height_assessment: Assessments::UserHeightAssessment,
     slide_assessment: Assessments::SlideAssessment,

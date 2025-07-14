@@ -1,0 +1,83 @@
+<%
+  # Composite partial for number + pass/fail + N/A + comment fields
+  # Required parameters:
+  #   field: Base field name (e.g., 'slide_platform_height')
+  # Optional parameters (passed through to number field):
+  #   step: Step value for number input (default: 0.01)
+  #   min: Minimum value
+  #   max: Maximum value
+  #   required: Whether the number field is required
+  #
+  # This will render:
+  #   - Number field: field (e.g., 'slide_platform_height')
+  #   - Pass/fail field: field + '_pass' (e.g., 'slide_platform_height_pass')
+  #     - Pass = true, Fail = false, N/A = 2 (but rendered as checkbox)
+  #   - Comment field: field + '_comment' (e.g., 'slide_platform_height_comment')
+
+  number_field = field
+  pass_fail_field = "#{field}_pass".to_sym
+  comment_field = "#{field}_comment".to_sym
+
+  number_options = local_assigns.slice(:step, :min, :max, :required)
+
+  form = @_current_form
+  model = form.object
+
+  field_data = form_field_setup(field, local_assigns)
+  number_options[:value] = field_data[:value]
+
+  pass_fail_value, pass_fail_prefilled = get_field_value_and_prefilled_status(
+    form,
+    pass_fail_field
+  )
+  
+  # Debug: Check if the model value is being read correctly
+  model_value = model.send(pass_fail_field) if model.respond_to?(pass_fail_field)
+  actual_value = pass_fail_prefilled ? pass_fail_value : model_value
+  na_checked = actual_value == 2
+  pass_fail_checked = na_checked ? nil : actual_value
+
+  comment_info = comment_field_options(
+    form,
+    comment_field,
+    field_data[:field_label]
+  )
+
+  pass_fail_id = form.field_id(pass_fail_field)
+  na_checkbox_id = "#{field}_pass_na_checkbox"
+%>
+
+<div class="form-grid number-radio-comment" id="<%= number_field %>">
+  <label for="<%= form.field_id(number_field) %>" class="label">
+    <%= field_data[:field_label] %>
+  </label>
+
+  <%= form.number_field number_field,
+    id: form.field_id(number_field),
+    step: number_options[:step] || 0.1,
+    min: number_options[:min],
+    max: number_options[:max],
+    required: number_options[:required],
+    placeholder: field_data[:field_placeholder],
+    value: number_options[:value],
+    class: "number"
+  %>
+
+  <%= render 'form/radio_pass_fail',
+    field: pass_fail_field,
+    prefilled: pass_fail_prefilled && !na_checked,
+    checked_value: pass_fail_checked
+  %>
+
+
+  <%= render 'form/comment_checkbox',
+      comment_field: comment_field,
+      checkbox_id: comment_info[:checkbox_id],
+      textarea_id: comment_info[:options][:id],
+      has_comment: comment_info[:has_comment],
+      prefilled: comment_info[:prefilled] %>
+
+  <%= form.text_area comment_field,
+    comment_info[:options]
+  %>
+</div>

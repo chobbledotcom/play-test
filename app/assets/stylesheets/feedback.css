@@ -9,6 +9,7 @@ a[role="button"].feedback-button {
   align-items: center;
   gap: 4px;
   z-index: 100;
+  border: 2px solid var(--color-bg);
 }
 
 .feedback-button .heart {

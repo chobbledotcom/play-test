@@ -7,6 +7,12 @@ module SeedData
     rand < 0.9
   end
 
+  def self.check_passed_integer?(inspection_passed)
+    return :pass if inspection_passed
+
+    (rand < 0.9) ? :pass : :fail
+  end
+
   def self.user_fields
     {
       email: "test#{rand(1000..9999)}@example.com",
@@ -99,8 +105,7 @@ module SeedData
   def self.materials_fields(passed: true)
     {
       ropes: rand(18..45),
-      ropes_pass: check_passed?(passed),
-      clamber_netting_pass: check_passed?(passed),
+      ropes_pass: check_passed_integer?(passed),
       retention_netting_pass: check_passed?(passed),
       zips_pass: check_passed?(passed),
       windows_pass: check_passed?(passed),
@@ -169,7 +174,7 @@ module SeedData
       runout: runout,
       slide_first_metre_height: rand(0.3..0.8).round(1),
       slide_beyond_first_metre_height: rand(0.8..1.5).round(1),
-      clamber_netting_pass: check_passed?(passed),
+      clamber_netting_pass: check_passed_integer?(passed),
       runout_pass: check_passed?(passed),
       slip_sheet_pass: check_passed?(passed),
       slide_permanent_roof: false,

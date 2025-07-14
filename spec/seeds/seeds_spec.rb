@@ -335,7 +335,7 @@ RSpec.describe "Seed Data", type: :model do
           Assessments::MaterialsAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
             expect(assessment.ropes).to be_present
-            expect([true, false]).to include(assessment.ropes_pass)
+            expect(["pass", "fail", "na"]).to include(assessment.ropes_pass)
             expect([true, false]).to include(assessment.fabric_strength_pass)
             expect([true, false]).to include(assessment.fire_retardant_pass)
             expect([true, false]).to include(assessment.thread_pass)
@@ -452,7 +452,7 @@ RSpec.describe "Seed Data", type: :model do
 
         it "creates assessments with required safety checks" do
           slide_assessments.each do |assessment|
-            expect([true, false]).to include(assessment.clamber_netting_pass)
+            expect(["pass", "fail", "na"]).to include(assessment.clamber_netting_pass)
             expect([true, false]).to include(assessment.runout_pass)
             expect([true, false]).to include(assessment.slip_sheet_pass)
           end

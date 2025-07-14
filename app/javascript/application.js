@@ -1,6 +1,7 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails";
 import "comment_toggles";
+import "na_toggles";
 import "details_links";
 import "dirty_forms";
 import "share_buttons";

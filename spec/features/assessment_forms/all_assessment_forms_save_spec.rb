@@ -46,8 +46,7 @@ MATERIALS_SAMPLE_DATA = {
   fabric_strength_pass: true,
   fire_retardant_pass: false,
   thread_pass: true,
-  ropes_pass: true,
-  clamber_netting_pass: true,
+  ropes_pass: "pass",
   retention_netting_pass: false,
   zips_pass: true,
   windows_pass: true,
@@ -122,7 +121,7 @@ SLIDE_SAMPLE_DATA = {
   slide_first_metre_height: 0.45,
   slide_beyond_first_metre_height: 0.35,
 
-  clamber_netting_pass: true,
+  clamber_netting_pass: "pass",
   runout_pass: false,
   slip_sheet_pass: true,
   slide_permanent_roof: true,

@@ -74,8 +74,22 @@ module RadioButtonHelpers
   end
 
   def find_and_click_radio(label, value)
+    # Convert boolean values to enum strings if needed
+    radio_value = case value
+    when true then "pass"
+    when false then "fail"
+    else value.to_s
+    end
+
     selectors = [
+      # Original selector for simple radio button structures
       "//label[normalize-space(.)='#{label}']/following::label[contains(.,'#{value ? "Pass" : "Fail"}')][1]/input[@type='radio']",
+      # For complex forms: find div containing the label, then look for pass-fail div with radio buttons
+      "//div[.//label[normalize-space(.)='#{label}']]//div[@class='pass-fail']//input[@type='radio'][@value='#{radio_value}']",
+      # For number-pass-fail-na forms: find by base field label (e.g., "Ropes (mm)"), then find pass-fail div
+      "//div[.//label[contains(.,'#{label.split.first}')]]//div[@class='pass-fail']//input[@type='radio'][@value='#{radio_value}']",
+      # Fallback selectors
+      "//div[.//label[normalize-space(.)='#{label}']]//input[@type='radio'][@value='#{radio_value}']",
       "//div[.//label[normalize-space(.)='#{label}']]//input[@type='radio'][@value='#{value}']"
     ]
 

@@ -19,7 +19,7 @@ FactoryBot.define do
       slide_first_metre_height { 0.5 }
       slide_beyond_first_metre_height { 0.3 }
       slide_permanent_roof { false }
-      clamber_netting_pass { true }
+      clamber_netting_pass { :pass }
       runout_pass { true }
       slip_sheet_pass { true }
       slide_platform_height_comment { "Platform height appropriate for age group" }
@@ -33,7 +33,7 @@ FactoryBot.define do
     end
 
     trait :failed do
-      clamber_netting_pass { false }
+      clamber_netting_pass { :fail }
       runout_pass { false }
     end
 

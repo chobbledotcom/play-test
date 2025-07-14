@@ -210,6 +210,13 @@ class InspectionWorkflow
       else
         choose_yes_no(field_label, value)
       end
+    when :pass, "pass"
+      choose_pass_fail(field_label, true)
+    when :fail, "fail"
+      choose_pass_fail(field_label, false)
+    when :na, "na"
+      # For now, skip N/A values as the test uses passing values
+      # The form should support N/A but we don't need to test it here
     else
       fill_in_form(tab_name.to_sym, field_name, value) if value.present?
     end

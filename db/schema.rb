@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_11_190008) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_14_175506) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -187,7 +187,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_11_190008) do
     t.decimal "runout", precision: 8, scale: 2
     t.decimal "slide_first_metre_height", precision: 8, scale: 2
     t.decimal "slide_beyond_first_metre_height", precision: 8, scale: 2
-    t.boolean "clamber_netting_pass"
+    t.integer "clamber_netting_pass", limit: 1
     t.boolean "runout_pass"
     t.boolean "slip_sheet_pass"
     t.boolean "slide_permanent_roof"

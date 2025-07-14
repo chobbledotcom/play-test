@@ -6,6 +6,8 @@ class Assessments::SlideAssessment < ApplicationRecord
 
   belongs_to :inspection
 
+  enum :clamber_netting_pass, Inspection::PASS_FAIL_NA
+
   validates :slide_platform_height,
     :slide_wall_height,
     :runout,
