@@ -6,15 +6,9 @@ RSpec.feature "Turbo incomplete fields update", js: true do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user:) }
   let(:inspection) {
-    # Create a completed inspection first
-    completed = create(:inspection, :completed, user:, unit:)
-
-    # Un-complete it so we can edit it
-    completed.update!(complete_date: nil)
-
-    # Then remove just the inspection_location to have exactly 1 incomplete field
-    completed.update_column(:inspection_location, nil)
-    completed
+    create(:inspection, :completed, user:, unit:).tap do |insp|
+      insp.update_columns(complete_date: nil, inspection_location: nil)
+    end
   }
 
   before do
@@ -30,7 +24,8 @@ RSpec.feature "Turbo incomplete fields update", js: true do
     expect(summary.text).to match(/Show 1 incomplete field/)
 
     # Fill in the missing field
-    fill_in I18n.t("forms.inspection.fields.inspection_location"), with: "Test Location"
+    location_label = I18n.t("forms.inspection.fields.inspection_location")
+    fill_in location_label, with: "Test Location"
 
     # Submit the form
     click_button I18n.t("forms.inspection.submit")

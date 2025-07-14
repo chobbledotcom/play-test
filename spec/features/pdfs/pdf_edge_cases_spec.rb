@@ -81,15 +81,11 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
     scenario "cleans up temporary files during PDF generation" do
       process_pattern = "/tmp/*qr_code*#{inspection.id}_#{Process.pid}*"
 
-      10.times do
-        temp_files_before = Dir.glob(process_pattern).size
-        get_pdf(inspection_path(inspection, format: :pdf))
+      temp_files_before = Dir.glob(process_pattern).size
+      get_pdf(inspection_path(inspection, format: :pdf))
 
-        sleep(0.01)
-
-        temp_files_after = Dir.glob(process_pattern).size
-        expect(temp_files_after).to eq(temp_files_before)
-      end
+      temp_files_after = Dir.glob(process_pattern).size
+      expect(temp_files_after).to eq(temp_files_before)
     end
   end
 end

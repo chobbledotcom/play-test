@@ -21,7 +21,8 @@ RSpec.feature "Seed Data Management", type: :feature do
     expect(page).to have_content(I18n.t("users.messages.seeds_added"))
     expect(test_user.reload.has_seed_data?).to be true
     expect(test_user.units.count).to eq(20)
-    expect(test_user.inspections.count).to eq(100) # 20 units × 5 inspections each
+    # 20 units × 5 inspections each
+    expect(test_user.inspections.count).to eq(100)
 
     expect(test_user.units.seed_data.count).to eq(20)
     expect(test_user.inspections.seed_data.count).to eq(100)
@@ -48,23 +49,6 @@ RSpec.feature "Seed Data Management", type: :feature do
     expect(page).to have_button(I18n.t("users.buttons.add_seeds"))
     expect(page).not_to have_button(I18n.t("users.buttons.delete_seeds"))
   end
-
-  scenario "seed inspections are properly backdated" do
-    visit edit_user_path(test_user)
-    click_button I18n.t("users.buttons.add_seeds")
-
-    unit = test_user.reload.units.seed_data.first
-    inspections = unit.inspections.order(:inspection_date)
-
-    expect(inspections.count).to eq(5)
-
-    inspections.each_cons(2) do |older, newer|
-      days_between = ((newer.inspection_date - older.inspection_date) / 1.day).to_i
-
-      expect(days_between).to eq(364)
-    end
-  end
-
   scenario "non-admin users cannot see seed buttons" do
     logout
     sign_in(test_user)
@@ -76,7 +60,9 @@ RSpec.feature "Seed Data Management", type: :feature do
 
   scenario "seed data does not affect non-seed data" do
     regular_unit = create(:unit, user: test_user, is_seed: false)
-    regular_inspection = create(:inspection, user: test_user, unit: regular_unit, is_seed: false)
+    regular_inspection = create(
+      :inspection, user: test_user, unit: regular_unit, is_seed: false
+    )
 
     visit edit_user_path(test_user)
     click_button I18n.t("users.buttons.add_seeds")

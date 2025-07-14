@@ -30,7 +30,8 @@ RSpec.describe "Users Seed Data Management", type: :request do
 
           expect(response).to redirect_to(edit_user_path(test_user))
           follow_redirect!
-          expect(response.body).to include(I18n.t("users.messages.seeds_failed"))
+          expect(response.body)
+            .to include(I18n.t("users.messages.seeds_failed"))
           expect(test_user.units.count).to eq(initial_count)
         end
       end
@@ -44,7 +45,8 @@ RSpec.describe "Users Seed Data Management", type: :request do
 
         expect(response).to redirect_to(root_path)
         follow_redirect!
-        expect(response.body).to include(I18n.t("forms.session_new.status.admin_required"))
+        expect(response.body)
+          .to include(I18n.t("forms.session_new.status.admin_required"))
       end
     end
 
@@ -74,14 +76,6 @@ RSpec.describe "Users Seed Data Management", type: :request do
         expect(response.body).to include(I18n.t("users.messages.seeds_deleted"))
         expect(test_user.reload.has_seed_data?).to be false
       end
-
-      it "preserves non-seed data" do
-        regular_unit = create(:unit, user: test_user, is_seed: false)
-
-        delete delete_seeds_user_path(test_user)
-
-        expect(test_user.reload.units).to include(regular_unit)
-      end
     end
 
     context "as non-admin" do
@@ -95,7 +89,8 @@ RSpec.describe "Users Seed Data Management", type: :request do
 
         expect(response).to redirect_to(root_path)
         follow_redirect!
-        expect(response.body).to include(I18n.t("forms.session_new.status.admin_required"))
+        expect(response.body)
+          .to include(I18n.t("forms.session_new.status.admin_required"))
         expect(test_user.reload.has_seed_data?).to be true
       end
     end

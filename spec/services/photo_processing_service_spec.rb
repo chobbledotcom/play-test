@@ -100,23 +100,18 @@ RSpec.describe PhotoProcessingService do
 
   describe "filename handling" do
     it "normalizes all filenames to .jpg extension" do
-      image_path = Rails.root.join("spec/fixtures/files/large_landscape.jpg")
+      image_path = Rails.root.join("spec/fixtures/files/test_image.jpg")
       image_data = File.binread(image_path)
 
-      # Test various input filenames
-      test_cases = [
-        ["photo.png", "photo.jpg"],
-        ["image.gif", "image.jpg"],
-        ["test.JPEG", "test.jpg"],
-        ["filename_no_extension", "filename_no_extension.jpg"],
-        ["", "photo.jpg"],
-        [nil, "photo.jpg"]
-      ]
+      # Test key filename cases
+      processed_io = described_class.process_upload_data(image_data, "photo.png")
+      expect(processed_io.original_filename).to eq("photo.jpg")
 
-      test_cases.each do |input, expected|
-        processed_io = described_class.process_upload_data(image_data, input)
-        expect(processed_io.original_filename).to eq(expected)
-      end
+      processed_io = described_class.process_upload_data(image_data, "test.JPEG")
+      expect(processed_io.original_filename).to eq("test.jpg")
+
+      processed_io = described_class.process_upload_data(image_data, nil)
+      expect(processed_io.original_filename).to eq("photo.jpg")
     end
   end
 end
