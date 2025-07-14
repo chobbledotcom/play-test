@@ -1,6 +1,6 @@
 require "rails_helper"
-require_relative "../../../db/seeds/seed_data"
 require "timeout"
+require Rails.root.join("db/seeds/seed_data")
 
 RSpec.feature "Complete Inspection Workflow", type: :feature, screenshot: true do
   scenario "complete workflow with prefilling - no slide or enclosure", js: true do

@@ -1,5 +1,5 @@
 require "rails_helper"
-require_relative "../../db/seeds/seed_data"
+require Rails.root.join("db/seeds/seed_data")
 
 RSpec.describe "SeedData slide_fields" do
   describe ".slide_fields" do

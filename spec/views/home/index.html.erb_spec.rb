@@ -1,5 +1,5 @@
 require "rails_helper"
-require_relative "../../../db/seeds/seed_data"
+require Rails.root.join("db/seeds/seed_data")
 
 RSpec.describe "home/index.html.erb", type: :view do
   context "when user is not logged in" do

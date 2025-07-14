@@ -1,6 +1,6 @@
 require "rails_helper"
 require "pdf/inspector"
-require_relative "../../../db/seeds/seed_data"
+require Rails.root.join("db/seeds/seed_data")
 
 ASSESSMENT_FORMS = %w[user_height structure anchorage materials fan slide enclosed].freeze
 

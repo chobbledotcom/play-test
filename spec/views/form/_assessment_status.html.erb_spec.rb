@@ -1,5 +1,5 @@
 require "rails_helper"
-require_relative "../../../db/seeds/seed_data"
+require Rails.root.join("db/seeds/seed_data")
 
 RSpec.describe "form/_assessment_status.html.erb", type: :view do
   let(:user) { create(:user) }
