@@ -9,20 +9,20 @@ RSpec.feature "Invalid inspection completion validation", type: :feature do
     sign_in(user)
   end
 
-  scenario "prevents viewing an inspection marked complete with validation errors" do
+  scenario "prevents viewing inspection marked complete with errors" do
     inspection.update_column(:complete_date, Time.current)
 
     expect {
       visit inspection_path(inspection)
-    }.to raise_error(RuntimeError, /DATA INTEGRITY ERROR/)
+    }.to raise_error(StandardError, /DATA INTEGRITY ERROR/)
   end
 
-  scenario "prevents editing an inspection marked complete with validation errors" do
+  scenario "prevents editing inspection marked complete with errors" do
     inspection.update_column(:complete_date, Time.current)
 
     expect {
       visit edit_inspection_path(inspection)
-    }.to raise_error(RuntimeError, /DATA INTEGRITY ERROR/)
+    }.to raise_error(StandardError, /DATA INTEGRITY ERROR/)
   end
 
   scenario "allows viewing properly completed inspections" do

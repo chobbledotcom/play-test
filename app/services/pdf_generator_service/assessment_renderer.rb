@@ -158,7 +158,7 @@ class PdfGeneratorService
     end
 
     def generate_assessment_section(pdf, assessment_type, assessment)
-      raise "Assessment missing: #{assessment_type}" unless assessment
+      raise ArgumentError, "Assessment missing: #{assessment_type}" unless assessment
 
       @current_assessment_type = assessment_type
       @current_assessment = assessment

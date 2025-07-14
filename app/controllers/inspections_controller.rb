@@ -231,7 +231,7 @@ class InspectionsController < ApplicationController
     # Only raise error in development/test environments
     if Rails.env.local?
       test_message = "In tests, use create(:inspection, :completed) to avoid this."
-      raise "DATA INTEGRITY ERROR: #{error_message}. #{test_message}"
+      raise StandardError, "DATA INTEGRITY ERROR: #{error_message}. #{test_message}"
     else
       # In production, log the error but continue
       Rails.logger.error "DATA INTEGRITY ERROR: #{error_message}"

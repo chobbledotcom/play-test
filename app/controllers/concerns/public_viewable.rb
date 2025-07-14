@@ -35,14 +35,12 @@ module PublicViewable
 
   # To be implemented by including controllers
   def check_resource_owner
-    key = "concerns.public_viewable.check_resource_owner_missing"
-    raise NotImplementedError, I18n.t(key)
+    raise NotImplementedError
   end
 
   # Determine if current user owns the resource
   def owns_resource?
-    key = "concerns.public_viewable.owns_resource_missing"
-    raise NotImplementedError, I18n.t(key)
+    raise NotImplementedError
   end
 
   # Render appropriate view for show action
@@ -58,12 +56,10 @@ module PublicViewable
 
   # To be implemented by including controllers
   def pdf_filename
-    key = "concerns.public_viewable.pdf_filename_missing"
-    raise NotImplementedError, I18n.t(key)
+    raise NotImplementedError
   end
 
   def resource_pdf_url
-    key = "concerns.public_viewable.resource_pdf_url_missing"
-    raise NotImplementedError, I18n.t(key)
+    raise NotImplementedError
   end
 end
