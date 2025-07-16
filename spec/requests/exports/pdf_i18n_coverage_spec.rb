@@ -23,7 +23,18 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
       incomplete_pdf = PdfGeneratorService.generate_inspection_report(incomplete_inspection)
       incomplete_pdf_text = pdf_text_content(incomplete_pdf.render)
 
-      all_pdf_text = [inspection_pdf_text, unit_pdf_text, failed_pdf_text, incomplete_pdf_text].join(" ")
+      # Create an inspection with passed: nil to test IN_PROGRESS status
+      in_progress_inspection = create(:inspection, user:, unit:, passed: nil, complete_date: nil)
+      in_progress_pdf = PdfGeneratorService.generate_inspection_report(in_progress_inspection)
+      in_progress_pdf_text = pdf_text_content(in_progress_pdf.render)
+
+      all_pdf_text = [
+        inspection_pdf_text,
+        unit_pdf_text,
+        failed_pdf_text,
+        incomplete_pdf_text,
+        in_progress_pdf_text
+      ].join(" ")
 
       used_keys = []
       unused_keys = []

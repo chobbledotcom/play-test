@@ -16,11 +16,13 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
   end
 
   def pass_indicator
-    "<font name='Courier'><b><color rgb='00AA00'>[PASS]</color></b></font>"
+    pass_color = PdfGeneratorService::Configuration::PASS_COLOR
+    "<font name='Courier'><b><color rgb='#{pass_color}'>[PASS]</color></b></font>"
   end
 
   def fail_indicator
-    "<font name='Courier'><b><color rgb='CC0000'>[FAIL]</color></b></font>"
+    fail_color = PdfGeneratorService::Configuration::FAIL_COLOR
+    "<font name='Courier'><b><color rgb='#{fail_color}'>[FAIL]</color></b></font>"
   end
 
   def bold(text)
