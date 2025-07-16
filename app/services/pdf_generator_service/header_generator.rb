@@ -46,9 +46,12 @@ class PdfGeneratorService
 
       def build_status_text_and_color(inspection)
         case inspection.passed
-        when true then [I18n.t("pdf.inspection.passed"), Configuration::PASS_COLOR]
-        when false then [I18n.t("pdf.inspection.failed"), Configuration::FAIL_COLOR]
-        when nil then [I18n.t("pdf.inspection.in_progress"), Configuration::NA_COLOR]
+        when true
+          [I18n.t("pdf.inspection.passed"), Configuration::PASS_COLOR]
+        when false
+          [I18n.t("pdf.inspection.failed"), Configuration::FAIL_COLOR]
+        when nil
+          [I18n.t("pdf.inspection.in_progress"), Configuration::NA_COLOR]
         end
       end
 
@@ -109,7 +112,8 @@ class PdfGeneratorService
       def render_unit_text_section(pdf, unit, unit_id_text, logo_width)
         width = pdf.bounds.width - logo_width
         pdf.bounding_box([0, pdf.bounds.top], width: width) do
-          pdf.text unit_id_text, size: Configuration::HEADER_TEXT_SIZE, style: :bold
+          pdf.text unit_id_text, size: Configuration::HEADER_TEXT_SIZE,
+            style: :bold
 
           expiry_label = I18n.t("pdf.unit.fields.expiry_date")
           expiry_value = if unit.last_inspection&.reinspection_date
@@ -126,7 +130,8 @@ class PdfGeneratorService
         x_position = pdf.bounds.width - logo_width + 10
         pdf.bounding_box([x_position, pdf.bounds.top],
           width: logo_width - 10) do
-          pdf.image logo_temp.path, height: Configuration::LOGO_HEIGHT, position: :right
+          pdf.image logo_temp.path, height: Configuration::LOGO_HEIGHT,
+            position: :right
         end
       end
     end
