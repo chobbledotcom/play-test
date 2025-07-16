@@ -47,7 +47,9 @@
           <% end %>
           <li><%= nav_link_to t('navigation.settings'), change_settings_user_path(current_user) %></li>
           <li><%= nav_link_to t('navigation.safety_standards'), safety_standards_path %></li>
-          <li><%= nav_link_to t('navigation.guides'), guides_path %></li>
+          <% if Rails.env.development? %>
+            <li><%= nav_link_to t('navigation.guides'), guides_path %></li>
+          <% end %>
           <li><%= nav_link_to t('navigation.about'), about_path %></li>
           <li>
             <%= button_to t("sessions.buttons.log_out"), logout_path, method: :delete %>
