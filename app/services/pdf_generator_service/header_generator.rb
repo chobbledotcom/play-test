@@ -45,10 +45,10 @@ class PdfGeneratorService
       end
 
       def build_status_text_and_color(inspection)
-        if inspection.passed?
-          [I18n.t("pdf.inspection.passed"), "008000"]
-        else
-          [I18n.t("pdf.inspection.failed"), "CC0000"]
+        case inspection.passed
+        when true then [I18n.t("pdf.inspection.passed"), Configuration::PASS_COLOR]
+        when false then [I18n.t("pdf.inspection.failed"), Configuration::FAIL_COLOR]
+        when nil then [I18n.t("pdf.inspection.in_progress"), Configuration::NA_COLOR]
         end
       end
 

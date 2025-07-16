@@ -81,10 +81,9 @@ class PdfGeneratorService
 
     def pass_fail_indicator(pass_value)
       indicator, color = case pass_value
-      when true, "pass" then [I18n.t("shared.pass_pdf"), PASS_COLOR]
-      when false, "fail" then [I18n.t("shared.fail_pdf"), FAIL_COLOR]
-      when "na" then [I18n.t("shared.na_pdf"), NA_COLOR]
-      else [I18n.t("shared.na_pdf"), NA_COLOR]
+      when true, "pass" then [I18n.t("shared.pass_pdf"), Configuration::PASS_COLOR]
+      when false, "fail" then [I18n.t("shared.fail_pdf"), Configuration::FAIL_COLOR]
+      else [I18n.t("shared.na_pdf"), Configuration::NA_COLOR]
       end
       "<font name='Courier'>#{bold(colored(indicator, color))}</font> "
     end

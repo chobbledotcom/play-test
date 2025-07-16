@@ -151,6 +151,20 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect(pdf_text).to include("[PASS]")
       expect(pdf_text).to include("[FAIL]")
     end
+
+    scenario "shows IN PROGRESS for inspections without passed value" do
+      in_progress_inspection = create(:inspection,
+        user: user,
+        unit: unit,
+        passed: nil,
+        complete_date: nil)
+
+      pdf_text = get_pdf_text(inspection_path(in_progress_inspection, format: :pdf))
+
+      expect(pdf_text).to include("IN PROGRESS")
+      expect(pdf_text).not_to include(I18n.t("pdf.inspection.passed"))
+      expect(pdf_text).not_to include(I18n.t("pdf.inspection.failed"))
+    end
   end
 
   feature "Unit History PDF Content" do

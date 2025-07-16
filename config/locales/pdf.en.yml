@@ -4,6 +4,7 @@ en:
     inspection:
       passed: "PASSED"
       failed: "FAILED"
+      in_progress: "IN PROGRESS"
       equipment_details: "Inspection Overview"
       risk_assessment: "Risk Assessment"
       assessments_section: "Assessment Results"
