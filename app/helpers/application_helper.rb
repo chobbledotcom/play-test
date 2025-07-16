@@ -34,45 +34,14 @@ module ApplicationHelper
   end
 
   def form_field_setup(field, local_assigns)
-    locally_assigned_keys = (local_assigns || {}).keys
-    disallowed_keys = locally_assigned_keys - ALLOWED_LOCAL_ASSIGNS
+    validate_local_assigns(local_assigns)
+    validate_form_context
 
-    if disallowed_keys.any?
-      raise ArgumentError, "local_assigns contains #{disallowed_keys.inspect}"
-    end
+    field_translations = build_field_translations(field)
+    value, prefilled = get_field_value_and_prefilled_status(@_current_form,
+      field)
 
-    i18n_base = @_current_i18n_base
-    form_object = @_current_form
-
-    raise ArgumentError, "missing i18n_base" unless i18n_base
-    raise ArgumentError, "missing form_object" unless form_object
-
-    fields_key = "#{i18n_base}.fields.#{field}"
-
-    field_label = t(fields_key, raise: true)
-
-    base_parts = i18n_base.split(".")
-    root = base_parts[0..-2]
-    hint_key = (root + ["hints", field]).join(".")
-    placeholder_key = (root + ["placeholders", field]).join(".")
-
-    field_hint = t(hint_key, default: nil)
-    field_placeholder = t(placeholder_key, default: nil)
-
-    value, prefilled = get_field_value_and_prefilled_status(
-      form_object,
-      field
-    )
-
-    {
-      form_object:,
-      i18n_base:,
-      field_label:,
-      field_hint:,
-      field_placeholder:,
-      value:,
-      prefilled:
-    }
+    build_field_setup_result(field_translations, value, prefilled)
   end
 
   def get_field_value_and_prefilled_status(form_object, field)
@@ -96,6 +65,47 @@ module ApplicationHelper
       precision: 4,
       strip_insignificant_zeros: true
     )
+  end
+
+  private
+
+  def validate_local_assigns(local_assigns)
+    locally_assigned_keys = (local_assigns || {}).keys
+    disallowed_keys = locally_assigned_keys - ALLOWED_LOCAL_ASSIGNS
+
+    if disallowed_keys.any?
+      raise ArgumentError, "local_assigns contains #{disallowed_keys.inspect}"
+    end
+  end
+
+  def validate_form_context
+    raise ArgumentError, "missing i18n_base" unless @_current_i18n_base
+    raise ArgumentError, "missing form_object" unless @_current_form
+  end
+
+  def build_field_translations(field)
+    fields_key = "#{@_current_i18n_base}.fields.#{field}"
+    field_label = t(fields_key, raise: true)
+
+    base_parts = @_current_i18n_base.split(".")
+    root = base_parts[0..-2]
+    hint_key = (root + ["hints", field]).join(".")
+    placeholder_key = (root + ["placeholders", field]).join(".")
+
+    {
+      field_label:,
+      field_hint: t(hint_key, default: nil),
+      field_placeholder: t(placeholder_key, default: nil)
+    }
+  end
+
+  def build_field_setup_result(field_translations, value, prefilled)
+    {
+      form_object: @_current_form,
+      i18n_base: @_current_i18n_base,
+      value:,
+      prefilled:
+    }.merge(field_translations)
   end
 
   def resolve_field_value(model, field)

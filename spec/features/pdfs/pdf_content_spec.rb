@@ -120,6 +120,37 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       expect(pdf_text).not_to include(I18n.t("pdf.inspection.risk_assessment"))
     end
+
+    scenario "handles N/A enum values correctly" do
+      inspection = create(:inspection, :completed,
+        user: user,
+        unit: unit,
+        has_slide: true)
+
+      # Set slide assessment with N/A value
+      inspection.slide_assessment.update!(
+        clamber_netting_pass: "na",
+        slide_platform_height: 2.0,
+        slide_wall_height: 1.5
+      )
+
+      # Set materials assessment with mixed values
+      inspection.materials_assessment.update!(
+        ropes_pass: "na",
+        ropes: 16,
+        retention_netting_pass: true,
+        zips_pass: false
+      )
+
+      pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
+
+      # Check that N/A indicators appear
+      expect(pdf_text).to include("[N/A]")
+
+      # Check that we still have passes and fails
+      expect(pdf_text).to include("[PASS]")
+      expect(pdf_text).to include("[FAIL]")
+    end
   end
 
   feature "Unit History PDF Content" do

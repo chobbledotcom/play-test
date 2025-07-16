@@ -3,8 +3,6 @@ class PdfGeneratorService
     include Configuration
 
     SENSITIVE_COLUMNS = %w[id inspection_id created_at updated_at].freeze
-    PASS_COLOR = "00AA00".freeze
-    FAIL_COLOR = "CC0000".freeze
     NULL_COLOR = "663399".freeze
     COMMENT_COLOR = "663399".freeze
     SECTION_TITLE_SIZE = 12
@@ -82,11 +80,12 @@ class PdfGeneratorService
     end
 
     def pass_fail_indicator(pass_value)
-      indicator, color =
-        [
-          pass_fail(pass_value).to_s,
-          pass_value ? PASS_COLOR : FAIL_COLOR
-        ]
+      indicator, color = case pass_value
+      when true, "pass" then [I18n.t("shared.pass_pdf"), PASS_COLOR]
+      when false, "fail" then [I18n.t("shared.fail_pdf"), FAIL_COLOR]
+      when "na" then [I18n.t("shared.na_pdf"), NA_COLOR]
+      else [I18n.t("shared.na_pdf"), NA_COLOR]
+      end
       "<font name='Courier'>#{bold(colored(indicator, color))}</font> "
     end
 

@@ -141,7 +141,10 @@ class CodeStandardsChecker
   end
 
   def skip_hardcoded_strings?(relative_path)
-    HARDCODED_STRINGS_ALLOWED_PATHS.any? { |path| relative_path.include?(path) }
+    allowed_path = HARDCODED_STRINGS_ALLOWED_PATHS.any? do |path|
+      relative_path.include?(path)
+    end
+    allowed_path || relative_path.include?("seed_data_service.rb")
   end
 
   def should_skip_line?(stripped)

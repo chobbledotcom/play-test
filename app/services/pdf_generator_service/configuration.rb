@@ -32,6 +32,7 @@ class PdfGeneratorService
     HISTORY_TABLE_ALT_ROW_COLOR = "F0F0F0"
     PASS_COLOR = "008000"  # Green
     FAIL_COLOR = "CC0000"  # Red
+    NA_COLOR = "4169E1"  # Royal Blue
     HEADER_COLOR = "663399"  # Purple
     SUBTITLE_COLOR = "666666"  # Gray
 
