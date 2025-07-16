@@ -126,7 +126,7 @@ class PdfGeneratorService
         x_position = pdf.bounds.width - logo_width + 10
         pdf.bounding_box([x_position, pdf.bounds.top],
           width: logo_width - 10) do
-          pdf.image logo_temp.path, height: LOGO_HEIGHT, position: :right
+          pdf.image logo_temp.path, height: Configuration::LOGO_HEIGHT, position: :right
         end
       end
     end
