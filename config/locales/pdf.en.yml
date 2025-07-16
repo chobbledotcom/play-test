@@ -5,6 +5,7 @@ en:
       passed: "PASSED"
       failed: "FAILED"
       equipment_details: "Inspection Overview"
+      risk_assessment: "Risk Assessment"
       assessments_section: "Assessment Results"
       no_assessment_data: "No %{assessment_type} data available"
       watermark:
@@ -17,6 +18,7 @@ en:
         inspected_by: "Inspected by"
         issued: "Issued"
         issued_date: "Issued Date"
+        expiry_date: "Expiry Date"
         rpii_inspector_no: "RPII Inspector No"
         report_id: "Report ID"
         description: "Description"
@@ -47,6 +49,7 @@ en:
         date: "Date"
         inspector: "Inspector"
         result: "Result"
+        expiry_date: "Expiry Date"
         na: "N/A"
 
     dimensions:

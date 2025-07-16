@@ -26,6 +26,9 @@ class PdfGeneratorService
       # Unit details section
       generate_inspection_unit_details(pdf, inspection)
 
+      # Risk assessment section (if present)
+      generate_risk_assessment_section(pdf, inspection)
+
       # Generate all assessment sections using the inspection's applicable assessments
       inspection.each_applicable_assessment do |assessment_key, _, assessment|
         # Get the assessment type name for i18n (remove _assessment suffix)
@@ -119,6 +122,17 @@ class PdfGeneratorService
     else
       TableBuilder.create_inspection_history_table(pdf, I18n.t("pdf.unit.inspection_history"), completed_inspections)
     end
+  end
+
+  def self.generate_risk_assessment_section(pdf, inspection)
+    return if inspection.risk_assessment.blank?
+
+    pdf.text I18n.t("pdf.inspection.risk_assessment"), size: HEADER_TEXT_SIZE, style: :bold
+    pdf.stroke_horizontal_rule
+    pdf.move_down 10
+
+    pdf.text inspection.risk_assessment, size: 10
+    pdf.move_down 15
   end
 
   # Helper methods for backward compatibility and testing

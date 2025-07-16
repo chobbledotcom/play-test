@@ -77,6 +77,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       expect_pdf_to_include_i18n(pdf_text, "pdf.inspection.failed")
 
       expect(pdf_text).to include("Torn seam on left side")
+      expect(pdf_text).to include("Multiple safety issues found")
+      expect_pdf_to_include_i18n(pdf_text, "pdf.inspection.risk_assessment")
     end
 
     scenario "includes all assessment types when present" do
@@ -106,6 +108,17 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       expect(pdf_text).to include(user_without_rpii.name)
       expect(pdf_text).not_to include(I18n.t("pdf.inspection.fields.rpii_inspector_no"))
+    end
+
+    scenario "does not include risk assessment section when blank" do
+      inspection_without_risk = create(:inspection, :completed,
+        user: user,
+        unit: unit,
+        risk_assessment: nil)
+
+      pdf_text = get_pdf_text(inspection_path(inspection_without_risk, format: :pdf))
+
+      expect(pdf_text).not_to include(I18n.t("pdf.inspection.risk_assessment"))
     end
   end
 
