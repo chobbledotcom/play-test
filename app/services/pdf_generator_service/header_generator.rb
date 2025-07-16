@@ -18,7 +18,7 @@ class PdfGeneratorService
         logo_width, logo_temp)
 
       logo_temp&.unlink
-      pdf.move_down STATUS_SPACING
+      pdf.move_down Configuration::STATUS_SPACING
     end
 
     def self.generate_unit_pdf_header(pdf, unit)
@@ -34,96 +34,100 @@ class PdfGeneratorService
       render_unit_header_layout(pdf, unit, unit_id_text, logo_width, logo_temp)
 
       logo_temp&.unlink
-      pdf.move_down STATUS_SPACING
+      pdf.move_down Configuration::STATUS_SPACING
     end
 
-    private
+    class << self
+      private
 
-    def self.build_report_id_text(inspection)
-      "#{I18n.t("pdf.inspection.fields.report_id")}: #{inspection.id}"
-    end
-
-    def self.build_status_text_and_color(inspection)
-      if inspection.passed?
-        [I18n.t("pdf.inspection.passed"), "008000"]
-      else
-        [I18n.t("pdf.inspection.failed"), "CC0000"]
+      def build_report_id_text(inspection)
+        "#{I18n.t("pdf.inspection.fields.report_id")}: #{inspection.id}"
       end
-    end
 
-    def self.build_unit_id_text(unit)
-      "#{I18n.t("pdf.unit.fields.unit_id")}: #{unit.id}"
-    end
-
-    def self.prepare_logo(user)
-      return [0, nil] unless user&.logo&.attached?
-
-      logo_data = user.logo.download
-      logo_height = LOGO_HEIGHT
-      logo_width = logo_height * 2 + 10
-
-      logo_temp = Tempfile.new(["user_logo_#{user.id}", ".png"])
-      logo_temp.binmode
-      logo_temp.write(logo_data)
-      logo_temp.close
-
-      [logo_width, logo_temp]
-    end
-
-    def self.render_inspection_header_layout(pdf, inspection, report_id_text,
-      status_text, status_color,
-      logo_width, logo_temp)
-      pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width) do
-        render_inspection_text_section(pdf, inspection, report_id_text,
-          status_text, status_color, logo_width)
-        render_logo_section(pdf, logo_temp, logo_width) if logo_temp
-      end
-    end
-
-    def self.render_inspection_text_section(pdf, inspection, report_id_text,
-      status_text, status_color, logo_width)
-      width = pdf.bounds.width - logo_width
-      pdf.bounding_box([0, pdf.bounds.top], width: width) do
-        pdf.text report_id_text, size: HEADER_TEXT_SIZE, style: :bold
-        pdf.text status_text, size: HEADER_TEXT_SIZE, style: :bold,
-          color: status_color
-
-        expiry_label = I18n.t("pdf.inspection.fields.expiry_date")
-        expiry_value = Utilities.format_date(inspection.reinspection_date)
-        pdf.text "#{expiry_label}: #{expiry_value}",
-          size: HEADER_TEXT_SIZE, style: :bold
-      end
-    end
-
-    def self.render_unit_header_layout(pdf, unit, unit_id_text,
-      logo_width, logo_temp)
-      pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width) do
-        render_unit_text_section(pdf, unit, unit_id_text, logo_width)
-        render_logo_section(pdf, logo_temp, logo_width) if logo_temp
-      end
-    end
-
-    def self.render_unit_text_section(pdf, unit, unit_id_text, logo_width)
-      width = pdf.bounds.width - logo_width
-      pdf.bounding_box([0, pdf.bounds.top], width: width) do
-        pdf.text unit_id_text, size: HEADER_TEXT_SIZE, style: :bold
-
-        expiry_label = I18n.t("pdf.unit.fields.expiry_date")
-        expiry_value = if unit.last_inspection&.reinspection_date
-          Utilities.format_date(unit.last_inspection.reinspection_date)
+      def build_status_text_and_color(inspection)
+        if inspection.passed?
+          [I18n.t("pdf.inspection.passed"), "008000"]
         else
-          I18n.t("pdf.unit.fields.na")
+          [I18n.t("pdf.inspection.failed"), "CC0000"]
         end
-        pdf.text "#{expiry_label}: #{expiry_value}",
-          size: HEADER_TEXT_SIZE, style: :bold
       end
-    end
 
-    def self.render_logo_section(pdf, logo_temp, logo_width)
-      x_position = pdf.bounds.width - logo_width + 10
-      pdf.bounding_box([x_position, pdf.bounds.top],
-        width: logo_width - 10) do
-        pdf.image logo_temp.path, height: LOGO_HEIGHT, position: :right
+      def build_unit_id_text(unit)
+        "#{I18n.t("pdf.unit.fields.unit_id")}: #{unit.id}"
+      end
+
+      def prepare_logo(user)
+        return [0, nil] unless user&.logo&.attached?
+
+        logo_data = user.logo.download
+        logo_height = Configuration::LOGO_HEIGHT
+        logo_width = logo_height * 2 + 10
+
+        logo_temp = Tempfile.new(["user_logo_#{user.id}", ".png"])
+        logo_temp.binmode
+        logo_temp.write(logo_data)
+        logo_temp.close
+
+        [logo_width, logo_temp]
+      end
+
+      def render_inspection_header_layout(pdf, inspection, report_id_text,
+        status_text, status_color,
+        logo_width, logo_temp)
+        pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width) do
+          render_inspection_text_section(pdf, inspection, report_id_text,
+            status_text, status_color, logo_width)
+          render_logo_section(pdf, logo_temp, logo_width) if logo_temp
+        end
+      end
+
+      def render_inspection_text_section(pdf, inspection, report_id_text,
+        status_text, status_color, logo_width)
+        width = pdf.bounds.width - logo_width
+        pdf.bounding_box([0, pdf.bounds.top], width: width) do
+          pdf.text report_id_text, size: Configuration::HEADER_TEXT_SIZE,
+            style: :bold
+          pdf.text status_text, size: Configuration::HEADER_TEXT_SIZE,
+            style: :bold,
+            color: status_color
+
+          expiry_label = I18n.t("pdf.inspection.fields.expiry_date")
+          expiry_value = Utilities.format_date(inspection.reinspection_date)
+          pdf.text "#{expiry_label}: #{expiry_value}",
+            size: Configuration::HEADER_TEXT_SIZE, style: :bold
+        end
+      end
+
+      def render_unit_header_layout(pdf, unit, unit_id_text,
+        logo_width, logo_temp)
+        pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width) do
+          render_unit_text_section(pdf, unit, unit_id_text, logo_width)
+          render_logo_section(pdf, logo_temp, logo_width) if logo_temp
+        end
+      end
+
+      def render_unit_text_section(pdf, unit, unit_id_text, logo_width)
+        width = pdf.bounds.width - logo_width
+        pdf.bounding_box([0, pdf.bounds.top], width: width) do
+          pdf.text unit_id_text, size: Configuration::HEADER_TEXT_SIZE, style: :bold
+
+          expiry_label = I18n.t("pdf.unit.fields.expiry_date")
+          expiry_value = if unit.last_inspection&.reinspection_date
+            Utilities.format_date(unit.last_inspection.reinspection_date)
+          else
+            I18n.t("pdf.unit.fields.na")
+          end
+          pdf.text "#{expiry_label}: #{expiry_value}",
+            size: Configuration::HEADER_TEXT_SIZE, style: :bold
+        end
+      end
+
+      def render_logo_section(pdf, logo_temp, logo_width)
+        x_position = pdf.bounds.width - logo_width + 10
+        pdf.bounding_box([x_position, pdf.bounds.top],
+          width: logo_width - 10) do
+          pdf.image logo_temp.path, height: LOGO_HEIGHT, position: :right
+        end
       end
     end
   end
