@@ -5,6 +5,7 @@ class User < ApplicationRecord
 
   has_many :inspections, dependent: :destroy
   has_many :units, dependent: :destroy
+  has_many :events, dependent: :destroy
   has_one_attached :logo
   validate :logo_must_be_image
 

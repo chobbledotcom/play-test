@@ -171,5 +171,30 @@ RSpec.describe User, type: :model do
         )
       end
     end
+
+    describe "deletion with associated records" do
+      it "successfully deletes user with inspections, units, and events" do
+        user = create(:user)
+        unit = create(:unit, user: user)
+        inspection = create(:inspection, user: user, unit: unit)
+
+        # Create an event for this user
+        Event.log(
+          user: user,
+          action: "created",
+          resource: inspection,
+          details: "Test event"
+        )
+
+        expect(user.inspections.count).to eq(1)
+        expect(user.units.count).to eq(1)
+        expect(user.events.count).to eq(1)
+
+        expect { user.destroy }.to change { User.count }.by(-1)
+          .and change { Inspection.count }.by(-1)
+          .and change { Unit.count }.by(-1)
+          .and change { Event.count }.by(-1)
+      end
+    end
   end
 end
