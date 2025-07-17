@@ -15,7 +15,7 @@ module RuboCop
       #     long_true_value :
       #     long_false_value
       #
-      class TernaryLineBreaks < RuboCop::Cop::Base
+      class TernaryLineBreaks < Base
         extend AutoCorrector
 
         MSG = "Break ternary operator across multiple lines " \
