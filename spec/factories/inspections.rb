@@ -65,7 +65,7 @@ FactoryBot.define do
     trait :with_unicode_data do
       inspection_location { "Meeting Room 🏢 3F" }
       risk_assessment { "❗️Tested with special 🔌 adapter. Result: ✅" }
-      association :unit, factory: [ :unit, :with_unicode_serial ]
+      association :unit, factory: [:unit, :with_unicode_serial]
     end
 
     trait :with_complete_assessments do
@@ -98,7 +98,7 @@ FactoryBot.define do
 
     trait :with_unicode_data do
       risk_assessment { "❗️Tested with special 🔌 adapter. Result: ✅" }
-      association :unit, factory: [ :unit, :with_unicode_serial ]
+      association :unit, factory: [:unit, :with_unicode_serial]
     end
 
     trait :max_length_risk_assessment do

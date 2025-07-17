@@ -2,8 +2,8 @@ class ChangeClamberNettingPassToIntegerInSlideAssessments < ActiveRecord::Migrat
   def up
     # Convert boolean values to integers: true -> 1, false -> 0, null -> null
     execute <<-SQL
-      UPDATE slide_assessments#{' '}
-      SET clamber_netting_pass = CASE#{' '}
+      UPDATE slide_assessments#{" "}
+      SET clamber_netting_pass = CASE#{" "}
         WHEN clamber_netting_pass = true THEN 1
         WHEN clamber_netting_pass = false THEN 0
         ELSE NULL
@@ -20,8 +20,8 @@ class ChangeClamberNettingPassToIntegerInSlideAssessments < ActiveRecord::Migrat
 
     # Convert integer values back to booleans: 1 -> true, 0 -> false, others -> null
     execute <<-SQL
-      UPDATE slide_assessments#{' '}
-      SET clamber_netting_pass = CASE#{' '}
+      UPDATE slide_assessments#{" "}
+      SET clamber_netting_pass = CASE#{" "}
         WHEN clamber_netting_pass = 1 THEN true
         WHEN clamber_netting_pass = 0 THEN false
         ELSE NULL

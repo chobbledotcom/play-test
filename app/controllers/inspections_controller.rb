@@ -285,7 +285,7 @@ class InspectionsController < ApplicationController
   end
 
   def filtered_inspections_query_without_order = current_user.inspections
-    .includes(:inspector_company, unit: { photo_attachment: :blob })
+    .includes(:inspector_company, unit: {photo_attachment: :blob})
     .search(params[:query])
     .filter_by_result(params[:result])
     .filter_by_unit(params[:unit_id])
@@ -299,7 +299,7 @@ class InspectionsController < ApplicationController
       .includes(
         :user, :inspector_company,
         *Inspection::ASSESSMENT_TYPES.keys,
-        unit: { photo_attachment: :blob }
+        unit: {photo_attachment: :blob}
       )
       .find_by(id: params[:id]&.upcase)
 
@@ -349,8 +349,8 @@ class InspectionsController < ApplicationController
         redirect_to @inspection
       end
       format.json do
-        render json: { status: I18n.t("shared.api.success"),
-                      inspection: @inspection }
+        render json: {status: I18n.t("shared.api.success"),
+                      inspection: @inspection}
       end
       format.turbo_stream { render turbo_stream: success_turbo_streams }
     end
@@ -359,7 +359,7 @@ class InspectionsController < ApplicationController
   def handle_failed_update
     respond_to do |format|
       format.html { render :edit, status: :unprocessable_entity }
-      format.json { render json: { status: I18n.t("shared.api.error"), errors: @inspection.errors.full_messages } }
+      format.json { render json: {status: I18n.t("shared.api.error"), errors: @inspection.errors.full_messages} }
       format.turbo_stream { render turbo_stream: error_turbo_streams }
     end
   end
@@ -470,11 +470,11 @@ class InspectionsController < ApplicationController
   def get_prefill_objects
     case params[:tab]
     when "inspection", "", nil
-      [ @inspection, @previous_inspection, Inspection.column_names ]
+      [@inspection, @previous_inspection, Inspection.column_names]
     when "results"
       # Results tab uses inspection fields directly, not an assessment
       # Only risk_assessment should be prefilled, not passed
-      [ @inspection, @previous_inspection, [ "risk_assessment" ] ]
+      [@inspection, @previous_inspection, ["risk_assessment"]]
     else
       assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
       assessment_class = ASSESSMENT_CLASS_MAPPING[params[:tab]]
@@ -521,7 +521,7 @@ class InspectionsController < ApplicationController
         user: current_user,
         action: action,
         details: details,
-        metadata: { resource_type: "Inspection" }
+        metadata: {resource_type: "Inspection"}
       )
     end
   rescue => e

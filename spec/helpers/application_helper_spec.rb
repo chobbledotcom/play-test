@@ -160,7 +160,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     context "when form is passed in local_assigns" do
-      let(:local_assigns) { { form: mock_form } }
+      let(:local_assigns) { {form: mock_form} }
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
@@ -173,7 +173,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     context "when i18n_base is passed in local_assigns" do
-      let(:local_assigns) { { i18n_base: "inspections.fields" } }
+      let(:local_assigns) { {i18n_base: "inspections.fields"} }
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
@@ -186,7 +186,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     context "when both form and i18n_base are passed in local_assigns" do
-      let(:local_assigns) { { form: mock_form, i18n_base: "inspections.fields" } }
+      let(:local_assigns) { {form: mock_form, i18n_base: "inspections.fields"} }
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
@@ -199,7 +199,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     context "when label is passed in local_assigns" do
-      let(:local_assigns) { { label: "Custom Label" } }
+      let(:local_assigns) { {label: "Custom Label"} }
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
@@ -267,7 +267,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     context "with allowed local_assigns keys" do
-      let(:local_assigns) { { min: 0, max: 100, step: 5, required: true } }
+      let(:local_assigns) { {min: 0, max: 100, step: 5, required: true} }
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
@@ -281,7 +281,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     context "with mixed allowed and disallowed keys" do
-      let(:local_assigns) { { min: 0, max: 100, form: mock_form } }
+      let(:local_assigns) { {min: 0, max: 100, form: mock_form} }
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)
@@ -294,7 +294,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
 
     context "with multiple disallowed keys including label" do
-      let(:local_assigns) { { label: "Custom", i18n_base: "test", form: mock_form } }
+      let(:local_assigns) { {label: "Custom", i18n_base: "test", form: mock_form} }
 
       before do
         helper.instance_variable_set(:@_current_form, mock_form)

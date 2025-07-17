@@ -86,7 +86,7 @@ RSpec.shared_examples "requires authentication for PDF access" do |path|
 
     # Should not return a PDF for unauthenticated users
     expect(page.driver.response.headers["Content-Type"]).not_to eq("application/pdf")
-    expect(page.driver.response.status).to be_in([ 302, 401, 403 ])
+    expect(page.driver.response.status).to be_in([302, 401, 403])
   end
 end
 

@@ -15,7 +15,7 @@ RSpec.describe "form/_number.html.erb", type: :view do
 
   # Default render method with common setup
   def render_number_field(locals = {})
-    render partial: "form/number", locals: { field: field }.merge(locals)
+    render partial: "form/number", locals: {field: field}.merge(locals)
   end
 
   before do

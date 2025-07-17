@@ -35,7 +35,7 @@ RSpec.describe "Seed Data", type: :model do
           expect(company.city).to be_present
           expect(company.postal_code).to be_present
           expect(company.country).to eq("UK")
-          expect([ true, false ]).to include(company.active)
+          expect([true, false]).to include(company.active)
         end
       end
 
@@ -72,7 +72,7 @@ RSpec.describe "Seed Data", type: :model do
           expect(user.password_digest).to be_present
           expect(user.rpii_inspector_number).to be_present
           expect(user.theme).to be_present
-          expect([ "light", "dark" ]).to include(user.theme)
+          expect(["light", "dark"]).to include(user.theme)
         end
       end
 
@@ -132,7 +132,7 @@ RSpec.describe "Seed Data", type: :model do
 
       it "creates units with inspections having correct slide and enclosed flags" do
         # Units with slide inspections
-        slide_unit_names = Unit.joins(:inspections).where(inspections: { has_slide: true }).distinct.pluck(:name)
+        slide_unit_names = Unit.joins(:inspections).where(inspections: {has_slide: true}).distinct.pluck(:name)
         expect(slide_unit_names).to include(
           "Princess Castle with Slide",
           "Assault Course Challenge",
@@ -140,7 +140,7 @@ RSpec.describe "Seed Data", type: :model do
         )
 
         # Units with enclosed inspections
-        enclosed_unit_names = Unit.joins(:inspections).where(inspections: { is_totally_enclosed: true }).distinct.pluck(:name)
+        enclosed_unit_names = Unit.joins(:inspections).where(inspections: {is_totally_enclosed: true}).distinct.pluck(:name)
         expect(enclosed_unit_names).to include("Toddler Soft Play Centre")
       end
 
@@ -163,12 +163,12 @@ RSpec.describe "Seed Data", type: :model do
           expect(inspection.inspector_company).to be_present
           expect(inspection.inspection_date).to be_present
           # Status is now determined by complete_date presence
-          expect([ true, false ]).to include(inspection.complete?)
+          expect([true, false]).to include(inspection.complete?)
           expect(inspection.width).to be > 0
           expect(inspection.length).to be > 0
           expect(inspection.height).to be > 0
-          expect([ true, false ]).to include(inspection.has_slide)
-          expect([ true, false ]).to include(inspection.is_totally_enclosed)
+          expect([true, false]).to include(inspection.has_slide)
+          expect([true, false]).to include(inspection.is_totally_enclosed)
         end
       end
 
@@ -271,21 +271,21 @@ RSpec.describe "Seed Data", type: :model do
 
       describe "Anchorage Assessments" do
         it "creates assessments with required fields" do
-          Assessments::AnchorageAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::AnchorageAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
             expect(assessment.num_low_anchors).to be_present
             expect(assessment.num_high_anchors).to be_present
-            expect([ true, false ]).to include(assessment.num_low_anchors_pass)
-            expect([ true, false ]).to include(assessment.num_high_anchors_pass)
-            expect([ true, false ]).to include(assessment.anchor_accessories_pass)
-            expect([ true, false ]).to include(assessment.anchor_degree_pass)
-            expect([ true, false ]).to include(assessment.anchor_type_pass)
-            expect([ true, false ]).to include(assessment.pull_strength_pass)
+            expect([true, false]).to include(assessment.num_low_anchors_pass)
+            expect([true, false]).to include(assessment.num_high_anchors_pass)
+            expect([true, false]).to include(assessment.anchor_accessories_pass)
+            expect([true, false]).to include(assessment.anchor_degree_pass)
+            expect([true, false]).to include(assessment.anchor_type_pass)
+            expect([true, false]).to include(assessment.pull_strength_pass)
           end
         end
 
         it "creates assessments with realistic anchor counts" do
-          Assessments::AnchorageAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::AnchorageAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.num_low_anchors).to be_between(0, 20)
             expect(assessment.num_high_anchors).to be_between(0, 15)
           end
@@ -294,19 +294,19 @@ RSpec.describe "Seed Data", type: :model do
 
       describe "Structure Assessments" do
         it "creates assessments with all required safety checks" do
-          Assessments::StructureAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
-            expect([ true, false ]).to include(assessment.seam_integrity_pass)
-            expect([ true, false ]).to include(assessment.uses_lock_stitching_pass)
-            expect([ true, false ]).to include(assessment.air_loss_pass)
-            expect([ true, false ]).to include(assessment.straight_walls_pass)
-            expect([ true, false ]).to include(assessment.sharp_edges_pass)
-            expect([ true, false ]).to include(assessment.unit_stable_pass)
+            expect([true, false]).to include(assessment.seam_integrity_pass)
+            expect([true, false]).to include(assessment.uses_lock_stitching_pass)
+            expect([true, false]).to include(assessment.air_loss_pass)
+            expect([true, false]).to include(assessment.straight_walls_pass)
+            expect([true, false]).to include(assessment.sharp_edges_pass)
+            expect([true, false]).to include(assessment.unit_stable_pass)
           end
         end
 
         it "creates assessments with required measurements" do
-          Assessments::StructureAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.stitch_length).to be_present
             expect(assessment.unit_pressure).to be_present
             expect(assessment.blower_tube_length).to be_present
@@ -318,7 +318,7 @@ RSpec.describe "Seed Data", type: :model do
         end
 
         it "creates assessments with realistic measurement values" do
-          Assessments::StructureAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.stitch_length).to be_between(5, 20)
             expect(assessment.unit_pressure).to be_between(0.5, 5.0)
             expect(assessment.blower_tube_length).to be_between(1.0, 10.0)
@@ -332,18 +332,18 @@ RSpec.describe "Seed Data", type: :model do
 
       describe "Materials Assessments" do
         it "creates assessments with required fields" do
-          Assessments::MaterialsAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::MaterialsAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
             expect(assessment.ropes).to be_present
-            expect([ "pass", "fail", "na" ]).to include(assessment.ropes_pass)
-            expect([ true, false ]).to include(assessment.fabric_strength_pass)
-            expect([ true, false ]).to include(assessment.fire_retardant_pass)
-            expect([ true, false ]).to include(assessment.thread_pass)
+            expect(["pass", "fail", "na"]).to include(assessment.ropes_pass)
+            expect([true, false]).to include(assessment.fabric_strength_pass)
+            expect([true, false]).to include(assessment.fire_retardant_pass)
+            expect([true, false]).to include(assessment.thread_pass)
           end
         end
 
         it "creates assessments with realistic rope sizes" do
-          Assessments::MaterialsAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::MaterialsAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.ropes).to be_between(10, 50)
           end
         end
@@ -351,18 +351,18 @@ RSpec.describe "Seed Data", type: :model do
 
       describe "Fan Assessments" do
         it "creates assessments with all required safety checks" do
-          Assessments::FanAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::FanAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
-            expect([ true, false ]).to include(assessment.blower_flap_pass)
-            expect([ true, false ]).to include(assessment.blower_finger_pass)
-            expect([ true, false ]).to include(assessment.blower_visual_pass)
-            expect([ true, false ]).to include(assessment.pat_pass)
+            expect([true, false]).to include(assessment.blower_flap_pass)
+            expect([true, false]).to include(assessment.blower_finger_pass)
+            expect([true, false]).to include(assessment.blower_visual_pass)
+            expect([true, false]).to include(assessment.pat_pass)
             expect(assessment.blower_serial).to be_present
           end
         end
 
         it "creates assessments with realistic blower serials" do
-          Assessments::FanAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::FanAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.blower_serial).to match(/FAN-\d{4}/)
           end
         end
@@ -370,7 +370,7 @@ RSpec.describe "Seed Data", type: :model do
 
       describe "User Height Assessments" do
         it "creates assessments with required measurements" do
-          Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
             expect(assessment.containing_wall_height).to be_present
             expect(assessment.platform_height).to be_present
@@ -386,7 +386,7 @@ RSpec.describe "Seed Data", type: :model do
         end
 
         it "creates assessments with realistic height values" do
-          Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.containing_wall_height).to be_between(0.5, 3.0)
             expect(assessment.platform_height).to be_between(0.2, 2.0)
             expect(assessment.tallest_user_height).to be_between(1.0, 2.0)
@@ -394,7 +394,7 @@ RSpec.describe "Seed Data", type: :model do
         end
 
         it "creates assessments with realistic user capacity counts" do
-          Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.users_at_1000mm).to be_between(0, 10)
             expect(assessment.users_at_1200mm).to be_between(0, 15)
             expect(assessment.users_at_1500mm).to be_between(0, 20)
@@ -403,7 +403,7 @@ RSpec.describe "Seed Data", type: :model do
         end
 
         it "creates play area dimensions within realistic bounds" do
-          Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each do |assessment|
+          Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             # Play area dimensions should be realistic
             expect(assessment.play_area_length).to be_between(1.0, 15.0)
             expect(assessment.play_area_width).to be_between(1.0, 15.0)
@@ -414,7 +414,7 @@ RSpec.describe "Seed Data", type: :model do
       end
 
       describe "Slide Assessments" do
-        let(:slide_assessments) { Assessments::SlideAssessment.joins(:inspection).where(inspections: { has_slide: true }).where.not(inspections: { complete_date: nil }) }
+        let(:slide_assessments) { Assessments::SlideAssessment.joins(:inspection).where(inspections: {has_slide: true}).where.not(inspections: {complete_date: nil}) }
 
         it "populates assessment data only for units with slides" do
           # All inspections have slide assessments, but only those with has_slide have data
@@ -452,15 +452,15 @@ RSpec.describe "Seed Data", type: :model do
 
         it "creates assessments with required safety checks" do
           slide_assessments.each do |assessment|
-            expect([ "pass", "fail", "na" ]).to include(assessment.clamber_netting_pass)
-            expect([ true, false ]).to include(assessment.runout_pass)
-            expect([ true, false ]).to include(assessment.slip_sheet_pass)
+            expect(["pass", "fail", "na"]).to include(assessment.clamber_netting_pass)
+            expect([true, false]).to include(assessment.runout_pass)
+            expect([true, false]).to include(assessment.slip_sheet_pass)
           end
         end
       end
 
       describe "Enclosed Assessments" do
-        let(:enclosed_assessments) { Assessments::EnclosedAssessment.joins(:inspection).where(inspections: { is_totally_enclosed: true }).where.not(inspections: { complete_date: nil }) }
+        let(:enclosed_assessments) { Assessments::EnclosedAssessment.joins(:inspection).where(inspections: {is_totally_enclosed: true}).where.not(inspections: {complete_date: nil}) }
 
         it "populates assessment data only for enclosed units" do
           # All inspections have enclosed assessments, but only those with is_totally_enclosed have data
@@ -480,8 +480,8 @@ RSpec.describe "Seed Data", type: :model do
           enclosed_assessments.each do |assessment|
             expect(assessment.inspection).to be_present
             expect(assessment.exit_number).to be_present
-            expect([ true, false ]).to include(assessment.exit_number_pass)
-            expect([ true, false ]).to include(assessment.exit_sign_always_visible_pass)
+            expect([true, false]).to include(assessment.exit_number_pass)
+            expect([true, false]).to include(assessment.exit_sign_always_visible_pass)
           end
         end
 
@@ -537,7 +537,7 @@ RSpec.describe "Seed Data", type: :model do
 
       it "ensures all created records are valid" do
         # Base models
-        base_models = [ InspectorCompany, User, Unit, Inspection ]
+        base_models = [InspectorCompany, User, Unit, Inspection]
 
         # Add assessment models from the hash
         assessment_models = Inspection::ASSESSMENT_TYPES.values
@@ -560,7 +560,7 @@ RSpec.describe "Seed Data", type: :model do
 
           # Validate assessments using the hash
           Inspection::ASSESSMENT_TYPES.each_value do |assessment_class|
-            assessment_class.joins(:inspection).where.not(inspections: { complete_date: nil }).find_each(&:validate!)
+            assessment_class.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each(&:validate!)
           end
         }.not_to raise_error
       end

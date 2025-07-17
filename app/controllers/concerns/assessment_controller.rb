@@ -43,7 +43,7 @@ module AssessmentController
     respond_to do |format|
       format.html { render_edit_with_errors }
       format.json do
-        render json: { errors: @assessment.errors }, status: :unprocessable_entity
+        render json: {errors: @assessment.errors}, status: :unprocessable_entity
       end
       format.turbo_stream { render turbo_stream: error_turbo_streams }
     end

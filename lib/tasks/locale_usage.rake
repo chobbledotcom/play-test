@@ -92,7 +92,7 @@ namespace :locale do
   end
 
   desc "Check specific locale keys for usage"
-  task :check_keys, [ :pattern ] => :environment do |t, args|
+  task :check_keys, [:pattern] => :environment do |t, args|
     require_relative "../i18n_usage_tracker"
 
     pattern = args[:pattern] || "*"

@@ -1,7 +1,7 @@
 class Inspection < ApplicationRecord
   include CustomIdGenerator
 
-  PASS_FAIL_NA = { fail: 0, pass: 1, na: 2 }.freeze
+  PASS_FAIL_NA = {fail: 0, pass: 1, na: 2}.freeze
 
   ASSESSMENT_TYPES = {
     user_height_assessment: Assessments::UserHeightAssessment,
@@ -66,7 +66,7 @@ class Inspection < ApplicationRecord
   validates :inspection_date, presence: true
   # rubocop:disable Rails/UniqueValidationWithoutIndex
   validates :unique_report_number,
-    uniqueness: { scope: :user_id, allow_blank: true }
+    uniqueness: {scope: :user_id, allow_blank: true}
   # rubocop:enable Rails/UniqueValidationWithoutIndex
 
   # Callbacks
@@ -98,7 +98,7 @@ class Inspection < ApplicationRecord
   }
   scope :filter_by_owner, ->(owner) {
     if owner.present?
-      joins(:unit).where(units: { owner: owner })
+      joins(:unit).where(units: {owner: owner})
     else
       all
     end
@@ -174,7 +174,7 @@ class Inspection < ApplicationRecord
 
   # Returns tabs in the order they appear in the UI
   def applicable_tabs
-    tabs = [ "inspection", "user_height" ]
+    tabs = ["inspection", "user_height"]
 
     # Only show slide tab for inspections that have slides
     tabs << "slide" if assessment_applicable?(:slide_assessment)
@@ -299,7 +299,7 @@ class Inspection < ApplicationRecord
 
   def inspection_tab_incomplete_fields
     # Fields required for the inspection tab specifically (excludes passed which is on results tab)
-    fields = REQUIRED_TO_COMPLETE_FIELDS - [ :passed ]
+    fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
     fields
       .select { |f| !f.end_with?("_comment") }
       .select { |f| send(f).nil? }
@@ -315,7 +315,7 @@ class Inspection < ApplicationRecord
         # Get incomplete fields for the inspection tab (excluding passed)
         inspection_tab_fields =
           inspection_tab_incomplete_fields
-            .map { |f| { field: f, label: field_label(:inspection, f) } }
+            .map { |f| {field: f, label: field_label(:inspection, f)} }
 
         if inspection_tab_fields.any?
           output << {
@@ -328,7 +328,7 @@ class Inspection < ApplicationRecord
       when "results"
         # Get incomplete fields for the results tab
         results_fields = []
-        results_fields << { field: :passed, label: field_label(:results, :passed) } if passed.nil?
+        results_fields << {field: :passed, label: field_label(:results, :passed)} if passed.nil?
 
         if results_fields.any?
           output << {
@@ -345,7 +345,7 @@ class Inspection < ApplicationRecord
 
         assessment_fields =
           assessment&.incomplete_fields
-            &.map { |f| { field: f, label: field_label(tab.to_sym, f) } } ||
+            &.map { |f| {field: f, label: field_label(tab.to_sym, f)} } ||
           []
 
         if assessment_fields.any?
@@ -397,7 +397,7 @@ class Inspection < ApplicationRecord
     assessment_types.map do |type|
       assessment = send("#{type}_assessment")
       message = I18n.t("inspections.validation.#{type}_incomplete")
-      [ type, assessment, message ]
+      [type, assessment, message]
     end
   end
 end

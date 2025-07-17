@@ -13,9 +13,9 @@ class NumberPassFailNaCommentTestModel
   # Mock enum behavior for _pass fields to support N/A radio buttons
   def self.defined_enums
     {
-      "slide_platform_height_pass" => { "fail" => 0, "pass" => 1, "na" => 2 },
-      "beam_width_pass" => { "fail" => 0, "pass" => 1, "na" => 2 },
-      "anchor_spacing_pass" => { "fail" => 0, "pass" => 1, "na" => 2 }
+      "slide_platform_height_pass" => {"fail" => 0, "pass" => 1, "na" => 2},
+      "beam_width_pass" => {"fail" => 0, "pass" => 1, "na" => 2},
+      "anchor_spacing_pass" => {"fail" => 0, "pass" => 1, "na" => 2}
     }
   end
 end
@@ -81,7 +81,7 @@ RSpec.describe "form/_number_pass_fail_na_comment.html.erb", type: :view do
 
   def render_number_pass_fail_na_comment(locals = {})
     partial_name = "form/number_pass_fail_na_comment"
-    render partial: partial_name, locals: { field: }.merge(locals)
+    render partial: partial_name, locals: {field:}.merge(locals)
   end
 
   # Helper methods for common expectations using Capybara selectors
@@ -177,7 +177,7 @@ RSpec.describe "form/_number_pass_fail_na_comment.html.erb", type: :view do
         end
 
         partial_name = "form/number_pass_fail_na_comment"
-        render partial: partial_name, locals: { field: field_name }
+        render partial: partial_name, locals: {field: field_name}
 
         grid_selector = "div.form-grid.number-radio-comment"
         expect(rendered).to have_css(grid_selector)
