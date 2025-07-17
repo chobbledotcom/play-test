@@ -178,7 +178,7 @@ class UnitsController < ApplicationController
       )
     end
   rescue => e
-    Rails.logger.error "Failed to log unit event: #{e.message}"
+    Rails.logger.error I18n.t("units.errors.log_failed", message: e.message)
   end
 
   def calculate_changes(previous_attributes, current_attributes, changed_keys)
@@ -225,16 +225,12 @@ class UnitsController < ApplicationController
   end
 
   def check_unit_owner
-    head :not_found unless current_user && @unit.user_id == current_user.id
+    head :not_found unless owns_resource?
   end
 
   def check_log_access
-    # Only admins and unit owners can view logs
-    # Return 404 for everyone else
-    is_owner = current_user && @unit.user_id == current_user.id
-    is_admin = current_user&.admin?
-
-    head :not_found unless is_owner || is_admin
+    # Only unit owners can view logs
+    head :not_found unless owns_resource?
   end
 
   def send_unit_pdf

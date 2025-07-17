@@ -29,7 +29,10 @@ module PublicViewable
     # Rule 2: Always allow HTML access (show action decides the view)
     return if request.format.html? && action_name == "show"
 
-    # Rule 3: All other cases require ownership
+    # Rule 3: Always allow HEAD requests for federation
+    return if request.head?
+
+    # Rule 4: All other cases require ownership
     check_resource_owner
   end
 
