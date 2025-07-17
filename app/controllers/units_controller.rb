@@ -9,6 +9,7 @@ class UnitsController < ApplicationController
   before_action :check_log_access, only: %i[log]
   before_action :require_user_active, only: %i[create new edit update]
   before_action :no_index
+  before_action :set_cors_headers_for_federation, only: %i[show]
 
   def index
     @units = filtered_units_query
@@ -25,6 +26,12 @@ class UnitsController < ApplicationController
   end
 
   def show
+    # Handle federation check requests
+    if params[:check] == "true"
+      head :ok
+      return
+    end
+
     @inspections = @unit.inspections
       .includes(inspector_company: {logo_attachment: :blob})
       .order(inspection_date: :desc)

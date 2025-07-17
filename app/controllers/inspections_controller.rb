@@ -12,6 +12,7 @@ class InspectionsController < ApplicationController
   before_action :require_user_active, only: %i[create edit update]
   before_action :validate_inspection_completability, only: %i[show edit]
   before_action :no_index
+  before_action :set_cors_headers_for_federation, only: %i[show]
 
   def index
     all_inspections = filtered_inspections_query_without_order.to_a
@@ -31,6 +32,12 @@ class InspectionsController < ApplicationController
   end
 
   def show
+    # Handle federation check requests
+    if params[:check] == "true"
+      head :ok
+      return
+    end
+
     respond_to do |format|
       format.html { render_show_html }
       format.pdf { send_inspection_pdf }

@@ -47,6 +47,7 @@
 <% unless current_user %>
   <nav>
     <ul>
+      <li><%= link_to t('navigation.search'), search_path %></li>
       <li><%= link_to t('navigation.about'), about_path %></li>
       <li><%= link_to t('navigation.safety_standards'), safety_standards_path %></li>
       <li><%= link_to t('navigation.guides'), guides_path %></li>

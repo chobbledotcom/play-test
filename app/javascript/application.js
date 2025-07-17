@@ -7,6 +7,7 @@ import "dirty_forms";
 import "share_buttons";
 import "safety_standards_tabs";
 import "guides_slider";
+import "search";
 
 // external libs
 import "highlight.js"

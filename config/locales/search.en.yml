@@ -1,0 +1,33 @@
+en:
+  # Search functionality
+  search:
+    title: "Search Federated Sites"
+    sites:
+      current_site: "Current Site"
+      play_test: "play-test.co.uk"
+      rpii_play_test: "rpii.play-test.co.uk"
+    results:
+      heading: "Search Results"
+      site: "Site"
+      status: "Status"
+      action: "Action"
+    status:
+      waiting: "Waiting..."
+      searching: "Searching..."
+      found: "Found"
+      not_found: "Not found"
+      error: "Error"
+  
+  # Form translations for search
+  forms:
+    search:
+      header: "Search for Inspections and Units"
+      sections:
+        search_details: "Search Details"
+      fields:
+        type: "Type"
+        id: "ID (8 characters)"
+      options:
+        inspection: "Inspection"
+        unit: "Unit"
+      submit: "Search"

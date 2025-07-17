@@ -3,6 +3,7 @@ en:
   navigation:
     inspections: "Inspections"
     units: "Units"
+    search: "Search"
     users: "Users"
     settings: "Settings"
     safety_standards: "Safety Standards"

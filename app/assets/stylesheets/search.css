@@ -1,0 +1,25 @@
+/* Search page styles */
+
+#search-results table {
+  margin-top: 2rem;
+}
+
+#search-results .status {
+  font-weight: bold;
+}
+
+#search-results .status.searching {
+  color: #666;
+}
+
+#search-results .status.found {
+  color: #28a745;
+}
+
+#search-results .status.not-found {
+  color: #999;
+}
+
+#search-results .status.error {
+  color: #dc3545;
+}

@@ -1,0 +1,47 @@
+<div id="search">
+<%= render 'form/form_context', 
+  model: nil,
+  scope: :search,
+  i18n_base: 'forms.search',
+  url: '#',
+  local: true do |form| %>
+  
+  <%= render 'form/fieldset', legend_key: 'search_details' do %>
+    <%= render 'form/select', 
+      field: :type,
+      options: options_for_select([
+        [t('forms.search.options.inspection'), 'inspection'],
+        [t('forms.search.options.unit'), 'unit']
+      ], 'unit') %>
+    
+    <% setup = form_field_setup(:id, {field: :id}) %>
+    <%= form.label :id, setup[:field_label] %>
+    <%= form.text_field :id, 
+      pattern: '[A-Za-z0-9]{8}',
+      placeholder: t('forms.search.placeholders.id', default: nil) %>
+  <% end %>
+<% end %>
+</div>
+
+<article id="search-results" style="display: none;">
+  <h2><%= t("search.results.heading") %></h2>
+  <table>
+    <thead>
+      <tr>
+        <th><%= t("search.results.site") %></th>
+        <th><%= t("search.results.status") %></th>
+        <th><%= t("search.results.action") %></th>
+      </tr>
+    </thead>
+    <tbody id="results-body">
+      <% @federated_sites.each do |site| %>
+        <tr data-site-name="<%= site[:name] %>" data-site-url="<%= site[:url] %>">
+          <td><%= t("search.sites.#{site[:name]}") %></td>
+          <td class="status"><%= t("search.status.waiting") %></td>
+          <td class="action">-</td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</article>
+

@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get "guides/*path", to: "guides#show", as: :guide
   get "safety_standards", to: "safety_standards#index"
   post "safety_standards", to: "safety_standards#index"
+  get "search", to: "search#index"
 
   get "signup", to: "users#new"
   post "signup", to: "users#create"
