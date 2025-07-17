@@ -61,7 +61,7 @@ class PdfGeneratorService
 
     # Preload all inspections once to avoid N+1 queries
     completed_inspections = unit.inspections
-      .includes(:user, inspector_company: {logo_attachment: :blob})
+      .includes(:user, inspector_company: { logo_attachment: :blob })
       .complete
       .order(inspection_date: :desc)
 
@@ -105,12 +105,12 @@ class PdfGeneratorService
     # Check for completed inspections - preload associations to avoid N+1 queries
     # Since all inspections belong to the same unit, we don't need to reload the unit
     completed_inspections = unit.inspections
-      .includes(:user, inspector_company: {logo_attachment: :blob})
+      .includes(:user, inspector_company: { logo_attachment: :blob })
       .complete
       .order(inspection_date: :desc)
 
     if completed_inspections.empty?
-      TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"), [[I18n.t("pdf.unit.no_completed_inspections"), ""]])
+      TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"), [ [ I18n.t("pdf.unit.no_completed_inspections"), "" ] ])
     else
       TableBuilder.create_inspection_history_table(pdf, I18n.t("pdf.unit.inspection_history"), completed_inspections)
     end
@@ -118,7 +118,7 @@ class PdfGeneratorService
 
   def self.generate_unit_inspection_history_with_data(pdf, unit, completed_inspections)
     if completed_inspections.empty?
-      TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"), [[I18n.t("pdf.unit.no_completed_inspections"), ""]])
+      TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"), [ [ I18n.t("pdf.unit.no_completed_inspections"), "" ] ])
     else
       TableBuilder.create_inspection_history_table(pdf, I18n.t("pdf.unit.inspection_history"), completed_inspections)
     end

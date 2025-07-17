@@ -119,7 +119,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
   end
 
   scenario "calculations match SafetyStandard model exactly" do
-    test_dimensions = [[3.0, 3.0, 2.0], [5.0, 4.0, 3.0], [8.0, 6.0, 4.0]]
+    test_dimensions = [ [ 3.0, 3.0, 2.0 ], [ 5.0, 4.0, 3.0 ], [ 8.0, 6.0, 4.0 ] ]
 
     test_dimensions.each do |length, width, height|
       visit safety_standards_path

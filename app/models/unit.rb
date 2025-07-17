@@ -18,7 +18,7 @@ class Unit < ApplicationRecord
 
   # All fields are required for Units
   validates :name, :serial, :description, :manufacturer, :owner, presence: true
-  validates :serial, uniqueness: {scope: [:user_id]}
+  validates :serial, uniqueness: { scope: [ :user_id ] }
 
   # Scopes - enhanced from original Equipment and new Unit functionality
   scope :seed_data, -> { where(is_seed: true) }
@@ -26,7 +26,7 @@ class Unit < ApplicationRecord
   scope :search, ->(query) {
     if query.present?
       search_term = "%#{query}%"
-      where(<<~SQL, *([search_term] * 5))
+      where(<<~SQL, *([ search_term ] * 5))
         serial LIKE ?
         OR name LIKE ?
         OR description LIKE ?
@@ -42,7 +42,7 @@ class Unit < ApplicationRecord
   scope :with_recent_inspections, -> {
     cutoff_date = SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago
     joins(:inspections)
-      .where(inspections: {inspection_date: cutoff_date..})
+      .where(inspections: { inspection_date: cutoff_date.. })
       .distinct
   }
 

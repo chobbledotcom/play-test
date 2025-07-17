@@ -3,7 +3,7 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
     let(:user) { create(:user) }
     let(:unit) { create(:unit, user: user) }
     let(:inspection) do
-      options = {user: user, unit: unit}
+      options = { user: user, unit: unit }
       options[:has_slide] = true if assessment_type == :slide
       options.merge!(traits_for_assessment(assessment_type))
       create(:inspection, **options)
@@ -20,7 +20,7 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
     private
 
     def traits_for_assessment(type)
-      (type == :enclosed) ? {is_totally_enclosed: true} : {}
+      (type == :enclosed) ? { is_totally_enclosed: true } : {}
     end
 
     def visit_assessment_tab(type)
@@ -126,7 +126,7 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
     end
 
     def fill_comment_in_context(base_key, base_label, value)
-      containers = ["form-grid", "radio-comment", "number-radio-comment"]
+      containers = [ "form-grid", "radio-comment", "number-radio-comment" ]
       filled = false
 
       containers.each do |container|

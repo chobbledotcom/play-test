@@ -10,7 +10,7 @@ RSpec.describe SafetyStandards::AnchorCalculator do
 
         # Should include minimum requirement note
         expect(result.breakdown).to include(
-          [I18n.t("safety_standards.calculators.anchor.en_minimum_label"), I18n.t("safety_standards.calculators.anchor.minimum_required", minimum: 6)]
+          [ I18n.t("safety_standards.calculators.anchor.en_minimum_label"), I18n.t("safety_standards.calculators.anchor.minimum_required", minimum: 6) ]
         )
       end
 
@@ -20,7 +20,7 @@ RSpec.describe SafetyStandards::AnchorCalculator do
 
         # Should include minimum requirement note
         expect(result.breakdown).to include(
-          [I18n.t("safety_standards.calculators.anchor.en_minimum_label"), I18n.t("safety_standards.calculators.anchor.minimum_required", minimum: 6)]
+          [ I18n.t("safety_standards.calculators.anchor.en_minimum_label"), I18n.t("safety_standards.calculators.anchor.minimum_required", minimum: 6) ]
         )
       end
 
@@ -30,7 +30,7 @@ RSpec.describe SafetyStandards::AnchorCalculator do
 
         # Should NOT include minimum requirement note
         expect(result.breakdown).not_to include(
-          ["EN 14960 minimum", "Minimum 6 anchors required, using 6"]
+          [ "EN 14960 minimum", "Minimum 6 anchors required, using 6" ]
         )
       end
     end
@@ -71,8 +71,8 @@ RSpec.describe SafetyStandards::AnchorCalculator do
         result = described_class.calculate(length: 5, width: 4, height: 3)
 
         expect(result.breakdown).to include(
-          [I18n.t("safety_standards.calculators.anchor.front_back_area_label"), "4m (W) × 3m (H) = 12m²"],
-          [I18n.t("safety_standards.calculators.anchor.sides_area_label"), "5m (L) × 3m (H) = 15m²"]
+          [ I18n.t("safety_standards.calculators.anchor.front_back_area_label"), "4m (W) × 3m (H) = 12m²" ],
+          [ I18n.t("safety_standards.calculators.anchor.sides_area_label"), "5m (L) × 3m (H) = 15m²" ]
         )
       end
     end
@@ -108,8 +108,8 @@ RSpec.describe SafetyStandards::AnchorCalculator do
 
         breakdown = result.breakdown
         expect(breakdown).to include(
-          [I18n.t("safety_standards.calculators.anchor.front_back_anchors_label"), "((12 × 114.0 * 1.5) ÷ 1600.0 = 2"],
-          [I18n.t("safety_standards.calculators.anchor.left_right_anchors_label"), "((15 × 114.0 * 1.5) ÷ 1600.0 = 2"]
+          [ I18n.t("safety_standards.calculators.anchor.front_back_anchors_label"), "((12 × 114.0 * 1.5) ÷ 1600.0 = 2" ],
+          [ I18n.t("safety_standards.calculators.anchor.left_right_anchors_label"), "((15 × 114.0 * 1.5) ÷ 1600.0 = 2" ]
         )
       end
 
@@ -118,7 +118,7 @@ RSpec.describe SafetyStandards::AnchorCalculator do
 
         breakdown = result.breakdown
         expect(breakdown).to include(
-          [I18n.t("safety_standards.calculators.anchor.total_anchors_label"), "(2 + 2) × 2 = 8"]
+          [ I18n.t("safety_standards.calculators.anchor.total_anchors_label"), "(2 + 2) × 2 = 8" ]
         )
       end
     end

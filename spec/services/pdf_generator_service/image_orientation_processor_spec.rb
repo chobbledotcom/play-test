@@ -209,7 +209,7 @@ RSpec.describe PdfGeneratorService::ImageOrientationProcessor do
         width, height = described_class.get_dimensions(image)
         processed_data = described_class.process_with_orientation(image)
 
-        expect(needs_correction).to be_in([true, false])
+        expect(needs_correction).to be_in([ true, false ])
         expect(width).to be > 0
         expect(height).to be > 0
         expect(processed_data).to be_a(String)

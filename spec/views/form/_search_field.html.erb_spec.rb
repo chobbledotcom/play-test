@@ -57,7 +57,7 @@ RSpec.describe "form/_search_field.html.erb", type: :view do
 
   context "with existing search parameters" do
     before do
-      allow(view).to receive(:params).and_return({query: "test search"})
+      allow(view).to receive(:params).and_return({ query: "test search" })
     end
 
     it "preserves existing search value" do
@@ -69,7 +69,7 @@ RSpec.describe "form/_search_field.html.erb", type: :view do
 
   context "with custom field name and existing parameters" do
     before do
-      allow(view).to receive(:params).and_return({search_term: "custom search"})
+      allow(view).to receive(:params).and_return({ search_term: "custom search" })
     end
 
     it "preserves existing value for custom field name" do

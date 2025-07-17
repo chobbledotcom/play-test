@@ -24,7 +24,9 @@ RSpec.feature "PDF Field Coverage", type: :feature do
       expect(text_content).to include(unit.name)
       expect(text_content).to include(unit.serial)
       expect(text_content).to include(inspection.inspection_date.strftime("%-d %B, %Y"))
-      expect(text_content).to include(inspection.passed? ? I18n.t("pdf.inspection.passed") : I18n.t("pdf.inspection.failed"))
+      expect(text_content).to include(inspection.passed? ?
+        I18n.t("pdf.inspection.passed") :
+        I18n.t("pdf.inspection.failed"))
       expect(text_content).to include("#{I18n.t("pdf.inspection.fields.report_id")}: #{inspection.id}")
 
       expect(text_content).to include(I18n.t("pdf.dimensions.width"))

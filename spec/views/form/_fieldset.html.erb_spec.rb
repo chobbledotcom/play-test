@@ -28,20 +28,20 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
           i18n_base = local_assigns[:i18n_base]
           raise ArgumentError, "i18n_base is required for form fieldsets" if i18n_base.nil?
           @_current_i18n_base = i18n_base
-          
+        #{'  '}
           # Determine legend text
           if local_assigns[:legend]
             legend_text = local_assigns[:legend]
           elsif local_assigns[:legend_key] && i18n_base
             # Remove .fields suffix if present to get to sections level
             sections_base = i18n_base.sub(/\\.fields$/, '')
-            legend_text = t("\#{sections_base}.sections.\#{local_assigns[:legend_key]}", 
+            legend_text = t("\#{sections_base}.sections.\#{local_assigns[:legend_key]}",#{' '}
                             default: local_assigns[:legend_key].to_s.humanize)
           else
             legend_text = local_assigns[:legend_key]&.to_s&.humanize || "Section"
           end
         %>
-        
+
         <fieldset>
           <% if legend_text.present? %>
             <legend><%= legend_text %></legend>
@@ -50,7 +50,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
         </fieldset>
       ERB
 
-      render partial: "form/fieldset", locals: {i18n_base: base_i18n_key, legend: "Test"}
+      render partial: "form/fieldset", locals: { i18n_base: base_i18n_key, legend: "Test" }
 
       expect(rendered).to have_css("fieldset")
       expect(rendered).to include("Sample field content")
@@ -63,7 +63,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
         rendered_html = "<fieldset><legend>Custom Legend</legend>Content</fieldset>"
         allow(view).to receive(:render).and_return(rendered_html.html_safe)
 
-        render partial: "form/fieldset", locals: {i18n_base: base_i18n_key, legend: "Custom Legend"}
+        render partial: "form/fieldset", locals: { i18n_base: base_i18n_key, legend: "Custom Legend" }
 
         expect(rendered).to include("Custom Legend")
       end
@@ -72,7 +72,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
         rendered_html = "<fieldset>Content</fieldset>"
         allow(view).to receive(:render).and_return(rendered_html.html_safe)
 
-        render partial: "form/fieldset", locals: {i18n_base: base_i18n_key, legend: ""}
+        render partial: "form/fieldset", locals: { i18n_base: base_i18n_key, legend: "" }
 
         expect(rendered).not_to include("<legend>")
       end
@@ -83,7 +83,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
         rendered_html = "<fieldset><legend>Structure Information</legend>Content</fieldset>"
         allow(view).to receive(:render).and_return(rendered_html.html_safe)
 
-        render partial: "form/fieldset", locals: {i18n_base: "test.forms.fields", legend_key: "structure"}
+        render partial: "form/fieldset", locals: { i18n_base: "test.forms.fields", legend_key: "structure" }
 
         expect(rendered).to include("Structure Information")
       end
@@ -92,7 +92,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
         rendered_html = "<fieldset><legend>Unknown section</legend>Content</fieldset>"
         allow(view).to receive(:render).and_return(rendered_html.html_safe)
 
-        render partial: "form/fieldset", locals: {i18n_base: base_i18n_key, legend_key: "unknown_section"}
+        render partial: "form/fieldset", locals: { i18n_base: base_i18n_key, legend_key: "unknown_section" }
 
         expect(rendered).to include("Unknown section")
       end
@@ -104,7 +104,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
       rendered_html = "<fieldset><legend>Test</legend>Content</fieldset>"
       allow(view).to receive(:render).and_return(rendered_html.html_safe)
 
-      render partial: "form/fieldset", locals: {i18n_base: base_i18n_key, legend: "Test"}
+      render partial: "form/fieldset", locals: { i18n_base: base_i18n_key, legend: "Test" }
 
       expect(rendered).not_to include("class=")
       expect(rendered).to include("<fieldset>")

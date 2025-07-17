@@ -86,7 +86,7 @@ failed_inspection = Inspection.create!(
 )
 create_assessments_for_inspection(failed_inspection, $obstacle_course, passed: false)
 
-[6.months.ago, 1.year.ago].each do |date|
+[ 6.months.ago, 1.year.ago ].each do |date|
   historical = Inspection.create!(
     SeedData.inspection_fields.merge(
       user: $test_user,
@@ -139,14 +139,14 @@ in_progress.anchorage_assessment.update!(
   )
 )
 
-[$soft_play_unit, $castle_slide_combo, $bungee_run].each do |unit|
+[ $soft_play_unit, $castle_slide_combo, $bungee_run ].each do |unit|
   dimensions = case unit
   when $soft_play_unit
-    {width: 6.0, length: 6.0, height: 2.5, has_slide: false, is_totally_enclosed: true}
+    { width: 6.0, length: 6.0, height: 2.5, has_slide: false, is_totally_enclosed: true }
   when $castle_slide_combo
-    {width: 5.5, length: 7.0, height: 4.0, has_slide: true, is_totally_enclosed: false}
+    { width: 5.5, length: 7.0, height: 4.0, has_slide: true, is_totally_enclosed: false }
   when $bungee_run
-    {width: 4.0, length: 10.0, height: 2.5, has_slide: false, is_totally_enclosed: false}
+    { width: 4.0, length: 10.0, height: 2.5, has_slide: false, is_totally_enclosed: false }
   end
 
   passed_status = rand(0..4) > 0
@@ -159,7 +159,9 @@ in_progress.anchorage_assessment.update!(
       inspection_date: rand(1..60).days.ago,
       complete_date: Time.current,
       passed: passed_status,
-      risk_assessment: passed_status ? "Unit inspected and meets all safety requirements. Risk level: LOW." : "Safety failures identified. Unit unsafe for use. Risk level: HIGH.",
+      risk_assessment: passed_status ?
+        "Unit inspected and meets all safety requirements. Risk level: LOW." :
+        "Safety failures identified. Unit unsafe for use. Risk level: HIGH.",
       **dimensions
     )
   )

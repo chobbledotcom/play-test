@@ -7,8 +7,8 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.bigint "blob_id", null: false
       t.datetime "created_at", null: false
       t.string "record_id"
-      t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
-      t.index ["record_type", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+      t.index [ "blob_id" ], name: "index_active_storage_attachments_on_blob_id"
+      t.index [ "record_type", "name", "blob_id" ], name: "index_active_storage_attachments_uniqueness", unique: true
     end
 
     create_table "active_storage_blobs", force: :cascade do |t|
@@ -20,19 +20,19 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.bigint "byte_size", null: false
       t.string "checksum"
       t.datetime "created_at", null: false
-      t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+      t.index [ "key" ], name: "index_active_storage_blobs_on_key", unique: true
     end
 
     # rubocop:disable Rails/CreateTableWithTimestamps
     create_table "active_storage_variant_records", force: :cascade do |t|
       t.bigint "blob_id", null: false
       t.string "variation_digest", null: false
-      t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+      t.index [ "blob_id", "variation_digest" ], name: "index_active_storage_variant_records_uniqueness", unique: true
     end
     # rubocop:enable Rails/CreateTableWithTimestamps
 
     # Users
-    create_table "users", id: {type: :string, limit: 8}, force: :cascade do |t|
+    create_table "users", id: { type: :string, limit: 8 }, force: :cascade do |t|
       t.string "email"
       t.string "password_digest"
       t.datetime "created_at", null: false
@@ -49,12 +49,12 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.string "country"
       t.string "postal_code"
       t.datetime "rpii_verified_date"
-      t.index ["email"], name: "index_users_on_email"
-      t.index ["inspection_company_id"], name: "index_users_on_inspection_company_id"
+      t.index [ "email" ], name: "index_users_on_email"
+      t.index [ "inspection_company_id" ], name: "index_users_on_inspection_company_id"
     end
 
     # Inspector Companies
-    create_table "inspector_companies", id: {type: :string, limit: 8}, force: :cascade do |t|
+    create_table "inspector_companies", id: { type: :string, limit: 8 }, force: :cascade do |t|
       t.boolean "active", default: true
       t.string "name", null: false
       t.string "email"
@@ -66,11 +66,11 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.text "notes"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.index ["active"], name: "index_inspector_companies_on_active"
+      t.index [ "active" ], name: "index_inspector_companies_on_active"
     end
 
     # Units
-    create_table "units", id: {type: :string, limit: 8}, force: :cascade do |t|
+    create_table "units", id: { type: :string, limit: 8 }, force: :cascade do |t|
       t.string "name"
       t.string "user_id", limit: 8, null: false
       t.datetime "created_at", null: false
@@ -83,13 +83,13 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.string "model"
       t.date "manufacture_date"
       t.string "serial"
-      t.index ["is_seed"], name: "index_units_on_is_seed"
-      t.index ["manufacturer", "serial"], name: "index_units_on_manufacturer_and_serial", unique: true
-      t.index ["user_id"], name: "index_units_on_user_id"
+      t.index [ "is_seed" ], name: "index_units_on_is_seed"
+      t.index [ "manufacturer", "serial" ], name: "index_units_on_manufacturer_and_serial", unique: true
+      t.index [ "user_id" ], name: "index_units_on_user_id"
     end
 
     # Inspections
-    create_table "inspections", id: {type: :string, limit: 8}, force: :cascade do |t|
+    create_table "inspections", id: { type: :string, limit: 8 }, force: :cascade do |t|
       t.datetime "inspection_date"
       t.boolean "passed"
       t.string "unit_id", limit: 8
@@ -111,11 +111,11 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.string "height_comment", limit: 1000
       t.text "risk_assessment"
       t.datetime "complete_date"
-      t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
-      t.index ["is_seed"], name: "index_inspections_on_is_seed"
-      t.index ["unit_id"], name: "index_inspections_on_unit_id"
-      t.index ["user_id", "unique_report_number"], name: "index_inspections_on_user_and_report_number", unique: true
-      t.index ["user_id"], name: "index_inspections_on_user_id"
+      t.index [ "inspector_company_id" ], name: "index_inspections_on_inspector_company_id"
+      t.index [ "is_seed" ], name: "index_inspections_on_is_seed"
+      t.index [ "unit_id" ], name: "index_inspections_on_unit_id"
+      t.index [ "user_id", "unique_report_number" ], name: "index_inspections_on_user_and_report_number", unique: true
+      t.index [ "user_id" ], name: "index_inspections_on_user_id"
     end
 
     # Assessment Tables
@@ -137,7 +137,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.text "num_high_anchors_comment"
       t.boolean "num_low_anchors_pass"
       t.boolean "num_high_anchors_pass"
-      t.index ["inspection_id"], name: "index_anchorage_assessments_on_inspection_id"
+      t.index [ "inspection_id" ], name: "index_anchorage_assessments_on_inspection_id"
     end
 
     create_table "enclosed_assessments", force: :cascade do |t|
@@ -149,7 +149,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.text "exit_number_comment"
       t.boolean "exit_sign_always_visible_pass"
       t.text "exit_sign_always_visible_comment"
-      t.index ["inspection_id"], name: "index_enclosed_assessments_on_inspection_id"
+      t.index [ "inspection_id" ], name: "index_enclosed_assessments_on_inspection_id"
     end
 
     create_table "fan_assessments", force: :cascade do |t|
@@ -168,7 +168,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.string "blower_serial"
       t.boolean "blower_serial_pass"
       t.text "blower_serial_comment"
-      t.index ["inspection_id"], name: "index_fan_assessments_on_inspection_id"
+      t.index [ "inspection_id" ], name: "index_fan_assessments_on_inspection_id"
     end
 
     create_table "materials_assessments", force: :cascade do |t|
@@ -199,7 +199,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.string "inflated_stability_comment", limit: 1000
       t.string "protrusions_comment", limit: 1000
       t.string "critical_defects_comment", limit: 1000
-      t.index ["inspection_id"], name: "index_materials_assessments_on_inspection_id"
+      t.index [ "inspection_id" ], name: "index_materials_assessments_on_inspection_id"
     end
 
     create_table "slide_assessments", force: :cascade do |t|
@@ -223,7 +223,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.text "clamber_netting_comment"
       t.text "runout_comment"
       t.text "slip_sheet_comment"
-      t.index ["inspection_id"], name: "index_slide_assessments_on_inspection_id"
+      t.index [ "inspection_id" ], name: "index_slide_assessments_on_inspection_id"
     end
 
     # Structure assessments - WITHOUT step_size fields
@@ -285,7 +285,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.decimal "step_ramp_size", precision: 8, scale: 2
       t.boolean "step_ramp_size_pass"
       t.text "step_ramp_size_comment"
-      t.index ["inspection_id"], name: "index_structure_assessments_on_inspection_id"
+      t.index [ "inspection_id" ], name: "index_structure_assessments_on_inspection_id"
     end
 
     create_table "user_height_assessments", force: :cascade do |t|
@@ -308,7 +308,7 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.integer "users_at_1200mm"
       t.integer "users_at_1500mm"
       t.integer "users_at_1800mm"
-      t.index ["inspection_id"], name: "index_user_height_assessments_on_inspection_id"
+      t.index [ "inspection_id" ], name: "index_user_height_assessments_on_inspection_id"
     end
 
     # Foreign Keys

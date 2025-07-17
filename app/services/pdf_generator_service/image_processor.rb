@@ -6,7 +6,7 @@ class PdfGeneratorService
     def self.generate_qr_code_footer(pdf, entity)
       entity_type = entity.class.name.downcase
       qr_code_png = QrCodeService.generate_qr_code(entity)
-      qr_code_temp_file = Tempfile.new(["qr_code_#{entity_type}_#{entity.id}_#{Process.pid}", ".png"])
+      qr_code_temp_file = Tempfile.new([ "qr_code_#{entity_type}_#{entity.id}_#{Process.pid}", ".png" ])
 
       begin
         qr_code_temp_file.binmode
@@ -23,7 +23,7 @@ class PdfGeneratorService
         # Add QR code on top with transparency
         pdf.transparent(0.5) do
           qr_width, qr_height = PositionCalculator.qr_code_dimensions
-          pdf.image qr_code_temp_file.path, at: [qr_x, qr_y], width: qr_width, height: qr_height
+          pdf.image qr_code_temp_file.path, at: [ qr_x, qr_y ], width: qr_width, height: qr_height
         end
       ensure
         qr_code_temp_file.close unless qr_code_temp_file.closed?
@@ -64,7 +64,7 @@ class PdfGeneratorService
       image.auto_orient
       processed_image = image.to_blob
 
-      pdf.image StringIO.new(processed_image), at: [photo_x, photo_y], width: photo_width, height: photo_height
+      pdf.image StringIO.new(processed_image), at: [ photo_x, photo_y ], width: photo_width, height: photo_height
     end
 
     def self.create_image(attachment)

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# Helix formatter wrapper for Ruby files
+# Runs RuboCop first, then StandardRB for final formatting
+
+# Read input from stdin
+input=$(cat)
+
+# Create a temporary file
+temp_file=$(mktemp /tmp/helix-ruby-formatter.XXXXXX.rb)
+
+# Write input to temp file
+echo "$input" > "$temp_file"
+
+# Run RuboCop with autocorrect
+bundle exec rubocop "$temp_file" --autocorrect-all --stderr 2>/dev/null
+
+# Run StandardRB for final formatting
+bundle exec standardrb --fix "$temp_file" 2>/dev/null
+
+# Output the formatted content
+cat "$temp_file"
+
+# Clean up
+rm -f "$temp_file"

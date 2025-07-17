@@ -7,7 +7,9 @@ class User < ApplicationRecord
   has_many :units, dependent: :destroy
   has_many :events, dependent: :destroy
   has_one_attached :logo
+  has_one_attached :signature
   validate :logo_must_be_image
+  validate :signature_must_be_image
 
   belongs_to :inspection_company,
     class_name: "InspectorCompany",
@@ -156,6 +158,15 @@ class User < ApplicationRecord
     unless logo.blob.content_type.start_with?("image/")
       errors.add(:logo, "must be an image file")
       logo.purge
+    end
+  end
+
+  def signature_must_be_image
+    return unless signature.attached?
+
+    unless signature.blob.content_type.start_with?("image/")
+      errors.add(:signature, "must be an image file")
+      signature.purge
     end
   end
 end

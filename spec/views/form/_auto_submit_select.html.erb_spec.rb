@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
   let(:field) { :status }
-  let(:options) { [["Active", "active"], ["Inactive", "inactive"]] }
+  let(:options) { [ [ "Active", "active" ], [ "Inactive", "inactive" ] ] }
 
   before do
     # Mock params
@@ -30,7 +30,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
         field,
         include("<option selected=\"selected\" value=\"active\">Active</option>"),
         {},
-        {onchange: "this.form.submit();"}
+        { onchange: "this.form.submit();" }
       )
       expect(rendered).to include('<select name="status"></select>')
     end
@@ -64,8 +64,8 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
       expect(form_builder).to have_received(:select).with(
         field,
         include("<option selected=\"selected\" value=\"active\">Active</option>"),
-        {include_blank: "All"},
-        {onchange: "this.form.submit();"}
+        { include_blank: "All" },
+        { onchange: "this.form.submit();" }
       )
     end
 
@@ -80,14 +80,14 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
       expect(form_builder).to have_received(:select).with(
         field,
         include("<option selected=\"selected\" value=\"active\">Active</option>"),
-        {include_blank: "Choose..."},
-        {onchange: "this.form.submit();"}
+        { include_blank: "Choose..." },
+        { onchange: "this.form.submit();" }
       )
     end
 
     context "with params value" do
       before do
-        allow(view).to receive(:params).and_return({status: "inactive"})
+        allow(view).to receive(:params).and_return({ status: "inactive" })
       end
 
       it "prefers params value over model value" do
@@ -129,13 +129,13 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
     end
 
     it "preserves specified parameters" do
-      allow(view).to receive(:params).and_return({search: "test", page: "2"})
+      allow(view).to receive(:params).and_return({ search: "test", page: "2" })
 
       render "form/auto_submit_select",
         field: field,
         options: options,
         url: url,
-        preserve_params: [:search]
+        preserve_params: [ :search ]
 
       expect(rendered).to include('name="search"')
       expect(rendered).to include('value="test"')
@@ -154,7 +154,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
 
     context "with existing field value in params" do
       before do
-        allow(view).to receive(:params).and_return({status: "active"})
+        allow(view).to receive(:params).and_return({ status: "active" })
       end
 
       it "preserves the selected value" do
@@ -192,10 +192,10 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
   context "with complex options" do
     let(:complex_options) do
       [
-        ["All Items", ""],
-        ["Active Items", "active"],
-        ["Inactive Items", "inactive"],
-        ["Pending Items", "pending"]
+        [ "All Items", "" ],
+        [ "Active Items", "active" ],
+        [ "Inactive Items", "inactive" ],
+        [ "Pending Items", "pending" ]
       ]
     end
 

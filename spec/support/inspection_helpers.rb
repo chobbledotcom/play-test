@@ -8,7 +8,7 @@ module InspectionHelpers
     )
 
     traits = options.delete(:traits) || []
-    traits = [:completed] + Array(traits)
+    traits = [ :completed ] + Array(traits)
     create(:inspection, *traits, **options)
   end
 end

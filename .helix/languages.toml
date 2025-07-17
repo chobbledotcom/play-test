@@ -1,0 +1,8 @@
+# Helix editor language configuration for this project
+
+[[language]]
+name = "ruby"
+auto-format = true
+
+[language.formatter]
+command = "bin/helix-ruby-formatter"

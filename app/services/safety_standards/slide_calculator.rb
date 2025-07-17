@@ -28,40 +28,40 @@ module SafetyStandards
       # Valid scenarios
       valid: {
         # No walls required (under 0.6m)
-        no_walls_required: [0.5, 1.5, 0, false],
-        no_walls_required_low: [0.3, 1.5, 0, false],
+        no_walls_required: [ 0.5, 1.5, 0, false ],
+        no_walls_required_low: [ 0.3, 1.5, 0, false ],
 
         # Basic walls (0.6m - 3.0m) - wall height >= user height
-        basic_walls_exact: [1.5, 1.5, 1.5, false],
-        basic_walls_exceeds: [2, 2, 2.5, false],
+        basic_walls_exact: [ 1.5, 1.5, 1.5, false ],
+        basic_walls_exceeds: [ 2, 2, 2.5, false ],
 
         # Enhanced walls (3.0m - 6.0m) - wall height >= 1.25x user height OR roof
-        enhanced_walls: [4, 4, 5, false], # 4 * 1.25 = 5
-        enhanced_walls_exact: [5, 5, 6.25, false], # 5 * 1.25 = 6.25
-        enhanced_walls_with_roof: [4, 4, 3, true], # Insufficient walls but has roof
-        enhanced_walls_roof_alternative: [5, 5, 5, true], # Has roof, walls don't need to be 1.25x
+        enhanced_walls: [ 4, 4, 5, false ], # 4 * 1.25 = 5
+        enhanced_walls_exact: [ 5, 5, 6.25, false ], # 5 * 1.25 = 6.25
+        enhanced_walls_with_roof: [ 4, 4, 3, true ], # Insufficient walls but has roof
+        enhanced_walls_roof_alternative: [ 5, 5, 5, true ], # Has roof, walls don't need to be 1.25x
 
         # Maximum height (6.0m - 8.0m) - wall height >= 1.25x user height AND roof
-        max_height_with_roof: [7, 7, 8.75, true], # 7 * 1.25 = 8.75 AND has roof
-        max_height_exact_with_roof: [6.5, 6.5, 8.125, true] # 6.5 * 1.25 = 8.125 AND has roof
+        max_height_with_roof: [ 7, 7, 8.75, true ], # 7 * 1.25 = 8.75 AND has roof
+        max_height_exact_with_roof: [ 6.5, 6.5, 8.125, true ] # 6.5 * 1.25 = 8.125 AND has roof
       },
 
       # Invalid scenarios
       invalid: {
         # Nil values
-        nil_user_height: [1, nil, 2, false],
-        nil_wall_height: [1, 1.5, nil, false],
-        nil_roof: [1, 1.5, 2, nil],
+        nil_user_height: [ 1, nil, 2, false ],
+        nil_wall_height: [ 1, 1.5, nil, false ],
+        nil_roof: [ 1, 1.5, 2, nil ],
 
         # Insufficient wall heights
-        basic_walls_too_low: [2, 2, 1.8, false],
-        enhanced_walls_too_low: [4, 4, 4.8, false], # Needs 5m or roof
-        max_height_too_low: [7, 7, 8, true], # Needs 8.75m even with roof
-        max_height_no_roof: [7, 7, 8.75, false], # Has correct walls but needs roof
+        basic_walls_too_low: [ 2, 2, 1.8, false ],
+        enhanced_walls_too_low: [ 4, 4, 4.8, false ], # Needs 5m or roof
+        max_height_too_low: [ 7, 7, 8, true ], # Needs 8.75m even with roof
+        max_height_no_roof: [ 7, 7, 8.75, false ], # Has correct walls but needs roof
 
         # Exceeds safe limits (over 8.0m)
-        exceeds_safe_height: [9, 7, 12, true],
-        exceeds_safe_height_high: [10, 7, 15, true]
+        exceeds_safe_height: [ 9, 7, 12, true ],
+        exceeds_safe_height_high: [ 10, 7, 15, true ]
       }
     }.freeze
 
@@ -71,25 +71,25 @@ module SafetyStandards
       # Valid scenarios
       valid: {
         # Runout is 50% of platform height
-        runout_exact: [1, 2],
-        runout_half: [0.5, 1],
+        runout_exact: [ 1, 2 ],
+        runout_half: [ 0.5, 1 ],
 
         # Minimum runout (0.3m)
-        runout_minimum: [0.3, 0.1] # Platform needs 0.05m but minimum is 0.3m
+        runout_minimum: [ 0.3, 0.1 ] # Platform needs 0.05m but minimum is 0.3m
       },
 
       # Invalid scenarios
       invalid: {
         # Nil values
-        runout_nil: [nil, 2],
-        platform_nil: [1.5, nil],
+        runout_nil: [ nil, 2 ],
+        platform_nil: [ 1.5, nil ],
 
         # Insufficient runout
-        runout_too_short: [0.8, 2], # Needs 1m
-        runout_insufficient: [0.2, 1], # Needs 0.5m
+        runout_too_short: [ 0.8, 2 ], # Needs 1m
+        runout_insufficient: [ 0.2, 1 ], # Needs 0.5m
 
         # Below minimum
-        runout_below_min: [0.25, 0.1] # Below 0.3m minimum
+        runout_below_min: [ 0.25, 0.1 ] # Below 0.3m minimum
       }
     }.freeze
 
@@ -102,7 +102,7 @@ module SafetyStandards
       stop_wall_add = RUNOUT_CALCULATION_CONSTANTS[:stop_wall_addition]
 
       calculated_runout = platform_height * height_ratio
-      base_runout = [calculated_runout, minimum_runout].max
+      base_runout = [ calculated_runout, minimum_runout ].max
 
       has_stop_wall ? base_runout + stop_wall_add : base_runout
     end

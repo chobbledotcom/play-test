@@ -16,6 +16,12 @@ echo "$(date): Parsed file path: $file_path" >> /tmp/claude-hook.log
 
 # Check if it's a Ruby file
 if [[ "$file_path" == *.rb ]]; then
+    # Run RuboCop with our custom cops first
+    echo "$(date): Running RuboCop on $file_path..." >> /tmp/claude-hook.log
+    bundle exec rubocop "$file_path" --autocorrect-all 2>&1
+    echo "$(date): RuboCop completed for $file_path" >> /tmp/claude-hook.log
+    
+    # Run StandardRB to ensure it has the final say
     echo "$(date): Running StandardRB on $file_path..." >> /tmp/claude-hook.log
     bundle exec standardrb --fix "$file_path"
     echo "$(date): StandardRB completed for $file_path" >> /tmp/claude-hook.log

@@ -21,10 +21,10 @@ RSpec.describe SafetyStandard, type: :model do
   describe "HEIGHT_CATEGORIES" do
     it "has correct height categories with labels" do
       expect(SafetyStandard::HEIGHT_CATEGORIES).to include(
-        1000 => {label: "1.0m (Young children)", max_users: :calculate_by_area},
-        1200 => {label: "1.2m (Children)", max_users: :calculate_by_area},
-        1500 => {label: "1.5m (Adolescents)", max_users: :calculate_by_area},
-        1800 => {label: "1.8m (Adults)", max_users: :calculate_by_area}
+        1000 => { label: "1.0m (Young children)", max_users: :calculate_by_area },
+        1200 => { label: "1.2m (Children)", max_users: :calculate_by_area },
+        1500 => { label: "1.5m (Adolescents)", max_users: :calculate_by_area },
+        1800 => { label: "1.8m (Adults)", max_users: :calculate_by_area }
       )
     end
   end

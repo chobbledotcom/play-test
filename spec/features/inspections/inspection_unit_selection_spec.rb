@@ -45,7 +45,7 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
 
     it "shows unit details in the list" do
       within ".table-list-items" do
-        [unit1, unit2, unit3].each do |unit|
+        [ unit1, unit2, unit3 ].each do |unit|
           expect(page).to have_content(unit.serial)
           expect(page).to have_content(unit.manufacturer)
         end

@@ -1,6 +1,6 @@
 module SafetyStandardsTurboHelpers
   def turbo_headers
-    {"Accept" => "text/vnd.turbo-stream.html"}
+    { "Accept" => "text/vnd.turbo-stream.html" }
   end
 end
 

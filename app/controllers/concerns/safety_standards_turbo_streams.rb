@@ -8,10 +8,10 @@ module SafetyStandardsTurboStreams
   end
 
   def safety_standards_turbo_streams
-    [turbo_stream.replace(
+    [ turbo_stream.replace(
       safety_results_frame_id,
       partial: safety_results_partial
-    )]
+    ) ]
   end
 
   def safety_results_frame_id

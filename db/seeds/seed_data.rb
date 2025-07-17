@@ -25,10 +25,10 @@ module SeedData
 
   def self.unit_fields
     {
-      name: "Bouncy Castle #{["Mega", "Super", "Fun", "Party", "Adventure"].sample} #{rand(1..99)}",
+      name: "Bouncy Castle #{[ "Mega", "Super", "Fun", "Party", "Adventure" ].sample} #{rand(1..99)}",
       serial: "BC-#{Date.current.year}-#{SecureRandom.hex(4).upcase}",
-      manufacturer: ["ABC Inflatables", "XYZ Bounce Co", "Fun Factory", "Party Products Ltd"].sample,
-      owner: ["Rental Company #{rand(1..10)}", "Party Hire #{rand(1..5)}", "Events Ltd"].sample,
+      manufacturer: [ "ABC Inflatables", "XYZ Bounce Co", "Fun Factory", "Party Products Ltd" ].sample,
+      owner: [ "Rental Company #{rand(1..10)}", "Party Hire #{rand(1..5)}", "Events Ltd" ].sample,
       manufacture_date: Date.current - rand(365..1825).days,
       description: "Commercial grade inflatable bouncy castle suitable for events"
     }
@@ -39,8 +39,8 @@ module SeedData
       inspection_date: Date.current,
       inspection_location: "Test Location #{rand(1..5)}",
       unique_report_number: "RPT-#{Date.current.year}-#{rand(1000..9999)}",
-      is_totally_enclosed: [true, false].sample,
-      has_slide: [true, false].sample,
+      is_totally_enclosed: [ true, false ].sample,
+      has_slide: [ true, false ].sample,
       width: rand(4.0..8.0).round(1),
       length: rand(5.0..10.0).round(1),
       height: rand(3.0..6.0).round(1)
@@ -96,8 +96,12 @@ module SeedData
       trough_adjacent_panel_width_pass: check_passed?(passed),
       evacuation_time: rand(30..90),
       evacuation_time_pass: check_passed?(passed),
-      seam_integrity_comment: passed ? "All seams in good condition" : "Minor thread loosening noted",
-      uses_lock_stitching_comment: passed ? "Lock stitching intact throughout" : "Some lock stitching showing wear",
+      seam_integrity_comment: passed ?
+        "All seams in good condition" :
+        "Minor thread loosening noted",
+      uses_lock_stitching_comment: passed ?
+        "Lock stitching intact throughout" :
+        "Some lock stitching showing wear",
       stitch_length_comment: "Measured at regular intervals"
     }
   end
@@ -114,7 +118,9 @@ module SeedData
       fabric_strength_pass: check_passed?(passed),
       fire_retardant_pass: check_passed?(passed),
       ropes_comment: passed ? nil : "Rope shows signs of wear",
-      fabric_strength_comment: passed ? "Fabric in good condition" : "Minor surface wear noted"
+      fabric_strength_comment: passed ?
+        "Fabric in good condition" :
+        "Minor surface wear noted"
     }
   end
 
@@ -126,12 +132,24 @@ module SeedData
       pat_pass: check_passed?(passed),
       blower_serial_pass: check_passed?(passed),
       blower_serial: "FAN-#{rand(1000..9999)}",
-      fan_size_type: passed ? "Fan operating correctly at optimal pressure" : "Fan requires servicing",
-      blower_flap_comment: passed ? "Flap mechanism functioning correctly" : "Flap sticking occasionally",
-      blower_finger_comment: passed ? "Guard secure, no finger trap hazards" : "Guard needs tightening",
-      blower_visual_comment: passed ? "Visual inspection satisfactory" : "Some wear visible on housing",
-      pat_comment: passed ? "PAT test valid until #{(Date.current + 6.months).strftime("%B %Y")}" : "PAT test overdue",
-      blower_serial_comment: passed ? "Serial number visible and recorded" : "Serial number partially obscured"
+      fan_size_type: passed ?
+        "Fan operating correctly at optimal pressure" :
+        "Fan requires servicing",
+      blower_flap_comment: passed ?
+        "Flap mechanism functioning correctly" :
+        "Flap sticking occasionally",
+      blower_finger_comment: passed ?
+        "Guard secure, no finger trap hazards" :
+        "Guard needs tightening",
+      blower_visual_comment: passed ?
+        "Visual inspection satisfactory" :
+        "Some wear visible on housing",
+      pat_comment: passed ?
+        "PAT test valid until #{(Date.current + 6.months).strftime("%B %Y")}" :
+        "PAT test overdue",
+      blower_serial_comment: passed ?
+        "Serial number visible and recorded" :
+        "Serial number partially obscured"
     }
   end
 
@@ -147,7 +165,9 @@ module SeedData
       play_area_length: rand(3.0..10.0).round(1),
       play_area_width: rand(3.0..8.0).round(1),
       negative_adjustment: rand(0..2.0).round(1),
-      tallest_user_height_comment: passed ? "Capacity within safe limits based on EN 14960:2019" : "Review user capacity - exceeds recommended limits",
+      tallest_user_height_comment: passed ?
+        "Capacity within safe limits based on EN 14960:2019" :
+        "Review user capacity - exceeds recommended limits",
       containing_wall_height_comment: "Measured from base to top of wall",
       platform_height_comment: "Platform height acceptable for age group",
       play_area_length_comment: "Effective play area after deducting obstacles",
@@ -178,11 +198,19 @@ module SeedData
       runout_pass: check_passed?(passed),
       slip_sheet_pass: check_passed?(passed),
       slide_permanent_roof: false,
-      slide_platform_height_comment: passed ? "Platform height compliant with EN 14960:2019" : "Platform height exceeds recommended limits",
+      slide_platform_height_comment: passed ?
+        "Platform height compliant with EN 14960:2019" :
+        "Platform height exceeds recommended limits",
       slide_wall_height_comment: "Wall height measured from slide bed",
-      runout_comment: passed ? "Runout area clear and adequate" : "Runout area needs extending",
-      clamber_netting_comment: passed ? "Netting secure with no gaps" : "Some gaps in netting need attention",
-      slip_sheet_comment: passed ? "Slip sheet in good condition" : "Slip sheet showing wear"
+      runout_comment: passed ?
+        "Runout area clear and adequate" :
+        "Runout area needs extending",
+      clamber_netting_comment: passed ?
+        "Netting secure with no gaps" :
+        "Some gaps in netting need attention",
+      slip_sheet_comment: passed ?
+        "Slip sheet in good condition" :
+        "Slip sheet showing wear"
     }
   end
 
@@ -191,8 +219,12 @@ module SeedData
       exit_number: rand(1..3),
       exit_number_pass: check_passed?(passed),
       exit_sign_always_visible_pass: check_passed?(passed),
-      exit_number_comment: passed ? "Number of exits compliant with unit size" : "Additional exit required",
-      exit_sign_always_visible_comment: passed ? "Exit signs visible from all points" : "Exit signs obscured from some angles"
+      exit_number_comment: passed ?
+        "Number of exits compliant with unit size" :
+        "Additional exit required",
+      exit_sign_always_visible_comment: passed ?
+        "Exit signs visible from all points" :
+        "Exit signs obscured from some angles"
     }
   end
 end

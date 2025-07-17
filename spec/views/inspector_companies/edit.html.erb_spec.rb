@@ -56,7 +56,7 @@ RSpec.describe "inspector_companies/edit", type: :view do
       allow(blob).to receive(:persisted?).and_return(true)
       allow(blob).to receive(:analyzed?).and_return(true)
       allow(blob).to receive(:analyze)
-      allow(blob).to receive(:metadata).and_return({"width" => 100, "height" => 100})
+      allow(blob).to receive(:metadata).and_return({ "width" => 100, "height" => 100 })
 
       allow(inspector_company).to receive(:logo).and_return(logo_attachment)
       allow(ImageProcessorService).to receive(:thumbnail).and_return("processed_image_url")

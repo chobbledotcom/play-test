@@ -13,7 +13,7 @@ RSpec.describe I18nUsageTracker do
   describe ".reset!" do
     it "clears used keys and disables tracking" do
       described_class.tracking_enabled = true
-      described_class.instance_variable_set(:@used_keys, Set.new(["test.key"]))
+      described_class.instance_variable_set(:@used_keys, Set.new([ "test.key" ]))
 
       described_class.reset!
 
@@ -102,7 +102,7 @@ RSpec.describe I18nUsageTracker do
         end
 
         it "handles array scope" do
-          described_class.track_key("created", scope: ["users", "messages"])
+          described_class.track_key("created", scope: [ "users", "messages" ])
 
           expect(described_class.used_keys).to include("users.messages.created")
           expect(described_class.used_keys).to include("users.messages")
@@ -192,7 +192,7 @@ RSpec.describe I18nUsageTracker do
 
     it "calculates usage percentage correctly" do
       # Mock all_locale_keys to have a known set
-      known_keys = Set.new(["users", "users.edit", "users.edit.title", "shared", "shared.save"])
+      known_keys = Set.new([ "users", "users.edit", "users.edit.title", "shared", "shared.save" ])
       allow(described_class).to receive(:all_locale_keys).and_return(known_keys)
 
       # Track some keys (this will also track parent keys)
@@ -243,7 +243,7 @@ RSpec.describe I18nUsageTracker do
     end
 
     it "handles simple values" do
-      hash = {"simple" => "value"}
+      hash = { "simple" => "value" }
       keys = Set.new
 
       described_class.send(:extract_keys_from_hash, hash, [], keys)

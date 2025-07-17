@@ -3,11 +3,11 @@ require "rails_helper"
 RSpec.describe "Safety Standards API", type: :request do
   describe "POST /safety_standards" do
     context "with JSON request format" do
-      let(:headers) { {"Content-Type": "application/json", Accept: "application/json"} }
+      let(:headers) { { "Content-Type": "application/json", Accept: "application/json" } }
 
       it "calculates anchor requirements" do
         post safety_standards_path,
-          params: {calculation: {type: "anchors", length: 5.0, width: 5.0, height: 3.0}}.to_json,
+          params: { calculation: { type: "anchors", length: 5.0, width: 5.0, height: 3.0 } }.to_json,
           headers: headers
 
         expect(response).to have_http_status(:ok)
@@ -20,7 +20,7 @@ RSpec.describe "Safety Standards API", type: :request do
 
       it "returns error for invalid data" do
         post safety_standards_path,
-          params: {calculation: {type: "anchors", length: 0, width: 0, height: 0}}.to_json,
+          params: { calculation: { type: "anchors", length: 0, width: 0, height: 0 } }.to_json,
           headers: headers
 
         expect(response).to have_http_status(:ok)

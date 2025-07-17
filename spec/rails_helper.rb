@@ -49,7 +49,7 @@ RSpec.configure do |config|
   config.include Capybara::DSL, type: :request
   config.include FormHelpers, type: :feature
 
-  config.fixture_paths = [Rails.root.join("spec/fixtures")]
+  config.fixture_paths = [ Rails.root.join("spec/fixtures") ]
   config.use_transactional_fixtures = false
 
   config.before(:suite) do

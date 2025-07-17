@@ -38,7 +38,7 @@ RSpec.describe TestDataHelpers do
     end
 
     it "uses valid postcode prefixes" do
-      prefixes = ["SW", "SE", "NW", "N", "E", "W", "EC", "WC", "B", "M", "L", "G", "EH", "CF", "BS", "OX", "CB"]
+      prefixes = [ "SW", "SE", "NW", "N", "E", "W", "EC", "WC", "B", "M", "L", "G", "EH", "CF", "BS", "OX", "CB" ]
       postcode = described_class.british_postcode
       prefix = postcode.split(/\d/).first
 
@@ -66,8 +66,8 @@ RSpec.describe TestDataHelpers do
     end
 
     it "uses valid British street names" do
-      expected_streets = ["High Street", "Church Lane", "Victoria Road", "King's Road", "Queen Street",
-        "Park Avenue", "Station Road", "London Road", "Market Square", "The Green"]
+      expected_streets = [ "High Street", "Church Lane", "Victoria Road", "King's Road", "Queen Street",
+        "Park Avenue", "Station Road", "London Road", "Market Square", "The Green" ]
       address = described_class.british_address
       street_name = address.split(" ", 2).last
 
@@ -90,9 +90,9 @@ RSpec.describe TestDataHelpers do
 
   describe ".british_city" do
     it "returns a valid British city" do
-      expected_cities = ["London", "Birmingham", "Manchester", "Leeds", "Liverpool", "Newcastle", "Bristol",
+      expected_cities = [ "London", "Birmingham", "Manchester", "Leeds", "Liverpool", "Newcastle", "Bristol",
         "Sheffield", "Nottingham", "Leicester", "Oxford", "Cambridge", "Brighton", "Southampton",
-        "Edinburgh", "Glasgow", "Cardiff", "Belfast"]
+        "Edinburgh", "Glasgow", "Cardiff", "Belfast" ]
       city = described_class.british_city
 
       expect(expected_cities).to include(city)
@@ -122,7 +122,7 @@ RSpec.describe TestDataHelpers do
       end
 
       it "uses valid company suffixes" do
-        expected_suffixes = ["Ltd", "UK", "Services", "Solutions", "Group", "& Co", "International"]
+        expected_suffixes = [ "Ltd", "UK", "Services", "Solutions", "Group", "& Co", "International" ]
         base_name = "ABC"
         company_name = described_class.british_company_name(base_name)
         suffix = company_name.split(" ", 2).last
@@ -163,9 +163,9 @@ RSpec.describe TestDataHelpers do
     end
 
     it "uses valid British cities" do
-      expected_cities = ["London", "Birmingham", "Manchester", "Leeds", "Liverpool", "Newcastle", "Bristol",
+      expected_cities = [ "London", "Birmingham", "Manchester", "Leeds", "Liverpool", "Newcastle", "Bristol",
         "Sheffield", "Nottingham", "Leicester", "Oxford", "Cambridge", "Brighton", "Southampton",
-        "Edinburgh", "Glasgow", "Cardiff", "Belfast"]
+        "Edinburgh", "Glasgow", "Cardiff", "Belfast" ]
       location = described_class.inspection_location
       city = location.split(" ").first
 
@@ -173,8 +173,8 @@ RSpec.describe TestDataHelpers do
     end
 
     it "uses valid venue types" do
-      expected_venues = ["Park", "Recreation Centre", "Community Hall", "School", "Leisure Centre",
-        "Sports Complex", "Village Hall", "Town Square", "Festival Grounds"]
+      expected_venues = [ "Park", "Recreation Centre", "Community Hall", "School", "Leisure Centre",
+        "Sports Complex", "Village Hall", "Town Square", "Festival Grounds" ]
       location = described_class.inspection_location
       venue = location.split(" ", 2).last
 

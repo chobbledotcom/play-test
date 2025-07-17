@@ -6,7 +6,7 @@ RSpec.describe "users/index.html.erb", type: :view do
   let(:regular_user2) { create(:user, email: "user2@example.com") }
 
   before do
-    assign(:users, [admin_user, regular_user1, regular_user2])
+    assign(:users, [ admin_user, regular_user1, regular_user2 ])
     assign(:inspection_counts, {
       admin_user.id => 5,
       regular_user1.id => 3,

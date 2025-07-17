@@ -7,7 +7,7 @@ class PdfGeneratorService
     def self.qr_code_position(pdf_bounds_width)
       x = pdf_bounds_width - QR_CODE_SIZE - QR_CODE_MARGIN
       y = QR_CODE_BOTTOM_OFFSET + QR_CODE_SIZE
-      [x, y]
+      [ x, y ]
     end
 
     # Calculate photo position aligned with QR code
@@ -23,7 +23,7 @@ class PdfGeneratorService
       # Photo's bottom edge aligns with QR's bottom edge (both match header spacing)
       photo_y = qr_y - QR_CODE_SIZE + photo_height
 
-      [photo_x, photo_y]
+      [ photo_x, photo_y ]
     end
 
     # Calculate photo dimensions for footer (width = 2x QR size, height maintains aspect ratio)
@@ -31,17 +31,17 @@ class PdfGeneratorService
     def self.footer_photo_dimensions(original_width, original_height)
       target_width = QR_CODE_SIZE * 2
 
-      return [target_width, target_width] if original_width.zero? || original_height.zero?
+      return [ target_width, target_width ] if original_width.zero? || original_height.zero?
 
       aspect_ratio = calculate_aspect_ratio(original_width, original_height)
       target_height = (target_width / aspect_ratio).round
 
-      [target_width, target_height]
+      [ target_width, target_height ]
     end
 
     # Get QR code dimensions
     def self.qr_code_dimensions
-      [QR_CODE_SIZE, QR_CODE_SIZE]
+      [ QR_CODE_SIZE, QR_CODE_SIZE ]
     end
 
     # Check if coordinates are within PDF bounds
@@ -60,11 +60,11 @@ class PdfGeneratorService
 
     # Calculate dimensions to fit within constraints while maintaining aspect ratio
     def self.fit_dimensions(original_width, original_height, max_width, max_height)
-      return [max_width, max_height] if original_width.zero? || original_height.zero?
+      return [ max_width, max_height ] if original_width.zero? || original_height.zero?
 
       # If original already fits within constraints, return original dimensions
       if original_width <= max_width && original_height <= max_height
-        return [original_width, original_height]
+        return [ original_width, original_height ]
       end
 
       aspect_ratio = calculate_aspect_ratio(original_width, original_height)
@@ -79,7 +79,7 @@ class PdfGeneratorService
         fitted_width = (fitted_height * aspect_ratio).round
       end
 
-      [fitted_width, fitted_height]
+      [ fitted_width, fitted_height ]
     end
   end
 end

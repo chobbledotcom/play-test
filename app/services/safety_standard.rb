@@ -3,10 +3,10 @@ module SafetyStandard
 
   # Height category constants based on EN 14960:2019
   HEIGHT_CATEGORIES = {
-    1000 => {label: "1.0m (Young children)", max_users: :calculate_by_area},
-    1200 => {label: "1.2m (Children)", max_users: :calculate_by_area},
-    1500 => {label: "1.5m (Adolescents)", max_users: :calculate_by_area},
-    1800 => {label: "1.8m (Adults)", max_users: :calculate_by_area}
+    1000 => { label: "1.0m (Young children)", max_users: :calculate_by_area },
+    1200 => { label: "1.2m (Children)", max_users: :calculate_by_area },
+    1500 => { label: "1.5m (Adolescents)", max_users: :calculate_by_area },
+    1800 => { label: "1.8m (Adults)", max_users: :calculate_by_area }
   }.freeze
 
   # Grounding test weights by user height (EN 14960:2019)
@@ -55,11 +55,11 @@ module SafetyStandard
         value: 8,
         value_suffix: "",
         breakdown: [
-          ["Front/back area", "5.0m (W) × 3.0m (H) = 15.0m²"],
-          ["Sides area", "5.0m (L) × 3.0m (H) = 15.0m²"],
-          ["Front & back anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
-          ["Left & right anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
-          ["Required anchors", "(2 + 2) × 2 = 8"]
+          [ "Front/back area", "5.0m (W) × 3.0m (H) = 15.0m²" ],
+          [ "Sides area", "5.0m (L) × 3.0m (H) = 15.0m²" ],
+          [ "Front & back anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2" ],
+          [ "Left & right anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2" ],
+          [ "Required anchors", "(2 + 2) × 2 = 8" ]
         ]
       }
     },
@@ -70,9 +70,9 @@ module SafetyStandard
         value: 1.25,
         value_suffix: "m",
         breakdown: [
-          ["50% calculation", "2.5m × 0.5 = 1.25m"],
-          ["Minimum requirement", "0.3m (300mm)"],
-          ["Base runout", "Maximum of 1.25m and 0.3m = 1.25m"]
+          [ "50% calculation", "2.5m × 0.5 = 1.25m" ],
+          [ "Minimum requirement", "0.3m (300mm)" ],
+          [ "Base runout", "Maximum of 1.25m and 0.3m = 1.25m" ]
         ]
       }
     },
@@ -83,8 +83,8 @@ module SafetyStandard
         value: 1.5,
         value_suffix: "m",
         breakdown: [
-          ["Height range", "0.6m - 3.0m"],
-          ["Calculation", "1.5m (user height)"]
+          [ "Height range", "0.6m - 3.0m" ],
+          [ "Calculation", "1.5m (user height)" ]
         ]
       }
     },
@@ -105,14 +105,14 @@ module SafetyStandard
           users_1800mm: 0
         },
         breakdown: [
-          ["Total area", "10m × 8m = 80m²"],
-          ["Obstacles/adjustments", "- 15m²"],
-          ["Usable area", "65m²"],
-          ["Capacity calculations", "Based on usable area"],
-          ["1m users", "65 ÷ 1 = 65 users"],
-          ["1.2m users", "65 ÷ 1.3 = 48 users"],
-          ["1.5m users", "65 ÷ 1.7 = 39 users"],
-          ["1.8m users", "Not allowed (exceeds height limit)"]
+          [ "Total area", "10m × 8m = 80m²" ],
+          [ "Obstacles/adjustments", "- 15m²" ],
+          [ "Usable area", "65m²" ],
+          [ "Capacity calculations", "Based on usable area" ],
+          [ "1m users", "65 ÷ 1 = 65 users" ],
+          [ "1.2m users", "65 ÷ 1.3 = 48 users" ],
+          [ "1.5m users", "65 ÷ 1.7 = 39 users" ],
+          [ "1.8m users", "Not allowed (exceeds height limit)" ]
         ]
       }
     }
@@ -140,7 +140,7 @@ module SafetyStandard
           title: "Slide Runout Requirements",
           description: "Minimum runout distance for safe slide deceleration.",
           method_name: :calculate_required_runout,
-          additional_methods: [:calculate_runout_value],
+          additional_methods: [ :calculate_runout_value ],
           module_name: SafetyStandards::SlideCalculator,
           example_input: 2.5,
           input_unit: "m",
@@ -153,7 +153,7 @@ module SafetyStandard
           description: "Containing wall heights must scale with user height based on platform height thresholds.",
           method_name: :meets_height_requirements?,
           module_name: SafetyStandards::SlideCalculator,
-          example_input: {platform_height: 2.0, user_height: 1.5},
+          example_input: { platform_height: 2.0, user_height: 1.5 },
           input_unit: "m",
           output_unit: "requirement text",
           formula_text: "Tiered requirements based on platform height thresholds",
@@ -164,7 +164,7 @@ module SafetyStandard
           description: I18n.t("safety_standards.calculators.user_capacity.description"),
           method_name: :calculate,
           module_name: SafetyStandards::UserCapacityCalculator,
-          example_input: {length: 10.0, width: 8.0},
+          example_input: { length: 10.0, width: 8.0 },
           input_unit: "m",
           output_unit: "users",
           formula_text: "Area ÷ space_per_user (varies by height: 1-2 m² per user)",
@@ -366,7 +366,7 @@ module SafetyStandard
         current_line += 1
       end
 
-      return ["Method definition not found"] if indent_level.nil?
+      return [ "Method definition not found" ] if indent_level.nil?
 
       # Extract method body until we reach the same or lesser indentation with 'end'
       while current_line < lines.length
@@ -391,7 +391,9 @@ module SafetyStandard
       min_indent = lines.reject(&:empty?).map { |line| line.match(/^(\s*)/)[1].length }.min || 0
 
       # Remove minimum indentation from all lines
-      lines.map { |line| line.empty? ? line : line[min_indent..] || "" }.join("\n")
+      lines.map { |line| line.empty? ?
+        line :
+        line[min_indent..] || "" }.join("\n")
     end
   end
 end

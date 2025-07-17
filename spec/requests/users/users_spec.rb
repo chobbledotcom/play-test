@@ -107,7 +107,7 @@ RSpec.describe "Users", type: :request do
 
   describe "settings functionality" do
     let(:user) { create(:user) }
-    let(:settings_params) { {user: {theme: "dark"}} }
+    let(:settings_params) { { user: { theme: "dark" } } }
 
     context "when logged in as the user" do
       before { login_as(user) }
@@ -238,7 +238,7 @@ RSpec.describe "Users", type: :request do
 
   def valid_user_params(overrides = {})
     user_data = SeedData.user_fields.merge(rpii_inspector_number: "RPII123")
-    {user: user_data.merge(overrides)}
+    { user: user_data.merge(overrides) }
   end
 
   def expect_validation_error(field)
@@ -423,7 +423,7 @@ RSpec.describe "Users", type: :request do
           theme: "dark"
         }
 
-        patch update_settings_user_path(regular_user), params: {user: settings_attrs}
+        patch update_settings_user_path(regular_user), params: { user: settings_attrs }
 
         regular_user.reload
         expect(regular_user.phone).to eq("020 7946 0958")
@@ -440,7 +440,7 @@ RSpec.describe "Users", type: :request do
           theme: "dark"
         }
 
-        patch update_settings_user_path(regular_user), params: {user: settings_attrs}
+        patch update_settings_user_path(regular_user), params: { user: settings_attrs }
 
         regular_user.reload
         expect(regular_user.name).to eq(original_name)

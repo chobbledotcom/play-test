@@ -86,7 +86,7 @@ module I18nUsageTracker
 
     def extract_keys_from_hash(hash, current_path, keys)
       hash.each do |key, value|
-        new_path = current_path + [key.to_s]
+        new_path = current_path + [ key.to_s ]
         full_key = new_path.join(".")
 
         if value.is_a?(Hash)

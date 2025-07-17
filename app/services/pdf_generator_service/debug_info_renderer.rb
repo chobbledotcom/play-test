@@ -19,7 +19,7 @@ class PdfGeneratorService
 
       # Build table data
       table_data = [
-        [I18n.t("debug.query"), I18n.t("debug.duration"), I18n.t("debug.name")]
+        [ I18n.t("debug.query"), I18n.t("debug.duration"), I18n.t("debug.name") ]
       ]
 
       queries.each do |query|
@@ -38,7 +38,7 @@ class PdfGeneratorService
         t.row(0).font_style = :bold
 
         # General styling
-        t.cells.borders = [:bottom]
+        t.cells.borders = [ :bottom ]
         t.cells.border_color = "DDDDDD"
         t.cells.padding = TABLE_CELL_PADDING
         t.cells.size = 8

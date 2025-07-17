@@ -103,6 +103,8 @@ en:
 
     errors:
       wrong_password: "Current password is incorrect"
+      logo_must_be_image: "must be an image file"
+      signature_must_be_image: "must be an image file"
       header:
         one: "Could not save user because there is 1 error:"
         other: "Could not save user because there are %{count} errors:"

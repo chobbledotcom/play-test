@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Assessment Safety Calculations", type: :request do
   let(:user) { create(:user) }
   let(:inspection) { create(:inspection, user: user) }
-  let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
+  let(:turbo_headers) { { "Accept" => "text/vnd.turbo-stream.html" } }
 
   before { login_as(user) }
 

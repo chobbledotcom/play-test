@@ -13,7 +13,7 @@ module CustomIdGenerator
     def generate_random_id(scope_conditions = {})
       loop do
         id = SecureRandom.alphanumeric(CustomIdGenerator::ID_LENGTH).upcase
-        break id unless exists?({id: id}.merge(scope_conditions))
+        break id unless exists?({ id: id }.merge(scope_conditions))
       end
     end
   end

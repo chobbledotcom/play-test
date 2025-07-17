@@ -41,13 +41,13 @@ RSpec.describe "Safety Standards Unified Tests" do
     describe "HTML format" do
       context "anchor calculation" do
         it "redirects with calculation params" do
-          post safety_standards_path, params: {calculation: anchor_params}
+          post safety_standards_path, params: { calculation: anchor_params }
           expect(response).to redirect_to(safety_standards_path(calculation: anchor_params))
         end
 
         it "returns error for invalid input" do
           invalid_params = anchor_params.merge(length: 0, width: 0, height: 0)
-          post safety_standards_path, params: {calculation: invalid_params}
+          post safety_standards_path, params: { calculation: invalid_params }
 
           follow_redirect!
           expect(response.body).to include('class="error"')
@@ -59,8 +59,8 @@ RSpec.describe "Safety Standards Unified Tests" do
     describe "JSON format" do
       it "accepts and processes JSON requests" do
         post safety_standards_path,
-          params: {calculation: anchor_params}.to_json,
-          headers: {"Content-Type": "application/json", Accept: "application/json"}
+          params: { calculation: anchor_params }.to_json,
+          headers: { "Content-Type": "application/json", Accept: "application/json" }
 
         expect(response).to be_successful
         expect(response.content_type).to include("application/json")
@@ -74,8 +74,8 @@ RSpec.describe "Safety Standards Unified Tests" do
       it "returns passed: false with status for invalid input" do
         invalid_params = anchor_params.merge(length: 0, width: 0, height: 0)
         post safety_standards_path,
-          params: {calculation: invalid_params}.to_json,
-          headers: {"Content-Type": "application/json", Accept: "application/json"}
+          params: { calculation: invalid_params }.to_json,
+          headers: { "Content-Type": "application/json", Accept: "application/json" }
 
         json = JSON.parse(response.body)
         expect(json["passed"]).to be false
@@ -85,8 +85,8 @@ RSpec.describe "Safety Standards Unified Tests" do
 
       it "returns passed: false for invalid calculation type" do
         post safety_standards_path,
-          params: {calculation: {type: "invalid_type", value: 123}}.to_json,
-          headers: {"Content-Type": "application/json", Accept: "application/json"}
+          params: { calculation: { type: "invalid_type", value: 123 } }.to_json,
+          headers: { "Content-Type": "application/json", Accept: "application/json" }
 
         json = JSON.parse(response.body)
         expect(json["passed"]).to be false
@@ -96,11 +96,11 @@ RSpec.describe "Safety Standards Unified Tests" do
     end
 
     describe "Turbo Stream format" do
-      let(:turbo_headers) { {Accept: "text/vnd.turbo-stream.html"} }
+      let(:turbo_headers) { { Accept: "text/vnd.turbo-stream.html" } }
 
       context "anchor calculation" do
         it "returns turbo stream response" do
-          post safety_standards_path, params: {calculation: anchor_params}, headers: turbo_headers
+          post safety_standards_path, params: { calculation: anchor_params }, headers: turbo_headers
           expect(response.content_type).to include("text/vnd.turbo-stream.html")
           expect(response.body).to include("turbo-stream")
           expect(response.body).to include("anchors-result")

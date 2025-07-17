@@ -4,7 +4,7 @@ RSpec.describe "form/_form_context", type: :view do
   let(:user) { create(:user) }
   let(:inspection) { create(:inspection, user: user) }
   let(:i18n_base) { "test.base" }
-  let(:render_options) { {model: inspection, i18n_base: i18n_base} }
+  let(:render_options) { { model: inspection, i18n_base: i18n_base } }
 
   def mock_translations(header: "Test Header", submit: "Submit")
     allow(I18n).to receive(:t).with("#{i18n_base}.header").and_return(header)

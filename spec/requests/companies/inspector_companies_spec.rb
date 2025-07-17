@@ -5,7 +5,7 @@ RSpec.describe "InspectorCompanies", type: :request do
   let(:regular_user) { create(:user) }
 
   let(:valid_attributes) { attributes_for(:inspector_company) }
-  let(:invalid_attributes) { {name: "", phone: "", address: ""} }
+  let(:invalid_attributes) { { name: "", phone: "", address: "" } }
 
   describe "Authentication requirements" do
     describe "GET /inspector_companies" do
@@ -44,7 +44,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
     describe "POST /inspector_companies" do
       it "denies access to regular users" do
-        post inspector_companies_path, params: {inspector_company: valid_attributes}
+        post inspector_companies_path, params: { inspector_company: valid_attributes }
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to be_present
       end
@@ -62,7 +62,7 @@ RSpec.describe "InspectorCompanies", type: :request do
     describe "PATCH /inspector_companies/:id" do
       it "denies access to regular users" do
         company = create(:inspector_company)
-        patch inspector_company_path(company), params: {inspector_company: {name: "Updated Name"}}
+        patch inspector_company_path(company), params: { inspector_company: { name: "Updated Name" } }
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to be_present
       end
@@ -104,12 +104,12 @@ RSpec.describe "InspectorCompanies", type: :request do
       context "with valid parameters" do
         it "creates a new inspector company" do
           expect {
-            post inspector_companies_path, params: {inspector_company: valid_attributes}
+            post inspector_companies_path, params: { inspector_company: valid_attributes }
           }.to change(InspectorCompany, :count).by(1)
         end
 
         it "creates company with proper attributes" do
-          post inspector_companies_path, params: {inspector_company: valid_attributes}
+          post inspector_companies_path, params: { inspector_company: valid_attributes }
           company = InspectorCompany.find_by(name: valid_attributes[:name])
           expect(company.name).to eq(valid_attributes[:name])
           # Company no longer has RPII field - that's per-inspector now
@@ -117,7 +117,7 @@ RSpec.describe "InspectorCompanies", type: :request do
 
         it "redirects to the created inspector company" do
           expect {
-            post inspector_companies_path, params: {inspector_company: valid_attributes}
+            post inspector_companies_path, params: { inspector_company: valid_attributes }
           }.to change(InspectorCompany, :count).by(1)
 
           created_company = InspectorCompany.find_by(name: valid_attributes[:name])
@@ -125,7 +125,7 @@ RSpec.describe "InspectorCompanies", type: :request do
         end
 
         it "sets a success flash message" do
-          post inspector_companies_path, params: {inspector_company: valid_attributes}
+          post inspector_companies_path, params: { inspector_company: valid_attributes }
           expect(flash[:notice]).to be_present
         end
       end
@@ -133,12 +133,12 @@ RSpec.describe "InspectorCompanies", type: :request do
       context "with invalid parameters" do
         it "does not create a new inspector company" do
           expect {
-            post inspector_companies_path, params: {inspector_company: invalid_attributes}
+            post inspector_companies_path, params: { inspector_company: invalid_attributes }
           }.not_to change(InspectorCompany, :count)
         end
 
         it "renders the new template" do
-          post inspector_companies_path, params: {inspector_company: invalid_attributes}
+          post inspector_companies_path, params: { inspector_company: invalid_attributes }
           expect(response).to render_template(:new)
         end
       end
@@ -164,32 +164,32 @@ RSpec.describe "InspectorCompanies", type: :request do
         end
 
         it "updates the requested inspector company" do
-          patch inspector_company_path(company), params: {inspector_company: new_attributes}
+          patch inspector_company_path(company), params: { inspector_company: new_attributes }
           company.reload
           expect(company.name).to eq("Updated Company Name")
           expect(company.email).to eq("updated@example.com")
         end
 
         it "redirects to the inspector company" do
-          patch inspector_company_path(company), params: {inspector_company: new_attributes}
+          patch inspector_company_path(company), params: { inspector_company: new_attributes }
           expect(response).to redirect_to(company)
         end
 
         it "sets a success flash message" do
-          patch inspector_company_path(company), params: {inspector_company: new_attributes}
+          patch inspector_company_path(company), params: { inspector_company: new_attributes }
           expect(flash[:notice]).to be_present
         end
       end
 
       context "with invalid parameters" do
         it "renders the edit template" do
-          patch inspector_company_path(company), params: {inspector_company: invalid_attributes}
+          patch inspector_company_path(company), params: { inspector_company: invalid_attributes }
           expect(response).to render_template(:edit)
         end
 
         it "does not update the company" do
           original_name = company.name
-          patch inspector_company_path(company), params: {inspector_company: invalid_attributes}
+          patch inspector_company_path(company), params: { inspector_company: invalid_attributes }
           company.reload
           expect(company.name).to eq(original_name)
         end
@@ -202,8 +202,8 @@ RSpec.describe "InspectorCompanies", type: :request do
       context "successful update with turbo stream" do
         it "returns turbo stream with success message" do
           patch inspector_company_path(company),
-            params: {inspector_company: {name: "Updated Name"}},
-            headers: {"Accept" => "text/vnd.turbo-stream.html"}
+            params: { inspector_company: { name: "Updated Name" } },
+            headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
           expect(response).to have_http_status(:success)
           expect(response.content_type).to include("text/vnd.turbo-stream.html")
@@ -215,8 +215,8 @@ RSpec.describe "InspectorCompanies", type: :request do
       context "failed update with turbo stream" do
         it "returns turbo stream with error message" do
           patch inspector_company_path(company),
-            params: {inspector_company: {name: ""}},
-            headers: {"Accept" => "text/vnd.turbo-stream.html"}
+            params: { inspector_company: { name: "" } },
+            headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
           expect(response).to have_http_status(:success)
           expect(response.content_type).to include("text/vnd.turbo-stream.html")
@@ -269,7 +269,7 @@ RSpec.describe "InspectorCompanies", type: :request do
     end
 
     it "returns 404 for missing inspector company on update" do
-      patch inspector_company_path("nonexistent"), params: {inspector_company: {name: "Test"}}
+      patch inspector_company_path("nonexistent"), params: { inspector_company: { name: "Test" } }
       expect(response).to have_http_status(:not_found)
     end
   end

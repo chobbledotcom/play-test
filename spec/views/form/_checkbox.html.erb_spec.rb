@@ -17,7 +17,7 @@ RSpec.describe "form/_checkbox.html.erb", type: :view do
 
   # Default render method with common setup
   def render_checkbox(locals = {})
-    render partial: "form/checkbox", locals: {field: field}.merge(locals)
+    render partial: "form/checkbox", locals: { field: field }.merge(locals)
   end
 
   before do

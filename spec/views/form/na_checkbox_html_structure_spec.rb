@@ -11,7 +11,7 @@ RSpec.describe "N/A Checkbox HTML Structure for JavaScript", type: :view do
 
       # Mock enum behavior for _pass fields to support N/A radio buttons
       def self.defined_enums
-        {"safety_check_pass" => {"fail" => 0, "pass" => 1, "na" => 2}}
+        { "safety_check_pass" => { "fail" => 0, "pass" => 1, "na" => 2 } }
       end
     end.new
   end
@@ -44,7 +44,7 @@ RSpec.describe "N/A Checkbox HTML Structure for JavaScript", type: :view do
   end
 
   it "generates HTML structure with radio buttons for pass/fail/N/A behavior" do
-    render partial: "form/pass_fail_na_comment", locals: {field: :safety_check_pass}
+    render partial: "form/pass_fail_na_comment", locals: { field: :safety_check_pass }
 
     # All options should be radio buttons now
     expect(rendered).to have_css('input[type="radio"][value="pass"]')
@@ -58,7 +58,7 @@ RSpec.describe "N/A Checkbox HTML Structure for JavaScript", type: :view do
   it "Pass radio is checked when field value is pass" do
     test_model.safety_check_pass = "pass"
 
-    render partial: "form/pass_fail_na_comment", locals: {field: :safety_check_pass}
+    render partial: "form/pass_fail_na_comment", locals: { field: :safety_check_pass }
 
     expect(rendered).to have_checked_field("Pass", type: "radio")
   end
@@ -66,13 +66,13 @@ RSpec.describe "N/A Checkbox HTML Structure for JavaScript", type: :view do
   it "N/A radio is checked when field value is na" do
     test_model.safety_check_pass = "na"
 
-    render partial: "form/pass_fail_na_comment", locals: {field: :safety_check_pass}
+    render partial: "form/pass_fail_na_comment", locals: { field: :safety_check_pass }
 
     expect(rendered).to have_checked_field("Not Applicable", type: "radio")
   end
 
   it "provides semantic labels that JavaScript can interact with" do
-    render partial: "form/pass_fail_na_comment", locals: {field: :safety_check_pass}
+    render partial: "form/pass_fail_na_comment", locals: { field: :safety_check_pass }
 
     # These labels allow users (and tests) to interact semantically
     expect(rendered).to have_content("Pass")

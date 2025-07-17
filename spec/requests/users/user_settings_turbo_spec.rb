@@ -15,7 +15,7 @@ RSpec.describe "User Settings Turbo Updates", type: :request do
             phone: "123-456-7890",
             theme: "dark"
           }
-        }, headers: {"Accept" => "text/vnd.turbo-stream.html"}
+        }, headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
@@ -34,7 +34,7 @@ RSpec.describe "User Settings Turbo Updates", type: :request do
           user: {
             logo: logo_file
           }
-        }, headers: {"Accept" => "text/vnd.turbo-stream.html"}
+        }, headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
@@ -55,7 +55,7 @@ RSpec.describe "User Settings Turbo Updates", type: :request do
           user: {
             logo: invalid_file
           }
-        }, headers: {"Accept" => "text/vnd.turbo-stream.html"}
+        }, headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
         expect(response).to have_http_status(:ok)  # It succeeds but the file is removed
         expect(response.content_type).to include("text/vnd.turbo-stream.html")

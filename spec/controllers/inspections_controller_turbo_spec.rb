@@ -19,7 +19,7 @@ RSpec.describe InspectionsController, type: :controller do
       it "renders turbo stream response without calling undefined methods" do
         # This test ensures we don't call methods like content_tag that aren't available
         expect {
-          patch :update, params: {id: inspection.id, inspection: {comments: "Test"}}
+          patch :update, params: { id: inspection.id, inspection: { comments: "Test" } }
         }.not_to raise_error
       end
 
@@ -27,7 +27,7 @@ RSpec.describe InspectionsController, type: :controller do
         # Verify that the controller still has access to helpers
         expect(controller.helpers).to respond_to(:inspection_tabs)
 
-        patch :update, params: {id: inspection.id, inspection: {comments: "Test"}}
+        patch :update, params: { id: inspection.id, inspection: { comments: "Test" } }
 
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
       end
@@ -37,7 +37,7 @@ RSpec.describe InspectionsController, type: :controller do
         inspection.update!(complete_date: nil)
 
         # Try to clear a required field
-        patch :update, params: {id: inspection.id, inspection: {inspection_location: ""}}
+        patch :update, params: { id: inspection.id, inspection: { inspection_location: "" } }
 
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
         expect(response.body).to include("turbo-stream")
@@ -63,7 +63,7 @@ RSpec.describe InspectionsController, type: :controller do
     end
 
     it "returns turbo streams for updates" do
-      patch :update, params: {id: inspection.id, inspection: {comments: "Test"}}
+      patch :update, params: { id: inspection.id, inspection: { comments: "Test" } }
 
       # Should return turbo stream elements
       expect(response.body).to include("<turbo-stream")
@@ -72,7 +72,7 @@ RSpec.describe InspectionsController, type: :controller do
 
     it "uses partial: parameter for rendering partials" do
       # Keep inspection as draft so we can update it
-      patch :update, params: {id: inspection.id, inspection: {comments: "Test"}}
+      patch :update, params: { id: inspection.id, inspection: { comments: "Test" } }
 
       # Should render the mark complete section partial
       expect(response.body).to include("mark_complete_section_#{inspection.id}")
@@ -81,7 +81,7 @@ RSpec.describe InspectionsController, type: :controller do
 
   describe "Multiple format support" do
     it "responds to HTML format" do
-      patch :update, params: {id: inspection.id, inspection: {comments: "HTML update"}}
+      patch :update, params: { id: inspection.id, inspection: { comments: "HTML update" } }
 
       expect(response).to redirect_to(inspection_path(inspection))
     end
@@ -89,7 +89,7 @@ RSpec.describe InspectionsController, type: :controller do
     it "responds to JSON format" do
       request.headers["Accept"] = "application/json"
 
-      patch :update, params: {id: inspection.id, inspection: {comments: "JSON update"}}
+      patch :update, params: { id: inspection.id, inspection: { comments: "JSON update" } }
 
       expect(response.content_type).to include("application/json")
       json = JSON.parse(response.body)
@@ -99,7 +99,7 @@ RSpec.describe InspectionsController, type: :controller do
     it "responds to Turbo Stream format" do
       request.headers["Accept"] = "text/vnd.turbo-stream.html"
 
-      patch :update, params: {id: inspection.id, inspection: {comments: "Turbo update"}}
+      patch :update, params: { id: inspection.id, inspection: { comments: "Turbo update" } }
 
       expect(response.content_type).to include("text/vnd.turbo-stream.html")
     end

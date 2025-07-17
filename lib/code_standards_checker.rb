@@ -72,11 +72,11 @@ class CodeStandardsChecker
   def check_file_length(relative_path, file_lines)
     return [] unless file_lines.length > @max_file_lines
 
-    [{
+    [ {
       file: relative_path,
       type: :file_length,
       message: "#{file_lines.length} lines (max #{@max_file_lines})"
-    }]
+    } ]
   end
 
   def check_line_lengths(relative_path, file_lines)
@@ -197,7 +197,7 @@ class CodeStandardsChecker
   def extract_methods_from_file(file_path)
     content = File.read(file_path)
     methods = []
-    parser_state = {current_method: nil, indent_level: 0, method_start_line: 0}
+    parser_state = { current_method: nil, indent_level: 0, method_start_line: 0 }
 
     content.lines.each_with_index do |line, index|
       process_line_for_methods(

@@ -8,7 +8,7 @@ class InspectorCompany < ApplicationRecord
 
   # Validations
   validates :name, presence: true
-  validates :email, format: {with: URI::MailTo::EMAIL_REGEXP}, allow_blank: true
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
   validates :phone, presence: true
   validates :address, presence: true
 
@@ -36,7 +36,7 @@ class InspectorCompany < ApplicationRecord
   # Credentials validation moved to individual inspector level (User model)
 
   def full_address
-    [address, city, postal_code].compact.join(", ")
+    [ address, city, postal_code ].compact.join(", ")
   end
 
   def inspection_count

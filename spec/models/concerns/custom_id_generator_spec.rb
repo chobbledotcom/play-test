@@ -38,7 +38,7 @@ RSpec.describe CustomIdGenerator, type: :concern do
     end
 
     it "accepts scope conditions for uniqueness checking" do
-      scope_conditions = {user_id: 1}
+      scope_conditions = { user_id: 1 }
       allow(test_class).to receive(:exists?).and_return(false)
 
       test_class.generate_random_id(scope_conditions)
@@ -76,13 +76,13 @@ RSpec.describe CustomIdGenerator, type: :concern do
 
     it "calls uniqueness_scope if model responds to it" do
       # Add uniqueness_scope method to test class
-      test_class.define_method(:uniqueness_scope) { {user_id: 1} }
+      test_class.define_method(:uniqueness_scope) { { user_id: 1 } }
 
       allow(test_class).to receive(:generate_random_id).and_return("TESTID123456")
 
       instance.send(:generate_custom_id)
 
-      expect(test_class).to have_received(:generate_random_id).with({user_id: 1})
+      expect(test_class).to have_received(:generate_random_id).with({ user_id: 1 })
     end
 
     it "calls generate_random_id with empty scope if no uniqueness_scope method" do

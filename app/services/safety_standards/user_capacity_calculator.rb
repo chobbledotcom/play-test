@@ -20,7 +20,7 @@ module SafetyStandards
 
       total_area = (length * width).round(2)
       negative_adjustment_area = negative_adjustment_area.to_f.abs
-      usable_area = [total_area - negative_adjustment_area, 0].max.round(2)
+      usable_area = [ total_area - negative_adjustment_area, 0 ].max.round(2)
 
       breakdown = build_breakdown(length, width, total_area, negative_adjustment_area, usable_area)
       capacities = calculate_capacities(usable_area, max_user_height, breakdown)
@@ -41,15 +41,15 @@ module SafetyStandards
       formatted_total = format_number(total_area)
       formatted_usable = format_number(usable_area)
 
-      breakdown << [I18n.t("safety_standards.calculators.user_capacity.total_area"), "#{formatted_length}m × #{formatted_width}m = #{formatted_total}m²"]
+      breakdown << [ I18n.t("safety_standards.calculators.user_capacity.total_area"), "#{formatted_length}m × #{formatted_width}m = #{formatted_total}m²" ]
 
       if negative_adjustment_area > 0
         formatted_adjustment = format_number(negative_adjustment_area)
-        breakdown << [I18n.t("safety_standards.calculators.user_capacity.obstacles_adjustments"), "- #{formatted_adjustment}m²"]
+        breakdown << [ I18n.t("safety_standards.calculators.user_capacity.obstacles_adjustments"), "- #{formatted_adjustment}m²" ]
       end
 
-      breakdown << [I18n.t("safety_standards.calculators.user_capacity.usable_area"), "#{formatted_usable}m²"]
-      breakdown << [I18n.t("safety_standards.calculators.user_capacity.capacity_calculations"), I18n.t("safety_standards.calculators.user_capacity.based_on_usable")]
+      breakdown << [ I18n.t("safety_standards.calculators.user_capacity.usable_area"), "#{formatted_usable}m²" ]
+      breakdown << [ I18n.t("safety_standards.calculators.user_capacity.capacity_calculations"), I18n.t("safety_standards.calculators.user_capacity.based_on_usable") ]
 
       breakdown
     end
@@ -68,10 +68,10 @@ module SafetyStandards
           formatted_divisor = format_number(divisor)
           calculation = "#{formatted_area} ÷ #{formatted_divisor} = #{capacity} "
           calculation += (capacity == 1) ? "user" : "users"
-          breakdown << ["#{format_number(height_m)}m users", calculation]
+          breakdown << [ "#{format_number(height_m)}m users", calculation ]
         else
           capacities[key] = 0
-          breakdown << ["#{format_number(height_m)}m users", I18n.t("safety_standards.calculators.user_capacity.not_allowed")]
+          breakdown << [ "#{format_number(height_m)}m users", I18n.t("safety_standards.calculators.user_capacity.not_allowed") ]
         end
       end
 
@@ -82,7 +82,7 @@ module SafetyStandards
       CalculatorResponse.new(
         value: default_capacity,
         value_suffix: "",
-        breakdown: [[I18n.t("safety_standards.errors.invalid_dimensions"), ""]]
+        breakdown: [ [ I18n.t("safety_standards.errors.invalid_dimensions"), "" ] ]
       )
     end
 

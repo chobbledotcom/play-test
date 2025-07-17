@@ -16,7 +16,7 @@ RSpec.describe PhotoProcessingService do
 
       # Check that the processed image is resized
       processed_image = MiniMagick::Image.read(processed_io.string)
-      expect([processed_image.width, processed_image.height].max).to be <= ImageProcessorService::FULL_SIZE
+      expect([ processed_image.width, processed_image.height ].max).to be <= ImageProcessorService::FULL_SIZE
 
       # The image should be resized properly - check actual dimensions
       expect(processed_image.width).to be > 0

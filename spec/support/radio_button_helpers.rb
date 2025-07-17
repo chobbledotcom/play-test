@@ -6,9 +6,9 @@ module RadioButtonHelpers
 
   def choose_yes_no(field_label, value)
     choose_radio_in_container(field_label, value,
-      ["radio-comment"],
-      yes: ["yes", "pass"],
-      no: ["no", "fail"])
+      [ "radio-comment" ],
+      yes: [ "yes", "pass" ],
+      no: [ "no", "fail" ])
   end
 
   def choose_pass_fail(field_label, value)
@@ -33,78 +33,153 @@ module RadioButtonHelpers
 
   private
 
-  def choose_radio_in_container(label, value, containers, selectors)
-    found = false
-
-    # Try to find the radio button using the simplified HTML structure
-    begin
-      # First, try to find by the main label
-      container = find(:xpath, "//div[@class='form-grid radio-comment'][.//label[@class='label'][normalize-space(.)='#{label}']]")
-
-      # Then find the pass-fail div and click the appropriate radio
-      within(container) do
-        within(".pass-fail") do
-          if value
-            # Click Yes/Pass radio
-            find("label", text: /^(Yes|Pass)$/).find("input[type='radio']").click
-          else
-            # Click No/Fail radio
-            find("label", text: /^(No|Fail)$/).find("input[type='radio']").click
-          end
-        end
-      end
-      found = true
-    rescue Capybara::ElementNotFound
-      # Try alternative selectors if the first approach fails
-      alt_selectors = [
-        "//label[normalize-space(.)='#{label}']/following-sibling::div[@class='pass-fail']//label[contains(.,'#{value ? "Yes" : "No"}')]/input[@type='radio']",
-        "//label[normalize-space(.)='#{label}']/following-sibling::div[@class='pass-fail']//label[contains(.,'#{value ? "Pass" : "Fail"}')]/input[@type='radio']"
-      ]
-
-      alt_selectors.each do |selector|
-        find(:xpath, selector).click
-        found = true
-        break
-      rescue Capybara::ElementNotFound
-        next
-      end
-    end
-
-    raise Capybara::ElementNotFound, "Unable to find radio for '#{label}'" unless found
+  # XPath selector builders
+  def label_xpath(label)
+    "//label[normalize-space(.)='#{label}']"
   end
 
-  def find_and_click_radio(label, value)
-    # Convert boolean values to enum strings if needed
-    radio_value = case value
+  def div_with_label_xpath(label)
+    "//div[.//label[normalize-space(.)='#{label}']]"
+  end
+
+  def pass_fail_div_xpath
+    "div[@class='pass-fail']"
+  end
+
+  def radio_input_xpath(value = nil)
+    base = "input[@type='radio']"
+    value ? "#{base}[@value='#{value}']" : base
+  end
+
+  # Text helpers for radio values
+  def radio_text_for_boolean(value, style = :yes_no)
+    case style
+    when :yes_no
+      value ? "Yes" : "No"
+    when :pass_fail
+      value ? "Pass" : "Fail"
+    end
+  end
+
+  def boolean_to_radio_value(value)
+    case value
     when true then "pass"
     when false then "fail"
     else value.to_s
     end
+  end
 
-    selectors = [
-      # Original selector for simple radio button structures
-      "//label[normalize-space(.)='#{label}']/following::label[contains(.,'#{value ? "Pass" : "Fail"}')][1]/input[@type='radio']",
-      # For complex forms: find div containing the label, then look for pass-fail div with radio buttons
-      "//div[.//label[normalize-space(.)='#{label}']]//div[@class='pass-fail']//input[@type='radio'][@value='#{radio_value}']",
-      # For number-pass-fail-na forms: find by base field label (e.g., "Ropes (mm)"), then find pass-fail div
-      "//div[.//label[contains(.,'#{label.split.first}')]]//div[@class='pass-fail']//input[@type='radio'][@value='#{radio_value}']",
-      # Fallback selectors
-      "//div[.//label[normalize-space(.)='#{label}']]//input[@type='radio'][@value='#{radio_value}']",
-      "//div[.//label[normalize-space(.)='#{label}']]//input[@type='radio'][@value='#{value}']"
-    ]
+  def choose_radio_in_container(label, value, containers, selectors)
+    # Try primary approach first
+    return if try_find_radio_in_form_grid(label, value)
 
-    clicked = false
-    selectors.each do |selector|
+    # Try alternative selectors
+    return if try_alternative_radio_selectors(label, value)
+
+    raise Capybara::ElementNotFound, "Unable to find radio for '#{label}'"
+  end
+
+  def try_find_radio_in_form_grid(label, value)
+    container_xpath = build_form_grid_container_xpath(label)
+    container = find(:xpath, container_xpath)
+
+    within(container) do
+      click_radio_in_pass_fail_div(value)
+    end
+    true
+  rescue Capybara::ElementNotFound
+    false
+  end
+
+  def try_alternative_radio_selectors(label, value)
+    build_alternative_radio_selectors(label, value).each do |selector|
       find(:xpath, selector).click
-      clicked = true
-      break
+      return true
     rescue Capybara::ElementNotFound
       next
     end
+    false
+  end
 
-    return if clicked
+  def build_form_grid_container_xpath(label)
+    "//div[@class='form-grid radio-comment'][.//label[@class='label']" \
+    "[normalize-space(.)='#{label}']]"
+  end
+
+  def build_alternative_radio_selectors(label, value)
+    yes_no_text = radio_text_for_boolean(value, :yes_no)
+    pass_fail_text = radio_text_for_boolean(value, :pass_fail)
+
+    [
+      "#{label_xpath(label)}/following-sibling::#{pass_fail_div_xpath}" \
+      "//label[contains(.,'#{yes_no_text}')]/#{radio_input_xpath}",
+
+      "#{label_xpath(label)}/following-sibling::#{pass_fail_div_xpath}" \
+      "//label[contains(.,'#{pass_fail_text}')]/#{radio_input_xpath}"
+    ]
+  end
+
+  def click_radio_in_pass_fail_div(value)
+    within(".pass-fail") do
+      text_pattern = value ? /^(Yes|Pass)$/ : /^(No|Fail)$/
+      find("label", text: text_pattern).find("input[type='radio']").click
+    end
+  end
+
+  def find_and_click_radio(label, value)
+    radio_value = boolean_to_radio_value(value)
+
+    if try_radio_selectors(label, value, radio_value)
+      return
+    end
 
     raise Capybara::ElementNotFound, "Unable to find radio for '#{label}'"
+  end
+
+  def try_radio_selectors(label, value, radio_value)
+    build_radio_selectors(label, value, radio_value).each do |selector|
+      find(:xpath, selector).click
+      return true
+    rescue Capybara::ElementNotFound
+      next
+    end
+    false
+  end
+
+  def build_radio_selectors(label, value, radio_value)
+    pass_fail_text = radio_text_for_boolean(value, :pass_fail)
+
+    [
+      # Original selector for simple radio button structures
+      build_simple_radio_selector(label, pass_fail_text),
+      # For complex forms with pass-fail div
+      build_complex_form_selector(label, radio_value),
+      # For number-pass-fail-na forms
+      build_partial_label_selector(label, radio_value),
+      # Fallback selectors
+      build_fallback_selector(label, radio_value),
+      build_fallback_selector(label, value)
+    ]
+  end
+
+  def build_simple_radio_selector(label, text)
+    "#{label_xpath(label)}/following::label[contains(.,'#{text}')][1]/" \
+    "#{radio_input_xpath}"
+  end
+
+  def build_complex_form_selector(label, radio_value)
+    "#{div_with_label_xpath(label)}//#{pass_fail_div_xpath}//" \
+    "#{radio_input_xpath(radio_value)}"
+  end
+
+  def build_partial_label_selector(label, radio_value)
+    first_word = label.split.first
+    "//div[.//label[contains(.,'#{first_word}')]]//#{pass_fail_div_xpath}//" \
+    "#{radio_input_xpath(radio_value)}"
+  end
+
+  def build_fallback_selector(label, value)
+    "#{div_with_label_xpath(label)}//#{radio_input_xpath(value)}"
   end
 
   def find_field_by_label(field_label)

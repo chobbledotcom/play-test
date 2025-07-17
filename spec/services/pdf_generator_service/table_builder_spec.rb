@@ -43,7 +43,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
   end
 
   describe ".create_pdf_table" do
-    let(:data) { [["Label 1", "Value 1"], ["Label 2", "Value 2"]] }
+    let(:data) { [ [ "Label 1", "Value 1" ], [ "Label 2", "Value 2" ] ] }
 
     it "creates a table with correct data and width" do
       described_class.create_pdf_table(pdf_double, data)
@@ -69,7 +69,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       described_class.create_pdf_table(pdf_double, data)
 
       expect(row_double).to have_received(:background_color=).with("EEEEEE")
-      expect(row_double).to have_received(:borders=).with([:bottom])
+      expect(row_double).to have_received(:borders=).with([ :bottom ])
       expect(row_double).to have_received(:border_color=).with("DDDDDD")
     end
 
@@ -94,7 +94,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
 
   describe ".create_nice_box_table" do
     let(:title) { "Test Title" }
-    let(:data) { [["Label", "Value"]] }
+    let(:data) { [ [ "Label", "Value" ] ] }
 
     it "adds title with correct styling" do
       described_class.create_nice_box_table(pdf_double, title, data)
@@ -134,7 +134,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
 
   describe ".create_unit_details_table" do
     let(:title) { "Unit Details" }
-    let(:data) { [["Description", "Test Unit", "Serial", "ABC123"]] }
+    let(:data) { [ [ "Description", "Test Unit", "Serial", "ABC123" ] ] }
 
     it "adds title and formatting" do
       described_class.create_unit_details_table(pdf_double, title, data)
@@ -210,14 +210,14 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       allow(table_double).to receive(:row).with(2).and_return(@row2_double)
       allow(table_double).to receive(:row).with(3).and_return(@row3_double)
 
-      [@row0_double, @row1_double, @row2_double, @row3_double].each do |row|
+      [ @row0_double, @row1_double, @row2_double, @row3_double ].each do |row|
         allow(row).to receive(:background_color=)
         allow(row).to receive(:font_style=)
         allow(row).to receive(:column).with(1).and_return(double("cell", text_color: nil, font_style: nil))
       end
 
       # Mock cell styling for result column
-      [@row1_double, @row2_double, @row3_double].each do |row|
+      [ @row1_double, @row2_double, @row3_double ].each do |row|
         cell_double = double("cell")
         allow(cell_double).to receive(:text_color=)
         allow(cell_double).to receive(:font_style=)
@@ -242,7 +242,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         I18n.t("pdf.inspection.fields.inspection_location")
       ]
 
-      expected_data = [expected_header] + inspections.map { |i|
+      expected_data = [ expected_header ] + inspections.map { |i|
         inspector_name = i.user.name || I18n.t("pdf.unit.fields.na")
         rpii_number = i.user.rpii_inspector_number
         inspector_text = if rpii_number.present?
@@ -272,9 +272,9 @@ RSpec.describe PdfGeneratorService::TableBuilder do
           I18n.t("pdf.unit.fields.inspector"),
           I18n.t("pdf.inspection.fields.inspection_location")
         ],
-        ["15 January, 2024", I18n.t("shared.pass_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)", "Site A"],
-        ["20 February, 2024", I18n.t("shared.fail_pdf"), "Jane Doe (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII456)", "Site B"],
-        ["1 March, 2024", I18n.t("shared.fail_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)", I18n.t("pdf.unit.fields.na")]
+        [ "15 January, 2024", I18n.t("shared.pass_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)", "Site A" ],
+        [ "20 February, 2024", I18n.t("shared.fail_pdf"), "Jane Doe (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII456)", "Site B" ],
+        [ "1 March, 2024", I18n.t("shared.fail_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)", I18n.t("pdf.unit.fields.na") ]
       ]
 
       described_class.create_inspection_history_table(pdf_double, title, inspections)
@@ -329,12 +329,12 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       let(:empty_inspections) { [] }
 
       it "handles empty inspections array" do
-        expected_data = [[
+        expected_data = [ [
           I18n.t("pdf.unit.fields.date"),
           I18n.t("pdf.unit.fields.result"),
           I18n.t("pdf.unit.fields.inspector"),
           I18n.t("pdf.inspection.fields.inspection_location")
-        ]]
+        ] ]
 
         described_class.create_inspection_history_table(pdf_double, title, empty_inspections)
 

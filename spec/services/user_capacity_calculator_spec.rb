@@ -16,8 +16,8 @@ RSpec.describe SafetyStandards::UserCapacityCalculator do
 
         # Check breakdown structure
         expect(result.breakdown).to include(
-          [I18n.t("safety_standards.calculators.user_capacity.total_area"), "10m × 10m = 100m²"],
-          [I18n.t("safety_standards.calculators.user_capacity.usable_area"), "100m²"]
+          [ I18n.t("safety_standards.calculators.user_capacity.total_area"), "10m × 10m = 100m²" ],
+          [ I18n.t("safety_standards.calculators.user_capacity.usable_area"), "100m²" ]
         )
       end
 
@@ -46,8 +46,8 @@ RSpec.describe SafetyStandards::UserCapacityCalculator do
 
         # Check breakdown includes adjustment
         expect(result.breakdown).to include(
-          [I18n.t("safety_standards.calculators.user_capacity.obstacles_adjustments"), "- 20m²"],
-          [I18n.t("safety_standards.calculators.user_capacity.usable_area"), "80m²"]
+          [ I18n.t("safety_standards.calculators.user_capacity.obstacles_adjustments"), "- 20m²" ],
+          [ I18n.t("safety_standards.calculators.user_capacity.usable_area"), "80m²" ]
         )
       end
 
@@ -62,7 +62,7 @@ RSpec.describe SafetyStandards::UserCapacityCalculator do
         expect(capacities[:users_1800mm]).to eq(0)
 
         expect(result.breakdown).to include(
-          [I18n.t("safety_standards.calculators.user_capacity.usable_area"), "0m²"]
+          [ I18n.t("safety_standards.calculators.user_capacity.usable_area"), "0m²" ]
         )
       end
 
@@ -73,7 +73,7 @@ RSpec.describe SafetyStandards::UserCapacityCalculator do
 
         expect(capacities[:users_1000mm]).to eq(85)  # (100 - 15) ÷ 1.0 = 85
         expect(result.breakdown).to include(
-          [I18n.t("safety_standards.calculators.user_capacity.obstacles_adjustments"), "- 15m²"]
+          [ I18n.t("safety_standards.calculators.user_capacity.obstacles_adjustments"), "- 15m²" ]
         )
       end
     end
@@ -112,7 +112,7 @@ RSpec.describe SafetyStandards::UserCapacityCalculator do
           users_1800mm: 0
         })
         expect(result.breakdown).to include(
-          [I18n.t("safety_standards.errors.invalid_dimensions"), ""]
+          [ I18n.t("safety_standards.errors.invalid_dimensions"), "" ]
         )
       end
 

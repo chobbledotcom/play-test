@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PdfGeneratorService
   class TableBuilder
     include Configuration
@@ -9,7 +11,7 @@ class PdfGeneratorService
         t.columns(0).font_style = :bold
         t.columns(0).width = TABLE_FIRST_COLUMN_WIDTH
         t.row(0..data.length - 1).background_color = "EEEEEE"
-        t.row(0..data.length - 1).borders = [:bottom]
+        t.row(0..data.length - 1).borders = [ :bottom ]
         t.row(0..data.length - 1).border_color = "DDDDDD"
       end
 
@@ -29,7 +31,7 @@ class PdfGeneratorService
         t.columns(0).font_style = :bold
         t.columns(0).width = TABLE_FIRST_COLUMN_WIDTH
         t.row(0..data.length - 1).background_color = "EEEEEE"
-        t.row(0..data.length - 1).borders = [:bottom]
+        t.row(0..data.length - 1).borders = [ :bottom ]
         t.row(0..data.length - 1).border_color = "DDDDDD"
       end
 
@@ -62,13 +64,13 @@ class PdfGeneratorService
           # Set column widths - labels just fit content, values take remaining space
           t.columns(0).width = UNIT_LABEL_COLUMN_WIDTH   # Description label
           t.columns(2).width = UNIT_LABEL_COLUMN_WIDTH   # Serial/Type/Owner labels
-          remaining_width = pdf.bounds.width - (UNIT_LABEL_COLUMN_WIDTH * 2)  # Total minus both label columns
+          remaining_width = pdf.bounds.width - (UNIT_LABEL_COLUMN_WIDTH * 2) # Total minus both label columns
           t.columns(1).width = remaining_width / 2  # Description value
           t.columns(3).width = remaining_width / 2  # Serial/Type/Owner values
         end
 
         t.row(0..data.length - 1).background_color = "EEEEEE"
-        t.row(0..data.length - 1).borders = [:bottom]
+        t.row(0..data.length - 1).borders = [ :bottom ]
         t.row(0..data.length - 1).border_color = "DDDDDD"
       end
 
@@ -107,7 +109,11 @@ class PdfGeneratorService
 
         table_data << [
           Utilities.format_date(inspection.inspection_date),
-          inspection.passed ? I18n.t("shared.pass_pdf") : I18n.t("shared.fail_pdf"),
+          if inspection.passed
+            I18n.t("shared.pass_pdf")
+          else
+            I18n.t("shared.fail_pdf")
+          end,
           inspector_text,
           inspection.inspection_location || I18n.t("pdf.unit.fields.na")
         ]
@@ -131,10 +137,8 @@ class PdfGeneratorService
           else
             HISTORY_TABLE_ALT_ROW_COLOR
           end
-        end
 
-        # Color and style the result column (index 1)
-        (1...table_data.length).each do |i|
+          # Color and style the result column (index 1)
           result_cell = t.row(i).column(1)
           if table_data[i][1] == I18n.t("shared.pass_pdf")
             result_cell.text_color = PASS_COLOR
@@ -150,7 +154,7 @@ class PdfGeneratorService
         inspector_width = remaining_width * HISTORY_INSPECTOR_WIDTH_PERCENT
         location_width = remaining_width * HISTORY_LOCATION_WIDTH_PERCENT
 
-        t.column_widths = [HISTORY_DATE_COLUMN_WIDTH, HISTORY_RESULT_COLUMN_WIDTH, inspector_width, location_width]
+        t.column_widths = [ HISTORY_DATE_COLUMN_WIDTH, HISTORY_RESULT_COLUMN_WIDTH, inspector_width, location_width ]
       end
 
       pdf.move_down 15
@@ -171,19 +175,26 @@ class PdfGeneratorService
       dimensions = []
 
       if last_inspection
-        dimensions << "#{I18n.t("pdf.dimensions.width")}: #{Utilities.format_dimension(last_inspection.width)}" if last_inspection.width.present?
-        dimensions << "#{I18n.t("pdf.dimensions.length")}: #{Utilities.format_dimension(last_inspection.length)}" if last_inspection.length.present?
-        dimensions << "#{I18n.t("pdf.dimensions.height")}: #{Utilities.format_dimension(last_inspection.height)}" if last_inspection.height.present?
+        if last_inspection.width.present?
+          dimensions << "#{I18n.t("pdf.dimensions.width")}: #{Utilities.format_dimension(last_inspection.width)}"
+        end
+        if last_inspection.length.present?
+          dimensions << "#{I18n.t("pdf.dimensions.length")}: #{Utilities.format_dimension(last_inspection.length)}"
+        end
+        if last_inspection.height.present?
+          dimensions << "#{I18n.t("pdf.dimensions.height")}: #{Utilities.format_dimension(last_inspection.height)}"
+        end
       end
       dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
 
       # Build simple two-column table for unit PDFs
       [
-        [I18n.t("pdf.inspection.fields.description"), Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH)],
-        [I18n.t("pdf.inspection.fields.manufacturer"), unit.manufacturer.presence || ""],
-        [I18n.t("pdf.inspection.fields.owner"), unit.owner.presence || ""],
-        [I18n.t("pdf.inspection.fields.serial"), unit.serial || ""],
-        [I18n.t("pdf.inspection.fields.size_m"), dimensions_text]
+        [ I18n.t("pdf.inspection.fields.description"),
+          Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH) ],
+        [ I18n.t("pdf.inspection.fields.manufacturer"), unit.manufacturer.presence || "" ],
+        [ I18n.t("pdf.inspection.fields.owner"), unit.owner.presence || "" ],
+        [ I18n.t("pdf.inspection.fields.serial"), unit.serial || "" ],
+        [ I18n.t("pdf.inspection.fields.size_m"), dimensions_text ]
       ]
     end
 
@@ -191,14 +202,24 @@ class PdfGeneratorService
       dimensions = []
 
       if last_inspection
-        dimensions << "#{I18n.t("pdf.dimensions.width")}: #{Utilities.format_dimension(last_inspection.width)}" if last_inspection.width.present?
-        dimensions << "#{I18n.t("pdf.dimensions.length")}: #{Utilities.format_dimension(last_inspection.length)}" if last_inspection.length.present?
-        dimensions << "#{I18n.t("pdf.dimensions.height")}: #{Utilities.format_dimension(last_inspection.height)}" if last_inspection.height.present?
+        if last_inspection.width.present?
+          dimensions << "#{I18n.t("pdf.dimensions.width")}: #{Utilities.format_dimension(last_inspection.width)}"
+        end
+        if last_inspection.length.present?
+          dimensions << "#{I18n.t("pdf.dimensions.length")}: #{Utilities.format_dimension(last_inspection.length)}"
+        end
+        if last_inspection.height.present?
+          dimensions << "#{I18n.t("pdf.dimensions.height")}: #{Utilities.format_dimension(last_inspection.height)}"
+        end
       end
       dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
 
       # Get inspector details from current inspection (for inspection PDF) or last inspection (for unit PDF)
-      inspection = (context == :inspection) ? last_inspection : unit.last_inspection
+      inspection = if context == :inspection
+        last_inspection
+      else
+        unit.last_inspection
+      end
       inspector_name = inspection&.user&.name || ""
       rpii_number = inspection&.user&.rpii_inspector_number
 
@@ -210,7 +231,11 @@ class PdfGeneratorService
       end
 
       inspection_location = inspection&.inspection_location || ""
-      issued_date = inspection&.inspection_date ? Utilities.format_date(inspection.inspection_date) : ""
+      issued_date = if inspection&.inspection_date
+        Utilities.format_date(inspection.inspection_date)
+      else
+        ""
+      end
 
       # Build the table rows
       [

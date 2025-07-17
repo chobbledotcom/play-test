@@ -6,12 +6,12 @@
 # under the search.sites namespace
 module Federation
   def self.sites(current_host = nil, current_user = nil)
-    all_sites = [{name: :current_site, host: ""}]
+    all_sites = [ { name: :current_site, host: "" } ]
 
     if Rails.env.local? || current_user&.admin?
       all_sites.concat([
-        {name: :play_test, host: "play-test.co.uk"},
-        {name: :rpii_play_test, host: "rpii.play-test.co.uk"}
+        { name: :play_test, host: "play-test.co.uk" },
+        { name: :rpii_play_test, host: "rpii.play-test.co.uk" }
       ])
     end
 
