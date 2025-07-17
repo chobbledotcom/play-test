@@ -64,7 +64,11 @@ class UnitsController < ApplicationController
 
     if @unit.update(unit_params)
       # Calculate what changed
-      changed_data = calculate_changes(previous_attributes, @unit.attributes, unit_params.keys)
+      changed_data = calculate_changes(
+        previous_attributes,
+        @unit.attributes,
+        unit_params.keys
+      )
 
       log_unit_event("updated", @unit, nil, changed_data)
       respond_to do |format|
@@ -78,7 +82,10 @@ class UnitsController < ApplicationController
       respond_to do |format|
         format.html { render :edit, status: :unprocessable_entity }
         format.json do
-          render json: {status: I18n.t("shared.api.error"), errors: @unit.errors.full_messages}
+          render json: {
+            status: I18n.t("shared.api.error"),
+            errors: @unit.errors.full_messages
+          }
         end
         format.turbo_stream { render_unit_update_error_stream }
       end
@@ -106,7 +113,9 @@ class UnitsController < ApplicationController
       flash[:notice] = I18n.t("units.messages.deleted")
       redirect_to units_path
     else
-      @unit.errors.full_messages.first || I18n.t("units.messages.delete_failed") => error_message
+      error_message =
+        @unit.errors.full_messages.first ||
+        I18n.t("units.messages.delete_failed")
       flash[:alert] = error_message
       redirect_to @unit
     end
@@ -146,7 +155,9 @@ class UnitsController < ApplicationController
       redirect_to inspection_path(service.inspection)
     elsif service.error_message
       flash[:alert] = service.error_message
-      redirect_path = service.inspection ? inspection_path(service.inspection) : root_path
+      redirect_path = service.inspection ?
+        inspection_path(service.inspection) :
+        root_path
       redirect_to redirect_path
     else
       @unit = service.unit
@@ -284,7 +295,9 @@ class UnitsController < ApplicationController
 
   def build_index_title
     title_parts = [I18n.t("units.titles.index")]
-    title_parts << I18n.t("units.status.overdue") if params[:status] == "overdue"
+    if params[:status] == "overdue"
+      title_parts << I18n.t("units.status.overdue")
+    end
     title_parts << params[:manufacturer] if params[:manufacturer].present?
     title_parts << params[:owner] if params[:owner].present?
     title_parts.join(" - ")
