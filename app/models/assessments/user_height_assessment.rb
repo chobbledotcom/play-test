@@ -48,6 +48,6 @@ class Assessments::UserHeightAssessment < ApplicationRecord
     # For platforms 3.0m+, check slide assessment if inspection has a slide
     return false unless inspection.has_slide?
 
-    inspection.slide_assessment&.slide_permanent_roof
+    inspection.slide_assessment?&.slide_permanent_roof
   end
 end
