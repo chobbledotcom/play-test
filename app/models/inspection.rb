@@ -48,6 +48,20 @@ class Inspection < ApplicationRecord
   # Accept nested attributes for all assessments
   accepts_nested_attributes_for(*ASSESSMENT_TYPES.keys)
 
+  # Override assessment getters to auto-create if missing
+  ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
+    # Auto-create version
+    define_method(assessment_name) do
+      super() || assessment_class.find_or_create_by!(inspection: self)
+    end
+
+    # Non-creating version for safe navigation
+    define_method("#{assessment_name}?") do
+      association(assessment_name).loaded? ? send(assessment_name) :
+        assessment_class.find_by(inspection: self)
+    end
+  end
+
   validates :inspection_location, presence: true, if: :complete?
   validates :inspection_date, presence: true
   # rubocop:disable Rails/UniqueValidationWithoutIndex
@@ -57,7 +71,6 @@ class Inspection < ApplicationRecord
 
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
-  after_create :create_assessments
 
   # Scopes
   scope :seed_data, -> { where(is_seed: true) }
@@ -331,8 +344,9 @@ class Inspection < ApplicationRecord
         assessment = send(assessment_key) if respond_to?(assessment_key)
 
         assessment_fields =
-          assessment.incomplete_fields
-            .map { |f| {field: f, label: field_label(tab.to_sym, f)} }
+          assessment&.incomplete_fields
+            &.map { |f| {field: f, label: field_label(tab.to_sym, f)} } ||
+          []
 
         if assessment_fields.any?
           output << {
@@ -348,12 +362,6 @@ class Inspection < ApplicationRecord
   end
 
   private
-
-  def create_assessments
-    ASSESSMENT_TYPES.each_key do |assessment_type|
-      send("create_#{assessment_type}!")
-    end
-  end
 
   def set_inspector_company_from_user
     self.inspector_company_id ||= user.inspection_company_id
