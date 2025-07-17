@@ -14,6 +14,7 @@ en:
         default_inspection_location: "Default Inspection Location"
         theme: "Theme"
         logo: "Company Logo"
+        signature: "Signature"
       errors:
         header:
           one: "1 error prevented these settings from being saved:"

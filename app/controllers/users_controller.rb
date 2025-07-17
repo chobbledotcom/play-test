@@ -14,7 +14,7 @@ class UsersController < ApplicationController
   ]
 
   skip_before_action :require_login, only: LOGGED_OUT_PATHS
-  skip_before_action :update_last_active_at, only: [ :update_settings ]
+  skip_before_action :update_last_active_at, only: [:update_settings]
   before_action :set_user, except: %i[index new create]
   before_action :require_admin, except: NON_ADMIN_PATHS + LOGGED_OUT_PATHS
   before_action :require_correct_user, only: NON_ADMIN_PATHS
@@ -155,7 +155,7 @@ class UsersController < ApplicationController
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("rpii_verification_result",
           partial: "users/rpii_verification_result",
-          locals: { result: result, user: @user })
+          locals: {result: result, user: @user})
       end
     end
   end
@@ -229,7 +229,7 @@ class UsersController < ApplicationController
   def settings_params
     settings_fields = %i[
       address country default_inspection_location
-      logo phone postal_code theme
+      logo phone postal_code signature theme
     ]
     params.require(:user).permit(settings_fields)
   end
