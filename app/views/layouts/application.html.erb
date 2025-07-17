@@ -41,7 +41,9 @@
         <ul>
           <li><%= nav_link_to t('navigation.inspections'), inspections_path %></li>
           <li><%= nav_link_to t('navigation.units'), units_path %></li>
-          <li><%= nav_link_to t('navigation.search'), search_path %></li>
+          <% if Rails.env.development? || Rails.env.test? %>
+            <li><%= nav_link_to t('navigation.search'), search_path %></li>
+          <% end %>
           <% if current_user.admin? %>
             <li><%= nav_link_to t('navigation.users'), users_path %></li>
             <li><%= nav_link_to t('inspector_companies.titles.index'), inspector_companies_path %></li>

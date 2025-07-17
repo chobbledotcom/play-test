@@ -4,8 +4,8 @@ en:
     title: "Search Federated Sites"
     sites:
       current_site: "Current Site"
-      play_test: "play-test.co.uk"
-      rpii_play_test: "rpii.play-test.co.uk"
+      play_test: "Play Test"
+      rpii_play_test: "RPII"
     results:
       heading: "Search Results"
       site: "Site"

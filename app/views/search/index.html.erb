@@ -35,8 +35,16 @@
     </thead>
     <tbody id="results-body">
       <% @federated_sites.each do |site| %>
-        <tr data-site-name="<%= site[:name] %>" data-site-url="<%= site[:url] %>">
-          <td><%= t("search.sites.#{site[:name]}") %></td>
+        <tr data-site-name="<%= site[:name] %>" data-site-url="<%= site[:host].present? ? "https://#{site[:host]}" : "" %>">
+          <td>
+            <% if site[:host].present? %>
+              <a href="https://<%= site[:host] %>" target="_blank" rel="noopener">
+                <%= t("search.sites.#{site[:name]}") %>
+              </a>
+            <% else %>
+              <%= t("search.sites.#{site[:name]}") %>
+            <% end %>
+          </td>
           <td class="status"><%= t("search.status.waiting") %></td>
           <td class="action">-</td>
         </tr>

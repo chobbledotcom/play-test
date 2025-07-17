@@ -57,7 +57,8 @@ class DirtyForms {
 		if (
 			formAction.includes("/login") ||
 			formAction.includes("/signup") ||
-			formAction.includes("/safety_standards")
+			formAction.includes("/safety_standards") ||
+			formAction.includes("/search")
 		) {
 			return;
 		}

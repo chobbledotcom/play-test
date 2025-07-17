@@ -49,12 +49,10 @@ class FederationSearch {
   async checkSite(row, siteUrl, type, id) {
     const statusCell = row.querySelector('.status');
     const actionCell = row.querySelector('.action');
+    const baseUrl = siteUrl || '';
+    const checkUrl = `${baseUrl}/${type}s/${id}`;
     
     try {
-      // Construct the URL for HEAD request
-      const baseUrl = siteUrl || '';
-      const checkUrl = `${baseUrl}/${type}s/${id}`;
-      
       // Use HEAD request to check if resource exists
       const response = await fetch(checkUrl, {
         method: 'HEAD',
@@ -80,8 +78,10 @@ class FederationSearch {
         actionCell.textContent = '-';
       }
     } catch (error) {
+      console.error(`Error checking ${checkUrl}:`, error);
       statusCell.textContent = 'Error';
       statusCell.className = 'status error';
+      statusCell.title = error.message || 'CORS or network error';
       actionCell.textContent = '-';
     }
   }

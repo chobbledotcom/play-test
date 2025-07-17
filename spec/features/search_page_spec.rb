@@ -46,7 +46,7 @@ RSpec.feature "Search page", type: :feature do
     visit search_path
 
     # Check that federated sites are in the DOM (even if hidden)
-    FEDERATED_SITES.each do |site|
+    Federation.sites.each do |site|
       site_name = I18n.t("search.sites.#{site[:name]}")
       expect(page.html).to include(site_name)
     end

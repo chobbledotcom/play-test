@@ -59,6 +59,9 @@ gem "dotenv-rails"
 # CSV support for Ruby 3.4+
 gem "csv"
 
+# CORS support for federation
+gem "rack-cors"
+
 gem "rails-controller-testing", "~> 1.0", groups: [:development, :test]
 
 gem "turbo-rails", "~> 2.0"

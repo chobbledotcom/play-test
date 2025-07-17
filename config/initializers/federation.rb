@@ -1,16 +1,22 @@
 # Federation configuration for searching across multiple sites
 # Each site in the array represents a federated instance that can be searched
-# The current site uses an empty URL to indicate local searches
+# The current site uses an empty host to indicate local searches
 
 # Site names are defined as symbols to be looked up in I18n translations
 # under the search.sites namespace
-FEDERATED_SITES = [
-  {name: :current_site, url: ""} # Empty URL for current/local site
-].tap do |sites|
-  if Rails.env.local?
-    sites.concat([
-      {name: :play_test, url: "https://play-test.co.uk"},
-      {name: :rpii_play_test, url: "https://rpii.play-test.co.uk"}
-    ])
+module Federation
+  def self.sites(current_host = nil)
+    all_sites = [{name: :current_site, host: ""}]
+
+    if Rails.env.local?
+      all_sites.concat([
+        {name: :play_test, host: "play-test.co.uk"},
+        {name: :rpii_play_test, host: "rpii.play-test.co.uk"}
+      ])
+    end
+
+    return all_sites unless current_host
+
+    all_sites.reject { |site| site[:host] == current_host }
   end
-end.freeze
+end

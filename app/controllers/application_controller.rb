@@ -49,15 +49,6 @@ class ApplicationController < ActionController::Base
     I18n.t("application.#{table}.#{key}", **args)
   end
 
-  def set_cors_headers_for_federation
-    # Allow CORS for federation HEAD requests
-    return unless request.head?
-
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-  end
-
   def form_i18n(form, key, **args)
     I18n.t("forms.#{form}.#{key}", **args)
   end
