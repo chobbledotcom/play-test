@@ -51,9 +51,9 @@ class FederationSearch {
     const actionCell = row.querySelector('.action');
     
     try {
-      // Construct the JSON URL with check=true
+      // Construct the URL for HEAD request
       const baseUrl = siteUrl || '';
-      const checkUrl = `${baseUrl}/${type}s/${id}.json?check=true`;
+      const checkUrl = `${baseUrl}/${type}s/${id}`;
       
       // Use HEAD request to check if resource exists
       const response = await fetch(checkUrl, {

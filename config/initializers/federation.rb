@@ -5,7 +5,12 @@
 # Site names are defined as symbols to be looked up in I18n translations
 # under the search.sites namespace
 FEDERATED_SITES = [
-  {name: :current_site, url: ""}, # Empty URL for current/local site
-  {name: :play_test, url: "https://play-test.co.uk"},
-  {name: :rpii_play_test, url: "https://rpii.play-test.co.uk"}
-].freeze
+  {name: :current_site, url: ""} # Empty URL for current/local site
+].tap do |sites|
+  if Rails.env.local?
+    sites.concat([
+      {name: :play_test, url: "https://play-test.co.uk"},
+      {name: :rpii_play_test, url: "https://rpii.play-test.co.uk"}
+    ])
+  end
+end.freeze

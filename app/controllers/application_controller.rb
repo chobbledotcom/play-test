@@ -50,11 +50,11 @@ class ApplicationController < ActionController::Base
   end
 
   def set_cors_headers_for_federation
-    # Allow CORS for federation checks
-    return unless params[:check] == "true" && request.format.json?
+    # Allow CORS for federation HEAD requests
+    return unless request.head?
 
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, HEAD"
+    response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
   end
 

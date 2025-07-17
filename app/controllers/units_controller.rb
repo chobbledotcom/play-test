@@ -26,11 +26,8 @@ class UnitsController < ApplicationController
   end
 
   def show
-    # Handle federation check requests
-    if params[:check] == "true"
-      head :ok
-      return
-    end
+    # Handle federation HEAD requests
+    return head :ok if request.head?
 
     @inspections = @unit.inspections
       .includes(inspector_company: {logo_attachment: :blob})

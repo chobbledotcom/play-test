@@ -21,7 +21,7 @@ en:
   # Form translations for search
   forms:
     search:
-      header: "Search for Inspections and Units"
+      header: "Search Units & Inspections"
       sections:
         search_details: "Search Details"
       fields:

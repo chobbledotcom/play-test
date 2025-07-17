@@ -32,11 +32,8 @@ class InspectionsController < ApplicationController
   end
 
   def show
-    # Handle federation check requests
-    if params[:check] == "true"
-      head :ok
-      return
-    end
+    # Handle federation HEAD requests
+    return head :ok if request.head?
 
     respond_to do |format|
       format.html { render_show_html }
