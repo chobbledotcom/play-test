@@ -5,10 +5,10 @@
 # Site names are defined as symbols to be looked up in I18n translations
 # under the search.sites namespace
 module Federation
-  def self.sites(current_host = nil)
+  def self.sites(current_host = nil, current_user = nil)
     all_sites = [{name: :current_site, host: ""}]
 
-    if Rails.env.local?
+    if Rails.env.local? || current_user&.admin?
       all_sites.concat([
         {name: :play_test, host: "play-test.co.uk"},
         {name: :rpii_play_test, host: "rpii.play-test.co.uk"}
