@@ -1,99 +1,99 @@
 /* Dark Theme Styles */
-.dark-theme {
+.dark {
 	background-color: var(--dark-bg-primary);
 	color: var(--dark-text);
 }
 
-.dark-theme nav a,
-.dark-theme nav button {
+.dark nav a,
+.dark nav button {
 	background-color: var(--dark-highlight) !important;
 	border-color: var(--dark-highlight) !important;
 	color: var(--dark-bg-primary) !important;
 }
 
-.dark-theme nav a:hover,
-.dark-theme nav button:hover {
+.dark nav a:hover,
+.dark nav button:hover {
 	background-color: var(--dark-bg-accent) !important;
 	border-color: var(--dark-bg-accent) !important;
 	color: var(--dark-text) !important;
 }
 
-.dark-theme nav span {
+.dark nav span {
 	background-color: transparent;
 	border: 2px solid var(--dark-highlight);
 	color: var(--dark-highlight);
 }
 
 /* Links */
-.dark-theme a {
+.dark a {
 	color: var(--dark-text);
 }
 
-.dark-theme a:hover {
+.dark a:hover {
 	color: var(--dark-highlight);
 }
 
 /* Forms */
-.dark-theme input[type="text"],
-.dark-theme input[type="email"],
-.dark-theme input[type="password"],
-.dark-theme input[type="date"],
-.dark-theme input[type="datetime-local"],
-.dark-theme input[type="number"],
-.dark-theme input[type="search"],
-.dark-theme select,
-.dark-theme textarea {
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="date"],
+.dark input[type="datetime-local"],
+.dark input[type="number"],
+.dark input[type="search"],
+.dark select,
+.dark textarea {
 	background-color: var(--dark-bg-primary);
 	color: var(--dark-text);
 	border: 1px solid var(--dark-border);
 }
 
-.dark-theme input[type="text"]:focus,
-.dark-theme input[type="email"]:focus,
-.dark-theme input[type="password"]:focus,
-.dark-theme input[type="date"]:focus,
-.dark-theme input[type="datetime-local"]:focus,
-.dark-theme input[type="number"]:focus,
-.dark-theme input[type="search"]:focus,
-.dark-theme select:focus,
-.dark-theme textarea:focus {
+.dark input[type="text"]:focus,
+.dark input[type="email"]:focus,
+.dark input[type="password"]:focus,
+.dark input[type="date"]:focus,
+.dark input[type="datetime-local"]:focus,
+.dark input[type="number"]:focus,
+.dark input[type="search"]:focus,
+.dark select:focus,
+.dark textarea:focus {
 	border-color: var(--dark-highlight);
 	background-color: var(--dark-bg-accent);
 }
 
 /* Buttons */
-.dark-theme button,
-.dark-theme input[type="submit"],
-.dark-theme input[type="button"],
-.dark-theme .button {
+.dark button,
+.dark input[type="submit"],
+.dark input[type="button"],
+.dark .button {
 	background-color: var(--dark-bg-accent);
 	color: var(--dark-text);
 	border: 1px solid var(--dark-border);
 }
 
-.dark-theme button:hover,
-.dark-theme input[type="submit"]:hover,
-.dark-theme input[type="button"]:hover,
-.dark-theme .button:hover {
+.dark button:hover,
+.dark input[type="submit"]:hover,
+.dark input[type="button"]:hover,
+.dark .button:hover {
 	background-color: var(--dark-highlight);
 	color: var(--dark-bg-primary);
 }
 
 /* Tables */
-.dark-theme table {
+.dark table {
 	background-color: var(--dark-bg-primary);
 }
 
-.dark-theme th {
+.dark th {
 	background-color: var(--dark-bg-accent);
 	color: var(--dark-text);
 }
 
-.dark-theme td {
+.dark td {
 	border-color: var(--dark-border);
 }
 
-.dark-theme tr:nth-child(even) {
+.dark tr:nth-child(even) {
 	background-color: var(--dark-bg-accent);
 	background-color: color-mix(
 		in srgb,
@@ -103,59 +103,59 @@
 }
 
 /* Fieldsets and legends */
-.dark-theme fieldset {
+.dark fieldset {
 	border-color: var(--dark-border);
 }
 
-.dark-theme legend {
+.dark legend {
 	color: var(--dark-text);
 }
 
 /* Sections and articles */
-.dark-theme article {
+.dark article {
 	background-color: var(--dark-bg-primary);
 }
 
-.dark-theme section {
+.dark section {
 	background-color: var(--dark-bg-primary);
 }
 
 /* Labels */
-.dark-theme label {
+.dark label {
 	color: var(--dark-text);
 }
 
 /* Help text and small text */
-.dark-theme small {
+.dark small {
 	color: var(--dark-text);
 	opacity: 0.8;
 }
 
-.dark-theme .help-text {
+.dark .help-text {
 	color: var(--dark-text);
 	opacity: 0.7;
 }
 
 /* Code blocks */
-.dark-theme code,
-.dark-theme pre {
+.dark code,
+.dark pre {
 	background-color: var(--dark-bg-accent);
 	color: var(--dark-text);
 }
 
 /* Borders */
-.dark-theme hr {
+.dark hr {
 	border-color: var(--dark-border);
 }
 
 /* Calculated fields */
-.dark-theme .calculated-field .calculated-value {
+.dark .calculated-field .calculated-value {
 	color: var(--dark-text);
 	opacity: 0.8;
 }
 
 /* Company activation notice */
-.dark-theme #company-activation-notice {
+.dark #company-activation-notice {
 	background-color: color-mix(in srgb, #d32f2f 20%, var(--dark-bg-primary));
 	border-color: #d32f2f;
 	color: var(--dark-text);
@@ -163,44 +163,44 @@
 }
 
 /* Dark mode box shadows - override bright shadows */
-.dark-theme {
+.dark {
 	--box-shadow: 2px 2px 10px;
 	--color-shadow: rgba(0, 0, 0, 0.6);
 }
 
 /* Override specific bright box shadows */
-.dark-theme form,
-.dark-theme fieldset,
-.dark-theme .completion-status-notice {
+.dark form,
+.dark fieldset,
+.dark .completion-status-notice {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-.dark-theme #company-activation-notice {
+.dark #company-activation-notice {
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* Hover effects with darker shadows */
-.dark-theme a:hover,
-.dark-theme button:hover,
-.dark-theme input[type="submit"]:hover {
+.dark a:hover,
+.dark button:hover,
+.dark input[type="submit"]:hover {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
 }
 
-.dark-theme tr:hover {
+.dark tr:hover {
 	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
-.dark-theme .table-list-items a:hover {
+.dark .table-list-items a:hover {
 	background-color: var(--dark-bg-accent) !important;
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Table list alternating rows in dark mode */
-.dark-theme .table-list-items li:nth-child(odd) a {
+.dark .table-list-items li:nth-child(odd) a {
 	background-color: var(--dark-bg-primary);
 }
 
-.dark-theme .table-list-items li:nth-child(even) a {
+.dark .table-list-items li:nth-child(even) a {
 	background-color: color-mix(
 		in srgb,
 		var(--dark-bg-accent) 20%,
@@ -209,52 +209,52 @@
 }
 
 /* Unit photo container dark mode shadows */
-.dark-theme .unit-photo-container:hover {
+.dark .unit-photo-container:hover {
 	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6) !important;
 }
 
-.dark-theme .unit-photo-field:hover {
+.dark .unit-photo-field:hover {
 	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Share button dark mode shadow */
-.dark-theme .share-button:hover {
+.dark .share-button:hover {
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* Completion status notice - nice dark blue box with white text */
-.dark-theme .completion-status-notice {
+.dark .completion-status-notice {
 	background: var(--dark-bg-accent);
 	border: 1px solid var(--dark-border);
 	color: var(--dark-text);
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-.dark-theme .completion-status-notice a {
+.dark .completion-status-notice a {
 	color: var(--dark-highlight);
 }
 
-.dark-theme .completion-status-notice a:hover {
+.dark .completion-status-notice a:hover {
 	color: var(--dark-text);
 	text-decoration: underline;
 }
 
 /* Pass/Fail/Pending badges dark mode */
-.dark-theme .pass-badge {
+.dark .pass-badge {
 	background-color: var(--dark-highlight);
 	color: var(--dark-bg-primary);
 	border: 1px solid var(--dark-highlight);
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.dark-theme .fail-badge {
+.dark .fail-badge {
 	background-color: #d32f2f;
 	color: var(--dark-text);
 	border: 1px solid #d32f2f;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.dark-theme .pending-badge {
+.dark .pending-badge {
 	background-color: #f9a825;
 	color: var(--dark-bg-primary);
 	border: 1px solid #f9a825;
@@ -262,69 +262,69 @@
 }
 
 /* Safety standards reference summary elements */
-.dark-theme .safety-standards-reference summary {
+.dark .safety-standards-reference summary {
 	background-color: var(--dark-bg-accent);
 	color: var(--dark-text);
 }
 
-.dark-theme .safety-standards-reference summary:hover {
+.dark .safety-standards-reference summary:hover {
 	background-color: var(--dark-highlight);
 	color: var(--dark-bg-primary);
 }
 
-.dark-theme .formula-box summary,
-.dark-theme .source-code-box summary,
-.dark-theme .api-details-box summary {
+.dark .formula-box summary,
+.dark .source-code-box summary,
+.dark .api-details-box summary {
 	background-color: var(--dark-bg-accent);
 	color: var(--dark-text);
 }
 
-.dark-theme .formula-box summary:hover,
-.dark-theme .source-code-box summary:hover,
-.dark-theme .api-details-box summary:hover {
+.dark .formula-box summary:hover,
+.dark .source-code-box summary:hover,
+.dark .api-details-box summary:hover {
 	background-color: var(--dark-highlight);
 	color: var(--dark-bg-primary);
 }
 
 /* Incomplete fields styling */
-.dark-theme .incomplete-fields-details {
+.dark .incomplete-fields-details {
 	border-color: var(--dark-border);
 	background-color: var(--dark-bg-primary);
 }
 
-.dark-theme .incomplete-fields-summary {
+.dark .incomplete-fields-summary {
 	color: var(--dark-highlight);
 	background-color: var(--dark-bg-accent);
 }
 
-.dark-theme .incomplete-fields-summary:hover {
+.dark .incomplete-fields-summary:hover {
 	background-color: var(--dark-highlight);
 	color: var(--dark-bg-primary);
 }
 
-.dark-theme .incomplete-fields-summary::marker {
+.dark .incomplete-fields-summary::marker {
 	color: var(--dark-highlight);
 }
 
-.dark-theme .incomplete-fields-content {
+.dark .incomplete-fields-content {
 	background-color: var(--dark-bg-primary);
 	border-top-color: var(--dark-border);
 }
 
-.dark-theme .incomplete-fields-list li {
+.dark .incomplete-fields-list li {
 	border-bottom-color: var(--dark-border);
 }
 
-.dark-theme .field-type {
+.dark .field-type {
 	color: var(--dark-text);
 	opacity: 0.7;
 }
 
-.dark-theme #mark-as-complete {
+.dark #mark-as-complete {
 	background: var(--dark-bg-accent);
 	border-color: var(--dark-border);
 }
 
-.dark-theme #mark-as-complete .incomplete-fields-details {
+.dark #mark-as-complete .incomplete-fields-details {
 	border-color: var(--dark-border);
 }
