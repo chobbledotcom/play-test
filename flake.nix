@@ -20,13 +20,14 @@
       {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            ruby_3_4
-            rubyPackages_3_4.ruby-vips
-            rubyPackages_3_4.psych
-            sqlite
-            nodejs
+            gh
             imagemagick
             jq
+            nodejs
+            rubyPackages_3_4.psych
+            rubyPackages_3_4.ruby-vips
+            ruby_3_4
+            sqlite
           ];
 
           # Use bundler to manage Rails version instead of Nix
