@@ -1,9 +1,14 @@
 class Inspection < ApplicationRecord
   include CustomIdGenerator
 
-  PASS_FAIL_NA = { fail: 0, pass: 1, na: 2 }.freeze
+  PASS_FAIL_NA = {fail: 0, pass: 1, na: 2}.freeze
 
-  ASSESSMENT_TYPES = {
+  enum :inspection_type, {
+    bouncy_castle: "BOUNCY_CASTLE",
+    bouncing_pillow: "BOUNCING_PILLOW"
+  }
+
+  CASTLE_ASSESSMENT_TYPES = {
     user_height_assessment: Assessments::UserHeightAssessment,
     slide_assessment: Assessments::SlideAssessment,
     structure_assessment: Assessments::StructureAssessment,
@@ -12,6 +17,13 @@ class Inspection < ApplicationRecord
     enclosed_assessment: Assessments::EnclosedAssessment,
     fan_assessment: Assessments::FanAssessment
   }.freeze
+
+  PILLOW_ASSESSMENT_TYPES = {
+    fan_assessment: Assessments::FanAssessment
+  }.freeze
+
+  ALL_ASSESSMENT_TYPES =
+    CASTLE_ASSESSMENT_TYPES.merge(PILLOW_ASSESSMENT_TYPES).freeze
 
   USER_EDITABLE_PARAMS = %i[
     has_slide
@@ -37,7 +49,7 @@ class Inspection < ApplicationRecord
   belongs_to :unit, optional: true
   belongs_to :inspector_company, optional: true
 
-  ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
+  ALL_ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
     has_one assessment_name,
       class_name: assessment_class.name,
       dependent: :destroy
@@ -46,10 +58,10 @@ class Inspection < ApplicationRecord
   alias_method :tallest_user_height_assessment, :user_height_assessment
 
   # Accept nested attributes for all assessments
-  accepts_nested_attributes_for(*ASSESSMENT_TYPES.keys)
+  accepts_nested_attributes_for(*ALL_ASSESSMENT_TYPES.keys)
 
   # Override assessment getters to auto-create if missing
-  ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
+  ALL_ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
     # Auto-create version
     define_method(assessment_name) do
       super() || assessment_class.find_or_create_by!(inspection: self)
@@ -66,11 +78,12 @@ class Inspection < ApplicationRecord
   validates :inspection_date, presence: true
   # rubocop:disable Rails/UniqueValidationWithoutIndex
   validates :unique_report_number,
-    uniqueness: { scope: :user_id, allow_blank: true }
+    uniqueness: {scope: :user_id, allow_blank: true}
   # rubocop:enable Rails/UniqueValidationWithoutIndex
 
   # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
+  before_validation :set_inspection_type_from_unit, on: :create
 
   # Scopes
   scope :seed_data, -> { where(is_seed: true) }
@@ -98,7 +111,7 @@ class Inspection < ApplicationRecord
   }
   scope :filter_by_owner, ->(owner) {
     if owner.present?
-      joins(:unit).where(units: { owner: owner })
+      joins(:unit).where(units: {owner: owner})
     else
       all
     end
@@ -140,14 +153,26 @@ class Inspection < ApplicationRecord
     width * length * height
   end
 
-  # Check if inspection is complete (not draft)
   def complete?
     complete_date.present?
   end
 
-  # Get list of applicable assessment tabs based on inspection configuration
+  def assessment_types
+    bouncing_pillow? ? PILLOW_ASSESSMENT_TYPES : CASTLE_ASSESSMENT_TYPES
+  end
+
   def applicable_assessments
-    ASSESSMENT_TYPES.select do |assessment_key, _|
+    if bouncing_pillow?
+      pillow_applicable_assessments
+    else
+      castle_applicable_assessments
+    end
+  end
+
+  private
+
+  def castle_applicable_assessments
+    CASTLE_ASSESSMENT_TYPES.select do |assessment_key, _|
       case assessment_key
       when :slide_assessment
         has_slide?
@@ -158,6 +183,12 @@ class Inspection < ApplicationRecord
       end
     end
   end
+
+  def pillow_applicable_assessments
+    PILLOW_ASSESSMENT_TYPES
+  end
+
+  public
 
   # Iterate over only applicable assessments with a block
   def each_applicable_assessment
@@ -174,7 +205,7 @@ class Inspection < ApplicationRecord
 
   # Returns tabs in the order they appear in the UI
   def applicable_tabs
-    tabs = [ "inspection", "user_height" ]
+    tabs = ["inspection", "user_height"]
 
     # Only show slide tab for inspections that have slides
     tabs << "slide" if assessment_applicable?(:slide_assessment)
@@ -299,7 +330,7 @@ class Inspection < ApplicationRecord
 
   def inspection_tab_incomplete_fields
     # Fields required for the inspection tab specifically (excludes passed which is on results tab)
-    fields = REQUIRED_TO_COMPLETE_FIELDS - [ :passed ]
+    fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
     fields
       .select { |f| !f.end_with?("_comment") }
       .select { |f| send(f).nil? }
@@ -315,7 +346,7 @@ class Inspection < ApplicationRecord
         # Get incomplete fields for the inspection tab (excluding passed)
         inspection_tab_fields =
           inspection_tab_incomplete_fields
-            .map { |f| { field: f, label: field_label(:inspection, f) } }
+            .map { |f| {field: f, label: field_label(:inspection, f)} }
 
         if inspection_tab_fields.any?
           output << {
@@ -328,7 +359,7 @@ class Inspection < ApplicationRecord
       when "results"
         # Get incomplete fields for the results tab
         results_fields = []
-        results_fields << { field: :passed, label: field_label(:results, :passed) } if passed.nil?
+        results_fields << {field: :passed, label: field_label(:results, :passed)} if passed.nil?
 
         if results_fields.any?
           output << {
@@ -345,7 +376,7 @@ class Inspection < ApplicationRecord
 
         assessment_fields =
           assessment&.incomplete_fields
-            &.map { |f| { field: f, label: field_label(tab.to_sym, f) } } ||
+            &.map { |f| {field: f, label: field_label(tab.to_sym, f)} } ||
           []
 
         if assessment_fields.any?
@@ -365,6 +396,14 @@ class Inspection < ApplicationRecord
 
   def set_inspector_company_from_user
     self.inspector_company_id ||= user.inspection_company_id
+  end
+
+  def set_inspection_type_from_unit
+    return unless unit
+    return unless new_record?
+
+    # Set inspection type to match unit type
+    self.inspection_type = unit.unit_type
   end
 
   def all_assessments_complete?
@@ -397,7 +436,7 @@ class Inspection < ApplicationRecord
     assessment_types.map do |type|
       assessment = send("#{type}_assessment")
       message = I18n.t("inspections.validation.#{type}_incomplete")
-      [ type, assessment, message ]
+      [type, assessment, message]
     end
   end
 end

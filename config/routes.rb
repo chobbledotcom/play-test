@@ -33,7 +33,7 @@ Rails.application.routes.draw do
   end
 
   # Inspections
-  resources :inspections, except: [ :new ] do
+  resources :inspections, except: [:new] do
     member do
       get "select_unit"
       patch "update_unit"
@@ -44,8 +44,8 @@ Rails.application.routes.draw do
       get "log"
     end
 
-    Inspection::ASSESSMENT_TYPES.each_key do |assessment_type|
-      resource assessment_type, only: [ :update ]
+    Inspection::ALL_ASSESSMENT_TYPES.each_key do |assessment_type|
+      resource assessment_type, only: [:update]
     end
   end
 
@@ -63,5 +63,5 @@ Rails.application.routes.draw do
   post "inspections/:id/create_unit", to: "units#create_from_inspection", as: "create_unit_from_inspection"
 
   # Inspector Companies
-  resources :inspector_companies, except: [ :destroy ]
+  resources :inspector_companies, except: [:destroy]
 end

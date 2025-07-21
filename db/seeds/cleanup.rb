@@ -2,7 +2,7 @@ if Rails.env.development?
   Rails.logger.debug "Cleaning up development data..."
 
   # Destroy assessments
-  Inspection::ASSESSMENT_TYPES.each do |_, assessment_class|
+  Inspection::ALL_ASSESSMENT_TYPES.each do |_, assessment_class|
     assessment_class.destroy_all
   end
 

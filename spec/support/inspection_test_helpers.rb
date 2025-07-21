@@ -100,7 +100,7 @@ module InspectionTestHelpers
   # Data helpers
   def fill_assessments_with_complete_data(inspection)
     inspection.reload
-    Inspection::ASSESSMENT_TYPES.each do |assessment_name, _|
+    inspection.assessment_types.each do |assessment_name, _|
       assessment = inspection.send(assessment_name)
       assessment.update!(attributes_for(assessment_name, :complete))
     end

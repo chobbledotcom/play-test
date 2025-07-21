@@ -10,7 +10,7 @@ RSpec.describe "Inspection assessment auto-creation", type: :model do
     end
 
     it "creates all assessment types on direct access" do
-      Inspection::ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
+      inspection.assessment_types.each do |assessment_name, assessment_class|
         assessment = inspection.send(assessment_name)
         expect(assessment).to be_a(assessment_class)
         expect(assessment).to be_persisted

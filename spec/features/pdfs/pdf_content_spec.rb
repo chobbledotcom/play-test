@@ -62,7 +62,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         risk_assessment: "Multiple safety issues found")
 
       # Update all assessments to be complete
-      Inspection::ASSESSMENT_TYPES.each do |assessment_name, _assessment_class|
+      failed_inspection.assessment_types.each do |assessment_name, _assessment_class|
         assessment = failed_inspection.send(assessment_name)
         assessment.update!(attributes_for(assessment_name, :complete))
       end

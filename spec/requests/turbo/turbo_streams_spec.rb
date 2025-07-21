@@ -3,14 +3,14 @@ require "rails_helper"
 RSpec.describe "Turbo Streams", type: :request do
   let(:user) { create(:user) }
   let(:inspection) { create(:inspection, user: user) }
-  let(:turbo_headers) { { "Accept" => "text/vnd.turbo-stream.html" } }
+  let(:turbo_headers) { {"Accept" => "text/vnd.turbo-stream.html"} }
 
   before { login_as(user) }
 
   describe "content negotiation" do
     it "returns turbo streams when requested" do
       patch inspection_path(inspection),
-        params: { inspection: { inspection_location: "Test" } },
+        params: {inspection: {inspection_location: "Test"}},
         headers: turbo_headers
 
       expect(response.content_type).to include("text/vnd.turbo-stream.html")
@@ -19,8 +19,8 @@ RSpec.describe "Turbo Streams", type: :request do
 
     it "returns JSON when requested" do
       patch inspection_path(inspection),
-        params: { inspection: { inspection_location: "Test" } },
-        headers: { "Accept" => "application/json" }
+        params: {inspection: {inspection_location: "Test"}},
+        headers: {"Accept" => "application/json"}
 
       expect(response.content_type).to include("application/json")
       expect(JSON.parse(response.body)["status"]).to eq("success")
@@ -28,7 +28,7 @@ RSpec.describe "Turbo Streams", type: :request do
 
     it "redirects for regular HTML" do
       patch inspection_path(inspection),
-        params: { inspection: { inspection_location: "Test" } }
+        params: {inspection: {inspection_location: "Test"}}
 
       expect(response).to redirect_to(inspection_path(inspection))
     end
@@ -37,7 +37,7 @@ RSpec.describe "Turbo Streams", type: :request do
   describe "inspection updates" do
     it "updates via turbo with validation errors" do
       patch inspection_path(inspection),
-        params: { inspection: { inspection_location: "" } },
+        params: {inspection: {inspection_location: ""}},
         headers: turbo_headers
 
       expect(response).to have_http_status(:ok)
@@ -48,7 +48,7 @@ RSpec.describe "Turbo Streams", type: :request do
       completed = create(:inspection, :completed, user: user)
 
       patch inspection_path(completed),
-        params: { inspection: { inspection_location: "Test" } },
+        params: {inspection: {inspection_location: "Test"}},
         headers: turbo_headers
 
       expect(response).to redirect_to(inspection_path(completed))
@@ -57,11 +57,11 @@ RSpec.describe "Turbo Streams", type: :request do
 
   describe "assessment updates" do
     # Test all assessment types with a single loop
-    Inspection::ASSESSMENT_TYPES.each_key do |assessment_type|
+    Inspection::ALL_ASSESSMENT_TYPES.each_key do |assessment_type|
       context "#{assessment_type} assessment" do
         let(:assessment) { inspection.send(assessment_type) }
         let(:path) { send("inspection_#{assessment_type}_path", inspection) }
-        let(:params) { { "assessments_#{assessment_type.to_s.classify.underscore}" => { id: assessment.id } } }
+        let(:params) { {"assessments_#{assessment_type.to_s.classify.underscore}" => {id: assessment.id}} }
 
         it "accepts turbo stream updates" do
           patch path, params: params, headers: turbo_headers

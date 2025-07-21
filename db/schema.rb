@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_14_175506) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_21_225002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -129,6 +129,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_14_175506) do
     t.text "risk_assessment"
     t.datetime "complete_date"
     t.boolean "is_seed", default: false, null: false
+    t.string "inspection_type", default: "BOUNCY_CASTLE", null: false
+    t.index ["inspection_type"], name: "index_inspections_on_inspection_type"
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
     t.index ["is_seed"], name: "index_inspections_on_is_seed"
     t.index ["unit_id"], name: "index_inspections_on_unit_id"
@@ -274,9 +276,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_14_175506) do
     t.date "manufacture_date"
     t.boolean "is_seed", default: false, null: false
     t.string "serial"
+    t.string "unit_type", default: "BOUNCY_CASTLE", null: false
     t.index ["is_seed"], name: "index_units_on_is_seed"
     t.index ["manufacturer", "serial"], name: "index_units_on_manufacturer_and_serial", unique: true
     t.index ["serial", "user_id"], name: "index_units_on_serial_and_user_id", unique: true
+    t.index ["unit_type"], name: "index_units_on_unit_type"
     t.index ["user_id"], name: "index_units_on_user_id"
   end
 

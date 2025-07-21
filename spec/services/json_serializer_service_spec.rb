@@ -229,7 +229,7 @@ RSpec.describe JsonSerializerService do
       included_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Verify we're including the expected number of fields
-      expect(included_fields.count).to eq(13) # Actual count of included fields (reduced by 1 after excluding unique_report_number)
+      expect(included_fields.count).to eq(14) # Actual count of included fields (includes new inspection_type field)
 
       # Verify critical fields are included
       %w[inspection_date inspection_location passed complete_date].each do |field|

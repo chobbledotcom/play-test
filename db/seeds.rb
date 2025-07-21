@@ -20,6 +20,6 @@ Rails.logger.debug { "Inspector Companies: #{InspectorCompany.count}" }
 Rails.logger.debug { "Users: #{User.count}" }
 Rails.logger.debug { "Units: #{Unit.count}" }
 Rails.logger.debug { "Inspections: #{Inspection.count}" }
-total_assessments = Inspection::ASSESSMENT_TYPES.values.sum(&:count)
+total_assessments = Inspection::CASTLE_ASSESSMENT_TYPES.values.sum(&:count)
 Rails.logger.debug { "Total Assessments: #{total_assessments}" }
 Rails.logger.debug "\nSeed data creation complete!"

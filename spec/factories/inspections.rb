@@ -43,7 +43,7 @@ FactoryBot.define do
 
       after(:create) do |inspection|
         inspection.reload
-        Inspection::ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
+        inspection.assessment_types.each do |assessment_name, assessment_class|
           assessment = assessment_class.create!(inspection: inspection)
           assessment.update!(attributes_for(assessment_name, :complete))
         end
@@ -65,7 +65,7 @@ FactoryBot.define do
     trait :with_unicode_data do
       inspection_location { "Meeting Room 🏢 3F" }
       risk_assessment { "❗️Tested with special 🔌 adapter. Result: ✅" }
-      association :unit, factory: [ :unit, :with_unicode_serial ]
+      association :unit, factory: [:unit, :with_unicode_serial]
     end
 
     trait :with_complete_assessments do
@@ -98,7 +98,7 @@ FactoryBot.define do
 
     trait :with_unicode_data do
       risk_assessment { "❗️Tested with special 🔌 adapter. Result: ✅" }
-      association :unit, factory: [ :unit, :with_unicode_serial ]
+      association :unit, factory: [:unit, :with_unicode_serial]
     end
 
     trait :max_length_risk_assessment do
