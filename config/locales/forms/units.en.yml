@@ -8,6 +8,7 @@ en:
         data: "Data"
       fields:
         name: "Unit Name"
+        unit_type: "Unit Type"
         serial: "Manufacturer Serial Number"
         manufacturer: "Manufacturer"
         model: "Model"

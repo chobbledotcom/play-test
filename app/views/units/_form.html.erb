@@ -14,7 +14,7 @@
     
     <%# Unit type - only for admins %>
     <% if current_user.admin? %>
-      <%= render 'form/select_field', field: :unit_type,
+      <%= render 'form/select', field: :unit_type,
           options: options_for_select([
             [t('units.unit_types.bouncy_castle'), 'bouncy_castle'],
             [t('units.unit_types.bouncing_pillow'), 'bouncing_pillow']

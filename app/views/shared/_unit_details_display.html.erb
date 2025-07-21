@@ -19,4 +19,8 @@
   <% if unit.description.present? %>
     <p><strong><%= t('inspections.fields.description') %>:</strong> <%= unit.description %></p>
   <% end %>
+
+  <% if current_user.admin? %>
+    <p><strong><%= t('inspections.fields.unit_type') %>:</strong> <%= t("units.unit_types.#{unit.unit_type}") %></p>
+  <% end %>
 </div>

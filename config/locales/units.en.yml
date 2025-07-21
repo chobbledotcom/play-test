@@ -68,6 +68,10 @@ en:
     slide_status:
       with_slide: "With Slide"
       without_slide: "Without Slide"
+    
+    unit_types:
+      bouncy_castle: "Bouncy Castle"
+      bouncing_pillow: "Bouncing Pillow"
 
     labels:
       inspection_location: "Inspection Location"

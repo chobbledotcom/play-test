@@ -71,6 +71,7 @@ en:
       serial: "Serial Number"
       owner: "Owner"
       description: "Description"
+      unit_type: "Unit Type"
       name: "Name"
       manufacture_date: "Manufacture Date"
       notes: "Notes"
