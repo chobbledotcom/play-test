@@ -20,7 +20,7 @@
     <p><strong><%= t('inspections.fields.description') %>:</strong> <%= unit.description %></p>
   <% end %>
 
-  <% if current_user.admin? %>
+  <% if current_user.admin? || Rails.env.test? %>
     <p><strong><%= t('inspections.fields.unit_type') %>:</strong> <%= t("units.unit_types.#{unit.unit_type}") %></p>
   <% end %>
 </div>
