@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe JsonSerializerService do
@@ -15,9 +17,7 @@ RSpec.describe JsonSerializerService do
       # Check all expected fields are present (if they have values)
       expected_fields.each do |field|
         value = unit.send(field)
-        if value.present?
-          expect(json).to have_key(field.to_sym), "Expected field '#{field}' to be in JSON"
-        end
+        expect(json).to have_key(field.to_sym), "Expected field '#{field}' to be in JSON" if value.present?
       end
 
       # Check excluded fields are not present
@@ -85,9 +85,7 @@ RSpec.describe JsonSerializerService do
       # Check all expected fields are present (if they have values)
       expected_fields.each do |field|
         value = inspection.send(field)
-        if value.present?
-          expect(json).to have_key(field.to_sym), "Expected field '#{field}' to be in JSON"
-        end
+        expect(json).to have_key(field.to_sym), "Expected field '#{field}' to be in JSON" if value.present?
       end
 
       # Check excluded fields are not present
@@ -213,7 +211,7 @@ RSpec.describe JsonSerializerService do
       included_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Verify we're including the expected number of fields
-      expect(included_fields.count).to eq(7) # Units have 13 fields minus 6 excluded
+      expect(included_fields.count).to eq(8)
 
       # Verify critical fields are included
       %w[name serial manufacturer owner description model].each do |field|

@@ -12,6 +12,16 @@
   <%= render 'form/fieldset', legend_key: 'unit_details' do %>
     <%= render 'form/text_field', field: :name, required: true %>
     
+    <%# Unit type - only for admins %>
+    <% if current_user.admin? %>
+      <%= render 'form/select_field', field: :unit_type,
+          options: options_for_select([
+            [t('units.unit_types.bouncy_castle'), 'bouncy_castle'],
+            [t('units.unit_types.bouncing_pillow'), 'bouncing_pillow']
+          ], unit.unit_type),
+          required: true %>
+    <% end %>
+    
     <%# Owner with optional count link %>
     <% if unit.persisted? && unit.owner.present? %>
       <% owner_count = current_user.units.where(owner: unit.owner).count %>
