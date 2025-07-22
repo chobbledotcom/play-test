@@ -45,7 +45,7 @@ gem "prawn-table"
 # Passwords
 gem "bcrypt"
 
-gem "importmap-rails", "~> 2.1"
+gem "importmap-rails", "~> 2.2"
 
 # Image processing
 gem "image_processing", "~> 1.12"
