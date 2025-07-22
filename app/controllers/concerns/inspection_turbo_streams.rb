@@ -23,7 +23,7 @@ module InspectionTurboStreams
     turbo_stream.replace(
       "mark_complete_section_#{@inspection.id}",
       partial: "inspections/mark_complete_section",
-      locals: { inspection: @inspection }
+      locals: {inspection: @inspection}
     )
   end
 

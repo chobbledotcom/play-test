@@ -41,9 +41,9 @@ class RpiiVerificationService
       inspector = results.find { |r| r[:number]&.to_s == inspector_number.to_s }
 
       if inspector
-        { valid: true, inspector: inspector }
+        {valid: true, inspector: inspector}
       else
-        { valid: false, inspector: nil }
+        {valid: false, inspector: nil}
       end
     end
 

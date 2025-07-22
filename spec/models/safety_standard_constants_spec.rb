@@ -34,7 +34,7 @@ RSpec.describe SafetyStandard, "Constants" do
 
     it "is used in runout calculations" do
       platform_height = 2.5
-      expected = [ platform_height * 0.5, 0.3 ].max
+      expected = [platform_height * 0.5, 0.3].max
 
       result = SafetyStandards::SlideCalculator.calculate_required_runout(platform_height)
       expect(result.value).to eq(expected)

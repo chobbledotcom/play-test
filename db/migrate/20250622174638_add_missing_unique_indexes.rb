@@ -11,7 +11,7 @@ class AddMissingUniqueIndexes < ActiveRecord::Migration[8.0]
     add_index :users, :rpii_inspector_number, unique: true, where: "rpii_inspector_number IS NOT NULL"
 
     # Add unique index for units.serial scoped to user_id
-    add_index :units, [ :serial, :user_id ], unique: true
+    add_index :units, [:serial, :user_id], unique: true
 
     # The inspections table already has a proper unique index
     # on ["user_id", "unique_report_number"], which handles NULL values correctly

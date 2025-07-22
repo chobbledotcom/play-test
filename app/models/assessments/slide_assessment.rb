@@ -13,7 +13,7 @@ class Assessments::SlideAssessment < ApplicationRecord
     :runout,
     :slide_first_metre_height,
     :slide_beyond_first_metre_height,
-    numericality: { greater_than_or_equal_to: 0 },
+    numericality: {greater_than_or_equal_to: 0},
     allow_blank: true
 
   def meets_runout_requirements?

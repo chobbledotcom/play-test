@@ -47,11 +47,11 @@ class PdfGeneratorService
       def build_status_text_and_color(inspection)
         case inspection.passed
         when true
-          [ I18n.t("pdf.inspection.passed"), Configuration::PASS_COLOR ]
+          [I18n.t("pdf.inspection.passed"), Configuration::PASS_COLOR]
         when false
-          [ I18n.t("pdf.inspection.failed"), Configuration::FAIL_COLOR ]
+          [I18n.t("pdf.inspection.failed"), Configuration::FAIL_COLOR]
         when nil
-          [ I18n.t("pdf.inspection.in_progress"), Configuration::NA_COLOR ]
+          [I18n.t("pdf.inspection.in_progress"), Configuration::NA_COLOR]
         end
       end
 
@@ -60,24 +60,24 @@ class PdfGeneratorService
       end
 
       def prepare_logo(user)
-        return [ 0, nil ] unless user&.logo&.attached?
+        return [0, nil] unless user&.logo&.attached?
 
         logo_data = user.logo.download
         logo_height = Configuration::LOGO_HEIGHT
         logo_width = logo_height * 2 + 10
 
-        logo_temp = Tempfile.new([ "user_logo_#{user.id}", ".png" ])
+        logo_temp = Tempfile.new(["user_logo_#{user.id}", ".png"])
         logo_temp.binmode
         logo_temp.write(logo_data)
         logo_temp.close
 
-        [ logo_width, logo_temp ]
+        [logo_width, logo_temp]
       end
 
       def render_inspection_header_layout(pdf, inspection, report_id_text,
         status_text, status_color,
         logo_width, logo_temp)
-        pdf.bounding_box([ 0, pdf.cursor ], width: pdf.bounds.width) do
+        pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width) do
           render_inspection_text_section(pdf, inspection, report_id_text,
             status_text, status_color, logo_width)
           render_logo_section(pdf, logo_temp, logo_width) if logo_temp
@@ -87,7 +87,7 @@ class PdfGeneratorService
       def render_inspection_text_section(pdf, inspection, report_id_text,
         status_text, status_color, logo_width)
         width = pdf.bounds.width - logo_width
-        pdf.bounding_box([ 0, pdf.bounds.top ], width: width) do
+        pdf.bounding_box([0, pdf.bounds.top], width: width) do
           pdf.text report_id_text, size: Configuration::HEADER_TEXT_SIZE,
             style: :bold
           pdf.text status_text, size: Configuration::HEADER_TEXT_SIZE,
@@ -103,7 +103,7 @@ class PdfGeneratorService
 
       def render_unit_header_layout(pdf, unit, unit_id_text,
         logo_width, logo_temp)
-        pdf.bounding_box([ 0, pdf.cursor ], width: pdf.bounds.width) do
+        pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width) do
           render_unit_text_section(pdf, unit, unit_id_text, logo_width)
           render_logo_section(pdf, logo_temp, logo_width) if logo_temp
         end
@@ -111,7 +111,7 @@ class PdfGeneratorService
 
       def render_unit_text_section(pdf, unit, unit_id_text, logo_width)
         width = pdf.bounds.width - logo_width
-        pdf.bounding_box([ 0, pdf.bounds.top ], width: width) do
+        pdf.bounding_box([0, pdf.bounds.top], width: width) do
           pdf.text unit_id_text, size: Configuration::HEADER_TEXT_SIZE,
             style: :bold
 
@@ -128,7 +128,7 @@ class PdfGeneratorService
 
       def render_logo_section(pdf, logo_temp, logo_width)
         x_position = pdf.bounds.width - logo_width + 10
-        pdf.bounding_box([ x_position, pdf.bounds.top ],
+        pdf.bounding_box([x_position, pdf.bounds.top],
           width: logo_width - 10) do
           pdf.image logo_temp.path, height: Configuration::LOGO_HEIGHT,
             position: :right

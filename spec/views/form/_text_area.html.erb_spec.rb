@@ -24,14 +24,14 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
 
   context "with default options" do
     it "renders text area with label" do
-      render partial: "form/text_area", locals: { field: field }
+      render partial: "form/text_area", locals: {field: field}
 
       expect(rendered).to include('<label for="description">Description</label>')
       expect(rendered).to include('<textarea name="description" id="description"></textarea>')
     end
 
     it "displays hint when present" do
-      render partial: "form/text_area", locals: { field: field }
+      render partial: "form/text_area", locals: {field: field}
 
       expect(rendered).to have_css("small", text: "Provide details")
     end
@@ -39,7 +39,7 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
     it "uses default rows of 4" do
       allow(mock_form).to receive(:text_area).with(field, hash_including(rows: 4)).and_return('<textarea rows="4"></textarea>'.html_safe)
 
-      render partial: "form/text_area", locals: { field: field }
+      render partial: "form/text_area", locals: {field: field}
 
       expect(mock_form).to have_received(:text_area).with(field, hash_including(rows: 4))
     end
@@ -47,7 +47,7 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
     it "includes placeholder when provided" do
       allow(mock_form).to receive(:text_area).with(field, hash_including(placeholder: "Enter description here...")).and_return('<textarea placeholder="Enter description here..."></textarea>'.html_safe)
 
-      render partial: "form/text_area", locals: { field: field }
+      render partial: "form/text_area", locals: {field: field}
 
       expect(mock_form).to have_received(:text_area).with(field, hash_including(placeholder: "Enter description here..."))
     end
@@ -57,7 +57,7 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
     it "uses custom rows value" do
       allow(mock_form).to receive(:text_area).with(field, hash_including(rows: 10)).and_return('<textarea rows="10"></textarea>'.html_safe)
 
-      render partial: "form/text_area", locals: { field: field, rows: 10 }
+      render partial: "form/text_area", locals: {field: field, rows: 10}
 
       expect(mock_form).to have_received(:text_area).with(field, hash_including(rows: 10))
     end
@@ -65,7 +65,7 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
     it "respects required parameter" do
       allow(mock_form).to receive(:text_area).with(field, hash_including(required: true)).and_return("<textarea required></textarea>".html_safe)
 
-      render partial: "form/text_area", locals: { field: field, required: true }
+      render partial: "form/text_area", locals: {field: field, required: true}
 
       expect(mock_form).to have_received(:text_area).with(field, hash_including(required: true))
     end
@@ -83,7 +83,7 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
     end
 
     it "does not render hint text" do
-      render partial: "form/text_area", locals: { field: field }
+      render partial: "form/text_area", locals: {field: field}
 
       expect(rendered).not_to have_css("small")
     end
@@ -103,7 +103,7 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
     it "does not include placeholder attribute" do
       allow(mock_form).to receive(:text_area).with(field, hash_excluding(:placeholder)).and_return("<textarea></textarea>".html_safe)
 
-      render partial: "form/text_area", locals: { field: field }
+      render partial: "form/text_area", locals: {field: field}
 
       expect(mock_form).to have_received(:text_area).with(field, hash_excluding(:placeholder))
     end
@@ -125,7 +125,7 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
     end
 
     it "uses the form object returned by form_field_setup" do
-      render partial: "form/text_area", locals: { field: field, form: other_form }
+      render partial: "form/text_area", locals: {field: field, form: other_form}
 
       expect(other_form).to have_received(:label)
       expect(other_form).to have_received(:text_area)
@@ -134,7 +134,7 @@ RSpec.describe "form/_text_area.html.erb", type: :view do
 
   context "HTML structure" do
     it "has proper semantic structure" do
-      render partial: "form/text_area", locals: { field: field }
+      render partial: "form/text_area", locals: {field: field}
 
       doc = Nokogiri::HTML::DocumentFragment.parse(rendered)
 

@@ -3,7 +3,7 @@ class InspectorCompaniesController < ApplicationController
     show edit update
   ]
   before_action :require_login
-  before_action :require_admin, except: [ :show ]
+  before_action :require_admin, except: [:show]
 
   def index
     @inspector_companies = InspectorCompany

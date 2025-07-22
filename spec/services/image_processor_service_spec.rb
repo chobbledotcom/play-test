@@ -19,15 +19,15 @@ RSpec.describe ImageProcessorService do
 
         expect(variant).to be_a(ActiveStorage::VariantWithRecord)
         expect(variant.variation.transformations).to include(
-          resize_to_limit: [ 1200, 1200 ],
+          resize_to_limit: [1200, 1200],
           format: :jpeg,
-          saver: { quality: 75 }
+          saver: {quality: 75}
         )
       end
 
       it "uses the correct size constant" do
         variant = described_class.full_size(unit.photo)
-        expected_size = [ ImageProcessorService::FULL_SIZE, ImageProcessorService::FULL_SIZE ]
+        expected_size = [ImageProcessorService::FULL_SIZE, ImageProcessorService::FULL_SIZE]
 
         expect(variant.variation.transformations[:resize_to_limit]).to eq(expected_size)
       end
@@ -55,15 +55,15 @@ RSpec.describe ImageProcessorService do
 
         expect(variant).to be_a(ActiveStorage::VariantWithRecord)
         expect(variant.variation.transformations).to include(
-          resize_to_limit: [ 200, 200 ],
+          resize_to_limit: [200, 200],
           format: :jpeg,
-          saver: { quality: 75 }
+          saver: {quality: 75}
         )
       end
 
       it "uses the correct size constant" do
         variant = described_class.thumbnail(unit.photo)
-        expected_size = [ ImageProcessorService::THUMBNAIL_SIZE, ImageProcessorService::THUMBNAIL_SIZE ]
+        expected_size = [ImageProcessorService::THUMBNAIL_SIZE, ImageProcessorService::THUMBNAIL_SIZE]
 
         expect(variant.variation.transformations[:resize_to_limit]).to eq(expected_size)
       end
@@ -85,15 +85,15 @@ RSpec.describe ImageProcessorService do
 
         expect(variant).to be_a(ActiveStorage::VariantWithRecord)
         expect(variant.variation.transformations).to include(
-          resize_to_limit: [ 800, 800 ],
+          resize_to_limit: [800, 800],
           format: :jpeg,
-          saver: { quality: 75 }
+          saver: {quality: 75}
         )
       end
 
       it "uses the correct size constant" do
         variant = described_class.default(unit.photo)
-        expected_size = [ ImageProcessorService::DEFAULT_SIZE, ImageProcessorService::DEFAULT_SIZE ]
+        expected_size = [ImageProcessorService::DEFAULT_SIZE, ImageProcessorService::DEFAULT_SIZE]
 
         expect(variant.variation.transformations[:resize_to_limit]).to eq(expected_size)
       end

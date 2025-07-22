@@ -45,10 +45,10 @@ module ApplicationHelper
   end
 
   def get_field_value_and_prefilled_status(form_object, field)
-    return [ nil, false ] unless form_object&.object
+    return [nil, false] unless form_object&.object
     model = form_object.object
     resolved = resolve_field_value(model, field)
-    [ resolved[:value], resolved[:prefilled] ]
+    [resolved[:value], resolved[:prefilled]]
   end
 
   def format_numeric_value(value)
@@ -89,8 +89,8 @@ module ApplicationHelper
 
     base_parts = @_current_i18n_base.split(".")
     root = base_parts[0..-2]
-    hint_key = (root + [ "hints", field ]).join(".")
-    placeholder_key = (root + [ "placeholders", field ]).join(".")
+    hint_key = (root + ["hints", field]).join(".")
+    placeholder_key = (root + ["placeholders", field]).join(".")
 
     {
       field_label:,
@@ -191,7 +191,7 @@ module ApplicationHelper
   end
 
   def radio_button_options(prefilled, checked_value, expected_value)
-    (prefilled && checked_value == expected_value) ? { checked: true } : {}
+    (prefilled && checked_value == expected_value) ? {checked: true} : {}
   end
 
   private

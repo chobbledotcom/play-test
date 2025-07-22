@@ -6,9 +6,9 @@ module RadioButtonHelpers
 
   def choose_yes_no(field_label, value)
     choose_radio_in_container(field_label, value,
-      [ "radio-comment" ],
-      yes: [ "yes", "pass" ],
-      no: [ "no", "fail" ])
+      ["radio-comment"],
+      yes: ["yes", "pass"],
+      no: ["no", "fail"])
   end
 
   def choose_pass_fail(field_label, value)

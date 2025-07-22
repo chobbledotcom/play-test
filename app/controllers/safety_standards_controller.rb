@@ -1,6 +1,6 @@
 class SafetyStandardsController < ApplicationController
   skip_before_action :require_login
-  skip_before_action :verify_authenticity_token, only: [ :index ]
+  skip_before_action :verify_authenticity_token, only: [:index]
 
   CALCULATION_TYPES = %w[anchors slide_runout wall_height user_capacity].freeze
 
@@ -174,7 +174,7 @@ class SafetyStandardsController < ApplicationController
           width: width,
           area: (length * width).round(2),
           negative_adjustment_area: negative_adjustment_area,
-          usable_area: [ (length * width) - negative_adjustment_area, 0 ].max.round(2),
+          usable_area: [(length * width) - negative_adjustment_area, 0].max.round(2),
           max_user_height: max_user_height,
           capacities: capacities,
           breakdown: result.breakdown

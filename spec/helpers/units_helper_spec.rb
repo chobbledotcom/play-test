@@ -14,7 +14,7 @@ RSpec.describe UnitsHelper, type: :helper do
       create(:unit, user: user, manufacturer: "ACME Corp") # duplicate
 
       result = helper.manufacturer_options(user)
-      expect(result).to eq([ "ACME Corp", "Beta Industries" ])
+      expect(result).to eq(["ACME Corp", "Beta Industries"])
     end
 
     it "excludes blank manufacturers" do
@@ -25,7 +25,7 @@ RSpec.describe UnitsHelper, type: :helper do
       unit2.update_column(:manufacturer, "")
 
       result = helper.manufacturer_options(user)
-      expect(result).to eq([ "Valid Corp" ])
+      expect(result).to eq(["Valid Corp"])
     end
 
     it "only returns manufacturers for the specific user" do
@@ -34,7 +34,7 @@ RSpec.describe UnitsHelper, type: :helper do
       create(:unit, user: other_user, manufacturer: "User2 Corp")
 
       result = helper.manufacturer_options(user)
-      expect(result).to eq([ "User1 Corp" ])
+      expect(result).to eq(["User1 Corp"])
     end
   end
 
@@ -49,7 +49,7 @@ RSpec.describe UnitsHelper, type: :helper do
       create(:unit, user: user, owner: "John Smith") # duplicate
 
       result = helper.owner_options(user)
-      expect(result).to eq([ "Alice Johnson", "John Smith" ])
+      expect(result).to eq(["Alice Johnson", "John Smith"])
     end
 
     it "excludes blank owners" do
@@ -60,7 +60,7 @@ RSpec.describe UnitsHelper, type: :helper do
       unit2.update_column(:owner, "")
 
       result = helper.owner_options(user)
-      expect(result).to eq([ "Valid Owner" ])
+      expect(result).to eq(["Valid Owner"])
     end
 
     it "only returns owners for the specific user" do
@@ -69,7 +69,7 @@ RSpec.describe UnitsHelper, type: :helper do
       create(:unit, user: other_user, owner: "User2 Owner")
 
       result = helper.owner_options(user)
-      expect(result).to eq([ "User1 Owner" ])
+      expect(result).to eq(["User1 Owner"])
     end
   end
 
@@ -115,7 +115,7 @@ RSpec.describe UnitsHelper, type: :helper do
       expect(inspection_action).to be_present
       expect(inspection_action[:url]).to eq(inspections_path)
       expect(inspection_action[:method]).to eq(:post)
-      expect(inspection_action[:params]).to eq({ unit_id: unit.id })
+      expect(inspection_action[:params]).to eq({unit_id: unit.id})
     end
   end
 end

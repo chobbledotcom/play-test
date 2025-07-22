@@ -3,14 +3,14 @@ require "rails_helper"
 RSpec.describe "Safety Standards Comprehensive Tests" do
   include SafetyStandardsTestHelpers
   shared_context "calculation parameters" do
-    let(:valid_anchor_params) { { length: 5.0, width: 5.0, height: 3.0 } }
-    let(:invalid_anchor_params) { { length: 0, width: 0, height: 0 } }
+    let(:valid_anchor_params) { {length: 5.0, width: 5.0, height: 3.0} }
+    let(:invalid_anchor_params) { {length: 0, width: 0, height: 0} }
 
-    let(:valid_runout_params) { { height: 2.5 } }
-    let(:invalid_runout_params) { { height: 0 } }
+    let(:valid_runout_params) { {height: 2.5} }
+    let(:invalid_runout_params) { {height: 0} }
 
-    let(:valid_wall_params) { { height: 1.5 } }
-    let(:invalid_wall_params) { { height: 0 } }
+    let(:valid_wall_params) { {height: 1.5} }
+    let(:invalid_wall_params) { {height: 0} }
   end
 
   describe "Non-JavaScript tests", type: :feature do
@@ -124,14 +124,14 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
 
     def api_request(params)
       post safety_standards_path,
-        params: { calculation: params }.to_json,
-        headers: { "Content-Type": "application/json", Accept: "application/json" }
+        params: {calculation: params}.to_json,
+        headers: {"Content-Type": "application/json", Accept: "application/json"}
     end
 
     def turbo_request(params)
       post safety_standards_path,
-        params: { calculation: params },
-        headers: { Accept: "text/vnd.turbo-stream.html" }
+        params: {calculation: params},
+        headers: {Accept: "text/vnd.turbo-stream.html"}
     end
 
     describe "JSON API" do
@@ -175,9 +175,9 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
 
         targets.each do |type, target|
           params = case type
-          when "anchors" then { type: type, **valid_anchor_params }
-          when "slide_runout" then { type: type, platform_height: 2.5 }
-          when "wall_height" then { type: type, user_height: 1.5 }
+          when "anchors" then {type: type, **valid_anchor_params}
+          when "slide_runout" then {type: type, platform_height: 2.5}
+          when "wall_height" then {type: type, user_height: 1.5}
           end
 
           turbo_request(params)
@@ -191,8 +191,8 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
     include_context "calculation parameters"
 
     it "handles anchor errors via POST" do
-      post safety_standards_path, params: { calculation: { type: "anchors", **invalid_anchor_params } }
-      expect(response).to redirect_to(safety_standards_path(calculation: { type: "anchors", **invalid_anchor_params }))
+      post safety_standards_path, params: {calculation: {type: "anchors", **invalid_anchor_params}}
+      expect(response).to redirect_to(safety_standards_path(calculation: {type: "anchors", **invalid_anchor_params}))
 
       follow_redirect!
       expect(response.body).to include("Error:")
@@ -211,7 +211,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
     end
 
     scenario "calculations match model exactly" do
-      dimensions = [ [ 3, 3, 2 ], [ 5, 4, 3 ], [ 8, 6, 4 ] ]
+      dimensions = [[3, 3, 2], [5, 4, 3], [8, 6, 4]]
 
       dimensions.each do |l, w, h|
         visit safety_standards_path

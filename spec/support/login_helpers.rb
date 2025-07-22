@@ -2,7 +2,7 @@ module LoginHelpers
   include FormHelpers
 
   def login_as(user)
-    post "/login", params: { session: { email: user.email, password: user.password } }
+    post "/login", params: {session: {email: user.email, password: user.password}}
   end
 
   def login_user_via_form(user)

@@ -25,10 +25,10 @@ module SeedData
 
   def self.unit_fields
     {
-      name: "Bouncy Castle #{[ "Mega", "Super", "Fun", "Party", "Adventure" ].sample} #{rand(1..99)}",
+      name: "Bouncy Castle #{["Mega", "Super", "Fun", "Party", "Adventure"].sample} #{rand(1..99)}",
       serial: "BC-#{Date.current.year}-#{SecureRandom.hex(4).upcase}",
-      manufacturer: [ "ABC Inflatables", "XYZ Bounce Co", "Fun Factory", "Party Products Ltd" ].sample,
-      owner: [ "Rental Company #{rand(1..10)}", "Party Hire #{rand(1..5)}", "Events Ltd" ].sample,
+      manufacturer: ["ABC Inflatables", "XYZ Bounce Co", "Fun Factory", "Party Products Ltd"].sample,
+      owner: ["Rental Company #{rand(1..10)}", "Party Hire #{rand(1..5)}", "Events Ltd"].sample,
       manufacture_date: Date.current - rand(365..1825).days,
       description: "Commercial grade inflatable bouncy castle suitable for events"
     }
@@ -39,8 +39,8 @@ module SeedData
       inspection_date: Date.current,
       inspection_location: "Test Location #{rand(1..5)}",
       unique_report_number: "RPT-#{Date.current.year}-#{rand(1000..9999)}",
-      is_totally_enclosed: [ true, false ].sample,
-      has_slide: [ true, false ].sample,
+      is_totally_enclosed: [true, false].sample,
+      has_slide: [true, false].sample,
       width: rand(4.0..8.0).round(1),
       length: rand(5.0..10.0).round(1),
       height: rand(3.0..6.0).round(1)

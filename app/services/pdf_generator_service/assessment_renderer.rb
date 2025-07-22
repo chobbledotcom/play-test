@@ -41,7 +41,7 @@ class PdfGeneratorService
       label_field = fields[:base] || fields[:pass]
       return unless label_field && has_any_i18n_label?(base_name, fields)
 
-      [ render_field_line(fields), render_comment_line(fields) ].compact.each do |line|
+      [render_field_line(fields), render_comment_line(fields)].compact.each do |line|
         @current_assessment_fields << line
       end
     end
@@ -67,7 +67,7 @@ class PdfGeneratorService
     def format_field_line(label, value, pass_value, is_pass_field)
       parts = []
       # For boolean fields that aren't pass/fail fields, don't show pass/fail indicator
-      if [ true, false ].include?(value) && !is_pass_field && pass_value.nil?
+      if [true, false].include?(value) && !is_pass_field && pass_value.nil?
         # Just show the label and value for regular boolean fields
         parts << bold(label)
         parts << ": #{value ? "Yes" : "No"}"
@@ -81,9 +81,9 @@ class PdfGeneratorService
 
     def pass_fail_indicator(pass_value)
       indicator, color = case pass_value
-      when true, "pass" then [ I18n.t("shared.pass_pdf"), Configuration::PASS_COLOR ]
-      when false, "fail" then [ I18n.t("shared.fail_pdf"), Configuration::FAIL_COLOR ]
-      else [ I18n.t("shared.na_pdf"), Configuration::NA_COLOR ]
+      when true, "pass" then [I18n.t("shared.pass_pdf"), Configuration::PASS_COLOR]
+      when false, "fail" then [I18n.t("shared.fail_pdf"), Configuration::FAIL_COLOR]
+      else [I18n.t("shared.na_pdf"), Configuration::NA_COLOR]
       end
       "<font name='Courier'>#{bold(colored(indicator, color))}</font> "
     end
@@ -177,7 +177,7 @@ class PdfGeneratorService
       pdf.stroke_horizontal_rule
       pdf.move_down SECTION_MARGIN_AFTER_TITLE
 
-      pdf.column_box([ 0, pdf.cursor ], columns: COLUMN_COUNT, width: pdf.bounds.width, spacer: COLUMN_SPACER) do
+      pdf.column_box([0, pdf.cursor], columns: COLUMN_COUNT, width: pdf.bounds.width, spacer: COLUMN_SPACER) do
         @current_assessment_blocks.each { |block| render_assessment_block(pdf, block) }
       end
 

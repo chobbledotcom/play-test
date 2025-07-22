@@ -20,7 +20,7 @@ module DeprecationHelper
       end
 
       # Build deprecation message
-      deprecation_parts = [ "[DEPRECATION]" ]
+      deprecation_parts = ["[DEPRECATION]"]
       deprecation_parts << "Called from #{relative_path}:#{location.lineno}"
       deprecation_parts << "trait :#{trait_name}" if trait_name
       deprecation_parts << message
