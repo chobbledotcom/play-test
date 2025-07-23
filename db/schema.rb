@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_23_204040) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_23_222042) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -215,7 +215,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_204040) do
     t.boolean "sharp_edges_pass"
     t.boolean "unit_stable_pass"
     t.decimal "stitch_length", precision: 8, scale: 2
-    t.decimal "evacuation_time", precision: 8, scale: 2
     t.decimal "unit_pressure", precision: 8, scale: 2
     t.decimal "blower_tube_length", precision: 8, scale: 2
     t.decimal "critical_fall_off_height", precision: 8, scale: 2

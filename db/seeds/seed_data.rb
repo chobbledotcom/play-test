@@ -94,7 +94,6 @@ module SeedData
       trough_depth_pass: check_passed?(passed),
       trough_adjacent_panel_width: rand(0.3..1.0).round(1),
       trough_adjacent_panel_width_pass: check_passed?(passed),
-      evacuation_time: rand(30..90),
       evacuation_time_pass: check_passed?(passed),
       seam_integrity_comment: passed ?
         "All seams in good condition" :

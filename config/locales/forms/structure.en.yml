@@ -17,7 +17,6 @@ en:
         # Measurements
         stitch_length: "Stitch Length (mm)"
         stitch_length_pass: "Stitch Length (mm)"
-        evacuation_time: "Evacuation Time (s)"
         evacuation_time_pass: "Evacuation Time (s)"
         unit_pressure: "Unit Pressure (kpa)"
         blower_tube_length: "Blower Tube Length (m)"

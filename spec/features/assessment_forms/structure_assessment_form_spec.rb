@@ -37,7 +37,6 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     fill_structure_field :stitch_length, "15.5"
     fill_structure_field :unit_pressure, "2.8"
     fill_structure_field :blower_tube_length, "1.75"
-    fill_structure_field :evacuation_time, "45"
     fill_structure_field :critical_fall_off_height, "1.2"
     fill_structure_field :step_ramp_size, "150"
     fill_structure_field :trough_depth, "200"

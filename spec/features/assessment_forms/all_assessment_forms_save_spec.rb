@@ -9,7 +9,6 @@ STRUCTURE_SAMPLE_DATA = {
   unit_stable_pass: true,
 
   stitch_length: 15.5,
-  evacuation_time: 45,
   unit_pressure: 2.8,
   blower_tube_length: 1.75,
   critical_fall_off_height: 0.85,

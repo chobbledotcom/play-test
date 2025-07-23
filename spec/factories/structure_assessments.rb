@@ -23,18 +23,25 @@ FactoryBot.define do
       end
 
       if evaluator.measurement_checks_pass == true
-        %w[stitch_length_pass evacuation_time_pass unit_pressure_pass
-          blower_tube_length_pass step_ramp_size_pass critical_fall_off_height_pass].each do |check|
+        %w[
+          stitch_length_pass evacuation_time_pass unit_pressure_pass
+          blower_tube_length_pass step_ramp_size_pass
+          critical_fall_off_height_pass
+        ].each do |check|
           assessment.send("#{check}=", true)
         end
       elsif evaluator.measurement_checks_pass == false
-        %w[stitch_length_pass unit_pressure_pass evacuation_time_pass].each do |check|
+        %w[
+          stitch_length_pass unit_pressure_pass evacuation_time_pass
+        ].each do |check|
           assessment.send("#{check}=", false)
         end
       end
 
       if evaluator.additional_checks_pass == true
-        %w[trough_pass entrapment_pass markings_pass grounding_pass].each do |check|
+        %w[
+          trough_pass entrapment_pass markings_pass grounding_pass
+        ].each do |check|
           assessment.send("#{check}=", true)
         end
       elsif evaluator.additional_checks_pass == false
@@ -54,7 +61,6 @@ FactoryBot.define do
 
       # Measurements with passing values
       stitch_length { 15.0 }
-      evacuation_time { 30.0 }
       unit_pressure { 2.5 }
       blower_tube_length { 1.5 }
       step_ramp_size { 0.2 }
@@ -95,7 +101,6 @@ FactoryBot.define do
       sharp_edges_comment { "No sharp edges found" }
       blower_tube_length_comment { "Tube length appropriate" }
       unit_stable_comment { "Unit stable during operation" }
-      evacuation_time_comment { "Evacuation time acceptable" }
       step_ramp_size_comment { "Step size within safety limits" }
       critical_fall_off_height_comment { "Fall-off height appropriate" }
       trough_comment { "Trough dimensions adequate" }
@@ -112,7 +117,6 @@ FactoryBot.define do
       # Failing measurement values
       stitch_length { 10.0 }
       unit_pressure { 1.0 }
-      evacuation_time { 90.0 }
     end
   end
 end
