@@ -9,6 +9,14 @@ RSpec.feature "Complete Inspection Workflow", type: :feature, js: false do
       is_totally_enclosed: true
     ).execute
   end
+
+  scenario "complete workflow with bouncing pillow unit" do
+    InspectionWorkflow.new(
+      has_slide: false,
+      is_totally_enclosed: false,
+      unit_type: :bouncing_pillow
+    ).execute
+  end
 end
 
 # RSpec.feature "Complete Inspection Workflow", type: :feature, js: true do
@@ -38,8 +46,8 @@ class InspectionWorkflow
   attr_reader :second_inspection
   attr_reader :options
 
-  def initialize(has_slide:, is_totally_enclosed:)
-    @options = { has_slide:, is_totally_enclosed: }
+  def initialize(has_slide:, is_totally_enclosed:, unit_type: :bouncy_castle)
+    @options = {has_slide:, is_totally_enclosed:, unit_type:}
   end
 
   def t(key, **options)
@@ -79,6 +87,7 @@ class InspectionWorkflow
     fill_general_inspection_details
     verify_inspection_not_completable
     verify_change_unit_functionality
+    verify_applicable_tabs_for_unit_type
     fill_all_assessments
     verify_inspection_completable
     mark_inspection_complete
@@ -129,13 +138,18 @@ class InspectionWorkflow
       fill_in_form :units, field_name, value
     end
 
+    select t("units.unit_types.#{@options[:unit_type]}"),
+      from: t("forms.units.fields.unit_type")
+
     submit_form :units
     expect_units_message("created")
 
     Unit.find_by!(
       name: unit_data[:name],
       serial: unit_data[:serial]
-    )
+    ).tap do |unit|
+      expect(unit.unit_type).to eq(@options[:unit_type].to_s)
+    end
   end
 
   def create_inspection_for_unit
@@ -147,11 +161,15 @@ class InspectionWorkflow
     expect(page).to have_current_path(/inspections\/\w+\/edit/)
     @unit.inspections.order(created_at: :desc).first.tap do |inspection|
       expect(inspection).to be_present
+      expect(inspection.inspection_type).to eq(@unit.unit_type)
     end
   end
 
   def fill_general_inspection_details
-    field_data = SeedData.inspection_fields(passed: true).merge(@options)
+    field_data = SeedData.inspection_fields(passed: true)
+    field_data[:has_slide] = @options[:has_slide]
+    field_data[:is_totally_enclosed] = @options[:is_totally_enclosed]
+
     field_data.each do |field_name, value|
       fill_inspection_field(field_name, value)
     end
@@ -450,6 +468,31 @@ class InspectionWorkflow
     other_user_unit = create(:unit, user: create(:user), name: "Other User's Unit")
     visit current_path
     expect(page).not_to have_content(other_user_unit.name)
+  end
+
+  ASSESSMENT_TABS = {
+    all: %w[user_height slide structure materials anchorage fan enclosed],
+    bouncing_pillow: %w[fan],
+    bouncy_castle: %w[user_height structure materials anchorage fan]
+  }.freeze
+
+  def verify_applicable_tabs_for_unit_type
+    visit edit_inspection_path(@inspection)
+
+    expected_tabs = ASSESSMENT_TABS[@options[:unit_type]].dup
+
+    if @options[:unit_type] == :bouncy_castle
+      expected_tabs << "slide" if @options[:has_slide]
+      expected_tabs << "enclosed" if @options[:is_totally_enclosed]
+    end
+
+    expected_tabs.each do |tab|
+      expect(page).to have_link(t("forms.#{tab}.header"))
+    end
+
+    (ASSESSMENT_TABS[:all] - expected_tabs).each do |tab|
+      expect(page).not_to have_link(t("forms.#{tab}.header"))
+    end
   end
 
   def delete_second_inspection

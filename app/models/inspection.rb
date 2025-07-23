@@ -205,16 +205,16 @@ class Inspection < ApplicationRecord
 
   # Returns tabs in the order they appear in the UI
   def applicable_tabs
-    tabs = ["inspection", "user_height"]
+    tabs = ["inspection"]
 
-    # Only show slide tab for inspections that have slides
-    tabs << "slide" if assessment_applicable?(:slide_assessment)
+    # Get applicable assessments for this inspection type
+    applicable = applicable_assessments.keys.map { |k| k.to_s.chomp("_assessment") }
 
-    # Add the core assessment tabs in UI order
-    tabs += %w[structure anchorage materials fan]
-
-    # Only show enclosed tab for totally enclosed inspections
-    tabs << "enclosed" if assessment_applicable?(:enclosed_assessment)
+    # Add tabs in the correct UI order
+    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed]
+    ordered_tabs.each do |tab|
+      tabs << tab if applicable.include?(tab)
+    end
 
     # Add results tab at the end
     tabs << "results"
