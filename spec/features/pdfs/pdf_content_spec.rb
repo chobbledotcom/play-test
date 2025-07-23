@@ -28,7 +28,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       )
 
       inspection.structure_assessment.update!(
-        SeedData.structure_fields.slice(:seam_integrity_pass, :uses_lock_stitching_pass, :air_loss_pass)
+        SeedData.structure_fields.slice(:seam_integrity_pass, :air_loss_pass)
       )
 
       pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))

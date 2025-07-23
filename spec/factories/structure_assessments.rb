@@ -12,12 +12,12 @@ FactoryBot.define do
     # Set critical safety checks based on transient attribute
     after(:build) do |assessment, evaluator|
       if evaluator.critical_checks_pass == true
-        %w[seam_integrity_pass uses_lock_stitching_pass air_loss_pass
+        %w[seam_integrity_pass air_loss_pass
           straight_walls_pass sharp_edges_pass unit_stable_pass].each do |check|
           assessment.send("#{check}=", true)
         end
       elsif evaluator.critical_checks_pass == false
-        %w[seam_integrity_pass uses_lock_stitching_pass air_loss_pass].each do |check|
+        %w[seam_integrity_pass air_loss_pass].each do |check|
           assessment.send("#{check}=", false)
         end
       end
@@ -47,7 +47,6 @@ FactoryBot.define do
     trait :passed do
       # Critical safety checks
       seam_integrity_pass { true }
-      uses_lock_stitching_pass { true }
       air_loss_pass { true }
       straight_walls_pass { true }
       sharp_edges_pass { true }
@@ -90,7 +89,6 @@ FactoryBot.define do
 
       # Comments for documentation
       seam_integrity_comment { "Seams in good condition" }
-      uses_lock_stitching_comment { "Lock stitching is used" }
       stitch_length_comment { "Stitch length within specification" }
       air_loss_comment { "No significant air loss detected" }
       straight_walls_comment { "Walls straight and properly tensioned" }

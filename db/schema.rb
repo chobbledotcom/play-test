@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_23_153915) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_23_185449) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -210,7 +210,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_153915) do
   create_table "structure_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
     t.boolean "seam_integrity_pass"
-    t.boolean "uses_lock_stitching_pass"
     t.boolean "air_loss_pass"
     t.boolean "straight_walls_pass"
     t.boolean "sharp_edges_pass"
@@ -231,7 +230,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_153915) do
     t.boolean "markings_pass"
     t.boolean "grounding_pass"
     t.text "seam_integrity_comment"
-    t.text "uses_lock_stitching_comment"
     t.text "stitch_length_comment"
     t.text "air_loss_comment"
     t.text "straight_walls_comment"

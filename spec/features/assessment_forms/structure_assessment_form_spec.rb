@@ -29,7 +29,6 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     visit edit_inspection_path(inspection, tab: "structure")
 
     choose_structure_field :seam_integrity_pass, true
-    choose_structure_field :uses_lock_stitching_pass, false
     choose_structure_field :air_loss_pass, true
     choose_structure_field :straight_walls_pass, true
     choose_structure_field :sharp_edges_pass, false
@@ -66,7 +65,6 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     structure = inspection.structure_assessment
 
     expect(structure.seam_integrity_pass).to be true
-    expect(structure.uses_lock_stitching_pass).to be false
     expect(structure.air_loss_pass).to be true
     expect(structure.straight_walls_pass).to be true
     expect(structure.sharp_edges_pass).to be false

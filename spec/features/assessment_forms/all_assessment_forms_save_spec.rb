@@ -3,7 +3,6 @@ require "rails_helper"
 STRUCTURE_SAMPLE_DATA = {
 
   seam_integrity_pass: true,
-  uses_lock_stitching_pass: false,
   air_loss_pass: true,
   straight_walls_pass: true,
   sharp_edges_pass: false,

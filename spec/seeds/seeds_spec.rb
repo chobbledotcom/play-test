@@ -297,7 +297,6 @@ RSpec.describe "Seed Data", type: :model do
           Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
             expect([true, false]).to include(assessment.seam_integrity_pass)
-            expect([true, false]).to include(assessment.uses_lock_stitching_pass)
             expect([true, false]).to include(assessment.air_loss_pass)
             expect([true, false]).to include(assessment.straight_walls_pass)
             expect([true, false]).to include(assessment.sharp_edges_pass)

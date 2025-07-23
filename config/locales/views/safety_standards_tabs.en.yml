@@ -38,7 +38,6 @@ en:
         items:
           - "Material: Non-rotting yarn required"
           - "Tensile strength: 88 Newtons minimum"
-          - "Stitch type: Lock stitching required"
           - "Stitch length: 3-8mm"
       rope:
         title: "Rope"
