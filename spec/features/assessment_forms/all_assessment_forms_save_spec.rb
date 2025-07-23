@@ -85,9 +85,7 @@ FAN_SAMPLE_DATA = {
   blower_finger_pass: true,
   blower_visual_pass: false,
   pat_pass: "pass",
-  blower_serial_pass: true,
 
-  blower_serial_comment: "Serial verified against manufacturer database",
   blower_visual_comment: "Minor damage to fan housing"
 }.freeze
 
