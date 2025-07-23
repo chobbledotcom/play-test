@@ -12,9 +12,12 @@ RSpec.feature "Indoor only field in inspection form", type: :feature do
     visit unit_path(unit)
     click_button I18n.t("units.buttons.add_inspection")
 
-    within_fieldset I18n.t("forms.inspection.sections.unit_configuration") do
-      expect(page).to have_content(I18n.t("forms.inspection.fields.indoor_only"))
-      expect(page).to have_field("inspection[indoor_only]", with: "false", visible: false)
+    unit_config_section = I18n.t("forms.inspection.sections.unit_configuration")
+    within_fieldset unit_config_section do
+      indoor_only_field = I18n.t("forms.inspection.fields.indoor_only")
+      expect(page).to have_content(indoor_only_field)
+      field_selector = "inspection[indoor_only]"
+      expect(page).to have_field(field_selector, with: "false", visible: false)
     end
   end
 
@@ -24,8 +27,10 @@ RSpec.feature "Indoor only field in inspection form", type: :feature do
 
     fill_in_inspection_form
 
-    within_fieldset I18n.t("forms.inspection.sections.unit_configuration") do
-      choose_yes_no(I18n.t("forms.inspection.fields.indoor_only"), true)
+    unit_config_section = I18n.t("forms.inspection.sections.unit_configuration")
+    within_fieldset unit_config_section do
+      indoor_only_field = I18n.t("forms.inspection.fields.indoor_only")
+      choose_yes_no(indoor_only_field, true)
     end
 
     click_button I18n.t("forms.inspection.submit")
@@ -55,18 +60,22 @@ RSpec.feature "Indoor only field in inspection form", type: :feature do
   private
 
   def fill_in_inspection_form
-    fill_in I18n.t("forms.inspection.fields.inspection_location"),
-      with: "Test Location"
+    fill_in I18n.t("forms.inspection.fields.unique_report_number"),
+      with: "TEST001"
     fill_in I18n.t("forms.inspection.fields.inspection_date"),
       with: Date.current.strftime("%Y-%m-%d")
     fill_in I18n.t("forms.inspection.fields.width"), with: "5.5"
     fill_in I18n.t("forms.inspection.fields.length"), with: "6.0"
     fill_in I18n.t("forms.inspection.fields.height"), with: "4.5"
 
-    within_fieldset I18n.t("forms.inspection.sections.unit_configuration") do
-      choose_yes_no(I18n.t("forms.inspection.fields.has_slide"), false)
-      choose_yes_no(I18n.t("forms.inspection.fields.is_totally_enclosed"), false)
-      choose_yes_no(I18n.t("forms.inspection.fields.indoor_only"), false)
+    unit_config_section = I18n.t("forms.inspection.sections.unit_configuration")
+    within_fieldset unit_config_section do
+      has_slide_field = I18n.t("forms.inspection.fields.has_slide")
+      enclosed_field = I18n.t("forms.inspection.fields.is_totally_enclosed")
+      indoor_only_field = I18n.t("forms.inspection.fields.indoor_only")
+      choose_yes_no(has_slide_field, false)
+      choose_yes_no(enclosed_field, false)
+      choose_yes_no(indoor_only_field, false)
     end
   end
 end

@@ -124,7 +124,7 @@ RSpec.describe "inspector_companies/show", type: :view do
 
       expect(rendered).to include("Recent Inspections")
       expect(rendered).to include("TEST001")
-      expect(rendered).to include(recent_inspections.first.inspection_location)
+      expect(rendered).to include("TEST001") # Unit serial instead of location
       expect(rendered).to include("Pass") # passed
     end
   end

@@ -154,40 +154,6 @@ RSpec.describe TestDataHelpers do
     end
   end
 
-  describe ".inspection_location" do
-    it "combines British city with venue type" do
-      location = described_class.inspection_location
-      parts = location.split(" ")
-
-      expect(parts.size).to be >= 2
-    end
-
-    it "uses valid British cities" do
-      expected_cities = ["London", "Birmingham", "Manchester", "Leeds", "Liverpool", "Newcastle", "Bristol",
-        "Sheffield", "Nottingham", "Leicester", "Oxford", "Cambridge", "Brighton", "Southampton",
-        "Edinburgh", "Glasgow", "Cardiff", "Belfast"]
-      location = described_class.inspection_location
-      city = location.split(" ").first
-
-      expect(expected_cities).to include(city)
-    end
-
-    it "uses valid venue types" do
-      expected_venues = ["Park", "Recreation Centre", "Community Hall", "School", "Leisure Centre",
-        "Sports Complex", "Village Hall", "Town Square", "Festival Grounds"]
-      location = described_class.inspection_location
-      venue = location.split(" ", 2).last
-
-      expect(expected_venues).to include(venue)
-    end
-
-    it "generates different locations on multiple calls" do
-      locations = 20.times.map { described_class.inspection_location }
-
-      expect(locations.uniq.size).to be > 1
-    end
-  end
-
   describe "data consistency" do
     it "all methods return non-empty strings" do
       expect(described_class.british_phone_number).not_to be_empty
@@ -195,7 +161,6 @@ RSpec.describe TestDataHelpers do
       expect(described_class.british_address).not_to be_empty
       expect(described_class.british_city).not_to be_empty
       expect(described_class.british_company_name("Test")).not_to be_empty
-      expect(described_class.inspection_location).not_to be_empty
     end
 
     it "all methods are deterministically random" do
@@ -204,8 +169,7 @@ RSpec.describe TestDataHelpers do
         :british_phone_number,
         :british_postcode,
         :british_address,
-        :british_city,
-        :inspection_location
+        :british_city
       ]
 
       methods_to_test.each do |method|

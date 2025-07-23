@@ -7,7 +7,9 @@ RSpec.feature "Turbo incomplete fields update", js: true do
   let(:unit) { create(:unit, user:) }
   let(:inspection) {
     create(:inspection, :completed, user:, unit:).tap do |insp|
-      insp.update_columns(complete_date: nil, inspection_location: nil)
+      insp.update_columns(complete_date: nil)
+      # Make an assessment field incomplete to have something to test with
+      insp.user_height_assessment.update_column(:tallest_user_height, nil)
     end
   }
 
@@ -24,11 +26,12 @@ RSpec.feature "Turbo incomplete fields update", js: true do
     expect(summary.text).to match(/Show 1 incomplete field/)
 
     # Fill in the missing field
-    location_label = I18n.t("forms.inspection.fields.inspection_location")
-    fill_in location_label, with: "Test Location"
+    visit edit_inspection_path(inspection, tab: "user_height")
+    height_label = I18n.t("forms.user_height.fields.tallest_user_height")
+    fill_in height_label, with: "2.5"
 
     # Submit the form
-    click_button I18n.t("forms.inspection.submit")
+    click_button I18n.t("forms.user_height.submit")
 
     # Wait for Turbo to update the frame
     # The incomplete fields should now be 0 and the count should update

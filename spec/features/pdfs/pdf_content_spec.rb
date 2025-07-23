@@ -2,7 +2,9 @@ require "rails_helper"
 require "pdf/inspector"
 require Rails.root.join("db/seeds/seed_data")
 
-ASSESSMENT_FORMS = %w[user_height structure anchorage materials fan slide enclosed].freeze
+ASSESSMENT_FORMS = %w[
+  user_height structure anchorage materials fan slide enclosed
+].freeze
 
 RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
   let(:user) { create(:user) }
@@ -23,9 +25,11 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         user: user,
         unit: unit)
 
-      inspection.user_height_assessment.update!(
-        SeedData.user_height_fields.slice(:containing_wall_height, :tallest_user_height, :users_at_1800mm)
+      user_height_fields = SeedData.user_height_fields
+      height_slice = user_height_fields.slice(
+        :containing_wall_height, :tallest_user_height, :users_at_1800mm
       )
+      inspection.user_height_assessment.update!(height_slice)
 
       inspection.structure_assessment.update!(
         SeedData.structure_fields.slice(:seam_integrity_pass, :air_loss_pass)
@@ -33,10 +37,12 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
 
-      expect_pdf_to_include_i18n_keys(pdf_text,
-        "pdf.inspection.equipment_details")
+      equipment_details_key = "pdf.inspection.equipment_details"
+      expect_pdf_to_include_i18n_keys(pdf_text, equipment_details_key)
 
-      expect(pdf_text).to include(user.rpii_inspector_number) if user.rpii_inspector_number.present?
+      if user.rpii_inspector_number.present?
+        expect(pdf_text).to include(user.rpii_inspector_number)
+      end
       expect(pdf_text).to include(unit.name)
       expect(pdf_text).to include(unit.serial)
       expect(pdf_text).to include(I18n.t("pdf.dimensions.width"))
@@ -62,7 +68,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         risk_assessment: "Multiple safety issues found")
 
       # Update all assessments to be complete
-      failed_inspection.assessment_types.each do |assessment_name, _assessment_class|
+      assessment_types = failed_inspection.assessment_types
+      assessment_types.each do |assessment_name, _assessment_class|
         assessment = failed_inspection.send(assessment_name)
         assessment.update!(attributes_for(assessment_name, :complete))
       end
@@ -103,11 +110,12 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))
 
-      expect_pdf_to_include_i18n_keys(pdf_text,
-        "pdf.inspection.equipment_details")
+      equipment_details_key = "pdf.inspection.equipment_details"
+      expect_pdf_to_include_i18n_keys(pdf_text, equipment_details_key)
 
       expect(pdf_text).to include(user_without_rpii.name)
-      expect(pdf_text).not_to include(I18n.t("pdf.inspection.fields.rpii_inspector_no"))
+      rpii_inspector_key = "pdf.inspection.fields.rpii_inspector_no"
+      expect(pdf_text).not_to include(I18n.t(rpii_inspector_key))
     end
 
     scenario "does not include risk assessment section when blank" do
@@ -116,9 +124,11 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         unit: unit,
         risk_assessment: nil)
 
-      pdf_text = get_pdf_text(inspection_path(inspection_without_risk, format: :pdf))
+      pdf_path = inspection_path(inspection_without_risk, format: :pdf)
+      pdf_text = get_pdf_text(pdf_path)
 
-      expect(pdf_text).not_to include(I18n.t("pdf.inspection.risk_assessment"))
+      risk_assessment_key = "pdf.inspection.risk_assessment"
+      expect(pdf_text).not_to include(I18n.t(risk_assessment_key))
     end
 
     scenario "handles N/A enum values correctly" do
@@ -159,7 +169,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
         passed: nil,
         complete_date: nil)
 
-      pdf_text = get_pdf_text(inspection_path(in_progress_inspection, format: :pdf))
+      pdf_path = inspection_path(in_progress_inspection, format: :pdf)
+      pdf_text = get_pdf_text(pdf_path)
 
       expect(pdf_text).to include("IN PROGRESS")
       expect(pdf_text).not_to include(I18n.t("pdf.inspection.passed"))
@@ -180,17 +191,21 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       pdf_text = get_pdf_text(unit_report_path(unit))
 
-      expect_pdf_to_include_i18n_keys(pdf_text,
+      unit_keys = [
         "pdf.unit.fields.unit_id",
         "pdf.unit.details",
-        "pdf.unit.inspection_history")
+        "pdf.unit.inspection_history"
+      ]
+      expect_pdf_to_include_i18n_keys(pdf_text, *unit_keys)
 
       expect(pdf_text).to include(unit.name)
       expect(pdf_text).to include(unit.manufacturer)
       expect(pdf_text).to include(unit.serial)
 
       inspections.each do |inspection|
-        expect(pdf_text).to include(inspection.inspection_date.strftime("%-d %B, %Y"))
+        date_format = "%-d %B, %Y"
+        formatted_date = inspection.inspection_date.strftime(date_format)
+        expect(pdf_text).to include(formatted_date)
       end
     end
 
@@ -199,8 +214,10 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       pdf_text = get_pdf_text(unit_report_path(empty_unit))
 
-      expect_pdf_to_include_i18n(pdf_text, "pdf.unit.fields.unit_id")
-      expect_pdf_to_include_i18n(pdf_text, "pdf.unit.no_completed_inspections")
+      unit_id_key = "pdf.unit.fields.unit_id"
+      expect_pdf_to_include_i18n(pdf_text, unit_id_key)
+      no_inspections_key = "pdf.unit.no_completed_inspections"
+      expect_pdf_to_include_i18n(pdf_text, no_inspections_key)
     end
 
     scenario "handles unit with image and multiple prior inspections" do
@@ -222,7 +239,7 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
           unit: unit_with_image,
           inspection_date: i.months.ago,
           passed: i.even?,
-          inspection_location: "Photo Location #{i + 1}")
+          unique_report_number: "PHOTO#{i + 1}")
       end
 
       start_time = Time.current
@@ -236,17 +253,21 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
 
       pdf_text = pdf_text_content(pdf_data)
 
-      expect_pdf_to_include_i18n_keys(pdf_text,
+      unit_keys = [
         "pdf.unit.fields.unit_id",
         "pdf.unit.details",
-        "pdf.unit.inspection_history")
+        "pdf.unit.inspection_history"
+      ]
+      expect_pdf_to_include_i18n_keys(pdf_text, *unit_keys)
 
       expect(pdf_text).to include("Castle with Photo")
       expect(pdf_text).to include("Photo Test Co")
       expect(pdf_text).to include("PTC-2024-IMG")
 
       inspections.each do |inspection|
-        expect(pdf_text).to include(inspection.inspection_date.strftime("%-d %B, %Y"))
+        date_format = "%-d %B, %Y"
+        formatted_date = inspection.inspection_date.strftime(date_format)
+        expect(pdf_text).to include(formatted_date)
       end
 
       inspections.each_with_index do |inspection, index|

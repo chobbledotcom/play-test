@@ -39,14 +39,13 @@ en:
       search: "Search"
 
     search:
-      placeholder: "Location, inspection ID, internal ID, or unit serial"
+      placeholder: "Inspection ID, internal ID, or unit serial"
 
     filters:
       all_statuses: "All Statuses"
       all_results: "All Results"
       all_units: "All Units"
       all_operators: "All Operators"
-      all_locations: "All Locations"
       passed: "Passed"
       failed: "Failed"
 
@@ -77,7 +76,6 @@ en:
       unit_select_prompt: "-- Select a unit --"
       status: "Status"
       progress: "Progress"
-      inspection_location: "Location of Inspection"
       inspection_date: "Inspection Date"
       reinspection_date: "Reinspection Date"
       inspector: "Inspector Name"

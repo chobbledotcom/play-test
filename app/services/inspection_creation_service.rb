@@ -45,7 +45,6 @@ class InspectionCreationService
       unit: unit,
       inspection_date: Date.current,
       inspector_company_id: @user.inspection_company_id,
-      inspection_location: @user.default_inspection_location,
       **copy_fields
     )
   end

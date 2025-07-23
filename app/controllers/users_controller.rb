@@ -240,7 +240,7 @@ class UsersController < ApplicationController
 
   def settings_params
     settings_fields = %i[
-      address country default_inspection_location
+      address country
       logo phone postal_code signature theme
     ]
     params.require(:user).permit(settings_fields)

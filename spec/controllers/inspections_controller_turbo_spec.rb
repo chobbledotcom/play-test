@@ -37,7 +37,7 @@ RSpec.describe InspectionsController, type: :controller do
         inspection.update!(complete_date: nil)
 
         # Try to clear a required field
-        patch :update, params: {id: inspection.id, inspection: {inspection_location: ""}}
+        patch :update, params: {id: inspection.id, inspection: {comments: ""}}
 
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
         expect(response.body).to include("turbo-stream")

@@ -15,7 +15,6 @@ en:
       fields:
         serial: "Serial Number"
         manufacturer: "Manufacturer"
-        inspection_location: "Inspection Location"
         inspector: "Inspector"
         inspected_by: "Inspected by"
         issued: "Issued"

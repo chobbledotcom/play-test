@@ -37,7 +37,6 @@ module SeedData
   def self.inspection_fields(passed: true)
     {
       inspection_date: Date.current,
-      inspection_location: "Test Location #{rand(1..5)}",
       unique_report_number: "RPT-#{Date.current.year}-#{rand(1000..9999)}",
       is_totally_enclosed: [true, false].sample,
       has_slide: [true, false].sample,
