@@ -91,17 +91,17 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
     end
 
     scenario "user uses search to find inspection and access PDF" do
+      searchable_unit = create(:unit, user: user, serial: "SEARCHSERIAL")
       searchable_inspection = create(:inspection, :completed,
         user: user,
-        unit: unit,
-        unique_report_number: "UNIQUE001")
+        unit: searchable_unit)
 
       visit inspections_path
 
-      fill_in "query", with: "UNIQUE001"
+      fill_in "query", with: "SEARCHSERIAL"
       click_button "Search" if page.has_button?("Search")
 
-      expect(page).to have_content("UNIQUE001")
+      expect(page).to have_content("SEARCHSERIAL")
 
       click_link searchable_inspection.unit.name
       expect(page).to have_css("iframe", wait: 5)

@@ -41,7 +41,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
     context "when user has inspections" do
       let!(:inspection) do
-        create_user_inspection(unique_report_number: "TEST001")
+        create_user_inspection
       end
 
       it "displays inspections in the list" do
@@ -49,7 +49,6 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
         expect(page).to have_content(unit.name)
         expect(page).to have_content(unit.serial)
-        expect(page).to have_content("TEST001")
       end
 
       it "shows inspection result" do
@@ -59,11 +58,11 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
       it "shows pending status for inspections without result" do
         # Create an inspection with null passed value
+        pending_unit = create(:unit, user: user, serial: "PENDING001")
         create(:inspection,
           user: user,
-          unit: unit,
+          unit: pending_unit,
           inspector_company: inspector_company,
-          unique_report_number: "PENDING001",
           passed: nil)
 
         visit inspections_path
@@ -90,11 +89,11 @@ RSpec.feature "Inspections Index Page", type: :feature do
       end
 
       it "routes to view page for complete inspections" do
+        complete_unit = create(:unit, user: user, serial: "COMPLETE001")
         complete_inspection = create(:inspection, :completed,
           user: user,
-          unit: unit,
-          inspector_company: inspector_company,
-          unique_report_number: "COMPLETE001")
+          unit: complete_unit,
+          inspector_company: inspector_company)
 
         visit inspections_path
 
@@ -107,9 +106,10 @@ RSpec.feature "Inspections Index Page", type: :feature do
     end
 
     context "when inspection has missing data" do
+      let(:draft_unit) { create(:unit, user: user, serial: "DRAFT001") }
       let!(:draft_inspection) do
         create_user_inspection(
-          unique_report_number: "DRAFT001",
+          unit: draft_unit,
           complete_date: nil
         )
       end
@@ -122,11 +122,13 @@ RSpec.feature "Inspections Index Page", type: :feature do
     end
 
     context "when user has multiple inspections" do
+      let(:unit1) { create(:unit, user: user, serial: "LOC001") }
+      let(:unit2) { create(:unit, user: user, serial: "LOC002") }
       let!(:inspection1) do
-        create_user_inspection(unique_report_number: "LOC001")
+        create_user_inspection(unit: unit1)
       end
       let!(:inspection2) do
-        create_user_inspection(unique_report_number: "LOC002")
+        create_user_inspection(unit: unit2)
       end
 
       it "displays all user's inspections" do
@@ -140,7 +142,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
   describe "page layout and metadata" do
     let!(:inspection) do
-      create_user_inspection(unique_report_number: "TEST002")
+      create_user_inspection
     end
 
     it "has proper page title" do
@@ -164,21 +166,21 @@ RSpec.feature "Inspections Index Page", type: :feature do
   describe "data isolation between users" do
     let(:other_user) { create(:user, inspection_company: inspector_company) }
     let(:other_unit) { create(:unit, user: other_user) }
+    let(:my_unit) { create(:unit, user: user, serial: "MY001") }
 
     let!(:other_inspection) do
-      create_other_user_inspection(other_user, other_unit,
-        unique_report_number: "OTHER001")
+      create_other_user_inspection(other_user, other_unit)
     end
 
     let!(:my_inspection) do
-      create_user_inspection(unique_report_number: "MY001")
+      create_user_inspection(unit: my_unit)
     end
 
     it "only shows current user's inspections" do
       visit inspections_path
 
       expect(page).to have_content("MY001")
-      expect(page).not_to have_content("OTHER001")
+      expect(page).not_to have_content(other_unit.serial)
     end
   end
 
@@ -209,16 +211,20 @@ RSpec.feature "Inspections Index Page", type: :feature do
   describe "inspection ordering" do
     context "draft inspections" do
       it "displays oldest draft inspections first" do
+        old_unit = create(:unit, user: user, serial: "OLD001")
+        new_unit = create(:unit, user: user, serial: "NEW001")
+        mid_unit = create(:unit, user: user, serial: "MID001")
+
         create_user_inspection(
-          unique_report_number: "OLD001",
+          unit: old_unit,
           created_at: 3.days.ago
         )
         create_user_inspection(
-          unique_report_number: "NEW001",
+          unit: new_unit,
           created_at: 1.day.ago
         )
         create_user_inspection(
-          unique_report_number: "MID001",
+          unit: mid_unit,
           created_at: 2.days.ago
         )
 
@@ -236,18 +242,22 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
     context "completed inspections" do
       it "displays newest completed inspections first" do
+        old_comp_unit = create(:unit, user: user, serial: "OLDCOMP001")
+        new_comp_unit = create(:unit, user: user, serial: "NEWCOMP001")
+        mid_comp_unit = create(:unit, user: user, serial: "MIDCOMP001")
+
         create_user_inspection(
-          unique_report_number: "OLDCOMP001",
+          unit: old_comp_unit,
           complete_date: Time.current,
           created_at: 3.days.ago
         )
         create_user_inspection(
-          unique_report_number: "NEWCOMP001",
+          unit: new_comp_unit,
           complete_date: Time.current,
           created_at: 1.day.ago
         )
         create_user_inspection(
-          unique_report_number: "MIDCOMP001",
+          unit: mid_comp_unit,
           complete_date: Time.current,
           created_at: 2.days.ago
         )

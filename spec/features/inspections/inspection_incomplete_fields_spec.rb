@@ -6,14 +6,15 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user:) }
   let(:inspection) {
-    create(:inspection,
+    inspection = create(:inspection,
       unit:,
       user:,
-      risk_assessment: nil,
       passed: true,
       width: 5.0,
       length: 10.0,
       height: 3.0)
+    inspection.update_column(:inspection_date, nil)
+    inspection
   }
 
   before { sign_in(user) }
@@ -60,7 +61,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
       incomplete_desc_key = "assessments.incomplete_fields.description"
       expect(page).to have_content(I18n.t(incomplete_desc_key))
       expect_incomplete_section("inspection")
-      expect_incomplete_field("inspection", "risk_assessment")
+      expect_incomplete_field("inspection", "inspection_date")
       # Button should NOT be visible when there are incomplete fields
       mark_complete_button = I18n.t("inspections.buttons.mark_complete")
       expect(page).not_to have_button(mark_complete_button)
@@ -72,11 +73,11 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     controlled_inspection = create(:inspection,
       unit: complete_unit,
       user:,
-      risk_assessment: nil,
       passed: true,
       height: 3.0,
       length: 10.0,
       width: 8.0)
+    controlled_inspection.update_column(:inspection_date, nil)
 
     user_height_assessment = controlled_inspection.user_height_assessment
     user_height_assessment.update!(tallest_user_height: nil)
@@ -86,7 +87,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
     expect_incomplete_section("inspection")
     expect_incomplete_section("user_height")
-    expect_incomplete_field("inspection", "risk_assessment")
+    expect_incomplete_field("inspection", "inspection_date")
     expect_incomplete_field("user_height", "tallest_user_height")
   end
 
@@ -106,7 +107,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
   end
 
   scenario "excludes optional assessment incomplete fields" do
-    inspection.update!(has_slide: false)
+    inspection.update_column(:has_slide, false)
     inspection.slide_assessment.update!(runout: nil)
 
     visit edit_inspection_path(inspection)
@@ -122,8 +123,8 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     inspection_link = find_link(I18n.t("forms.inspection.header"))
     expect(inspection_link[:href]).to include("tab=inspection", "#tabs")
 
-    field_link = find_link(I18n.t("forms.inspection.fields.risk_assessment"))
-    expected_params = ["tab=inspection", "#risk_assessment"]
+    field_link = find_link(I18n.t("forms.inspection.fields.inspection_date"))
+    expected_params = ["tab=inspection", "#inspection_date"]
     expect(field_link[:href]).to include(*expected_params)
   end
 
@@ -146,7 +147,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     expand_incomplete_fields
 
     within(".incomplete-fields-content") do
-      field_link = find_link(I18n.t("forms.inspection.fields.risk_assessment"))
+      field_link = find_link(I18n.t("forms.inspection.fields.inspection_date"))
       field_link.click
     end
 

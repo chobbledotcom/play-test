@@ -23,12 +23,6 @@
   <% if show_inspection_fields && inspection %>
     <%# Inspection Details Section %>
     <ul class="unit-details-list">
-      <li>
-        <strong><%= t("inspections.fields.inspection_location") %>:</strong>
-        <span><%= link_to inspection.inspection_location, 
-                         inspections_path(inspection_location: inspection.inspection_location, anchor: "main"),
-                         title: "View all inspections at #{inspection.inspection_location}" %></span>
-      </li>
       
       <li>
         <strong><%= t("inspections.fields.inspection_date") %>:</strong>

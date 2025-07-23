@@ -6,6 +6,7 @@ RSpec.feature "Details element link behavior" do
   let(:inspection) do
     inspection = create(:inspection, :completed, user:, unit:)
     inspection.update!(complete_date: nil)
+    inspection.update_column(:inspection_date, nil)
     inspection
   end
 

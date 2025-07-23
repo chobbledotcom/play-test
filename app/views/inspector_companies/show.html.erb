@@ -88,7 +88,6 @@
       <tr>
         <th>Date</th>
         <th>Serial</th>
-        <th>Location</th>
         <th>Passed</th>
         <th><%= t('ui.actions') %></th>
       </tr>
@@ -98,7 +97,6 @@
         <tr>
           <td><%= inspection.inspection_date&.strftime("%b %d, %Y") || "No date" %></td>
           <td><%= inspection.unit&.serial || "No unit" %></td>
-          <td><%= inspection.inspection_location %></td>
           <td><%= render 'shared/pass_fail_string', passed: inspection.passed? %></td>
           <td><%= link_to t('ui.view'), inspection %></td>
         </tr>

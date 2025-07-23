@@ -30,7 +30,6 @@ RSpec.shared_examples "handles unicode in PDFs" do |inspection_or_unit|
     # Update the object with Unicode content
     if inspection_or_unit.is_a?(Inspection)
       inspection_or_unit.update(
-        inspection_location: "Test Location with Ünicøde 😀",
         comments: "Comments with émoji 🎈 and spëcial characters"
       )
     else # Unit
@@ -59,7 +58,6 @@ RSpec.shared_examples "handles long text in PDFs" do |inspection_or_unit|
 
     if inspection_or_unit.is_a?(Inspection)
       inspection_or_unit.update(
-        inspection_location: "Long location #{long_text}",
         comments: "Long comments #{long_text}"
       )
     else # Unit

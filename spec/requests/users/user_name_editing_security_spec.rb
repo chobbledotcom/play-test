@@ -10,7 +10,7 @@ RSpec.describe "User Name Editing Security", type: :request do
       patch update_settings_user_path(regular_user), params: {
         user: {
           name: "Hacked Name",
-          default_inspection_location: "Test Location"
+          theme: "light"
         }
       }
 
@@ -18,7 +18,7 @@ RSpec.describe "User Name Editing Security", type: :request do
 
       expect(regular_user.name).to eq("Original Name")
 
-      expect(regular_user.default_inspection_location).to eq("Test Location")
+      expect(regular_user.theme).to eq("light")
     end
 
     it "prevents regular users from changing name via admin edit form tampering" do
