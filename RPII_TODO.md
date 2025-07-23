@@ -16,14 +16,8 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 
 **Time: 20m**
 
-- Inspection
-  - Inspection Location
-- Structure Assessment
-  - Uses Lock Stitching
 - Slides
   - Slide Platform Height
-- Units
-  - Model
 
 ## Field Moves Between Assessments
 
@@ -62,6 +56,17 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 - Stucture
   - Trough Depth & Trough Adjacent Panel Width" => remove pass/fails, keep number, keep "Trough Check"
   - Evacuation Time => remove number, just pass/fail/comment
+
+## Field Deletions
+
+**Time: 20m**
+
+- Inspection
+  - Inspection Location
+- Structure Assessment
+  - Uses Lock Stitching
+- Units
+  - Model
 
 ## Text Renames
 
