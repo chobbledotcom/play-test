@@ -37,9 +37,6 @@ module InspectionTestHelpers
   end
 
   # Form filling - use the generic form helpers
-  def fill_in_location(value)
-    fill_in_form(:inspection, :inspection_location, value)
-  end
 
   def fill_in_report_number(value)
     fill_in_form(:inspection, :unique_report_number, value)

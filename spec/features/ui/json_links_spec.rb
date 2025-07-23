@@ -45,7 +45,6 @@ RSpec.feature "JSON Links", type: :feature do
     visit inspection_url(inspection, format: :json)
 
     json = JSON.parse(page.body)
-    expect(json["inspection_location"]).to eq(inspection.inspection_location)
     expect(json["passed"]).to eq(inspection.passed)
   end
 end

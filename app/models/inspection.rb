@@ -30,7 +30,6 @@ class Inspection < ApplicationRecord
     height
     indoor_only
     inspection_date
-    inspection_location
     is_totally_enclosed
     length
     passed
@@ -84,7 +83,6 @@ class Inspection < ApplicationRecord
     end
   end
 
-  validates :inspection_location, presence: true, if: :complete?
   validates :inspection_date, presence: true
   # rubocop:disable Rails/UniqueValidationWithoutIndex
   validates :unique_report_number,
@@ -126,9 +124,6 @@ class Inspection < ApplicationRecord
       all
     end
   }
-  scope :filter_by_inspection_location, ->(location) {
-    where(inspection_location: location) if location.present?
-  }
   scope :filter_by_date_range, ->(start_date, end_date) {
     range = start_date..end_date
     where(inspection_date: range) if both_dates_present?(start_date, end_date)
@@ -137,12 +132,12 @@ class Inspection < ApplicationRecord
 
   # Helper methods for scopes
   def self.search_conditions
-    "inspections.inspection_location LIKE ? OR inspections.id LIKE ? OR " \
+    "inspections.id LIKE ? OR " \
     "inspections.unique_report_number LIKE ? OR units.serial LIKE ? OR " \
     "units.manufacturer LIKE ? OR units.name LIKE ?"
   end
 
-  def self.search_values(query) = Array.new(6) { "%#{query}%" }
+  def self.search_values(query) = Array.new(5) { "%#{query}%" }
 
   def self.both_dates_present?(start_date, end_date) =
     start_date.present? && end_date.present?
@@ -238,7 +233,6 @@ class Inspection < ApplicationRecord
   def can_be_completed?
     unit.present? &&
       all_assessments_complete? &&
-      inspection_location.present? &&
       !passed.nil? &&
       inspection_date.present? &&
       width.present? &&

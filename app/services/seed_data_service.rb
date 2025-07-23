@@ -171,7 +171,6 @@ class SeedDataService
       {
         unit: unit,
         inspector_company: user.inspection_company,
-        inspection_location: "#{TestDataHelpers.british_address}, #{TestDataHelpers.british_city}",
         inspection_date: inspection_date,
         complete_date: is_complete ?
           inspection_date.to_time + rand(INSPECTION_DURATION_RANGE).hours :

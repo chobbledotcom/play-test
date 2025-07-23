@@ -22,8 +22,8 @@ RSpec.feature "Inspection Prefilling", type: :feature do
     expect(new_inspection.width).to eq(55555)
     expect(page).to have_current_path(edit_inspection_path(new_inspection))
 
-    location_field = find_form_field(:inspection, :inspection_location)
-    expect(location_field.value).to eq("Test Location")
+    report_field = find_form_field(:inspection, :unique_report_number)
+    expect(report_field.value).to eq("Test Report")
 
     # The simplified HTML doesn't add set-previous class
     # Just verify the field has the prefilled value
@@ -39,8 +39,8 @@ RSpec.feature "Inspection Prefilling", type: :feature do
     expect(width_field.value).to eq("55555.0")
 
     # The simplified HTML doesn't use set-previous class
-    # After save, the field should still have the value (now saved, not prefilled)
-    location_field = find_form_field(:inspection, :inspection_location)
-    expect(location_field.value).to eq("Test Location")
+    # After save, field should still have value (now saved, not prefilled)
+    report_field = find_form_field(:inspection, :unique_report_number)
+    expect(report_field.value).to eq("Test Report")
   end
 end

@@ -362,7 +362,6 @@ class InspectionWorkflow
 
     expect(@second_inspection.has_slide).to eq(@options[:has_slide])
     expect(@second_inspection.is_totally_enclosed).to eq(@options[:is_totally_enclosed])
-    expect(@second_inspection.inspection_location).to eq(@inspection.inspection_location)
 
     click_mark_complete_button
     expect_marked_complete_message

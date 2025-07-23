@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_23_153915) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_23_185045) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -115,7 +115,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_153915) do
     t.datetime "updated_at", null: false
     t.datetime "pdf_last_accessed_at"
     t.string "unit_id"
-    t.string "inspection_location"
     t.string "unique_report_number"
     t.string "inspector_company_id"
     t.decimal "width", precision: 8, scale: 2
@@ -185,7 +184,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_153915) do
 
   create_table "slide_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
-    t.decimal "slide_platform_height", precision: 8, scale: 2
     t.decimal "slide_wall_height", precision: 8, scale: 2
     t.decimal "runout", precision: 8, scale: 2
     t.decimal "slide_first_metre_height", precision: 8, scale: 2
@@ -194,7 +192,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_153915) do
     t.boolean "runout_pass"
     t.boolean "slip_sheet_pass"
     t.boolean "slide_permanent_roof"
-    t.text "slide_platform_height_comment"
     t.text "slide_wall_height_comment"
     t.text "slide_first_metre_height_comment"
     t.text "slide_beyond_first_metre_height_comment"
@@ -210,7 +207,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_153915) do
   create_table "structure_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
     t.boolean "seam_integrity_pass"
-    t.boolean "uses_lock_stitching_pass"
     t.boolean "air_loss_pass"
     t.boolean "straight_walls_pass"
     t.boolean "sharp_edges_pass"
@@ -273,7 +269,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_153915) do
     t.string "manufacturer"
     t.string "description"
     t.string "operator"
-    t.string "model"
     t.date "manufacture_date"
     t.boolean "is_seed", default: false, null: false
     t.string "serial"
@@ -315,7 +310,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_153915) do
     t.datetime "updated_at", null: false
     t.datetime "last_active_at"
     t.string "inspection_company_id"
-    t.string "default_inspection_location"
     t.string "theme", default: "light"
     t.string "rpii_inspector_number"
     t.date "active_until"

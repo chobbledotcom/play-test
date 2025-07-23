@@ -10,7 +10,6 @@ module JsonTestHelpers
   # Basic fields that should be in inspection JSON
   INSPECTION_BASIC_FIELDS = %w[
     inspection_date
-    inspection_location
     passed
     complete
   ].freeze

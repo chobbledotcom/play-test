@@ -33,11 +33,6 @@
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'inspection_details' do %>
-    <%= render 'form/autocomplete_field',
-      field: :inspection_location,
-      options: @inspection_locations
-    %>
-
     <%= render 'form/date_field', field: :inspection_date %>
 
     <div class="calculated-field">

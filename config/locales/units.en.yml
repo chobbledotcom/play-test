@@ -74,7 +74,6 @@ en:
       bouncing_pillow: "Bouncing Pillow"
 
     labels:
-      inspection_location: "Inspection Location"
       inspection_date: "Inspection Date"
       dimensions: "Dimensions"
       all_count: "All (%{count})"

@@ -19,7 +19,6 @@ class InspectionsController < ApplicationController
 
     @title = build_index_title
     @has_any_inspections = all_inspections.any?
-    load_inspection_locations
 
     respond_to do |format|
       format.html
@@ -63,7 +62,6 @@ class InspectionsController < ApplicationController
 
   def edit
     validate_tab_parameter
-    load_inspection_locations
     set_previous_inspection
   end
 
@@ -290,7 +288,6 @@ class InspectionsController < ApplicationController
     .filter_by_result(params[:result])
     .filter_by_unit(params[:unit_id])
     .filter_by_operator(params[:operator])
-    .filter_by_inspection_location(params[:inspection_location])
 
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
 
@@ -411,15 +408,6 @@ class InspectionsController < ApplicationController
 
   def resource_pdf_url
     inspection_path(@inspection, format: :pdf)
-  end
-
-  def load_inspection_locations
-    @inspection_locations = current_user
-      .inspections
-      .pluck(:inspection_location)
-      .uniq
-      .compact
-      .sort
   end
 
   def handle_inactive_user_redirect

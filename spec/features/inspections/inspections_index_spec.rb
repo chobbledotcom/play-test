@@ -34,19 +34,22 @@ RSpec.feature "Inspections Index Page", type: :feature do
         visit inspections_path
 
         expect(page).to have_content("No inspection records found")
-        expect(page).to have_button(I18n.t("inspections.buttons.add_inspection"))
+        add_inspection_button = I18n.t("inspections.buttons.add_inspection")
+        expect(page).to have_button(add_inspection_button)
       end
     end
 
     context "when user has inspections" do
-      let!(:inspection) { create_user_inspection(inspection_location: "Test Location") }
+      let!(:inspection) do
+        create_user_inspection(unique_report_number: "TEST001")
+      end
 
       it "displays inspections in the list" do
         visit inspections_path
 
         expect(page).to have_content(unit.name)
         expect(page).to have_content(unit.serial)
-        expect(page).to have_content("Test Location")
+        expect(page).to have_content("TEST001")
       end
 
       it "shows inspection result" do
@@ -60,12 +63,12 @@ RSpec.feature "Inspections Index Page", type: :feature do
           user: user,
           unit: unit,
           inspector_company: inspector_company,
-          inspection_location: "Pending Location",
+          unique_report_number: "PENDING001",
           passed: nil)
 
         visit inspections_path
 
-        within("li", text: "Pending Location") do
+        within("li", text: "PENDING001") do
           expect(page).to have_content(I18n.t("inspections.status.pending"))
         end
       end
@@ -76,7 +79,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
         expect(page).to have_content(Date.current.strftime("%b %d, %Y"))
       end
 
-      it "makes list items clickable and routes to edit for non-complete inspections" do
+      it "makes list items clickable and routes to edit for non-complete" do
         visit inspections_path
 
         inspection_item = page.find("li", text: unit.name)
@@ -91,11 +94,11 @@ RSpec.feature "Inspections Index Page", type: :feature do
           user: user,
           unit: unit,
           inspector_company: inspector_company,
-          inspection_location: "Complete Location")
+          unique_report_number: "COMPLETE001")
 
         visit inspections_path
 
-        inspection_item = page.find("li", text: "Complete Location")
+        inspection_item = page.find("li", text: "COMPLETE001")
         inspection_link = inspection_item.find("a.table-list-link")
         inspection_link.click
 
@@ -106,7 +109,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
     context "when inspection has missing data" do
       let!(:draft_inspection) do
         create_user_inspection(
-          inspection_location: "",
+          unique_report_number: "DRAFT001",
           complete_date: nil
         )
       end
@@ -119,20 +122,26 @@ RSpec.feature "Inspections Index Page", type: :feature do
     end
 
     context "when user has multiple inspections" do
-      let!(:inspection1) { create_user_inspection(inspection_location: "Location 1") }
-      let!(:inspection2) { create_user_inspection(inspection_location: "Location 2") }
+      let!(:inspection1) do
+        create_user_inspection(unique_report_number: "LOC001")
+      end
+      let!(:inspection2) do
+        create_user_inspection(unique_report_number: "LOC002")
+      end
 
       it "displays all user's inspections" do
         visit inspections_path
 
-        expect(page).to have_content("Location 1")
-        expect(page).to have_content("Location 2")
+        expect(page).to have_content("LOC001")
+        expect(page).to have_content("LOC002")
       end
     end
   end
 
   describe "page layout and metadata" do
-    let!(:inspection) { create_user_inspection(inspection_location: "Test Location") }
+    let!(:inspection) do
+      create_user_inspection(unique_report_number: "TEST002")
+    end
 
     it "has proper page title" do
       visit inspections_path
@@ -158,16 +167,18 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
     let!(:other_inspection) do
       create_other_user_inspection(other_user, other_unit,
-        inspection_location: "Other Location")
+        unique_report_number: "OTHER001")
     end
 
-    let!(:my_inspection) { create_user_inspection(inspection_location: "My Location") }
+    let!(:my_inspection) do
+      create_user_inspection(unique_report_number: "MY001")
+    end
 
     it "only shows current user's inspections" do
       visit inspections_path
 
-      expect(page).to have_content("My Location")
-      expect(page).not_to have_content("Other Location")
+      expect(page).to have_content("MY001")
+      expect(page).not_to have_content("OTHER001")
     end
   end
 
@@ -183,8 +194,10 @@ RSpec.feature "Inspections Index Page", type: :feature do
 
       click_add_inspection_on_index_button
 
-      expect(current_path).to match(/\/inspections\/\w+\/edit/)
-      expect(page).to have_content(I18n.t("inspections.messages.created_without_unit"))
+      edit_path_pattern = /\/inspections\/\w+\/edit/
+      expect(current_path).to match(edit_path_pattern)
+      created_message = I18n.t("inspections.messages.created_without_unit")
+      expect(page).to have_content(created_message)
 
       inspection = user.inspections.where(unit_id: nil).order(:created_at).last
       expect(inspection).to be_present
@@ -197,43 +210,44 @@ RSpec.feature "Inspections Index Page", type: :feature do
     context "draft inspections" do
       it "displays oldest draft inspections first" do
         create_user_inspection(
-          inspection_location: "Old Draft",
+          unique_report_number: "OLD001",
           created_at: 3.days.ago
         )
         create_user_inspection(
-          inspection_location: "New Draft",
+          unique_report_number: "NEW001",
           created_at: 1.day.ago
         )
         create_user_inspection(
-          inspection_location: "Middle Draft",
+          unique_report_number: "MID001",
           created_at: 2.days.ago
         )
 
         visit inspections_path
 
-        draft_table = page.find("h2", text: "In Progress").sibling(".table-list")
+        in_progress_header = page.find("h2", text: "In Progress")
+        draft_table = in_progress_header.sibling(".table-list")
         draft_rows = draft_table.all(".table-list-items li")
 
-        expect(draft_rows[0].text).to include("Old Draft")
-        expect(draft_rows[1].text).to include("Middle Draft")
-        expect(draft_rows[2].text).to include("New Draft")
+        expect(draft_rows[0].text).to include("OLD001")
+        expect(draft_rows[1].text).to include("MID001")
+        expect(draft_rows[2].text).to include("NEW001")
       end
     end
 
     context "completed inspections" do
       it "displays newest completed inspections first" do
         create_user_inspection(
-          inspection_location: "Old Complete",
+          unique_report_number: "OLDCOMP001",
           complete_date: Time.current,
           created_at: 3.days.ago
         )
         create_user_inspection(
-          inspection_location: "New Complete",
+          unique_report_number: "NEWCOMP001",
           complete_date: Time.current,
           created_at: 1.day.ago
         )
         create_user_inspection(
-          inspection_location: "Middle Complete",
+          unique_report_number: "MIDCOMP001",
           complete_date: Time.current,
           created_at: 2.days.ago
         )
@@ -247,9 +261,9 @@ RSpec.feature "Inspections Index Page", type: :feature do
         end
         complete_rows = complete_table.all(".table-list-items li")
 
-        expect(complete_rows[0].text).to include("New Complete")
-        expect(complete_rows[1].text).to include("Middle Complete")
-        expect(complete_rows[2].text).to include("Old Complete")
+        expect(complete_rows[0].text).to include("NEWCOMP001")
+        expect(complete_rows[1].text).to include("MIDCOMP001")
+        expect(complete_rows[2].text).to include("OLDCOMP001")
       end
     end
   end

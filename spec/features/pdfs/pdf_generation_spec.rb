@@ -3,7 +3,10 @@ require "pdf/inspector"
 
 RSpec.feature "PDF Generation User Workflows", type: :feature do
   let(:user) { create(:user) }
-  let(:unit) { create(:unit, user: user, manufacturer: "Test Manufacturer", serial: "TEST123") }
+  let(:unit) do
+    create(:unit, user: user, manufacturer: "Test Manufacturer",
+      serial: "TEST123")
+  end
   let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
 
   before do
@@ -52,7 +55,9 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       visit unit_path(unit)
 
       expect(page).to have_content(I18n.t("units.fields.qr_code"))
-      expect(page).to have_link(I18n.t("units.fields.qr_code"), href: unit_path(unit, format: :png))
+      qr_code_link = I18n.t("units.fields.qr_code")
+      qr_code_href = unit_path(unit, format: :png)
+      expect(page).to have_link(qr_code_link, href: qr_code_href)
 
       pdf_text = get_pdf_text("/units/#{unit.id}.pdf")
 
@@ -89,14 +94,14 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
       searchable_inspection = create(:inspection, :completed,
         user: user,
         unit: unit,
-        inspection_location: "Unique Test Location")
+        unique_report_number: "UNIQUE001")
 
       visit inspections_path
 
-      fill_in "query", with: "Unique Test"
+      fill_in "query", with: "UNIQUE001"
       click_button "Search" if page.has_button?("Search")
 
-      expect(page).to have_content("Unique Test Location")
+      expect(page).to have_content("UNIQUE001")
 
       click_link searchable_inspection.unit.name
       expect(page).to have_css("iframe", wait: 5)
@@ -118,7 +123,8 @@ RSpec.feature "PDF Generation User Workflows", type: :feature do
 
       expect(current_path).to eq(inspection_path(other_inspection))
       expect(page.html).to include("<iframe")
-      expect(page.html).to include(inspection_path(other_inspection, format: :pdf))
+      pdf_path = inspection_path(other_inspection, format: :pdf)
+      expect(page.html).to include(pdf_path)
     end
 
     scenario "user accesses draft inspection (shows PDF)" do

@@ -2,7 +2,6 @@
   show_photo = local_assigns.fetch(:show_photo, false)
   show_name = local_assigns.fetch(:show_name, true)
   show_serial = local_assigns.fetch(:show_serial, true)
-  show_location = local_assigns.fetch(:show_location, true)
   show_inspector = local_assigns.fetch(:show_inspector, false)
   context_unit = local_assigns[:unit] # If provided, we're showing inspections for a specific unit
 %>
@@ -18,9 +17,6 @@
     <% end %>
     <% if show_serial %>
       <span class="col-serial"><%= t('inspections.fields.serial') %></span>
-    <% end %>
-    <% if show_location %>
-      <span class="col-location"><%= t('inspections.fields.inspection_location') %></span>
     <% end %>
     <span class="col-last-inspection"><%= t('inspections.fields.last_inspection') %></span>
     <% if show_inspector %>
@@ -67,9 +63,6 @@
             <span class="col-serial" data-label="<%= t('inspections.fields.serial') %>">
               <%= inspection.unit&.serial.presence || t('inspections.messages.missing_serial') %>
             </span>
-          <% end %>
-          <% if show_location %>
-            <span class="col-location" data-label="<%= t('inspections.fields.inspection_location') %>"><%= inspection.inspection_location %></span>
           <% end %>
           <span class="col-last-inspection" data-label="<%= t('inspections.fields.last_inspection') %>"><%= render_time(inspection.inspection_date) %></span>
           <% if show_inspector %>
