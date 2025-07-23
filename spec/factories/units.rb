@@ -6,7 +6,6 @@ FactoryBot.define do
     description { "Test Bouncy Castle" }
     manufacturer { "Test Manufacturer" }
     operator { "Test Operator" }
-    model { "Test Model" }
     manufacture_date { 1.year.ago }
     is_seed { false }
 
@@ -14,7 +13,6 @@ FactoryBot.define do
     trait :with_different_values do
       name { "Different Test Unit" }
       manufacturer { "Different Manufacturer" }
-      model { "DM-2024" }
       serial { "DIFF-TEST-001" }
       description { "A different test unit" }
       operator { "Different Operator Ltd" }
@@ -42,7 +40,6 @@ FactoryBot.define do
     trait :with_all_fields do
       name { "Complete Test Unit" }
       manufacturer { "Premium Inflatables Ltd" }
-      model { "PRM-2024-XL" }
       serial { "PRM-SERIAL-001" }
       description { "Premium bouncy castle with all features" }
       operator { "Test Events Company" }

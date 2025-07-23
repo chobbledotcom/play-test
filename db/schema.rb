@@ -271,7 +271,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_185449) do
     t.string "manufacturer"
     t.string "description"
     t.string "operator"
-    t.string "model"
     t.date "manufacture_date"
     t.boolean "is_seed", default: false, null: false
     t.string "serial"

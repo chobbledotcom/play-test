@@ -52,7 +52,6 @@ en:
       serial: "Serial"
       manufacturer: "Manufacturer"
       has_slide: "Has Slide"
-      model: "Model"
       operator: "Operator"
       description: "Description"
       photo: "Photo"

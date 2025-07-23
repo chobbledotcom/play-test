@@ -72,13 +72,6 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 - Blower
   - Blower Serial => remove pass/fail/comment
 
-## Small Changes
-
-**Time: 10m**
-
-- Risk Assessment => make box significantly bigger by default
-- Mark as complete - "By continuing you confirm that the data you have entered is accurate"
-
 ---
 
 # Done
@@ -119,3 +112,10 @@ Add a link inside inspection results to upload images
 **Time: 10m**
 
 Add "Activate" and "Deactivate" buttons which sets active_until date
+
+## Small Changes
+
+**Time: 10m**
+
+- Risk Assessment => make box significantly bigger by default
+- Mark as complete - "By continuing you confirm that the data you have entered is accurate"
