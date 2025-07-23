@@ -149,7 +149,6 @@ RSpec.describe "Units", type: :request do
         fill_in I18n.t("forms.units.fields.name"), with: "New Test Unit"
         # Has slide checkbox defaults to unchecked
         fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
-        fill_in I18n.t("forms.units.fields.model"), with: "Test Model"
         fill_in I18n.t("forms.units.fields.serial"), with: "NEWTEST123"
         fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
         fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
@@ -366,7 +365,6 @@ RSpec.describe "Units", type: :request do
         fill_in I18n.t("forms.units.fields.name"), with: "Unit with Photo"
         # Has slide checkbox defaults to unchecked
         fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
-        fill_in I18n.t("forms.units.fields.model"), with: "Test Model"
         fill_in I18n.t("forms.units.fields.serial"), with: "PHOTO123"
         fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
         fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
@@ -445,7 +443,6 @@ RSpec.describe "Units", type: :request do
       fill_in I18n.t("forms.units.fields.name"), with: "Protected Unit"
       # Has slide checkbox defaults to unchecked
       fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
-      fill_in I18n.t("forms.units.fields.model"), with: "Test Model"
       fill_in I18n.t("forms.units.fields.serial"), with: "PROTECT123"
       fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
       fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
@@ -589,8 +586,7 @@ RSpec.describe "Units", type: :request do
             operator: "Test Operator",
             width: 5.0,
             length: 4.0,
-            height: 3.0,
-            model: "Test Model"
+            height: 3.0
           }
         }
 

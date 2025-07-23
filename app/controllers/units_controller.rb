@@ -215,7 +215,6 @@ class UnitsController < ApplicationController
       description
       manufacture_date
       manufacturer
-      model
       name
       operator
       photo

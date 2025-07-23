@@ -26,8 +26,6 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       fill_in_form :units, :operator, "Test Operator"
       fill_in_form :units, :description, "Test Description"
 
-      fill_in_form :units, :model, "Test Model"
-
       submit_form :units
 
       expect(page).to have_content(I18n.t("units.messages.created"))

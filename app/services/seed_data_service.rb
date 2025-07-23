@@ -99,7 +99,6 @@ class SeedDataService
         serial: "SEED-#{Date.current.year}-#{SecureRandom.hex(4).upcase}",
         description: generate_description(config[:name]),
         manufacturer: config[:manufacturer],
-        model: "Model #{rand(100..999)}",
         operator: STEFAN_OWNER_NAMES.sample,
         is_seed: true
       )

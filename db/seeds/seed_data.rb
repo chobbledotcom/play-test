@@ -71,7 +71,6 @@ module SeedData
   def self.structure_fields(passed: true)
     {
       seam_integrity_pass: check_passed?(passed),
-      uses_lock_stitching_pass: check_passed?(passed),
       air_loss_pass: check_passed?(passed),
       straight_walls_pass: check_passed?(passed),
       sharp_edges_pass: check_passed?(passed),
@@ -99,9 +98,6 @@ module SeedData
       seam_integrity_comment: passed ?
         "All seams in good condition" :
         "Minor thread loosening noted",
-      uses_lock_stitching_comment: passed ?
-        "Lock stitching intact throughout" :
-        "Some lock stitching showing wear",
       stitch_length_comment: "Measured at regular intervals"
     }
   end

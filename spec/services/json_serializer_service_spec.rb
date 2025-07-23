@@ -211,10 +211,10 @@ RSpec.describe JsonSerializerService do
       included_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Verify we're including the expected number of fields
-      expect(included_fields.count).to eq(8)
+      expect(included_fields.count).to eq(7)
 
       # Verify critical fields are included
-      %w[name serial manufacturer operator description model].each do |field|
+      %w[name serial manufacturer operator description].each do |field|
         expect(json).to have_key(field.to_sym)
       end
     end

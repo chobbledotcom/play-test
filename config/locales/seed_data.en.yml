@@ -32,8 +32,6 @@ en:
       anchor_wear: "Some wear visible on anchor points"
       seams_good: "All seams in good condition"
       seams_wear: "Minor thread loosening noted"
-      lock_stitch_good: "Lock stitching intact throughout"
-      lock_stitch_wear: "Some lock stitching showing wear"
       stitch_measured: "Measured at regular intervals"
       rope_wear: "Rope shows signs of wear"
       fabric_good: "Fabric in good condition"

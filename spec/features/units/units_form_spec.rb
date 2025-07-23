@@ -15,7 +15,6 @@ RSpec.describe "Units Form", type: :feature do
     it "successfully creates a unit with valid data" do
       fill_in_form :units, :name, "Test Bouncy Castle"
       fill_in_form :units, :manufacturer, "JumpCo"
-      fill_in_form :units, :model, "JC-2000"
       fill_in_form :units, :serial, "ASSET-001"
       fill_in_form :units, :description, "Large bouncy castle for events"
       fill_in_form :units, :operator, "Test Company Ltd"
