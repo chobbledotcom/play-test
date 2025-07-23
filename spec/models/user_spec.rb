@@ -129,25 +129,28 @@ RSpec.describe User, type: :model do
       expect(user.is_active?).to be false # Yesterday means inactive
     end
 
-    describe "#is_active?" do
-      it "returns true when active_until is nil" do
-        user = create(:user, active_until: nil)
-        expect(user.is_active?).to be true
-      end
+    describe "#is_active? and activation behavior" do
+      # Basic is_active? tests are in user_activity_spec.rb
+      # Here we test activation/deactivation scenarios
 
-      it "returns true when active_until is in the future" do
-        user = create(:user, active_until: Date.current + 1.day)
-        expect(user.is_active?).to be true
-      end
+      context "with SIMPLE_USER_ACTIVATION enabled" do
+        it "simulates activation by setting active_until far in future" do
+          user = create(:user, active_until: Date.current - 1.day)
+          expect(user.is_active?).to be false
 
-      it "returns true when active_until is today" do
-        user = create(:user, active_until: Date.current)
-        expect(user.is_active?).to be true
-      end
+          # Simulate activation
+          user.update(active_until: Date.current + 1000.years)
+          expect(user.is_active?).to be true
+        end
 
-      it "returns false when active_until is in the past" do
-        user = create(:user, active_until: Date.current - 1.day)
-        expect(user.is_active?).to be false
+        it "simulates deactivation by setting active_until to today" do
+          user = create(:user, active_until: Date.current + 1.year)
+          expect(user.is_active?).to be true
+
+          # Simulate deactivation
+          user.update(active_until: Date.current)
+          expect(user.is_active?).to be false
+        end
       end
     end
 

@@ -111,7 +111,7 @@ class InspectionWorkflow
   end
 
   def activate_user
-    @user.update!(active_until: 5.minutes.from_now)
+    @user.update!(active_until: Date.current + 1.day)
   end
 
   def verify_no_warning_after_activation

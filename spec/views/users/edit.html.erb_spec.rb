@@ -23,7 +23,15 @@ RSpec.describe "users/edit.html.erb", type: :view do
     # Admin users should see name field and other admin controls
     expect(rendered).to have_field("Name")
     expect(rendered).to have_field("RPII Inspector No")
-    expect(rendered).to have_field("Active Until")
+
+    if ENV["SIMPLE_USER_ACTIVATION"] == "true"
+      # Check for activation status display instead of field
+      expect(rendered).to have_content(I18n.t("users.labels.activated_at")) ||
+        have_content(I18n.t("users.labels.deactivated_at"))
+    else
+      expect(rendered).to have_field("Active Until")
+    end
+
     expect(rendered).to have_select("Inspection Company")
     expect(rendered).to have_button("Delete")
   end

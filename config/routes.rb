@@ -29,6 +29,8 @@ Rails.application.routes.draw do
       post "verify_rpii"
       post "add_seeds"
       delete "delete_seeds"
+      post "activate"
+      patch "deactivate"
     end
   end
 

@@ -41,7 +41,7 @@ class User < ApplicationRecord
   before_create :set_inactive_on_signup
 
   def is_active?
-    active_until.nil? || active_until >= Date.current
+    active_until.nil? || active_until > Date.current
   end
 
   alias_method :can_create_inspection?, :is_active?

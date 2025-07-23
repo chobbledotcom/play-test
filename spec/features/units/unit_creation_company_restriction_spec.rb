@@ -125,8 +125,15 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       logout
       sign_in(admin_user)
       visit edit_user_path(active_user)
-      fill_in "user_active_until", with: (Date.current - 1.day).strftime("%Y-%m-%d")
-      click_button I18n.t("users.buttons.update_user")
+
+      if ENV["SIMPLE_USER_ACTIVATION"] == "true"
+        # Use the deactivate button
+        click_button I18n.t("users.buttons.deactivate")
+      else
+        # Use the date field
+        fill_in "user_active_until", with: (Date.current - 1.day).strftime("%Y-%m-%d")
+        click_button I18n.t("users.buttons.update_user")
+      end
 
       logout
       sign_in(active_user)

@@ -30,7 +30,15 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       expect_field_present(:user_edit, :name)
       expect_field_present(:user_edit, :email)
       expect_field_present(:user_edit, :rpii_inspector_number)
-      expect_field_present(:user_edit, :active_until)
+
+      if ENV["SIMPLE_USER_ACTIVATION"] == "true"
+        # Check for activation status display instead of field
+        expect(page).to have_content(I18n.t("users.labels.activated_at")) ||
+          have_content(I18n.t("users.labels.deactivated_at"))
+      else
+        expect_field_present(:user_edit, :active_until)
+      end
+
       expect_field_present(:user_edit, :inspection_company_id)
     end
   end

@@ -5,7 +5,21 @@
     <%= render 'form/text_field', field: :password, type: :password_field %>
     <%= render 'form/text_field', field: :password_confirmation, type: :password_field %>
     <%= render 'form/text_field', field: :rpii_inspector_number %>
-    <%= render 'form/date_field', field: :active_until %>
+    <% if ENV["SIMPLE_USER_ACTIVATION"] == "true" %>
+      <%
+        if @user.active_until&.future?
+          label_key = 'users.labels.activated_at'
+          display_date = l(@user.active_until - 1000.years, format: :short)
+        else
+          label_key = 'users.labels.deactivated_at'
+          display_date = @user.active_until ? l(@user.active_until, format: :short) : t('users.messages.last_active_never')
+        end
+      %>
+      <%= form.label :active_until, t(label_key) %>
+      <p><%= display_date %></p>
+    <% else %>
+      <%= render 'form/date_field', field: :active_until %>
+    <% end %>
     <%= render 'form/select',
         field: :inspection_company_id,
         options: options_for_select(
@@ -28,6 +42,23 @@
       <% end %>
     </div>
   </article>
+<% end %>
+
+<% if ENV["SIMPLE_USER_ACTIVATION"] == "true" %>
+  <% if @user.active_until&.future? %>
+    <article>
+      <%= button_to t('users.buttons.deactivate'),
+          deactivate_user_path(@user),
+          method: :patch,
+          data: { confirm: t('users.messages.deactivate_confirm', email: @user.email) } %>
+    </article>
+  <% else %>
+    <article>
+      <%= button_to t('users.buttons.activate'),
+          activate_user_path(@user),
+          method: :post %>
+    </article>
+  <% end %>
 <% end %>
 
 <% if @user.has_seed_data? %>

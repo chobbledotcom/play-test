@@ -176,6 +176,18 @@ class UsersController < ApplicationController
     redirect_to edit_user_path(@user)
   end
 
+  def activate
+    @user.update(active_until: 1000.years.from_now)
+    flash[:notice] = I18n.t("users.messages.user_activated")
+    redirect_to edit_user_path(@user)
+  end
+
+  def deactivate
+    @user.update(active_until: Time.current)
+    flash[:notice] = I18n.t("users.messages.user_deactivated")
+    redirect_to edit_user_path(@user)
+  end
+
   private
 
   def get_rpii_error_message(result)

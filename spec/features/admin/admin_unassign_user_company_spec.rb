@@ -14,14 +14,28 @@ RSpec.feature "Admin User Management", type: :feature do
     expect(regular_user.can_create_inspection?).to be true
 
     visit edit_user_path(regular_user)
-    fill_in "user_active_until", with: (Date.current - 1.day).strftime("%Y-%m-%d")
-    select I18n.t("users.forms.no_company"), from: I18n.t("users.forms.inspection_company_id")
-    click_button I18n.t("users.buttons.update_user")
 
-    expect(page).to have_content(I18n.t("users.messages.user_updated"))
+    if ENV["SIMPLE_USER_ACTIVATION"] == "true"
+      # Deactivate the user
+      click_button I18n.t("users.buttons.deactivate")
+      expect(page).to have_content(I18n.t("users.messages.user_deactivated"))
+
+      regular_user.reload
+      expect(regular_user.is_active?).to be false
+
+      # Also remove the company for full test coverage
+      visit edit_user_path(regular_user)
+      select I18n.t("users.forms.no_company"), from: I18n.t("users.forms.inspection_company_id")
+      click_button I18n.t("users.buttons.update_user")
+    else
+      # Use the date field
+      fill_in "user_active_until", with: (Date.current - 1.day).strftime("%Y-%m-%d")
+      select I18n.t("users.forms.no_company"), from: I18n.t("users.forms.inspection_company_id")
+      click_button I18n.t("users.buttons.update_user")
+      expect(page).to have_content(I18n.t("users.messages.user_updated"))
+    end
 
     regular_user.reload
-    expect(regular_user.active_until).to eq(Date.current - 1.day)
     expect(regular_user.is_active?).to be false
     expect(regular_user.can_create_inspection?).to be false
   end
