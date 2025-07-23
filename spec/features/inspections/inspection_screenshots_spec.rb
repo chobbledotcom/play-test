@@ -8,14 +8,14 @@ RSpec.feature "Complete Inspection Workflow",
   skip: "Run manually with --tag screenshot" do
   scenario "complete workflow with prefilling - no slide or enclosure",
     js: true do
-    InspectionWorkflow.new(
+    InspectionScreenshotWorkflow.new(
       has_slide: true,
       is_totally_enclosed: true
     ).execute
   end
 end
 
-class InspectionWorkflow
+class InspectionScreenshotWorkflow
   include Capybara::DSL
   include RSpec::Matchers
   include Rails.application.routes.url_helpers
@@ -25,16 +25,14 @@ class InspectionWorkflow
   include FormHelpers
   include GuideScreenshotHelpers
 
-  BOOLEAN_FIELDS = %w[has_slide is_totally_enclosed passed].freeze
-
   attr_reader :user
   attr_reader :unit
   attr_reader :inspection
   attr_reader :second_inspection
   attr_reader :options
 
-  def initialize(has_slide:, is_totally_enclosed:)
-    @options = {has_slide:, is_totally_enclosed:}
+  def initialize(has_slide:, is_totally_enclosed:, unit_type: :bouncy_castle)
+    @options = {has_slide:, is_totally_enclosed:, unit_type:}
   end
 
   def t(key, **options)
@@ -169,16 +167,6 @@ class InspectionWorkflow
     capture_guide_screenshot("Inspection Summary - Incomplete")
   end
 
-  def fill_inspection_field(field_name, value)
-    if BOOLEAN_FIELDS.include?(field_name.to_s)
-      value ?
-        check_form_radio(:inspection, field_name) :
-        uncheck_form_radio(:inspection, field_name)
-    else
-      fill_in_form :inspection, field_name, value
-    end
-  end
-
   def fill_all_assessments
     applicable_tabs.each do |tab_name|
       fill_assessment_tab(tab_name)
@@ -201,43 +189,6 @@ class InspectionWorkflow
     submit_form tab_name.to_sym
     expect(page).to have_selector "#form_save_message"
     capture_guide_screenshot("#{tab_name.humanize} Assessment - Saved")
-  end
-
-  def fill_assessment_field(tab_name, field_name, value)
-    return if field_name.to_s.end_with?("_comment")
-
-    field_label = get_field_label(tab_name, field_name)
-
-    case value
-    when true, false
-      if field_name.to_s.end_with?("_pass") || field_name.to_s == "passed"
-        choose_pass_fail(field_label, value)
-      elsif BOOLEAN_FIELDS.include?(field_name.to_s)
-        value ? check_form_radio(tab_name.to_sym, field_name) :
-                uncheck_form_radio(tab_name.to_sym, field_name)
-      else
-        choose_yes_no(field_label, value)
-      end
-    else
-      fill_in_form(tab_name.to_sym, field_name, value) if value.present?
-    end
-  end
-
-  def get_field_label(tab_name, field_name)
-    field_str = field_name.to_s
-
-    if field_str.end_with?("_pass")
-      pass_key = "forms.#{tab_name}.fields.#{field_name}"
-      base_key = "forms.#{tab_name}.fields.#{field_str.chomp("_pass")}"
-
-      I18n.exists?(pass_key) ? I18n.t(pass_key) : I18n.t(base_key)
-    else
-      I18n.t("forms.#{tab_name}.fields.#{field_name}")
-    end
-  end
-
-  def click_units_button(key)
-    click_button t("units.buttons.#{key}")
   end
 
   def mark_inspection_complete

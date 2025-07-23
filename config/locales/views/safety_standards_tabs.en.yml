@@ -13,7 +13,7 @@ en:
         stop_wall: "If stop wall fitted: adds 50cm to required run-out length"
         wall_height_runout: "Wall height on run-out sides: 50% of user height"
       containing_wall_heights:
-        title: "Containing Wall Heights for Slides:"
+        title: "Containing Platform Wall Heights for Slides:"
         platform_height: "Platform Height"
         requirement: "Requirement"
         under_600mm: "Under 600mm"

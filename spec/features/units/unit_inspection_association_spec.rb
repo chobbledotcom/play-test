@@ -37,7 +37,7 @@ RSpec.feature "Unit Inspection Association", type: :feature do
       fill_unit_field(:serial, "UFI-2024-001")
       fill_unit_field(:manufacturer, "Inspection Manufacturer")
       fill_unit_field(:description, "Unit created from inspection")
-      fill_unit_field(:owner, "Inspection Owner Ltd")
+      fill_unit_field(:operator, "Inspection Operator Ltd")
       click_button I18n.t("forms.units.submit")
 
       expect(page).to have_content(I18n.t("units.messages.created_from_inspection"))

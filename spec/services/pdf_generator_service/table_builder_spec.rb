@@ -364,7 +364,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         expect(flattened).to include(unit.name)
         expect(flattened).to include(unit.serial)
         expect(flattened).to include(unit.manufacturer)
-        expect(flattened).to include(unit.owner)
+        expect(flattened).to include(unit.operator)
       end
     end
 
@@ -388,7 +388,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         expect(flattened).to include("") # empty description
         expect(flattened).to include(unit.serial)
         expect(flattened).to include(unit.manufacturer)
-        expect(flattened).to include(unit.owner)
+        expect(flattened).to include(unit.operator)
       end
     end
 

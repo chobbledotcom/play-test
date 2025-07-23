@@ -100,7 +100,7 @@ class SeedDataService
         description: generate_description(config[:name]),
         manufacturer: config[:manufacturer],
         model: "Model #{rand(100..999)}",
-        owner: STEFAN_OWNER_NAMES.sample,
+        operator: STEFAN_OWNER_NAMES.sample,
         is_seed: true
       )
 

@@ -18,20 +18,6 @@ Rename to "Save Asssement" to "Continue", and have it automatically continue to 
 
 Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and then force that theme to be set for all users of the RPII's instance. Also, make the homepage and about page HTML editable by admins.
 
-## Text Renames
-
-**Time: 30m**
-
-"Owner" => "Operator"
-"Straight Walls" => "Vertical Walls (+/- 5%)"
-"Sharp Edges" => "Sharp angles, oblique edges"
-"Unit Stable" => "Unit Stability"
-"Critical Fall Off Height" => "Fall Off Height"
-"Negative Adjustment" => "Negative Play Space Adjustment (m2)"
-"Tallest User Height" => "Maximum User Height"
-
-Slides - "Containing Wall Height" => "Containing Platform Wall Height"
-
 ## Field Deletions
 
 **Time: 20m**
@@ -86,19 +72,43 @@ Slides - "Containing Wall Height" => "Containing Platform Wall Height"
 - Blower
   - Blower Serial => remove pass/fail/comment
 
-## Indoor / Anchorage change
-
-**Time: 15m**
-
-- Add new field to inspections and units, "indoor_only"
-- Exclude the anchorage section if that's selected
-
 ## Small Changes
 
 **Time: 10m**
 
 - Risk Assessment => make box significantly bigger by default
 - Mark as complete - "By continuing you confirm that the data you have entered is accurate"
+
+## Users
+
+**Time: 10m**
+
+Add "Activate" and "Deactivate" buttons which sets active_until date
+
+---
+
+# Done
+
+## Text Renames
+
+**Time: 30m**
+
+"Owner" => "Operator"
+"Straight Walls" => "Vertical Walls (+/- 5%)"
+"Sharp Edges" => "Sharp Angles or Oblique Edges"
+"Unit Stable" => "Unit Stability"
+"Critical Fall Off Height" => "Fall Off Height"
+"Negative Adjustment" => "Negative Play Space Adjustment (m2)"
+"Tallest User Height" => "Maximum User Height"
+
+Slides - "Containing Wall Height" => "Containing Platform Wall Height"
+
+## Indoor / Anchorage change
+
+**Time: 15m**
+
+- Add new field to inspections and units, "indoor_only"
+- Exclude the anchorage section if that's selected
 
 ## Additional Inspection Images
 
@@ -109,9 +119,3 @@ Add a link inside inspection results to upload images
 - Maximum 3 per inspection
 - Compress them
 - Show links in the reports: Photo 1, 2, 3
-
-## Users
-
-**Time: 10m**
-
-Add "Activate" and "Deactivate" buttons which sets active_until date

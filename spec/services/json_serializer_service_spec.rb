@@ -214,7 +214,7 @@ RSpec.describe JsonSerializerService do
       expect(included_fields.count).to eq(8)
 
       # Verify critical fields are included
-      %w[name serial manufacturer owner description model].each do |field|
+      %w[name serial manufacturer operator description model].each do |field|
         expect(json).to have_key(field.to_sym)
       end
     end
@@ -227,7 +227,7 @@ RSpec.describe JsonSerializerService do
       included_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Verify we're including the expected number of fields
-      expect(included_fields.count).to eq(14) # Actual count of included fields (includes new inspection_type field)
+      expect(included_fields.count).to eq(15) # Actual count of included fields (includes new inspection_type field and indoor_only)
 
       # Verify critical fields are included
       %w[inspection_date inspection_location passed complete_date].each do |field|

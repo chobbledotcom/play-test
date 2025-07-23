@@ -118,7 +118,7 @@ RSpec.describe "Seed Data", type: :model do
           expect(unit.serial).to be_present
           expect(unit.manufacturer).to be_present
           expect(unit.model).to be_present
-          expect(unit.owner).to be_present
+          expect(unit.operator).to be_present
           expect(unit.description).to be_present
           expect(unit.user).to be_present
         end

@@ -29,27 +29,27 @@ RSpec.describe "Units Index Title", type: :request do
       expect(response.body).to include("<h1>#{expected_title}</h1>")
     end
 
-    it "includes owner in title when filtered" do
-      get units_path(owner: "Stef's Rentals")
+    it "includes operator in title when filtered" do
+      get units_path(operator: "Stef's Rentals")
 
       expect(response.body).to include("<h1>Units - Stef&#39;s Rentals</h1>")
     end
 
     it "combines multiple filters in title" do
-      get units_path(status: "overdue", manufacturer: "Bouncy Co", owner: "John's Events")
+      get units_path(status: "overdue", manufacturer: "Bouncy Co", operator: "John's Events")
 
       expect(response.body).to include("<h1>Units - Overdue - Bouncy Co - John&#39;s Events</h1>")
     end
 
     it "ignores empty string parameters" do
-      get units_path(manufacturer: "", owner: "")
+      get units_path(manufacturer: "", operator: "")
 
       expect(response.body).to include("<h1>#{I18n.t("units.titles.index")}</h1>")
       expect(response.body).not_to include(" - ")
     end
 
     it "ignores nil parameters" do
-      get units_path(manufacturer: nil, owner: nil)
+      get units_path(manufacturer: nil, operator: nil)
 
       expect(response.body).to include("<h1>#{I18n.t("units.titles.index")}</h1>")
       expect(response.body).not_to include(" - ")

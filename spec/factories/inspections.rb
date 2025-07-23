@@ -10,6 +10,7 @@ FactoryBot.define do
     passed { true }
     has_slide { true }
     is_totally_enclosed { true }
+    indoor_only { false }
     inspection_date { Date.current }
     unique_report_number { nil } # User provides this manually
     complete_date { nil }
@@ -111,6 +112,10 @@ FactoryBot.define do
 
     trait :without_slide do
       has_slide { false }
+    end
+
+    trait :indoor_only do
+      indoor_only { true }
     end
 
     trait :totally_enclosed do

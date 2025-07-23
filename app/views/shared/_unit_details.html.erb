@@ -86,10 +86,10 @@
       </li>
       
       <li>
-        <strong><%= t("units.fields.owner") %>:</strong>
-        <span><%= link_to unit.owner, 
-                         units_path(owner: unit.owner, anchor: "main"),
-                         title: "View all units owned by #{unit.owner}" %></span>
+        <strong><%= t("units.fields.operator") %>:</strong>
+        <span><%= link_to unit.operator, 
+                         units_path(operator: unit.operator, anchor: "main"),
+                         title: "View all units operated by #{unit.operator}" %></span>
       </li>
       
       <% if last_inspection %>

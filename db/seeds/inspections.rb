@@ -81,7 +81,8 @@ failed_inspection = Inspection.create!(
     length: 12.0,
     height: 3.5,
     has_slide: true,
-    is_totally_enclosed: false
+    is_totally_enclosed: false,
+    indoor_only: false
   )
 )
 create_assessments_for_inspection(failed_inspection, $obstacle_course, passed: false)
@@ -115,6 +116,7 @@ Inspection.create!(
     length: 15.0,
     height: 7.5,
     has_slide: true,
+    indoor_only: false,
     risk_assessment: "Inspection in progress"
   )
 )
@@ -142,11 +144,11 @@ in_progress.anchorage_assessment.update!(
 [$soft_play_unit, $castle_slide_combo, $bungee_run].each do |unit|
   dimensions = case unit
   when $soft_play_unit
-    {width: 6.0, length: 6.0, height: 2.5, has_slide: false, is_totally_enclosed: true}
+    {width: 6.0, length: 6.0, height: 2.5, has_slide: false, is_totally_enclosed: true, indoor_only: true}
   when $castle_slide_combo
-    {width: 5.5, length: 7.0, height: 4.0, has_slide: true, is_totally_enclosed: false}
+    {width: 5.5, length: 7.0, height: 4.0, has_slide: true, is_totally_enclosed: false, indoor_only: false}
   when $bungee_run
-    {width: 4.0, length: 10.0, height: 2.5, has_slide: false, is_totally_enclosed: false}
+    {width: 4.0, length: 10.0, height: 2.5, has_slide: false, is_totally_enclosed: false, indoor_only: false}
   end
 
   passed_status = rand(0..4) > 0
@@ -180,7 +182,8 @@ lead_inspection = Inspection.create!(
     length: 4.5,
     height: 3.5,
     has_slide: false,
-    is_totally_enclosed: false
+    is_totally_enclosed: false,
+    indoor_only: false
   )
 )
 create_assessments_for_inspection(lead_inspection, $castle_standard, passed: true)
@@ -197,7 +200,8 @@ complete_inspection = Inspection.create!(
     length: 9.0,
     height: 4.5,
     has_slide: false,
-    is_totally_enclosed: false
+    is_totally_enclosed: false,
+    indoor_only: false
   )
 )
 create_assessments_for_inspection(complete_inspection, $castle_large, passed: true)
