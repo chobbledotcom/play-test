@@ -22,8 +22,6 @@
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'preferences' do %>
-    <%= render 'form/text_field', field: :default_inspection_location %>
-
     <%= render 'form/select',
       field: :theme,
       options: options_for_select([

@@ -11,7 +11,6 @@ en:
         inspection_results: "Inspection Results"
       fields:
         id: "Public Inspection ID"
-        inspection_location: "Inspection Location"
         inspection_date: "Inspection Date"
         reinspection_date: "Reinspection Date"
         unique_report_number: "Internal ID"

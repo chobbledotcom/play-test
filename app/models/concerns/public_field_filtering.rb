@@ -21,7 +21,6 @@ module PublicFieldFiltering
   PDF_EXCLUDED_FIELDS = %w[
     complete_date
     inspection_date
-    inspection_location
   ].freeze
 
   # Fields excluded from PDFs (combines shared + PDF-specific)

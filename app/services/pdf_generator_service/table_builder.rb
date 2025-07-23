@@ -91,8 +91,7 @@ class PdfGeneratorService
       table_data << [
         I18n.t("pdf.unit.fields.date"),
         I18n.t("pdf.unit.fields.result"),
-        I18n.t("pdf.unit.fields.inspector"),
-        I18n.t("pdf.inspection.fields.inspection_location")
+        I18n.t("pdf.unit.fields.inspector")
       ]
 
       # Data rows
@@ -114,8 +113,7 @@ class PdfGeneratorService
           else
             I18n.t("shared.fail_pdf")
           end,
-          inspector_text,
-          inspection.inspection_location || I18n.t("pdf.unit.fields.na")
+          inspector_text
         ]
       end
 
@@ -149,12 +147,11 @@ class PdfGeneratorService
           end
         end
 
-        # Column widths - specific widths for date and result; others fill remaining space
+        # Column widths - specific widths for date and result; inspector fills remaining space
         remaining_width = pdf.bounds.width - HISTORY_DATE_COLUMN_WIDTH - HISTORY_RESULT_COLUMN_WIDTH
-        inspector_width = remaining_width * HISTORY_INSPECTOR_WIDTH_PERCENT
-        location_width = remaining_width * HISTORY_LOCATION_WIDTH_PERCENT
+        inspector_width = remaining_width
 
-        t.column_widths = [HISTORY_DATE_COLUMN_WIDTH, HISTORY_RESULT_COLUMN_WIDTH, inspector_width, location_width]
+        t.column_widths = [HISTORY_DATE_COLUMN_WIDTH, HISTORY_RESULT_COLUMN_WIDTH, inspector_width]
       end
 
       pdf.move_down 15
@@ -230,7 +227,6 @@ class PdfGeneratorService
         inspector_name
       end
 
-      inspection_location = inspection&.inspection_location || ""
       issued_date = if inspection&.inspection_date
         Utilities.format_date(inspection.inspection_date)
       else
@@ -254,8 +250,8 @@ class PdfGeneratorService
         [
           I18n.t("pdf.inspection.fields.size_m"),
           dimensions_text,
-          I18n.t("pdf.inspection.fields.inspection_location"),
-          inspection_location
+          I18n.t("pdf.inspection.fields.operator"),
+          unit.operator.presence || ""
         ],
         [
           I18n.t("pdf.inspection.fields.serial"),

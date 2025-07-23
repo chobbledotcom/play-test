@@ -13,15 +13,6 @@ RSpec.describe Inspection, type: :model do
       error_msg = "can't be blank"
       expect(invalid_inspection.errors[:inspection_date]).to include(error_msg)
     end
-
-    it "requires inspection_location when complete" do
-      invalid_inspection = build(:inspection, inspection_location: nil,
-        complete_date: Time.current)
-      expect(invalid_inspection).not_to be_valid
-      error_msg = "can't be blank"
-      errors = invalid_inspection.errors[:inspection_location]
-      expect(errors).to include(error_msg)
-    end
   end
 
   describe "#complete?" do

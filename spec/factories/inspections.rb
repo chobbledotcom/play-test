@@ -6,7 +6,6 @@ FactoryBot.define do
     # Always use the user's inspection company
     inspector_company { user.inspection_company }
 
-    inspection_location { "Test Location" }
     passed { true }
     has_slide { true }
     is_totally_enclosed { true }
@@ -64,7 +63,6 @@ FactoryBot.define do
     end
 
     trait :with_unicode_data do
-      inspection_location { "Meeting Room 🏢 3F" }
       risk_assessment { "❗️Tested with special 🔌 adapter. Result: ✅" }
       association :unit, factory: [:unit, :with_unicode_serial]
     end
@@ -94,7 +92,7 @@ FactoryBot.define do
     end
 
     trait :sql_injection_test do
-      inspection_location { "Location'); UPDATE users SET admin=true; --" }
+      risk_assessment { "Risk'); UPDATE users SET admin=true; --" }
     end
 
     trait :with_unicode_data do

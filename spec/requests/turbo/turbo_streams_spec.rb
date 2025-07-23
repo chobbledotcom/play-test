@@ -10,7 +10,7 @@ RSpec.describe "Turbo Streams", type: :request do
   describe "content negotiation" do
     it "returns turbo streams when requested" do
       patch inspection_path(inspection),
-        params: {inspection: {inspection_location: "Test"}},
+        params: {inspection: {comments: "Test"}},
         headers: turbo_headers
 
       expect(response.content_type).to include("text/vnd.turbo-stream.html")
@@ -19,7 +19,7 @@ RSpec.describe "Turbo Streams", type: :request do
 
     it "returns JSON when requested" do
       patch inspection_path(inspection),
-        params: {inspection: {inspection_location: "Test"}},
+        params: {inspection: {comments: "Test"}},
         headers: {"Accept" => "application/json"}
 
       expect(response.content_type).to include("application/json")
@@ -28,7 +28,7 @@ RSpec.describe "Turbo Streams", type: :request do
 
     it "redirects for regular HTML" do
       patch inspection_path(inspection),
-        params: {inspection: {inspection_location: "Test"}}
+        params: {inspection: {comments: "Test"}}
 
       expect(response).to redirect_to(inspection_path(inspection))
     end
@@ -37,7 +37,7 @@ RSpec.describe "Turbo Streams", type: :request do
   describe "inspection updates" do
     it "updates via turbo with validation errors" do
       patch inspection_path(inspection),
-        params: {inspection: {inspection_location: ""}},
+        params: {inspection: {comments: ""}},
         headers: turbo_headers
 
       expect(response).to have_http_status(:ok)
@@ -48,7 +48,7 @@ RSpec.describe "Turbo Streams", type: :request do
       completed = create(:inspection, :completed, user: user)
 
       patch inspection_path(completed),
-        params: {inspection: {inspection_location: "Test"}},
+        params: {inspection: {comments: "Test"}},
         headers: turbo_headers
 
       expect(response).to redirect_to(inspection_path(completed))

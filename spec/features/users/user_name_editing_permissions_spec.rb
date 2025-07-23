@@ -82,19 +82,16 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
     scenario "Regular user can still edit preferences but not name" do
       visit change_settings_user_path(regular_user)
 
-      expect_field_present(:user_settings, :default_inspection_location)
       expect_field_present(:user_settings, :theme)
 
       theme_field = I18n.t("forms.user_settings.fields.theme")
       select I18n.t("users.options.theme_dark"), from: theme_field
-      fill_in_form(:user_settings, :default_inspection_location, "Test Location")
       submit_form(:user_settings)
 
       expect(page).to have_content(I18n.t("users.messages.settings_updated"))
 
       regular_user.reload
       expect(regular_user.theme).to eq("dark")
-      expect(regular_user.default_inspection_location).to eq("Test Location")
 
       expect(regular_user.name).to eq("Original Name")
     end

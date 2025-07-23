@@ -29,8 +29,7 @@ class JsonSerializerService
             passed: inspection.passed,
             complete: inspection.complete?,
             inspector_company: inspection.inspector_company&.name,
-            unique_report_number: inspection.unique_report_number,
-            inspection_location: inspection.inspection_location
+            unique_report_number: inspection.unique_report_number
           }
         end
 

@@ -110,7 +110,6 @@ Inspection.create!(
     unit: $giant_slide,
     inspector_company: $stefan_testing,
     inspection_date: Date.current,
-    inspection_location: nil,
     complete_date: nil,
     width: 5.0,
     length: 15.0,

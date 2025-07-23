@@ -11,7 +11,6 @@ en:
         address: "Address"
         country: "Country"
         postal_code: "Postal Code"
-        default_inspection_location: "Default Inspection Location"
         theme: "Theme"
         logo: "Company Logo"
         signature: "Signature"

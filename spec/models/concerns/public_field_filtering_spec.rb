@@ -77,7 +77,6 @@ RSpec.describe PublicFieldFiltering do
         expected_fields = %w[
           complete_date
           inspection_date
-          inspection_location
         ]
 
         expect(described_class::PDF_EXCLUDED_FIELDS).to eq(expected_fields)

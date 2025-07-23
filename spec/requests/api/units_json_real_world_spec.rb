@@ -11,15 +11,13 @@ RSpec.describe "Unit JSON real-world scenarios", type: :request do
         @inspection1 = create(:inspection, :completed,
           user: user,
           unit: unit,
-          inspection_date: 3.days.ago,
-          inspection_location: "Location A")
+          inspection_date: 3.days.ago)
 
         @inspection2 = create(:inspection, :completed,
           user: user,
           unit: unit,
           passed: false,
-          inspection_date: 1.day.ago,
-          inspection_location: "Location B")
+          inspection_date: 1.day.ago)
 
         # Also create a draft inspection that should NOT appear
         @draft = create(:inspection,
@@ -51,11 +49,9 @@ RSpec.describe "Unit JSON real-world scenarios", type: :request do
         # Verify the order (most recent first)
         first = json["inspection_history"][0]
         expect(first["passed"]).to eq(false)
-        expect(first["inspection_location"]).to eq("Location B")
 
         second = json["inspection_history"][1]
         expect(second["passed"]).to eq(true)
-        expect(second["inspection_location"]).to eq("Location A")
       end
     end
 

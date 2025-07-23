@@ -190,9 +190,9 @@ RSpec.describe PdfGeneratorService::TableBuilder do
     let(:user2) { create(:user, name: "Jane Doe", rpii_inspector_number: "RPII456", inspection_company: company2) }
     let(:inspections) do
       [
-        create(:inspection, :passed, inspection_date: Date.new(2024, 1, 15), user: user1, inspection_location: "Site A"),
-        create(:inspection, :failed, inspection_date: Date.new(2024, 2, 20), user: user2, inspection_location: "Site B"),
-        create(:inspection, inspection_date: Date.new(2024, 3, 1), user: user1, inspection_location: nil, passed: nil)
+        create(:inspection, :passed, inspection_date: Date.new(2024, 1, 15), user: user1),
+        create(:inspection, :failed, inspection_date: Date.new(2024, 2, 20), user: user2),
+        create(:inspection, inspection_date: Date.new(2024, 3, 1), user: user1, passed: nil)
       ]
     end
 
@@ -238,8 +238,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       expected_header = [
         I18n.t("pdf.unit.fields.date"),
         I18n.t("pdf.unit.fields.result"),
-        I18n.t("pdf.unit.fields.inspector"),
-        I18n.t("pdf.inspection.fields.inspection_location")
+        I18n.t("pdf.unit.fields.inspector")
       ]
 
       expected_data = [expected_header] + inspections.map { |i|
@@ -254,8 +253,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         [
           PdfGeneratorService::Utilities.format_date(i.inspection_date),
           i.passed ? I18n.t("shared.pass_pdf") : I18n.t("shared.fail_pdf"),
-          inspector_text,
-          i.inspection_location || I18n.t("pdf.unit.fields.na")
+          inspector_text
         ]
       }
 
@@ -269,12 +267,11 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         [
           I18n.t("pdf.unit.fields.date"),
           I18n.t("pdf.unit.fields.result"),
-          I18n.t("pdf.unit.fields.inspector"),
-          I18n.t("pdf.inspection.fields.inspection_location")
+          I18n.t("pdf.unit.fields.inspector")
         ],
-        ["15 January, 2024", I18n.t("shared.pass_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)", "Site A"],
-        ["20 February, 2024", I18n.t("shared.fail_pdf"), "Jane Doe (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII456)", "Site B"],
-        ["1 March, 2024", I18n.t("shared.fail_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)", I18n.t("pdf.unit.fields.na")]
+        ["15 January, 2024", I18n.t("shared.pass_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)"],
+        ["20 February, 2024", I18n.t("shared.fail_pdf"), "Jane Doe (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII456)"],
+        ["1 March, 2024", I18n.t("shared.fail_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)"]
       ]
 
       described_class.create_inspection_history_table(pdf_double, title, inspections)
@@ -310,14 +307,11 @@ RSpec.describe PdfGeneratorService::TableBuilder do
     it "sets column widths correctly" do
       remaining_width = 500 - PdfGeneratorService::Configuration::HISTORY_DATE_COLUMN_WIDTH -
         PdfGeneratorService::Configuration::HISTORY_RESULT_COLUMN_WIDTH
-      inspector_width = remaining_width * PdfGeneratorService::Configuration::HISTORY_INSPECTOR_WIDTH_PERCENT
-      location_width = remaining_width * PdfGeneratorService::Configuration::HISTORY_LOCATION_WIDTH_PERCENT
 
       expected_widths = [
         PdfGeneratorService::Configuration::HISTORY_DATE_COLUMN_WIDTH,
         PdfGeneratorService::Configuration::HISTORY_RESULT_COLUMN_WIDTH,
-        inspector_width,
-        location_width
+        remaining_width
       ]
 
       described_class.create_inspection_history_table(pdf_double, title, inspections)
@@ -332,8 +326,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         expected_data = [[
           I18n.t("pdf.unit.fields.date"),
           I18n.t("pdf.unit.fields.result"),
-          I18n.t("pdf.unit.fields.inspector"),
-          I18n.t("pdf.inspection.fields.inspection_location")
+          I18n.t("pdf.unit.fields.inspector")
         ]]
 
         described_class.create_inspection_history_table(pdf_double, title, empty_inspections)

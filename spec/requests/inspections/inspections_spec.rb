@@ -11,7 +11,6 @@ RSpec.describe "Inspections", type: :request do
   let(:valid_inspection_attributes) do
     {
       inspection_date: Time.zone.today,
-      inspection_location: "Test Location",
       passed: true,
       comments: "Test comments",
       complete_date: nil

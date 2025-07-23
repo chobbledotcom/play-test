@@ -13,7 +13,6 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
         # Check specific field values
         nice_date = inspection.inspection_date.strftime("%F") # YYYY-MM-DD
         expect(json["inspection_date"]).to eq(nice_date)
-        expect(json["inspection_location"]).to eq(inspection.inspection_location)
         expect(json["passed"]).to eq(inspection.passed)
         expect(json["complete"]).to eq(inspection.complete?)
 
@@ -118,8 +117,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to include("application/json")
 
-        json = JSON.parse(response.body)
-        expect(json["inspection_location"]).to eq(inspection.inspection_location)
+        JSON.parse(response.body)
       end
     end
   end

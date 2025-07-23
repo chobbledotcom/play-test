@@ -24,13 +24,7 @@
         ] + operator_options(current_user), params[:operator]),
         {}, { onchange: "this.form.submit();" } %>
     
-    <%= form.select :inspection_location, 
-        options_for_select([
-          [t('inspections.filters.all_locations'), ""]
-        ] + @inspection_locations, params[:inspection_location]),
-        {}, { onchange: "this.form.submit();" } %>
-    
-    <% if params[:result].present? || params[:unit_id].present? || params[:query].present? || params[:operator].present? || params[:inspection_location].present? %>
+    <% if params[:result].present? || params[:unit_id].present? || params[:query].present? || params[:operator].present? %>
       <%= link_to t("ui.buttons.clear_filters"), inspections_path %>
     <% end %>
 <% end %>

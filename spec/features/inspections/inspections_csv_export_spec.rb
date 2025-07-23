@@ -10,7 +10,6 @@ RSpec.feature "Inspections CSV Export", type: :feature do
       user: user,
       unit: unit1,
       passed: true,
-      inspection_location: "Test Location 1",
       inspection_date: Date.current)
   end
 
@@ -19,7 +18,6 @@ RSpec.feature "Inspections CSV Export", type: :feature do
       user: user,
       unit: unit2,
       passed: nil,
-      inspection_location: "Test Location 2",
       inspection_date: Date.current - 1.day)
   end
 
@@ -41,7 +39,7 @@ RSpec.feature "Inspections CSV Export", type: :feature do
 
       expect(csv_lines.length).to eq(1) # Should only have complete inspection
 
-      key_headers = %w[id inspection_date inspection_location passed risk_assessment unit_name unit_serial unit_manufacturer inspector_company_name]
+      key_headers = %w[id inspection_date passed risk_assessment unit_name unit_serial unit_manufacturer inspector_company_name]
       key_headers.each do |header|
         expect(csv_lines.headers).to include(header)
       end
@@ -49,7 +47,6 @@ RSpec.feature "Inspections CSV Export", type: :feature do
       row = csv_lines.find { |row| row["unit_serial"] == "TU001" }
       expect(row).to be_present
       expect(row["unit_name"]).to eq("Test Unit 1")
-      expect(row["inspection_location"]).to eq("Test Location 1")
       expect(row["unit_manufacturer"]).to eq("Test Mfg")
       expect(row["passed"]).to eq("true")
 

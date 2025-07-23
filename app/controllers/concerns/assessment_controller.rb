@@ -52,7 +52,6 @@ module AssessmentController
   def render_edit_with_errors
     params[:tab] = assessment_type
     @inspection.association(assessment_association).target = @assessment
-    load_inspection_locations
     render "inspections/edit", status: :unprocessable_entity
   end
 
@@ -108,10 +107,6 @@ module AssessmentController
   def assessment_class
     # e.g. "MaterialsAssessmentsController" -> Assessments::MaterialsAssessment
     "Assessments::#{controller_name.singularize.camelize}".constantize
-  end
-
-  def load_inspection_locations
-    @inspection_locations = []
   end
 
   def set_previous_inspection
