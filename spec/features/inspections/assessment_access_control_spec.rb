@@ -44,8 +44,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
     page.driver.submit :patch, inspection_path(inspection2), {
       inspection: {
         user_height_assessment_attributes: {
-          containing_wall_height: 999.99,
-          platform_height: 888.88
+          containing_wall_height: 999.99
         }
       }
     }
@@ -55,7 +54,6 @@ RSpec.feature "Assessment Access Control", type: :feature do
     inspection2.reload
     assessment = inspection2.user_height_assessment
     expect(assessment.containing_wall_height).not_to eq(999.99)
-    expect(assessment.platform_height).not_to eq(888.88)
   end
 
   scenario "allows public access to inspection JSON data" do

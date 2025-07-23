@@ -14,6 +14,7 @@ STRUCTURE_SAMPLE_DATA = {
   trough_depth: 0.15,
   trough_adjacent_panel_width: 0.65,
   step_ramp_size: 0.3,
+  platform_height: 1.8,
 
   stitch_length_pass: true,
   stitch_length_comment: "Stitch length comment",
@@ -23,6 +24,7 @@ STRUCTURE_SAMPLE_DATA = {
   critical_fall_off_height_pass: true,
   trough_pass: true,
   step_ramp_size_pass: true,
+  platform_height_pass: true,
   entrapment_pass: false,
   markings_pass: true,
   grounding_pass: true,
@@ -30,6 +32,7 @@ STRUCTURE_SAMPLE_DATA = {
   unit_pressure_comment: "Unit pressure comment",
   critical_fall_off_height_comment: "Critical fall off height comment",
   step_ramp_size_comment: "Step ramp size comment",
+  platform_height_comment: "Platform height verified",
   trough_depth_comment: "Trough depth comment",
   trough_adjacent_panel_width_comment: "Trough adjacent panel width comment",
   trough_comment: "Trough comment"
@@ -91,7 +94,6 @@ FAN_SAMPLE_DATA = {
 USER_HEIGHT_SAMPLE_DATA = {
 
   containing_wall_height: 2.5,
-  platform_height: 1.8,
   tallest_user_height: 1.95,
   users_at_1000mm: 15,
   users_at_1200mm: 12,
@@ -102,7 +104,6 @@ USER_HEIGHT_SAMPLE_DATA = {
   negative_adjustment: 0.5,
 
   containing_wall_height_comment: "Height adequate for tallest users",
-  platform_height_comment: "Platform height verified",
   tallest_user_height_comment: "Maximum user height checked",
   play_area_length_comment: "Length measurement confirmed",
   play_area_width_comment: "Width adequate for capacity",

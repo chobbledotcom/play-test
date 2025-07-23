@@ -78,6 +78,7 @@ module SeedData
       stitch_length_pass: check_passed?(passed),
       blower_tube_length_pass: check_passed?(passed),
       step_ramp_size_pass: check_passed?(passed),
+      platform_height_pass: check_passed?(passed),
       critical_fall_off_height_pass: check_passed?(passed),
       unit_pressure_pass: check_passed?(passed),
       trough_pass: check_passed?(passed),
@@ -87,6 +88,7 @@ module SeedData
       unit_pressure: rand(1.0..3.0).round(1),
       blower_tube_length: rand(2.0..5.0).round(1),
       step_ramp_size: rand(200..400),
+      platform_height: rand(0.5..1.5).round(1),
       critical_fall_off_height: rand(0.5..2.0).round(1),
       trough_depth: rand(30..80).round(1),
       trough_adjacent_panel_width: rand(0.3..1.0).round(1),
@@ -94,7 +96,8 @@ module SeedData
       seam_integrity_comment: passed ?
         "All seams in good condition" :
         "Minor thread loosening noted",
-      stitch_length_comment: "Measured at regular intervals"
+      stitch_length_comment: "Measured at regular intervals",
+      platform_height_comment: "Platform height acceptable for age group"
     }
   end
 
@@ -148,7 +151,6 @@ module SeedData
   def self.user_height_fields(passed: true)
     {
       containing_wall_height: rand(1.0..2.0).round(1),
-      platform_height: rand(0.5..1.5).round(1),
       tallest_user_height: rand(1.2..1.8).round(1),
       users_at_1000mm: rand(0..5),
       users_at_1200mm: rand(2..8),
@@ -161,7 +163,6 @@ module SeedData
         "Capacity within safe limits based on EN 14960:2019" :
         "Review user capacity - exceeds recommended limits",
       containing_wall_height_comment: "Measured from base to top of wall",
-      platform_height_comment: "Platform height acceptable for age group",
       play_area_length_comment: "Effective play area after deducting obstacles",
       play_area_width_comment: "Width measured at narrowest point"
     }

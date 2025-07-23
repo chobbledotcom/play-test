@@ -18,8 +18,10 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       long_comment = "Detailed assessment comment " * 50
       full_inspection.user_height_assessment.update(
         containing_wall_height_comment: long_comment,
-        platform_height_comment: long_comment,
         tallest_user_height_comment: long_comment
+      )
+      full_inspection.structure_assessment.update(
+        platform_height_comment: long_comment
       )
 
       start_time = Time.current
@@ -49,7 +51,9 @@ RSpec.feature "PDF Edge Cases and Stress Testing", type: :feature do
       )
 
       complete_inspection.user_height_assessment.update(
-        containing_wall_height_comment: "Wall height measured from ground level",
+        containing_wall_height_comment: "Wall height measured from ground level"
+      )
+      complete_inspection.structure_assessment.update(
         platform_height_comment: "Platform stable and level"
       )
       complete_inspection.slide_assessment.update(

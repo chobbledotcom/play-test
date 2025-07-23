@@ -368,7 +368,6 @@ RSpec.describe "Seed Data", type: :model do
           Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
             expect(assessment.containing_wall_height).to be_present
-            expect(assessment.platform_height).to be_present
             expect(assessment.tallest_user_height).to be_present
             expect(assessment.users_at_1000mm).to be_present
             expect(assessment.users_at_1200mm).to be_present
@@ -377,14 +376,19 @@ RSpec.describe "Seed Data", type: :model do
             expect(assessment.play_area_length).to be_present
             expect(assessment.play_area_width).to be_present
             expect(assessment.negative_adjustment).to be_present
+            # platform_height moved to structure_assessment
+            structure = assessment.inspection.structure_assessment
+            expect(structure.platform_height).to be_present
           end
         end
 
         it "creates assessments with realistic height values" do
           Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.containing_wall_height).to be_between(0.5, 3.0)
-            expect(assessment.platform_height).to be_between(0.2, 2.0)
             expect(assessment.tallest_user_height).to be_between(1.0, 2.0)
+            # platform_height moved to structure_assessment
+            structure = assessment.inspection.structure_assessment
+            expect(structure.platform_height).to be_between(0.2, 2.0)
           end
         end
 

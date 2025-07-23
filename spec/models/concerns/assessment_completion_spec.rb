@@ -15,7 +15,6 @@ RSpec.describe AssessmentCompletion, type: :model do
       it "returns all required fields as incomplete" do
         expect(incomplete).to include(
           :containing_wall_height,
-          :platform_height,
           :tallest_user_height
         )
         pass_fields.each do |field|
@@ -28,7 +27,6 @@ RSpec.describe AssessmentCompletion, type: :model do
       before do
         assessment.update!(
           containing_wall_height: 2.5,
-          platform_height: 1.5,
           tallest_user_height: 1.8
         )
       end
@@ -36,7 +34,6 @@ RSpec.describe AssessmentCompletion, type: :model do
       it "only returns incomplete fields" do
         expect(incomplete).not_to include(
           :containing_wall_height,
-          :platform_height,
           :tallest_user_height
         )
         pass_fields.each do |field|
@@ -49,7 +46,6 @@ RSpec.describe AssessmentCompletion, type: :model do
       before do
         assessment.update!(
           containing_wall_height: 2.5,
-          platform_height: 1.5,
           tallest_user_height: 1.8,
           users_at_1000mm: 5,
           users_at_1200mm: 10,

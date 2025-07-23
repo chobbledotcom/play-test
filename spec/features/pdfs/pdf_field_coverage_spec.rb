@@ -43,7 +43,7 @@ RSpec.feature "PDF Field Coverage", type: :feature do
 
       expect(text_content).to include("[PASS]") # Should have some passing assessments
       expect(text_content).to include("1.2") # containing_wall_height
-      expect(text_content).to include("1.8") # platform_height
+      expect(text_content).to include("1.8") # platform_height (now in structure)
     end
   end
 end
