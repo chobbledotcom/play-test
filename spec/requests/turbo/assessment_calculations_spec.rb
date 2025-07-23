@@ -39,10 +39,12 @@ RSpec.describe "Assessment Safety Calculations", type: :request do
     end
 
     it "updates user height calculations" do
+      # First set platform_height on structure assessment
+      inspection.structure_assessment.update!(platform_height: 2.0)
+
       patch inspection_user_height_assessment_path(inspection),
         params: {
           assessments_user_height_assessment: {
-            platform_height: 2.0,
             containing_wall_height: 1,
             tallest_user_height: 1.99
           }

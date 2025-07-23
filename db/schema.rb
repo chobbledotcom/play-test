@@ -107,7 +107,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_224047) do
     t.index ["inspection_id"], name: "index_fan_assessments_on_inspection_id"
   end
 
-  create_table "inspections", id: { type: :string, limit: 8 }, force: :cascade do |t|
+  create_table "inspections", id: {type: :string, limit: 8}, force: :cascade do |t|
     t.datetime "inspection_date"
     t.boolean "passed"
     t.string "unit_id", limit: 8
@@ -138,7 +138,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_224047) do
     t.index ["user_id"], name: "index_inspections_on_user_id"
   end
 
-  create_table "inspector_companies", id: { type: :string, limit: 8 }, force: :cascade do |t|
+  create_table "inspector_companies", id: {type: :string, limit: 8}, force: :cascade do |t|
     t.boolean "active", default: true
     t.string "name", null: false
     t.string "email"
@@ -256,10 +256,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_224047) do
     t.decimal "step_ramp_size", precision: 8, scale: 2
     t.boolean "step_ramp_size_pass"
     t.text "step_ramp_size_comment"
+    t.decimal "platform_height", precision: 8, scale: 2
+    t.boolean "platform_height_pass"
+    t.text "platform_height_comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "index_structure_assessments_on_inspection_id"
   end
 
-  create_table "units", id: { type: :string, limit: 8 }, force: :cascade do |t|
+  create_table "units", id: {type: :string, limit: 8}, force: :cascade do |t|
     t.string "name"
     t.string "user_id", limit: 8, null: false
     t.datetime "created_at", null: false
@@ -284,8 +289,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_224047) do
     t.datetime "updated_at", null: false
     t.decimal "containing_wall_height", precision: 8, scale: 2
     t.text "containing_wall_height_comment"
-    t.decimal "platform_height", precision: 8, scale: 2
-    t.text "platform_height_comment"
     t.decimal "tallest_user_height", precision: 8, scale: 2
     t.text "tallest_user_height_comment"
     t.decimal "play_area_length", precision: 8, scale: 2
@@ -301,7 +304,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_224047) do
     t.index ["inspection_id"], name: "index_user_height_assessments_on_inspection_id"
   end
 
-  create_table "users", id: { type: :string, limit: 8 }, force: :cascade do |t|
+  create_table "users", id: {type: :string, limit: 8}, force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
     t.datetime "created_at", null: false

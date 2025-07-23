@@ -39,6 +39,7 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     fill_structure_field :blower_tube_length, "1.75"
     fill_structure_field :critical_fall_off_height, "1.2"
     fill_structure_field :step_ramp_size, "150"
+    fill_structure_field :platform_height, "1.0"
     fill_structure_field :trough_depth, "200"
     fill_structure_field :trough_adjacent_panel_width, "0.8"
 
@@ -48,6 +49,7 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     choose_structure_field :evacuation_time_pass, true
     choose_structure_field :critical_fall_off_height_pass, true
     choose_structure_field :step_ramp_size_pass, true
+    choose_structure_field :platform_height_pass, true
     choose_structure_field :trough_pass, true
 
     choose_structure_field :entrapment_pass, false

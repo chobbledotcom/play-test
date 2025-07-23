@@ -61,7 +61,9 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
           # Check assessment fields
           user_height = json["assessments"]["user_height_assessment"]
           expect(user_height["containing_wall_height"]).to be_present
-          expect(user_height["platform_height"]).to be_present
+          # platform_height moved to structure_assessment
+          structure = json["assessments"]["structure_assessment"]
+          expect(structure["platform_height"]).to be_present
           expect(user_height).not_to have_key("inspection_id")
           expect(user_height).not_to have_key("created_at")
         end

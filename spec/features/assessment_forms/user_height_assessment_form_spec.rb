@@ -19,7 +19,6 @@ RSpec.feature "User Height Assessment", type: :feature do
 
     it "displays all the required form fields" do
       expect_field_present :user_height, :containing_wall_height
-      expect_field_present :user_height, :platform_height
       expect_field_present :user_height, :tallest_user_height
 
       expect_field_present :user_height, :users_at_1000mm
@@ -36,7 +35,6 @@ RSpec.feature "User Height Assessment", type: :feature do
 
     it "saves the assessment data when submitting the form" do
       fill_in_form :user_height, :containing_wall_height, "2.5"
-      fill_in_form :user_height, :platform_height, "1.0"
       fill_in_form :user_height, :tallest_user_height, "1.8"
 
       fill_in_form :user_height, :users_at_1000mm, "5"
@@ -56,7 +54,6 @@ RSpec.feature "User Height Assessment", type: :feature do
       assessment = inspection.user_height_assessment
       expect(assessment).to be_present
       expect(assessment.containing_wall_height).to eq(2.5)
-      expect(assessment.platform_height).to eq(1.0)
       expect(assessment.tallest_user_height).to eq(1.8)
       expect(assessment.users_at_1000mm).to eq(5)
       expect(assessment.users_at_1200mm).to eq(4)
@@ -75,7 +72,10 @@ RSpec.feature "User Height Assessment", type: :feature do
       expect(page.status_code).to eq(422)
 
       expect(page).to have_css(".form-errors")
-      expect(page).to have_content("Containing wall height must be greater than or equal to 0")
+      wall_height_error = I18n.t(
+        "forms.user_height.errors.containing_wall_height_negative"
+      )
+      expect(page).to have_content(wall_height_error)
 
       assessment = inspection.user_height_assessment.reload
       expect(assessment.containing_wall_height).not_to eq(-1)

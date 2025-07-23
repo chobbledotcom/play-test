@@ -25,7 +25,7 @@ FactoryBot.define do
       if evaluator.measurement_checks_pass == true
         %w[
           stitch_length_pass evacuation_time_pass unit_pressure_pass
-          blower_tube_length_pass step_ramp_size_pass
+          blower_tube_length_pass step_ramp_size_pass platform_height_pass
           critical_fall_off_height_pass
         ].each do |check|
           assessment.send("#{check}=", true)
@@ -64,6 +64,7 @@ FactoryBot.define do
       unit_pressure { 2.5 }
       blower_tube_length { 1.5 }
       step_ramp_size { 0.2 }
+      platform_height { 1.0 }
       critical_fall_off_height { 0.6 }
       trough_depth { 0.3 }
       trough_adjacent_panel_width { 0.8 }
@@ -74,6 +75,7 @@ FactoryBot.define do
       unit_pressure_pass { true }
       blower_tube_length_pass { true }
       step_ramp_size_pass { true }
+      platform_height_pass { true }
       critical_fall_off_height_pass { true }
 
       # Additional checks
@@ -100,6 +102,7 @@ FactoryBot.define do
       blower_tube_length_comment { "Tube length appropriate" }
       unit_stable_comment { "Unit stable during operation" }
       step_ramp_size_comment { "Step size within safety limits" }
+      platform_height_comment { "Platform height meets standards" }
       critical_fall_off_height_comment { "Fall-off height appropriate" }
       trough_comment { "Trough dimensions adequate" }
       entrapment_comment { "No entrapment hazards identified" }

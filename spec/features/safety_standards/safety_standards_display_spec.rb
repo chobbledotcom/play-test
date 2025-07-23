@@ -60,11 +60,13 @@ RSpec.feature "Safety Standards Display", type: :feature do
 
   scenario "safety standards info appears in user height assessment form" do
     inspection.user_height_assessment.update!(
-      platform_height: 2.0,
       tallest_user_height: 1.2,
       containing_wall_height: 1.3,
       play_area_length: 5,
       play_area_width: 4
+    )
+    inspection.structure_assessment.update!(
+      platform_height: 2.0
     )
     inspection.slide_assessment.update!(slide_permanent_roof: false)
 
@@ -83,11 +85,13 @@ RSpec.feature "Safety Standards Display", type: :feature do
 
   scenario "user height assessment shows permanent roof requirement for high platforms" do
     inspection.user_height_assessment.update!(
-      platform_height: 4.0,
       tallest_user_height: 1.8,
       containing_wall_height: 2.3,
       play_area_length: 5,
       play_area_width: 4
+    )
+    inspection.structure_assessment.update!(
+      platform_height: 4.0
     )
     inspection.slide_assessment.update!(slide_permanent_roof: true)
 

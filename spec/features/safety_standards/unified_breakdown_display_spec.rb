@@ -35,9 +35,11 @@ RSpec.feature "Unified Safety Standards Breakdown Display", type: :feature do
   scenario "user height and slide assessments use same breakdown format" do
     inspection.update!(has_slide: true)
     inspection.user_height_assessment.update!(
-      platform_height: 4.0,
       tallest_user_height: 1.8,
       containing_wall_height: 2.3
+    )
+    inspection.structure_assessment.update!(
+      platform_height: 4.0
     )
     inspection.slide_assessment.update!(
       slide_platform_height: 4.0,

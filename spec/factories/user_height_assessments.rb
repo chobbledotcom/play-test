@@ -3,7 +3,6 @@ FactoryBot.define do
     association :inspection
 
     containing_wall_height { nil }
-    platform_height { nil }
     tallest_user_height { nil }
     users_at_1000mm { nil }
     users_at_1200mm { nil }
@@ -16,8 +15,6 @@ FactoryBot.define do
     trait :complete do
       containing_wall_height { 1.2 }
       containing_wall_height_comment { "Wall height adequate for age group" }
-      platform_height { 1.0 }
-      platform_height_comment { "Platform height meets standards" }
       tallest_user_height { 1.8 }
       tallest_user_height_comment { "User height appropriate" }
       play_area_length { 5.0 }
@@ -34,12 +31,10 @@ FactoryBot.define do
 
     trait :incomplete do
       containing_wall_height { nil }
-      platform_height { nil }
     end
 
     trait :standard_test_values do
       containing_wall_height { 2.5 }
-      platform_height { 1.0 }
       tallest_user_height { 1.8 }
       users_at_1000mm { 5 }
       users_at_1200mm { 4 }
@@ -53,7 +48,6 @@ FactoryBot.define do
 
     trait :with_basic_data do
       containing_wall_height { 1.5 }
-      platform_height { 1.0 }
       tallest_user_height { 1.2 }
       users_at_1000mm { 10 }
       users_at_1200mm { 8 }
@@ -66,7 +60,6 @@ FactoryBot.define do
 
     trait :extreme_values do
       containing_wall_height { 999.999999 }
-      platform_height { 0.000001 }
       tallest_user_height { 1.23456789 }
       play_area_length { 999999.123456 }
       play_area_width { 0.000000001 }
@@ -74,7 +67,6 @@ FactoryBot.define do
 
     trait :edge_case_values do
       containing_wall_height { nil }
-      platform_height { "" }
       tallest_user_height { 0 }
       users_at_1000mm { nil }
       users_at_1200mm { 0 }
