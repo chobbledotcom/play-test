@@ -12,7 +12,7 @@ class PdfGeneratorService
     def self.get_dimensions(image)
       image = image.dup
       image.auto_orient
-      [ image.width, image.height ]
+      [image.width, image.height]
     end
 
     # Check if image needs orientation correction

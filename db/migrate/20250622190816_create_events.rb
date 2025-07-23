@@ -10,9 +10,9 @@ class CreateEvents < ActiveRecord::Migration[8.0]
       t.json :metadata
       t.datetime :created_at, null: false
 
-      t.index [ :user_id, :created_at ]
-      t.index [ :resource_type, :resource_id ]
-      t.index [ :action ]
+      t.index [:user_id, :created_at]
+      t.index [:resource_type, :resource_id]
+      t.index [:action]
       t.index :created_at
     end
   end

@@ -8,8 +8,8 @@ class ImageProcessorService
 
     image.variant(
       format: :jpeg,
-      resize_to_limit: [ FULL_SIZE, FULL_SIZE ],
-      saver: { quality: 75 }
+      resize_to_limit: [FULL_SIZE, FULL_SIZE],
+      saver: {quality: 75}
     )
   end
 
@@ -18,8 +18,8 @@ class ImageProcessorService
 
     image.variant(
       format: :jpeg,
-      resize_to_limit: [ THUMBNAIL_SIZE, THUMBNAIL_SIZE ],
-      saver: { quality: 75 }
+      resize_to_limit: [THUMBNAIL_SIZE, THUMBNAIL_SIZE],
+      saver: {quality: 75}
     )
   end
 
@@ -28,8 +28,8 @@ class ImageProcessorService
 
     image.variant(
       format: :jpeg,
-      resize_to_limit: [ DEFAULT_SIZE, DEFAULT_SIZE ],
-      saver: { quality: 75 }
+      resize_to_limit: [DEFAULT_SIZE, DEFAULT_SIZE],
+      saver: {quality: 75}
     )
   end
 
@@ -53,7 +53,7 @@ class ImageProcessorService
   end
 
   def self.resize_dimensions(original_width, original_height, max_size)
-    ratio = max_size / [ original_width, original_height ].max
+    ratio = max_size / [original_width, original_height].max
 
     if ratio < 1
       {
@@ -61,7 +61,7 @@ class ImageProcessorService
         height: (original_height * ratio).round
       }
     else
-      { width: original_width.to_i, height: original_height.to_i }
+      {width: original_width.to_i, height: original_height.to_i}
     end
   end
 end

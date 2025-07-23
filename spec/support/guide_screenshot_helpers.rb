@@ -34,7 +34,7 @@ module GuideScreenshotHelpers
 
     # Generate filename based on sequence
     sequence = metadata["screenshots"].size + 1
-    filename = "%03d_%s.png" % [ sequence, caption.downcase.gsub(/[^a-z0-9]+/, "_") ]
+    filename = "%03d_%s.png" % [sequence, caption.downcase.gsub(/[^a-z0-9]+/, "_")]
     filepath = screenshot_dir.join(filename)
 
     # Take the screenshot - requires js: true for the test

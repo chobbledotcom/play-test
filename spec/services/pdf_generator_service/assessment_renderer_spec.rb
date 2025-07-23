@@ -66,9 +66,9 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
       groups = renderer.group_assessment_fields(field_keys)
 
       expect(groups).to eq({
-        "num_low_anchors" => { base: :num_low_anchors, pass: :num_low_anchors_pass, comment: :num_low_anchors_comment },
-        "num_high_anchors" => { pass: :num_high_anchors_pass, comment: :num_high_anchors_comment },
-        "anchor_type" => { pass: :anchor_type_pass, comment: :anchor_type_comment }
+        "num_low_anchors" => {base: :num_low_anchors, pass: :num_low_anchors_pass, comment: :num_low_anchors_comment},
+        "num_high_anchors" => {pass: :num_high_anchors_pass, comment: :num_high_anchors_comment},
+        "anchor_type" => {pass: :anchor_type_pass, comment: :anchor_type_comment}
       })
     end
 
@@ -82,7 +82,7 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
       groups = renderer.group_assessment_fields(field_keys)
 
       expect(groups).to eq({
-        "num_low_anchors" => { base: :num_low_anchors }
+        "num_low_anchors" => {base: :num_low_anchors}
       })
     end
   end
@@ -91,7 +91,7 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
     context "with a simple value field" do
       it "renders the field with label and value" do
         assessment.update!(num_low_anchors: 6)
-        fields = { base: :num_low_anchors }
+        fields = {base: :num_low_anchors}
 
         result = renderer.render_field_line(fields)
 
@@ -102,7 +102,7 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
     context "with a pass/fail field" do
       it "renders PASS indicator for true value" do
         assessment.update!(anchor_type_pass: true)
-        fields = { pass: :anchor_type_pass }
+        fields = {pass: :anchor_type_pass}
 
         result = renderer.render_field_line(fields)
 
@@ -111,7 +111,7 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
 
       it "renders FAIL indicator for false value" do
         assessment.update!(anchor_type_pass: false)
-        fields = { pass: :anchor_type_pass }
+        fields = {pass: :anchor_type_pass}
 
         result = renderer.render_field_line(fields)
 
@@ -122,7 +122,7 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
     context "with value and pass/fail fields" do
       it "renders value with pass/fail status" do
         assessment.update!(num_low_anchors: 6, num_low_anchors_pass: true)
-        fields = { base: :num_low_anchors, pass: :num_low_anchors_pass }
+        fields = {base: :num_low_anchors, pass: :num_low_anchors_pass}
 
         result = renderer.render_field_line(fields)
 
@@ -133,7 +133,7 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
     context "with empty value" do
       it "renders label with colon only" do
         assessment.update!(num_low_anchors: nil)
-        fields = { base: :num_low_anchors }
+        fields = {base: :num_low_anchors}
 
         result = renderer.render_field_line(fields)
 
@@ -146,7 +146,7 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
     context "with a comment" do
       it "renders purple italic comment with indentation" do
         assessment.update!(anchor_type_comment: "Using approved D-ring anchors")
-        fields = { comment: :anchor_type_comment }
+        fields = {comment: :anchor_type_comment}
 
         result = renderer.render_comment_line(fields)
 
@@ -157,7 +157,7 @@ RSpec.describe PdfGeneratorService::AssessmentRenderer do
     context "without a comment" do
       it "returns nil when comment is blank" do
         assessment.update!(anchor_type_comment: "")
-        fields = { comment: :anchor_type_comment }
+        fields = {comment: :anchor_type_comment}
 
         result = renderer.render_comment_line(fields)
 

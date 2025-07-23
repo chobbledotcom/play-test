@@ -10,6 +10,6 @@ class Assessments::EnclosedAssessment < ApplicationRecord
     uniqueness: true
 
   validates :exit_number,
-    numericality: { greater_than: 0 },
+    numericality: {greater_than: 0},
     allow_blank: true
 end

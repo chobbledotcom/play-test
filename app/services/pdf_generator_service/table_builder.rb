@@ -11,7 +11,7 @@ class PdfGeneratorService
         t.columns(0).font_style = :bold
         t.columns(0).width = TABLE_FIRST_COLUMN_WIDTH
         t.row(0..data.length - 1).background_color = "EEEEEE"
-        t.row(0..data.length - 1).borders = [ :bottom ]
+        t.row(0..data.length - 1).borders = [:bottom]
         t.row(0..data.length - 1).border_color = "DDDDDD"
       end
 
@@ -31,7 +31,7 @@ class PdfGeneratorService
         t.columns(0).font_style = :bold
         t.columns(0).width = TABLE_FIRST_COLUMN_WIDTH
         t.row(0..data.length - 1).background_color = "EEEEEE"
-        t.row(0..data.length - 1).borders = [ :bottom ]
+        t.row(0..data.length - 1).borders = [:bottom]
         t.row(0..data.length - 1).border_color = "DDDDDD"
       end
 
@@ -70,7 +70,7 @@ class PdfGeneratorService
         end
 
         t.row(0..data.length - 1).background_color = "EEEEEE"
-        t.row(0..data.length - 1).borders = [ :bottom ]
+        t.row(0..data.length - 1).borders = [:bottom]
         t.row(0..data.length - 1).border_color = "DDDDDD"
       end
 
@@ -154,7 +154,7 @@ class PdfGeneratorService
         inspector_width = remaining_width * HISTORY_INSPECTOR_WIDTH_PERCENT
         location_width = remaining_width * HISTORY_LOCATION_WIDTH_PERCENT
 
-        t.column_widths = [ HISTORY_DATE_COLUMN_WIDTH, HISTORY_RESULT_COLUMN_WIDTH, inspector_width, location_width ]
+        t.column_widths = [HISTORY_DATE_COLUMN_WIDTH, HISTORY_RESULT_COLUMN_WIDTH, inspector_width, location_width]
       end
 
       pdf.move_down 15
@@ -189,12 +189,12 @@ class PdfGeneratorService
 
       # Build simple two-column table for unit PDFs
       [
-        [ I18n.t("pdf.inspection.fields.description"),
-          Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH) ],
-        [ I18n.t("pdf.inspection.fields.manufacturer"), unit.manufacturer.presence || "" ],
-        [ I18n.t("pdf.inspection.fields.owner"), unit.owner.presence || "" ],
-        [ I18n.t("pdf.inspection.fields.serial"), unit.serial || "" ],
-        [ I18n.t("pdf.inspection.fields.size_m"), dimensions_text ]
+        [I18n.t("pdf.inspection.fields.description"),
+          Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH)],
+        [I18n.t("pdf.inspection.fields.manufacturer"), unit.manufacturer.presence || ""],
+        [I18n.t("pdf.inspection.fields.owner"), unit.owner.presence || ""],
+        [I18n.t("pdf.inspection.fields.serial"), unit.serial || ""],
+        [I18n.t("pdf.inspection.fields.size_m"), dimensions_text]
       ]
     end
 

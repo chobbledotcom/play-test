@@ -43,7 +43,7 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
   end
 
   def render_text_field(locals = {})
-    render partial: "form/text_field", locals: { field: }.merge(locals)
+    render partial: "form/text_field", locals: {field:}.merge(locals)
   end
 
   describe "basic rendering" do
@@ -64,7 +64,7 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
   describe "field type variations" do
     shared_examples "renders correct field type" do |field_type, input_type, field_name|
       it "renders #{field_type} as #{input_type} input" do
-        locals = { field: field_name, type: field_type }
+        locals = {field: field_name, type: field_type}
         render partial: "form/text_field", locals: locals
         expect(rendered).to have_css(%(label input[type="#{input_type}"]))
       end
@@ -78,7 +78,7 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
     include_examples "renders correct field type", :search_field, "search", :search_term
     include_examples "renders correct field type", :date_field, "date", :birth_date
     include_examples "renders correct field type", :time_field, "time", :appointment_time
-    datetime_examples = [ "datetime-local", :meeting_datetime ]
+    datetime_examples = ["datetime-local", :meeting_datetime]
     include_examples "renders correct field type", :datetime_field, *datetime_examples
     include_examples "renders correct field type", :color_field, "color", :favorite_color
     include_examples "renders correct field type", :file_field, "file", :document
@@ -101,7 +101,7 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
 
     context "with accept attribute" do
       it "adds accept attribute to file input" do
-        locals = { field: :document, type: :file_field, accept: "image/*" }
+        locals = {field: :document, type: :file_field, accept: "image/*"}
         render partial: "form/text_field", locals: locals
         expect(rendered).to have_css('label input[type="file"][accept="image/*"]')
       end
@@ -110,7 +110,7 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
     context "with additional HTML attributes" do
       it "form_field_setup raises error for data parameter" do
         expect {
-          render_text_field(data: { validate: "presence" })
+          render_text_field(data: {validate: "presence"})
         }.to raise_error(ActionView::Template::Error, /local_assigns contains \[:data\]/)
       end
 

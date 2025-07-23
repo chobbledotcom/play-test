@@ -45,7 +45,7 @@ module UnitsHelper
       label: I18n.t("units.buttons.add_inspection"),
       url: inspections_path,
       method: :post,
-      params: { unit_id: unit.id },
+      params: {unit_id: unit.id},
       confirm: I18n.t("units.messages.add_inspection_confirm")
     }
 

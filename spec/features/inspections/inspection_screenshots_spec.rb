@@ -34,7 +34,7 @@ class InspectionWorkflow
   attr_reader :options
 
   def initialize(has_slide:, is_totally_enclosed:)
-    @options = { has_slide:, is_totally_enclosed: }
+    @options = {has_slide:, is_totally_enclosed:}
   end
 
   def t(key, **options)

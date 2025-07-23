@@ -3,7 +3,7 @@ class PdfGeneratorService
     # Unit table constants
     UNIT_LABEL_COLUMN_WIDTH = 100
     UNIT_NAME_MAX_LENGTH = 30
-    UNIT_TABLE_CELL_PADDING = [ 6, 4 ]
+    UNIT_TABLE_CELL_PADDING = [6, 4]
     UNIT_TABLE_TEXT_SIZE = 9
 
     # General text and spacing constants
@@ -16,13 +16,13 @@ class PdfGeneratorService
 
     # Header table constants
     LOGO_HEIGHT = 50
-    HEADER_TABLE_PADDING = [ 5, 0 ]
+    HEADER_TABLE_PADDING = [5, 0]
     LOGO_COLUMN_WIDTH_RATIO = 1.0 / 3.0
 
     # Table constants
-    TABLE_CELL_PADDING = [ 5, 10 ]
+    TABLE_CELL_PADDING = [5, 10]
     TABLE_FIRST_COLUMN_WIDTH = 150
-    NICE_TABLE_CELL_PADDING = [ 4, 8 ]
+    NICE_TABLE_CELL_PADDING = [4, 8]
     NICE_TABLE_TEXT_SIZE = 10
 
     # Inspection history table styling

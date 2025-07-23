@@ -7,8 +7,8 @@ RSpec.describe "Safety Standards API examples", type: :request do
         it "produces the exact response shown in API documentation" do
           # Make the API call with the documented example parameters
           post safety_standards_path,
-            params: { calculation: params },
-            headers: { "Accept" => "application/json" },
+            params: {calculation: params},
+            headers: {"Accept" => "application/json"},
             as: :json
 
           expect(response).to have_http_status(:success)
@@ -49,7 +49,7 @@ RSpec.describe "Safety Standards API examples", type: :request do
 
   describe "all calculation types use consistent response structure" do
     it "has required top-level keys for all calculations" do
-      required_keys = [ :passed, :status, :result ]
+      required_keys = [:passed, :status, :result]
 
       SafetyStandard::API_EXAMPLE_RESPONSES.each do |type, response|
         required_keys.each do |key|
@@ -89,8 +89,8 @@ RSpec.describe "Safety Standards API examples", type: :request do
             invalid_params = transform.call(valid_params.dup)
 
             post safety_standards_path,
-              params: { calculation: invalid_params },
-              headers: { "Accept" => "application/json" },
+              params: {calculation: invalid_params},
+              headers: {"Accept" => "application/json"},
               as: :json
 
             response_data = JSON.parse(response.body, symbolize_names: true)
@@ -98,7 +98,7 @@ RSpec.describe "Safety Standards API examples", type: :request do
             # Should either return an error or handle gracefully
             if variation_name == :missing_type
               expect(response_data[:passed]).to eq(false)
-            elsif [ :nil_values, :negative_values, :zero_values ].include?(variation_name)
+            elsif [:nil_values, :negative_values, :zero_values].include?(variation_name)
               # These should be handled according to business rules
               # Some calculations might accept zero, others might not
               expect(response_data).to have_key(:passed)
@@ -114,7 +114,7 @@ RSpec.describe "Safety Standards API examples", type: :request do
     SafetyStandard::API_EXAMPLE_PARAMS.each do |type, params|
       it "curl command for #{type} would produce valid JSON" do
         # This simulates what the curl command would send
-        curl_payload = { calculation: params }
+        curl_payload = {calculation: params}
 
         post safety_standards_path,
           params: curl_payload,
@@ -129,7 +129,7 @@ RSpec.describe "Safety Standards API examples", type: :request do
         # Verify response is valid JSON
         response_data = JSON.parse(response.body)
         expect(response_data).to be_a(Hash)
-        expect(response_data["passed"]).to be_in([ true, false ])
+        expect(response_data["passed"]).to be_in([true, false])
       end
     end
   end
@@ -138,8 +138,8 @@ RSpec.describe "Safety Standards API examples", type: :request do
     it "all error responses follow consistent format" do
       # Test with invalid type
       post safety_standards_path,
-        params: { calculation: { type: "invalid_type" } },
-        headers: { "Accept" => "application/json" },
+        params: {calculation: {type: "invalid_type"}},
+        headers: {"Accept" => "application/json"},
         as: :json
 
       error_response = JSON.parse(response.body, symbolize_names: true)
@@ -158,8 +158,8 @@ RSpec.describe "Safety Standards API examples", type: :request do
 
         2.times do
           post safety_standards_path,
-            params: { calculation: params },
-            headers: { "Accept" => "application/json" },
+            params: {calculation: params},
+            headers: {"Accept" => "application/json"},
             as: :json
 
           results << JSON.parse(response.body, symbolize_names: true)

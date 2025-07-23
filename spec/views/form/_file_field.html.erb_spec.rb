@@ -59,7 +59,7 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
       allow(blob).to receive(:persisted?).and_return(true)
       allow(blob).to receive(:analyzed?).and_return(true)
       allow(blob).to receive(:analyze)
-      allow(blob).to receive(:metadata).and_return({ "width" => 100, "height" => 100 })
+      allow(blob).to receive(:metadata).and_return({"width" => 100, "height" => 100})
       allow(blob).to receive(:service).and_return(service)
       allow(blob).to receive(:key).and_return("test_key")
       allow(service).to receive(:exist?).and_return(true)
@@ -88,7 +88,7 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
 
         render "form/file_field", field: field, preview_size: 150
 
-        expect(attachment).to have_received(:variant).with(resize_to_limit: [ 150, 150 ])
+        expect(attachment).to have_received(:variant).with(resize_to_limit: [150, 150])
         expect(rendered).to include('<img src="test.jpg"')
       end
     end

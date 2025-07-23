@@ -37,7 +37,7 @@ class InspectionCreationService
     copy_fields = {}
     if last_inspection
       copy_fields = COPY_FROM_LAST_INSPECTION_FIELDS.map do |field|
-        [ field, last_inspection.send(field) ]
+        [field, last_inspection.send(field)]
       end.to_h
     end
 

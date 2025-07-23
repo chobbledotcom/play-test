@@ -53,15 +53,15 @@ module SafetyStandards
       # Full unit calculations
       units: {
         small_unit: {
-          dimensions: { length: 1, width: 1, height: 1 },
+          dimensions: {length: 1, width: 1, height: 1},
           expected_anchors: 6 # Front/back: 1m² → 1, Sides: 1m² → 1, Total: (1+1)*2 = 4, Min: 6
         },
         standard_unit: {
-          dimensions: { length: 5, width: 4, height: 3 },
+          dimensions: {length: 5, width: 4, height: 3},
           expected_anchors: 8 # Front/back: 12m² → 2, Sides: 15m² → 2, Total: (2+2)*2 = 8
         },
         large_unit: {
-          dimensions: { length: 10, width: 8, height: 4 },
+          dimensions: {length: 10, width: 8, height: 4},
           expected_anchors: 18 # Front/back: 32m² → 4, Sides: 40m² → 5, Total: (4+5)*2 = 18
         }
       }
@@ -95,7 +95,7 @@ module SafetyStandards
 
       # EN 14960-1:2019 Lines 441-442 - "Each inflatable shall have at least six anchorage points"
       minimum = ANCHOR_CALCULATION_CONSTANTS[:minimum_anchors]
-      total_required = [ total_required, minimum ].max
+      total_required = [total_required, minimum].max
 
       area_coeff = ANCHOR_CALCULATION_CONSTANTS[:area_coefficient]
       base_div = ANCHOR_CALCULATION_CONSTANTS[:base_divisor]

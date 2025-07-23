@@ -10,7 +10,7 @@ FactoryBot.define do
 
     trait :with_changes do
       action { "updated" }
-      changed_data { { status: [ "draft", "complete" ] } }
+      changed_data { {status: ["draft", "complete"]} }
     end
 
     trait :system_event do
@@ -22,7 +22,7 @@ FactoryBot.define do
 
     trait :download_event do
       action { "downloaded" }
-      metadata { { format: "pdf", filename: "inspection_INS123.pdf" } }
+      metadata { {format: "pdf", filename: "inspection_INS123.pdf"} }
     end
   end
 end

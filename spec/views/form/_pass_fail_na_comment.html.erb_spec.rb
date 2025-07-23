@@ -45,7 +45,7 @@ RSpec.describe "form/_pass_fail_na_comment.html.erb", type: :view do
   end
 
   def render_pass_fail_na_comment(locals = {})
-    render partial: "form/pass_fail_na_comment", locals: { field: }.merge(locals)
+    render partial: "form/pass_fail_na_comment", locals: {field:}.merge(locals)
   end
 
   # Helper methods for common expectations using Capybara selectors
