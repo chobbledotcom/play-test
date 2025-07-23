@@ -72,29 +72,12 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 - Blower
   - Blower Serial => remove pass/fail/comment
 
-## Indoor / Anchorage change
-
-**Time: 15m**
-
-- Add new field to inspections and units, "indoor_only"
-- Exclude the anchorage section if that's selected
-
 ## Small Changes
 
 **Time: 10m**
 
 - Risk Assessment => make box significantly bigger by default
 - Mark as complete - "By continuing you confirm that the data you have entered is accurate"
-
-## Additional Inspection Images
-
-**Time: 45m**
-
-Add a link inside inspection results to upload images
-
-- Maximum 3 per inspection
-- Compress them
-- Show links in the reports: Photo 1, 2, 3
 
 ## Users
 
@@ -119,3 +102,20 @@ Add "Activate" and "Deactivate" buttons which sets active_until date
 "Tallest User Height" => "Maximum User Height"
 
 Slides - "Containing Wall Height" => "Containing Platform Wall Height"
+
+## Indoor / Anchorage change
+
+**Time: 15m**
+
+- Add new field to inspections and units, "indoor_only"
+- Exclude the anchorage section if that's selected
+
+## Additional Inspection Images
+
+**Time: 45m**
+
+Add a link inside inspection results to upload images
+
+- Maximum 3 per inspection
+- Compress them
+- Show links in the reports: Photo 1, 2, 3
