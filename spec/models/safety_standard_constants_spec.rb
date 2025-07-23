@@ -142,9 +142,6 @@ RSpec.describe SafetyStandard, "Constants" do
       expect(SafetyStandard::REINSPECTION_INTERVAL_DAYS).to eq(365)
 
       # Check validation methods use constants
-      expect(SafetyStandards::MaterialValidator.valid_stitch_length?(5)).to be true
-      expect(SafetyStandards::MaterialValidator.valid_stitch_length?(2)).to be false # Below min
-      expect(SafetyStandards::MaterialValidator.valid_stitch_length?(9)).to be false # Above max
     end
 
     it "generates consistent formula descriptions from constants" do

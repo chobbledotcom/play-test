@@ -100,14 +100,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_235342) do
     t.boolean "blower_visual_pass"
     t.text "blower_visual_comment"
     t.string "blower_serial"
-    t.boolean "blower_serial_pass"
-    t.text "blower_serial_comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "fan_assessments_new_pkey", unique: true
   end
 
-  create_table "inspections", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "inspections", id: {type: :string, limit: 12}, force: :cascade do |t|
     t.datetime "inspection_date"
     t.boolean "passed"
     t.string "user_id", limit: 12, null: false
@@ -138,7 +136,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_235342) do
     t.index ["user_id"], name: "index_inspections_on_user_id"
   end
 
-  create_table "inspector_companies", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "inspector_companies", id: {type: :string, limit: 12}, force: :cascade do |t|
     t.string "name", null: false
     t.string "email"
     t.string "phone", null: false
@@ -213,7 +211,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_235342) do
     t.boolean "straight_walls_pass"
     t.boolean "sharp_edges_pass"
     t.boolean "unit_stable_pass"
-    t.decimal "stitch_length", precision: 8, scale: 2
     t.decimal "unit_pressure", precision: 8, scale: 2
     t.decimal "blower_tube_length", precision: 8, scale: 2
     t.decimal "critical_fall_off_height", precision: 8, scale: 2
@@ -256,7 +253,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_235342) do
     t.index ["inspection_id"], name: "structure_assessments_new_pkey", unique: true
   end
 
-  create_table "units", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "units", id: {type: :string, limit: 12}, force: :cascade do |t|
     t.string "name"
     t.string "user_id", limit: 12, null: false
     t.datetime "created_at", null: false
@@ -296,7 +293,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_235342) do
     t.index ["inspection_id"], name: "user_height_assessments_new_pkey", unique: true
   end
 
-  create_table "users", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "users", id: {type: :string, limit: 12}, force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
     t.datetime "created_at", null: false

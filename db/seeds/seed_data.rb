@@ -85,7 +85,6 @@ module SeedData
       entrapment_pass: check_passed?(passed),
       markings_pass: check_passed?(passed),
       grounding_pass: check_passed?(passed),
-      stitch_length: rand(8..12),
       unit_pressure: rand(1.0..3.0).round(1),
       blower_tube_length: rand(2.0..5.0).round(1),
       step_ramp_size: rand(200..400),
@@ -126,7 +125,6 @@ module SeedData
       blower_finger_pass: check_passed?(passed),
       blower_visual_pass: check_passed?(passed),
       pat_pass: check_passed_integer?(passed),
-      blower_serial_pass: check_passed?(passed),
       blower_serial: "FAN-#{rand(1000..9999)}",
       fan_size_type: passed ?
         "Fan operating correctly at optimal pressure" :
@@ -142,10 +140,7 @@ module SeedData
         "Some wear visible on housing",
       pat_comment: passed ?
         "PAT test valid until #{(Date.current + 6.months).strftime("%B %Y")}" :
-        "PAT test overdue",
-      blower_serial_comment: passed ?
-        "Serial number visible and recorded" :
-        "Serial number partially obscured"
+        "PAT test overdue"
     }
   end
 

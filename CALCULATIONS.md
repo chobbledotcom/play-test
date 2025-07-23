@@ -270,9 +270,7 @@ MATERIAL_STANDARDS = {
     fire_standard: "EN 71-3"       # Fire retardancy standard
   },
   thread: {
-    min_tensile_strength: 88,      # Newtons minimum
-    min_stitch_length: 3,          # 3mm minimum stitch length
-    max_stitch_length: 8           # 8mm maximum stitch length
+    min_tensile_strength: 88      # Newtons minimum
   }
   # Missing rope validation
 }

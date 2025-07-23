@@ -7,7 +7,6 @@ en:
       fields:
         fan_size_type: "Blower size"
         blower_serial: "Blower serial number"
-        blower_serial_pass: "Blower serial"
         blower_flap_pass: "Return flap present"
         blower_finger_pass: "Finger probe Test"
         pat_pass: "PAT"
@@ -21,7 +20,6 @@ en:
         safety_checks: "Safety Checks"
         blower_checks: "Blower Checks"
         electrical_safety: "Electrical Safety"
-        blower_serial: "Blower Serial"
         safety_issues: "Safety Issues"
         overall_status: "Overall Status"
         all_checks_passed: "All safety checks passed"

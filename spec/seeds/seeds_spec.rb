@@ -304,7 +304,6 @@ RSpec.describe "Seed Data", type: :model do
 
         it "creates assessments with required measurements" do
           Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
-            expect(assessment.stitch_length).to be_present
             expect(assessment.unit_pressure).to be_present
             expect(assessment.blower_tube_length).to be_present
             expect(assessment.step_ramp_size).to be_present
@@ -316,7 +315,6 @@ RSpec.describe "Seed Data", type: :model do
 
         it "creates assessments with realistic measurement values" do
           Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
-            expect(assessment.stitch_length).to be_between(5, 20)
             expect(assessment.unit_pressure).to be_between(0.5, 5.0)
             expect(assessment.blower_tube_length).to be_between(1.0, 10.0)
             expect(assessment.step_ramp_size).to be_between(100, 500)

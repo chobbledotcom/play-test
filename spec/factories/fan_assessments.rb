@@ -29,8 +29,6 @@ FactoryBot.define do
 
     trait :complete do
       fan_size_type { "Standard 2HP blower" }
-      blower_serial_pass { true }
-      blower_serial_comment { "Serial number verified" }
       blower_flap_pass { :pass }
       blower_flap_comment { "Flap opens and closes properly" }
       blower_finger_pass { true }

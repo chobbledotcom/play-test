@@ -17,14 +17,14 @@ RSpec.describe "Assessment Controllers", type: :request do
       patch inspection_structure_assessment_path(inspection), params: {
         assessments_structure_assessment: {
           seam_integrity_pass: true,
-          stitch_length: 12.5
+          stitch_length_pass: true
         }
       }
 
       expect(response).to redirect_to(inspection_path(inspection))
       inspection.reload
       expect(inspection.structure_assessment.seam_integrity_pass).to be true
-      expect(inspection.structure_assessment.stitch_length).to eq(12.5)
+      expect(inspection.structure_assessment.stitch_length_pass).to be true
     end
   end
 
