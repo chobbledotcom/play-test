@@ -5,11 +5,9 @@ A web app for managing safety inspections of inflatable play equipment like boun
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Docker Image](https://img.shields.io/badge/docker-dockerstefn%2Fplay--test-blue)](https://hub.docker.com/r/dockerstefn/play-test)
 
-## What's This?
-
 play-test helps inspectors track and document safety checks on inflatable play equipment. It handles equipment records, inspection forms, photo management, and PDF report generation. Makes repeat inspections of the same units quick and straightforward.
 
-A public instance is live at [play-test.co.uk](https://play-test.co.uk).
+A public instance is live at **[play-test.co.uk](https://play-test.co.uk)**.
 
 ## Sponsor Development
 
@@ -17,7 +15,7 @@ A public instance is live at [play-test.co.uk](https://play-test.co.uk).
 - [**LiberaPay**.com/chobble](https://liberapay.com/chobble/)
 - [**Patreon**.com/chobble](https://www.patreon.com/c/Chobble)
 
-## Key Features
+## Features
 
 ### 🎪 Equipment Tracking
 - Store unit details, dimensions, and manufacturer info
@@ -88,7 +86,7 @@ rails server
 
 ## Testing
 
-We maintain over 97% test coverage:
+Currently over 90% test coverage:
 
 ```bash
 # Run all tests with coverage
