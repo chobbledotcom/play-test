@@ -30,6 +30,8 @@ en:
   # ActiveRecord validation messages
   activerecord:
     errors:
+      messages:
+        not_an_image: "must be an image file"
       models:
         user:
           attributes:

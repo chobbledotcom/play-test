@@ -33,6 +33,9 @@ class Inspection < ApplicationRecord
     is_totally_enclosed
     length
     passed
+    photo_1
+    photo_2
+    photo_3
     risk_assessment
     unique_report_number
     unit_id
@@ -48,6 +51,12 @@ class Inspection < ApplicationRecord
   belongs_to :user
   belongs_to :unit, optional: true
   belongs_to :inspector_company, optional: true
+
+  # File attachments
+  has_one_attached :photo_1
+  has_one_attached :photo_2
+  has_one_attached :photo_3
+  validate :photos_must_be_images
 
   ALL_ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
     has_one assessment_name,
@@ -437,6 +446,18 @@ class Inspection < ApplicationRecord
       assessment = send("#{type}_assessment")
       message = I18n.t("inspections.validation.#{type}_incomplete")
       [type, assessment, message]
+    end
+  end
+
+  def photos_must_be_images
+    [[:photo_1, photo_1], [:photo_2, photo_2], [:photo_3, photo_3]].each do |field_name, photo|
+      next unless photo.attached?
+
+      # Check if blob exists and has content_type
+      if photo.blob && !photo.blob.content_type.to_s.start_with?("image/")
+        errors.add(field_name, I18n.t("activerecord.errors.messages.not_an_image"))
+        photo.purge
+      end
     end
   end
 end

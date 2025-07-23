@@ -299,7 +299,10 @@ class InspectionsController < ApplicationController
       .includes(
         :user, :inspector_company,
         *Inspection::ALL_ASSESSMENT_TYPES.keys,
-        unit: {photo_attachment: :blob}
+        unit: {photo_attachment: :blob},
+        photo_1_attachment: :blob,
+        photo_2_attachment: :blob,
+        photo_3_attachment: :blob
       )
       .find_by(id: params[:id]&.upcase)
 

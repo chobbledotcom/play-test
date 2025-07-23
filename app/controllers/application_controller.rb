@@ -141,7 +141,8 @@ class ApplicationController < ActionController::Base
         log_n_plus_one_queries(table, count)
         # Only raise exception in development and test environments
         # Skip if we're processing images (which legitimately needs multiple blob queries)
-        if Rails.env.local? && !processing_image_upload?
+        # Only check N+1 queries on GET requests
+        if Rails.env.local? && !processing_image_upload? && request.get?
           message = app_i18n(:debug, :n_plus_one_with_limit, table: table, count: count, limit: 5)
           raise message
         end

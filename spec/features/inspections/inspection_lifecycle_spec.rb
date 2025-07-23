@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Business Logic: Inspection Lifecycle Management Feature Tests
 #
 # Tests the user-centric inspection lifecycle management, including:
@@ -36,7 +38,8 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       expect(completed_inspection.reload.complete?).to be false
 
       # Verify event was logged
-      event = Event.where(resource_type: "Inspection", resource_id: completed_inspection.id, action: "marked_draft").first
+      event = Event.where(resource_type: "Inspection", resource_id: completed_inspection.id,
+        action: "marked_draft").first
       expect(event).to be_present
       expect(event.user).to eq(user)
     end
@@ -220,6 +223,48 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
 
       expect(new_inspection.inspector_company_id).to be_nil
       expect(new_inspection).to be_persisted
+    end
+  end
+
+  describe "photo uploads" do
+    let(:inspection) { create(:inspection, user: user, unit: unit) }
+
+    it "allows uploading photos in the results form" do
+      visit edit_inspection_path(inspection, tab: "results")
+
+      # Upload photo_1
+      within_fieldset(I18n.t("forms.results.sections.photos")) do
+        attach_file I18n.t("forms.results.fields.photo_1"),
+          Rails.root.join("spec/fixtures/files/test_image.jpg")
+        attach_file I18n.t("forms.results.fields.photo_2"),
+          Rails.root.join("spec/fixtures/files/test_image.jpg")
+        attach_file I18n.t("forms.results.fields.photo_3"),
+          Rails.root.join("spec/fixtures/files/test_image.jpg")
+      end
+
+      click_button I18n.t("forms.results.submit")
+
+      expect(page).to have_content(I18n.t("inspections.messages.updated"))
+
+      inspection.reload
+      expect(inspection.photo_1.attached?).to be true
+      expect(inspection.photo_2.attached?).to be true
+      expect(inspection.photo_3.attached?).to be true
+    end
+
+    it "displays existing photos when editing" do
+      # Attach a photo first
+      inspection.photo_1.attach(
+        io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+        filename: "existing.jpg",
+        content_type: "image/jpeg"
+      )
+
+      visit edit_inspection_path(inspection, tab: "results")
+
+      within_fieldset(I18n.t("forms.results.sections.photos")) do
+        expect(page).to have_content("existing.jpg")
+      end
     end
   end
 end

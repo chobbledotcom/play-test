@@ -5,9 +5,13 @@ en:
       sections:
         inspection_results: "Inspection Results"
         comments: "Comments"
+        photos: "Photos"
       fields:
         passed: "Passed"
         risk_assessment: "Risk Assessment"
+        photo_1: "Photo 1"
+        photo_2: "Photo 2"
+        photo_3: "Photo 3"
       messages:
         no_comments: "No comments found"
       submit: "Save Results"

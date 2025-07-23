@@ -65,6 +65,12 @@ class PdfGeneratorService
     WATERMARK_WIDTH = 100
     WATERMARK_HEIGHT = 60
 
+    # Photos page constants
+    PHOTO_MAX_HEIGHT_PERCENT = 0.25  # 25% of page height
+    PHOTO_SPACING = 20  # Space between photos
+    PHOTO_LABEL_SIZE = 10  # Size of "Photo 1", "Photo 2", "Photo 3" text
+    PHOTO_LABEL_SPACING = 5  # Space between photo and label
+
     def self.setup_pdf_fonts(pdf)
       font_path = Rails.root.join("app/assets/fonts")
       pdf.font_families.update(

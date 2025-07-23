@@ -8,6 +8,7 @@ class PdfGeneratorService
   require_relative "pdf_generator_service/image_orientation_processor"
   require_relative "pdf_generator_service/image_processor"
   require_relative "pdf_generator_service/debug_info_renderer"
+  require_relative "pdf_generator_service/photos_renderer"
 
   include Configuration
 
@@ -48,6 +49,9 @@ class PdfGeneratorService
 
       # Add DRAFT watermark overlay for draft inspections
       Utilities.add_draft_watermark(pdf) unless inspection.complete?
+
+      # Add photos page if photos are attached
+      PhotosRenderer.generate_photos_page(pdf, inspection)
 
       # Add debug info page if enabled (admins only)
       if debug_enabled && debug_queries.present?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe Inspection, type: :model do
@@ -8,13 +10,17 @@ RSpec.describe Inspection, type: :model do
     it "requires inspection_date" do
       invalid_inspection = build(:inspection, inspection_date: nil)
       expect(invalid_inspection).not_to be_valid
-      expect(invalid_inspection.errors[:inspection_date]).to include("can't be blank")
+      error_msg = "can't be blank"
+      expect(invalid_inspection.errors[:inspection_date]).to include(error_msg)
     end
 
     it "requires inspection_location when complete" do
-      invalid_inspection = build(:inspection, inspection_location: nil, complete_date: Time.current)
+      invalid_inspection = build(:inspection, inspection_location: nil,
+        complete_date: Time.current)
       expect(invalid_inspection).not_to be_valid
-      expect(invalid_inspection.errors[:inspection_location]).to include("can't be blank")
+      error_msg = "can't be blank"
+      errors = invalid_inspection.errors[:inspection_location]
+      expect(errors).to include(error_msg)
     end
   end
 
@@ -143,10 +149,39 @@ RSpec.describe Inspection, type: :model do
   describe "#complete!" do
     it "sets complete_date and logs audit action" do
       inspection.complete_date = nil
-      expect(inspection).to receive(:log_audit_action).with("completed", user, "Inspection completed")
+      expect(inspection).to receive(:log_audit_action)
+        .with("completed", user, "Inspection completed")
 
       inspection.complete!(user)
       expect(inspection.complete_date).not_to be_nil
+    end
+  end
+
+  describe "photo attachments" do
+    describe "validations" do
+      it "allows image files for photo_1" do
+        file = fixture_file_upload("test_image.jpg", "image/jpeg")
+        inspection.photo_1.attach(file)
+        expect(inspection).to be_valid
+      end
+
+      it "allows image files for photo_2" do
+        inspection.photo_2.attach(
+          io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+          filename: "test.jpg",
+          content_type: "image/jpeg"
+        )
+        expect(inspection).to be_valid
+      end
+
+      it "allows image files for photo_3" do
+        inspection.photo_3.attach(
+          io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+          filename: "test.jpg",
+          content_type: "image/jpeg"
+        )
+        expect(inspection).to be_valid
+      end
     end
   end
 end

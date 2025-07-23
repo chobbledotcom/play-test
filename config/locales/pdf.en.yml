@@ -8,6 +8,7 @@ en:
       equipment_details: "Inspection Overview"
       risk_assessment: "Risk Assessment"
       assessments_section: "Assessment Results"
+      photos_section: "Photos"
       no_assessment_data: "No %{assessment_type} data available"
       watermark:
         draft: "DRAFT"
@@ -35,6 +36,9 @@ en:
         size: "Size"
         size_with_unit: "Size (m)"
         unit_meters: "m"
+        photo_1_label: "Photo 1"
+        photo_2_label: "Photo 2"
+        photo_3_label: "Photo 3"
 
     unit:
       details: "Unit Details"

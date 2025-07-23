@@ -50,4 +50,10 @@
     <%= render 'form/pass_fail', field: :passed %>
     <%= render 'form/text_area', field: :risk_assessment, rows: 3 %>
   <% end %>
+
+  <%= render 'form/fieldset', legend_key: 'photos' do %>
+    <%= render 'form/file_field', field: :photo_1 %>
+    <%= render 'form/file_field', field: :photo_2 %>
+    <%= render 'form/file_field', field: :photo_3 %>
+  <% end %>
 <% end %>

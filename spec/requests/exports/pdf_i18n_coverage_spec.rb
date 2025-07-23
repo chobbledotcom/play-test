@@ -28,12 +28,33 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
       in_progress_pdf = PdfGeneratorService.generate_inspection_report(in_progress_inspection)
       in_progress_pdf_text = pdf_text_content(in_progress_pdf.render)
 
+      # Create an inspection with photos to test photos section i18n
+      photos_inspection = create(:inspection, :completed, user:, unit:, passed: true)
+      photos_inspection.photo_1.attach(
+        io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+        filename: "test.jpg",
+        content_type: "image/jpeg"
+      )
+      photos_inspection.photo_2.attach(
+        io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+        filename: "test2.jpg",
+        content_type: "image/jpeg"
+      )
+      photos_inspection.photo_3.attach(
+        io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+        filename: "test3.jpg",
+        content_type: "image/jpeg"
+      )
+      photos_pdf = PdfGeneratorService.generate_inspection_report(photos_inspection)
+      photos_pdf_text = pdf_text_content(photos_pdf.render)
+
       all_pdf_text = [
         inspection_pdf_text,
         unit_pdf_text,
         failed_pdf_text,
         incomplete_pdf_text,
-        in_progress_pdf_text
+        in_progress_pdf_text,
+        photos_pdf_text
       ].join(" ")
 
       used_keys = []
