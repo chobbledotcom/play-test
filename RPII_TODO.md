@@ -47,15 +47,21 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 - Stucture
   - Stitch Length => Pass/Fail/Comment
   - Blower Tube Length => not required to store number
-  - Evacuation Time => remove number, just pass/fail/comment
   - Trough Adjacent Panel Width => convert to mm
-  - Trough Depth & Trough Adjacent Panel Width" => remove pass/fails, keep number, keep "Trough Check"
 - Blower
   - Blower Serial => remove pass/fail/comment
 
 ---
 
 # Done
+
+## Field Changes
+
+**Time: 45m**
+
+- Stucture
+  - Trough Depth & Trough Adjacent Panel Width" => remove pass/fails, keep number, keep "Trough Check"
+  - Evacuation Time => remove number, just pass/fail/comment
 
 ## Text Renames
 
