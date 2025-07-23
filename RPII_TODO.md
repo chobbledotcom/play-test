@@ -6,12 +6,6 @@ I've grouped the tasks into related sections and have given a time for how long 
 - Total Hours: 5h
 - Total £s: 500
 
-## "Continue" change
-
-**Time: 30m**
-
-Rename to "Save Asssement" to "Continue", and have it automatically continue to the next page if there's no issues with the calculations, otherwise show the issue - and a link to continue anyway
-
 ## Branding
 
 **Time: 45m**
@@ -30,19 +24,6 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
   - Slide Platform Height
 - Units
   - Model
-
-## N/A Fields
-
-**Time: 30m**
-
-- Materials
-  - Retention Netting
-  - Zips
-  - Windows
-  - Artwork
-- Fan/Blower
-  - Return flap present
-  - PAT
 
 ## Field Moves Between Assessments
 
@@ -119,3 +100,22 @@ Add "Activate" and "Deactivate" buttons which sets active_until date
 
 - Risk Assessment => make box significantly bigger by default
 - Mark as complete - "By continuing you confirm that the data you have entered is accurate"
+
+## N/A Fields
+
+**Time: 30m**
+
+- Materials
+  - Retention Netting
+  - Zips
+  - Windows
+  - Artwork
+- Fan/Blower
+  - Return flap present
+  - PAT
+
+## "Continue" change
+
+**Time: 30m**
+
+Rename to "Save Asssement" to "Continue", and have it automatically continue to the next page if there's no issues with the calculations, otherwise show the issue - and a link to continue anyway
