@@ -35,3 +35,6 @@
 /config/master.key
 .direnv
 .gems
+
+# Ignore test coverage reports
+/coverage/*
