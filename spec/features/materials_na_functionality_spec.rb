@@ -1,7 +1,10 @@
 require "rails_helper"
 
 RSpec.feature "Materials Assessment N/A Functionality", type: :feature do
-  let(:user) { create(:user, inspection_company: create(:inspector_company), active_until: 1.hour.from_now) }
+  let(:company) { create(:inspector_company) }
+  let(:user) do
+    create(:user, inspection_company: company, active_until: 2.days.from_now)
+  end
   let(:unit) { create(:unit, user: user) }
   let(:inspection) { create(:inspection, user: user, unit: unit) }
 
@@ -14,7 +17,8 @@ RSpec.feature "Materials Assessment N/A Functionality", type: :feature do
     visit edit_inspection_path(inspection, tab: "materials")
 
     # Choose the N/A radio button for ropes
-    choose "assessments_materials_assessment_ropes_pass_na"
+    field_id = "assessments_materials_assessment_ropes_pass_na"
+    choose field_id
 
     # Submit the form
     click_button "Save Assessment"
@@ -26,7 +30,8 @@ RSpec.feature "Materials Assessment N/A Functionality", type: :feature do
     visit edit_inspection_path(inspection, tab: "materials")
 
     # N/A checkbox should still be checked
-    expect(page).to have_checked_field("assessments_materials_assessment_ropes_pass_na")
+    field_id = "assessments_materials_assessment_ropes_pass_na"
+    expect(page).to have_checked_field(field_id)
 
     # Verify in the database
     inspection.reload
