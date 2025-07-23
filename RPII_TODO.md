@@ -79,12 +79,6 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 - Risk Assessment => make box significantly bigger by default
 - Mark as complete - "By continuing you confirm that the data you have entered is accurate"
 
-## Users
-
-**Time: 10m**
-
-Add "Activate" and "Deactivate" buttons which sets active_until date
-
 ---
 
 # Done
@@ -119,3 +113,9 @@ Add a link inside inspection results to upload images
 - Maximum 3 per inspection
 - Compress them
 - Show links in the reports: Photo 1, 2, 3
+
+## Users
+
+**Time: 10m**
+
+Add "Activate" and "Deactivate" buttons which sets active_until date
