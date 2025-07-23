@@ -28,6 +28,7 @@ class Inspection < ApplicationRecord
   USER_EDITABLE_PARAMS = %i[
     has_slide
     height
+    indoor_only
     inspection_date
     inspection_location
     is_totally_enclosed
@@ -178,6 +179,8 @@ class Inspection < ApplicationRecord
         has_slide?
       when :enclosed_assessment
         is_totally_enclosed?
+      when :anchorage_assessment
+        !indoor_only?
       else
         true
       end
@@ -233,7 +236,8 @@ class Inspection < ApplicationRecord
       length.present? &&
       height.present? &&
       !has_slide.nil? &&
-      !is_totally_enclosed.nil?
+      !is_totally_enclosed.nil? &&
+      !indoor_only.nil?
   end
 
   def completion_status

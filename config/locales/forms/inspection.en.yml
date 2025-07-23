@@ -20,6 +20,7 @@ en:
         height: "Height (m)"
         has_slide: "Has slide"
         is_totally_enclosed: "Is totally enclosed"
+        indoor_only: "Indoor use only"
         passed: "Passed"
         risk_assessment: "Risk Assessment"
         unit_id: "Unit Selection"

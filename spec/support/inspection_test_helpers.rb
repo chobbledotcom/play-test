@@ -4,6 +4,9 @@ module InspectionTestHelpers
   # Include FormHelpers to reuse existing methods
   include FormHelpers
 
+  # Boolean fields for inspection forms
+  BOOLEAN_FIELDS = %w[has_slide is_totally_enclosed indoor_only passed].freeze
+
   # Button clicks - these are specific to inspections, not generic form buttons
   def click_mark_complete_button
     click_button I18n.t("inspections.buttons.mark_complete")
@@ -121,6 +124,73 @@ module InspectionTestHelpers
 
   def expect_on_inspection_edit_page(inspection)
     expect(page).to have_current_path(edit_inspection_path(inspection))
+  end
+
+  # Field filling methods for inspection workflow
+  def fill_inspection_field(field_name, value)
+    if BOOLEAN_FIELDS.include?(field_name.to_s)
+      value ?
+        check_form_radio(:inspection, field_name) :
+        uncheck_form_radio(:inspection, field_name)
+    else
+      fill_in_form :inspection, field_name, value
+    end
+  end
+
+  def fill_assessment_field(tab_name, field_name, value)
+    return if field_name.to_s.end_with?("_comment")
+
+    field_label = get_field_label(tab_name, field_name)
+
+    case value
+    when true, false
+      if field_name.to_s.end_with?("_pass") || field_name.to_s == "passed"
+        choose_pass_fail(field_label, value)
+      elsif BOOLEAN_FIELDS.include?(field_name.to_s)
+        value ? check_form_radio(tab_name.to_sym, field_name) :
+                uncheck_form_radio(tab_name.to_sym, field_name)
+      else
+        choose_yes_no(field_label, value)
+      end
+    when :pass, "pass"
+      choose_pass_fail(field_label, true)
+    when :fail, "fail"
+      choose_pass_fail(field_label, false)
+    when :na, "na"
+      # For now, skip N/A values as the test uses passing values
+      # The form should support N/A but we don't need to test it here
+    else
+      fill_in_form(tab_name.to_sym, field_name, value) if value.present?
+    end
+  end
+
+  def get_field_label(tab_name, field_name)
+    field_str = field_name.to_s
+
+    if field_str.end_with?("_pass")
+      pass_key = "forms.#{tab_name}.fields.#{field_name}"
+      base_key = "forms.#{tab_name}.fields.#{field_str.chomp("_pass")}"
+
+      I18n.exists?(pass_key) ? I18n.t(pass_key) : I18n.t(base_key)
+    else
+      I18n.t("forms.#{tab_name}.fields.#{field_name}")
+    end
+  end
+
+  # Unit-related button methods
+  def click_units_button(key, confirm: false)
+    translation = I18n.t("units.buttons.#{key}")
+    if confirm && page.driver.respond_to?(:accept_modal)
+      accept_confirm do
+        click_button translation
+      end
+    else
+      click_button translation
+    end
+  end
+
+  def expect_units_message(key)
+    expect_i18n_content("units.messages.#{key}")
   end
 end
 

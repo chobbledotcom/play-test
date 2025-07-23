@@ -38,16 +38,14 @@ class InspectionWorkflow
   include InspectionTestHelpers
   include FormHelpers
 
-  BOOLEAN_FIELDS = %w[has_slide is_totally_enclosed passed].freeze
-
   attr_reader :user
   attr_reader :unit
   attr_reader :inspection
   attr_reader :second_inspection
   attr_reader :options
 
-  def initialize(has_slide:, is_totally_enclosed:, unit_type: :bouncy_castle)
-    @options = {has_slide:, is_totally_enclosed:, unit_type:}
+  def initialize(has_slide:, is_totally_enclosed:, unit_type: :bouncy_castle, indoor_only: false)
+    @options = {has_slide:, is_totally_enclosed:, unit_type:, indoor_only:}
   end
 
   def t(key, **options)
@@ -156,7 +154,7 @@ class InspectionWorkflow
     visit root_path
     click_link "Units"
     click_link "Test Bouncy Castle"
-    click_units_button("add_inspection", confirm: true)
+    click_units_button("add_inspection")
     expect(page).to have_content(t("inspections.titles.edit"))
     expect(page).to have_current_path(/inspections\/\w+\/edit/)
     @unit.inspections.order(created_at: :desc).first.tap do |inspection|
@@ -169,21 +167,12 @@ class InspectionWorkflow
     field_data = SeedData.inspection_fields(passed: true)
     field_data[:has_slide] = @options[:has_slide]
     field_data[:is_totally_enclosed] = @options[:is_totally_enclosed]
+    field_data[:indoor_only] = @options[:indoor_only] || false
 
     field_data.each do |field_name, value|
       fill_inspection_field(field_name, value)
     end
     click_submit_button
-  end
-
-  def fill_inspection_field(field_name, value)
-    if BOOLEAN_FIELDS.include?(field_name.to_s)
-      value ?
-        check_form_radio(:inspection, field_name) :
-        uncheck_form_radio(:inspection, field_name)
-    else
-      fill_in_form :inspection, field_name, value
-    end
   end
 
   def fill_all_assessments
@@ -211,61 +200,6 @@ class InspectionWorkflow
     end
     submit_form tab_name.to_sym
     expect_updated_message
-  end
-
-  def fill_assessment_field(tab_name, field_name, value)
-    return if field_name.to_s.end_with?("_comment")
-
-    field_label = get_field_label(tab_name, field_name)
-
-    case value
-    when true, false
-      if field_name.to_s.end_with?("_pass") || field_name.to_s == "passed"
-        choose_pass_fail(field_label, value)
-      elsif BOOLEAN_FIELDS.include?(field_name.to_s)
-        value ? check_form_radio(tab_name.to_sym, field_name) :
-                uncheck_form_radio(tab_name.to_sym, field_name)
-      else
-        choose_yes_no(field_label, value)
-      end
-    when :pass, "pass"
-      choose_pass_fail(field_label, true)
-    when :fail, "fail"
-      choose_pass_fail(field_label, false)
-    when :na, "na"
-      # For now, skip N/A values as the test uses passing values
-      # The form should support N/A but we don't need to test it here
-    else
-      fill_in_form(tab_name.to_sym, field_name, value) if value.present?
-    end
-  end
-
-  def get_field_label(tab_name, field_name)
-    field_str = field_name.to_s
-
-    if field_str.end_with?("_pass")
-      pass_key = "forms.#{tab_name}.fields.#{field_name}"
-      base_key = "forms.#{tab_name}.fields.#{field_str.chomp("_pass")}"
-
-      I18n.exists?(pass_key) ? I18n.t(pass_key) : I18n.t(base_key)
-    else
-      I18n.t("forms.#{tab_name}.fields.#{field_name}")
-    end
-  end
-
-  def click_units_button(key, confirm: false)
-    translation = t("units.buttons.#{key}")
-    if @js && confirm
-      accept_confirm do
-        click_button translation
-      end
-    else
-      click_button translation
-    end
-  end
-
-  def expect_units_message(key)
-    expect_i18n_content("units.messages.#{key}")
   end
 
   def verify_inspection_not_completable
@@ -371,7 +305,7 @@ class InspectionWorkflow
 
   def create_second_inspection
     visit unit_path(@unit)
-    click_units_button("add_inspection", confirm: true)
+    click_units_button("add_inspection")
     @second_inspection = @unit.inspections.order(created_at: :desc).first
   end
 
@@ -484,6 +418,7 @@ class InspectionWorkflow
     if @options[:unit_type] == :bouncy_castle
       expected_tabs << "slide" if @options[:has_slide]
       expected_tabs << "enclosed" if @options[:is_totally_enclosed]
+      expected_tabs.delete("anchorage") if @options[:indoor_only]
     end
 
     expected_tabs.each do |tab|
