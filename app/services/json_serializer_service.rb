@@ -82,7 +82,7 @@ class JsonSerializerService
         name: inspection.unit.name,
         serial: inspection.unit.serial,
         manufacturer: inspection.unit.manufacturer,
-        owner: inspection.unit.owner
+        operator: inspection.unit.operator
       }
     end
 

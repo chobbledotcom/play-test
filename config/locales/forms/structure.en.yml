@@ -12,9 +12,9 @@ en:
         seam_integrity_pass: "Seam Integrity"
         uses_lock_stitching_pass: "Uses Lock Stitching"
         air_loss_pass: "Air Loss"
-        straight_walls_pass: "Straight Walls"
-        sharp_edges_pass: "Sharp Edges"
-        unit_stable_pass: "Unit Stable"
+        straight_walls_pass: "Vertical Walls (+/- 5%)"
+        sharp_edges_pass: "Sharp Angles or Oblique Edges"
+        unit_stable_pass: "Unit Stability"
         # Measurements
         stitch_length: "Stitch Length (mm)"
         stitch_length_pass: "Stitch Length (mm)"
@@ -24,7 +24,7 @@ en:
         blower_tube_length: "Blower Tube Length (m)"
         blower_tube_length_pass: "Blower Tube Length (m)"
         # Additional Safety Checks
-        critical_fall_off_height: "Critical Fall Off Height (m)"
+        critical_fall_off_height: "Fall Off Height (m)"
         step_ramp_size: "Step/Ramp Size (mm)"
         trough_depth: "Trough Depth (mm)"
         trough_adjacent_panel_width: "Trough Adjacent Panel Width (m)"

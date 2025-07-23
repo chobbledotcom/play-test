@@ -109,8 +109,8 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_button("Delete")
       end
 
-      it "displays manufacturer and owner information" do
-        test_unit = create(:unit, user: user, manufacturer: "ACME Corp", owner: "John Doe")
+      it "displays manufacturer and operator information" do
+        test_unit = create(:unit, user: user, manufacturer: "ACME Corp", operator: "John Doe")
 
         visit unit_path(test_unit)
 
@@ -152,7 +152,7 @@ RSpec.describe "Units", type: :request do
         fill_in I18n.t("forms.units.fields.model"), with: "Test Model"
         fill_in I18n.t("forms.units.fields.serial"), with: "NEWTEST123"
         fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
-        fill_in I18n.t("forms.units.fields.owner"), with: "Test Owner"
+        fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
 
         click_button I18n.t("forms.units.submit")
 
@@ -184,7 +184,7 @@ RSpec.describe "Units", type: :request do
         fill_in I18n.t("forms.units.fields.manufacturer"), with: "Same Mfg"
         fill_in I18n.t("forms.units.fields.serial"), with: existing_unit.serial
         fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
-        fill_in I18n.t("forms.units.fields.owner"), with: "Test Owner"
+        fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
 
         click_button I18n.t("forms.units.submit")
 
@@ -282,8 +282,8 @@ RSpec.describe "Units", type: :request do
 
     describe "Search and filtering functionality" do
       before do
-        create(:unit, user: user, name: "Searchable Bouncy Castle", manufacturer: "ACME Corp", owner: "John Doe")
-        create(:unit, user: user, name: "Different Slide", manufacturer: "XYZ Industries", owner: "Jane Smith")
+        create(:unit, user: user, name: "Searchable Bouncy Castle", manufacturer: "ACME Corp", operator: "John Doe")
+        create(:unit, user: user, name: "Different Slide", manufacturer: "XYZ Industries", operator: "Jane Smith")
       end
 
       it "performs search by name" do
@@ -311,13 +311,13 @@ RSpec.describe "Units", type: :request do
         end
       end
 
-      it "filters by owner" do
+      it "filters by operator" do
         visit units_path
 
-        if page.has_select?("owner")
-          select "Jane Smith", from: "owner"
+        if page.has_select?("operator")
+          select "Jane Smith", from: "operator"
           # Give time for auto-submit or check current page
-          visit current_path + "?owner=Jane+Smith"
+          visit current_path + "?operator=Jane+Smith"
 
           expect(page).to have_content("Different Slide")
           expect(page).not_to have_content("Searchable Bouncy Castle")
@@ -369,7 +369,7 @@ RSpec.describe "Units", type: :request do
         fill_in I18n.t("forms.units.fields.model"), with: "Test Model"
         fill_in I18n.t("forms.units.fields.serial"), with: "PHOTO123"
         fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
-        fill_in I18n.t("forms.units.fields.owner"), with: "Test Owner"
+        fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
 
         # Only attach photo if the field exists
         if page.has_field?("Photo")
@@ -448,7 +448,7 @@ RSpec.describe "Units", type: :request do
       fill_in I18n.t("forms.units.fields.model"), with: "Test Model"
       fill_in I18n.t("forms.units.fields.serial"), with: "PROTECT123"
       fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
-      fill_in I18n.t("forms.units.fields.owner"), with: "Test Owner"
+      fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
 
       click_button I18n.t("forms.units.submit")
 
@@ -586,7 +586,7 @@ RSpec.describe "Units", type: :request do
             manufacturer: "Test Manufacturer",
             serial: "FROM_INSP_123",
             description: "Created from inspection",
-            owner: "Test Owner",
+            operator: "Test Operator",
             width: 5.0,
             length: 4.0,
             height: 3.0,
@@ -669,7 +669,7 @@ RSpec.describe "Units", type: :request do
             manufacturer: "Test",
             serial: "FAIL123",
             description: "Test",
-            owner: "Test",
+            operator: "Test",
             width: 5.0,
             length: 4.0,
             height: 3.0

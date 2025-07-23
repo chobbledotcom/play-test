@@ -22,22 +22,22 @@
   <%= render 'form/text_field', field: :serial, required: true %>
   <%= render 'form/text_area', field: :description, required: true %>
   
-  <%# Owner with optional count link %>
-  <% if object.persisted? && object.owner.present? %>
-    <% owner_count = current_user.units.where(owner: object.owner).count %>
-    <% if owner_count > 0 %>
+  <%# Operator with optional count link %>
+  <% if object.persisted? && object.operator.present? %>
+    <% operator_count = current_user.units.where(operator: object.operator).count %>
+    <% if operator_count > 0 %>
       <%= render 'form/field_with_link',
           field_type: :autocomplete_field,
-          field: :owner,
+          field: :operator,
           required: true,
-          options: owner_options(current_user),
-          link_url: units_path(owner: object.owner),
-          link_text: t('units.labels.all_count', count: owner_count) %>
+          options: operator_options(current_user),
+          link_url: units_path(operator: object.operator),
+          link_text: t('units.labels.all_count', count: operator_count) %>
     <% else %>
-      <%= render 'form/autocomplete_field', field: :owner, required: true, options: owner_options(current_user) %>
+      <%= render 'form/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
     <% end %>
   <% else %>
-    <%= render 'form/autocomplete_field', field: :owner, required: true, options: owner_options(current_user) %>
+    <%= render 'form/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
   <% end %>
   
   <%= render 'form/date_field', field: :manufacture_date %>

@@ -23,13 +23,13 @@ RSpec.describe Unit, type: :model do
   describe "validations" do
     it "validates presence of all required fields" do
       unit = build(:unit, user: user, name: nil, serial: nil,
-        description: nil, manufacturer: nil, owner: nil)
+        description: nil, manufacturer: nil, operator: nil)
       expect(unit).not_to be_valid
       expect(unit.errors[:name]).to be_present
       expect(unit.errors[:serial]).to be_present
       expect(unit.errors[:description]).to be_present
       expect(unit.errors[:manufacturer]).to be_present
-      expect(unit.errors[:owner]).to be_present
+      expect(unit.errors[:operator]).to be_present
     end
 
     it "validates serial uniqueness within user" do
@@ -98,11 +98,11 @@ RSpec.describe Unit, type: :model do
     describe "validations in unit mode" do
       it "validates unit-specific fields when in unit mode" do
         unit = build(:unit, user: user, manufacturer: nil,
-          owner: nil, serial: nil)
+          operator: nil, serial: nil)
 
         expect(unit).not_to be_valid
         expect(unit.errors[:manufacturer]).to be_present
-        expect(unit.errors[:owner]).to be_present
+        expect(unit.errors[:operator]).to be_present
         expect(unit.errors[:serial]).to be_present
       end
 
@@ -125,7 +125,7 @@ RSpec.describe Unit, type: :model do
           results = Unit.search("Test Manufacturer")
           expect(results).to include(test_unit)
 
-          results = Unit.search("Test Owner")
+          results = Unit.search("Test Operator")
           expect(results).to include(test_unit)
         end
       end

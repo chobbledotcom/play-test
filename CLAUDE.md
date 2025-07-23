@@ -570,7 +570,7 @@ scope :search, ->(query) {
       OR name LIKE ?
       OR description LIKE ?
       OR manufacturer LIKE ?
-      OR owner LIKE ?
+      OR operator LIKE ?
     SQL
   else
     all
@@ -578,7 +578,7 @@ scope :search, ->(query) {
 }
 
 # BAD - Long SQL on single line
-where("serial LIKE ? OR name LIKE ? OR description LIKE ? OR manufacturer LIKE ? OR owner LIKE ?",
+where("serial LIKE ? OR name LIKE ? OR description LIKE ? OR manufacturer LIKE ? OR operator LIKE ?",
       search_term, search_term, search_term, search_term, search_term)
 
 # BAD - All on one line when over 80 chars

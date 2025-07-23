@@ -45,15 +45,15 @@ en:
       all_statuses: "All Statuses"
       all_results: "All Results"
       all_units: "All Units"
-      all_owners: "All Owners"
+      all_operators: "All Operators"
       all_locations: "All Locations"
       passed: "Passed"
       failed: "Failed"
 
     tabs:
       general: "General"
-      user_height: "Tallest User Height"
-      tallest_user_height: "Tallest User Height" # New key for compatibility
+      user_height: "Maximum User Height"
+      tallest_user_height: "Maximum User Height" # New key for compatibility
       slide: "Slide"
       structure: "Structure"
       anchorage: "Anchorage"
@@ -69,7 +69,7 @@ en:
       model: "Model"
       manufacturer: "Manufacturer"
       serial: "Serial Number"
-      owner: "Owner"
+      operator: "Operator"
       description: "Description"
       unit_type: "Unit Type"
       name: "Name"
@@ -97,8 +97,8 @@ en:
       inspection_company_name: "Inspection Company Name"
       overall_result: "Overall Result"
       passed: "Pass"
-      critical_fall_off_height: "Critical Fall Off Height (m)"
-      critical_fall_off_height_pass: "Critical Fall Off Height Pass"
+      critical_fall_off_height: "Fall Off Height (m)"
+      critical_fall_off_height_pass: "Fall Off Height Pass"
       unit_pressure: "Unit Pressure (kPa)"
       unit_pressure_pass: "Unit Pressure Pass"
       entrapment_pass: "Entrapment Pass"

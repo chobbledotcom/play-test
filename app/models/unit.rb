@@ -22,7 +22,7 @@ class Unit < ApplicationRecord
   before_destroy :destroy_draft_inspections
 
   # All fields are required for Units
-  validates :name, :serial, :description, :manufacturer, :owner, presence: true
+  validates :name, :serial, :description, :manufacturer, :operator, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
 
   # Scopes - enhanced from original Equipment and new Unit functionality
@@ -36,14 +36,14 @@ class Unit < ApplicationRecord
         OR name LIKE ?
         OR description LIKE ?
         OR manufacturer LIKE ?
-        OR owner LIKE ?
+        OR operator LIKE ?
       SQL
     else
       all
     end
   }
   scope :by_manufacturer, ->(manufacturer) { where(manufacturer: manufacturer) if manufacturer.present? }
-  scope :by_owner, ->(owner) { where(owner: owner) if owner.present? }
+  scope :by_operator, ->(operator) { where(operator: operator) if operator.present? }
   scope :with_recent_inspections, -> {
     cutoff_date = SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago
     joins(:inspections)

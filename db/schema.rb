@@ -272,7 +272,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_153915) do
     t.datetime "updated_at", null: false
     t.string "manufacturer"
     t.string "description"
-    t.string "owner"
+    t.string "operator"
     t.string "model"
     t.date "manufacture_date"
     t.boolean "is_seed", default: false, null: false

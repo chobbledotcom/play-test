@@ -12,8 +12,8 @@
   <p><strong><%= t('inspections.fields.serial') %>:</strong> <%= unit.serial %></p>
   <p><strong><%= t('inspections.fields.manufacturer') %>:</strong> <%= unit.manufacturer %></p>
 
-  <% if unit.owner.present? %>
-    <p><strong><%= t('inspections.fields.owner') %>:</strong> <%= unit.owner %></p>
+  <% if unit.operator.present? %>
+    <p><strong><%= t('inspections.fields.operator') %>:</strong> <%= unit.operator %></p>
   <% end %>
 
   <% if unit.description.present? %>

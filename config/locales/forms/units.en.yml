@@ -13,7 +13,7 @@ en:
         manufacturer: "Manufacturer"
         model: "Model"
         description: "Description"
-        owner: "Owner"
+        operator: "Operator"
         manufacture_date: "Manufacture Date"
         photo: "Photo"
       submit: "Save Unit"

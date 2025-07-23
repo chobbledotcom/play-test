@@ -22,22 +22,22 @@
           required: true %>
     <% end %>
     
-    <%# Owner with optional count link %>
-    <% if unit.persisted? && unit.owner.present? %>
-      <% owner_count = current_user.units.where(owner: unit.owner).count %>
-      <% if owner_count > 0 %>
+    <%# Operator with optional count link %>
+    <% if unit.persisted? && unit.operator.present? %>
+      <% operator_count = current_user.units.where(operator: unit.operator).count %>
+      <% if operator_count > 0 %>
         <%= render 'form/field_with_link',
             field_type: :autocomplete_field,
-            field: :owner,
+            field: :operator,
             required: true,
-            options: owner_options(current_user),
-            link_url: units_path(owner: unit.owner),
-            link_text: t('units.labels.all_count', count: owner_count) %>
+            options: operator_options(current_user),
+            link_url: units_path(operator: unit.operator),
+            link_text: t('units.labels.all_count', count: operator_count) %>
       <% else %>
-        <%= render 'form/autocomplete_field', field: :owner, required: true, options: owner_options(current_user) %>
+        <%= render 'form/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
       <% end %>
     <% else %>
-      <%= render 'form/autocomplete_field', field: :owner, required: true, options: owner_options(current_user) %>
+      <%= render 'form/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
     <% end %>
     
     <%# Photo upload %>

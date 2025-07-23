@@ -18,20 +18,6 @@ Rename to "Save Asssement" to "Continue", and have it automatically continue to 
 
 Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and then force that theme to be set for all users of the RPII's instance. Also, make the homepage and about page HTML editable by admins.
 
-## Text Renames
-
-**Time: 30m**
-
-"Owner" => "Operator"
-"Straight Walls" => "Vertical Walls (+/- 5%)"
-"Sharp Edges" => "Sharp angles, oblique edges"
-"Unit Stable" => "Unit Stability"
-"Critical Fall Off Height" => "Fall Off Height"
-"Negative Adjustment" => "Negative Play Space Adjustment (m2)"
-"Tallest User Height" => "Maximum User Height"
-
-Slides - "Containing Wall Height" => "Containing Platform Wall Height"
-
 ## Field Deletions
 
 **Time: 20m**
@@ -115,3 +101,21 @@ Add a link inside inspection results to upload images
 **Time: 10m**
 
 Add "Activate" and "Deactivate" buttons which sets active_until date
+
+---
+
+# Done
+
+## Text Renames
+
+**Time: 30m**
+
+"Owner" => "Operator"
+"Straight Walls" => "Vertical Walls (+/- 5%)"
+"Sharp Edges" => "Sharp Angles or Oblique Edges"
+"Unit Stable" => "Unit Stability"
+"Critical Fall Off Height" => "Fall Off Height"
+"Negative Adjustment" => "Negative Play Space Adjustment (m2)"
+"Tallest User Height" => "Maximum User Height"
+
+Slides - "Containing Wall Height" => "Containing Platform Wall Height"

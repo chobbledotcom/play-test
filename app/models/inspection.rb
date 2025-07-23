@@ -110,9 +110,9 @@ class Inspection < ApplicationRecord
   scope :filter_by_unit, ->(unit_id) {
     where(unit_id: unit_id) if unit_id.present?
   }
-  scope :filter_by_owner, ->(owner) {
-    if owner.present?
-      joins(:unit).where(units: {owner: owner})
+  scope :filter_by_operator, ->(operator) {
+    if operator.present?
+      joins(:unit).where(units: {operator: operator})
     else
       all
     end

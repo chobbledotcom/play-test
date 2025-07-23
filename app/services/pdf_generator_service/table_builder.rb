@@ -192,7 +192,7 @@ class PdfGeneratorService
         [I18n.t("pdf.inspection.fields.description"),
           Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH)],
         [I18n.t("pdf.inspection.fields.manufacturer"), unit.manufacturer.presence || ""],
-        [I18n.t("pdf.inspection.fields.owner"), unit.owner.presence || ""],
+        [I18n.t("pdf.inspection.fields.operator"), unit.operator.presence || ""],
         [I18n.t("pdf.inspection.fields.serial"), unit.serial || ""],
         [I18n.t("pdf.inspection.fields.size_m"), dimensions_text]
       ]
@@ -248,8 +248,8 @@ class PdfGeneratorService
         [
           I18n.t("pdf.inspection.fields.manufacturer"),
           unit.manufacturer.presence || "",
-          I18n.t("pdf.inspection.fields.owner"),
-          unit.owner.presence || ""
+          I18n.t("pdf.inspection.fields.operator"),
+          unit.operator.presence || ""
         ],
         [
           I18n.t("pdf.inspection.fields.size_m"),

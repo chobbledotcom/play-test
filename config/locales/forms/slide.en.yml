@@ -6,9 +6,9 @@ en:
         slide_dimensions: "Slide Measurements"
       fields:
         slide_platform_height: "Slide Platform Height (m)"
-        slide_wall_height: "Containing Wall Height (m)"
-        slide_first_metre_height: "First Metre of Slide Containing Wall Height (m)"
-        slide_beyond_first_metre_height: "Remaining Slide Containing Wall Height (m)"
+        slide_wall_height: "Containing Platform Wall Height (m)"
+        slide_first_metre_height: "First Metre of Slide Containing Platform Wall Height (m)"
+        slide_beyond_first_metre_height: "Remaining Slide Containing Platform Wall Height (m)"
         slide_permanent_roof: "Permanent Roof Fitted to Top of Slide?"
         clamber_netting_pass: "Steps / Clamber Netting"
         runout: "Slide Run Out (m)"

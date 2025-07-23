@@ -214,7 +214,7 @@ RSpec.describe JsonSerializerService do
       expect(included_fields.count).to eq(8)
 
       # Verify critical fields are included
-      %w[name serial manufacturer owner description model].each do |field|
+      %w[name serial manufacturer operator description model].each do |field|
         expect(json).to have_key(field.to_sym)
       end
     end
