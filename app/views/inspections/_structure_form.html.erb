@@ -21,8 +21,8 @@
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'trough_assessment' do %>
-    <%= render 'form/number_pass_fail_comment', field: :trough_depth, step: 1 %>
-    <%= render 'form/number_pass_fail_comment', field: :trough_adjacent_panel_width, step: 0.1 %>
+    <%= render 'form/decimal_comment', field: :trough_depth %>
+    <%= render 'form/decimal_comment', field: :trough_adjacent_panel_width %>
     <%= render 'form/pass_fail_comment', field: :trough_pass %>
   <% end %>
 

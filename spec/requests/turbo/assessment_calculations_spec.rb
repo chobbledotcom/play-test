@@ -9,6 +9,9 @@ RSpec.describe "Assessment Safety Calculations", type: :request do
 
   describe "dynamic calculations" do
     it "updates anchorage calculations" do
+      # Set inspection dimensions so calculations can be performed
+      inspection.update!(width: 10, height: 5, length: 15)
+
       patch inspection_anchorage_assessment_path(inspection),
         params: {
           assessments_anchorage_assessment: {

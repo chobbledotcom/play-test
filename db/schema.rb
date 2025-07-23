@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_23_222042) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_23_224047) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -250,9 +250,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_222042) do
     t.string "opening_dimension_comment", limit: 1000
     t.string "entrances_comment", limit: 1000
     t.string "fabric_integrity_comment", limit: 1000
-    t.boolean "trough_depth_pass"
     t.decimal "trough_adjacent_panel_width", precision: 8, scale: 2
-    t.boolean "trough_adjacent_panel_width_pass"
     t.text "trough_adjacent_panel_width_comment"
     t.decimal "step_ramp_size", precision: 8, scale: 2
     t.boolean "step_ramp_size_pass"

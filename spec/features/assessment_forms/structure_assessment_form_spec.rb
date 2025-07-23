@@ -48,8 +48,6 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     choose_structure_field :evacuation_time_pass, true
     choose_structure_field :critical_fall_off_height_pass, true
     choose_structure_field :step_ramp_size_pass, true
-    choose_structure_field :trough_depth_pass, true
-    choose_structure_field :trough_adjacent_panel_width_pass, true
     choose_structure_field :trough_pass, true
 
     choose_structure_field :entrapment_pass, false

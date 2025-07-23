@@ -87,9 +87,7 @@ FactoryBot.define do
       passed
 
       # Additional complete-only fields
-      trough_depth_pass { true }
       trough_adjacent_panel_width { 0.8 }
-      trough_adjacent_panel_width_pass { true }
       step_ramp_size { 0.3 }
       step_ramp_size_pass { true }
 

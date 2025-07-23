@@ -91,9 +91,7 @@ module SeedData
       step_ramp_size: rand(200..400),
       critical_fall_off_height: rand(0.5..2.0).round(1),
       trough_depth: rand(30..80).round(1),
-      trough_depth_pass: check_passed?(passed),
       trough_adjacent_panel_width: rand(0.3..1.0).round(1),
-      trough_adjacent_panel_width_pass: check_passed?(passed),
       evacuation_time_pass: check_passed?(passed),
       seam_integrity_comment: passed ?
         "All seams in good condition" :

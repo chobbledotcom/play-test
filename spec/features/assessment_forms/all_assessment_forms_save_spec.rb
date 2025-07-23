@@ -22,8 +22,6 @@ STRUCTURE_SAMPLE_DATA = {
   blower_tube_length_pass: true,
   critical_fall_off_height_pass: true,
   trough_pass: true,
-  trough_depth_pass: false,
-  trough_adjacent_panel_width_pass: true,
   step_ramp_size_pass: true,
   entrapment_pass: false,
   markings_pass: true,

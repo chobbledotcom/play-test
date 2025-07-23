@@ -29,7 +29,8 @@ RSpec.feature "Trough Fields in Structure Assessment", type: :feature do
 
       inspection.reload
       expect(inspection.structure_assessment.trough_depth).to eq(150.0)
-      expect(inspection.structure_assessment.trough_adjacent_panel_width).to eq(75.0)
+      width = inspection.structure_assessment.trough_adjacent_panel_width
+      expect(width).to eq(75.0)
     end
   end
 
@@ -38,10 +39,9 @@ RSpec.feature "Trough Fields in Structure Assessment", type: :feature do
       structure_assessment = inspection.structure_assessment
 
       expect(structure_assessment).to respond_to(:trough_depth)
-      expect(structure_assessment).to respond_to(:trough_depth_pass)
       expect(structure_assessment).to respond_to(:trough_adjacent_panel_width)
-      expect(structure_assessment).to respond_to(:trough_adjacent_panel_width_pass)
-      expect(structure_assessment).to respond_to(:trough_adjacent_panel_width_comment)
+      comment_field = :trough_adjacent_panel_width_comment
+      expect(structure_assessment).to respond_to(comment_field)
 
       expect(inspection).not_to respond_to(:trough_depth)
       expect(inspection).not_to respond_to(:trough_adjacent_panel_width)
