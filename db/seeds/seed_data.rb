@@ -85,7 +85,6 @@ module SeedData
       entrapment_pass: check_passed?(passed),
       markings_pass: check_passed?(passed),
       grounding_pass: check_passed?(passed),
-      stitch_length: rand(8..12),
       unit_pressure: rand(1.0..3.0).round(1),
       blower_tube_length: rand(2.0..5.0).round(1),
       step_ramp_size: rand(200..400),

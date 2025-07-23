@@ -209,7 +209,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_231038) do
     t.boolean "straight_walls_pass"
     t.boolean "sharp_edges_pass"
     t.boolean "unit_stable_pass"
-    t.decimal "stitch_length", precision: 8, scale: 2
     t.decimal "unit_pressure", precision: 8, scale: 2
     t.decimal "blower_tube_length", precision: 8, scale: 2
     t.decimal "critical_fall_off_height", precision: 8, scale: 2

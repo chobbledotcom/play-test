@@ -10,9 +10,7 @@ module SafetyStandards
         fire_standard: "EN 71-3"       # Fire retardancy standard
       },
       thread: {
-        min_tensile_strength: 88,      # Newtons minimum
-        stitch_length_min: 3,          # mm minimum
-        stitch_length_max: 8           # mm maximum
+        min_tensile_strength: 88      # Newtons minimum
       },
       rope: {
         min_diameter: 18,              # mm minimum
@@ -27,18 +25,6 @@ module SafetyStandards
 
     # Test examples for material validation
     MATERIAL_TEST_EXAMPLES = {
-      stitch_length: {
-        valid: {
-          minimum: 3,      # mm - minimum allowed
-          medium: 5,       # mm - middle of range
-          maximum: 8       # mm - maximum allowed
-        },
-        invalid: {
-          too_short: 2,    # mm - below minimum
-          too_long: 9,     # mm - above maximum
-          nil_value: nil   # nil not allowed
-        }
-      },
       rope_diameter: {
         valid: {
           minimum: 18,     # mm - minimum allowed
@@ -53,14 +39,6 @@ module SafetyStandards
       }
     }.freeze
 
-    def valid_stitch_length?(length_mm)
-      # EN 14960:2019 - Stitch length must be within specified range to ensure
-      # adequate seam strength while maintaining fabric integrity
-      min_length = MATERIAL_STANDARDS[:thread][:stitch_length_min]
-      max_length = MATERIAL_STANDARDS[:thread][:stitch_length_max]
-      length_mm.present? && length_mm.between?(min_length, max_length)
-    end
-
     def valid_rope_diameter?(diameter_mm)
       # EN 14960:2019 - Rope diameter range prevents finger entrapment while
       # ensuring adequate grip and structural strength
@@ -69,7 +47,9 @@ module SafetyStandards
       diameter_mm.present? && diameter_mm.between?(min_diameter, max_diameter)
     end
 
-    def fabric_tensile_requirement(fabric_standards = MATERIAL_STANDARDS[:fabric])
+    def fabric_tensile_requirement(
+      fabric_standards = MATERIAL_STANDARDS[:fabric]
+    )
       "#{fabric_standards[:min_tensile_strength]} Newtons minimum"
     end
 

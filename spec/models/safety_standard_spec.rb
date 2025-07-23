@@ -132,22 +132,6 @@ RSpec.describe SafetyStandard, type: :model do
   end
 
   describe "validation methods" do
-    describe ".valid_stitch_length?" do
-      # Test valid stitch lengths
-      SafetyStandards::MaterialValidator::MATERIAL_TEST_EXAMPLES[:stitch_length][:valid].each do |scenario, value|
-        it "returns true for #{scenario}: #{value}mm" do
-          expect(SafetyStandards::MaterialValidator.valid_stitch_length?(value)).to be true
-        end
-      end
-
-      # Test invalid stitch lengths
-      SafetyStandards::MaterialValidator::MATERIAL_TEST_EXAMPLES[:stitch_length][:invalid].each do |scenario, value|
-        it "returns false for #{scenario}: #{value.inspect}" do
-          expect(SafetyStandards::MaterialValidator.valid_stitch_length?(value)).to be false
-        end
-      end
-    end
-
     describe ".valid_rope_diameter?" do
       # Test valid rope diameters
       SafetyStandards::MaterialValidator::MATERIAL_TEST_EXAMPLES[:rope_diameter][:valid].each do |scenario, value|

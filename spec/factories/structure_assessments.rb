@@ -60,7 +60,6 @@ FactoryBot.define do
       unit_stable_pass { true }
 
       # Measurements with passing values
-      stitch_length { 15.0 }
       unit_pressure { 2.5 }
       blower_tube_length { 1.5 }
       step_ramp_size { 0.2 }
@@ -116,7 +115,6 @@ FactoryBot.define do
       additional_checks_pass { false }
 
       # Failing measurement values
-      stitch_length { 10.0 }
       unit_pressure { 1.0 }
     end
   end
