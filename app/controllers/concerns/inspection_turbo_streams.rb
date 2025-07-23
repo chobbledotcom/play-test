@@ -48,10 +48,14 @@ module InspectionTurboStreams
 
   def save_message_locals(success:, dom_id:)
     if success
+      current_tab_name = params[:tab].presence || "inspection"
+      next_tab = helpers.next_incomplete_tab(@inspection, current_tab_name)
       {
         dom_id: dom_id,
         success: true,
-        message: t("inspections.messages.updated")
+        message: t("inspections.messages.updated"),
+        next_tab: next_tab,
+        inspection: @inspection
       }
     else
       {

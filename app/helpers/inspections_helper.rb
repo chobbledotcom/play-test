@@ -82,4 +82,21 @@ module InspectionsHelper
     name = t("forms.#{tab}.header")
     assessment_complete?(inspection, tab) ? "#{name} ✓" : name
   end
+
+  def next_incomplete_tab(inspection, current_tab)
+    all_tabs = inspection.applicable_tabs
+    current_index = all_tabs.index(current_tab)
+    return nil unless current_index
+
+    tabs_to_check = all_tabs[(current_index + 1)..]
+    next_tab = tabs_to_check.find { |tab|
+      !assessment_complete?(inspection, tab)
+    }
+
+    return next_tab if next_tab
+
+    if inspection.passed.nil?
+      "results"
+    end
+  end
 end

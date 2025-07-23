@@ -12,5 +12,12 @@
 <% else %>
   <div class="success" id="form_save_message">
     <%= message_text || t('shared.messages.saved_successfully') %>
+    <% if local_assigns[:next_tab] && local_assigns[:inspection] %>
+      <br>
+      <%= link_to t('inspections.buttons.continue_to_tab', 
+                    tab_name: t("forms.#{local_assigns[:next_tab]}.header")),
+            edit_inspection_path(local_assigns[:inspection], 
+                                 tab: local_assigns[:next_tab]) + "#tabs" %>
+    <% end %>
   </div>
 <% end %>

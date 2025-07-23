@@ -152,6 +152,7 @@ en:
       download_qr_code: "Download QR Code"
       use_suggested_id: "Use its public ID - %{id}"
       log: "Log"
+      continue_to_tab: "Continue to %{tab_name}"
 
     messages:
       no_unit: "No unit selected"
