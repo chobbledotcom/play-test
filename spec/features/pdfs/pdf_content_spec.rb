@@ -138,8 +138,8 @@ RSpec.feature "PDF Content Structure", type: :feature, pdf: true do
       inspection.materials_assessment.update!(
         ropes_pass: "na",
         ropes: 16,
-        retention_netting_pass: true,
-        zips_pass: false
+        retention_netting_pass: "pass",
+        zips_pass: "fail"
       )
 
       pdf_text = get_pdf_text(inspection_path(inspection, format: :pdf))

@@ -23,10 +23,10 @@ FactoryBot.define do
       fabric_strength_pass { true }
       fire_retardant_pass { true }
       thread_pass { true }
-      retention_netting_pass { true }
-      zips_pass { true }
-      windows_pass { true }
-      artwork_pass { true }
+      retention_netting_pass { :pass }
+      zips_pass { :pass }
+      windows_pass { :pass }
+      artwork_pass { :pass }
     end
 
     trait :complete do
@@ -35,10 +35,10 @@ FactoryBot.define do
       fabric_strength_pass { true }
       fire_retardant_pass { true }
       thread_pass { true }
-      retention_netting_pass { true }
-      zips_pass { true }
-      windows_pass { true }
-      artwork_pass { true }
+      retention_netting_pass { :pass }
+      zips_pass { :pass }
+      windows_pass { :pass }
+      artwork_pass { :pass }
       ropes_comment { "Rope diameter meets safety standards" }
       fabric_strength_comment { "Fabric in good condition" }
       fire_retardant_comment { "Fire retardant treatment effective" }
@@ -51,7 +51,7 @@ FactoryBot.define do
       fabric_strength_pass { false }
       fire_retardant_pass { false }
       thread_pass { false }
-      retention_netting_pass { false }
+      retention_netting_pass { :fail }
     end
 
     trait :critical_failures do

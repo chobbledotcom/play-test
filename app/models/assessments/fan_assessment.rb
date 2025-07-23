@@ -6,6 +6,9 @@ class Assessments::FanAssessment < ApplicationRecord
 
   belongs_to :inspection
 
+  enum :pat_pass, Inspection::PASS_FAIL_NA, prefix: true
+  enum :blower_flap_pass, Inspection::PASS_FAIL_NA, prefix: true
+
   validates :inspection_id,
     uniqueness: true
 end

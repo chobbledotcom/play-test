@@ -16,11 +16,11 @@ FactoryBot.define do
 
     trait :passed do
       fan_size_type { "Standard 2HP blower" }
-      blower_flap_pass { true }
+      blower_flap_pass { :pass }
       blower_flap_comment { "Flap opens and closes properly" }
       blower_finger_pass { true }
       blower_finger_comment { "Finger guards in place and secure" }
-      pat_pass { true }
+      pat_pass { :pass }
       pat_comment { "PAT test completed successfully" }
       blower_visual_pass { true }
       blower_visual_comment { "Visual inspection shows good condition" }
@@ -31,11 +31,11 @@ FactoryBot.define do
       fan_size_type { "Standard 2HP blower" }
       blower_serial_pass { true }
       blower_serial_comment { "Serial number verified" }
-      blower_flap_pass { true }
+      blower_flap_pass { :pass }
       blower_flap_comment { "Flap opens and closes properly" }
       blower_finger_pass { true }
       blower_finger_comment { "Finger guards in place and secure" }
-      pat_pass { true }
+      pat_pass { :pass }
       pat_comment { "PAT test completed successfully" }
       blower_visual_pass { true }
       blower_visual_comment { "Visual inspection shows good condition" }
@@ -44,9 +44,9 @@ FactoryBot.define do
 
     trait :failed do
       fan_size_type { "2HP blower - safety issues identified" }
-      blower_flap_pass { false }
+      blower_flap_pass { :fail }
       blower_finger_pass { false }
-      pat_pass { false }
+      pat_pass { :fail }
       blower_visual_pass { false }
       blower_flap_comment { "Flap does not open properly" }
       blower_finger_comment { "Finger guards damaged" }
@@ -56,8 +56,8 @@ FactoryBot.define do
     end
 
     trait :pat_failure do
-      pat_pass { false }
-      pat_comment { "Electrical safety test failed - immediate attention required" }
+      pat_pass { :fail }
+      pat_comment { "Electrical safety test failed - attention required" }
     end
   end
 end

@@ -46,10 +46,10 @@ MATERIALS_SAMPLE_DATA = {
   fire_retardant_pass: false,
   thread_pass: true,
   ropes_pass: "pass",
-  retention_netting_pass: false,
-  zips_pass: true,
-  windows_pass: true,
-  artwork_pass: false,
+  retention_netting_pass: "fail",
+  zips_pass: "pass",
+  windows_pass: "pass",
+  artwork_pass: "fail",
 
   ropes_comment: "Rope diameter within spec",
   fire_retardant_comment: "Requires flame retardant treatment",
@@ -81,10 +81,10 @@ FAN_SAMPLE_DATA = {
   blower_serial: "FAN-2024-12345",
   fan_size_type: "Centrifugal 1.5HP",
 
-  blower_flap_pass: true,
+  blower_flap_pass: "pass",
   blower_finger_pass: true,
   blower_visual_pass: false,
-  pat_pass: true,
+  pat_pass: "pass",
   blower_serial_pass: true,
 
   blower_serial_comment: "Serial verified against manufacturer database",

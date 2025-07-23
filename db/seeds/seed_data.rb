@@ -107,10 +107,10 @@ module SeedData
     {
       ropes: rand(18..45),
       ropes_pass: check_passed_integer?(passed),
-      retention_netting_pass: check_passed?(passed),
-      zips_pass: check_passed?(passed),
-      windows_pass: check_passed?(passed),
-      artwork_pass: check_passed?(passed),
+      retention_netting_pass: check_passed_integer?(passed),
+      zips_pass: check_passed_integer?(passed),
+      windows_pass: check_passed_integer?(passed),
+      artwork_pass: check_passed_integer?(passed),
       thread_pass: check_passed?(passed),
       fabric_strength_pass: check_passed?(passed),
       fire_retardant_pass: check_passed?(passed),
@@ -123,10 +123,10 @@ module SeedData
 
   def self.fan_fields(passed: true)
     {
-      blower_flap_pass: check_passed?(passed),
+      blower_flap_pass: check_passed_integer?(passed),
       blower_finger_pass: check_passed?(passed),
       blower_visual_pass: check_passed?(passed),
-      pat_pass: check_passed?(passed),
+      pat_pass: check_passed_integer?(passed),
       blower_serial_pass: check_passed?(passed),
       blower_serial: "FAN-#{rand(1000..9999)}",
       fan_size_type: passed ?

@@ -351,10 +351,10 @@ RSpec.describe "Seed Data", type: :model do
         it "creates assessments with all required safety checks" do
           Assessments::FanAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
-            expect([true, false]).to include(assessment.blower_flap_pass)
+            expect(["pass", "fail", "na"]).to include(assessment.blower_flap_pass)
             expect([true, false]).to include(assessment.blower_finger_pass)
             expect([true, false]).to include(assessment.blower_visual_pass)
-            expect([true, false]).to include(assessment.pat_pass)
+            expect(["pass", "fail", "na"]).to include(assessment.pat_pass)
             expect(assessment.blower_serial).to be_present
           end
         end

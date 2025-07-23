@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_23_185449) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_23_204040) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -91,11 +91,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_185449) do
   create_table "fan_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
     t.text "fan_size_type"
-    t.boolean "blower_flap_pass"
+    t.integer "blower_flap_pass", limit: 1
     t.text "blower_flap_comment"
     t.boolean "blower_finger_pass"
     t.text "blower_finger_comment"
-    t.boolean "pat_pass"
+    t.integer "pat_pass", limit: 1
     t.text "pat_comment"
     t.boolean "blower_visual_pass"
     t.text "blower_visual_comment"
@@ -158,10 +158,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_185449) do
     t.string "inspection_id", limit: 12, null: false
     t.decimal "ropes", precision: 8, scale: 2
     t.integer "ropes_pass", limit: 1
-    t.boolean "retention_netting_pass"
-    t.boolean "zips_pass"
-    t.boolean "windows_pass"
-    t.boolean "artwork_pass"
+    t.integer "retention_netting_pass", limit: 1
+    t.integer "zips_pass", limit: 1
+    t.integer "windows_pass", limit: 1
+    t.integer "artwork_pass", limit: 1
     t.boolean "thread_pass"
     t.boolean "fabric_strength_pass"
     t.boolean "fire_retardant_pass"

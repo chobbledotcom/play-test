@@ -127,13 +127,30 @@ module RadioButtonHelpers
   end
 
   def find_and_click_radio(label, value)
-    radio_value = boolean_to_radio_value(value)
-
-    if try_radio_selectors(label, value, radio_value)
-      return
+    # Convert value to the text that appears on the radio button label
+    target_text = case value.to_s
+    when "pass" then "Pass"
+    when "fail" then "Fail"
+    when "na" then "Not Applicable"
+    else
+      # Fallback for boolean values
+      radio_text_for_boolean(value, :pass_fail)
     end
 
-    raise Capybara::ElementNotFound, "Unable to find radio for '#{label}'"
+    # Find the form section containing the field label, then find the radio button with the target text
+    begin
+      # Look for the specific form grid container with this field label
+      within(:xpath, "//div[@class='form-grid radio-comment'][.//label[@class='label'][normalize-space(.)='#{label}']]") do
+        # Find the radio button with the target text and click it
+        find("label", text: /^#{Regexp.escape(target_text)}$/).find("input[type='radio']").click
+      end
+    rescue Capybara::ElementNotFound
+      # Fallback to original complex selectors if the simple approach fails
+      radio_value = boolean_to_radio_value(value)
+      unless try_radio_selectors(label, value, radio_value)
+        raise Capybara::ElementNotFound, "Unable to find radio for '#{label}' with value '#{value}'"
+      end
+    end
   end
 
   def try_radio_selectors(label, value, radio_value)
