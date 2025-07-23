@@ -31,17 +31,17 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
       # Create an inspection with photos to test photos section i18n
       photos_inspection = create(:inspection, :completed, user:, unit:, passed: true)
       photos_inspection.photo_1.attach(
-        io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+        io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
         filename: "test.jpg",
         content_type: "image/jpeg"
       )
       photos_inspection.photo_2.attach(
-        io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+        io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
         filename: "test2.jpg",
         content_type: "image/jpeg"
       )
       photos_inspection.photo_3.attach(
-        io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+        io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
         filename: "test3.jpg",
         content_type: "image/jpeg"
       )

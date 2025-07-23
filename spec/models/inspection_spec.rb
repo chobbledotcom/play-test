@@ -167,7 +167,7 @@ RSpec.describe Inspection, type: :model do
 
       it "allows image files for photo_2" do
         inspection.photo_2.attach(
-          io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+          io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
           filename: "test.jpg",
           content_type: "image/jpeg"
         )
@@ -176,7 +176,7 @@ RSpec.describe Inspection, type: :model do
 
       it "allows image files for photo_3" do
         inspection.photo_3.attach(
-          io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+          io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
           filename: "test.jpg",
           content_type: "image/jpeg"
         )

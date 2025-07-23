@@ -255,7 +255,7 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
     it "displays existing photos when editing" do
       # Attach a photo first
       inspection.photo_1.attach(
-        io: File.open(Rails.root.join("spec/fixtures/files/test_image.jpg")),
+        io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
         filename: "existing.jpg",
         content_type: "image/jpeg"
       )
