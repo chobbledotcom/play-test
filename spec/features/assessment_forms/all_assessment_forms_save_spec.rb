@@ -8,7 +8,6 @@ STRUCTURE_SAMPLE_DATA = {
   sharp_edges_pass: false,
   unit_stable_pass: true,
 
-  stitch_length: 15.5,
   unit_pressure: 2.8,
   blower_tube_length: 1.75,
   critical_fall_off_height: 0.85,
@@ -17,6 +16,7 @@ STRUCTURE_SAMPLE_DATA = {
   step_ramp_size: 0.3,
 
   stitch_length_pass: true,
+  stitch_length_comment: "Stitch length comment",
   evacuation_time_pass: false,
   unit_pressure_pass: true,
   blower_tube_length_pass: true,

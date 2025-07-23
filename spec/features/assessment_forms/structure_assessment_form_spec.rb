@@ -34,7 +34,6 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     choose_structure_field :sharp_edges_pass, false
     choose_structure_field :unit_stable_pass, true
 
-    fill_structure_field :stitch_length, "15.5"
     fill_structure_field :unit_pressure, "2.8"
     fill_structure_field :blower_tube_length, "1.75"
     fill_structure_field :critical_fall_off_height, "1.2"
@@ -43,6 +42,12 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     fill_structure_field :trough_adjacent_panel_width, "0.8"
 
     choose_structure_field :stitch_length_pass, true
+    # Fill comment field
+    checkbox = find(:css, "input[id*='stitch_length_has_comment_']")
+    checkbox.check unless checkbox.checked?
+    textarea = find(:css, "textarea[id*='stitch_length_comment_']",
+      visible: :all)
+    textarea.set("Stitch length within specification")
     choose_structure_field :unit_pressure_pass, true
     choose_structure_field :blower_tube_length_pass, true
     choose_structure_field :evacuation_time_pass, true
@@ -67,11 +72,12 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     expect(structure.sharp_edges_pass).to be false
     expect(structure.unit_stable_pass).to be true
 
-    expect(structure.stitch_length).to eq(15.5)
     expect(structure.unit_pressure).to eq(2.8)
     expect(structure.blower_tube_length).to eq(1.75)
 
     expect(structure.stitch_length_pass).to be true
+    expected_comment = "Stitch length within specification"
+    expect(structure.stitch_length_comment).to eq(expected_comment)
     expect(structure.unit_pressure_pass).to be true
     expect(structure.blower_tube_length_pass).to be true
 

@@ -15,8 +15,7 @@ en:
         sharp_edges_pass: "Sharp Angles or Oblique Edges"
         unit_stable_pass: "Unit Stability"
         # Measurements
-        stitch_length: "Stitch Length (mm)"
-        stitch_length_pass: "Stitch Length (mm)"
+        stitch_length_pass: "Stitch Length"
         evacuation_time_pass: "Evacuation Time (s)"
         unit_pressure: "Unit Pressure (kpa)"
         blower_tube_length: "Blower Tube Length (m)"

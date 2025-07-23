@@ -6,8 +6,7 @@ class Assessments::StructureAssessment < ApplicationRecord
 
   belongs_to :inspection
 
-  validates :stitch_length,
-    :unit_pressure,
+  validates :unit_pressure,
     :blower_tube_length,
     :step_ramp_size,
     :critical_fall_off_height,
@@ -17,7 +16,4 @@ class Assessments::StructureAssessment < ApplicationRecord
     allow_blank: true
 
   after_update :log_assessment_update, if: :saved_changes?
-
-  def stitch_length_compliant? =
-    SafetyStandards::MaterialValidator.valid_stitch_length?(stitch_length)
 end
