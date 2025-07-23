@@ -23,7 +23,7 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       fill_in_form :units, :name, "Test Unit"
       fill_in_form :units, :serial, "TEST123"
       fill_in_form :units, :manufacturer, "Test Manufacturer"
-      fill_in_form :units, :owner, "Test Owner"
+      fill_in_form :units, :operator, "Test Operator"
       fill_in_form :units, :description, "Test Description"
 
       fill_in_form :units, :model, "Test Model"
@@ -42,7 +42,7 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       fill_in_form :units, :name, "Helper Demo Unit"
       fill_in_form :units, :serial, "DEMO123"
       fill_in_form :units, :manufacturer, "Helper Corp"
-      fill_in_form :units, :owner, "Test Owner"
+      fill_in_form :units, :operator, "Test Operator"
       fill_in_form :units, :description, "Demonstrates form helper capabilities"
 
       submit_form :units
@@ -77,7 +77,7 @@ RSpec.feature "Unit creation company restriction", type: :feature do
           name: "Test Unit",
           serial: "TEST123",
           manufacturer: "Test Manufacturer",
-          owner: "Test Owner",
+          operator: "Test Operator",
           description: "Test Description",
           width: "10",
           length: "10",

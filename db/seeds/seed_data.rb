@@ -28,7 +28,7 @@ module SeedData
       name: "Bouncy Castle #{["Mega", "Super", "Fun", "Party", "Adventure"].sample} #{rand(1..99)}",
       serial: "BC-#{Date.current.year}-#{SecureRandom.hex(4).upcase}",
       manufacturer: ["ABC Inflatables", "XYZ Bounce Co", "Fun Factory", "Party Products Ltd"].sample,
-      owner: ["Rental Company #{rand(1..10)}", "Party Hire #{rand(1..5)}", "Events Ltd"].sample,
+      operator: ["Rental Company #{rand(1..10)}", "Party Hire #{rand(1..5)}", "Events Ltd"].sample,
       manufacture_date: Date.current - rand(365..1825).days,
       description: "Commercial grade inflatable bouncy castle suitable for events"
     }

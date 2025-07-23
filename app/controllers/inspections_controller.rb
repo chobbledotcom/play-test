@@ -289,7 +289,7 @@ class InspectionsController < ApplicationController
     .search(params[:query])
     .filter_by_result(params[:result])
     .filter_by_unit(params[:unit_id])
-    .filter_by_owner(params[:owner])
+    .filter_by_operator(params[:operator])
     .filter_by_inspection_location(params[:inspection_location])
 
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")

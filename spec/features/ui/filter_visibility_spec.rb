@@ -69,8 +69,8 @@ RSpec.feature "Filter Visibility", type: :feature do
 
     context "when user has units" do
       before do
-        create(:unit, user: user, manufacturer: "Acme Corp", owner: "John Doe")
-        create(:unit, user: user, manufacturer: "Widget Inc", owner: "Jane Smith")
+        create(:unit, user: user, manufacturer: "Acme Corp", operator: "John Doe")
+        create(:unit, user: user, manufacturer: "Widget Inc", operator: "Jane Smith")
       end
 
       scenario "shows filter form" do
@@ -85,10 +85,10 @@ RSpec.feature "Filter Visibility", type: :feature do
         expect_manufacturer_dropdown_populated
       end
 
-      scenario "populates owner dropdown with unique values" do
+      scenario "populates operator dropdown with unique values" do
         visit units_path
 
-        expect_owner_dropdown_populated
+        expect_operator_dropdown_populated
       end
     end
 
@@ -147,7 +147,7 @@ RSpec.feature "Filter Visibility", type: :feature do
     expect(page).not_to have_field("query")
     expect(page).not_to have_select("status")
     expect(page).not_to have_select("manufacturer")
-    expect(page).not_to have_select("owner")
+    expect(page).not_to have_select("operator")
   end
 
   def expect_units_filter_form_present
@@ -155,7 +155,7 @@ RSpec.feature "Filter Visibility", type: :feature do
     expect(page).to have_field("query")
     expect(page).to have_select("status")
     expect(page).to have_select("manufacturer")
-    expect(page).to have_select("owner")
+    expect(page).to have_select("operator")
   end
 
   def expect_manufacturer_dropdown_populated
@@ -166,9 +166,9 @@ RSpec.feature "Filter Visibility", type: :feature do
     end
   end
 
-  def expect_owner_dropdown_populated
-    within "select[name='owner']" do
-      expect(page).to have_content("All Owners")
+  def expect_operator_dropdown_populated
+    within "select[name='operator']" do
+      expect(page).to have_content("All Operators")
       expect(page).to have_content("John Doe")
       expect(page).to have_content("Jane Smith")
     end

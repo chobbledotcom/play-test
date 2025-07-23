@@ -33,7 +33,7 @@ RSpec.feature "PDF Field Coverage", type: :feature do
       expect(text_content).to include(I18n.t("pdf.dimensions.length"))
       expect(text_content).to include(I18n.t("pdf.dimensions.height"))
       expect(text_content).to include(unit.manufacturer)
-      expect(text_content).to include(unit.owner)
+      expect(text_content).to include(unit.operator)
 
       inspection.each_applicable_assessment do |assessment_key, _, _|
         assessment_type = assessment_key.to_s.sub(/_assessment$/, "")

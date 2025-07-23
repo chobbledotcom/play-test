@@ -3,8 +3,8 @@ module UnitsHelper
     user.units.distinct.pluck(:manufacturer).compact.compact_blank.sort
   end
 
-  def owner_options(user)
-    user.units.distinct.pluck(:owner).compact.compact_blank.sort
+  def operator_options(user)
+    user.units.distinct.pluck(:operator).compact.compact_blank.sort
   end
 
   def unit_actions(unit)

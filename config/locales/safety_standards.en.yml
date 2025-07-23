@@ -76,7 +76,7 @@ en:
         description: "Based on age-appropriate space allocation per user by height category."
         length_label: "Length (m):"
         width_label: "Width (m):"
-        adjustment_label: "Negative Adjustment (m²):"
+        adjustment_label: "Negative Play Space Adjustment (m²):"
         length_placeholder: "e.g. 5.0"
         width_placeholder: "e.g. 4.0"
         adjustment_placeholder: "e.g. 2.0 (optional)"
@@ -84,7 +84,7 @@ en:
         result_title: "Result:"
         dimensions_result: "Dimensions:"
         total_area_result: "Total Area:"
-        negative_adjustment_result: "Negative Adjustment:"
+        negative_adjustment_result: "Negative Play Space Adjustment:"
         usable_area_result: "Usable Area:"
         capacities_result: "User Capacities:"
 
@@ -108,12 +108,12 @@ en:
 
       wall_height:
         title: "Calculate Wall Height Requirements"
-        user_height_label: "Tallest User Height (m):"
+        user_height_label: "Maximum User Height (m):"
         user_height_placeholder: "e.g. 1.5"
         submit: "Calculate Wall Height"
         result_title: "Result:"
         platform_height_result: "Platform Height:"
-        user_height_result: "Tallest User Height:"
+        user_height_result: "Maximum User Height:"
         requirement_result: "Requirement:"
         additional_result: "Additional:"
         roof_required: "Permanent roof required"

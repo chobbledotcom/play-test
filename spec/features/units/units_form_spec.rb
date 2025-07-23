@@ -18,7 +18,7 @@ RSpec.describe "Units Form", type: :feature do
       fill_in_form :units, :model, "JC-2000"
       fill_in_form :units, :serial, "ASSET-001"
       fill_in_form :units, :description, "Large bouncy castle for events"
-      fill_in_form :units, :owner, "Test Company Ltd"
+      fill_in_form :units, :operator, "Test Company Ltd"
       fill_in_form :units, :manufacture_date, "2023-01-15"
 
       submit_form :units
@@ -44,7 +44,7 @@ RSpec.describe "Units Form", type: :feature do
       expect(page).to have_content(I18n.t("units.validations.manufacturer_blank"))
       expect(page).to have_content(I18n.t("units.validations.serial_blank"))
       expect(page).to have_content(I18n.t("units.validations.description_blank"))
-      expect(page).to have_content(I18n.t("units.validations.owner_blank"))
+      expect(page).to have_content(I18n.t("units.validations.operator_blank"))
     end
 
     it "validates serial uniqueness per user" do
@@ -54,7 +54,7 @@ RSpec.describe "Units Form", type: :feature do
       fill_in_form :units, :manufacturer, "Test Mfg"
       fill_in_form :units, :serial, "DUPLICATE-001"
       fill_in_form :units, :description, "Test description"
-      fill_in_form :units, :owner, "Test Owner"
+      fill_in_form :units, :operator, "Test Operator"
 
       submit_form :units
 

@@ -24,7 +24,7 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 
 "Owner" => "Operator"
 "Straight Walls" => "Vertical Walls (+/- 5%)"
-"Sharp Edges" => "Sharp angles, oblique edges"
+"Sharp Edges" => "Sharp Angles or Oblique Edges"
 "Unit Stable" => "Unit Stability"
 "Critical Fall Off Height" => "Fall Off Height"
 "Negative Adjustment" => "Negative Play Space Adjustment (m2)"

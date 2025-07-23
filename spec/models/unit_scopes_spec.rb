@@ -5,8 +5,8 @@ RSpec.describe Unit, type: :model do
     let(:user) { create(:user) }
     let!(:airquee_unit) { create(:unit, user: user, manufacturer: "Airquee") }
     let!(:other_unit) { create(:unit, user: user, manufacturer: "Other Brand") }
-    let!(:stef_unit) { create(:unit, user: user, owner: "Stef's Castles") }
-    let!(:other_owner_unit) { create(:unit, user: user, owner: "Other Owner") }
+    let!(:stef_unit) { create(:unit, user: user, operator: "Stef's Castles") }
+    let!(:other_operator_unit) { create(:unit, user: user, operator: "Other Operator") }
 
     describe ".by_manufacturer" do
       it "filters by manufacturer when provided" do
@@ -26,21 +26,21 @@ RSpec.describe Unit, type: :model do
       end
     end
 
-    describe ".by_owner" do
-      it "filters by owner when provided" do
-        expect(user.units.by_owner("Stef's Castles")).to contain_exactly(stef_unit)
+    describe ".by_operator" do
+      it "filters by operator when provided" do
+        expect(user.units.by_operator("Stef's Castles")).to contain_exactly(stef_unit)
       end
 
       it "returns all units when nil is passed" do
-        expect(user.units.by_owner(nil)).to match_array(user.units)
+        expect(user.units.by_operator(nil)).to match_array(user.units)
       end
 
       it "returns all units when empty string is passed" do
-        expect(user.units.by_owner("")).to match_array(user.units)
+        expect(user.units.by_operator("")).to match_array(user.units)
       end
 
-      it "returns empty when non-existent owner is passed" do
-        expect(user.units.by_owner("NonExistent")).to be_empty
+      it "returns empty when non-existent operator is passed" do
+        expect(user.units.by_operator("NonExistent")).to be_empty
       end
     end
   end

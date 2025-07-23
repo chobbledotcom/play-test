@@ -35,7 +35,7 @@ RSpec.describe "Inspections CSV Export Completeness", type: :request do
       headers = CSV.parse(csv_content).first
 
       # Unit fields
-      expect(headers).to include("unit_name", "unit_serial", "unit_manufacturer", "unit_owner", "unit_description")
+      expect(headers).to include("unit_name", "unit_serial", "unit_manufacturer", "unit_operator", "unit_description")
 
       # Inspector company field
       expect(headers).to include("inspector_company_name")

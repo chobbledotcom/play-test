@@ -5,7 +5,7 @@ FactoryBot.define do
     sequence(:serial) { |n| "TEST#{n.to_s.rjust(3, "0")}" }
     description { "Test Bouncy Castle" }
     manufacturer { "Test Manufacturer" }
-    owner { "Test Owner" }
+    operator { "Test Operator" }
     model { "Test Model" }
     manufacture_date { 1.year.ago }
     is_seed { false }
@@ -17,7 +17,7 @@ FactoryBot.define do
       model { "DM-2024" }
       serial { "DIFF-TEST-001" }
       description { "A different test unit" }
-      owner { "Different Owner Ltd" }
+      operator { "Different Operator Ltd" }
       manufacture_date { Date.new(2024, 2, 20) }
     end
 
@@ -45,7 +45,7 @@ FactoryBot.define do
       model { "PRM-2024-XL" }
       serial { "PRM-SERIAL-001" }
       description { "Premium bouncy castle with all features" }
-      owner { "Test Events Company" }
+      operator { "Test Events Company" }
       manufacture_date { Date.new(2024, 1, 15) }
     end
   end
