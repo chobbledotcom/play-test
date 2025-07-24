@@ -44,6 +44,7 @@
 .rpii button,
 .rpii input[type="submit"],
 .rpii input[type="button"],
+.rpii a[role="button"],
 .rpii .button {
 	background-color: #194EB1;
 	color: #fff;
@@ -53,6 +54,7 @@
 .rpii button:hover,
 .rpii input[type="submit"]:hover,
 .rpii input[type="button"]:hover,
+.rpii a[role="button"]:hover,
 .rpii .button:hover {
 	background-color: #2563c7;
 	border-color: #2563c7;
@@ -93,12 +95,9 @@
 	justify-content: space-between;
 	align-items: center;
 	padding: 0.5rem 1rem;
-}
-
-.rpii .logo {
-	margin: 0;
-	display: flex;
-	align-items: center;
+	padding: 0.5rem 1rem;
+  max-width: var(--width-content);
+  margin: 0 auto 1rem;
 }
 
 .rpii .logo.left {
@@ -112,4 +111,16 @@
 .rpii .logo img {
 	width: auto;
 	height: 45.5px;
+}
+
+.rpii main form {
+	border-image: linear-gradient( to right, var(--color-bg-secondary) 0%, #3a0eb5 100% ) 1;
+}
+
+.rpii main form header {
+	background: linear-gradient( to right, var(--color-bg-secondary) 0%, #3a0eb5 100% );
+}
+
+.rpii fieldset legend {
+	color: #3a0eb5;
 }
