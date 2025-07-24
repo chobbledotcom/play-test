@@ -51,6 +51,7 @@ RSpec.describe AssessmentCompletion, type: :model do
           users_at_1200mm: 10,
           users_at_1500mm: 8,
           users_at_1800mm: 2,
+          user_count_at_maximum_user_height: 2,
           play_area_length: 10.0,
           play_area_width: 8.0,
           negative_adjustment: 0.0

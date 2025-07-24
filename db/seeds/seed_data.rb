@@ -152,6 +152,7 @@ module SeedData
       users_at_1200mm: rand(2..8),
       users_at_1500mm: rand(4..10),
       users_at_1800mm: rand(2..6),
+      user_count_at_maximum_user_height: rand(1..4),
       play_area_length: rand(3.0..10.0).round(1),
       play_area_width: rand(3.0..8.0).round(1),
       negative_adjustment: rand(0..2.0).round(1),

@@ -25,6 +25,7 @@ RSpec.feature "User Height Assessment", type: :feature do
       expect_field_present :user_height, :users_at_1200mm
       expect_field_present :user_height, :users_at_1500mm
       expect_field_present :user_height, :users_at_1800mm
+      expect_field_present :user_height, :user_count_at_maximum_user_height
 
       expect_field_present :user_height, :play_area_length
       expect_field_present :user_height, :play_area_width
@@ -41,6 +42,7 @@ RSpec.feature "User Height Assessment", type: :feature do
       fill_in_form :user_height, :users_at_1200mm, "4"
       fill_in_form :user_height, :users_at_1500mm, "3"
       fill_in_form :user_height, :users_at_1800mm, "2"
+      fill_in_form :user_height, :user_count_at_maximum_user_height, "1"
 
       fill_in_form :user_height, :play_area_length, "10.0"
       fill_in_form :user_height, :play_area_width, "8.0"
@@ -59,6 +61,7 @@ RSpec.feature "User Height Assessment", type: :feature do
       expect(assessment.users_at_1200mm).to eq(4)
       expect(assessment.users_at_1500mm).to eq(3)
       expect(assessment.users_at_1800mm).to eq(2)
+      expect(assessment.user_count_at_maximum_user_height).to eq(1)
       expect(assessment.play_area_length).to eq(10.0)
       expect(assessment.play_area_width).to eq(8.0)
       expect(assessment.negative_adjustment).to eq(2.0)
