@@ -40,7 +40,7 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     fill_structure_field :step_ramp_size, "150"
     fill_structure_field :platform_height, "1.0"
     fill_structure_field :trough_depth, "200"
-    fill_structure_field :trough_adjacent_panel_width, "0.8"
+    fill_structure_field :trough_adjacent_panel_width, "800"
 
     choose_structure_field :stitch_length_pass, true
     # Fill comment field

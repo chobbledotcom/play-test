@@ -1,0 +1,58 @@
+<%
+  # Composite partial for integer + comment fields with grid layout
+  # Required parameters:
+  #   field: Base field name (e.g., 'trough_depth')
+  # Optional parameters:
+  #   min: Minimum value
+  #   max: Maximum value
+  #   required: Whether the integer field is required (defaults to true)
+  #   placeholder: Placeholder text
+  #
+  # This will render:
+  #   - Integer field: field (e.g., 'trough_depth')
+  #   - Comment field: field + '_comment' (e.g., 'trough_depth_comment')
+
+  integer_field = field
+  comment_field = "#{field}_comment".to_sym
+
+  form = @_current_form
+  model = form.object
+
+  field_data = form_field_setup(field, local_assigns)
+
+  integer_options = {
+    inputmode: "numeric",
+    pattern: "[0-9]*",
+    placeholder: field_data[:field_placeholder] || local_assigns[:placeholder],
+    required: local_assigns.fetch(:required, true),
+    class: "number"
+  }
+
+  if field_data[:prefilled]
+    integer_options[:value] = field_data[:value]
+  end
+
+  integer_options[:data] = {}
+  integer_options[:data][:min] = local_assigns[:min] if local_assigns[:min]
+  integer_options[:data][:max] = local_assigns[:max] if local_assigns[:max]
+
+  comment_info = comment_field_options(
+    form,
+    comment_field,
+    field_data[:field_label]
+  )
+%>
+
+<div class="form-grid number-comment" id="<%= integer_field %>">
+  <%= form.label integer_field, field_data[:field_label], class: "label" %>
+  <%= form.text_field integer_field, integer_options %>
+
+  <%= render 'form/comment_checkbox',
+      comment_field: comment_field,
+      checkbox_id: comment_info[:checkbox_id],
+      textarea_id: comment_info[:options][:id],
+      has_comment: comment_info[:has_comment],
+      prefilled: comment_info[:prefilled] %>
+
+  <%= form.text_area comment_field, comment_info[:options] %>
+</div>

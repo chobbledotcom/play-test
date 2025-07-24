@@ -320,7 +320,7 @@ RSpec.describe "Seed Data", type: :model do
             expect(assessment.step_ramp_size).to be_between(100, 500)
             expect(assessment.critical_fall_off_height).to be_between(0.1, 3.0)
             expect(assessment.trough_depth).to be_between(10, 100)
-            expect(assessment.trough_adjacent_panel_width).to be_between(0.1, 2.0)
+            expect(assessment.trough_adjacent_panel_width).to be_between(100, 2000)
           end
         end
       end

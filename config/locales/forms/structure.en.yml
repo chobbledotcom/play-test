@@ -26,7 +26,7 @@ en:
         platform_height: "Platform Height (m)"
         platform_height_pass: "Platform Height (m)"
         trough_depth: "Trough Depth (mm)"
-        trough_adjacent_panel_width: "Trough Adjacent Panel Width (m)"
+        trough_adjacent_panel_width: "Trough Adjacent Panel Width (mm)"
         trough_pass: "Trough Check"
         entrapment_pass: "Entrapment"
         markings_pass: "Markings"

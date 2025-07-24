@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_24_001107) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_24_141500) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -214,7 +214,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_001107) do
     t.decimal "unit_pressure", precision: 8, scale: 2
     t.decimal "blower_tube_length", precision: 8, scale: 2
     t.decimal "critical_fall_off_height", precision: 8, scale: 2
-    t.decimal "trough_depth", precision: 8, scale: 2
+    t.integer "trough_depth"
     t.boolean "stitch_length_pass"
     t.boolean "blower_tube_length_pass"
     t.boolean "evacuation_time_pass"
@@ -240,7 +240,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_001107) do
     t.text "grounding_comment"
     t.string "trough_depth_comment", limit: 1000
     t.string "netting_comment", limit: 1000
-    t.decimal "trough_adjacent_panel_width", precision: 8, scale: 2
+    t.integer "trough_adjacent_panel_width"
     t.text "trough_adjacent_panel_width_comment"
     t.decimal "step_ramp_size", precision: 8, scale: 2
     t.boolean "step_ramp_size_pass"

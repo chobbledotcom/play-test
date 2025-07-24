@@ -28,9 +28,9 @@ RSpec.feature "Trough Fields in Structure Assessment", type: :feature do
       expect_updated_message
 
       inspection.reload
-      expect(inspection.structure_assessment.trough_depth).to eq(150.0)
+      expect(inspection.structure_assessment.trough_depth).to eq(150)
       width = inspection.structure_assessment.trough_adjacent_panel_width
-      expect(width).to eq(75.0)
+      expect(width).to eq(75)
     end
   end
 

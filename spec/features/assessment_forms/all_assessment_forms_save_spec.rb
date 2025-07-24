@@ -11,8 +11,8 @@ STRUCTURE_SAMPLE_DATA = {
   unit_pressure: 2.8,
   blower_tube_length: 1.75,
   critical_fall_off_height: 0.85,
-  trough_depth: 0.15,
-  trough_adjacent_panel_width: 0.65,
+  trough_depth: 150,
+  trough_adjacent_panel_width: 650,
   step_ramp_size: 0.3,
   platform_height: 1.8,
 
