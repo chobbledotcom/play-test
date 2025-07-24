@@ -1,5 +1,5 @@
 class UnitsController < ApplicationController
-  include UnitTurboStreams
+  include TurboStreamResponders
   include PublicViewable
   include UserActivityCheck
 
@@ -49,10 +49,9 @@ class UnitsController < ApplicationController
 
     if @unit.save
       log_unit_event("created", @unit)
-      flash[:notice] = I18n.t("units.messages.created")
-      redirect_to @unit
+      handle_create_success(@unit)
     else
-      render :new, status: :unprocessable_entity
+      handle_create_failure(@unit)
     end
   end
 
@@ -71,24 +70,9 @@ class UnitsController < ApplicationController
       )
 
       log_unit_event("updated", @unit, nil, changed_data)
-      respond_to do |format|
-        format.html do
-          flash[:notice] = I18n.t("units.messages.updated")
-          redirect_to @unit
-        end
-        format.turbo_stream { render_unit_update_success_stream }
-      end
+      handle_update_success(@unit)
     else
-      respond_to do |format|
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json do
-          render json: {
-            status: I18n.t("shared.api.error"),
-            errors: @unit.errors.full_messages
-          }
-        end
-        format.turbo_stream { render_unit_update_error_stream }
-      end
+      handle_update_failure(@unit)
     end
   end
 

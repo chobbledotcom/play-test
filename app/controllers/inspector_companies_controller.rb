@@ -1,4 +1,6 @@
 class InspectorCompaniesController < ApplicationController
+  include TurboStreamResponders
+
   before_action :set_inspector_company, only: %i[
     show edit update
   ]
@@ -27,10 +29,9 @@ class InspectorCompaniesController < ApplicationController
     @inspector_company = InspectorCompany.new(inspector_company_params)
 
     if @inspector_company.save
-      flash[:notice] = t("inspector_companies.messages.created")
-      redirect_to @inspector_company
+      handle_create_success(@inspector_company)
     else
-      render :new, status: :unprocessable_entity
+      handle_create_failure(@inspector_company)
     end
   end
 
@@ -39,52 +40,13 @@ class InspectorCompaniesController < ApplicationController
 
   def update
     if @inspector_company.update(inspector_company_params)
-      handle_successful_update
+      handle_update_success(@inspector_company)
     else
-      handle_failed_update
+      handle_update_failure(@inspector_company)
     end
   end
 
   private
-
-  def handle_successful_update
-    respond_to do |format|
-      format.html do
-        flash[:notice] = t("inspector_companies.messages.updated")
-        redirect_to @inspector_company
-      end
-      format.turbo_stream do
-        render turbo_stream: save_message_turbo_stream(
-          t("inspector_companies.messages.updated"),
-          "success"
-        )
-      end
-    end
-  end
-
-  def handle_failed_update
-    respond_to do |format|
-      format.html { render :edit, status: :unprocessable_entity }
-      format.turbo_stream do
-        render turbo_stream: save_message_turbo_stream(
-          t("shared.messages.save_failed"),
-          "error"
-        )
-      end
-    end
-  end
-
-  def save_message_turbo_stream(message, type)
-    [
-      turbo_stream.replace("form_save_message",
-        partial: "shared/save_message",
-        locals: {
-          element_id: "form_save_message",
-          message: message,
-          type: type
-        })
-    ]
-  end
 
   def set_inspector_company
     @inspector_company = InspectorCompany.find(params[:id])

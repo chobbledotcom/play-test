@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  include UserTurboStreams
+  include TurboStreamResponders
 
   NON_ADMIN_PATHS = %i[
     change_settings
@@ -56,35 +56,9 @@ class UsersController < ApplicationController
     end
 
     if @user.update(user_params)
-      respond_to do |format|
-        format.html do
-          flash[:notice] = I18n.t("users.messages.user_updated")
-          redirect_to users_path
-        end
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.replace("form_save_message",
-              partial: "shared/save_message",
-              locals: {
-                message: I18n.t("users.messages.user_updated")
-              })
-          ]
-        end
-      end
+      handle_update_success(@user, "users.messages.user_updated", users_path)
     else
-      respond_to do |format|
-        format.html { render :edit, status: :unprocessable_entity }
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.replace("form_save_message",
-              partial: "shared/save_message",
-              locals: {
-                errors: @user.errors.full_messages,
-                message: t("shared.messages.save_failed")
-              })
-          ]
-        end
-      end
+      handle_update_failure(@user)
     end
   end
 
@@ -124,18 +98,13 @@ class UsersController < ApplicationController
 
   def update_settings
     if @user.update(settings_params)
-      respond_to do |format|
-        format.html do
-          flash[:notice] = I18n.t("users.messages.settings_updated")
-          redirect_to change_settings_user_path(@user)
-        end
-        format.turbo_stream { render_user_update_success_stream }
-      end
+      handle_update_success(
+        @user,
+        "users.messages.settings_updated",
+        change_settings_user_path(@user)
+      )
     else
-      respond_to do |format|
-        format.html { render :change_settings, status: :unprocessable_entity }
-        format.turbo_stream { render_user_update_error_stream }
-      end
+      handle_update_failure(@user, :change_settings)
     end
   end
 

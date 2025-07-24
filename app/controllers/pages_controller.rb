@@ -1,4 +1,6 @@
 class PagesController < ApplicationController
+  include TurboStreamResponders
+
   skip_before_action :require_login, only: :show
   before_action :require_admin, except: :show
   before_action :set_page, only: %i[edit update destroy]
@@ -32,9 +34,9 @@ class PagesController < ApplicationController
   def create
     @page = Page.new(page_params)
     if @page.save
-      redirect_to pages_path, notice: I18n.t("pages.messages.created")
+      handle_create_success(@page)
     else
-      render :new, status: :unprocessable_entity
+      handle_create_failure(@page)
     end
   end
 
@@ -43,9 +45,9 @@ class PagesController < ApplicationController
 
   def update
     if @page.update(page_params)
-      redirect_to pages_path, notice: I18n.t("pages.messages.updated")
+      handle_update_success(@page)
     else
-      render :edit, status: :unprocessable_entity
+      handle_update_failure(@page)
     end
   end
 

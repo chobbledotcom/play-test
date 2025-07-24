@@ -109,9 +109,10 @@ RSpec.describe "Pages", type: :request do
           }.to change(Page, :count).by(1)
         end
 
-        it "redirects to pages index" do
+        it "redirects to the created page" do
           post pages_path, params: valid_params
-          expect(response).to redirect_to(pages_path)
+          page = Page.find_by(slug: "new-page")
+          expect(response).to redirect_to(page_path(page))
         end
       end
 
@@ -172,11 +173,11 @@ RSpec.describe "Pages", type: :request do
           expect(page.reload.link_title).to eq("Updated Title")
         end
 
-        it "redirects to pages index" do
+        it "redirects to the updated page" do
           patch page_path(page), params: {
             page: {link_title: "Updated Title"}
           }
-          expect(response).to redirect_to(pages_path)
+          expect(response).to redirect_to(page_path(page))
         end
       end
 
