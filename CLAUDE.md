@@ -27,6 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Prefer running individual test files or specific tests during development
 - **Database locking**: If tests fail with "database is locked", just inform the user and wait for them to confirm it's unlocked
 - **NEVER paste code into Rails console** - it never works. Instead write very specific RSpec tests
+- **Active Storage cleanup**: Test suite automatically cleans tmp/storage before and after test runs
 
 ## Test Helper Scripts
 
@@ -95,6 +96,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   3. Once working, either:
      - Add `--write` to auto-apply the fix
      - Manually apply the fix to the file
+
+## Active Storage Maintenance
+
+### Cleaning Orphaned Files
+
+- **Check storage statistics**: `bundle exec rake active_storage:stats`
+- **Clean orphaned files (dry run)**: `bundle exec rake active_storage:cleanup_orphaned`
+- **Actually delete files**: `DRY_RUN=false bundle exec rake active_storage:cleanup_orphaned`
+- **Why files get orphaned**: When database is deleted but tmp/storage remains
+- **Test cleanup**: Automatic - rails_helper cleans tmp/storage before/after test suite
 
 ## Core Development Principles
 
