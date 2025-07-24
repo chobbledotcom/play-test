@@ -19,13 +19,6 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 - Slides
   - Slide Platform Height
 
-## Field Moves Between Assessments
-
-**Time: 10m**
-
-- User Height/Count
-  - Platform Height => move to structure after step/ramp size
-
 ## Field Moves On Assessments
 
 **Time: 10m**
@@ -39,11 +32,8 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 **Time: 45m**
 
 - Stucture
-  - Stitch Length => Pass/Fail/Comment
   - Blower Tube Length => not required to store number
   - Trough Adjacent Panel Width => convert to mm
-- Blower
-  - Blower Serial => remove pass/fail/comment
 
 ---
 
@@ -54,8 +44,11 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 **Time: 45m**
 
 - Stucture
+  - Stitch Length => Pass/Fail/Comment
   - Trough Depth & Trough Adjacent Panel Width" => remove pass/fails, keep number, keep "Trough Check"
   - Evacuation Time => remove number, just pass/fail/comment
+- Blower
+  - Blower Serial => remove pass/fail/comment
 
 ## Field Deletions
 
@@ -67,6 +60,13 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
   - Uses Lock Stitching
 - Units
   - Model
+
+## Field Moves Between Assessments
+
+**Time: 10m**
+
+- User Height/Count
+  - Platform Height => move to structure after step/ramp size
 
 ## Text Renames
 
