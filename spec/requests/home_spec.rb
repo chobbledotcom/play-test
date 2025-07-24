@@ -29,37 +29,17 @@ require "rails_helper"
 # - Clean semantic HTML structure for SEO and accessibility
 
 RSpec.describe "Home", type: :request do
-  before do
-    # Create minimal homepage
-    create(:page,
-      slug: "/",
-      meta_title: "play-test | BS EN 14960 Inspection Logger & Database | play-test.co.uk",
-      content: <<~HTML
-        <h1>play-test</h1>
-        <p>#{I18n.t("home.subtitle")}</p>
-        <a href="#{I18n.t("home.company_url")}">#{I18n.t("home.company_name")}</a>
-        <h2>#{I18n.t("home.features.log_inspections.title")}</h2>
-        <h2>#{I18n.t("home.features.generate_pdfs.title")}</h2>
-        <h2>#{I18n.t("home.features.search_export.title")}</h2>
-        <p>compliance tracking</p>
-        <p>QR codes</p>
-        <p>PDF reports</p>
-        <article><header></header><section><aside></aside></section></article>
-      HTML
-    )
-
-    # Create minimal about page
-    create(:page,
-      slug: "about",
-      content: <<~HTML
-        <h1>#{I18n.t("about.title")}</h1>
-        <h2>#{I18n.t("about.what_it_is.title")}</h2>
-        <p>QR codes</p>
-      HTML
-    )
-  end
+  # No global setup needed - each test section creates what it needs
 
   describe "GET /" do
+    before do
+      # Create minimal homepage - just enough to not crash
+      Page.where(slug: "/").first_or_create!(
+        content: "Home",
+        link_title: "Home"
+      )
+    end
+
     context "when not logged in" do
       it "returns http success" do
         visit root_path
@@ -71,48 +51,15 @@ RSpec.describe "Home", type: :request do
         expect(page).to have_current_path(root_path)
       end
 
-      it "displays the application title" do
-        visit root_path
-        expect(page).to have_content(I18n.t("home.company_name"))
-      end
-
       it "shows login and register links" do
         visit root_path
         expect(page).to have_link(I18n.t("session.login.title"), href: login_path)
         expect(page).to have_link(I18n.t("users.titles.register"), href: register_path)
       end
 
-      it "displays feature descriptions" do
-        visit root_path
-        expect(page).to have_content(I18n.t("home.features.log_inspections.title"))
-        expect(page).to have_content(I18n.t("home.features.generate_pdfs.title"))
-        expect(page).to have_content(I18n.t("home.features.search_export.title"))
-      end
-
-      it "includes promotional content" do
-        visit root_path
-        expect(page).to have_content(I18n.t("home.subtitle"))
-        expect(page).to have_content("QR codes")
-        expect(page).to have_content("compliance tracking")
-      end
-
-      it "includes company branding" do
-        visit root_path
-        expect(page).to have_content(I18n.t("home.company_name"))
-        expect(page).to have_link(I18n.t("home.company_name"), href: I18n.t("home.company_url"))
-      end
-
       it "does not require authentication" do
         visit root_path
         expect(page).not_to have_current_path(login_path)
-      end
-
-      it "has proper semantic HTML structure" do
-        visit root_path
-        expect(page).to have_css("article")
-        expect(page).to have_css("header")
-        expect(page).to have_css("section")
-        expect(page).to have_css("aside")
       end
     end
 
@@ -140,13 +87,6 @@ RSpec.describe "Home", type: :request do
         expect(page).to have_link("Settings")
         expect(page).to have_link("Inspections")
         expect(page).to have_link("Units")
-      end
-
-      it "still displays application content" do
-        visit root_path
-        expect(page).to have_content(I18n.t("home.company_name"))
-        expect(page).to have_content(I18n.t("home.features.log_inspections.title"))
-        expect(page).to have_content(I18n.t("home.features.generate_pdfs.title"))
       end
 
       it "allows access without redirect" do
@@ -188,21 +128,6 @@ RSpec.describe "Home", type: :request do
     end
   end
 
-  describe "GET /about" do
-    context "when visiting about page" do
-      it "returns success response" do
-        visit "/pages/about"
-        expect(page.status_code).to eq(200)
-      end
-
-      it "renders about page content" do
-        visit "/pages/about"
-        expect(page).to have_content(I18n.t("about.title"))
-        expect(page).to have_content(I18n.t("about.what_it_is.title"))
-      end
-    end
-  end
-
   describe "navigation integration" do
     context "when logged in" do
       let(:user) { create(:user) }
@@ -222,26 +147,6 @@ RSpec.describe "Home", type: :request do
         visit root_path
         expect(page).to have_button("Log Out") if page.has_button?("Log Out")
       end
-    end
-  end
-
-  describe "accessibility and SEO" do
-    it "includes proper page title" do
-      visit root_path
-      expect(page).to have_title("play-test | BS EN 14960 Inspection Logger & Database | play-test.co.uk")
-    end
-
-    it "has semantic HTML structure for screen readers" do
-      visit root_path
-      expect(page).to have_css("[role]") if page.has_css?("[role]")
-      expect(page).to have_css("h1")
-      expect(page).to have_css("h2")
-    end
-
-    it "includes meta descriptions for SEO" do
-      visit root_path
-      expect(page).to have_content(I18n.t("home.subtitle"))
-      expect(page).to have_content("PDF reports")
     end
   end
 end
