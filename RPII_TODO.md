@@ -24,8 +24,7 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 **Time: 10m**
 
 - User Height/Count
-  - Maximum User Height => move to User Capacity box after the pre-set sizes
-  - User count at maximum user height => add below the above
+  - Maximum User Height => move to User Capacity box above the maximum user count at that height
 
 ## Field Changes
 
@@ -33,7 +32,6 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 
 - Stucture
   - Blower Tube Length => not required to store number
-  - Trough Adjacent Panel Width => convert to mm
 
 ---
 
@@ -47,6 +45,7 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
   - Stitch Length => Pass/Fail/Comment
   - Trough Depth & Trough Adjacent Panel Width" => remove pass/fails, keep number, keep "Trough Check"
   - Evacuation Time => remove number, just pass/fail/comment
+  - Trough Adjacent Panel Width => convert to mm
 - Blower
   - Blower Serial => remove pass/fail/comment
 
@@ -67,6 +66,13 @@ Copy RPII's branding from their #BounceSafe page to create an RPII "theme", and 
 
 - User Height/Count
   - Platform Height => move to structure after step/ramp size
+
+## Field Moves On Assessments
+
+**Time: 10m**
+
+- User Height/Count
+  - User count at maximum user height
 
 ## Text Renames
 
