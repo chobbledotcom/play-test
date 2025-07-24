@@ -7,3 +7,33 @@
 <% end %>
 
 <%= raw @page.content %>
+
+<% if @page.slug == "/" && !current_user %>
+  <nav>
+    <ul>
+      <li>
+        <%= link_to login_path do %>
+          <%= t("session.login.title") %>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to register_path do %>
+          <%= t("users.titles.register") %>
+        <% end %>
+      </li>
+    </ul>
+  </nav>
+<% end %>
+
+<% unless current_user %>
+  <nav>
+    <ul>
+      <% if Rails.env.development? || Rails.env.test? %>
+        <li><%= link_to t('navigation.search'), search_path %></li>
+      <% end %>
+      <li><%= link_to t('navigation.about'), page_by_slug_path("about") %></li>
+      <li><%= link_to t('navigation.safety_standards'), safety_standards_path %></li>
+      <li><%= link_to t('navigation.guides'), guides_path %></li>
+    </ul>
+  </nav>
+<% end %>

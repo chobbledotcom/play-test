@@ -1,7 +1,9 @@
 class CreateDefaultPages < ActiveRecord::Migration[8.0]
-  def change
-    create_table :default_pages do |t|
-      t.timestamps
-    end
+  def up
+    # This migration is now empty - page creation moved to seeds.rb
+  end
+
+  def down
+    # Nothing to rollback
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_24_150502) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_24_161252) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -187,10 +187,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_150502) do
     t.text "content"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_snippet", default: false, null: false
   end
 
   create_table "slide_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
+    t.decimal "slide_platform_height", precision: 8, scale: 2
     t.decimal "slide_wall_height", precision: 8, scale: 2
     t.decimal "runout", precision: 8, scale: 2
     t.decimal "slide_first_metre_height", precision: 8, scale: 2
@@ -199,6 +201,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_150502) do
     t.boolean "runout_pass"
     t.boolean "slip_sheet_pass"
     t.boolean "slide_permanent_roof"
+    t.text "slide_platform_height_comment"
     t.text "slide_wall_height_comment"
     t.text "slide_first_metre_height_comment"
     t.text "slide_beyond_first_metre_height_comment"

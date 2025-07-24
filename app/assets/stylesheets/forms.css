@@ -360,3 +360,19 @@ form *:target {
 .report-links {
 	margin: 0.5em 0;
 }
+
+/* Form actions (submit button + secondary link) */
+.form-actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+/* Secondary button styling */
+.secondary[role="button"],
+a.secondary[role="button"] {
+	background: var(--color-bg);
+	color: var(--color-link);
+}

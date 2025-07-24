@@ -5,7 +5,10 @@ class Page < ApplicationRecord
   validates :link_title, presence: true
   validates :content, presence: true
 
+  scope :pages, -> { where(is_snippet: false) }
+  scope :snippets, -> { where(is_snippet: true) }
+
   def to_param
-    slug
+    slug.presence || "new"
   end
 end

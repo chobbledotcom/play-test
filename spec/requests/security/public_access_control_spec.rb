@@ -7,6 +7,12 @@ RSpec.describe "Public Access Control", type: :request do
   let(:unit) { create(:unit, user: user) }
   let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
 
+  before do
+    # Create pages for CMS system
+    create(:page, slug: "/", content: "<h1>Homepage</h1>")
+    create(:page, slug: "about", content: "<h1>About</h1>")
+  end
+
   describe "Public pages (should be accessible without login)" do
     before do
       # Ensure we're not logged in
@@ -15,32 +21,32 @@ RSpec.describe "Public Access Control", type: :request do
 
     it "allows access to home page" do
       visit root_path
-      expect(page).to have_http_status(:success)
+      expect(page.status_code).to eq(200)
       expect(page.current_path).to eq(root_path)
     end
 
     it "allows access to about page" do
-      visit about_path
-      expect(page).to have_http_status(:success)
-      expect(page.current_path).to eq(about_path)
+      visit "/pages/about"
+      expect(page.status_code).to eq(200)
+      expect(page.current_path).to eq("/pages/about")
     end
 
     it "allows access to safety standards page" do
       visit safety_standards_path
-      expect(page).to have_http_status(:success)
+      expect(page.status_code).to eq(200)
       expect(page.current_path).to eq(safety_standards_path)
     end
 
     it "allows access to login page" do
       visit login_path
-      expect(page).to have_http_status(:success)
+      expect(page.status_code).to eq(200)
       expect(page.current_path).to eq(login_path)
     end
 
-    it "allows access to signup page" do
-      visit signup_path
-      expect(page).to have_http_status(:success)
-      expect(page.current_path).to eq(signup_path)
+    it "allows access to register page" do
+      visit register_path
+      expect(page.status_code).to eq(200)
+      expect(page.current_path).to eq(register_path)
     end
 
     describe "Public report access" do
@@ -112,7 +118,7 @@ RSpec.describe "Public Access Control", type: :request do
     describe "Safety standards page" do
       it "allows access to safety standards page" do
         visit safety_standards_path
-        expect(page).to have_http_status(:success)
+        expect(page.status_code).to eq(200)
         expect(page).to have_content(I18n.t("safety_standards.title"))
       end
     end
@@ -170,7 +176,7 @@ RSpec.describe "Public Access Control", type: :request do
 
     it "returns 404 for user show page (no show action)" do
       visit user_path(user)
-      expect(page).to have_http_status(:not_found)
+      expect(page.status_code).to eq(404)
     end
 
     it "redirects user edit page to login" do
@@ -203,7 +209,7 @@ RSpec.describe "Public Access Control", type: :request do
     describe "Public JSON endpoints" do
       it "allows public access to inspection JSON" do
         visit "/inspections/#{inspection.id}.json"
-        expect(page).to have_http_status(:success)
+        expect(page.status_code).to eq(200)
         expect(page.current_path).to eq("/inspections/#{inspection.id}.json")
         json = JSON.parse(page.body)
         expect(json).to have_key("inspection_date")
@@ -211,7 +217,7 @@ RSpec.describe "Public Access Control", type: :request do
 
       it "allows public access to unit JSON" do
         visit "/units/#{unit.id}.json"
-        expect(page).to have_http_status(:success)
+        expect(page.status_code).to eq(200)
         expect(page.current_path).to eq("/units/#{unit.id}.json")
         json = JSON.parse(page.body)
         expect(json).to have_key("serial")
@@ -227,12 +233,12 @@ RSpec.describe "Public Access Control", type: :request do
 
     it "returns 404 for non-existent inspection reports" do
       visit "/inspections/NONEXISTENT"
-      expect(page).to have_http_status(:not_found)
+      expect(page.status_code).to eq(404)
     end
 
     it "returns 404 for non-existent unit reports" do
       visit "/units/NONEXISTENT"
-      expect(page).to have_http_status(:not_found)
+      expect(page.status_code).to eq(404)
     end
 
     it "returns 404 for non-existent inspection QR codes" do
@@ -259,13 +265,13 @@ RSpec.describe "Public Access Control", type: :request do
 
     it "prevents directory traversal attacks" do
       visit "/inspections/../../../etc/passwd"
-      expect(page).to have_http_status(:not_found)
+      expect(page.status_code).to eq(404)
     end
 
     it "handles malformed requests gracefully" do
       # Safety standards page handles GET requests with params
       visit "#{safety_standards_path}?calculation[type]=invalid&calculation[value]=test"
-      expect(page).to have_http_status(:success)
+      expect(page.status_code).to eq(200)
       # Page should still render even with invalid params
       expect(page).to have_content(I18n.t("safety_standards.title"))
     end

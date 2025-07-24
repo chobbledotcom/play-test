@@ -41,6 +41,12 @@ module ApplicationHelper
     ENV["RIGHT_LOGO_ALT"] || "Logo"
   end
 
+  def page_snippet(slug)
+    snippet = Page.snippets.find_by(slug: slug)
+    return "" unless snippet
+    raw snippet.content
+  end
+
   ALLOWED_LOCAL_ASSIGNS = %i[
     accept
     field

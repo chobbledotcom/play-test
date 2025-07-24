@@ -13,3 +13,5 @@ en:
         password: "Password"
         remember_me: "Remember Me"
       submit: "Log in"
+      messages:
+        register_link: "Register"

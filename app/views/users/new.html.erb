@@ -1,4 +1,4 @@
-<%= render 'form/form_context', model: @user, i18n_base: 'forms.user_new', url: signup_path do |form| %>
+<%= render 'form/form_context', model: @user, i18n_base: 'forms.user_new', url: register_path do |form| %>
   <%= render 'form/fieldset', legend_key: 'account_details' do %>
     <%= render 'form/text_field',
       field: :email,

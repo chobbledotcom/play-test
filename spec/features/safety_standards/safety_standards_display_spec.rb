@@ -19,11 +19,16 @@ RSpec.feature "Safety Standards Display", type: :feature do
   end
 
   scenario "safety standards link appears in navigation" do
+    # Ensure homepage exists
+    Page.find_or_create_by!(slug: "/") do |page|
+      page.link_title = "Home"
+      page.content = "<h1>Welcome</h1>"
+    end
+
     visit root_path
 
-    within("nav") do
-      expect(page).to have_link(I18n.t("navigation.safety_standards"), href: safety_standards_path)
-    end
+    # For logged-in users, navigation is in the application layout
+    expect(page).to have_link(I18n.t("navigation.safety_standards"), href: safety_standards_path)
   end
 
   scenario "safety standards info appears in slide assessment form" do

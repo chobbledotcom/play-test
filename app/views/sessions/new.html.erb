@@ -1,4 +1,10 @@
-<%= render 'form/form_context', model: nil, i18n_base: 'forms.session_new', url: login_path, scope: :session do |form| %>
+<%= render 'form/form_context', 
+  model: nil, 
+  i18n_base: 'forms.session_new', 
+  url: login_path, 
+  scope: :session,
+  secondary_link_url: register_path,
+  secondary_link_text: t('forms.session_new.messages.register_link') do |form| %>
   <%= render 'form/fieldset', legend_key: 'credentials' do %>
     <%= render 'form/text_field',
       field: :email,

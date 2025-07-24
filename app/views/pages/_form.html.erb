@@ -2,6 +2,7 @@
   <%= render 'form/fieldset', legend_key: 'page_details' do %>
     <%= render 'form/text_field', field: :slug, required: true %>
     <%= render 'form/text_field', field: :link_title, required: true %>
+    <%= render 'form/checkbox', field: :is_snippet %>
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'seo_metadata' do %>

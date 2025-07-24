@@ -59,7 +59,14 @@ end %>
   <% end %>
 
   <fieldset>
-    <%= render 'form/submit_button' %>
+    <% if local_assigns[:secondary_link_url].present? && local_assigns[:secondary_link_text].present? %>
+      <div class="form-actions">
+        <%= render 'form/submit_button' %>
+        <%= link_to secondary_link_text, secondary_link_url, role: "button", class: "secondary" %>
+      </div>
+    <% else %>
+      <%= render 'form/submit_button' %>
+    <% end %>
   </fieldset>
 
   <%# Save message display for Turbo Streams %>

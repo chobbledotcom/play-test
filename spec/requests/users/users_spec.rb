@@ -14,23 +14,23 @@ RSpec.describe "Users", type: :request do
     fill_in_form_fields(form_name, fields)
     submit_form(form_name)
   end
-  describe "GET /signup" do
+  describe "GET /register" do
     it "returns http success" do
-      visit "/signup"
+      visit "/register"
       expect(page).to have_http_status(:success)
     end
 
     it "displays registration form" do
-      visit "/signup"
+      visit "/register"
       expect(page).to have_content(I18n.t("users.titles.register"))
       expect_form_fields_present("forms.user_new")
       expect(page).to have_button(I18n.t("users.buttons.register"))
     end
   end
 
-  describe "POST /signup" do
+  describe "POST /register" do
     it "creates a user and redirects" do
-      visit "/signup"
+      visit "/register"
 
       user_data = SeedData.user_fields.merge(rpii_inspector_number: "RPII123")
       fill_and_submit_form(:user_new, user_data)
@@ -248,7 +248,7 @@ RSpec.describe "Users", type: :request do
 
   describe "user creation" do
     it "renders new user form when validation fails" do
-      post "/signup", params: valid_user_params(email: "")
+      post "/register", params: valid_user_params(email: "")
       expect_validation_error(:email)
     end
 
@@ -259,7 +259,7 @@ RSpec.describe "Users", type: :request do
         allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
 
         params = valid_user_params
-        post "/signup", params: params
+        post "/register", params: params
 
         expect(NtfyService).to have_received(:notify).with("new user: #{params[:user][:email]}")
       end
@@ -267,7 +267,7 @@ RSpec.describe "Users", type: :request do
       it "does not send notification in non-production environment" do
         allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("development"))
 
-        post "/signup", params: valid_user_params
+        post "/register", params: valid_user_params
 
         expect(NtfyService).not_to have_received(:notify)
       end
@@ -275,21 +275,21 @@ RSpec.describe "Users", type: :request do
 
     it "logs in user after successful creation" do
       params = valid_user_params
-      post "/signup", params: params
+      post "/register", params: params
 
       created_user = User.find_by(email: params[:user][:email])
       expect(session[:user_id]).to eq(created_user.id)
     end
 
     it "handles password confirmation mismatch" do
-      post "/signup", params: valid_user_params(password_confirmation: "different")
+      post "/register", params: valid_user_params(password_confirmation: "different")
       expect_validation_error(:password_confirmation)
     end
 
     it "handles duplicate email" do
       create(:user, email: "existing@example.com")
 
-      post "/signup", params: valid_user_params(email: "existing@example.com")
+      post "/register", params: valid_user_params(email: "existing@example.com")
       expect_validation_error(:email)
     end
   end
@@ -390,7 +390,7 @@ RSpec.describe "Users", type: :request do
         inspection_company_id: company.id
       )
 
-      post "/signup", params: params
+      post "/register", params: params
 
       created_user = User.find_by(email: params[:user][:email])
       expect(created_user).to be_present

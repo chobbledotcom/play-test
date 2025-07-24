@@ -54,7 +54,7 @@
           <% if Rails.env.development? %>
             <li><%= nav_link_to t('navigation.guides'), guides_path %></li>
           <% end %>
-          <li><%= nav_link_to t('navigation.about'), about_path %></li>
+          <li><%= nav_link_to t('navigation.about'), page_by_slug_path("about") %></li>
           <li>
             <%= button_to t("sessions.buttons.log_out"), logout_path, method: :delete %>
           </li>
@@ -81,15 +81,7 @@
 
       <hr id="footer-rule">
       <footer>
-        <p>
-          <strong>Privacy policy:</strong> I won't use your info for anything other than contacting you about this service, which will be rare. You can delete your data whenever you like.
-        </p>
-        <p>
-          <strong>Self promo:</strong> Do you need a website, software development, or honest techy advice? Get in touch with me at <a rel="nofollow" href="https://chobble.com">chobble.com</a>.
-        </p>
-        <p>
-          <a rel="nofollow" href="https://git.chobble.com/chobble/play-test">Source Code</a>
-        </p>
+        <%= page_snippet("footer") %>
       </footer>
       <%= render 'shared/debug_info' %>
     </main>

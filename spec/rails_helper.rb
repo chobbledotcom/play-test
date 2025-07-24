@@ -63,12 +63,5 @@ RSpec.configure do |config|
     FileUtils.rm_rf(Rails.root.join("tmp/storage")) if Rails.env.test?
   end
 
-  config.after(:suite) do
-    # Clean up Active Storage files after test suite completes
-    if Rails.env.test?
-      FileUtils.rm_rf(Rails.root.join("tmp/storage"))
-    end
-  end
-
   config.filter_rails_from_backtrace!
 end

@@ -295,7 +295,7 @@ end
 
 # GOOD - Just inline it instead
 scenario "displays page title" do
-  visit about_path
+  visit "/pages/about"
   expect(page).to have_content(I18n.t("about.title"))
 end
 ```

@@ -11,8 +11,8 @@ Rails.application.routes.draw do
   post "safety_standards", to: "safety_standards#index"
   get "search", to: "search#index"
 
-  get "signup", to: "users#new"
-  post "signup", to: "users#create"
+  get "register", to: "users#new"
+  post "register", to: "users#create"
   get "login", to: "sessions#new"
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
@@ -72,5 +72,8 @@ Rails.application.routes.draw do
 
   # Pages (CMS)
   resources :pages, except: [:show]
-  get "pages/:slug", to: "pages#show", as: :page, constraints: {slug: /[^\/]+/}
+  get "pages/:slug",
+    to: "pages#show",
+    as: :page_by_slug,
+    constraints: {slug: /[^\/]+/}
 end

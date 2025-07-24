@@ -56,7 +56,7 @@ class DirtyForms {
 		const formAction = form.action || "";
 		if (
 			formAction.includes("/login") ||
-			formAction.includes("/signup") ||
+			formAction.includes("/register") ||
 			formAction.includes("/safety_standards") ||
 			formAction.includes("/search")
 		) {

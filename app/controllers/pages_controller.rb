@@ -1,4 +1,5 @@
 class PagesController < ApplicationController
+  skip_before_action :require_login, only: :show
   before_action :require_admin, except: :show
   before_action :set_page, only: %i[edit update destroy]
 
@@ -8,7 +9,20 @@ class PagesController < ApplicationController
 
   def show
     slug = params[:slug] || "/"
-    @page = Page.find_by!(slug: slug)
+    @page = Page.pages.find_by(slug: slug)
+
+    # If homepage doesn't exist, create a temporary empty page object
+    if @page.nil? && slug == "/"
+      @page = Page.new(
+        slug: "/",
+        content: "",
+        meta_title: "play-test",
+        meta_description: ""
+      )
+    elsif @page.nil?
+      # For other missing pages, still raise not found
+      raise ActiveRecord::RecordNotFound
+    end
   end
 
   def new
@@ -43,7 +57,7 @@ class PagesController < ApplicationController
   private
 
   def set_page
-    @page = Page.find(params[:id])
+    @page = Page.find_by!(slug: params[:id])
   end
 
   def page_params
@@ -52,7 +66,8 @@ class PagesController < ApplicationController
       :meta_title,
       :meta_description,
       :link_title,
-      :content
+      :content,
+      :is_snippet
     )
   end
 end

@@ -93,6 +93,12 @@ class InspectionWorkflow
   end
 
   def register_new_user
+    # Ensure homepage exists
+    Page.find_or_create_by!(slug: "/") do |page|
+      page.link_title = "Home"
+      page.content = "<h1>Welcome</h1>"
+    end
+
     visit root_path
 
     click_link t("users.titles.register")
