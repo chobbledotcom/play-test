@@ -105,7 +105,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_141500) do
     t.index ["inspection_id"], name: "fan_assessments_new_pkey", unique: true
   end
 
-  create_table "inspections", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "inspections", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.datetime "inspection_date"
     t.boolean "passed"
     t.string "user_id", limit: 12, null: false
@@ -136,7 +136,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_141500) do
     t.index ["user_id"], name: "index_inspections_on_user_id"
   end
 
-  create_table "inspector_companies", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "inspector_companies", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.string "name", null: false
     t.string "email"
     t.string "phone", null: false
@@ -182,7 +182,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_141500) do
 
   create_table "slide_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
-    t.decimal "slide_platform_height", precision: 8, scale: 2
     t.decimal "slide_wall_height", precision: 8, scale: 2
     t.decimal "runout", precision: 8, scale: 2
     t.decimal "slide_first_metre_height", precision: 8, scale: 2
@@ -191,7 +190,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_141500) do
     t.boolean "runout_pass"
     t.boolean "slip_sheet_pass"
     t.boolean "slide_permanent_roof"
-    t.text "slide_platform_height_comment"
     t.text "slide_wall_height_comment"
     t.text "slide_first_metre_height_comment"
     t.text "slide_beyond_first_metre_height_comment"
@@ -253,7 +251,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_141500) do
     t.index ["inspection_id"], name: "structure_assessments_new_pkey", unique: true
   end
 
-  create_table "units", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "units", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.string "name"
     t.string "user_id", limit: 12, null: false
     t.datetime "created_at", null: false
@@ -294,7 +292,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_141500) do
     t.index ["inspection_id"], name: "user_height_assessments_new_pkey", unique: true
   end
 
-  create_table "users", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "users", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
     t.datetime "created_at", null: false

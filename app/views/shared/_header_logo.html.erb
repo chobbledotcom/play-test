@@ -1,4 +1,21 @@
-<p class="logo">
-  <%= image_tag "logo.svg", alt: "play-test logo" %>
-  play-test.co.uk
-</p>
+<% if left_logo_path.present? || right_logo_path.present? %>
+  <div class="logo-container">
+    <% if left_logo_path.present? %>
+      <p class="logo left">
+        <%= image_tag left_logo_path, alt: left_logo_alt %>
+      </p>
+    <% end %>
+    <% if right_logo_path.present? %>
+      <p class="logo right">
+        <%= image_tag right_logo_path, alt: right_logo_alt %>
+      </p>
+    <% end %>
+  </div>
+<% else %>
+  <p class="logo">
+    <%= image_tag logo_path, alt: logo_alt_text %>
+    <% unless ENV["LOGO_PATH"].present? %>
+      play-test.co.uk
+    <% end %>
+  </p>
+<% end %>

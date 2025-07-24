@@ -11,6 +11,36 @@ module ApplicationHelper
     end
   end
 
+  def effective_theme
+    ENV["THEME"] || current_user&.theme || "light"
+  end
+
+  def theme_selector_disabled? = ENV["THEME"].present?
+
+  def logo_path
+    ENV["LOGO_PATH"] || "logo.svg"
+  end
+
+  def logo_alt_text
+    ENV["LOGO_ALT"] || "play-test logo"
+  end
+
+  def left_logo_path
+    ENV["LEFT_LOGO_PATH"]
+  end
+
+  def left_logo_alt
+    ENV["LEFT_LOGO_ALT"] || "Logo"
+  end
+
+  def right_logo_path
+    ENV["RIGHT_LOGO_PATH"]
+  end
+
+  def right_logo_alt
+    ENV["RIGHT_LOGO_ALT"] || "Logo"
+  end
+
   ALLOWED_LOCAL_ASSIGNS = %i[
     accept
     field

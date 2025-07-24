@@ -22,14 +22,16 @@
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'preferences' do %>
-    <%= render 'form/select',
-      field: :theme,
-      options: options_for_select([
-        [t('users.options.theme_light'), "light"],
-        [t('users.options.theme_default'), "default"],
-        [t('users.options.theme_dark'), "dark"]
-      ], @user.theme)
-    %>
+    <% unless theme_selector_disabled? %>
+      <%= render 'form/select',
+        field: :theme,
+        options: options_for_select([
+          [t('users.options.theme_light'), "light"],
+          [t('users.options.theme_default'), "default"],
+          [t('users.options.theme_dark'), "dark"]
+        ], @user.theme)
+      %>
+    <% end %>
 
     <div id="user_logo_preview">
       <%= render 'form/file_field', field: :logo, accept: "image/*" %>
