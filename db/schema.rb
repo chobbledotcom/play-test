@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_24_001107) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_24_141412) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -290,6 +290,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_001107) do
     t.integer "users_at_1800mm"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_count_at_maximum_user_height"
     t.index ["inspection_id"], name: "user_height_assessments_new_pkey", unique: true
   end
 

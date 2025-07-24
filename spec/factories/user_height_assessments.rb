@@ -8,6 +8,7 @@ FactoryBot.define do
     users_at_1200mm { nil }
     users_at_1500mm { nil }
     users_at_1800mm { nil }
+    user_count_at_maximum_user_height { nil }
     play_area_length { nil }
     play_area_width { nil }
     negative_adjustment { nil }
@@ -27,6 +28,7 @@ FactoryBot.define do
       users_at_1200mm { 8 }
       users_at_1500mm { 6 }
       users_at_1800mm { 4 }
+      user_count_at_maximum_user_height { 3 }
     end
 
     trait :incomplete do
@@ -40,6 +42,7 @@ FactoryBot.define do
       users_at_1200mm { 4 }
       users_at_1500mm { 3 }
       users_at_1800mm { 2 }
+      user_count_at_maximum_user_height { 2 }
       play_area_length { 10.0 }
       play_area_width { 8.0 }
       negative_adjustment { 2.0 }
@@ -53,6 +56,7 @@ FactoryBot.define do
       users_at_1200mm { 8 }
       users_at_1500mm { 6 }
       users_at_1800mm { 4 }
+      user_count_at_maximum_user_height { 3 }
       play_area_length { 5.0 }
       play_area_width { 4.0 }
       negative_adjustment { 0.0 }
@@ -70,6 +74,7 @@ FactoryBot.define do
       tallest_user_height { 0 }
       users_at_1000mm { nil }
       users_at_1200mm { 0 }
+      user_count_at_maximum_user_height { nil }
     end
   end
 end
