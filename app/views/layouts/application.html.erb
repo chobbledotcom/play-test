@@ -27,7 +27,7 @@
         async src="https://analytics.play-test.co.uk/count.js"></script>
     <% end %>
   </head>
-  <body class="<%= current_user&.theme || "light" %>">
+  <body class="<%= effective_theme %>">
     <%= #render 'shared/construction_banner'
     %>
     <%= render 'shared/header_logo' %>

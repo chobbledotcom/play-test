@@ -1,0 +1,115 @@
+/* RPII Theme - Based on light theme with RPII blue (#0e5dc7) */
+.rpii nav a,
+.rpii nav button {
+	background-color: #0e5dc7;
+	border: 2px solid #0e5dc7;
+	color: #fff;
+	border-radius: var(--border-radius);
+	text-decoration: none;
+	&:hover {
+		filter: none; /* Remove MVP's brightness filter */
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(14, 93, 199, 0.3);
+		background-color: #1a6dd8; /* Lighter blue on hover */
+		border-color: #1a6dd8;
+		text-decoration: none;
+		color: #fff;
+	}
+}
+
+.rpii nav a:active,
+.rpii nav button:active {
+	transform: translateY(0);
+	box-shadow: 0 2px 6px rgba(14, 93, 199, 0.2);
+	background-color: #0a4a9a; /* Darker blue on click */
+	border-color: #0a4a9a;
+}
+
+.rpii nav a.active,
+.rpii nav a.active:hover,
+.rpii nav button:hover {
+	background-color: #fff;
+	color: #0e5dc7;
+	border: 2px solid #0e5dc7;
+	text-decoration: none;
+}
+
+.rpii nav a.active:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 16px rgba(14, 93, 199, 0.3);
+	color: #0e5dc7;
+}
+
+/* General buttons */
+.rpii button,
+.rpii input[type="submit"],
+.rpii input[type="button"],
+.rpii .button {
+	background-color: #194EB1;
+	color: #fff;
+	border: 2px solid #194EB1;
+}
+
+.rpii button:hover,
+.rpii input[type="submit"]:hover,
+.rpii input[type="button"]:hover,
+.rpii .button:hover {
+	background-color: #2563c7;
+	border-color: #2563c7;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(25, 78, 177, 0.3);
+}
+
+/* Table headers */
+.rpii th {
+	background-color: #194EB1;
+	color: #fff;
+}
+
+/* Links */
+.rpii a {
+	color: #194EB1;
+}
+
+.rpii a:hover {
+	color: #2563c7;
+}
+
+/* Table list items hover effect */
+.rpii .table-list-items a:hover {
+	background-color: rgba(25, 78, 177, 0.1);
+}
+
+/* Override CSS variables for consistent theming */
+.rpii {
+	--color-link: #194EB1;
+	--color-bg-secondary: #194EB1;
+	--color-table: #194EB1;
+}
+
+/* Logo container for two logos */
+.rpii .logo-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.5rem 1rem;
+}
+
+.rpii .logo {
+	margin: 0;
+	display: flex;
+	align-items: center;
+}
+
+.rpii .logo.left {
+	justify-content: flex-start;
+}
+
+.rpii .logo.right {
+	justify-content: flex-end;
+}
+
+.rpii .logo img {
+	width: auto;
+	height: 45.5px;
+}
