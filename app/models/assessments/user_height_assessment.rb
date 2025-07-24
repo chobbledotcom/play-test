@@ -17,6 +17,7 @@ class Assessments::UserHeightAssessment < ApplicationRecord
     :users_at_1200mm,
     :users_at_1500mm,
     :users_at_1800mm,
+    :user_count_at_maximum_user_height,
     numericality: {greater_than_or_equal_to: 0, only_integer: true},
     allow_blank: true
 
