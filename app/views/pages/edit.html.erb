@@ -1,0 +1,9 @@
+<%= render 'shared/page_header', title: t('pages.edit.title') %>
+
+<%= render 'form' %>
+
+<%= link_to t('pages.edit.delete'), page_path(@page),
+    data: {
+      turbo_method: :delete,
+      turbo_confirm: t('pages.edit.confirm_delete')
+    } %>

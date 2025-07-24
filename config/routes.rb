@@ -4,8 +4,7 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", :as => :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", :as => :pwa_manifest
 
-  root "home#index"
-  get "about", to: "home#about"
+  root to: "pages#show", defaults: {slug: "/"}
   get "guides", to: "guides#index"
   get "guides/*path", to: "guides#show", as: :guide
   get "safety_standards", to: "safety_standards#index"
@@ -61,9 +60,17 @@ Rails.application.routes.draw do
   end
 
   # Create unit from inspection
-  get "inspections/:id/new_unit", to: "units#new_from_inspection", as: "new_unit_from_inspection"
-  post "inspections/:id/create_unit", to: "units#create_from_inspection", as: "create_unit_from_inspection"
+  get "inspections/:id/new_unit",
+    to: "units#new_from_inspection",
+    as: "new_unit_from_inspection"
+  post "inspections/:id/create_unit",
+    to: "units#create_from_inspection",
+    as: "create_unit_from_inspection"
 
   # Inspector Companies
   resources :inspector_companies, except: [:destroy]
+
+  # Pages (CMS)
+  resources :pages, except: [:show]
+  get "pages/:slug", to: "pages#show", as: :page, constraints: {slug: /[^\/]+/}
 end

@@ -1,0 +1,15 @@
+<%= render 'form/form_context', model: @page, i18n_base: 'forms.pages' do |form| %>
+  <%= render 'form/fieldset', legend_key: 'page_details' do %>
+    <%= render 'form/text_field', field: :slug, required: true %>
+    <%= render 'form/text_field', field: :link_title, required: true %>
+  <% end %>
+
+  <%= render 'form/fieldset', legend_key: 'seo_metadata' do %>
+    <%= render 'form/text_field', field: :meta_title %>
+    <%= render 'form/text_area', field: :meta_description, rows: 3 %>
+  <% end %>
+
+  <%= render 'form/fieldset', legend_key: 'content' do %>
+    <%= render 'form/text_area', field: :content, rows: 20, required: true %>
+  <% end %>
+<% end %>

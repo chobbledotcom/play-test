@@ -1,0 +1,9 @@
+<% if @page.meta_title.present? %>
+  <% content_for :title, @page.meta_title %>
+<% end %>
+
+<% if @page.meta_description.present? %>
+  <% content_for :meta_description, @page.meta_description %>
+<% end %>
+
+<%= raw @page.content %>

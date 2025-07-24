@@ -1,0 +1,37 @@
+<%= render 'shared/page_header', title: t('pages.index.title') %>
+
+<%= button_to new_page_path, method: :get do %>
+  <strong><%= t('pages.index.new_page') %></strong>
+<% end %>
+
+<% if @pages.any? %>
+  <div class="table-list pages-list">
+    <!-- Header row -->
+    <div class="table-list-header">
+      <span class="col-slug"><%= t('pages.index.slug') %></span>
+      <span class="col-link-title"><%= t('pages.index.link_title') %></span>
+      <span class="col-meta-title"><%= t('pages.index.meta_title') %></span>
+    </div>
+
+    <!-- Data rows -->
+    <ul class="table-list-items">
+      <% @pages.each do |page| %>
+        <li>
+          <%= link_to edit_page_path(page), class: "table-list-link" do %>
+            <span class="col-slug" data-label="<%= t('pages.index.slug') %>">
+              <%= page.slug %>
+            </span>
+            <span class="col-link-title" data-label="<%= t('pages.index.link_title') %>">
+              <%= page.link_title %>
+            </span>
+            <span class="col-meta-title" data-label="<%= t('pages.index.meta_title') %>">
+              <%= page.meta_title %>
+            </span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% else %>
+  <p><%= t('pages.messages.no_pages_found') %></p>
+<% end %>
