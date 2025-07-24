@@ -5,7 +5,6 @@
 %>
   <%= render 'form/fieldset', legend_key: 'height_measurements' do %>
       <%= render 'form/decimal_comment', field: :containing_wall_height %>
-    <%= render 'form/decimal_comment', field: :tallest_user_height %>
   <% end %>
 
   <%= render 'form/fieldset', legend_key: 'play_area' do %>
@@ -20,6 +19,7 @@
       <%= render 'form/number', field: :users_at_1200mm, min: 0, step: 1 %>
       <%= render 'form/number', field: :users_at_1500mm, min: 0, step: 1 %>
       <%= render 'form/number', field: :users_at_1800mm, min: 0, step: 1 %>
+      <%= render 'form/decimal_comment', field: :tallest_user_height %>
       <%= render 'form/number', field: :user_count_at_maximum_user_height, min: 0, step: 1 %>
     </div>
   <% end %>
