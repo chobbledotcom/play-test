@@ -6,7 +6,7 @@
   <% content_for :meta_description, @page.meta_description %>
 <% end %>
 
-<%= raw @page.content %>
+<%= @page.safe_content %>
 
 <% if @page.slug == "/" && !current_user %>
   <nav>

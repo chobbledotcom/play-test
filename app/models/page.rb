@@ -11,4 +11,10 @@ class Page < ApplicationRecord
   def to_param
     slug.presence || "new"
   end
+
+  # Returns content marked as safe for rendering
+  # Page content is admin-controlled and contains intentional HTML
+  def safe_content
+    content.to_s.html_safe
+  end
 end
