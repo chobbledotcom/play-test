@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_24_161252) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_26_234314) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -170,11 +170,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_161252) do
     t.text "thread_comment"
     t.text "fabric_strength_comment"
     t.text "fire_retardant_comment"
-    t.string "marking_comment", limit: 1000
-    t.string "instructions_comment", limit: 1000
-    t.string "inflated_stability_comment", limit: 1000
-    t.string "protrusions_comment", limit: 1000
-    t.string "critical_defects_comment", limit: 1000
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "materials_assessments_new_pkey", unique: true
@@ -249,7 +244,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_24_161252) do
     t.text "markings_comment"
     t.text "grounding_comment"
     t.string "trough_depth_comment", limit: 1000
-    t.string "netting_comment", limit: 1000
     t.integer "trough_adjacent_panel_width"
     t.text "trough_adjacent_panel_width_comment"
     t.decimal "step_ramp_size", precision: 8, scale: 2
