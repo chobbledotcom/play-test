@@ -1,0 +1,29 @@
+form_fields:
+  - legend_i18n_key: slide_dimensions
+    fields:
+      - partial: decimal_comment
+        field: slide_platform_height
+        attributes:
+          min: 0
+      - partial: decimal_comment
+        field: slide_wall_height
+        attributes:
+          min: 0
+      - partial: decimal_comment
+        field: slide_first_metre_height
+        attributes:
+          min: 0
+      - partial: decimal_comment
+        field: slide_beyond_first_metre_height
+        attributes:
+          min: 0
+      - partial: yes_no_radio_comment
+        field: slide_permanent_roof
+      - partial: pass_fail_na_comment
+        field: clamber_netting_pass
+      - partial: number_pass_fail_comment
+        field: runout
+        attributes:
+          min: 0
+      - partial: pass_fail_comment
+        field: slip_sheet_pass

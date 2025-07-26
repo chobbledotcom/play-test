@@ -1,4 +1,6 @@
 class Page < ApplicationRecord
+  include FormConfigurable
+
   self.primary_key = "slug"
 
   validates :slug, presence: true, uniqueness: true

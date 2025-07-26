@@ -1,0 +1,9 @@
+<% model.class.form_fields(user: current_user).each do |fieldset| %>
+  <%= render 'form/fieldset', legend_key: fieldset[:legend_i18n_key] do %>
+    <% fieldset[:fields].each do |field_config| %>
+      <% render_options = { field: field_config[:field] } %>
+      <% render_options.merge!(field_config[:attributes]) if field_config[:attributes] %>
+      <%= render "form/#{field_config[:partial]}", render_options %>
+    <% end %>
+  <% end %>
+<% end %>

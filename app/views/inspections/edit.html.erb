@@ -44,8 +44,10 @@
       <% case current_tab %>
       <% when 'inspection' %>
         <%= render 'inspections/form' %>
+      <% when 'results' %>
+        <%= render 'inspections/results_form' %>
       <% else %>
-        <%= render "inspections/#{current_tab}_form" %>
+        <%= render 'inspections/assessment_form', assessment_type: current_tab %>
       <% end %>
     </div>
 

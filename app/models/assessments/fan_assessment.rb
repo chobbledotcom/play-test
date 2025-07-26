@@ -1,6 +1,7 @@
 class Assessments::FanAssessment < ApplicationRecord
   include AssessmentLogging
   include AssessmentCompletion
+  include FormConfigurable
 
   self.primary_key = "inspection_id"
 

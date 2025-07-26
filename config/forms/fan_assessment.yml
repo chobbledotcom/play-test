@@ -1,0 +1,15 @@
+form_fields:
+  - legend_i18n_key: fan_assessment
+    fields:
+      - partial: text_field
+        field: fan_size_type
+      - partial: text_field
+        field: blower_serial
+      - partial: pass_fail_na_comment
+        field: blower_flap_pass
+      - partial: pass_fail_comment
+        field: blower_finger_pass
+      - partial: pass_fail_na_comment
+        field: pat_pass
+      - partial: pass_fail_comment
+        field: blower_visual_pass

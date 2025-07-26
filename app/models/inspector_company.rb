@@ -1,7 +1,22 @@
 class InspectorCompany < ApplicationRecord
   include CustomIdGenerator
+  include FormConfigurable
 
   has_many :inspections, dependent: :destroy
+
+  # Override to filter admin-only fields
+  def self.form_fields(user: nil)
+    fields = super
+
+    # Remove notes field unless user is admin
+    unless user&.admin?
+      fields.each do |fieldset|
+        fieldset[:fields].delete_if { |field| field[:field] == :notes }
+      end
+    end
+
+    fields
+  end
 
   # File attachments
   has_one_attached :logo
@@ -30,7 +45,6 @@ class InspectorCompany < ApplicationRecord
 
   # Callbacks
   before_save :normalize_phone_number
-  after_update :update_inspection_company_data, if: :saved_change_to_name?
 
   # Methods
   # Credentials validation moved to individual inspector level (User model)
@@ -82,14 +96,5 @@ class InspectorCompany < ApplicationRecord
 
     # Remove all non-digit characters
     self.phone = phone.gsub(/\D/, "")
-  end
-
-  def update_inspection_company_data
-    # Update any draft inspections with new company name
-    # Will be enhanced when draft scope and audit logging are added to Inspection
-    inspections.each do |inspection|
-      # inspection.update(inspection_company_name: name) - will be added in later step
-      # inspection.log_audit_action('company_updated', user, 'Company name updated') - will be added in later step
-    end
   end
 end

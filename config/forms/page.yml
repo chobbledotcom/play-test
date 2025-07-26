@@ -1,0 +1,28 @@
+form_fields:
+  - legend_i18n_key: page_details
+    fields:
+      - partial: text_field
+        field: slug
+        attributes:
+          required: true
+      - partial: text_field
+        field: link_title
+        attributes:
+          required: true
+      - partial: checkbox
+        field: is_snippet
+  - legend_i18n_key: seo_metadata
+    fields:
+      - partial: text_field
+        field: meta_title
+      - partial: text_area
+        field: meta_description
+        attributes:
+          rows: 3
+  - legend_i18n_key: content
+    fields:
+      - partial: text_area
+        field: content
+        attributes:
+          rows: 20
+          required: true

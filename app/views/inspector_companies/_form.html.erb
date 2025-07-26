@@ -1,25 +1,3 @@
 <%= render 'form/form_context', model: @inspector_company, i18n_base: 'forms.inspector_companies' do |form| %>
-  <%= render 'form/fieldset', legend_key: 'company_details' do %>
-    <%= render 'form/text_field', field: :name, required: true %>
-    <%= render 'form/text_field', field: :email, type: :email_field %>
-    <%= render 'form/text_field', field: :phone, type: :telephone_field, required: true %>
-  <% end %>
-
-  <%= render 'form/fieldset', legend_key: 'contact_information' do %>
-    <%= render 'form/text_area', field: :address, rows: 3, required: true %>
-    <%= render 'form/text_field', field: :city %>
-    <%= render 'form/text_field', field: :state %>
-    <%= render 'form/text_field', field: :postal_code %>
-    <%= render 'form/text_field', field: :country %>
-  <% end %>
-
-  <%= render 'form/fieldset', legend_key: 'company_status' do %>
-    <%= render 'form/checkbox', field: :active %>
-
-    <% if current_user&.admin? %>
-      <%= render 'form/text_area', field: :notes, rows: 4 %>
-    <% end %>
-
-    <%= render 'form/file_field', field: :logo %>
-  <% end %>
+  <%= render 'form/fields', model: @inspector_company %>
 <% end %>

@@ -1,0 +1,17 @@
+form_fields:
+  - legend_i18n_key: unit_dimensions
+    fields:
+      - partial: decimal_comment
+        field: width
+      - partial: decimal_comment
+        field: length
+      - partial: decimal_comment
+        field: height
+  - legend_i18n_key: unit_configuration
+    fields:
+      - partial: yes_no_radio
+        field: has_slide
+      - partial: yes_no_radio
+        field: is_totally_enclosed
+      - partial: yes_no_radio
+        field: indoor_only
