@@ -11,9 +11,11 @@ RSpec.describe "Public Access Control", type: :request do
     # Create pages for CMS system
     Page.find_or_create_by(slug: "/") do |page|
       page.content = "<h1>Homepage</h1>"
+      page.link_title = "Home"
     end
     Page.find_or_create_by(slug: "about") do |page|
       page.content = "<h1>About</h1>"
+      page.link_title = "About"
     end
   end
 
