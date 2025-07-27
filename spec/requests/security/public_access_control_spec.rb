@@ -9,8 +9,12 @@ RSpec.describe "Public Access Control", type: :request do
 
   before do
     # Create pages for CMS system
-    create(:page, slug: "/", content: "<h1>Homepage</h1>")
-    create(:page, slug: "about", content: "<h1>About</h1>")
+    Page.find_or_create_by(slug: "/") do |page|
+      page.content = "<h1>Homepage</h1>"
+    end
+    Page.find_or_create_by(slug: "about") do |page|
+      page.content = "<h1>About</h1>"
+    end
   end
 
   describe "Public pages (should be accessible without login)" do

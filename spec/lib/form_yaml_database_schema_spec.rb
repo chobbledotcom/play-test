@@ -1,5 +1,58 @@
 require "rails_helper"
 
+# System columns that should be excluded from validation
+SYSTEM_COLUMNS = %w[inspection_id created_at updated_at].freeze
+
+# Assessment types to validate
+ASSESSMENT_TYPES = %w[
+  anchorage_assessment
+  enclosed_assessment
+  fan_assessment
+  materials_assessment
+  slide_assessment
+  structure_assessment
+  user_height_assessment
+].freeze
+
+# Define expected partials for different column types
+PARTIAL_TYPE_MAPPINGS = {
+  # Boolean columns
+  boolean: %w[pass_fail checkbox yes_no_radio pass_fail_comment
+    yes_no_radio_comment],
+  # Integer columns (includes pass/fail/NA values as 0/1/2)
+  integer: %w[number integer_comment number_pass_fail_comment
+    number_pass_fail_na_comment pass_fail_na_comment],
+  # Decimal columns (we use decimal, not float)
+  decimal: %w[number decimal_comment number_pass_fail_comment
+    number_pass_fail_na_comment],
+  # Text/String columns
+  text: %w[text_area comment pass_fail_comment pass_fail_na_comment
+    radio_comment yes_no_radio_comment text_field],
+  string: %w[text_field text_area comment pass_fail_comment
+    pass_fail_na_comment radio_comment yes_no_radio_comment]
+}.freeze
+
+# Define allowed attributes for each partial type
+PARTIAL_ALLOWED_ATTRIBUTES = {
+  # Number fields can have step, min, max
+  "number" => %w[step min max],
+  "number_pass_fail_comment" => %w[step min max],
+  "number_pass_fail_na_comment" => %w[step min max],
+  "decimal_comment" => %w[step min max],
+  "integer_comment" => %w[step min max],
+  # Most partials don't allow any attributes
+  "text_field" => [],
+  "text_area" => [],
+  "pass_fail" => [],
+  "pass_fail_comment" => [],
+  "pass_fail_na_comment" => [],
+  "checkbox" => [],
+  "yes_no_radio" => [],
+  "yes_no_radio_comment" => [],
+  "comment" => [],
+  "radio_comment" => []
+}.freeze
+
 RSpec.describe "Form YAML Database Schema Validation" do
   # Helper to load form YAML configuration
   def load_form_config(assessment_type)
@@ -52,20 +105,6 @@ RSpec.describe "Form YAML Database Schema Validation" do
   def get_database_columns(table_name)
     ActiveRecord::Base.connection.columns(table_name).map(&:name)
   end
-
-  # System columns that should be excluded from validation
-  SYSTEM_COLUMNS = %w[inspection_id created_at updated_at].freeze
-
-  # Assessment types to validate
-  ASSESSMENT_TYPES = %w[
-    anchorage_assessment
-    enclosed_assessment
-    fan_assessment
-    materials_assessment
-    slide_assessment
-    structure_assessment
-    user_height_assessment
-  ].freeze
 
   describe "Task 1: Database Column Coverage" do
     it "includes all database columns in form YAML files" do
@@ -160,24 +199,6 @@ RSpec.describe "Form YAML Database Schema Validation" do
   describe "Task 3: Partial Type Validation" do
     it "uses appropriate partials for database column types" do
       errors = []
-
-      # Define expected partials for different column types
-      PARTIAL_TYPE_MAPPINGS = {
-        # Boolean columns
-        boolean: %w[pass_fail checkbox yes_no_radio pass_fail_comment
-          yes_no_radio_comment],
-        # Integer columns (includes pass/fail/NA values as 0/1/2)
-        integer: %w[number integer_comment number_pass_fail_comment
-          number_pass_fail_na_comment pass_fail_na_comment],
-        # Decimal columns (we use decimal, not float)
-        decimal: %w[number decimal_comment number_pass_fail_comment
-          number_pass_fail_na_comment],
-        # Text/String columns
-        text: %w[text_area comment pass_fail_comment pass_fail_na_comment
-          radio_comment yes_no_radio_comment text_field],
-        string: %w[text_field text_area comment pass_fail_comment
-          pass_fail_na_comment radio_comment yes_no_radio_comment]
-      }.freeze
 
       ASSESSMENT_TYPES.each do |assessment_type|
         table_name = assessment_type.pluralize
@@ -297,11 +318,6 @@ RSpec.describe "Form YAML Database Schema Validation" do
                 # Field ending in _pass should have matching _comment field
                 base_field = field.gsub(/_pass$/, "")
                 comment_field = "#{base_field}_comment"
-                unless db_columns.include?(comment_field)
-                  errors << <<~MSG
-                    #{assessment_type}: #{comment_field} missing for #{field}
-                  MSG
-                end
               else
                 # Base field should have both _pass and _comment
                 pass_field = "#{field}_pass"
@@ -311,11 +327,11 @@ RSpec.describe "Form YAML Database Schema Validation" do
                     #{assessment_type}: #{pass_field} missing for #{field}
                   MSG
                 end
-                unless db_columns.include?(comment_field)
-                  errors << <<~MSG
-                    #{assessment_type}: #{comment_field} missing for #{field}
-                  MSG
-                end
+              end
+              unless db_columns.include?(comment_field)
+                errors << <<~MSG
+                  #{assessment_type}: #{comment_field} missing for #{field}
+                MSG
               end
             when "number_pass_fail_comment", "number_pass_fail_na_comment"
               # Base field should exist, plus _pass and _comment
@@ -367,27 +383,6 @@ RSpec.describe "Form YAML Database Schema Validation" do
   describe "Field Attributes Validation" do
     it "only uses allowed attributes for each partial type" do
       errors = []
-
-      # Define allowed attributes for each partial type
-      PARTIAL_ALLOWED_ATTRIBUTES = {
-        # Number fields can have step, min, max
-        "number" => %w[step min max],
-        "number_pass_fail_comment" => %w[step min max],
-        "number_pass_fail_na_comment" => %w[step min max],
-        "decimal_comment" => %w[step min max],
-        "integer_comment" => %w[step min max],
-        # Most partials don't allow any attributes
-        "text_field" => [],
-        "text_area" => [],
-        "pass_fail" => [],
-        "pass_fail_comment" => [],
-        "pass_fail_na_comment" => [],
-        "checkbox" => [],
-        "yes_no_radio" => [],
-        "yes_no_radio_comment" => [],
-        "comment" => [],
-        "radio_comment" => []
-      }.freeze
 
       ASSESSMENT_TYPES.each do |assessment_type|
         form_config = load_form_config(assessment_type)
