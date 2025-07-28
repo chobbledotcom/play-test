@@ -48,6 +48,7 @@ RSpec.configure do |config|
   config.include Capybara::DSL, type: :feature
   config.include Capybara::DSL, type: :request
   config.include FormHelpers, type: :feature
+  config.include Chobble::Forms::Helpers, type: :view
 
   config.fixture_paths = [Rails.root.join("spec/fixtures")]
   config.use_transactional_fixtures = false

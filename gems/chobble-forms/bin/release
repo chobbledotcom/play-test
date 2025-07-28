@@ -1,0 +1,102 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -i bash -p gh
+
+set -euo pipefail
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Function to display usage
+usage() {
+    echo "Usage: $0 [major|minor|patch]"
+    echo ""
+    echo "Examples:"
+    echo "  $0 patch    # Bump patch version (0.1.0 -> 0.1.1)"
+    echo "  $0 minor    # Bump minor version (0.1.0 -> 0.2.0)"
+    echo "  $0 major    # Bump major version (0.1.0 -> 1.0.0)"
+    exit 1
+}
+
+# Check if bump type is provided
+if [ $# -lt 1 ]; then
+    usage
+fi
+
+BUMP_TYPE=$1
+
+# Validate bump type
+if [[ ! "$BUMP_TYPE" =~ ^(major|minor|patch)$ ]]; then
+    echo -e "${RED}Error: Invalid bump type '$BUMP_TYPE'${NC}"
+    usage
+fi
+
+# Check if gh CLI is available
+if ! command -v gh &> /dev/null; then
+    echo -e "${RED}Error: GitHub CLI (gh) is not installed${NC}"
+    echo "Please install it: https://cli.github.com/"
+    exit 1
+fi
+
+# Check if we're in a git repository
+if ! git rev-parse --git-dir > /dev/null 2>&1; then
+    echo -e "${RED}Error: Not in a git repository${NC}"
+    exit 1
+fi
+
+# Check if we're authenticated with GitHub
+if ! gh auth status &> /dev/null; then
+    echo -e "${RED}Error: Not authenticated with GitHub${NC}"
+    echo "Please run: gh auth login"
+    exit 1
+fi
+
+echo -e "${YELLOW}Triggering ${BUMP_TYPE} release...${NC}"
+
+# Trigger the workflow (suppress the gh output)
+if ! gh workflow run release.yml -f version=$BUMP_TYPE >/dev/null 2>&1; then
+    echo -e "${RED}Error: Failed to trigger workflow${NC}"
+    echo "Make sure you're in the correct repository and the release.yml workflow exists"
+    exit 1
+fi
+
+# Wait a moment for the workflow to start
+sleep 3
+
+# Get the latest workflow run ID
+RUN_ID=$(gh run list --workflow=release.yml --limit=1 --json databaseId --jq '.[0].databaseId' 2>/dev/null)
+
+if [ -z "$RUN_ID" ]; then
+    echo -e "${RED}Error: Could not find workflow run${NC}"
+    echo "The workflow may not have started yet, or there might be an issue with permissions"
+    exit 1
+fi
+
+# Get the repository info
+REPO_INFO=$(gh repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null)
+
+# Construct the URL
+WORKFLOW_URL="https://github.com/${REPO_INFO}/actions/runs/${RUN_ID}"
+
+echo -e "${GREEN}✓ Release workflow started${NC}"
+echo ""
+echo "URL: $WORKFLOW_URL"
+echo ""
+
+# Open in default browser (suppress output)
+BROWSER_OPENED=false
+if command -v xdg-open &> /dev/null; then
+    xdg-open "$WORKFLOW_URL" 2>/dev/null && BROWSER_OPENED=true
+elif command -v open &> /dev/null; then
+    open "$WORKFLOW_URL" 2>/dev/null && BROWSER_OPENED=true
+elif command -v start &> /dev/null; then
+    start "$WORKFLOW_URL" 2>/dev/null && BROWSER_OPENED=true
+fi
+
+if [ "$BROWSER_OPENED" = true ]; then
+    echo -e "${GREEN}✓ Opened in browser${NC}"
+else
+    echo -e "${YELLOW}Please open the URL above in your browser to monitor progress${NC}"
+fi

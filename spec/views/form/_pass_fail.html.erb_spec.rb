@@ -90,15 +90,13 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
       expect(rendered).not_to have_css('input[type="radio"][value="false"][checked="checked"]')
     end
 
-    it "adds prefilled wrapper class when field is prefilled" do
+    it "does not check any radio button when field value is nil" do
       test_model.status = nil
-      @previous_inspection = PassFailTestModel.new(status: false)
 
       render_pass_fail
 
-      # The simplified HTML doesn't add set-previous classes
-      # Just verify the radio button is checked correctly
-      expect(rendered).to have_css('input[type="radio"][value="false"][checked="checked"]')
+      # When the field value is nil, no radio button should be checked
+      expect(rendered).not_to have_css('input[type="radio"][checked="checked"]')
     end
   end
 

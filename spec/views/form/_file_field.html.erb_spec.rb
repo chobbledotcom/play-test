@@ -11,16 +11,13 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
     allow(form_builder).to receive(:label).and_return("Photo")
     allow(form_builder).to receive(:file_field).and_return('<input type="file" name="photo">'.html_safe)
 
-    # Mock the form_field_setup helper
-    allow(view).to receive(:form_field_setup).and_return({
-      form_object: form_builder,
-      field_label: "Photo",
-      field_hint: nil,
-      field_placeholder: nil
-    })
+    # Set the required instance variables for form_field_setup
+    view.instance_variable_set(:@_current_form, form_builder)
+    view.instance_variable_set(:@_current_i18n_base, i18n_base)
 
-    # Set the i18n_base instance variable
-    assign(:_current_i18n_base, i18n_base)
+    # Mock the i18n translation
+    allow(view).to receive(:t).with("#{i18n_base}.fields.#{field}", raise: true).and_return("Photo")
+    allow(view).to receive(:t).with(anything, default: nil).and_return(nil)
   end
 
   context "when no file is attached" do
