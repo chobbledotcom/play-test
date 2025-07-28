@@ -1,10 +1,10 @@
-<%= render 'form/form_context', model: @user, i18n_base: 'forms.user_edit' do |form| %>
-  <%= render 'form/fieldset', legend_key: 'account_details' do %>
-    <%= render 'form/text_field', field: :name %>
-    <%= render 'form/text_field', field: :email, type: :email_field %>
-    <%= render 'form/text_field', field: :password, type: :password_field %>
-    <%= render 'form/text_field', field: :password_confirmation, type: :password_field %>
-    <%= render 'form/text_field', field: :rpii_inspector_number %>
+<%= render 'chobble_forms/form_context', model: @user, i18n_base: 'forms.user_edit' do |form| %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'account_details' do %>
+    <%= render 'chobble_forms/text_field', field: :name %>
+    <%= render 'chobble_forms/text_field', field: :email, type: :email_field %>
+    <%= render 'chobble_forms/text_field', field: :password, type: :password_field %>
+    <%= render 'chobble_forms/text_field', field: :password_confirmation, type: :password_field %>
+    <%= render 'chobble_forms/text_field', field: :rpii_inspector_number %>
     <% if ENV["SIMPLE_USER_ACTIVATION"] == "true" %>
       <%
         if @user.active_until&.future?
@@ -18,9 +18,9 @@
       <%= form.label :active_until, t(label_key) %>
       <p><%= display_date %></p>
     <% else %>
-      <%= render 'form/date_field', field: :active_until %>
+      <%= render 'chobble_forms/date_field', field: :active_until %>
     <% end %>
-    <%= render 'form/select',
+    <%= render 'chobble_forms/select',
         field: :inspection_company_id,
         options: options_for_select(
           [[t('users.forms.no_company'), ""]] +

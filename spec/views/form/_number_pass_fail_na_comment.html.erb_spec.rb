@@ -20,7 +20,7 @@ class NumberPassFailNaCommentTestModel
   end
 end
 
-RSpec.describe "form/_number_pass_fail_na_comment.html.erb", type: :view do
+RSpec.describe "chobble_forms/_number_pass_fail_na_comment.html.erb", type: :view do
   let(:test_model) { NumberPassFailNaCommentTestModel.new }
   let(:field) { :slide_platform_height }
 
@@ -80,7 +80,7 @@ RSpec.describe "form/_number_pass_fail_na_comment.html.erb", type: :view do
   end
 
   def render_number_pass_fail_na_comment(locals = {})
-    partial_name = "form/number_pass_fail_na_comment"
+    partial_name = "chobble_forms/number_pass_fail_na_comment"
     render partial: partial_name, locals: {field:}.merge(locals)
   end
 
@@ -176,7 +176,7 @@ RSpec.describe "form/_number_pass_fail_na_comment.html.erb", type: :view do
           ""
         end
 
-        partial_name = "form/number_pass_fail_na_comment"
+        partial_name = "chobble_forms/number_pass_fail_na_comment"
         render partial: partial_name, locals: {field: field_name}
 
         grid_selector = "div.form-grid.number-radio-comment"

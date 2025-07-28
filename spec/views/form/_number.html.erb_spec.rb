@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "form/_number.html.erb", type: :view do
+RSpec.describe "chobble_forms/_number.html.erb", type: :view do
   let(:mock_form) { double("FormBuilder") }
   let(:field) { :quantity }
   let(:field_config) do
@@ -15,7 +15,7 @@ RSpec.describe "form/_number.html.erb", type: :view do
 
   # Default render method with common setup
   def render_number_field(locals = {})
-    render partial: "form/number", locals: {field: field}.merge(locals)
+    render partial: "chobble_forms/number", locals: {field: field}.merge(locals)
   end
 
   before do

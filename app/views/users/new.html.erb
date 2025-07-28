@@ -1,24 +1,24 @@
-<%= render 'form/form_context', model: @user, i18n_base: 'forms.user_new', url: register_path do |form| %>
-  <%= render 'form/fieldset', legend_key: 'account_details' do %>
-    <%= render 'form/text_field',
+<%= render 'chobble_forms/form_context', model: @user, i18n_base: 'forms.user_new', url: register_path do |form| %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'account_details' do %>
+    <%= render 'chobble_forms/text_field',
       field: :email,
       type: :email_field,
       required: true %>
 
-    <%= render 'form/text_field',
+    <%= render 'chobble_forms/text_field',
       field: :name,
       required: true %>
 
-    <%= render 'form/text_field',
+    <%= render 'chobble_forms/text_field',
       field: :rpii_inspector_number
     %>
 
-    <%= render 'form/text_field',
+    <%= render 'chobble_forms/text_field',
       field: :password,
       type: :password_field,
       required: true %>
 
-    <%= render 'form/text_field',
+    <%= render 'chobble_forms/text_field',
       field: :password_confirmation,
       type: :password_field,
       required: true %>

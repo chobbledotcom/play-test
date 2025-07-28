@@ -1,5 +1,5 @@
 <%
-  # Composite partial for number + pass/fail + comment fields
+  # Composite partial for number + pass/fail + N/A + comment fields
   # Required parameters:
   #   field: Base field name (e.g., 'slide_platform_height')
   # Optional parameters (passed through to number field):
@@ -11,6 +11,7 @@
   # This will render:
   #   - Number field: field (e.g., 'slide_platform_height')
   #   - Pass/fail field: field + '_pass' (e.g., 'slide_platform_height_pass')
+  #     - Pass = true, Fail = false, N/A = 2 (but rendered as checkbox)
   #   - Comment field: field + '_comment' (e.g., 'slide_platform_height_comment')
 
   number_field = field
@@ -29,13 +30,21 @@
     form,
     pass_fail_field
   )
-  pass_fail_checked = pass_fail_prefilled ? pass_fail_value : nil
+  
+  # Debug: Check if the model value is being read correctly
+  model_value = model.send(pass_fail_field) if model.respond_to?(pass_fail_field)
+  actual_value = pass_fail_prefilled ? pass_fail_value : model_value
+  na_checked = actual_value == 2
+  pass_fail_checked = na_checked ? nil : actual_value
 
   comment_info = comment_field_options(
     form,
     comment_field,
     field_data[:field_label]
   )
+
+  pass_fail_id = form.field_id(pass_fail_field)
+  na_checkbox_id = "#{field}_pass_na_checkbox"
 %>
 
 <div class="form-grid number-radio-comment" id="<%= number_field %>">
@@ -54,13 +63,14 @@
     class: "number"
   %>
 
-  <%= render 'form/radio_pass_fail',
+  <%= render 'chobble_forms/radio_pass_fail',
     field: pass_fail_field,
-    prefilled: pass_fail_prefilled,
+    prefilled: pass_fail_prefilled && !na_checked,
     checked_value: pass_fail_checked
   %>
 
-  <%= render 'form/comment_checkbox',
+
+  <%= render 'chobble_forms/comment_checkbox',
       comment_field: comment_field,
       checkbox_id: comment_info[:checkbox_id],
       textarea_id: comment_info[:options][:id],

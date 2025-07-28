@@ -9,7 +9,7 @@ class PassFailTestModel
   def persisted? = false
 end
 
-RSpec.describe "form/_pass_fail.html.erb", type: :view do
+RSpec.describe "chobble_forms/_pass_fail.html.erb", type: :view do
   let(:test_model) { PassFailTestModel.new }
   let(:field) { :status }
 
@@ -41,7 +41,7 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
   end
 
   def render_pass_fail(locals = {})
-    render partial: "form/pass_fail", locals: {field:}.merge(locals)
+    render partial: "chobble_forms/pass_fail", locals: {field:}.merge(locals)
   end
 
   describe "basic rendering" do
@@ -108,7 +108,7 @@ RSpec.describe "form/_pass_fail.html.erb", type: :view do
           ""
         end
 
-        render partial: "form/pass_fail", locals: {field: field_name}
+        render partial: "chobble_forms/pass_fail", locals: {field: field_name}
 
         expect(rendered).to have_css("div")
         expect(rendered).to have_css("label", text: expected_label)

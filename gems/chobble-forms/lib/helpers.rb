@@ -1,8 +1,7 @@
 require "action_view"
 
-module Chobble
-  module Forms
-    module Helpers
+module ChobbleForms
+  module Helpers
       include ActionView::Helpers::NumberHelper
       def form_field_setup(field, local_assigns)
         validate_local_assigns(local_assigns)
@@ -213,6 +212,5 @@ module Chobble
           {value: nil, prefilled: false}
         end
       end
-    end
   end
 end

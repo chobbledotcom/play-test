@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "form/_fieldset.html.erb", type: :view do
+RSpec.describe "chobble_forms/_fieldset.html.erb", type: :view do
   let(:base_i18n_key) { "test.forms.fields" }
 
   before do
@@ -21,7 +21,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
   describe "basic rendering" do
     it "renders a semantic fieldset element" do
       assign(:content, "Sample field content")
-      stub_template "form/_fieldset.html.erb" => <<~ERB
+      stub_template "chobble_forms/_fieldset.html.erb" => <<~ERB
         <%
           # Set form and i18n context for child form controls
           @_current_form = local_assigns[:form] || @_current_form
@@ -50,7 +50,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
         </fieldset>
       ERB
 
-      render partial: "form/fieldset", locals: {i18n_base: base_i18n_key, legend: "Test"}
+      render partial: "chobble_forms/fieldset", locals: {i18n_base: base_i18n_key, legend: "Test"}
 
       expect(rendered).to have_css("fieldset")
       expect(rendered).to include("Sample field content")
@@ -63,7 +63,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
         rendered_html = "<fieldset><legend>Custom Legend</legend>Content</fieldset>"
         allow(view).to receive(:render).and_return(rendered_html.html_safe)
 
-        render partial: "form/fieldset", locals: {i18n_base: base_i18n_key, legend: "Custom Legend"}
+        render partial: "chobble_forms/fieldset", locals: {i18n_base: base_i18n_key, legend: "Custom Legend"}
 
         expect(rendered).to include("Custom Legend")
       end
@@ -72,7 +72,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
         rendered_html = "<fieldset>Content</fieldset>"
         allow(view).to receive(:render).and_return(rendered_html.html_safe)
 
-        render partial: "form/fieldset", locals: {i18n_base: base_i18n_key, legend: ""}
+        render partial: "chobble_forms/fieldset", locals: {i18n_base: base_i18n_key, legend: ""}
 
         expect(rendered).not_to include("<legend>")
       end
@@ -83,7 +83,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
         rendered_html = "<fieldset><legend>Structure Information</legend>Content</fieldset>"
         allow(view).to receive(:render).and_return(rendered_html.html_safe)
 
-        render partial: "form/fieldset", locals: {i18n_base: "test.forms.fields", legend_key: "structure"}
+        render partial: "chobble_forms/fieldset", locals: {i18n_base: "test.forms.fields", legend_key: "structure"}
 
         expect(rendered).to include("Structure Information")
       end
@@ -92,7 +92,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
         rendered_html = "<fieldset><legend>Unknown section</legend>Content</fieldset>"
         allow(view).to receive(:render).and_return(rendered_html.html_safe)
 
-        render partial: "form/fieldset", locals: {i18n_base: base_i18n_key, legend_key: "unknown_section"}
+        render partial: "chobble_forms/fieldset", locals: {i18n_base: base_i18n_key, legend_key: "unknown_section"}
 
         expect(rendered).to include("Unknown section")
       end
@@ -104,7 +104,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
       rendered_html = "<fieldset><legend>Test</legend>Content</fieldset>"
       allow(view).to receive(:render).and_return(rendered_html.html_safe)
 
-      render partial: "form/fieldset", locals: {i18n_base: base_i18n_key, legend: "Test"}
+      render partial: "chobble_forms/fieldset", locals: {i18n_base: base_i18n_key, legend: "Test"}
 
       expect(rendered).not_to include("class=")
       expect(rendered).to include("<fieldset>")
@@ -117,7 +117,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
       # Since we can't easily test the actual error raising in view specs,
       # we'll verify the partial expects this parameter
       expect {
-        render partial: "form/fieldset", locals: {}
+        render partial: "chobble_forms/fieldset", locals: {}
       }.to raise_error(ActionView::Template::Error)
     end
   end
@@ -127,7 +127,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
     it "renders the actual fieldset partial" do
       # Create a test wrapper template that uses the fieldset
       stub_template "test_wrapper.html.erb" => <<~ERB
-        <%= render 'form/fieldset', i18n_base: 'test.forms.fields', legend: 'Test Legend' do %>
+        <%= render 'chobble_forms/fieldset', i18n_base: 'test.forms.fields', legend: 'Test Legend' do %>
           <div>Test Content</div>
         <% end %>
       ERB
@@ -140,7 +140,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
 
     it "sets instance variables for child components" do
       stub_template "test_wrapper.html.erb" => <<~ERB
-        <%= render 'form/fieldset', i18n_base: 'custom.base', form: 'test_form' do %>
+        <%= render 'chobble_forms/fieldset', i18n_base: 'custom.base', form: 'test_form' do %>
           <div>Content</div>
         <% end %>
       ERB
@@ -152,7 +152,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
 
     it "handles legend_key with i18n lookup" do
       stub_template "test_wrapper.html.erb" => <<~ERB
-        <%= render 'form/fieldset', i18n_base: 'test.forms.fields', legend_key: 'structure' do %>
+        <%= render 'chobble_forms/fieldset', i18n_base: 'test.forms.fields', legend_key: 'structure' do %>
           <div>Structure Content</div>
         <% end %>
       ERB
@@ -165,7 +165,7 @@ RSpec.describe "form/_fieldset.html.erb", type: :view do
 
     it "handles missing legend gracefully" do
       stub_template "test_wrapper.html.erb" => <<~ERB
-        <%= render 'form/fieldset', i18n_base: 'test.forms.fields' do %>
+        <%= render 'chobble_forms/fieldset', i18n_base: 'test.forms.fields' do %>
           <div>No Legend Content</div>
         <% end %>
       ERB

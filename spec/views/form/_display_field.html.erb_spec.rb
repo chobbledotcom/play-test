@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "form/_display_field.html.erb", type: :view do
+RSpec.describe "chobble_forms/_display_field.html.erb", type: :view do
   let(:user) { create(:user, :without_company, name: "Test User") }
   let(:form_object) { ActionView::Helpers::FormBuilder.new(:user, user, view, {}) }
 
@@ -11,7 +11,7 @@ RSpec.describe "form/_display_field.html.erb", type: :view do
   end
 
   it "renders display field using model value automatically" do
-    render "form/display_field",
+    render "chobble_forms/display_field",
       field: :name
 
     expect(rendered).to include("<label")
@@ -25,7 +25,7 @@ RSpec.describe "form/_display_field.html.erb", type: :view do
     form_object_nil = ActionView::Helpers::FormBuilder.new(:user, user_with_nil_phone, view, {})
     assign(:_current_form, form_object_nil)
 
-    render "form/display_field",
+    render "chobble_forms/display_field",
       field: :phone
 
     expect(rendered).to include("<label")

@@ -1,13 +1,13 @@
 <div id="search">
-<%= render 'form/form_context', 
+<%= render 'chobble_forms/form_context', 
   model: nil,
   scope: :search,
   i18n_base: 'forms.search',
   url: '#',
   local: true do |form| %>
   
-  <%= render 'form/fieldset', legend_key: 'search_details' do %>
-    <%= render 'form/select', 
+  <%= render 'chobble_forms/fieldset', legend_key: 'search_details' do %>
+    <%= render 'chobble_forms/select', 
       field: :type,
       options: options_for_select([
         [t('forms.search.options.inspection'), 'inspection'],

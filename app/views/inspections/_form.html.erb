@@ -1,8 +1,8 @@
-<%= render 'form/form_context',
+<%= render 'chobble_forms/form_context',
   model: @inspection,
   i18n_base: 'forms.inspection' do |form|
 %>
-  <%= render 'form/fieldset', legend_key: 'current_unit' do %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'current_unit' do %>
     <% if @inspection.unit.present? %>
       <%= render 'shared/unit_details_display', unit: @inspection.unit %>
       <%= link_to t('inspections.buttons.change_unit'),
@@ -19,8 +19,8 @@
   <% end %>
 
   <% unless @inspection.new_record? %>
-    <%= render 'form/fieldset', legend_key: 'public_information' do %>
-      <%= render 'form/display_field', field: :id %>
+    <%= render 'chobble_forms/fieldset', legend_key: 'public_information' do %>
+      <%= render 'chobble_forms/display_field', field: :id %>
       <div>
         <%= link_to t('inspections.buttons.download_pdf'),
           inspection_path(@inspection, format: :pdf),
@@ -32,8 +32,8 @@
     <% end %>
   <% end %>
 
-  <%= render 'form/fieldset', legend_key: 'inspection_details' do %>
-    <%= render 'form/date_field', field: :inspection_date %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'inspection_details' do %>
+    <%= render 'chobble_forms/date_field', field: :inspection_date %>
 
     <div class="calculated-field">
       <label><%= t('inspections.fields.reinspection_date') %></label>
@@ -60,6 +60,6 @@
     </div>
   <% end %>
 
-  <%= render 'form/fields', model: @inspection %>
+  <%= render 'chobble_forms/fields', model: @inspection %>
 
 <% end %>

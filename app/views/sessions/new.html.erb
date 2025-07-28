@@ -1,24 +1,24 @@
-<%= render 'form/form_context', 
+<%= render 'chobble_forms/form_context', 
   model: nil, 
   i18n_base: 'forms.session_new', 
   url: login_path, 
   scope: :session,
   secondary_link_url: register_path,
   secondary_link_text: t('forms.session_new.messages.register_link') do |form| %>
-  <%= render 'form/fieldset', legend_key: 'credentials' do %>
-    <%= render 'form/text_field',
+  <%= render 'chobble_forms/fieldset', legend_key: 'credentials' do %>
+    <%= render 'chobble_forms/text_field',
       field: :email,
       type: :email_field,
       required: true
     %>
 
-    <%= render 'form/text_field',
+    <%= render 'chobble_forms/text_field',
       field: :password,
       type: :password_field,
       required: true
     %>
 
-    <%= render 'form/checkbox',
+    <%= render 'chobble_forms/checkbox',
       field: :remember_me
     %>
   <% end %>

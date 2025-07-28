@@ -1,12 +1,12 @@
 require "rails_helper"
 
-RSpec.describe "form/_errors.html.erb", type: :view do
+RSpec.describe "chobble_forms/_errors.html.erb", type: :view do
   let(:mock_model) { double("Model") }
   let(:error_double) { double("Error") }
 
   # Default render method with common setup
   def render_errors(locals = {})
-    render partial: "form/errors", locals: {model: mock_model}.merge(locals)
+    render partial: "chobble_forms/errors", locals: {model: mock_model}.merge(locals)
   end
 
   before do
@@ -176,17 +176,17 @@ RSpec.describe "form/_errors.html.erb", type: :view do
 
   describe "parameter validation" do
     it "raises error when no model provided" do
-      expect { render partial: "form/errors", locals: {} }.to raise_error(ActionView::Template::Error, "model object is required for form errors")
+      expect { render partial: "chobble_forms/errors", locals: {} }.to raise_error(ActionView::Template::Error, "model object is required for form errors")
     end
 
     it "raises error when model is nil" do
-      expect { render partial: "form/errors", locals: {model: nil} }.to raise_error(ActionView::Template::Error, "model object is required for form errors")
+      expect { render partial: "chobble_forms/errors", locals: {model: nil} }.to raise_error(ActionView::Template::Error, "model object is required for form errors")
     end
 
     it "accepts model via 'object' parameter for compatibility" do
       allow(mock_model).to receive(:errors).and_return(double("Errors", any?: false, count: 0))
 
-      expect { render partial: "form/errors", locals: {object: mock_model} }.not_to raise_error
+      expect { render partial: "chobble_forms/errors", locals: {object: mock_model} }.not_to raise_error
     end
   end
 

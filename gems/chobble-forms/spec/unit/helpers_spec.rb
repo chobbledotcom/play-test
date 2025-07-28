@@ -2,11 +2,11 @@ require "spec_helper"
 require "action_view"
 require "chobble/forms/helpers"
 
-RSpec.describe Chobble::Forms::Helpers do
+RSpec.describe ChobbleForms::Helpers do
   # Create a test class that includes the helpers
   let(:helper_class) do
     Class.new do
-      include Chobble::Forms::Helpers
+      include ChobbleForms::Helpers
       include ActionView::Helpers::NumberHelper
       include ActionView::Helpers::TranslationHelper
 

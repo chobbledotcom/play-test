@@ -45,7 +45,7 @@ elsif scope
 end %>
 
 <%= form_with(**form_options) do |form| %>
-  <%= render "form/header",
+  <%= render "chobble_forms/header",
     title: I18n.t("#{i18n_base}.header")
   %>
 
@@ -55,17 +55,17 @@ end %>
   <%= yield form %>
 
   <% if model && model.respond_to?(:errors) && model.errors.any? %>
-    <%= render 'form/errors', model: model %>
+    <%= render 'chobble_forms/errors', model: model %>
   <% end %>
 
   <fieldset>
     <% if local_assigns[:secondary_link_url].present? && local_assigns[:secondary_link_text].present? %>
       <div class="form-actions">
-        <%= render 'form/submit_button' %>
+        <%= render 'chobble_forms/submit_button' %>
         <%= link_to secondary_link_text, secondary_link_url, role: "button", class: "secondary" %>
       </div>
     <% else %>
-      <%= render 'form/submit_button' %>
+      <%= render 'chobble_forms/submit_button' %>
     <% end %>
   </fieldset>
 

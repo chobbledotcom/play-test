@@ -22,9 +22,9 @@
 
 <div class="<%= css_classes %>">
   <% if field_type == :autocomplete_field %>
-    <%= render 'form/autocomplete_field', field: field, required: required, options: options %>
+    <%= render 'chobble_forms/autocomplete_field', field: field, required: required, options: options %>
   <% else %>
-    <%= render 'form/text_field', field: field, required: required %>
+    <%= render 'chobble_forms/text_field', field: field, required: required %>
   <% end %>
   
   <% if has_link %>

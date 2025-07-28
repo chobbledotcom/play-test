@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
+RSpec.describe "chobble_forms/_auto_submit_select.html.erb", type: :view do
   let(:field) { :status }
   let(:options) { [["Active", "active"], ["Inactive", "inactive"]] }
 
@@ -21,7 +21,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
     end
 
     it "renders select within existing form" do
-      render "form/auto_submit_select",
+      render "chobble_forms/auto_submit_select",
         field: field,
         options: options,
         form: form_builder
@@ -36,7 +36,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
     end
 
     it "includes label when provided" do
-      render "form/auto_submit_select",
+      render "chobble_forms/auto_submit_select",
         field: field,
         options: options,
         form: form_builder,
@@ -46,7 +46,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
     end
 
     it "skips label when not provided" do
-      render "form/auto_submit_select",
+      render "chobble_forms/auto_submit_select",
         field: field,
         options: options,
         form: form_builder
@@ -55,7 +55,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
     end
 
     it "includes blank option when requested" do
-      render "form/auto_submit_select",
+      render "chobble_forms/auto_submit_select",
         field: field,
         options: options,
         form: form_builder,
@@ -70,7 +70,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
     end
 
     it "uses custom blank text" do
-      render "form/auto_submit_select",
+      render "chobble_forms/auto_submit_select",
         field: field,
         options: options,
         form: form_builder,
@@ -93,7 +93,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
       it "prefers params value over model value" do
         # We can't easily test the options_for_select output directly,
         # but we can verify the select method was called
-        render "form/auto_submit_select",
+        render "chobble_forms/auto_submit_select",
           field: field,
           options: options,
           form: form_builder
@@ -107,7 +107,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
     let(:url) { "/filter" }
 
     it "renders standalone form with select" do
-      render "form/auto_submit_select",
+      render "chobble_forms/auto_submit_select",
         field: field,
         options: options,
         url: url
@@ -119,7 +119,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
     end
 
     it "includes label when provided" do
-      render "form/auto_submit_select",
+      render "chobble_forms/auto_submit_select",
         field: field,
         options: options,
         url: url,
@@ -131,7 +131,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
     it "preserves specified parameters" do
       allow(view).to receive(:params).and_return({search: "test", page: "2"})
 
-      render "form/auto_submit_select",
+      render "chobble_forms/auto_submit_select",
         field: field,
         options: options,
         url: url,
@@ -143,7 +143,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
     end
 
     it "can enable turbo" do
-      render "form/auto_submit_select",
+      render "chobble_forms/auto_submit_select",
         field: field,
         options: options,
         url: url,
@@ -158,7 +158,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
       end
 
       it "preserves the selected value" do
-        render "form/auto_submit_select",
+        render "chobble_forms/auto_submit_select",
           field: field,
           options: options,
           url: url
@@ -172,19 +172,19 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
   context "error handling" do
     it "requires field parameter" do
       expect {
-        render "form/auto_submit_select", options: options
+        render "chobble_forms/auto_submit_select", options: options
       }.to raise_error(ActionView::Template::Error, /field is required/)
     end
 
     it "requires options parameter" do
       expect {
-        render "form/auto_submit_select", field: field
+        render "chobble_forms/auto_submit_select", field: field
       }.to raise_error(ActionView::Template::Error, /options is required/)
     end
 
     it "requires url for standalone usage" do
       expect {
-        render "form/auto_submit_select", field: field, options: options
+        render "chobble_forms/auto_submit_select", field: field, options: options
       }.to raise_error(ActionView::Template::Error, /url is required for standalone/)
     end
   end
@@ -200,7 +200,7 @@ RSpec.describe "form/_auto_submit_select.html.erb", type: :view do
     end
 
     it "handles complex option arrays" do
-      render "form/auto_submit_select",
+      render "chobble_forms/auto_submit_select",
         field: field,
         options: complex_options,
         url: "/test"

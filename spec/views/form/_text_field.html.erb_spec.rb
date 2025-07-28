@@ -9,7 +9,7 @@ class TextFieldTestModel
   def persisted? = false
 end
 
-RSpec.describe "form/_text_field.html.erb", type: :view do
+RSpec.describe "chobble_forms/_text_field.html.erb", type: :view do
   let(:test_model) { TextFieldTestModel.new }
   let(:field) { :name }
 
@@ -43,7 +43,7 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
   end
 
   def render_text_field(locals = {})
-    render partial: "form/text_field", locals: {field:}.merge(locals)
+    render partial: "chobble_forms/text_field", locals: {field:}.merge(locals)
   end
 
   describe "basic rendering" do
@@ -65,7 +65,7 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
     shared_examples "renders correct field type" do |field_type, input_type, field_name|
       it "renders #{field_type} as #{input_type} input" do
         locals = {field: field_name, type: field_type}
-        render partial: "form/text_field", locals: locals
+        render partial: "chobble_forms/text_field", locals: locals
         expect(rendered).to have_css(%(label input[type="#{input_type}"]))
       end
     end
@@ -102,7 +102,7 @@ RSpec.describe "form/_text_field.html.erb", type: :view do
     context "with accept attribute" do
       it "adds accept attribute to file input" do
         locals = {field: :document, type: :file_field, accept: "image/*"}
-        render partial: "form/text_field", locals: locals
+        render partial: "chobble_forms/text_field", locals: locals
         expect(rendered).to have_css('label input[type="file"][accept="image/*"]')
       end
     end

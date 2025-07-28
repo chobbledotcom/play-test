@@ -1,9 +1,6 @@
-require "chobble/forms/version"
-require "chobble/forms/engine"
-require "chobble/forms/helpers"
+require_relative "version"
+require_relative "engine"
+require_relative "helpers"
 
-module Chobble
-  module Forms
-    # Your code goes here...
-  end
+module ChobbleForms
 end

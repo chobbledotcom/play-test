@@ -167,7 +167,7 @@ module ViewHelpers
   # Render a form partial with standard setup
   # Usage: render_form_partial("text_field", field: :name)
   def render_form_partial(partial_name, locals = {})
-    render partial: "form/#{partial_name}", locals: locals
+    render partial: "chobble_forms/#{partial_name}", locals: locals
   end
 
   # Check for labeled form field structure

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "form/_pass_fail_na_comment.html.erb", type: :view do
+RSpec.describe "chobble_forms/_pass_fail_na_comment.html.erb", type: :view do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user) }
   let(:inspection) { create(:inspection, user: user, unit: unit) }
@@ -45,7 +45,7 @@ RSpec.describe "form/_pass_fail_na_comment.html.erb", type: :view do
   end
 
   def render_pass_fail_na_comment(locals = {})
-    render partial: "form/pass_fail_na_comment", locals: {field:}.merge(locals)
+    render partial: "chobble_forms/pass_fail_na_comment", locals: {field:}.merge(locals)
   end
 
   # Helper methods for common expectations using Capybara selectors

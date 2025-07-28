@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "form/_form_context", type: :view do
+RSpec.describe "chobble_forms/_form_context", type: :view do
   let(:user) { create(:user) }
   let(:inspection) { create(:inspection, user: user) }
   let(:i18n_base) { "test.base" }
@@ -20,7 +20,7 @@ RSpec.describe "form/_form_context", type: :view do
 
   context "when i18n header key exists" do
     it "renders the page header" do
-      render partial: "form/form_context", locals: render_options
+      render partial: "chobble_forms/form_context", locals: render_options
 
       expect(rendered).to have_css("header")
       expect(rendered).to have_content("Test Header")
@@ -35,13 +35,13 @@ RSpec.describe "form/_form_context", type: :view do
     it "does not render the page header" do
       # The form_context always tries to render header, so if translation is missing, it will fail
       expect {
-        render partial: "form/form_context", locals: render_options
+        render partial: "chobble_forms/form_context", locals: render_options
       }.to raise_error(ActionView::Template::Error)
     end
   end
 
   it "renders the form with correct attributes" do
-    render partial: "form/form_context", locals: render_options
+    render partial: "chobble_forms/form_context", locals: render_options
 
     expect(rendered).to have_css("form[action='#{inspection_path(inspection)}']")
     expect(rendered).to have_css("form[method='post']")
@@ -49,7 +49,7 @@ RSpec.describe "form/_form_context", type: :view do
   end
 
   it "yields control to the block" do
-    render partial: "form/form_context", locals: render_options
+    render partial: "chobble_forms/form_context", locals: render_options
 
     # The block content would be passed in the actual view usage
     # This test just ensures the partial renders without errors

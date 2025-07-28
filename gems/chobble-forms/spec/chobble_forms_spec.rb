@@ -1,22 +1,22 @@
 require "spec_helper"
 
-RSpec.describe Chobble::Forms do
+RSpec.describe ChobbleForms do
   it "has a version number" do
-    expect(Chobble::Forms::VERSION).not_to be nil
+    expect(ChobbleForms::VERSION).not_to be nil
   end
 
   it "defines the Engine class" do
-    expect(Chobble::Forms::Engine).to be < Rails::Engine
+    expect(ChobbleForms::Engine).to be < Rails::Engine
   end
 
   it "defines the Helpers module" do
-    expect(Chobble::Forms::Helpers).to be_a(Module)
+    expect(ChobbleForms::Helpers).to be_a(Module)
   end
 
   describe "Helpers module" do
     let(:dummy_class) do
       Class.new do
-        include Chobble::Forms::Helpers
+        include ChobbleForms::Helpers
         attr_accessor :_current_form, :_current_i18n_base, :prefill_model
 
         def t(key, options = {})

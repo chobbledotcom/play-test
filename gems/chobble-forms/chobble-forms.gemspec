@@ -1,8 +1,8 @@
-require_relative "lib/chobble/forms/version"
+require_relative "lib/version"
 
 Gem::Specification.new do |spec|
   spec.name = "chobble-forms"
-  spec.version = Chobble::Forms::VERSION
+  spec.version = ChobbleForms::VERSION
   spec.authors = ["Your Name"]
   spec.email = ["your@email.com"]
 
@@ -12,10 +12,10 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
 
-  spec.files = Dir["{app,config,lib}/**/*", "README.md"]
+  spec.files = Dir["{lib,views}/**/*", "README.md"]
 
   spec.add_dependency "rails", ">= 7.0.0"
-  
+
   spec.add_development_dependency "rspec-rails", "~> 6.0"
   spec.add_development_dependency "capybara", "~> 3.0"
 end

@@ -4,17 +4,17 @@
   form_url = local_assigns[:form_url] || nil
 %>
 
-<%= render 'form/form_context',
+<%= render 'chobble_forms/form_context',
   model: unit,
   i18n_base: 'forms.units',
   url: form_url do |form|
 %>
-  <%= render 'form/fieldset', legend_key: 'unit_details' do %>
-    <%= render 'form/text_field', field: :name, required: true %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'unit_details' do %>
+    <%= render 'chobble_forms/text_field', field: :name, required: true %>
     
     <%# Unit type - only for admins or test mode %>
     <% if current_user.admin? || Rails.env.test? %>
-      <%= render 'form/select', field: :unit_type,
+      <%= render 'chobble_forms/select', field: :unit_type,
           options: options_for_select([
             [t('units.unit_types.bouncy_castle'), 'bouncy_castle'],
             [t('units.unit_types.bouncing_pillow'), 'bouncing_pillow']
@@ -26,7 +26,7 @@
     <% if unit.persisted? && unit.operator.present? %>
       <% operator_count = current_user.units.where(operator: unit.operator).count %>
       <% if operator_count > 0 %>
-        <%= render 'form/field_with_link',
+        <%= render 'chobble_forms/field_with_link',
             field_type: :autocomplete_field,
             field: :operator,
             required: true,
@@ -34,45 +34,45 @@
             link_url: units_path(operator: unit.operator),
             link_text: t('units.labels.all_count', count: operator_count) %>
       <% else %>
-        <%= render 'form/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
+        <%= render 'chobble_forms/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
       <% end %>
     <% else %>
-      <%= render 'form/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
+      <%= render 'chobble_forms/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
     <% end %>
     
     <%# Photo upload %>
     <div id="unit_photo_preview">
-      <%= render 'form/file_field', field: :photo, accept: "image/*" %>
+      <%= render 'chobble_forms/file_field', field: :photo, accept: "image/*" %>
     </div>
   <% end %>
   
-  <%= render 'form/fieldset', legend_key: 'manufacture' do %>
-    <%= render 'form/date_field', field: :manufacture_date %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'manufacture' do %>
+    <%= render 'chobble_forms/date_field', field: :manufacture_date %>
     
     <%# Manufacturer with optional count link %>
     <% if unit.persisted? && unit.manufacturer.present? %>
       <% manufacturer_count = current_user.units.where(manufacturer: unit.manufacturer).count %>
       <% if manufacturer_count > 0 %>
-        <%= render 'form/field_with_link', 
+        <%= render 'chobble_forms/field_with_link', 
             field_type: :text_field,
             field: :manufacturer, 
             required: true,
             link_url: units_path(manufacturer: unit.manufacturer),
             link_text: t('units.labels.all_count', count: manufacturer_count) %>
       <% else %>
-        <%= render 'form/text_field', field: :manufacturer, required: true %>
+        <%= render 'chobble_forms/text_field', field: :manufacturer, required: true %>
       <% end %>
     <% else %>
-      <%= render 'form/text_field', field: :manufacturer, required: true %>
+      <%= render 'chobble_forms/text_field', field: :manufacturer, required: true %>
     <% end %>
     
-    <%= render 'form/text_field', field: :serial, required: true %>
-    <%= render 'form/text_area', field: :description, required: true %>
+    <%= render 'chobble_forms/text_field', field: :serial, required: true %>
+    <%= render 'chobble_forms/text_area', field: :description, required: true %>
   <% end %>
   
   <%# Only show data fieldset if unit is persisted %>
   <% if unit.persisted? %>
-    <%= render 'form/fieldset', legend_key: 'data' do %>
+    <%= render 'chobble_forms/fieldset', legend_key: 'data' do %>
       <%# Display size from last inspection (read-only) %>
       <% if unit.last_inspection %>
         <div>

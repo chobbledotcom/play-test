@@ -5,7 +5,7 @@
 %>
 
 <div class="calculator-form">
-  <%= render 'form/form_context',
+  <%= render 'chobble_forms/form_context',
     model: nil,
     scope: :calculation,
     url: safety_standards_path,
@@ -19,33 +19,33 @@
     
     <% case type %>
     <% when :anchors %>
-      <%= render 'form/fieldset', legend_key: 'unit_dimensions' do %>
-        <%= render 'form/number', field: :length, min: 1.0, required: true %>
-        <%= render 'form/number', field: :width, min: 1.0, required: true %>
-        <%= render 'form/number', field: :height, min: 1.0, required: true %>
+      <%= render 'chobble_forms/fieldset', legend_key: 'unit_dimensions' do %>
+        <%= render 'chobble_forms/number', field: :length, min: 1.0, required: true %>
+        <%= render 'chobble_forms/number', field: :width, min: 1.0, required: true %>
+        <%= render 'chobble_forms/number', field: :height, min: 1.0, required: true %>
       <% end %>
       
     <% when :slide_runout %>
-      <%= render 'form/fieldset', legend_key: 'input' do %>
-        <%= render 'form/number', field: :platform_height, min: 1.0, required: true %>
-        <%= render 'form/checkbox', field: :has_stop_wall %>
+      <%= render 'chobble_forms/fieldset', legend_key: 'input' do %>
+        <%= render 'chobble_forms/number', field: :platform_height, min: 1.0, required: true %>
+        <%= render 'chobble_forms/checkbox', field: :has_stop_wall %>
       <% end %>
       
     <% when :wall_height %>
-      <%= render 'form/fieldset', legend_key: 'input' do %>
-        <%= render 'form/number', field: :platform_height, min: 0.0, required: true %>
-        <%= render 'form/number', field: :user_height, min: 0.0, required: true %>
+      <%= render 'chobble_forms/fieldset', legend_key: 'input' do %>
+        <%= render 'chobble_forms/number', field: :platform_height, min: 0.0, required: true %>
+        <%= render 'chobble_forms/number', field: :user_height, min: 0.0, required: true %>
       <% end %>
       
     <% when :user_capacity %>
-      <%= render 'form/fieldset', legend_key: 'dimensions' do %>
-        <%= render 'form/number', field: :length, min: 1.0, required: true %>
-        <%= render 'form/number', field: :width, min: 1.0, required: true %>
-        <%= render 'form/number', field: :negative_adjustment_area, min: 0.0, required: false %>
+      <%= render 'chobble_forms/fieldset', legend_key: 'dimensions' do %>
+        <%= render 'chobble_forms/number', field: :length, min: 1.0, required: true %>
+        <%= render 'chobble_forms/number', field: :width, min: 1.0, required: true %>
+        <%= render 'chobble_forms/number', field: :negative_adjustment_area, min: 0.0, required: false %>
       <% end %>
       
-      <%= render 'form/fieldset', legend_key: 'user_height' do %>
-        <%= render 'form/number', field: :max_user_height, min: 0.0, required: false %>
+      <%= render 'chobble_forms/fieldset', legend_key: 'user_height' do %>
+        <%= render 'chobble_forms/number', field: :max_user_height, min: 0.0, required: false %>
       <% end %>
     <% end %>
     

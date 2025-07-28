@@ -1,11 +1,11 @@
 <%
-  # Composite partial for radio + comment fields with grid layout
+  # Composite partial for yes/no radio + comment fields with grid layout
   # Required parameters:
-  #   field: Base field name (e.g., 'permanent_roof')
+  #   field: Base field name (e.g., 'has_permanent_roof')
   #
   # This will render:
   #   - Radio field: field with Yes (true) / No (false) options
-  #   - Comment field: field + '_comment' (e.g., 'permanent_roof_comment')
+  #   - Comment field: field + '_comment' (e.g., 'has_permanent_roof_comment')
 
   radio_field = field
   comment_field = "#{field}_comment".to_sym
@@ -29,13 +29,14 @@
     <%= field_data[:field_label] %>
   </label>
 
-  <%= render 'form/radio_pass_fail',
+  <%= render 'chobble_forms/radio_pass_fail',
     field: radio_field,
     prefilled: field_data[:prefilled],
-    checked_value: checked_value
+    checked_value: checked_value,
+    yes_no: true
   %>
 
-  <%= render 'form/comment_checkbox',
+  <%= render 'chobble_forms/comment_checkbox',
     comment_field: comment_field,
     checkbox_id: comment_info[:checkbox_id],
     textarea_id: comment_info[:options][:id],

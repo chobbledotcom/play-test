@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "form/_file_field.html.erb", type: :view do
+RSpec.describe "chobble_forms/_file_field.html.erb", type: :view do
   let(:form_builder) { double("form_builder") }
   let(:mock_object) { double("model") }
   let(:field) { :photo }
@@ -29,7 +29,7 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
     end
 
     it "renders the file field without preview" do
-      render "form/file_field", field: field
+      render "chobble_forms/file_field", field: field
 
       expect(rendered).to include("Photo")
       expect(rendered).to include('<input type="file" name="photo">')
@@ -37,7 +37,7 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
     end
 
     it "uses custom accept attribute" do
-      render "form/file_field", field: field, accept: "application/pdf"
+      render "chobble_forms/file_field", field: field, accept: "application/pdf"
 
       expect(form_builder).to have_received(:file_field).with(field, accept: "application/pdf")
     end
@@ -73,7 +73,7 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
       it "renders file field with image preview" do
         allow(view).to receive(:image_tag).and_return('<img src="test.jpg">'.html_safe)
 
-        render "form/file_field", field: field
+        render "chobble_forms/file_field", field: field
 
         expect(rendered).to include("file-preview")
         expect(rendered).to include('<img src="test.jpg">')
@@ -83,7 +83,7 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
       it "uses custom preview size" do
         allow(view).to receive(:image_tag).and_return('<img src="test.jpg" style="max-width: 150px; height: auto;">'.html_safe)
 
-        render "form/file_field", field: field, preview_size: 150
+        render "chobble_forms/file_field", field: field, preview_size: 150
 
         expect(attachment).to have_received(:variant).with(resize_to_limit: [150, 150])
         expect(rendered).to include('<img src="test.jpg"')
@@ -97,7 +97,7 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
       end
 
       it "shows filename for non-image file" do
-        render "form/file_field", field: field
+        render "chobble_forms/file_field", field: field
 
         expect(rendered).not_to include("<img")
         expect(rendered).to include("document.pdf")
@@ -112,7 +112,7 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
     end
 
     it "renders without errors or preview" do
-      render "form/file_field", field: field
+      render "chobble_forms/file_field", field: field
 
       expect(rendered).to include("Photo")
       expect(rendered).to include('<input type="file" name="photo">')
@@ -136,7 +136,7 @@ RSpec.describe "form/_file_field.html.erb", type: :view do
     end
 
     it "displays the hint text" do
-      render "form/file_field", field: field
+      render "chobble_forms/file_field", field: field
 
       expect(rendered).to include("Upload an image file")
       expect(rendered).to include("form-text")

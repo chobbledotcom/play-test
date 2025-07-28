@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "form/_submit_button.html.erb", type: :view do
+RSpec.describe "chobble_forms/_submit_button.html.erb", type: :view do
   let(:default_button_text) { "Save Form" }
   let(:i18n_base) { "forms.test_form" }
 

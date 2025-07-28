@@ -1,12 +1,10 @@
 <%
-  # Composite partial for pass/fail + N/A + comment fields with grid layout
+  # Composite partial for pass/fail + comment fields with grid layout
   # Required parameters:
   #   field: Base field name (e.g., 'seam_integrity_pass')
   #
   # This will render:
-  #   - Pass/fail/N/A field: field (e.g., 'seam_integrity_pass')
-  #     - Enum fields: Pass = "pass", Fail = "fail", N/A = "na" (rendered as radio buttons)
-  #     - Boolean fields: Pass = true, Fail = false (rendered as radio buttons)
+  #   - Pass/fail field: field (e.g., 'seam_integrity_pass')
   #   - Comment field: base field + '_comment' (e.g., 'seam_integrity_comment')
 
   base_field = field.to_s.gsub(/_pass$/, "")
@@ -31,13 +29,13 @@
     <%= field_data[:field_label] %>
   </label>
 
-  <%= render 'form/radio_pass_fail',
+  <%= render 'chobble_forms/radio_pass_fail',
     field: field,
     prefilled: field_data[:prefilled],
     checked_value: checked_value
   %>
 
-  <%= render 'form/comment_checkbox',
+  <%= render 'chobble_forms/comment_checkbox',
     comment_field: comment_field,
     checkbox_id: comment_info[:checkbox_id],
     textarea_id: comment_info[:options][:id],

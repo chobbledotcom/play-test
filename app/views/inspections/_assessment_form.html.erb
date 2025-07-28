@@ -13,12 +13,12 @@
   end
 %>
 
-<%= render 'form/form_context',
+<%= render 'chobble_forms/form_context',
   model: assessment,
   i18n_base: "forms.#{assessment_type}",
   url: send("inspection_#{assessment_type}_assessment_path", @inspection) do |form|
 %>
-  <%= render 'form/fields', model: assessment %>
+  <%= render 'chobble_forms/fields', model: assessment %>
   
   <% if has_safety_standards %>
     <%= render 'shared/safety_standards_display',

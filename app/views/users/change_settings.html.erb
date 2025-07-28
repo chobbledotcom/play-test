@@ -1,29 +1,29 @@
 <%= render 'shared/page_header', title: t('users.titles.settings') %>
 
-<%= render 'form/form_context', model: @user, i18n_base: 'forms.user_settings',
+<%= render 'chobble_forms/form_context', model: @user, i18n_base: 'forms.user_settings',
   url: update_settings_user_path(@user),
   method: :patch do |form| %>
 
-  <%= render 'form/fieldset', legend_key: 'contact_details' do %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'contact_details' do %>
     <% if @user.has_company? %>
-      <%= render 'form/display_field', field: :name %>
-      <%= render 'form/display_field', field: :phone %>
-      <%= render 'form/display_field', field: :address %>
-      <%= render 'form/display_field', field: :country %>
-      <%= render 'form/display_field', field: :postal_code %>
+      <%= render 'chobble_forms/display_field', field: :name %>
+      <%= render 'chobble_forms/display_field', field: :phone %>
+      <%= render 'chobble_forms/display_field', field: :address %>
+      <%= render 'chobble_forms/display_field', field: :country %>
+      <%= render 'chobble_forms/display_field', field: :postal_code %>
       <p><%= t('users.messages.inherited_from_company') %></p>
     <% else %>
-      <%= render 'form/display_field', field: :name %>
-      <%= render 'form/text_field', field: :phone %>
-      <%= render 'form/text_area', field: :address %>
-      <%= render 'form/text_field', field: :country %>
-      <%= render 'form/text_field', field: :postal_code %>
+      <%= render 'chobble_forms/display_field', field: :name %>
+      <%= render 'chobble_forms/text_field', field: :phone %>
+      <%= render 'chobble_forms/text_area', field: :address %>
+      <%= render 'chobble_forms/text_field', field: :country %>
+      <%= render 'chobble_forms/text_field', field: :postal_code %>
     <% end %>
   <% end %>
 
-  <%= render 'form/fieldset', legend_key: 'preferences' do %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'preferences' do %>
     <% unless theme_selector_disabled? %>
-      <%= render 'form/select',
+      <%= render 'chobble_forms/select',
         field: :theme,
         options: options_for_select([
           [t('users.options.theme_light'), "light"],
@@ -34,11 +34,11 @@
     <% end %>
 
     <div id="user_logo_preview">
-      <%= render 'form/file_field', field: :logo, accept: "image/*" %>
+      <%= render 'chobble_forms/file_field', field: :logo, accept: "image/*" %>
     </div>
 
     <div id="user_signature_preview">
-      <%= render 'form/file_field', field: :signature, accept: "image/*" %>
+      <%= render 'chobble_forms/file_field', field: :signature, accept: "image/*" %>
     </div>
   <% end %>
 <% end %>
