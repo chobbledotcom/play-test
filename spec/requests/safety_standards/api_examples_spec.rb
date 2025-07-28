@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "Safety Standards API examples", type: :request do
   describe "API example parameters produce documented responses" do
-    SafetyStandard::API_EXAMPLE_PARAMS.each do |type, params|
+    SafetyStandardsController::API_EXAMPLE_PARAMS.each do |type, params|
       context "#{type} calculation" do
         it "produces the exact response shown in API documentation" do
           # Make the API call with the documented example parameters
@@ -15,7 +15,8 @@ RSpec.describe "Safety Standards API examples", type: :request do
           actual_response = JSON.parse(response.body, symbolize_names: true)
 
           # Get the documented example response
-          example_response = SafetyStandard::API_EXAMPLE_RESPONSES[type]
+          example_response =
+            SafetyStandardsController::API_EXAMPLE_RESPONSES[type]
 
           # Loop through all top-level keys in the example response
           example_response.each do |key, expected_value|
@@ -51,7 +52,7 @@ RSpec.describe "Safety Standards API examples", type: :request do
     it "has required top-level keys for all calculations" do
       required_keys = [:passed, :status, :result]
 
-      SafetyStandard::API_EXAMPLE_RESPONSES.each do |type, response|
+      SafetyStandardsController::API_EXAMPLE_RESPONSES.each do |type, response|
         required_keys.each do |key|
           expect(response).to have_key(key),
             "#{type} response missing required key: #{key}"
@@ -60,7 +61,7 @@ RSpec.describe "Safety Standards API examples", type: :request do
     end
 
     it "all successful responses have passed=true and consistent status" do
-      SafetyStandard::API_EXAMPLE_RESPONSES.each do |type, response|
+      SafetyStandardsController::API_EXAMPLE_RESPONSES.each do |type, response|
         expect(response[:passed]).to eq(true),
           "#{type} response should have passed=true"
         expect(response[:status]).to eq("Calculation completed successfully"),
@@ -82,7 +83,7 @@ RSpec.describe "Safety Standards API examples", type: :request do
       }
     }
 
-    SafetyStandard::API_EXAMPLE_PARAMS.each do |type, valid_params|
+    SafetyStandardsController::API_EXAMPLE_PARAMS.each do |type, valid_params|
       context "#{type} calculation validation" do
         invalid_params_variations.each do |variation_name, transform|
           it "handles #{variation_name} appropriately" do
@@ -98,7 +99,8 @@ RSpec.describe "Safety Standards API examples", type: :request do
             # Should either return an error or handle gracefully
             if variation_name == :missing_type
               expect(response_data[:passed]).to eq(false)
-            elsif [:nil_values, :negative_values, :zero_values].include?(variation_name)
+            elsif [:nil_values, :negative_values,
+              :zero_values].include?(variation_name)
               # These should be handled according to business rules
               # Some calculations might accept zero, others might not
               expect(response_data).to have_key(:passed)
@@ -111,7 +113,7 @@ RSpec.describe "Safety Standards API examples", type: :request do
   end
 
   describe "curl commands produce expected results" do
-    SafetyStandard::API_EXAMPLE_PARAMS.each do |type, params|
+    SafetyStandardsController::API_EXAMPLE_PARAMS.each do |type, params|
       it "curl command for #{type} would produce valid JSON" do
         # This simulates what the curl command would send
         curl_payload = {calculation: params}
@@ -153,7 +155,7 @@ RSpec.describe "Safety Standards API examples", type: :request do
 
     it "all successful calculations return deterministic results" do
       # Run each calculation twice and verify same results
-      SafetyStandard::API_EXAMPLE_PARAMS.each do |type, params|
+      SafetyStandardsController::API_EXAMPLE_PARAMS.each do |type, params|
         results = []
 
         2.times do

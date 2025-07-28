@@ -1,15 +1,15 @@
-<% if @capacity_result || @capacity_error %>
+<% if @user_capacity_result || @user_capacity_error %>
   <div class="calculation-result">
     <h3><%= t('forms.safety_standards_user_capacity.sections.result') %></h3>
     
-    <% if @capacity_error %>
-      <p class="error"><%= @capacity_error %></p>
-    <% elsif @capacity_result %>
-      <% if @capacity_result.breakdown %>
+    <% if @user_capacity_error %>
+      <p class="error"><%= @user_capacity_error %></p>
+    <% elsif @user_capacity_result %>
+      <% if @user_capacity_result.breakdown %>
         <h4>Calculation Breakdown:</h4>
         <table>
           <tbody>
-            <% @capacity_result.breakdown.each do |label, value| %>
+            <% @user_capacity_result.breakdown.each do |label, value| %>
               <tr>
                 <th><%= label %>:</th>
                 <td><%= value %></td>

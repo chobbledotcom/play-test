@@ -19,12 +19,16 @@ class Assessments::SlideAssessment < ApplicationRecord
 
   def meets_runout_requirements?
     return false unless runout.present? && slide_platform_height.present?
-    SafetyStandards::SlideCalculator.meets_runout_requirements?(runout, slide_platform_height)
+    EN14960::Calculators::SlideCalculator.meets_runout_requirements?(
+      runout, slide_platform_height
+    )
   end
 
   def required_runout_length
     return nil if slide_platform_height.blank?
-    SafetyStandards::SlideCalculator.calculate_runout_value(slide_platform_height)
+    EN14960::Calculators::SlideCalculator.calculate_runout_value(
+      slide_platform_height
+    )
   end
 
   def runout_compliance_status
@@ -32,18 +36,20 @@ class Assessments::SlideAssessment < ApplicationRecord
     if meets_runout_requirements?
       I18n.t("forms.slide.compliance.compliant")
     else
-      I18n.t("forms.slide.compliance.non_compliant", required: required_runout_length)
+      I18n.t("forms.slide.compliance.non_compliant",
+        required: required_runout_length)
     end
   end
 
   def meets_wall_height_requirements?
-    return false unless slide_platform_height.present? && slide_wall_height.present? && !slide_permanent_roof.nil?
+    return false unless slide_platform_height.present? &&
+      slide_wall_height.present? && !slide_permanent_roof.nil?
 
     # Get user height from the inspection's user height assessment
     user_height = inspection.user_height_assessment?&.tallest_user_height
     return false if user_height.blank?
 
-    SafetyStandards::SlideCalculator.meets_height_requirements?(
+    EN14960::Calculators::SlideCalculator.meets_height_requirements?(
       slide_platform_height,
       user_height,
       slide_wall_height,

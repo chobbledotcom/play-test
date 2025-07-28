@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe SafetyStandards::AnchorCalculator do
+RSpec.describe EN14960::Calculators::AnchorCalculator do
   describe ".calculate" do
     # EN 14960-1:2019 Line 441-442: "Each inflatable shall have at least six anchorage points"
     context "minimum anchor requirements" do
@@ -88,16 +88,16 @@ RSpec.describe SafetyStandards::AnchorCalculator do
         expect(wind_force_coefficient).to be_within(1).of(114)
 
         # Verify it's used in the calculator
-        expect(described_class::ANCHOR_CALCULATION_CONSTANTS[:area_coefficient]).to eq(114.0)
+        expect(EN14960::Constants::ANCHOR_CALCULATION_CONSTANTS[:area_coefficient]).to eq(114.0)
       end
 
       it "uses 1600N as the base divisor per anchor point" do
         # EN 14960-1:2019 Line 450: "withstand a force of 1 600 N"
-        expect(described_class::ANCHOR_CALCULATION_CONSTANTS[:base_divisor]).to eq(1600.0)
+        expect(EN14960::Constants::ANCHOR_CALCULATION_CONSTANTS[:base_divisor]).to eq(1600.0)
       end
 
       it "uses safety factor of 1.5" do
-        expect(described_class::ANCHOR_CALCULATION_CONSTANTS[:safety_factor]).to eq(1.5)
+        expect(EN14960::Constants::ANCHOR_CALCULATION_CONSTANTS[:safety_factor]).to eq(1.5)
       end
     end
 
@@ -166,9 +166,9 @@ RSpec.describe SafetyStandards::AnchorCalculator do
   end
 
   describe ".anchor_calculation_description" do
-    it "returns the i18n description" do
+    it "returns the description" do
       expect(described_class.anchor_calculation_description).to eq(
-        I18n.t("safety_standards.calculators.anchor.description")
+        "Anchors must be calculated based on the play area to ensure adequate ground restraint for wind loads."
       )
     end
   end

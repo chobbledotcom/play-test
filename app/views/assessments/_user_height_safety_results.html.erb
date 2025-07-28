@@ -8,7 +8,7 @@
     <% slide_assessment = @assessment.inspection.slide_assessment %>
     <% has_permanent_roof = slide_assessment&.slide_permanent_roof %>
     
-    <% wall_details = SafetyStandards::SlideCalculator.get_wall_height_requirement_details(
+    <% wall_details = EN14960::Calculators::SlideCalculator.get_wall_height_requirement_details(
          platform_height, 
          user_height, 
          has_permanent_roof

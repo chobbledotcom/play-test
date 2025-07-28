@@ -1,5 +1,5 @@
 <%
-  metadata = SafetyStandard.calculation_metadata[type]
+  metadata = @calculation_metadata[type]
   i18n_base = "forms.safety_standards_#{type}"
   result_id = "#{type.to_s.dasherize}-result"
 %>
@@ -66,7 +66,7 @@
   <summary><strong>Calculation Formula</strong></summary>
   <div>
     <code><%= metadata[:formula_text] %></code>
-    <p>Example: <%= SafetyStandard.generate_example(type) %></p>
+    <%# Example generation not available in gem %>
   </div>
 </details>
 
@@ -74,13 +74,20 @@
   <summary><strong>Ruby Source Code</strong></summary>
   <div class="source-code">
     <h4>Method: <%= metadata[:method_name] %></h4>
-    <pre><code class="language-ruby"><%= SafetyStandard.get_method_source(metadata[:method_name], metadata[:module_name], metadata[:additional_methods] || []) %></code></pre>
+    <pre><code class="language-ruby"><%=
+      additional_methods = metadata[:additional_methods] || []
+      EN14960::SourceCode.get_method_source(
+        metadata[:method_name],
+        metadata[:module_name],
+        additional_methods
+      )
+    %></code></pre>
     <% 
-      # Convert module name to file path
-      file_path = metadata[:module_name].name.underscore.gsub('::', '/')
-      git_url = "https://git.chobble.com/chobble/play-test/src/branch/main/app/services/#{file_path}.rb"
+      # Convert module name to file path for GitHub link
+      file_path = metadata[:module_name].name.underscore.gsub('en14960/', '')
+      github_url = "https://github.com/chobbledotcom/en14960/blob/main/lib/en14960/#{file_path}.rb"
     %>
-    <p><em>Source: <%= link_to metadata[:module_name].name, git_url, target: "_blank", rel: "noopener" %></em></p>
+    <p><em>Source: <%= link_to metadata[:module_name].name, github_url, target: "_blank", rel: "noopener" %> (en14960 gem)</em></p>
   </div>
 </details>
 

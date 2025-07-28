@@ -4,8 +4,104 @@ class SafetyStandardsController < ApplicationController
 
   CALCULATION_TYPES = %w[anchors slide_runout wall_height user_capacity].freeze
 
+  API_EXAMPLE_PARAMS = {
+    anchors: {
+      type: "anchors",
+      length: 5.0,
+      width: 5.0,
+      height: 3.0
+    },
+    slide_runout: {
+      type: "slide_runout",
+      platform_height: 2.5
+    },
+    wall_height: {
+      type: "wall_height",
+      platform_height: 2.0,
+      user_height: 1.5
+    },
+    user_capacity: {
+      type: "user_capacity",
+      length: 10.0,
+      width: 8.0,
+      negative_adjustment_area: 15.0,
+      max_user_height: 1.5
+    }
+  }.freeze
+
+  API_EXAMPLE_RESPONSES = {
+    anchors: {
+      passed: true,
+      status: "Calculation completed successfully",
+      result: {
+        value: 8,
+        value_suffix: "",
+        breakdown: [
+          ["Front/back area", "5.0m (W) × 3.0m (H) = 15.0m²"],
+          ["Sides area", "5.0m (L) × 3.0m (H) = 15.0m²"],
+          ["Front & back anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
+          ["Left & right anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
+          ["Required anchors", "(2 + 2) × 2 = 8"]
+        ]
+      }
+    },
+    slide_runout: {
+      passed: true,
+      status: "Calculation completed successfully",
+      result: {
+        value: 1.25,
+        value_suffix: "m",
+        breakdown: [
+          ["50% calculation", "2.5m × 0.5 = 1.25m"],
+          ["Minimum requirement", "0.3m (300mm)"],
+          ["Base runout", "Maximum of 1.25m and 0.3m = 1.25m"]
+        ]
+      }
+    },
+    wall_height: {
+      passed: true,
+      status: "Calculation completed successfully",
+      result: {
+        value: 1.5,
+        value_suffix: "m",
+        breakdown: [
+          ["Height range", "0.6m - 3.0m"],
+          ["Calculation", "1.5m (user height)"]
+        ]
+      }
+    },
+    user_capacity: {
+      passed: true,
+      status: "Calculation completed successfully",
+      result: {
+        length: 10.0,
+        width: 8.0,
+        area: 80.0,
+        negative_adjustment_area: 15.0,
+        usable_area: 65.0,
+        max_user_height: 1.5,
+        capacities: {
+          users_1000mm: 65,
+          users_1200mm: 48,
+          users_1500mm: 39,
+          users_1800mm: 0
+        },
+        breakdown: [
+          ["Total area", "10m × 8m = 80m²"],
+          ["Obstacles/adjustments", "- 15m²"],
+          ["Usable area", "65m²"],
+          ["Capacity calculations", "Based on usable area"],
+          ["1m users", "65 ÷ 1 = 65 users"],
+          ["1.2m users", "65 ÷ 1.3 = 48 users"],
+          ["1.5m users", "65 ÷ 1.7 = 39 users"],
+          ["1.8m users", "Not allowed (exceeds height limit)"]
+        ]
+      }
+    }
+  }.freeze
+
   def index
-    @calculation_metadata = SafetyStandard.calculation_metadata
+    @calculation_metadata = calculation_metadata
 
     if post_request_with_calculation?
       handle_calculation_post
@@ -21,7 +117,9 @@ class SafetyStandardsController < ApplicationController
   end
 
   def handle_calculation_post
-    calculate_safety_standard
+    type = params[:calculation][:type]
+    calculate_safety_standard if CALCULATION_TYPES.include?(type)
+
     respond_to do |format|
       format.turbo_stream
       format.json { render json: build_json_response }
@@ -30,14 +128,20 @@ class SafetyStandardsController < ApplicationController
   end
 
   def handle_calculation_get
-    calculate_safety_standard if params[:calculation].present?
+    if params[:calculation].present?
+      type = params[:calculation][:type]
+      calculate_safety_standard if CALCULATION_TYPES.include?(type)
+    end
+
     respond_to do |format|
       format.html
     end
   end
 
   def redirect_with_calculation_params
-    redirect_to safety_standards_path(calculation: params[:calculation].to_unsafe_h)
+    redirect_to safety_standards_path(
+      calculation: params[:calculation].to_unsafe_h
+    )
   end
 
   def calculate_safety_standard
@@ -49,9 +153,9 @@ class SafetyStandardsController < ApplicationController
     dimensions = extract_dimensions(:length, :width, :height)
 
     if dimensions.values.all?(&:positive?)
-      @anchor_result = SafetyStandards::AnchorCalculator.calculate(**dimensions)
+      @anchors_result = EN14960.calculate_anchors(**dimensions)
     else
-      set_error(:anchor, :invalid_dimensions)
+      set_error(:anchors, :invalid_dimensions)
     end
   end
 
@@ -60,9 +164,9 @@ class SafetyStandardsController < ApplicationController
     has_stop_wall = params[:calculation][:has_stop_wall] == "1"
 
     if height.positive?
-      @runout_result = build_runout_result(height, has_stop_wall)
+      @slide_runout_result = build_runout_result(height, has_stop_wall)
     else
-      set_error(:runout, :invalid_height)
+      set_error(:slide_runout, :invalid_height)
     end
   end
 
@@ -71,7 +175,9 @@ class SafetyStandardsController < ApplicationController
     user_height = param_to_float(:user_height)
 
     if platform_height.positive? && user_height.positive?
-      @wall_height_result = build_wall_height_result(platform_height, user_height)
+      @wall_height_result = build_wall_height_result(
+        platform_height, user_height
+      )
     else
       set_error(:wall_height, :invalid_height)
     end
@@ -85,12 +191,11 @@ class SafetyStandardsController < ApplicationController
     negative_adjustment_area = param_to_float(:negative_adjustment_area)
 
     if length.positive? && width.positive?
-      @capacity_result = SafetyStandards::UserCapacityCalculator.calculate(
+      @user_capacity_result = EN14960.calculate_user_capacity(
         length, width, max_user_height, negative_adjustment_area
       )
     else
-      @capacity_result = nil
-      @capacity_error = t("safety_standards.errors.invalid_dimensions")
+      set_error(:user_capacity, :invalid_dimensions)
     end
   end
 
@@ -103,97 +208,182 @@ class SafetyStandardsController < ApplicationController
   end
 
   def set_error(type, error_key)
-    instance_variable_set("@#{type}_error", t("safety_standards.errors.#{error_key}"))
+    error_msg = t("safety_standards.errors.#{error_key}")
+    instance_variable_set("@#{type}_error", error_msg)
+    instance_variable_set("@#{type}_result", nil)
   end
 
   def build_runout_result(platform_height, has_stop_wall)
-    SafetyStandards::SlideCalculator.calculate_required_runout(
+    EN14960.calculate_slide_runout(
       platform_height,
       has_stop_wall: has_stop_wall
     )
   end
 
   def build_wall_height_result(platform_height, user_height)
-    SafetyStandards::SlideCalculator.calculate_wall_height_requirements(platform_height, user_height)
+    EN14960.calculate_wall_height(
+      platform_height, user_height
+    )
   end
 
   def build_json_response
     type = params[:calculation][:type]
-
-    unless CALCULATION_TYPES.include?(type)
-      return {
-        passed: false,
-        status: "Invalid calculation type: #{type || "none provided"}",
-        result: nil
-      }
-    end
+    return invalid_type_response(type) unless CALCULATION_TYPES.include?(type)
 
     build_typed_json_response(type)
-  rescue => e
+  end
+
+  def invalid_type_response(type)
     {
       passed: false,
-      status: "Calculation failed: #{e.message}",
+      status: t("safety_standards.api.invalid_calculation_type",
+        type: type || t("safety_standards.api.none_provided")),
+      result: nil
+    }
+  end
+
+  def error_response(message)
+    {
+      passed: false,
+      status: t("safety_standards.api.calculation_failed", error: message),
       result: nil
     }
   end
 
   def build_typed_json_response(type)
-    # Ensure calculation is performed
     calculate_safety_standard
 
-    result_var = case type
-    when "anchors" then "@anchor_result"
-    when "slide_runout" then "@runout_result"
-    when "wall_height" then "@wall_height_result"
-    when "user_capacity" then "@capacity_result"
-    end
+    result, error = get_calculation_results(type)
 
-    error_var = case type
-    when "anchors" then "@anchor_error"
-    when "slide_runout" then "@runout_error"
-    when "wall_height" then "@wall_height_error"
-    when "user_capacity" then "@capacity_error"
+    if result
+      build_success_response(type, result)
+    else
+      build_error_response(error)
     end
+  end
+
+  def get_calculation_results(type)
+    result_var = "@#{type}_result"
+    error_var = "@#{type}_error"
 
     result = instance_variable_get(result_var)
     error = instance_variable_get(error_var)
 
-    if result
-      # For user capacity, we need to extract the capacities from the CalculatorResponse
-      if type == "user_capacity" && result.is_a?(CalculatorResponse)
-        capacities = result.value
-        # Extract input parameters for backwards compatibility
-        length = param_to_float(:length)
-        width = param_to_float(:width)
-        max_user_height = param_to_float(:max_user_height)
-        max_user_height = nil if max_user_height.zero?
-        negative_adjustment_area = param_to_float(:negative_adjustment_area)
+    [result, error]
+  end
 
-        json_result = {
-          length: length,
-          width: width,
-          area: (length * width).round(2),
-          negative_adjustment_area: negative_adjustment_area,
-          usable_area: [(length * width) - negative_adjustment_area, 0].max.round(2),
-          max_user_height: max_user_height,
-          capacities: capacities,
-          breakdown: result.breakdown
-        }
-      else
-        json_result = result
-      end
-
+  def build_success_response(type, result)
+    json_result = if type == "user_capacity"
+      build_user_capacity_json(result)
+    elsif result.is_a?(EN14960::CalculatorResponse)
       {
-        passed: true,
-        status: "Calculation completed successfully",
-        result: json_result
+        value: result.value,
+        value_suffix: result.value_suffix || "",
+        breakdown: result.breakdown
       }
     else
-      {
-        passed: false,
-        status: error || "Calculation failed with unknown error",
-        result: nil
-      }
+      result
     end
+
+    {
+      passed: true,
+      status: t("safety_standards.api.calculation_success"),
+      result: json_result
+    }
+  end
+
+  def build_error_response(error)
+    {
+      passed: false,
+      status: error || t("safety_standards.api.unknown_error"),
+      result: nil
+    }
+  end
+
+  def build_user_capacity_json(result)
+    return result unless result.is_a?(EN14960::CalculatorResponse)
+
+    length = param_to_float(:length)
+    width = param_to_float(:width)
+    max_user_height = param_to_float(:max_user_height)
+    max_user_height = nil if max_user_height.zero?
+    neg_adj = param_to_float(:negative_adjustment_area)
+
+    {
+      length: length,
+      width: width,
+      area: (length * width).round(2),
+      negative_adjustment_area: neg_adj,
+      usable_area: [(length * width) - neg_adj, 0].max.round(2),
+      max_user_height: max_user_height,
+      capacities: result.value,
+      breakdown: result.breakdown
+    }
+  end
+
+  def calculation_metadata
+    {
+      anchors: anchor_metadata,
+      slide_runout: slide_runout_metadata,
+      wall_height: wall_height_metadata,
+      user_capacity: user_capacity_metadata
+    }
+  end
+
+  def anchor_metadata
+    {
+      title: t("safety_standards.metadata.anchor_title"),
+      description: t("safety_standards.calculators.anchor.description"),
+      method_name: :calculate_required_anchors,
+      module_name: EN14960::Calculators::AnchorCalculator,
+      example_input: 25.0,
+      input_unit: "m²",
+      output_unit: "anchors",
+      formula_text: t("safety_standards.metadata.anchor_formula"),
+      standard_reference: t("safety_standards.metadata.standard_reference")
+    }
+  end
+
+  def slide_runout_metadata
+    {
+      title: t("safety_standards.metadata.slide_runout_title"),
+      description: t("safety_standards.metadata.slide_runout_description"),
+      method_name: :calculate_required_runout,
+      additional_methods: [:calculate_runout_value],
+      module_name: EN14960::Calculators::SlideCalculator,
+      example_input: 2.5,
+      input_unit: "m",
+      output_unit: "m",
+      formula_text: t("safety_standards.metadata.runout_formula"),
+      standard_reference: t("safety_standards.metadata.standard_reference")
+    }
+  end
+
+  def wall_height_metadata
+    {
+      title: t("safety_standards.metadata.wall_height_title"),
+      description: t("safety_standards.metadata.wall_height_description"),
+      method_name: :meets_height_requirements?,
+      module_name: EN14960::Calculators::SlideCalculator,
+      example_input: {platform_height: 2.0, user_height: 1.5},
+      input_unit: "m",
+      output_unit: t("safety_standards.metadata.requirement_text_unit"),
+      formula_text: t("safety_standards.metadata.wall_height_formula"),
+      standard_reference: t("safety_standards.metadata.standard_reference")
+    }
+  end
+
+  def user_capacity_metadata
+    {
+      title: t("safety_standards.metadata.user_capacity_title"),
+      description: t("safety_standards.calculators.user_capacity.description"),
+      method_name: :calculate,
+      module_name: EN14960::Calculators::UserCapacityCalculator,
+      example_input: {length: 10.0, width: 8.0},
+      input_unit: "m",
+      output_unit: "users",
+      formula_text: t("safety_standards.metadata.user_capacity_formula"),
+      standard_reference: t("safety_standards.metadata.standard_reference")
+    }
   end
 end

@@ -8,7 +8,7 @@
     
     <%# Wall Height Requirements with Breakdown %>
     <% if user_height.present? && @assessment.slide_wall_height.present? %>
-      <% wall_details = SafetyStandards::SlideCalculator.get_wall_height_requirement_details(
+      <% wall_details = EN14960::Calculators::SlideCalculator.get_wall_height_requirement_details(
            platform_height, 
            user_height, 
            @assessment.slide_permanent_roof
@@ -23,7 +23,7 @@
     <%# Runout Requirements with Breakdown %>
     <% if @assessment.runout.present? %>
       <br>
-      <% runout_result = SafetyStandards::SlideCalculator.calculate_required_runout(
+      <% runout_result = EN14960.calculate_slide_runout(
            platform_height,
            has_stop_wall: false
          ) %>

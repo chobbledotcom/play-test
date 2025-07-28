@@ -154,10 +154,10 @@ RSpec.shared_examples "validates comment field" do |field|
   end
 end
 
-RSpec.shared_examples "delegates to SafetyStandard" do |delegated_methods|
+RSpec.shared_examples "delegates to EN14960::Constants" do |delegated_methods|
   delegated_methods.each do |method|
-    it "delegates ##{method} to SafetyStandard" do
-      expect(SafetyStandard).to respond_to(method)
+    it "delegates ##{method} to EN14960::Constants" do
+      expect(EN14960::Constants).to respond_to(method)
     end
   end
 end

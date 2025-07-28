@@ -10,8 +10,8 @@ RSpec.describe "SeedData slide_fields" do
           platform_height = fields[:slide_platform_height]
           runout = fields[:runout]
 
-          meets_requirements = SafetyStandards::SlideCalculator.meets_runout_requirements?(runout, platform_height)
-          required_runout = SafetyStandards::SlideCalculator.calculate_required_runout(platform_height)
+          meets_requirements = EN14960::Calculators::SlideCalculator.meets_runout_requirements?(runout, platform_height)
+          required_runout = EN14960::Calculators::SlideCalculator.calculate_required_runout(platform_height)
 
           expect(meets_requirements).to be(true),
             "Expected runout #{runout}m to meet requirements for platform height #{platform_height}m (required: #{required_runout}m)"
@@ -26,8 +26,8 @@ RSpec.describe "SeedData slide_fields" do
           platform_height = fields[:slide_platform_height]
           runout = fields[:runout]
 
-          meets_requirements = SafetyStandards::SlideCalculator.meets_runout_requirements?(runout, platform_height)
-          required_runout = SafetyStandards::SlideCalculator.calculate_required_runout(platform_height)
+          meets_requirements = EN14960::Calculators::SlideCalculator.meets_runout_requirements?(runout, platform_height)
+          required_runout = EN14960::Calculators::SlideCalculator.calculate_required_runout(platform_height)
 
           expect(meets_requirements).to be(false),
             "Expected runout #{runout}m to fail requirements for platform height #{platform_height}m (required: #{required_runout}m)"

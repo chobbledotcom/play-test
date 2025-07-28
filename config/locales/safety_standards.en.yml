@@ -173,3 +173,24 @@ en:
         height_restriction: "If a unit has a maximum user height restriction, do not calculate capacity for taller users"
         round_down: "Always round down fractional users for safety"
         consider_obstacles: "Consider obstacles and unusable areas when calculating total play area"
+    
+    api:
+      invalid_calculation_type: "Invalid calculation type: %{type}"
+      none_provided: "none provided"
+      calculation_failed: "Calculation failed: %{error}"
+      calculation_success: "Calculation completed successfully"
+      unknown_error: "Calculation failed with unknown error"
+    
+    metadata:
+      anchor_title: "Anchor Requirements"
+      slide_runout_title: "Slide Runout Requirements"
+      slide_runout_description: "Minimum runout distance for safe slide deceleration."
+      wall_height_title: "Wall Height Requirements"
+      wall_height_description: "Containing wall heights must scale with user height based on platform height thresholds."
+      user_capacity_title: "User Capacity Calculation"
+      anchor_formula: "((Area × 114.0 × 1.5) ÷ 1600.0)"
+      runout_formula: "50% of platform height, minimum 300mm"
+      wall_height_formula: "Tiered requirements based on platform height thresholds"
+      user_capacity_formula: "Area ÷ space_per_user (varies by height: 1-2 m² per user)"
+      standard_reference: "EN 14960:2019"
+      requirement_text_unit: "requirement text"

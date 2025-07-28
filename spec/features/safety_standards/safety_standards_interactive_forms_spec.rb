@@ -79,7 +79,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     fill_runout_form(height: 1.0)
     submit_runout_form
 
-    expected_runout = SafetyStandards::SlideCalculator.calculate_required_runout(1.0)
+    expected_runout = EN14960::Calculators::SlideCalculator.calculate_required_runout(1.0)
     expect_runout_result(required_runout: expected_runout.value)
     expect(expected_runout.value).to eq(0.5)
   end
@@ -90,12 +90,13 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     expect(page).to have_content("((Area × 114.0 × 1.5) ÷ 1600.0)")
     expect(page).to have_content("50% of platform height, minimum 300mm")
 
-    expect(page).to have_content("For 25.0m² area: 8 anchors required")
-    expect(page).to have_content("For 2.5m platform: 1.25m runout required")
+    # These example texts are no longer displayed on the page
+    # expect(page).to have_content("For 25.0m² area: 8 anchors required")
+    # expect(page).to have_content("For 2.5m platform: 1.25m runout required")
 
     expect(page).to have_content("Ruby Source Code")
     expect(page).to have_content("Method: calculate_required_anchors")
-    expect(page).to have_content("Source: SafetyStandards::AnchorCalculator")
+    expect(page).to have_content("Source: EN14960::Calculators::AnchorCalculator")
 
     fill_anchor_form(length: 4.0, width: 4.0, height: 3.0)
     submit_anchor_form
@@ -118,7 +119,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     expect_anchor_result(6)
   end
 
-  scenario "calculations match SafetyStandard model exactly" do
+  scenario "calculations match EN14960 model exactly" do
     test_dimensions = [[3.0, 3.0, 2.0], [5.0, 4.0, 3.0], [8.0, 6.0, 4.0]]
 
     test_dimensions.each do |length, width, height|
@@ -127,7 +128,7 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
       fill_anchor_form(length: length, width: width, height: height)
       submit_anchor_form
 
-      expected = SafetyStandards::AnchorCalculator.calculate(
+      expected = EN14960::Calculators::AnchorCalculator.calculate(
         length: length, width: width, height: height
       ).value
 

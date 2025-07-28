@@ -44,7 +44,8 @@
         <h4><%= t('inspections.safety_standards.user_capacity') %></h4>
         <p><%= t('inspections.safety_standards.capacity_by_height') %></p>
         <% max_height = inspection.user_height_assessment?&.tallest_user_height %>
-        <% capacity = SafetyStandards::UserCapacityCalculator.calculate(inspection.length, inspection.width, max_height) %>
+        <% capacity_result = EN14960.calculate_user_capacity(inspection.length, inspection.width, max_height) %>
+        <% capacity = capacity_result.value %>
         <ul>
           <% if capacity[:users_1000mm] > 0 %>
             <li><%= t('inspections.safety_standards.capacity_1000mm', count: capacity[:users_1000mm]) %></li>

@@ -28,7 +28,7 @@ class Assessments::StructureAssessment < ApplicationRecord
     permanent_roof = permanent_roof_status
     return false if permanent_roof.nil?
 
-    SafetyStandards::SlideCalculator.meets_height_requirements?(
+    EN14960::Calculators::SlideCalculator.meets_height_requirements?(
       platform_height,
       user_height.tallest_user_height,
       user_height.containing_wall_height,

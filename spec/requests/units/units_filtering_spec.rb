@@ -71,7 +71,7 @@ RSpec.describe "Units Filtering", type: :request do
         create(:inspection, :completed,
           user: user,
           unit: overdue_unit,
-          inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 10).days.ago)
+          inspection_date: (EN14960::Constants::REINSPECTION_INTERVAL_DAYS + 10).days.ago)
 
         # Create a recent inspection for the current unit
         create(:inspection, :completed,

@@ -1,13 +1,13 @@
 require "rails_helper"
 
-RSpec.describe SafetyStandards::UserCapacityCalculator do
+RSpec.describe EN14960::Calculators::UserCapacityCalculator do
   describe ".calculate" do
     context "with valid dimensions" do
       it "returns CalculatorResponse with correct capacity and breakdown" do
         # 10m x 10m = 100m² area
         result = described_class.calculate(10, 10)
 
-        expect(result).to be_a(CalculatorResponse)
+        expect(result).to be_a(EN14960::CalculatorResponse)
         capacities = result.value
         expect(capacities[:users_1000mm]).to eq(100)  # 100 ÷ 1.0 = 100
         expect(capacities[:users_1200mm]).to eq(75)   # 100 ÷ 1.33 = 75.18 → 75
@@ -104,7 +104,7 @@ RSpec.describe SafetyStandards::UserCapacityCalculator do
       it "returns default result when length is nil" do
         result = described_class.calculate(nil, 10)
 
-        expect(result).to be_a(CalculatorResponse)
+        expect(result).to be_a(EN14960::CalculatorResponse)
         expect(result.value).to eq({
           users_1000mm: 0,
           users_1200mm: 0,
@@ -112,14 +112,14 @@ RSpec.describe SafetyStandards::UserCapacityCalculator do
           users_1800mm: 0
         })
         expect(result.breakdown).to include(
-          [I18n.t("safety_standards.errors.invalid_dimensions"), ""]
+          ["Invalid dimensions", ""]
         )
       end
 
       it "returns default result when width is nil" do
         result = described_class.calculate(10, nil)
 
-        expect(result).to be_a(CalculatorResponse)
+        expect(result).to be_a(EN14960::CalculatorResponse)
         expect(result.value).to eq({
           users_1000mm: 0,
           users_1200mm: 0,

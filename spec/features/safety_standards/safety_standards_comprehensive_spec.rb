@@ -219,7 +219,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         fill_anchor_form(length: l, width: w, height: h)
         submit_anchor_form
 
-        expected = SafetyStandards::AnchorCalculator.calculate(
+        expected = EN14960.calculate_anchors(
           length: l, width: w, height: h
         ).value
 

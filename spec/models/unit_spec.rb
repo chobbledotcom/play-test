@@ -170,21 +170,27 @@ RSpec.describe Unit, type: :model do
 
     context "when last inspection was within the reinspection interval" do
       it "returns false" do
-        create(:inspection, :completed, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago)
+        reinspection_days = EN14960::Constants::REINSPECTION_INTERVAL_DAYS
+        create(:inspection, :completed, unit: unit,
+          inspection_date: (reinspection_days / 2).days.ago)
         expect(unit.inspection_overdue?).to be false
       end
     end
 
     context "when last inspection was beyond the reinspection interval" do
       it "returns true" do
-        create(:inspection, :completed, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 30).days.ago)
+        reinspection_days = EN14960::Constants::REINSPECTION_INTERVAL_DAYS
+        create(:inspection, :completed, unit: unit,
+          inspection_date: (reinspection_days + 30).days.ago)
         expect(unit.inspection_overdue?).to be true
       end
     end
 
     context "when last inspection was exactly at the reinspection interval" do
       it "returns false" do
-        create(:inspection, :completed, unit: unit, inspection_date: SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago)
+        reinspection_days = EN14960::Constants::REINSPECTION_INTERVAL_DAYS
+        create(:inspection, :completed, unit: unit,
+          inspection_date: reinspection_days.days.ago)
         expect(unit.inspection_overdue?).to be false
       end
     end
@@ -204,15 +210,15 @@ RSpec.describe Unit, type: :model do
         inspection_date = Date.new(2024, 1, 15)
         create(:inspection, :completed, unit: unit, inspection_date: inspection_date)
 
-        expect(unit.next_inspection_due).to eq(inspection_date + SafetyStandard::REINSPECTION_INTERVAL_DAYS.days)
+        expect(unit.next_inspection_due).to eq(inspection_date + EN14960::Constants::REINSPECTION_INTERVAL_DAYS.days)
       end
 
       it "uses the most recent inspection date" do
-        create(:inspection, :completed, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS * 2).days.ago)
-        recent_date = (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago.to_date
+        create(:inspection, :completed, unit: unit, inspection_date: (EN14960::Constants::REINSPECTION_INTERVAL_DAYS * 2).days.ago)
+        recent_date = (EN14960::Constants::REINSPECTION_INTERVAL_DAYS / 2).days.ago.to_date
         create(:inspection, :completed, unit: unit, inspection_date: recent_date)
 
-        expect(unit.next_inspection_due).to eq(recent_date + SafetyStandard::REINSPECTION_INTERVAL_DAYS.days)
+        expect(unit.next_inspection_due).to eq(recent_date + EN14960::Constants::REINSPECTION_INTERVAL_DAYS.days)
       end
     end
   end
@@ -224,10 +230,10 @@ RSpec.describe Unit, type: :model do
     let!(:just_due_unit) { create(:unit) }
 
     before do
-      create(:inspection, unit: recently_inspected, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago)
-      create(:inspection, unit: overdue_unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 30).days.ago)
+      create(:inspection, unit: recently_inspected, inspection_date: (EN14960::Constants::REINSPECTION_INTERVAL_DAYS / 2).days.ago)
+      create(:inspection, unit: overdue_unit, inspection_date: (EN14960::Constants::REINSPECTION_INTERVAL_DAYS + 30).days.ago)
       # Create inspection exactly at the reinspection interval boundary (as a date, not datetime)
-      create(:inspection, unit: just_due_unit, inspection_date: Date.current - SafetyStandard::REINSPECTION_INTERVAL_DAYS.days)
+      create(:inspection, unit: just_due_unit, inspection_date: Date.current - EN14960::Constants::REINSPECTION_INTERVAL_DAYS.days)
     end
 
     it "returns units with inspections older than the reinspection interval" do
@@ -247,7 +253,9 @@ RSpec.describe Unit, type: :model do
     end
 
     it "returns distinct units even with multiple old inspections" do
-      create(:inspection, unit: overdue_unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS * 2).days.ago)
+      reinspection_days = EN14960::Constants::REINSPECTION_INTERVAL_DAYS
+      create(:inspection, unit: overdue_unit,
+        inspection_date: (reinspection_days * 2).days.ago)
 
       result = Unit.overdue
       # When using GROUP BY, result is already distinct by unit
@@ -268,21 +276,27 @@ RSpec.describe Unit, type: :model do
 
     context "when inspection is overdue" do
       it "returns 'Overdue'" do
-        create(:inspection, :completed, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS + 30).days.ago, passed: true)
+        reinspection_days = EN14960::Constants::REINSPECTION_INTERVAL_DAYS
+        create(:inspection, :completed, unit: unit, passed: true,
+          inspection_date: (reinspection_days + 30).days.ago)
         expect(unit.compliance_status).to eq("Overdue")
       end
     end
 
     context "when recently inspected and passed" do
       it "returns 'Compliant'" do
-        create(:inspection, :completed, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago, passed: true)
+        reinspection_days = EN14960::Constants::REINSPECTION_INTERVAL_DAYS
+        create(:inspection, :completed, unit: unit, passed: true,
+          inspection_date: (reinspection_days / 2).days.ago)
         expect(unit.compliance_status).to eq("Compliant")
       end
     end
 
     context "when recently inspected but failed" do
       it "returns 'Non-Compliant'" do
-        create(:inspection, :completed, unit: unit, inspection_date: (SafetyStandard::REINSPECTION_INTERVAL_DAYS / 2).days.ago, passed: false)
+        reinspection_days = EN14960::Constants::REINSPECTION_INTERVAL_DAYS
+        create(:inspection, :completed, unit: unit, passed: false,
+          inspection_date: (reinspection_days / 2).days.ago)
         expect(unit.compliance_status).to eq("Non-Compliant")
       end
     end

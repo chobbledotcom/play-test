@@ -1,9 +1,9 @@
-<% if @runout_result %>
+<% if @slide_runout_result %>
   <%= render 'result_with_breakdown',
     result_label: t('safety_standards.calculators.runout.required_runout_result'),
-    result: @runout_result %>
-<% elsif @runout_error %>
+    result: @slide_runout_result %>
+<% elsif @slide_runout_error %>
   <div class="error">
-    <p><strong><%= t('shared.error') %>:</strong> <%= @runout_error %></p>
+    <p><strong><%= t('shared.error') %>:</strong> <%= @slide_runout_error %></p>
   </div>
 <% end %>

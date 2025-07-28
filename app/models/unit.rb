@@ -45,7 +45,7 @@ class Unit < ApplicationRecord
   scope :by_manufacturer, ->(manufacturer) { where(manufacturer: manufacturer) if manufacturer.present? }
   scope :by_operator, ->(operator) { where(operator: operator) if operator.present? }
   scope :with_recent_inspections, -> {
-    cutoff_date = SafetyStandard::REINSPECTION_INTERVAL_DAYS.days.ago
+    cutoff_date = EN14960::Constants::REINSPECTION_INTERVAL_DAYS.days.ago
     joins(:inspections)
       .where(inspections: {inspection_date: cutoff_date..})
       .distinct
@@ -55,7 +55,7 @@ class Unit < ApplicationRecord
     joins(:inspections)
       .merge(Inspection.completed)
       .group("units.id")
-      .having("MAX(inspections.complete_date) + INTERVAL #{SafetyStandard::REINSPECTION_INTERVAL_DAYS} DAY <= CURRENT_DATE")
+      .having("MAX(inspections.complete_date) + INTERVAL #{EN14960::Constants::REINSPECTION_INTERVAL_DAYS} DAY <= CURRENT_DATE")
   }
 
   # Instance methods
@@ -74,7 +74,7 @@ class Unit < ApplicationRecord
 
   def next_inspection_due
     return nil unless last_inspection
-    last_inspection.inspection_date + SafetyStandard::REINSPECTION_INTERVAL_DAYS.days
+    last_inspection.inspection_date + EN14960::Constants::REINSPECTION_INTERVAL_DAYS.days
   end
 
   def inspection_overdue?
@@ -127,7 +127,7 @@ class Unit < ApplicationRecord
   def self.overdue
     # Find units where their most recent inspection is older than the interval
     # Using Date.current instead of Date.today for Rails timezone consistency
-    cutoff_date = Date.current - SafetyStandard::REINSPECTION_INTERVAL_DAYS.days
+    cutoff_date = Date.current - EN14960::Constants::REINSPECTION_INTERVAL_DAYS.days
     joins(:inspections)
       .group("units.id")
       .having("MAX(inspections.inspection_date) <= ?", cutoff_date)
