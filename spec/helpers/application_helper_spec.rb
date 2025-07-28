@@ -119,7 +119,6 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
-
   describe "#format_numeric_value" do
     context "with numeric values" do
       it "removes trailing zeros from decimal values" do

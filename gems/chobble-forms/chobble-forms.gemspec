@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{app,config,lib}/**/*", "README.md"]
 
   spec.add_dependency "rails", ">= 7.0.0"
-  
+
   spec.add_development_dependency "rspec-rails", "~> 6.0"
   spec.add_development_dependency "capybara", "~> 3.0"
 end
