@@ -4,6 +4,9 @@ RSpec.feature "About Page", type: :feature do
   let(:user) { create(:user) }
 
   before do
+    # Clean up any existing pages to avoid conflicts
+    Page.where(slug: ["about", "/"]).destroy_all
+
     sign_in(user)
     # Create about page
     create(:page, slug: "about", content: <<~HTML
@@ -12,7 +15,8 @@ RSpec.feature "About Page", type: :feature do
       <p>EN 14960:2019 inflatable playground equipment</p>
       <h2>#{I18n.t("about.key_features.title")}</h2>
       <h2>#{I18n.t("about.attribution.title")}</h2>
-      <p>Stefan at Chobble.com Spencer Elliott elliottsbouncycastlehire.co.uk AGPLv3</p>
+      <p>Stefan at Chobble.com Spencer Elliott
+      elliottsbouncycastlehire.co.uk AGPLv3</p>
       <h2>#{I18n.t("about.disclaimer.title")}</h2>
       <p>not affiliated with any testing bodies</p>
     HTML

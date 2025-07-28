@@ -5,7 +5,8 @@ RSpec.describe "Inspection assessment auto-creation", type: :model do
 
   describe "auto-creation behavior" do
     it "creates assessment when accessed directly" do
-      expect(inspection.materials_assessment).to be_a(Assessments::MaterialsAssessment)
+      materials = inspection.materials_assessment
+      expect(materials).to be_a(Assessments::MaterialsAssessment)
       expect(inspection.materials_assessment).to be_persisted
     end
 
@@ -41,8 +42,8 @@ RSpec.describe "Inspection assessment auto-creation", type: :model do
       # Should not create assessment and return nil
       expect(inspection.materials_assessment?&.ropes).to be_nil
 
-      # Verify no assessment was created
-      expect(Assessments::MaterialsAssessment.count).to eq(0)
+      # Verify no assessment was created for this inspection
+      expect(inspection.materials_assessment?).to be_nil
     end
 
     it "works with safe navigation on existing assessment" do
