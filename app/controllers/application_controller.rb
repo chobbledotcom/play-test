@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   after_action :cleanup_debug_subscription, if: :admin_debug_enabled?
 
   rescue_from StandardError do |exception|
-    if Rails.env.production?
+    if Rails.env.production? && should_notify_error?(exception)
       user_email = current_user&.email || app_i18n(:errors, :not_logged_in)
       user_label = app_i18n(:errors, :user_label)
       user_info = "#{user_label}: #{user_email}"
@@ -198,5 +198,19 @@ class ApplicationController < ActionController::Base
 
     ActiveSupport::Notifications.unsubscribe(@debug_subscription)
     @debug_subscription = nil
+  end
+
+  def should_notify_error?(exception)
+    if exception.is_a?(ActionController::InvalidAuthenticityToken)
+      csrf_ignored_actions = [
+        ["sessions", "create"],
+        ["users", "create"]
+      ]
+
+      action = [controller_name, action_name]
+      return false if csrf_ignored_actions.include?(action)
+    end
+
+    true
   end
 end
