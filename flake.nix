@@ -48,6 +48,7 @@
             echo "  rspec-replace  - Test replacements for broken tests"
             echo "  test-memory    - Run tests with memory analysis"
             echo "  find           - Run ripgrep for a string, useful dirs only"
+            echo "  update-chobble - Update chobble-forms and en14960 gems"
           '';
         };
       }

@@ -1,0 +1,7 @@
+#!/usr/bin/env -S bash
+
+# Update chobble-forms and en14960 gems conservatively
+echo "Updating chobble-forms and en14960 gems..."
+bundle update chobble-forms en14960 --conservative
+
+echo "Update complete!"
