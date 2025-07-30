@@ -3,101 +3,120 @@ class PdfGeneratorService
     def self.generate_photos_page(pdf, inspection)
       return unless has_photos?(inspection)
 
-      # Start a new page for photos
       pdf.start_new_page
+      add_photos_header(pdf)
 
-      # Add photos header
-      pdf.text I18n.t("pdf.inspection.photos_section"), size: Configuration::HEADER_TEXT_SIZE, style: :bold
+      max_photo_height = calculate_max_photo_height(pdf)
+      process_all_photos(pdf, inspection, max_photo_height)
+    end
+
+    def self.has_photos?(inspection)
+      inspection.photo_1.attached? ||
+        inspection.photo_2.attached? ||
+        inspection.photo_3.attached?
+    end
+
+    def self.add_photos_header(pdf)
+      header_options = {
+        size: Configuration::HEADER_TEXT_SIZE,
+        style: :bold
+      }
+      pdf.text I18n.t("pdf.inspection.photos_section"), header_options
       pdf.stroke_horizontal_rule
       pdf.move_down 15
+    end
 
-      # Calculate maximum photo height (25% of page)
-      max_photo_height = pdf.bounds.height * Configuration::PHOTO_MAX_HEIGHT_PERCENT
+    def self.calculate_max_photo_height(pdf)
+      height_percent = Configuration::PHOTO_MAX_HEIGHT_PERCENT
+      pdf.bounds.height * height_percent
+    end
 
-      # Current Y position for placing photos
+    def self.process_all_photos(pdf, inspection, max_photo_height)
       current_y = pdf.cursor
 
-      # Process each photo
-      [
-        [:photo_1, I18n.t("pdf.inspection.fields.photo_1_label")],
-        [:photo_2, I18n.t("pdf.inspection.fields.photo_2_label")],
-        [:photo_3, I18n.t("pdf.inspection.fields.photo_3_label")]
-      ].each do |photo_field, label|
+      photo_fields.each do |photo_field, label|
         photo = inspection.send(photo_field)
         next unless photo.attached?
 
-        # Check if we have enough space, otherwise start new page
-        needed_space = max_photo_height + Configuration::PHOTO_LABEL_SIZE + Configuration::PHOTO_LABEL_SPACING + Configuration::PHOTO_SPACING
-        if current_y < needed_space
-          pdf.start_new_page
-          current_y = pdf.cursor
-        end
+        current_y = handle_page_break_if_needed(
+          pdf, current_y, max_photo_height
+        )
 
-        # Process and render the photo
         render_photo(pdf, photo, label, max_photo_height)
         current_y = pdf.cursor - Configuration::PHOTO_SPACING
         pdf.move_down Configuration::PHOTO_SPACING
       end
     end
 
-    class << self
-      private
+    def self.photo_fields
+      [
+        [:photo_1, I18n.t("pdf.inspection.fields.photo_1_label")],
+        [:photo_2, I18n.t("pdf.inspection.fields.photo_2_label")],
+        [:photo_3, I18n.t("pdf.inspection.fields.photo_3_label")]
+      ]
+    end
 
-      def has_photos?(inspection)
-        inspection.photo_1.attached? || inspection.photo_2.attached? || inspection.photo_3.attached?
+    def self.handle_page_break_if_needed(pdf, current_y, max_photo_height)
+      needed_space = calculate_needed_space(max_photo_height)
+
+      if current_y < needed_space
+        pdf.start_new_page
+        pdf.cursor
+      else
+        current_y
       end
+    end
 
-      def render_photo(pdf, photo, label, max_height)
-        # Download and process the image
-        photo.blob.download
-        processed_image = ImageProcessor.process_image_with_orientation(photo)
+    def self.calculate_needed_space(max_photo_height)
+      label_size = Configuration::PHOTO_LABEL_SIZE
+      label_spacing = Configuration::PHOTO_LABEL_SPACING
+      photo_spacing = Configuration::PHOTO_SPACING
+      max_photo_height + label_size + label_spacing + photo_spacing
+    end
 
-        # Create temporary file for the processed image
-        temp_file = Tempfile.new(["pdf_photo_#{photo.id}_#{Process.pid}", ".jpg"])
-        begin
-          temp_file.binmode
-          temp_file.write(processed_image)
-          temp_file.close
+    def self.render_photo(pdf, photo, label, max_height)
+      photo.blob.download
+      processed_image = ImageProcessor.process_image_with_orientation(photo)
 
-          # Calculate image dimensions maintaining aspect ratio
-          image_width, image_height = calculate_photo_dimensions(temp_file.path, pdf.bounds.width, max_height)
+      image_width, image_height = calculate_photo_dimensions_from_blob(
+        photo, pdf.bounds.width, max_height
+      )
+      x_position = (pdf.bounds.width - image_width) / 2
 
-          # Center the image horizontally
-          x_position = (pdf.bounds.width - image_width) / 2
+      render_image_to_pdf(
+        pdf, processed_image, x_position, image_width, image_height
+      )
 
-          # Render the image
-          pdf.image temp_file.path, at: [x_position, pdf.cursor], width: image_width, height: image_height
+      add_photo_label(pdf, label, image_height)
+    end
 
-          # Move cursor down by image height
-          pdf.move_down image_height + Configuration::PHOTO_LABEL_SPACING
+    def self.calculate_photo_dimensions_from_blob(photo, max_width, max_height)
+      original_width = photo.metadata[:width].to_f
+      original_height = photo.metadata[:height].to_f
 
-          # Add centered label below the photo
-          pdf.text label, size: Configuration::PHOTO_LABEL_SIZE, align: :center
-        ensure
-          temp_file.close unless temp_file.closed?
-          temp_file.unlink if File.exist?(temp_file.path)
-        end
-      end
+      width_scale = max_width / original_width
+      height_scale = max_height / original_height
+      scale = [width_scale, height_scale].min
 
-      def calculate_photo_dimensions(image_path, max_width, max_height)
-        # Use ImageMagick to get image dimensions
-        image = MiniMagick::Image.open(image_path)
-        original_width = image.width.to_f
-        original_height = image.height.to_f
+      [original_width * scale, original_height * scale]
+    end
 
-        # Calculate scale factors for both width and height constraints
-        width_scale = max_width / original_width
-        height_scale = max_height / original_height
+    def self.render_image_to_pdf(pdf, image_data, x_position, width, height)
+      image_options = {
+        at: [x_position, pdf.cursor],
+        width: width,
+        height: height
+      }
+      pdf.image StringIO.new(image_data), image_options
+    end
 
-        # Use the smaller scale factor to ensure image fits within both constraints
-        scale = [width_scale, height_scale].min
-
-        # Calculate final dimensions
-        final_width = original_width * scale
-        final_height = original_height * scale
-
-        [final_width, final_height]
-      end
+    def self.add_photo_label(pdf, label, image_height)
+      pdf.move_down image_height + Configuration::PHOTO_LABEL_SPACING
+      label_options = {
+        size: Configuration::PHOTO_LABEL_SIZE,
+        align: :center
+      }
+      pdf.text label, label_options
     end
   end
 end
