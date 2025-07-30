@@ -4,6 +4,7 @@ en:
       header: "Fan/Blower"
       sections:
         fan_assessment: "Fan Assessment"
+        fan_assessment_footer: "You must test and log for every blower for this unit"
       fields:
         fan_size_type: "Blower sizes"
         blower_serial: "Blower serial numbers"

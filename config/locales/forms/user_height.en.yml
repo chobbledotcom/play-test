@@ -4,6 +4,7 @@ en:
       header: "User Height/Count"
       sections:
         height_measurements: "Height Measurements"
+        height_measurements_footer: "This is not slides - that's the next page"
         user_capacity: "User Capacity"
         play_area: "Play Area"
       fields:
