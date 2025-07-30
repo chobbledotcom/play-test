@@ -54,8 +54,10 @@ class PdfGeneratorService
       photo_x, photo_y = positions
 
       render_processed_image(
-        pdf, image, photo_x, photo_y, photo_width, photo_height
+        pdf, image, photo_x, photo_y, photo_width, photo_height, attachment
       )
+    rescue Prawn::Errors::UnsupportedImageType => e
+      raise ImageError.build_detailed_error(e, attachment)
     end
 
     def self.calculate_footer_photo_dimensions(image)
@@ -66,7 +68,7 @@ class PdfGeneratorService
       )
     end
 
-    def self.render_processed_image(pdf, image, x, y, width, height)
+    def self.render_processed_image(pdf, image, x, y, width, height, attachment)
       image.auto_orient
       processed_image = image.to_blob
 
@@ -76,6 +78,8 @@ class PdfGeneratorService
         height: height
       }
       pdf.image StringIO.new(processed_image), image_options
+    rescue Prawn::Errors::UnsupportedImageType => e
+      raise ImageError.build_detailed_error(e, attachment)
     end
 
     def self.create_image(attachment)

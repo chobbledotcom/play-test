@@ -11,13 +11,11 @@ class PdfGeneratorService
       report_id_text = build_report_id_text(inspection)
       status_text, status_color = build_status_text_and_color(inspection)
 
-      logo_width, logo_temp = prepare_logo(inspector_user)
+      render_header_with_logo(pdf, inspector_user) do |logo_width|
+        render_inspection_text_section(pdf, inspection, report_id_text,
+          status_text, status_color, logo_width)
+      end
 
-      render_inspection_header_layout(pdf, inspection, report_id_text,
-        status_text, status_color,
-        logo_width, logo_temp)
-
-      logo_temp&.unlink
       pdf.move_down Configuration::STATUS_SPACING
     end
 
@@ -29,11 +27,10 @@ class PdfGeneratorService
       user = unit.user
       unit_id_text = build_unit_id_text(unit)
 
-      logo_width, logo_temp = prepare_logo(user)
+      render_header_with_logo(pdf, user) do |logo_width|
+        render_unit_text_section(pdf, unit, unit_id_text, logo_width)
+      end
 
-      render_unit_header_layout(pdf, unit, unit_id_text, logo_width, logo_temp)
-
-      logo_temp&.unlink
       pdf.move_down Configuration::STATUS_SPACING
     end
 
@@ -59,29 +56,25 @@ class PdfGeneratorService
         "#{I18n.t("pdf.unit.fields.unit_id")}: #{unit.id}"
       end
 
+      def render_header_with_logo(pdf, user)
+        logo_width, logo_data, logo_attachment = prepare_logo(user)
+
+        pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width) do
+          yield(logo_width)
+          if logo_data
+            render_logo_section(pdf, logo_data, logo_width, logo_attachment)
+          end
+        end
+      end
+
       def prepare_logo(user)
-        return [0, nil] unless user&.logo&.attached?
+        return [0, nil, nil] unless user&.logo&.attached?
 
         logo_data = user.logo.download
         logo_height = Configuration::LOGO_HEIGHT
         logo_width = logo_height * 2 + 10
 
-        logo_temp = Tempfile.new(["user_logo_#{user.id}", ".png"])
-        logo_temp.binmode
-        logo_temp.write(logo_data)
-        logo_temp.close
-
-        [logo_width, logo_temp]
-      end
-
-      def render_inspection_header_layout(pdf, inspection, report_id_text,
-        status_text, status_color,
-        logo_width, logo_temp)
-        pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width) do
-          render_inspection_text_section(pdf, inspection, report_id_text,
-            status_text, status_color, logo_width)
-          render_logo_section(pdf, logo_temp, logo_width) if logo_temp
-        end
+        [logo_width, logo_data, user.logo]
       end
 
       def render_inspection_text_section(pdf, inspection, report_id_text,
@@ -98,14 +91,6 @@ class PdfGeneratorService
           expiry_value = Utilities.format_date(inspection.reinspection_date)
           pdf.text "#{expiry_label}: #{expiry_value}",
             size: Configuration::HEADER_TEXT_SIZE, style: :bold
-        end
-      end
-
-      def render_unit_header_layout(pdf, unit, unit_id_text,
-        logo_width, logo_temp)
-        pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width) do
-          render_unit_text_section(pdf, unit, unit_id_text, logo_width)
-          render_logo_section(pdf, logo_temp, logo_width) if logo_temp
         end
       end
 
@@ -126,13 +111,15 @@ class PdfGeneratorService
         end
       end
 
-      def render_logo_section(pdf, logo_temp, logo_width)
+      def render_logo_section(pdf, logo_data, logo_width, logo_attachment)
         x_position = pdf.bounds.width - logo_width + 10
         pdf.bounding_box([x_position, pdf.bounds.top],
           width: logo_width - 10) do
-          pdf.image logo_temp.path, height: Configuration::LOGO_HEIGHT,
+          pdf.image StringIO.new(logo_data), height: Configuration::LOGO_HEIGHT,
             position: :right
         end
+      rescue Prawn::Errors::UnsupportedImageType => e
+        raise ImageError.build_detailed_error(e, logo_attachment)
       end
     end
   end
