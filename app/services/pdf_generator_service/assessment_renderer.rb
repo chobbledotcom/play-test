@@ -31,9 +31,47 @@ class PdfGeneratorService
     end
 
     def render_fields_from_i18n
-      available_columns = @current_assessment.attributes.keys - SENSITIVE_COLUMNS
-      field_groups = group_assessment_fields(available_columns.map(&:to_sym))
+      ordered_fields = get_form_config_fields
+      field_groups = group_assessment_fields(ordered_fields)
       field_groups.each { |base, fields| render_field_group(base, fields) }
+    end
+
+    def get_form_config_fields
+      return [] unless @current_assessment.class.respond_to?(:form_fields)
+
+      form_config = @current_assessment.class.form_fields
+      ordered_fields = []
+
+      form_config.each do |section|
+        section[:fields].each do |field_config|
+          field_name = field_config[:field]
+          partial_name = field_config[:partial]
+          next unless @current_assessment.respond_to?(field_name)
+
+          # Add base field
+          ordered_fields << field_name.to_sym
+
+          # Parse partial name to determine which fields to add
+          # If partial contains "pass_fail", it has a _pass field
+          if partial_name.to_s.include?("pass_fail")
+            # If field already ends with _pass, don't add another _pass
+            unless field_name.to_s.end_with?("_pass")
+              pass_field = :"#{field_name}_pass"
+              ordered_fields << pass_field if @current_assessment.respond_to?(pass_field)
+            end
+          end
+
+          # If partial contains "comment", it has a _comment field
+          if partial_name.to_s.include?("comment")
+            # For fields ending in _pass, remove _pass and add _comment
+            base_field = field_name.to_s.sub(/_pass$/, "")
+            comment_field = :"#{base_field}_comment"
+            ordered_fields << comment_field if @current_assessment.respond_to?(comment_field)
+          end
+        end
+      end
+
+      ordered_fields
     end
 
     def render_field_group(base_name, fields)

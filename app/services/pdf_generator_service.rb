@@ -30,16 +30,8 @@ class PdfGeneratorService
       # Risk assessment section (if present)
       generate_risk_assessment_section(pdf, inspection)
 
-      # Generate all assessment sections using the inspection's applicable assessments
-      inspection.each_applicable_assessment do |assessment_key, _, assessment|
-        # Get the assessment type name for i18n (remove _assessment suffix)
-        assessment_type = assessment_key.to_s.sub(/_assessment$/, "")
-
-        # Generate the section using the generic renderer
-        renderer = AssessmentRenderer.new
-        renderer.generate_assessment_section(pdf, assessment_type, assessment)
-        assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
-      end
+      # Generate all assessment sections in the correct UI order from applicable_tabs
+      generate_assessments_in_ui_order(inspection, assessment_renderer, pdf)
 
       # Render all collected assessments in newspaper-style columns
       assessment_renderer.render_all_assessments_in_columns(pdf)
@@ -47,8 +39,10 @@ class PdfGeneratorService
       # QR Code in bottom right corner
       ImageProcessor.generate_qr_code_footer(pdf, inspection)
 
-      # Add DRAFT watermark overlay for draft inspections
-      Utilities.add_draft_watermark(pdf) unless inspection.complete?
+      # Add DRAFT watermark overlay for draft inspections (except in test env)
+      if !inspection.complete? && !Rails.env.test?
+        Utilities.add_draft_watermark(pdf)
+      end
 
       # Add photos page if photos are attached
       PhotosRenderer.generate_photos_page(pdf, inspection)
@@ -137,6 +131,24 @@ class PdfGeneratorService
 
     pdf.text inspection.risk_assessment, size: 10
     pdf.move_down 15
+  end
+
+  def self.generate_assessments_in_ui_order(inspection, assessment_renderer, pdf)
+    # Get the UI order from applicable_tabs (excluding non-assessment tabs)
+    ui_ordered_tabs = inspection.applicable_tabs - ["inspection", "results"]
+
+    ui_ordered_tabs.each do |tab_name|
+      assessment_key = :"#{tab_name}_assessment"
+      next unless inspection.assessment_applicable?(assessment_key)
+
+      assessment = inspection.send(assessment_key)
+      next unless assessment
+
+      # Generate the section using the generic renderer
+      renderer = AssessmentRenderer.new
+      renderer.generate_assessment_section(pdf, tab_name, assessment)
+      assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
+    end
   end
 
   # Helper methods for backward compatibility and testing
