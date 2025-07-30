@@ -3,7 +3,7 @@ require Rails.root.join("db/seeds/seed_data")
 
 RSpec.describe "SeedData assessment field completeness" do
   # Assessment types that have corresponding seed data methods
-  ASSESSMENT_TYPES = %w[
+  assessment_types = %w[
     structure
     anchorage
     materials
@@ -13,7 +13,7 @@ RSpec.describe "SeedData assessment field completeness" do
     fan
   ]
 
-  ASSESSMENT_TYPES.each do |assessment_type|
+  assessment_types.each do |assessment_type|
     describe ".#{assessment_type}_fields" do
       let(:model_class) do
         "Assessments::#{assessment_type.classify}Assessment".constantize
