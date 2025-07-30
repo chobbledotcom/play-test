@@ -12,8 +12,6 @@ class PdfGeneratorService
       original_error.class.new(detailed_message)
     end
 
-    private
-
     def self.extract_image_details(blob, attachment)
       record = attachment.record
       {
@@ -48,5 +46,8 @@ class PdfGeneratorService
         ActiveStorage URL: #{service_url}
       MESSAGE
     end
+
+    private_class_method :extract_image_details, :build_service_url,
+      :format_error_message
   end
 end
