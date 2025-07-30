@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class PdfGeneratorService
   class TableBuilder
     include Configuration
@@ -45,38 +43,49 @@ class PdfGeneratorService
       pdf.stroke_horizontal_rule
       pdf.move_down 10
 
-      # Check if it's a 2-column table (unit PDF) or 4-column table (inspection PDF)
-      is_unit_pdf = data.first.length == 2
-
-      table = pdf.table(data, width: pdf.bounds.width) do |t|
-        t.cells.borders = []
-        t.cells.padding = UNIT_TABLE_CELL_PADDING
-        t.cells.size = UNIT_TABLE_TEXT_SIZE
-
-        t.columns(0).font_style = :bold
-        if is_unit_pdf
-          # Simple 2-column layout for unit PDFs
-          t.columns(0).width = UNIT_LABEL_COLUMN_WIDTH
-        else
-          # 4-column layout for inspection PDFs
-          # Make label columns (0 and 2) bold
-          t.columns(2).font_style = :bold
-          # Set column widths - labels just fit content, values take remaining space
-          t.columns(0).width = UNIT_LABEL_COLUMN_WIDTH   # Description label
-          t.columns(2).width = UNIT_LABEL_COLUMN_WIDTH   # Serial/Type/Owner labels
-          remaining_width = pdf.bounds.width - (UNIT_LABEL_COLUMN_WIDTH * 2) # Total minus both label columns
-          t.columns(1).width = remaining_width / 2  # Description value
-          t.columns(3).width = remaining_width / 2  # Serial/Type/Owner values
-        end
-
-        t.row(0..data.length - 1).background_color = "EEEEEE"
-        t.row(0..data.length - 1).borders = [:bottom]
-        t.row(0..data.length - 1).border_color = "DDDDDD"
-      end
-
+      table = create_styled_unit_table(pdf, data)
       yield table if block_given?
       pdf.move_down 15
       table
+    end
+
+    def self.create_styled_unit_table(pdf, data)
+      is_unit_pdf = data.first.length == 2
+
+      pdf.table(data, width: pdf.bounds.width) do |t|
+        apply_unit_table_base_styling(t, data.length)
+        apply_unit_table_column_styling(t, is_unit_pdf, pdf.bounds.width)
+      end
+    end
+
+    def self.apply_unit_table_base_styling(table, row_count)
+      table.cells.borders = []
+      table.cells.padding = UNIT_TABLE_CELL_PADDING
+      table.cells.size = UNIT_TABLE_TEXT_SIZE
+
+      table.row(0..row_count - 1).background_color = "EEEEEE"
+      table.row(0..row_count - 1).borders = [:bottom]
+      table.row(0..row_count - 1).border_color = "DDDDDD"
+    end
+
+    def self.apply_unit_table_column_styling(table, is_unit_pdf, pdf_width)
+      table.columns(0).font_style = :bold
+
+      if is_unit_pdf
+        table.columns(0).width = UNIT_LABEL_COLUMN_WIDTH
+      else
+        apply_four_column_styling(table, pdf_width)
+      end
+    end
+
+    def self.apply_four_column_styling(table, pdf_width)
+      table.columns(2).font_style = :bold
+      table.columns(0).width = UNIT_LABEL_COLUMN_WIDTH
+      table.columns(2).width = UNIT_LABEL_COLUMN_WIDTH
+
+      remaining_width = pdf_width - (UNIT_LABEL_COLUMN_WIDTH * 2)
+      table.columns(1).width = remaining_width / 2
+      table.columns(3).width = remaining_width / 2
     end
 
     def self.create_inspection_history_table(pdf, title, inspections)
@@ -84,78 +93,105 @@ class PdfGeneratorService
       pdf.stroke_horizontal_rule
       pdf.move_down 10
 
-      # Prepare table data with header row
-      table_data = []
+      table_data = build_inspection_history_data(inspections)
+      table = create_styled_history_table(pdf, table_data)
 
-      # Header row
-      table_data << [
+      pdf.move_down 15
+      table
+    end
+
+    def self.build_inspection_history_data(inspections)
+      header = [
         I18n.t("pdf.unit.fields.date"),
         I18n.t("pdf.unit.fields.result"),
         I18n.t("pdf.unit.fields.inspector")
       ]
 
-      # Data rows
-      inspections.each do |inspection|
-        inspector_name = inspection.user.name || I18n.t("pdf.unit.fields.na")
-        rpii_number = inspection.user.rpii_inspector_number
-
-        # Combine inspector name with RPII number if present
-        inspector_text = if rpii_number.present?
-          "#{inspector_name} (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} #{rpii_number})"
-        else
-          inspector_name
-        end
-
-        table_data << [
+      data_rows = inspections.map do |inspection|
+        [
           Utilities.format_date(inspection.inspection_date),
-          if inspection.passed
-            I18n.t("shared.pass_pdf")
-          else
-            I18n.t("shared.fail_pdf")
-          end,
-          inspector_text
+          inspection_result_text(inspection),
+          inspector_text(inspection)
         ]
       end
 
-      # Create table with enhanced styling
-      table = pdf.table(table_data, width: pdf.bounds.width) do |t|
-        t.cells.padding = NICE_TABLE_CELL_PADDING
-        t.cells.size = HISTORY_TABLE_TEXT_SIZE
-        t.cells.border_width = 0.5
-        t.cells.border_color = "CCCCCC"
+      [header] + data_rows
+    end
 
-        # Header row styling
-        t.row(0).background_color = HISTORY_TABLE_HEADER_COLOR
-        t.row(0).font_style = :bold
-
-        # Alternating row colors for data rows (skip header row)
-        (1...table_data.length).each do |i|
-          t.row(i).background_color = if i.odd?
-            HISTORY_TABLE_ROW_COLOR
-          else
-            HISTORY_TABLE_ALT_ROW_COLOR
-          end
-
-          # Color and style the result column (index 1)
-          result_cell = t.row(i).column(1)
-          if table_data[i][1] == I18n.t("shared.pass_pdf")
-            result_cell.text_color = PASS_COLOR
-            result_cell.font_style = :bold
-          elsif table_data[i][1] == I18n.t("shared.fail_pdf")
-            result_cell.text_color = FAIL_COLOR
-            result_cell.font_style = :bold
-          end
-        end
-
-        # Column widths - specific widths for date and result; inspector fills remaining space
-        remaining_width = pdf.bounds.width - HISTORY_DATE_COLUMN_WIDTH - HISTORY_RESULT_COLUMN_WIDTH
-        inspector_width = remaining_width
-
-        t.column_widths = [HISTORY_DATE_COLUMN_WIDTH, HISTORY_RESULT_COLUMN_WIDTH, inspector_width]
+    def self.inspection_result_text(inspection)
+      if inspection.passed
+        I18n.t("shared.pass_pdf")
+      else
+        I18n.t("shared.fail_pdf")
       end
+    end
 
-      pdf.move_down 15
-      table
+    def self.inspector_text(inspection)
+      inspector_name = inspection.user.name || I18n.t("pdf.unit.fields.na")
+      rpii_number = inspection.user.rpii_inspector_number
+
+      if rpii_number.present?
+        I18n.t("pdf.unit.fields.inspector_with_rpii",
+          name: inspector_name,
+          rpii_label: I18n.t("pdf.inspection.fields.rpii_inspector_no"),
+          rpii_number: rpii_number)
+      else
+        inspector_name
+      end
+    end
+
+    def self.create_styled_history_table(pdf, table_data)
+      pdf.table(table_data, width: pdf.bounds.width) do |t|
+        apply_history_table_base_styling(t)
+        apply_history_table_row_styling(t, table_data)
+        apply_history_table_column_widths(t, pdf.bounds.width)
+      end
+    end
+
+    def self.apply_history_table_base_styling(table)
+      table.cells.padding = NICE_TABLE_CELL_PADDING
+      table.cells.size = HISTORY_TABLE_TEXT_SIZE
+      table.cells.border_width = 0.5
+      table.cells.border_color = "CCCCCC"
+
+      table.row(0).background_color = HISTORY_TABLE_HEADER_COLOR
+      table.row(0).font_style = :bold
+    end
+
+    def self.apply_history_table_row_styling(table, table_data)
+      (1...table_data.length).each do |i|
+        apply_row_background_color(table, i)
+        apply_result_cell_styling(table, i, table_data[i][1])
+      end
+    end
+
+    def self.apply_row_background_color(table, row_index)
+      color = if row_index.odd?
+        HISTORY_TABLE_ROW_COLOR
+      else
+        HISTORY_TABLE_ALT_ROW_COLOR
+      end
+      table.row(row_index).background_color = color
+    end
+
+    def self.apply_result_cell_styling(table, row_index, result_text)
+      result_cell = table.row(row_index).column(1)
+
+      if result_text == I18n.t("shared.pass_pdf")
+        result_cell.text_color = PASS_COLOR
+        result_cell.font_style = :bold
+      elsif result_text == I18n.t("shared.fail_pdf")
+        result_cell.text_color = FAIL_COLOR
+        result_cell.font_style = :bold
+      end
+    end
+
+    def self.apply_history_table_column_widths(table, pdf_width)
+      date_width = HISTORY_DATE_COLUMN_WIDTH
+      result_width = HISTORY_RESULT_COLUMN_WIDTH
+      inspector_width = pdf_width - date_width - result_width
+
+      table.column_widths = [date_width, result_width, inspector_width]
     end
 
     def self.build_unit_details_table(unit, context)

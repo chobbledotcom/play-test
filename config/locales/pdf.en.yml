@@ -52,6 +52,7 @@ en:
         size_m: "Size (m)"
         date: "Date"
         inspector: "Inspector"
+        inspector_with_rpii: "%{name} (%{rpii_label} %{rpii_number})"
         result: "Result"
         expiry_date: "Expiry Date"
         na: "N/A"
