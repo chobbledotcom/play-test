@@ -26,7 +26,7 @@ RSpec.describe "I18n site overrides" do
     it "respects ENV variable for override path" do
       # This would need to be tested at app boot time
       # Just verify the ENV variable exists in our code
-      app_rb = File.read(Rails.root.join("config/application.rb"))
+      app_rb = Rails.root.join("config/application.rb").read
       expect(app_rb).to include("I18N_OVERRIDES_PATH")
     end
   end

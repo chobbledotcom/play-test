@@ -126,6 +126,7 @@ module SeedData
       blower_visual_pass: check_passed?(passed),
       pat_pass: check_passed_integer?(passed),
       blower_serial: "FAN-#{rand(1000..9999)}",
+      number_of_blowers: 1,
       fan_size_type: passed ?
         "Fan operating correctly at optimal pressure" :
         "Fan requires servicing",
