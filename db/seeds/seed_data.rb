@@ -55,7 +55,7 @@ module SeedData
   end
 
   def self.anchorage_fields(passed: true)
-    {
+    fields = {
       num_low_anchors: rand(6..12),
       num_high_anchors: rand(4..8),
       num_low_anchors_pass: check_passed?(passed),
@@ -63,9 +63,14 @@ module SeedData
       anchor_accessories_pass: check_passed?(passed),
       anchor_degree_pass: check_passed?(passed),
       anchor_type_pass: check_passed?(passed),
-      pull_strength_pass: check_passed?(passed),
-      anchor_type_comment: passed ? nil : "Some wear visible on anchor points"
+      pull_strength_pass: check_passed?(passed)
     }
+
+    unless passed
+      fields[:anchor_type_comment] = "Some wear visible on anchor points"
+    end
+
+    fields
   end
 
   def self.structure_fields(passed: true)
@@ -102,7 +107,7 @@ module SeedData
   end
 
   def self.materials_fields(passed: true)
-    {
+    fields = {
       ropes: rand(18..45),
       ropes_pass: check_passed_integer?(passed),
       retention_netting_pass: check_passed_integer?(passed),
@@ -111,12 +116,17 @@ module SeedData
       artwork_pass: check_passed_integer?(passed),
       thread_pass: check_passed?(passed),
       fabric_strength_pass: check_passed?(passed),
-      fire_retardant_pass: check_passed?(passed),
-      ropes_comment: passed ? nil : "Rope shows signs of wear",
-      fabric_strength_comment: passed ?
-        "Fabric in good condition" :
-        "Minor surface wear noted"
+      fire_retardant_pass: check_passed?(passed)
     }
+
+    if passed
+      fields[:fabric_strength_comment] = "Fabric in good condition"
+    else
+      fields[:ropes_comment] = "Rope shows signs of wear"
+      fields[:fabric_strength_comment] = "Minor surface wear noted"
+    end
+
+    fields
   end
 
   def self.fan_fields(passed: true)
