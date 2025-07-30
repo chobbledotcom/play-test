@@ -38,3 +38,4 @@
 
 # Ignore test coverage reports
 /coverage/*
+/.bundle

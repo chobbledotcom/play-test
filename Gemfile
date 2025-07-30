@@ -15,17 +15,8 @@ gem "puma", ">= 5.0"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[windows jruby]
 
-if File.exist?("../chobble-forms")
-  gem "chobble-forms", path: "../chobble-forms"
-else
-  gem "chobble-forms"
-end
-
-if File.exist?("../en14960")
-  gem "en14960", path: "../en14960"
-else
-  gem "en14960"
-end
+gem "chobble-forms"
+gem "en14960"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
