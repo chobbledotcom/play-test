@@ -1,28 +1,23 @@
-# Field Renames
+## Field Renames
 
 **Time: 20m**
 
-# Add Notes
+## Add Notes
 
 **Time: 10m**
 
-- Structure:
-  - Under main wall height: "This is not slides - that's the next page"
-- Blowers:
-  - "You must test and log for every blower for this unit"
-
-# Field Additions
+## Field Additions
 
 **Time: 10m**
 
-# Field Changes
+## Field Changes
 
 **Time: 30m**
 
 - Structure:
   - Move blower tube length bit to blower section
 
-# Calculators
+## Calculators
 
 **Time: 20m**
 
@@ -35,20 +30,20 @@
 - Wall Heights:
   - If there's a permanent roof, we can skip the "Walls must be at least" message, make this clearer in the breakdown
 
-# Layout
+## Layout
 
 **Time: 30m** (more complicated than it seems - atm every field is required)
 
 - Ropes - not required when N/A is selected
 
-# PDF
+## PDF
 
 **Time: 30m**
 
 - Add a Disclaimer footer and fit signature in
 - Move the photo up
 
-# Design
+## Design
 
 **Time: 0m**
 
@@ -90,7 +85,7 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
 - Blowers:
   - Number of Blowers
 
-# Field Changes
+## Field Changes
 
 **Time: 30m**
 
@@ -98,6 +93,13 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
   - Platform height: change to mm
   - Fall off height: change to mm
 
-# Calculators / Source Code
+## Calculators / Source Code
 
 - Platform height (non slide) calculation - get Spencer's input
+
+## Add Notes
+
+- Structure:
+  - Under main wall height: "This is not slides - that's the next page"
+- Blowers:
+  - "You must test and log for every blower for this unit"
