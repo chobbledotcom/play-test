@@ -52,8 +52,16 @@
   <% end %>
 
   <%= render 'chobble_forms/fieldset', legend_key: 'photos' do %>
-    <%= render 'chobble_forms/file_field', field: :photo_1 %>
-    <%= render 'chobble_forms/file_field', field: :photo_2 %>
-    <%= render 'chobble_forms/file_field', field: :photo_3 %>
+    <%= turbo_frame_tag "inspection_photo_1_field" do %>
+      <%= render 'chobble_forms/file_field', field: :photo_1 %>
+    <% end %>
+    
+    <%= turbo_frame_tag "inspection_photo_2_field" do %>
+      <%= render 'chobble_forms/file_field', field: :photo_2 %>
+    <% end %>
+    
+    <%= turbo_frame_tag "inspection_photo_3_field" do %>
+      <%= render 'chobble_forms/file_field', field: :photo_3 %>
+    <% end %>
   <% end %>
 <% end %>

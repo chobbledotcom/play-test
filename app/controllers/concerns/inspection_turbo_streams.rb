@@ -7,8 +7,9 @@ module InspectionTurboStreams
     [
       mark_complete_section_stream,
       save_message_stream(success: true),
-      assessment_save_message_stream(success: true)
-    ]
+      assessment_save_message_stream(success: true),
+      *photo_update_streams
+    ].compact
   end
 
   def error_turbo_streams
@@ -63,6 +64,26 @@ module InspectionTurboStreams
         errors: @inspection.errors.full_messages,
         message: t("shared.messages.save_failed")
       }
+    end
+  end
+
+  def photo_update_streams
+    return [] unless params[:inspection]
+
+    %i[photo_1 photo_2 photo_3].filter_map do |photo_field|
+      next if params[:inspection][photo_field].blank?
+
+      turbo_stream.replace(
+        "inspection_#{photo_field}_field",
+        partial: "chobble_forms/file_field_turbo_response",
+        locals: {
+          model: @inspection,
+          field: photo_field,
+          turbo_frame_id: "inspection_#{photo_field}_field",
+          i18n_base: "forms.results",
+          accept: "image/*"
+        }
+      )
     end
   end
 end
