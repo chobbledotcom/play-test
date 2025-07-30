@@ -2,7 +2,9 @@ require "rails_helper"
 
 RSpec.describe ImageProcessorService do
   let(:unit) { create(:unit) }
-  let(:test_image_path) { Rails.root.join("spec/fixtures/files/test_image.jpg") }
+  let(:test_image_path) do
+    Rails.root.join("spec/fixtures/files/test_image.jpg")
+  end
 
   before do
     unit.photo.attach(
@@ -12,38 +14,44 @@ RSpec.describe ImageProcessorService do
     )
   end
 
-  describe ".full_size" do
-    context "when image is attached" do
-      it "returns a variant with 1200px max size without upscaling" do
-        variant = described_class.full_size(unit.photo)
+  describe ".calculate_dimensions" do
+    let(:metadata) { {"width" => 2000, "height" => 1500} }
 
-        expect(variant).to be_a(ActiveStorage::VariantWithRecord)
-        expect(variant.variation.transformations).to include(
-          resize_to_limit: [1200, 1200],
-          format: :jpeg,
-          saver: {quality: 75}
-        )
-      end
+    context "when calculating full size dimensions" do
+      it "returns dimensions limited to FULL_SIZE constant" do
+        dimensions = described_class.calculate_dimensions(metadata, :full)
 
-      it "uses the correct size constant" do
-        variant = described_class.full_size(unit.photo)
-        expected_size = [ImageProcessorService::FULL_SIZE, ImageProcessorService::FULL_SIZE]
-
-        expect(variant.variation.transformations[:resize_to_limit]).to eq(expected_size)
+        expect(dimensions[:width]).to eq(1200)
+        expect(dimensions[:height]).to eq(900)
       end
     end
 
-    context "when image is not attached" do
-      before { unit.photo.purge }
+    context "when calculating thumbnail dimensions" do
+      it "returns dimensions limited to THUMBNAIL_SIZE constant" do
+        dimensions = described_class.calculate_dimensions(metadata, :thumbnail)
 
-      it "returns nil" do
-        expect(described_class.full_size(unit.photo)).to be_nil
+        expect(dimensions[:width]).to eq(200)
+        expect(dimensions[:height]).to eq(150)
       end
     end
 
-    context "when attachment is nil" do
-      it "returns nil" do
-        expect(described_class.full_size(nil)).to be_nil
+    context "when calculating default dimensions" do
+      it "returns dimensions limited to DEFAULT_SIZE constant" do
+        dimensions = described_class.calculate_dimensions(metadata, :default)
+
+        expect(dimensions[:width]).to eq(800)
+        expect(dimensions[:height]).to eq(600)
+      end
+    end
+
+    context "when image is smaller than limit" do
+      let(:metadata) { {"width" => 100, "height" => 75} }
+
+      it "returns original dimensions without upscaling" do
+        dimensions = described_class.calculate_dimensions(metadata, :thumbnail)
+
+        expect(dimensions[:width]).to eq(100)
+        expect(dimensions[:height]).to eq(75)
       end
     end
   end
@@ -63,9 +71,13 @@ RSpec.describe ImageProcessorService do
 
       it "uses the correct size constant" do
         variant = described_class.thumbnail(unit.photo)
-        expected_size = [ImageProcessorService::THUMBNAIL_SIZE, ImageProcessorService::THUMBNAIL_SIZE]
+        expected_size = [
+          ImageProcessorService::THUMBNAIL_SIZE,
+          ImageProcessorService::THUMBNAIL_SIZE
+        ]
 
-        expect(variant.variation.transformations[:resize_to_limit]).to eq(expected_size)
+        expect(variant.variation.transformations[:resize_to_limit])
+          .to eq(expected_size)
       end
     end
 
@@ -93,9 +105,13 @@ RSpec.describe ImageProcessorService do
 
       it "uses the correct size constant" do
         variant = described_class.default(unit.photo)
-        expected_size = [ImageProcessorService::DEFAULT_SIZE, ImageProcessorService::DEFAULT_SIZE]
+        expected_size = [
+          ImageProcessorService::DEFAULT_SIZE,
+          ImageProcessorService::DEFAULT_SIZE
+        ]
 
-        expect(variant.variation.transformations[:resize_to_limit]).to eq(expected_size)
+        expect(variant.variation.transformations[:resize_to_limit])
+          .to eq(expected_size)
       end
     end
 

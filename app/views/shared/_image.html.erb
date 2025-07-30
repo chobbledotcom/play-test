@@ -17,7 +17,7 @@
 
   variant = case size
   when :full
-    ImageProcessorService.full_size(image_attachment)
+    image_attachment
   when :thumbnail
     ImageProcessorService.thumbnail(image_attachment)
   else

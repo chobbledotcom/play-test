@@ -15,7 +15,7 @@
 
 <div>
   <% begin %>
-    <%= link_to rails_blob_path(ImageProcessorService.full_size(image_attachment), disposition: "inline") do %>
+    <%= link_to rails_blob_path(image_attachment, disposition: "inline") do %>
       <%= render 'shared/image', image: image_attachment, size: :thumbnail, alt: alt_text %>
       <p><small><%= link_text %></small></p>
     <% end %>
