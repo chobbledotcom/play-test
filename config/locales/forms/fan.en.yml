@@ -11,6 +11,7 @@ en:
         blower_finger_pass: "Finger probe tests"
         pat_pass: "PATs"
         blower_visual_pass: "Visual inspections"
+        number_of_blowers: "Number of blowers"
       status:
         checks_passed: "Fields completed"
         completion: "Assessment Completion"

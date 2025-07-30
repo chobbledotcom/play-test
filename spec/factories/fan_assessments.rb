@@ -4,6 +4,7 @@ FactoryBot.define do
 
     # Default to nil for tests to control values
     fan_size_type { nil }
+    number_of_blowers { nil }
     blower_flap_pass { nil }
     blower_flap_comment { nil }
     blower_finger_pass { nil }
@@ -16,6 +17,7 @@ FactoryBot.define do
 
     trait :passed do
       fan_size_type { "Standard 2HP blower" }
+      number_of_blowers { 1 }
       blower_flap_pass { :pass }
       blower_flap_comment { "Flap opens and closes properly" }
       blower_finger_pass { true }
@@ -29,6 +31,7 @@ FactoryBot.define do
 
     trait :complete do
       fan_size_type { "Standard 2HP blower" }
+      number_of_blowers { 1 }
       blower_flap_pass { :pass }
       blower_flap_comment { "Flap opens and closes properly" }
       blower_finger_pass { true }
@@ -42,6 +45,7 @@ FactoryBot.define do
 
     trait :failed do
       fan_size_type { "2HP blower - safety issues identified" }
+      number_of_blowers { 2 }
       blower_flap_pass { :fail }
       blower_finger_pass { false }
       pat_pass { :fail }

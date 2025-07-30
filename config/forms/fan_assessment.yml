@@ -3,6 +3,8 @@ form_fields:
     fields:
       - partial: text_field
         field: fan_size_type
+      - partial: number
+        field: number_of_blowers
       - partial: text_field
         field: blower_serial
       - partial: pass_fail_na_comment
