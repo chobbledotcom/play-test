@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+return if Rails.env.test?
+
+require "sentry-ruby"
+require "sentry-rails"
+
 Sentry.init do |config|
   config.dsn = ENV["SENTRY_DSN"]
   config.enabled_environments = %w[production development]

@@ -339,6 +339,12 @@ GEM
       ffi (~> 1.12)
       logger
     securerandom (0.4.1)
+    sentry-rails (5.26.0)
+      railties (>= 5.0)
+      sentry-ruby (~> 5.26.0)
+    sentry-ruby (5.26.0)
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -436,6 +442,8 @@ DEPENDENCIES
   rqrcode
   rspec-rails
   rubocop-rails-omakase
+  sentry-rails
+  sentry-ruby
   simplecov
   sprockets-rails
   sqlite3 (>= 1.4)
