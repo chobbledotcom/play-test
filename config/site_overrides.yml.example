@@ -1,0 +1,8 @@
+# Example site-specific i18n overrides
+# Copy this file to site_overrides.yml and customise as needed
+en:
+  forms:
+    user_new:
+      fields:
+        email: "Email Address"
+        name: "Full Name"
