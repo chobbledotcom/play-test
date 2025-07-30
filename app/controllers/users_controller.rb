@@ -106,10 +106,41 @@ class UsersController < ApplicationController
     end
 
     if @user.update(params_to_update)
+      additional_streams = []
+
+      if params[:user][:logo].present?
+        additional_streams << turbo_stream.replace(
+          "user_logo_field",
+          partial: "chobble_forms/file_field_turbo_response",
+          locals: {
+            model: @user,
+            field: :logo,
+            turbo_frame_id: "user_logo_field",
+            i18n_base: "forms.user_settings",
+            accept: "image/*"
+          }
+        )
+      end
+
+      if params[:user][:signature].present?
+        additional_streams << turbo_stream.replace(
+          "user_signature_field",
+          partial: "chobble_forms/file_field_turbo_response",
+          locals: {
+            model: @user,
+            field: :signature,
+            turbo_frame_id: "user_signature_field",
+            i18n_base: "forms.user_settings",
+            accept: "image/*"
+          }
+        )
+      end
+
       handle_update_success(
         @user,
         "users.messages.settings_updated",
-        change_settings_user_path(@user)
+        change_settings_user_path(@user),
+        additional_streams: additional_streams
       )
     else
       handle_update_failure(@user, :change_settings)

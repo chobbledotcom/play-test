@@ -3,19 +3,25 @@ module TurboStreamResponders
 
   private
 
-  def render_save_message_stream(success:, message:, model: nil)
-    render turbo_stream: turbo_stream.replace(
-      "form_save_message",
-      partial: "shared/save_message",
-      locals: {
-        message: message,
-        type: success ? "success" : "error",
-        errors: success ? nil : model&.errors&.full_messages
-      }
-    )
+  def render_save_message_stream(success:, message:, model: nil, additional_streams: [])
+    streams = [
+      turbo_stream.replace(
+        "form_save_message",
+        partial: "shared/save_message",
+        locals: {
+          message: message,
+          type: success ? "success" : "error",
+          errors: success ? nil : model&.errors&.full_messages
+        }
+      )
+    ]
+
+    streams.concat(additional_streams) if additional_streams.any?
+
+    render turbo_stream: streams
   end
 
-  def handle_update_success(model, message_key = nil, redirect_path = nil)
+  def handle_update_success(model, message_key = nil, redirect_path = nil, additional_streams: [])
     message_key ||= "#{model.class.table_name}.messages.updated"
     redirect_path ||= model
 
@@ -27,7 +33,8 @@ module TurboStreamResponders
       format.turbo_stream do
         render_save_message_stream(
           success: true,
-          message: I18n.t(message_key)
+          message: I18n.t(message_key),
+          additional_streams: additional_streams
         )
       end
     end

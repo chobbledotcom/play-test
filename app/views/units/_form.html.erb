@@ -41,9 +41,9 @@
     <% end %>
     
     <%# Photo upload %>
-    <div id="unit_photo_preview">
+    <%= turbo_frame_tag "unit_photo_preview" do %>
       <%= render 'chobble_forms/file_field', field: :photo, accept: "image/*" %>
-    </div>
+    <% end %>
   <% end %>
   
   <%= render 'chobble_forms/fieldset', legend_key: 'manufacture' do %>

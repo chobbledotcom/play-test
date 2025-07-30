@@ -83,7 +83,24 @@ class UnitsController < ApplicationController
       )
 
       log_unit_event("updated", @unit, nil, changed_data)
-      handle_update_success(@unit)
+
+      additional_streams = []
+      if params[:unit][:photo].present?
+        # Render just the file field without a new form wrapper
+        additional_streams << turbo_stream.replace(
+          "unit_photo_preview",
+          partial: "chobble_forms/file_field_turbo_response",
+          locals: {
+            model: @unit,
+            field: :photo,
+            turbo_frame_id: "unit_photo_preview",
+            i18n_base: "forms.units",
+            accept: "image/*"
+          }
+        )
+      end
+
+      handle_update_success(@unit, nil, nil, additional_streams: additional_streams)
     else
       handle_update_failure(@unit)
     end

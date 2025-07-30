@@ -33,13 +33,13 @@
       %>
     <% end %>
 
-    <div id="user_logo_preview">
+    <%= turbo_frame_tag "user_logo_field" do %>
       <%= render 'chobble_forms/file_field', field: :logo, accept: "image/*" %>
-    </div>
+    <% end %>
 
-    <div id="user_signature_preview">
+    <%= turbo_frame_tag "user_signature_field" do %>
       <%= render 'chobble_forms/file_field', field: :signature, accept: "image/*" %>
-    </div>
+    <% end %>
   <% end %>
 <% end %>
 
