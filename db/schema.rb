@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_30_171658) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_30_192718) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -154,7 +154,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_30_171658) do
 
   create_table "materials_assessments", id: false, force: :cascade do |t|
     t.string "inspection_id", limit: 12, null: false
-    t.decimal "ropes", precision: 8, scale: 2
+    t.integer "ropes"
     t.integer "ropes_pass", limit: 1
     t.integer "retention_netting_pass", limit: 1
     t.integer "zips_pass", limit: 1
@@ -247,7 +247,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_30_171658) do
     t.string "trough_depth_comment", limit: 1000
     t.integer "trough_adjacent_panel_width"
     t.text "trough_adjacent_panel_width_comment"
-    t.decimal "step_ramp_size", precision: 8, scale: 2
+    t.integer "step_ramp_size"
     t.boolean "step_ramp_size_pass"
     t.text "step_ramp_size_comment"
     t.datetime "created_at", null: false

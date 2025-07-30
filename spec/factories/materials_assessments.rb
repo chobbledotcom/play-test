@@ -18,7 +18,7 @@ FactoryBot.define do
     artwork_pass { nil }
 
     trait :passed do
-      ropes { 25.0 }
+      ropes { 25 }
       ropes_pass { :pass }
       fabric_strength_pass { true }
       fire_retardant_pass { true }
@@ -30,7 +30,7 @@ FactoryBot.define do
     end
 
     trait :complete do
-      ropes { 25.0 }
+      ropes { 25 }
       ropes_pass { :pass }
       fabric_strength_pass { true }
       fire_retardant_pass { true }
@@ -46,7 +46,7 @@ FactoryBot.define do
     end
 
     trait :failed do
-      ropes { 10.0 }  # Below minimum
+      ropes { 10 }  # Below minimum
       ropes_pass { :fail }
       fabric_strength_pass { false }
       fire_retardant_pass { false }

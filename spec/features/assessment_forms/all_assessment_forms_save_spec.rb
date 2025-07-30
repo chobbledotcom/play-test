@@ -40,7 +40,7 @@ STRUCTURE_SAMPLE_DATA = {
 
 MATERIALS_SAMPLE_DATA = {
 
-  ropes: 12.5,
+  ropes: 12,
 
   fabric_strength_pass: true,
   fire_retardant_pass: false,
