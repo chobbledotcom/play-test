@@ -15,7 +15,7 @@ module ImageProcessable
 
   def process_image_params(params_hash, *image_fields)
     image_fields.each do |field|
-      next unless params_hash[field].present?
+      next if params_hash[field].blank?
 
       uploaded_file = params_hash[field]
       next unless uploaded_file.respond_to?(:read)
