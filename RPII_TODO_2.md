@@ -7,8 +7,6 @@
   - Unit Name => Bounce Safe Number
 - Structure:
   - Containing Platform Wall Height => Main Wall Height
-- Blower:
-  - Rename "Blower size" and "Blower serial number" to "size(s)" and "number(s)"
 - Anchorage:
   - Add the degree sign to the 30-45
 - Materials:
@@ -86,3 +84,12 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
 
 - User Capacity => arrange the "Max users at X" fields horizontally
 - PDF - Operator is listed twice
+
+---
+
+# Done
+
+## Field Renames
+
+- Blower:
+  - Rename "Blower size" and "Blower serial number" to "size(s)" and "number(s)"
