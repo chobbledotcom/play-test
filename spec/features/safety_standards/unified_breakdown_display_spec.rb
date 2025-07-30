@@ -39,7 +39,7 @@ RSpec.feature "Unified Safety Standards Breakdown Display", type: :feature do
       containing_wall_height: 2.3
     )
     inspection.structure_assessment.update!(
-      platform_height: 4.0
+      platform_height: 4000
     )
     inspection.slide_assessment.update!(
       slide_platform_height: 4.0,

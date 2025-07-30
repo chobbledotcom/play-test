@@ -3,10 +3,19 @@ form_fields:
     fields:
       - partial: decimal_comment
         field: width
+        attributes:
+          min: 0
+          max: 200
       - partial: decimal_comment
         field: length
+        attributes:
+          min: 0
+          max: 200
       - partial: decimal_comment
         field: height
+        attributes:
+          min: 0
+          max: 50
   - legend_i18n_key: unit_configuration
     fields:
       - partial: yes_no_radio

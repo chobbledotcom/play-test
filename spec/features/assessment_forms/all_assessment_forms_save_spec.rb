@@ -10,11 +10,11 @@ STRUCTURE_SAMPLE_DATA = {
 
   unit_pressure: 2.8,
   blower_tube_length: 1.75,
-  critical_fall_off_height: 0.85,
+  critical_fall_off_height: 850,
   trough_depth: 150,
   trough_adjacent_panel_width: 650,
-  step_ramp_size: 0.3,
-  platform_height: 1.8,
+  step_ramp_size: 300,
+  platform_height: 1800,
 
   stitch_length_pass: true,
   stitch_length_comment: "Stitch length comment",

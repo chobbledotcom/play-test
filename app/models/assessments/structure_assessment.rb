@@ -10,11 +10,14 @@ class Assessments::StructureAssessment < ApplicationRecord
   validates :unit_pressure,
     :blower_tube_length,
     :step_ramp_size,
-    :critical_fall_off_height,
-    :platform_height,
     :trough_depth,
     :trough_adjacent_panel_width,
     numericality: {greater_than_or_equal_to: 0},
+    allow_blank: true
+
+  validates :platform_height,
+    :critical_fall_off_height,
+    numericality: {greater_than_or_equal_to: 10},
     allow_blank: true
 
   after_update :log_assessment_update, if: :saved_changes?
@@ -29,7 +32,7 @@ class Assessments::StructureAssessment < ApplicationRecord
     return false if permanent_roof.nil?
 
     EN14960::Calculators::SlideCalculator.meets_height_requirements?(
-      platform_height,
+      platform_height / 1000.0, # Convert mm to m
       user_height.tallest_user_height,
       user_height.containing_wall_height,
       permanent_roof
@@ -39,8 +42,8 @@ class Assessments::StructureAssessment < ApplicationRecord
   private
 
   def permanent_roof_status
-    # Permanent roof only matters for platforms 3.0m and above
-    return false if platform_height < 3.0
+    # Permanent roof only matters for platforms 3000mm and above
+    return false if platform_height < 3000
 
     # For platforms 3.0m+, check slide assessment if inspection has a slide
     return false unless inspection.has_slide?

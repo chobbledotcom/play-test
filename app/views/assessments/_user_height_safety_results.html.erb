@@ -9,7 +9,7 @@
     <% has_permanent_roof = slide_assessment&.slide_permanent_roof %>
     
     <% wall_details = EN14960::Calculators::SlideCalculator.get_wall_height_requirement_details(
-         platform_height, 
+         platform_height / 1000.0, # Convert mm to m
          user_height, 
          has_permanent_roof
        ) %>

@@ -21,10 +21,10 @@ en:
         blower_tube_length: "Blower Tube Length (m)"
         blower_tube_length_pass: "Blower Tube Length (m)"
         # Additional Safety Checks
-        critical_fall_off_height: "Fall Off Height (m)"
+        critical_fall_off_height: "Fall Off Height (mm)"
         step_ramp_size: "Step/Ramp Size (mm)"
-        platform_height: "Platform Height (m)"
-        platform_height_pass: "Platform Height (m)"
+        platform_height: "Platform Height (mm)"
+        platform_height_pass: "Platform Height (mm)"
         trough_depth: "Trough Depth (mm)"
         trough_adjacent_panel_width: "Trough Adjacent Panel Width (mm)"
         trough_pass: "Trough Check"

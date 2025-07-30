@@ -62,11 +62,11 @@ FactoryBot.define do
       # Measurements with passing values
       unit_pressure { 2.5 }
       blower_tube_length { 1.5 }
-      step_ramp_size { 0.2 }
-      platform_height { 1.0 }
-      critical_fall_off_height { 0.6 }
-      trough_depth { 0.3 }
-      trough_adjacent_panel_width { 0.8 }
+      step_ramp_size { 200 }
+      platform_height { 1000 }
+      critical_fall_off_height { 600 }
+      trough_depth { 300 }
+      trough_adjacent_panel_width { 800 }
 
       # Measurement pass/fail checks
       stitch_length_pass { true }
@@ -88,8 +88,8 @@ FactoryBot.define do
       passed
 
       # Additional complete-only fields
-      trough_adjacent_panel_width { 0.8 }
-      step_ramp_size { 0.3 }
+      trough_adjacent_panel_width { 800 }
+      step_ramp_size { 300 }
       step_ramp_size_pass { true }
 
       # Comments for documentation

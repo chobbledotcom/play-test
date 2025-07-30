@@ -71,7 +71,7 @@ RSpec.feature "Safety Standards Display", type: :feature do
       play_area_width: 4
     )
     inspection.structure_assessment.update!(
-      platform_height: 2.0
+      platform_height: 2000
     )
     inspection.slide_assessment.update!(slide_permanent_roof: false)
 
@@ -96,7 +96,7 @@ RSpec.feature "Safety Standards Display", type: :feature do
       play_area_width: 4
     )
     inspection.structure_assessment.update!(
-      platform_height: 4.0
+      platform_height: 4000
     )
     inspection.slide_assessment.update!(slide_permanent_roof: true)
 

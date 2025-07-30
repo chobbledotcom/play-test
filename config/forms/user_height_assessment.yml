@@ -3,20 +3,26 @@ form_fields:
     fields:
       - partial: decimal_comment
         field: containing_wall_height
+        attributes:
+          min: 0
+          max: 50
   - legend_i18n_key: play_area
     fields:
       - partial: decimal_comment
         field: play_area_length
         attributes:
           min: 0
+          max: 200
       - partial: decimal_comment
         field: play_area_width
         attributes:
           min: 0
+          max: 200
       - partial: decimal_comment
         field: negative_adjustment
         attributes:
           min: 0
+          max: 200
   - legend_i18n_key: user_capacity
     fields:
       - partial: number
@@ -41,6 +47,10 @@ form_fields:
           step: 1
       - partial: decimal_comment
         field: tallest_user_height
+        attributes:
+          min: 0.1
+          max: 3
+          step: 0.1
       - partial: number
         field: user_count_at_maximum_user_height
         attributes:

@@ -318,7 +318,7 @@ RSpec.describe "Seed Data", type: :model do
             expect(assessment.unit_pressure).to be_between(0.5, 5.0)
             expect(assessment.blower_tube_length).to be_between(1.0, 10.0)
             expect(assessment.step_ramp_size).to be_between(100, 500)
-            expect(assessment.critical_fall_off_height).to be_between(0.1, 3.0)
+            expect(assessment.critical_fall_off_height).to be_between(100, 3000)
             expect(assessment.trough_depth).to be_between(10, 100)
             expect(assessment.trough_adjacent_panel_width).to be_between(100, 2000)
           end
@@ -388,7 +388,7 @@ RSpec.describe "Seed Data", type: :model do
             expect(assessment.tallest_user_height).to be_between(1.0, 2.0)
             # platform_height moved to structure_assessment
             structure = assessment.inspection.structure_assessment
-            expect(structure.platform_height).to be_between(0.2, 2.0)
+            expect(structure.platform_height).to be_between(200, 2000)
           end
         end
 
