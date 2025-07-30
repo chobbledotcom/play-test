@@ -2,11 +2,6 @@
 
 **Time: 20m**
 
-- Inspection:
-  - Unit Name => Bounce Safe Number
-
-For "Bounce Safe Number" I need to add per-site translations rather than per-language, because only one Play-Test site will be a #BounceSafe one, but I don't think that'll be too complicated.
-
 # Add Notes
 
 **Time: 10m**
@@ -26,8 +21,6 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
 
 - Structure:
   - Move blower tube length bit to blower section
-  - Platform height: change to mm
-  - Fall off height: change to mm
 
 # Calculators
 
@@ -61,10 +54,6 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
 
 - Bigger logos
 
-# Calculators / Source Code
-
-- Platform height (non slide) calculation - get Spencer's input
-
 ## Bug Fixes (free)
 
 - User Capacity => arrange the "Max users at X" fields horizontally
@@ -87,10 +76,28 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
 - Anchorage:
   - Add the degree sign to the 30-45
 - Slides:
+
   - "First Metre of Slide Containing Platform Wall Height (m)" => "First Metre of Slide Wall Height (m)"
   - "Remaining Slide Containing Platform Wall Height (m)" => "Remaining Slide Wall Height (m)"
+
+- Inspection:
+  - Unit Name => Bounce Safe Number
+
+For "Bounce Safe Number" I need to add per-site translations rather than per-language, because only one Play-Test site will be a #BounceSafe one, but I don't think that'll be too complicated.
 
 ## Field Additions
 
 - Blowers:
   - Number of Blowers
+
+# Field Changes
+
+**Time: 30m**
+
+- Structure:
+  - Platform height: change to mm
+  - Fall off height: change to mm
+
+# Calculators / Source Code
+
+- Platform height (non slide) calculation - get Spencer's input
