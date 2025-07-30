@@ -97,7 +97,15 @@ class UsersController < ApplicationController
   end
 
   def update_settings
-    if @user.update(settings_params)
+    params_to_update = settings_params
+
+    if @image_processing_error
+      flash[:alert] = @image_processing_error.message
+      redirect_to change_settings_user_path(@user)
+      return
+    end
+
+    if @user.update(params_to_update)
       handle_update_success(
         @user,
         "users.messages.settings_updated",
@@ -212,6 +220,8 @@ class UsersController < ApplicationController
       address country
       logo phone postal_code signature theme
     ]
-    params.require(:user).permit(settings_fields)
+    permitted_params = params.require(:user).permit(settings_fields)
+
+    process_image_params(permitted_params, :logo, :signature)
   end
 end

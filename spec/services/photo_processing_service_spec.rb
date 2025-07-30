@@ -11,11 +11,12 @@ RSpec.describe PhotoProcessingService do
       processed_io = described_class.process_upload_data(image_data, "large_landscape.jpg")
 
       expect(processed_io).to be_present
-      expect(processed_io.content_type).to eq("image/jpeg")
-      expect(processed_io.original_filename).to eq("large_landscape.jpg")
+      expect(processed_io).to be_a(Hash)
+      expect(processed_io[:content_type]).to eq("image/jpeg")
+      expect(processed_io[:filename]).to eq("large_landscape.jpg")
 
       # Check that the processed image is resized
-      processed_image = MiniMagick::Image.read(processed_io.string)
+      processed_image = MiniMagick::Image.read(processed_io[:io].string)
       expect([processed_image.width, processed_image.height].max).to be <= ImageProcessorService::FULL_SIZE
 
       # The image should be resized properly - check actual dimensions
@@ -34,7 +35,7 @@ RSpec.describe PhotoProcessingService do
       expect(processed_io).to be_present
 
       # Check that orientation has been applied
-      processed_image = MiniMagick::Image.read(processed_io.string)
+      processed_image = MiniMagick::Image.read(processed_io[:io].string)
 
       # Original was 100x60 landscape with orientation 6 (90° rotation)
       # After processing should be 60x100 portrait with no EXIF orientation
@@ -55,11 +56,11 @@ RSpec.describe PhotoProcessingService do
       processed_io = described_class.process_upload_data(image_data, "test.png")
 
       expect(processed_io).to be_present
-      expect(processed_io.content_type).to eq("image/jpeg")
-      expect(processed_io.original_filename).to eq("test.jpg") # Extension changed to jpg
+      expect(processed_io[:content_type]).to eq("image/jpeg")
+      expect(processed_io[:filename]).to eq("test.jpg") # Extension changed to jpg
 
       # Verify it's actually JPEG
-      processed_image = MiniMagick::Image.read(processed_io.string)
+      processed_image = MiniMagick::Image.read(processed_io[:io].string)
       expect(processed_image.type).to eq("JPEG")
     end
 
@@ -78,7 +79,7 @@ RSpec.describe PhotoProcessingService do
 
       processed_io = described_class.process_upload_data(image_data)
 
-      expect(processed_io.original_filename).to eq("photo.jpg")
+      expect(processed_io[:filename]).to eq("photo.jpg")
     end
   end
 
@@ -105,13 +106,13 @@ RSpec.describe PhotoProcessingService do
 
       # Test key filename cases
       processed_io = described_class.process_upload_data(image_data, "photo.png")
-      expect(processed_io.original_filename).to eq("photo.jpg")
+      expect(processed_io[:filename]).to eq("photo.jpg")
 
       processed_io = described_class.process_upload_data(image_data, "test.JPEG")
-      expect(processed_io.original_filename).to eq("test.jpg")
+      expect(processed_io[:filename]).to eq("test.jpg")
 
       processed_io = described_class.process_upload_data(image_data, nil)
-      expect(processed_io.original_filename).to eq("photo.jpg")
+      expect(processed_io[:filename]).to eq("photo.jpg")
     end
   end
 end

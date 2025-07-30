@@ -67,7 +67,16 @@ class InspectionsController < ApplicationController
 
   def update
     previous_attributes = @inspection.attributes.dup
-    if @inspection.update(inspection_params)
+
+    params_to_update = inspection_params
+
+    if @image_processing_error
+      flash.now[:alert] = @image_processing_error.message
+      render :edit, status: :unprocessable_entity
+      return
+    end
+
+    if @inspection.update(params_to_update)
       changed_data = calculate_changes(
         previous_attributes,
         @inspection.attributes,
@@ -185,7 +194,8 @@ class InspectionsController < ApplicationController
   def inspection_params
     base_params = build_base_params
     add_assessment_params(base_params)
-    base_params
+
+    process_image_params(base_params, :photo_1, :photo_2, :photo_3)
   end
 
   private

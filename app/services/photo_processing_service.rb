@@ -26,26 +26,26 @@ class PhotoProcessingService
       image.format "jpeg"
       image.quality "75"
 
-      # Get processed image data
       processed_data = image.to_blob
 
-      # Create a new StringIO object with processed data
-      processed_io = StringIO.new(processed_data)
-      # Add custom attributes by defining singleton methods
       processed_filename = change_extension_to_jpg(original_filename)
-      processed_io.define_singleton_method(:original_filename) { processed_filename }
-      processed_io.define_singleton_method(:content_type) { "image/jpeg" }
 
-      processed_io
+      {
+        io: StringIO.new(processed_data),
+        filename: processed_filename,
+        content_type: "image/jpeg"
+      }
     rescue => e
       Rails.logger.error "Photo processing failed: #{e.message}"
       nil
     end
   end
 
-  # Process uploaded file (for backward compatibility)
   def self.process_upload(uploaded_file)
     return nil if uploaded_file.blank?
+
+    uploaded_file.rewind if uploaded_file.respond_to?(:rewind)
+
     process_upload_data(uploaded_file.read, uploaded_file.original_filename)
   end
 
@@ -61,10 +61,15 @@ class PhotoProcessingService
     false
   end
 
-  # Validate that uploaded file is a processable image
   def self.valid_image?(uploaded_file)
     return false if uploaded_file.blank?
-    valid_image_data?(uploaded_file.read)
+
+    uploaded_file.rewind if uploaded_file.respond_to?(:rewind)
+
+    data = uploaded_file.read
+    uploaded_file.rewind if uploaded_file.respond_to?(:rewind)
+
+    valid_image_data?(data)
   end
 
   def self.change_extension_to_jpg(filename)

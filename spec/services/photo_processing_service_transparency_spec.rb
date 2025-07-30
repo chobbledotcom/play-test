@@ -11,10 +11,10 @@ RSpec.describe PhotoProcessingService do
       processed_io = described_class.process_upload_data(image_data, "test.jpg")
 
       expect(processed_io).not_to be_nil
-      expect(processed_io.content_type).to eq("image/jpeg")
+      expect(processed_io[:content_type]).to eq("image/jpeg")
 
       # The image should process successfully with the transparency handling code
-      processed_image = MiniMagick::Image.read(processed_io.read)
+      processed_image = MiniMagick::Image.read(processed_io[:io].string)
       expect(processed_image.type).to eq("JPEG")
     end
 
@@ -26,8 +26,8 @@ RSpec.describe PhotoProcessingService do
       processed_io = described_class.process_upload_data(image_data, "image.png")
 
       expect(processed_io).not_to be_nil
-      expect(processed_io.original_filename).to eq("image.jpg")
-      expect(processed_io.content_type).to eq("image/jpeg")
+      expect(processed_io[:filename]).to eq("image.jpg")
+      expect(processed_io[:content_type]).to eq("image/jpeg")
     end
   end
 end

@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include SessionsHelper
+  include ImageProcessable
 
   before_action :require_login
   before_action :update_last_active_at

@@ -30,3 +30,6 @@ en:
     messages:
       cant_be_blank: "can't be blank"
       is_invalid: "is invalid"
+      invalid_image_format: "must be a valid image file"
+      image_processing_failed: "could not be processed"
+      image_processing_error: "could not be processed: %{error}"

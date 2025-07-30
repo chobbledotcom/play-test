@@ -37,8 +37,7 @@ RSpec.feature "User Logo Upload", type: :feature do
 
     click_button I18n.t("forms.user_settings.submit")
 
-    # Should show validation error
-    expect(page).to have_content("Logo must be an image file")
+    expect(page).to have_content(I18n.t("errors.messages.invalid_image_format"))
 
     # Logo should not be attached
     user.reload

@@ -47,6 +47,12 @@ class UnitsController < ApplicationController
   def create
     @unit = current_user.units.build(unit_params)
 
+    if @image_processing_error
+      flash.now[:alert] = @image_processing_error.message
+      handle_create_failure(@unit)
+      return
+    end
+
     if @unit.save
       log_unit_event("created", @unit)
       handle_create_success(@unit)
@@ -58,10 +64,17 @@ class UnitsController < ApplicationController
   def edit = nil
 
   def update
-    # Capture the changes before update
     previous_attributes = @unit.attributes.dup
 
-    if @unit.update(unit_params)
+    params_to_update = unit_params
+
+    if @image_processing_error
+      flash.now[:alert] = @image_processing_error.message
+      handle_update_failure(@unit)
+      return
+    end
+
+    if @unit.update(params_to_update)
       # Calculate what changed
       changed_data = calculate_changes(
         previous_attributes,
@@ -195,7 +208,7 @@ class UnitsController < ApplicationController
   end
 
   def unit_params
-    params.require(:unit).permit(*%i[
+    permitted_params = params.require(:unit).permit(*%i[
       description
       manufacture_date
       manufacturer
@@ -205,6 +218,8 @@ class UnitsController < ApplicationController
       serial
       unit_type
     ])
+
+    process_image_params(permitted_params, :photo)
   end
 
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
