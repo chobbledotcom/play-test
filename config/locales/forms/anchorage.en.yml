@@ -9,7 +9,7 @@ en:
         num_low_anchors: "Low anchor points"
         num_high_anchors: "High anchor points"
         anchor_accessories_pass: "Correct anchor accessories"
-        anchor_degree_pass: "Anchors between 30-45"
+        anchor_degree_pass: "Anchors between 30-45°"
         anchor_type_pass: "Anchors permanently closed and metal"
         pull_strength_pass: "Pull strength test"
       status:

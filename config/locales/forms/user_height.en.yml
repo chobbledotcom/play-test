@@ -7,7 +7,7 @@ en:
         user_capacity: "User Capacity"
         play_area: "Play Area"
       fields:
-        containing_wall_height: "Containing Platform Wall Height"
+        containing_wall_height: "Main Wall Height"
         tallest_user_height: "Maximum User Height (m)"
         users_at_1000mm: "Users at 1m"
         users_at_1200mm: "Users at 1.2m"

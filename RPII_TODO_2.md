@@ -3,19 +3,7 @@
 **Time: 20m**
 
 - Inspection:
-  - Serial Number => Manufacturer Serial Number
   - Unit Name => Bounce Safe Number
-- Structure:
-  - Containing Platform Wall Height => Main Wall Height
-- Anchorage:
-  - Add the degree sign to the 30-45
-- Materials:
-  - "Stitch Length" => "Stitching"
-  - "Sharp Angles or Oblique Edges" => "Sharp Angles or Edges"
-- Slides:
-  - "First Metre of Slide Containing Platform Wall Height (m)"
-  - "Remaining Slide Containing Platform Wall Height (m)"
-    - Remove "Containing Platform" for both
 
 For "Bounce Safe Number" I need to add per-site translations rather than per-language, because only one Play-Test site will be a #BounceSafe one, but I don't think that'll be too complicated.
 
@@ -90,6 +78,17 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
 
 - Blower:
   - Rename "Blower size" and "Blower serial number" to "size(s)" and "number(s)"
+- Inspection:
+  - Serial Number => Manufacturer Serial Number
+- Structure/User Height:
+  - Containing Platform Wall Height => Main Wall Height
+  - "Stitch Length" => "Stitching"
+  - "Sharp Angles or Oblique Edges" => "Sharp Angles or Edges"
+- Anchorage:
+  - Add the degree sign to the 30-45
+- Slides:
+  - "First Metre of Slide Containing Platform Wall Height (m)" => "First Metre of Slide Wall Height (m)"
+  - "Remaining Slide Containing Platform Wall Height (m)" => "Remaining Slide Wall Height (m)"
 
 ## Field Additions
 

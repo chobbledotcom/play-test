@@ -12,10 +12,10 @@ en:
         seam_integrity_pass: "Seam Integrity"
         air_loss_pass: "Air Loss"
         straight_walls_pass: "Vertical Walls (+/- 5%)"
-        sharp_edges_pass: "Sharp Angles or Oblique Edges"
+        sharp_edges_pass: "Sharp Angles or Edges"
         unit_stable_pass: "Unit Stability"
         # Measurements
-        stitch_length_pass: "Stitch Length"
+        stitch_length_pass: "Stitching"
         evacuation_time_pass: "Evacuation Time (s)"
         unit_pressure: "Unit Pressure (kpa)"
         blower_tube_length: "Blower Tube Length (m)"
