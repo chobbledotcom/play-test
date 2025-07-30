@@ -5,12 +5,12 @@ en:
       sections:
         fan_assessment: "Fan Assessment"
       fields:
-        fan_size_type: "Blower size"
-        blower_serial: "Blower serial number"
-        blower_flap_pass: "Return flap present"
-        blower_finger_pass: "Finger probe Test"
-        pat_pass: "PAT"
-        blower_visual_pass: "Visual Inspection"
+        fan_size_type: "Blower sizes"
+        blower_serial: "Blower serial numbers"
+        blower_flap_pass: "Return flaps present"
+        blower_finger_pass: "Finger probe tests"
+        pat_pass: "PATs"
+        blower_visual_pass: "Visual inspections"
       status:
         checks_passed: "Fields completed"
         completion: "Assessment Completion"
