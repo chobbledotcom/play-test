@@ -57,13 +57,11 @@ RSpec.describe "User Settings Turbo Updates", type: :request do
           }
         }, headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
-        expect(response).to have_http_status(:ok)  # It succeeds but the file is removed
-        expect(response.content_type).to include("text/vnd.turbo-stream.html")
+        # With invalid image, it redirects with error
+        expect(response).to have_http_status(:found)
+        expect(flash[:alert]).to eq(I18n.t("errors.messages.invalid_image_format"))
 
-        # Should return save message turbo stream
-        expect(response.body).to include('turbo-stream action="replace" target="form_save_message"')
-
-        # File should not be attached (removed by processing)
+        # File should not be attached
         user.reload
         expect(user.logo).not_to be_attached
       end
