@@ -24,12 +24,7 @@ class PdfGeneratorService
     end
 
     def self.build_service_url(blob)
-      default_host = Rails.application.config
-        .action_controller.default_url_options[:host] || "localhost"
-
-      Rails.application.routes.url_helpers.rails_blob_url(
-        blob, host: default_host
-      )
+      "/rails/active_storage/blobs/#{blob.signed_id}/#{blob.filename}"
     end
 
     def self.format_error_message(original_error, details, service_url)
