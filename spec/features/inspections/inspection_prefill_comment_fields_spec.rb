@@ -32,7 +32,7 @@ RSpec.feature "Inspection Prefilling Comment Fields", type: :feature do
       length_comment: "Length includes platform")
 
     first_inspection.structure_assessment.update!(
-      step_ramp_size: 12.5,
+      step_ramp_size: 12,
       step_ramp_size_comment: "Measured at steepest angle"
     )
 
@@ -45,7 +45,7 @@ RSpec.feature "Inspection Prefilling Comment Fields", type: :feature do
 
     verify_field_and_comment(
       I18n.t("forms.structure.fields.step_ramp_size"),
-      "12.5",
+      "12",
       "Measured at steepest angle"
     )
 

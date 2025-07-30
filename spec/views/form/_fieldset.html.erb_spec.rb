@@ -127,20 +127,31 @@ RSpec.describe "chobble_forms/_fieldset.html.erb", type: :view do
     it "renders the actual fieldset partial" do
       # Create a test wrapper template that uses the fieldset
       stub_template "test_wrapper.html.erb" => <<~ERB
-        <%= render 'chobble_forms/fieldset', i18n_base: 'test.forms.fields', legend: 'Test Legend' do %>
+        <%= render 'chobble_forms/fieldset', i18n_base: 'test.forms.fields', legend_key: 'structure' do %>
           <div>Test Content</div>
         <% end %>
       ERB
 
       render template: "test_wrapper"
 
-      expect(rendered).to have_css("fieldset legend", text: "Test Legend")
+      expect(rendered).to have_css("fieldset legend", text: "Structure Information")
       expect(rendered).to have_css("fieldset div", text: "Test Content")
     end
 
     it "sets instance variables for child components" do
+      # Add the required i18n translations for custom.base
+      I18n.backend.store_translations(:en, {
+        custom: {
+          base: {
+            sections: {
+              test_section: "Test Section"
+            }
+          }
+        }
+      })
+
       stub_template "test_wrapper.html.erb" => <<~ERB
-        <%= render 'chobble_forms/fieldset', i18n_base: 'custom.base', form: 'test_form' do %>
+        <%= render 'chobble_forms/fieldset', i18n_base: 'custom.base', legend_key: 'test_section', form: 'test_form' do %>
           <div>Content</div>
         <% end %>
       ERB
@@ -163,17 +174,28 @@ RSpec.describe "chobble_forms/_fieldset.html.erb", type: :view do
       expect(rendered).to have_css("fieldset div", text: "Structure Content")
     end
 
-    it "handles missing legend gracefully" do
+    it "renders footer text when provided in i18n" do
+      # Add footer translation
+      I18n.backend.store_translations(:en, {
+        test: {
+          forms: {
+            sections: {
+              structure_footer: "This is a footer note"
+            }
+          }
+        }
+      })
+
       stub_template "test_wrapper.html.erb" => <<~ERB
-        <%= render 'chobble_forms/fieldset', i18n_base: 'test.forms.fields' do %>
-          <div>No Legend Content</div>
+        <%= render 'chobble_forms/fieldset', i18n_base: 'test.forms.fields', legend_key: 'structure' do %>
+          <div>Content with footer</div>
         <% end %>
       ERB
 
       render template: "test_wrapper"
 
-      expect(rendered).to have_css("fieldset legend", text: "Section")
-      expect(rendered).to have_css("fieldset div", text: "No Legend Content")
+      expect(rendered).to have_css("fieldset legend", text: "Structure Information")
+      expect(rendered).to have_css("fieldset small", text: "This is a footer note")
     end
   end
 end
