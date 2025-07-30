@@ -32,9 +32,6 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
 
 **Time: 10m**
 
-- Blowers:
-  - Number of Blowers
-
 # Field Changes
 
 **Time: 30m**
@@ -93,3 +90,8 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
 
 - Blower:
   - Rename "Blower size" and "Blower serial number" to "size(s)" and "number(s)"
+
+## Field Additions
+
+- Blowers:
+  - Number of Blowers
