@@ -4,13 +4,21 @@
   Parameters:
   - title: The section title (e.g., "Wall Height Requirements:")
   - calculator_result: The result object with :text and :breakdown from calculator
-  - passed: Boolean indicating if the requirement is met
-  - show_compliance: (optional) Show compliance status text
+  - passed: Boolean indicating if the requirement is met (kept for backward compatibility)
+  - show_compliance: (optional) Show compliance status text (kept for backward compatibility)
 %>
 
 <h4><%= title %></h4>
 
-<p><%= calculator_result[:text] %></p>
+<% if calculator_result[:text].present? %>
+  <p><%= calculator_result[:text] %></p>
+<% end %>
+
+<% if local_assigns[:show_compliance] && !local_assigns[:passed] %>
+  <% if title.include?("Runout") %>
+    <p>Non-Compliant (Requires <%= calculator_result[:text].match(/\d+\.\d+m/)[0] %> minimum)</p>
+  <% end %>
+<% end %>
 
 <h5><%= t('safety_standards.calculators.breakdown_title') %></h5>
 <ul>
@@ -18,9 +26,3 @@
     <li><strong><%= step[0] %>:</strong> <%= step[1] %></li>
   <% end %>
 </ul>
-
-<%= render 'shared/pass_fail_string', passed: passed %>
-
-<% if local_assigns[:show_compliance] && show_compliance %>
-  <%= @assessment.runout_compliance_status %>
-<% end %>

@@ -26,8 +26,9 @@ RSpec.feature "Unified Safety Standards Breakdown Display", type: :feature do
     within(".safety-standards-info") do
       # Check runout section
       expect(page).to have_content("Runout Requirements")
-      expect(page).to have_content("Required Runout: 1.5m")
-      expect(page).to have_content("Fail")
+      expect(page).to have_content("Breakdown")
+      expect(page).to have_content("Base runout:")
+      # Should show non-compliance in compliance status (separate from EN14960 display)
       expect(page).to have_content("Non-Compliant (Requires 1.5m minimum)")
     end
   end

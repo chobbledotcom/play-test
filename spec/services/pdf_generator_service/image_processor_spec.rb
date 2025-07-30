@@ -10,9 +10,7 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
 
   before do
     unit_with_photo.photo.attach(
-      io: Rails.root.join("spec/fixtures/files/test_image.jpg").open,
-      filename: "test_image.jpg",
-      content_type: "image/jpeg"
+      fixture_file_upload("test_image.jpg", "image/jpeg")
     )
   end
 

@@ -31,12 +31,15 @@ module SafetyStandardsTestHelpers
   end
 
   def fill_wall_height_form(height: nil, platform_height: nil, user_height: nil)
-    # Support both old signature (height:) and new signature (platform_height:, user_height:)
+    # Support both old signature (height:) and new signature
+    # (platform_height:, user_height:)
     if height && !platform_height && !user_height
       # Old signature - assume reasonable defaults
-      fill_calculator_form(:wall_height, platform_height: 2.0, user_height: height)
+      fill_calculator_form(:wall_height, platform_height: 2.0,
+        user_height: height)
     else
-      fill_calculator_form(:wall_height, platform_height: platform_height, user_height: user_height)
+      fill_calculator_form(:wall_height, platform_height: platform_height,
+        user_height: user_height)
     end
   end
 
@@ -55,15 +58,28 @@ module SafetyStandardsTestHelpers
   end
 
   def expect_anchor_result(count)
-    expect_result_content(:anchors, "Required Anchors: #{count}")
+    # Now we only have breakdown, look for the final calculation step
+    within_result(:anchors) do
+      expect(page).to have_content("Required Anchors: #{count}")
+    end
   end
 
   def expect_runout_result(required_runout:)
-    expect_result_content(:runout, "Required Runout: #{required_runout}m")
+    # Look for runout in the breakdown
+    within_result(:runout) do
+      expect(page).to have_content("Base runout:")
+      expect(page).to have_content("= #{required_runout}m")
+    end
   end
 
   def expect_wall_height_result(text)
-    expect_result_content(:wall_height, text)
+    # Look for wall height in the breakdown
+    # Extract just the height value from the old format
+    height_value = text.match(/(\d+\.\d+m)/)[1] if /(\d+\.\d+m)/.match?(text)
+    within_result(:wall_height) do
+      expect(page).to have_content("Calculation:")
+      expect(page).to have_content(height_value) if height_value
+    end
   end
 
   # Navigation helpers

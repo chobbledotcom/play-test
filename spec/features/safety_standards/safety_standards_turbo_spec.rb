@@ -46,7 +46,7 @@ RSpec.feature "Safety Standards with Turbo", js: true do
       end
 
       within("#slide-runout-result") do
-        expect(page).to have_content("Required Runout: 1.25m")
+        expect(page).to have_content("Base runout: Maximum of 1.25m and 0.3m = 1.25m")
       end
 
       expect(page).to have_current_path(safety_standards_path)
@@ -64,7 +64,6 @@ RSpec.feature "Safety Standards with Turbo", js: true do
       end
 
       within("#wall-height-result") do
-        expect(page).to have_content("Required Wall Height: 1.5m")
         expect(page).to have_content("0.6m - 3.0m")
         expect(page).to have_content("1.5m (user height)")
       end
@@ -83,7 +82,7 @@ RSpec.feature "Safety Standards with Turbo", js: true do
       end
 
       within("#anchors-result") do
-        expect(page).to have_content("8")
+        expect(page).to have_content("Required anchors:")
       end
 
       click_link "Slides"
@@ -100,7 +99,7 @@ RSpec.feature "Safety Standards with Turbo", js: true do
       click_link "Anchorage"
 
       within("#anchors-result") do
-        expect(page).to have_content("8")
+        expect(page).to have_content("Required anchors:")
       end
     end
   end

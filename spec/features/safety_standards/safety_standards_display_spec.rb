@@ -49,17 +49,15 @@ RSpec.feature "Safety Standards Display", type: :feature do
     within(".safety-standards-info") do
       # Wall height requirements section
       expect(page).to have_content("Wall Height Requirements")
-      expect(page).to have_content("Walls must be at least 2.0m (equal to user height)")
       expect(page).to have_content("Breakdown")
       expect(page).to have_content("Height range: 0.6m - 3.0m")
-      expect(page).to have_content("Pass")
+      expect(page).to have_content("Calculation: 2.0m (user height)")
 
       # Runout requirements section
       expect(page).to have_content("Runout Requirements")
-      expect(page).to have_content("Required Runout: 1.25m")
       expect(page).to have_content("50% calculation: 2.5m × 0.5 = 1.25m")
       expect(page).to have_content("Minimum requirement: 0.3m (300mm)")
-      expect(page).to have_content("Pass") # 1.5m runout exceeds 1.25m requirement
+      expect(page).to have_content("Base runout: Maximum of 1.25m and 0.3m = 1.25m")
     end
   end
 
@@ -84,7 +82,6 @@ RSpec.feature "Safety Standards Display", type: :feature do
       expect(page).to have_content("Breakdown")
       expect(page).to have_content("Height range: 0.6m - 3.0m")
       expect(page).to have_content("Calculation: 1.2m (user height)")
-      expect(page).to have_content("Pass")
     end
   end
 
@@ -105,12 +102,11 @@ RSpec.feature "Safety Standards Display", type: :feature do
 
     within(".safety-standards-info") do
       expect(page).to have_content("Height Requirements")
-      expect(page).to have_content("Walls must be at least 2.25m (1.25× user height)")
       expect(page).to have_content("Breakdown")
       expect(page).to have_content("Height range: 3.0m - 6.0m")
+      expect(page).to have_content("Calculation: 1.8m × 1.25 = 2.25m")
       expect(page).to have_content("Alternative requirement: Permanent roof")
       expect(page).to have_content("Permanent roof: Fitted ✓")
-      expect(page).to have_content("Pass")
     end
   end
 
@@ -126,11 +122,9 @@ RSpec.feature "Safety Standards Display", type: :feature do
 
     within(".safety-standards-info") do
       expect(page).to have_content("Anchor Requirements")
-      expect(page).to have_content("Required Anchors: 8")
       expect(page).to have_content("Breakdown")
       expect(page).to have_content("Front/back area: 4.0m (W) × 3.0m (H) = 12.0m²")
       expect(page).to have_content("Required anchors: (2 + 2) × 2 = 8")
-      expect(page).to have_content("Pass")
     end
   end
 end

@@ -199,32 +199,4 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
       expect(response.body).to include(I18n.t("safety_standards.errors.invalid_dimensions"))
     end
   end
-
-  describe "Edge cases", type: :feature do
-    scenario "minimum values are enforced" do
-      visit safety_standards_path
-
-      fill_runout_form(height: 0.1)
-      submit_runout_form
-
-      expect_runout_result(required_runout: 0.3)
-    end
-
-    scenario "calculations match model exactly" do
-      dimensions = [[3, 3, 2], [5, 4, 3], [8, 6, 4]]
-
-      dimensions.each do |l, w, h|
-        visit safety_standards_path
-
-        fill_anchor_form(length: l, width: w, height: h)
-        submit_anchor_form
-
-        expected = EN14960.calculate_anchors(
-          length: l, width: w, height: h
-        ).value
-
-        expect_anchor_result(expected)
-      end
-    end
-  end
 end

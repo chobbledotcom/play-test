@@ -71,7 +71,8 @@ RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
     end
 
     within("#anchors-result") do
-      expect(page).to have_content("Required Anchors: 8")
+      expect(page).to have_content("Required anchors:")
+      expect(page).to have_content("= 8")
     end
 
     # Navigate to slides tab and test calculator there
@@ -83,7 +84,7 @@ RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
     end
 
     within("#slide-runout-result") do
-      expect(page).to have_content("Required Runout: 1.25m")
+      expect(page).to have_content("Base runout:")
     end
   end
 end
