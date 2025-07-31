@@ -31,6 +31,14 @@ jobs:
           bundle exec rails parallel:prepare
           bundle exec parallel_rspec spec/
 
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 1
+
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
         if: failure()
@@ -38,3 +46,23 @@ jobs:
           name: screenshots
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
+
+  deploy-coverage:
+    name: "Deploy Coverage to Neocities"
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage
+          path: coverage
+
+      - name: Deploy to neocities
+        uses: bcomnes/deploy-to-neocities@v3
+        with:
+          api_key: ${{ secrets.COVERAGE_NEOCITIES_API_KEY }}
+          cleanup: false
+          neocities_supporter: true
+          preview_before_deploy: false
+          dist_dir: coverage
