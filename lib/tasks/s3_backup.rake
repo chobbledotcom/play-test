@@ -137,6 +137,74 @@ namespace :s3 do
       end
     end
 
+    desc "Restore database from S3 backup"
+    task :restore, [:date] => :environment do |_task, args|
+      ensure_s3_enabled
+
+      unless args[:date]
+        puts "❌ Please provide a date in YYYY-MM-DD format"
+        puts "   Example: rake s3:backup:restore[2025-07-31]"
+        exit 1
+      end
+
+      handle_s3_errors do
+        service = get_s3_service
+
+        filename = "database-#{args[:date]}.tar.gz"
+        s3_key = "#{backup_dir}/#{filename}"
+        temp_compressed_path = temp_dir.join(filename)
+        temp_backup_path = temp_dir.join("database-#{args[:date]}.sqlite3")
+        
+        # Create temp directory
+        FileUtils.mkdir_p(temp_dir)
+
+        begin
+          # Download backup
+          print "Downloading backup from S3... "
+          content = service.download(s3_key)
+          File.binwrite(temp_compressed_path, content)
+          puts "✅"
+
+          # Extract backup
+          print "Extracting backup... "
+          system("tar -xzf #{temp_compressed_path} -C #{temp_dir}", exception: true)
+          puts "✅"
+
+          # Verify extracted file exists
+          unless File.exist?(temp_backup_path)
+            puts "❌ Extracted database file not found at #{temp_backup_path}"
+            exit 1
+          end
+
+          # Create a safety backup of current database
+          safety_backup_path = database_path.to_s + ".pre-restore-#{Time.current.strftime('%Y%m%d%H%M%S')}"
+          print "Creating safety backup of current database... "
+          FileUtils.cp(database_path, safety_backup_path) if File.exist?(database_path)
+          puts "✅"
+
+          # Restore the database
+          print "Restoring database... "
+          system("sqlite3 #{database_path} \".restore '#{temp_backup_path}'\"", exception: true)
+          puts "✅"
+
+          puts "\n🎉 Database restored successfully!"
+          puts "   Restored from: #{filename}"
+          puts "   Safety backup: #{safety_backup_path}"
+          puts "\n⚠️  Remember to restart your Rails app to pick up the restored database!"
+
+        rescue Aws::S3::Errors::NoSuchKey
+          puts "❌"
+          puts "\n⚠️  Backup not found: #{filename}"
+          puts "   Run 'rake s3:backup:list' to see available backups"
+          exit 1
+        ensure
+          # Clean up temp files
+          FileUtils.rm_f(temp_compressed_path)
+          FileUtils.rm_f(temp_backup_path)
+        end
+      end
+    end
+
     private
 
     def create_tar_gz(source_path, dest_path)
