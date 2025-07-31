@@ -21,27 +21,33 @@ runs:
       shell: bash
       run: sudo rm -f /var/lib/man-db/auto-update
 
-    - name: Cache ImageMagick
+    - name: Cache ImageMagick binaries
       uses: actions/cache@v4
       id: imagemagick-cache
       with:
-        path: |
-          /usr/bin/mogrify
-          /usr/bin/identify
-          /usr/bin/convert
-        key: ${{ runner.os }}-imagemagick-binaries-v1
+        path: ~/imagemagick-bin
+        key: ${{ runner.os }}-imagemagick-standalone-v1
         
-    - name: Install ImageMagick if not cached
+    - name: Download and install ImageMagick if not cached
       shell: bash
       if: steps.imagemagick-cache.outputs.cache-hit != 'true'
       run: |
-        echo "ImageMagick not cached, installing..."
-        # sudo apt-get update -qq
-        sudo apt-get install -y -qq imagemagick
+        echo "Downloading ImageMagick standalone binaries..."
+        mkdir -p ~/imagemagick-bin
+        curl -L https://download.imagemagick.org/archive/binaries/ImageMagick-x86_64-pc-linux-gnu.tar.gz | tar xz -C /tmp
+        # Copy just the binaries we need
+        cp /tmp/ImageMagick-*/bin/mogrify ~/imagemagick-bin/
+        cp /tmp/ImageMagick-*/bin/identify ~/imagemagick-bin/
+        cp /tmp/ImageMagick-*/bin/convert ~/imagemagick-bin/
+        chmod +x ~/imagemagick-bin/*
         
-    - name: Verify ImageMagick installation
+    - name: Add ImageMagick to PATH
       shell: bash
       run: |
+        # Copy binaries to /usr/local/bin
+        sudo cp ~/imagemagick-bin/* /usr/local/bin/
+        
+        # Verify installation
         echo "Verifying ImageMagick installation:"
         which mogrify || (echo "ERROR: mogrify not found" && exit 1)
         which identify || (echo "ERROR: identify not found" && exit 1)
