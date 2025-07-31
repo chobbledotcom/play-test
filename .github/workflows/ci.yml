@@ -42,8 +42,9 @@ jobs:
       - name: Prepare database
         env:
           RAILS_ENV: test
+          CACHE_HIT: ${{ steps.db-cache.outputs.cache-hit }}
         run: |
-          if [[ "${{ steps.db-cache.outputs.cache-hit }}" != "true" ]]; then
+          if [[ "$CACHE_HIT" != "true" ]]; then
             echo "Database cache miss, running migrations..."
             bundle exec rails db:migrate
             bundle exec rails parallel:prepare
