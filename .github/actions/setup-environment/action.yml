@@ -17,6 +17,9 @@ runs:
         ruby-version: .ruby-version
         bundler-cache: true
 
+    - name: Disable man-db update
+      run: sudo rm -f /var/lib/man-db/auto-update
+  
     - name: Fix ImageMagick PATH
       shell: bash
       run: |
