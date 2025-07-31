@@ -18,24 +18,28 @@ A public instance is live at **[play-test.co.uk](https://play-test.co.uk)**.
 ## Features
 
 ### 🎪 Equipment Tracking
+
 - Store unit details, dimensions, and manufacturer info
 - Keep inspection history for each piece of equipment
 - Upload photos with automatic processing
 - Quick access to previous inspection data
 
 ### 📋 Inspection Management
+
 - Seven assessment types covering different safety aspects
 - Draft inspections you can edit before finalising
 - Generate PDF reports with QR codes
 - Built-in safety calculations (anchor points, user capacity, etc.)
 
 ### 👥 Company Management
+
 - Company accounts with branding
 - User management and access control
 - Upload your logo for PDF reports
 - Works on phones, tablets, and desktops
 
 ### 🛠️ Technical Features
+
 - Export any unit or inspection as PDF or JSON
 - Shows safety standards right where you need them
 - Dark/light theme
@@ -98,6 +102,10 @@ ruby coverage_check.rb app/models/inspection.rb
 # View detailed HTML report
 open coverage/index.html
 ```
+
+## Test Coverage
+
+If you want to help improve Play-Test, a great way would be to write some more `rspec` and `Capybara` tests. Check out [coverage.play-test.co.uk](https://coverage.play-test.co.uk/) for an up-to-date test coverage breakdown.
 
 ## Tech Stack
 
