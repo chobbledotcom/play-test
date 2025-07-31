@@ -2,6 +2,7 @@ class Assessments::EnclosedAssessment < ApplicationRecord
   include AssessmentLogging
   include AssessmentCompletion
   include FormConfigurable
+  include ValidationConfigurable
 
   self.primary_key = "inspection_id"
 
@@ -9,8 +10,4 @@ class Assessments::EnclosedAssessment < ApplicationRecord
 
   validates :inspection_id,
     uniqueness: true
-
-  validates :exit_number,
-    numericality: {greater_than: 0},
-    allow_blank: true
 end

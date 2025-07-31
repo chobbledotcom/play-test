@@ -2,20 +2,13 @@ class Assessments::SlideAssessment < ApplicationRecord
   include AssessmentLogging
   include AssessmentCompletion
   include FormConfigurable
+  include ValidationConfigurable
 
   self.primary_key = "inspection_id"
 
   belongs_to :inspection
 
   enum :clamber_netting_pass, Inspection::PASS_FAIL_NA
-
-  validates :slide_platform_height,
-    :slide_wall_height,
-    :runout,
-    :slide_first_metre_height,
-    :slide_beyond_first_metre_height,
-    numericality: {greater_than_or_equal_to: 0},
-    allow_blank: true
 
   def meets_runout_requirements?
     return false unless runout.present? && slide_platform_height.present?

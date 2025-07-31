@@ -2,14 +2,10 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   include AssessmentLogging
   include AssessmentCompletion
   include FormConfigurable
+  include ValidationConfigurable
 
   self.primary_key = "inspection_id"
   belongs_to :inspection
-
-  validates :num_high_anchors,
-    :num_low_anchors,
-    numericality: {greater_than_or_equal_to: 0, only_integer: true},
-    allow_blank: true
 
   after_update :log_assessment_update, if: :saved_changes?
 

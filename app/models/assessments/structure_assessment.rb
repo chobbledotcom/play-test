@@ -2,22 +2,11 @@ class Assessments::StructureAssessment < ApplicationRecord
   include AssessmentLogging
   include AssessmentCompletion
   include FormConfigurable
+  include ValidationConfigurable
 
   self.primary_key = "inspection_id"
 
   belongs_to :inspection
-
-  validates :unit_pressure,
-    :step_ramp_size,
-    :trough_depth,
-    :trough_adjacent_panel_width,
-    numericality: {greater_than_or_equal_to: 0},
-    allow_blank: true
-
-  validates :platform_height,
-    :critical_fall_off_height,
-    numericality: {greater_than_or_equal_to: 10},
-    allow_blank: true
 
   after_update :log_assessment_update, if: :saved_changes?
 

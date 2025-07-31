@@ -42,7 +42,8 @@ RSpec.describe "Assessment Controllers", type: :request do
 
       expect(response).to redirect_to(inspection_path(inspection))
       inspection.reload
-      expect(inspection.user_height_assessment.containing_wall_height).to eq(1.8)
+      wall_height = inspection.user_height_assessment.containing_wall_height
+      expect(wall_height).to eq(1.8)
       expect(inspection.user_height_assessment.users_at_1500mm).to eq(25)
     end
   end
@@ -54,14 +55,14 @@ RSpec.describe "Assessment Controllers", type: :request do
 
       patch inspection_materials_assessment_path(inspection), params: {
         assessments_materials_assessment: {
-          ropes: 30.0,
+          ropes: 30,
           fabric_strength_pass: true
         }
       }
 
       expect(response).to redirect_to(inspection_path(inspection))
       inspection.reload
-      expect(inspection.materials_assessment.ropes).to eq(30.0)
+      expect(inspection.materials_assessment.ropes).to eq(30)
       expect(inspection.materials_assessment.fabric_strength_pass).to be true
     end
   end

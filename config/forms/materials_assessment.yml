@@ -3,6 +3,8 @@ form_fields:
     fields:
       - partial: number_pass_fail_na_comment
         field: ropes
+        attributes:
+          min: 0
       - partial: pass_fail_na_comment
         field: retention_netting_pass
       - partial: pass_fail_na_comment
