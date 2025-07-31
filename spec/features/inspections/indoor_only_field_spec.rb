@@ -37,8 +37,9 @@ RSpec.feature "Indoor only field in inspection form", type: :feature do
 
     click_button I18n.t("forms.inspection.submit")
 
-    inspection = Inspection.last
-    inspection.reload
+    # Find the inspection we just created for this specific unit
+    inspection = unit.inspections.order(created_at: :desc).first
+    expect(inspection).to be_present
     expect(inspection.indoor_only).to be true
   end
 
