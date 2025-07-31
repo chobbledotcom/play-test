@@ -21,6 +21,16 @@ runs:
       shell: bash
       run: sudo rm -f /var/lib/man-db/auto-update
 
+    - name: Debug ImageMagick installation
+      shell: bash
+      run: |
+        echo "=== Checking what ImageMagick-related files are in /usr/bin ==="
+        ls -la /usr/bin/*identify* 2>/dev/null || echo "No identify files found"
+        ls -la /usr/bin/*mogrify* 2>/dev/null || echo "No mogrify files found"
+        ls -la /usr/bin/*convert* 2>/dev/null || echo "No convert files found"
+        echo "=== Checking installed ImageMagick packages ==="
+        dpkg -l | grep -i imagemagick || echo "No ImageMagick packages found"
+        
     - name: Setup ImageMagick
       shell: bash
       run: |
