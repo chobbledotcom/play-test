@@ -1,6 +1,7 @@
 class Inspection < ApplicationRecord
   include CustomIdGenerator
   include FormConfigurable
+  include ValidationConfigurable
 
   PASS_FAIL_NA = {fail: 0, pass: 1, na: 2}.freeze
 
