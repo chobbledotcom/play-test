@@ -1,25 +1,13 @@
-name: "Test: Ruby"
+name: Coverage Report
 
 on:
-  pull_request:
-  push:
-    branches: [main]
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2am
+  workflow_dispatch:  # Manual trigger
 
 jobs:
-  test:
+  coverage:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        test-suite:
-          - controllers
-          - features  
-          - models
-          - requests
-          - services
-          - helpers
-          - lib
-          - seeds
-          - views
 
     steps:
       - name: Install packages
@@ -34,11 +22,19 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Run tests
+      - name: Run all tests with coverage
         env:
           RAILS_ENV: test
         run: |
           bundle exec rails db:migrate
           bundle exec rails parallel:prepare
-          bundle exec parallel_rspec spec/${{ matrix.test-suite }}
+          bundle exec rake coverage:parallel
 
+      - name: Deploy to neocities
+        uses: bcomnes/deploy-to-neocities@v3
+        with:
+          api_key: ${{ secrets.COVERAGE_NEOCITIES_API_KEY }}
+          cleanup: false
+          neocities_supporter: true
+          preview_before_deploy: false
+          dist_dir: coverage
