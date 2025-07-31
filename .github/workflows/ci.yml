@@ -50,8 +50,6 @@ jobs:
             bundle exec rails parallel:prepare
           else
             echo "Database restored from cache"
-            # Just ensure the parallel DBs exist
-            bundle exec rails parallel:create
           fi
 
       - name: Run tests
