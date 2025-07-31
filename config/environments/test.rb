@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_support/core_ext/integer/time"
 
 # The test environment is used exclusively to run your application's
@@ -33,7 +35,7 @@ Rails.application.configure do
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
 
-  # Configure Active Storage
+  # Override the default Active Storage service for test environment
   config.active_storage.service = :test
 
   # Print deprecation notices to the stderr.

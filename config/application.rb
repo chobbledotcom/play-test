@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "boot"
 
 require "rails"
@@ -45,14 +47,20 @@ module PatLogger
     # Preserve full timezone rather than offset in Rails 8.1+
     config.active_support.to_time_preserves_timezone = :zone
 
+    config.active_storage.service =
+      if ENV["USE_S3_STORAGE"]
+        :s3_host
+      else
+        :local
+      end
+    config.active_storage.service_urls_expire_in = 1.day
+
     # Add site-specific i18n overrides
     config.before_initialize do
       override_path = ENV["I18N_OVERRIDES_PATH"].presence ||
         Rails.root.join("config/site_overrides.yml").to_s
 
-      if File.exist?(override_path)
-        config.i18n.load_path << override_path
-      end
+      config.i18n.load_path << override_path if File.exist?(override_path)
     end
   end
 end

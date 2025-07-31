@@ -74,3 +74,6 @@ gem "turbo-rails", "~> 2.0"
 # Error tracking with BugSink (Sentry-compatible)
 gem "sentry-ruby"
 gem "sentry-rails"
+
+# S3-compatible storage
+gem "aws-sdk-s3", require: false

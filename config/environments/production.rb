@@ -72,10 +72,6 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  # Configure Active Storage
-  config.active_storage.service = :local
-  config.active_storage.service_urls_expire_in = 1.hour
-
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [:id]
 
