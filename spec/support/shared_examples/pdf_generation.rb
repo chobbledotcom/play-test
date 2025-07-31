@@ -2,15 +2,27 @@ require "pdf/inspector"
 
 RSpec.shared_examples "generates valid PDF structure" do |pdf_response|
   it "generates a valid PDF document" do
-    expect(pdf_response[0..3]).to eq("%PDF")
-    expect { PDF::Inspector::Text.analyze(pdf_response) }.not_to raise_error
+    expect_valid_pdf(pdf_response)
   end
 end
 
 RSpec.shared_examples "generates PDF successfully" do |path|
   it "generates a valid PDF with correct headers" do
     pdf_data = get_pdf(path)
-    expect_valid_pdf(pdf_data)
+    expect_complete_pdf_validation(pdf_data, check_headers: true)
+  end
+end
+
+# Enhanced shared example for comprehensive PDF validation
+RSpec.shared_examples "generates standard PDF" do |type, model = nil|
+  it "generates PDF with standard structure and content" do
+    pdf_path = case type
+    when :inspection then "/inspections/#{model.id}.pdf"
+    when :unit then "/units/#{model.id}.pdf"
+    end
+
+    pdf_data = get_pdf(pdf_path)
+    expect_standard_pdf_structure(pdf_data, type: type, model: model)
   end
 end
 

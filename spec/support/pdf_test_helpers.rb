@@ -25,7 +25,8 @@ module PdfTestHelpers
 
   # Verify PDF response headers and format
   def verify_pdf_response
-    expect(page.driver.response.headers["Content-Type"]).to eq("application/pdf")
+    content_type = page.driver.response.headers["Content-Type"]
+    expect(content_type).to eq("application/pdf")
     expect(page.driver.response.body[0..3]).to eq("%PDF")
   end
 
@@ -46,6 +47,83 @@ module PdfTestHelpers
     expect_valid_pdf(pdf_data)
     pdf_text_content(pdf_data)
   end
+
+  # Comprehensive PDF validation - replaces multiple separate checks
+  def expect_complete_pdf_validation(pdf_data, expected_i18n_keys: [],
+    expected_content: [],
+    check_headers: true)
+    expect_valid_pdf(pdf_data)
+    validate_pdf_headers if check_headers
+    validate_pdf_content(pdf_data, expected_i18n_keys, expected_content)
+  end
+
+  # Validate PDF HTTP headers
+  def validate_pdf_headers
+    return unless defined?(page) && page.respond_to?(:driver)
+
+    content_type = page.driver.response.headers["Content-Type"]
+    expect(content_type).to eq("application/pdf")
+
+    disposition = page.driver.response.headers["Content-Disposition"]
+    expect(disposition).to include("inline")
+  end
+
+  # Validate PDF content and i18n keys
+  def validate_pdf_content(pdf_data, expected_i18n_keys, expected_content)
+    return if expected_i18n_keys.empty? && expected_content.empty?
+
+    pdf_text = pdf_text_content(pdf_data)
+
+    if expected_i18n_keys.any?
+      expect_pdf_to_include_i18n_keys(pdf_text, *expected_i18n_keys)
+    end
+
+    expected_content.each do |content|
+      expect(pdf_text).to include(content.to_s)
+    end
+  end
+
+  # Validate PDF meets all standard requirements for inspection/unit PDFs
+  def expect_standard_pdf_structure(pdf_data, type: :inspection, model: nil)
+    expect_valid_pdf(pdf_data)
+    pdf_text = pdf_text_content(pdf_data)
+
+    case type
+    when :inspection
+      validate_inspection_pdf_structure(pdf_text, model)
+    when :unit
+      validate_unit_pdf_structure(pdf_text, model)
+    end
+  end
+
+  private
+
+  def validate_inspection_pdf_structure(pdf_text, model)
+    expect_pdf_to_include_i18n_keys(pdf_text,
+      "pdf.inspection.equipment_details",
+      "pdf.dimensions.width",
+      "pdf.dimensions.length",
+      "pdf.dimensions.height")
+
+    return unless model
+
+    expect(pdf_text).to include(model.unit.name) if model.unit
+    report_id_key = "pdf.inspection.fields.report_id"
+    expect(pdf_text).to include("#{I18n.t(report_id_key)}: #{model.id}")
+  end
+
+  def validate_unit_pdf_structure(pdf_text, model)
+    expect_pdf_to_include_i18n_keys(pdf_text,
+      "pdf.unit.fields.unit_id",
+      "pdf.unit.details")
+
+    return unless model
+
+    expect(pdf_text).to include(model.name)
+    expect(pdf_text).to include(model.serial) if model.serial.present?
+  end
+
+  public
 
   # Get all PDF i18n keys from locale files
   def all_pdf_i18n_keys
