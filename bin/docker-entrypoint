@@ -12,8 +12,8 @@ if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
   echo "Setting up cron jobs with whenever..."
   bundle exec whenever --update-crontab
   
-  echo "Starting cron service..."
-  service cron start
+  echo "Starting cron in background..."
+  cron
 fi
 
 exec "${@}"
