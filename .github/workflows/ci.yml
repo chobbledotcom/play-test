@@ -17,6 +17,7 @@ jobs:
         with:
           packages: google-chrome-stable curl libjemalloc2 sqlite3 libvips42 imagemagick
           version: 1.0
+          execute_install_scripts: true
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -56,6 +57,7 @@ jobs:
         with:
           packages: google-chrome-stable curl libjemalloc2 sqlite3 libvips42 imagemagick
           version: 1.0
+          execute_install_scripts: true
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
