@@ -2,6 +2,7 @@ class Inspection < ApplicationRecord
   include CustomIdGenerator
   include FormConfigurable
   include ValidationConfigurable
+  include CompositeFieldMapping
 
   PASS_FAIL_NA = {fail: 0, pass: 1, na: 2}.freeze
 
@@ -326,7 +327,7 @@ class Inspection < ApplicationRecord
     label = I18n.t(key, default: nil)
     # Try removing _pass and/or _comment suffixes
     if label.nil?
-      base_field = field.to_s.gsub(/_pass$|_comment$/, "")
+      base_field = strip_field_suffix(field)
       label = I18n.t("forms.#{form}.fields.#{base_field}", default: nil)
     end
     # Try adding _pass suffix
@@ -383,17 +384,37 @@ class Inspection < ApplicationRecord
         assessment_key = :"#{tab}_assessment"
         assessment = send(assessment_key) if respond_to?(assessment_key)
 
-        assessment_fields =
-          assessment&.incomplete_fields
-            &.map { |f| {field: f, label: field_label(tab.to_sym, f)} } ||
-          []
+        if assessment
+          grouped_fields = assessment.incomplete_fields_grouped
+          assessment_fields = []
 
-        if assessment_fields.any?
-          output << {
-            tab: tab.to_sym,
-            name: I18n.t("forms.#{tab}.header"),
-            fields: assessment_fields
-          }
+          grouped_fields.each do |base_field, info|
+            # Determine what's missing
+            has_value_missing = info[:fields].include?(base_field)
+            has_pass_missing = info[:fields].include?(:"#{base_field}_pass")
+
+            # Get the base label
+            base_label = field_label(tab.to_sym, base_field)
+
+            # Construct the full label
+            label = if has_value_missing && has_pass_missing
+              "#{base_label} (+ Pass/Fail)"
+            elsif has_pass_missing
+              "#{base_label} Pass/Fail"
+            else
+              base_label
+            end
+
+            assessment_fields << {field: base_field, label: label}
+          end
+
+          if assessment_fields.any?
+            output << {
+              tab: tab.to_sym,
+              name: I18n.t("forms.#{tab}.header"),
+              fields: assessment_fields
+            }
+          end
         end
       end
     end

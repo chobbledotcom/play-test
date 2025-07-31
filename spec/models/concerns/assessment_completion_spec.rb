@@ -64,4 +64,49 @@ RSpec.describe AssessmentCompletion, type: :model do
       end
     end
   end
+
+  describe "#incomplete_fields_grouped" do
+    let(:inspection) { create(:inspection) }
+    let(:assessment) { inspection.materials_assessment }
+
+    context "when both value and pass fields are missing" do
+      before do
+        assessment.update!(ropes: nil, ropes_pass: nil)
+      end
+
+      it "groups them together under the base field" do
+        grouped = assessment.incomplete_fields_grouped
+
+        expect(grouped[:ropes]).to be_present
+        expect(grouped[:ropes][:fields]).to contain_exactly(:ropes, :ropes_pass)
+        expect(grouped[:ropes][:partial]).to eq("number_pass_fail_na_comment")
+      end
+    end
+
+    context "when only pass field is missing" do
+      before do
+        assessment.update!(ropes: 10, ropes_pass: nil)
+      end
+
+      it "returns only the pass field" do
+        grouped = assessment.incomplete_fields_grouped
+
+        expect(grouped[:ropes_pass]).to be_present
+        expect(grouped[:ropes_pass][:fields]).to eq([:ropes_pass])
+      end
+    end
+
+    context "when only value field is missing" do
+      before do
+        assessment.update!(ropes: nil, ropes_pass: 1)
+      end
+
+      it "returns only the value field" do
+        grouped = assessment.incomplete_fields_grouped
+
+        expect(grouped[:ropes]).to be_present
+        expect(grouped[:ropes][:fields]).to eq([:ropes])
+      end
+    end
+  end
 end

@@ -54,6 +54,9 @@ PARTIAL_ALLOWED_ATTRIBUTES = {
 }.freeze
 
 RSpec.describe "Form YAML Database Schema Validation" do
+  # Include the shared composite field mapping
+  include CompositeFieldMapping
+
   # Helper to load form YAML configuration
   def load_form_config(assessment_type)
     config_path = Rails.root.join("config/forms/#{assessment_type}.yml")
@@ -61,27 +64,6 @@ RSpec.describe "Form YAML Database Schema Validation" do
 
     yaml_content = YAML.load_file(config_path)
     yaml_content["form_fields"]
-  end
-
-  # Helper to get implied fields from composite partials
-  def get_composite_fields(field, partial)
-    case partial
-    when "pass_fail_comment", "pass_fail_na_comment"
-      # If field ends with _pass, also covers the comment field
-      if field.end_with?("_pass")
-        base_field = field.gsub(/_pass$/, "")
-        ["#{base_field}_comment"]
-      else
-        # Otherwise, it covers both _pass and _comment
-        ["#{field}_pass", "#{field}_comment"]
-      end
-    when "number_pass_fail_comment", "number_pass_fail_na_comment"
-      ["#{field}_pass", "#{field}_comment"]
-    when "decimal_comment", "integer_comment", "yes_no_radio_comment"
-      ["#{field}_comment"]
-    else
-      []
-    end
   end
 
   # Helper to get all fields from form config

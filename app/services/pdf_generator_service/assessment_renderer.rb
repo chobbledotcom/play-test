@@ -1,6 +1,7 @@
 class PdfGeneratorService
   class AssessmentRenderer
     include Configuration
+    include CompositeFieldMapping
 
     SENSITIVE_COLUMNS = %w[id inspection_id created_at updated_at].freeze
     NULL_COLOR = "663399".freeze
@@ -51,22 +52,10 @@ class PdfGeneratorService
           # Add base field
           ordered_fields << field_name.to_sym
 
-          # Parse partial name to determine which fields to add
-          # If partial contains "pass_fail", it has a _pass field
-          if partial_name.to_s.include?("pass_fail")
-            # If field already ends with _pass, don't add another _pass
-            unless field_name.to_s.end_with?("_pass")
-              pass_field = :"#{field_name}_pass"
-              ordered_fields << pass_field if @current_assessment.respond_to?(pass_field)
-            end
-          end
-
-          # If partial contains "comment", it has a _comment field
-          if partial_name.to_s.include?("comment")
-            # For fields ending in _pass, remove _pass and add _comment
-            base_field = field_name.to_s.sub(/_pass$/, "")
-            comment_field = :"#{base_field}_comment"
-            ordered_fields << comment_field if @current_assessment.respond_to?(comment_field)
+          # Use consolidated method to get composite fields
+          composite_fields = get_composite_fields(field_name, partial_name)
+          composite_fields.each do |composite_field|
+            ordered_fields << composite_field.to_sym if @current_assessment.respond_to?(composite_field)
           end
         end
       end
