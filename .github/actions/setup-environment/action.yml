@@ -21,31 +21,24 @@ runs:
       shell: bash
       run: sudo rm -f /var/lib/man-db/auto-update
 
-    - name: Cache ImageMagick binaries
-      uses: actions/cache@v4
-      id: imagemagick-cache
-      with:
-        path: ~/imagemagick-bin
-        key: ${{ runner.os }}-imagemagick-standalone-v1
-        
-    - name: Download and install ImageMagick if not cached
-      shell: bash
-      if: steps.imagemagick-cache.outputs.cache-hit != 'true'
-      run: |
-        echo "Downloading ImageMagick standalone binaries..."
-        mkdir -p ~/imagemagick-bin
-        curl -L https://download.imagemagick.org/archive/binaries/ImageMagick-x86_64-pc-linux-gnu.tar.gz | tar xz -C /tmp
-        # Copy just the binaries we need
-        cp /tmp/ImageMagick-*/bin/mogrify ~/imagemagick-bin/
-        cp /tmp/ImageMagick-*/bin/identify ~/imagemagick-bin/
-        cp /tmp/ImageMagick-*/bin/convert ~/imagemagick-bin/
-        chmod +x ~/imagemagick-bin/*
-        
-    - name: Add ImageMagick to PATH
+    - name: Setup ImageMagick
       shell: bash
       run: |
-        # Copy binaries to /usr/local/bin
-        sudo cp ~/imagemagick-bin/* /usr/local/bin/
+        # Check if ImageMagick commands are available
+        if ! command -v identify &> /dev/null; then
+          echo "Setting up ImageMagick symlinks..."
+          # The apt package installs versioned binaries like identify-6.q16
+          # Create symlinks to the standard names
+          sudo ln -sf /usr/bin/identify-6.q16 /usr/local/bin/identify || true
+          sudo ln -sf /usr/bin/mogrify-6.q16 /usr/local/bin/mogrify || true
+          sudo ln -sf /usr/bin/convert-6.q16 /usr/local/bin/convert || true
+        fi
+        
+        # If still not found, try installing imagemagick meta-package
+        if ! command -v identify &> /dev/null; then
+          echo "Installing imagemagick meta-package..."
+          sudo apt-get install -y imagemagick
+        fi
         
         # Verify installation
         echo "Verifying ImageMagick installation:"
