@@ -33,7 +33,11 @@ module ValidationConfigurable
       attributes = field_config[:attributes] || {}
       partial = field_config[:partial]
 
-      return unless field && attributes.any?
+      return unless field
+
+      if attributes[:required]
+        validates field, presence: true
+      end
 
       case partial
       when "decimal_comment", "decimal"

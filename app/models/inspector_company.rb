@@ -1,6 +1,7 @@
 class InspectorCompany < ApplicationRecord
   include CustomIdGenerator
   include FormConfigurable
+  include ValidationConfigurable
 
   has_many :inspections, dependent: :destroy
 
@@ -22,10 +23,7 @@ class InspectorCompany < ApplicationRecord
   has_one_attached :logo
 
   # Validations
-  validates :name, presence: true
   validates :email, format: {with: URI::MailTo::EMAIL_REGEXP}, allow_blank: true
-  validates :phone, presence: true
-  validates :address, presence: true
 
   # Scopes
   scope :active, -> { where(active: true) }

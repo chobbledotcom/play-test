@@ -1,11 +1,10 @@
 class Page < ApplicationRecord
   include FormConfigurable
+  include ValidationConfigurable
 
   self.primary_key = "slug"
 
-  validates :slug, presence: true, uniqueness: true
-  validates :link_title, presence: true
-  validates :content, presence: true
+  validates :slug, uniqueness: true
 
   scope :pages, -> { where(is_snippet: false) }
   scope :snippets, -> { where(is_snippet: true) }
