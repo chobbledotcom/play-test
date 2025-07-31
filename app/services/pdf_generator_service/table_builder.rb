@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PdfGeneratorService
   class TableBuilder
     include Configuration
@@ -280,8 +282,8 @@ class PdfGeneratorService
         [
           I18n.t("pdf.inspection.fields.manufacturer"),
           unit.manufacturer.presence || "",
-          I18n.t("pdf.inspection.fields.operator"),
-          unit.operator.presence || ""
+          I18n.t("units.fields.name"),
+          unit.name.presence || ""
         ],
         [
           I18n.t("pdf.inspection.fields.size_m"),
