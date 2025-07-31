@@ -1,0 +1,2 @@
+# Daily database backup at 2 AM
+0 2 * * * cd /rails && bundle exec rake s3:backup:database >> /rails/log/cron.log 2>&1

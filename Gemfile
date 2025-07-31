@@ -77,3 +77,6 @@ gem "sentry-rails"
 
 # S3-compatible storage
 gem "aws-sdk-s3", require: false
+
+# Cron job management
+gem "whenever", require: false
