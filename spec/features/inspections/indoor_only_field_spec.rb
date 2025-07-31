@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.feature "Indoor only field in inspection form", type: :feature do
@@ -36,6 +38,7 @@ RSpec.feature "Indoor only field in inspection form", type: :feature do
     click_button I18n.t("forms.inspection.submit")
 
     inspection = Inspection.last
+    inspection.reload
     expect(inspection.indoor_only).to be true
   end
 
