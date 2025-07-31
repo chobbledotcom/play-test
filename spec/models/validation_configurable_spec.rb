@@ -39,7 +39,7 @@ RSpec.describe ValidationConfigurable do
     context "for Inspection" do
       let(:user) { create(:user) }
       let(:unit) { create(:unit) }
-      let(:inspection) { Inspection.new(user: user, unit: unit, inspection_date: Date.today) }
+      let(:inspection) { Inspection.new(user: user, unit: unit, inspection_date: Time.zone.today) }
 
       it "applies min validation from YAML for width" do
         inspection.width = -1
