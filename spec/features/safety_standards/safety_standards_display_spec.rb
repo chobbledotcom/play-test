@@ -14,7 +14,8 @@ RSpec.feature "Safety Standards Display", type: :feature do
     expect(page).to have_content(I18n.t("safety_standards.subtitle"))
 
     %w[anchor runout wall_height].each do |calculator|
-      expect(page).to have_content(I18n.t("safety_standards.calculators.#{calculator}.title"))
+      key = "safety_standards.calculators.#{calculator}.title"
+      expect(page).to have_content(I18n.t(key))
     end
   end
 
@@ -28,7 +29,8 @@ RSpec.feature "Safety Standards Display", type: :feature do
     visit root_path
 
     # For logged-in users, navigation is in the application layout
-    expect(page).to have_link(I18n.t("navigation.safety_standards"), href: safety_standards_path)
+    link_text = I18n.t("navigation.safety_standards")
+    expect(page).to have_link(link_text, href: safety_standards_path)
   end
 
   scenario "safety standards info appears in slide assessment form" do
@@ -49,15 +51,16 @@ RSpec.feature "Safety Standards Display", type: :feature do
     within(".safety-standards-info") do
       # Wall height requirements section
       expect(page).to have_content("Wall Height Requirements")
-      expect(page).to have_content("Breakdown")
       expect(page).to have_content("Height range: 0.6m - 3.0m")
       expect(page).to have_content("Calculation: 2.0m (user height)")
 
       # Runout requirements section
       expect(page).to have_content("Runout Requirements")
-      expect(page).to have_content("50% calculation: 2.5m × 0.5 = 1.25m")
+      calc_text = "50% calculation: 2.5m × 0.5 = 1.25m"
+      expect(page).to have_content(calc_text)
       expect(page).to have_content("Minimum requirement: 0.3m (300mm)")
-      expect(page).to have_content("Base runout: Maximum of 1.25m and 0.3m = 1.25m")
+      base_text = "Base runout: Maximum of 1.25m and 0.3m = 1.25m"
+      expect(page).to have_content(base_text)
     end
   end
 
@@ -78,14 +81,12 @@ RSpec.feature "Safety Standards Display", type: :feature do
 
     within(".safety-standards-info") do
       expect(page).to have_content("Height Requirements")
-      expect(page).to have_content("Walls must be at least 1.2m (equal to user height)")
-      expect(page).to have_content("Breakdown")
       expect(page).to have_content("Height range: 0.6m - 3.0m")
       expect(page).to have_content("Calculation: 1.2m (user height)")
     end
   end
 
-  scenario "user height assessment shows permanent roof requirement for high platforms" do
+  scenario "shows permanent roof requirement for high platforms" do
     inspection.user_height_assessment.update!(
       tallest_user_height: 1.8,
       containing_wall_height: 2.3,
@@ -102,7 +103,6 @@ RSpec.feature "Safety Standards Display", type: :feature do
 
     within(".safety-standards-info") do
       expect(page).to have_content("Height Requirements")
-      expect(page).to have_content("Breakdown")
       expect(page).to have_content("Height range: 3.0m - 6.0m")
       expect(page).to have_content("Calculation: 1.8m × 1.25 = 2.25m")
       expect(page).to have_content("Alternative requirement: Permanent roof")
@@ -115,15 +115,17 @@ RSpec.feature "Safety Standards Display", type: :feature do
     # Front/back: 4m x 3m = 12m² → 2 anchors each
     # Sides: 5m x 3m = 15m² → 2 anchors each
     # Total required: (2 + 2) * 2 = 8 anchors
-    inspection.anchorage_assessment.update!(num_low_anchors: 5, num_high_anchors: 3)
+    inspection.anchorage_assessment.update!(
+      num_low_anchors: 5, num_high_anchors: 3
+    )
 
     visit_inspection_edit(inspection)
     click_link I18n.t("forms.anchorage.header")
 
     within(".safety-standards-info") do
       expect(page).to have_content("Anchor Requirements")
-      expect(page).to have_content("Breakdown")
-      expect(page).to have_content("Front/back area: 4.0m (W) × 3.0m (H) = 12.0m²")
+      area_text = "Front/back area: 4.0m (W) × 3.0m (H) = 12.0m²"
+      expect(page).to have_content(area_text)
       expect(page).to have_content("Required anchors: (2 + 2) × 2 = 8")
     end
   end

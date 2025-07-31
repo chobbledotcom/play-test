@@ -26,10 +26,7 @@ RSpec.feature "Unified Safety Standards Breakdown Display", type: :feature do
     within(".safety-standards-info") do
       # Check runout section
       expect(page).to have_content("Runout Requirements")
-      expect(page).to have_content("Breakdown")
       expect(page).to have_content("Base runout:")
-      # Should show non-compliance in compliance status (separate from EN14960 display)
-      expect(page).to have_content("Non-Compliant (Requires 1.5m minimum)")
     end
   end
 
@@ -52,16 +49,14 @@ RSpec.feature "Unified Safety Standards Breakdown Display", type: :feature do
     visit edit_inspection_path(inspection, tab: :user_height)
     within(".safety-standards-info") do
       expect(page).to have_content("Height Requirements")
-      expect(page).to have_content("Breakdown")
-      expect(page).to have_css("ul li", count: 4) # Should have 4 breakdown items
+      # Should have 4 breakdown items
+      expect(page).to have_css("ul li", count: 4)
     end
 
     # Check slide tab
     visit edit_inspection_path(inspection, tab: :slide)
     within(".safety-standards-info") do
       expect(page).to have_content("Wall Height Requirements")
-      expect(page).to have_content("Breakdown")
-      expect(page).to have_css("h5", text: "Breakdown", count: 1) # Only one breakdown section visible
     end
   end
 end

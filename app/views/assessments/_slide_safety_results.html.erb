@@ -14,7 +14,7 @@
            @assessment.slide_permanent_roof
          ) %>
       
-      <%= render 'shared/safety_standard_with_breakdown',
+      <%= render 'assessments/safety_standard_with_breakdown',
           title: t('safety_standards.slide_requirements.wall_height_requirements'),
           calculator_result: wall_details,
           passed: @assessment.meets_wall_height_requirements? %>
@@ -34,7 +34,7 @@
            breakdown: runout_result.breakdown
          } %>
       
-      <%= render 'shared/safety_standard_with_breakdown',
+      <%= render 'assessments/safety_standard_with_breakdown',
           title: t('safety_standards.slide_requirements.runout_requirements'),
           calculator_result: runout_details,
           passed: @assessment.meets_runout_requirements?,

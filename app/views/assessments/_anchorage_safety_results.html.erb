@@ -7,7 +7,7 @@
          breakdown: @assessment.anchorage_breakdown
        } %>
     
-    <%= render 'shared/safety_standard_with_breakdown',
+    <%= render 'assessments/safety_standard_with_breakdown',
         title: t('safety_standards.anchor_requirements.title'),
         calculator_result: anchor_details,
         passed: @assessment.total_anchors&.positive? ? @assessment.meets_anchor_requirements? : nil %>

@@ -14,7 +14,7 @@
          has_permanent_roof
        ) %>
     
-    <%= render 'shared/safety_standard_with_breakdown',
+    <%= render 'assessments/safety_standard_with_breakdown',
         title: t('safety_standards.user_height.height_requirements'),
         calculator_result: wall_details,
         passed: structure.meets_height_requirements? %>
