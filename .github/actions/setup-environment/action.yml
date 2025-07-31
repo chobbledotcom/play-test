@@ -23,7 +23,6 @@ runs:
         # Check if ImageMagick executables are available
         if ! command -v mogrify &> /dev/null; then
           echo "ImageMagick executables not found, installing directly..."
-          sudo DEBIAN_FRONTEND=noninteractive apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y imagemagick
         else
           echo "ImageMagick already in PATH"
