@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 require "pdf/inspector"
 
@@ -81,6 +83,9 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
         end
       end
 
+      # draft watermark is hidden in tests cause it breaks too much
+      unused_keys.delete "pdf.inspection.watermark.draft"
+
       if unused_keys.any?
         puts "\n\nUnused PDF i18n keys found:"
         unused_keys.each { puts "  - #{it}" }
@@ -110,11 +115,11 @@ RSpec.describe "PDF i18n Coverage", type: :request, pdf: true do
           .reject { it.include?("I18n.t") }
           .reject { it.include?("pdf.") }
 
-        if matches.any?
-          puts "\nPotential hardcoded string found (should use i18n):"
-          puts "  Pattern: #{pattern}"
-          matches.each { puts "  Line: #{it.strip}" }
-        end
+        next unless matches.any?
+
+        puts "\nPotential hardcoded string found (should use i18n):"
+        puts "  Pattern: #{pattern}"
+        matches.each { puts "  Line: #{it.strip}" }
       end
     end
   end
