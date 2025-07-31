@@ -28,12 +28,30 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup-environment
 
+      - name: Cache test databases
+        uses: actions/cache@v4
+        id: db-cache
+        with:
+          path: |
+            db/test.sqlite3
+            db/test.sqlite3-*
+          key: ${{ runner.os }}-test-db-${{ hashFiles('db/schema.rb', 'db/migrate/**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-test-db-
+
       - name: Prepare database
         env:
           RAILS_ENV: test
         run: |
-          bundle exec rails db:migrate
-          bundle exec rails parallel:prepare
+          if [[ "${{ steps.db-cache.outputs.cache-hit }}" != "true" ]]; then
+            echo "Database cache miss, running migrations..."
+            bundle exec rails db:migrate
+            bundle exec rails parallel:prepare
+          else
+            echo "Database restored from cache"
+            # Just ensure the parallel DBs exist
+            bundle exec rails parallel:create
+          fi
 
       - name: Run tests
         env:
