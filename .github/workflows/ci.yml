@@ -38,18 +38,6 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Debug ImageMagick
-        run: |
-          echo "PATH: $PATH"
-          echo "Looking for ImageMagick executables:"
-          which identify || echo "identify not found in PATH"
-          which mogrify || echo "mogrify not found in PATH"
-          which convert || echo "convert not found in PATH"
-          echo "Searching filesystem for ImageMagick:"
-          find /usr -name "mogrify" 2>/dev/null || echo "mogrify not found in /usr"
-          echo "Installed packages:"
-          dpkg -l | grep -i imagemagick || echo "ImageMagick package not listed"
-
       - name: Prepare database
         env:
           RAILS_ENV: test
