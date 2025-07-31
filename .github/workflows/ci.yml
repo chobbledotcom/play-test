@@ -6,34 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install packages
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: google-chrome-stable curl libjemalloc2 sqlite3 libvips42 imagemagick
-          version: 1.0
-          execute_install_scripts: true
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-          bundler-cache: true
-
-      - name: Prepare database
-        env:
-          RAILS_ENV: test
-        run: |
-          bundle exec rails db:migrate
-          bundle exec rails parallel:prepare
-
   test:
-    needs: setup
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -64,6 +37,13 @@ jobs:
         with:
           ruby-version: .ruby-version
           bundler-cache: true
+
+      - name: Prepare database
+        env:
+          RAILS_ENV: test
+        run: |
+          bundle exec rails db:migrate
+          bundle exec rails parallel:prepare
 
       - name: Run tests
         env:
