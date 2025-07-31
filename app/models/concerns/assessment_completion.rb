@@ -1,6 +1,5 @@
 module AssessmentCompletion
   extend ActiveSupport::Concern
-  include CompositeFieldMapping
 
   SYSTEM_FIELDS = %w[
     id
@@ -38,7 +37,7 @@ module AssessmentCompletion
         field_to_partial[field.to_sym] = partial
 
         # Also map composite fields
-        composite_fields = get_composite_fields(field, partial)
+        composite_fields = FieldUtils.get_composite_fields(field, partial)
         composite_fields.each do |cf|
           field_to_partial[cf.to_sym] = partial
         end
@@ -55,11 +54,11 @@ module AssessmentCompletion
     incomplete.each do |field|
       next if processed.include?(field)
 
-      base_field = strip_field_suffix(field).to_sym
+      base_field = FieldUtils.strip_field_suffix(field).to_sym
       partial = field_to_partial[field] || field_to_partial[base_field]
 
       # Find all related incomplete fields for this base
-      related = incomplete.select { |f| strip_field_suffix(f).to_sym == base_field }
+      related = incomplete.select { |f| FieldUtils.strip_field_suffix(f).to_sym == base_field }
 
       key = (related.size > 1) ? base_field : field
       grouped[key] = {

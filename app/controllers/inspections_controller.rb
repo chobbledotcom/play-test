@@ -488,9 +488,9 @@ class InspectionsController < ApplicationController
   end
 
   def translate_field_name(field)
-    is_comment = field.end_with?("_comment")
-    is_pass = field.end_with?("_pass")
-    field_base = field.gsub(/_(comment|pass)$/, "")
+    is_comment = FieldUtils.is_comment_field?(field)
+    is_pass = FieldUtils.is_pass_field?(field)
+    field_base = FieldUtils.strip_field_suffix(field)
     i18n_base = "forms.#{params[:tab]}.fields"
 
     translated = I18n.t("#{i18n_base}.#{field_base}", default: nil)

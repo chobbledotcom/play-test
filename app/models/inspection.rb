@@ -2,7 +2,6 @@ class Inspection < ApplicationRecord
   include CustomIdGenerator
   include FormConfigurable
   include ValidationConfigurable
-  include CompositeFieldMapping
 
   PASS_FAIL_NA = {fail: 0, pass: 1, na: 2}.freeze
 
@@ -327,7 +326,7 @@ class Inspection < ApplicationRecord
     label = I18n.t(key, default: nil)
     # Try removing _pass and/or _comment suffixes
     if label.nil?
-      base_field = strip_field_suffix(field)
+      base_field = FieldUtils.strip_field_suffix(field)
       label = I18n.t("forms.#{form}.fields.#{base_field}", default: nil)
     end
     # Try adding _pass suffix

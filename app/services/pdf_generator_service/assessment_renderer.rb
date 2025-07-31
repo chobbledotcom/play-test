@@ -1,7 +1,6 @@
 class PdfGeneratorService
   class AssessmentRenderer
     include Configuration
-    include CompositeFieldMapping
 
     SENSITIVE_COLUMNS = %w[id inspection_id created_at updated_at].freeze
     NULL_COLOR = "663399".freeze
@@ -53,7 +52,7 @@ class PdfGeneratorService
           ordered_fields << field_name.to_sym
 
           # Use consolidated method to get composite fields
-          composite_fields = get_composite_fields(field_name, partial_name)
+          composite_fields = FieldUtils.get_composite_fields(field_name, partial_name)
           composite_fields.each do |composite_field|
             ordered_fields << composite_field.to_sym if @current_assessment.respond_to?(composite_field)
           end

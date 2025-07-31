@@ -76,15 +76,7 @@ module PdfTestHelpers
       # Group fields to understand which are rendered together
       field_groups = {}
       fields.each_key do |field_key|
-        field_str = field_key.to_s
-        base_field = if field_str.end_with?("_pass")
-          field_str.sub(/_pass$/, "")
-        elsif field_str.end_with?("_comment")
-          field_str.sub(/_comment$/, "")
-        else
-          field_str
-        end
-
+        base_field = FieldUtils.strip_field_suffix(field_key)
         field_groups[base_field] ||= []
         field_groups[base_field] << field_key
       end
