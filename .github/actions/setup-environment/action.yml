@@ -24,17 +24,30 @@ runs:
         if ! command -v mogrify &> /dev/null; then
           echo "ImageMagick executables not in PATH, searching for them..."
           # Find and link ImageMagick executables
+          FOUND_COUNT=0
           for cmd in mogrify identify convert; do
             BIN_PATH=$(find /usr -name "$cmd" -type f -executable 2>/dev/null | grep -E "bin/$cmd$" | head -1)
             if [ -n "$BIN_PATH" ]; then
               echo "Found $cmd at $BIN_PATH"
               sudo ln -sf "$BIN_PATH" "/usr/local/bin/$cmd"
+              FOUND_COUNT=$((FOUND_COUNT + 1))
             else
-              echo "Warning: $cmd not found"
+              echo "Warning: $cmd not found in filesystem"
             fi
           done
+          
+          # If we couldn't find the executables, try installing directly
+          if [ $FOUND_COUNT -eq 0 ]; then
+            echo "ImageMagick executables not found, installing directly..."
+            sudo DEBIAN_FRONTEND=noninteractive apt-get update
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y imagemagick
+          fi
         else
           echo "ImageMagick already in PATH"
         fi
-        # Verify installation
-        which mogrify identify convert
+        
+        # Verify installation - exit with error if still not found
+        echo "Verifying ImageMagick installation:"
+        which mogrify || (echo "ERROR: mogrify still not found after installation" && exit 1)
+        which identify || (echo "ERROR: identify still not found after installation" && exit 1)
+        which convert || (echo "ERROR: convert still not found after installation" && exit 1)
