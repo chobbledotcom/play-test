@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 namespace :s3 do
-  TEST_FILE_KEY = "test-uploads/rails-s3-test-file.txt"
+  def test_file_key
+    "test-uploads/rails-s3-test-file.txt"
+  end
 
   # Helper methods
   def ensure_s3_enabled
@@ -42,23 +44,23 @@ namespace :s3 do
       test_content = <<~CONTENT
         Rails S3 Test File
         ==================
-        
+
         This file was uploaded by the Rails S3 test rake task.
-        
+
         Uploaded at: #{Time.current}
         Rails Environment: #{Rails.env}
         S3 Endpoint: #{ENV["S3_ENDPOINT"]}
         S3 Bucket: #{ENV["S3_BUCKET"]}
-        
+
         You can delete this file by running: rake s3:delete_test
       CONTENT
 
-      print "Uploading test file to S3 at '#{TEST_FILE_KEY}'... "
-      service.upload(TEST_FILE_KEY, StringIO.new(test_content))
+      print "Uploading test file to S3 at '#{test_file_key}'... "
+      service.upload(test_file_key, StringIO.new(test_content))
       puts "✅"
 
       puts "\n📁 File uploaded successfully!"
-      puts "   Location: #{TEST_FILE_KEY}"
+      puts "   Location: #{test_file_key}"
       puts "   Check your Hetzner web UI to see the file."
       puts "   To delete it, run: rake s3:delete_test"
     end
@@ -74,21 +76,21 @@ namespace :s3 do
       # Check if file exists before trying to delete
       print "Checking if test file exists... "
       begin
-        service.download(TEST_FILE_KEY)
+        service.download(test_file_key)
         puts "✅"
       rescue Aws::S3::Errors::NoSuchKey
         puts "❌"
-        puts "\n⚠️  Test file not found at '#{TEST_FILE_KEY}'"
+        puts "\n⚠️  Test file not found at '#{test_file_key}'"
         puts "   Run 'rake s3:upload_test' first to create it."
         exit 1
       end
 
       print "Deleting test file from S3... "
-      service.delete(TEST_FILE_KEY)
+      service.delete(test_file_key)
       puts "✅"
 
       puts "\n🗑️  File deleted successfully!"
-      puts "   The file '#{TEST_FILE_KEY}' has been removed from S3."
+      puts "   The file '#{test_file_key}' has been removed from S3."
     end
   end
 
