@@ -18,8 +18,9 @@ runs:
         bundler-cache: true
 
     - name: Disable man-db update
+      shell: bash
       run: sudo rm -f /var/lib/man-db/auto-update
-  
+
     - name: Fix ImageMagick PATH
       shell: bash
       run: |
