@@ -21,12 +21,6 @@
 
 **Time: 20m**
 
-- All:
-  - Remove "Pass/Fail" from the calculation bits
-  - Instead say something like "Under/above the calculated anchor points" in the breakdown
-- Anchorage:
-  - Make it clear that the calculation uses the box model
-  - "Required anchors" => "Calculated **total** anchors required"
 - Wall Heights:
   - If there's a permanent roof, we can skip the "Walls must be at least" message, make this clearer in the breakdown
 
@@ -46,8 +40,6 @@
 ## Design
 
 **Time: 0m**
-
-- Bigger logos
 
 ## Bug Fixes (free)
 
@@ -103,3 +95,16 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
   - Under main wall height: "This is not slides - that's the next page"
 - Blowers:
   - "You must test and log for every blower for this unit"
+
+## Calculators
+
+- All:
+  - Remove "Pass/Fail" from the calculation bits
+  - Instead say something like "Under/above the calculated anchor points" in the breakdown
+- Anchorage:
+  - Make it clear that the calculation uses the box model
+  - "Required anchors" => "Calculated **total** anchors required"
+
+## Design
+
+- Bigger logos
