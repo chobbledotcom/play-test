@@ -14,9 +14,6 @@
 
 **Time: 30m**
 
-- Structure:
-  - Move blower tube length bit to blower section
-
 ## Calculators
 
 **Time: 20m**
@@ -60,14 +57,12 @@
   - Containing Platform Wall Height => Main Wall Height
   - "Stitch Length" => "Stitching"
   - "Sharp Angles or Oblique Edges" => "Sharp Angles or Edges"
-- Anchorage:
+- Anchorage
   - Add the degree sign to the 30-45
-- Slides:
-
+- Slides
   - "First Metre of Slide Containing Platform Wall Height (m)" => "First Metre of Slide Wall Height (m)"
   - "Remaining Slide Containing Platform Wall Height (m)" => "Remaining Slide Wall Height (m)"
-
-- Inspection:
+- Inspection
   - Unit Name => Bounce Safe Number
 
 For "Bounce Safe Number" I need to add per-site translations rather than per-language, because only one Play-Test site will be a #BounceSafe one, but I don't think that'll be too complicated.
@@ -79,11 +74,11 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
 
 ## Field Changes
 
-**Time: 30m**
-
 - Structure:
   - Platform height: change to mm
   - Fall off height: change to mm
+- Structure:
+  - Move blower tube length bit to blower section
 
 ## Calculators / Source Code
 
