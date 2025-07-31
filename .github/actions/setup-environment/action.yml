@@ -7,39 +7,21 @@ runs:
     - name: Install packages
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: google-chrome-stable curl libjemalloc2 sqlite3 libvips42 imagemagick-6.q16 libmagickcore-6.q16-6 libmagickwand-6.q16-6 libtiff5
-        version: 1.2
-        execute_install_scripts: true
+        packages: google-chrome-stable curl libjemalloc2 sqlite3 libvips42 imagemagick-6.q16
+        version: 1.3
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: .ruby-version
         bundler-cache: true
-
-    - name: Disable man-db update
-      shell: bash
-      run: sudo rm -f /var/lib/man-db/auto-update
-
-    - name: Debug ImageMagick installation
-      shell: bash
-      run: |
-        echo "=== Checking what ImageMagick-related files are in /usr/bin ==="
-        ls -la /usr/bin/*identify* 2>/dev/null || echo "No identify files found"
-        ls -la /usr/bin/*mogrify* 2>/dev/null || echo "No mogrify files found"
-        ls -la /usr/bin/*convert* 2>/dev/null || echo "No convert files found"
-        echo "=== Checking installed ImageMagick packages ==="
-        dpkg -l | grep -i imagemagick || echo "No ImageMagick packages found"
         
     - name: Setup ImageMagick
       shell: bash
       run: |
-        # Check if ImageMagick commands are available
         if ! command -v identify &> /dev/null; then
           echo "Setting up ImageMagick symlinks..."
-          # Find the actual binary names dynamically
           for cmd in identify mogrify convert; do
-            # Find the versioned binary (e.g., identify-im6.q16)
             BINARY=$(ls /usr/bin/${cmd}-* 2>/dev/null | grep -E "${cmd}-im[0-9]" | head -1)
             if [ -n "$BINARY" ]; then
               echo "Creating symlink: $BINARY -> /usr/local/bin/$cmd"
@@ -48,18 +30,4 @@ runs:
               echo "Warning: No binary found for $cmd"
             fi
           done
-        else
-          echo "ImageMagick commands already available"
         fi
-        
-        # If still not found, try installing imagemagick meta-package
-        if ! command -v identify &> /dev/null; then
-          echo "Installing imagemagick meta-package..."
-          sudo apt-get install -y imagemagick
-        fi
-        
-        # Verify installation
-        echo "Verifying ImageMagick installation:"
-        which mogrify || (echo "ERROR: mogrify not found" && exit 1)
-        which identify || (echo "ERROR: identify not found" && exit 1)
-        which convert || (echo "ERROR: convert not found" && exit 1)
