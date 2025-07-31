@@ -17,7 +17,8 @@ RSpec.describe PdfGeneratorService::PositionCalculator do
         x, y = described_class.qr_code_position(pdf_width)
 
         expected_x = pdf_width - qr_code_size - qr_code_margin
-        expected_y = qr_code_bottom_offset + qr_code_size
+        # QR code is on first page, so includes footer height
+        expected_y = PdfGeneratorService::Configuration::FOOTER_HEIGHT + qr_code_bottom_offset + qr_code_size
 
         expect(x).to eq(expected_x)
         expect(y).to eq(expected_y)
@@ -31,7 +32,8 @@ RSpec.describe PdfGeneratorService::PositionCalculator do
         x, y = described_class.qr_code_position(pdf_width)
 
         expected_x = pdf_width - qr_code_size - qr_code_margin
-        expected_y = qr_code_bottom_offset + qr_code_size
+        # QR code is on first page, so includes footer height
+        expected_y = PdfGeneratorService::Configuration::FOOTER_HEIGHT + qr_code_bottom_offset + qr_code_size
 
         expect(x).to eq(expected_x)
         expect(y).to eq(expected_y)
@@ -52,7 +54,8 @@ RSpec.describe PdfGeneratorService::PositionCalculator do
         x, y = described_class.qr_code_position(pdf_width)
 
         expected_x = pdf_width - qr_code_size - qr_code_margin
-        expected_y = qr_code_bottom_offset + qr_code_size
+        # QR code is on first page, so includes footer height
+        expected_y = PdfGeneratorService::Configuration::FOOTER_HEIGHT + qr_code_bottom_offset + qr_code_size
 
         expect(x).to eq(expected_x)
         expect(y).to eq(expected_y)

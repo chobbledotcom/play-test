@@ -9,7 +9,7 @@ class PdfGeneratorService
 
     def self.render_qr_code_with_photo(pdf, entity, qr_code_png)
       photo_entity = entity.is_a?(Inspection) ? entity.unit : entity
-      qr_x, qr_y = PositionCalculator.qr_code_position(pdf.bounds.width)
+      qr_x, qr_y = PositionCalculator.qr_code_position(pdf.bounds.width, pdf.page_number)
 
       add_entity_photo_footer(pdf, photo_entity, qr_x, qr_y)
       add_qr_code_overlay(pdf, qr_code_png, qr_x, qr_y)

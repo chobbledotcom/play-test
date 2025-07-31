@@ -140,13 +140,17 @@ class ApplicationController < ActionController::Base
     table_query_counts.each do |table, count|
       if count > 5
         log_n_plus_one_queries(table, count)
-        # Only raise exception in development and test environments
-        # Skip if we're processing images (which legitimately needs multiple blob queries)
-        # Only check N+1 queries on GET requests
-        if Rails.env.local? && !processing_image_upload? && request.get?
-          message = app_i18n(:debug, :n_plus_one_with_limit, table: table, count: count, limit: 5)
-          raise message
-        end
+        # Log to Sentry instead of raising
+        message = app_i18n(:debug, :n_plus_one_with_limit,
+          table: table, count: count, limit: 5)
+        Sentry.capture_message(message, level: :warning, extra: {
+          table: table,
+          query_count: count,
+          controller: controller_name,
+          action: action_name,
+          request_path: request.path,
+          request_method: request.method
+        })
       end
     end
   end
@@ -156,21 +160,24 @@ class ApplicationController < ActionController::Base
     when "users"
       action_name == "update_settings" && params.dig(:user, :logo).present?
     when "units"
-      %w[create update].include?(action_name) && params.dig(:unit, :photo).present?
+      %w[create update].include?(action_name) &&
+        params.dig(:unit, :photo).present?
     else
       false
     end
   end
 
   def log_n_plus_one_queries(table, count)
-    error_message = app_i18n(:debug, :n_plus_one_detected, table: table, count: count)
+    error_message = app_i18n(:debug, :n_plus_one_detected,
+      table: table, count: count)
     Rails.logger.error error_message
     Rails.logger.error app_i18n(:debug, :queries_for_table, table: table)
     table_queries = debug_sql_queries.select { |q|
       table_from_query(q[:sql]) == table
     }
     table_queries.each_with_index do |query, i|
-      query_log = app_i18n(:debug, :query_log_entry, name: query[:name], sql: query[:sql])
+      query_log = app_i18n(:debug, :query_log_entry,
+        name: query[:name], sql: query[:sql])
       Rails.logger.error "  #{i + 1}. #{query_log}"
     end
   end

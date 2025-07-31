@@ -71,6 +71,23 @@ class PdfGeneratorService
     PHOTO_LABEL_SIZE = 10  # Size of "Photo 1", "Photo 2", "Photo 3" text
     PHOTO_LABEL_SPACING = 5  # Space between photo and label
 
+    # Disclaimer footer constants
+    DISCLAIMER_HEADER_SIZE = HEADER_TEXT_SIZE  # Match existing header style
+    DISCLAIMER_TEXT_SIZE = ASSESSMENT_FIELD_TEXT_SIZE  # Match assessment field text
+    DISCLAIMER_TEXT_LINES = 3  # Height in lines of text for disclaimer
+    SIGNATURE_HEIGHT_LINES = 4  # Maximum height in lines of text
+    TEXT_LINE_HEIGHT = DISCLAIMER_TEXT_SIZE * 1.5  # Standard line height multiplier
+    DISCLAIMER_TEXT_HEIGHT = DISCLAIMER_TEXT_LINES * TEXT_LINE_HEIGHT  # Total disclaimer text height
+    SIGNATURE_HEIGHT = SIGNATURE_HEIGHT_LINES * TEXT_LINE_HEIGHT  # Total signature height
+    FOOTER_INTERNAL_PADDING = 10  # Padding between elements within footer
+    FOOTER_VERTICAL_PADDING = 15  # Bottom padding for footer
+    FOOTER_TOP_PADDING = 30  # Top padding for footer (about 2 lines)
+    # Use the larger of disclaimer or signature height for footer calculation
+    FOOTER_CONTENT_HEIGHT = [DISCLAIMER_TEXT_HEIGHT, SIGNATURE_HEIGHT].max
+    FOOTER_HEIGHT = FOOTER_TOP_PADDING + DISCLAIMER_HEADER_SIZE + FOOTER_INTERNAL_PADDING +
+      FOOTER_CONTENT_HEIGHT + FOOTER_VERTICAL_PADDING  # Total footer height
+    DISCLAIMER_TEXT_WIDTH_PERCENT = 0.75  # Disclaimer text takes 75% of width
+
     def self.setup_pdf_fonts(pdf)
       font_path = Rails.root.join("app/assets/fonts")
       pdf.font_families.update(

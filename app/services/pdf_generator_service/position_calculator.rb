@@ -3,10 +3,15 @@ class PdfGeneratorService
     include Configuration
 
     # Calculate QR code position in bottom right corner
-    # QR code's bottom-right corner aligns with table right edge, bottom matches header spacing from top
-    def self.qr_code_position(pdf_bounds_width)
+    # QR code's bottom-right corner aligns with table right edge, positioned above footer on first page
+    def self.qr_code_position(pdf_bounds_width, pdf_page_number = 1)
       x = pdf_bounds_width - QR_CODE_SIZE - QR_CODE_MARGIN
-      y = QR_CODE_BOTTOM_OFFSET + QR_CODE_SIZE
+      # On first page, position above footer; on other pages, use standard bottom offset
+      y = if pdf_page_number == 1
+        Configuration::FOOTER_HEIGHT + QR_CODE_BOTTOM_OFFSET + QR_CODE_SIZE
+      else
+        QR_CODE_BOTTOM_OFFSET + QR_CODE_SIZE
+      end
       [x, y]
     end
 

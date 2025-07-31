@@ -203,7 +203,21 @@ class PdfGeneratorService
       pdf.stroke_horizontal_rule
       pdf.move_down SECTION_MARGIN_AFTER_TITLE
 
-      pdf.column_box([0, pdf.cursor], columns: COLUMN_COUNT, width: pdf.bounds.width, spacer: COLUMN_SPACER) do
+      # Calculate available height accounting for footer on first page
+      available_height = if pdf.page_number == 1
+        pdf.cursor - Configuration::FOOTER_HEIGHT
+      else
+        pdf.cursor
+      end
+
+      # Check if we have enough space for at least some content
+      min_content_height = 100  # Minimum height for meaningful content
+      if available_height < min_content_height
+        pdf.start_new_page
+        available_height = pdf.cursor
+      end
+
+      pdf.column_box([0, pdf.cursor], columns: COLUMN_COUNT, width: pdf.bounds.width, spacer: COLUMN_SPACER, height: available_height) do
         @current_assessment_blocks.each { |block| render_assessment_block(pdf, block) }
       end
 

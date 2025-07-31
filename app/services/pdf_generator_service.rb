@@ -9,6 +9,7 @@ class PdfGeneratorService
   require_relative "pdf_generator_service/image_processor"
   require_relative "pdf_generator_service/debug_info_renderer"
   require_relative "pdf_generator_service/photos_renderer"
+  require_relative "pdf_generator_service/disclaimer_footer_renderer"
 
   include Configuration
 
@@ -35,6 +36,9 @@ class PdfGeneratorService
 
       # Render all collected assessments in newspaper-style columns
       assessment_renderer.render_all_assessments_in_columns(pdf)
+
+      # Disclaimer footer (only on first page)
+      DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
 
       # QR Code in bottom right corner
       ImageProcessor.generate_qr_code_footer(pdf, inspection)
@@ -70,6 +74,10 @@ class PdfGeneratorService
       HeaderGenerator.generate_unit_pdf_header(pdf, unit)
       generate_unit_details_with_inspection(pdf, unit, last_inspection)
       generate_unit_inspection_history_with_data(pdf, unit, completed_inspections)
+
+      # Disclaimer footer (only on first page)
+      DisclaimerFooterRenderer.render_disclaimer_footer(pdf, unit.user)
+
       ImageProcessor.generate_qr_code_footer(pdf, unit)
 
       # Add debug info page if enabled (admins only)
