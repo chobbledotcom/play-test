@@ -41,7 +41,7 @@ class SafetyStandardsController < ApplicationController
           ["Sides area", "5.0m (L) × 3.0m (H) = 15.0m²"],
           ["Front & back anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
           ["Left & right anchor counts", "((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2"],
-          ["Required anchors", "(2 + 2) × 2 = 8"]
+          ["Calculated total anchors", "(2 + 2) × 2 = 8"]
         ]
       }
     },

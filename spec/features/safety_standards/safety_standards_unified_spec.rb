@@ -124,7 +124,7 @@ RSpec.describe "Safety Standards Unified Tests" do
         end
 
         within("#anchors-result") do
-          expect(page).to have_content("Required anchors:")
+          expect(page).to have_content("Calculated Total Anchors:")
           expect(page).to have_content("= 8")
         end
 

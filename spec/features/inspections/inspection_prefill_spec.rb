@@ -11,7 +11,7 @@ RSpec.feature "Inspection Prefilling", type: :feature do
       user: user,
       inspection_date: 365.days.ago,
       unit: unit,
-      width: 55555)
+      width: 123.45)
 
     visit unit_path(unit)
     click_button I18n.t("units.buttons.add_inspection")
@@ -19,20 +19,20 @@ RSpec.feature "Inspection Prefilling", type: :feature do
     expect(page).to have_content(I18n.t("inspections.titles.edit"))
 
     new_inspection = unit.inspections.order(:inspection_date).last
-    expect(new_inspection.width).to eq(55555)
+    expect(new_inspection.width).to eq(123.45)
     expect(page).to have_current_path(edit_inspection_path(new_inspection))
 
     # The simplified HTML doesn't add set-previous class
     # Just verify the field has the prefilled value
 
     width_field = find_form_field(:inspection, :width)
-    expect(width_field.value).to eq("55555.0")
+    expect(width_field.value).to eq("123.45")
 
     click_button I18n.t("forms.inspection.submit")
     expect_updated_message
 
     visit edit_inspection_path(new_inspection)
     width_field = find_form_field(:inspection, :width)
-    expect(width_field.value).to eq("55555.0")
+    expect(width_field.value).to eq("123.45")
   end
 end

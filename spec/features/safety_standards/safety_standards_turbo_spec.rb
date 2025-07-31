@@ -14,7 +14,7 @@ RSpec.feature "Safety Standards with Turbo", js: true do
 
       within("#anchors-result") do
         expect(page).to have_content("8")
-        expect(page).to have_content("Required anchors")
+        expect(page).to have_content("Calculated Total Anchors")
       end
 
       expect(page).to have_current_path(safety_standards_path)
@@ -82,7 +82,7 @@ RSpec.feature "Safety Standards with Turbo", js: true do
       end
 
       within("#anchors-result") do
-        expect(page).to have_content("Required anchors:")
+        expect(page).to have_content("Calculated Total Anchors:")
       end
 
       click_link "Slides"
@@ -99,7 +99,7 @@ RSpec.feature "Safety Standards with Turbo", js: true do
       click_link "Anchorage"
 
       within("#anchors-result") do
-        expect(page).to have_content("Required anchors:")
+        expect(page).to have_content("Calculated Total Anchors:")
       end
     end
   end

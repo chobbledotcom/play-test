@@ -60,7 +60,7 @@ module SafetyStandardsTestHelpers
   def expect_anchor_result(count)
     # Now we only have breakdown, look for the final calculation step
     within_result(:anchors) do
-      expect(page).to have_content("Required Anchors: #{count}")
+      expect(page).to have_content("Calculated Total Anchors: #{count}")
     end
   end
 

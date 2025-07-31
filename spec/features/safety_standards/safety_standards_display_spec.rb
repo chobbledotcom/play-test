@@ -126,7 +126,7 @@ RSpec.feature "Safety Standards Display", type: :feature do
       expect(page).to have_content("Anchor Requirements")
       area_text = "Front/back area: 4.0m (W) × 3.0m (H) = 12.0m²"
       expect(page).to have_content(area_text)
-      expect(page).to have_content("Required anchors: (2 + 2) × 2 = 8")
+      expect(page).to have_content("Calculated total anchors: (2 + 2) × 2 = 8")
     end
   end
 end
