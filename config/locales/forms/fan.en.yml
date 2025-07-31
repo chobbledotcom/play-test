@@ -8,6 +8,8 @@ en:
       fields:
         fan_size_type: "Blower sizes"
         blower_serial: "Blower serial numbers"
+        blower_tube_length: "Blower Tube Length (m)"
+        blower_tube_length_pass: "Blower Tube Length (m)"
         blower_flap_pass: "Return flaps present"
         blower_finger_pass: "Finger probe tests"
         pat_pass: "PATs"

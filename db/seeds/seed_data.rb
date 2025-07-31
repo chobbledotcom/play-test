@@ -81,7 +81,6 @@ module SeedData
       sharp_edges_pass: check_passed?(passed),
       unit_stable_pass: check_passed?(passed),
       stitch_length_pass: check_passed?(passed),
-      blower_tube_length_pass: check_passed?(passed),
       step_ramp_size_pass: check_passed?(passed),
       platform_height_pass: check_passed?(passed),
       critical_fall_off_height_pass: check_passed?(passed),
@@ -91,7 +90,6 @@ module SeedData
       markings_pass: check_passed?(passed),
       grounding_pass: check_passed?(passed),
       unit_pressure: rand(1.0..3.0).round(1),
-      blower_tube_length: rand(2.0..5.0).round(1),
       step_ramp_size: rand(200..400),
       platform_height: rand(500..1500),
       critical_fall_off_height: rand(500..2000),
@@ -137,6 +135,8 @@ module SeedData
       pat_pass: check_passed_integer?(passed),
       blower_serial: "FAN-#{rand(1000..9999)}",
       number_of_blowers: 1,
+      blower_tube_length: rand(2.0..5.0).round(1),
+      blower_tube_length_pass: check_passed?(passed),
       fan_size_type: passed ?
         "Fan operating correctly at optimal pressure" :
         "Fan requires servicing",

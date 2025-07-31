@@ -14,6 +14,9 @@ FactoryBot.define do
     blower_visual_pass { nil }
     blower_visual_comment { nil }
     blower_serial { nil }
+    blower_tube_length { nil }
+    blower_tube_length_pass { nil }
+    blower_tube_length_comment { nil }
 
     trait :passed do
       fan_size_type { "Standard 2HP blower" }
@@ -27,6 +30,9 @@ FactoryBot.define do
       blower_visual_pass { true }
       blower_visual_comment { "Visual inspection shows good condition" }
       blower_serial { "BL123456" }
+      blower_tube_length { 2.5 }
+      blower_tube_length_pass { true }
+      blower_tube_length_comment { "Tube length appropriate" }
     end
 
     trait :complete do
@@ -41,6 +47,9 @@ FactoryBot.define do
       blower_visual_pass { true }
       blower_visual_comment { "Visual inspection shows good condition" }
       blower_serial { "BL123456" }
+      blower_tube_length { 2.5 }
+      blower_tube_length_pass { true }
+      blower_tube_length_comment { "Tube length appropriate" }
     end
 
     trait :failed do
@@ -55,6 +64,9 @@ FactoryBot.define do
       pat_comment { "PAT test failed" }
       blower_visual_comment { "Visible damage to housing" }
       blower_serial { "BL789012" }
+      blower_tube_length { 0.5 }
+      blower_tube_length_pass { false }
+      blower_tube_length_comment { "Tube length too short" }
     end
 
     trait :pat_failure do

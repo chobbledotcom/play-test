@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_30_192718) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_31_114705) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -103,6 +103,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_30_192718) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "number_of_blowers"
+    t.decimal "blower_tube_length", precision: 8, scale: 2
+    t.boolean "blower_tube_length_pass"
+    t.text "blower_tube_length_comment"
     t.index ["inspection_id"], name: "fan_assessments_new_pkey", unique: true
   end
 
@@ -218,11 +221,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_30_192718) do
     t.boolean "sharp_edges_pass"
     t.boolean "unit_stable_pass"
     t.decimal "unit_pressure", precision: 8, scale: 2
-    t.decimal "blower_tube_length", precision: 8, scale: 2
     t.integer "critical_fall_off_height"
     t.integer "trough_depth"
     t.boolean "stitch_length_pass"
-    t.boolean "blower_tube_length_pass"
     t.boolean "evacuation_time_pass"
     t.boolean "critical_fall_off_height_pass"
     t.boolean "unit_pressure_pass"
@@ -235,7 +236,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_30_192718) do
     t.text "air_loss_comment"
     t.text "straight_walls_comment"
     t.text "sharp_edges_comment"
-    t.text "blower_tube_length_comment"
     t.text "unit_stable_comment"
     t.text "evacuation_time_comment"
     t.text "critical_fall_off_height_comment"

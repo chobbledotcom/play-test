@@ -25,7 +25,7 @@ FactoryBot.define do
       if evaluator.measurement_checks_pass == true
         %w[
           stitch_length_pass evacuation_time_pass unit_pressure_pass
-          blower_tube_length_pass step_ramp_size_pass platform_height_pass
+          step_ramp_size_pass platform_height_pass
           critical_fall_off_height_pass
         ].each do |check|
           assessment.send("#{check}=", true)
@@ -61,7 +61,6 @@ FactoryBot.define do
 
       # Measurements with passing values
       unit_pressure { 2.5 }
-      blower_tube_length { 1.5 }
       step_ramp_size { 200 }
       platform_height { 1000 }
       critical_fall_off_height { 600 }
@@ -72,7 +71,6 @@ FactoryBot.define do
       stitch_length_pass { true }
       evacuation_time_pass { true }
       unit_pressure_pass { true }
-      blower_tube_length_pass { true }
       step_ramp_size_pass { true }
       platform_height_pass { true }
       critical_fall_off_height_pass { true }
@@ -98,7 +96,6 @@ FactoryBot.define do
       air_loss_comment { "No significant air loss detected" }
       straight_walls_comment { "Walls straight and properly tensioned" }
       sharp_edges_comment { "No sharp edges found" }
-      blower_tube_length_comment { "Tube length appropriate" }
       unit_stable_comment { "Unit stable during operation" }
       step_ramp_size_comment { "Step size within safety limits" }
       platform_height_comment { "Platform height meets standards" }

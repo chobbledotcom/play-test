@@ -305,7 +305,6 @@ RSpec.describe "Seed Data", type: :model do
         it "creates assessments with required measurements" do
           Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.unit_pressure).to be_present
-            expect(assessment.blower_tube_length).to be_present
             expect(assessment.step_ramp_size).to be_present
             expect(assessment.critical_fall_off_height).to be_present
             expect(assessment.trough_depth).to be_present
@@ -316,7 +315,6 @@ RSpec.describe "Seed Data", type: :model do
         it "creates assessments with realistic measurement values" do
           Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.unit_pressure).to be_between(0.5, 5.0)
-            expect(assessment.blower_tube_length).to be_between(1.0, 10.0)
             expect(assessment.step_ramp_size).to be_between(100, 500)
             expect(assessment.critical_fall_off_height).to be_between(100, 3000)
             expect(assessment.trough_depth).to be_between(10, 100)
@@ -359,6 +357,14 @@ RSpec.describe "Seed Data", type: :model do
         it "creates assessments with realistic blower serials" do
           Assessments::FanAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.blower_serial).to match(/FAN-\d{4}/)
+          end
+        end
+
+        it "creates assessments with blower tube length measurements" do
+          Assessments::FanAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
+            expect(assessment.blower_tube_length).to be_present
+            expect(assessment.blower_tube_length).to be_between(1.0, 10.0)
+            expect([true, false]).to include(assessment.blower_tube_length_pass)
           end
         end
       end

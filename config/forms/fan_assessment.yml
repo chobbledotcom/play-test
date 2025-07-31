@@ -7,6 +7,11 @@ form_fields:
         field: number_of_blowers
       - partial: text_field
         field: blower_serial
+      - partial: number_pass_fail_comment
+        field: blower_tube_length
+        attributes:
+          step: 0.1
+          max: 10
       - partial: pass_fail_na_comment
         field: blower_flap_pass
       - partial: pass_fail_comment

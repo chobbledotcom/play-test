@@ -8,7 +8,6 @@ class Assessments::StructureAssessment < ApplicationRecord
   belongs_to :inspection
 
   validates :unit_pressure,
-    :blower_tube_length,
     :step_ramp_size,
     :trough_depth,
     :trough_adjacent_panel_width,

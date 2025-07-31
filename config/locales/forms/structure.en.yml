@@ -18,8 +18,6 @@ en:
         stitch_length_pass: "Stitching"
         evacuation_time_pass: "Evacuation Time (s)"
         unit_pressure: "Unit Pressure (kpa)"
-        blower_tube_length: "Blower Tube Length (m)"
-        blower_tube_length_pass: "Blower Tube Length (m)"
         # Additional Safety Checks
         critical_fall_off_height: "Fall Off Height (mm)"
         step_ramp_size: "Step/Ramp Size (mm)"

@@ -9,7 +9,6 @@ STRUCTURE_SAMPLE_DATA = {
   unit_stable_pass: true,
 
   unit_pressure: 2.8,
-  blower_tube_length: 1.75,
   critical_fall_off_height: 850,
   trough_depth: 150,
   trough_adjacent_panel_width: 650,
@@ -20,7 +19,6 @@ STRUCTURE_SAMPLE_DATA = {
   stitch_length_comment: "Stitch length comment",
   evacuation_time_pass: false,
   unit_pressure_pass: true,
-  blower_tube_length_pass: true,
   critical_fall_off_height_pass: true,
   trough_pass: true,
   step_ramp_size_pass: true,
@@ -80,6 +78,9 @@ FAN_SAMPLE_DATA = {
 
   blower_serial: "FAN-2024-12345",
   fan_size_type: "Centrifugal 1.5HP",
+
+  blower_tube_length: 1.75,
+  blower_tube_length_pass: true,
 
   blower_flap_pass: "pass",
   blower_finger_pass: true,
