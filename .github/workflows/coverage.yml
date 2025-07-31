@@ -13,18 +13,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install packages
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: google-chrome-stable curl libjemalloc2 sqlite3 libvips42 imagemagick-6.q16
-          version: 1.1
-          execute_install_scripts: true
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-          bundler-cache: true
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
 
       - name: Run all tests with coverage
         env:
