@@ -26,14 +26,14 @@ class SeedDataService
   require Rails.root.join("db/seeds/seed_data")
 
   class << self
-    def add_seeds_for_user(user)
+    def add_seeds_for_user(user, unit_count: UNIT_COUNT, inspection_count: INSPECTION_COUNT)
       raise "User already has seed data" if user.has_seed_data?
 
       ActiveRecord::Base.transaction do
         Rails.logger.info I18n.t("seed_data.logging.starting_creation", user_id: user.id)
         ensure_castle_blobs_exist
         Rails.logger.info I18n.t("seed_data.logging.castle_images_found", count: @castle_images.size)
-        create_seed_units_for_user(user)
+        create_seed_units_for_user(user, unit_count, inspection_count)
         Rails.logger.info I18n.t("seed_data.logging.creation_completed")
       end
       true
@@ -71,7 +71,7 @@ class SeedDataService
       Rails.logger.warn I18n.t("seed_data.logging.no_castle_images") if @castle_images.empty?
     end
 
-    def create_seed_units_for_user(user)
+    def create_seed_units_for_user(user, unit_count, inspection_count)
       # Mix of unit types similar to existing seeds
       unit_configs = [
         {name: "Medieval Castle Bouncer", manufacturer: "Airquee Manufacturing Ltd", width: 4.5, length: 4.5, height: 3.5},
@@ -84,12 +84,12 @@ class SeedDataService
         {name: "Double Bungee Run", manufacturer: "Party Castle Manufacturers", width: 4.0, length: 10.0, height: 2.5}
       ]
 
-      UNIT_COUNT.times do |i|
+      unit_count.times do |i|
         config = unit_configs[i % unit_configs.length]
         unit = create_unit_from_config(user, config, i)
         # Make half of units have incomplete most recent inspection
         should_have_incomplete_inspection = i.even?
-        create_inspections_for_unit(unit, user, config, has_incomplete_recent: should_have_incomplete_inspection)
+        create_inspections_for_unit(unit, user, config, inspection_count, has_incomplete_recent: should_have_incomplete_inspection)
       end
     end
 
@@ -137,10 +137,10 @@ class SeedDataService
       end
     end
 
-    def create_inspections_for_unit(unit, user, config, has_incomplete_recent: false)
+    def create_inspections_for_unit(unit, user, config, inspection_count, has_incomplete_recent: false)
       offset_days = rand(INSPECTION_OFFSET_RANGE)
 
-      INSPECTION_COUNT.times do |i|
+      inspection_count.times do |i|
         create_single_inspection(unit, user, config, offset_days, i, has_incomplete_recent)
       end
     end

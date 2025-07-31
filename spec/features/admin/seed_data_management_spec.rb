@@ -9,6 +9,10 @@ RSpec.feature "Seed Data Management", type: :feature do
   end
 
   scenario "admin adds seed data to a user without existing seeds" do
+    # Use smaller numbers for faster tests
+    stub_const("SeedDataService::UNIT_COUNT", 3)
+    stub_const("SeedDataService::INSPECTION_COUNT", 2)
+
     visit edit_user_path(test_user)
 
     expect(page).to have_content(I18n.t("users.titles.edit"))
@@ -20,19 +24,21 @@ RSpec.feature "Seed Data Management", type: :feature do
 
     expect(page).to have_content(I18n.t("users.messages.seeds_added"))
     expect(test_user.reload.has_seed_data?).to be true
-    expect(test_user.units.count).to eq(20)
-    # 20 units × 5 inspections each
-    expect(test_user.inspections.count).to eq(100)
+    expect(test_user.units.count).to eq(3)
+    # 3 units × 2 inspections each
+    expect(test_user.inspections.count).to eq(6)
 
-    expect(test_user.units.seed_data.count).to eq(20)
-    expect(test_user.inspections.seed_data.count).to eq(100)
+    expect(test_user.units.seed_data.count).to eq(3)
+    expect(test_user.inspections.seed_data.count).to eq(6)
 
     expect(page).not_to have_button(I18n.t("users.buttons.add_seeds"))
     expect(page).to have_button(I18n.t("users.buttons.delete_seeds"))
   end
 
   scenario "admin deletes seed data from a user with existing seeds" do
-    SeedDataService.add_seeds_for_user(test_user)
+    # Use smaller numbers for faster tests
+    smaller_counts = {unit_count: 3, inspection_count: 2}
+    SeedDataService.add_seeds_for_user(test_user, **smaller_counts)
 
     visit edit_user_path(test_user)
 
@@ -59,6 +65,10 @@ RSpec.feature "Seed Data Management", type: :feature do
   end
 
   scenario "seed data does not affect non-seed data" do
+    # Use smaller numbers for faster tests
+    stub_const("SeedDataService::UNIT_COUNT", 3)
+    stub_const("SeedDataService::INSPECTION_COUNT", 2)
+
     regular_unit = create(:unit, user: test_user, is_seed: false)
     regular_inspection = create(
       :inspection, user: test_user, unit: regular_unit, is_seed: false
