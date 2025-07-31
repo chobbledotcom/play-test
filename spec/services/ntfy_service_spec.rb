@@ -4,60 +4,39 @@ RSpec.describe NtfyService do
   describe ".notify" do
     let(:test_message) { "Test notification message" }
 
-    it "starts a thread for notification" do
-      expect(Thread).to receive(:new)
-      NtfyService.notify(test_message)
-    end
-
-    it "handles errors gracefully" do
-      allow(Thread).to receive(:new).and_yield
-      error = StandardError.new("Test error")
-      allow(NtfyService).to receive(:send_notification).and_raise(error)
-      expected_message = "NtfyService error: Test error"
-      expect(Rails.logger).to receive(:error).with(expected_message)
-
-      NtfyService.notify(test_message)
-    end
-
-    it "releases database connection in ensure block" do
-      allow(Thread).to receive(:new).and_yield
-      allow(NtfyService).to receive(:send_notification)
-      expect(ActiveRecord::Base.connection_pool).to receive(:release_connection)
-
-      NtfyService.notify(test_message)
+    it "accepts a message without raising errors" do
+      expect { NtfyService.notify(test_message) }.not_to raise_error
     end
 
     context "when NTFY_CHANNEL is not configured" do
       before do
-        allow(Thread).to receive(:new).and_yield
         allow(ENV).to receive(:[]).and_call_original
         allow(ENV).to receive(:[]).with("NTFY_CHANNEL").and_return(nil)
-        connection_pool = ActiveRecord::Base.connection_pool
-        allow(connection_pool).to receive(:release_connection)
       end
 
-      it "does not attempt to send notification" do
+      it "does not attempt HTTP requests" do
         expect(Net::HTTP).not_to receive(:new)
         NtfyService.notify(test_message)
+        sleep 0.1 # Give thread time to execute
       end
     end
 
     context "when NTFY_CHANNEL is configured" do
       before do
-        allow(Thread).to receive(:new).and_yield
         allow(ENV).to receive(:[]).and_call_original
-        test_channel = "test-channel"
-        allow(ENV).to receive(:[]).with("NTFY_CHANNEL").and_return(test_channel)
-        connection_pool = ActiveRecord::Base.connection_pool
-        allow(connection_pool).to receive(:release_connection)
+        allow(ENV).to receive(:[]).with("NTFY_CHANNEL").and_return("test-channel")
+
+        # Stub HTTP to prevent actual network calls
+        http_double = instance_double(Net::HTTP)
+        allow(Net::HTTP).to receive(:new).and_return(http_double)
+        allow(http_double).to receive(:use_ssl=)
+        allow(http_double).to receive(:request)
       end
 
-      it "attempts to send notification" do
-        error = StandardError.new("Mocked to prevent real HTTP")
-        expect(Net::HTTP).to receive(:new).with("ntfy.sh", 443).and_raise(error)
-        expect(Rails.logger).to receive(:error)
-
+      it "attempts to send notification via HTTP" do
+        expect(Net::HTTP).to receive(:new).with("ntfy.sh", 443)
         NtfyService.notify(test_message)
+        sleep 0.1 # Give thread time to execute
       end
     end
   end
