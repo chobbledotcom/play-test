@@ -50,7 +50,7 @@ RSpec.describe ValidationConfigurable do
     end
 
     it "respects existing validations" do
-      model = test_model_class.new(inspection_date: Date.today, width: 0.5)
+      model = test_model_class.new(inspection_date: Time.zone.today, width: 0.5)
 
       expect(model).not_to be_valid
       expect(model.errors[:width])
@@ -58,7 +58,7 @@ RSpec.describe ValidationConfigurable do
     end
 
     it "allows valid values" do
-      model = test_model_class.new(inspection_date: Date.today, width: 50)
+      model = test_model_class.new(inspection_date: Time.zone.today, width: 50)
 
       expect(model.errors[:inspection_date]).to be_empty
       expect(model.errors[:width]).to be_empty
