@@ -154,7 +154,7 @@ namespace :s3 do
         s3_key = "#{backup_dir}/#{filename}"
         temp_compressed_path = temp_dir.join(filename)
         temp_backup_path = temp_dir.join("database-#{args[:date]}.sqlite3")
-        
+
         # Create temp directory
         FileUtils.mkdir_p(temp_dir)
 
@@ -177,7 +177,7 @@ namespace :s3 do
           end
 
           # Create a safety backup of current database
-          safety_backup_path = database_path.to_s + ".pre-restore-#{Time.current.strftime('%Y%m%d%H%M%S')}"
+          safety_backup_path = database_path.to_s + ".pre-restore-#{Time.current.strftime("%Y%m%d%H%M%S")}"
           print "Creating safety backup of current database... "
           FileUtils.cp(database_path, safety_backup_path) if File.exist?(database_path)
           puts "✅"
@@ -191,7 +191,6 @@ namespace :s3 do
           puts "   Restored from: #{filename}"
           puts "   Safety backup: #{safety_backup_path}"
           puts "\n⚠️  Remember to restart your Rails app to pick up the restored database!"
-
         rescue Aws::S3::Errors::NoSuchKey
           puts "❌"
           puts "\n⚠️  Backup not found: #{filename}"
