@@ -10,10 +10,11 @@ if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
   ./bin/rails db:prepare
   
   echo "Setting up cron jobs with whenever..."
-  bundle exec whenever --update-crontab
+  # Generate crontab file for supercronic
+  bundle exec whenever > /tmp/crontab
   
-  echo "Starting cron in background..."
-  cron
+  echo "Starting supercronic in background..."
+  supercronic /tmp/crontab &
 fi
 
 exec "${@}"
