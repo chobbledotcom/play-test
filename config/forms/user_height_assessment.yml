@@ -45,6 +45,8 @@ form_fields:
         attributes:
           min: 0
           step: 1
+  - legend_i18n_key: tallest_user_capacity
+    fields:
       - partial: decimal_comment
         field: tallest_user_height
         attributes:

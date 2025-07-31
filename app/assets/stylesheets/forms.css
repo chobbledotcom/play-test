@@ -98,10 +98,6 @@
 	padding-top: 1rem;
 }
 
-.form-grid:last-child {
-	margin-bottom: -0.5rem;
-}
-
 legend + .form-grid {
 	border-top: none;
 }
@@ -168,6 +164,19 @@ form *:target {
 
 .form-grid .pass-fail label {
 	display: flex;
+}
+
+.number {
+	grid-template-area: "label number";
+	grid-template-columns: auto min-content;
+	align-items: center;
+}
+.number-comment > .label {
+	grid-area: label;
+}
+.number-comment > .number {
+	grid-area: number;
+	width: 14rem;
 }
 
 .radio-comment {
@@ -326,20 +335,20 @@ form *:target {
 }
 
 /* User height fields flexbox layout */
-.user-heights {
+fieldset#user_capacity {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1rem;
 }
 
 /* Mobile: 2 columns (2 rows of 2) */
-.user-heights > * {
+fieldset#user_capacity > * {
 	flex: 1 1 calc(50% - 0.5rem);
 }
 
 /* Desktop: 4 columns (1 row of 4) */
 @media (min-width: 768px) {
-	.user-heights > * {
+	fieldset#user_capacity > * {
 		flex: 1 1 calc(25% - 0.75rem);
 	}
 }

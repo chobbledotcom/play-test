@@ -6,9 +6,10 @@ en:
         height_measurements: "Height Measurements"
         height_measurements_footer: "This is not slides - that's the next page"
         user_capacity: "User Capacity"
+        tallest_user_capacity: "User Capacity (Maximum)"
         play_area: "Play Area"
       fields:
-        containing_wall_height: "Main Wall Height"
+        containing_wall_height: "Main Wall Height (m)"
         tallest_user_height: "Maximum User Height (m)"
         users_at_1000mm: "Users at 1m"
         users_at_1200mm: "Users at 1.2m"
