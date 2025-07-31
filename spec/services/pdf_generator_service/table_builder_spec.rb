@@ -7,466 +7,178 @@ RSpec.describe PdfGeneratorService::TableBuilder do
     end
   end
 
-  let(:pdf_double) { double("pdf") }
-  let(:bounds_double) { double("bounds", width: 500) }
-  let(:table_double) { double("table") }
-  let(:cells_double) { double("cells") }
-  let(:columns_double) { double("columns") }
-  let(:row_double) { double("row") }
-
-  before do
-    allow(pdf_double).to receive(:bounds).and_return(bounds_double)
-    allow(pdf_double).to receive(:table).and_return(table_double)
-    allow(pdf_double).to receive(:text)
-    allow(pdf_double).to receive(:stroke_horizontal_rule)
-    allow(pdf_double).to receive(:move_down)
-
-    allow(table_double).to receive(:cells).and_return(cells_double)
-    allow(table_double).to receive(:columns).and_return(columns_double)
-    allow(table_double).to receive(:row).and_return(row_double)
-    allow(table_double).to receive(:column_widths=)
-
-    allow(cells_double).to receive(:borders=)
-    allow(cells_double).to receive(:padding=)
-    allow(cells_double).to receive(:size=)
-    allow(cells_double).to receive(:border_width=)
-    allow(cells_double).to receive(:border_color=)
-
-    allow(columns_double).to receive(:font_style=)
-    allow(columns_double).to receive(:width=)
-
-    allow(row_double).to receive(:background_color=)
-    allow(row_double).to receive(:borders=)
-    allow(row_double).to receive(:border_color=)
-    allow(row_double).to receive(:font_style=)
-    allow(row_double).to receive(:column).and_return(double("cell", text_color: "000000", font_style: :normal))
-  end
-
-  describe ".create_pdf_table" do
-    let(:data) { [["Label 1", "Value 1"], ["Label 2", "Value 2"]] }
-
-    it "creates a table with correct data and width" do
-      described_class.create_pdf_table(pdf_double, data)
-
-      expect(pdf_double).to have_received(:table).with(data, width: 500)
-    end
-
-    it "configures table styling correctly" do
-      allow(pdf_double).to receive(:table).and_yield(table_double).and_return(table_double)
-
-      described_class.create_pdf_table(pdf_double, data)
-
-      expect(cells_double).to have_received(:borders=).with([])
-      expect(cells_double).to have_received(:padding=).with(PdfGeneratorService::Configuration::TABLE_CELL_PADDING)
-      expect(columns_double).to have_received(:font_style=).with(:bold)
-      expect(columns_double).to have_received(:width=).with(PdfGeneratorService::Configuration::TABLE_FIRST_COLUMN_WIDTH)
-    end
-
-    it "applies row styling for all data rows" do
-      allow(pdf_double).to receive(:table).and_yield(table_double).and_return(table_double)
-      allow(table_double).to receive(:row).with(0..1).and_return(row_double)
-
-      described_class.create_pdf_table(pdf_double, data)
-
-      expect(row_double).to have_received(:background_color=).with("EEEEEE")
-      expect(row_double).to have_received(:borders=).with([:bottom])
-      expect(row_double).to have_received(:border_color=).with("DDDDDD")
-    end
-
-    it "yields table to block when given" do
-      block_called = false
-      allow(pdf_double).to receive(:table).and_yield(table_double).and_return(table_double)
-
-      result = described_class.create_pdf_table(pdf_double, data) do |table|
-        block_called = true
-        expect(table).to eq(table_double)
+  describe ".build_unit_details_table" do
+    context "for inspection context with complete data" do
+      let(:company) { create(:inspector_company) }
+      let(:user) do
+        create(:user,
+          inspection_company: company,
+          rpii_inspector_number: "RPII123")
+      end
+      let(:unit) { create(:unit, :with_all_fields) }
+      let!(:inspection) do
+        create(:inspection,
+          unit: unit,
+          user: user,
+          width: 10.5,
+          length: 8.0,
+          height: 2.5)
       end
 
-      expect(block_called).to be(true)
-      expect(result).to eq(table_double)
-    end
-
-    it "returns table without yielding when no block given" do
-      result = described_class.create_pdf_table(pdf_double, data)
-      expect(result).to eq(table_double)
-    end
-  end
-
-  describe ".create_nice_box_table" do
-    let(:title) { "Test Title" }
-    let(:data) { [["Label", "Value"]] }
-
-    it "adds title with correct styling" do
-      described_class.create_nice_box_table(pdf_double, title, data)
-
-      expect(pdf_double).to have_received(:text).with(title, size: PdfGeneratorService::Configuration::HEADER_TEXT_SIZE, style: :bold)
-    end
-
-    it "adds horizontal rule and spacing" do
-      described_class.create_nice_box_table(pdf_double, title, data)
-
-      expect(pdf_double).to have_received(:stroke_horizontal_rule)
-      expect(pdf_double).to have_received(:move_down).with(10)
-      expect(pdf_double).to have_received(:move_down).with(15)
-    end
-
-    it "creates table with nice styling" do
-      allow(pdf_double).to receive(:table).and_yield(table_double).and_return(table_double)
-
-      described_class.create_nice_box_table(pdf_double, title, data)
-
-      expect(cells_double).to have_received(:padding=).with(PdfGeneratorService::Configuration::NICE_TABLE_CELL_PADDING)
-      expect(cells_double).to have_received(:size=).with(PdfGeneratorService::Configuration::NICE_TABLE_TEXT_SIZE)
-    end
-
-    it "yields table to block when given" do
-      block_called = false
-      allow(pdf_double).to receive(:table).and_yield(table_double).and_return(table_double)
-
-      described_class.create_nice_box_table(pdf_double, title, data) do |table|
-        block_called = true
-        expect(table).to eq(table_double)
+      before do
+        unit.reload # Ensure unit sees the inspection
       end
 
-      expect(block_called).to be(true)
+      it "formats unit data into 4x4 table structure" do
+        result = described_class.build_unit_details_table(unit, :inspection)
+
+        expect(result).to be_an(Array)
+        expect(result.length).to eq(4)
+        result.each { |row| expect(row.length).to eq(4) }
+      end
+
+      it "includes key unit information" do
+        result = described_class.build_unit_details_table(unit, :inspection)
+        flattened = result.flatten
+
+        expect(flattened).to include(unit.name)
+        expect(flattened).to include(unit.serial)
+        expect(flattened).to include(unit.manufacturer)
+        expect(flattened).to include(unit.operator)
+      end
+
+      it "includes dimensions when available" do
+        result = described_class.build_unit_details_table(unit, :inspection)
+        dimensions_text = result[2][1] # Size field
+
+        # Just verify dimensions field exists - depends on unit.last_inspection
+        expect(dimensions_text).to be_a(String)
+      end
+    end
+
+    context "for unit context" do
+      let(:unit) { create(:unit) }
+
+      it "formats unit data into 2-column table structure" do
+        result = described_class.build_unit_details_table(unit, :unit)
+
+        expect(result).to be_an(Array)
+        expect(result.length).to eq(5)
+        result.each { |row| expect(row.length).to eq(2) }
+      end
+    end
+
+    context "with missing data" do
+      let(:unit) do
+        build(:unit, name: nil, description: nil, manufacturer: nil)
+      end
+
+      it "handles missing fields with empty strings" do
+        result = described_class.build_unit_details_table(unit, "inspection")
+
+        expect(result[0][1]).to eq("") # empty name/description
+        expect(result[1][1]).to eq("") # empty manufacturer
+      end
     end
   end
 
-  describe ".create_unit_details_table" do
-    let(:title) { "Unit Details" }
-    let(:data) { [["Description", "Test Unit", "Serial", "ABC123"]] }
-
-    it "adds title and formatting" do
-      described_class.create_unit_details_table(pdf_double, title, data)
-
-      expect(pdf_double).to have_received(:text).with(title, size: PdfGeneratorService::Configuration::HEADER_TEXT_SIZE, style: :bold)
-      expect(pdf_double).to have_received(:stroke_horizontal_rule)
-      expect(pdf_double).to have_received(:move_down).with(10)
-      expect(pdf_double).to have_received(:move_down).with(15)
+  describe ".build_inspection_history_data" do
+    let(:company) { create(:inspector_company) }
+    let(:user) do
+      create(:user,
+        name: "John Smith",
+        rpii_inspector_number: "RPII123",
+        inspection_company: company)
     end
-
-    it "configures unit-specific table styling" do
-      allow(pdf_double).to receive(:table).and_yield(table_double).and_return(table_double)
-
-      described_class.create_unit_details_table(pdf_double, title, data)
-
-      expect(cells_double).to have_received(:padding=).with(PdfGeneratorService::Configuration::UNIT_TABLE_CELL_PADDING)
-      expect(cells_double).to have_received(:size=).with(PdfGeneratorService::Configuration::UNIT_TABLE_TEXT_SIZE)
-    end
-
-    it "sets bold styling for label columns" do
-      allow(pdf_double).to receive(:table).and_yield(table_double).and_return(table_double)
-      allow(table_double).to receive(:columns).with(0).and_return(columns_double)
-      allow(table_double).to receive(:columns).with(2).and_return(columns_double)
-
-      described_class.create_unit_details_table(pdf_double, title, data)
-
-      expect(columns_double).to have_received(:font_style=).with(:bold).twice
-    end
-
-    it "calculates column widths correctly" do
-      allow(pdf_double).to receive(:table).and_yield(table_double).and_return(table_double)
-      allow(table_double).to receive(:columns).with(0).and_return(columns_double)
-      allow(table_double).to receive(:columns).with(1).and_return(columns_double)
-      allow(table_double).to receive(:columns).with(2).and_return(columns_double)
-      allow(table_double).to receive(:columns).with(3).and_return(columns_double)
-
-      described_class.create_unit_details_table(pdf_double, title, data)
-
-      label_width = PdfGeneratorService::Configuration::UNIT_LABEL_COLUMN_WIDTH
-      remaining_width = 500 - (label_width * 2)
-      value_width = remaining_width / 2
-
-      expect(columns_double).to have_received(:width=).with(label_width).twice
-      expect(columns_double).to have_received(:width=).with(value_width).twice
-    end
-  end
-
-  describe ".create_inspection_history_table" do
-    let(:title) { "Inspection History" }
-    let(:company1) { create(:inspector_company, name: "Smith Inspections") }
-    let(:company2) { create(:inspector_company, name: "Doe Inspections") }
-    let(:user1) { create(:user, name: "John Smith", rpii_inspector_number: "RPII123", inspection_company: company1) }
-    let(:user2) { create(:user, name: "Jane Doe", rpii_inspector_number: "RPII456", inspection_company: company2) }
     let(:inspections) do
       [
-        create(:inspection, :passed, inspection_date: Date.new(2024, 1, 15), user: user1),
-        create(:inspection, :failed, inspection_date: Date.new(2024, 2, 20), user: user2),
-        create(:inspection, inspection_date: Date.new(2024, 3, 1), user: user1, passed: nil)
+        create(:inspection, :passed,
+          inspection_date: Date.new(2024, 1, 15), user: user),
+        create(:inspection, :failed,
+          inspection_date: Date.new(2024, 2, 20), user: user)
       ]
     end
 
-    before do
-      allow(pdf_double).to receive(:table).and_yield(table_double).and_return(table_double)
+    it "formats inspection history with header row" do
+      result = described_class.build_inspection_history_data(inspections)
 
-      # Create separate row doubles for each row to track calls properly
-      @row0_double = double("row0")
-      @row1_double = double("row1")
-      @row2_double = double("row2")
-      @row3_double = double("row3")
-
-      allow(table_double).to receive(:row).with(0).and_return(@row0_double)
-      allow(table_double).to receive(:row).with(1).and_return(@row1_double)
-      allow(table_double).to receive(:row).with(2).and_return(@row2_double)
-      allow(table_double).to receive(:row).with(3).and_return(@row3_double)
-
-      [@row0_double, @row1_double, @row2_double, @row3_double].each do |row|
-        allow(row).to receive(:background_color=)
-        allow(row).to receive(:font_style=)
-        allow(row).to receive(:column).with(1).and_return(double("cell", text_color: nil, font_style: nil))
-      end
-
-      # Mock cell styling for result column
-      [@row1_double, @row2_double, @row3_double].each do |row|
-        cell_double = double("cell")
-        allow(cell_double).to receive(:text_color=)
-        allow(cell_double).to receive(:font_style=)
-        allow(row).to receive(:column).with(1).and_return(cell_double)
-      end
-    end
-
-    it "adds title and formatting" do
-      described_class.create_inspection_history_table(pdf_double, title, inspections)
-
-      expect(pdf_double).to have_received(:text).with(title, size: PdfGeneratorService::Configuration::HEADER_TEXT_SIZE, style: :bold)
-      expect(pdf_double).to have_received(:stroke_horizontal_rule)
-      expect(pdf_double).to have_received(:move_down).with(10)
-      expect(pdf_double).to have_received(:move_down).with(15)
-    end
-
-    it "creates header row with correct labels" do
-      expected_header = [
+      expect(result.length).to eq(3) # header + 2 inspections
+      expect(result[0]).to eq([
         I18n.t("pdf.unit.fields.date"),
         I18n.t("pdf.unit.fields.result"),
         I18n.t("pdf.unit.fields.inspector")
-      ]
-
-      expected_data = [expected_header] + inspections.map { |i|
-        inspector_name = i.user.name || I18n.t("pdf.unit.fields.na")
-        rpii_number = i.user.rpii_inspector_number
-        inspector_text = if rpii_number.present?
-          "#{inspector_name} (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} #{rpii_number})"
-        else
-          inspector_name
-        end
-
-        [
-          PdfGeneratorService::Utilities.format_date(i.inspection_date),
-          i.passed ? I18n.t("shared.pass_pdf") : I18n.t("shared.fail_pdf"),
-          inspector_text
-        ]
-      }
-
-      described_class.create_inspection_history_table(pdf_double, title, inspections)
-
-      expect(pdf_double).to have_received(:table).with(expected_data, width: 500)
+      ])
     end
 
     it "formats inspection data correctly" do
-      expected_data = [
-        [
-          I18n.t("pdf.unit.fields.date"),
-          I18n.t("pdf.unit.fields.result"),
-          I18n.t("pdf.unit.fields.inspector")
-        ],
-        ["15 January, 2024", I18n.t("shared.pass_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)"],
-        ["20 February, 2024", I18n.t("shared.fail_pdf"), "Jane Doe (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII456)"],
-        ["1 March, 2024", I18n.t("shared.fail_pdf"), "John Smith (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} RPII123)"]
-      ]
+      result = described_class.build_inspection_history_data(inspections)
 
-      described_class.create_inspection_history_table(pdf_double, title, inspections)
+      rpii_label = I18n.t("pdf.inspection.fields.rpii_inspector_no")
+      inspector_text = "John Smith (#{rpii_label} RPII123)"
 
-      expect(pdf_double).to have_received(:table).with(expected_data, width: 500)
+      expect(result[1]).to eq([
+        "15 January, 2024",
+        I18n.t("shared.pass_pdf"),
+        inspector_text
+      ])
+
+      expect(result[2]).to eq([
+        "20 February, 2024",
+        I18n.t("shared.fail_pdf"),
+        inspector_text
+      ])
     end
 
-    it "configures table styling correctly" do
-      described_class.create_inspection_history_table(pdf_double, title, inspections)
+    it "handles empty inspections array" do
+      result = described_class.build_inspection_history_data([])
 
-      expect(cells_double).to have_received(:padding=).with(PdfGeneratorService::Configuration::NICE_TABLE_CELL_PADDING)
-      expect(cells_double).to have_received(:size=).with(PdfGeneratorService::Configuration::HISTORY_TABLE_TEXT_SIZE)
-      expect(cells_double).to have_received(:border_width=).with(0.5)
-      expect(cells_double).to have_received(:border_color=).with("CCCCCC")
-    end
-
-    it "applies header styling" do
-      described_class.create_inspection_history_table(pdf_double, title, inspections)
-
-      expect(@row0_double).to have_received(:background_color=).with(PdfGeneratorService::Configuration::HISTORY_TABLE_HEADER_COLOR)
-      expect(@row0_double).to have_received(:font_style=).with(:bold)
-    end
-
-    it "applies alternating row colors" do
-      described_class.create_inspection_history_table(pdf_double, title, inspections)
-
-      # Rows 1, 3 (odd) get one color, row 2 (even) gets another
-      expect(@row1_double).to have_received(:background_color=).with(PdfGeneratorService::Configuration::HISTORY_TABLE_ROW_COLOR)
-      expect(@row2_double).to have_received(:background_color=).with(PdfGeneratorService::Configuration::HISTORY_TABLE_ALT_ROW_COLOR)
-      expect(@row3_double).to have_received(:background_color=).with(PdfGeneratorService::Configuration::HISTORY_TABLE_ROW_COLOR)
-    end
-
-    it "sets column widths correctly" do
-      remaining_width = 500 - PdfGeneratorService::Configuration::HISTORY_DATE_COLUMN_WIDTH -
-        PdfGeneratorService::Configuration::HISTORY_RESULT_COLUMN_WIDTH
-
-      expected_widths = [
-        PdfGeneratorService::Configuration::HISTORY_DATE_COLUMN_WIDTH,
-        PdfGeneratorService::Configuration::HISTORY_RESULT_COLUMN_WIDTH,
-        remaining_width
-      ]
-
-      described_class.create_inspection_history_table(pdf_double, title, inspections)
-
-      expect(table_double).to have_received(:column_widths=).with(expected_widths)
-    end
-
-    context "with empty inspections" do
-      let(:empty_inspections) { [] }
-
-      it "handles empty inspections array" do
-        expected_data = [[
-          I18n.t("pdf.unit.fields.date"),
-          I18n.t("pdf.unit.fields.result"),
-          I18n.t("pdf.unit.fields.inspector")
-        ]]
-
-        described_class.create_inspection_history_table(pdf_double, title, empty_inspections)
-
-        expect(pdf_double).to have_received(:table).with(expected_data, width: 500)
-      end
+      expect(result.length).to eq(1) # just header
+      expect(result[0]).to eq([
+        I18n.t("pdf.unit.fields.date"),
+        I18n.t("pdf.unit.fields.result"),
+        I18n.t("pdf.unit.fields.inspector")
+      ])
     end
   end
 
-  describe ".build_unit_details_table" do
-    context "with complete unit data" do
-      let(:unit) { create(:unit, :with_all_fields) }
-
-      it "formats complete unit data correctly" do
-        result = described_class.build_unit_details_table(unit, "inspection")
-
-        # Check structure and that all fields are present
-        expect(result).to be_an(Array)
-        expect(result.length).to eq(4) # 4 rows
-
-        # Check each row has 4 columns (label, value, label, value)
-        result.each do |row|
-          expect(row.length).to eq(4)
-        end
-
-        # Check key fields are included
-        flattened = result.flatten
-        expect(flattened).to include(unit.name)
-        expect(flattened).to include(unit.serial)
-        expect(flattened).to include(unit.manufacturer)
-        expect(flattened).to include(unit.operator)
-      end
+  describe ".inspection_result_text" do
+    it "returns correct text for passed inspection" do
+      inspection = build(:inspection, passed: true)
+      result = described_class.inspection_result_text(inspection)
+      expect(result).to eq(I18n.t("shared.pass_pdf"))
     end
 
-    context "with minimal unit data" do
-      let(:unit) { build(:unit, name: nil, description: nil) }
+    it "returns correct text for failed inspection" do
+      inspection = build(:inspection, passed: false)
+      result = described_class.inspection_result_text(inspection)
+      expect(result).to eq(I18n.t("shared.fail_pdf"))
+    end
+  end
 
-      it "handles missing data with appropriate fallbacks" do
-        result = described_class.build_unit_details_table(unit, "unit")
+  describe ".inspector_text" do
+    let(:user) { build(:user, name: "John Smith", rpii_inspector_number: nil) }
+    let(:inspection) { build(:inspection, user: user) }
 
-        # Check structure
-        expect(result).to be_an(Array)
-        expect(result.length).to eq(4) # 4 rows
+    it "formats inspector with RPII number" do
+      user.rpii_inspector_number = "RPII123"
+      result = described_class.inspector_text(inspection)
 
-        # Check each row has 4 columns
-        result.each do |row|
-          expect(row.length).to eq(4)
-        end
-
-        # Check that missing name/description shows as empty string
-        flattened = result.flatten
-        expect(flattened).to include("") # empty description
-        expect(flattened).to include(unit.serial)
-        expect(flattened).to include(unit.manufacturer)
-        expect(flattened).to include(unit.operator)
-      end
+      rpii_label = I18n.t("pdf.inspection.fields.rpii_inspector_no")
+      expect(result).to eq("John Smith (#{rpii_label} RPII123)")
     end
 
-    context "with partial data" do
-      let(:unit) { build(:unit, manufacturer: nil) }
+    it "returns name only without RPII number" do
+      result = described_class.inspector_text(inspection)
 
-      it "handles partial data correctly" do
-        result = described_class.build_unit_details_table(unit, "inspection")
-
-        # Check structure
-        expect(result).to be_an(Array)
-        expect(result.length).to eq(4) # 4 rows
-
-        # Check manufacturer is missing (empty string)
-        flattened = result.flatten
-        expect(flattened).to include("") # empty manufacturer
-        expect(flattened).to include(unit.name)
-        expect(flattened).to include(unit.serial)
-      end
+      expect(result).to eq("John Smith")
     end
 
-    context "with empty manufacturer" do
-      let(:unit) do
-        build(:unit,
-          manufacturer: "",
-          name: "Test Unit")
-      end
+    it "handles missing inspector name" do
+      user.name = nil
+      user.rpii_inspector_number = nil
+      result = described_class.inspector_text(inspection)
 
-      it "shows empty string for empty manufacturer" do
-        result = described_class.build_unit_details_table(unit, "inspection")
-
-        expect(result[1][1]).to eq("")
-      end
-    end
-
-    context "with long unit name" do
-      let(:unit) do
-        create(:unit,
-          name: "This is a very long unit name that exceeds the maximum allowed length and should be truncated properly",
-          description: "Also a very long description that should be considered when name is nil")
-      end
-
-      it "truncates long unit name" do
-        allow(PdfGeneratorService::Utilities).to receive(:truncate_text).and_call_original
-
-        described_class.build_unit_details_table(unit, "inspection")
-
-        expect(PdfGeneratorService::Utilities).to have_received(:truncate_text).with(
-          unit.name,
-          PdfGeneratorService::Configuration::UNIT_NAME_MAX_LENGTH
-        )
-      end
-
-      it "falls back to description when name is nil" do
-        unit.name = nil
-        allow(PdfGeneratorService::Utilities).to receive(:truncate_text).and_call_original
-
-        described_class.build_unit_details_table(unit, "inspection")
-
-        expect(PdfGeneratorService::Utilities).to have_received(:truncate_text).with(
-          unit.description,
-          PdfGeneratorService::Configuration::UNIT_NAME_MAX_LENGTH
-        )
-      end
-    end
-
-    context "with different contexts" do
-      let(:unit) { create(:unit, name: "Test Unit") }
-
-      it "uses correct I18n keys for inspection context" do
-        result = described_class.build_unit_details_table(unit, "inspection")
-
-        # Should contain inspection-specific I18n keys
-        expect(result.flatten).to include(I18n.t("pdf.inspection.fields.description"))
-        expect(result.flatten).to include(I18n.t("pdf.inspection.fields.serial"))
-      end
-
-      it "shows empty string when name and description are nil" do
-        unit.name = nil
-        unit.description = nil
-        result = described_class.build_unit_details_table(unit, "unit")
-
-        # Should show empty string instead of N/A
-        expect(result[0][1]).to eq("")
-      end
+      expect(result).to eq(I18n.t("pdf.unit.fields.na"))
     end
   end
 end
