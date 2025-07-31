@@ -5,7 +5,7 @@ en:
     compliant: "Compliant"
 
     anchor_requirements:
-      title: "Anchor Requirements"
+      title: "Anchor Requirements (box model)"
       description: "Anchors must be calculated based on the play area to ensure adequate ground restraint."
       unit_area: "Unit Area (m²)"
       required_anchors: "Required Anchors"

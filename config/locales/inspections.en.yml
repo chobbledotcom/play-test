@@ -204,7 +204,7 @@ en:
     safety_standards:
       title: "Safety Standards Compliance"
       description: "Assessment against EN 14960:2019 requirements"
-      anchor_requirements: "Anchor Requirements"
+#      anchor_requirements: "Anchor Requirements (box model)"
       anchor_calculation: "Required anchors: %{required} (based on %{area}m² area)"
       anchor_status: "Current anchors: %{current} of %{required} required"
       slide_requirements: "Slide Safety Requirements"
