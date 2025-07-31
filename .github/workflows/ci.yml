@@ -38,6 +38,27 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
+      - name: Fix ImageMagick PATH
+        run: |
+          # Check if ImageMagick executables are available
+          if ! command -v mogrify &> /dev/null; then
+            echo "ImageMagick executables not in PATH, searching for them..."
+            # Find and link ImageMagick executables
+            for cmd in mogrify identify convert; do
+              BIN_PATH=$(find /usr -name "$cmd" -type f -executable 2>/dev/null | grep -E "bin/$cmd$" | head -1)
+              if [ -n "$BIN_PATH" ]; then
+                echo "Found $cmd at $BIN_PATH"
+                sudo ln -sf "$BIN_PATH" "/usr/local/bin/$cmd"
+              else
+                echo "Warning: $cmd not found"
+              fi
+            done
+          else
+            echo "ImageMagick already in PATH"
+          fi
+          # Verify installation
+          which mogrify identify convert
+
       - name: Prepare database
         env:
           RAILS_ENV: test
