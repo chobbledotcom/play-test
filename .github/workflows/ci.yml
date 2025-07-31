@@ -33,8 +33,8 @@ jobs:
         id: db-cache
         with:
           path: |
-            db/test.sqlite3
-            db/test.sqlite3-*
+            storage/test.sqlite3
+            storage/test*.sqlite3
           key: ${{ runner.os }}-test-db-${{ hashFiles('db/schema.rb', 'db/migrate/**/*') }}
           restore-keys: |
             ${{ runner.os }}-test-db-
