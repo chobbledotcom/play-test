@@ -37,11 +37,19 @@ runs:
         # Check if ImageMagick commands are available
         if ! command -v identify &> /dev/null; then
           echo "Setting up ImageMagick symlinks..."
-          # The apt package installs versioned binaries like identify-6.q16
-          # Create symlinks to the standard names
-          sudo ln -sf /usr/bin/identify-6.q16 /usr/local/bin/identify || true
-          sudo ln -sf /usr/bin/mogrify-6.q16 /usr/local/bin/mogrify || true
-          sudo ln -sf /usr/bin/convert-6.q16 /usr/local/bin/convert || true
+          # Find the actual binary names dynamically
+          for cmd in identify mogrify convert; do
+            # Find the versioned binary (e.g., identify-im6.q16)
+            BINARY=$(ls /usr/bin/${cmd}-* 2>/dev/null | grep -E "${cmd}-im[0-9]" | head -1)
+            if [ -n "$BINARY" ]; then
+              echo "Creating symlink: $BINARY -> /usr/local/bin/$cmd"
+              sudo ln -sf "$BINARY" "/usr/local/bin/$cmd"
+            else
+              echo "Warning: No binary found for $cmd"
+            fi
+          done
+        else
+          echo "ImageMagick commands already available"
         fi
         
         # If still not found, try installing imagemagick meta-package
