@@ -161,19 +161,6 @@ module InspectionTestHelpers
     end
   end
 
-  def get_field_label(tab_name, field_name)
-    field_str = field_name.to_s
-
-    if field_str.end_with?("_pass")
-      pass_key = "forms.#{tab_name}.fields.#{field_name}"
-      base_key = "forms.#{tab_name}.fields.#{field_str.chomp("_pass")}"
-
-      I18n.exists?(pass_key) ? I18n.t(pass_key) : I18n.t(base_key)
-    else
-      I18n.t("forms.#{tab_name}.fields.#{field_name}")
-    end
-  end
-
   # Unit-related button methods
   def click_units_button(key, confirm: false)
     translation = I18n.t("units.buttons.#{key}")

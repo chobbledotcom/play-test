@@ -5,102 +5,59 @@ RSpec.feature "Safety Standards with Turbo", js: true do
 
   describe "anchor calculator" do
     it "updates results without page reload via Turbo" do
-      within(".calculator-form", text: I18n.t("forms.safety_standards_anchors.header")) do
-        fill_in I18n.t("forms.safety_standards_anchors.fields.length"), with: 5.0
-        fill_in I18n.t("forms.safety_standards_anchors.fields.width"), with: 5.0
-        fill_in I18n.t("forms.safety_standards_anchors.fields.height"), with: 3.0
-        click_button I18n.t("forms.safety_standards_anchors.submit")
-      end
-
-      within("#anchors-result") do
-        expect(page).to have_content("8")
-        expect(page).to have_content("Calculated Total Anchors")
-      end
-
+      fill_anchor_calculator(length: 5.0, width: 5.0, height: 3.0)
+      expect_anchor_result_header(8)
       expect(page).to have_current_path(safety_standards_path)
     end
 
     it "maintains form values after submission" do
-      within(".calculator-form", text: I18n.t("forms.safety_standards_anchors.header")) do
-        fill_in I18n.t("forms.safety_standards_anchors.fields.length"), with: 5.0
-        fill_in I18n.t("forms.safety_standards_anchors.fields.width"), with: 5.0
-        fill_in I18n.t("forms.safety_standards_anchors.fields.height"), with: 3.0
-        click_button I18n.t("forms.safety_standards_anchors.submit")
-      end
-
-      within(".calculator-form", text: I18n.t("forms.safety_standards_anchors.header")) do
-        expect(find_field(I18n.t("forms.safety_standards_anchors.fields.length")).value).to eq("5.0")
-        expect(find_field(I18n.t("forms.safety_standards_anchors.fields.width")).value).to eq("5.0")
-        expect(find_field(I18n.t("forms.safety_standards_anchors.fields.height")).value).to eq("3.0")
+      fill_anchor_calculator(length: 5.0, width: 5.0, height: 3.0)
+      within_form("safety_standards_anchors") do
+        form = "safety_standards_anchors"
+        expect(find_form_field(form, "length").value).to eq("5.0")
+        expect(find_form_field(form, "width").value).to eq("5.0")
+        expect(find_form_field(form, "height").value).to eq("3.0")
       end
     end
   end
 
   describe "slide runout calculator" do
     it "updates results without page reload via Turbo" do
-      click_link "Slides"
-
-      within(".calculator-form", text: I18n.t("forms.safety_standards_slide_runout.header")) do
-        fill_in I18n.t("forms.safety_standards_slide_runout.fields.platform_height"), with: 2.5
-        click_button I18n.t("forms.safety_standards_slide_runout.submit")
+      navigate_to_standard_tab(:slides)
+      fill_slide_calculator(platform_height: 2.5)
+      within_result(:runout) do
+        content = "Base runout: Maximum of 1.25m and 0.3m = 1.25m"
+        expect(page).to have_content(content)
       end
-
-      within("#slide-runout-result") do
-        expect(page).to have_content("Base runout: Maximum of 1.25m and 0.3m = 1.25m")
-      end
-
       expect(page).to have_current_path(safety_standards_path)
     end
   end
 
   describe "wall height calculator" do
     it "updates results without page reload via Turbo" do
-      click_link "Slides"
-
-      within(".calculator-form", text: I18n.t("forms.safety_standards_wall_height.header")) do
-        fill_in I18n.t("forms.safety_standards_wall_height.fields.platform_height"), with: 2.0
-        fill_in I18n.t("forms.safety_standards_wall_height.fields.user_height"), with: 1.5
-        click_button I18n.t("forms.safety_standards_wall_height.submit")
-      end
-
-      within("#wall-height-result") do
+      navigate_to_standard_tab(:slides)
+      fill_wall_height_calculator(platform_height: 2.0, user_height: 1.5)
+      within_result(:wall_height) do
         expect(page).to have_content("0.6m - 3.0m")
         expect(page).to have_content("1.5m (user height)")
       end
-
       expect(page).to have_current_path(safety_standards_path)
     end
   end
 
   describe "multiple form interactions" do
     it "updates each form independently" do
-      within(".calculator-form", text: I18n.t("forms.safety_standards_anchors.header")) do
-        fill_in I18n.t("forms.safety_standards_anchors.fields.length"), with: 5.0
-        fill_in I18n.t("forms.safety_standards_anchors.fields.width"), with: 5.0
-        fill_in I18n.t("forms.safety_standards_anchors.fields.height"), with: 3.0
-        click_button I18n.t("forms.safety_standards_anchors.submit")
-      end
+      fill_anchor_calculator(length: 5.0, width: 5.0, height: 3.0)
+      expect_anchor_result_header
 
-      within("#anchors-result") do
-        expect(page).to have_content("Calculated Total Anchors:")
-      end
-
-      click_link "Slides"
-
-      within(".calculator-form", text: I18n.t("forms.safety_standards_slide_runout.header")) do
-        fill_in I18n.t("forms.safety_standards_slide_runout.fields.platform_height"), with: 2.5
-        click_button I18n.t("forms.safety_standards_slide_runout.submit")
-      end
-
-      within("#slide-runout-result") do
+      navigate_to_standard_tab(:slides)
+      fill_slide_calculator(platform_height: 2.5)
+      within_result(:runout) do
         expect(page).to have_content("1.25m")
       end
 
-      click_link "Anchorage"
-
-      within("#anchors-result") do
-        expect(page).to have_content("Calculated Total Anchors:")
-      end
+      navigate_to_standard_tab(:anchorage)
+      expect_anchor_result_header
     end
   end
 end

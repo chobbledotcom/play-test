@@ -8,11 +8,11 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
     submit_anchor_form
 
     expect_anchor_result(8)
+    expect_anchor_breakdown(width: 5.0, height: 3.0, area: 15.0)
 
-    within("#anchors-result") do
-      expect(page).to have_content(I18n.t("safety_standards.calculators.anchor.front_back_area_label"))
-      expect(page).to have_content("5.0m (W) × 3.0m (H) = 15.0m²")
-      expect(page).to have_content(I18n.t("safety_standards.calculators.anchor.total_anchors_label"))
+    within_result(:anchors) do
+      key = "safety_standards.calculators.anchor.total_anchors_label"
+      expect_i18n_content(key)
       expect(page).to have_content("(2 + 2) × 2 = 8")
     end
   end
@@ -20,66 +20,58 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
   scenario "calculating slide runout requirements" do
     visit safety_standards_path
 
-    fill_runout_form(height: 2.5)
+    fill_runout_form(platform_height: 2.5)
     submit_runout_form
 
     expect_runout_result(required_runout: 1.25)
-
-    within("#slide-runout-result") do
-      expect(page).to have_content("#{I18n.t("safety_standards.calculators.runout.calculation_label")}: 2.5m × 0.5 = 1.25m")
-      expect(page).to have_content("#{I18n.t("safety_standards.calculators.runout.minimum_label")}: 0.3m (300mm)")
-    end
+    expect_runout_breakdown(platform_height: 2.5, calculated: 1.25)
   end
 
-  scenario "calculating wall height requirements for different platform heights" do
+  scenario "wall height requirements for different platform heights" do
     visit safety_standards_path
 
     # Platform < 0.6m: No walls required
     fill_wall_height_form(platform_height: 0.5, user_height: 1.5)
     submit_wall_height_form
-    within("#wall-height-result") do
-      expect(page).to have_content("Required Wall Height: 0m")
-      expect(page).to have_content("Under 0.6m")
-      expect(page).to have_content("No containing walls required")
-    end
+    expect_no_walls_required
 
     # Platform 0.6-3.0m: Walls equal to user height
     fill_wall_height_form(platform_height: 2.0, user_height: 1.5)
     submit_wall_height_form
-    within("#wall-height-result") do
-      expect(page).to have_content("Required Wall Height: 1.5m")
-      expect(page).to have_content("0.6m - 3.0m")
-      expect(page).to have_content("1.5m (user height)")
-    end
+    expect_wall_height_breakdown(
+      height: 1.5,
+      range: "0.6m - 3.0m",
+      calculation: "1.5m (user height)"
+    )
 
     # Platform 3.0-6.0m: Walls 1.25× user height
     fill_wall_height_form(platform_height: 4.0, user_height: 2.0)
     submit_wall_height_form
-    within("#wall-height-result") do
-      expect(page).to have_content("Required Wall Height: 2.5m")
-      expect(page).to have_content("3.0m - 6.0m")
-      expect(page).to have_content("2.0m × 1.25 = 2.5m")
-    end
+    expect_wall_height_breakdown(
+      height: 2.5,
+      range: "3.0m - 6.0m",
+      calculation: "2.0m × 1.25 = 2.5m"
+    )
 
     # Platform > 6.0m: Walls 1.25× user height + roof required
     fill_wall_height_form(platform_height: 7.0, user_height: 2.0)
     submit_wall_height_form
-
-    within("#wall-height-result") do
-      expect(page).to have_content("Required Wall Height: 2.5m")
-      expect(page).to have_content("Over 6.0m")
-      expect(page).to have_content("2.0m × 1.25 = 2.5m")
-      expect(page).to have_content("Permanent roof required")
-    end
+    expect_wall_height_breakdown(
+      height: 2.5,
+      range: "Over 6.0m",
+      calculation: "2.0m × 1.25 = 2.5m",
+      roof: true
+    )
   end
 
   scenario "enforcing minimum runout requirements" do
     visit safety_standards_path
 
-    fill_runout_form(height: 1.0)
+    fill_runout_form(platform_height: 1.0)
     submit_runout_form
 
-    expected_runout = EN14960::Calculators::SlideCalculator.calculate_required_runout(1.0)
+    calculator = EN14960::Calculators::SlideCalculator
+    expected_runout = calculator.calculate_required_runout(1.0)
     expect_runout_result(required_runout: expected_runout.value)
     expect(expected_runout.value).to eq(0.5)
   end
@@ -87,26 +79,13 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
   scenario "showing calculation transparency" do
     visit safety_standards_path
 
-    expect(page).to have_content("((Area × 114.0 × 1.5) ÷ 1600.0)")
-    expect(page).to have_content("50% of platform height, minimum 300mm")
-
-    # These example texts are no longer displayed on the page
-    # expect(page).to have_content("For 25.0m² area: 8 anchors required")
-    # expect(page).to have_content("For 2.5m platform: 1.25m runout required")
-
-    expect(page).to have_content("Ruby Source Code")
-    expect(page).to have_content("Method: calculate_required_anchors")
-    expect(page).to have_content("Source: EN14960::Calculators::AnchorCalculator")
+    expect_calculation_transparency
 
     fill_anchor_form(length: 4.0, width: 4.0, height: 3.0)
     submit_anchor_form
 
     expect_anchor_result(8)
-
-    within("#anchors-result") do
-      expect(page).to have_content(I18n.t("safety_standards.calculators.anchor.front_back_area_label"))
-      expect(page).to have_content("4.0m (W) × 3.0m (H) = 12.0m²")
-    end
+    expect_anchor_breakdown(width: 4.0, height: 3.0, area: 12.0)
   end
 
   scenario "handling invalid input gracefully" do
@@ -124,7 +103,6 @@ RSpec.feature "Safety Standards Interactive Forms", type: :feature do
 
     test_dimensions.each do |length, width, height|
       visit safety_standards_path
-
       fill_anchor_form(length: length, width: width, height: height)
       submit_anchor_form
 

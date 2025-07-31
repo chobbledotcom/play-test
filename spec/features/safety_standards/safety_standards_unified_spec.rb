@@ -42,7 +42,8 @@ RSpec.describe "Safety Standards Unified Tests" do
       context "anchor calculation" do
         it "redirects with calculation params" do
           post safety_standards_path, params: {calculation: anchor_params}
-          expect(response).to redirect_to(safety_standards_path(calculation: anchor_params))
+          redirect_path = safety_standards_path(calculation: anchor_params)
+          expect(response).to redirect_to(redirect_path)
         end
 
         it "returns error for invalid input" do
@@ -51,7 +52,8 @@ RSpec.describe "Safety Standards Unified Tests" do
 
           follow_redirect!
           expect(response.body).to include('class="error"')
-          expect(response.body).to include(I18n.t("safety_standards.errors.invalid_dimensions"))
+          error_msg = I18n.t("safety_standards.errors.invalid_dimensions")
+          expect(response.body).to include(error_msg)
         end
       end
     end
@@ -60,7 +62,10 @@ RSpec.describe "Safety Standards Unified Tests" do
       it "accepts and processes JSON requests" do
         post safety_standards_path,
           params: {calculation: anchor_params}.to_json,
-          headers: {"Content-Type": "application/json", Accept: "application/json"}
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          }
 
         expect(response).to be_successful
         expect(response.content_type).to include("application/json")
@@ -75,18 +80,25 @@ RSpec.describe "Safety Standards Unified Tests" do
         invalid_params = anchor_params.merge(length: 0, width: 0, height: 0)
         post safety_standards_path,
           params: {calculation: invalid_params}.to_json,
-          headers: {"Content-Type": "application/json", Accept: "application/json"}
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          }
 
         json = JSON.parse(response.body)
         expect(json["passed"]).to be false
-        expect(json["status"]).to eq(I18n.t("safety_standards.errors.invalid_dimensions"))
+        error_msg = I18n.t("safety_standards.errors.invalid_dimensions")
+        expect(json["status"]).to eq(error_msg)
         expect(json["result"]).to be_nil
       end
 
       it "returns passed: false for invalid calculation type" do
         post safety_standards_path,
           params: {calculation: {type: "invalid_type", value: 123}}.to_json,
-          headers: {"Content-Type": "application/json", Accept: "application/json"}
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          }
 
         json = JSON.parse(response.body)
         expect(json["passed"]).to be false
@@ -100,7 +112,9 @@ RSpec.describe "Safety Standards Unified Tests" do
 
       context "anchor calculation" do
         it "returns turbo stream response" do
-          post safety_standards_path, params: {calculation: anchor_params}, headers: turbo_headers
+          post safety_standards_path,
+            params: {calculation: anchor_params},
+            headers: turbo_headers
           expect(response.content_type).to include("text/vnd.turbo-stream.html")
           expect(response.body).to include("turbo-stream")
           expect(response.body).to include("anchors-result")
@@ -116,18 +130,8 @@ RSpec.describe "Safety Standards Unified Tests" do
 
     describe "anchor calculator" do
       it "submits via Turbo without page reload" do
-        within_form("safety_standards_anchors") do
-          fill_in_form("safety_standards_anchors", :length, 5.0)
-          fill_in_form("safety_standards_anchors", :width, 5.0)
-          fill_in_form("safety_standards_anchors", :height, 3.0)
-          submit_form("safety_standards_anchors")
-        end
-
-        within("#anchors-result") do
-          expect(page).to have_content("Calculated Total Anchors:")
-          expect(page).to have_content("= 8")
-        end
-
+        fill_anchor_calculator(length: 5.0, width: 5.0, height: 3.0)
+        expect_anchor_result_header(8)
         expect(page).to have_current_path(safety_standards_path)
       end
     end

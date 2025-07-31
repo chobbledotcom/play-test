@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.feature "Unified Safety Standards Breakdown Display", type: :feature do
+  include SafetyStandardsTestHelpers
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user) }
   let(:inspection) { create(:inspection, user: user, unit: unit) }
@@ -21,7 +22,8 @@ RSpec.feature "Unified Safety Standards Breakdown Display", type: :feature do
       tallest_user_height: 1.8
     )
 
-    visit edit_inspection_path(inspection, tab: :slide)
+    visit_inspection_edit(inspection)
+    navigate_to_assessment_tab("slide")
 
     within(".safety-standards-info") do
       # Check runout section
@@ -46,7 +48,8 @@ RSpec.feature "Unified Safety Standards Breakdown Display", type: :feature do
     )
 
     # Check user height tab
-    visit edit_inspection_path(inspection, tab: :user_height)
+    visit_inspection_edit(inspection)
+    navigate_to_assessment_tab("user_height")
     within(".safety-standards-info") do
       expect(page).to have_content("Height Requirements")
       # Should have 4 breakdown items
@@ -54,7 +57,7 @@ RSpec.feature "Unified Safety Standards Breakdown Display", type: :feature do
     end
 
     # Check slide tab
-    visit edit_inspection_path(inspection, tab: :slide)
+    navigate_to_assessment_tab("slide")
     within(".safety-standards-info") do
       expect(page).to have_content("Wall Height Requirements")
     end

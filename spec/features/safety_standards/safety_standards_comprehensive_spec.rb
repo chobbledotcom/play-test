@@ -6,11 +6,11 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
     let(:valid_anchor_params) { {length: 5.0, width: 5.0, height: 3.0} }
     let(:invalid_anchor_params) { {length: 0, width: 0, height: 0} }
 
-    let(:valid_runout_params) { {height: 2.5} }
-    let(:invalid_runout_params) { {height: 0} }
+    let(:valid_runout_params) { {platform_height: 2.5} }
+    let(:invalid_runout_params) { {platform_height: 0} }
 
-    let(:valid_wall_params) { {height: 1.5} }
-    let(:invalid_wall_params) { {height: 0} }
+    let(:valid_wall_params) { {platform_height: 2.0, user_height: 1.5} }
+    let(:invalid_wall_params) { {platform_height: 0, user_height: 0} }
   end
 
   describe "Non-JavaScript tests", type: :feature do
@@ -55,7 +55,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
 
       scenario "runout calculation updates without reload" do
         visit safety_standards_path
-        navigate_to_tab("Slides")
+        navigate_to_standard_tab(:slides)
 
         fill_runout_form(**valid_runout_params)
         submit_runout_form
@@ -65,7 +65,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
 
       scenario "wall height calculation updates without reload" do
         visit safety_standards_path
-        navigate_to_tab("Slides")
+        navigate_to_standard_tab(:slides)
 
         fill_wall_height_form(**valid_wall_params)
         submit_wall_height_form
@@ -79,7 +79,10 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         visit safety_standards_path
 
         # The forms have min values that prevent submitting zeros
-        expect_form_field_min_value("safety_standards_anchors", "length", "1.0")
+        within_form("safety_standards_anchors") do
+          field = find_form_field("safety_standards_anchors", "length")
+          expect(field["min"]).to eq("1.0")
+        end
       end
     end
 
@@ -88,18 +91,21 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         visit safety_standards_path
 
         # Submit anchor form
-        submit_form_with_values(:anchors, valid_anchor_params)
+        fill_anchor_form(**valid_anchor_params)
+        submit_anchor_form
 
         # Submit slide forms
-        navigate_to_tab("Slides")
-        submit_form_with_values(:runout, valid_runout_params)
-        submit_form_with_values(:wall_height, valid_wall_params)
+        navigate_to_standard_tab(:slides)
+        fill_runout_form(**valid_runout_params)
+        submit_runout_form
+        fill_wall_height_form(**valid_wall_params)
+        submit_wall_height_form
 
         # Verify all results
-        navigate_to_tab("Anchorage")
+        navigate_to_standard_tab(:anchorage)
         expect_anchor_result(8)
 
-        navigate_to_tab("Slides")
+        navigate_to_standard_tab(:slides)
         expect_runout_result(required_runout: 1.25)
         expect_wall_height_result("Required Wall Height: 1.5m")
       end
@@ -110,11 +116,13 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         fill_anchor_form(**valid_anchor_params)
         submit_anchor_form
 
-        expect_form_values_persist("safety_standards_anchors", {
-          length: "5.0",
-          width: "5.0",
-          height: "3.0"
-        })
+        # Verify form values persist
+        within_form("safety_standards_anchors") do
+          form_name = "safety_standards_anchors"
+          expect(find_form_field(form_name, "length").value).to eq("5.0")
+          expect(find_form_field(form_name, "width").value).to eq("5.0")
+          expect(find_form_field(form_name, "height").value).to eq("3.0")
+        end
       end
     end
   end
@@ -125,7 +133,10 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
     def api_request(params)
       post safety_standards_path,
         params: {calculation: params}.to_json,
-        headers: {"Content-Type": "application/json", Accept: "application/json"}
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        }
     end
 
     def turbo_request(params)
@@ -191,12 +202,15 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
     include_context "calculation parameters"
 
     it "handles anchor errors via POST" do
-      post safety_standards_path, params: {calculation: {type: "anchors", **invalid_anchor_params}}
-      expect(response).to redirect_to(safety_standards_path(calculation: {type: "anchors", **invalid_anchor_params}))
+      params = {type: "anchors", **invalid_anchor_params}
+      post safety_standards_path, params: {calculation: params}
+      redirect_path = safety_standards_path(calculation: params)
+      expect(response).to redirect_to(redirect_path)
 
       follow_redirect!
       expect(response.body).to include("Error:")
-      expect(response.body).to include(I18n.t("safety_standards.errors.invalid_dimensions"))
+      error_msg = I18n.t("safety_standards.errors.invalid_dimensions")
+      expect(response.body).to include(error_msg)
     end
   end
 end
