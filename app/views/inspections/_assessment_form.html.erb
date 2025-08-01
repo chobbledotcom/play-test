@@ -18,7 +18,6 @@
   i18n_base: "forms.#{assessment_type}",
   url: send("inspection_#{assessment_type}_assessment_path", @inspection) do |form|
 %>
-  <%= hidden_field_tag :tab, assessment_type %>
   <%= render 'chobble_forms/fields', model: assessment %>
   
   <% if has_safety_standards %>

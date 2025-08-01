@@ -49,7 +49,8 @@ module InspectionTurboStreams
 
   def save_message_locals(success:, dom_id:)
     if success
-      current_tab_name = params[:tab].presence || "inspection"
+      current_tab_name = params[:tab].presence || 
+                         (respond_to?(:assessment_type) ? assessment_type : "inspection")
       nav_info = helpers.next_tab_navigation_info(@inspection, current_tab_name)
 
       {
