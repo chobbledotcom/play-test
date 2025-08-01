@@ -15,7 +15,7 @@ module AssessmentCompletion
   def incomplete_fields
     (attributes.keys - SYSTEM_FIELDS)
       .select { |f| !f.end_with?("_comment") }
-      .select { |f| send(f).nil? }
+      .select { |f| field_is_incomplete?(f) }
       .reject { |f| field_allows_nil_when_na?(f) }
       .map { |f| f.to_sym }
   end
@@ -74,10 +74,19 @@ module AssessmentCompletion
 
   private
 
+  def field_is_incomplete?(field)
+    value = send(field)
+    # Field is incomplete if nil
+    return true if value.nil?
+    # Pass fields with "na" value are also incomplete (pass fields require actual pass/fail value)
+    field.end_with?("_pass") && value == "na"
+  end
+
   def field_allows_nil_when_na?(field)
-    # Only allow nil for value fields (not _pass fields) when their corresponding _pass field is "na"
+    # Pass fields are always required, even if set to "na"
     return false if field.end_with?("_pass")
 
+    # Only allow nil for value fields when their corresponding _pass field is "na"
     pass_field = "#{field}_pass"
     respond_to?(pass_field) && send(pass_field) == "na"
   end
