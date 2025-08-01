@@ -37,7 +37,7 @@ class QrCodeService
 
     qrcode.as_png(
       bit_depth: 1,
-      border_modules: 2,           # Less border space
+      border_modules: 0,           # No border for proper alignment
       color_mode: ChunkyPNG::COLOR_GRAYSCALE,
       color: "black",
       file: nil,
