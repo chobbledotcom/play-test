@@ -272,43 +272,49 @@ class PdfGeneratorService
       end
 
       # Return the top edge of the photo (photo_y is the top edge in Prawn coordinates)
+      photo_y
     end
 
     def check_for_overflow(pdf, available_height, columns, text_size, photo_boundary)
-      overflow = false
-
-      # Perform a dry run to check if content would overflow
-      pdf.transaction do
-        pdf.column_box([0, pdf.cursor], columns: columns, width: pdf.bounds.width, spacer: ASSESSMENT_COLUMN_SPACER, height: available_height) do
-          @current_assessment_blocks.each do |block|
-            # Check if we're in the third column
-            column_width = (pdf.bounds.width - (ASSESSMENT_COLUMN_SPACER * (columns - 1))) / columns
-            current_column = (pdf.bounds.absolute_left / (column_width + ASSESSMENT_COLUMN_SPACER)).floor
-
-            # If in third column (index 2) and cursor would go below photo boundary
-            if current_column == 2 && pdf.cursor < photo_boundary
-              overflow = true
-              raise Prawn::Errors::CannotFit # Force rollback
-            end
-
-            # Simulate rendering the block
-            pdf.text block[:title], size: ASSESSMENT_TITLE_SIZE, style: :bold
-            pdf.move_down ASSESSMENT_MARGIN_AFTER_TITLE
-
-            block[:fields].each do |field|
-              pdf.text field, size: text_size, inline_format: true
-            end
-            pdf.move_down ASSESSMENT_MARGIN_AFTER
-          end
+      # Calculate total content height needed
+      total_content_height = calculate_total_content_height(text_size)
+      
+      # Calculate how content distributes across columns
+      column_height = available_height
+      content_per_column = total_content_height / columns.to_f
+      
+      # Check if content in third column would overflow into photo area
+      if columns == 3
+        # Calculate where the third column content would end
+        third_column_bottom = pdf.cursor - content_per_column
+        
+        # Check if it would overlap with photo
+        if third_column_bottom < photo_boundary
+          return true
         end
-
-        # Rollback the transaction
-        pdf.rollback
       end
-
-      overflow
-    rescue Prawn::Errors::CannotFit
-      true
+      
+      false
+    end
+    
+    def calculate_total_content_height(text_size)
+      total_height = 0
+      
+      # Calculate line height based on text size (Prawn default is ~1.2x font size)
+      title_line_height = ASSESSMENT_TITLE_SIZE * 1.2
+      field_line_height = text_size * 1.2
+      
+      @current_assessment_blocks.each do |block|
+        # Title height
+        total_height += title_line_height
+        total_height += ASSESSMENT_MARGIN_AFTER_TITLE
+        
+        # Fields height (each field is one line)
+        total_height += block[:fields].size * field_line_height
+        total_height += ASSESSMENT_MARGIN_AFTER
+      end
+      
+      total_height
     end
 
     def render_assessments_with_params(pdf, available_height, columns, text_size)
