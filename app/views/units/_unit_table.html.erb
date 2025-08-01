@@ -1,8 +1,8 @@
 <div class="table-list units-list">
   <!-- Header row -->
   <div class="table-list-header">
-    <span class="col-id"><%= t('units.fields.id') %></span>
     <span class="col-photo"><%= t('units.fields.photo') %></span>
+    <span class="col-id"><%= t('units.fields.id') %></span>
     <span class="col-name"><%= t('units.fields.name') %></span>
     <span class="col-manufacturer"><%= t('units.fields.manufacturer') %></span>
     <span class="col-serial"><%= t('units.fields.serial') %></span>
@@ -13,9 +13,6 @@
     <% unit.each do |item| %>
       <li>
         <%= link_to item, class: "table-list-link" do %>
-          <span class="col-id" data-label="<%= t('units.fields.id') %>">
-            <%= item.id %>
-          </span>
           <span class="col-photo" data-label="<%= t('units.fields.photo') %>">
             <% if item.photo.attached? %>
               <%= render 'shared/image',
@@ -28,6 +25,9 @@
                   width: 60,
                   height: 60 %>
             <% end %>
+          </span>
+          <span class="col-id" data-label="<%= t('units.fields.id') %>">
+            <%= item.id %>
           </span>
           <span class="col-name" data-label="<%= t('units.fields.name') %>">
             <%= item.name %>

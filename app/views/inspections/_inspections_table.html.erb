@@ -9,10 +9,10 @@
 <div class="table-list inspections-list">
   <!-- Header row -->
   <div class="table-list-header">
-    <span class="col-id"><%= t('inspections.fields.id') %></span>
     <% if show_photo %>
       <span class="col-photo"><%= t('units.fields.photo') %></span>
     <% end %>
+    <span class="col-id"><%= t('inspections.fields.id') %></span>
     <% if show_name %>
       <span class="col-name"><%= t('inspections.fields.name') %></span>
     <% end %>
@@ -37,9 +37,6 @@
       %>
       <li>
         <%= link_to target_path, class: "table-list-link" do %>
-          <span class="col-id" data-label="<%= t('inspections.fields.id') %>">
-            <%= inspection.id %>
-          </span>
           <% if show_photo %>
             <span class="col-photo" data-label="<%= t('units.fields.photo') %>">
               <% if !inspection.complete? && inspection.unit&.photo&.attached? %>
@@ -55,6 +52,9 @@
               <% end %>
             </span>
           <% end %>
+          <span class="col-id" data-label="<%= t('inspections.fields.id') %>">
+            <%= inspection.id %>
+          </span>
           <% if show_name %>
             <span class="col-name" data-label="<%= t('inspections.fields.name') %>">
               <% if inspection.unit.nil? %>
