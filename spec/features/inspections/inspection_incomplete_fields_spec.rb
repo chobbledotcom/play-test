@@ -198,19 +198,20 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     # Setup inspection with known incomplete fields
     inspection.update_columns(
       inspection_date: nil,
-      inspector: nil
+      width: nil,
+      length: nil
     )
     inspection.structure_assessment.update_columns(
-      structure_secure_pass: nil,
-      structure_fabric_attachment_pass: nil,
-      structure_standing_surface_pass: nil
+      seam_integrity_pass: nil,
+      stitch_length_pass: nil,
+      air_loss_pass: nil
     )
 
     visit edit_inspection_path(inspection)
     expand_incomplete_fields
 
-    # Check that General shows (2) for inspection_date and inspector
-    expect_incomplete_section("inspection", count: 2)
+    # Check that General shows (3) for inspection_date, width, and length
+    expect_incomplete_section("inspection", count: 3)
 
     # Check that Structure shows (3) for the three nil fields
     expect_incomplete_section("structure", count: 3)

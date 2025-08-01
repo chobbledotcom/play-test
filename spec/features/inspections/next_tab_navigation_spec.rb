@@ -27,7 +27,7 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
   scenario "suggests next tab forward when current tab is incomplete" do
     # Make inspection tab incomplete by clearing a required field
     visit edit_inspection_path(inspection, tab: "inspection")
-    fill_in "inspection[inspection_location]", with: ""
+    fill_in "inspection[width]", with: ""
 
     # Save the form
     click_button I18n.t("forms.inspection.submit")
@@ -42,15 +42,12 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
   end
 
   scenario "suggests results tab when all assessments are complete" do
-    # Complete all assessments
-    inspection.applicable_assessments.each do |assessment_type, _|
-      assessment = inspection.send(assessment_type)
-      assessment.update!(complete: true)
-    end
-
+    # Create a completed inspection which has all assessments complete
+    completed_inspection = create(:inspection, :completed, user: user, unit: unit)
+    
     # Visit the last assessment tab
-    last_tab = inspection.applicable_tabs[-2] # -2 because results is last
-    visit edit_inspection_path(inspection, tab: last_tab)
+    last_tab = completed_inspection.applicable_tabs[-2] # -2 because results is last
+    visit edit_inspection_path(completed_inspection, tab: last_tab)
 
     # Save the form
     click_button I18n.t("forms.#{last_tab}.submit")
@@ -64,15 +61,12 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
   end
 
   scenario "no next tab link when on results tab and everything is complete" do
-    # Complete everything including results
-    inspection.applicable_assessments.each do |assessment_type, _|
-      assessment = inspection.send(assessment_type)
-      assessment.update!(complete: true)
-    end
-    inspection.update!(passed: true)
-
+    # Create a completed inspection which has all assessments complete
+    completed_inspection = create(:inspection, :completed, user: user, unit: unit)
+    completed_inspection.update!(passed: true)
+    
     # Visit results tab
-    visit edit_inspection_path(inspection, tab: "results")
+    visit edit_inspection_path(completed_inspection, tab: "results")
 
     # Save the form
     click_button I18n.t("forms.results.submit")
