@@ -189,7 +189,7 @@ RSpec.describe InspectionsHelper, type: :helper do
         # Make inspection tab incomplete
         @test_inspection.update!(width: nil)
         # Ensure user_height is complete but slide is incomplete
-        @test_inspection.slide_assessment.update!(slide_platform_height: nil) if @test_inspection.slide_assessment
+        @test_inspection.slide_assessment&.update!(slide_platform_height: nil)
       end
 
       it "skips the complete tab and suggests the next incomplete one" do
