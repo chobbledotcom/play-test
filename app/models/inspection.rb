@@ -264,16 +264,16 @@ class Inspection < ApplicationRecord
   def completion_errors
     errors = []
     errors << "Unit is required" if unit.blank?
-    
+
     # Get detailed incomplete field information
     incomplete_tabs = incomplete_fields
-    
+
     incomplete_tabs.each do |tab_info|
       tab_name = tab_info[:name]
       incomplete_field_names = tab_info[:fields].map { |f| f[:label] }.join(", ")
       errors << "#{tab_name}: #{incomplete_field_names}"
     end
-    
+
     errors
   end
 
