@@ -83,7 +83,6 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
     end
   end
 
-
   describe "integration with real PDF generation" do
     it "generates complete PDF with QR code and photos" do
       pdf_content = nil
