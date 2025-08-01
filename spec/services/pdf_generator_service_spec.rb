@@ -69,7 +69,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
       pdf = PdfGeneratorService.generate_unit_report(unit)
       pdf_text = pdf_text_content(pdf.render)
 
-      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.description"))
+      expect(pdf_text).to include(I18n.t("units.fields.name"))
       expect(pdf_text).to include(I18n.t("pdf.inspection.fields.serial"))
       expect(pdf_text).to include(I18n.t("pdf.inspection.fields.manufacturer"))
       expect(pdf_text).to include(I18n.t("pdf.inspection.fields.operator"))

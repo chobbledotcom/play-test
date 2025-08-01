@@ -42,6 +42,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         flattened = result.flatten
 
         expect(flattened).to include(unit.name)
+        expect(flattened).to include(unit.description)
         expect(flattened).to include(unit.serial)
         expect(flattened).to include(unit.manufacturer)
         expect(flattened).to include(unit.operator)
@@ -73,12 +74,12 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         build(:unit, name: nil, description: nil, manufacturer: nil)
       end
 
-      it "handles missing fields with empty strings" do
+      it "handles missing fields with nil values" do
         result = described_class.build_unit_details_table(unit, "inspection")
 
-        expect(result[0][1]).to eq("") # empty name
-        expect(result[1][1]).to eq("") # empty description
-        expect(result[2][1]).to eq("") # empty manufacturer
+        expect(result[0][1]).to be_nil # nil name
+        expect(result[1][1]).to be_nil # nil description
+        expect(result[2][3]).to be_nil # nil manufacturer
       end
     end
   end
