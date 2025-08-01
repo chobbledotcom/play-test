@@ -35,6 +35,5 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: |
-            # ${{ vars.DOCKER_USERNAME }}/play-test:latest
+          tags: | # ${{ vars.DOCKER_USERNAME }}/play-test:latest
             git.chobble.com/chobble/play-test:latest
