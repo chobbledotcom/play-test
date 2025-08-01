@@ -14,7 +14,7 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
     visit edit_inspection_path(inspection, tab: "inspection")
 
     # Save the form
-    click_button I18n.t("forms.inspection.submit")
+    submit_form(:inspection)
 
     # Should suggest the first incomplete assessment tab
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
@@ -49,7 +49,7 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
     visit edit_inspection_path(completed_inspection, tab: last_tab)
 
     # Save the form
-    click_button I18n.t("forms.#{last_tab}.submit")
+    submit_form(last_tab.to_sym)
 
     # Should suggest results tab
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
@@ -68,7 +68,7 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
     visit edit_inspection_path(completed_inspection, tab: "results")
 
     # Save the form
-    click_button I18n.t("forms.results.submit")
+    submit_form(:results)
 
     # Should not suggest any next tab
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
