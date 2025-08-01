@@ -111,7 +111,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
 
           # Should not have anchorage assessment
           expect(json["assessments"]).not_to have_key("anchorage_assessment")
-          
+
           # Should still have other assessments
           expect(json["assessments"]).to have_key("user_height_assessment")
           expect(json["assessments"]).to have_key("structure_assessment")
