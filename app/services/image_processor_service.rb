@@ -9,7 +9,8 @@ class ImageProcessorService
     image.variant(
       format: :jpeg,
       resize_to_limit: [THUMBNAIL_SIZE, THUMBNAIL_SIZE],
-      saver: {quality: 75}
+      saver: {quality: 75},
+      content_type: "image/jpeg"
     )
   end
 
@@ -19,7 +20,8 @@ class ImageProcessorService
     image.variant(
       format: :jpeg,
       resize_to_limit: [DEFAULT_SIZE, DEFAULT_SIZE],
-      saver: {quality: 75}
+      saver: {quality: 75},
+      content_type: "image/jpeg"
     )
   end
 

@@ -24,6 +24,9 @@
     ImageProcessorService.default(image_attachment)
   end
   
+  # Ensure variant is processed for Safari compatibility
+  variant = variant.processed if variant.respond_to?(:processed)
+  
   # Get actual dimensions based on metadata
   # Ensure blob is analyzed before trying to get dimensions
   image_attachment.blob.analyze unless image_attachment.blob.analyzed?
@@ -36,4 +39,5 @@
     width: dimensions[:width],
     height: dimensions[:height],
     loading: "lazy",
-    decoding: "async" %>
+    decoding: "async",
+    crossorigin: "anonymous" %>

@@ -9,7 +9,7 @@
   return unless attachment&.attached? && attachment.blob.persisted?
 %>
 
-<%= link_to rails_blob_path(attachment, disposition: "inline") do %>
+<%= link_to rails_blob_path(attachment, disposition: "inline"), class: "unit-photo" do %>
   <%= render 'shared/image',
       image: attachment,
       size: size,
