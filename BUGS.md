@@ -1,5 +1,3 @@
-# Description -> Bounce Safe Number on Inspections
-
 # Images aren't loading in Safari?
 
 # Inspection Name => Bounce Safe Number
@@ -11,6 +9,8 @@
 ---
 
 Done:
+
+# Description -> Bounce Safe Number on Inspections
 
 # Unit Pressure => 2 decimal places
 
