@@ -257,18 +257,20 @@ class PdfGeneratorService
     end
 
     def calculate_photo_boundary(pdf)
-      # Calculate where the photo will be positioned
-      qr_x, qr_y = PositionCalculator.qr_code_position(pdf.bounds.width, pdf.page_number)
-
       # For boundary calculation, use the larger photo size (3 columns)
       # This ensures we check against where the photo WOULD be if we use 3 columns
       photo_width = Configuration::QR_CODE_SIZE * 2
       # Assume square photo for calculation (will be adjusted by aspect ratio later)
       photo_height = photo_width
-
-      # Get photo position
-      _, photo_y = PositionCalculator.photo_footer_position(qr_x, qr_y, photo_width, photo_height)
-
+      
+      # Calculate photo position in bottom right corner
+      # Account for footer height on first page
+      photo_y = if pdf.page_number == 1
+        Configuration::FOOTER_HEIGHT + Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
+      else
+        Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
+      end
+      
       # Return the top edge of the photo (photo_y is the top edge in Prawn coordinates)
       photo_y
     end
