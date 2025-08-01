@@ -1,30 +1,4 @@
 en:
-  # Test fixtures (for test environment only)
-  test:
-    password: "password123"
-    access_denied: "Access denied"
-    invalid_password: "wrongpassword"
-    admin_emails_pattern: "^admin\\d*@example\\.com$"
-
-  # Background Jobs
-  jobs:
-    storage_cleanup_job:
-      name: "Storage Cleanup Job"
-      description: "Cleans up unattached blob files"
-
-  # Test models for error handling
-  test_models:
-    errors:
-      header:
-        one: "Could not save test model because there is 1 error:"
-        other: "Could not save test model because there are %{count} errors:"
-
-  custom_models:
-    errors:
-      header:
-        one: "Could not save custom model because there is 1 error:"
-        other: "Could not save custom model because there are %{count} errors:"
-
   # Validation Messages
   errors:
     messages:
