@@ -282,17 +282,26 @@ class PdfGeneratorService
       # Calculate total content height needed
       total_content_height = calculate_total_content_height(text_size)
 
-      # Calculate how content distributes across columns
-      content_per_column = total_content_height / columns.to_f
-
-      # Check if content in third column would overflow into photo area
+      # Check if content would spill into third column
       if columns == 3
-        # Calculate where the third column content would end
-        third_column_bottom = pdf.cursor - content_per_column
-
-        # Check if it would overlap with photo
-        if third_column_bottom < photo_boundary
-          return true
+        # Content fills vertically in each column before moving to next
+        # Check if we need more than 2 columns worth of height
+        two_columns_height = available_height * 2
+        
+        if total_content_height > two_columns_height
+          # Content will spill into third column
+          # Calculate how much content goes into third column
+          third_column_content_height = total_content_height - two_columns_height
+          
+          # Calculate where third column content would end
+          # Third column starts at top of available area
+          third_column_bottom = pdf.cursor - third_column_content_height
+          
+          # Check if it would overlap with photo
+          # Add 20pt buffer - only switch to 4 columns if we really need to
+          if third_column_bottom < (photo_boundary + 20)
+            return true
+          end
         end
       end
 
