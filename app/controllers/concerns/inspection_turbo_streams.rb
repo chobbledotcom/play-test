@@ -50,24 +50,20 @@ module InspectionTurboStreams
   def save_message_locals(success:, dom_id:)
     if success
       current_tab_name = params[:tab].presence || "inspection"
-      next_tab_info = helpers.next_incomplete_tab_with_fallback(@inspection, current_tab_name)
-
-      locals = {
+      nav_info = helpers.next_tab_navigation_info(@inspection, current_tab_name)
+      
+      {
         dom_id: dom_id,
         success: true,
         message: t("inspections.messages.updated"),
         inspection: @inspection
-      }
-
-      if next_tab_info
-        locals[:next_tab] = next_tab_info[:tab]
-        locals[:is_current_tab] = next_tab_info[:is_current]
-        if next_tab_info[:is_current]
-          locals[:incomplete_count] = helpers.count_incomplete_fields_for_tab(@inspection, current_tab_name)
+      }.tap do |locals|
+        if nav_info
+          locals[:next_tab] = nav_info[:tab]
+          locals[:skip_incomplete] = nav_info[:skip_incomplete]
+          locals[:incomplete_count] = nav_info[:incomplete_count] if nav_info[:skip_incomplete]
         end
       end
-
-      locals
     else
       {
         dom_id: dom_id,

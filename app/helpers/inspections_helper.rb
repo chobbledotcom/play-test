@@ -83,78 +83,47 @@ module InspectionsHelper
     assessment_complete?(inspection, tab) ? "#{name} ✓" : name
   end
 
-  def next_incomplete_tab(inspection, current_tab)
+
+  def next_tab_navigation_info(inspection, current_tab)
     all_tabs = inspection.applicable_tabs
     current_index = all_tabs.index(current_tab)
     return nil unless current_index
 
-    # First, look for incomplete tabs after the current one
-    tabs_to_check = all_tabs[(current_index + 1)..]
-    next_tab = tabs_to_check.find { |tab|
-      !assessment_complete?(inspection, tab)
-    }
-
-    # If we found an incomplete tab after current, return it
-    return next_tab if next_tab
-
-    # Check if results tab needs completion
-    if inspection.passed.nil?
-      "results"
-    end
-  end
-
-  def next_incomplete_tab_with_fallback(inspection, current_tab)
-    all_tabs = inspection.applicable_tabs
-    current_index = all_tabs.index(current_tab)
-    return nil unless current_index
-
-    # First, check if current tab is incomplete
-    current_tab_incomplete = !assessment_complete?(inspection, current_tab)
-
-    # Look for the first incomplete tab after the current one
-    tabs_after_current = all_tabs[(current_index + 1)..]
-    next_incomplete = tabs_after_current.find { |tab|
-      !assessment_complete?(inspection, tab)
-    }
-
-    # If we found an incomplete tab after current, return it
-    if next_incomplete
-      return {tab: next_incomplete, is_current: false}
-    end
-
-    # Check if results tab needs completion
+    tabs_after = all_tabs[(current_index + 1)..]
+    
+    # Find first incomplete tab after current
+    next_incomplete = tabs_after.find { |tab| !assessment_complete?(inspection, tab) }
+    
+    # If found, that's our target
+    return {tab: next_incomplete, skip_incomplete: false} if next_incomplete
+    
+    # Check if results tab needs completion (and we're not already on it)
     if inspection.passed.nil? && current_tab != "results"
-      return {tab: "results", is_current: false}
+      return {tab: "results", skip_incomplete: false}
     end
-
-    # If current tab is incomplete and no other tabs after it are incomplete
-    if current_tab_incomplete
-      # Find the NEXT tab after current (even if complete) to suggest
-      next_index = current_index + 1
-      if next_index < all_tabs.length
-        return {tab: all_tabs[next_index], is_current: true}
-      elsif inspection.passed.nil? && current_tab != "results"
-        return {tab: "results", is_current: true}
-      end
+    
+    # If current tab is incomplete but no tabs after are incomplete, 
+    # suggest next tab with warning
+    if !assessment_complete?(inspection, current_tab) && tabs_after.any?
+      incomplete_count = incomplete_fields_count(inspection, current_tab)
+      return {tab: tabs_after.first, skip_incomplete: true, incomplete_count: incomplete_count}
     end
-
+    
     nil
   end
 
-  def count_incomplete_fields_for_tab(inspection, tab)
-    case tab
+  def incomplete_fields_count(inspection, tab)
+    @incomplete_fields_cache ||= {}
+    cache_key = "#{inspection.id}_#{tab}"
+    
+    @incomplete_fields_cache[cache_key] ||= case tab
     when "inspection"
       inspection.inspection_tab_incomplete_fields.length
     when "results"
       inspection.passed.nil? ? 1 : 0
     else
-      assessment_method = "#{tab}_assessment"
-      assessment = inspection.public_send(assessment_method)
-      if assessment
-        assessment.incomplete_fields_grouped.sum { |group| group[:fields].length }
-      else
-        0
-      end
+      assessment = inspection.public_send("#{tab}_assessment")
+      assessment&.incomplete_fields_grouped&.sum { |group| group[:fields].length } || 0
     end
   end
 end

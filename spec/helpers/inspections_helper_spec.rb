@@ -151,17 +151,17 @@ RSpec.describe InspectionsHelper, type: :helper do
     end
   end
 
-  describe "#next_incomplete_tab_with_fallback" do
+  describe "#next_tab_navigation_info" do
     let(:user) { create(:user) }
     let(:unit) { create(:unit, user: user) }
     let(:inspection) { create(:inspection, unit: unit, user: user) }
 
     context "when there are incomplete tabs after current" do
       it "returns the first incomplete tab after current" do
-        result = helper.next_incomplete_tab_with_fallback(inspection, "inspection")
+        result = helper.next_tab_navigation_info(inspection, "inspection")
 
         expect(result[:tab]).to eq("user_height")
-        expect(result[:is_current]).to eq(false)
+        expect(result[:skip_incomplete]).to eq(false)
       end
     end
 
@@ -176,11 +176,12 @@ RSpec.describe InspectionsHelper, type: :helper do
         inspection.update!(inspection_location: nil)
       end
 
-      it "returns the next tab with is_current true" do
-        result = helper.next_incomplete_tab_with_fallback(inspection, "inspection")
+      it "returns the next tab with skip_incomplete true" do
+        result = helper.next_tab_navigation_info(inspection, "inspection")
 
         expect(result[:tab]).to eq("user_height")
-        expect(result[:is_current]).to eq(true)
+        expect(result[:skip_incomplete]).to eq(true)
+        expect(result[:incomplete_count]).to eq(1)
       end
     end
 
@@ -195,10 +196,10 @@ RSpec.describe InspectionsHelper, type: :helper do
 
       it "returns results tab" do
         last_assessment = inspection.applicable_tabs[-2]
-        result = helper.next_incomplete_tab_with_fallback(inspection, last_assessment)
+        result = helper.next_tab_navigation_info(inspection, last_assessment)
 
         expect(result[:tab]).to eq("results")
-        expect(result[:is_current]).to eq(false)
+        expect(result[:skip_incomplete]).to eq(false)
       end
     end
 
@@ -213,14 +214,14 @@ RSpec.describe InspectionsHelper, type: :helper do
       end
 
       it "returns nil" do
-        result = helper.next_incomplete_tab_with_fallback(inspection, "results")
+        result = helper.next_tab_navigation_info(inspection, "results")
 
         expect(result).to be_nil
       end
     end
   end
 
-  describe "#count_incomplete_fields_for_tab" do
+  describe "#incomplete_fields_count" do
     let(:user) { create(:user) }
     let(:unit) { create(:unit, user: user) }
     let(:inspection) { create(:inspection, unit: unit, user: user) }
@@ -231,7 +232,17 @@ RSpec.describe InspectionsHelper, type: :helper do
       end
 
       it "counts incomplete required fields" do
-        count = helper.count_incomplete_fields_for_tab(inspection, "inspection")
+        count = helper.incomplete_fields_count(inspection, "inspection")
+        expect(count).to eq(2)
+      end
+
+      it "caches the result" do
+        # First call
+        helper.incomplete_fields_count(inspection, "inspection")
+        
+        # Second call should use cache (we can't easily test this directly, 
+        # but at least verify it returns the same result)
+        count = helper.incomplete_fields_count(inspection, "inspection")
         expect(count).to eq(2)
       end
     end
@@ -239,13 +250,13 @@ RSpec.describe InspectionsHelper, type: :helper do
     context "for results tab" do
       it "counts 1 when passed is nil" do
         inspection.update!(passed: nil)
-        count = helper.count_incomplete_fields_for_tab(inspection, "results")
+        count = helper.incomplete_fields_count(inspection, "results")
         expect(count).to eq(1)
       end
 
       it "counts 0 when passed is set" do
         inspection.update!(passed: true)
-        count = helper.count_incomplete_fields_for_tab(inspection, "results")
+        count = helper.incomplete_fields_count(inspection, "results")
         expect(count).to eq(0)
       end
     end
@@ -259,7 +270,7 @@ RSpec.describe InspectionsHelper, type: :helper do
           max_user_height_pass: nil
         )
 
-        count = helper.count_incomplete_fields_for_tab(inspection, "user_height")
+        count = helper.incomplete_fields_count(inspection, "user_height")
         expect(count).to be > 0
       end
     end
