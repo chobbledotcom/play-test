@@ -112,7 +112,7 @@ class PdfGeneratorService
         )
 
         # Add caption below signature (align with border)
-        caption_y = y_position - height - border_padding - 8
+        caption_y = y_position - height - border_padding - 4
         pdf.text_box I18n.t("pdf.signature.caption"),
           at: [border_x, caption_y],
           width: border_width,
