@@ -11,7 +11,8 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
       user:,
       width: 5.0,
       length: 10.0,
-      height: 3.0)
+      height: 3.0,
+      complete_date: nil)
     inspection.update_column(:inspection_date, nil)
     inspection
   }
