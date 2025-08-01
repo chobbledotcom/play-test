@@ -83,7 +83,7 @@ class PdfGeneratorService
 
         # Add border around signature with more padding
         border_padding = 5
-        
+
         # Position signature aligned with disclaimer text
         # Shift left to account for border and padding so the border aligns to the right edge
         x_position = x_offset + available_width - width - (border_padding * 2)
@@ -96,9 +96,9 @@ class PdfGeneratorService
         border_y = y_position + border_padding
         border_width = width + (border_padding * 2)
         border_height = height + (border_padding * 2)
-        
+
         # Adjust signature position to be inside the border
-        x_position = x_position + border_padding
+        x_position += border_padding
         y_position = y_position
 
         # Draw border
