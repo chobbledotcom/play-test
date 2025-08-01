@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe PdfGeneratorService::PhotosRenderer do
   let(:pdf) { instance_double(Prawn::Document) }
   let(:inspection) { instance_double("Inspection") }
-  let(:photo_attachment) { instance_double("ActiveStorage::Attached::One") }
+  let(:photo_attachment) { double("ActiveStorage::Attached::One") }
   let(:photo_blob) { instance_double("ActiveStorage::Blob") }
   # photo is removed - we should use photo_attachment which is ActiveStorage::Attached::One
 
@@ -183,10 +183,10 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "when only some photos are attached" do
-      let(:photo_1_attached) { instance_double("ActiveStorage::Attached::One") }
+      let(:photo_1_attached) { double("ActiveStorage::Attached::One") }
       # photo_1 is not needed - using photo_1_attached
-      let(:photo_2_attached) { instance_double("ActiveStorage::Attached::One") }
-      let(:photo_3_attached) { instance_double("ActiveStorage::Attached::One") }
+      let(:photo_2_attached) { double("ActiveStorage::Attached::One") }
+      let(:photo_3_attached) { double("ActiveStorage::Attached::One") }
       # photo_3 is not needed - using photo_3_attached
 
       before do
@@ -293,7 +293,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
   describe ".render_photo" do
     let(:image_data) { "fake_image_data" }
     let(:bounds) { instance_double("Bounds", width: 500) }
-    let(:photo_attached_one) { instance_double("ActiveStorage::Attached::One") }
+    let(:photo_attached_one) { double("ActiveStorage::Attached::One") }
 
     before do
       allow(photo_attached_one).to receive(:blob).and_return(photo_blob)
@@ -382,7 +382,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
   describe ".calculate_photo_dimensions_from_blob" do
     let(:metadata) { {width: 800, height: 600} }
-    let(:photo_attached_one) { instance_double("ActiveStorage::Attached::One") }
+    let(:photo_attached_one) { double("ActiveStorage::Attached::One") }
 
     before do
       allow(photo_attached_one).to receive(:blob).and_return(photo_blob)
@@ -458,7 +458,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
   describe ".render_image_to_pdf" do
     let(:image_data) { "fake_image_data" }
-    let(:photo_attached_one) { instance_double("ActiveStorage::Attached::One") }
+    let(:photo_attached_one) { double("ActiveStorage::Attached::One") }
 
     before do
       allow(photo_attached_one).to receive(:blob).and_return(photo_blob)
@@ -523,9 +523,9 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "complete photo rendering flow" do
-      let(:photo_1_attached) { instance_double("ActiveStorage::Attached::One") }
-      let(:photo_2_attached) { instance_double("ActiveStorage::Attached::One") }
-      let(:photo_3_attached) { instance_double("ActiveStorage::Attached::One") }
+      let(:photo_1_attached) { double("ActiveStorage::Attached::One") }
+      let(:photo_2_attached) { double("ActiveStorage::Attached::One") }
+      let(:photo_3_attached) { double("ActiveStorage::Attached::One") }
 
       before do
         allow(inspection).to receive(:photo_1).and_return(photo_1_attached)
@@ -558,7 +558,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "page break scenarios" do
-      let(:photo_1_attached) { instance_double("ActiveStorage::Attached::One") }
+      let(:photo_1_attached) { double("ActiveStorage::Attached::One") }
 
       before do
         allow(inspection).to receive(:photo_1).and_return(photo_1_attached)
@@ -584,9 +584,9 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "error recovery" do
-      let(:good_photo_attached) { instance_double("ActiveStorage::Attached::One") }
+      let(:good_photo_attached) { double("ActiveStorage::Attached::One") }
       let(:bad_blob) { instance_double("ActiveStorage::Blob") }
-      let(:bad_photo_attached) { instance_double("ActiveStorage::Attached::One") }
+      let(:bad_photo_attached) { double("ActiveStorage::Attached::One") }
 
       before do
         allow(inspection).to receive(:photo_1).and_return(good_photo_attached)
