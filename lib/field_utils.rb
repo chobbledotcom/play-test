@@ -34,4 +34,8 @@ module FieldUtils
   def self.base_field_name(field)
     strip_field_suffix(field)
   end
+
+  def self.form_field_label(form, field)
+    I18n.t("forms.#{form}.fields.#{field}")
+  end
 end

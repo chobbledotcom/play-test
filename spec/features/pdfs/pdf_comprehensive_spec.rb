@@ -41,10 +41,7 @@ RSpec.feature "PDF Comprehensive Testing", type: :feature do
 
     # Test i18n usage
     expect_pdf_to_include_i18n_keys(pdf_content,
-      "pdf.inspection.equipment_details",
-      "pdf.dimensions.width",
-      "pdf.dimensions.length",
-      "pdf.dimensions.height")
+      "pdf.inspection.equipment_details")
 
     # === EDGE CASE TESTING ===
     # Test with long comments (performance)

@@ -46,7 +46,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf_text = pdf_text_content(pdf.render)
 
         # Manufacturer field should be blank (empty string) when not specified
-        expect(pdf_text).to include(I18n.t("pdf.inspection.fields.manufacturer"))
+        expect(pdf_text).to include(I18n.t("forms.units.fields.manufacturer"))
         # The actual value after the manufacturer label should be empty/blank
       end
     end
@@ -70,9 +70,9 @@ RSpec.describe PdfGeneratorService, pdf: true do
       pdf_text = pdf_text_content(pdf.render)
 
       expect(pdf_text).to include(I18n.t("units.fields.name"))
-      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.serial"))
-      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.manufacturer"))
-      expect(pdf_text).to include(I18n.t("pdf.inspection.fields.operator"))
+      expect(pdf_text).to include(I18n.t("forms.units.fields.serial"))
+      expect(pdf_text).to include(I18n.t("forms.units.fields.manufacturer"))
+      expect(pdf_text).to include(I18n.t("forms.units.fields.operator"))
     end
 
     context "with inspections" do
@@ -103,7 +103,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         pdf_text = pdf_text_content(pdf.render)
 
         # Manufacturer field should be blank (empty string) when not specified
-        expect(pdf_text).to include(I18n.t("pdf.inspection.fields.manufacturer"))
+        expect(pdf_text).to include(I18n.t("forms.units.fields.manufacturer"))
         # The actual value after the manufacturer label should be empty/blank
       end
     end

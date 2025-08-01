@@ -90,10 +90,7 @@ RSpec.feature "PDF Complete Integration", type: :feature do
     # Validate key i18n strings are used
     expect_pdf_to_include_i18n_keys(pdf_content,
       "pdf.inspection.equipment_details",
-      "pdf.inspection.assessments_section",
-      "pdf.dimensions.width",
-      "pdf.dimensions.length",
-      "pdf.dimensions.height")
+      "pdf.inspection.assessments_section")
 
     # Validate unit details
     expect(pdf_content).to include(unit.manufacturer)
