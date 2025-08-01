@@ -193,7 +193,10 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         allow(inspection).to receive(:send).with(:photo_1).and_return(photo_1_attached)
         allow(inspection).to receive(:send).with(:photo_2).and_return(photo_2_attached)
         allow(inspection).to receive(:send).with(:photo_3).and_return(photo_3_attached)
+        allow(photo_1_attached).to receive(:attached?).and_return(true)
         allow(photo_1_attached).to receive(:blob).and_return(photo_blob)
+        allow(photo_2_attached).to receive(:attached?).and_return(false)
+        allow(photo_3_attached).to receive(:attached?).and_return(true)
         allow(photo_3_attached).to receive(:blob).and_return(photo_blob)
         allow(described_class).to receive(:handle_page_break_if_needed).and_return(cursor_position)
         allow(described_class).to receive(:render_photo)
@@ -226,9 +229,9 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         expect(described_class).to receive(:handle_page_break_if_needed)
           .with(pdf, 700, 300).ordered.and_return(700)
         expect(described_class).to receive(:handle_page_break_if_needed)
-          .with(pdf, 640, 300).ordered.and_return(640)
+          .with(pdf, 590, 300).ordered.and_return(590)
         expect(described_class).to receive(:handle_page_break_if_needed)
-          .with(pdf, 540, 300).ordered.and_return(540)
+          .with(pdf, 490, 300).ordered.and_return(490)
 
         described_class.process_all_photos(pdf, inspection, 300)
       end
@@ -428,10 +431,10 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     context "with very small image" do
       let(:metadata) { {width: 100, height: 100} }
 
-      it "does not upscale beyond original size" do
+      it "scales proportionally to fit within max dimensions" do
         width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 500, 500)
-        expect(width).to eq(100)
-        expect(height).to eq(100)
+        expect(width).to eq(500.0)
+        expect(height).to eq(500.0)
       end
     end
 
@@ -439,9 +442,9 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       let(:metadata) { {width: 0, height: 600} }
 
       it "handles zero width gracefully" do
-        expect {
-          described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 400, 300)
-        }.to raise_error(ZeroDivisionError)
+        width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 400, 300)
+        expect(width).to be_infinite
+        expect(height).to be_infinite
       end
     end
 
@@ -449,9 +452,9 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       let(:metadata) { {width: nil, height: 600} }
 
       it "converts nil to zero and handles error" do
-        expect {
-          described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 400, 300)
-        }.to raise_error(ZeroDivisionError)
+        width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 400, 300)
+        expect(width).to be_infinite
+        expect(height).to be_infinite
       end
     end
   end
@@ -566,6 +569,8 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         allow(inspection).to receive(:photo_3).and_return(photo_attachment)
         allow(photo_attachment).to receive(:attached?).and_return(false)
         allow(inspection).to receive(:send).with(:photo_1).and_return(photo_1_attached)
+        allow(inspection).to receive(:send).with(:photo_2).and_return(photo_attachment)
+        allow(inspection).to receive(:send).with(:photo_3).and_return(photo_attachment)
         allow(photo_1_attached).to receive(:attached?).and_return(true)
         allow(photo_1_attached).to receive(:blob).and_return(photo_blob)
         allow(photo_blob).to receive(:download)
