@@ -291,7 +291,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
     before do
       allow(photo_blob).to receive(:download)
-      allow(photo_blob).to receive(:metadata).and_return({ width: 800, height: 600 })
+      allow(photo_blob).to receive(:metadata).and_return({width: 800, height: 600})
       allow(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).and_return(image_data)
       allow(pdf).to receive(:bounds).and_return(bounds)
       allow(pdf).to receive(:cursor).and_return(700)
@@ -382,7 +382,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
   end
 
   describe ".calculate_photo_dimensions_from_blob" do
-    let(:metadata) { { width: 800, height: 600 } }
+    let(:metadata) { {width: 800, height: 600} }
 
     before do
       allow(photo).to receive(:metadata).and_return(metadata)
@@ -405,7 +405,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "with square image" do
-      let(:metadata) { { width: 500, height: 500 } }
+      let(:metadata) { {width: 500, height: 500} }
 
       it "scales proportionally" do
         width, height = described_class.calculate_photo_dimensions_from_blob(photo, 300, 400)
@@ -415,7 +415,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "with portrait image" do
-      let(:metadata) { { width: 400, height: 800 } }
+      let(:metadata) { {width: 400, height: 800} }
 
       it "scales based on height when limited by max height" do
         width, height = described_class.calculate_photo_dimensions_from_blob(photo, 500, 400)
@@ -425,7 +425,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "with very small image" do
-      let(:metadata) { { width: 100, height: 100 } }
+      let(:metadata) { {width: 100, height: 100} }
 
       it "does not upscale beyond original size" do
         width, height = described_class.calculate_photo_dimensions_from_blob(photo, 500, 500)
@@ -435,7 +435,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "with zero dimensions" do
-      let(:metadata) { { width: 0, height: 600 } }
+      let(:metadata) { {width: 0, height: 600} }
 
       it "handles zero width gracefully" do
         expect {
@@ -445,7 +445,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "with nil metadata values" do
-      let(:metadata) { { width: nil, height: 600 } }
+      let(:metadata) { {width: nil, height: 600} }
 
       it "converts nil to zero and handles error" do
         expect {
@@ -534,7 +534,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         allow(inspection).to receive(:send).with(:photo_2).and_return(photo_2)
         allow(inspection).to receive(:send).with(:photo_3).and_return(photo_3)
         allow(photo_blob).to receive(:download)
-        allow(photo_blob).to receive(:metadata).and_return({ width: 800, height: 600 })
+        allow(photo_blob).to receive(:metadata).and_return({width: 800, height: 600})
         allow(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).and_return("image_data")
       end
 
@@ -561,7 +561,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         allow(photo_attachment).to receive(:attached?).and_return(false)
         allow(inspection).to receive(:send).with(:photo_1).and_return(photo_1)
         allow(photo_blob).to receive(:download)
-        allow(photo_blob).to receive(:metadata).and_return({ width: 800, height: 600 })
+        allow(photo_blob).to receive(:metadata).and_return({width: 800, height: 600})
         allow(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).and_return("image_data")
       end
 
@@ -589,7 +589,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         allow(inspection).to receive(:send).with(:photo_2).and_return(bad_photo)
 
         allow(photo_blob).to receive(:download)
-        allow(photo_blob).to receive(:metadata).and_return({ width: 800, height: 600 })
+        allow(photo_blob).to receive(:metadata).and_return({width: 800, height: 600})
         allow(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).with(good_photo).and_return("good_data")
 
         allow(bad_blob).to receive(:download)
