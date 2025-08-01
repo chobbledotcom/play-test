@@ -48,6 +48,7 @@ en:
       other_dimensions: "Other Specifications"
 
     fields:
+      id: "ID"
       name: "Unit Name"
       serial: "Serial"
       manufacturer: "Manufacturer"
