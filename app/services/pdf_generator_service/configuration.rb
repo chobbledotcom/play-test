@@ -49,8 +49,9 @@ class PdfGeneratorService
     ASSESSMENT_BLOCK_SPACING = 8
 
     # QR Code constants
-    QR_CODE_SIZE = 80
-    QR_CODE_MARGIN = 0  # No margin - align with table right edge
+    # QR code size is 3 lines of header text (12pt * 1.5 line height * 3 lines)
+    QR_CODE_SIZE = (HEADER_TEXT_SIZE * 1.5 * 3).round
+    QR_CODE_MARGIN = 0  # No margin - align with page edge
     QR_CODE_BOTTOM_OFFSET = HEADER_SPACING  # Match header spacing from top
 
     # Unit photo constants
