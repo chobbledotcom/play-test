@@ -74,7 +74,7 @@ class PdfGeneratorService
       table.columns(0).font_style = :bold
 
       if is_unit_pdf
-        table.columns(0).width = UNIT_LABEL_COLUMN_WIDTH
+        table.columns(0).width = I18n.t("pdf.table.unit_label_column_width_left")
       else
         apply_four_column_styling(table, pdf_width)
       end
@@ -82,10 +82,14 @@ class PdfGeneratorService
 
     def self.apply_four_column_styling(table, pdf_width)
       table.columns(2).font_style = :bold
-      table.columns(0).width = UNIT_LABEL_COLUMN_WIDTH
-      table.columns(2).width = UNIT_LABEL_COLUMN_WIDTH
 
-      remaining_width = pdf_width - (UNIT_LABEL_COLUMN_WIDTH * 2)
+      left_width = I18n.t("pdf.table.unit_label_column_width_left")
+      right_width = I18n.t("pdf.table.unit_label_column_width_right")
+
+      table.columns(0).width = left_width
+      table.columns(2).width = right_width
+
+      remaining_width = pdf_width - (left_width + right_width)
       table.columns(1).width = remaining_width / 2
       table.columns(3).width = remaining_width / 2
     end
@@ -129,7 +133,7 @@ class PdfGeneratorService
     end
 
     def self.inspector_text(inspection)
-      inspector_name = inspection.user.name || I18n.t("pdf.unit.fields.na")
+      inspector_name = inspection.user.name
       rpii_number = inspection.user.rpii_inspector_number
 
       if rpii_number.present?
@@ -224,11 +228,11 @@ class PdfGeneratorService
 
       # Build simple two-column table for unit PDFs
       [
-        [I18n.t("pdf.inspection.fields.description"),
-          Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH)],
-        [I18n.t("pdf.inspection.fields.manufacturer"), unit.manufacturer.presence || ""],
-        [I18n.t("pdf.inspection.fields.operator"), unit.operator.presence || ""],
-        [I18n.t("pdf.inspection.fields.serial"), unit.serial || ""],
+        [I18n.t("units.fields.name"),
+          Utilities.truncate_text(unit.name, UNIT_NAME_MAX_LENGTH)],
+        [I18n.t("pdf.inspection.fields.manufacturer"), unit.manufacturer],
+        [I18n.t("pdf.inspection.fields.operator"), unit.operator],
+        [I18n.t("pdf.inspection.fields.serial"), unit.serial],
         [I18n.t("pdf.inspection.fields.size_m"), dimensions_text]
       ]
     end
@@ -255,7 +259,7 @@ class PdfGeneratorService
       else
         unit.last_inspection
       end
-      inspector_name = inspection&.user&.name || ""
+      inspector_name = inspection&.user&.name
       rpii_number = inspection&.user&.rpii_inspector_number
 
       # Combine inspector name with RPII number if present
@@ -267,33 +271,31 @@ class PdfGeneratorService
 
       issued_date = if inspection&.inspection_date
         Utilities.format_date(inspection.inspection_date)
-      else
-        ""
       end
 
       # Build the table rows
       [
         [
-          I18n.t("pdf.inspection.fields.description"),
-          Utilities.truncate_text(unit.name || unit.description || "", UNIT_NAME_MAX_LENGTH),
+          I18n.t("units.fields.name"),
+          Utilities.truncate_text(unit.name, UNIT_NAME_MAX_LENGTH),
           I18n.t("pdf.inspection.fields.inspected_by"),
           inspector_text
         ],
         [
+          I18n.t("pdf.inspection.fields.description"),
+          unit.description,
           I18n.t("pdf.inspection.fields.manufacturer"),
-          unit.manufacturer.presence || "",
-          I18n.t("units.fields.name"),
-          unit.name.presence || ""
+          unit.manufacturer
         ],
         [
           I18n.t("pdf.inspection.fields.size_m"),
           dimensions_text,
           I18n.t("pdf.inspection.fields.operator"),
-          unit.operator.presence || ""
+          unit.operator
         ],
         [
           I18n.t("pdf.inspection.fields.serial"),
-          unit.serial || "",
+          unit.serial,
           I18n.t("pdf.inspection.fields.issued_date"),
           issued_date
         ]

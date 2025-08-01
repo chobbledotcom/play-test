@@ -1,7 +1,6 @@
 class PdfGeneratorService
   module Configuration
     # Unit table constants
-    UNIT_LABEL_COLUMN_WIDTH = 100
     UNIT_NAME_MAX_LENGTH = 30
     UNIT_TABLE_CELL_PADDING = [6, 4]
     UNIT_TABLE_TEXT_SIZE = 9
