@@ -226,7 +226,6 @@ class PdfGeneratorService
       [
         [I18n.t("units.fields.name"),
           Utilities.truncate_text(unit.name, UNIT_NAME_MAX_LENGTH)],
-        [I18n.t("pdf.inspection.fields.description"), unit.description],
         [I18n.t("pdf.inspection.fields.manufacturer"), unit.manufacturer],
         [I18n.t("pdf.inspection.fields.operator"), unit.operator],
         [I18n.t("pdf.inspection.fields.serial"), unit.serial],

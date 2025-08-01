@@ -63,7 +63,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         result = described_class.build_unit_details_table(unit, :unit)
 
         expect(result).to be_an(Array)
-        expect(result.length).to eq(6)
+        expect(result.length).to eq(5)
         result.each { |row| expect(row.length).to eq(2) }
       end
     end
@@ -78,7 +78,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
 
         expect(result[0][1]).to eq("") # empty name
         expect(result[1][1]).to eq("") # empty description
-        expect(result[1][3]).to eq("") # empty manufacturer
+        expect(result[2][1]).to eq("") # empty manufacturer
       end
     end
   end
