@@ -239,8 +239,8 @@ RSpec.describe InspectionsHelper, type: :helper do
       it "caches the result" do
         # First call
         helper.incomplete_fields_count(inspection, "inspection")
-        
-        # Second call should use cache (we can't easily test this directly, 
+
+        # Second call should use cache (we can't easily test this directly,
         # but at least verify it returns the same result)
         count = helper.incomplete_fields_count(inspection, "inspection")
         expect(count).to eq(2)
