@@ -215,13 +215,13 @@ class PdfGeneratorService
 
       if last_inspection
         if last_inspection.width.present?
-          dimensions << "#{I18n.t("forms.inspection.fields.width").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
+          dimensions << "#{FieldUtils.form_field_label("inspection", "width").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
         end
         if last_inspection.length.present?
-          dimensions << "#{I18n.t("forms.inspection.fields.length").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
+          dimensions << "#{FieldUtils.form_field_label("inspection", "length").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
         end
         if last_inspection.height.present?
-          dimensions << "#{I18n.t("forms.inspection.fields.height").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
+          dimensions << "#{FieldUtils.form_field_label("inspection", "height").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
         end
       end
       dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
@@ -230,9 +230,9 @@ class PdfGeneratorService
       [
         [I18n.t("units.fields.name"),
           Utilities.truncate_text(unit.name, UNIT_NAME_MAX_LENGTH)],
-        [I18n.t("forms.units.fields.manufacturer"), unit.manufacturer],
-        [I18n.t("forms.units.fields.operator"), unit.operator],
-        [I18n.t("forms.units.fields.serial"), unit.serial],
+        [FieldUtils.form_field_label("units", "manufacturer"), unit.manufacturer],
+        [FieldUtils.form_field_label("units", "operator"), unit.operator],
+        [FieldUtils.form_field_label("units", "serial"), unit.serial],
         [I18n.t("pdf.inspection.fields.size_m"), dimensions_text]
       ]
     end
@@ -242,13 +242,13 @@ class PdfGeneratorService
 
       if last_inspection
         if last_inspection.width.present?
-          dimensions << "#{I18n.t("forms.inspection.fields.width").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
+          dimensions << "#{FieldUtils.form_field_label("inspection", "width").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
         end
         if last_inspection.length.present?
-          dimensions << "#{I18n.t("forms.inspection.fields.length").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
+          dimensions << "#{FieldUtils.form_field_label("inspection", "length").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
         end
         if last_inspection.height.present?
-          dimensions << "#{I18n.t("forms.inspection.fields.height").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
+          dimensions << "#{FieldUtils.form_field_label("inspection", "height").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
         end
       end
       dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
@@ -282,19 +282,19 @@ class PdfGeneratorService
           inspector_text
         ],
         [
-          I18n.t("forms.units.fields.description"),
+          FieldUtils.form_field_label("units", "description"),
           unit.description,
-          I18n.t("forms.units.fields.manufacturer"),
+          FieldUtils.form_field_label("units", "manufacturer"),
           unit.manufacturer
         ],
         [
           I18n.t("pdf.inspection.fields.size_m"),
           dimensions_text,
-          I18n.t("forms.units.fields.operator"),
+          FieldUtils.form_field_label("units", "operator"),
           unit.operator
         ],
         [
-          I18n.t("forms.units.fields.serial"),
+          FieldUtils.form_field_label("units", "serial"),
           unit.serial,
           I18n.t("pdf.inspection.fields.issued_date"),
           issued_date
