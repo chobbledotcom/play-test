@@ -74,7 +74,7 @@ RSpec.describe JsonSerializerService do
 
   describe ".serialize_inspection" do
     let(:unit) { create(:unit, user: user) }
-    let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
+    let(:inspection) { create(:inspection, :completed, user: user, unit: unit, indoor_only: false) }
 
     it "includes all public fields using reflection" do
       json = JsonSerializerService.serialize_inspection(inspection)
@@ -198,6 +198,22 @@ RSpec.describe JsonSerializerService do
         json = JsonSerializerService.serialize_inspection(inspection_no_slide)
 
         expect(json[:assessments]).not_to have_key(:slide_assessment)
+      end
+    end
+
+    context "when inspection is indoor only" do
+      let(:indoor_inspection) { create(:inspection, :completed, :indoor_only, user: user, unit: unit) }
+
+      it "excludes anchorage assessment" do
+        json = JsonSerializerService.serialize_inspection(indoor_inspection)
+
+        expect(json[:assessments]).not_to have_key(:anchorage_assessment)
+
+        # Should still have other assessments
+        expect(json[:assessments]).to have_key(:user_height_assessment)
+        expect(json[:assessments]).to have_key(:structure_assessment)
+        expect(json[:assessments]).to have_key(:materials_assessment)
+        expect(json[:assessments]).to have_key(:fan_assessment)
       end
     end
   end
