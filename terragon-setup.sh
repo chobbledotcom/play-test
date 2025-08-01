@@ -10,20 +10,12 @@ if [ -f ".terragon-setup-complete" ] && [ -z "${FORCE_SETUP:-}" ]; then
     exit 0
 fi
 
-echo "Setting up Rails environment..."
+echo "Installing Ruby and dependencies..."
+sudo apt-get update -qq
+sudo apt-get install -y ruby-full ruby-bundler build-essential libsqlite3-dev libyaml-dev imagemagick
 
-# Check if Ruby is installed
-if \! command -v ruby &> /dev/null; then
-    echo "Installing Ruby and dependencies..."
-    sudo apt-get update -qq
-    sudo apt-get install -y ruby-full ruby-bundler build-essential libsqlite3-dev
-fi
-
-# Check if bundler is up to date
-if \! gem list bundler -i &> /dev/null; then
-    echo "Installing bundler gem..."
-    sudo gem install bundler
-fi
+echo "Installing bundler gem..."
+sudo gem install bundler
 
 # Install Rails dependencies with bundler
 echo "Installing gems..."
@@ -56,3 +48,4 @@ done
 touch .terragon-setup-complete
 
 echo "Rails setup complete\!"
+
