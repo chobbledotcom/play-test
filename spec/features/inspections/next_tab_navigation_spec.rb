@@ -13,8 +13,8 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
     # Start on inspection tab which is complete
     visit edit_inspection_path(inspection, tab: "inspection")
 
-    # Save the form
-    submit_form(:inspection)
+    # Save the form - find the submit input directly for JS tests
+    find("input[type='submit']").click
 
     # Should suggest the first incomplete assessment tab
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
@@ -29,7 +29,7 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
     visit edit_inspection_path(inspection, tab: "inspection")
 
     # Save the form without filling required fields
-    click_button I18n.t("forms.inspection.submit")
+    find("input[type='submit']").click
 
     # Should suggest the next tab with incomplete count (3 fields: width, length, height)
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
@@ -48,8 +48,8 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
     last_tab = completed_inspection.applicable_tabs[-2] # -2 because results is last
     visit edit_inspection_path(completed_inspection, tab: last_tab)
 
-    # Save the form
-    submit_form(last_tab.to_sym)
+    # Save the form - find the submit input directly for JS tests
+    find("input[type='submit']").click
 
     # Should suggest results tab
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
@@ -67,8 +67,8 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
     # Visit results tab
     visit edit_inspection_path(completed_inspection, tab: "results")
 
-    # Save the form
-    submit_form(:results)
+    # Save the form - find the submit input directly for JS tests
+    find("input[type='submit']").click
 
     # Should not suggest any next tab
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
