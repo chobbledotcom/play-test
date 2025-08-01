@@ -79,7 +79,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
 
         expect(result[0][1]).to eq("") # empty name (truncate_text converts nil to "")
         expect(result[1][1]).to be_nil # nil description
-        expect(result[2][3]).to be_nil # nil manufacturer
+        expect(result[1][3]).to be_nil # nil manufacturer (row 1, col 3)
       end
     end
   end
