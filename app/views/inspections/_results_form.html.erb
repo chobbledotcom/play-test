@@ -2,6 +2,7 @@
   model: @inspection,
   i18n_base: 'forms.results' do |form|
 %>
+  <%= hidden_field_tag :tab, 'results' %>
   <%= render 'chobble_forms/fieldset', legend_key: 'comments' do %>
     <% comments_found = false %>
     <% comment_items = [] %>

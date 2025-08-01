@@ -151,6 +151,7 @@ en:
       use_suggested_id: "Use its public ID - %{id}"
       log: "Log"
       continue_to_tab: "Continue to %{tab_name}"
+      continue_to_tab_with_incomplete: "You have %{count} incomplete fields on this page. Continue to %{tab_name} anyway?"
 
     messages:
       no_unit: "No unit selected"
