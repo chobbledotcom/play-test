@@ -36,5 +36,5 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ vars.DOCKER_USERNAME }}/play-test:latest
+            # ${{ vars.DOCKER_USERNAME }}/play-test:latest
             git.chobble.com/chobble/play-test:latest
