@@ -44,7 +44,7 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
   scenario "suggests results tab when all assessments are complete" do
     # Create a completed inspection which has all assessments complete
     completed_inspection = create(:inspection, :completed, user: user, unit: unit)
-    
+
     # Visit the last assessment tab
     last_tab = completed_inspection.applicable_tabs[-2] # -2 because results is last
     visit edit_inspection_path(completed_inspection, tab: last_tab)
@@ -64,7 +64,7 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
     # Create a completed inspection which has all assessments complete
     completed_inspection = create(:inspection, :completed, user: user, unit: unit)
     completed_inspection.update!(passed: true)
-    
+
     # Visit results tab
     visit edit_inspection_path(completed_inspection, tab: "results")
 
