@@ -13,8 +13,6 @@ en:
       watermark:
         draft: "DRAFT"
       fields:
-        serial: "Serial Number"
-        manufacturer: "Manufacturer"
         inspector: "Inspector"
         inspected_by: "Inspected by"
         issued: "Issued"
@@ -22,16 +20,11 @@ en:
         expiry_date: "Expiry Date"
         rpii_inspector_no: "RPII Inspector No"
         report_id: "Report ID"
-        description: "Description"
-        operator: "Operator"
         size_m: "Size (m)"
         passed: "PASSED"
         failed: "FAILED"
         incomplete: "INCOMPLETE"
         na: "N/A"
-        width: "Width"
-        length: "Length"
-        height: "Height"
         size: "Size"
         size_with_unit: "Size (m)"
         unit_meters: "m"
@@ -52,10 +45,6 @@ en:
       no_completed_inspections: "No completed inspections"
       fields:
         unit_id: "Unit ID"
-        description: "Description"
-        serial: "Serial Number"
-        manufacturer: "Manufacturer"
-        operator: "Operator"
         size_m: "Size (m)"
         date: "Date"
         inspector: "Inspector"
@@ -65,9 +54,6 @@ en:
         na: "N/A"
 
     dimensions:
-      width: "Width"
-      length: "Length"
-      height: "Height"
       size: "Size"
       size_with_unit: "Size (m)"
       unit_meters: "m"
