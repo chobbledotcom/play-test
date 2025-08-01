@@ -88,10 +88,35 @@ class PdfGeneratorService
         # Since we want them vertically aligned, position from same top y
         y_position = content_top_y
 
+        # Add border around signature
+        border_padding = 2
+        border_x = x_position - border_padding
+        border_y = y_position + border_padding
+        border_width = width + (border_padding * 2)
+        border_height = height + (border_padding * 2)
+
+        # Draw border
+        pdf.stroke_color "CCCCCC"
+        pdf.line_width = 1
+        pdf.stroke_rectangle [border_x, border_y], border_width, border_height
+
         # Render the signature
         ImageProcessor.render_processed_image(
           pdf, image, x_position, y_position, width, height, signature_attachment
         )
+
+        # Add caption below signature
+        caption_y = y_position - height - 10
+        pdf.text_box I18n.t("pdf.signature.caption"),
+          at: [border_x, caption_y],
+          width: border_width,
+          height: 20,
+          size: DISCLAIMER_TEXT_SIZE,
+          align: :center,
+          valign: :top
+
+        # Reset stroke color to default
+        pdf.stroke_color "000000"
       rescue => e
         Rails.logger.error "Failed to render signature: #{e.message}"
       end
