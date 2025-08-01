@@ -2,6 +2,8 @@ en:
   # Search functionality
   search:
     title: "Search Federated Sites"
+    homepage:
+      placeholder: "Unit or Inspection ID"
     sites:
       current_site: "Current Site"
       play_test: "Play Test"
