@@ -16,7 +16,18 @@ module AssessmentCompletion
     (attributes.keys - SYSTEM_FIELDS)
       .select { |f| !f.end_with?("_comment") }
       .select { |f| send(f).nil? }
+      .reject { |f| field_allows_nil_when_na?(f) }
       .map { |f| f.to_sym }
+  end
+
+  private
+
+  def field_allows_nil_when_na?(field)
+    # Only allow nil for value fields (not _pass fields) when their corresponding _pass field is "na"
+    return false if field.end_with?("_pass")
+
+    pass_field = "#{field}_pass"
+    respond_to?(pass_field) && send(pass_field) == "na"
   end
 
   def incomplete_fields_grouped
@@ -44,7 +55,7 @@ module AssessmentCompletion
       end
     end
 
-    # Get all incomplete fields
+    # Get all incomplete fields (already filtered for NA fields)
     incomplete = incomplete_fields
 
     # Group related fields
