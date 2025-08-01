@@ -14,7 +14,9 @@ on:
 
 jobs:
   test:
-    uses: ./.github/workflows/ci.yml
+    uses: ./.github/workflows/test.yml
+    permissions:
+      contents: read
     
   lint:
     uses: ./.github/workflows/standard.yml
@@ -142,15 +144,16 @@ jobs:
           name: Release ${{ steps.new.outputs.version }}
           body: |
             # v${{ steps.new.outputs.version }}
-            
+
+            [Read the full changelog here](https://github.com/${{ github.repository }}/compare/v${{ steps.current.outputs.version }}...v${{ steps.new.outputs.version }})
+
             ## Docker Images
             - `${{ vars.DOCKER_USERNAME }}/play-test:v${{ steps.new.outputs.version }}`
             - `git.chobble.com/chobble/play-test:v${{ steps.new.outputs.version }}`
             - `ghcr.io/${{ github.repository }}:v${{ steps.new.outputs.version }}`
             
-            [Read the full changelog here](https://github.com/${{ github.repository }}/compare/v${{ steps.current.outputs.version }}...v${{ steps.new.outputs.version }})
           files: |
-            pat-logger-v${{ steps.new.outputs.version }}.zip
+            play-test-v${{ steps.new.outputs.version }}.zip
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}

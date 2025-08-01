@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.feature "Safety Standards Display", type: :feature do
@@ -104,7 +106,6 @@ RSpec.feature "Safety Standards Display", type: :feature do
     within(".safety-standards-info") do
       expect(page).to have_content("Height Requirements")
       expect(page).to have_content("Height range: 3.0m - 6.0m")
-      expect(page).to have_content("Calculation: 1.8m × 1.25 = 2.25m")
       expect(page).to have_content("Alternative requirement: Permanent roof")
       expect(page).to have_content("Permanent roof: Fitted ✓")
     end

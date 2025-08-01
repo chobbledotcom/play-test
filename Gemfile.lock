@@ -138,7 +138,7 @@ GEM
       dotenv (= 3.1.8)
       railties (>= 6.1)
     drb (2.2.1)
-    en14960 (0.1.8)
+    en14960 (0.2.0)
     erubi (1.13.1)
     factory_bot (6.5.3)
       activesupport (>= 6.1.0)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.feature "Inspection incomplete fields display", type: :feature do
@@ -5,18 +7,41 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user:) }
-  let(:inspection) {
-    inspection = create(:inspection,
-      unit:,
-      user:,
-      width: 5.0,
-      length: 10.0,
-      height: 3.0)
-    inspection.update_column(:inspection_date, nil)
-    inspection
-  }
+  let(:inspection) { create_incomplete_inspection_with_multiple_sections }
 
   before { sign_in(user) }
+
+  def create_incomplete_inspection_with_multiple_sections
+    create_incomplete_inspection(
+      inspection_fields: %i[inspection_date width length],
+      assessment_fields: {
+        structure_assessment: %i[seam_integrity_pass air_loss_pass stitch_length_pass]
+      }
+    )
+  end
+
+  def create_incomplete_inspection(inspection_fields: [], assessment_fields: {}, **attrs)
+    # Start with complete inspection to avoid validation errors
+    inspection = create(:inspection, :completed, {unit:, user:}.merge(attrs))
+
+    # Make it incomplete (remove complete_date)
+    inspection.update_column(:complete_date, nil)
+
+    # Remove specified inspection fields
+    if inspection_fields.any?
+      field_values = inspection_fields.index_with { nil }
+      inspection.update_columns(field_values)
+    end
+
+    # Remove specified assessment fields
+    assessment_fields.each do |assessment_name, fields|
+      assessment = inspection.send(assessment_name)
+      field_values = fields.index_with { nil }
+      assessment.update_columns(field_values)
+    end
+
+    inspection
+  end
 
   def expect_incomplete_fields_summary(count)
     show_fields_key = "assessments.incomplete_fields.show_fields"
@@ -70,17 +95,17 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
   scenario "shows incomplete fields from assessments with section headers" do
     complete_unit = create(:unit, user:)
-    controlled_inspection = create(:inspection,
+    controlled_inspection = create_incomplete_inspection(
       unit: complete_unit,
-      user:,
       passed: true,
       height: 3.0,
       length: 10.0,
-      width: 8.0)
-    controlled_inspection.update_column(:inspection_date, nil)
-
-    user_height_assessment = controlled_inspection.user_height_assessment
-    user_height_assessment.update!(tallest_user_height: nil)
+      width: 8.0,
+      inspection_fields: [:inspection_date],
+      assessment_fields: {
+        user_height_assessment: [:tallest_user_height]
+      }
+    )
 
     visit edit_inspection_path(controlled_inspection)
     expand_incomplete_fields
@@ -174,9 +199,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
     # Verify Results appears last if present
     results_header = I18n.t("forms.results.header")
-    if section_headers.any? { |h| h.include?(results_header) }
-      expect(section_headers.last).to include(results_header)
-    end
+    expect(section_headers.last).to include(results_header) if section_headers.any? { |h| h.include?(results_header) }
 
     # Verify the order matches the tab order from applicable_tabs
     # Exact tabs shown depend on which have incomplete fields
@@ -194,22 +217,14 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
   end
 
   scenario "displays incomplete field counts for each section" do
-    # Start with a completed inspection that has all fields filled
-    completed_inspection = create(:inspection, :completed, user: user, unit: unit)
-
-    # Setup inspection with known incomplete fields
-    completed_inspection.update_columns(
-      inspection_date: nil,
-      width: nil,
-      length: nil
-    )
-    completed_inspection.structure_assessment.update_columns(
-      seam_integrity_pass: nil,
-      stitch_length_pass: nil,
-      air_loss_pass: nil
+    controlled_inspection = create_incomplete_inspection(
+      inspection_fields: %i[inspection_date width length],
+      assessment_fields: {
+        structure_assessment: %i[seam_integrity_pass stitch_length_pass air_loss_pass]
+      }
     )
 
-    visit edit_inspection_path(completed_inspection)
+    visit edit_inspection_path(controlled_inspection)
     expand_incomplete_fields
 
     # Check that General shows (3) for inspection_date, width, and length
@@ -250,15 +265,15 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
         section_name = header.text
         # Find fields for section by looking for links with same tab param
         tab_match = header[:href].match(/tab=(\w+)/)
-        if tab_match
-          tab_name = tab_match[1]
-          tab_selector = "tab=#{tab_name}"
-          section_fields = field_links.select do |link|
-            link[:href].include?(tab_selector)
-          end
-          error_msg = "Section '#{section_name}' should have incomplete fields"
-          expect(section_fields.count).to be > 0, error_msg
+        next unless tab_match
+
+        tab_name = tab_match[1]
+        tab_selector = "tab=#{tab_name}"
+        section_fields = field_links.select do |link|
+          link[:href].include?(tab_selector)
         end
+        error_msg = "Section '#{section_name}' should have incomplete fields"
+        expect(section_fields.count).to be > 0, error_msg
       end
     end
   end
