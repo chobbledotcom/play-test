@@ -3,6 +3,7 @@ set -euo pipefail
 
 # Terragon Labs Rails Setup Script
 # Optimized for Ubuntu 24.04 - runs on every sandbox start
+# According to Terragon docs, Ruby should be pre-installed in their environment
 
 # Skip if already set up (optimization for repeated runs)
 if [ -f ".terragon-setup-complete" ] && [ -z "${FORCE_SETUP:-}" ]; then
@@ -12,7 +13,14 @@ fi
 
 echo "Setting up Rails environment..."
 
+# Check if bundle command exists
+if ! command -v bundle &> /dev/null; then
+    echo "Installing bundler..."
+    gem install bundler
+fi
+
 # Install Rails dependencies with bundler
+echo "Installing gems..."
 bundle install --jobs 4
 
 # Database setup (only if not exists)
