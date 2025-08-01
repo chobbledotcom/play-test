@@ -197,7 +197,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
   scenario "displays incomplete field counts for each section" do
     # Start with a completed inspection that has all fields filled
     completed_inspection = create(:inspection, :completed, user: user, unit: unit)
-    
+
     # Setup inspection with known incomplete fields
     completed_inspection.update_columns(
       inspection_date: nil,
