@@ -108,5 +108,35 @@ RSpec.describe AssessmentCompletion, type: :model do
         expect(grouped[:ropes][:fields]).to eq([:ropes])
       end
     end
+
+    context "when pass field is set to NA" do
+      before do
+        assessment.update!(ropes: nil, ropes_pass: "na")
+      end
+
+      it "does not include the value field in incomplete fields" do
+        expect(assessment.incomplete_fields).not_to include(:ropes)
+      end
+
+      it "does not include the pass field in incomplete fields" do
+        expect(assessment.incomplete_fields).not_to include(:ropes_pass)
+      end
+
+      it "does not group NA fields as incomplete" do
+        grouped = assessment.incomplete_fields_grouped
+        expect(grouped[:ropes]).to be_nil
+        expect(grouped[:ropes_pass]).to be_nil
+      end
+    end
+
+    context "when a pass-only field is set to NA" do
+      before do
+        assessment.update!(retention_netting_pass: "na")
+      end
+
+      it "does not include the field in incomplete fields" do
+        expect(assessment.incomplete_fields).not_to include(:retention_netting_pass)
+      end
+    end
   end
 end
