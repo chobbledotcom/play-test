@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.feature "Inspection incomplete fields display", type: :feature do
@@ -11,9 +13,9 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
   def create_incomplete_inspection_with_multiple_sections
     create_incomplete_inspection(
-      inspection_fields: [:inspection_date, :width, :length],
+      inspection_fields: %i[inspection_date width length],
       assessment_fields: {
-        structure_assessment: [:seam_integrity_pass, :air_loss_pass, :stitch_length_pass]
+        structure_assessment: %i[seam_integrity_pass air_loss_pass stitch_length_pass]
       }
     )
   end
@@ -197,9 +199,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
     # Verify Results appears last if present
     results_header = I18n.t("forms.results.header")
-    if section_headers.any? { |h| h.include?(results_header) }
-      expect(section_headers.last).to include(results_header)
-    end
+    expect(section_headers.last).to include(results_header) if section_headers.any? { |h| h.include?(results_header) }
 
     # Verify the order matches the tab order from applicable_tabs
     # Exact tabs shown depend on which have incomplete fields
@@ -218,9 +218,9 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
   scenario "displays incomplete field counts for each section" do
     controlled_inspection = create_incomplete_inspection(
-      inspection_fields: [:inspection_date, :width, :length],
+      inspection_fields: %i[inspection_date width length],
       assessment_fields: {
-        structure_assessment: [:seam_integrity_pass, :stitch_length_pass, :air_loss_pass]
+        structure_assessment: %i[seam_integrity_pass stitch_length_pass air_loss_pass]
       }
     )
 
@@ -265,15 +265,15 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
         section_name = header.text
         # Find fields for section by looking for links with same tab param
         tab_match = header[:href].match(/tab=(\w+)/)
-        if tab_match
-          tab_name = tab_match[1]
-          tab_selector = "tab=#{tab_name}"
-          section_fields = field_links.select do |link|
-            link[:href].include?(tab_selector)
-          end
-          error_msg = "Section '#{section_name}' should have incomplete fields"
-          expect(section_fields.count).to be > 0, error_msg
+        next unless tab_match
+
+        tab_name = tab_match[1]
+        tab_selector = "tab=#{tab_name}"
+        section_fields = field_links.select do |link|
+          link[:href].include?(tab_selector)
         end
+        error_msg = "Section '#{section_name}' should have incomplete fields"
+        expect(section_fields.count).to be > 0, error_msg
       end
     end
   end
