@@ -231,7 +231,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         expect(described_class).to receive(:handle_page_break_if_needed)
           .with(pdf, 640, 300).ordered.and_return(640)
         expect(described_class).to receive(:handle_page_break_if_needed)
-          .with(pdf, 540, 300).ordered.and_return(540)
+          .with(pdf, 590, 300).ordered.and_return(590)
 
         described_class.process_all_photos(pdf, inspection, 300)
       end
