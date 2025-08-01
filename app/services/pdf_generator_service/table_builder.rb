@@ -228,7 +228,7 @@ class PdfGeneratorService
 
       # Build simple two-column table for unit PDFs
       [
-        [I18n.t("units.fields.name"),
+        [FieldUtils.form_field_label("units", "name"),
           Utilities.truncate_text(unit.name, UNIT_NAME_MAX_LENGTH)],
         [FieldUtils.form_field_label("units", "manufacturer"), unit.manufacturer],
         [FieldUtils.form_field_label("units", "operator"), unit.operator],
@@ -276,7 +276,7 @@ class PdfGeneratorService
       # Build the table rows
       [
         [
-          I18n.t("units.fields.name"),
+          FieldUtils.form_field_label("units", "name"),
           Utilities.truncate_text(unit.name, UNIT_NAME_MAX_LENGTH),
           I18n.t("pdf.inspection.fields.inspected_by"),
           inspector_text

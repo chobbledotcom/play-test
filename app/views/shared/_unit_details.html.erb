@@ -53,7 +53,7 @@
     <%# Unit Details Section %>
     <ul class="unit-details-list">
       <li>
-        <strong><%= t("units.fields.name") %>:</strong>
+        <strong><%= FieldUtils.form_field_label('units', 'name') %>:</strong>
         <span><%= link_to unit.name, unit_path(unit) %></span>
       </li>
       

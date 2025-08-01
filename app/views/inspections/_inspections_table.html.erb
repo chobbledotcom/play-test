@@ -14,7 +14,7 @@
     <% end %>
     <span class="col-id"><%= t('inspections.fields.id') %></span>
     <% if show_name %>
-      <span class="col-name"><%= t('inspections.fields.name') %></span>
+      <span class="col-name"><%= FieldUtils.form_field_label('units', 'name') %></span>
     <% end %>
     <% if show_serial %>
       <span class="col-serial"><%= t('inspections.fields.serial') %></span>
@@ -56,7 +56,7 @@
             <%= inspection.id %>
           </span>
           <% if show_name %>
-            <span class="col-name" data-label="<%= t('inspections.fields.name') %>">
+            <span class="col-name" data-label="<%= FieldUtils.form_field_label('units', 'name') %>">
               <% if inspection.unit.nil? %>
                 <span class="badge">[<%= t("inspections.labels.no_unit") %>]</span>
               <% end %>

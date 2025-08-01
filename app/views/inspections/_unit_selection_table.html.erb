@@ -2,7 +2,7 @@
   <!-- Header row -->
   <div class="table-list-header">
     <span class="col-photo"><%= t('units.fields.photo') %></span>
-    <span class="col-name"><%= t('units.fields.name') %></span>
+    <span class="col-name"><%= FieldUtils.form_field_label('units', 'name') %></span>
     <span class="col-manufacturer"><%= t('units.fields.manufacturer') %></span>
     <span class="col-serial"><%= t('units.fields.serial') %></span>
     <span class="col-action"><%= t('units.actions.select') %></span>
@@ -23,7 +23,7 @@
               <span style="color: #ccc;"><%= t('units.messages.no_photo') %></span>
             <% end %>
           </span>
-          <span class="col-name" data-label="<%= t('units.fields.name') %>">
+          <span class="col-name" data-label="<%= FieldUtils.form_field_label('units', 'name') %>">
             <%= item.name %>
           </span>
           <span class="col-manufacturer" data-label="<%= t('units.fields.manufacturer') %>">
