@@ -30,6 +30,8 @@ jobs:
     permissions:
       contents: write
       id-token: write
+      packages: write
+      attestations: write
     
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +53,7 @@ jobs:
       - name: Get current version
         id: current
         run: |
-          CURRENT_VERSION=$(ruby -r ./lib/en14960/version.rb -e "puts EN14960::VERSION")
+          CURRENT_VERSION=$(cat VERSION)
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
       
       - name: Calculate new version
@@ -79,13 +81,11 @@ jobs:
       
       - name: Update version
         run: |
-          sed -i 's/VERSION = "[^"]*"/VERSION = "${{ steps.new.outputs.version }}"/' lib/en14960/version.rb
-          bundle config set frozen false
-          bundle install
+          echo "${{ steps.new.outputs.version }}" > VERSION
       
       - name: Commit version bump
         run: |
-          git add lib/en14960/version.rb Gemfile.lock
+          git add VERSION
           git commit -m "Bump version to ${{ steps.new.outputs.version }}"
       
       - name: Create tag
@@ -97,8 +97,45 @@ jobs:
           git push origin main
           git push origin "v${{ steps.new.outputs.version }}"
       
-      - name: Publish to RubyGems
-        uses: rubygems/release-gem@v1
+      - name: Create release archive
+        run: |
+          # Create a clean archive without .git directory
+          git archive --format=zip --prefix=pat-logger-v${{ steps.new.outputs.version }}/ HEAD > pat-logger-v${{ steps.new.outputs.version }}.zip
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to Forgejo Registry
+        uses: docker/login-action@v3
+        with:
+          registry: git.chobble.com
+          username: stefan
+          password: ${{ secrets.FORGEJO_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: |
+            ${{ vars.DOCKER_USERNAME }}/play-test:latest
+            ${{ vars.DOCKER_USERNAME }}/play-test:v${{ steps.new.outputs.version }}
+            git.chobble.com/chobble/play-test:latest
+            git.chobble.com/chobble/play-test:v${{ steps.new.outputs.version }}
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:v${{ steps.new.outputs.version }}
       
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -107,8 +144,16 @@ jobs:
           name: Release ${{ steps.new.outputs.version }}
           body: |
             # v${{ steps.new.outputs.version }}
-            
+
             [Read the full changelog here](https://github.com/${{ github.repository }}/compare/v${{ steps.current.outputs.version }}...v${{ steps.new.outputs.version }})
+
+            ## Docker Images
+            - `${{ vars.DOCKER_USERNAME }}/play-test:v${{ steps.new.outputs.version }}`
+            - `git.chobble.com/chobble/play-test:v${{ steps.new.outputs.version }}`
+            - `ghcr.io/${{ github.repository }}:v${{ steps.new.outputs.version }}`
+            
+          files: |
+            play-test-v${{ steps.new.outputs.version }}.zip
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}

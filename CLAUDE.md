@@ -548,7 +548,7 @@ end
 def fabric_requirement = "Fabric tensile strength: 1850N minimum"
 
 # GOOD - Use I18n for user-facing strings
-I18n.t("materials_assessment.requirements.fabric_tensile")
+# Store user-facing strings in locale files under config/locales/
 
 # BAD - Method that just transforms a constant
 def total_checks = CHECKS.length

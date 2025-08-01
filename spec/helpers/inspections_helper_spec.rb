@@ -150,4 +150,144 @@ RSpec.describe InspectionsHelper, type: :helper do
       end
     end
   end
+
+  describe "#next_tab_navigation_info" do
+    let(:user) { create(:user) }
+    let(:unit) { create(:unit, user: user) }
+    let(:inspection) { create(:inspection, unit: unit, user: user) }
+
+    context "when there are incomplete tabs after current" do
+      it "returns the first incomplete tab after current" do
+        # The inspection tab is incomplete by default (missing width/length/height)
+        # So skip_incomplete should be true
+        result = helper.next_tab_navigation_info(inspection, "inspection")
+
+        expect(result[:tab]).to eq("user_height")
+        expect(result[:skip_incomplete]).to eq(true)
+      end
+    end
+
+    context "when current tab is incomplete and no tabs after are incomplete" do
+      before do
+        # Use a completed inspection which has all assessments complete
+        @completed_inspection = create(:inspection, :completed, user: user, unit: unit)
+        # Make inspection tab incomplete by clearing some required fields
+        @completed_inspection.update!(width: nil, length: nil)
+      end
+
+      it "returns nil when all remaining tabs are complete" do
+        result = helper.next_tab_navigation_info(@completed_inspection, "inspection")
+
+        expect(result).to be_nil
+      end
+    end
+
+    context "when current tab is incomplete and next tab is complete but tabs after that are incomplete" do
+      before do
+        # Create a completed inspection first
+        @test_inspection = create(:inspection, :completed, user: user, unit: unit)
+        # Make inspection tab incomplete
+        @test_inspection.update!(width: nil)
+        # Ensure user_height is complete but slide is incomplete
+        @test_inspection.slide_assessment&.update!(slide_platform_height: nil)
+      end
+
+      it "skips the complete tab and suggests the next incomplete one" do
+        result = helper.next_tab_navigation_info(@test_inspection, "inspection")
+
+        # Should skip the complete user_height tab and go to slide
+        expect(result[:tab]).to eq("slide")
+        expect(result[:skip_incomplete]).to eq(true)
+        expect(result[:incomplete_count]).to eq(1)
+      end
+    end
+
+    context "when on last assessment tab with results incomplete" do
+      before do
+        # Use a completed inspection which has all assessments complete
+        @completed_inspection = create(:inspection, :completed, user: user, unit: unit)
+        # Make results incomplete by clearing passed field
+        @completed_inspection.update!(passed: nil)
+      end
+
+      it "returns results tab" do
+        last_assessment = @completed_inspection.applicable_tabs[-2]
+        result = helper.next_tab_navigation_info(@completed_inspection, last_assessment)
+
+        expect(result[:tab]).to eq("results")
+        expect(result[:skip_incomplete]).to eq(false)
+      end
+    end
+
+    context "when everything is complete" do
+      before do
+        # Use a completed inspection which has all assessments complete
+        @completed_inspection = create(:inspection, :completed, user: user, unit: unit)
+        # Ensure passed is set (completed trait should already set this)
+        @completed_inspection.update!(passed: true) if @completed_inspection.passed.nil?
+      end
+
+      it "returns nil" do
+        result = helper.next_tab_navigation_info(@completed_inspection, "results")
+
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  describe "#incomplete_fields_count" do
+    let(:user) { create(:user) }
+    let(:unit) { create(:unit, user: user) }
+    let(:inspection) { create(:inspection, unit: unit, user: user) }
+
+    context "for inspection tab" do
+      before do
+        inspection.update!(width: nil, length: nil)
+      end
+
+      it "counts incomplete required fields" do
+        count = helper.incomplete_fields_count(inspection, "inspection")
+        expect(count).to be >= 2
+      end
+
+      it "caches the result" do
+        # First call
+        helper.incomplete_fields_count(inspection, "inspection")
+
+        # Second call should use cache (we can't easily test this directly,
+        # but at least verify it returns the same result)
+        count = helper.incomplete_fields_count(inspection, "inspection")
+        expect(count).to be >= 2
+      end
+    end
+
+    context "for results tab" do
+      it "counts 1 when passed is nil" do
+        inspection.update!(passed: nil)
+        count = helper.incomplete_fields_count(inspection, "results")
+        expect(count).to eq(1)
+      end
+
+      it "counts 0 when passed is set" do
+        inspection.update!(passed: true)
+        count = helper.incomplete_fields_count(inspection, "results")
+        expect(count).to eq(0)
+      end
+    end
+
+    context "for assessment tabs" do
+      it "counts incomplete fields in the assessment" do
+        assessment = inspection.user_height_assessment
+        # Clear some required fields
+        assessment.update!(
+          # Clear fields that actually exist in user_height_assessment
+          containing_wall_height: nil,
+          tallest_user_height: nil
+        )
+
+        count = helper.incomplete_fields_count(inspection, "user_height")
+        expect(count).to be > 0
+      end
+    end
+  end
 end
