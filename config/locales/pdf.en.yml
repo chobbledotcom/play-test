@@ -68,3 +68,7 @@ en:
       size: "Size"
       size_with_unit: "Size (m)"
       unit_meters: "m"
+
+    table:
+      unit_label_column_width_left: 100
+      unit_label_column_width_right: 100

@@ -74,7 +74,7 @@ class PdfGeneratorService
       table.columns(0).font_style = :bold
 
       if is_unit_pdf
-        table.columns(0).width = UNIT_LABEL_COLUMN_WIDTH
+        table.columns(0).width = I18n.t("pdf.table.unit_label_column_width_left")
       else
         apply_four_column_styling(table, pdf_width)
       end
@@ -82,10 +82,14 @@ class PdfGeneratorService
 
     def self.apply_four_column_styling(table, pdf_width)
       table.columns(2).font_style = :bold
-      table.columns(0).width = UNIT_LABEL_COLUMN_WIDTH
-      table.columns(2).width = UNIT_LABEL_COLUMN_WIDTH
+      
+      left_width = I18n.t("pdf.table.unit_label_column_width_left")
+      right_width = I18n.t("pdf.table.unit_label_column_width_right")
+      
+      table.columns(0).width = left_width
+      table.columns(2).width = right_width
 
-      remaining_width = pdf_width - (UNIT_LABEL_COLUMN_WIDTH * 2)
+      remaining_width = pdf_width - (left_width + right_width)
       table.columns(1).width = remaining_width / 2
       table.columns(3).width = remaining_width / 2
     end
