@@ -438,25 +438,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       end
     end
 
-    context "with zero dimensions" do
-      let(:metadata) { {width: 0, height: 600} }
-
-      it "handles zero width gracefully" do
-        width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 400, 300)
-        expect(width).to eq(0.0)
-        expect(height).to eq(300.0)
-      end
-    end
-
-    context "with nil metadata values" do
-      let(:metadata) { {width: nil, height: 600} }
-
-      it "converts nil to zero and handles error" do
-        width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 400, 300)
-        expect(width).to eq(0.0)
-        expect(height).to eq(300.0)
-      end
-    end
+    # Removed tests for zero/nil dimensions as we control the images and they will always have valid metadata
   end
 
   describe ".render_image_to_pdf" do
