@@ -25,7 +25,7 @@ module AssessmentCompletion
   def field_allows_nil_when_na?(field)
     # Only allow nil for value fields (not _pass fields) when their corresponding _pass field is "na"
     return false if field.end_with?("_pass")
-    
+
     pass_field = "#{field}_pass"
     respond_to?(pass_field) && send(pass_field) == "na"
   end
