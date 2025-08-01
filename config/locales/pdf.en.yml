@@ -43,6 +43,9 @@ en:
       header: "Disclaimer"
       text: "This inspection report has been prepared in accordance with industry standards and guidelines. The findings and recommendations contained herein are based on the inspection conducted on the date specified. Any subsequent modifications, damage, or deterioration may not be reflected in this report."
 
+    signature:
+      caption: "Signature of Inspector"
+
     unit:
       details: "Unit Details"
       inspection_history: "Inspection History"
