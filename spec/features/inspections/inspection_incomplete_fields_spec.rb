@@ -273,7 +273,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
           link[:href].include?(tab_selector)
         end
         error_msg = "Section '#{section_name}' should have incomplete fields"
-        expect(section_fields.count).to be.positive?, error_msg
+        expect(section_fields.count).to be > 0, error_msg
       end
     end
   end
