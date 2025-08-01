@@ -40,7 +40,7 @@ FactoryBot.define do
       width { 5.5 }
       length { 6.0 }
       height { 4.5 }
-      indoor_use_only { [true, false].sample }
+      indoor_only { [true, false].sample }
 
       after(:create) do |inspection|
         inspection.reload
