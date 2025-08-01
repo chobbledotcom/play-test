@@ -19,7 +19,7 @@ FactoryBot.define do
     blower_tube_length_comment { nil }
 
     trait :passed do
-      fan_size_type { "Standard 2HP blower" }
+      fan_size_type { "2HP blower" }
       number_of_blowers { 1 }
       blower_flap_pass { :pass }
       blower_flap_comment { "Flap opens and closes properly" }
@@ -36,7 +36,7 @@ FactoryBot.define do
     end
 
     trait :complete do
-      fan_size_type { "Standard 2HP blower" }
+      fan_size_type { "2HP blower" }
       number_of_blowers { 1 }
       blower_flap_pass { :pass }
       blower_flap_comment { "Flap opens and closes properly" }

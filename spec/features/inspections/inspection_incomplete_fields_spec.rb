@@ -6,13 +6,22 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user:) }
   let(:inspection) {
-    inspection = create(:inspection,
-      unit:,
-      user:,
-      width: 5.0,
-      length: 10.0,
-      height: 3.0)
-    inspection.update_column(:inspection_date, nil)
+    # Start with a complete inspection to avoid validation errors
+    inspection = create(:inspection, :completed, unit:, user:)
+    # Make it incomplete (remove complete_date)
+    inspection.update_column(:complete_date, nil)
+    # Remove specific fields to test incomplete field display
+    inspection.update_columns(
+      inspection_date: nil,
+      width: nil,
+      length: nil
+    )
+    # Add incomplete fields to structure assessment
+    inspection.structure_assessment.update_columns(
+      seam_integrity_pass: nil,
+      air_loss_pass: nil,
+      stitch_length_pass: nil
+    )
     inspection
   }
 
@@ -197,8 +206,9 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     # Start with a completed inspection that has all fields filled
     completed_inspection = create(:inspection, :completed, user: user, unit: unit)
 
-    # Setup inspection with known incomplete fields
+    # Setup inspection with known incomplete fields (also remove complete_date)
     completed_inspection.update_columns(
+      complete_date: nil,
       inspection_date: nil,
       width: nil,
       length: nil
