@@ -6,14 +6,10 @@ class PdfGeneratorService
     NULL_COLOR = "663399".freeze
     COMMENT_COLOR = "663399".freeze
     SECTION_TITLE_SIZE = 12
-    ASSESSMENT_TITLE_SIZE = 10
-    FIELD_TEXT_SIZE = 8
     SECTION_MARGIN_AFTER_TITLE = 15
     ASSESSMENT_MARGIN_AFTER_TITLE = 3
     ASSESSMENT_MARGIN_AFTER = 16
     SECTION_MARGIN_AFTER = 20
-    COLUMN_COUNT = 3
-    COLUMN_SPACER = 10
 
     attr_accessor :current_assessment_blocks, :current_assessment_fields
 
@@ -217,7 +213,7 @@ class PdfGeneratorService
         available_height = pdf.cursor
       end
 
-      pdf.column_box([0, pdf.cursor], columns: COLUMN_COUNT, width: pdf.bounds.width, spacer: COLUMN_SPACER, height: available_height) do
+      pdf.column_box([0, pdf.cursor], columns: ASSESSMENT_COLUMNS_COUNT, width: pdf.bounds.width, spacer: ASSESSMENT_COLUMN_SPACER, height: available_height) do
         @current_assessment_blocks.each { |block| render_assessment_block(pdf, block) }
       end
 
@@ -229,7 +225,7 @@ class PdfGeneratorService
       pdf.text block[:title], size: ASSESSMENT_TITLE_SIZE, style: :bold
       pdf.move_down ASSESSMENT_MARGIN_AFTER_TITLE
 
-      block[:fields].each { |field| pdf.text field, size: FIELD_TEXT_SIZE, inline_format: true }
+      block[:fields].each { |field| pdf.text field, size: ASSESSMENT_FIELD_TEXT_SIZE, inline_format: true }
       pdf.move_down ASSESSMENT_MARGIN_AFTER
     end
   end
