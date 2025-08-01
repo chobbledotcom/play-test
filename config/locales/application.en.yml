@@ -11,8 +11,8 @@ en:
       backtrace_label: "Backtrace (first 5 lines)"
 
     debug:
-      n_plus_one_detected: "N+1 query detected: %{table} table was queried %{count} times"
-      n_plus_one_with_limit: "N+1 query detected: %{table} table was queried %{count} times (limit: %{limit})"
+      n_plus_one_detected: "N+1 query detected: %{table} table was queried too many times"
+      n_plus_one_with_limit: "N+1 query detected: %{table} table was queried too many times"
       table_query_count: "%{table} was queried %{count} times"
       queries_for_table: "Queries for %{table}:"
       query_log_entry: "%{name}: %{sql}"
