@@ -116,7 +116,7 @@ class PdfGeneratorService
           end
           pdf.text "#{expiry_label}: #{expiry_value}",
             size: Configuration::HEADER_TEXT_SIZE, style: :bold
-          
+
           # Add extra line of spacing to match 3-line QR code height
           pdf.move_down Configuration::HEADER_TEXT_SIZE * 1.5
         end
