@@ -16,34 +16,16 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
     unit_with_photo.photo.blob.analyze
   end
 
-  describe ".generate_qr_code_footer" do
-    context "with unit that has photo" do
-      it "generates QR code footer without errors" do
-        expect { described_class.generate_qr_code_footer(pdf, unit_with_photo) }.not_to raise_error
-      end
-
-      it "includes photo in the PDF" do
-        initial_page_count = pdf.page_count
-        described_class.generate_qr_code_footer(pdf, unit_with_photo)
-
-        # Should not add extra pages
-        expect(pdf.page_count).to eq(initial_page_count)
-      end
-    end
-
-    context "with unit without photo" do
-      it "generates QR code footer without errors" do
-        expect { described_class.generate_qr_code_footer(pdf, unit_without_photo) }.not_to raise_error
+  describe ".generate_qr_code_header" do
+    context "with unit entity" do
+      it "generates QR code header without errors" do
+        expect { described_class.generate_qr_code_header(pdf, unit_with_photo) }.not_to raise_error
       end
     end
 
     context "with inspection entity" do
-      it "generates QR code footer for inspection with photo" do
-        expect { described_class.generate_qr_code_footer(pdf, inspection_with_photo) }.not_to raise_error
-      end
-
-      it "generates QR code footer for inspection without photo" do
-        expect { described_class.generate_qr_code_footer(pdf, inspection_without_photo) }.not_to raise_error
+      it "generates QR code header without errors" do
+        expect { described_class.generate_qr_code_header(pdf, inspection_with_photo) }.not_to raise_error
       end
     end
 
@@ -51,7 +33,33 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
       it "handles QR service errors gracefully" do
         allow(QrCodeService).to receive(:generate_qr_code).and_raise(StandardError, "QR generation failed")
 
-        expect { described_class.generate_qr_code_footer(pdf, unit_with_photo) }.to raise_error(StandardError, "QR generation failed")
+        expect { described_class.generate_qr_code_header(pdf, unit_with_photo) }.to raise_error(StandardError, "QR generation failed")
+      end
+    end
+  end
+
+  describe ".add_unit_photo_footer" do
+    context "with unit that has photo" do
+      it "adds photo footer without errors" do
+        expect { described_class.add_unit_photo_footer(pdf, unit_with_photo) }.not_to raise_error
+      end
+
+      it "includes photo in the PDF" do
+        initial_page_count = pdf.page_count
+        described_class.add_unit_photo_footer(pdf, unit_with_photo)
+
+        # Should not add extra pages
+        expect(pdf.page_count).to eq(initial_page_count)
+      end
+
+      it "respects column count parameter" do
+        expect { described_class.add_unit_photo_footer(pdf, unit_with_photo, 4) }.not_to raise_error
+      end
+    end
+
+    context "with unit without photo" do
+      it "does nothing when no photo attached" do
+        expect { described_class.add_unit_photo_footer(pdf, unit_without_photo) }.not_to raise_error
       end
     end
   end
@@ -72,26 +80,6 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
 
       # Should process the image (might be same if no orientation change needed, but should not error)
       expect(processed_data).to be_a(String)
-    end
-  end
-
-  describe ".add_entity_photo_footer" do
-    context "with unit that has photo" do
-      it "does not raise errors" do
-        expect { described_class.add_entity_photo_footer(pdf, unit_with_photo, 100, 200) }.not_to raise_error
-      end
-    end
-
-    context "with unit without photo" do
-      it "does nothing when no photo attached" do
-        expect { described_class.add_entity_photo_footer(pdf, unit_without_photo, 100, 200) }.not_to raise_error
-      end
-    end
-
-    context "with nil entity" do
-      it "does nothing when entity is nil" do
-        expect { described_class.add_entity_photo_footer(pdf, nil, 100, 200) }.not_to raise_error
-      end
     end
   end
 

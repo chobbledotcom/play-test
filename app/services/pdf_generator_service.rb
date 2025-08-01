@@ -40,6 +40,13 @@ class PdfGeneratorService
       # Disclaimer footer (only on first page)
       DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
 
+      # Add unit photo in bottom right corner
+      # Pass column count info to adjust photo width accordingly
+      if inspection.unit&.photo
+        column_count = assessment_renderer.used_compact_layout ? 4 : 3
+        ImageProcessor.add_unit_photo_footer(pdf, inspection.unit, column_count)
+      end
+
       # Add DRAFT watermark overlay for draft inspections (except in test env)
       if !inspection.complete? && !Rails.env.test?
         Utilities.add_draft_watermark(pdf)
@@ -74,6 +81,11 @@ class PdfGeneratorService
 
       # Disclaimer footer (only on first page)
       DisclaimerFooterRenderer.render_disclaimer_footer(pdf, unit.user)
+
+      # Add unit photo in bottom right corner (for unit PDFs, always use 3 columns)
+      if unit.photo
+        ImageProcessor.add_unit_photo_footer(pdf, unit, 3)
+      end
 
       # Add debug info page if enabled (admins only)
       if debug_enabled && debug_queries.present?
