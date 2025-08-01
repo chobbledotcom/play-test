@@ -16,7 +16,7 @@
         <% incomplete_fields.each do |form| %>
           <li>
             <strong>
-              <%= link_to t("forms.#{form[:tab]}.header"),
+              <%= link_to "#{t("forms.#{form[:tab]}.header")} (#{form[:fields].count})",
                 edit_inspection_path(
                   @inspection,
                   tab: form[:tab],
