@@ -84,6 +84,9 @@ module InspectionsHelper
   end
 
   def next_tab_navigation_info(inspection, current_tab)
+    # Don't show continue message on results tab
+    return nil if current_tab == "results"
+    
     all_tabs = inspection.applicable_tabs
     current_index = all_tabs.index(current_tab)
     return nil unless current_index
