@@ -234,16 +234,16 @@ class PdfGeneratorService
     def render_assessments_adaptively(pdf, available_height)
       # First, calculate photo boundary (top edge of unit photo)
       photo_boundary = calculate_photo_boundary(pdf)
-      
+
       # Save the current state
       start_y = pdf.y
-      
+
       # Try a dry run with 3 columns to check for overflow
       overflow = check_for_overflow(pdf, available_height, 3, 8, photo_boundary)
-      
+
       # Reset cursor position
       pdf.y = start_y
-      
+
       if overflow
         # Use 4 columns with smaller text
         render_assessments_with_params(pdf, available_height, ASSESSMENT_COLUMNS_COUNT, ASSESSMENT_FIELD_TEXT_SIZE)
@@ -259,23 +259,23 @@ class PdfGeneratorService
     def calculate_photo_boundary(pdf)
       # Calculate where the photo will be positioned
       qr_x, qr_y = PositionCalculator.qr_code_position(pdf.bounds.width, pdf.page_number)
-      
+
       # For boundary calculation, use the larger photo size (3 columns)
       # This ensures we check against where the photo WOULD be if we use 3 columns
       photo_width = Configuration::QR_CODE_SIZE * 2
       # Assume square photo for calculation (will be adjusted by aspect ratio later)
       photo_height = photo_width
-      
+
       # Get photo position
-      photo_x, photo_y = PositionCalculator.photo_footer_position(qr_x, qr_y, photo_width, photo_height)
-      
+      _, photo_y = PositionCalculator.photo_footer_position(qr_x, qr_y, photo_width, photo_height)
+
       # Return the top edge of the photo (photo_y is the top edge in Prawn coordinates)
       photo_y
     end
 
     def check_for_overflow(pdf, available_height, columns, text_size, photo_boundary)
       overflow = false
-      
+
       # Perform a dry run to check if content would overflow
       pdf.transaction do
         pdf.column_box([0, pdf.cursor], columns: columns, width: pdf.bounds.width, spacer: ASSESSMENT_COLUMN_SPACER, height: available_height) do
@@ -283,28 +283,28 @@ class PdfGeneratorService
             # Check if we're in the third column
             column_width = (pdf.bounds.width - (ASSESSMENT_COLUMN_SPACER * (columns - 1))) / columns
             current_column = (pdf.bounds.absolute_left / (column_width + ASSESSMENT_COLUMN_SPACER)).floor
-            
+
             # If in third column (index 2) and cursor would go below photo boundary
             if current_column == 2 && pdf.cursor < photo_boundary
               overflow = true
               raise Prawn::Errors::CannotFit # Force rollback
             end
-            
+
             # Simulate rendering the block
             pdf.text block[:title], size: ASSESSMENT_TITLE_SIZE, style: :bold
             pdf.move_down ASSESSMENT_MARGIN_AFTER_TITLE
-            
-            block[:fields].each do |field| 
-              pdf.text field, size: text_size, inline_format: true 
+
+            block[:fields].each do |field|
+              pdf.text field, size: text_size, inline_format: true
             end
             pdf.move_down ASSESSMENT_MARGIN_AFTER
           end
         end
-        
+
         # Rollback the transaction
         pdf.rollback
       end
-      
+
       overflow
     rescue Prawn::Errors::CannotFit
       true
@@ -315,9 +315,9 @@ class PdfGeneratorService
         @current_assessment_blocks.each do |block|
           pdf.text block[:title], size: ASSESSMENT_TITLE_SIZE, style: :bold
           pdf.move_down ASSESSMENT_MARGIN_AFTER_TITLE
-          
-          block[:fields].each do |field| 
-            pdf.text field, size: text_size, inline_format: true 
+
+          block[:fields].each do |field|
+            pdf.text field, size: text_size, inline_format: true
           end
           pdf.move_down ASSESSMENT_MARGIN_AFTER
         end

@@ -63,12 +63,12 @@ class PdfGeneratorService
     def self.calculate_footer_photo_dimensions(image, column_count = 3)
       original_width = image.width
       original_height = image.height
-      
+
       # Adjust photo width based on column count
       # For 3 columns: width = 2x QR size
       # For 4 columns: width = 1.5x QR size (smaller to fit with more columns)
-      width_multiplier = column_count == 4 ? 1.5 : 2.0
-      
+      width_multiplier = (column_count == 4) ? 1.5 : 2.0
+
       PositionCalculator.footer_photo_dimensions_with_multiplier(
         original_width, original_height, width_multiplier
       )
