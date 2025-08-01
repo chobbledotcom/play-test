@@ -34,7 +34,12 @@ class PdfGeneratorService
     # Calculate photo dimensions for footer (width = 2x QR size, height maintains aspect ratio)
     # Note: original_width and original_height should be post-EXIF-rotation dimensions
     def self.footer_photo_dimensions(original_width, original_height)
-      target_width = QR_CODE_SIZE * 2
+      footer_photo_dimensions_with_multiplier(original_width, original_height, 2.0)
+    end
+
+    # Calculate photo dimensions with custom width multiplier
+    def self.footer_photo_dimensions_with_multiplier(original_width, original_height, width_multiplier)
+      target_width = (QR_CODE_SIZE * width_multiplier).round
 
       return [target_width, target_width] if original_width.zero? || original_height.zero?
 

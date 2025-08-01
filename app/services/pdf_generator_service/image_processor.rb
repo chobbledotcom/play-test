@@ -2,16 +2,16 @@ class PdfGeneratorService
   class ImageProcessor
     include Configuration
 
-    def self.generate_qr_code_footer(pdf, entity)
+    def self.generate_qr_code_footer(pdf, entity, column_count = 3)
       qr_code_png = QrCodeService.generate_qr_code(entity)
-      render_qr_code_with_photo(pdf, entity, qr_code_png)
+      render_qr_code_with_photo(pdf, entity, qr_code_png, column_count)
     end
 
-    def self.render_qr_code_with_photo(pdf, entity, qr_code_png)
+    def self.render_qr_code_with_photo(pdf, entity, qr_code_png, column_count = 3)
       photo_entity = entity.is_a?(Inspection) ? entity.unit : entity
       qr_x, qr_y = PositionCalculator.qr_code_position(pdf.bounds.width, pdf.page_number)
 
-      add_entity_photo_footer(pdf, photo_entity, qr_x, qr_y)
+      add_entity_photo_footer(pdf, photo_entity, qr_x, qr_y, column_count)
       add_qr_code_overlay(pdf, qr_code_png, qr_x, qr_y)
     end
 
@@ -32,20 +32,20 @@ class PdfGeneratorService
       ImageOrientationProcessor.process_with_orientation(image)
     end
 
-    def self.add_entity_photo_footer(pdf, entity, qr_x, qr_y)
+    def self.add_entity_photo_footer(pdf, entity, qr_x, qr_y, column_count = 3)
       return unless entity&.photo
 
       attachment = entity.photo
       return unless attachment.blob
 
-      render_entity_photo(pdf, attachment, qr_x, qr_y)
+      render_entity_photo(pdf, attachment, qr_x, qr_y, column_count)
     end
 
-    def self.render_entity_photo(pdf, attachment, qr_x, qr_y)
+    def self.render_entity_photo(pdf, attachment, qr_x, qr_y, column_count = 3)
       image_data = attachment.blob.download
       image = MiniMagick::Image.read(image_data)
 
-      dimensions = calculate_footer_photo_dimensions(image)
+      dimensions = calculate_footer_photo_dimensions(image, column_count)
       photo_width, photo_height = dimensions
 
       positions = PositionCalculator.photo_footer_position(
@@ -60,11 +60,17 @@ class PdfGeneratorService
       raise ImageError.build_detailed_error(e, attachment)
     end
 
-    def self.calculate_footer_photo_dimensions(image)
+    def self.calculate_footer_photo_dimensions(image, column_count = 3)
       original_width = image.width
       original_height = image.height
-      PositionCalculator.footer_photo_dimensions(
-        original_width, original_height
+      
+      # Adjust photo width based on column count
+      # For 3 columns: width = 2x QR size
+      # For 4 columns: width = 1.5x QR size (smaller to fit with more columns)
+      width_multiplier = column_count == 4 ? 1.5 : 2.0
+      
+      PositionCalculator.footer_photo_dimensions_with_multiplier(
+        original_width, original_height, width_multiplier
       )
     end
 
