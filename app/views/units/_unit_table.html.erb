@@ -1,11 +1,11 @@
 <div class="table-list units-list">
   <!-- Header row -->
   <div class="table-list-header">
-    <span class="col-photo"><%= t('units.fields.photo') %></span>
+    <span class="col-photo"><%= FieldUtils.form_field_label('units', 'photo') %></span>
     <span class="col-id"><%= t('units.fields.id') %></span>
     <span class="col-name"><%= FieldUtils.form_field_label('units', 'name') %></span>
-    <span class="col-manufacturer"><%= t('units.fields.manufacturer') %></span>
-    <span class="col-serial"><%= t('units.fields.serial') %></span>
+    <span class="col-manufacturer"><%= FieldUtils.form_field_label('units', 'manufacturer') %></span>
+    <span class="col-serial"><%= FieldUtils.form_field_label('units', 'serial') %></span>
   </div>
 
   <!-- Data rows -->
@@ -13,7 +13,7 @@
     <% unit.each do |item| %>
       <li>
         <%= link_to item, class: "table-list-link" do %>
-          <span class="col-photo" data-label="<%= t('units.fields.photo') %>">
+          <span class="col-photo" data-label="<%= FieldUtils.form_field_label('units', 'photo') %>">
             <% if item.photo.attached? %>
               <%= render 'shared/image',
                   image: item.photo,
@@ -32,10 +32,10 @@
           <span class="col-name" data-label="<%= FieldUtils.form_field_label('units', 'name') %>">
             <%= item.name %>
           </span>
-          <span class="col-manufacturer" data-label="<%= t('units.fields.manufacturer') %>">
+          <span class="col-manufacturer" data-label="<%= FieldUtils.form_field_label('units', 'manufacturer') %>">
             <%= item.manufacturer %>
           </span>
-          <span class="col-serial" data-label="<%= t('units.fields.serial') %>">
+          <span class="col-serial" data-label="<%= FieldUtils.form_field_label('units', 'serial') %>">
             <%= item.serial %>
           </span>
         <% end %>
