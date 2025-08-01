@@ -51,14 +51,14 @@ module InspectionTurboStreams
     if success
       current_tab_name = params[:tab].presence || "inspection"
       next_tab_info = helpers.next_incomplete_tab_with_fallback(@inspection, current_tab_name)
-      
+
       locals = {
         dom_id: dom_id,
         success: true,
         message: t("inspections.messages.updated"),
         inspection: @inspection
       }
-      
+
       if next_tab_info
         locals[:next_tab] = next_tab_info[:tab]
         locals[:is_current_tab] = next_tab_info[:is_current]
@@ -66,7 +66,7 @@ module InspectionTurboStreams
           locals[:incomplete_count] = helpers.count_incomplete_fields_for_tab(@inspection, current_tab_name)
         end
       end
-      
+
       locals
     else
       {

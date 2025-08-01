@@ -12,15 +12,15 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
   scenario "suggests next incomplete tab when current tab is complete" do
     # Start on inspection tab which is complete
     visit edit_inspection_path(inspection, tab: "inspection")
-    
+
     # Save the form
     click_button I18n.t("forms.inspection.submit")
-    
+
     # Should suggest the first incomplete assessment tab
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
     expect(page).to have_link(
-      I18n.t("inspections.buttons.continue_to_tab", 
-             tab_name: I18n.t("forms.user_height.header"))
+      I18n.t("inspections.buttons.continue_to_tab",
+        tab_name: I18n.t("forms.user_height.header"))
     )
   end
 
@@ -28,16 +28,16 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
     # Make inspection tab incomplete by clearing a required field
     visit edit_inspection_path(inspection, tab: "inspection")
     fill_in "inspection[inspection_location]", with: ""
-    
+
     # Save the form
     click_button I18n.t("forms.inspection.submit")
-    
+
     # Should suggest the next tab with incomplete count
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
     expect(page).to have_link(
-      I18n.t("inspections.buttons.continue_to_tab_with_incomplete", 
-             count: 1,
-             tab_name: I18n.t("forms.user_height.header"))
+      I18n.t("inspections.buttons.continue_to_tab_with_incomplete",
+        count: 1,
+        tab_name: I18n.t("forms.user_height.header"))
     )
   end
 
@@ -47,19 +47,19 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
       assessment = inspection.send(assessment_type)
       assessment.update!(complete: true)
     end
-    
+
     # Visit the last assessment tab
     last_tab = inspection.applicable_tabs[-2] # -2 because results is last
     visit edit_inspection_path(inspection, tab: last_tab)
-    
+
     # Save the form
     click_button I18n.t("forms.#{last_tab}.submit")
-    
+
     # Should suggest results tab
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
     expect(page).to have_link(
-      I18n.t("inspections.buttons.continue_to_tab", 
-             tab_name: I18n.t("forms.results.header"))
+      I18n.t("inspections.buttons.continue_to_tab",
+        tab_name: I18n.t("forms.results.header"))
     )
   end
 
@@ -70,13 +70,13 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
       assessment.update!(complete: true)
     end
     inspection.update!(passed: true)
-    
+
     # Visit results tab
     visit edit_inspection_path(inspection, tab: "results")
-    
+
     # Save the form
     click_button I18n.t("forms.results.submit")
-    
+
     # Should not suggest any next tab
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
     expect(page).not_to have_link(I18n.t("inspections.buttons.continue_to_tab", tab_name: ""))

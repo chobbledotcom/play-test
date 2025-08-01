@@ -110,7 +110,7 @@ module InspectionsHelper
 
     # First, check if current tab is incomplete
     current_tab_incomplete = !assessment_complete?(inspection, current_tab)
-    
+
     # Look for the first incomplete tab after the current one
     tabs_after_current = all_tabs[(current_index + 1)..]
     next_incomplete = tabs_after_current.find { |tab|

@@ -159,7 +159,7 @@ RSpec.describe InspectionsHelper, type: :helper do
     context "when there are incomplete tabs after current" do
       it "returns the first incomplete tab after current" do
         result = helper.next_incomplete_tab_with_fallback(inspection, "inspection")
-        
+
         expect(result[:tab]).to eq("user_height")
         expect(result[:is_current]).to eq(false)
       end
@@ -178,7 +178,7 @@ RSpec.describe InspectionsHelper, type: :helper do
 
       it "returns the next tab with is_current true" do
         result = helper.next_incomplete_tab_with_fallback(inspection, "inspection")
-        
+
         expect(result[:tab]).to eq("user_height")
         expect(result[:is_current]).to eq(true)
       end
@@ -196,7 +196,7 @@ RSpec.describe InspectionsHelper, type: :helper do
       it "returns results tab" do
         last_assessment = inspection.applicable_tabs[-2]
         result = helper.next_incomplete_tab_with_fallback(inspection, last_assessment)
-        
+
         expect(result[:tab]).to eq("results")
         expect(result[:is_current]).to eq(false)
       end
@@ -214,7 +214,7 @@ RSpec.describe InspectionsHelper, type: :helper do
 
       it "returns nil" do
         result = helper.next_incomplete_tab_with_fallback(inspection, "results")
-        
+
         expect(result).to be_nil
       end
     end
@@ -258,7 +258,7 @@ RSpec.describe InspectionsHelper, type: :helper do
           max_user_height: nil,
           max_user_height_pass: nil
         )
-        
+
         count = helper.count_incomplete_fields_for_tab(inspection, "user_height")
         expect(count).to be > 0
       end
