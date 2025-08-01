@@ -93,8 +93,8 @@ class PdfGeneratorService
     end
 
     def self.calculate_photo_dimensions_from_blob(photo, max_width, max_height)
-      original_width = photo.metadata[:width].to_f
-      original_height = photo.metadata[:height].to_f
+      original_width = photo.blob.metadata[:width].to_f
+      original_height = photo.blob.metadata[:height].to_f
 
       width_scale = max_width / original_width
       height_scale = max_height / original_height

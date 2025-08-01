@@ -112,8 +112,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     it "adds header text with correct formatting" do
       expect(pdf).to receive(:text).with(
         I18n.t("pdf.inspection.photos_section"),
-        size: 16,
-        style: :bold
+        {size: 16, style: :bold}
       )
       described_class.add_photos_header(pdf)
     end
@@ -162,10 +161,11 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
     context "when photos are attached" do
       before do
-        allow(inspection).to receive(:send).with(:photo_1).and_return(photo)
-        allow(inspection).to receive(:send).with(:photo_2).and_return(photo)
-        allow(inspection).to receive(:send).with(:photo_3).and_return(photo)
-        allow(photo).to receive(:attached?).and_return(true)
+        allow(inspection).to receive(:send).with(:photo_1).and_return(photo_attachment)
+        allow(inspection).to receive(:send).with(:photo_2).and_return(photo_attachment)
+        allow(inspection).to receive(:send).with(:photo_3).and_return(photo_attachment)
+        allow(photo_attachment).to receive(:attached?).and_return(true)
+        allow(photo_attachment).to receive(:blob).and_return(photo_blob)
         allow(described_class).to receive(:handle_page_break_if_needed).and_return(cursor_position)
         allow(described_class).to receive(:render_photo)
       end
@@ -183,14 +183,18 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "when only some photos are attached" do
-      let(:photo_1) { instance_double("ActiveStorage::Attachment", blob: photo_blob, attached?: true) }
-      let(:photo_2_attachment) { instance_double("ActiveStorage::Attached::One", attached?: false) }
-      let(:photo_3) { instance_double("ActiveStorage::Attachment", blob: photo_blob, attached?: true) }
+      let(:photo_1_attached) { instance_double("ActiveStorage::Attached::One", attached?: true) }
+      let(:photo_1) { instance_double("ActiveStorage::Attachment", blob: photo_blob) }
+      let(:photo_2_attached) { instance_double("ActiveStorage::Attached::One", attached?: false) }
+      let(:photo_3_attached) { instance_double("ActiveStorage::Attached::One", attached?: true) }
+      let(:photo_3) { instance_double("ActiveStorage::Attachment", blob: photo_blob) }
 
       before do
-        allow(inspection).to receive(:send).with(:photo_1).and_return(photo_1)
-        allow(inspection).to receive(:send).with(:photo_2).and_return(photo_2_attachment)
-        allow(inspection).to receive(:send).with(:photo_3).and_return(photo_3)
+        allow(inspection).to receive(:send).with(:photo_1).and_return(photo_1_attached)
+        allow(inspection).to receive(:send).with(:photo_2).and_return(photo_2_attached)
+        allow(inspection).to receive(:send).with(:photo_3).and_return(photo_3_attached)
+        allow(photo_1_attached).to receive(:blob).and_return(photo_blob)
+        allow(photo_3_attached).to receive(:blob).and_return(photo_blob)
         allow(described_class).to receive(:handle_page_break_if_needed).and_return(cursor_position)
         allow(described_class).to receive(:render_photo)
       end
@@ -209,10 +213,11 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
     context "when cursor position changes during rendering" do
       before do
-        allow(inspection).to receive(:send).with(:photo_1).and_return(photo)
-        allow(inspection).to receive(:send).with(:photo_2).and_return(photo)
-        allow(inspection).to receive(:send).with(:photo_3).and_return(photo)
-        allow(photo).to receive(:attached?).and_return(true)
+        allow(inspection).to receive(:send).with(:photo_1).and_return(photo_attachment)
+        allow(inspection).to receive(:send).with(:photo_2).and_return(photo_attachment)
+        allow(inspection).to receive(:send).with(:photo_3).and_return(photo_attachment)
+        allow(photo_attachment).to receive(:attached?).and_return(true)
+        allow(photo_attachment).to receive(:blob).and_return(photo_blob)
         allow(described_class).to receive(:render_photo)
         allow(pdf).to receive(:cursor).and_return(700, 650, 600, 550, 500, 450)
       end
@@ -309,9 +314,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       expect(described_class).to receive(:calculate_photo_dimensions_from_blob).and_return([400, 300])
       expect(pdf).to receive(:image).with(
         instance_of(StringIO),
-        at: [50, 700],
-        width: 400,
-        height: 300
+        {at: [50, 700], width: 400, height: 300}
       )
       described_class.render_photo(pdf, photo, "Test Label", 300)
     end
@@ -325,9 +328,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       allow(described_class).to receive(:calculate_photo_dimensions_from_blob).and_return([200, 150])
       expect(pdf).to receive(:image).with(
         instance_of(StringIO),
-        at: [150, 700],  # (500 - 200) / 2 = 150
-        width: 200,
-        height: 150
+        {at: [150, 700], width: 200, height: 150}  # (500 - 200) / 2 = 150
       )
       described_class.render_photo(pdf, photo, "Test Label", 300)
     end
@@ -337,9 +338,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         allow(described_class).to receive(:calculate_photo_dimensions_from_blob).and_return([500, 200])
         expect(pdf).to receive(:image).with(
           instance_of(StringIO),
-          at: [0, 700],  # (500 - 500) / 2 = 0
-          width: 500,
-          height: 200
+          {at: [0, 700], width: 500, height: 200}  # (500 - 500) / 2 = 0
         )
         described_class.render_photo(pdf, photo, "Test Label", 300)
       end
@@ -348,9 +347,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         allow(described_class).to receive(:calculate_photo_dimensions_from_blob).and_return([100, 300])
         expect(pdf).to receive(:image).with(
           instance_of(StringIO),
-          at: [200, 700],  # (500 - 100) / 2 = 200
-          width: 100,
-          height: 300
+          {at: [200, 700], width: 100, height: 300}  # (500 - 100) / 2 = 200
         )
         described_class.render_photo(pdf, photo, "Test Label", 300)
       end
@@ -385,12 +382,12 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     let(:metadata) { {width: 800, height: 600} }
 
     before do
-      allow(photo).to receive(:metadata).and_return(metadata)
+      allow(photo.blob).to receive(:metadata).and_return(metadata)
     end
 
     context "when width is limiting factor" do
       it "scales based on width" do
-        width, height = described_class.calculate_photo_dimensions_from_blob(photo, 400, 600)
+        width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 400, 600)
         expect(width).to eq(400)
         expect(height).to eq(300)
       end
@@ -398,7 +395,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
     context "when height is limiting factor" do
       it "scales based on height" do
-        width, height = described_class.calculate_photo_dimensions_from_blob(photo, 1000, 300)
+        width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 1000, 300)
         expect(width).to eq(400)
         expect(height).to eq(300)
       end
@@ -408,7 +405,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       let(:metadata) { {width: 500, height: 500} }
 
       it "scales proportionally" do
-        width, height = described_class.calculate_photo_dimensions_from_blob(photo, 300, 400)
+        width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 300, 400)
         expect(width).to eq(300)
         expect(height).to eq(300)
       end
@@ -418,7 +415,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       let(:metadata) { {width: 400, height: 800} }
 
       it "scales based on height when limited by max height" do
-        width, height = described_class.calculate_photo_dimensions_from_blob(photo, 500, 400)
+        width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 500, 400)
         expect(width).to eq(200)
         expect(height).to eq(400)
       end
@@ -428,7 +425,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       let(:metadata) { {width: 100, height: 100} }
 
       it "does not upscale beyond original size" do
-        width, height = described_class.calculate_photo_dimensions_from_blob(photo, 500, 500)
+        width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 500, 500)
         expect(width).to eq(100)
         expect(height).to eq(100)
       end
@@ -439,7 +436,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
       it "handles zero width gracefully" do
         expect {
-          described_class.calculate_photo_dimensions_from_blob(photo, 400, 300)
+          described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 400, 300)
         }.to raise_error(ZeroDivisionError)
       end
     end
@@ -449,7 +446,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
       it "converts nil to zero and handles error" do
         expect {
-          described_class.calculate_photo_dimensions_from_blob(photo, 400, 300)
+          described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 400, 300)
         }.to raise_error(ZeroDivisionError)
       end
     end
@@ -457,6 +454,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
   describe ".render_image_to_pdf" do
     let(:image_data) { "fake_image_data" }
+    let(:photo_attached_one) { instance_double("ActiveStorage::Attached::One", blob: photo_blob) }
 
     before do
       allow(pdf).to receive(:cursor).and_return(700)
@@ -466,11 +464,9 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     it "renders image with correct options" do
       expect(pdf).to receive(:image).with(
         instance_of(StringIO),
-        at: [100, 700],
-        width: 400,
-        height: 300
+        {at: [100, 700], width: 400, height: 300}
       )
-      described_class.render_image_to_pdf(pdf, image_data, 100, 400, 300, photo)
+      described_class.render_image_to_pdf(pdf, image_data, 100, 400, 300, photo_attached_one)
     end
 
     context "when Prawn raises unsupported image error" do
@@ -481,7 +477,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       it "raises ImageError with details" do
         expect(PdfGeneratorService::ImageError).to receive(:build_detailed_error)
         expect {
-          described_class.render_image_to_pdf(pdf, image_data, 100, 400, 300, photo)
+          described_class.render_image_to_pdf(pdf, image_data, 100, 400, 300, photo_attached_one)
         }.to raise_error
       end
     end
@@ -501,8 +497,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     it "renders centered label text" do
       expect(pdf).to receive(:text).with(
         "Test Label",
-        size: 12,
-        align: :center
+        {size: 12, align: :center}
       )
       described_class.add_photo_label(pdf, "Test Label", 300)
     end
@@ -522,17 +517,22 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "complete photo rendering flow" do
-      let(:photo_1) { instance_double("ActiveStorage::Attachment", blob: photo_blob, attached?: true) }
-      let(:photo_2) { instance_double("ActiveStorage::Attachment", blob: photo_blob, attached?: false) }
-      let(:photo_3) { instance_double("ActiveStorage::Attachment", blob: photo_blob, attached?: true) }
+      let(:photo_1_attached) { instance_double("ActiveStorage::Attached::One") }
+      let(:photo_2_attached) { instance_double("ActiveStorage::Attached::One") }
+      let(:photo_3_attached) { instance_double("ActiveStorage::Attached::One") }
 
       before do
-        allow(inspection).to receive(:photo_1).and_return(photo_1)
-        allow(inspection).to receive(:photo_2).and_return(photo_2)
-        allow(inspection).to receive(:photo_3).and_return(photo_3)
-        allow(inspection).to receive(:send).with(:photo_1).and_return(photo_1)
-        allow(inspection).to receive(:send).with(:photo_2).and_return(photo_2)
-        allow(inspection).to receive(:send).with(:photo_3).and_return(photo_3)
+        allow(inspection).to receive(:photo_1).and_return(photo_1_attached)
+        allow(inspection).to receive(:photo_2).and_return(photo_2_attached)
+        allow(inspection).to receive(:photo_3).and_return(photo_3_attached)
+        allow(inspection).to receive(:send).with(:photo_1).and_return(photo_1_attached)
+        allow(inspection).to receive(:send).with(:photo_2).and_return(photo_2_attached)
+        allow(inspection).to receive(:send).with(:photo_3).and_return(photo_3_attached)
+        allow(photo_1_attached).to receive(:attached?).and_return(true)
+        allow(photo_2_attached).to receive(:attached?).and_return(false)
+        allow(photo_3_attached).to receive(:attached?).and_return(true)
+        allow(photo_1_attached).to receive(:blob).and_return(photo_blob)
+        allow(photo_3_attached).to receive(:blob).and_return(photo_blob)
         allow(photo_blob).to receive(:download)
         allow(photo_blob).to receive(:metadata).and_return({width: 800, height: 600})
         allow(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).and_return("image_data")
@@ -552,14 +552,16 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "page break scenarios" do
-      let(:photo_1) { instance_double("ActiveStorage::Attachment", blob: photo_blob, attached?: true) }
+      let(:photo_1_attached) { instance_double("ActiveStorage::Attached::One") }
 
       before do
-        allow(inspection).to receive(:photo_1).and_return(photo_1)
+        allow(inspection).to receive(:photo_1).and_return(photo_1_attached)
         allow(inspection).to receive(:photo_2).and_return(photo_attachment)
         allow(inspection).to receive(:photo_3).and_return(photo_attachment)
         allow(photo_attachment).to receive(:attached?).and_return(false)
-        allow(inspection).to receive(:send).with(:photo_1).and_return(photo_1)
+        allow(inspection).to receive(:send).with(:photo_1).and_return(photo_1_attached)
+        allow(photo_1_attached).to receive(:attached?).and_return(true)
+        allow(photo_1_attached).to receive(:blob).and_return(photo_blob)
         allow(photo_blob).to receive(:download)
         allow(photo_blob).to receive(:metadata).and_return({width: 800, height: 600})
         allow(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).and_return("image_data")
@@ -576,25 +578,30 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "error recovery" do
-      let(:good_photo) { instance_double("ActiveStorage::Attachment", blob: photo_blob, attached?: true) }
+      let(:good_photo_attached) { instance_double("ActiveStorage::Attached::One") }
       let(:bad_blob) { instance_double("ActiveStorage::Blob") }
-      let(:bad_photo) { instance_double("ActiveStorage::Attachment", blob: bad_blob, attached?: true) }
+      let(:bad_photo_attached) { instance_double("ActiveStorage::Attached::One") }
 
       before do
-        allow(inspection).to receive(:photo_1).and_return(good_photo)
-        allow(inspection).to receive(:photo_2).and_return(bad_photo)
+        allow(inspection).to receive(:photo_1).and_return(good_photo_attached)
+        allow(inspection).to receive(:photo_2).and_return(bad_photo_attached)
         allow(inspection).to receive(:photo_3).and_return(photo_attachment)
         allow(photo_attachment).to receive(:attached?).and_return(false)
-        allow(inspection).to receive(:send).with(:photo_1).and_return(good_photo)
-        allow(inspection).to receive(:send).with(:photo_2).and_return(bad_photo)
+        allow(inspection).to receive(:send).with(:photo_1).and_return(good_photo_attached)
+        allow(good_photo_attached).to receive(:attached?).and_return(true)
+        allow(good_photo_attached).to receive(:blob).and_return(photo_blob)
+        allow(bad_photo_attached).to receive(:attached?).and_return(true)
+        allow(bad_photo_attached).to receive(:blob).and_return(bad_blob)
+        allow(inspection).to receive(:send).with(:photo_2).and_return(bad_photo_attached)
 
         allow(photo_blob).to receive(:download)
         allow(photo_blob).to receive(:metadata).and_return({width: 800, height: 600})
-        allow(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).with(good_photo).and_return("good_data")
+        allow(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).with(good_photo_attached).and_return("good_data")
 
         allow(bad_blob).to receive(:download)
+        allow(bad_blob).to receive(:metadata).and_return({width: 800, height: 600})
         allow(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation)
-          .with(bad_photo).and_raise(Prawn::Errors::UnsupportedImageType.new("Bad format"))
+          .with(bad_photo_attached).and_raise(Prawn::Errors::UnsupportedImageType.new("Bad format"))
       end
 
       it "stops processing after first error" do
