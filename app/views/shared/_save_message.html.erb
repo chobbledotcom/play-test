@@ -6,16 +6,21 @@
 %>
 
 <% if message_type == "error" %>
-  <div class="error" id="form_save_message">
+  <div class="error" id="<%= local_assigns[:dom_id] || 'form_save_message' %>">
     <%= message_text || t('shared.messages.save_failed') %>
   </div>
 <% else %>
-  <div class="success" id="form_save_message">
+  <div class="success" id="<%= local_assigns[:dom_id] || 'form_save_message' %>">
     <%= message_text || t('shared.messages.saved_successfully') %>
     <% if local_assigns[:next_tab] && local_assigns[:inspection] %>
       <br>
-      <%= link_to t('inspections.buttons.continue_to_tab', 
-                    tab_name: t("forms.#{local_assigns[:next_tab]}.header")),
+      <%
+        tab_name = t("forms.#{local_assigns[:next_tab]}.header")
+        link_key = local_assigns[:skip_incomplete] ? 'continue_to_tab_with_incomplete' : 'continue_to_tab'
+        link_params = { tab_name: tab_name }
+        link_params[:count] = local_assigns[:incomplete_count] if local_assigns[:skip_incomplete]
+      %>
+      <%= link_to t("inspections.buttons.#{link_key}", **link_params),
             edit_inspection_path(local_assigns[:inspection], 
                                  tab: local_assigns[:next_tab]) + "#tabs" %>
     <% end %>

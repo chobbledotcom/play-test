@@ -83,20 +83,72 @@ module InspectionsHelper
     assessment_complete?(inspection, tab) ? "#{name} ✓" : name
   end
 
-  def next_incomplete_tab(inspection, current_tab)
+  def next_tab_navigation_info(inspection, current_tab)
+    # Don't show continue message on results tab
+    return nil if current_tab == "results"
+
     all_tabs = inspection.applicable_tabs
     current_index = all_tabs.index(current_tab)
     return nil unless current_index
 
-    tabs_to_check = all_tabs[(current_index + 1)..]
-    next_tab = tabs_to_check.find { |tab|
-      !assessment_complete?(inspection, tab)
+    tabs_after = all_tabs[(current_index + 1)..]
+
+    # Check if current tab is incomplete
+    current_tab_incomplete = !assessment_complete?(inspection, current_tab)
+
+    # Find first incomplete tab after current (excluding results for now)
+    next_incomplete = tabs_after.find { |tab|
+      tab != "results" && !assessment_complete?(inspection, tab)
     }
 
-    return next_tab if next_tab
+    # If current tab is incomplete and there's a next tab available
+    if current_tab_incomplete && tabs_after.any?
+      incomplete_count = incomplete_fields_count(inspection, current_tab)
 
-    if inspection.passed.nil?
-      "results"
+      # If there's an incomplete tab after, user should skip current incomplete
+      if next_incomplete
+        return {tab: next_incomplete, skip_incomplete: true, incomplete_count: incomplete_count}
+      end
+
+      # If results tab is incomplete, user should skip to results
+      if tabs_after.include?("results") && inspection.passed.nil?
+        return {tab: "results", skip_incomplete: true, incomplete_count: incomplete_count}
+      end
+
+      # Don't suggest next tab if it's complete and there are no incomplete tabs
+      return nil
+    end
+
+    # Current tab is complete, just suggest next incomplete tab
+    if next_incomplete
+      return {tab: next_incomplete, skip_incomplete: false}
+    end
+
+    # Check if results tab is incomplete
+    if tabs_after.include?("results") && inspection.passed.nil?
+      return {tab: "results", skip_incomplete: false}
+    end
+
+    nil
+  end
+
+  def incomplete_fields_count(inspection, tab)
+    @incomplete_fields_cache ||= {}
+    cache_key = "#{inspection.id}_#{tab}"
+
+    @incomplete_fields_cache[cache_key] ||= case tab
+    when "inspection"
+      inspection.inspection_tab_incomplete_fields.length
+    when "results"
+      inspection.passed.nil? ? 1 : 0
+    else
+      assessment = inspection.public_send("#{tab}_assessment")
+      if assessment
+        grouped = assessment.incomplete_fields_grouped
+        grouped.values.sum { |group| group[:fields].length }
+      else
+        0
+      end
     end
   end
 end

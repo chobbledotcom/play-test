@@ -18,9 +18,6 @@
 
 **Time: 20m**
 
-- Wall Heights:
-  - If there's a permanent roof, we can skip the "Walls must be at least" message, make this clearer in the breakdown
-
 ## Layout
 
 **Time: 30m** (more complicated than it seems - atm every field is required)
@@ -28,8 +25,6 @@
 ## PDF
 
 **Time: 30m**
-
-- Move the photo up
 
 ## Design
 
@@ -103,8 +98,14 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
 ## PDF
 
 - Add a Disclaimer footer and fit signature in
+- Move the photo up
 
 ## Bug Fixes (free)
 
 - User Capacity => arrange the "Max users at X" fields horizontally
 - PDF - Operator is listed twice
+
+## Calculators
+
+- Wall Heights:
+  - If there's a permanent roof, we can skip the "Walls must be at least" message, make this clearer in the breakdown
