@@ -9,7 +9,6 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     inspection = create(:inspection,
       unit:,
       user:,
-      passed: true,
       width: 5.0,
       length: 10.0,
       height: 3.0)

@@ -70,7 +70,7 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
 
         it "includes all assessment fields except system fields" do
           # Use complete inspection that already has all assessments
-          complete_inspection = create(:inspection, :completed, user: user, unit: unit)
+          complete_inspection = create(:inspection, :completed, user: user, unit: unit, indoor_only: false)
 
           json = get_inspection_json(complete_inspection)
 
@@ -100,6 +100,23 @@ RSpec.describe "Inspection JSON endpoints", type: :request do
           if json["assessments"]
             expect(json["assessments"]).not_to have_key("slide_assessment")
           end
+        end
+      end
+
+      context "when inspection is indoor only" do
+        it "excludes anchorage assessment" do
+          indoor_inspection = create(:inspection, :completed, :indoor_only, user: user, unit: unit)
+
+          json = get_inspection_json(indoor_inspection)
+
+          # Should not have anchorage assessment
+          expect(json["assessments"]).not_to have_key("anchorage_assessment")
+
+          # Should still have other assessments
+          expect(json["assessments"]).to have_key("user_height_assessment")
+          expect(json["assessments"]).to have_key("structure_assessment")
+          expect(json["assessments"]).to have_key("materials_assessment")
+          expect(json["assessments"]).to have_key("fan_assessment")
         end
       end
     end

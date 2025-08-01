@@ -112,6 +112,9 @@
 	}
 
 	/* Column widths for inspections table */
+	.inspections-list .col-id {
+		flex: 0 0 115px;
+	}
 	.inspections-list .col-photo {
 		flex: 0 0 80px;
 	}
@@ -139,6 +142,9 @@
 	}
 
 	/* Column widths for units table */
+	.units-list .col-id {
+		flex: 0 0 115px;
+	}
 	.units-list .col-photo {
 		flex: 0 0 80px;
 	}

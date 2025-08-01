@@ -6,19 +6,16 @@ class PdfGeneratorService
     NULL_COLOR = "663399".freeze
     COMMENT_COLOR = "663399".freeze
     SECTION_TITLE_SIZE = 12
-    ASSESSMENT_TITLE_SIZE = 10
-    FIELD_TEXT_SIZE = 8
     SECTION_MARGIN_AFTER_TITLE = 15
     ASSESSMENT_MARGIN_AFTER_TITLE = 3
     ASSESSMENT_MARGIN_AFTER = 16
     SECTION_MARGIN_AFTER = 20
-    COLUMN_COUNT = 3
-    COLUMN_SPACER = 10
 
-    attr_accessor :current_assessment_blocks, :current_assessment_fields
+    attr_accessor :current_assessment_blocks, :current_assessment_fields, :used_compact_layout
 
     def initialize
       @current_assessment_blocks = []
+      @used_compact_layout = false
       reset_assessment_context
     end
 
@@ -217,9 +214,8 @@ class PdfGeneratorService
         available_height = pdf.cursor
       end
 
-      pdf.column_box([0, pdf.cursor], columns: COLUMN_COUNT, width: pdf.bounds.width, spacer: COLUMN_SPACER, height: available_height) do
-        @current_assessment_blocks.each { |block| render_assessment_block(pdf, block) }
-      end
+      # Try adaptive rendering with overflow detection
+      render_assessments_adaptively(pdf, available_height)
 
       @current_assessment_blocks = []
       pdf.move_down SECTION_MARGIN_AFTER
@@ -229,8 +225,108 @@ class PdfGeneratorService
       pdf.text block[:title], size: ASSESSMENT_TITLE_SIZE, style: :bold
       pdf.move_down ASSESSMENT_MARGIN_AFTER_TITLE
 
-      block[:fields].each { |field| pdf.text field, size: FIELD_TEXT_SIZE, inline_format: true }
+      block[:fields].each { |field| pdf.text field, size: ASSESSMENT_FIELD_TEXT_SIZE, inline_format: true }
       pdf.move_down ASSESSMENT_MARGIN_AFTER
+    end
+
+    private
+
+    def render_assessments_adaptively(pdf, available_height)
+      # First, calculate photo boundary (top edge of unit photo)
+      photo_boundary = calculate_photo_boundary(pdf)
+
+      # Save the current state
+      start_y = pdf.y
+
+      # Try a dry run with 3 columns to check for overflow
+      overflow = check_for_overflow(pdf, available_height, 3, 8, photo_boundary)
+
+      # Reset cursor position
+      pdf.y = start_y
+
+      if overflow
+        # Use 4 columns with smaller text
+        render_assessments_with_params(pdf, available_height, ASSESSMENT_COLUMNS_COUNT, ASSESSMENT_FIELD_TEXT_SIZE)
+        # Return true to indicate we used compact layout
+        @used_compact_layout = true
+      else
+        # Use 3 columns with larger text
+        render_assessments_with_params(pdf, available_height, 3, 8)
+        @used_compact_layout = false
+      end
+    end
+
+    def calculate_photo_boundary(pdf)
+      # For boundary calculation, use the larger photo size (3 columns)
+      # This ensures we check against where the photo WOULD be if we use 3 columns
+      photo_width = Configuration::QR_CODE_SIZE * 2
+      # Assume square photo for calculation (will be adjusted by aspect ratio later)
+      photo_height = photo_width
+
+      # Calculate photo position in bottom right corner
+      # Account for footer height on first page
+      if pdf.page_number == 1
+        Configuration::FOOTER_HEIGHT + Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
+      else
+        Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
+      end
+
+      # Return the top edge of the photo (photo_y is the top edge in Prawn coordinates)
+    end
+
+    def check_for_overflow(pdf, available_height, columns, text_size, photo_boundary)
+      # Calculate total content height needed
+      total_content_height = calculate_total_content_height(text_size)
+
+      # Calculate how content distributes across columns
+      content_per_column = total_content_height / columns.to_f
+
+      # Check if content in third column would overflow into photo area
+      if columns == 3
+        # Calculate where the third column content would end
+        third_column_bottom = pdf.cursor - content_per_column
+
+        # Check if it would overlap with photo
+        if third_column_bottom < photo_boundary
+          return true
+        end
+      end
+
+      false
+    end
+
+    def calculate_total_content_height(text_size)
+      total_height = 0
+
+      # Calculate line height based on text size (Prawn default is ~1.2x font size)
+      title_line_height = ASSESSMENT_TITLE_SIZE * 1.2
+      field_line_height = text_size * 1.2
+
+      @current_assessment_blocks.each do |block|
+        # Title height
+        total_height += title_line_height
+        total_height += ASSESSMENT_MARGIN_AFTER_TITLE
+
+        # Fields height (each field is one line)
+        total_height += block[:fields].size * field_line_height
+        total_height += ASSESSMENT_MARGIN_AFTER
+      end
+
+      total_height
+    end
+
+    def render_assessments_with_params(pdf, available_height, columns, text_size)
+      pdf.column_box([0, pdf.cursor], columns: columns, width: pdf.bounds.width, spacer: ASSESSMENT_COLUMN_SPACER, height: available_height) do
+        @current_assessment_blocks.each do |block|
+          pdf.text block[:title], size: ASSESSMENT_TITLE_SIZE, style: :bold
+          pdf.move_down ASSESSMENT_MARGIN_AFTER_TITLE
+
+          block[:fields].each do |field|
+            pdf.text field, size: text_size, inline_format: true
+          end
+          pdf.move_down ASSESSMENT_MARGIN_AFTER
+        end
+      end
     end
   end
 end
