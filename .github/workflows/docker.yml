@@ -8,6 +8,7 @@ on:
 
 jobs:
   build_and_push:
+    if: false
     runs-on: ubuntu-latest
     permissions:
       contents: read
