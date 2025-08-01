@@ -48,6 +48,7 @@ class PdfGeneratorService
     ASSESSMENT_COLUMN_SPACER = 10
     ASSESSMENT_TITLE_SIZE = 9
     ASSESSMENT_FIELD_TEXT_SIZE = 7
+    ASSESSMENT_FIELD_TEXT_SIZE_PREFERRED = 9  # Larger text size for 3-column layout
     ASSESSMENT_BLOCK_SPACING = 8
 
     # QR code size is 3 lines of header text (12pt * 1.5 line height * 3 lines)

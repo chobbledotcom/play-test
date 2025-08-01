@@ -239,7 +239,7 @@ class PdfGeneratorService
       start_y = pdf.y
 
       # Try a dry run with 3 columns to check for overflow
-      overflow = check_for_overflow(pdf, available_height, 3, 9, photo_boundary)
+      overflow = check_for_overflow(pdf, available_height, 3, Configuration::ASSESSMENT_FIELD_TEXT_SIZE_PREFERRED, photo_boundary)
 
       # Reset cursor position
       pdf.y = start_y
@@ -251,7 +251,7 @@ class PdfGeneratorService
         @used_compact_layout = true
       else
         # Use 3 columns with larger text
-        render_assessments_with_params(pdf, available_height, 3, 9)
+        render_assessments_with_params(pdf, available_height, 3, Configuration::ASSESSMENT_FIELD_TEXT_SIZE_PREFERRED)
         @used_compact_layout = false
       end
     end
