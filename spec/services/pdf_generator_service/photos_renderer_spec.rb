@@ -229,9 +229,9 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         expect(described_class).to receive(:handle_page_break_if_needed)
           .with(pdf, 700, 300).ordered.and_return(700)
         expect(described_class).to receive(:handle_page_break_if_needed)
-          .with(pdf, 590, 300).ordered.and_return(590)
+          .with(pdf, 640, 300).ordered.and_return(640)
         expect(described_class).to receive(:handle_page_break_if_needed)
-          .with(pdf, 490, 300).ordered.and_return(490)
+          .with(pdf, 540, 300).ordered.and_return(540)
 
         described_class.process_all_photos(pdf, inspection, 300)
       end
@@ -443,8 +443,8 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
       it "handles zero width gracefully" do
         width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 400, 300)
-        expect(width).to be_infinite
-        expect(height).to be_infinite
+        expect(width).to eq(0.0)
+        expect(height).to eq(300.0)
       end
     end
 
@@ -453,8 +453,8 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
       it "converts nil to zero and handles error" do
         width, height = described_class.calculate_photo_dimensions_from_blob(photo_attached_one, 400, 300)
-        expect(width).to be_infinite
-        expect(height).to be_infinite
+        expect(width).to eq(0.0)
+        expect(height).to eq(300.0)
       end
     end
   end
