@@ -5,7 +5,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
   let(:inspection) { instance_double("Inspection") }
   let(:photo_attachment) { instance_double("ActiveStorage::Attached::One") }
   let(:photo_blob) { instance_double("ActiveStorage::Blob") }
-  let(:photo) { instance_double("ActiveStorage::Attachment", blob: photo_blob) }
+  # photo is removed - we should use photo_attachment which is ActiveStorage::Attached::One
 
   # Mock configuration constants
   before do
@@ -183,10 +183,10 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     end
 
     context "when only some photos are attached" do
-      let(:photo_1_attached) { instance_double("ActiveStorage::Attached::One", attached?: true) }
+      let(:photo_1_attached) { instance_double("ActiveStorage::Attached::One") }
       let(:photo_1) { instance_double("ActiveStorage::Attachment", blob: photo_blob) }
-      let(:photo_2_attached) { instance_double("ActiveStorage::Attached::One", attached?: false) }
-      let(:photo_3_attached) { instance_double("ActiveStorage::Attached::One", attached?: true) }
+      let(:photo_2_attached) { instance_double("ActiveStorage::Attached::One") }
+      let(:photo_3_attached) { instance_double("ActiveStorage::Attached::One") }
       let(:photo_3) { instance_double("ActiveStorage::Attachment", blob: photo_blob) }
 
       before do
@@ -295,6 +295,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     let(:bounds) { instance_double("Bounds", width: 500) }
 
     before do
+      allow(photo_attached_one).to receive(:blob).and_return(photo_blob)
       allow(photo_blob).to receive(:download)
       allow(photo_blob).to receive(:metadata).and_return({width: 800, height: 600})
       allow(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).and_return(image_data)
@@ -306,8 +307,8 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
     it "downloads and processes the image" do
       expect(photo_blob).to receive(:download)
-      expect(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).with(photo)
-      described_class.render_photo(pdf, photo, "Test Label", 300)
+      expect(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).with(photo_attached_one)
+      described_class.render_photo(pdf, photo_attached_one, "Test Label", 300)
     end
 
     it "calculates dimensions and renders image" do
@@ -316,12 +317,12 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         instance_of(StringIO),
         {at: [50, 700], width: 400, height: 300}
       )
-      described_class.render_photo(pdf, photo, "Test Label", 300)
+      described_class.render_photo(pdf, photo_attached_one, "Test Label", 300)
     end
 
     it "adds photo label" do
       expect(described_class).to receive(:add_photo_label).with(pdf, "Test Label", 300)
-      described_class.render_photo(pdf, photo, "Test Label", 300)
+      described_class.render_photo(pdf, photo_attached_one, "Test Label", 300)
     end
 
     it "centers image horizontally" do
@@ -330,7 +331,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
         instance_of(StringIO),
         {at: [150, 700], width: 200, height: 150}  # (500 - 200) / 2 = 150
       )
-      described_class.render_photo(pdf, photo, "Test Label", 300)
+      described_class.render_photo(pdf, photo_attached_one, "Test Label", 300)
     end
 
     context "with different image dimensions" do
@@ -340,7 +341,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
           instance_of(StringIO),
           {at: [0, 700], width: 500, height: 200}  # (500 - 500) / 2 = 0
         )
-        described_class.render_photo(pdf, photo, "Test Label", 300)
+        described_class.render_photo(pdf, photo_attached_one, "Test Label", 300)
       end
 
       it "handles narrow images" do
@@ -349,7 +350,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
           instance_of(StringIO),
           {at: [200, 700], width: 100, height: 300}  # (500 - 100) / 2 = 200
         )
-        described_class.render_photo(pdf, photo, "Test Label", 300)
+        described_class.render_photo(pdf, photo_attached_one, "Test Label", 300)
       end
     end
 
@@ -361,7 +362,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
       it "raises ImageError with details" do
         expect(PdfGeneratorService::ImageError).to receive(:build_detailed_error)
-        expect { described_class.render_photo(pdf, photo, "Test Label", 300) }.to raise_error
+        expect { described_class.render_photo(pdf, photo_attached_one, "Test Label", 300) }.to raise_error
       end
     end
 
@@ -373,16 +374,18 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
       it "does not call add_photo_label" do
         expect(described_class).not_to receive(:add_photo_label)
-        expect { described_class.render_photo(pdf, photo, "Test Label", 300) }.to raise_error
+        expect { described_class.render_photo(pdf, photo_attached_one, "Test Label", 300) }.to raise_error
       end
     end
   end
 
   describe ".calculate_photo_dimensions_from_blob" do
     let(:metadata) { {width: 800, height: 600} }
+    let(:photo_attached_one) { instance_double("ActiveStorage::Attached::One") }
 
     before do
-      allow(photo.blob).to receive(:metadata).and_return(metadata)
+      allow(photo_attached_one).to receive(:blob).and_return(photo_blob)
+      allow(photo_blob).to receive(:metadata).and_return(metadata)
     end
 
     context "when width is limiting factor" do
@@ -454,9 +457,10 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
   describe ".render_image_to_pdf" do
     let(:image_data) { "fake_image_data" }
-    let(:photo_attached_one) { instance_double("ActiveStorage::Attached::One", blob: photo_blob) }
+    let(:photo_attached_one) { instance_double("ActiveStorage::Attached::One") }
 
     before do
+      allow(photo_attached_one).to receive(:blob).and_return(photo_blob)
       allow(pdf).to receive(:cursor).and_return(700)
       allow(pdf).to receive(:image)
     end
@@ -476,6 +480,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
       it "raises ImageError with details" do
         expect(PdfGeneratorService::ImageError).to receive(:build_detailed_error)
+          .with(instance_of(Prawn::Errors::UnsupportedImageType), photo_attached_one)
         expect {
           described_class.render_image_to_pdf(pdf, image_data, 100, 400, 300, photo_attached_one)
         }.to raise_error
