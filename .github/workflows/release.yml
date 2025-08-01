@@ -127,6 +127,12 @@ jobs:
             git.chobble.com/chobble/play-test:v${{ steps.new.outputs.version }}
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:v${{ steps.new.outputs.version }}
+          cache-from: |
+            type=gha
+            type=registry,ref=${{ vars.DOCKER_USERNAME }}/play-test:buildcache
+          cache-to: |
+            type=gha,mode=max
+            type=registry,ref=${{ vars.DOCKER_USERNAME }}/play-test:buildcache,mode=max
       
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
