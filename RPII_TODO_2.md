@@ -25,23 +25,15 @@
 
 **Time: 30m** (more complicated than it seems - atm every field is required)
 
-- Ropes - not required when N/A is selected
-
 ## PDF
 
 **Time: 30m**
 
-- Add a Disclaimer footer and fit signature in
 - Move the photo up
 
 ## Design
 
 **Time: 0m**
-
-## Bug Fixes (free)
-
-- User Capacity => arrange the "Max users at X" fields horizontally
-- PDF - Operator is listed twice
 
 ---
 
@@ -103,3 +95,16 @@ For "Bounce Safe Number" I need to add per-site translations rather than per-lan
 ## Design
 
 - Bigger logos
+
+## Layout
+
+- Ropes - not required when N/A is selected
+
+## PDF
+
+- Add a Disclaimer footer and fit signature in
+
+## Bug Fixes (free)
+
+- User Capacity => arrange the "Max users at X" fields horizontally
+- PDF - Operator is listed twice
