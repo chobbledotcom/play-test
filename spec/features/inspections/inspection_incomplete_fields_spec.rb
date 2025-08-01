@@ -195,19 +195,22 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
   end
 
   scenario "displays incomplete field counts for each section" do
+    # Start with a completed inspection that has all fields filled
+    completed_inspection = create(:inspection, :completed, user: user, unit: unit)
+    
     # Setup inspection with known incomplete fields
-    inspection.update_columns(
+    completed_inspection.update_columns(
       inspection_date: nil,
       width: nil,
       length: nil
     )
-    inspection.structure_assessment.update_columns(
+    completed_inspection.structure_assessment.update_columns(
       seam_integrity_pass: nil,
       stitch_length_pass: nil,
       air_loss_pass: nil
     )
 
-    visit edit_inspection_path(inspection)
+    visit edit_inspection_path(completed_inspection)
     expand_incomplete_fields
 
     # Check that General shows (3) for inspection_date, width, and length

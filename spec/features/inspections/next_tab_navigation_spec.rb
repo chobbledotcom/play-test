@@ -25,18 +25,17 @@ RSpec.feature "Next tab navigation", type: :feature, js: true do
   end
 
   scenario "suggests next tab forward when current tab is incomplete" do
-    # Make inspection tab incomplete by clearing a required field
+    # Inspection already has width, length, height as nil by default
     visit edit_inspection_path(inspection, tab: "inspection")
-    fill_in "inspection[width]", with: ""
 
-    # Save the form
+    # Save the form without filling required fields
     click_button I18n.t("forms.inspection.submit")
 
-    # Should suggest the next tab with incomplete count
+    # Should suggest the next tab with incomplete count (3 fields: width, length, height)
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
     expect(page).to have_link(
       I18n.t("inspections.buttons.continue_to_tab_with_incomplete",
-        count: 1,
+        count: 3,
         tab_name: I18n.t("forms.user_height.header"))
     )
   end
