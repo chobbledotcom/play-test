@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class PdfGeneratorService
   module Configuration
     # Unit table constants
     UNIT_NAME_MAX_LENGTH = 30
-    UNIT_TABLE_CELL_PADDING = [6, 4]
+    UNIT_TABLE_CELL_PADDING = [6, 4].freeze
     UNIT_TABLE_TEXT_SIZE = 9
 
     # General text and spacing constants
@@ -15,13 +17,13 @@ class PdfGeneratorService
 
     # Header table constants
     LOGO_HEIGHT = 50
-    HEADER_TABLE_PADDING = [5, 0]
+    HEADER_TABLE_PADDING = [5, 0].freeze
     LOGO_COLUMN_WIDTH_RATIO = 1.0 / 3.0
 
     # Table constants
-    TABLE_CELL_PADDING = [5, 10]
+    TABLE_CELL_PADDING = [5, 10].freeze
     TABLE_FIRST_COLUMN_WIDTH = 150
-    NICE_TABLE_CELL_PADDING = [4, 8]
+    NICE_TABLE_CELL_PADDING = [4, 8].freeze
     NICE_TABLE_TEXT_SIZE = 10
 
     # Inspection history table styling
@@ -31,9 +33,9 @@ class PdfGeneratorService
     HISTORY_TABLE_ALT_ROW_COLOR = "F0F0F0"
     PASS_COLOR = "008000"  # Green
     FAIL_COLOR = "CC0000"  # Red
-    NA_COLOR = "4169E1"  # Royal Blue
-    HEADER_COLOR = "663399"  # Purple
-    SUBTITLE_COLOR = "666666"  # Gray
+    NA_COLOR = "4169E1" # Royal Blue
+    HEADER_COLOR = "663399" # Purple
+    SUBTITLE_COLOR = "666666" # Gray
 
     # Inspection history table column widths
     HISTORY_DATE_COLUMN_WIDTH = 90      # Date column (DD/MM/YYYY) - slightly wider
@@ -42,13 +44,12 @@ class PdfGeneratorService
     HISTORY_LOCATION_WIDTH_PERCENT = 0.5   # 50% of remaining space
 
     # Assessment layout constants
-    ASSESSMENT_COLUMNS_COUNT = 3
+    ASSESSMENT_COLUMNS_COUNT = 4
     ASSESSMENT_COLUMN_SPACER = 10
-    ASSESSMENT_TITLE_SIZE = 10
+    ASSESSMENT_TITLE_SIZE = 9
     ASSESSMENT_FIELD_TEXT_SIZE = 7
     ASSESSMENT_BLOCK_SPACING = 8
 
-    # QR Code constants
     # QR code size is 3 lines of header text (12pt * 1.5 line height * 3 lines)
     QR_CODE_SIZE = (HEADER_TEXT_SIZE * 1.5 * 3).round
     QR_CODE_MARGIN = 0  # No margin - align with page edge
@@ -66,28 +67,28 @@ class PdfGeneratorService
     WATERMARK_HEIGHT = 60
 
     # Photos page constants
-    PHOTO_MAX_HEIGHT_PERCENT = 0.25  # 25% of page height
-    PHOTO_SPACING = 20  # Space between photos
-    PHOTO_LABEL_SIZE = 10  # Size of "Photo 1", "Photo 2", "Photo 3" text
-    PHOTO_LABEL_SPACING = 5  # Space between photo and label
+    PHOTO_MAX_HEIGHT_PERCENT = 0.25 # 25% of page height
+    PHOTO_SPACING = 20 # Space between photos
+    PHOTO_LABEL_SIZE = 10 # Size of "Photo 1", "Photo 2", "Photo 3" text
+    PHOTO_LABEL_SPACING = 5 # Space between photo and label
 
     # Disclaimer footer constants
-    DISCLAIMER_HEADER_SIZE = HEADER_TEXT_SIZE  # Match existing header style
-    DISCLAIMER_TEXT_SIZE = ASSESSMENT_FIELD_TEXT_SIZE  # Match assessment field text
-    DISCLAIMER_TEXT_LINES = 3  # Height in lines of text for disclaimer
-    SIGNATURE_HEIGHT_LINES = 4  # Maximum height in lines of text
-    SIGNATURE_CAPTION_LINES = 1.5  # Space for caption below signature
-    TEXT_LINE_HEIGHT = DISCLAIMER_TEXT_SIZE * 1.5  # Standard line height multiplier
-    DISCLAIMER_TEXT_HEIGHT = DISCLAIMER_TEXT_LINES * TEXT_LINE_HEIGHT  # Total disclaimer text height
-    SIGNATURE_HEIGHT = (SIGNATURE_HEIGHT_LINES + SIGNATURE_CAPTION_LINES) * TEXT_LINE_HEIGHT  # Total signature height including caption
+    DISCLAIMER_HEADER_SIZE = HEADER_TEXT_SIZE # Match existing header style
+    DISCLAIMER_TEXT_SIZE = 10
+    DISCLAIMER_TEXT_LINES = 3 # Height in lines of text for disclaimer
+    SIGNATURE_HEIGHT_LINES = 4 # Maximum height in lines of text
+    SIGNATURE_CAPTION_LINES = 1.5 # Space for caption below signature
+    TEXT_LINE_HEIGHT = DISCLAIMER_TEXT_SIZE * 1.5 # Standard line height multiplier
+    DISCLAIMER_TEXT_HEIGHT = DISCLAIMER_TEXT_LINES * TEXT_LINE_HEIGHT # Total disclaimer text height
+    SIGNATURE_HEIGHT = (SIGNATURE_HEIGHT_LINES + SIGNATURE_CAPTION_LINES) * TEXT_LINE_HEIGHT # Total signature height including caption
     FOOTER_INTERNAL_PADDING = 10  # Padding between elements within footer
     FOOTER_VERTICAL_PADDING = 15  # Bottom padding for footer
-    FOOTER_TOP_PADDING = 30  # Top padding for footer (about 2 lines)
+    FOOTER_TOP_PADDING = 30 # Top padding for footer (about 2 lines)
     # Use the larger of disclaimer or signature height for footer calculation
     FOOTER_CONTENT_HEIGHT = [DISCLAIMER_TEXT_HEIGHT, SIGNATURE_HEIGHT].max
     FOOTER_HEIGHT = FOOTER_TOP_PADDING + DISCLAIMER_HEADER_SIZE + FOOTER_INTERNAL_PADDING +
-      FOOTER_CONTENT_HEIGHT + FOOTER_VERTICAL_PADDING  # Total footer height
-    DISCLAIMER_TEXT_WIDTH_PERCENT = 0.75  # Disclaimer text takes 75% of width
+      FOOTER_CONTENT_HEIGHT + FOOTER_VERTICAL_PADDING # Total footer height
+    DISCLAIMER_TEXT_WIDTH_PERCENT = 0.75 # Disclaimer text takes 75% of width
 
     def self.setup_pdf_fonts(pdf)
       font_path = Rails.root.join("app/assets/fonts")
