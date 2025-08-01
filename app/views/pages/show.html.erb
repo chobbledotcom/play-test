@@ -8,6 +8,13 @@
 
 <%= @page.safe_content %>
 
+<% if @page.slug == "/" %>
+  <form action="/search" method="get">
+    <input type="text" name="id" placeholder="<%= t('search.homepage.placeholder') %>" pattern="[A-Za-z0-9]{8}" required>
+    <button type="submit">🔍</button>
+  </form>
+<% end %>
+
 <% if @page.slug == "/" && !current_user %>
   <nav>
     <ul>
