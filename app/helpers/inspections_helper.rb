@@ -89,21 +89,28 @@ module InspectionsHelper
     return nil unless current_index
 
     tabs_after = all_tabs[(current_index + 1)..]
+    
+    # Check if current tab is incomplete
+    current_tab_incomplete = !assessment_complete?(inspection, current_tab)
 
-    # Find first incomplete tab after current
-    next_incomplete = tabs_after.find { |tab| !assessment_complete?(inspection, tab) }
+    # Find first incomplete tab after current (excluding results for now)
+    next_incomplete = tabs_after.find { |tab| 
+      tab != "results" && !assessment_complete?(inspection, tab) 
+    }
 
-    # If found, that's our target
-    return {tab: next_incomplete, skip_incomplete: false} if next_incomplete
-
-    # Check if results tab needs completion (and we're not already on it)
-    if inspection.passed.nil? && current_tab != "results"
+    # If we found an incomplete assessment tab after current, that's our target
+    if next_incomplete
+      return {tab: next_incomplete, skip_incomplete: false}
+    end
+    
+    # Check if results tab is incomplete and comes after current tab
+    if tabs_after.include?("results") && inspection.passed.nil?
       return {tab: "results", skip_incomplete: false}
     end
 
     # If current tab is incomplete but no tabs after are incomplete,
     # suggest next tab with warning
-    if !assessment_complete?(inspection, current_tab) && tabs_after.any?
+    if current_tab_incomplete && tabs_after.any?
       incomplete_count = incomplete_fields_count(inspection, current_tab)
       return {tab: tabs_after.first, skip_incomplete: true, incomplete_count: incomplete_count}
     end

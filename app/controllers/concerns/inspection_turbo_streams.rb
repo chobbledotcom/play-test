@@ -51,7 +51,7 @@ module InspectionTurboStreams
     if success
       current_tab_name = params[:tab].presence || "inspection"
       nav_info = helpers.next_tab_navigation_info(@inspection, current_tab_name)
-
+      
       {
         dom_id: dom_id,
         success: true,
