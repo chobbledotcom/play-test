@@ -140,7 +140,12 @@ module InspectionsHelper
       inspection.passed.nil? ? 1 : 0
     else
       assessment = inspection.public_send("#{tab}_assessment")
-      assessment&.incomplete_fields_grouped&.sum { |group| group[:fields].length } || 0
+      if assessment
+        grouped = assessment.incomplete_fields_grouped
+        grouped.values.sum { |group| group[:fields].length }
+      else
+        0
+      end
     end
   end
 end
