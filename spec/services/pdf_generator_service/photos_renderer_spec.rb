@@ -184,10 +184,10 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
     context "when only some photos are attached" do
       let(:photo_1_attached) { instance_double("ActiveStorage::Attached::One") }
-      let(:photo_1) { instance_double("ActiveStorage::Attachment", blob: photo_blob) }
+      # photo_1 is not needed - using photo_1_attached
       let(:photo_2_attached) { instance_double("ActiveStorage::Attached::One") }
       let(:photo_3_attached) { instance_double("ActiveStorage::Attached::One") }
-      let(:photo_3) { instance_double("ActiveStorage::Attachment", blob: photo_blob) }
+      # photo_3 is not needed - using photo_3_attached
 
       before do
         allow(inspection).to receive(:send).with(:photo_1).and_return(photo_1_attached)
@@ -293,6 +293,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
   describe ".render_photo" do
     let(:image_data) { "fake_image_data" }
     let(:bounds) { instance_double("Bounds", width: 500) }
+    let(:photo_attached_one) { instance_double("ActiveStorage::Attached::One") }
 
     before do
       allow(photo_attached_one).to receive(:blob).and_return(photo_blob)
