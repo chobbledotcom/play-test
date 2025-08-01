@@ -137,7 +137,13 @@ class ApplicationController < ActionController::Base
   def check_query_limit
     table_query_counts = count_queries_by_table
 
+    # Tables to ignore for N+1 detection (Active Storage tables)
+    ignored_tables = %w[active_storage_blobs active_storage_attachments]
+
     table_query_counts.each do |table, count|
+      # Skip checking for ignored tables
+      next if ignored_tables.include?(table)
+
       if count > 5
         log_n_plus_one_queries(table, count)
         # Log to Sentry instead of raising
