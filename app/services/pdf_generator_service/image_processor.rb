@@ -7,6 +7,19 @@ class PdfGeneratorService
       render_qr_code_with_photo(pdf, entity, qr_code_png)
     end
 
+    def self.generate_qr_code_header(pdf, entity)
+      qr_code_png = QrCodeService.generate_qr_code(entity)
+      # Position QR code at top left of page
+      qr_width, qr_height = PositionCalculator.qr_code_dimensions
+      # Use pdf.bounds.top to position from top of page
+      image_options = {
+        at: [0, pdf.bounds.top],
+        width: qr_width,
+        height: qr_height
+      }
+      pdf.image StringIO.new(qr_code_png), image_options
+    end
+
     def self.render_qr_code_with_photo(pdf, entity, qr_code_png)
       photo_entity = entity.is_a?(Inspection) ? entity.unit : entity
       qr_x, qr_y = PositionCalculator.qr_code_position(pdf.bounds.width, pdf.page_number)
@@ -16,15 +29,14 @@ class PdfGeneratorService
     end
 
     def self.add_qr_code_overlay(pdf, qr_code_png, qr_x, qr_y)
-      pdf.transparent(0.5) do
-        qr_width, qr_height = PositionCalculator.qr_code_dimensions
-        image_options = {
-          at: [qr_x, qr_y],
-          width: qr_width,
-          height: qr_height
-        }
-        pdf.image StringIO.new(qr_code_png), image_options
-      end
+      # Render at 100% opacity (removed transparent wrapper)
+      qr_width, qr_height = PositionCalculator.qr_code_dimensions
+      image_options = {
+        at: [qr_x, qr_y],
+        width: qr_width,
+        height: qr_height
+      }
+      pdf.image StringIO.new(qr_code_png), image_options
     end
 
     def self.process_image_with_orientation(attachment)

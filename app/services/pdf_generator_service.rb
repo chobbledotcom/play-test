@@ -40,9 +40,6 @@ class PdfGeneratorService
       # Disclaimer footer (only on first page)
       DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
 
-      # QR Code in bottom right corner
-      ImageProcessor.generate_qr_code_footer(pdf, inspection)
-
       # Add DRAFT watermark overlay for draft inspections (except in test env)
       if !inspection.complete? && !Rails.env.test?
         Utilities.add_draft_watermark(pdf)
@@ -77,8 +74,6 @@ class PdfGeneratorService
 
       # Disclaimer footer (only on first page)
       DisclaimerFooterRenderer.render_disclaimer_footer(pdf, unit.user)
-
-      ImageProcessor.generate_qr_code_footer(pdf, unit)
 
       # Add debug info page if enabled (admins only)
       if debug_enabled && debug_queries.present?
