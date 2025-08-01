@@ -239,7 +239,7 @@ class PdfGeneratorService
       start_y = pdf.y
 
       # Try a dry run with 3 columns to check for overflow
-      overflow = check_for_overflow(pdf, available_height, 3, 8, photo_boundary)
+      overflow = check_for_overflow(pdf, available_height, 3, 9, photo_boundary)
 
       # Reset cursor position
       pdf.y = start_y
@@ -251,27 +251,32 @@ class PdfGeneratorService
         @used_compact_layout = true
       else
         # Use 3 columns with larger text
-        render_assessments_with_params(pdf, available_height, 3, 8)
+        render_assessments_with_params(pdf, available_height, 3, 9)
         @used_compact_layout = false
       end
     end
 
     def calculate_photo_boundary(pdf)
       # For boundary calculation, use the larger photo size (3 columns)
-      # This ensures we check against where the photo WOULD be if we use 3 columns
-      photo_width = Configuration::QR_CODE_SIZE * 2
-      # Assume square photo for calculation (will be adjusted by aspect ratio later)
+      # Calculate column width for 3 columns
+      total_spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER * 2
+      column_width = (pdf.bounds.width - total_spacer_width) / 3.0
+
+      # Photo width equals one column width
+      photo_width = column_width.round
+      # Assume square photo for worst-case calculation
       photo_height = photo_width
 
       # Calculate photo position in bottom right corner
       # Account for footer height on first page
-      if pdf.page_number == 1
+      photo_y = if pdf.page_number == 1
         Configuration::FOOTER_HEIGHT + Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
       else
         Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
       end
 
       # Return the top edge of the photo (photo_y is the top edge in Prawn coordinates)
+      photo_y
     end
 
     def check_for_overflow(pdf, available_height, columns, text_size, photo_boundary)

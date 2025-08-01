@@ -24,7 +24,7 @@ class PdfGeneratorService
       # Calculate photo dimensions based on column count
       attachment = unit.photo
       image = create_image(attachment)
-      photo_width, photo_height = calculate_footer_photo_dimensions(image, column_count)
+      photo_width, photo_height = calculate_footer_photo_dimensions(pdf, image, column_count)
 
       # Position photo in bottom right corner
       photo_x = pdf_width - photo_width
@@ -45,18 +45,27 @@ class PdfGeneratorService
       ImageOrientationProcessor.process_with_orientation(image)
     end
 
-    def self.calculate_footer_photo_dimensions(image, column_count = 3)
+    def self.calculate_footer_photo_dimensions(pdf, image, column_count = 3)
       original_width = image.width
       original_height = image.height
 
-      # Adjust photo width based on column count
-      # For 3 columns: width = 2x QR size
-      # For 4 columns: width = 1.8x QR size (slightly smaller to fit with more columns)
-      width_multiplier = (column_count == 4) ? 1.8 : 2.0
+      # Calculate column width based on PDF width and column count
+      # Account for column spacers
+      total_spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER * (column_count - 1)
+      column_width = (pdf.bounds.width - total_spacer_width) / column_count.to_f
 
-      PositionCalculator.footer_photo_dimensions_with_multiplier(
-        original_width, original_height, width_multiplier
-      )
+      # Photo width equals one column width
+      photo_width = column_width.round
+
+      # Calculate height maintaining aspect ratio
+      if original_width.zero? || original_height.zero?
+        photo_height = photo_width
+      else
+        aspect_ratio = original_width.to_f / original_height.to_f
+        photo_height = (photo_width / aspect_ratio).round
+      end
+
+      [photo_width, photo_height]
     end
 
     def self.render_processed_image(pdf, image, x, y, width, height, attachment)
