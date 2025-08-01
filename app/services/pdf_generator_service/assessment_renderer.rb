@@ -278,42 +278,41 @@ class PdfGeneratorService
     def check_for_overflow(pdf, available_height, columns, text_size, photo_boundary)
       # Calculate total content height needed
       total_content_height = calculate_total_content_height(text_size)
-      
+
       # Calculate how content distributes across columns
-      column_height = available_height
       content_per_column = total_content_height / columns.to_f
-      
+
       # Check if content in third column would overflow into photo area
       if columns == 3
         # Calculate where the third column content would end
         third_column_bottom = pdf.cursor - content_per_column
-        
+
         # Check if it would overlap with photo
         if third_column_bottom < photo_boundary
           return true
         end
       end
-      
+
       false
     end
-    
+
     def calculate_total_content_height(text_size)
       total_height = 0
-      
+
       # Calculate line height based on text size (Prawn default is ~1.2x font size)
       title_line_height = ASSESSMENT_TITLE_SIZE * 1.2
       field_line_height = text_size * 1.2
-      
+
       @current_assessment_blocks.each do |block|
         # Title height
         total_height += title_line_height
         total_height += ASSESSMENT_MARGIN_AFTER_TITLE
-        
+
         # Fields height (each field is one line)
         total_height += block[:fields].size * field_line_height
         total_height += ASSESSMENT_MARGIN_AFTER
       end
-      
+
       total_height
     end
 
