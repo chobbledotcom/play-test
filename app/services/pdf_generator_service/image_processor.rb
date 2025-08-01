@@ -20,12 +20,12 @@ class PdfGeneratorService
 
       # Calculate photo position in bottom right corner
       pdf_width = pdf.bounds.width
-      
+
       # Calculate photo dimensions based on column count
       attachment = unit.photo
       image = create_image(attachment)
       photo_width, photo_height = calculate_footer_photo_dimensions(image, column_count)
-      
+
       # Position photo in bottom right corner
       photo_x = pdf_width - photo_width
       # Account for footer height on first page
@@ -34,7 +34,7 @@ class PdfGeneratorService
       else
         Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
       end
-      
+
       render_processed_image(pdf, image, photo_x, photo_y, photo_width, photo_height, attachment)
     rescue Prawn::Errors::UnsupportedImageType => e
       raise ImageError.build_detailed_error(e, attachment)
@@ -44,7 +44,6 @@ class PdfGeneratorService
       image = create_image(attachment)
       ImageOrientationProcessor.process_with_orientation(image)
     end
-
 
     def self.calculate_footer_photo_dimensions(image, column_count = 3)
       original_width = image.width
