@@ -35,10 +35,11 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     end
   end
 
-  def expect_incomplete_section(form_name)
+  def expect_incomplete_section(form_name, count: nil)
     section_header = I18n.t("forms.#{form_name}.header")
+    expected_text = count ? "#{section_header} (#{count})" : section_header
     within(".incomplete-fields-content") do
-      expect(page).to have_link(section_header)
+      expect(page).to have_link(expected_text)
     end
   end
 
@@ -120,7 +121,9 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     visit edit_inspection_path(inspection)
     expand_incomplete_fields
 
-    inspection_link = find_link(I18n.t("forms.inspection.header"))
+    # Find link by partial match since it now includes count
+    inspection_header = I18n.t("forms.inspection.header")
+    inspection_link = find_link(text: /#{Regexp.escape(inspection_header)}/)
     expect(inspection_link[:href]).to include("tab=inspection", "#tabs")
 
     field_link = find_link(I18n.t("forms.inspection.fields.inspection_date"))
@@ -134,7 +137,8 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
     # Click field link from different tab in incomplete fields section
     within(".incomplete-fields-content") do
-      structure_link = find_link(I18n.t("forms.structure.header"))
+      structure_header = I18n.t("forms.structure.header")
+      structure_link = find_link(text: /#{Regexp.escape(structure_header)}/)
       structure_link.click
     end
 
@@ -167,11 +171,12 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     section_headers = all(".incomplete-fields-content strong a").map(&:text)
 
     # Verify the first item is always "General" (inspection tab)
-    expect(section_headers.first).to eq(I18n.t("forms.inspection.header"))
+    expect(section_headers.first).to include(I18n.t("forms.inspection.header"))
 
     # Verify Results appears last if present
-    if section_headers.include?(I18n.t("forms.results.header"))
-      expect(section_headers.last).to eq(I18n.t("forms.results.header"))
+    results_header = I18n.t("forms.results.header")
+    if section_headers.any? { |h| h.include?(results_header) }
+      expect(section_headers.last).to include(results_header)
     end
 
     # Verify the order matches the tab order from applicable_tabs
@@ -181,10 +186,34 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
     # Filter to tabs that actually appear in incomplete fields
     expected_headers = tab_headers.select do |header|
-      section_headers.include?(header)
+      section_headers.any? { |sh| sh.include?(header) }
     end
 
-    expect(section_headers).to eq(expected_headers)
+    # Extract just the header names without counts for comparison
+    section_names = section_headers.map { |h| h.sub(/ \(\d+\)$/, '') }
+    expect(section_names).to eq(expected_headers)
+  end
+
+  scenario "displays incomplete field counts for each section" do
+    # Setup inspection with known incomplete fields
+    inspection.update_columns(
+      inspection_date: nil,
+      inspector: nil
+    )
+    inspection.structure_assessment.update_columns(
+      structure_secure_pass: nil,
+      structure_fabric_attachment_pass: nil,
+      structure_standing_surface_pass: nil
+    )
+
+    visit edit_inspection_path(inspection)
+    expand_incomplete_fields
+
+    # Check that General shows (2) for inspection_date and inspector
+    expect_incomplete_section("inspection", count: 2)
+    
+    # Check that Structure shows (3) for the three nil fields
+    expect_incomplete_section("structure", count: 3)
   end
 
   scenario "counts total incomplete fields across all pages" do
