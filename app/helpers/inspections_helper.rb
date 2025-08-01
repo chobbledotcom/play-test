@@ -89,7 +89,7 @@ module InspectionsHelper
     return nil unless current_index
 
     tabs_after = all_tabs[(current_index + 1)..]
-
+    
     # Check if current tab is incomplete
     current_tab_incomplete = !assessment_complete?(inspection, current_tab)
 
@@ -98,21 +98,32 @@ module InspectionsHelper
       tab != "results" && !assessment_complete?(inspection, tab)
     }
 
-    # If we found an incomplete assessment tab after current, that's our target
+    # If current tab is incomplete and there's a next tab available
+    if current_tab_incomplete && tabs_after.any?
+      incomplete_count = incomplete_fields_count(inspection, current_tab)
+      
+      # If there's an incomplete tab after, user should skip current incomplete
+      if next_incomplete
+        return {tab: next_incomplete, skip_incomplete: true, incomplete_count: incomplete_count}
+      end
+      
+      # If results tab is incomplete, user should skip to results
+      if tabs_after.include?("results") && inspection.passed.nil?
+        return {tab: "results", skip_incomplete: true, incomplete_count: incomplete_count}
+      end
+      
+      # Otherwise suggest next tab (even if complete)
+      return {tab: tabs_after.first, skip_incomplete: true, incomplete_count: incomplete_count}
+    end
+    
+    # Current tab is complete, just suggest next incomplete tab
     if next_incomplete
       return {tab: next_incomplete, skip_incomplete: false}
     end
-
-    # Check if results tab is incomplete and comes after current tab
+    
+    # Check if results tab is incomplete
     if tabs_after.include?("results") && inspection.passed.nil?
       return {tab: "results", skip_incomplete: false}
-    end
-
-    # If current tab is incomplete but no tabs after are incomplete,
-    # suggest next tab with warning
-    if current_tab_incomplete && tabs_after.any?
-      incomplete_count = incomplete_fields_count(inspection, current_tab)
-      return {tab: tabs_after.first, skip_incomplete: true, incomplete_count: incomplete_count}
     end
 
     nil

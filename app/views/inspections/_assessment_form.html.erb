@@ -16,7 +16,7 @@
 <%= render 'chobble_forms/form_context',
   model: assessment,
   i18n_base: "forms.#{assessment_type}",
-  url: send("inspection_#{assessment_type}_assessment_path", @inspection) do |form|
+  url: send("inspection_#{assessment_type}_assessment_path", @inspection, tab: assessment_type) do |form|
 %>
   <%= render 'chobble_forms/fields', model: assessment %>
   
