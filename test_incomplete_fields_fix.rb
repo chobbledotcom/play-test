@@ -70,7 +70,7 @@ module FieldUtils
 end
 
 # Load the concern
-require_relative 'app/models/concerns/assessment_completion'
+require_relative "app/models/concerns/assessment_completion"
 
 # Create a test class
 class TestAssessment
@@ -97,9 +97,9 @@ class TestAssessment
     [
       {
         fields: [
-          { field: :field1, partial: "pass_fail_comment" },
-          { field: :field2, partial: "pass_fail_comment" },
-          { field: :field3, partial: "pass_fail_comment" }
+          {field: :field1, partial: "pass_fail_comment"},
+          {field: :field2, partial: "pass_fail_comment"},
+          {field: :field3, partial: "pass_fail_comment"}
         ]
       }
     ]
