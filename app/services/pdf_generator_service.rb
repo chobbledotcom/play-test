@@ -40,10 +40,12 @@ class PdfGeneratorService
       # Disclaimer footer (only on first page)
       DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
 
-      # QR Code in bottom right corner
+      # Add unit photo in bottom right corner
       # Pass column count info to adjust photo width accordingly
-      column_count = assessment_renderer.used_compact_layout ? 4 : 3
-      ImageProcessor.generate_qr_code_footer(pdf, inspection, column_count)
+      if inspection.unit&.photo
+        column_count = assessment_renderer.used_compact_layout ? 4 : 3
+        ImageProcessor.add_unit_photo_footer(pdf, inspection.unit, column_count)
+      end
 
       # Add DRAFT watermark overlay for draft inspections (except in test env)
       if !inspection.complete? && !Rails.env.test?
@@ -80,8 +82,10 @@ class PdfGeneratorService
       # Disclaimer footer (only on first page)
       DisclaimerFooterRenderer.render_disclaimer_footer(pdf, unit.user)
 
-      # For unit PDFs, default to 3 columns (no assessments to check)
-      ImageProcessor.generate_qr_code_footer(pdf, unit, 3)
+      # Add unit photo in bottom right corner (for unit PDFs, always use 3 columns)
+      if unit.photo
+        ImageProcessor.add_unit_photo_footer(pdf, unit, 3)
+      end
 
       # Add debug info page if enabled (admins only)
       if debug_enabled && debug_queries.present?

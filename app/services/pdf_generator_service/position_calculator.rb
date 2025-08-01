@@ -2,16 +2,13 @@ class PdfGeneratorService
   class PositionCalculator
     include Configuration
 
-    # Calculate QR code position in bottom right corner
-    # QR code's bottom-right corner aligns with table right edge, positioned above footer on first page
+    # Calculate QR code position in top left corner
+    # QR code's top-left corner aligns with page top left, matching header spacing
     def self.qr_code_position(pdf_bounds_width, pdf_page_number = 1)
-      x = pdf_bounds_width - QR_CODE_SIZE - QR_CODE_MARGIN
-      # On first page, position above footer; on other pages, use standard bottom offset
-      y = if pdf_page_number == 1
-        Configuration::FOOTER_HEIGHT + QR_CODE_BOTTOM_OFFSET + QR_CODE_SIZE
-      else
-        QR_CODE_BOTTOM_OFFSET + QR_CODE_SIZE
-      end
+      x = QR_CODE_MARGIN
+      # In Prawn, Y coordinates are from bottom, so we need to calculate from page top
+      # This positions the QR code at the very top of the page
+      y = QR_CODE_SIZE
       [x, y]
     end
 

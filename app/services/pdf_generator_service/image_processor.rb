@@ -2,29 +2,42 @@ class PdfGeneratorService
   class ImageProcessor
     include Configuration
 
-    def self.generate_qr_code_footer(pdf, entity, column_count = 3)
+    def self.generate_qr_code_header(pdf, entity)
       qr_code_png = QrCodeService.generate_qr_code(entity)
-      render_qr_code_with_photo(pdf, entity, qr_code_png, column_count)
+      # Position QR code at top left of page
+      qr_width, qr_height = PositionCalculator.qr_code_dimensions
+      # Use pdf.bounds.top to position from top of page
+      image_options = {
+        at: [0, pdf.bounds.top],
+        width: qr_width,
+        height: qr_height
+      }
+      pdf.image StringIO.new(qr_code_png), image_options
     end
 
-    def self.render_qr_code_with_photo(pdf, entity, qr_code_png, column_count = 3)
-      photo_entity = entity.is_a?(Inspection) ? entity.unit : entity
-      qr_x, qr_y = PositionCalculator.qr_code_position(pdf.bounds.width, pdf.page_number)
+    def self.add_unit_photo_footer(pdf, unit, column_count = 3)
+      return unless unit&.photo&.blob
 
-      add_entity_photo_footer(pdf, photo_entity, qr_x, qr_y, column_count)
-      add_qr_code_overlay(pdf, qr_code_png, qr_x, qr_y)
-    end
-
-    def self.add_qr_code_overlay(pdf, qr_code_png, qr_x, qr_y)
-      pdf.transparent(0.5) do
-        qr_width, qr_height = PositionCalculator.qr_code_dimensions
-        image_options = {
-          at: [qr_x, qr_y],
-          width: qr_width,
-          height: qr_height
-        }
-        pdf.image StringIO.new(qr_code_png), image_options
+      # Calculate photo position in bottom right corner
+      pdf_width = pdf.bounds.width
+      
+      # Calculate photo dimensions based on column count
+      attachment = unit.photo
+      image = create_image(attachment)
+      photo_width, photo_height = calculate_footer_photo_dimensions(image, column_count)
+      
+      # Position photo in bottom right corner
+      photo_x = pdf_width - photo_width
+      # Account for footer height on first page
+      photo_y = if pdf.page_number == 1
+        Configuration::FOOTER_HEIGHT + Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
+      else
+        Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
       end
+      
+      render_processed_image(pdf, image, photo_x, photo_y, photo_width, photo_height, attachment)
+    rescue Prawn::Errors::UnsupportedImageType => e
+      raise ImageError.build_detailed_error(e, attachment)
     end
 
     def self.process_image_with_orientation(attachment)
@@ -32,33 +45,6 @@ class PdfGeneratorService
       ImageOrientationProcessor.process_with_orientation(image)
     end
 
-    def self.add_entity_photo_footer(pdf, entity, qr_x, qr_y, column_count = 3)
-      return unless entity&.photo
-
-      attachment = entity.photo
-      return unless attachment.blob
-
-      render_entity_photo(pdf, attachment, qr_x, qr_y, column_count)
-    end
-
-    def self.render_entity_photo(pdf, attachment, qr_x, qr_y, column_count = 3)
-      image_data = attachment.blob.download
-      image = MiniMagick::Image.read(image_data)
-
-      dimensions = calculate_footer_photo_dimensions(image, column_count)
-      photo_width, photo_height = dimensions
-
-      positions = PositionCalculator.photo_footer_position(
-        qr_x, qr_y, photo_width, photo_height
-      )
-      photo_x, photo_y = positions
-
-      render_processed_image(
-        pdf, image, photo_x, photo_y, photo_width, photo_height, attachment
-      )
-    rescue Prawn::Errors::UnsupportedImageType => e
-      raise ImageError.build_detailed_error(e, attachment)
-    end
 
     def self.calculate_footer_photo_dimensions(image, column_count = 3)
       original_width = image.width
