@@ -34,8 +34,9 @@ class PdfGeneratorService
 
       pdf.move_down FOOTER_INTERNAL_PADDING
 
-      # Calculate widths
-      disclaimer_width = pdf.bounds.width * DISCLAIMER_TEXT_WIDTH_PERCENT
+      # Calculate widths based on whether signature exists
+      has_signature = user&.signature&.attached?
+      disclaimer_width = has_signature ? (pdf.bounds.width * DISCLAIMER_TEXT_WIDTH_PERCENT) : pdf.bounds.width
       signature_width = pdf.bounds.width * (1 - DISCLAIMER_TEXT_WIDTH_PERCENT)
 
       # Both disclaimer and signature should be vertically aligned
@@ -51,7 +52,7 @@ class PdfGeneratorService
       end
 
       # Signature on the right if user has one
-      if user&.signature&.attached?
+      if has_signature
         # Position signature aligned with disclaimer text area
         render_user_signature(pdf, user, disclaimer_width, signature_width, content_top_y)
       end
