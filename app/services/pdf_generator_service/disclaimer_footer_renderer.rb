@@ -99,7 +99,6 @@ class PdfGeneratorService
 
         # Adjust signature position to be inside the border
         x_position += border_padding
-        y_position = y_position
 
         # Draw border
         pdf.stroke_color "CCCCCC"
