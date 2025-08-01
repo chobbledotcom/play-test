@@ -25,7 +25,7 @@ module AssessmentCompletion
   def field_allows_nil_when_na?(field)
     # Check if this field has a corresponding _pass field with "na" selected
     pass_field = "#{field}_pass"
-    
+
     # If the field itself ends with _pass, check if it's set to "na"
     if field.end_with?("_pass")
       respond_to?(field) && send(field) == "na"
