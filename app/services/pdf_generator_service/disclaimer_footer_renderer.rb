@@ -81,19 +81,25 @@ class PdfGeneratorService
         signature_dimensions = calculate_signature_dimensions(image, available_width)
         width, height = signature_dimensions
 
+        # Add border around signature with more padding
+        border_padding = 5
+        
         # Position signature aligned with disclaimer text
-        # x_position is offset from left + remaining space to align right
-        x_position = x_offset + available_width - width
+        # Shift left to account for border and padding so the border aligns to the right edge
+        x_position = x_offset + available_width - width - (border_padding * 2)
         # y_position aligns with the disclaimer text area
         # Since we want them vertically aligned, position from same top y
         y_position = content_top_y
 
-        # Add border around signature
-        border_padding = 2
-        border_x = x_position - border_padding
+        # Calculate border position (signature is already shifted, so border starts at x_position)
+        border_x = x_position
         border_y = y_position + border_padding
         border_width = width + (border_padding * 2)
         border_height = height + (border_padding * 2)
+        
+        # Adjust signature position to be inside the border
+        x_position = x_position + border_padding
+        y_position = y_position
 
         # Draw border
         pdf.stroke_color "CCCCCC"
@@ -105,8 +111,8 @@ class PdfGeneratorService
           pdf, image, x_position, y_position, width, height, signature_attachment
         )
 
-        # Add caption below signature
-        caption_y = y_position - height - 10
+        # Add caption below signature (align with border)
+        caption_y = y_position - height - border_padding - 8
         pdf.text_box I18n.t("pdf.signature.caption"),
           at: [border_x, caption_y],
           width: border_width,
@@ -124,10 +130,12 @@ class PdfGeneratorService
 
     def self.calculate_signature_dimensions(image, max_width)
       # Use existing fit_dimensions method from PositionCalculator
+      # Account for border padding (5px on each side = 10px total)
+      border_total_padding = 10
       PositionCalculator.fit_dimensions(
         image.width,
         image.height,
-        max_width - FOOTER_INTERNAL_PADDING,  # Leave some padding
+        max_width - FOOTER_INTERNAL_PADDING - border_total_padding,  # Leave padding for border
         SIGNATURE_HEIGHT
       )
     end
