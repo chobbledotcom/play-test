@@ -267,9 +267,9 @@ RSpec.describe "I18n monkey patch" do
   describe "I18n.t" do
     it "tracks keys when called" do
       # Use a key that exists in the app
-      I18n.t("hello")
+      I18n.t("shared.yes")
 
-      expect(I18nUsageTracker.used_keys).to include("hello")
+      expect(I18nUsageTracker.used_keys).to include("shared.yes")
     end
 
     it "works with scope option" do
@@ -284,7 +284,7 @@ RSpec.describe "I18n monkey patch" do
     it "does not track when tracking is disabled" do
       I18nUsageTracker.tracking_enabled = false
 
-      I18n.t("hello")
+      I18n.t("shared.yes")
 
       expect(I18nUsageTracker.used_keys).to be_empty
     end
@@ -292,9 +292,9 @@ RSpec.describe "I18n monkey patch" do
 
   describe "I18n.translate" do
     it "tracks keys when called" do
-      I18n.translate("hello")
+      I18n.translate("shared.yes")
 
-      expect(I18nUsageTracker.used_keys).to include("hello")
+      expect(I18nUsageTracker.used_keys).to include("shared.yes")
     end
   end
 end

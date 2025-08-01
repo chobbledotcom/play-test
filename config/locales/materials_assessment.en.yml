@@ -1,8 +1,0 @@
-en:
-  materials_assessment:
-    requirements:
-      fabric_tensile: "Fabric tensile strength: 1850N minimum"
-      fabric_tear: "Fabric tear strength: 350N minimum"
-      fire_retardant: "Fire retardancy: EN 71-3 compliance"
-      thread_tensile: "Thread tensile strength: 88N minimum"
-      rope_diameter: "Rope diameter: 18-45mm range"
