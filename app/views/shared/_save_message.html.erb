@@ -14,7 +14,6 @@
     <%= message_text || t('shared.messages.saved_successfully') %>
     <% if local_assigns[:next_tab] && local_assigns[:inspection] %>
       <br>
-      <!-- DEBUG: next_tab=<%= local_assigns[:next_tab].inspect %>, skip_incomplete=<%= local_assigns[:skip_incomplete].inspect %>, incomplete_count=<%= local_assigns[:incomplete_count].inspect %>, all_locals=<%= local_assigns.keys.inspect %> -->
       <%
         tab_name = t("forms.#{local_assigns[:next_tab]}.header")
         link_key = local_assigns[:skip_incomplete] ? 'continue_to_tab_with_incomplete' : 'continue_to_tab'
