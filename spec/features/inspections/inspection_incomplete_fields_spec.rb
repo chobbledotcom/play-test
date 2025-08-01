@@ -190,7 +190,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     end
 
     # Extract just the header names without counts for comparison
-    section_names = section_headers.map { |h| h.sub(/ \(\d+\)$/, '') }
+    section_names = section_headers.map { |h| h.sub(/ \(\d+\)$/, "") }
     expect(section_names).to eq(expected_headers)
   end
 
@@ -211,7 +211,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
     # Check that General shows (2) for inspection_date and inspector
     expect_incomplete_section("inspection", count: 2)
-    
+
     # Check that Structure shows (3) for the three nil fields
     expect_incomplete_section("structure", count: 3)
   end
