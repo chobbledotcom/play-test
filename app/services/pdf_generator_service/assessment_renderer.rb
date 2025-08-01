@@ -269,14 +269,13 @@ class PdfGeneratorService
 
       # Calculate photo position in bottom right corner
       # Account for footer height on first page
-      photo_y = if pdf.page_number == 1
+      if pdf.page_number == 1
         Configuration::FOOTER_HEIGHT + Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
       else
         Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
       end
 
       # Return the top edge of the photo (photo_y is the top edge in Prawn coordinates)
-      photo_y
     end
 
     def check_for_overflow(pdf, available_height, columns, text_size, photo_boundary)
