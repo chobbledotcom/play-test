@@ -23,18 +23,11 @@ module AssessmentCompletion
   private
 
   def field_allows_nil_when_na?(field)
-    # Check if this field has a corresponding _pass field with "na" selected
+    # Only allow nil for value fields (not _pass fields) when their corresponding _pass field is "na"
+    return false if field.end_with?("_pass")
+    
     pass_field = "#{field}_pass"
-
-    # If the field itself ends with _pass, check if it's set to "na"
-    if field.end_with?("_pass")
-      respond_to?(field) && send(field) == "na"
-    # Otherwise, check if there's a corresponding _pass field set to "na"
-    elsif respond_to?(pass_field)
-      send(pass_field) == "na"
-    else
-      false
-    end
+    respond_to?(pass_field) && send(pass_field) == "na"
   end
 
   def incomplete_fields_grouped
