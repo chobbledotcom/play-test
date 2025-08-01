@@ -150,4 +150,118 @@ RSpec.describe InspectionsHelper, type: :helper do
       end
     end
   end
+
+  describe "#next_incomplete_tab_with_fallback" do
+    let(:user) { create(:user) }
+    let(:unit) { create(:unit, user: user) }
+    let(:inspection) { create(:inspection, unit: unit, user: user) }
+
+    context "when there are incomplete tabs after current" do
+      it "returns the first incomplete tab after current" do
+        result = helper.next_incomplete_tab_with_fallback(inspection, "inspection")
+        
+        expect(result[:tab]).to eq("user_height")
+        expect(result[:is_current]).to eq(false)
+      end
+    end
+
+    context "when current tab is incomplete and no tabs after are incomplete" do
+      before do
+        # Complete all assessments
+        inspection.applicable_assessments.each do |assessment_type, _|
+          assessment = inspection.send(assessment_type)
+          assessment.update!(complete: true)
+        end
+        # Make inspection tab incomplete
+        inspection.update!(inspection_location: nil)
+      end
+
+      it "returns the next tab with is_current true" do
+        result = helper.next_incomplete_tab_with_fallback(inspection, "inspection")
+        
+        expect(result[:tab]).to eq("user_height")
+        expect(result[:is_current]).to eq(true)
+      end
+    end
+
+    context "when on last assessment tab with results incomplete" do
+      before do
+        # Complete all assessments
+        inspection.applicable_assessments.each do |assessment_type, _|
+          assessment = inspection.send(assessment_type)
+          assessment.update!(complete: true)
+        end
+      end
+
+      it "returns results tab" do
+        last_assessment = inspection.applicable_tabs[-2]
+        result = helper.next_incomplete_tab_with_fallback(inspection, last_assessment)
+        
+        expect(result[:tab]).to eq("results")
+        expect(result[:is_current]).to eq(false)
+      end
+    end
+
+    context "when everything is complete" do
+      before do
+        # Complete all assessments
+        inspection.applicable_assessments.each do |assessment_type, _|
+          assessment = inspection.send(assessment_type)
+          assessment.update!(complete: true)
+        end
+        inspection.update!(passed: true)
+      end
+
+      it "returns nil" do
+        result = helper.next_incomplete_tab_with_fallback(inspection, "results")
+        
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  describe "#count_incomplete_fields_for_tab" do
+    let(:user) { create(:user) }
+    let(:unit) { create(:unit, user: user) }
+    let(:inspection) { create(:inspection, unit: unit, user: user) }
+
+    context "for inspection tab" do
+      before do
+        inspection.update!(inspection_location: nil, inspector: nil)
+      end
+
+      it "counts incomplete required fields" do
+        count = helper.count_incomplete_fields_for_tab(inspection, "inspection")
+        expect(count).to eq(2)
+      end
+    end
+
+    context "for results tab" do
+      it "counts 1 when passed is nil" do
+        inspection.update!(passed: nil)
+        count = helper.count_incomplete_fields_for_tab(inspection, "results")
+        expect(count).to eq(1)
+      end
+
+      it "counts 0 when passed is set" do
+        inspection.update!(passed: true)
+        count = helper.count_incomplete_fields_for_tab(inspection, "results")
+        expect(count).to eq(0)
+      end
+    end
+
+    context "for assessment tabs" do
+      it "counts incomplete fields in the assessment" do
+        assessment = inspection.user_height_assessment
+        # Clear some required fields
+        assessment.update!(
+          max_user_height: nil,
+          max_user_height_pass: nil
+        )
+        
+        count = helper.count_incomplete_fields_for_tab(inspection, "user_height")
+        expect(count).to be > 0
+      end
+    end
+  end
 end
