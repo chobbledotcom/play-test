@@ -115,8 +115,8 @@ module InspectionsHelper
         return {tab: "results", skip_incomplete: true, incomplete_count: incomplete_count}
       end
 
-      # Otherwise suggest next tab (even if complete)
-      return {tab: tabs_after.first, skip_incomplete: true, incomplete_count: incomplete_count}
+      # Don't suggest next tab if it's complete and there are no incomplete tabs
+      return nil
     end
 
     # Current tab is complete, just suggest next incomplete tab

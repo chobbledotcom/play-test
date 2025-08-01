@@ -176,10 +176,26 @@ RSpec.describe InspectionsHelper, type: :helper do
         inspection.update!(inspection_location: nil)
       end
 
-      it "returns the next tab with skip_incomplete true" do
+      it "returns nil when all remaining tabs are complete" do
         result = helper.next_tab_navigation_info(inspection, "inspection")
 
-        expect(result[:tab]).to eq("user_height")
+        expect(result).to be_nil
+      end
+    end
+
+    context "when current tab is incomplete and next tab is complete but tabs after that are incomplete" do
+      before do
+        # Make inspection tab incomplete
+        inspection.update!(inspection_location: nil)
+        # Complete user_height_assessment
+        inspection.user_height_assessment.update!(complete: true)
+        # Keep other assessments incomplete
+      end
+
+      it "skips the complete tab and suggests the next incomplete one" do
+        result = helper.next_tab_navigation_info(inspection, "inspection")
+
+        expect(result[:tab]).to eq("slide")
         expect(result[:skip_incomplete]).to eq(true)
         expect(result[:incomplete_count]).to eq(1)
       end
