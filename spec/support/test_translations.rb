@@ -4,7 +4,7 @@
 I18n.backend.store_translations(:en, {
   test: {
     password: "password123",
-    access_denied: "Access denied", 
+    access_denied: "Access denied",
     invalid_password: "wrongpassword",
     admin_emails_pattern: "^admin\\d*@example\\.com$"
   }
