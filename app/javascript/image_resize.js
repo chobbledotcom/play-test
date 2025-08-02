@@ -23,42 +23,71 @@ class ImageResize {
 		if (this.processedInputs.has(input)) return;
 		this.processedInputs.add(input);
 
-		// Store original accept attribute for validation
-		const acceptTypes = input.getAttribute("accept");
+		// Create a hidden canvas for this input
+		const canvas = document.createElement("canvas");
+		canvas.style.display = "none";
+		document.body.appendChild(canvas);
 
-		input.addEventListener("change", async (event) => {
+		input.addEventListener("change", (event) => {
 			const files = Array.from(event.target.files);
 			if (files.length === 0) return;
 
-			// Process each file
-			const processedFiles = await Promise.all(
-				files.map((file) => this.processFile(file))
-			);
+			// Disable the input while processing
+			input.disabled = true;
 
-			// Replace the input's files with processed versions
-			this.replaceInputFiles(input, processedFiles);
+			// Process files synchronously to maintain user gesture
+			this.processFiles(input, files, canvas).then((processedFiles) => {
+				// Re-enable input
+				input.disabled = false;
+			}).catch((error) => {
+				console.error("Error processing files:", error);
+				input.disabled = false;
+			});
 		});
+
+		// Clean up canvas when input is removed
+		const observer = new MutationObserver((mutations) => {
+			if (!document.body.contains(input)) {
+				canvas.remove();
+				observer.disconnect();
+			}
+		});
+		observer.observe(document.body, { childList: true, subtree: true });
 	}
 
-	async processFile(file) {
+	async processFiles(input, files, canvas) {
+		const processedFiles = [];
+
+		for (const file of files) {
+			const processed = await this.processFile(file, canvas);
+			processedFiles.push(processed);
+		}
+
+		// Replace the input's files with processed versions
+		this.replaceInputFiles(input, processedFiles);
+		return processedFiles;
+	}
+
+	async processFile(file, canvas) {
 		// Only process image files
 		if (!file.type.startsWith("image/")) {
 			return file;
 		}
 
-		// Check if file needs processing
-		const needsProcessing = await this.shouldProcessFile(file);
-		if (!needsProcessing) {
-			return file;
-		}
-
 		try {
-			const processedBlob = await this.resizeImage(file);
+			// Check if file needs processing
+			const needsProcessing = await this.shouldProcessFile(file);
+			if (!needsProcessing) {
+				return file;
+			}
+
+			const processedBlob = await this.resizeImage(file, canvas);
 			// Create new File object with original name
 			const processedFile = new File([processedBlob], file.name, {
 				type: "image/jpeg",
 				lastModified: Date.now(),
 			});
+			console.log(`Resized ${file.name}: ${file.size} bytes -> ${processedFile.size} bytes`);
 			return processedFile;
 		} catch (error) {
 			console.error("Error processing image:", error);
@@ -93,7 +122,7 @@ class ImageResize {
 		});
 	}
 
-	async resizeImage(file) {
+	async resizeImage(file, canvas) {
 		return new Promise((resolve, reject) => {
 			const img = new Image();
 			const url = URL.createObjectURL(file);
@@ -101,32 +130,43 @@ class ImageResize {
 			img.onload = () => {
 				URL.revokeObjectURL(url);
 
-				// Calculate new dimensions
-				const { width, height } = this.calculateDimensions(
-					img.width,
-					img.height
-				);
+				try {
+					// Calculate new dimensions
+					const { width, height } = this.calculateDimensions(
+						img.width,
+						img.height
+					);
 
-				// Create canvas and resize
-				const canvas = document.createElement("canvas");
-				canvas.width = width;
-				canvas.height = height;
+					// Set canvas dimensions
+					canvas.width = width;
+					canvas.height = height;
 
-				const ctx = canvas.getContext("2d");
-				ctx.drawImage(img, 0, 0, width, height);
+					// Get context and draw
+					const ctx = canvas.getContext("2d", { willReadFrequently: false });
+					
+					// Clear canvas first
+					ctx.clearRect(0, 0, width, height);
+					
+					// Draw image
+					ctx.drawImage(img, 0, 0, width, height);
 
-				// Convert to blob
-				canvas.toBlob(
-					(blob) => {
-						if (blob) {
-							resolve(blob);
-						} else {
-							reject(new Error("Failed to create blob"));
-						}
-					},
-					"image/jpeg",
-					this.jpegQuality
-				);
+					// Convert to blob immediately
+					canvas.toBlob(
+						(blob) => {
+							if (blob) {
+								// Clear canvas after use
+								ctx.clearRect(0, 0, width, height);
+								resolve(blob);
+							} else {
+								reject(new Error("Failed to create blob"));
+							}
+						},
+						"image/jpeg",
+						this.jpegQuality
+					);
+				} catch (error) {
+					reject(error);
+				}
 			};
 
 			img.onerror = () => {
@@ -165,10 +205,6 @@ class ImageResize {
 
 		// Replace input's files
 		input.files = dataTransfer.files;
-
-		// Trigger change event for any listeners
-		const event = new Event("change", { bubbles: true });
-		input.dispatchEvent(event);
 	}
 
 	cleanup() {
