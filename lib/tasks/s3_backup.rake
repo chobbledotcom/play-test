@@ -8,17 +8,49 @@ namespace :s3 do
   namespace :backup do
     def backup_dir = "db_backups"
 
-    def temp_dir = Rails.root.join("tmp/backups")
+    def temp_dir
+      unless Rails.root
+        error_msg = "Rails.root is nil - cannot determine temp directory"
+        Sentry.capture_message(error_msg, level: "error")
+        raise error_msg
+      end
+      Rails.root.join("tmp/backups")
+    end
 
-    def database_path = Rails.root.join(Rails.configuration.database_configuration[Rails.env]["database"])
+    def database_path
+      db_config = Rails.configuration.database_configuration[Rails.env]
+      unless db_config && db_config["database"]
+        error_msg = "Database configuration missing for #{Rails.env} environment"
+        Sentry.capture_message(error_msg, level: "error", extra: {
+          rails_env: Rails.env,
+          db_config: db_config
+        })
+        raise error_msg
+      end
+      
+      path = db_config["database"]
+      # Handle relative paths
+      path = Rails.root.join(path) unless path.start_with?("/")
+      path
+    end
 
     def backup_retention_days = 60
 
     desc "Backup SQLite database to S3"
     task database: :environment do
       ensure_s3_enabled
+      validate_s3_config
 
       handle_s3_errors do
+        # Capture backup context for better error reporting
+        Sentry.with_scope do |scope|
+          scope.set_context("backup", {
+            task: "s3:backup:database",
+            rails_env: Rails.env,
+            timestamp: Time.current.iso8601
+          })
+        end
+
         service = get_s3_service
 
         # Create temp directory
@@ -35,6 +67,15 @@ namespace :s3 do
         begin
           # Create SQLite backup
           print "Creating database backup... "
+
+          # Check if database path exists and is valid
+          unless database_path && File.exist?(database_path)
+            error_msg = "Database file not found at: #{database_path}"
+            puts "\n❌ #{error_msg}"
+            Sentry.capture_message(error_msg, level: "error")
+            exit 1
+          end
+
           system("sqlite3 #{database_path} \".backup '#{temp_backup_path}'\"", exception: true)
           puts "✅"
 
@@ -58,6 +99,15 @@ namespace :s3 do
           puts "\n🎉 Database backup completed successfully!"
           puts "   Backup location: #{s3_key}"
           puts "   Backup size: #{(File.size(temp_compressed_path) / 1024.0 / 1024.0).round(2)} MB"
+        rescue => e
+          # Report any unexpected errors to Sentry with full context
+          Sentry.capture_exception(e, extra: {
+            database_path: database_path.to_s,
+            backup_filename: backup_filename,
+            s3_key: s3_key,
+            step: "backup_process"
+          })
+          raise # Re-raise to let handle_s3_errors deal with it
         ensure
           # Clean up temp files
           FileUtils.rm_f(temp_backup_path)
@@ -69,6 +119,7 @@ namespace :s3 do
     desc "List database backups in S3"
     task list: :environment do
       ensure_s3_enabled
+      validate_s3_config
 
       handle_s3_errors do
         service = get_s3_service
@@ -105,6 +156,7 @@ namespace :s3 do
     desc "Download a database backup from S3"
     task :download, [:date] => :environment do |_task, args|
       ensure_s3_enabled
+      validate_s3_config
 
       unless args[:date]
         puts "❌ Please provide a date in YYYY-MM-DD format"
@@ -140,6 +192,7 @@ namespace :s3 do
     desc "Restore database from S3 backup"
     task :restore, [:date] => :environment do |_task, args|
       ensure_s3_enabled
+      validate_s3_config
 
       unless args[:date]
         puts "❌ Please provide a date in YYYY-MM-DD format"
