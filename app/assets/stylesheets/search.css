@@ -1,5 +1,31 @@
 /* Search page styles */
 
+/* Homepage search box */
+#homepage-search {
+  display: flex;
+  max-width: 30rem;
+  margin: 2rem auto;
+  border: none;
+}
+
+#homepage-search input {
+  border-radius: 5px 0 0 5px;
+  margin: 0;
+}
+
+#homepage-search button {
+  border-radius: 0 5px 5px 0;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+#homepage-search button svg {
+  stroke: currentColor;
+}
+
 #search-results table {
   margin-top: 2rem;
 }
