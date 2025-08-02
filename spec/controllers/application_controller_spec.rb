@@ -106,7 +106,7 @@ RSpec.describe ApplicationController, type: :controller do
         allow(controller).to receive(:controller_name).and_return("users")
         allow(controller).to receive(:action_name).and_return("update_settings")
         allow(controller).to receive(:params).and_return(
-          ActionController::Parameters.new(user: { logo: "file" })
+          ActionController::Parameters.new(user: {logo: "file"})
         )
         expect(controller.send(:processing_image_upload?)).to be true
       end
@@ -115,7 +115,7 @@ RSpec.describe ApplicationController, type: :controller do
         allow(controller).to receive(:controller_name).and_return("users")
         allow(controller).to receive(:action_name).and_return("update_settings")
         allow(controller).to receive(:params).and_return(
-          ActionController::Parameters.new(user: { name: "Test" })
+          ActionController::Parameters.new(user: {name: "Test"})
         )
         expect(controller.send(:processing_image_upload?)).to be false
       end
@@ -124,7 +124,7 @@ RSpec.describe ApplicationController, type: :controller do
         allow(controller).to receive(:controller_name).and_return("units")
         allow(controller).to receive(:action_name).and_return("create")
         allow(controller).to receive(:params).and_return(
-          ActionController::Parameters.new(unit: { photo: "file" })
+          ActionController::Parameters.new(unit: {photo: "file"})
         )
         expect(controller.send(:processing_image_upload?)).to be true
       end
@@ -133,7 +133,7 @@ RSpec.describe ApplicationController, type: :controller do
         allow(controller).to receive(:controller_name).and_return("units")
         allow(controller).to receive(:action_name).and_return("update")
         allow(controller).to receive(:params).and_return(
-          ActionController::Parameters.new(unit: { photo: "file" })
+          ActionController::Parameters.new(unit: {photo: "file"})
         )
         expect(controller.send(:processing_image_upload?)).to be true
       end
@@ -142,7 +142,7 @@ RSpec.describe ApplicationController, type: :controller do
         allow(controller).to receive(:controller_name).and_return("inspections")
         allow(controller).to receive(:action_name).and_return("create")
         allow(controller).to receive(:params).and_return(
-          ActionController::Parameters.new(inspection: { photo: "file" })
+          ActionController::Parameters.new(inspection: {photo: "file"})
         )
         expect(controller.send(:processing_image_upload?)).to be false
       end
@@ -383,15 +383,15 @@ RSpec.describe ApplicationController, type: :controller do
     describe "#count_queries_by_table" do
       it "counts queries by table name" do
         queries = [
-          { sql: 'SELECT * FROM "users"' },
-          { sql: 'SELECT * FROM "users" WHERE id = 1' },
-          { sql: 'UPDATE "inspections" SET name = ?' },
-          { sql: 'SELECT * FROM "units"' }
+          {sql: 'SELECT * FROM "users"'},
+          {sql: 'SELECT * FROM "users" WHERE id = 1'},
+          {sql: 'UPDATE "inspections" SET name = ?'},
+          {sql: 'SELECT * FROM "units"'}
         ]
         controller.instance_variable_set(:@debug_sql_queries, queries)
 
         result = controller.send(:count_queries_by_table)
-        expect(result).to eq({ "users" => 2, "inspections" => 1, "units" => 1 })
+        expect(result).to eq({"users" => 2, "inspections" => 1, "units" => 1})
       end
 
       it "handles empty query list" do
@@ -402,13 +402,13 @@ RSpec.describe ApplicationController, type: :controller do
 
       it "ignores queries without identifiable tables" do
         queries = [
-          { sql: 'PRAGMA table_info(users)' },
-          { sql: 'SELECT * FROM "users"' }
+          {sql: "PRAGMA table_info(users)"},
+          {sql: 'SELECT * FROM "users"'}
         ]
         controller.instance_variable_set(:@debug_sql_queries, queries)
 
         result = controller.send(:count_queries_by_table)
-        expect(result).to eq({ "users" => 1 })
+        expect(result).to eq({"users" => 1})
       end
     end
   end
@@ -416,7 +416,7 @@ RSpec.describe ApplicationController, type: :controller do
   describe "error handling" do
     controller do
       skip_before_action :require_login
-      
+
       def index
         raise StandardError, "Test error"
       end
@@ -432,13 +432,21 @@ RSpec.describe ApplicationController, type: :controller do
 
       it "notifies errors via NtfyService" do
         allow(controller).to receive(:current_user).and_return(user)
-        get :index rescue nil
+        begin
+          get :index
+        rescue
+          nil
+        end
         expect(NtfyService).to have_received(:notify)
       end
 
       it "includes user email in notification" do
         allow(controller).to receive(:current_user).and_return(user)
-        get :index rescue nil
+        begin
+          get :index
+        rescue
+          nil
+        end
         expect(NtfyService).to have_received(:notify) do |message|
           expect(message).to include(user.email)
         end
@@ -446,14 +454,22 @@ RSpec.describe ApplicationController, type: :controller do
 
       it "includes controller and action info" do
         allow(controller).to receive(:current_user).and_return(user)
-        get :index rescue nil
+        begin
+          get :index
+        rescue
+          nil
+        end
         expect(NtfyService).to have_received(:notify) do |message|
           expect(message).to include("anonymous#index")
         end
       end
 
       it "handles not logged in users" do
-        get :index rescue nil
+        begin
+          get :index
+        rescue
+          nil
+        end
         expect(NtfyService).to have_received(:notify) do |message|
           expect(message).to include(I18n.t("application.errors.not_logged_in"))
         end
@@ -466,7 +482,11 @@ RSpec.describe ApplicationController, type: :controller do
           raise ActionController::InvalidAuthenticityToken
         end
 
-        get :index rescue nil
+        begin
+          get :index
+        rescue
+          nil
+        end
         expect(NtfyService).not_to have_received(:notify)
       end
     end
@@ -475,7 +495,11 @@ RSpec.describe ApplicationController, type: :controller do
       before { allow(Rails.env).to receive(:production?).and_return(false) }
 
       it "does not notify errors" do
-        get :index rescue nil
+        begin
+          get :index
+        rescue
+          nil
+        end
         expect(NtfyService).not_to have_received(:notify)
       end
     end
@@ -513,7 +537,7 @@ RSpec.describe ApplicationController, type: :controller do
 
     describe "#debug_sql_queries" do
       it "returns debug queries when set" do
-        queries = [{ sql: "SELECT * FROM users" }]
+        queries = [{sql: "SELECT * FROM users"}]
         controller.instance_variable_set(:@debug_sql_queries, queries)
         expect(controller.send(:debug_sql_queries)).to eq(queries)
       end
