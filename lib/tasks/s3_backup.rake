@@ -27,7 +27,7 @@ namespace :s3 do
         })
         raise error_msg
       end
-
+      
       path = db_config["database"]
       # Handle relative paths
       path = Rails.root.join(path) unless path.start_with?("/")
@@ -289,12 +289,12 @@ namespace :s3 do
         })
         raise error_msg
       end
-
+      
       # Use system tar command for reliable compression
       dir_name = File.dirname(source_path)
       base_name = File.basename(source_path)
       tar_command = "tar -czf #{dest_path} -C #{dir_name} #{base_name}"
-
+      
       unless system(tar_command, exception: true)
         error_msg = "Failed to create tar archive"
         Sentry.capture_message(error_msg, level: "error", extra: {
