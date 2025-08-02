@@ -19,6 +19,17 @@ class FederationSearch {
       e.preventDefault();
       this.performSearch();
     });
+    
+    // Check URL params and auto-submit if id is present
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    if (id) {
+      const idField = this.form.querySelector('input[name="search[id]"]');
+      if (idField) {
+        idField.value = id;
+        this.performSearch();
+      }
+    }
   }
 
   performSearch() {
