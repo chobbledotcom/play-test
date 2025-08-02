@@ -76,7 +76,27 @@ namespace :s3 do
             exit 1
           end
 
-          system("sqlite3 #{database_path} \".backup '#{temp_backup_path}'\"", exception: true)
+          # Check if sqlite3 command is available
+          unless system("which sqlite3 > /dev/null 2>&1")
+            error_msg = "sqlite3 command not found - required for database backup"
+            puts "\n❌ #{error_msg}"
+            Sentry.capture_message(error_msg, level: "error", extra: {
+              environment: Rails.env,
+              path: ENV["PATH"]
+            })
+            exit 1
+          end
+
+          backup_command = "sqlite3 #{database_path} \".backup '#{temp_backup_path}'\""
+          unless system(backup_command, exception: true)
+            error_msg = "Failed to create SQLite backup"
+            Sentry.capture_message(error_msg, level: "error", extra: {
+              command: backup_command,
+              database_path: database_path.to_s,
+              temp_backup_path: temp_backup_path.to_s
+            })
+            raise error_msg
+          end
           puts "✅"
 
           # Compress the backup
@@ -260,8 +280,30 @@ namespace :s3 do
     private
 
     def create_tar_gz(source_path, dest_path)
+      # Check if tar command is available
+      unless system("which tar > /dev/null 2>&1")
+        error_msg = "tar command not found - required for backup compression"
+        Sentry.capture_message(error_msg, level: "error", extra: {
+          environment: Rails.env,
+          path: ENV["PATH"]
+        })
+        raise error_msg
+      end
+      
       # Use system tar command for reliable compression
-      system("tar -czf #{dest_path} -C #{File.dirname(source_path)} #{File.basename(source_path)}", exception: true)
+      dir_name = File.dirname(source_path)
+      base_name = File.basename(source_path)
+      tar_command = "tar -czf #{dest_path} -C #{dir_name} #{base_name}"
+      
+      unless system(tar_command, exception: true)
+        error_msg = "Failed to create tar archive"
+        Sentry.capture_message(error_msg, level: "error", extra: {
+          command: tar_command,
+          source_path: source_path,
+          dest_path: dest_path
+        })
+        raise error_msg
+      end
     end
 
     def cleanup_old_backups(service)
