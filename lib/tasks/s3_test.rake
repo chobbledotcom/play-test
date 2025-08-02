@@ -13,6 +13,24 @@ namespace :s3 do
     exit 1
   end
 
+  def validate_s3_config
+    required_vars = %w[S3_ENDPOINT S3_ACCESS_KEY_ID S3_SECRET_ACCESS_KEY S3_BUCKET]
+    missing_vars = required_vars.select { |var| ENV[var].blank? }
+
+    if missing_vars.any?
+      error_msg = "Missing required S3 environment variables: #{missing_vars.join(", ")}"
+      puts "❌ #{error_msg}"
+
+      Sentry.capture_message(error_msg, level: "error", extra: {
+        missing_vars: missing_vars,
+        task: "s3:backup",
+        environment: Rails.env
+      })
+
+      exit 1
+    end
+  end
+
   def get_s3_service
     service = ActiveStorage::Blob.service
 
@@ -28,9 +46,11 @@ namespace :s3 do
     yield
   rescue Aws::S3::Errors::ServiceError => e
     puts "\n❌ S3 Error: #{e.message}"
+    Sentry.capture_exception(e)
     exit 1
   rescue => e
     puts "\n❌ Error: #{e.class.name} - #{e.message}"
+    Sentry.capture_exception(e)
     exit 1
   end
 
