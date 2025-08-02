@@ -10,6 +10,7 @@ pin "share_buttons"
 pin "safety_standards_tabs"
 pin "guides_slider"
 pin "search"
+pin "image_resize"
 
 # external libs
 pin "highlight.js", to: "highlight.js"

@@ -8,6 +8,7 @@ import "share_buttons";
 import "safety_standards_tabs";
 import "guides_slider";
 import "search";
+import "image_resize";
 
 // external libs
 import "highlight.js"
