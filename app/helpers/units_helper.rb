@@ -7,6 +7,12 @@ module UnitsHelper
     user.units.distinct.pluck(:operator).compact.compact_blank.sort
   end
 
+  def unit_search_placeholder
+    serial_label = FieldUtils.form_field_label("units", "serial")
+    name_label = FieldUtils.form_field_label("units", "name")
+    "#{serial_label} or #{name_label.downcase}"
+  end
+
   def unit_actions(unit)
     actions = [
       {

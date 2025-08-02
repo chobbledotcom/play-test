@@ -8,19 +8,19 @@
     %>
   <% end %>
 
-  <p><strong><%= t('inspections.fields.name') %>:</strong> <%= link_to unit.name, edit_unit_path(unit) %></p>
-  <p><strong><%= t('inspections.fields.serial') %>:</strong> <%= unit.serial %></p>
-  <p><strong><%= t('inspections.fields.manufacturer') %>:</strong> <%= unit.manufacturer %></p>
+  <p><strong><%= FieldUtils.form_field_label('units', 'name') %>:</strong> <%= link_to unit.name, edit_unit_path(unit) %></p>
+  <p><strong><%= FieldUtils.form_field_label('units', 'serial') %>:</strong> <%= unit.serial %></p>
+  <p><strong><%= FieldUtils.form_field_label('units', 'manufacturer') %>:</strong> <%= unit.manufacturer %></p>
 
   <% if unit.operator.present? %>
-    <p><strong><%= t('inspections.fields.operator') %>:</strong> <%= unit.operator %></p>
+    <p><strong><%= FieldUtils.form_field_label('units', 'operator') %>:</strong> <%= unit.operator %></p>
   <% end %>
 
   <% if unit.description.present? %>
-    <p><strong><%= t('inspections.fields.description') %>:</strong> <%= unit.description %></p>
+    <p><strong><%= FieldUtils.form_field_label('units', 'description') %>:</strong> <%= unit.description %></p>
   <% end %>
 
   <% if current_user.admin? || Rails.env.test? %>
-    <p><strong><%= t('inspections.fields.unit_type') %>:</strong> <%= t("units.unit_types.#{unit.unit_type}") %></p>
+    <p><strong><%= FieldUtils.form_field_label('units', 'unit_type') %>:</strong> <%= t("units.unit_types.#{unit.unit_type}") %></p>
   <% end %>
 </div>
