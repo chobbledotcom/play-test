@@ -3,7 +3,9 @@
 require "rails_helper"
 require "rubocop"
 require "rubocop/rspec/support"
-require_relative "../../../../../lib/rubocop/cop/custom/ternary_line_breaks"
+
+# Load the custom cop using Rails.root
+require Rails.root.join("lib/rubocop/cop/custom/ternary_line_breaks")
 
 RSpec.describe RuboCop::Cop::Custom::TernaryLineBreaks, type: :rubocop do
   include RuboCop::RSpec::ExpectOffense
