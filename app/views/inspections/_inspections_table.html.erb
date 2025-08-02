@@ -19,7 +19,7 @@
     <% if show_serial %>
       <span class="col-serial"><%= FieldUtils.form_field_label('units', 'serial') %></span>
     <% end %>
-    <span class="col-last-inspection"><%= FieldUtils.form_field_label('inspection', 'inspection_date') %></span>
+    <span class="col-last-inspection"><%= t('inspections.fields.last_inspection') %></span>
     <% if show_inspector %>
       <span class="col-inspector"><%= FieldUtils.form_field_label('inspection', 'inspector') %></span>
     <% end %>
@@ -68,7 +68,7 @@
               <%= inspection.unit&.serial.presence || t('inspections.messages.missing_serial') %>
             </span>
           <% end %>
-          <span class="col-last-inspection" data-label="<%= FieldUtils.form_field_label('inspection', 'inspection_date') %>"><%= render_time(inspection.inspection_date) %></span>
+          <span class="col-last-inspection" data-label="<%= t('inspections.fields.last_inspection') %>"><%= render_time(inspection.inspection_date) %></span>
           <% if show_inspector %>
             <span class="col-inspector" data-label="<%= FieldUtils.form_field_label('inspection', 'inspector') %>"><%= inspection.inspector_company&.name %></span>
           <% end %>

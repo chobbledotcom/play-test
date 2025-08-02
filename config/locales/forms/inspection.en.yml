@@ -15,7 +15,7 @@ en:
         reinspection_date: "Reinspection Date"
         unique_report_number: "Internal ID"
         name: "Unit Name"
-        inspector: "Inspector"
+        inspector: "Inspector Name"
         result: "Result"
         width: "Width (m)"
         length: "Length (m)"
