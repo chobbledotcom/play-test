@@ -32,6 +32,13 @@ namespace :s3 do
       validate_s3_config
 
       handle_s3_errors do
+        Sentry.with_scope do |scope|
+          scope.set_context("backup", {
+            task: "s3:backup:database",
+            rails_env: Rails.env,
+            timestamp: Time.current.iso8601
+          })
+        end
 
         service = get_s3_service
 
