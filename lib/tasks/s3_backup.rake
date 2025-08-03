@@ -29,15 +29,21 @@ namespace :s3 do
       end
 
       path = db_config["database"]
-      # Handle relative paths
-      path = Rails.root.join(path) unless path.start_with?("/")
-      path
+      # Handle relative paths - ensure we use Pathname for proper joining
+      if path.start_with?("/")
+        Pathname.new(path)
+      else
+        Rails.root.join(path)
+      end
     end
 
     def backup_retention_days = 60
 
     desc "Backup SQLite database to S3"
     task database: :environment do
+      # Ensure Rails is fully loaded
+      Rails.application.eager_load!
+      
       ensure_s3_enabled
       validate_s3_config
 
@@ -47,7 +53,9 @@ namespace :s3 do
           scope.set_context("backup", {
             task: "s3:backup:database",
             rails_env: Rails.env,
-            timestamp: Time.current.iso8601
+            timestamp: Time.current.iso8601,
+            working_dir: Dir.pwd,
+            rails_root: Rails.root.to_s
           })
         end
 
@@ -69,11 +77,44 @@ namespace :s3 do
           print "Creating database backup... "
 
           # Check if database path exists and is valid
-          unless database_path && File.exist?(database_path)
-            error_msg = "Database file not found at: #{database_path}"
-            puts "\n❌ #{error_msg}"
-            Sentry.capture_message(error_msg, level: "error")
-            exit 1
+          db_path = database_path.to_s
+          
+          # Log database path information for debugging
+          puts "Database path: #{db_path}" if ENV["DEBUG_CRON"]
+          
+          unless db_path.present? && File.exist?(db_path)
+            # Try alternative common production paths
+            alternative_paths = [
+              "/rails/storage/production.sqlite3",
+              Rails.root.join("db/production.sqlite3").to_s,
+              ENV["DATABASE_PATH"]
+            ].compact.uniq
+            
+            found_path = alternative_paths.find { |path| path && File.exist?(path) }
+            
+            if found_path
+              puts "Warning: Database not found at configured path, using: #{found_path}"
+              db_path = found_path
+            else
+              error_msg = "Database file not found at: #{db_path}"
+              puts "\n❌ #{error_msg}"
+              puts "Searched paths: #{([db_path] + alternative_paths).join(', ')}"
+              
+              # Add detailed debugging information for cron issues
+              Sentry.capture_message(error_msg, level: "error", extra: {
+                database_path: db_path,
+                rails_root: Rails.root.to_s,
+                rails_env: Rails.env,
+                working_dir: Dir.pwd,
+                path_exists: File.exist?(db_path).to_s,
+                db_config: Rails.configuration.database_configuration[Rails.env],
+                alternative_paths: alternative_paths,
+                storage_contents: Dir.exist?(Rails.root.join("storage")) ? 
+                  Dir.entries(Rails.root.join("storage")).reject { |f| f.start_with?(".") } : 
+                  "storage dir not found"
+              })
+              exit 1
+            end
           end
 
           # Check if sqlite3 command is available
@@ -87,12 +128,12 @@ namespace :s3 do
             exit 1
           end
 
-          backup_command = "sqlite3 #{database_path} \".backup '#{temp_backup_path}'\""
+          backup_command = "sqlite3 #{db_path} \".backup '#{temp_backup_path}'\""
           unless system(backup_command, exception: true)
             error_msg = "Failed to create SQLite backup"
             Sentry.capture_message(error_msg, level: "error", extra: {
               command: backup_command,
-              database_path: database_path.to_s,
+              database_path: db_path,
               temp_backup_path: temp_backup_path.to_s
             })
             raise error_msg
