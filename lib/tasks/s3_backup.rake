@@ -58,9 +58,8 @@ namespace :s3 do
           print "Creating database backup... "
 
           # Check if database path exists and is valid
-          db_path = database_path
-          unless File.exist?(db_path)
-            error_msg = "Database file not found at: #{db_path}"
+          unless File.exist?(database_path)
+            error_msg = "Database file not found at: #{database_path}"
             puts "\n❌ #{error_msg}"
             Sentry.capture_message(error_msg, level: "error")
             exit 1
@@ -77,12 +76,12 @@ namespace :s3 do
             exit 1
           end
 
-          backup_command = "sqlite3 #{db_path} \".backup '#{temp_backup_path}'\""
+          backup_command = "sqlite3 #{database_path} \".backup '#{temp_backup_path}'\""
           unless system(backup_command, exception: true)
             error_msg = "Failed to create SQLite backup"
             Sentry.capture_message(error_msg, level: "error", extra: {
               command: backup_command,
-              database_path: db_path,
+              database_path: database_path,
               temp_backup_path: temp_backup_path.to_s
             })
             raise error_msg
@@ -112,7 +111,7 @@ namespace :s3 do
         rescue => e
           # Report any unexpected errors to Sentry with full context
           Sentry.capture_exception(e, extra: {
-            database_path: db_path,
+            database_path: database_path,
             backup_filename: backup_filename,
             s3_key: s3_key,
             step: "backup_process"
