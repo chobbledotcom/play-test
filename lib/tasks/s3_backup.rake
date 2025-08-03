@@ -19,6 +19,15 @@ namespace :s3 do
 
     def database_path
       db_config = Rails.configuration.database_configuration[Rails.env]
+      unless db_config && db_config["database"]
+        error_msg = "Database configuration missing for #{Rails.env} environment"
+        Sentry.capture_message(error_msg, level: "error", extra: {
+          rails_env: Rails.env,
+          db_config: db_config
+        })
+        raise error_msg
+      end
+
       path = db_config["database"]
       # Handle relative paths
       path.start_with?("/") ? path : Rails.root.join(path).to_s
