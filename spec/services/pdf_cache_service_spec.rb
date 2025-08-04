@@ -1,7 +1,8 @@
 require "rails_helper"
 
 RSpec.describe PdfCacheService, type: :service do
-  let(:inspection) { create(:inspection) }
+  let(:inspection) { create(:inspection, :completed) }
+  let(:incomplete_inspection) { create(:inspection) }
   let(:unit) { create(:unit) }
 
   describe ".fetch_or_generate_inspection_pdf" do
@@ -27,6 +28,21 @@ RSpec.describe PdfCacheService, type: :service do
     context "when caching is enabled" do
       before do
         allow(described_class).to receive(:pdf_cache_from_date).and_return(Date.parse("2024-01-01"))
+      end
+
+      context "with incomplete inspection" do
+        it "generates PDF without caching" do
+          expect(PdfGeneratorService).to receive(:generate_inspection_report)
+            .with(incomplete_inspection)
+            .and_return(double(render: "pdf_data"))
+
+          expect(described_class).not_to receive(:store_cached_pdf)
+
+          result = described_class.fetch_or_generate_inspection_pdf(incomplete_inspection)
+          expect(result).to be_a(PdfCacheService::CacheResult)
+          expect(result.type).to eq(:pdf_data)
+          expect(result.data).to eq("pdf_data")
+        end
       end
 
       context "with no cached PDF" do
@@ -101,18 +117,10 @@ RSpec.describe PdfCacheService, type: :service do
         allow(ENV).to receive(:[]).with("PDF_CACHE_FROM").and_return("invalid-date")
       end
 
-      it "logs an error and generates PDF without caching" do
-        expect(Rails.logger).to receive(:error).with(/Invalid PDF_CACHE_FROM date format/)
-        expect(PdfGeneratorService).to receive(:generate_inspection_report)
-          .with(inspection)
-          .and_return(double(render: "pdf_data"))
-
-        expect(described_class).not_to receive(:store_cached_pdf)
-
-        result = described_class.fetch_or_generate_inspection_pdf(inspection)
-        expect(result).to be_a(PdfCacheService::CacheResult)
-        expect(result.type).to eq(:pdf_data)
-        expect(result.data).to eq("pdf_data")
+      it "raises an error with helpful message" do
+        expect {
+          described_class.fetch_or_generate_inspection_pdf(inspection)
+        }.to raise_error(ArgumentError, /Invalid PDF_CACHE_FROM date format: invalid-date. Expected format: YYYY-MM-DD/)
       end
     end
 

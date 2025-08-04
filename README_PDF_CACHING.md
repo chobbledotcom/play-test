@@ -5,11 +5,12 @@ This application now supports caching generated PDFs in S3/object storage to imp
 ## How it works
 
 1. When `PDF_CACHE_FROM` environment variable is set, the system will cache generated PDFs
-2. The cached PDF is stored as an Active Storage attachment on the inspection/unit record
-3. On subsequent requests, if the cached PDF is newer than the `PDF_CACHE_FROM` date, the system:
+2. Only **completed inspections** are cached - in-progress inspections are always generated fresh
+3. The cached PDF is stored as an Active Storage attachment on the inspection/unit record
+4. On subsequent requests, if the cached PDF is newer than the `PDF_CACHE_FROM` date, the system:
    - Returns an HTTP 302 redirect to a signed Active Storage URL (valid for 1 hour)
    - This allows CDN caching and direct serving from S3/storage
-4. Cache is automatically invalidated when the record is updated
+5. Cache is automatically invalidated when the record is updated
 
 ## Configuration
 
@@ -22,6 +23,8 @@ export PDF_CACHE_FROM="2024-01-01"
 # Disable PDF caching (default)
 export PDF_CACHE_FROM=""
 ```
+
+**Note**: The date must be in `YYYY-MM-DD` format. Invalid formats will raise an `ArgumentError` to ensure configuration issues are caught early.
 
 ## Usage
 

@@ -5,7 +5,8 @@ class PdfCacheService
 
   class << self
     def fetch_or_generate_inspection_pdf(inspection, **options)
-      unless caching_enabled?
+      # Never cache incomplete inspections
+      unless caching_enabled? && inspection.complete?
         pdf_data = generate_inspection_pdf(inspection, **options)
         return CacheResult.new(type: :pdf_data, data: pdf_data)
       end
@@ -71,8 +72,7 @@ class PdfCacheService
 
         Date.parse(date_string)
       rescue ArgumentError
-        Rails.logger.error "Invalid PDF_CACHE_FROM date format: #{date_string}"
-        nil
+        raise ArgumentError, "Invalid PDF_CACHE_FROM date format: #{date_string}. Expected format: YYYY-MM-DD"
       end
     end
 
