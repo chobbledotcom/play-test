@@ -24,6 +24,40 @@ RSpec.describe PdfGeneratorService, pdf: true do
         "pdf.inspection.assessments_section")
     end
 
+    it "does not exceed 3 pages for inspection PDFs" do
+      # Create an inspection with lots of assessment data
+      inspection = create(:inspection, :completed, user: user)
+
+      # Add lots of data to assessments to test overflow
+      # Access each assessment type directly
+      [
+        inspection.user_height_assessment,
+        inspection.slide_assessment,
+        inspection.structure_assessment,
+        inspection.anchorage_assessment,
+        inspection.materials_assessment,
+        inspection.enclosed_assessment,
+        inspection.fan_assessment
+      ].compact.each do |assessment|
+        # Fill all comment fields with long content
+        assessment.attributes.each do |key, value|
+          if key.end_with?("_comment") && assessment.respond_to?("#{key}=")
+            assessment.send("#{key}=", "This is a very long comment that will take up space in the PDF rendering. " * 3)
+          end
+        end
+        assessment.save!
+      end
+
+      # Generate the PDF
+      pdf = PdfGeneratorService.generate_inspection_report(inspection)
+      pdf_content = pdf.render
+
+      # Parse the PDF to count pages
+      analyzed_pdf = PDF::Inspector::Page.analyze(pdf_content)
+
+      expect(analyzed_pdf.pages.size).to be <= 3
+    end
+
     it "handles different inspection statuses with I18n" do
       inspection.update(passed: true)
       pdf = PdfGeneratorService.generate_inspection_report(inspection)
