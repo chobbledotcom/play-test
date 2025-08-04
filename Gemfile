@@ -48,6 +48,11 @@ group :development, :test do
 
   # ERB linter
   gem "erb_lint", require: false
+  
+  # Sorbet type checker
+  gem "sorbet", require: false
+  gem "sorbet-runtime"
+  gem "tapioca", require: false
 end
 
 # PDF generation
