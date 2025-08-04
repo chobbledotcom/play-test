@@ -3,7 +3,8 @@ require "rails_helper"
 RSpec.describe InspectionsHelper, type: :helper do
   describe "#format_inspection_count" do
     it "formats the inspection count" do
-      user = double("User", inspections: double("Inspections", count: 5))
+      user = create(:user)
+      5.times { create(:inspection, user: user) }
       expect(helper.format_inspection_count(user)).to eq("5 inspections")
     end
   end
