@@ -41,6 +41,10 @@ group :development, :test do
   # Ruby code formatter and linter
   gem "standard", require: false
   gem "standard-rails"
+
+  # N+1 query detection
+  gem "prosopite"
+  gem "pg_query" # Required by prosopite for SQL fingerprinting
 end
 
 # PDF generation
