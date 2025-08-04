@@ -25,7 +25,7 @@
           <td><%= backup[:size_mb] %> MB</td>
           <td><%= backup[:last_modified].strftime("%Y-%m-%d %H:%M") %></td>
           <td>
-            <%= link_to t("backups.download"), download_backups_path(key: backup[:key]), 
+            <%= link_to t("backups.download"), download_backups_path(date: backup[:date]), 
                 data: { turbo: false } %>
           </td>
         </tr>

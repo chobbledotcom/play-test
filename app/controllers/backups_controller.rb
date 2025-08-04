@@ -9,13 +9,17 @@ class BackupsController < ApplicationController
   end
 
   def download
-    backup_key = params[:key]
-
-    # Validate backup key format and prevent directory traversal
-    unless valid_backup_key?(backup_key)
-      flash[:error] = t("backups.errors.invalid_backup")
+    # Parse and validate date parameter
+    begin
+      backup_date = Date.parse(params[:date])
+    rescue ArgumentError, TypeError
+      flash[:error] = t("backups.errors.invalid_date")
       redirect_to backups_path and return
     end
+
+    # Construct the backup key from the date
+    backup_filename = "database-#{backup_date.strftime("%Y-%m-%d")}.tar.gz"
+    backup_key = "db_backups/#{backup_filename}"
 
     # Verify the backup actually exists
     unless backup_exists?(backup_key)
@@ -27,7 +31,7 @@ class BackupsController < ApplicationController
     presigned_url = service.url(
       backup_key,
       expires_in: 300, # 5 minutes
-      response_content_disposition: "attachment; filename=\"#{File.basename(backup_key)}\""
+      response_content_disposition: "attachment; filename=\"#{backup_filename}\""
     )
 
     redirect_to presigned_url, allow_other_host: true
@@ -67,11 +71,14 @@ class BackupsController < ApplicationController
 
     backups = []
     bucket.objects(prefix: "db_backups/").each do |object|
-      next unless object.key.match?(/database-\d{4}-\d{2}-\d{2}\.tar\.gz$/)
+      match = object.key.match(/database-(\d{4}-\d{2}-\d{2})\.tar\.gz$/)
+      next unless match
 
+      backup_date = match[1]
       backups << {
         key: object.key,
         filename: File.basename(object.key),
+        date: backup_date,
         size: object.size,
         last_modified: object.last_modified,
         size_mb: (object.size / 1024.0 / 1024.0).round(2)
@@ -83,20 +90,6 @@ class BackupsController < ApplicationController
     Rails.logger.error "Failed to fetch backups: #{e.message}"
     flash.now[:error] = t("backups.errors.fetch_failed")
     []
-  end
-
-  def valid_backup_key?(key)
-    return false unless key.is_a?(String) && key.present?
-
-    # Must start with db_backups/
-    return false unless key.start_with?("db_backups/")
-
-    # Prevent directory traversal
-    return false if key.include?("..") || key.include?("//")
-
-    # Must match expected backup filename pattern
-    filename = File.basename(key)
-    filename.match?(/\Adatabase-\d{4}-\d{2}-\d{2}\.tar\.gz\z/)
   end
 
   def backup_exists?(key)

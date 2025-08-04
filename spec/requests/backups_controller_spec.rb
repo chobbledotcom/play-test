@@ -13,31 +13,26 @@ RSpec.describe "Backups", type: :request do
     context "when logged in as admin" do
       before { login_as(admin_user) }
 
-      it "rejects invalid backup keys with directory traversal" do
-        get download_backups_path, params: {key: "db_backups/../../../etc/passwd"}
+      it "rejects invalid date format" do
+        get download_backups_path, params: {date: "not-a-date"}
         expect(response).to redirect_to(backups_path)
-        expect(flash[:error]).to eq(I18n.t("backups.errors.invalid_backup"))
+        expect(flash[:error]).to eq(I18n.t("backups.errors.invalid_date"))
       end
 
-      it "rejects backup keys without db_backups prefix" do
-        get download_backups_path, params: {key: "some/other/path.tar.gz"}
+      it "rejects empty date parameter" do
+        get download_backups_path, params: {date: ""}
         expect(response).to redirect_to(backups_path)
-        expect(flash[:error]).to eq(I18n.t("backups.errors.invalid_backup"))
+        expect(flash[:error]).to eq(I18n.t("backups.errors.invalid_date"))
       end
 
-      it "rejects backup keys with invalid filename format" do
-        get download_backups_path, params: {key: "db_backups/malicious-file.sh"}
+      it "rejects nil date parameter" do
+        get download_backups_path, params: {}
         expect(response).to redirect_to(backups_path)
-        expect(flash[:error]).to eq(I18n.t("backups.errors.invalid_backup"))
+        expect(flash[:error]).to eq(I18n.t("backups.errors.invalid_date"))
       end
 
-      it "rejects double slashes in path" do
-        get download_backups_path, params: {key: "db_backups//database-2024-01-15.tar.gz"}
-        expect(response).to redirect_to(backups_path)
-        expect(flash[:error]).to eq(I18n.t("backups.errors.invalid_backup"))
-      end
-
-      context "with valid backup key" do
+      context "with valid date" do
+        let(:valid_date) { "2024-01-15" }
         let(:valid_key) { "db_backups/database-2024-01-15.tar.gz" }
 
         before do
@@ -62,7 +57,7 @@ RSpec.describe "Backups", type: :request do
         end
 
         it "redirects to presigned S3 URL for valid backup" do
-          get download_backups_path, params: {key: valid_key}
+          get download_backups_path, params: {date: valid_date}
           expect(response).to redirect_to("https://s3.example.com/signed-url")
         end
       end
@@ -77,7 +72,7 @@ RSpec.describe "Backups", type: :request do
         allow(s3_service).to receive(:send).with(:bucket).and_return(bucket)
         allow(bucket).to receive(:objects).with(prefix: "db_backups/").and_return([])
 
-        get download_backups_path, params: {key: "db_backups/database-2099-12-31.tar.gz"}
+        get download_backups_path, params: {date: "2099-12-31"}
         expect(response).to redirect_to(backups_path)
         expect(flash[:error]).to eq(I18n.t("backups.errors.backup_not_found"))
       end
@@ -87,7 +82,7 @@ RSpec.describe "Backups", type: :request do
       before { login_as(regular_user) }
 
       it "redirects to root with unauthorized message" do
-        get download_backups_path, params: {key: "db_backups/database-2024-01-15.tar.gz"}
+        get download_backups_path, params: {date: "2024-01-15"}
         expect(response).to redirect_to(root_path)
         expect(flash[:error]).to eq(I18n.t("errors.unauthorized"))
       end
@@ -95,7 +90,7 @@ RSpec.describe "Backups", type: :request do
 
     context "when not logged in" do
       it "redirects to login page" do
-        get download_backups_path, params: {key: "db_backups/database-2024-01-15.tar.gz"}
+        get download_backups_path, params: {date: "2024-01-15"}
         expect(response).to redirect_to(login_path)
       end
     end
