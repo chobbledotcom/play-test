@@ -1,5 +1,9 @@
+# typed: true
+# frozen_string_literal: true
+
 module ImageProcessable
   extend ActiveSupport::Concern
+  extend T::Sig
 
   included do
     rescue_from ApplicationErrors::NotAnImageError do |exception|
@@ -13,6 +17,7 @@ module ImageProcessable
 
   private
 
+  sig { params(params_hash: T::Hash[T.untyped, T.untyped], image_fields: T.untyped).returns(T::Hash[T.untyped, T.untyped]) }
   def process_image_params(params_hash, *image_fields)
     image_fields.each do |field|
       next if params_hash[field].blank?
@@ -32,6 +37,7 @@ module ImageProcessable
     params_hash
   end
 
+  sig { params(uploaded_file: T.untyped).returns(T.untyped) }
   def process_image(uploaded_file)
     validate_image!(uploaded_file)
 
@@ -45,11 +51,13 @@ module ImageProcessable
     raise ApplicationErrors::ImageProcessingError, error_message
   end
 
+  sig { params(uploaded_file: T.untyped).void }
   def validate_image!(uploaded_file)
     return if PhotoProcessingService.valid_image?(uploaded_file)
     raise ApplicationErrors::NotAnImageError
   end
 
+  sig { params(exception: StandardError).void }
   def handle_image_error(exception)
     respond_to do |format|
       format.html do
