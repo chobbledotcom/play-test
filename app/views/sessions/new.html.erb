@@ -1,7 +1,7 @@
-<%= render 'chobble_forms/form_context', 
-  model: nil, 
-  i18n_base: 'forms.session_new', 
-  url: login_path, 
+<%= render 'chobble_forms/form_context',
+  model: nil,
+  i18n_base: 'forms.session_new',
+  url: login_path,
   scope: :session,
   secondary_link_url: register_path,
   secondary_link_text: t('forms.session_new.messages.register_link') do |form| %>
@@ -9,17 +9,14 @@
     <%= render 'chobble_forms/text_field',
       field: :email,
       type: :email_field,
-      required: true
-    %>
+      required: true %>
 
     <%= render 'chobble_forms/text_field',
       field: :password,
       type: :password_field,
-      required: true
-    %>
+      required: true %>
 
     <%= render 'chobble_forms/checkbox',
-      field: :remember_me
-    %>
+      field: :remember_me %>
   <% end %>
 <% end %>

@@ -16,7 +16,7 @@ RSpec.describe "Prosopite N+1 detection" do
     allow(Rails.env).to receive(:development?).and_return(true)
     allow(Rails.env).to receive(:test?).and_return(false)
     allow(Rails.env).to receive(:production?).and_return(false)
-    
+
     # This would require reloading the controller, so we just verify the condition
     expect(Rails.env.production? || Rails.env.test?).to be false
   end

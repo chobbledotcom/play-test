@@ -7,13 +7,13 @@
     <% user_height = @assessment.tallest_user_height %>
     <% slide_assessment = @assessment.inspection.slide_assessment %>
     <% has_permanent_roof = slide_assessment&.slide_permanent_roof %>
-    
+
     <% wall_details = EN14960::Calculators::SlideCalculator.get_wall_height_requirement_details(
          platform_height / 1000.0, # Convert mm to m
-         user_height, 
+         user_height,
          has_permanent_roof
        ) %>
-    
+
     <%= render 'assessments/safety_standard_with_breakdown',
         title: t('safety_standards.user_height.height_requirements'),
         calculator_result: wall_details,

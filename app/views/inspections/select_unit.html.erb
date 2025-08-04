@@ -17,10 +17,10 @@
 
 <section>
   <%= form_with url: select_unit_inspection_path(@inspection), method: :get, data: { turbo: false } do |form| %>
-    <%= form.select :manufacturer, 
+    <%= form.select :manufacturer,
         options_for_select([["All Manufacturers", ""]] + manufacturer_options(current_user).map { |m| [m, m] }, params[:manufacturer]),
         {}, { onchange: "this.form.submit();" } %>
-    
+
     <% if params[:manufacturer].present? %>
       <%= link_to t("ui.buttons.clear_filters"), select_unit_inspection_path(@inspection) %>
     <% end %>

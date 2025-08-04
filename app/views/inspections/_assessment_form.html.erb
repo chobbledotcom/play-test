@@ -1,10 +1,10 @@
 <%
   # Assessment type passed in as local variable
   assessment = @inspection.send("#{assessment_type}_assessment")
-  
+
   # Determine which assessments have safety standards displays
   has_safety_standards = %w[anchorage slide user_height].include?(assessment_type)
-  
+
   # Reference partials for safety standards (only some assessments have them)
   reference_partials = case assessment_type
   when 'slide' then ['shared/safety_standards/slide_safety_requirements']
@@ -16,11 +16,10 @@
 <%= render 'chobble_forms/form_context',
   model: assessment,
   i18n_base: "forms.#{assessment_type}",
-  url: send("inspection_#{assessment_type}_assessment_path", @inspection) do |form|
-%>
+  url: send("inspection_#{assessment_type}_assessment_path", @inspection) do |form| %>
   <%= hidden_field_tag :tab, assessment_type %>
   <%= render 'chobble_forms/fields', model: assessment %>
-  
+
   <% if has_safety_standards %>
     <%= render 'shared/safety_standards_display',
         reference_partials: reference_partials,

@@ -4,8 +4,7 @@
     <%= render 'shared/image',
       image: unit.photo,
       size: :default,
-      alt: "Photo of #{unit.name}"
-    %>
+      alt: "Photo of #{unit.name}" %>
   <% end %>
 
   <p><strong><%= FieldUtils.form_field_label('units', 'name') %>:</strong> <%= link_to unit.name, edit_unit_path(unit) %></p>

@@ -2,7 +2,7 @@
   <ul>
     <% actions.each do |action| %>
       <li>
-        <%= link_to action[:path], 
+        <%= link_to action[:path],
                     class: action[:danger] ? 'danger' : nil,
                     data: action[:data],
                     target: action[:target] do %>

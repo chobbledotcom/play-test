@@ -2,13 +2,13 @@
   # Shared image link partial for linking to full-size images
   # Required locals: image (ActiveStorage attachment)
   # Optional locals: alt (alt text), link_text (text to show for link)
-  
+
   image_attachment = local_assigns[:image]
   alt_text = local_assigns[:alt] || ""
   link_text = local_assigns[:link_text] || t('shared.view_full_size')
-  
+
   return unless image_attachment&.attached?
-  
+
   # Don't try to display images that aren't persisted yet (validation failures)
   return unless image_attachment.blob.persisted?
 %>

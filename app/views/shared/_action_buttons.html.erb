@@ -4,14 +4,14 @@
       <li>
         <% if action[:button] || action[:method].in?([:post, :patch, :put, :delete]) %>
           <%= button_to action[:label],
-                        action[:url], 
+                        action[:url],
                         method: action[:method] || :post,
                         params: action[:params] || {},
                         class: action[:danger] ? 'danger' : nil,
                         data: { turbo_confirm: action[:confirm] } %>
         <% else %>
           <%= link_to action[:label],
-                      action[:url], 
+                      action[:url],
                       class: action[:danger] ? 'danger' : nil,
                       target: action[:target],
                       data: action[:data] %>

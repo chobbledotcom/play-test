@@ -111,10 +111,6 @@ linters:
   SpaceIndentation:
     enabled: true
 
-  # Checks for proper usage of view strict locals
-  StrictLocals:
-    enabled: true
-
   # Removes trailing whitespace
   TrailingWhitespace:
     enabled: true

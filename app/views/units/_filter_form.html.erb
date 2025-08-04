@@ -1,21 +1,21 @@
 <%= form_with url: units_path, method: :get, data: { turbo: false }, id: "search-box" do |form| %>
-    <%= form.text_field :query, 
-        placeholder: unit_search_placeholder, 
+    <%= form.text_field :query,
+        placeholder: unit_search_placeholder,
         value: params[:query],
         onkeyup: "if(event.key === 'Enter') this.form.submit();" %>
-    
-    <%= form.select :status, 
+
+    <%= form.select :status,
         options_for_select([["All", ""], ["Overdue", "overdue"]], params[:status]),
         {}, { onchange: "this.form.submit();" } %>
-    
-    <%= form.select :manufacturer, 
+
+    <%= form.select :manufacturer,
         options_for_select([["All Manufacturers", ""]] + manufacturer_options(current_user).map { |m| [m, m] }, params[:manufacturer]),
         {}, { onchange: "this.form.submit();" } %>
-    
-    <%= form.select :operator, 
+
+    <%= form.select :operator,
         options_for_select([["All Operators", ""]] + operator_options(current_user).map { |o| [o, o] }, params[:operator]),
         {}, { onchange: "this.form.submit();" } %>
-    
+
     <% if params[:status].present? || params[:manufacturer].present? || params[:operator].present? || params[:query].present? %>
       <%= link_to t("ui.buttons.clear_filters"), units_path %>
     <% end %>

@@ -2,10 +2,9 @@
   <article class="view-inspection">
     <%= render 'shared/page_header', title: t('inspections.titles.show') %>
 
-    <%= render 'shared/pdf_embed', 
+    <%= render 'shared/pdf_embed',
       url: inspection_path(@inspection, format: :pdf),
-      title: "Inspection #{@inspection.id} Report"
-    %>
+      title: "Inspection #{@inspection.id} Report" %>
   </article>
 <% else %>
   <article class="view-inspection">
@@ -16,8 +15,7 @@
         <h4><%= t("inspections.labels.no_unit") %></h4>
         <p><%= t("inspections.messages.no_unit_description") %></p>
         <%= link_to t("inspections.buttons.create_unit"),
-          new_unit_from_inspection_path(@inspection)
-        %>
+          new_unit_from_inspection_path(@inspection) %>
       </aside>
     <% end %>
 
@@ -35,7 +33,7 @@
         <p><strong>Note:</strong> This is a draft report. It will be clearly marked as DRAFT in the PDF.</p>
       </div>
     <% end %>
-    <%= render 'shared/pdf_embed', 
+    <%= render 'shared/pdf_embed',
       url: inspection_path(@inspection, format: :pdf),
       title: "Inspection #{@inspection.id} Report" %>
   </article>

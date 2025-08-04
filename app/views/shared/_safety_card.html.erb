@@ -1,6 +1,6 @@
-<%# 
+<%#
   Safety Card Partial - Displays a safety requirements card with title and content
-  
+
   Parameters:
   - i18n_key: The i18n key suffix for the card (e.g., 'fan.general_requirements')
   - The full i18n path will be: safety_standards_tabs.#{i18n_key}
@@ -14,7 +14,7 @@
 <% full_key = "safety_standards_tabs.#{i18n_key}" %>
 <div class="safety-card">
   <h3><%= t("#{full_key}.title") %></h3>
-  
+
   <% if I18n.exists?("#{full_key}.items") %>
     <%# List format %>
     <ul>
