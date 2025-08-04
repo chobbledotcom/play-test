@@ -176,6 +176,27 @@ GEM
     ffi (1.17.2-x86_64-linux-musl)
     globalid (1.2.1)
       activesupport (>= 6.1)
+    google-protobuf (4.31.1)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.31.1-aarch64-linux-gnu)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.31.1-aarch64-linux-musl)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.31.1-arm64-darwin)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.31.1-x86_64-darwin)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.31.1-x86_64-linux-gnu)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.31.1-x86_64-linux-musl)
+      bigdecimal
+      rake (>= 13)
     hashery (2.1.2)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
@@ -251,6 +272,8 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
+    pg_query (5.1.0)
+      google-protobuf (>= 3.22.3)
     pp (0.6.2)
       prettyprint
     prawn (2.5.0)
@@ -474,6 +497,7 @@ DEPENDENCIES
   importmap-rails (~> 2.1)
   parallel_tests
   pdf-inspector
+  pg_query (~> 5.1)
   prawn
   prawn-table
   prosopite

@@ -44,6 +44,7 @@ group :development, :test do
 
   # N+1 query detection
   gem "prosopite"
+  gem "pg_query", "~> 5.1"
   
   # ERB linter
   gem "erb_lint", require: false
