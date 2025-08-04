@@ -1,12 +1,18 @@
+# typed: true
+# frozen_string_literal: true
+
 module SafetyStandardsTurboStreams
   extend ActiveSupport::Concern
+  extend T::Sig
 
   private
 
+  sig { returns(T::Array[T.untyped]) }
   def success_turbo_streams
     super + safety_standards_turbo_streams
   end
 
+  sig { returns(T::Array[T.untyped]) }
   def safety_standards_turbo_streams
     [turbo_stream.replace(
       safety_results_frame_id,
@@ -14,10 +20,12 @@ module SafetyStandardsTurboStreams
     )]
   end
 
+  sig { returns(String) }
   def safety_results_frame_id
     "#{assessment_type}_safety_results"
   end
 
+  sig { returns(String) }
   def safety_results_partial
     "assessments/#{assessment_type}_safety_results"
   end

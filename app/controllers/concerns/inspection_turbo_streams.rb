@@ -1,8 +1,13 @@
+# typed: true
+# frozen_string_literal: true
+
 module InspectionTurboStreams
   extend ActiveSupport::Concern
+  extend T::Sig
 
   private
 
+  sig { returns(T::Array[T.untyped]) }
   def success_turbo_streams
     [
       mark_complete_section_stream,
@@ -12,6 +17,7 @@ module InspectionTurboStreams
     ].compact
   end
 
+  sig { returns(T::Array[T.untyped]) }
   def error_turbo_streams
     [
       mark_complete_section_stream,
@@ -20,6 +26,7 @@ module InspectionTurboStreams
     ]
   end
 
+  sig { returns(T.untyped) }
   def mark_complete_section_stream
     turbo_stream.replace(
       "mark_complete_section_#{@inspection.id}",
@@ -28,6 +35,7 @@ module InspectionTurboStreams
     )
   end
 
+  sig { params(success: T::Boolean).returns(T.untyped) }
   def save_message_stream(success:)
     turbo_stream.replace(
       "inspection_save_message",
@@ -39,6 +47,7 @@ module InspectionTurboStreams
     )
   end
 
+  sig { params(success: T::Boolean).returns(T.untyped) }
   def assessment_save_message_stream(success:)
     turbo_stream.replace(
       "form_save_message",
@@ -47,6 +56,7 @@ module InspectionTurboStreams
     )
   end
 
+  sig { params(success: T::Boolean, dom_id: String).returns(T::Hash[Symbol, T.untyped]) }
   def save_message_locals(success:, dom_id:)
     if success
       current_tab_name = params[:tab].presence || "inspection"
@@ -73,6 +83,7 @@ module InspectionTurboStreams
     end
   end
 
+  sig { returns(T::Array[T.untyped]) }
   def photo_update_streams
     return [] unless params[:inspection]
 
