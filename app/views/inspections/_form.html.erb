@@ -1,7 +1,6 @@
 <%= render 'chobble_forms/form_context',
   model: @inspection,
-  i18n_base: 'forms.inspection' do |form|
-%>
+  i18n_base: 'forms.inspection' do |form| %>
   <%= render 'chobble_forms/fieldset', legend_key: 'current_unit' do %>
     <% if @inspection.unit.present? %>
       <%= render 'shared/unit_details_display', unit: @inspection.unit %>

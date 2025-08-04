@@ -1,9 +1,9 @@
 <div class="calculation-result notice">
-  
+
   <% if local_assigns[:result_label] %>
     <p><strong><%= result_label %>:</strong> <%= result.value %><%= result.value_suffix %></p>
   <% end %>
-  
+
   <ul>
     <% result.breakdown.each do |step| %>
       <li><strong><%= step[0] %>:</strong> <%= step[1] %></li>

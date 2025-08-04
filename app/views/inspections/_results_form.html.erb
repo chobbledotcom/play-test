@@ -1,12 +1,11 @@
 <%= render 'chobble_forms/form_context',
   model: @inspection,
-  i18n_base: 'forms.results' do |form|
-%>
+  i18n_base: 'forms.results' do |form| %>
   <%= hidden_field_tag :tab, 'results' %>
   <%= render 'chobble_forms/fieldset', legend_key: 'comments' do %>
     <% comments_found = false %>
     <% comment_items = [] %>
-    
+
     <% # Get all comment fields from the inspection itself %>
     <% @inspection.attributes.each do |field_name, value| %>
       <% if field_name.end_with?('_comment') && value.present? %>
@@ -21,7 +20,7 @@
     <% @inspection.applicable_assessments.each do |assessment_key, assessment_class| %>
       <% assessment = @inspection.send(assessment_key) %>
       <% next unless assessment %>
-      
+
       <% assessment.attributes.each do |field_name, value| %>
         <% if field_name.end_with?('_comment') && value.present? %>
           <% comments_found = true %>
@@ -32,7 +31,7 @@
         <% end %>
       <% end %>
     <% end %>
-    
+
     <% if comments_found %>
       <ul>
         <% comment_items.each do |item| %>
@@ -56,11 +55,11 @@
     <%= turbo_frame_tag "inspection_photo_1_field" do %>
       <%= render 'chobble_forms/file_field', field: :photo_1 %>
     <% end %>
-    
+
     <%= turbo_frame_tag "inspection_photo_2_field" do %>
       <%= render 'chobble_forms/file_field', field: :photo_2 %>
     <% end %>
-    
+
     <%= turbo_frame_tag "inspection_photo_3_field" do %>
       <%= render 'chobble_forms/file_field', field: :photo_3 %>
     <% end %>

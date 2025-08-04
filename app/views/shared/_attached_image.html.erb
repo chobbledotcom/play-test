@@ -2,10 +2,10 @@
   # Unified attached image partial for any ActiveStorage attachment
   # Required locals: attachment (ActiveStorage attachment)
   # Optional locals: size (symbol, defaults to :default)
-  
+
   attachment = local_assigns[:attachment]
   size = local_assigns[:size] || :default
-  
+
   return unless attachment&.attached? && attachment.blob.persisted?
 %>
 

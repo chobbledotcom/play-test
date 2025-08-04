@@ -11,7 +11,7 @@
 
   # Don't try to display images that aren't persisted yet (validation failures)
   return unless image_attachment.blob.persisted?
-  
+
   # Don't try to display images whose files don't exist on disk
   return unless image_attachment.blob.service.exist?(image_attachment.blob.key)
 
@@ -23,7 +23,7 @@
   else
     ImageProcessorService.default(image_attachment)
   end
-  
+
   # Get actual dimensions based on metadata
   # Ensure blob is analyzed before trying to get dimensions
   image_attachment.blob.analyze unless image_attachment.blob.analyzed?

@@ -1,17 +1,17 @@
 <%= form_with url: inspector_companies_path, method: :get, data: { turbo: false }, id: "search-box" do |form| %>
-    <%= form.text_field :search, 
-        placeholder: t('inspector_companies.search.placeholder'), 
+    <%= form.text_field :search,
+        placeholder: t('inspector_companies.search.placeholder'),
         value: params[:search],
         onkeyup: "if(event.key === 'Enter') this.form.submit();" %>
-    
-    <%= form.select :active, 
+
+    <%= form.select :active,
         options_for_select([
           [t('inspector_companies.filters.all_companies'), "all"],
           [t('inspector_companies.status.active'), "active"],
           [t('inspector_companies.status.archived'), "archived"]
         ], params[:active]),
         {}, { onchange: "this.form.submit();" } %>
-    
+
     <% if params[:active].present? && params[:active] != "all" || params[:search].present? %>
       <%= link_to t("ui.buttons.clear_filters"), inspector_companies_path %>
     <% end %>

@@ -21,7 +21,7 @@
         link_params[:count] = local_assigns[:incomplete_count] if local_assigns[:skip_incomplete]
       %>
       <%= link_to t("inspections.buttons.#{link_key}", **link_params),
-            edit_inspection_path(local_assigns[:inspection], 
+            edit_inspection_path(local_assigns[:inspection],
                                  tab: local_assigns[:next_tab]) + "#tabs" %>
     <% end %>
   </div>

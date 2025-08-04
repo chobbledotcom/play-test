@@ -12,11 +12,11 @@
     method: :post,
     local: false,
     i18n_base: i18n_base do |form| %>
-    
+
     <%= form.hidden_field :type, value: type.to_s %>
 
     <p><%= metadata[:description] %></p>
-    
+
     <% case type %>
     <% when :anchors %>
       <%= render 'chobble_forms/fieldset', legend_key: 'unit_dimensions' do %>
@@ -24,38 +24,38 @@
         <%= render 'chobble_forms/number', field: :width, min: 1.0, required: true %>
         <%= render 'chobble_forms/number', field: :height, min: 1.0, required: true %>
       <% end %>
-      
+
     <% when :slide_runout %>
       <%= render 'chobble_forms/fieldset', legend_key: 'input' do %>
         <%= render 'chobble_forms/number', field: :platform_height, min: 1.0, required: true %>
         <%= render 'chobble_forms/checkbox', field: :has_stop_wall %>
       <% end %>
-      
+
     <% when :wall_height %>
       <%= render 'chobble_forms/fieldset', legend_key: 'input' do %>
         <%= render 'chobble_forms/number', field: :platform_height, min: 0.0, required: true %>
         <%= render 'chobble_forms/number', field: :user_height, min: 0.0, required: true %>
       <% end %>
-      
+
     <% when :user_capacity %>
       <%= render 'chobble_forms/fieldset', legend_key: 'dimensions' do %>
         <%= render 'chobble_forms/number', field: :length, min: 1.0, required: true %>
         <%= render 'chobble_forms/number', field: :width, min: 1.0, required: true %>
         <%= render 'chobble_forms/number', field: :negative_adjustment_area, min: 0.0, required: false %>
       <% end %>
-      
+
       <%= render 'chobble_forms/fieldset', legend_key: 'user_height' do %>
         <%= render 'chobble_forms/number', field: :max_user_height, min: 0.0, required: false %>
       <% end %>
     <% end %>
-    
+
     <% result_partial_mapping = {
       anchors: "anchor_result",
       slide_runout: "runout_result",
       wall_height: "wall_height_result",
       user_capacity: "user_capacity_result"
     } %>
-    
+
     <div id="<%= result_id %>">
       <%= render result_partial_mapping[type] %>
     </div>
@@ -81,8 +81,8 @@
         metadata[:module_name],
         additional_methods
       )
-    %></code></pre>
-    <% 
+                                     %></code></pre>
+    <%
       # Convert module name to file path for GitHub link
       file_path = metadata[:module_name].name.underscore.gsub('en14960/', '')
       github_url = "https://github.com/chobbledotcom/en14960/blob/main/lib/en14960/#{file_path}.rb"
@@ -96,17 +96,17 @@
   <div class="api-details">
     <h4>Endpoint:</h4>
     <code>POST <%= safety_standards_url %></code>
-    
+
     <h4>Headers:</h4>
     <pre>Content-Type: application/json
 Accept: application/json</pre>
-    
+
     <h4>Parameters:</h4>
     <pre><code class="language-json"><%= render 'api_params', type: type %></code></pre>
-    
+
     <h4>Example Response:</h4>
     <pre><code class="language-json"><%= render 'api_response', type: type %></code></pre>
-    
+
     <h4>Test with curl:</h4>
     <pre class="curl-command"><code class="language-bash"><%= render 'curl_command', type: type, url: safety_standards_url %></code></pre>
   </div>

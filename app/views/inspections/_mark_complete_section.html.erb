@@ -10,11 +10,10 @@
       <%= button_to t('inspections.buttons.mark_complete'),
         complete_inspection_path(@inspection),
         method: :patch,
-        data: { 
+        data: {
           turbo_confirm: t('inspections.messages.mark_complete_confirm'),
           turbo_frame: "_top"
-        }
-      %>
+        } %>
     <% end %>
   </div>
 <% end %>

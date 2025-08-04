@@ -13,7 +13,7 @@
       </p>
       <% if guide[:first_screenshot] %>
         <%= link_to guide_path(guide[:path]) do %>
-          <%= image_tag "/guide_screenshots/#{guide[:path]}/#{guide[:first_screenshot]['filename']}", 
+          <%= image_tag "/guide_screenshots/#{guide[:path]}/#{guide[:first_screenshot]['filename']}",
               alt: guide[:first_screenshot]['caption'] %>
         <% end %>
       <% end %>

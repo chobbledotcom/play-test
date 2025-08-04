@@ -1,22 +1,22 @@
 <div id="search">
-<%= render 'chobble_forms/form_context', 
+<%= render 'chobble_forms/form_context',
   model: nil,
   scope: :search,
   i18n_base: 'forms.search',
   url: '#',
   local: true do |form| %>
-  
+
   <%= render 'chobble_forms/fieldset', legend_key: 'search_details' do %>
-    <%= render 'chobble_forms/select', 
+    <%= render 'chobble_forms/select',
       field: :type,
       options: options_for_select([
         [t('forms.search.options.inspection'), 'inspection'],
         [t('forms.search.options.unit'), 'unit']
       ], 'unit') %>
-    
+
     <% setup = form_field_setup(:id, {field: :id}) %>
     <%= form.label :id, setup[:field_label] %>
-    <%= form.text_field :id, 
+    <%= form.text_field :id,
       pattern: '[A-Za-z0-9]{8}',
       placeholder: t('forms.search.placeholders.id', default: nil) %>
   <% end %>
@@ -52,4 +52,3 @@
     </tbody>
   </table>
 </article>
-

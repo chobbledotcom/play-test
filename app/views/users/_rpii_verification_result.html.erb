@@ -6,10 +6,10 @@
       <dl>
         <dt><%= t('users.verification.name') %>:</dt>
         <dd><%= inspector[:name] %></dd>
-        
+
         <dt><%= t('users.verification.number') %>:</dt>
         <dd><%= inspector[:number] %></dd>
-        
+
         <dt><%= t('users.verification.qualifications') %>:</dt>
         <dd><%= inspector[:qualifications] %></dd>
       </dl>
@@ -28,8 +28,8 @@
           <%= t('users.messages.rpii_blank_name') %>
         <% when :name_mismatch %>
           <% inspector = result[:inspector] %>
-          <%= t('users.messages.rpii_name_mismatch', 
-                user_name: user.name, 
+          <%= t('users.messages.rpii_name_mismatch',
+                user_name: user.name,
                 inspector_name: inspector[:name]) %>
           <% if inspector %>
             <dl style="margin-top: 1rem;">

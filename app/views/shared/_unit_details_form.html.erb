@@ -1,13 +1,13 @@
 <%= render 'chobble_forms/fieldset', form: form, i18n_base: i18n_base, legend_key: 'unit_details' do %>
   <%= render 'chobble_forms/text_field', field: :name, required: true %>
-  
+
   <%# Manufacturer with optional count link %>
   <% if object.persisted? && object.manufacturer.present? %>
     <% manufacturer_count = current_user.units.where(manufacturer: object.manufacturer).count %>
     <% if manufacturer_count > 0 %>
-      <%= render 'chobble_forms/field_with_link', 
+      <%= render 'chobble_forms/field_with_link',
           field_type: :text_field,
-          field: :manufacturer, 
+          field: :manufacturer,
           required: true,
           link_url: units_path(manufacturer: object.manufacturer),
           link_text: t('units.labels.all_count', count: manufacturer_count) %>
@@ -17,10 +17,10 @@
   <% else %>
     <%= render 'chobble_forms/text_field', field: :manufacturer, required: true %>
   <% end %>
-  
+
   <%= render 'chobble_forms/text_field', field: :serial, required: true %>
   <%= render 'chobble_forms/text_area', field: :description, required: true %>
-  
+
   <%# Operator with optional count link %>
   <% if object.persisted? && object.operator.present? %>
     <% operator_count = current_user.units.where(operator: object.operator).count %>
@@ -38,9 +38,9 @@
   <% else %>
     <%= render 'chobble_forms/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
   <% end %>
-  
+
   <%= render 'chobble_forms/date_field', field: :manufacture_date %>
-  
+
   <%# Only show these fields if unit is persisted %>
   <% if object.persisted? %>
     <%# Display size from last inspection (read-only) %>
@@ -52,13 +52,13 @@
         </p>
       </div>
     <% end %>
-    
+
     <%# Unit report links %>
     <div>
       <label><%= t("units.fields.reports") %></label>
       <p style="margin: 0.5em 0;">
         <%= link_to "PDF", unit_path(object, format: :pdf), target: "_blank" %>
-        <%= render 'shared/share_button', 
+        <%= render 'shared/share_button',
                    url: unit_url(object, format: :pdf),
                    title: "Unit #{object.serial} Report",
                    copied_text: t("shared.messages.link_copied"),
@@ -70,7 +70,7 @@
       </p>
     </div>
   <% end %>
-  
+
   <% if show_photo %>
     <%= form.label :photo, t("#{i18n_base}.fields.photo") %>
     <%= form.file_field :photo, accept: "image/*" %>

@@ -7,11 +7,10 @@
 <%= render 'chobble_forms/form_context',
   model: unit,
   i18n_base: 'forms.units',
-  url: form_url do |form|
-%>
+  url: form_url do |form| %>
   <%= render 'chobble_forms/fieldset', legend_key: 'unit_details' do %>
     <%= render 'chobble_forms/text_field', field: :name, required: true %>
-    
+
     <%# Unit type - only for admins or test mode %>
     <% if current_user.admin? || Rails.env.test? %>
       <%= render 'chobble_forms/select', field: :unit_type,
@@ -21,7 +20,7 @@
           ], unit.unit_type),
           required: true %>
     <% end %>
-    
+
     <%# Operator with optional count link %>
     <% if unit.persisted? && unit.operator.present? %>
       <% operator_count = current_user.units.where(operator: unit.operator).count %>
@@ -39,23 +38,23 @@
     <% else %>
       <%= render 'chobble_forms/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
     <% end %>
-    
+
     <%# Photo upload %>
     <%= turbo_frame_tag "unit_photo_preview" do %>
       <%= render 'chobble_forms/file_field', field: :photo, accept: "image/*" %>
     <% end %>
   <% end %>
-  
+
   <%= render 'chobble_forms/fieldset', legend_key: 'manufacture' do %>
     <%= render 'chobble_forms/date_field', field: :manufacture_date %>
-    
+
     <%# Manufacturer with optional count link %>
     <% if unit.persisted? && unit.manufacturer.present? %>
       <% manufacturer_count = current_user.units.where(manufacturer: unit.manufacturer).count %>
       <% if manufacturer_count > 0 %>
-        <%= render 'chobble_forms/field_with_link', 
+        <%= render 'chobble_forms/field_with_link',
             field_type: :text_field,
-            field: :manufacturer, 
+            field: :manufacturer,
             required: true,
             link_url: units_path(manufacturer: unit.manufacturer),
             link_text: t('units.labels.all_count', count: manufacturer_count) %>
@@ -65,11 +64,11 @@
     <% else %>
       <%= render 'chobble_forms/text_field', field: :manufacturer, required: true %>
     <% end %>
-    
+
     <%= render 'chobble_forms/text_field', field: :serial, required: true %>
     <%= render 'chobble_forms/text_area', field: :description, required: true %>
   <% end %>
-  
+
   <%# Only show data fieldset if unit is persisted %>
   <% if unit.persisted? %>
     <%= render 'chobble_forms/fieldset', legend_key: 'data' do %>
@@ -83,7 +82,7 @@
           </p>
         </div>
       <% end %>
-      
+
       <%# Unit report links %>
       <div>
         <label><%= t("units.fields.reports") %></label>
@@ -91,7 +90,7 @@
           <li>
             <strong><%= t("units.labels.unit_reports") %>:</strong>
             <%= link_to "PDF", unit_path(unit, format: :pdf), target: "_blank" %>
-            <%= render 'shared/share_button', 
+            <%= render 'shared/share_button',
                        url: unit_url(unit, format: :pdf),
                        title: "Unit #{unit.serial} Report",
                        copied_text: t("shared.messages.link_copied"),
@@ -101,12 +100,12 @@
             /
             <%= link_to "JSON", unit_path(unit, format: :json), target: "_blank" %>
           </li>
-          
+
           <li>
             <strong><%= t("units.labels.last_inspection_reports") %>:</strong>
             <% if unit.last_inspection %>
               <%= link_to "PDF", inspection_path(unit.last_inspection, format: :pdf), target: "_blank" %>
-              <%= render 'shared/share_button', 
+              <%= render 'shared/share_button',
                          url: inspection_url(unit.last_inspection, format: :pdf),
                          title: "Inspection #{unit.last_inspection.id} Report",
                          copied_text: t("shared.messages.link_copied"),

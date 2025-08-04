@@ -2,8 +2,7 @@
   <h1><%= t('inspections.titles.edit') %></h1>
   <nav>
     <%= link_to t('inspections.buttons.qr_and_pdf'),
-      inspection_path(@inspection)
-    %>
+      inspection_path(@inspection) %>
   </nav>
 </header>
 
@@ -18,8 +17,7 @@
             <% else %>
               <%= link_to tab_name_with_check(@inspection, tab),
                 edit_inspection_path(@inspection, tab: tab, anchor: "tabs"),
-                data: { tab: tab }
-              %>
+                data: { tab: tab } %>
             <% end %>
           </li>
         <% end %>
@@ -61,8 +59,7 @@
           method: :patch,
           data: {
             turbo_confirm: t('inspections.messages.mark_in_progress_confirm')
-          }
-        %>
+          } %>
       <% elsif !@inspection.complete? || current_user.admin? %>
         <%= button_to t('inspections.buttons.delete'),
           inspection_path(@inspection),
@@ -70,8 +67,7 @@
           class: "danger",
           data: {
             turbo_confirm: t('inspections.messages.delete_confirm')
-          }
-        %>
+          } %>
       <% end %>
     </div>
   </div>

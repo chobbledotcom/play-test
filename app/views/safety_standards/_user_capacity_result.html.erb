@@ -1,7 +1,7 @@
 <% if @user_capacity_result || @user_capacity_error %>
   <div class="calculation-result">
     <h3><%= t('forms.safety_standards_user_capacity.sections.result') %></h3>
-    
+
     <% if @user_capacity_error %>
       <p class="error"><%= @user_capacity_error %></p>
     <% elsif @user_capacity_result %>

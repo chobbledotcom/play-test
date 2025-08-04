@@ -26,8 +26,7 @@
         <h4><%= t('inspections.safety_standards.slide_requirements') %></h4>
         <p>
           <%= t('inspections.safety_standards.runout_requirement',
-            required: inspection.slide_assessment.required_runout_length&.round(2))
-          %>
+            required: inspection.slide_assessment.required_runout_length&.round(2)) %>
         </p>
         <% if inspection.slide_assessment.runout_value.present? %>
           <p class="<%= inspection.slide_assessment.meets_runout_requirements? ? 'text-notice' : 'text-error' %>">
