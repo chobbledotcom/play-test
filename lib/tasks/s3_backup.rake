@@ -6,6 +6,54 @@ require "rubygems/package"
 
 namespace :s3 do
   namespace :backup do
+    # Helper methods for S3 operations in rake tasks
+    def ensure_s3_enabled
+      return if ENV["USE_S3_STORAGE"] == "true"
+
+      puts "❌ S3 storage is not enabled. Set USE_S3_STORAGE=true in your .env file"
+      exit 1
+    end
+
+    def validate_s3_config
+      required_vars = %w[S3_ENDPOINT S3_ACCESS_KEY_ID S3_SECRET_ACCESS_KEY S3_BUCKET]
+      missing_vars = required_vars.select { |var| ENV[var].blank? }
+
+      if missing_vars.any?
+        error_msg = "Missing required S3 environment variables: #{missing_vars.join(", ")}"
+        puts "❌ #{error_msg}"
+
+        Sentry.capture_message(error_msg, level: "error", extra: {
+          missing_vars: missing_vars,
+          task: "s3:backup",
+          environment: Rails.env
+        })
+
+        exit 1
+      end
+    end
+
+    def get_s3_service
+      service = ActiveStorage::Blob.service
+
+      unless service.is_a?(ActiveStorage::Service::S3Service)
+        puts "❌ Active Storage is not configured to use S3. Current service: #{service.class.name}"
+        exit 1
+      end
+
+      service
+    end
+
+    def handle_s3_errors
+      yield
+    rescue Aws::S3::Errors::ServiceError => e
+      puts "\n❌ S3 Error: #{e.message}"
+      Sentry.capture_exception(e)
+      exit 1
+    rescue => e
+      puts "\n❌ Unexpected error: #{e.message}"
+      Sentry.capture_exception(e)
+      exit 1
+    end
     def backup_dir = "db_backups"
 
     def temp_dir
@@ -36,7 +84,7 @@ namespace :s3 do
 
     def backup_retention_days = 60
 
-    desc "Backup SQLite database to S3"
+    desc "Backup SQLite database to S3 (via job queue)"
     task database: :environment do
       # Ensure Rails is fully loaded for cron jobs
       Rails.application.eager_load! if Rails.env.production?
@@ -44,6 +92,24 @@ namespace :s3 do
       puts "Enqueuing S3 backup job..."
       S3BackupJob.perform_later
       puts "✅ S3 backup job enqueued successfully!"
+    end
+
+    desc "Backup SQLite database to S3 (immediate execution)"
+    task database_now: :environment do
+      # Ensure Rails is fully loaded for cron jobs
+      Rails.application.eager_load! if Rails.env.production?
+
+      print "Creating database backup... "
+      result = S3BackupService.new.perform
+      puts "✅"
+      
+      puts "\n🎉 Database backup completed successfully!"
+      puts "   Backup location: #{result[:location]}"
+      puts "   Backup size: #{result[:size_mb]} MB"
+      puts "   Deleted old backups: #{result[:deleted_count]}" if result[:deleted_count].positive?
+    rescue => e
+      puts "\n❌ Backup failed: #{e.message}"
+      exit 1
     end
 
     desc "List database backups in S3"

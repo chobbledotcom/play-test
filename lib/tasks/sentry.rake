@@ -1,28 +1,43 @@
 # frozen_string_literal: true
 
 namespace :sentry do
-  desc "Test Sentry integration"
+  desc "Test Sentry integration (immediate execution)"
   task test: :environment do
     puts "Testing Sentry integration..."
-
-    begin
-      Sentry.capture_message("Test message from Rails app")
-      puts "✓ Test message sent to Sentry"
-    rescue => e
-      puts "✗ Failed to send test message: #{e.message}"
+    
+    result = SentryTestService.new.perform
+    
+    result[:results].each do |test_result|
+      status_symbol = test_result[:status] == "success" ? "✓" : "✗"
+      puts "#{status_symbol} #{test_result[:message]}"
     end
-
-    begin
-      1 / 0
-    rescue ZeroDivisionError => e
-      Sentry.capture_exception(e)
-      puts "✓ Test exception sent to Sentry"
-    end
-
+    
     puts "\nSentry configuration:"
-    puts "  DSN: #{Sentry.configuration.dsn ? "Configured" : "Not configured"}"
-    puts "  Environment: #{Sentry.configuration.environment}"
-    puts "  Enabled environments: #{Sentry.configuration.enabled_environments.join(", ")}"
+    puts "  DSN: #{result[:configuration][:dsn_configured] ? 'Configured' : 'Not configured'}"
+    puts "  Environment: #{result[:configuration][:environment]}"
+    puts "  Enabled environments: #{result[:configuration][:enabled_environments].join(', ')}"
     puts "\nCheck your BugSink dashboard to verify the test events were received."
+  end
+  
+  desc "Test Sentry integration (via job queue)"
+  task test_job: :environment do
+    puts "Enqueuing Sentry test job..."
+    SentryTestJob.perform_later
+    puts "✅ Sentry test job enqueued successfully!"
+  end
+  
+  desc "Test specific error type (via job queue)"
+  task :test_error, [:type] => :environment do |_task, args|
+    error_types = %i[database_not_found missing_config generic_exception]
+    
+    if args[:type].nil? || !error_types.include?(args[:type].to_sym)
+      puts "❌ Please provide an error type: #{error_types.join(', ')}"
+      puts "   Example: rake sentry:test_error[database_not_found]"
+      exit 1
+    end
+    
+    puts "Enqueuing Sentry test job with error type: #{args[:type]}..."
+    SentryTestJob.perform_later(args[:type])
+    puts "✅ Sentry test job enqueued successfully!"
   end
 end

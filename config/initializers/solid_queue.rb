@@ -5,4 +5,4 @@
 Rails.application.config.mission_control.jobs.http_basic_auth_enabled = false
 
 # Set custom base controller for Mission Control authentication
-MissionControl::Jobs.base_controller_class = "ApplicationController"
+MissionControl::Jobs.base_controller_class = "MissionControlController"
