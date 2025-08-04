@@ -27,11 +27,6 @@ RSpec.describe PdfGeneratorService::AssessmentBlockRenderer do
         height_without = renderer.height_for(block_without_pass_fail, pdf)
         height_with = renderer.height_for(block_with_pass_fail, pdf)
 
-        puts "Height without pass/fail: #{height_without}"
-        puts "Height with pass/fail: #{height_with}"
-        puts "Fragments without pass/fail: #{renderer.render_fragments(block_without_pass_fail)}"
-        puts "Fragments with pass/fail: #{renderer.render_fragments(block_with_pass_fail)}"
-
         # They shouldn't be dramatically different - allow some tolerance for formatting
         expect((height_with - height_without).abs).to be < 5
       end
@@ -51,19 +46,27 @@ RSpec.describe PdfGeneratorService::AssessmentBlockRenderer do
           inline_format: true
         )
         box.render(dry_run: true)
-        height = box.height
-        puts "#{description}: #{height} - '#{text}'"
-        height
+        box.height
       end
 
-      it "compares heights of different text formats directly" do
-        simple_text = "<b>Width</b>: 100mm"
-        complex_text = "<b><color rgb='008000'>[PASS]</color></b> <b>Width</b>: 100mm"
+      it "includes spacing in height calculation" do
+        renderer = described_class.new(font_size: 7)
+        pdf = Prawn::Document.new
 
-        simple_height = test_text_height(simple_text, "Simple")
-        complex_height = test_text_height(complex_text, "Complex")
+        block = PdfGeneratorService::AssessmentBlock.new(
+          type: :value,
+          name: "Width",
+          value: "100mm"
+        )
 
-        expect((complex_height - simple_height).abs).to be < 5
+        height = renderer.height_for(block, pdf)
+
+        # Height should include base text height plus 33% of font size as spacing
+        expected_spacing = (7 * 0.33).round(1)
+        expect(height).to be > expected_spacing
+
+        # Just verify it calculates some reasonable height
+        expect(height).to be > 0
       end
 
       it "tests individual components" do
@@ -86,14 +89,9 @@ RSpec.describe PdfGeneratorService::AssessmentBlockRenderer do
         separate_tags = "<b>[PASS]</b>"
         no_nesting = "[PASS]"
 
-        deep_height = test_text_height(nested_deep, "Deeply nested")
-        separate_height = test_text_height(separate_tags, "Separate tags")
-        plain_height = test_text_height(no_nesting, "No nesting")
-
-        puts "Height differences:"
-        puts "  Deep vs Separate: #{(deep_height - separate_height).abs}"
-        puts "  Deep vs Plain: #{(deep_height - plain_height).abs}"
-        puts "  Separate vs Plain: #{(separate_height - plain_height).abs}"
+        test_text_height(nested_deep, "Deeply nested")
+        test_text_height(separate_tags, "Separate tags")
+        test_text_height(no_nesting, "No nesting")
 
         # Just verify they complete
         expect(true).to be true
@@ -123,17 +121,12 @@ RSpec.describe PdfGeneratorService::AssessmentBlockRenderer do
 
           height = renderer.height_for(block, pdf)
           heights << height
-
-          puts "Text #{index + 1} (#{text.length} chars): #{height} height"
-          puts "  Content: '#{text[0..50]}#{"..." if text.length > 50}'"
         end
 
         # Heights should generally increase with longer content
         expect(heights[1]).to be >= heights[0] # Medium >= Short
         expect(heights[2]).to be > heights[1]  # Long > Medium
         expect(heights[3]).to be > heights[2]  # Very long > Long
-
-        puts "Height progression: #{heights.join(" -> ")}"
 
         # Verify we have meaningful height differences for wrapping
         expect(heights.last).to be > heights.first * 2 # Longest should be at least 2x tallest

@@ -18,9 +18,6 @@ class PdfGeneratorService
 
       while font_size >= min_font_size
         if content_fits_with_font_size?(pdf, font_size)
-          if !Rails.env.production?
-            Rails.logger.debug { "SUCCESS: Using font size #{font_size}" }
-          end
           render_with_font_size(pdf, font_size)
           return true
         end
@@ -28,9 +25,6 @@ class PdfGeneratorService
       end
 
       # If we still can't fit, render with minimum font size anyway
-      if !Rails.env.production?
-        Rails.logger.debug { "FALLBACK: Using minimum font size #{min_font_size}" }
-      end
       render_with_font_size(pdf, min_font_size)
       false
     end
@@ -45,13 +39,7 @@ class PdfGeneratorService
       columns = calculate_column_boxes(pdf)
       total_capacity = columns.sum { |col| col[:height] }
 
-      fits = total_height <= total_capacity
-
-      if !Rails.env.production?
-        Rails.logger.debug { "Font #{font_size}: content=#{total_height.round(1)}, capacity=#{total_capacity.round(1)}, fits=#{fits}" }
-      end
-
-      fits
+      total_height <= total_capacity
     end
 
     def calculate_total_content_height(font_size, pdf)
