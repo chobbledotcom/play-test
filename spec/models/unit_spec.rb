@@ -304,22 +304,22 @@ RSpec.describe Unit, type: :model do
 
   describe "#invalidate_pdf_cache" do
     let(:unit) { create(:unit, user: user) }
-    
+
     it "does not invalidate cache when only updated_at changes" do
       expect(PdfCacheService).not_to receive(:invalidate_unit_cache)
-      
+
       unit.touch
     end
 
     it "invalidates cache when other attributes change" do
       expect(PdfCacheService).to receive(:invalidate_unit_cache).with(unit)
-      
+
       unit.update!(name: "New Unit Name")
     end
 
     it "invalidates cache when multiple attributes change including updated_at" do
       expect(PdfCacheService).to receive(:invalidate_unit_cache).with(unit)
-      
+
       unit.update!(name: "New Unit Name", serial: "NEW123")
     end
   end

@@ -179,26 +179,26 @@ RSpec.describe Inspection, type: :model do
   describe "#invalidate_pdf_cache" do
     it "does not invalidate cache when only pdf_last_accessed_at changes" do
       expect(PdfCacheService).not_to receive(:invalidate_inspection_cache)
-      
+
       inspection.update!(pdf_last_accessed_at: Time.current)
     end
 
     it "does not invalidate cache when only updated_at changes" do
       expect(PdfCacheService).not_to receive(:invalidate_inspection_cache)
-      
+
       # Simulate touching the record
       inspection.touch
     end
 
     it "invalidates cache when other attributes change" do
       expect(PdfCacheService).to receive(:invalidate_inspection_cache).with(inspection)
-      
+
       inspection.update!(risk_assessment: "Updated risk assessment")
     end
 
     it "invalidates cache when multiple attributes change including pdf_last_accessed_at" do
       expect(PdfCacheService).to receive(:invalidate_inspection_cache).with(inspection)
-      
+
       inspection.update!(
         pdf_last_accessed_at: Time.current,
         risk_assessment: "Updated risk assessment"
