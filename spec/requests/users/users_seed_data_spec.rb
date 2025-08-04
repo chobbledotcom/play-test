@@ -4,6 +4,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
   let(:admin_user) { create(:user, :admin) }
   let(:regular_user) { create(:user) }
   let(:test_user) { create(:user) }
+  let!(:homepage) { create(:page, slug: "/", content: "<h1>Home</h1>") }
 
   describe "POST /users/:id/add_seeds" do
     context "as admin" do
@@ -14,8 +15,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
           post add_seeds_user_path(test_user)
 
           expect(response).to redirect_to(edit_user_path(test_user))
-          follow_redirect!
-          expect(response.body).to include(I18n.t("users.messages.seeds_added"))
+          expect(flash[:notice]).to eq(I18n.t("users.messages.seeds_added"))
           expect(test_user.reload.has_seed_data?).to be true
         end
       end
@@ -29,9 +29,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
           post add_seeds_user_path(test_user)
 
           expect(response).to redirect_to(edit_user_path(test_user))
-          follow_redirect!
-          expect(response.body)
-            .to include(I18n.t("users.messages.seeds_failed"))
+          expect(flash[:alert]).to eq(I18n.t("users.messages.seeds_failed"))
           expect(test_user.units.count).to eq(initial_count)
         end
       end
@@ -44,9 +42,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
         post add_seeds_user_path(test_user)
 
         expect(response).to redirect_to(root_path)
-        follow_redirect!
-        expect(response.body)
-          .to include(I18n.t("forms.session_new.status.admin_required"))
+        expect(flash[:alert]).to eq(I18n.t("forms.session_new.status.admin_required"))
       end
     end
 
@@ -72,8 +68,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
         delete delete_seeds_user_path(test_user)
 
         expect(response).to redirect_to(edit_user_path(test_user))
-        follow_redirect!
-        expect(response.body).to include(I18n.t("users.messages.seeds_deleted"))
+        expect(flash[:notice]).to eq(I18n.t("users.messages.seeds_deleted"))
         expect(test_user.reload.has_seed_data?).to be false
       end
     end
@@ -88,9 +83,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
         delete delete_seeds_user_path(test_user)
 
         expect(response).to redirect_to(root_path)
-        follow_redirect!
-        expect(response.body)
-          .to include(I18n.t("forms.session_new.status.admin_required"))
+        expect(flash[:alert]).to eq(I18n.t("forms.session_new.status.admin_required"))
         expect(test_user.reload.has_seed_data?).to be true
       end
     end

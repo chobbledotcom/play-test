@@ -4,7 +4,7 @@ class ApplicationController < ChobbleApp::ApplicationController
   include ImageProcessable
   
   # Route helpers for ChobbleApp models to map to regular routes
-  helper_method :chobble_app_user_path, :chobble_app_users_path
+  helper_method :chobble_app_user_path, :chobble_app_users_path, :chobble_app_page_path, :chobble_app_pages_path
   
   def chobble_app_user_path(user, options = {})
     user_path(user, options)
@@ -12,6 +12,14 @@ class ApplicationController < ChobbleApp::ApplicationController
   
   def chobble_app_users_path(options = {})
     users_path(options)
+  end
+  
+  def chobble_app_page_path(page, options = {})
+    page_path(page, options)
+  end
+  
+  def chobble_app_pages_path(options = {})
+    pages_path(options)
   end
 
   # App-specific customizations can go here
