@@ -48,7 +48,7 @@ RSpec.feature "Backups Management", type: :feature do
     sign_in(regular_user)
     visit backups_path
 
-    expect(page).to have_content(I18n.t("errors.unauthorized"))
+    expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
     expect(current_path).to eq(root_path)
   end
 
