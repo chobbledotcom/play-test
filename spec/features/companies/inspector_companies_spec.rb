@@ -42,8 +42,8 @@ RSpec.describe "Inspector Companies", type: :feature do
         expect(page).to have_content(I18n.t("inspector_companies.titles.index"))
       end
 
-      it "shows inspector companies link in navigation" do
-        expect(page).to have_link(I18n.t("inspector_companies.titles.index"))
+      it "shows admin link in navigation" do
+        expect(page).to have_link(I18n.t("navigation.admin"))
       end
     end
   end

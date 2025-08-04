@@ -47,7 +47,7 @@ class BackupsController < ApplicationController
 
   def get_s3_service
     service = ActiveStorage::Blob.service
-    unless service.class.name == "ActiveStorage::Service::S3Service"
+    unless service.class.name == "ActiveStorage::Service::S3Service" # standard:disable Style/ClassEqualityComparison
       raise "Active Storage is not configured to use S3"
     end
     service
