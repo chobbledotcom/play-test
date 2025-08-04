@@ -11,18 +11,18 @@ a[role="button"] {
 	font-weight: bold;
 	line-height: var(--line-height);
 	text-decoration: none;
-	
+
 	/* Layout */
 	display: inline-block;
 	margin: 0.5rem 0;
 	padding: 0.5rem 1rem;
-	
+
 	/* Appearance */
 	background-color: var(--color-link);
 	border: 2px solid var(--color-link);
 	border-radius: var(--border-radius);
 	color: var(--color-bg);
-	
+
 	/* Interaction */
 	cursor: pointer;
 	transition: all 0.2s ease;

@@ -28,7 +28,7 @@ namespace :s3 do
       print "Creating database backup... "
       result = S3BackupService.new.perform
       puts "✅"
-      
+
       puts "\n🎉 Database backup completed successfully!"
       puts "   Backup location: #{result[:location]}"
       puts "   Backup size: #{result[:size_mb]} MB"

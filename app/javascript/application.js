@@ -11,7 +11,7 @@ import "search";
 import "image_resize";
 
 // external libs
-import "highlight.js"
+import "highlight.js";
 
 // Initialize features on Turbo navigation
 function initializeFeatures() {

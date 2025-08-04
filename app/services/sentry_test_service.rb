@@ -3,13 +3,13 @@
 class SentryTestService
   def perform
     results = []
-    
+
     # Test 1: Send a test message
     begin
       Sentry.capture_message("Test message from Rails app")
-      results << { test: "message", status: "success", message: "Test message sent to Sentry" }
+      results << {test: "message", status: "success", message: "Test message sent to Sentry"}
     rescue => e
-      results << { test: "message", status: "failed", message: "Failed to send test message: #{e.message}" }
+      results << {test: "message", status: "failed", message: "Failed to send test message: #{e.message}"}
     end
 
     # Test 2: Send a test exception
@@ -17,7 +17,7 @@ class SentryTestService
       1 / 0
     rescue ZeroDivisionError => e
       Sentry.capture_exception(e)
-      results << { test: "exception", status: "success", message: "Test exception sent to Sentry" }
+      results << {test: "exception", status: "success", message: "Test exception sent to Sentry"}
     end
 
     # Test 3: Send exception with extra context
@@ -29,12 +29,12 @@ class SentryTestService
           rails_env: Rails.env
         })
         scope.set_tags(test_type: "integration_test")
-        
+
         raise "This is a test error with context"
       end
     rescue => e
       Sentry.capture_exception(e)
-      results << { test: "exception_with_context", status: "success", message: "Test exception with context sent to Sentry" }
+      results << {test: "exception_with_context", status: "success", message: "Test exception with context sent to Sentry"}
     end
 
     # Return results and configuration info

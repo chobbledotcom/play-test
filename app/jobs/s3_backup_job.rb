@@ -8,7 +8,7 @@ class S3BackupJob < ApplicationJob
     Rails.application.eager_load! if Rails.env.production?
 
     result = S3BackupService.new.perform
-    
+
     Rails.logger.info "S3BackupJob completed successfully"
     Rails.logger.info "Backup location: #{result[:location]}"
     Rails.logger.info "Backup size: #{result[:size_mb]} MB"

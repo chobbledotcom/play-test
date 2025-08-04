@@ -38,7 +38,7 @@ RSpec.feature "Mission Control navigation", type: :feature do
   scenario "Jobs link has correct href attribute" do
     sign_in(admin_user)
     visit root_path
-    
+
     # Check that the Jobs link exists with correct href
     jobs_link = page.find("nav").find_link(I18n.t("navigation.jobs"))
     expect(jobs_link).not_to be_nil
