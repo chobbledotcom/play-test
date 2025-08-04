@@ -2,12 +2,6 @@
   <h1><%= t("backups.title") %></h1>
 </header>
 
-<nav>
-  <ul>
-    <li><%= link_to t("admin.back_to_admin"), admin_path %></li>
-  </ul>
-</nav>
-
 <% if @backups.any? %>
   <table>
     <thead>
