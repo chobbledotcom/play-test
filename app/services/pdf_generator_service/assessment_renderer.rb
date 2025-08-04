@@ -232,113 +232,59 @@ class PdfGeneratorService
     private
 
     def render_assessments_adaptively(pdf, available_height)
-      # First, calculate photo boundary (top edge of unit photo)
-      photo_boundary = calculate_photo_boundary(pdf)
+      # Calculate photo dimensions for layout
+      photo_boundary = calculate_photo_boundary(pdf, 4)
 
-      # Save the current state
-      start_y = pdf.y
+      # Calculate photo height (assuming square photo for worst case)
+      total_spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER * 3
+      column_width = (pdf.bounds.width - total_spacer_width) / 4.0
+      photo_height = column_width
 
-      # Try a dry run with 3 columns to check for overflow
-      overflow = check_for_overflow(pdf, available_height, 3, Configuration::ASSESSMENT_FIELD_TEXT_SIZE_PREFERRED, photo_boundary)
-
-      # Reset cursor position
-      pdf.y = start_y
-
-      if overflow
-        # Use 4 columns with smaller text
-        render_assessments_with_params(pdf, available_height, ASSESSMENT_COLUMNS_COUNT, ASSESSMENT_FIELD_TEXT_SIZE)
-        # Return true to indicate we used compact layout
-        @used_compact_layout = true
+      # If photo boundary is within our available height, we need to account for it
+      photo_height_in_area = if photo_boundary < (pdf.cursor - available_height + Configuration::FOOTER_HEIGHT)
+        # Photo will be in our rendering area
+        photo_height
       else
-        # Use 3 columns with larger text
-        render_assessments_with_params(pdf, available_height, 3, Configuration::ASSESSMENT_FIELD_TEXT_SIZE_PREFERRED)
-        @used_compact_layout = false
+        # Photo is below our rendering area
+        0
+      end
+
+      # Use the new column renderer
+      column_renderer = AssessmentColumns.new(
+        @current_assessment_blocks,
+        available_height,
+        photo_height_in_area
+      )
+
+      success = column_renderer.render(pdf)
+      @used_compact_layout = true
+
+      # Add debug warning if content didn't fit
+      if !success && !Rails.env.production?
+        pdf.fill_color "FF0000"
+        pdf.text "[DEBUG: Content overflow - some assessments may not be displayed]", size: 8
+        pdf.fill_color "000000"
       end
     end
 
-    def calculate_photo_boundary(pdf)
-      # For boundary calculation, use the larger photo size (3 columns)
-      # Calculate column width for 3 columns
-      total_spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER * 2
-      column_width = (pdf.bounds.width - total_spacer_width) / 3.0
+    def calculate_photo_boundary(pdf, columns = 3)
+      # Calculate the exact same photo position that ImageProcessor uses
+      # This matches the logic in ImageProcessor.add_unit_photo_footer
 
-      # Photo width equals one column width
+      # Calculate photo dimensions based on column count
+      total_spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER * (columns - 1)
+      column_width = (pdf.bounds.width - total_spacer_width) / columns.to_f
       photo_width = column_width.round
-      # Assume square photo for worst-case calculation
+
+      # For boundary calculation, assume square photo as worst case
+      # Real photos will be sized maintaining aspect ratio, but this gives us a safe boundary
       photo_height = photo_width
 
-      # Calculate photo position in bottom right corner
-      # Account for footer height on first page
+      # Photo Y position (top edge) - matches ImageProcessor calculation exactly
       if pdf.page_number == 1
         Configuration::FOOTER_HEIGHT + Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
       else
         Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
-      end
-
-      # Return the top edge of the photo (photo_y is the top edge in Prawn coordinates)
-    end
-
-    def check_for_overflow(pdf, available_height, columns, text_size, photo_boundary)
-      # Calculate total content height needed
-      total_content_height = calculate_total_content_height(text_size)
-
-      # Check if content would spill into third column
-      if columns == 3
-        # Content fills vertically in each column before moving to next
-        # Check if we need more than 2 columns worth of height
-        two_columns_height = available_height * 2
-
-        if total_content_height > two_columns_height
-          # Content will spill into third column
-          # Calculate how much content goes into third column
-          third_column_content_height = total_content_height - two_columns_height
-
-          # Calculate where third column content would end
-          # Third column starts at top of available area
-          third_column_bottom = pdf.cursor - third_column_content_height
-
-          # Check if it would overlap with photo
-          # Add 20pt buffer - only switch to 4 columns if we really need to
-          if third_column_bottom < (photo_boundary + 20)
-            return true
-          end
-        end
-      end
-
-      false
-    end
-
-    def calculate_total_content_height(text_size)
-      total_height = 0
-
-      # Calculate line height based on text size (Prawn default is ~1.2x font size)
-      title_line_height = ASSESSMENT_TITLE_SIZE * 1.2
-      field_line_height = text_size * 1.2
-
-      @current_assessment_blocks.each do |block|
-        # Title height
-        total_height += title_line_height
-        total_height += ASSESSMENT_MARGIN_AFTER_TITLE
-
-        # Fields height (each field is one line)
-        total_height += block[:fields].size * field_line_height
-        total_height += ASSESSMENT_MARGIN_AFTER
-      end
-
-      total_height
-    end
-
-    def render_assessments_with_params(pdf, available_height, columns, text_size)
-      pdf.column_box([0, pdf.cursor], columns: columns, width: pdf.bounds.width, spacer: ASSESSMENT_COLUMN_SPACER, height: available_height) do
-        @current_assessment_blocks.each do |block|
-          pdf.text block[:title], size: ASSESSMENT_TITLE_SIZE, style: :bold
-          pdf.move_down ASSESSMENT_MARGIN_AFTER_TITLE
-
-          block[:fields].each do |field|
-            pdf.text field, size: text_size, inline_format: true
-          end
-          pdf.move_down ASSESSMENT_MARGIN_AFTER
-        end
       end
     end
   end
