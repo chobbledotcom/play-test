@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::Base
   include SessionsHelper
   include ImageProcessable
@@ -8,9 +10,7 @@ class ApplicationController < ActionController::Base
   before_action :start_debug_timer, if: :admin_debug_enabled?
   after_action :cleanup_debug_subscription, if: :admin_debug_enabled?
 
-  unless Rails.env.production? || Rails.env.test?
-    around_action :n_plus_one_detection
-  end
+  around_action :n_plus_one_detection unless Rails.env.production?
 
   rescue_from StandardError do |exception|
     if Rails.env.production? && should_notify_error?(exception)
@@ -57,30 +57,30 @@ class ApplicationController < ActionController::Base
   end
 
   def require_login
-    unless logged_in?
-      flash[:alert] = form_i18n(:session_new, "status.login_required")
-      redirect_to login_path
-    end
+    return if logged_in?
+
+    flash[:alert] = form_i18n(:session_new, "status.login_required")
+    redirect_to login_path
   end
 
   def require_logged_out
-    if logged_in?
-      flash[:alert] = form_i18n(:session_new, "status.already_logged_in")
-      redirect_to inspections_path
-    end
+    return unless logged_in?
+
+    flash[:alert] = form_i18n(:session_new, "status.already_logged_in")
+    redirect_to inspections_path
   end
 
   def update_last_active_at
-    if current_user&.is_a?(User)
-      current_user.update(last_active_at: Time.current)
-    end
+    return unless current_user.is_a?(User)
+
+    current_user.update(last_active_at: Time.current)
   end
 
   def require_admin
-    unless current_user&.admin?
-      flash[:alert] = I18n.t("forms.session_new.status.admin_required")
-      redirect_to root_path
-    end
+    return if current_user&.admin?
+
+    flash[:alert] = I18n.t("forms.session_new.status.admin_required")
+    redirect_to root_path
   end
 
   def admin_debug_enabled?
@@ -100,12 +100,10 @@ class ApplicationController < ActionController::Base
     @debug_start_time = Time.current
     @debug_sql_queries = []
 
-    if @debug_subscription
-      ActiveSupport::Notifications.unsubscribe(@debug_subscription)
-    end
+    ActiveSupport::Notifications.unsubscribe(@debug_subscription) if @debug_subscription
 
     @debug_subscription = ActiveSupport::Notifications
-      .subscribe("sql.active_record") do |name, start, finish, id, payload|
+      .subscribe("sql.active_record") do |_name, start, finish, _id, payload|
       unless payload[:name] == "SCHEMA" || payload[:sql] =~ /^PRAGMA/
         @debug_sql_queries << {
           sql: payload[:sql],
@@ -123,9 +121,9 @@ class ApplicationController < ActionController::Base
     :debug_sql_queries
 
   def debug_render_time
-    if @debug_start_time
-      ((Time.current - @debug_start_time) * 1000).round(2)
-    end
+    return unless @debug_start_time
+
+    ((Time.current - @debug_start_time) * 1000).round(2)
   end
 
   def debug_sql_queries
@@ -161,8 +159,8 @@ class ApplicationController < ActionController::Base
   def should_notify_error?(exception)
     if exception.is_a?(ActionController::InvalidAuthenticityToken)
       csrf_ignored_actions = [
-        ["sessions", "create"],
-        ["users", "create"]
+        %w[sessions create],
+        %w[users create]
       ]
 
       action = [controller_name, action_name]
