@@ -41,7 +41,11 @@ group :development, :test do
   # Ruby code formatter and linter
   gem "standard", require: false
   gem "standard-rails"
-  
+
+  # N+1 query detection
+  gem "prosopite"
+  gem "pg_query", "~> 5.1"
+
   # ERB linter
   gem "erb_lint", require: false
 end
