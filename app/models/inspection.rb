@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Inspection < ApplicationRecord
   include CustomIdGenerator
   include FormConfigurable
@@ -54,19 +56,17 @@ class Inspection < ApplicationRecord
   belongs_to :unit, optional: true
   belongs_to :inspector_company, optional: true
 
-  # File attachments
   has_one_attached :photo_1
   has_one_attached :photo_2
   has_one_attached :photo_3
   has_one_attached :cached_pdf
   validate :photos_must_be_images
 
-  # Callbacks
   before_validation :set_inspector_company_from_user, on: :create
   before_validation :set_inspection_type_from_unit, on: :create
-  # Callbacks
+
   after_update :invalidate_pdf_cache
-  after_save :invalidate_unit_pdf_cache, if: :saved_change_to_complete_date?
+  after_save :invalidate_unit_pdf_cache
 
   ALL_ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
     has_one assessment_name,
@@ -88,8 +88,11 @@ class Inspection < ApplicationRecord
 
     # Non-creating version for safe navigation
     define_method("#{assessment_name}?") do
-      association(assessment_name).loaded? ? send(assessment_name) :
+      if association(assessment_name).loaded?
+        send(assessment_name)
+      else
         assessment_class.find_by(inspection: self)
+      end
     end
   end
 
@@ -106,7 +109,7 @@ class Inspection < ApplicationRecord
   scope :failed, -> { where(passed: false) }
   scope :complete, -> { where.not(complete_date: nil) }
   scope :draft, -> { where(complete_date: nil) }
-  scope :search, ->(query) {
+  scope :search, lambda { |query|
     if query.present?
       joins("LEFT JOIN units ON units.id = inspections.unit_id")
         .where(search_conditions, *search_values(query))
@@ -114,23 +117,23 @@ class Inspection < ApplicationRecord
       all
     end
   }
-  scope :filter_by_result, ->(result) {
+  scope :filter_by_result, lambda { |result|
     case result
     when "passed" then where(passed: true)
     when "failed" then where(passed: false)
     end
   }
-  scope :filter_by_unit, ->(unit_id) {
+  scope :filter_by_unit, lambda { |unit_id|
     where(unit_id: unit_id) if unit_id.present?
   }
-  scope :filter_by_operator, ->(operator) {
+  scope :filter_by_operator, lambda { |operator|
     if operator.present?
       joins(:unit).where(units: {operator: operator})
     else
       all
     end
   }
-  scope :filter_by_date_range, ->(start_date, end_date) {
+  scope :filter_by_date_range, lambda { |start_date, end_date|
     range = start_date..end_date
     where(inspection_date: range) if both_dates_present?(start_date, end_date)
   }
@@ -151,16 +154,19 @@ class Inspection < ApplicationRecord
   # Calculated fields
   def reinspection_date
     return nil if inspection_date.blank?
+
     inspection_date + 1.year
   end
 
   def area
     return nil unless width && length
+
     width * length
   end
 
   def volume
     return nil unless width && length && height
+
     width * length * height
   end
 
@@ -289,12 +295,12 @@ class Inspection < ApplicationRecord
 
     # Check for missing assessments using the new helper
     each_applicable_assessment do |assessment_key, _, assessment|
-      unless assessment&.complete?
-        # Get the assessment type without "_assessment" suffix
-        assessment_type = assessment_key.to_s.sub("_assessment", "")
-        # Get the name from the form header
-        missing << I18n.t("forms.#{assessment_type}.header")
-      end
+      next if assessment&.complete?
+
+      # Get the assessment type without "_assessment" suffix
+      assessment_type = assessment_key.to_s.sub("_assessment", "")
+      # Get the name from the form header
+      missing << I18n.t("forms.#{assessment_type}.header")
     end
 
     missing
@@ -316,7 +322,7 @@ class Inspection < ApplicationRecord
       assessment_key = :"#{name}_assessment"
       next unless assessment_applicable?(assessment_key)
 
-      message if assessment&.present? && !assessment.complete?
+      message if assessment.present? && !assessment.complete?
     end
   end
 
@@ -343,9 +349,7 @@ class Inspection < ApplicationRecord
       label = I18n.t("forms.#{form}.fields.#{base_field}", default: nil)
     end
     # Try adding _pass suffix
-    if label.nil? && !field.to_s.end_with?("_pass")
-      label = I18n.t("#{key}_pass", default: nil)
-    end
+    label = I18n.t("#{key}_pass", default: nil) if label.nil? && !field.to_s.end_with?("_pass")
     # If still not found, raise for the original key
     label || I18n.t(key)
   end
@@ -354,7 +358,7 @@ class Inspection < ApplicationRecord
     # Fields required for the inspection tab specifically (excludes passed which is on results tab)
     fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
     fields
-      .select { |f| !f.end_with?("_comment") }
+      .reject { |f| f.end_with?("_comment") }
       .select { |f| send(f).nil? }
   end
 
@@ -462,8 +466,6 @@ class Inspection < ApplicationRecord
     applicable_assessments.map { |assessment_key, _| send(assessment_key) }
   end
 
-  private
-
   def assessment_validation_data
     assessment_types = %i[
       anchorage
@@ -499,7 +501,6 @@ class Inspection < ApplicationRecord
   end
 
   def invalidate_unit_pdf_cache
-    # When an inspection is completed, invalidate the unit's PDF cache
     PdfCacheService.invalidate_unit_cache(unit) if unit
   end
 end
