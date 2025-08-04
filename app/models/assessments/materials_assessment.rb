@@ -1,4 +1,8 @@
+# typed: true
+# frozen_string_literal: true
+
 class Assessments::MaterialsAssessment < ApplicationRecord
+  extend T::Sig
   include AssessmentLogging
   include AssessmentCompletion
   include FormConfigurable
@@ -16,6 +20,7 @@ class Assessments::MaterialsAssessment < ApplicationRecord
 
   after_update :log_assessment_update, if: :saved_changes?
 
+  sig { returns(T::Boolean) }
   def ropes_compliant?
     EN14960.valid_rope_diameter?(ropes)
   end

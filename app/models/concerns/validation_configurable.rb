@@ -1,5 +1,9 @@
+# typed: true
+# frozen_string_literal: true
+
 module ValidationConfigurable
   extend ActiveSupport::Concern
+  extend T::Sig
 
   included do
     # Apply validations when the concern is included
@@ -9,6 +13,9 @@ module ValidationConfigurable
   end
 
   class_methods do
+    extend T::Sig
+
+    sig { void }
     def apply_form_validations
       form_config = begin
         form_fields
@@ -28,6 +35,7 @@ module ValidationConfigurable
 
     private
 
+    sig { params(field_config: T::Hash[Symbol, T.untyped]).void }
     def apply_validation_for_field(field_config)
       field = field_config[:field]
       attributes = field_config[:attributes] || {}
@@ -47,17 +55,20 @@ module ValidationConfigurable
       end
     end
 
+    sig { params(field: T.any(String, Symbol), attributes: T::Hash[Symbol, T.untyped]).void }
     def apply_decimal_validation(field, attributes)
       options = build_numericality_options(attributes)
       validates field, numericality: options, allow_blank: true
     end
 
+    sig { params(field: T.any(String, Symbol), attributes: T::Hash[Symbol, T.untyped]).void }
     def apply_number_validation(field, attributes)
       options = build_numericality_options(attributes)
       options[:only_integer] = true
       validates field, numericality: options, allow_blank: true
     end
 
+    sig { params(attributes: T::Hash[Symbol, T.untyped]).returns(T::Hash[Symbol, T.untyped]) }
     def build_numericality_options(attributes)
       options = {}
 

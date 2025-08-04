@@ -1,4 +1,8 @@
+# typed: true
+# frozen_string_literal: true
+
 class Assessments::FanAssessment < ApplicationRecord
+  extend T::Sig
   include AssessmentLogging
   include AssessmentCompletion
   include FormConfigurable

@@ -1,5 +1,9 @@
+# typed: true
+# frozen_string_literal: true
+
 module AssessmentCompletion
   extend ActiveSupport::Concern
+  extend T::Sig
 
   SYSTEM_FIELDS = %w[
     id
@@ -8,10 +12,12 @@ module AssessmentCompletion
     updated_at
   ]
 
+  sig { returns(T::Boolean) }
   def complete?
     incomplete_fields.empty?
   end
 
+  sig { returns(T::Array[Symbol]) }
   def incomplete_fields
     (attributes.keys - SYSTEM_FIELDS)
       .select { |f| !f.end_with?("_comment") }
@@ -20,6 +26,7 @@ module AssessmentCompletion
       .map { |f| f.to_sym }
   end
 
+  sig { returns(T::Hash[Symbol, T::Hash[Symbol, T.untyped]]) }
   def incomplete_fields_grouped
     # Get form configuration to understand field relationships
     form_config = begin
@@ -74,6 +81,7 @@ module AssessmentCompletion
 
   private
 
+  sig { params(field: String).returns(T::Boolean) }
   def field_is_incomplete?(field)
     value = send(field)
     # Field is incomplete if nil
@@ -82,6 +90,7 @@ module AssessmentCompletion
     field.end_with?("_pass") && value == "na"
   end
 
+  sig { params(field: String).returns(T::Boolean) }
   def field_allows_nil_when_na?(field)
     # Pass fields are always required, even if set to "na"
     return false if field.end_with?("_pass")
