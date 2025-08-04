@@ -24,7 +24,6 @@ class BackupsController < ApplicationController
 
   private
 
-
   def ensure_s3_enabled
     return if ENV["USE_S3_STORAGE"] == "true"
 
