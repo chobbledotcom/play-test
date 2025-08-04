@@ -39,7 +39,6 @@ RSpec.describe ApplicationController, type: :controller do
       end
     end
 
-
     describe "#seed_data_action?" do
       it "returns true for add_seeds action on users controller" do
         allow(controller).to receive(:controller_name).and_return("users")
@@ -338,7 +337,7 @@ RSpec.describe ApplicationController, type: :controller do
       it "wraps actions with Prosopite scanning" do
         expect(Prosopite).to receive(:scan)
         expect(Prosopite).to receive(:finish)
-        
+
         controller.send(:n_plus_one_detection) { "test" }
       end
     end
