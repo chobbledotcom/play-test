@@ -64,12 +64,40 @@ namespace :code_standards do
     end
   end
 
+  desc "Run erb_lint on all ERB files"
+  task :erb_lint do
+    puts "Running erb_lint on all ERB files..."
+    success = system("bundle exec erb_lint --lint-all")
+    exit 1 unless success
+  end
+
+  desc "Run erb_lint with autocorrect on all ERB files"
+  task :erb_lint_fix do
+    puts "Running erb_lint with autocorrect on all ERB files..."
+    system("bundle exec erb_lint --lint-all --autocorrect")
+  end
+
+  desc "Run erb_lint on modified ERB files only"
+  task :erb_lint_modified do
+    modified_files = `git diff --name-only HEAD`.split("\n").select { |f| f.match?(/\.(erb|html\.erb)$/) }
+
+    if modified_files.empty?
+      puts "No modified ERB files to lint."
+    else
+      puts "Linting #{modified_files.length} modified ERB files..."
+      system("bundle exec erb_lint #{modified_files.join(" ")}")
+    end
+  end
+
   desc "Full workflow: lint with StandardRB then check standards"
   task :fix_all do
     puts "Step 1: Running StandardRB on all Ruby files..."
     system("bundle exec standardrb --fix app/ lib/ spec/")
 
-    puts "\nStep 2: Checking remaining code standards violations..."
+    puts "\nStep 2: Running erb_lint on all ERB files..."
+    system("bundle exec erb_lint --lint-all --autocorrect")
+
+    puts "\nStep 3: Checking remaining code standards violations..."
     Rake::Task["code_standards:check"].invoke
   rescue SystemExit
     puts "\nWorkflow complete. Check output above for any remaining violations."

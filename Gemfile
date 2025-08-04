@@ -43,6 +43,9 @@ group :development, :test do
   # Ruby code formatter and linter
   gem "standard", require: false
   gem "standard-rails"
+  
+  # ERB linter
+  gem "erb_lint", require: false
 end
 
 # PDF generation
