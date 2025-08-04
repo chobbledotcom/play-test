@@ -9,7 +9,9 @@ if Rails.env.development?
 
     Prosopite.allow_stack_paths = [
       "active_storage",
-      "active_record/associations/preloader"
+      "active_record/associations/preloader",
+      "mission_control",
+      "solid_queue"
     ]
 
     Prosopite.custom_logger = if defined?(Sentry)
