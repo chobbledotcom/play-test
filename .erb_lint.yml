@@ -25,9 +25,10 @@ linters:
   DeprecatedClasses:
     enabled: false
 
-  # Checks for potential XSS vulnerabilities in ERB
+  # Checks for potential XSS vulnerabilities in ERB (uses better-html)
   ErbSafety:
-    enabled: false
+    enabled: true
+    better_html_config: .better-html.yml
 
   # Checks for extra blank lines
   ExtraNewline:
@@ -113,6 +114,7 @@ linters:
   # Removes trailing whitespace
   TrailingWhitespace:
     enabled: true
+
 
 # Files to lint
 glob: "**/*.{html,html.erb,erb}"

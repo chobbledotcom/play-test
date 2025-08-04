@@ -46,8 +46,9 @@ group :development, :test do
   gem "prosopite"
   gem "pg_query", "~> 5.1"
 
-  # ERB linter
+  # ERB linter with better-html support
   gem "erb_lint", require: false
+  gem "better_html", require: false
 
   # Sorbet type checker
   gem "sorbet", require: false
