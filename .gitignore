@@ -45,6 +45,3 @@
 
 # Ignore terragon setup marker
 .terragon-setup-complete
-
-# Ignore actionlint fallback binary (for non-NixOS users)
-/bin/.actionlint-binary

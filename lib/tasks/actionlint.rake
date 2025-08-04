@@ -2,8 +2,9 @@ namespace :actionlint do
   desc "Run actionlint to check GitHub Actions workflows"
   task :check do
     puts "Running actionlint on GitHub Actions workflows..."
-    success = system("bin/actionlint")
-    
+    # Use nix-shell to run actionlint directly
+    success = system("nix-shell -p actionlint --run 'actionlint'")
+
     if success
       puts "✓ All GitHub Actions workflows are valid!"
     else
@@ -15,12 +16,12 @@ namespace :actionlint do
   desc "Run actionlint with verbose output"
   task :verbose do
     puts "Running actionlint with verbose output..."
-    system("bin/actionlint -verbose")
+    system("nix-shell -p actionlint --run 'actionlint -verbose'")
   end
 
   desc "Format actionlint output as JSON"
   task :json do
-    system("bin/actionlint -format '{{json .}}'")
+    system("nix-shell -p actionlint --run \"actionlint -format '{{json .}}'\"")
   end
 end
 
