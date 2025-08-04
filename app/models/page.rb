@@ -3,7 +3,7 @@
 
 class Page < ApplicationRecord
   extend T::Sig
-  
+
   include FormConfigurable
   include ValidationConfigurable
 
