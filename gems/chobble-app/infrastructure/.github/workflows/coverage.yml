@@ -1,0 +1,34 @@
+name: Coverage Report
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2am
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Run all tests with coverage
+        env:
+          RAILS_ENV: test
+        run: |
+          bundle exec rails db:migrate
+          bundle exec rails parallel:prepare
+          bundle exec rake coverage:parallel
+
+      - name: Deploy to neocities
+        uses: bcomnes/deploy-to-neocities@v3
+        with:
+          api_key: ${{ secrets.COVERAGE_NEOCITIES_API_KEY }}
+          cleanup: false
+          neocities_supporter: true
+          preview_before_deploy: false
+          dist_dir: coverage

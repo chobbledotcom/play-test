@@ -4,7 +4,7 @@
 class Inspection < ApplicationRecord
   extend T::Sig
 
-  include CustomIdGenerator
+  include ChobbleApp::CustomIdGenerator
   include FormConfigurable
   include ValidationConfigurable
 
@@ -372,7 +372,7 @@ class Inspection < ApplicationRecord
     label = I18n.t(key, default: nil)
     # Try removing _pass and/or _comment suffixes
     if label.nil?
-      base_field = FieldUtils.strip_field_suffix(field)
+      base_field = ChobbleApp::FieldUtils.strip_field_suffix(field)
       label = I18n.t("forms.#{form}.fields.#{base_field}", default: nil)
     end
     # Try adding _pass suffix

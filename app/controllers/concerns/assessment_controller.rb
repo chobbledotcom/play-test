@@ -4,7 +4,7 @@
 module AssessmentController
   extend ActiveSupport::Concern
   extend T::Sig
-  include UserActivityCheck
+  include ChobbleApp::UserActivityCheck
   include InspectionTurboStreams
 
   included do

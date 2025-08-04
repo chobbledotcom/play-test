@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+# CLI wrapper for code standards checking - used by Claude Code hooks
+
+require 'bundler/setup'
+require 'rails'
+require_relative '../config/environment'
+
+if ARGV.empty?
+  puts "Usage: bin/code-standards-check <file_path>"
+  exit 1
+end
+
+file_path = ARGV[0]
+
+unless File.exist?(file_path)
+  puts "Error: File '#{file_path}' does not exist"
+  exit 1
+end
+
+unless file_path.end_with?('.rb')
+  puts "Skipping non-Ruby file: #{file_path}"
+  exit 0
+end
+
+checker = CodeStandardsChecker.new
+violations = checker.check_file(file_path)
+
+if violations.empty?
+  puts "✅ #{file_path} meets code standards"
+  exit 0
+else
+  puts "❌ Code standards violations in #{file_path}:"
+  puts checker.format_violations(violations, show_summary: false)
+  exit 1
+end

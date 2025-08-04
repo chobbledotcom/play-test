@@ -4,7 +4,7 @@
 class InspectorCompany < ApplicationRecord
   extend T::Sig
 
-  include CustomIdGenerator
+  include ChobbleApp::CustomIdGenerator
   include FormConfigurable
   include ValidationConfigurable
 

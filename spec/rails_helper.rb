@@ -8,14 +8,14 @@ require "rspec/rails"
 require "factory_bot_rails"
 require "capybara/rspec"
 require "database_cleaner/active_record"
-require_relative "../lib/i18n_usage_tracker"
+require "chobble_app/i18n_usage_tracker"
 
 Capybara.raise_server_errors = true
 Capybara.default_max_wait_time = 10
 
 if ENV["I18N_TRACKING_ENABLED"] == "true"
-  I18nUsageTracker.reset!
-  I18nUsageTracker.tracking_enabled = true
+  ChobbleApp::I18nUsageTracker.reset!
+  ChobbleApp::I18nUsageTracker.tracking_enabled = true
 end
 
 Rails.root.glob("spec/support/**/*.rb").sort_by(&:to_s).each { |f| require f }

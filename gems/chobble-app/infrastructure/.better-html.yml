@@ -1,0 +1,11 @@
+# Better HTML configuration
+# See: https://github.com/Shopify/better-html
+
+javascript_safe_methods:
+  - to_json
+  - to_i
+  - to_f
+  - raw
+  - html_safe
+
+template_exclusion_filter: .*\.mjml\.erb

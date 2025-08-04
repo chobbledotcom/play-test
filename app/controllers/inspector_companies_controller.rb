@@ -1,5 +1,5 @@
 class InspectorCompaniesController < ApplicationController
-  include TurboStreamResponders
+  include ChobbleApp::TurboStreamResponders
 
   before_action :set_inspector_company, only: %i[
     show edit update

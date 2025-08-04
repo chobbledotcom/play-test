@@ -1,3 +1,5 @@
-class ApplicationRecord < ActiveRecord::Base
-  primary_abstract_class
+# frozen_string_literal: true
+
+class ApplicationRecord < ChobbleApp::ApplicationRecord
+  self.abstract_class = true
 end

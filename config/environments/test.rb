@@ -58,4 +58,7 @@ Rails.application.configure do
 
   # Use test adapter for Active Job in tests
   config.active_job.queue_adapter = :test
+
+  # Don't check for precompiled assets in test environment
+  config.assets.check_precompiled_asset = false
 end

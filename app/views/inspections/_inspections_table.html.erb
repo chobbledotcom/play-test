@@ -10,20 +10,20 @@
   <!-- Header row -->
   <div class="table-list-header">
     <% if show_photo %>
-      <span class="col-photo"><%= FieldUtils.form_field_label('units', 'photo') %></span>
+      <span class="col-photo"><%= ChobbleApp::FieldUtils.form_field_label('units', 'photo') %></span>
     <% end %>
-    <span class="col-id"><%= FieldUtils.form_field_label('inspection', 'id') %></span>
+    <span class="col-id"><%= ChobbleApp::FieldUtils.form_field_label('inspection', 'id') %></span>
     <% if show_name %>
-      <span class="col-name"><%= FieldUtils.form_field_label('units', 'name') %></span>
+      <span class="col-name"><%= ChobbleApp::FieldUtils.form_field_label('units', 'name') %></span>
     <% end %>
     <% if show_serial %>
-      <span class="col-serial"><%= FieldUtils.form_field_label('units', 'serial') %></span>
+      <span class="col-serial"><%= ChobbleApp::FieldUtils.form_field_label('units', 'serial') %></span>
     <% end %>
     <span class="col-last-inspection"><%= t('inspections.fields.last_inspection') %></span>
     <% if show_inspector %>
-      <span class="col-inspector"><%= FieldUtils.form_field_label('inspection', 'inspector') %></span>
+      <span class="col-inspector"><%= ChobbleApp::FieldUtils.form_field_label('inspection', 'inspector') %></span>
     <% end %>
-    <span class="col-result"><%= FieldUtils.form_field_label('inspection', 'result') %></span>
+    <span class="col-result"><%= ChobbleApp::FieldUtils.form_field_label('inspection', 'result') %></span>
   </div>
 
   <!-- Data rows -->
@@ -38,7 +38,7 @@
       <li>
         <%= link_to target_path, class: "table-list-link" do %>
           <% if show_photo %>
-            <span class="col-photo" data-label="<%= FieldUtils.form_field_label('units', 'photo') %>">
+            <span class="col-photo" data-label="<%= ChobbleApp::FieldUtils.form_field_label('units', 'photo') %>">
               <% if !inspection.complete? && inspection.unit&.photo&.attached? %>
                 <%= render 'shared/image',
                     image: inspection.unit.photo,
@@ -52,11 +52,11 @@
               <% end %>
             </span>
           <% end %>
-          <span class="col-id" data-label="<%= FieldUtils.form_field_label('inspection', 'id') %>">
+          <span class="col-id" data-label="<%= ChobbleApp::FieldUtils.form_field_label('inspection', 'id') %>">
             <%= inspection.id %>
           </span>
           <% if show_name %>
-            <span class="col-name" data-label="<%= FieldUtils.form_field_label('units', 'name') %>">
+            <span class="col-name" data-label="<%= ChobbleApp::FieldUtils.form_field_label('units', 'name') %>">
               <% if inspection.unit.nil? %>
                 <span class="badge">[<%= t("inspections.labels.no_unit") %>]</span>
               <% end %>
@@ -64,15 +64,15 @@
             </span>
           <% end %>
           <% if show_serial %>
-            <span class="col-serial" data-label="<%= FieldUtils.form_field_label('units', 'serial') %>">
+            <span class="col-serial" data-label="<%= ChobbleApp::FieldUtils.form_field_label('units', 'serial') %>">
               <%= inspection.unit&.serial.presence || t('inspections.messages.missing_serial') %>
             </span>
           <% end %>
           <span class="col-last-inspection" data-label="<%= t('inspections.fields.last_inspection') %>"><%= render_time(inspection.inspection_date) %></span>
           <% if show_inspector %>
-            <span class="col-inspector" data-label="<%= FieldUtils.form_field_label('inspection', 'inspector') %>"><%= inspection.inspector_company&.name %></span>
+            <span class="col-inspector" data-label="<%= ChobbleApp::FieldUtils.form_field_label('inspection', 'inspector') %>"><%= inspection.inspector_company&.name %></span>
           <% end %>
-          <span class="col-result" data-label="<%= FieldUtils.form_field_label('inspection', 'result') %>"><%= inspection_result_badge(inspection) %></span>
+          <span class="col-result" data-label="<%= ChobbleApp::FieldUtils.form_field_label('inspection', 'result') %>"><%= inspection_result_badge(inspection) %></span>
         <% end %>
       </li>
     <% end %>

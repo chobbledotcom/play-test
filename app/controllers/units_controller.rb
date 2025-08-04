@@ -4,9 +4,9 @@
 class UnitsController < ApplicationController
   extend T::Sig
 
-  include TurboStreamResponders
-  include PublicViewable
-  include UserActivityCheck
+  include ChobbleApp::TurboStreamResponders
+  include ChobbleApp::PublicViewable
+  include ChobbleApp::UserActivityCheck
 
   skip_before_action :require_login, only: %i[show]
   before_action :set_unit, only: %i[destroy edit log show update]

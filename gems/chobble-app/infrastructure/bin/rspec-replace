@@ -1,0 +1,224 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+# Parse command line arguments
+options = {}
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: rspec-replace [options] FILE:LINE REPLACEMENT_CODE"
+  
+  opts.separator ""
+  opts.separator "Replace a test at the specified line with new code and run it"
+  opts.separator ""
+  opts.separator "Examples:"
+  opts.separator "  # Single line replacement"
+  opts.separator "  rspec-replace spec/models/user_spec.rb:42 'it \"works\" do; expect(true).to be true; end'"
+  opts.separator ""
+  opts.separator "  # Multi-line replacement"
+  opts.separator "  rspec-replace spec/models/user_spec.rb:42 'it \"validates email\" do"
+  opts.separator "    user = build(:user, email: \"invalid\")"
+  opts.separator "    expect(user).not_to be_valid"
+  opts.separator "  end'"
+  opts.separator ""
+  opts.separator "  # Automatically write changes if tests pass"
+  opts.separator "  rspec-replace --write spec/models/user_spec.rb:42 'it \"fixed test\" do ...'"
+  opts.separator ""
+  opts.separator "Options:"
+  
+  opts.on("-w", "--write", "Write changes to file if tests pass and line count is reasonable") do
+    options[:write] = true
+  end
+  
+  opts.on("-h", "--help", "Show this help message") do
+    puts opts
+    exit
+  end
+end
+
+begin
+  parser.parse!
+rescue OptionParser::InvalidOption => e
+  puts e.message
+  puts parser
+  exit 1
+end
+
+# Check arguments
+if ARGV.length != 2
+  puts "Error: Wrong number of arguments"
+  puts parser
+  exit 1
+end
+
+file_spec = ARGV[0]
+replacement_content = ARGV[1]
+
+# Parse file:line format
+unless file_spec =~ /^(.+):(\d+)$/
+  puts "Error: First argument must be in format FILE:LINE"
+  puts "Example: spec/models/user_spec.rb:42"
+  exit 1
+end
+
+file_path = $1
+target_line = $2.to_i
+
+# Check if file exists
+unless File.exist?(file_path)
+  puts "Error: File #{file_path} does not exist"
+  exit 1
+end
+
+# Read the file
+lines = File.readlines(file_path)
+
+# Find the test boundaries
+start_line = nil
+end_line = nil
+indent_level = nil
+
+# Work backwards from target line to find the beginning
+(target_line - 1).downto(0) do |i|
+  line = lines[i]
+  if line =~ /^\s*(it|scenario|specify|example|describe|context)\s+['"]/ || 
+     line =~ /^\s*(it|scenario|specify|example|describe|context)\s+do/
+    start_line = i + 1
+    indent_level = line[/^\s*/].length
+    break
+  end
+end
+
+unless start_line
+  puts "Error: Could not find test beginning at or before line #{target_line}"
+  exit 1
+end
+
+# Find the end of the test
+lines.each_with_index do |line, i|
+  next if i < start_line
+  
+  # Check if we've reached an 'end' at the same indent level
+  if line =~ /^\s{#{indent_level}}end\s*$/
+    end_line = i + 1
+    break
+  end
+end
+
+unless end_line
+  puts "Error: Could not find test end after line #{target_line}"
+  exit 1
+end
+
+original_line_count = lines.length
+replaced_line_count = end_line - start_line + 1
+
+puts "Replacing test at lines #{start_line}-#{end_line} in #{file_path}"
+puts "Original test: #{replaced_line_count} lines"
+puts "-" * 80
+
+# Create temporary file with replacement
+require 'tempfile'
+temp_file = Tempfile.new(['rspec_replace', '.rb'])
+
+begin
+  # Write lines before the test
+  temp_file.write(lines[0...start_line-1].join) if start_line > 1
+  
+  # Write the replacement content
+  # Ensure proper indentation
+  indent = " " * indent_level
+  replacement_lines = replacement_content.split("\n")
+  replacement_lines.each_with_index do |line, i|
+    # Don't add indent to empty lines
+    if line.strip.empty?
+      temp_file.puts
+    else
+      # First line might already have correct indentation
+      if i == 0 && line.start_with?(indent)
+        temp_file.puts line
+      else
+        temp_file.puts "#{indent}#{line}"
+      end
+    end
+  end
+  
+  # Write lines after the test
+  temp_file.write(lines[end_line..-1].join) if end_line < lines.length
+  
+  temp_file.close
+  
+  # Run rspec on the temporary file
+  # Replace temp file path with original in output
+  puts "Running test..."
+  puts "-" * 80
+  
+  # Capture output to check if tests actually ran
+  output = `bundle exec rspec #{temp_file.path} --format documentation 2>&1`
+  exit_status = $?.exitstatus
+  
+  # Display output with path substitution
+  puts output.gsub(temp_file.path, file_path)
+  
+  # Check if any tests actually ran
+  test_count_match = output.match(/(\d+) examples?/)
+  test_count = test_count_match ? test_count_match[1].to_i : 0
+  
+  # Check for syntax errors or loading issues
+  has_syntax_error = output.include?("SyntaxError") || output.include?("syntax error")
+  has_loading_error = output.include?("error occurred outside of examples")
+  
+  # If tests passed, check if we should write the file
+  if exit_status == 0 && test_count > 0 && !has_syntax_error && !has_loading_error
+    # Calculate line difference
+    new_content = File.read(temp_file.path)
+    new_line_count = new_content.lines.count
+    line_difference = (original_line_count - new_line_count).abs
+    
+    puts "\n" + "-" * 80
+    puts "✅ Tests passed!"
+    puts "Line count: #{original_line_count} → #{new_line_count} (difference: #{line_difference})"
+    
+    if options[:write]
+      if line_difference > 10
+        puts "\n⚠️  Line count changed by more than 10 lines. Too risky to auto-write."
+        puts "Please review the changes and apply them manually if appropriate."
+      else
+        # Write the changes
+        File.write(file_path, new_content)
+        puts "\n✅ Changes written to #{file_path}"
+        puts "The test has been permanently updated in the file."
+      end
+    else
+      puts "\n💡 To automatically write these changes to the file, use:"
+      puts "   bin/rspec-replace --write #{file_spec} '...'"
+      if line_difference > 10
+        puts "\n⚠️  Note: Line count differs by #{line_difference} lines, which may be too risky for auto-write."
+      end
+    end
+  else
+    puts "\n" + "-" * 80
+    if test_count == 0
+      if has_syntax_error
+        puts "❌ Syntax error in replacement code! No tests ran."
+        puts "Please check your replacement code for syntax errors."
+      elsif has_loading_error
+        puts "❌ Error loading test file! No tests ran."
+        puts "This usually indicates a syntax error or other loading issue."
+      else
+        puts "❌ No tests ran! This usually indicates a problem with the test code."
+      end
+    else
+      puts "❌ Tests failed. No changes made to the file."
+    end
+  end
+  
+ensure
+  temp_file.unlink
+end
+
+# Exit with error if no tests ran or syntax error
+if test_count == 0 || has_syntax_error || has_loading_error
+  exit 1
+else
+  exit exit_status
+end

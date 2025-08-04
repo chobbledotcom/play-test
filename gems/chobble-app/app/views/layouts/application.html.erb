@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for?(:title) ? yield(:title) : "play-test | BS EN 14960 Inspection Logger & Database | play-test.co.uk" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application" %>
+    <%= javascript_importmap_tags %>
+
+    <% begin %>
+      <%= favicon_link_tag asset_path("favicon.svg") %>
+    <% rescue Sprockets::Rails::Helper::AssetNotPrecompiledError %>
+      <!-- No favicon available -->
+    <% end %>
+    <% unless Rails.env.test? %>
+      <script>
+        window.goatcounter = {no_onload: true}
+        const trackPageView = () => {
+          if (typeof window.goatcounter.count === 'function') {
+            window.goatcounter.count({
+              path: location.pathname + location.search + location.hash,
+            });
+          }
+        };
+        document.addEventListener("DOMContentLoaded", trackPageView);
+        document.addEventListener("turbo:load", trackPageView);
+      </script>
+      <script data-goatcounter="https://analytics.play-test.co.uk/count"
+        async src="https://analytics.play-test.co.uk/count.js"></script>
+    <% end %>
+  </head>
+  <body class="<%= effective_theme %>">
+    <%= render 'shared/header_logo' %>
+    <% if current_user %>
+      <% if !current_user.is_active? %>
+        <aside id="company-activation-notice">
+          <%= current_user.inactive_user_message %>
+        </aside>
+      <% end %>
+      <nav>
+        <ul>
+          <li><%= nav_link_to t('navigation.inspections'), inspections_path %></li>
+          <li><%= nav_link_to t('navigation.units'), units_path %></li>
+          <% if Rails.env.development? || Rails.env.test? %>
+            <li><%= nav_link_to t('navigation.search'), search_path %></li>
+          <% end %>
+          <% if current_user.admin? %>
+            <li><%= nav_link_to t('navigation.users'), users_path %></li>
+            <li><%= nav_link_to t('inspector_companies.titles.index'), inspector_companies_path %></li>
+            <li><%= nav_link_to t('navigation.pages'), pages_path %></li>
+            <li><%= nav_link_to t('navigation.jobs'), "/mission_control" %></li>
+          <% end %>
+          <li><%= nav_link_to t('navigation.settings'), change_settings_user_path(current_user) %></li>
+          <li><%= nav_link_to t('navigation.safety_standards'), safety_standards_path %></li>
+          <% if Rails.env.development? %>
+            <li><%= nav_link_to t('navigation.guides'), guides_path %></li>
+          <% end %>
+          <li><%= nav_link_to t('navigation.about'), page_by_slug_path("about") %></li>
+          <li>
+            <%= button_to t("sessions.buttons.log_out"), logout_path, method: :delete %>
+          </li>
+        </ul>
+      </nav>
+    <% end %>
+    <main id="main">
+      <% flash.each do |type, message| %>
+        <article class="<%= type %>">
+          <%= message %>
+          <% if type.to_s == "notice" && session[:rpii_verification_details] %>
+            <div style="margin-top: 0.5rem; padding: 0.5rem; background: #f0f0f0;">
+              <strong><%= t("users.verification.details_header") %></strong><br>
+              <%= t("users.verification.name") %>: <%= session[:rpii_verification_details]["name"] %><br>
+              <%= t("users.verification.number") %>: <%= session[:rpii_verification_details]["number"] %><br>
+              <%= t("users.verification.qualifications") %>: <%= session[:rpii_verification_details]["qualifications"] %>
+            </div>
+            <% session.delete(:rpii_verification_details) %>
+          <% end %>
+        </article>
+      <% end %>
+
+      <%= yield %>
+
+      <hr id="footer-rule">
+      <footer>
+        <%= page_snippet("footer") %>
+      </footer>
+      <%= render 'shared/debug_info' %>
+    </main>
+    <% if current_user %>
+      <a href="https://feedback.chobble.com" target="_blank" rel="noopener" role="button" class="feedback-button">
+        <span class="heart">🤍</span>
+        <%= t('navigation.feedback') %>
+      </a>
+    <% end %>
+  </body>
+</html>

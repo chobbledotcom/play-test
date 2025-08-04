@@ -1,19 +1,19 @@
 require "rails_helper"
 
-RSpec.describe CustomIdGenerator, type: :concern do
+RSpec.describe ChobbleApp::CustomIdGenerator, type: :concern do
   # Create a test model to include the concern
   let(:test_class) do
     Class.new(ApplicationRecord) do
       self.table_name = "units" # Use units table which has string ID
-      include CustomIdGenerator
+      include ChobbleApp::CustomIdGenerator
     end
   end
 
   describe ".generate_random_id" do
     it "generates an ID with the configured length" do
       id = test_class.generate_random_id
-      expect(id.length).to eq(CustomIdGenerator::ID_LENGTH)
-      expect(id).to match(/\A[A-Z0-9]{#{CustomIdGenerator::ID_LENGTH}}\z/o)
+      expect(id.length).to eq(ChobbleApp::CustomIdGenerator::ID_LENGTH)
+      expect(id).to match(/\A[A-Z0-9]{#{ChobbleApp::CustomIdGenerator::ID_LENGTH}}\z/o)
     end
 
     it "generates an 8-character alphanumeric uppercase ID" do
