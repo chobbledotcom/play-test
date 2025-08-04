@@ -1,5 +1,6 @@
 # Reusable code standards checker for both rake tasks and hooks
-class CodeStandardsChecker
+module ChobbleApp
+  class CodeStandardsChecker
   HARDCODED_STRINGS_ALLOWED_PATHS = %w[/lib/ /seeds/ /spec/ /test/].freeze
 
   def initialize(max_method_lines: 20, max_file_lines: 500, max_line_length: 80)
@@ -293,5 +294,6 @@ class CodeStandardsChecker
       length: end_line - start_line + 1,
       file: file_path
     }
+  end
   end
 end

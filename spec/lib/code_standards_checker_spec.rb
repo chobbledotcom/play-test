@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe CodeStandardsChecker do
+RSpec.describe ChobbleApp::CodeStandardsChecker do
   let(:checker) { described_class.new }
   let(:temp_file) { Tempfile.new(["test", ".rb"]) }
 

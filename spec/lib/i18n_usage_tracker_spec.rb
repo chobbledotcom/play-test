@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe I18nUsageTracker do
+RSpec.describe ChobbleApp::I18nUsageTracker do
   # Clean up state before each test
   before do
     described_class.reset!
@@ -131,9 +131,9 @@ RSpec.describe I18nUsageTracker do
       keys = described_class.all_locale_keys
 
       # Check for some keys we know exist in the app
-      expect(keys).to include("users")
       expect(keys).to include("inspections")
-      expect(keys).to include("shared")
+      expect(keys).to include("forms")
+      expect(keys).to include("safety_standards")
     end
 
     it "caches the result" do
@@ -154,21 +154,31 @@ RSpec.describe I18nUsageTracker do
     it "returns keys that haven't been tracked" do
       all_keys = described_class.all_locale_keys
 
-      # Track some keys
-      described_class.track_key("users.edit.title")
-      described_class.track_key("shared.save")
+      # Track some keys that we know exist
+      described_class.track_key("inspections.new.title")
+      described_class.track_key("forms.general_assessment.header")
 
       unused = described_class.unused_keys
+      used = described_class.used_keys
 
       expect(unused).to be_a(Set)
-      expect(unused).not_to include("users.edit.title")
-      expect(unused).not_to include("users.edit")
-      expect(unused).not_to include("users")
-      expect(unused).not_to include("shared.save")
-      expect(unused).not_to include("shared")
+      expect(used).to include("inspections.new.title")
+      expect(used).to include("inspections.new")
+      expect(used).to include("inspections")
+      expect(used).to include("forms.general_assessment.header")
+      expect(used).to include("forms.general_assessment")
+      expect(used).to include("forms")
+      
+      expect(unused).not_to include("inspections.new.title")
+      expect(unused).not_to include("inspections.new")
+      expect(unused).not_to include("inspections")
+      expect(unused).not_to include("forms.general_assessment.header")
+      expect(unused).not_to include("forms.general_assessment")
+      expect(unused).not_to include("forms")
 
       # Should include keys that weren't tracked
       expect(unused.size).to be < all_keys.size
+      expect(used.size).to be > 0
     end
   end
 
@@ -177,8 +187,8 @@ RSpec.describe I18nUsageTracker do
 
     it "returns a comprehensive usage report" do
       # Track some keys
-      described_class.track_key("users.edit.title")
-      described_class.track_key("shared.save")
+      described_class.track_key("inspections.new.title")
+      described_class.track_key("forms.general_assessment.header")
 
       report = described_class.usage_report
 
@@ -256,12 +266,12 @@ end
 # Test I18n monkey patching
 RSpec.describe "I18n monkey patch" do
   before do
-    I18nUsageTracker.reset!
-    I18nUsageTracker.tracking_enabled = true
+    ChobbleApp::I18nUsageTracker.reset!
+    ChobbleApp::I18nUsageTracker.tracking_enabled = true
   end
 
   after do
-    I18nUsageTracker.reset!
+    ChobbleApp::I18nUsageTracker.reset!
   end
 
   describe "I18n.t" do
@@ -269,24 +279,24 @@ RSpec.describe "I18n monkey patch" do
       # Use a key that exists in the app
       I18n.t("shared.yes")
 
-      expect(I18nUsageTracker.used_keys).to include("shared.yes")
+      expect(ChobbleApp::I18nUsageTracker.used_keys).to include("shared.yes")
     end
 
     it "works with scope option" do
       I18n.t("save", scope: "shared.actions")
 
-      expect(I18nUsageTracker.used_keys).to include("save")
-      expect(I18nUsageTracker.used_keys).to include("shared.actions.save")
-      expect(I18nUsageTracker.used_keys).to include("shared.actions")
-      expect(I18nUsageTracker.used_keys).to include("shared")
+      expect(ChobbleApp::I18nUsageTracker.used_keys).to include("save")
+      expect(ChobbleApp::I18nUsageTracker.used_keys).to include("shared.actions.save")
+      expect(ChobbleApp::I18nUsageTracker.used_keys).to include("shared.actions")
+      expect(ChobbleApp::I18nUsageTracker.used_keys).to include("shared")
     end
 
     it "does not track when tracking is disabled" do
-      I18nUsageTracker.tracking_enabled = false
+      ChobbleApp::I18nUsageTracker.tracking_enabled = false
 
       I18n.t("shared.yes")
 
-      expect(I18nUsageTracker.used_keys).to be_empty
+      expect(ChobbleApp::I18nUsageTracker.used_keys).to be_empty
     end
   end
 
@@ -294,7 +304,7 @@ RSpec.describe "I18n monkey patch" do
     it "tracks keys when called" do
       I18n.translate("shared.yes")
 
-      expect(I18nUsageTracker.used_keys).to include("shared.yes")
+      expect(ChobbleApp::I18nUsageTracker.used_keys).to include("shared.yes")
     end
   end
 end

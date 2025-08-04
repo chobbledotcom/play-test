@@ -4,7 +4,8 @@ require "open3"
 
 # Runs erb_lint on files one at a time with progress output
 # rubocop:disable Rails/Output
-class ErbLintRunner
+module ChobbleApp
+  class ErbLintRunner
   def initialize(autocorrect: false, verbose: false)
     @autocorrect = autocorrect
     @verbose = verbose
@@ -121,6 +122,7 @@ class ErbLintRunner
     else
       puts "\n✅ All ERB files passed linting!"
     end
+  end
   end
 end
 # rubocop:enable Rails/Output
