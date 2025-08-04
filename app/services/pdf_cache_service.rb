@@ -84,9 +84,6 @@ class PdfCacheService
         filename: filename,
         content_type: "application/pdf"
       )
-
-      # Force a save to ensure attachment is persisted
-      record.save! if record.changed?
     end
 
     def generate_inspection_pdf(inspection, **options)
