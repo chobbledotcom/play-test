@@ -11,7 +11,7 @@ module S3RakeHelpers
     return if ENV["USE_S3_STORAGE"] == "true"
 
     error_msg = "S3 storage is not enabled. Set USE_S3_STORAGE=true in your .env file"
-    Rails.logger.debug "❌ #{error_msg}"
+    Rails.logger.debug { "❌ #{error_msg}" }
     raise StandardError, error_msg
   end
 
