@@ -35,6 +35,10 @@ RSpec.feature "Mission Control navigation", type: :feature do
     end
   end
 
+  # NOTE: We can't actually visit Mission Control in tests because it requires
+  # SolidQueue adapter, but tests use the :test adapter. The Prosopite error
+  # we fixed would only occur in development/production where SolidQueue is active.
+
   scenario "Jobs link has correct href attribute" do
     sign_in(admin_user)
     visit root_path

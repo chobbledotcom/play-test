@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-if Rails.env.development?
+unless Rails.env.production?
   require "prosopite"
 
   Rails.application.config.after_initialize do
