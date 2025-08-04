@@ -65,37 +65,51 @@ namespace :code_standards do
   end
 
   desc "Run erb_lint on all ERB files"
-  task :erb_lint do
-    puts "Running erb_lint on all ERB files..."
-    success = system("bundle exec erb_lint --lint-all")
+  task erb_lint: :environment do
+    require_relative "../erb_lint_runner"
+    runner = ErbLintRunner.new(autocorrect: false)
+    success = runner.run_on_all_files
     exit 1 unless success
   end
 
   desc "Run erb_lint with autocorrect on all ERB files"
-  task :erb_lint_fix do
-    puts "Running erb_lint with autocorrect on all ERB files..."
-    system("bundle exec erb_lint --lint-all --autocorrect")
+  task erb_lint_fix: :environment do
+    require_relative "../erb_lint_runner"
+    runner = ErbLintRunner.new(autocorrect: true)
+    runner.run_on_all_files
   end
 
   desc "Run erb_lint on modified ERB files only"
-  task :erb_lint_modified do
+  task erb_lint_modified: :environment do
     modified_files = `git diff --name-only HEAD`.split("\n").select { |f| f.match?(/\.(erb|html\.erb)$/) }
 
     if modified_files.empty?
       puts "No modified ERB files to lint."
     else
-      puts "Linting #{modified_files.length} modified ERB files..."
-      system("bundle exec erb_lint #{modified_files.join(" ")}")
+      require_relative "../erb_lint_runner"
+      runner = ErbLintRunner.new(autocorrect: false)
+      success = runner.run_on_files(modified_files)
+      exit 1 unless success
     end
   end
 
+  desc "Run erb_lint in verbose mode (shows details for slow files)"
+  task erb_lint_verbose: :environment do
+    require_relative "../erb_lint_runner"
+    runner = ErbLintRunner.new(autocorrect: false, verbose: true)
+    success = runner.run_on_all_files
+    exit 1 unless success
+  end
+
   desc "Full workflow: lint with StandardRB then check standards"
-  task :fix_all do
+  task fix_all: :environment do
     puts "Step 1: Running StandardRB on all Ruby files..."
     system("bundle exec standardrb --fix app/ lib/ spec/")
 
-    puts "\nStep 2: Running erb_lint on all ERB files..."
-    system("bundle exec erb_lint --lint-all --autocorrect")
+    puts "\nStep 2: Running erb_lint on all ERB files (one at a time)..."
+    require_relative "../erb_lint_runner"
+    runner = ErbLintRunner.new(autocorrect: true)
+    runner.run_on_all_files
 
     puts "\nStep 3: Checking remaining code standards violations..."
     Rake::Task["code_standards:check"].invoke
