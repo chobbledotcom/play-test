@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "users/edit.html.erb", type: :view do
-  let(:admin_user) { create(:user, :admin) }
-  let(:user_to_edit) { create(:user) }
+  let(:admin_user) { create(:chobble_app_user, :admin) }
+  let(:user_to_edit) { create(:chobble_app_user) }
 
   before do
     assign(:user, user_to_edit)

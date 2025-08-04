@@ -1,9 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "users/index.html.erb", type: :view do
-  let(:admin_user) { create(:user, :admin) }
-  let(:regular_user1) { create(:user, email: "user1@example.com") }
-  let(:regular_user2) { create(:user, email: "user2@example.com") }
+  let(:admin_user) { create(:chobble_app_user, :admin) }
+  let(:regular_user1) { create(:chobble_app_user, email: "user1@example.com") }
+  let(:regular_user2) { create(:chobble_app_user, email: "user2@example.com") }
 
   before do
     assign(:users, [admin_user, regular_user1, regular_user2])

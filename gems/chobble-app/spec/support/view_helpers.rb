@@ -54,7 +54,7 @@ module ViewHelpers
   # Common setup for admin user in view context
   # Usage: setup_admin_view_context
   def setup_admin_view_context(user = nil)
-    admin_user = user || create(:user, :admin)
+    admin_user = user || create(:chobble_app_user, :admin)
     allow(view).to receive(:current_user).and_return(admin_user)
     admin_user
   end

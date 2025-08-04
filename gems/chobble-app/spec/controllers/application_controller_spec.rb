@@ -15,8 +15,8 @@ RSpec.describe ApplicationController, type: :controller do
     end
   end
 
-  let(:user) { create(:user) }
-  let(:admin) { create(:user, :admin) }
+  let(:user) { create(:chobble_app_user) }
+  let(:admin) { create(:chobble_app_user, :admin) }
 
   describe "private helper methods" do
     describe "#app_i18n" do

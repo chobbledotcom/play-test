@@ -20,13 +20,13 @@ module LoginHelpers
   end
 
   def create_and_login_user(attributes = {})
-    user = create(:user, attributes)
+    user = create(:chobble_app_user, attributes)
     login_as(user)
     user
   end
 
   def create_and_login_admin(attributes = {})
-    admin = create(:user, :admin, attributes)
+    admin = create(:chobble_app_user, :admin, attributes)
     login_as(admin)
     admin
   end

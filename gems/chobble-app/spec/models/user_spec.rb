@@ -44,7 +44,7 @@ RSpec.describe ChobbleApp::User, type: :model do
     end
 
     it "requires a unique email" do
-      create(:user, email: "duplicate@example.com")
+      create(:chobble_app_user, email: "duplicate@example.com")
       duplicate_user = build(:user, email: "duplicate@example.com")
 
       expect(duplicate_user).not_to be_valid
@@ -57,19 +57,19 @@ RSpec.describe ChobbleApp::User, type: :model do
     end
 
     it "normalizes blank RPII inspector number to nil" do
-      user = create(:user, rpii_inspector_number: "")
+      user = create(:chobble_app_user, rpii_inspector_number: "")
       expect(user.rpii_inspector_number).to be_nil
     end
 
     it "requires unique RPII inspector number when present" do
-      create(:user, rpii_inspector_number: "RPII123")
+      create(:chobble_app_user, rpii_inspector_number: "RPII123")
       duplicate_user = build(:user, rpii_inspector_number: "RPII123")
       expect(duplicate_user).not_to be_valid
       expect(duplicate_user.errors[:rpii_inspector_number]).to include("has already been taken")
     end
 
     it "allows multiple users with nil RPII inspector number" do
-      create(:user, rpii_inspector_number: nil)
+      create(:chobble_app_user, rpii_inspector_number: nil)
       user_with_nil_rpii = build(:user, rpii_inspector_number: nil)
       expect(user_with_nil_rpii).to be_valid
     end
@@ -89,7 +89,7 @@ RSpec.describe ChobbleApp::User, type: :model do
 
   describe "custom ID generation" do
     it "generates string IDs using CustomIdGenerator" do
-      user = create(:user)
+      user = create(:chobble_app_user)
 
       # Verify ID is a string
       expect(user.id).to be_a(String)
@@ -98,7 +98,7 @@ RSpec.describe ChobbleApp::User, type: :model do
       expect(user.id).to match(/\A[A-Z0-9]{8}\z/)
 
       # Verify ID is unique for multiple users
-      second_user = create(:user)
+      second_user = create(:chobble_app_user)
 
       expect(second_user.id).to be_a(String)
       expect(second_user.id).to match(/\A[A-Z0-9]{8}\z/)
@@ -109,10 +109,10 @@ RSpec.describe ChobbleApp::User, type: :model do
   describe "admin functionality" do
     it "determines admin status based on ENV configuration" do
       # Create a user with admin email pattern
-      admin_user = create(:user, :admin)
+      admin_user = create(:chobble_app_user, :admin)
 
       # Create a regular user
-      regular_user = create(:user)
+      regular_user = create(:chobble_app_user)
 
       # Verify admin user is detected as admin
       expect(admin_user.admin?).to be true
@@ -124,7 +124,7 @@ RSpec.describe ChobbleApp::User, type: :model do
 
   describe "active_until" do
     it "defaults to yesterday (inactive on signup)" do
-      user = create(:user, :newly_signed_up)
+      user = create(:chobble_app_user, :newly_signed_up)
       expect(user.active_until).to eq(Date.current - 1.day)
       expect(user.is_active?).to be false # Yesterday means inactive
     end
@@ -135,7 +135,7 @@ RSpec.describe ChobbleApp::User, type: :model do
 
       context "with SIMPLE_USER_ACTIVATION enabled" do
         it "simulates activation by setting active_until far in future" do
-          user = create(:user, active_until: Date.current - 1.day)
+          user = create(:chobble_app_user, active_until: Date.current - 1.day)
           expect(user.is_active?).to be false
 
           # Simulate activation
@@ -144,7 +144,7 @@ RSpec.describe ChobbleApp::User, type: :model do
         end
 
         it "simulates deactivation by setting active_until to today" do
-          user = create(:user, active_until: Date.current + 1.year)
+          user = create(:chobble_app_user, active_until: Date.current + 1.year)
           expect(user.is_active?).to be true
 
           # Simulate deactivation
@@ -156,19 +156,19 @@ RSpec.describe ChobbleApp::User, type: :model do
 
     describe "#can_create_inspection?" do
       it "returns true when user is active" do
-        user = create(:user, :active_user)
+        user = create(:chobble_app_user, :active_user)
         expect(user.can_create_inspection?).to be true
       end
 
       it "returns false when user is inactive" do
-        user = create(:user, :inactive_user)
+        user = create(:chobble_app_user, :inactive_user)
         expect(user.can_create_inspection?).to be false
       end
     end
 
     describe "#inactive_user_message" do
       it "returns inactive user message" do
-        user = create(:user)
+        user = create(:chobble_app_user)
         expect(user.inactive_user_message).to eq(
           I18n.t("users.messages.user_inactive")
         )
@@ -177,7 +177,7 @@ RSpec.describe ChobbleApp::User, type: :model do
 
     describe "deletion with associated records" do
       it "successfully deletes user with inspections, units, and events" do
-        user = create(:user)
+        user = create(:chobble_app_user)
         unit = create(:unit, user: user)
         inspection = create(:inspection, user: user, unit: unit)
 

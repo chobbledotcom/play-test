@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "User Settings Turbo Updates", type: :request do
-  let(:user) { create(:user) }
+  let(:user) { create(:chobble_app_user) }
 
   before do
     login_as(user)

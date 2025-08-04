@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe SessionsHelper, type: :helper do
-  let(:user) { create(:user) }
+  let(:user) { create(:chobble_app_user) }
 
   # Security test helpers
   def simulate_csrf_attack

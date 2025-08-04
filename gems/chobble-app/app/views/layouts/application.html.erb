@@ -9,7 +9,11 @@
     <%= stylesheet_link_tag "application" %>
     <%= javascript_importmap_tags %>
 
-    <%= favicon_link_tag asset_path("favicon.svg") %>
+    <% begin %>
+      <%= favicon_link_tag asset_path("favicon.svg") %>
+    <% rescue Sprockets::Rails::Helper::AssetNotPrecompiledError %>
+      <!-- No favicon available -->
+    <% end %>
     <% unless Rails.env.test? %>
       <script>
         window.goatcounter = {no_onload: true}

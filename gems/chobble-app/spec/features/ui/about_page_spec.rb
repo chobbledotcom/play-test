@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.feature "About Page", type: :feature do
-  let(:user) { create(:user) }
+  let(:user) { create(:chobble_app_user) }
 
   before do
     # Clean up any existing pages to avoid conflicts

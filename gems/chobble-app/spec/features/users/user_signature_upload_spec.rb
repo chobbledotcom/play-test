@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.feature "User Signature Upload", type: :feature do
-  let(:user) { create(:user) }
+  let(:user) { create(:chobble_app_user) }
 
   before do
     sign_in(user)

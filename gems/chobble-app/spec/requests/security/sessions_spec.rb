@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "Sessions", type: :feature do
-  let(:user) { create(:user) }
+  let(:user) { create(:chobble_app_user) }
 
   describe "Login page" do
     it "displays the login form" do

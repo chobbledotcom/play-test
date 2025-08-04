@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :user do
+  factory :user, class: "User" do
     sequence(:email) { |n| "user#{n}_#{SecureRandom.hex(4)}@example.com" }
     sequence(:name) { |n| "Test User #{n}" }
     password { "password123" }

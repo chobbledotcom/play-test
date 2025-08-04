@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "users/change_password.html.erb", type: :view do
-  let(:user) { create(:user) }
+  let(:user) { create(:chobble_app_user) }
 
   before do
     assign(:user, user)

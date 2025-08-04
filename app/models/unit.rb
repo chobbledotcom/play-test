@@ -1,6 +1,6 @@
 class Unit < ApplicationRecord
   self.table_name = "units"
-  include CustomIdGenerator
+  include ChobbleApp::CustomIdGenerator
 
   enum :unit_type, {
     bouncy_castle: "BOUNCY_CASTLE",

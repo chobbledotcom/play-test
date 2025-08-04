@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Pages", type: :request do
-  let(:admin_user) { create(:user, :admin) }
-  let(:regular_user) { create(:user) }
+  let(:admin_user) { create(:chobble_app_user, :admin) }
+  let(:regular_user) { create(:chobble_app_user) }
   let(:page) { create(:page) }
 
   describe "GET /pages (index)" do

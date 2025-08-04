@@ -215,24 +215,24 @@ class PdfGeneratorService
 
       if last_inspection
         if last_inspection.width.present?
-          dimensions << "#{FieldUtils.form_field_label("inspection", "width").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
+          dimensions << "#{ChobbleApp::FieldUtils.form_field_label("inspection", "width").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
         end
         if last_inspection.length.present?
-          dimensions << "#{FieldUtils.form_field_label("inspection", "length").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
+          dimensions << "#{ChobbleApp::FieldUtils.form_field_label("inspection", "length").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
         end
         if last_inspection.height.present?
-          dimensions << "#{FieldUtils.form_field_label("inspection", "height").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
+          dimensions << "#{ChobbleApp::FieldUtils.form_field_label("inspection", "height").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
         end
       end
       dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
 
       # Build simple two-column table for unit PDFs
       [
-        [FieldUtils.form_field_label("units", "name"),
+        [ChobbleApp::FieldUtils.form_field_label("units", "name"),
           Utilities.truncate_text(unit.name, UNIT_NAME_MAX_LENGTH)],
-        [FieldUtils.form_field_label("units", "manufacturer"), unit.manufacturer],
-        [FieldUtils.form_field_label("units", "operator"), unit.operator],
-        [FieldUtils.form_field_label("units", "serial"), unit.serial],
+        [ChobbleApp::FieldUtils.form_field_label("units", "manufacturer"), unit.manufacturer],
+        [ChobbleApp::FieldUtils.form_field_label("units", "operator"), unit.operator],
+        [ChobbleApp::FieldUtils.form_field_label("units", "serial"), unit.serial],
         [I18n.t("pdf.inspection.fields.size_m"), dimensions_text]
       ]
     end
@@ -242,13 +242,13 @@ class PdfGeneratorService
 
       if last_inspection
         if last_inspection.width.present?
-          dimensions << "#{FieldUtils.form_field_label("inspection", "width").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
+          dimensions << "#{ChobbleApp::FieldUtils.form_field_label("inspection", "width").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
         end
         if last_inspection.length.present?
-          dimensions << "#{FieldUtils.form_field_label("inspection", "length").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
+          dimensions << "#{ChobbleApp::FieldUtils.form_field_label("inspection", "length").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
         end
         if last_inspection.height.present?
-          dimensions << "#{FieldUtils.form_field_label("inspection", "height").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
+          dimensions << "#{ChobbleApp::FieldUtils.form_field_label("inspection", "height").sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
         end
       end
       dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
@@ -276,25 +276,25 @@ class PdfGeneratorService
       # Build the table rows
       [
         [
-          FieldUtils.form_field_label("units", "name"),
+          ChobbleApp::FieldUtils.form_field_label("units", "name"),
           Utilities.truncate_text(unit.name, UNIT_NAME_MAX_LENGTH),
           I18n.t("pdf.inspection.fields.inspected_by"),
           inspector_text
         ],
         [
-          FieldUtils.form_field_label("units", "description"),
+          ChobbleApp::FieldUtils.form_field_label("units", "description"),
           unit.description,
-          FieldUtils.form_field_label("units", "manufacturer"),
+          ChobbleApp::FieldUtils.form_field_label("units", "manufacturer"),
           unit.manufacturer
         ],
         [
           I18n.t("pdf.inspection.fields.size_m"),
           dimensions_text,
-          FieldUtils.form_field_label("units", "operator"),
+          ChobbleApp::FieldUtils.form_field_label("units", "operator"),
           unit.operator
         ],
         [
-          FieldUtils.form_field_label("units", "serial"),
+          ChobbleApp::FieldUtils.form_field_label("units", "serial"),
           unit.serial,
           I18n.t("pdf.inspection.fields.issued_date"),
           issued_date

@@ -488,9 +488,9 @@ class InspectionsController < ApplicationController
   end
 
   def translate_field_name(field)
-    is_comment = FieldUtils.is_comment_field?(field)
-    is_pass = FieldUtils.is_pass_field?(field)
-    field_base = FieldUtils.strip_field_suffix(field)
+    is_comment = ChobbleApp::FieldUtils.is_comment_field?(field)
+    is_pass = ChobbleApp::FieldUtils.is_pass_field?(field)
+    field_base = ChobbleApp::FieldUtils.strip_field_suffix(field)
     i18n_base = "forms.#{params[:tab]}.fields"
 
     translated = I18n.t("#{i18n_base}.#{field_base}", default: nil)

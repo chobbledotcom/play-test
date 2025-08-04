@@ -51,7 +51,7 @@ RSpec.describe "Users", type: :request do
   end
 
   describe "password change functionality" do
-    let(:user) { create(:user) }
+    let(:user) { create(:chobble_app_user) }
 
     context "when logged in as the user" do
       before do
@@ -89,7 +89,7 @@ RSpec.describe "Users", type: :request do
       end
 
       it "does not allow changing another user's password" do
-        other_user = create(:user)
+        other_user = create(:chobble_app_user)
 
         visit change_password_user_path(other_user)
         expect(page).to have_current_path(root_path)
@@ -106,7 +106,7 @@ RSpec.describe "Users", type: :request do
   end
 
   describe "settings functionality" do
-    let(:user) { create(:user) }
+    let(:user) { create(:chobble_app_user) }
     let(:settings_params) { {user: {theme: "dark"}} }
 
     context "when logged in as the user" do
@@ -132,7 +132,7 @@ RSpec.describe "Users", type: :request do
       end
 
       it "does not allow changing another user's settings" do
-        other_user = create(:user)
+        other_user = create(:chobble_app_user)
 
         get change_settings_user_path(other_user)
         expect(response).to redirect_to(root_path)
@@ -213,8 +213,8 @@ RSpec.describe "Users", type: :request do
   end
 
   describe "admin functionality" do
-    let(:admin) { create(:user, :admin) }
-    let(:regular_user) { create(:user) }
+    let(:admin) { create(:chobble_app_user, :admin) }
+    let(:regular_user) { create(:chobble_app_user) }
 
     context "when logged in as admin" do
       before { login_as(admin) }
@@ -287,7 +287,7 @@ RSpec.describe "Users", type: :request do
     end
 
     it "handles duplicate email" do
-      create(:user, email: "existing@example.com")
+      create(:chobble_app_user, email: "existing@example.com")
 
       post "/register", params: valid_user_params(email: "existing@example.com")
       expect_validation_error(:email)
@@ -295,7 +295,7 @@ RSpec.describe "Users", type: :request do
   end
 
   describe "password change validation failures" do
-    let(:user) { create(:user) }
+    let(:user) { create(:chobble_app_user) }
 
     before { login_as(user) }
 
@@ -314,9 +314,9 @@ RSpec.describe "Users", type: :request do
   end
 
   describe "admin user parameter handling" do
-    let(:admin) { create(:user, :admin) }
+    let(:admin) { create(:chobble_app_user, :admin) }
     let(:company) { create(:inspector_company) }
-    let(:regular_user) { create(:user) }
+    let(:regular_user) { create(:chobble_app_user) }
 
     before do
       login_as(admin)
@@ -354,8 +354,8 @@ RSpec.describe "Users", type: :request do
   end
 
   describe "impersonation with admin context" do
-    let(:admin) { create(:user, :admin) }
-    let(:target_user) { create(:user) }
+    let(:admin) { create(:chobble_app_user, :admin) }
+    let(:target_user) { create(:chobble_app_user) }
 
     before do
       login_as(admin)
@@ -380,7 +380,7 @@ RSpec.describe "Users", type: :request do
   end
 
   describe "non-admin user parameter restrictions" do
-    let(:regular_user) { create(:user) }
+    let(:regular_user) { create(:chobble_app_user) }
     let(:company) { create(:inspector_company) }
 
     it "accepts RPII during registration but ignores admin-only fields" do

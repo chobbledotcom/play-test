@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe ChobbleApp::Event, type: :model do
-  let(:user) { create(:user) }
+  let(:user) { create(:chobble_app_user) }
   let(:resource) { create(:page) } # Use Page as a generic resource for testing
 
   describe "validations" do

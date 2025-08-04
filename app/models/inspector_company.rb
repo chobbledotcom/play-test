@@ -1,5 +1,5 @@
 class InspectorCompany < ApplicationRecord
-  include CustomIdGenerator
+  include ChobbleApp::CustomIdGenerator
   include FormConfigurable
   include ValidationConfigurable
 

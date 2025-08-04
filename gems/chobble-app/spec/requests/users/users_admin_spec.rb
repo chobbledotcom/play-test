@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe "Admin User Management", type: :request do
   describe "as admin user" do
-    let!(:admin) { create(:user, :admin) }
-    let!(:regular_user) { create(:user) }
+    let!(:admin) { create(:chobble_app_user, :admin) }
+    let!(:regular_user) { create(:chobble_app_user) }
 
     before do
       login_as(admin)
@@ -21,8 +21,8 @@ RSpec.describe "Admin User Management", type: :request do
   end
 
   describe "as regular user" do
-    let!(:admin) { create(:user, :admin) }
-    let!(:regular_user) { create(:user) }
+    let!(:admin) { create(:chobble_app_user, :admin) }
+    let!(:regular_user) { create(:chobble_app_user) }
 
     before do
       login_as(regular_user)
