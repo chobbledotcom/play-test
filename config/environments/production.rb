@@ -74,7 +74,7 @@ Rails.application.configure do
 
   # Use Solid Queue for Active Job
   config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue } }
+  config.solid_queue.connects_to = {database: {writing: :queue}}
 
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [:id]
