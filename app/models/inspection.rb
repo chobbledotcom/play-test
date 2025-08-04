@@ -162,7 +162,7 @@ class Inspection < ApplicationRecord
   def reinspection_date
     return nil if inspection_date.blank?
 
-    inspection_date + 1.year
+    (inspection_date + 1.year).to_date
   end
 
   sig { returns(T.nilable(Numeric)) }
