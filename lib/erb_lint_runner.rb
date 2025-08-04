@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # Runs erb_lint on files one at a time with progress output
+# rubocop:disable Rails/Output
 class ErbLintRunner
   def initialize(autocorrect: false, verbose: false)
     @autocorrect = autocorrect
@@ -44,7 +45,7 @@ class ErbLintRunner
     files = []
     patterns.each do |pattern|
       Dir.glob(Rails.root.join(pattern).to_s).each do |file|
-        relative_path = file.sub("#{Rails.root}/", "")
+        relative_path = file.sub(Rails.root.to_s + "/", "")
         next if exclude_dirs.any? { |dir| relative_path.start_with?(dir) }
         files << relative_path
       end
@@ -56,21 +57,21 @@ class ErbLintRunner
   def process_file(file, current, total)
     print "[#{current}/#{total}] #{file.ljust(60)} "
     $stdout.flush
-    
-    start_time = Time.now
+
+    start_time = Time.current
     command = build_command(file)
-    
+
     output = `#{command} 2>&1`
     success = $?.success?
-    elapsed = (Time.now - start_time).round(2)
+    elapsed = (Time.current - start_time).round(2)
 
     if success
       puts "✅ (#{elapsed}s)"
     else
       violations = extract_violation_count(output)
       @total_violations += violations
-      @failed_files << { file: file, violations: violations, output: output }
-      
+      @failed_files << {file:, violations:, output:}
+
       # Show slow linter warning if it took too long
       if elapsed > 5.0
         puts "❌ #{violations} violation(s) (#{elapsed}s) ⚠️  SLOW"
@@ -86,7 +87,7 @@ class ErbLintRunner
     @processed += 1
   rescue => e
     puts "💥 Error: #{e.message}"
-    @failed_files << { file: file, violations: 0, output: e.message }
+    @failed_files << {file:, violations: 0, output: e.message}
   end
 
   def build_command(file)
@@ -123,3 +124,4 @@ class ErbLintRunner
     end
   end
 end
+# rubocop:enable Rails/Output
