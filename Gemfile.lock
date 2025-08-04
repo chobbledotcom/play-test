@@ -408,7 +408,7 @@ GEM
       concurrent-ruby (>= 1.3.1)
       fugit (~> 1.11.0)
       railties (>= 7.1)
-      thor (>= 1.3.1)D
+      thor (>= 1.3.1)
     smart_properties (1.17.0)D
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
