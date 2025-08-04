@@ -43,8 +43,8 @@ class SeedDataService
       ActiveRecord::Base.transaction do
         # Delete inspections first (due to foreign key constraints)
         user.inspections.seed_data.destroy_all
-        # Then delete units
-        user.units.seed_data.destroy_all
+        # Then delete units with preloaded attachments to avoid N+1
+        user.units.seed_data.includes(photo_attachment: :blob, cached_pdf_attachment: :blob).destroy_all
       end
       true
     end
