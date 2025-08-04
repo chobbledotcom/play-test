@@ -70,7 +70,10 @@ module ChobbleApp
     end
 
     def update_password
-      if @user.authenticate(params[:user][:current_password])
+      # Handle both user and chobble_app_user parameter keys
+      user_params_key = params.key?(:user) ? :user : :chobble_app_user
+      
+      if @user.authenticate(params[user_params_key][:current_password])
         if @user.update(password_params)
           flash[:notice] = I18n.t("users.messages.password_updated")
           redirect_to root_path
@@ -105,8 +108,12 @@ module ChobbleApp
 
       if @user.update(params_to_update)
         additional_streams = []
+        
+        # Handle both user and chobble_app_user parameter keys
+        user_params_key = params.key?(:user) ? :user : :chobble_app_user
+        user_params = params[user_params_key]
 
-        if params[:user][:logo].present?
+        if user_params && user_params[:logo].present?
           additional_streams << turbo_stream.replace(
             "user_logo_field",
             partial: "chobble_forms/file_field_turbo_response",
@@ -120,7 +127,7 @@ module ChobbleApp
           )
         end
 
-        if params[:user][:signature].present?
+        if user_params && user_params[:signature].present?
           additional_streams << turbo_stream.replace(
             "user_signature_field",
             partial: "chobble_forms/file_field_turbo_response",
@@ -219,21 +226,24 @@ module ChobbleApp
     end
 
     def user_params
+      # Handle both user and chobble_app_user parameter keys
+      user_params_key = params.key?(:user) ? :user : :chobble_app_user
+      
       if current_user&.admin?
         admin_permitted_params = %i[
           active_until email name password
           password_confirmation rpii_inspector_number
         ]
-        params.require(:user).permit(admin_permitted_params)
+        params.require(user_params_key).permit(admin_permitted_params)
       elsif action_name == "create"
-        params.require(:user).permit(:email, :name, :rpii_inspector_number, :password, :password_confirmation)
+        params.require(user_params_key).permit(:email, :name, :rpii_inspector_number, :password, :password_confirmation)
       else
-        params.require(:user).permit(:email, :password, :password_confirmation)
+        params.require(user_params_key).permit(:email, :password, :password_confirmation)
       end
     end
 
     def require_correct_user
-      unless current_user == @user
+      unless current_user.id == @user.id
         action = action_name.include?("password") ? "password" : "settings"
         flash[:alert] = I18n.t("users.messages.own_action_only", action: action)
         redirect_to root_path
@@ -241,7 +251,9 @@ module ChobbleApp
     end
 
     def password_params
-      params.require(:user).permit(:password, :password_confirmation)
+      # Handle both user and chobble_app_user parameter keys
+      user_params_key = params.key?(:user) ? :user : :chobble_app_user
+      params.require(user_params_key).permit(:password, :password_confirmation)
     end
 
     def settings_params
@@ -249,7 +261,9 @@ module ChobbleApp
         address country
         logo phone postal_code signature theme
       ]
-      permitted_params = params.require(:user).permit(settings_fields)
+      # Handle both user and chobble_app_user parameter keys
+      user_params_key = params.key?(:user) ? :user : :chobble_app_user
+      permitted_params = params.require(user_params_key).permit(settings_fields)
 
       process_image_params(permitted_params, :logo, :signature)
     end

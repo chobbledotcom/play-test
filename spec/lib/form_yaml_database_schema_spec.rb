@@ -74,7 +74,7 @@ RSpec.describe "Form YAML Database Schema Validation" do
         partial = field_config["partial"]
 
         fields << field
-        fields.concat(FieldUtils.get_composite_fields(field, partial))
+        fields.concat(ChobbleApp::FieldUtils.get_composite_fields(field, partial))
       end
     end
     fields

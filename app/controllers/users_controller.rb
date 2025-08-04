@@ -1,7 +1,14 @@
 # frozen_string_literal: true
 
 class UsersController < ChobbleApp::UsersController
+  include ImageProcessable
+  
   private
+  
+  # Override to ensure we get the app's User class with units association
+  def set_user
+    @user = ::User.find(params[:id])
+  end
 
   def load_app_specific_data
     @inspection_counts = Inspection
