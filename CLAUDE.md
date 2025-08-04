@@ -2,6 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## PDF Caching
+
+The system supports caching generated PDFs in S3/object storage to improve performance. To enable:
+
+1. Set the `PDF_CACHE_FROM` environment variable to a date in YYYY-MM-DD format
+2. PDFs generated after this date will be cached
+3. Cached PDFs are automatically invalidated when the inspection/unit is updated
+4. Leave `PDF_CACHE_FROM` empty to disable caching
+
+Example: `PDF_CACHE_FROM=2024-01-01`
+
+This is useful for production environments where PDF generation is expensive. Set the date to when you last changed PDF layouts to ensure old cached PDFs are regenerated.
+
 ## Build/Lint/Test Commands
 
 - Run server: `rails s` or `bundle exec rails server`

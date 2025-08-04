@@ -58,7 +58,12 @@ class Inspection < ApplicationRecord
   has_one_attached :photo_1
   has_one_attached :photo_2
   has_one_attached :photo_3
+  has_one_attached :cached_pdf
   validate :photos_must_be_images
+
+  # Callbacks
+  after_update :invalidate_pdf_cache
+  after_save :invalidate_unit_pdf_cache, if: :saved_change_to_complete_date?
 
   ALL_ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
     has_one assessment_name,
@@ -488,5 +493,14 @@ class Inspection < ApplicationRecord
         photo.purge
       end
     end
+  end
+
+  def invalidate_pdf_cache
+    PdfCacheService.invalidate_inspection_cache(self)
+  end
+
+  def invalidate_unit_pdf_cache
+    # When an inspection is completed, invalidate the unit's PDF cache
+    PdfCacheService.invalidate_unit_cache(unit) if unit
   end
 end

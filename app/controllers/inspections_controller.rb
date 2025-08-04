@@ -375,14 +375,14 @@ class InspectionsController < ApplicationController
   end
 
   def send_inspection_pdf
-    pdf_data = PdfGeneratorService.generate_inspection_report(
+    pdf_data = PdfCacheService.fetch_or_generate_inspection_pdf(
       @inspection,
       debug_enabled: admin_debug_enabled?,
       debug_queries: debug_sql_queries
     )
     @inspection.update(pdf_last_accessed_at: Time.current)
 
-    send_data pdf_data.render,
+    send_data pdf_data,
       filename: pdf_filename,
       type: "application/pdf",
       disposition: "inline"

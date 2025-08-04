@@ -14,12 +14,14 @@ class Unit < ApplicationRecord
 
   # File attachments
   has_one_attached :photo
+  has_one_attached :cached_pdf
   validate :photo_must_be_image
 
   # Callbacks
   before_create :generate_custom_id
   before_destroy :check_complete_inspections
   before_destroy :destroy_draft_inspections
+  after_update :invalidate_pdf_cache
 
   # All fields are required for Units
   validates :name, :serial, :description, :manufacturer, :operator, presence: true
@@ -149,5 +151,9 @@ class Unit < ApplicationRecord
       errors.add(:photo, "must be an image file")
       photo.purge
     end
+  end
+
+  def invalidate_pdf_cache
+    PdfCacheService.invalidate_unit_cache(self)
   end
 end
