@@ -52,8 +52,10 @@ RSpec.describe "Backups", type: :request do
 
           allow(bucket).to receive(:objects).with(prefix: "db_backups/").and_return([backup])
 
-          # Mock presigned URL generation
-          allow(s3_service).to receive(:url).and_return("https://s3.example.com/signed-url")
+          # Mock object for presigned URL generation
+          s3_object = double("S3Object")
+          allow(bucket).to receive(:object).with(valid_key).and_return(s3_object)
+          allow(s3_object).to receive(:presigned_url).and_return("https://s3.example.com/signed-url")
         end
 
         it "redirects to presigned S3 URL for valid backup" do

@@ -1,4 +1,8 @@
+# typed: true
+# frozen_string_literal: true
+
 class Unit < ApplicationRecord
+  extend T::Sig
   self.table_name = "units"
   include CustomIdGenerator
 
@@ -62,28 +66,34 @@ class Unit < ApplicationRecord
 
   # Instance methods
 
+  sig { returns(T.nilable(Inspection)) }
   def last_inspection
     @last_inspection ||= inspections.merge(Inspection.complete).order(complete_date: :desc).first
   end
 
+  sig { returns(String) }
   def last_inspection_status
     last_inspection&.passed? ? "Passed" : "Failed"
   end
 
+  sig { returns(ActiveRecord::Relation) }
   def inspection_history
     inspections.includes(:user).order(inspection_date: :desc)
   end
 
+  sig { returns(T.nilable(Date)) }
   def next_inspection_due
     return nil unless last_inspection
-    last_inspection.inspection_date + EN14960::Constants::REINSPECTION_INTERVAL_DAYS.days
+    (last_inspection.inspection_date + EN14960::Constants::REINSPECTION_INTERVAL_DAYS.days).to_date
   end
 
+  sig { returns(T::Boolean) }
   def inspection_overdue?
     return false unless next_inspection_due
     next_inspection_due < Date.current
   end
 
+  sig { returns(String) }
   def compliance_status
     return "Never Inspected" unless last_inspection
 
@@ -96,6 +106,7 @@ class Unit < ApplicationRecord
     end
   end
 
+  sig { returns(T::Hash[Symbol, T.untyped]) }
   def inspection_summary
     {
       total_inspections: inspections.count,
@@ -107,12 +118,14 @@ class Unit < ApplicationRecord
     }
   end
 
+  sig { returns(T::Boolean) }
   def deletable?
     !complete_inspections.exists?
   end
 
   private
 
+  sig { void }
   def check_complete_inspections
     if complete_inspections.exists?
       errors.add(:base, :has_complete_inspections)
@@ -120,12 +133,14 @@ class Unit < ApplicationRecord
     end
   end
 
+  sig { void }
   def destroy_draft_inspections
     draft_inspections.destroy_all
   end
 
   public
 
+  sig { returns(ActiveRecord::Relation) }
   def self.overdue
     # Find units where their most recent inspection is older than the interval
     # Using Date.current instead of Date.today for Rails timezone consistency
@@ -137,6 +152,7 @@ class Unit < ApplicationRecord
 
   private
 
+  sig { void }
   def check_for_complete_inspections
     if complete_inspections.exists?
       errors.add(:base, :has_complete_inspections)
@@ -144,6 +160,7 @@ class Unit < ApplicationRecord
     end
   end
 
+  sig { void }
   def photo_must_be_image
     return unless photo.attached?
 
@@ -153,6 +170,7 @@ class Unit < ApplicationRecord
     end
   end
 
+  sig { void }
   def invalidate_pdf_cache
     # Skip cache invalidation if only updated_at changed
     changed_attrs = saved_changes.keys
