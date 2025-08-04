@@ -45,3 +45,6 @@
 
 # Ignore terragon setup marker
 .terragon-setup-complete
+
+# Ignore actionlint binary
+/bin/actionlint
