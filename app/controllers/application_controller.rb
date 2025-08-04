@@ -135,6 +135,10 @@ class ApplicationController < ActionController::Base
   def n_plus_one_detection
     Prosopite.scan
     yield
+  rescue PgQuery::ParseError => e
+    # PgQuery can't parse queries with bind parameters - ignore these errors
+    Rails.logger.debug { "Prosopite: Skipping query due to parse error: #{e.message}" }
+    yield
   ensure
     Prosopite.finish
   end
