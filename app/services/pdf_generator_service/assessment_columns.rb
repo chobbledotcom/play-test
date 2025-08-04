@@ -3,14 +3,9 @@ class PdfGeneratorService
     # Include configuration for column spacing and font sizes
     include Configuration
 
-    # Define assessment layout constants (matching AssessmentRenderer)
-    ASSESSMENT_MARGIN_AFTER_TITLE = 3
-    ASSESSMENT_MARGIN_AFTER = 16
-    ASSESSMENT_TITLE_SIZE = 9
-
     attr_reader :assessment_blocks, :assessment_results_height, :photo_height
 
-    def initialize(assessment_blocks, assessment_results_height, photo_height = 0)
+    def initialize(assessment_blocks, assessment_results_height, photo_height)
       @assessment_blocks = assessment_blocks
       @assessment_results_height = assessment_results_height
       @photo_height = photo_height
@@ -21,15 +16,8 @@ class PdfGeneratorService
       font_size = Configuration::ASSESSMENT_FIELD_TEXT_SIZE_PREFERRED
       min_font_size = Configuration::MIN_ASSESSMENT_FONT_SIZE
 
-      Rails.logger.debug "=== AssessmentColumns Debug ===" if !Rails.env.production?
-      Rails.logger.debug { "Assessment blocks count: #{assessment_blocks.size}" } if !Rails.env.production?
-      Rails.logger.debug { "Assessment results height: #{assessment_results_height}" } if !Rails.env.production?
-      Rails.logger.debug { "Photo height: #{photo_height}" } if !Rails.env.production?
-
       while font_size >= min_font_size
-        Rails.logger.debug { "Trying font size: #{font_size}" } if !Rails.env.production?
         if content_fits_with_font_size?(pdf, font_size)
-          Rails.logger.debug { "Success! Font size #{font_size} fits" } if !Rails.env.production?
           render_with_font_size(pdf, font_size)
           return true
         end
@@ -37,7 +25,6 @@ class PdfGeneratorService
       end
 
       # If we still can't fit, render with minimum font size anyway
-      Rails.logger.debug { "Could not fit with any font size, using minimum: #{min_font_size}" } if !Rails.env.production?
       render_with_font_size(pdf, min_font_size)
       false
     end
@@ -46,7 +33,7 @@ class PdfGeneratorService
 
     def content_fits_with_font_size?(pdf, font_size)
       # Calculate total content height
-      total_height = calculate_total_content_height(font_size)
+      total_height = calculate_total_content_height(font_size, pdf)
 
       # Calculate column capacity
       columns = calculate_column_boxes(pdf)
@@ -55,20 +42,13 @@ class PdfGeneratorService
       total_height <= total_capacity
     end
 
-    def calculate_total_content_height(font_size)
+    def calculate_total_content_height(font_size, pdf)
+      renderer = AssessmentBlockRenderer.new(font_size: font_size)
       total_height = 0
-      line_height = calculate_line_height(font_size)
-      title_line_height = calculate_line_height(ASSESSMENT_TITLE_SIZE)
 
       @assessment_blocks.each do |block|
-        # Title height
-        total_height += title_line_height + ASSESSMENT_MARGIN_AFTER_TITLE
-
-        # Fields height
-        total_height += block[:fields].size * line_height
-
-        # Block margin
-        total_height += ASSESSMENT_MARGIN_AFTER
+        # Add height for this block using actual PDF document
+        total_height += renderer.height_for(block, pdf)
       end
 
       total_height
@@ -82,37 +62,27 @@ class PdfGeneratorService
       start_y = pdf.cursor
 
       # Track content placement across columns
-      content_blocks = prepare_content_blocks(font_size)
+      content_blocks = prepare_content_blocks(pdf, font_size)
       place_content_in_columns(pdf, content_blocks, columns, start_y, font_size)
 
       # Move cursor to end of assessment area
       pdf.move_cursor_to(start_y - assessment_results_height)
     end
 
-    def prepare_content_blocks(font_size)
+    def prepare_content_blocks(pdf, font_size)
       blocks = []
+      renderer = AssessmentBlockRenderer.new(font_size: font_size)
 
       @assessment_blocks.each do |block|
-        # Add title
-        blocks << {
-          type: :title,
-          text: block[:title],
-          height: calculate_line_height(ASSESSMENT_TITLE_SIZE) + ASSESSMENT_MARGIN_AFTER_TITLE
-        }
+        # Get rendered fragments and height for this block
+        fragments = renderer.render_fragments(block)
+        height = renderer.height_for(block, pdf)
 
-        # Add fields
-        block[:fields].each do |field|
-          blocks << {
-            type: :field,
-            text: field,
-            height: calculate_line_height(font_size)
-          }
-        end
-
-        # Add margin after block
         blocks << {
-          type: :margin,
-          height: ASSESSMENT_MARGIN_AFTER
+          type: block.type,
+          fragments: fragments,
+          height: height,
+          font_size: renderer.font_size_for(block)
         }
       end
 
@@ -141,10 +111,8 @@ class PdfGeneratorService
         end
 
         # Render content in current column
-        if content[:type] != :margin
-          column = columns[current_column]
-          render_content_at_position(pdf, content, column, column_y, font_size)
-        end
+        column = columns[current_column]
+        render_content_at_position(pdf, content, column, column_y, font_size)
 
         # Update position
         column_y -= content[:height]
@@ -154,47 +122,39 @@ class PdfGeneratorService
     def render_content_at_position(pdf, content, column, y_pos, font_size)
       # Save original state
       original_y = pdf.cursor
-      pdf.bounds.width
-      pdf.bounds.left
-
-      # Move to position and render
-      pdf.move_cursor_to y_pos
+      original_fill_color = pdf.fill_color
 
       # Calculate actual x position
       actual_x = column[:x]
 
-      # Use a formatted text box to position content precisely
-      if content[:type] == :title
-        pdf.formatted_text_box(
-          [{text: content[:text], styles: [:bold]}],
-          at: [actual_x, y_pos],
-          width: column[:width],
-          size: ASSESSMENT_TITLE_SIZE
-        )
-      else
-        # Parse inline formatting for fields
-        pdf.formatted_text_box(
-          parse_inline_formatting(content[:text]),
-          at: [actual_x, y_pos],
-          width: column[:width],
-          size: font_size
-        )
+      # Use the font size from the content block if available
+      text_size = content[:font_size] || font_size
+
+      # Convert fragments to formatted text array for proper wrapping
+      formatted_text = content[:fragments].map do |fragment|
+        styles = []
+        styles << :bold if fragment[:bold]
+        styles << :italic if fragment[:italic]
+
+        {
+          text: fragment[:text],
+          styles: styles,
+          color: fragment[:color]
+        }
       end
 
-      # Restore cursor
+      # Render as single formatted text box for proper wrapping
+      pdf.formatted_text_box(
+        formatted_text,
+        at: [actual_x, y_pos],
+        width: column[:width],
+        size: text_size,
+        overflow: :truncate
+      )
+
+      # Restore original state
+      pdf.fill_color original_fill_color
       pdf.move_cursor_to original_y
-    end
-
-    def parse_inline_formatting(text)
-      # Simple parser for Prawn inline formatting
-      # This handles basic HTML-like tags that Prawn understands
-      if text.include?("<")
-        # For now, just strip tags and return plain text
-        # In a real implementation, you'd parse the tags properly
-        [{text: text.gsub(/<[^>]+>/, "")}]
-      else
-        [{text: text}]
-      end
     end
 
     def calculate_column_boxes(pdf)
@@ -222,14 +182,6 @@ class PdfGeneratorService
         width: column_width,
         height: fourth_column_height
       }
-
-      if !Rails.env.production?
-        Rails.logger.debug "=== Column Layout Debug ==="
-        Rails.logger.debug { "Column width: #{column_width}" }
-        Rails.logger.debug { "Columns 1-3 height: #{assessment_results_height}" }
-        Rails.logger.debug { "Column 4 height: #{fourth_column_height}" }
-        Rails.logger.debug { "Photo height impact: #{photo_height}" }
-      end
 
       columns
     end
