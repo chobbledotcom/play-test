@@ -1,6 +1,6 @@
 module AssessmentController
   extend ActiveSupport::Concern
-  include UserActivityCheck
+  include ChobbleApp::UserActivityCheck
   include InspectionTurboStreams
 
   included do

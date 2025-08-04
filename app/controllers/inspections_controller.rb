@@ -1,7 +1,7 @@
 class InspectionsController < ApplicationController
   include InspectionTurboStreams
-  include PublicViewable
-  include UserActivityCheck
+  include ChobbleApp::PublicViewable
+  include ChobbleApp::UserActivityCheck
 
   skip_before_action :require_login, only: %i[show]
   before_action :set_inspection, except: %i[create index]
