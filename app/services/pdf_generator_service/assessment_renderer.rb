@@ -189,7 +189,7 @@ class PdfGeneratorService
 
       @current_assessment_blocks << {
         title: I18n.t("forms.#{assessment_type}.header"),
-        fields: @current_assessment_fields.dup.freeze
+        fields: @current_assessment_fields.dup
       }
     end
 
