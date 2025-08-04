@@ -1,18 +1,26 @@
+# typed: true
+# frozen_string_literal: true
+
 module UnitsHelper
+  extend T::Sig
+  sig { params(user: User).returns(T::Array[String]) }
   def manufacturer_options(user)
     user.units.distinct.pluck(:manufacturer).compact.compact_blank.sort
   end
 
+  sig { params(user: User).returns(T::Array[String]) }
   def operator_options(user)
     user.units.distinct.pluck(:operator).compact.compact_blank.sort
   end
 
+  sig { returns(String) }
   def unit_search_placeholder
     serial_label = ChobbleApp::FieldUtils.form_field_label("units", "serial")
     name_label = ChobbleApp::FieldUtils.form_field_label("units", "name")
     "#{serial_label} or #{name_label.downcase}"
   end
 
+  sig { params(unit: Unit).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def unit_actions(unit)
     actions = [
       {

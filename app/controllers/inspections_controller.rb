@@ -202,12 +202,12 @@ class InspectionsController < ApplicationController
 
   def partition_inspections(all_inspections)
     @draft_inspections = all_inspections
-      .select { |it| it.complete_date.nil? }
+      .select { |inspection| inspection.complete_date.nil? }
       .sort_by(&:created_at)
 
     @complete_inspections = all_inspections
-      .select { |it| it.complete_date.present? }
-      .sort_by { |it| -it.created_at.to_i }
+      .select { |inspection| inspection.complete_date.present? }
+      .sort_by { |inspection| -inspection.created_at.to_i }
   end
 
   def send_inspections_csv
@@ -289,7 +289,7 @@ class InspectionsController < ApplicationController
   def assessment_permitted_attributes(assessment_type)
     model_class = "Assessments::#{assessment_type.to_s.camelize}".constantize
     all_attributes = model_class.column_names
-    (all_attributes - ASSESSMENT_SYSTEM_ATTRIBUTES).map { |it| it.to_sym }
+    (all_attributes - ASSESSMENT_SYSTEM_ATTRIBUTES).map(&:to_sym)
   end
 
   def filtered_inspections_query_without_order = current_user.inspections
@@ -375,17 +375,22 @@ class InspectionsController < ApplicationController
   end
 
   def send_inspection_pdf
-    pdf_data = PdfGeneratorService.generate_inspection_report(
+    result = PdfCacheService.fetch_or_generate_inspection_pdf(
       @inspection,
       debug_enabled: admin_debug_enabled?,
       debug_queries: debug_sql_queries
     )
     @inspection.update(pdf_last_accessed_at: Time.current)
 
-    send_data pdf_data.render,
-      filename: pdf_filename,
-      type: "application/pdf",
-      disposition: "inline"
+    case result.type
+    when :redirect
+      redirect_to result.data, allow_other_host: true
+    when :pdf_data
+      send_data result.data,
+        filename: pdf_filename,
+        type: "application/pdf",
+        disposition: "inline"
+    end
   end
 
   def send_inspection_qr_code

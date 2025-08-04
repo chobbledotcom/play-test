@@ -1,4 +1,9 @@
+# typed: true
+# frozen_string_literal: true
+
 class InspectorCompany < ApplicationRecord
+  extend T::Sig
+
   include ChobbleApp::CustomIdGenerator
   include FormConfigurable
   include ValidationConfigurable
@@ -6,6 +11,7 @@ class InspectorCompany < ApplicationRecord
   has_many :inspections, dependent: :destroy
 
   # Override to filter admin-only fields
+  sig { params(user: T.nilable(User)).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def self.form_fields(user: nil)
     fields = super
 
@@ -47,26 +53,31 @@ class InspectorCompany < ApplicationRecord
   # Methods
   # Credentials validation moved to individual inspector level (User model)
 
+  sig { returns(String) }
   def full_address
     [address, city, postal_code].compact.join(", ")
   end
 
+  sig { returns(Integer) }
   def inspection_count
     inspections.count
   end
 
+  sig { params(limit: Integer).returns(ActiveRecord::Relation) }
   def recent_inspections(limit = 10)
     # Will be enhanced when Unit relationship is added
     inspections.order(inspection_date: :desc).limit(limit)
   end
 
+  sig { params(total: T.nilable(Integer), passed: T.nilable(Integer)).returns(Float) }
   def pass_rate(total = nil, passed = nil)
     total ||= inspections.count
     passed ||= inspections.passed.count
-    return 0 if total == 0
+    return 0.0 if total == 0
     (passed.to_f / total * 100).round(2)
   end
 
+  sig { returns(T::Hash[Symbol, T.any(Integer, Float)]) }
   def company_statistics
     # Use group to get all counts in a single query
     counts = inspections.group(:passed).count
@@ -83,12 +94,14 @@ class InspectorCompany < ApplicationRecord
     }
   end
 
+  sig { returns(T.nilable(ActiveStorage::Attached::One)) }
   def logo_url
     logo.attached? ? logo : nil
   end
 
   private
 
+  sig { void }
   def normalize_phone_number
     return if phone.blank?
 

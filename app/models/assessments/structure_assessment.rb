@@ -1,4 +1,8 @@
+# typed: true
+# frozen_string_literal: true
+
 class Assessments::StructureAssessment < ApplicationRecord
+  extend T::Sig
   include AssessmentLogging
   include AssessmentCompletion
   include FormConfigurable
@@ -10,6 +14,7 @@ class Assessments::StructureAssessment < ApplicationRecord
 
   after_update :log_assessment_update, if: :saved_changes?
 
+  sig { returns(T::Boolean) }
   def meets_height_requirements?
     user_height = inspection.user_height_assessment
     return false unless platform_height.present? &&
@@ -29,6 +34,7 @@ class Assessments::StructureAssessment < ApplicationRecord
 
   private
 
+  sig { returns(T::Boolean) }
   def permanent_roof_status
     # Permanent roof only matters for platforms 3000mm and above
     return false if platform_height < 3000
