@@ -1,6 +1,9 @@
+# typed: true
 # frozen_string_literal: true
 
 class Inspection < ApplicationRecord
+  extend T::Sig
+
   include CustomIdGenerator
   include FormConfigurable
   include ValidationConfigurable
@@ -140,44 +143,53 @@ class Inspection < ApplicationRecord
   scope :overdue, -> { where("inspection_date < ?", Time.zone.today - 1.year) }
 
   # Helper methods for scopes
+  sig { returns(String) }
   def self.search_conditions
     "inspections.id LIKE ? OR " \
     "inspections.unique_report_number LIKE ? OR units.serial LIKE ? OR " \
     "units.manufacturer LIKE ? OR units.name LIKE ?"
   end
 
+  sig { params(query: String).returns(T::Array[String]) }
   def self.search_values(query) = Array.new(5) { "%#{query}%" }
 
+  sig { params(start_date: T.untyped, end_date: T.untyped).returns(T::Boolean) }
   def self.both_dates_present?(start_date, end_date) =
     start_date.present? && end_date.present?
 
   # Calculated fields
+  sig { returns(T.nilable(Date)) }
   def reinspection_date
     return nil if inspection_date.blank?
 
-    inspection_date + 1.year
+    (inspection_date + 1.year).to_date
   end
 
+  sig { returns(T.nilable(Numeric)) }
   def area
     return nil unless width && length
 
     width * length
   end
 
+  sig { returns(T.nilable(Numeric)) }
   def volume
     return nil unless width && length && height
 
     width * length * height
   end
 
+  sig { returns(T::Boolean) }
   def complete?
     complete_date.present?
   end
 
+  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def assessment_types
     bouncing_pillow? ? PILLOW_ASSESSMENT_TYPES : CASTLE_ASSESSMENT_TYPES
   end
 
+  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def applicable_assessments
     if bouncing_pillow?
       pillow_applicable_assessments
@@ -188,6 +200,7 @@ class Inspection < ApplicationRecord
 
   private
 
+  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def castle_applicable_assessments
     CASTLE_ASSESSMENT_TYPES.select do |assessment_key, _|
       case assessment_key
@@ -203,6 +216,7 @@ class Inspection < ApplicationRecord
     end
   end
 
+  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def pillow_applicable_assessments
     PILLOW_ASSESSMENT_TYPES
   end
@@ -210,7 +224,8 @@ class Inspection < ApplicationRecord
   public
 
   # Iterate over only applicable assessments with a block
-  def each_applicable_assessment
+  sig { params(block: T.proc.params(assessment_key: Symbol, assessment_class: T.class_of(ApplicationRecord), assessment: ApplicationRecord).void).void }
+  def each_applicable_assessment(&block)
     applicable_assessments.each do |assessment_key, assessment_class|
       assessment = send(assessment_key)
       yield(assessment_key, assessment_class, assessment) if block_given?
@@ -218,11 +233,13 @@ class Inspection < ApplicationRecord
   end
 
   # Check if a specific assessment is applicable
+  sig { params(assessment_key: Symbol).returns(T::Boolean) }
   def assessment_applicable?(assessment_key)
     applicable_assessments.key?(assessment_key)
   end
 
   # Returns tabs in the order they appear in the UI
+  sig { returns(T::Array[String]) }
   def applicable_tabs
     tabs = ["inspection"]
 
@@ -242,6 +259,7 @@ class Inspection < ApplicationRecord
   end
 
   # Advanced methods
+  sig { returns(T::Boolean) }
   def can_be_completed?
     unit.present? &&
       all_assessments_complete? &&
@@ -255,6 +273,7 @@ class Inspection < ApplicationRecord
       !indoor_only.nil?
   end
 
+  sig { returns(T::Hash[Symbol, T.any(T::Boolean, T::Array[String])]) }
   def completion_status
     complete = complete?
     all_assessments_complete = all_assessments_complete?
@@ -269,8 +288,10 @@ class Inspection < ApplicationRecord
     }
   end
 
+  sig { returns(T::Boolean) }
   def can_mark_complete? = can_be_completed?
 
+  sig { returns(T::Array[String]) }
   def completion_errors
     errors = []
     errors << "Unit is required" if unit.blank?
@@ -287,6 +308,7 @@ class Inspection < ApplicationRecord
     errors
   end
 
+  sig { returns(T::Array[String]) }
   def get_missing_assessments
     missing = []
 
@@ -306,16 +328,19 @@ class Inspection < ApplicationRecord
     missing
   end
 
+  sig { params(user: User).void }
   def complete!(user)
     update!(complete_date: Time.current)
     log_audit_action("completed", user, "Inspection completed")
   end
 
+  sig { params(user: User).void }
   def un_complete!(user)
     update!(complete_date: nil)
     log_audit_action("marked_incomplete", user, "Inspection completed")
   end
 
+  sig { returns(T::Array[String]) }
   def validate_completeness
     assessment_validation_data.filter_map do |name, assessment, message|
       # Convert the symbol name (e.g., :slide) to assessment key (e.g., :slide_assessment)
@@ -326,6 +351,7 @@ class Inspection < ApplicationRecord
     end
   end
 
+  sig { params(action: String, user: T.nilable(User), details: String).void }
   def log_audit_action(action, user, details)
     Event.log(
       user: user,
@@ -339,6 +365,7 @@ class Inspection < ApplicationRecord
     Rails.logger.info("Inspection #{id}: #{action} by #{user&.email} - #{details}")
   end
 
+  sig { params(form: T.any(Symbol, String), field: T.any(Symbol, String)).returns(String) }
   def field_label(form, field)
     key = "forms.#{form}.fields.#{field}"
     # Try the field as-is first
@@ -354,6 +381,7 @@ class Inspection < ApplicationRecord
     label || I18n.t(key)
   end
 
+  sig { returns(T::Array[Symbol]) }
   def inspection_tab_incomplete_fields
     # Fields required for the inspection tab specifically (excludes passed which is on results tab)
     fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
@@ -362,6 +390,7 @@ class Inspection < ApplicationRecord
       .select { |f| send(f).nil? }
   end
 
+  sig { returns(T::Array[T::Hash[Symbol, T.any(Symbol, String, T::Array[T::Hash[Symbol, T.any(Symbol, String)]])]]) }
   def incomplete_fields
     output = []
 
@@ -440,10 +469,12 @@ class Inspection < ApplicationRecord
 
   private
 
+  sig { void }
   def set_inspector_company_from_user
     self.inspector_company_id ||= user.inspection_company_id
   end
 
+  sig { void }
   def set_inspection_type_from_unit
     return unless unit
     return unless new_record?
@@ -452,20 +483,24 @@ class Inspection < ApplicationRecord
     self.inspection_type = unit.unit_type
   end
 
+  sig { returns(T::Boolean) }
   def all_assessments_complete?
     required_assessment_completions.all?
   end
 
+  sig { returns(T::Array[T::Boolean]) }
   def required_assessment_completions
     applicable_assessments.map do |assessment_key, _|
       send(assessment_key)&.complete?
     end
   end
 
+  sig { returns(T::Array[ApplicationRecord]) }
   def all_assessments
     applicable_assessments.map { |assessment_key, _| send(assessment_key) }
   end
 
+  sig { returns(T::Array[T::Array[T.untyped]]) }
   def assessment_validation_data
     assessment_types = %i[
       anchorage
@@ -484,6 +519,7 @@ class Inspection < ApplicationRecord
     end
   end
 
+  sig { void }
   def photos_must_be_images
     [[:photo_1, photo_1], [:photo_2, photo_2], [:photo_3, photo_3]].each do |field_name, photo|
       next unless photo.attached?
@@ -496,6 +532,7 @@ class Inspection < ApplicationRecord
     end
   end
 
+  sig { void }
   def invalidate_pdf_cache
     # Skip cache invalidation if only pdf_last_accessed_at or updated_at changed
     changed_attrs = saved_changes.keys
@@ -506,6 +543,7 @@ class Inspection < ApplicationRecord
     PdfCacheService.invalidate_inspection_cache(self)
   end
 
+  sig { void }
   def invalidate_unit_pdf_cache
     PdfCacheService.invalidate_unit_cache(unit) if unit
   end
