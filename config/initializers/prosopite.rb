@@ -2,13 +2,15 @@
 
 require "prosopite"
 
+Rails.application.config.active_record.query_log_tags_enabled = true
+
 Rails.application.config.after_initialize do
   Prosopite.rails_logger = Rails.logger
   Prosopite.prosopite_logger = true
 
-  Prosopite.allow_stack_paths = [
-    "mission_control",
-    "solid_queue"
+  Prosopite.allow_stack_paths = %w[
+    mission_control
+    solid_queue
   ]
 
   Prosopite.custom_logger = if defined?(Sentry)
