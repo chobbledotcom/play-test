@@ -6,6 +6,7 @@ module S3BackupOperations
   private
 
   def backup_dir = "db_backups"
+
   def backup_retention_days = 60
 
   def temp_dir
@@ -48,12 +49,12 @@ module S3BackupOperations
     # Use system tar command for reliable compression
     dir_name = File.dirname(source_path)
     base_name = File.basename(source_path)
-    tar_command = "tar -czf #{dest_path} -C #{dir_name} #{base_name}"
 
-    unless system(tar_command, exception: true)
+    # Use array form to prevent command injection
+    unless system("tar", "-czf", dest_path.to_s, "-C", dir_name.to_s, base_name.to_s, exception: true)
       error_msg = "Failed to create tar archive"
       Sentry.capture_message(error_msg, level: "error", extra: {
-        command: tar_command,
+        command: "tar -czf #{dest_path} -C #{dir_name} #{base_name}",
         source_path: source_path,
         dest_path: dest_path
       })

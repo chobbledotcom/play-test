@@ -54,11 +54,11 @@ class S3BackupService
           raise error_msg
         end
 
-        backup_command = "sqlite3 #{database_path} \".backup '#{temp_backup_path}'\""
-        unless system(backup_command, exception: true)
+        # Use array form to prevent command injection
+        unless system("sqlite3", database_path.to_s, ".backup '#{temp_backup_path}'", exception: true)
           error_msg = "Failed to create SQLite backup"
           Sentry.capture_message(error_msg, level: "error", extra: {
-            command: backup_command,
+            command: "sqlite3 #{database_path} .backup '#{temp_backup_path}'",
             database_path: database_path.to_s,
             temp_backup_path: temp_backup_path.to_s
           })
@@ -119,7 +119,7 @@ class S3BackupService
     if defined?(Rails.logger)
       Rails.logger.info message
     else
-      puts message
+      warn message
     end
   end
 
@@ -127,7 +127,7 @@ class S3BackupService
     if defined?(Rails.logger)
       Rails.logger.error message
     else
-      puts "❌ #{message}"
+      warn "❌ #{message}"
     end
   end
 end
