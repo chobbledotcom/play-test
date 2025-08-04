@@ -1,20 +1,72 @@
 #!/usr/bin/env nix-shell
 #! nix-shell -i bash -I nixpkgs=channel:nixpkgs-unstable -p biome actionlint
 
-biome \
-  format \
-  --write \
-  --no-errors-on-unmatched \
-  --files-ignore-unknown=true \
-  "./app/javascript"
+# bin/lint - Run all linters systematically
+# This script runs all linters except the code_standards gem
 
-biome \
-  format \
-  --write \
-  --no-errors-on-unmatched \
-  --files-ignore-unknown=true \
-  "./app/assets"
+set -e  # Exit on first error
 
-# Run actionlint on GitHub Actions workflows
-echo "Checking GitHub Actions workflows..."
-actionlint
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Track overall status
+OVERALL_STATUS=0
+
+# Function to run a command and report status
+run_linter() {
+  local name=$1
+  local command=$2
+  
+  echo -e "\n${BLUE}Running ${name}...${NC}"
+  
+  if eval "$command"; then
+    echo -e "${GREEN}✓ ${name} passed${NC}"
+  else
+    echo -e "${RED}✗ ${name} failed${NC}"
+    OVERALL_STATUS=1
+  fi
+}
+
+echo -e "${YELLOW}Running all linters...${NC}\n"
+
+# 1. Ruby linting with StandardRB
+run_linter "StandardRB (Ruby formatter/linter)" \
+  "bundle exec standardrb --fix"
+
+# 2. Ruby type checking with Sorbet
+run_linter "Sorbet (Ruby type checker)" \
+  "bundle exec srb tc"
+
+# 3. ERB template linting
+run_linter "ERB Lint (ERB template linter)" \
+  "bundle exec erb_lint --autocorrect"
+
+# 4. Security scanning with Brakeman
+run_linter "Brakeman (security scanner)" \
+  "bundle exec brakeman -q --no-summary"
+
+# 5. JavaScript/TypeScript formatting with Biome
+run_linter "Biome (JavaScript formatter) - app/javascript" \
+  "biome format --write --no-errors-on-unmatched --files-ignore-unknown=true ./app/javascript"
+
+run_linter "Biome (JavaScript formatter) - app/assets" \
+  "biome format --write --no-errors-on-unmatched --files-ignore-unknown=true ./app/assets"
+
+# 6. GitHub Actions linting with actionlint
+run_linter "Actionlint (GitHub Actions linter)" \
+  "actionlint"
+
+# Summary
+echo -e "\n${YELLOW}========================================${NC}"
+if [ $OVERALL_STATUS -eq 0 ]; then
+  echo -e "${GREEN}✓ All linters passed!${NC}"
+else
+  echo -e "${RED}✗ Some linters failed. Please fix the issues above.${NC}"
+fi
+echo -e "${YELLOW}========================================${NC}"
+
+exit $OVERALL_STATUS
