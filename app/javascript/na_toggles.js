@@ -10,7 +10,9 @@ class NaToggles {
 
 	attachListeners() {
 		// Find all enum radio buttons (pass/fail/na)
-		const enumRadios = document.querySelectorAll('input[type="radio"][value="pass"], input[type="radio"][value="fail"], input[type="radio"][value="na"]');
+		const enumRadios = document.querySelectorAll(
+			'input[type="radio"][value="pass"], input[type="radio"][value="fail"], input[type="radio"][value="na"]',
+		);
 		enumRadios.forEach((radio) => this.setupRadio(radio));
 	}
 
@@ -29,15 +31,17 @@ class NaToggles {
 	updatePassFailState(changedRadio) {
 		// Find all radio buttons with the same name (same field)
 		const fieldName = changedRadio.name;
-		const allRadios = document.querySelectorAll(`input[type="radio"][name="${fieldName}"]`);
-		
+		const allRadios = document.querySelectorAll(
+			`input[type="radio"][name="${fieldName}"]`,
+		);
+
 		// Check if N/A is selected
-		const naRadio = Array.from(allRadios).find(radio => radio.value === "na");
+		const naRadio = Array.from(allRadios).find((radio) => radio.value === "na");
 		const isNaSelected = naRadio && naRadio.checked;
-		
+
 		allRadios.forEach((radio) => {
 			const label = radio.parentElement;
-			
+
 			if (isNaSelected && radio.value !== "na") {
 				// N/A is selected - mute pass/fail options
 				label.classList.add("muted");

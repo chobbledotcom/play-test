@@ -46,9 +46,9 @@
 .rpii input[type="button"],
 .rpii a[role="button"],
 .rpii .button {
-	background-color: #194EB1;
+	background-color: #194eb1;
 	color: #fff;
-	border: 2px solid #194EB1;
+	border: 2px solid #194eb1;
 }
 
 .rpii button:hover,
@@ -64,13 +64,13 @@
 
 /* Table headers */
 .rpii th {
-	background-color: #194EB1;
+	background-color: #194eb1;
 	color: #fff;
 }
 
 /* Links */
 .rpii a {
-	color: #194EB1;
+	color: #194eb1;
 }
 
 .rpii a:hover {
@@ -84,9 +84,9 @@
 
 /* Override CSS variables for consistent theming */
 .rpii {
-	--color-link: #194EB1;
-	--color-bg-secondary: #194EB1;
-	--color-table: #194EB1;
+	--color-link: #194eb1;
+	--color-bg-secondary: #194eb1;
+	--color-table: #194eb1;
 }
 
 /* Logo container for two logos */
@@ -96,8 +96,8 @@
 	align-items: center;
 	padding: 0.5rem 1rem;
 	padding: 0.5rem 1rem;
-  max-width: var(--width-content);
-  margin: 0 auto 1rem;
+	max-width: var(--width-content);
+	margin: 0 auto 1rem;
 }
 
 .rpii .logo.left {
@@ -114,11 +114,20 @@
 }
 
 .rpii main form {
-	border-image: linear-gradient( to right, var(--color-bg-secondary) 0%, #3a0eb5 100% ) 1;
+	border-image: linear-gradient(
+			to right,
+			var(--color-bg-secondary) 0%,
+			#3a0eb5 100%
+		)
+		1;
 }
 
 .rpii main form header {
-	background: linear-gradient( to right, var(--color-bg-secondary) 0%, #3a0eb5 100% );
+	background: linear-gradient(
+		to right,
+		var(--color-bg-secondary) 0%,
+		#3a0eb5 100%
+	);
 }
 
 .rpii fieldset legend {

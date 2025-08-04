@@ -14,7 +14,9 @@ class ImageResize {
 
 	attachListeners() {
 		// Find all file inputs that accept images
-		const fileInputs = document.querySelectorAll('input[type="file"][accept*="image"]');
+		const fileInputs = document.querySelectorAll(
+			'input[type="file"][accept*="image"]',
+		);
 		fileInputs.forEach((input) => this.setupInput(input));
 	}
 
@@ -36,13 +38,15 @@ class ImageResize {
 			input.disabled = true;
 
 			// Process files synchronously to maintain user gesture
-			this.processFiles(input, files, canvas).then((processedFiles) => {
-				// Re-enable input
-				input.disabled = false;
-			}).catch((error) => {
-				console.error("Error processing files:", error);
-				input.disabled = false;
-			});
+			this.processFiles(input, files, canvas)
+				.then((processedFiles) => {
+					// Re-enable input
+					input.disabled = false;
+				})
+				.catch((error) => {
+					console.error("Error processing files:", error);
+					input.disabled = false;
+				});
 		});
 
 		// Clean up canvas when input is removed
@@ -87,7 +91,9 @@ class ImageResize {
 				type: "image/jpeg",
 				lastModified: Date.now(),
 			});
-			console.log(`Resized ${file.name}: ${file.size} bytes -> ${processedFile.size} bytes`);
+			console.log(
+				`Resized ${file.name}: ${file.size} bytes -> ${processedFile.size} bytes`,
+			);
 			return processedFile;
 		} catch (error) {
 			console.error("Error processing image:", error);
@@ -134,7 +140,7 @@ class ImageResize {
 					// Calculate new dimensions
 					const { width, height } = this.calculateDimensions(
 						img.width,
-						img.height
+						img.height,
 					);
 
 					// Set canvas dimensions
@@ -143,10 +149,10 @@ class ImageResize {
 
 					// Get context and draw
 					const ctx = canvas.getContext("2d", { willReadFrequently: false });
-					
+
 					// Clear canvas first
 					ctx.clearRect(0, 0, width, height);
-					
+
 					// Draw image
 					ctx.drawImage(img, 0, 0, width, height);
 
@@ -162,7 +168,7 @@ class ImageResize {
 							}
 						},
 						"image/jpeg",
-						this.jpegQuality
+						this.jpegQuality,
 					);
 				} catch (error) {
 					reject(error);

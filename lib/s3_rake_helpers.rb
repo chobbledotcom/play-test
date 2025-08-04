@@ -10,7 +10,7 @@ module S3RakeHelpers
   def ensure_s3_enabled
     return if ENV["USE_S3_STORAGE"] == "true"
 
-    puts "❌ S3 storage is not enabled. Set USE_S3_STORAGE=true in your .env file"
+    Rails.logger.debug "❌ S3 storage is not enabled. Set USE_S3_STORAGE=true in your .env file"
     exit 1
   end
 
@@ -20,7 +20,7 @@ module S3RakeHelpers
 
     if missing_vars.any?
       error_msg = "Missing required S3 environment variables: #{missing_vars.join(", ")}"
-      puts "❌ #{error_msg}"
+      Rails.logger.debug { "❌ #{error_msg}" }
 
       Sentry.capture_message(error_msg, level: "error", extra: {
         missing_vars: missing_vars,
@@ -36,7 +36,7 @@ module S3RakeHelpers
     service = ActiveStorage::Blob.service
 
     unless service.is_a?(ActiveStorage::Service::S3Service)
-      puts "❌ Active Storage is not configured to use S3. Current service: #{service.class.name}"
+      Rails.logger.debug { "❌ Active Storage is not configured to use S3. Current service: #{service.class.name}" }
       exit 1
     end
 
@@ -46,11 +46,11 @@ module S3RakeHelpers
   def handle_s3_errors
     yield
   rescue Aws::S3::Errors::ServiceError => e
-    puts "\n❌ S3 Error: #{e.message}"
+    Rails.logger.debug { "\n❌ S3 Error: #{e.message}" }
     Sentry.capture_exception(e)
     exit 1
   rescue => e
-    puts "\n❌ Unexpected error: #{e.message}"
+    Rails.logger.debug { "\n❌ Unexpected error: #{e.message}" }
     Sentry.capture_exception(e)
     exit 1
   end

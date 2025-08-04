@@ -7,7 +7,13 @@ function initializeGuideSlider() {
 	const nextButtons = slider.querySelectorAll(".slider-next");
 	const selectDropdowns = slider.querySelectorAll(".slider-select");
 
-	if (!slides.length || !prevButtons.length || !nextButtons.length || !selectDropdowns.length) return;
+	if (
+		!slides.length ||
+		!prevButtons.length ||
+		!nextButtons.length ||
+		!selectDropdowns.length
+	)
+		return;
 
 	let currentIndex = 0;
 

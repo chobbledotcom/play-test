@@ -9,7 +9,7 @@ Rails.application.config.to_prepare do
   MissionControl::Jobs::ApplicationController.class_eval do
     # Skip the default HTTP basic authentication
     skip_before_action :authenticate_by_http_basic, raise: false
-    
+
     # Add our admin authentication
     before_action :require_admin
   end
