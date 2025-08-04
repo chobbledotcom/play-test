@@ -6,54 +6,60 @@ class PdfCacheService
   class << self
     def fetch_or_generate_inspection_pdf(inspection, **options)
       # Never cache incomplete inspections
-      unless caching_enabled? && inspection.complete?
-        pdf_data = generate_inspection_pdf(inspection, **options)
-        return CacheResult.new(type: :pdf_data, data: pdf_data)
-      end
+      return generate_pdf_result(inspection, :inspection, **options) unless caching_enabled? && inspection.complete?
 
-      if inspection.cached_pdf.attached? && cached_pdf_valid?(inspection.cached_pdf)
-        Rails.logger.info "PDF cache hit for inspection #{inspection.id}"
-        url = generate_signed_url(inspection.cached_pdf)
-        CacheResult.new(type: :redirect, data: url)
-      else
-        Rails.logger.info "PDF cache miss for inspection #{inspection.id}"
-        pdf_data = generate_inspection_pdf(inspection, **options)
-        store_cached_pdf(inspection, pdf_data)
-        CacheResult.new(type: :pdf_data, data: pdf_data)
-      end
+      fetch_or_generate(inspection, :inspection, **options)
     end
 
     def fetch_or_generate_unit_pdf(unit, **options)
-      unless caching_enabled?
-        pdf_data = generate_unit_pdf(unit, **options)
-        return CacheResult.new(type: :pdf_data, data: pdf_data)
-      end
+      return generate_pdf_result(unit, :unit, **options) unless caching_enabled?
 
-      if unit.cached_pdf.attached? && cached_pdf_valid?(unit.cached_pdf)
-        Rails.logger.info "PDF cache hit for unit #{unit.id}"
-        url = generate_signed_url(unit.cached_pdf)
-        CacheResult.new(type: :redirect, data: url)
-      else
-        Rails.logger.info "PDF cache miss for unit #{unit.id}"
-        pdf_data = generate_unit_pdf(unit, **options)
-        store_cached_pdf(unit, pdf_data)
-        CacheResult.new(type: :pdf_data, data: pdf_data)
-      end
+      fetch_or_generate(unit, :unit, **options)
     end
 
     def invalidate_inspection_cache(inspection)
-      return unless caching_enabled?
-
-      inspection.cached_pdf.purge if inspection.cached_pdf.attached?
+      invalidate_cache(inspection)
     end
 
     def invalidate_unit_cache(unit)
-      return unless caching_enabled?
-
-      unit.cached_pdf.purge if unit.cached_pdf.attached?
+      invalidate_cache(unit)
     end
 
     private
+
+    def fetch_or_generate(record, type, **options)
+      if record.cached_pdf.attached? && cached_pdf_valid?(record.cached_pdf)
+        Rails.logger.info "PDF cache hit for #{type} #{record.id}"
+        url = generate_signed_url(record.cached_pdf)
+        CacheResult.new(type: :redirect, data: url)
+      else
+        Rails.logger.info "PDF cache miss for #{type} #{record.id}"
+        generate_and_cache(record, type, **options)
+      end
+    end
+
+    def generate_and_cache(record, type, **options)
+      result = generate_pdf_result(record, type, **options)
+      store_cached_pdf(record, result.data)
+      result
+    end
+
+    def generate_pdf_result(record, type, **options)
+      pdf_document = case type
+      when :inspection
+        PdfGeneratorService.generate_inspection_report(record, **options)
+      when :unit
+        PdfGeneratorService.generate_unit_report(record, **options)
+      end
+
+      CacheResult.new(type: :pdf_data, data: pdf_document.render)
+    end
+
+    def invalidate_cache(record)
+      return unless caching_enabled?
+
+      record.cached_pdf.purge if record.cached_pdf.attached?
+    end
 
     def caching_enabled?
       pdf_cache_from_date.present?
@@ -87,11 +93,8 @@ class PdfCacheService
       record.cached_pdf.purge if record.cached_pdf.attached?
 
       # Store new cached PDF
-      filename = if record.is_a?(Inspection)
-        "inspection_#{record.id}_cached_#{Time.current.to_i}.pdf"
-      else
-        "unit_#{record.id}_cached_#{Time.current.to_i}.pdf"
-      end
+      type_name = record.class.name.downcase
+      filename = "#{type_name}_#{record.id}_cached_#{Time.current.to_i}.pdf"
 
       # Create a StringIO with proper positioning
       io = StringIO.new(pdf_data)
@@ -102,24 +105,6 @@ class PdfCacheService
         filename: filename,
         content_type: "application/pdf"
       )
-    end
-
-    def generate_inspection_pdf(inspection, **options)
-      pdf_document = if options.any?
-        PdfGeneratorService.generate_inspection_report(inspection, **options)
-      else
-        PdfGeneratorService.generate_inspection_report(inspection)
-      end
-      pdf_document.render
-    end
-
-    def generate_unit_pdf(unit, **options)
-      pdf_document = if options.any?
-        PdfGeneratorService.generate_unit_report(unit, **options)
-      else
-        PdfGeneratorService.generate_unit_report(unit)
-      end
-      pdf_document.render
     end
   end
 end
