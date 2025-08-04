@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # Mount Mission Control Jobs (authentication handled by initializer)
+  mount MissionControl::Jobs::Engine => "/mission_control"
+
   get "up" => "rails/health#show", :as => :rails_health_check
 
   get "service-worker" => "rails/pwa#service_worker", :as => :pwa_service_worker

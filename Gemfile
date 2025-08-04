@@ -11,6 +11,8 @@ gem "sqlite3", ">= 1.4"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Using in-memory queue for background processing
+gem "solid_queue", "~> 1.0"
+gem "mission_control-jobs", "~> 1.0"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[windows jruby]
