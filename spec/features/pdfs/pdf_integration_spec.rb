@@ -42,6 +42,42 @@ RSpec.feature "PDF Complete Integration", type: :feature do
           present_words = key_words.count do |word|
             normalized_content.include?(word)
           end
+          
+          # Enhanced debugging for intermittent failures
+          if present_words < (key_words.length / 2.0).ceil && field_key.to_s == "blower_serial"
+            puts "\n=== DEBUG: blower_serial failure ==="
+            puts "Expected label: #{expected_label}"
+            puts "Key words: #{key_words.inspect}"
+            puts "Present words count: #{present_words}/#{key_words.length}"
+            puts "Field value: #{assessment.send(field_key).inspect}"
+            
+            # Check if the field appears anywhere in the PDF
+            puts "PDF contains 'Blower serial numbers': #{pdf_content.include?('Blower serial numbers')}"
+            puts "PDF contains value '#{assessment.send(field_key)}': #{pdf_content.include?(assessment.send(field_key).to_s)}"
+            
+            # Look for fan section
+            fan_match = pdf_content.match(/Fan\/Blower.*?(?=\n[A-Z]|\z)/m)
+            if fan_match
+              puts "Fan section content:"
+              puts fan_match[0]
+            else
+              puts "No Fan/Blower section found in PDF!"
+            end
+            
+            # Check all assessments in PDF
+            puts "\n=== ALL ASSESSMENTS IN PDF ==="
+            Inspection::ASSESSMENTS.each do |key, _|
+              assessment_type = key.to_s.sub(/_assessment$/, "")
+              header = I18n.t("forms.#{assessment_type}.header")
+              if pdf_content.include?(header)
+                section_match = pdf_content.match(/#{Regexp.escape(header)}.*?(?=\n[A-Z]|\z)/m)
+                if section_match
+                  puts "#{header}: #{section_match[0].lines.count} lines"
+                end
+              end
+            end
+          end
+          
           expect(present_words).to be >= (key_words.length / 2.0).ceil,
             "Missing key words from label '#{expected_label}' " \
             "for #{assessment_type}.#{field_key}"
