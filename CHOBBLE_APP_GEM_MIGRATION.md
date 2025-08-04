@@ -15,7 +15,6 @@ This document summarizes the extraction of reusable components into the `chobble
 - `SessionsController` - Login/logout functionality
 - `UsersController` - User management
 - `PagesController` - CMS page management
-- `SearchController` - Search functionality
 
 ### Helpers
 - `ApplicationHelper` - Common view helpers
@@ -27,14 +26,13 @@ This document summarizes the extraction of reusable components into the `chobble
 - All session views (login/logout)
 - All user views (index, show, edit, etc.)
 - All page views (CMS)
-- Search views
 - Layouts
 - PWA views
 - Shared partials (generic ones like `_action_buttons`, `_header_logo`, etc.)
 
 ### Assets
 - Core stylesheets (application.css, base/, buttons.css, themes, etc.)
-- Core JavaScript files (application.js, search.js, etc.)
+- Core JavaScript files (application.js, dirty_forms.js, etc.)
 - Generic images (logo.svg, favicon.svg, etc.)
 
 ### Library Files
@@ -55,7 +53,6 @@ This document summarizes the extraction of reusable components into the `chobble
 - `debug.en.yml`
 - `errors.en.yml`
 - `pages.en.yml`
-- `search.en.yml`
 - `sessions.en.yml`
 - `shared.en.yml`
 - `users.en.yml`
@@ -69,6 +66,13 @@ This document summarizes the extraction of reusable components into the `chobble
 - `UserActivityCheck` - User activity validation
 - `TurboStreamResponders` - Turbo Stream helpers
 - `PublicViewable` - Public access control
+
+### Infrastructure (in infrastructure/ directory)
+- Dockerfile and .dockerignore
+- Linter configurations (.rubocop.yml, .standard.yml, .erb_lint.yml, .better-html.yml)
+- GitHub workflows (CI, security scanning, release, coverage)
+- Development tools (bin/lint, bin/test, bin/rspec-find, bin/rspec-replace, etc.)
+- Infrastructure setup script for new apps
 
 ## What Stayed in the Main App
 
@@ -85,6 +89,7 @@ This document summarizes the extraction of reusable components into the `chobble
 - `UnitsController`
 - `SafetyStandardsController`
 - `GuidesController`
+- `SearchController` (domain-specific search)
 
 ### Views
 - All inspection views
@@ -93,6 +98,7 @@ This document summarizes the extraction of reusable components into the `chobble
 - Unit views
 - Safety standards views
 - Guides views
+- Search views (domain-specific)
 
 ### Assets
 - Inspection-specific stylesheets

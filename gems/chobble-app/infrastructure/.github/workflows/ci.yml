@@ -1,0 +1,58 @@
+name: "Test: Ruby"
+
+on:
+  pull_request:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-suite:
+          - controllers
+          - features  
+          - models
+          - requests
+          - services
+          - helpers
+          - lib
+          - seeds
+          - views
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Cache test databases
+        uses: actions/cache@v4
+        id: db-cache
+        with:
+          path: |
+            storage/test.sqlite3
+            storage/test*.sqlite3
+          key: ${{ runner.os }}-test-db-${{ hashFiles('db/schema.rb', 'db/migrate/**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-test-db-
+
+      - name: Prepare database
+        env:
+          RAILS_ENV: test
+          CACHE_HIT: ${{ steps.db-cache.outputs.cache-hit }}
+        run: |
+          if [[ "$CACHE_HIT" != "true" ]]; then
+            echo "Database cache miss, running migrations..."
+            bundle exec rails db:migrate
+            bundle exec rails parallel:prepare
+          else
+            echo "Database restored from cache"
+          fi
+
+      - name: Run tests
+        env:
+          RAILS_ENV: test
+        run: bundle exec parallel_rspec spec/${{ matrix.test-suite }}
+

@@ -1,0 +1,23 @@
+#!/bin/bash -e
+
+# Enable jemalloc for reduced memory usage and latency.
+if [ -z "${LD_PRELOAD+x}" ] && [ -f /usr/lib/*/libjemalloc.so.2 ]; then
+  export LD_PRELOAD="$(echo /usr/lib/*/libjemalloc.so.2)"
+fi
+
+# If running the rails server then create or migrate existing database
+if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+  ./bin/rails db:prepare
+  
+  echo "Setting up cron jobs with whenever..."
+  # Generate crontab file for supercronic
+  bundle exec whenever > /tmp/crontab
+  
+  echo "Starting supercronic in background..."
+  supercronic /tmp/crontab &
+  
+  echo "Starting Solid Queue worker in background..."
+  ./bin/jobs &
+fi
+
+exec "${@}"

@@ -1,5 +1,7 @@
-# frozen_string_literal: true
+class SearchController < ApplicationController
+  skip_before_action :require_login
 
-class SearchController < ChobbleApp::SearchController
-  # App-specific customizations can go here
+  def index
+    @federated_sites = Federation.sites(request.host, current_user)
+  end
 end

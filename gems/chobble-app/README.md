@@ -12,8 +12,8 @@ Core infrastructure gem for Chobble applications. Provides user management, auth
 - Base controllers and models
 - Theme support (light/dark/minimal)
 - Image processing helpers
-- Search functionality
 - Turbo Stream responders
+- Infrastructure templates (Docker, linters, CI/CD)
 
 ## Installation
 
@@ -107,6 +107,22 @@ end
 ### Routes
 
 The gem doesn't provide routes - define them in your main application as needed.
+
+### Infrastructure Setup
+
+The gem includes standard infrastructure files that can be copied to your app:
+
+    $ bundle exec rake chobble_app:setup_infrastructure
+
+This will copy:
+- Dockerfile and .dockerignore
+- Linter configurations (.rubocop.yml, .standard.yml, .erb_lint.yml, .better-html.yml)
+- GitHub workflow files (CI, security scanning, etc.)
+- Development tools (bin/lint, bin/test, bin/rspec-find, etc.)
+
+You can also run the setup script directly:
+
+    $ ruby gems/chobble-app/infrastructure/setup_infrastructure.rb [target_directory]
 
 ## Development
 
