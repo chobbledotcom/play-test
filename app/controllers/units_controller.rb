@@ -262,16 +262,21 @@ class UnitsController < ApplicationController
 
   def send_unit_pdf
     # Unit already has photo loaded from set_unit
-    pdf_data = PdfCacheService.fetch_or_generate_unit_pdf(
+    result = PdfCacheService.fetch_or_generate_unit_pdf(
       @unit,
       debug_enabled: admin_debug_enabled?,
       debug_queries: debug_sql_queries
     )
 
-    send_data pdf_data,
-      filename: "#{@unit.serial}.pdf",
-      type: "application/pdf",
-      disposition: "inline"
+    case result.type
+    when :redirect
+      redirect_to result.data, allow_other_host: true
+    when :pdf_data
+      send_data result.data,
+        filename: "#{@unit.serial}.pdf",
+        type: "application/pdf",
+        disposition: "inline"
+    end
   end
 
   def send_unit_qr_code

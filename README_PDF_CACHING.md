@@ -6,7 +6,9 @@ This application now supports caching generated PDFs in S3/object storage to imp
 
 1. When `PDF_CACHE_FROM` environment variable is set, the system will cache generated PDFs
 2. The cached PDF is stored as an Active Storage attachment on the inspection/unit record
-3. On subsequent requests, if the cached PDF is newer than the `PDF_CACHE_FROM` date, it will be served from cache
+3. On subsequent requests, if the cached PDF is newer than the `PDF_CACHE_FROM` date, the system:
+   - Returns an HTTP 302 redirect to a signed Active Storage URL (valid for 1 hour)
+   - This allows CDN caching and direct serving from S3/storage
 4. Cache is automatically invalidated when the record is updated
 
 ## Configuration
@@ -23,7 +25,7 @@ export PDF_CACHE_FROM=""
 
 ## Usage
 
-The caching is transparent to the application. Controllers continue to work as before:
+The caching is transparent to the application. Controllers handle the caching response automatically:
 
 ```ruby
 # InspectionsController
@@ -36,17 +38,24 @@ end
 private
 
 def send_inspection_pdf
-  # This now uses PdfCacheService internally
-  pdf_data = PdfCacheService.fetch_or_generate_inspection_pdf(
+  # PdfCacheService returns a CacheResult with type and data
+  result = PdfCacheService.fetch_or_generate_inspection_pdf(
     @inspection,
     debug_enabled: admin_debug_enabled?,
     debug_queries: debug_sql_queries
   )
   
-  send_data pdf_data,
-    filename: pdf_filename,
-    type: "application/pdf",
-    disposition: "inline"
+  case result.type
+  when :redirect
+    # Cache hit - redirect to signed URL
+    redirect_to result.data, allow_other_host: true
+  when :pdf_data
+    # Cache miss - send generated PDF directly
+    send_data result.data,
+      filename: pdf_filename,
+      type: "application/pdf",
+      disposition: "inline"
+  end
 end
 ```
 
@@ -70,6 +79,8 @@ Cached PDFs are stored using Active Storage, which means:
 - Reduces PDF generation time from seconds to milliseconds for cached PDFs
 - Reduces server CPU usage
 - Improves user experience with faster PDF loading
+- Enables CDN caching of PDF URLs (when using redirects)
+- Offloads PDF serving to S3/storage service directly
 
 ## When to Change PDF_CACHE_FROM
 

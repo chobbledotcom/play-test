@@ -18,7 +18,9 @@ RSpec.describe PdfCacheService, type: :service do
         expect(described_class).not_to receive(:store_cached_pdf)
 
         result = described_class.fetch_or_generate_inspection_pdf(inspection)
-        expect(result).to eq("pdf_data")
+        expect(result).to be_a(PdfCacheService::CacheResult)
+        expect(result.type).to eq(:pdf_data)
+        expect(result.data).to eq("pdf_data")
       end
     end
 
@@ -37,7 +39,9 @@ RSpec.describe PdfCacheService, type: :service do
           expect(described_class).to receive(:store_cached_pdf).with(inspection, "new_pdf_data")
 
           result = described_class.fetch_or_generate_inspection_pdf(inspection)
-          expect(result).to eq("new_pdf_data")
+          expect(result).to be_a(PdfCacheService::CacheResult)
+          expect(result.type).to eq(:pdf_data)
+          expect(result.data).to eq("new_pdf_data")
         end
       end
 
@@ -52,11 +56,14 @@ RSpec.describe PdfCacheService, type: :service do
           allow(cached_pdf).to receive(:download).and_return("cached_pdf_data")
         end
 
-        it "returns the cached PDF" do
+        it "returns a redirect to the cached PDF" do
           expect(PdfGeneratorService).not_to receive(:generate_inspection_report)
+          expect(described_class).to receive(:generate_signed_url).and_return("https://example.com/signed-url")
 
           result = described_class.fetch_or_generate_inspection_pdf(inspection)
-          expect(result).to eq("cached_pdf_data")
+          expect(result).to be_a(PdfCacheService::CacheResult)
+          expect(result.type).to eq(:redirect)
+          expect(result.data).to eq("https://example.com/signed-url")
         end
       end
 
@@ -80,7 +87,9 @@ RSpec.describe PdfCacheService, type: :service do
           expect(described_class).to receive(:store_cached_pdf).with(inspection, "new_pdf_data")
 
           result = described_class.fetch_or_generate_inspection_pdf(inspection)
-          expect(result).to eq("new_pdf_data")
+          expect(result).to be_a(PdfCacheService::CacheResult)
+          expect(result.type).to eq(:pdf_data)
+          expect(result.data).to eq("new_pdf_data")
         end
       end
     end
@@ -101,7 +110,9 @@ RSpec.describe PdfCacheService, type: :service do
         expect(described_class).not_to receive(:store_cached_pdf)
 
         result = described_class.fetch_or_generate_inspection_pdf(inspection)
-        expect(result).to eq("pdf_data")
+        expect(result).to be_a(PdfCacheService::CacheResult)
+        expect(result.type).to eq(:pdf_data)
+        expect(result.data).to eq("pdf_data")
       end
     end
 
@@ -117,7 +128,9 @@ RSpec.describe PdfCacheService, type: :service do
           .and_return(double(render: "pdf_data"))
 
         result = described_class.fetch_or_generate_inspection_pdf(inspection, **options)
-        expect(result).to eq("pdf_data")
+        expect(result).to be_a(PdfCacheService::CacheResult)
+        expect(result.type).to eq(:pdf_data)
+        expect(result.data).to eq("pdf_data")
       end
     end
   end
@@ -137,7 +150,9 @@ RSpec.describe PdfCacheService, type: :service do
         expect(described_class).to receive(:store_cached_pdf).with(unit, "unit_pdf_data")
 
         result = described_class.fetch_or_generate_unit_pdf(unit)
-        expect(result).to eq("unit_pdf_data")
+        expect(result).to be_a(PdfCacheService::CacheResult)
+        expect(result.type).to eq(:pdf_data)
+        expect(result.data).to eq("unit_pdf_data")
       end
     end
   end
@@ -224,6 +239,20 @@ RSpec.describe PdfCacheService, type: :service do
       expect(cached_pdf).to receive(:attach)
 
       described_class.send(:store_cached_pdf, inspection, "pdf_data")
+    end
+  end
+
+  describe ".generate_signed_url" do
+    it "generates a signed URL with 1 hour expiration" do
+      # Mock the attachment and blob
+      cached_pdf = double("cached_pdf")
+      blob = double("blob")
+      allow(cached_pdf).to receive(:blob).and_return(blob)
+
+      expect(blob).to receive(:url).with(expires_in: 1.hour, disposition: "inline").and_return("https://example.com/signed-url")
+
+      url = described_class.send(:generate_signed_url, cached_pdf)
+      expect(url).to eq("https://example.com/signed-url")
     end
   end
 end

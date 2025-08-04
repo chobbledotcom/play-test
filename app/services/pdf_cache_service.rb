@@ -1,30 +1,42 @@
 class PdfCacheService
+  CacheResult = Struct.new(:type, :data, keyword_init: true)
+  # type: :redirect or :pdf_data
+  # data: URL string for redirect, or PDF binary data
+
   class << self
     def fetch_or_generate_inspection_pdf(inspection, **options)
-      return generate_inspection_pdf(inspection, **options) unless caching_enabled?
+      unless caching_enabled?
+        pdf_data = generate_inspection_pdf(inspection, **options)
+        return CacheResult.new(type: :pdf_data, data: pdf_data)
+      end
 
       if inspection.cached_pdf.attached? && cached_pdf_valid?(inspection.cached_pdf)
         Rails.logger.info "PDF cache hit for inspection #{inspection.id}"
-        inspection.cached_pdf.download
+        url = generate_signed_url(inspection.cached_pdf)
+        CacheResult.new(type: :redirect, data: url)
       else
         Rails.logger.info "PDF cache miss for inspection #{inspection.id}"
         pdf_data = generate_inspection_pdf(inspection, **options)
         store_cached_pdf(inspection, pdf_data)
-        pdf_data
+        CacheResult.new(type: :pdf_data, data: pdf_data)
       end
     end
 
     def fetch_or_generate_unit_pdf(unit, **options)
-      return generate_unit_pdf(unit, **options) unless caching_enabled?
+      unless caching_enabled?
+        pdf_data = generate_unit_pdf(unit, **options)
+        return CacheResult.new(type: :pdf_data, data: pdf_data)
+      end
 
       if unit.cached_pdf.attached? && cached_pdf_valid?(unit.cached_pdf)
         Rails.logger.info "PDF cache hit for unit #{unit.id}"
-        unit.cached_pdf.download
+        url = generate_signed_url(unit.cached_pdf)
+        CacheResult.new(type: :redirect, data: url)
       else
         Rails.logger.info "PDF cache miss for unit #{unit.id}"
         pdf_data = generate_unit_pdf(unit, **options)
         store_cached_pdf(unit, pdf_data)
-        pdf_data
+        CacheResult.new(type: :pdf_data, data: pdf_data)
       end
     end
 
@@ -44,6 +56,12 @@ class PdfCacheService
 
     def caching_enabled?
       pdf_cache_from_date.present?
+    end
+
+    def generate_signed_url(attachment)
+      # Generate a signed URL that expires in 1 hour
+      # The URL includes a timestamp in the signed parameters
+      attachment.blob.url(expires_in: 1.hour, disposition: "inline")
     end
 
     def pdf_cache_from_date

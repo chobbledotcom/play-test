@@ -8,12 +8,13 @@ The system supports caching generated PDFs in S3/object storage to improve perfo
 
 1. Set the `PDF_CACHE_FROM` environment variable to a date in YYYY-MM-DD format
 2. PDFs generated after this date will be cached
-3. Cached PDFs are automatically invalidated when the inspection/unit is updated
-4. Leave `PDF_CACHE_FROM` empty to disable caching
+3. When serving cached PDFs, the system returns HTTP 302 redirects to signed Active Storage URLs (valid for 1 hour)
+4. Cached PDFs are automatically invalidated when the inspection/unit is updated
+5. Leave `PDF_CACHE_FROM` empty to disable caching
 
 Example: `PDF_CACHE_FROM=2024-01-01`
 
-This is useful for production environments where PDF generation is expensive. Set the date to when you last changed PDF layouts to ensure old cached PDFs are regenerated.
+This is useful for production environments where PDF generation is expensive. Set the date to when you last changed PDF layouts to ensure old cached PDFs are regenerated. The redirect approach allows CDN caching and direct serving from S3.
 
 ## Build/Lint/Test Commands
 
