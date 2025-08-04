@@ -86,7 +86,7 @@ RSpec.describe "Backups", type: :request do
       it "redirects to root with unauthorized message" do
         get download_backups_path, params: {date: "2024-01-15"}
         expect(response).to redirect_to(root_path)
-        expect(flash[:error]).to eq(I18n.t("errors.unauthorized"))
+        expect(flash[:alert]).to eq(I18n.t("forms.session_new.status.admin_required"))
       end
     end
 

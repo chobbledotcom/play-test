@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BackupsController < ApplicationController
-  before_action :require_admin_user
+  before_action :require_admin
   before_action :ensure_s3_enabled
 
   def index
@@ -23,13 +23,6 @@ class BackupsController < ApplicationController
   end
 
   private
-
-  def require_admin_user
-    return if current_user&.admin?
-
-    flash[:error] = t("errors.unauthorized")
-    redirect_to root_path
-  end
 
   def ensure_s3_enabled
     return if ENV["USE_S3_STORAGE"] == "true"
