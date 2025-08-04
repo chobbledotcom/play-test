@@ -40,6 +40,20 @@ class PdfGeneratorService
       raise ImageError.build_detailed_error(e, attachment)
     end
 
+    def self.measure_unit_photo_height(pdf, unit, column_count = 3)
+      return 0 unless unit&.photo&.blob
+
+      attachment = unit.photo
+      image = create_image(attachment)
+      _photo_width, photo_height = calculate_footer_photo_dimensions(pdf, image, column_count)
+
+      raise "Photo height calculated as 0 for unit #{unit.id}" if photo_height <= 0
+
+      photo_height
+    rescue Prawn::Errors::UnsupportedImageType => e
+      raise ImageError.build_detailed_error(e, attachment)
+    end
+
     def self.process_image_with_orientation(attachment)
       image = create_image(attachment)
       ImageOrientationProcessor.process_with_orientation(image)
