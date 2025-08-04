@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "open3"
+
 # Runs erb_lint on files one at a time with progress output
 # rubocop:disable Rails/Output
 class ErbLintRunner
@@ -58,12 +60,15 @@ class ErbLintRunner
     print "[#{current}/#{total}] #{file.ljust(60)} "
     $stdout.flush
 
-    start_time = Time.current
-    command = build_command(file)
+    start_time = Time.now.to_f
 
-    output = `#{command} 2>&1`
-    success = $?.success?
-    elapsed = (Time.current - start_time).round(2)
+    # Use Open3 for safer command execution
+    cmd_args = ["bundle", "exec", "erb_lint", file]
+    cmd_args << "--autocorrect" if @autocorrect
+
+    output, status = Open3.capture2e(*cmd_args)
+    success = status.success?
+    elapsed = (Time.now.to_f - start_time).round(2)
 
     if success
       puts "✅ (#{elapsed}s)"
@@ -88,12 +93,6 @@ class ErbLintRunner
   rescue => e
     puts "💥 Error: #{e.message}"
     @failed_files << {file:, violations: 0, output: e.message}
-  end
-
-  def build_command(file)
-    cmd = "bundle exec erb_lint #{file}"
-    cmd += " --autocorrect" if @autocorrect
-    cmd
   end
 
   def extract_violation_count(output)
