@@ -10,8 +10,9 @@ module S3RakeHelpers
   def ensure_s3_enabled
     return if ENV["USE_S3_STORAGE"] == "true"
 
-    Rails.logger.debug "❌ S3 storage is not enabled. Set USE_S3_STORAGE=true in your .env file"
-    exit 1
+    error_msg = "S3 storage is not enabled. Set USE_S3_STORAGE=true in your .env file"
+    Rails.logger.debug { "❌ #{error_msg}" }
+    raise StandardError, error_msg
   end
 
   def validate_s3_config
@@ -28,7 +29,7 @@ module S3RakeHelpers
         environment: Rails.env
       })
 
-      exit 1
+      raise StandardError, error_msg
     end
   end
 
@@ -36,8 +37,9 @@ module S3RakeHelpers
     service = ActiveStorage::Blob.service
 
     unless service.is_a?(ActiveStorage::Service::S3Service)
-      Rails.logger.debug { "❌ Active Storage is not configured to use S3. Current service: #{service.class.name}" }
-      exit 1
+      error_msg = "Active Storage is not configured to use S3. Current service: #{service.class.name}"
+      Rails.logger.debug { "❌ #{error_msg}" }
+      raise StandardError, error_msg
     end
 
     service
@@ -48,10 +50,10 @@ module S3RakeHelpers
   rescue Aws::S3::Errors::ServiceError => e
     Rails.logger.debug { "\n❌ S3 Error: #{e.message}" }
     Sentry.capture_exception(e)
-    exit 1
+    raise
   rescue => e
     Rails.logger.debug { "\n❌ Unexpected error: #{e.message}" }
     Sentry.capture_exception(e)
-    exit 1
+    raise
   end
 end

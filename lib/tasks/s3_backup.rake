@@ -35,7 +35,7 @@ namespace :s3 do
       puts "   Deleted old backups: #{result[:deleted_count]}" if result[:deleted_count].positive?
     rescue => e
       puts "\n❌ Backup failed: #{e.message}"
-      exit 1
+      raise
     end
 
     desc "List database backups in S3"
@@ -81,9 +81,10 @@ namespace :s3 do
       validate_s3_config
 
       unless args[:date]
-        puts "❌ Please provide a date in YYYY-MM-DD format"
+        error_msg = "Please provide a date in YYYY-MM-DD format"
+        puts "❌ #{error_msg}"
         puts "   Example: rake s3:backup:download[2025-07-31]"
-        exit 1
+        raise ArgumentError, error_msg
       end
 
       handle_s3_errors do
@@ -106,7 +107,7 @@ namespace :s3 do
           puts "❌"
           puts "\n⚠️  Backup not found: #{filename}"
           puts "   Run 'rake s3:backup:list' to see available backups"
-          exit 1
+          raise
         end
       end
     end
@@ -117,9 +118,10 @@ namespace :s3 do
       validate_s3_config
 
       unless args[:date]
-        puts "❌ Please provide a date in YYYY-MM-DD format"
+        error_msg = "Please provide a date in YYYY-MM-DD format"
+        puts "❌ #{error_msg}"
         puts "   Example: rake s3:backup:restore[2025-07-31]"
-        exit 1
+        raise ArgumentError, error_msg
       end
 
       handle_s3_errors do
@@ -147,8 +149,9 @@ namespace :s3 do
 
           # Verify extracted file exists
           unless File.exist?(temp_backup_path)
-            puts "❌ Extracted database file not found at #{temp_backup_path}"
-            exit 1
+            error_msg = "Extracted database file not found at #{temp_backup_path}"
+            puts "❌ #{error_msg}"
+            raise StandardError, error_msg
           end
 
           # Create a safety backup of current database
@@ -170,7 +173,7 @@ namespace :s3 do
           puts "❌"
           puts "\n⚠️  Backup not found: #{filename}"
           puts "   Run 'rake s3:backup:list' to see available backups"
-          exit 1
+          raise
         ensure
           # Clean up temp files
           FileUtils.rm_f(temp_compressed_path)
