@@ -10,5 +10,6 @@ en:
     errors:
       s3_not_enabled: "S3 storage is not enabled."
       invalid_backup: "Invalid backup requested."
+      backup_not_found: "Backup file not found."
       download_failed: "Failed to generate download URL."
       fetch_failed: "Failed to fetch backups from S3."

@@ -10,8 +10,16 @@ class BackupsController < ApplicationController
 
   def download
     backup_key = params[:key]
-    unless backup_key.present? && backup_key.start_with?("db_backups/")
+
+    # Validate backup key format and prevent directory traversal
+    unless valid_backup_key?(backup_key)
       flash[:error] = t("backups.errors.invalid_backup")
+      redirect_to backups_path and return
+    end
+
+    # Verify the backup actually exists
+    unless backup_exists?(backup_key)
+      flash[:error] = t("backups.errors.backup_not_found")
       redirect_to backups_path and return
     end
 
@@ -75,5 +83,25 @@ class BackupsController < ApplicationController
     Rails.logger.error "Failed to fetch backups: #{e.message}"
     flash.now[:error] = t("backups.errors.fetch_failed")
     []
+  end
+
+  def valid_backup_key?(key)
+    return false unless key.is_a?(String) && key.present?
+
+    # Must start with db_backups/
+    return false unless key.start_with?("db_backups/")
+
+    # Prevent directory traversal
+    return false if key.include?("..") || key.include?("//")
+
+    # Must match expected backup filename pattern
+    filename = File.basename(key)
+    filename.match?(/\Adatabase-\d{4}-\d{2}-\d{2}\.tar\.gz\z/)
+  end
+
+  def backup_exists?(key)
+    fetch_backups.any? { |backup| backup[:key] == key }
+  rescue
+    false
   end
 end
