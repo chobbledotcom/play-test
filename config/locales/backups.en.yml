@@ -9,7 +9,9 @@ en:
     no_backups: "No backups found."
     errors:
       s3_not_enabled: "S3 storage is not enabled."
-      invalid_date: "Invalid date format."
+      s3_not_configured: "Active Storage is not configured to use S3."
+      invalid_backup: "Invalid backup requested."
+      invalid_date: "Invalid date format. Expected YYYY-MM-DD."
       backup_not_found: "Backup file not found."
       download_failed: "Failed to generate download URL."
       fetch_failed: "Failed to fetch backups from S3."

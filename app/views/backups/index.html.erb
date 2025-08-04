@@ -2,11 +2,6 @@
   <h1><%= t("backups.title") %></h1>
 </header>
 
-<nav>
-  <ul>
-    <li><%= link_to t("admin.back_to_admin"), admin_path %></li>
-  </ul>
-</nav>
 
 <% if @backups.any? %>
   <table>
@@ -15,19 +10,18 @@
         <th><%= t("backups.filename") %></th>
         <th><%= t("backups.size") %></th>
         <th><%= t("backups.created_at") %></th>
-        <th><%= t("backups.actions") %></th>
       </tr>
     </thead>
     <tbody>
       <% @backups.each do |backup| %>
+        <% date = backup[:filename].match(/database-(\d{4}-\d{2}-\d{2})\.tar\.gz/)&.[](1) %>
         <tr>
-          <td><%= backup[:filename] %></td>
-          <td><%= backup[:size_mb] %> MB</td>
-          <td><%= backup[:last_modified].strftime("%Y-%m-%d %H:%M") %></td>
           <td>
-            <%= link_to t("backups.download"), download_backups_path(date: backup[:date]), 
+            <%= link_to backup[:filename], download_backups_path(date: date), 
                 data: { turbo: false } %>
           </td>
+          <td><%= backup[:size_mb] %> MB</td>
+          <td><%= backup[:last_modified].strftime("%Y-%m-%d %H:%M") %></td>
         </tr>
       <% end %>
     </tbody>
