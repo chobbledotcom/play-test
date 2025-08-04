@@ -23,6 +23,7 @@
             gh
             imagemagick
             jq
+            libyaml
             nodejs
             rubyPackages_3_4.psych
             rubyPackages_3_4.ruby-vips

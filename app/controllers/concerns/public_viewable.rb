@@ -1,10 +1,15 @@
+# typed: true
+# frozen_string_literal: true
+
 module PublicViewable
   extend ActiveSupport::Concern
+  extend T::Sig
 
   included do
     before_action :check_resource_access, only: %i[show]
   end
 
+  sig { void }
   def show
     # Implemented by including controllers, but we call render_show_html
     # for HTML format
@@ -22,6 +27,7 @@ module PublicViewable
   #    - Logged in as owner: Allowed, shows full application view
   #    - Logged in as non-owner: Allowed, shows minimal PDF viewer
   # 3. All other actions/formats: Require ownership
+  sig { void }
   def check_resource_access
     # Rule 1: Always allow PDF/JSON/PNG access for everyone
     return if request.format.pdf? || request.format.json? || request.format.png?
@@ -37,16 +43,19 @@ module PublicViewable
   end
 
   # To be implemented by including controllers
+  sig { void }
   def check_resource_owner
     raise NotImplementedError
   end
 
   # Determine if current user owns the resource
+  sig { returns(T::Boolean) }
   def owns_resource?
     raise NotImplementedError
   end
 
   # Render appropriate view for show action
+  sig { void }
   def render_show_html
     if !logged_in? || !owns_resource?
       # Show minimal PDF viewer for public access or non-owners
@@ -58,10 +67,12 @@ module PublicViewable
   end
 
   # To be implemented by including controllers
+  sig { returns(String) }
   def pdf_filename
     raise NotImplementedError
   end
 
+  sig { returns(String) }
   def resource_pdf_url
     raise NotImplementedError
   end

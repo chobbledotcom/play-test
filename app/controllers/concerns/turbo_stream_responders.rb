@@ -1,8 +1,13 @@
+# typed: true
+# frozen_string_literal: true
+
 module TurboStreamResponders
   extend ActiveSupport::Concern
+  extend T::Sig
 
   private
 
+  sig { params(success: T::Boolean, message: String, model: T.nilable(ActiveRecord::Base), additional_streams: T::Array[T.untyped]).void }
   def render_save_message_stream(success:, message:, model: nil, additional_streams: [])
     streams = [
       turbo_stream.replace(
@@ -21,6 +26,7 @@ module TurboStreamResponders
     render turbo_stream: streams
   end
 
+  sig { params(model: ActiveRecord::Base, message_key: T.nilable(String), redirect_path: T.untyped, additional_streams: T::Array[T.untyped]).void }
   def handle_update_success(model, message_key = nil, redirect_path = nil, additional_streams: [])
     message_key ||= "#{model.class.table_name}.messages.updated"
     redirect_path ||= model
@@ -40,6 +46,7 @@ module TurboStreamResponders
     end
   end
 
+  sig { params(model: ActiveRecord::Base, view: Symbol, block: T.nilable(T.proc.params(format: T.untyped).void)).void }
   def handle_update_failure(model, view = :edit, &block)
     respond_to do |format|
       format.html { render view, status: :unprocessable_entity }
@@ -60,6 +67,7 @@ module TurboStreamResponders
     end
   end
 
+  sig { params(model: ActiveRecord::Base, message_key: T.nilable(String)).void }
   def handle_create_success(model, message_key = nil)
     message_key ||= "#{model.class.table_name}.messages.created"
     respond_to do |format|
@@ -76,6 +84,7 @@ module TurboStreamResponders
     end
   end
 
+  sig { params(model: ActiveRecord::Base, view: Symbol).void }
   def handle_create_failure(model, view = :new)
     respond_to do |format|
       format.html { render view, status: :unprocessable_entity }

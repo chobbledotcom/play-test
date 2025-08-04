@@ -21,7 +21,7 @@ gem "chobble-forms"
 gem "en14960"
 
 # Sorbet runtime (needed in all environments)
-gem "sorbet-runtime"
+gem "sorbet-runtime", "= 0.5.12016"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -71,6 +71,9 @@ gem "importmap-rails", "~> 2.1"
 
 # Image processing
 gem "image_processing", "~> 1.12"
+# Pin ruby-vips for nixpkgs compatibility
+# Note: Requires libvips to be installed on the system
+gem "ruby-vips", "= 2.2.3", require: false
 
 # QR code generation
 gem "rqrcode"
@@ -97,3 +100,6 @@ gem "aws-sdk-s3", require: false
 
 # Cron job management
 gem "whenever", require: false
+
+# Pinned versions for nixpkgs compatibility
+gem "psych", "= 5.2.3"
