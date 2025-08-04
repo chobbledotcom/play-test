@@ -1,4 +1,9 @@
+# typed: true
+# frozen_string_literal: true
+
 class Event < ApplicationRecord
+  extend T::Sig
+
   belongs_to :user
   belongs_to :resource, polymorphic: true, optional: true
 
@@ -16,6 +21,16 @@ class Event < ApplicationRecord
   scope :this_week, -> { where(created_at: Date.current.all_week) }
 
   # Helper to create events easily
+  sig do
+    params(
+      user: User,
+      action: String,
+      resource: T.untyped,
+      details: T.nilable(String),
+      changed_data: T.nilable(T::Hash[String, T.untyped]),
+      metadata: T.nilable(T::Hash[String, T.untyped])
+    ).returns(Event)
+  end
   def self.log(user:, action:, resource:, details: nil,
     changed_data: nil, metadata: nil)
     create!(
@@ -30,6 +45,14 @@ class Event < ApplicationRecord
   end
 
   # Helper for system events that don't have a specific resource
+  sig do
+    params(
+      user: User,
+      action: String,
+      details: String,
+      metadata: T.nilable(T::Hash[String, T.untyped])
+    ).returns(Event)
+  end
   def self.log_system_event(user:, action:, details:, metadata: nil)
     create!(
       user: user,
@@ -42,16 +65,19 @@ class Event < ApplicationRecord
   end
 
   # Formatted description for display
+  sig { returns(String) }
   def description
     details || "#{user.email} #{action} #{resource_type} #{resource_id}"
   end
 
   # Check if the event was triggered by a specific user
+  sig { params(check_user: User).returns(T::Boolean) }
   def triggered_by?(check_user)
     user == check_user
   end
 
   # Get the resource object if it still exists
+  sig { returns(T.nilable(T.untyped)) }
   def resource_object
     return nil unless resource_type && resource_id
     resource_type.constantize.find_by(id: resource_id)
