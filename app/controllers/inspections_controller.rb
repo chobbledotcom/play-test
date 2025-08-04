@@ -202,12 +202,12 @@ class InspectionsController < ApplicationController
 
   def partition_inspections(all_inspections)
     @draft_inspections = all_inspections
-      .select { it.complete_date.nil? }
+      .select { _1.complete_date.nil? }
       .sort_by(&:created_at)
 
     @complete_inspections = all_inspections
-      .select { it.complete_date.present? }
-      .sort_by { -it.created_at.to_i }
+      .select { _1.complete_date.present? }
+      .sort_by { -_1.created_at.to_i }
   end
 
   def send_inspections_csv

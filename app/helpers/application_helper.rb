@@ -5,10 +5,10 @@ module ApplicationHelper
   extend T::Sig
   include ActionView::Helpers::NumberHelper
 
-  sig { params(datetime: T.nilable(T.any(Time, DateTime, ActiveSupport::TimeWithZone))).returns(T.nilable(String)) }
+  sig { params(datetime: T.nilable(T.any(Date, Time, DateTime, ActiveSupport::TimeWithZone))).returns(T.nilable(String)) }
   def render_time(datetime) = datetime&.strftime("%b %d, %Y")
 
-  sig { params(datetime: T.nilable(T.any(Time, DateTime, ActiveSupport::TimeWithZone))).returns(T.nilable(Date)) }
+  sig { params(datetime: T.nilable(T.any(Date, Time, DateTime, ActiveSupport::TimeWithZone))).returns(T.nilable(Date)) }
   def date_for_form(datetime) = datetime&.to_date
 
   sig { params(html_options: T::Hash[T.untyped, T.untyped], block: T.proc.void).returns(String) }
