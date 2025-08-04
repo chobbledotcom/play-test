@@ -44,7 +44,6 @@ group :development, :test do
 
   # N+1 query detection
   gem "prosopite"
-  gem "pg_query" # Required by prosopite for SQL fingerprinting
 end
 
 # PDF generation
