@@ -1,3 +1,4 @@
+<%# locals: () %>
 <%= render 'shared/safety_info_box',
   content: -> do %>
   <% if @assessment.required_anchors > 0 %>
@@ -6,7 +7,7 @@
          text: "#{t('safety_standards.anchor_requirements.required')} #{@assessment.required_anchors}",
          breakdown: @assessment.anchorage_breakdown
        } %>
-    
+
     <%= render 'assessments/safety_standard_with_breakdown',
         title: t('safety_standards.anchor_requirements.title'),
         calculator_result: anchor_details,

@@ -1,0 +1,129 @@
+---
+# Enable all linters by default
+EnableDefaultLinters: false
+
+# List of all linters with their configurations
+linters:
+  # Checks for allowed script types
+  AllowedScriptType:
+    enabled: true
+    allowed_types:
+      - 'text/javascript'
+      - 'module'
+      - 'application/javascript'
+      - 'text/ecmascript'
+
+  # Ensures closing ERB tags are properly indented
+  ClosingErbTagIndent:
+    enabled: true
+
+  # Checks ERB comment syntax
+  CommentSyntax:
+    enabled: true
+
+  # Warns about deprecated CSS classes
+  DeprecatedClasses:
+    enabled: false
+
+  # Checks for potential XSS vulnerabilities in ERB
+  ErbSafety:
+    enabled: false
+
+  # Checks for extra blank lines
+  ExtraNewline:
+    enabled: true
+
+  # Ensures files end with a newline
+  FinalNewline:
+    enabled: true
+    present: true
+
+  # Detects hardcoded strings that should use i18n
+  HardCodedString:
+    enabled: true
+
+  # Prevents use of javascript_tag helper
+  NoJavaScriptTagHelper:
+    enabled: true
+
+  # Warns about unused disable comments
+  NoUnusedDisable:
+    enabled: true
+
+  # Reports ERB parsing errors
+  ParserErrors:
+    enabled: true
+
+  # Warns about using instance variables in partials
+  PartialInstanceVariable:
+    enabled: true
+
+  # Requires autocomplete attribute on input fields
+  RequireInputAutocomplete:
+    enabled: true
+    
+  # Requires nonce attribute on script tags
+  RequireScriptNonce:
+    enabled: true
+
+  # Removes trailing whitespace in ERB tags
+  RightTrim:
+    enabled: true
+    enforced_style: '-' # Use -%> to trim whitespace
+
+  # Runs RuboCop on Ruby code within ERB tags
+  Rubocop:
+    enabled: true
+    only:
+      - .
+    rubocop_config:
+      Layout/InitialIndentation:
+        Enabled: false
+      Layout/TrailingEmptyLines:
+        Enabled: false
+      Layout/TrailingWhitespace:
+        Enabled: false
+      Naming/FileName:
+        Enabled: false
+      Style/FrozenStringLiteralComment:
+        Enabled: false
+      Lint/UselessAssignment:
+        Enabled: false
+
+  # Runs RuboCop on text/Ruby code outside ERB tags
+  RubocopText:
+    enabled: true
+
+  # Ensures self-closing tags are properly formatted
+  SelfClosingTag:
+    enabled: true
+
+  # Enforces spacing around ERB tags
+  SpaceAroundErbTag:
+    enabled: true
+
+  # Checks spacing in HTML tags
+  SpaceInHtmlTag:
+    enabled: true
+
+  # Ensures consistent indentation (spaces not tabs)
+  SpaceIndentation:
+    enabled: true
+
+  # Checks for proper usage of view strict locals
+  StrictLocals:
+    enabled: true
+
+  # Removes trailing whitespace
+  TrailingWhitespace:
+    enabled: true
+
+# Files to lint
+glob: "**/*.{html,html.erb,erb}"
+
+# Exclude patterns
+exclude:
+  - '**/vendor/**/*'
+  - '**/node_modules/**/*'
+  - '**/tmp/**/*'
+  - '**/public/**/*'

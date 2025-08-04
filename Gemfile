@@ -44,6 +44,9 @@ group :development, :test do
 
   # N+1 query detection
   gem "prosopite"
+  
+  # ERB linter
+  gem "erb_lint", require: false
 end
 
 # PDF generation
