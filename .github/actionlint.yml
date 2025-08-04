@@ -5,9 +5,6 @@
 shellcheck:
   enable: true
 
-# Enable pyflakes integration for Python scripts
-pyflakes:
-  enable: true
 
 # List of paths to rule files
 # rule:

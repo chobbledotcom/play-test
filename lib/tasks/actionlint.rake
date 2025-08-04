@@ -1,11 +1,6 @@
 namespace :actionlint do
   desc "Run actionlint to check GitHub Actions workflows"
   task :check do
-    unless File.exist?("bin/actionlint")
-      puts "actionlint not found. Installing..."
-      system("./bin/install-actionlint") || abort("Failed to install actionlint")
-    end
-
     puts "Running actionlint on GitHub Actions workflows..."
     success = system("bin/actionlint")
     
@@ -17,29 +12,14 @@ namespace :actionlint do
     end
   end
 
-  desc "Install or update actionlint"
-  task :install do
-    system("./bin/install-actionlint") || abort("Failed to install actionlint")
-  end
-
   desc "Run actionlint with verbose output"
   task :verbose do
-    unless File.exist?("bin/actionlint")
-      puts "actionlint not found. Installing..."
-      system("./bin/install-actionlint") || abort("Failed to install actionlint")
-    end
-
     puts "Running actionlint with verbose output..."
     system("bin/actionlint -verbose")
   end
 
   desc "Format actionlint output as JSON"
   task :json do
-    unless File.exist?("bin/actionlint")
-      puts "actionlint not found. Installing..."
-      system("./bin/install-actionlint") || abort("Failed to install actionlint")
-    end
-
     system("bin/actionlint -format '{{json .}}'")
   end
 end
