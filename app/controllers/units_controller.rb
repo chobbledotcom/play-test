@@ -1,4 +1,9 @@
+# typed: true
+# frozen_string_literal: true
+
 class UnitsController < ApplicationController
+  extend T::Sig
+
   include TurboStreamResponders
   include PublicViewable
   include UserActivityCheck
