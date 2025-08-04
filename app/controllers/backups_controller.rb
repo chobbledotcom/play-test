@@ -11,9 +11,7 @@ class BackupsController < ApplicationController
   def download
     date = params[:date]
 
-    unless valid_date?(date)
-      return redirect_with_error("invalid_date")
-    end
+    return redirect_with_error("invalid_date") unless valid_date?(date)
 
     backup_key = build_backup_key(date)
     unless backup_exists?(backup_key)
@@ -27,26 +25,29 @@ class BackupsController < ApplicationController
   private
 
   def require_admin_user
-    unless current_user&.admin?
-      flash[:error] = t("errors.unauthorized")
-      redirect_to root_path
-    end
+    return if current_user&.admin?
+
+    flash[:error] = t("errors.unauthorized")
+    redirect_to root_path
   end
 
   def ensure_s3_enabled
-    unless ENV["USE_S3_STORAGE"] == "true"
-      flash[:error] = t("backups.errors.s3_not_enabled")
-      redirect_to admin_path
-    end
+    return if ENV["USE_S3_STORAGE"] == "true"
+
+    flash[:error] = t("backups.errors.s3_not_enabled")
+    redirect_to admin_path
   end
 
   def get_s3_service
     service = ActiveStorage::Blob.service
-    service_name = "ActiveStorage::Service::S3Service"
-    # standard:disable Style/ClassEqualityComparison
-    unless service.class.name == service_name
-      raise t("backups.errors.s3_not_configured")
+
+    # Only check S3Service class if it's loaded (production/S3 environments)
+    if defined?(ActiveStorage::Service::S3Service)
+      unless service.is_a?(ActiveStorage::Service::S3Service)
+        raise t("backups.errors.s3_not_configured")
+      end
     end
+
     service
   end
 
@@ -116,6 +117,7 @@ class BackupsController < ApplicationController
 
   def valid_date?(date)
     return false unless date.is_a?(String) && date.present?
+
     date.match?(/\A\d{4}-\d{2}-\d{2}\z/) && Date.parse(date)
   rescue Date::Error
     false
