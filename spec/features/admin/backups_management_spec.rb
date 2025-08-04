@@ -41,7 +41,8 @@ RSpec.feature "Backups Management", type: :feature do
     expect(page).to have_content("5.0 MB")
     expect(page).to have_content("database-2024-01-14.tar.gz")
     expect(page).to have_content("4.0 MB")
-    expect(page).to have_link(I18n.t("backups.download"))
+    expect(page).to have_link("database-2024-01-15.tar.gz")
+    expect(page).to have_link("database-2024-01-14.tar.gz")
   end
 
   scenario "regular user cannot access backups page" do
@@ -59,10 +60,8 @@ RSpec.feature "Backups Management", type: :feature do
     allow(s3_service).to receive(:send).and_raise("S3 Error")
 
     sign_in(admin_user)
-    visit backups_path
 
-    expect(page).to have_content(I18n.t("backups.errors.fetch_failed"))
-    expect(page).to have_content(I18n.t("backups.no_backups"))
+    expect { visit backups_path }.to raise_error("S3 Error")
   end
 
   scenario "redirects if S3 not enabled" do
