@@ -40,7 +40,7 @@ namespace :s3 do
     task database: :environment do
       # Ensure Rails is fully loaded for cron jobs
       Rails.application.eager_load! if Rails.env.production?
-      
+
       ensure_s3_enabled
       validate_s3_config
 
