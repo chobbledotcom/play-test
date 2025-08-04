@@ -20,11 +20,17 @@ module S3BackupOperations
 
   def database_path
     db_config = Rails.configuration.database_configuration[Rails.env]
+
+    # Handle multi-database configuration (e.g., production with primary/queue)
+    if db_config.is_a?(Hash) && db_config.key?("primary")
+      db_config = db_config["primary"]
+    end
+
     unless db_config && db_config["database"]
       error_msg = "Database configuration missing for #{Rails.env} environment"
       Sentry.capture_message(error_msg, level: "error", extra: {
         rails_env: Rails.env,
-        db_config: db_config
+        db_config: Rails.configuration.database_configuration[Rails.env]
       })
       raise error_msg
     end
