@@ -23,8 +23,7 @@ RSpec.describe "Admin user company management", type: :request do
         }
 
         expect(response).to redirect_to(users_path)
-        follow_redirect!
-        expect(response.body).to include(I18n.t("users.messages.user_updated"))
+        expect(flash[:notice]).to eq(I18n.t("users.messages.user_updated"))
 
         user_with_company.reload
         expect(user_with_company.inspection_company_id).to be_nil
