@@ -51,8 +51,6 @@ FactoryBot.define do
           complete_attrs = FactoryBot.attributes_for(assessment_name, :complete)
           assessment.update!(complete_attrs)
         end
-        # Reload to ensure all assessment associations are fresh
-        inspection.reload
       end
     end
 
