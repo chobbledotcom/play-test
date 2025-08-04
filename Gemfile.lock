@@ -482,6 +482,7 @@ PLATFORMS
 DEPENDENCIES
   aws-sdk-s3
   bcrypt
+  better_html
   brakeman
   capybara
   chobble-forms
