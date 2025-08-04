@@ -9,12 +9,21 @@ fi
 if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
   ./bin/rails db:prepare
   
+  # Load Solid Queue schema if tables don't exist
+  if ! ./bin/rails runner "exit ActiveRecord::Base.connection.table_exists?('solid_queue_jobs') ? 0 : 1" 2>/dev/null; then
+    echo "Loading Solid Queue schema..."
+    ./bin/rails db:schema:load SCHEMA=db/queue_schema.rb
+  fi
+  
   echo "Setting up cron jobs with whenever..."
   # Generate crontab file for supercronic
   bundle exec whenever > /tmp/crontab
   
   echo "Starting supercronic in background..."
   supercronic /tmp/crontab &
+  
+  echo "Starting Solid Queue worker in background..."
+  ./bin/jobs &
 fi
 
 exec "${@}"
