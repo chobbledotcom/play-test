@@ -1,11 +1,19 @@
+# typed: true
+# frozen_string_literal: true
+
 module FormConfigurable
   extend ActiveSupport::Concern
+  extend T::Sig
 
   class_methods do
+    extend T::Sig
+
+    sig { params(user: T.nilable(User)).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
     def form_fields(user: nil)
       @form_config ||= load_form_config_from_yaml
     end
 
+    sig { returns(T::Array[T::Hash[Symbol, T.untyped]]) }
     def load_form_config_from_yaml
       # Remove namespace and use just the class name
       file_name = name.demodulize.underscore

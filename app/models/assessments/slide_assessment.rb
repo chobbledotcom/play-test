@@ -1,4 +1,8 @@
+# typed: true
+# frozen_string_literal: true
+
 class Assessments::SlideAssessment < ApplicationRecord
+  extend T::Sig
   include AssessmentLogging
   include AssessmentCompletion
   include FormConfigurable
@@ -10,6 +14,7 @@ class Assessments::SlideAssessment < ApplicationRecord
 
   enum :clamber_netting_pass, Inspection::PASS_FAIL_NA
 
+  sig { returns(T::Boolean) }
   def meets_runout_requirements?
     return false unless runout.present? && slide_platform_height.present?
     EN14960::Calculators::SlideCalculator.meets_runout_requirements?(
@@ -17,6 +22,7 @@ class Assessments::SlideAssessment < ApplicationRecord
     )
   end
 
+  sig { returns(T.nilable(Integer)) }
   def required_runout_length
     return nil if slide_platform_height.blank?
     EN14960::Calculators::SlideCalculator.calculate_runout_value(
@@ -24,6 +30,7 @@ class Assessments::SlideAssessment < ApplicationRecord
     )
   end
 
+  sig { returns(String) }
   def runout_compliance_status
     return I18n.t("forms.slide.compliance.not_assessed") if runout.blank?
     if meets_runout_requirements?
@@ -34,6 +41,7 @@ class Assessments::SlideAssessment < ApplicationRecord
     end
   end
 
+  sig { returns(T::Boolean) }
   def meets_wall_height_requirements?
     return false unless slide_platform_height.present? &&
       slide_wall_height.present? && !slide_permanent_roof.nil?

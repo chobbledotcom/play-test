@@ -1,4 +1,8 @@
+# typed: true
+# frozen_string_literal: true
+
 class Assessments::EnclosedAssessment < ApplicationRecord
+  extend T::Sig
   include AssessmentLogging
   include AssessmentCompletion
   include FormConfigurable
