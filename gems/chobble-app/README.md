@@ -124,12 +124,36 @@ You can also run the setup script directly:
 
     $ ruby gems/chobble-app/infrastructure/setup_infrastructure.rb [target_directory]
 
-## Development
+## Testing
 
-After checking out the repo, run tests with:
+The gem includes comprehensive specs for the core infrastructure. To run tests:
 
     $ cd gems/chobble-app
+    $ bundle install
     $ bundle exec rspec
+
+The gem includes:
+- Model specs for User, Event, and Page
+- Controller specs for ApplicationController
+- Helper specs for sessions and users
+- Request specs for authentication and user management
+- View specs for user interfaces
+- Feature specs for UI functionality
+
+When using the gem in your app, you can extend the factories:
+
+```ruby
+# spec/factories/users_app.rb
+FactoryBot.modify do
+  factory :user do
+    association :inspection_company # Add app-specific associations
+  end
+end
+```
+
+## Development
+
+When developing the gem, ensure all specs pass before releasing.
 
 ## Contributing
 
