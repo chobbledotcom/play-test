@@ -15,14 +15,14 @@ class PdfGeneratorService
       @font_size = font_size
     end
 
-    def render(block)
+    def render_fragments(block)
       case block.type
       when :header
-        render_header(block)
+        render_header_fragments(block)
       when :value
-        render_value(block)
+        render_value_fragments(block)
       when :comment
-        render_comment(block)
+        render_comment_fragments(block)
       else
         raise ArgumentError, "Unknown block type: #{block.type}"
       end
@@ -33,75 +33,69 @@ class PdfGeneratorService
     end
 
     def height_for(block, pdf)
-      # Get the rendered text
-      text = render(block)
-
-      # Return 0 height for empty text (like blank comments)
-      return 0 if text.blank?
+      fragments = render_fragments(block)
+      return 0 if fragments.empty?
 
       font_size = font_size_for(block)
 
-      # Create a text box and render with dry_run to measure using actual PDF
-      box = Prawn::Text::Box.new(
-        text,
-        document: pdf,
-        at: [0, pdf.cursor],
+      # Convert fragments to formatted text array
+      formatted_text = fragments.map do |fragment|
+        styles = []
+        styles << :bold if fragment[:bold]
+        styles << :italic if fragment[:italic]
+
+        {
+          text: fragment[:text],
+          styles: styles,
+          color: fragment[:color]
+        }
+      end
+
+      # Use height_of_formatted to get the actual height with wrapping
+      pdf.height_of_formatted(
+        formatted_text,
         width: COLUMN_WIDTH,
-        size: font_size,
-        inline_format: true
+        size: font_size
       )
-
-      # Render with dry_run to calculate height without actually drawing
-      box.render(dry_run: true)
-
-      # Get the actual height used
-      box.height
     end
 
     private
 
-    def render_header(block)
-      bold(block.name || block.value)
+    def render_header_fragments(block)
+      text = block.name || block.value
+      [{text: text, bold: true, color: "000000"}]
     end
 
-    def render_value(block)
-      parts = []
+    def render_value_fragments(block)
+      fragments = []
 
       # Add pass/fail indicator if present
       if !block.pass_fail.nil?
-        parts << pass_fail_indicator(block.pass_fail)
+        indicator, color = case block.pass_fail
+        when true, "pass" then [I18n.t("shared.pass_pdf"), Configuration::PASS_COLOR]
+        when false, "fail" then [I18n.t("shared.fail_pdf"), Configuration::FAIL_COLOR]
+        else [I18n.t("shared.na_pdf"), Configuration::NA_COLOR]
+        end
+        fragments << {text: "#{indicator} ", bold: true, color: color}
       end
 
       # Add field name
-      parts << bold(block.name) if block.name
+      if block.name
+        fragments << {text: block.name, bold: true, color: "000000"}
+      end
 
       # Add value if present and not a pass/fail field
       if block.value && !block.name.to_s.end_with?("_pass")
-        parts << ": #{block.value}"
+        fragments << {text: ": #{block.value}", bold: false, color: "000000"}
       end
 
-      parts.join
+      fragments
     end
 
-    def render_comment(block)
-      return "" if block.comment.blank?
+    def render_comment_fragments(block)
+      return [] if block.comment.blank?
 
-      "<font name='Courier'>#{colored(italic(block.comment), Configuration::HEADER_COLOR)}</font>"
+      [{text: block.comment, bold: false, color: Configuration::HEADER_COLOR, italic: true}]
     end
-
-    def pass_fail_indicator(pass_value)
-      indicator, color = case pass_value
-      when true, "pass" then [I18n.t("shared.pass_pdf"), Configuration::PASS_COLOR]
-      when false, "fail" then [I18n.t("shared.fail_pdf"), Configuration::FAIL_COLOR]
-      else [I18n.t("shared.na_pdf"), Configuration::NA_COLOR]
-      end
-      "<font name='Courier'>#{bold(colored(indicator, color))}</font> "
-    end
-
-    def colored(text, color) = "<color rgb='#{color}'>#{text}</color>"
-
-    def bold(text) = "<b>#{text}</b>"
-
-    def italic(text) = "<i>#{text}</i>"
   end
 end

@@ -82,13 +82,13 @@ class PdfGeneratorService
       renderer = AssessmentBlockRenderer.new(font_size: font_size)
 
       @assessment_blocks.each do |block|
-        # Get rendered text and height for this block
-        text = renderer.render(block)
+        # Get rendered fragments and height for this block
+        fragments = renderer.render_fragments(block)
         height = renderer.height_for(block, pdf)
 
         blocks << {
           type: block.type,
-          text: text,
+          fragments: fragments,
           height: height,
           font_size: renderer.font_size_for(block)
         }
@@ -130,6 +130,7 @@ class PdfGeneratorService
     def render_content_at_position(pdf, content, column, y_pos, font_size)
       # Save original state
       original_y = pdf.cursor
+      original_fill_color = pdf.fill_color
 
       # Calculate actual x position
       actual_x = column[:x]
@@ -137,16 +138,30 @@ class PdfGeneratorService
       # Use the font size from the content block if available
       text_size = content[:font_size] || font_size
 
-      # Render the text with inline formatting
-      pdf.text_box(
-        content[:text],
+      # Convert fragments to formatted text array for proper wrapping
+      formatted_text = content[:fragments].map do |fragment|
+        styles = []
+        styles << :bold if fragment[:bold]
+        styles << :italic if fragment[:italic]
+
+        {
+          text: fragment[:text],
+          styles: styles,
+          color: fragment[:color]
+        }
+      end
+
+      # Render as single formatted text box for proper wrapping
+      pdf.formatted_text_box(
+        formatted_text,
         at: [actual_x, y_pos],
         width: column[:width],
         size: text_size,
-        inline_format: true
+        overflow: :truncate
       )
 
-      # Restore cursor
+      # Restore original state
+      pdf.fill_color original_fill_color
       pdf.move_cursor_to original_y
     end
 
