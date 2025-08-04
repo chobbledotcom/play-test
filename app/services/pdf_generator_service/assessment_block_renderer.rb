@@ -52,11 +52,15 @@ class PdfGeneratorService
       end
 
       # Use height_of_formatted to get the actual height with wrapping
-      pdf.height_of_formatted(
+      base_height = pdf.height_of_formatted(
         formatted_text,
         width: COLUMN_WIDTH,
         size: font_size
       )
+
+      # Add 33% of font size as spacing
+      spacing = (font_size * 0.33).round(1)
+      base_height + spacing
     end
 
     private

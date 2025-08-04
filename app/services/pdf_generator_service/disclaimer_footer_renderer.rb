@@ -27,6 +27,11 @@ class PdfGeneratorService
       pdf.move_cursor_to original_y
     end
 
+    def self.measure_footer_height(pdf, user)
+      return 0 unless should_render_footer?(pdf)
+      FOOTER_HEIGHT
+    end
+
     def self.should_render_footer?(pdf)
       # Only render on first page
       pdf.page_number == 1

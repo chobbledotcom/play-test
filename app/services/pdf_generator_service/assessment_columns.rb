@@ -5,7 +5,7 @@ class PdfGeneratorService
 
     attr_reader :assessment_blocks, :assessment_results_height, :photo_height
 
-    def initialize(assessment_blocks, assessment_results_height, photo_height = 0)
+    def initialize(assessment_blocks, assessment_results_height, photo_height)
       @assessment_blocks = assessment_blocks
       @assessment_results_height = assessment_results_height
       @photo_height = photo_height
@@ -16,15 +16,11 @@ class PdfGeneratorService
       font_size = Configuration::ASSESSMENT_FIELD_TEXT_SIZE_PREFERRED
       min_font_size = Configuration::MIN_ASSESSMENT_FONT_SIZE
 
-      Rails.logger.debug "=== AssessmentColumns Debug ===" if !Rails.env.production?
-      Rails.logger.debug { "Assessment blocks count: #{assessment_blocks.size}" } if !Rails.env.production?
-      Rails.logger.debug { "Assessment results height: #{assessment_results_height}" } if !Rails.env.production?
-      Rails.logger.debug { "Photo height: #{photo_height}" } if !Rails.env.production?
-
       while font_size >= min_font_size
-        Rails.logger.debug { "Trying font size: #{font_size}" } if !Rails.env.production?
         if content_fits_with_font_size?(pdf, font_size)
-          Rails.logger.debug { "Success! Font size #{font_size} fits" } if !Rails.env.production?
+          if !Rails.env.production?
+            Rails.logger.debug { "SUCCESS: Using font size #{font_size}" }
+          end
           render_with_font_size(pdf, font_size)
           return true
         end
@@ -32,7 +28,9 @@ class PdfGeneratorService
       end
 
       # If we still can't fit, render with minimum font size anyway
-      Rails.logger.debug { "Could not fit with any font size, using minimum: #{min_font_size}" } if !Rails.env.production?
+      if !Rails.env.production?
+        Rails.logger.debug { "FALLBACK: Using minimum font size #{min_font_size}" }
+      end
       render_with_font_size(pdf, min_font_size)
       false
     end
@@ -47,7 +45,13 @@ class PdfGeneratorService
       columns = calculate_column_boxes(pdf)
       total_capacity = columns.sum { |col| col[:height] }
 
-      total_height <= total_capacity
+      fits = total_height <= total_capacity
+
+      if !Rails.env.production?
+        Rails.logger.debug { "Font #{font_size}: content=#{total_height.round(1)}, capacity=#{total_capacity.round(1)}, fits=#{fits}" }
+      end
+
+      fits
     end
 
     def calculate_total_content_height(font_size, pdf)
@@ -190,14 +194,6 @@ class PdfGeneratorService
         width: column_width,
         height: fourth_column_height
       }
-
-      if !Rails.env.production?
-        Rails.logger.debug "=== Column Layout Debug ==="
-        Rails.logger.debug { "Column width: #{column_width}" }
-        Rails.logger.debug { "Columns 1-3 height: #{assessment_results_height}" }
-        Rails.logger.debug { "Column 4 height: #{fourth_column_height}" }
-        Rails.logger.debug { "Photo height impact: #{photo_height}" }
-      end
 
       columns
     end

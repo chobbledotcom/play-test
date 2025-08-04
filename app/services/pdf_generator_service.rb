@@ -36,17 +36,24 @@ class PdfGeneratorService
       # Generate all assessment sections in the correct UI order from applicable_tabs
       generate_assessments_in_ui_order(inspection, assessment_blocks)
 
-      # Render all collected assessments in newspaper-style columns
-      render_assessment_blocks_in_columns(pdf, assessment_blocks)
+      # Render footer and photo first to measure actual space used
+      cursor_before_footer = pdf.cursor
 
       # Disclaimer footer (only on first page)
       DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
+      disclaimer_height = DisclaimerFooterRenderer.measure_footer_height(pdf, inspection.user)
 
       # Add unit photo in bottom right corner
-      # Always use 4 columns for assessments now
+      photo_height = ImageProcessor.measure_unit_photo_height(pdf, inspection.unit, 4)
       if inspection.unit&.photo
         ImageProcessor.add_unit_photo_footer(pdf, inspection.unit, 4)
       end
+
+      # Reset cursor to render assessments with proper space accounting
+      pdf.move_cursor_to(cursor_before_footer)
+
+      # Render all collected assessments in newspaper-style columns
+      render_assessment_blocks_in_columns(pdf, assessment_blocks, disclaimer_height, photo_height)
 
       # Add DRAFT watermark overlay for draft inspections (except in test env)
       Utilities.add_draft_watermark(pdf) if !inspection.complete? && !Rails.env.test?
@@ -172,16 +179,16 @@ class PdfGeneratorService
     end
   end
 
-  def self.render_assessment_blocks_in_columns(pdf, assessment_blocks)
+  def self.render_assessment_blocks_in_columns(pdf, assessment_blocks, disclaimer_height, photo_height)
     return if assessment_blocks.empty?
 
     pdf.text I18n.t("pdf.inspection.assessments_section"), size: 12, style: :bold
     pdf.stroke_horizontal_rule
     pdf.move_down 15
 
-    # Calculate available height accounting for footer on first page
+    # Calculate available height accounting for disclaimer footer only
     available_height = if pdf.page_number == 1
-      pdf.cursor - Configuration::FOOTER_HEIGHT
+      pdf.cursor - disclaimer_height
     else
       pdf.cursor
     end
@@ -191,10 +198,11 @@ class PdfGeneratorService
     if available_height < min_content_height
       pdf.start_new_page
       available_height = pdf.cursor
+      0  # No footer on new pages
     end
 
-    # Render assessments using the column layout
-    renderer = AssessmentColumns.new(assessment_blocks, available_height)
+    # Render assessments using the column layout with measured footer space
+    renderer = AssessmentColumns.new(assessment_blocks, available_height, photo_height)
     renderer.render(pdf)
 
     pdf.move_down 20
