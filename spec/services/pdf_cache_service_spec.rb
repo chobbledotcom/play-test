@@ -35,7 +35,7 @@ RSpec.describe PdfCacheService, type: :service do
 
           result = described_class.fetch_or_generate_inspection_pdf(inspection)
           expect(result).to eq("new_pdf_data")
-          
+
           inspection.reload
           expect(inspection.cached_pdf.attached?).to be true
         end
@@ -109,7 +109,7 @@ RSpec.describe PdfCacheService, type: :service do
       end
 
       it "passes options to PDF generator" do
-        options = { debug_enabled: true, debug_queries: ["SELECT 1"] }
+        options = {debug_enabled: true, debug_queries: ["SELECT 1"]}
         expect(PdfGeneratorService).to receive(:generate_inspection_report)
           .with(inspection, **options)
           .and_return(double(render: "pdf_data"))
@@ -134,7 +134,7 @@ RSpec.describe PdfCacheService, type: :service do
 
         result = described_class.fetch_or_generate_unit_pdf(unit)
         expect(result).to eq("unit_pdf_data")
-        
+
         unit.reload
         expect(unit.cached_pdf.attached?).to be true
       end
@@ -155,7 +155,7 @@ RSpec.describe PdfCacheService, type: :service do
     it "purges the cached PDF" do
       expect(inspection.cached_pdf.attached?).to be true
       described_class.invalidate_inspection_cache(inspection)
-      
+
       inspection.reload
       expect(inspection.cached_pdf.attached?).to be false
     end
@@ -175,7 +175,7 @@ RSpec.describe PdfCacheService, type: :service do
     it "purges the cached PDF" do
       expect(unit.cached_pdf.attached?).to be true
       described_class.invalidate_unit_cache(unit)
-      
+
       unit.reload
       expect(unit.cached_pdf.attached?).to be false
     end

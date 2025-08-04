@@ -19,9 +19,9 @@ class Unit < ApplicationRecord
 
   # Callbacks
   before_create :generate_custom_id
+  after_update :invalidate_pdf_cache
   before_destroy :check_complete_inspections
   before_destroy :destroy_draft_inspections
-  after_update :invalidate_pdf_cache
 
   # All fields are required for Units
   validates :name, :serial, :description, :manufacturer, :operator, presence: true

@@ -62,6 +62,9 @@ class Inspection < ApplicationRecord
   validate :photos_must_be_images
 
   # Callbacks
+  before_validation :set_inspector_company_from_user, on: :create
+  before_validation :set_inspection_type_from_unit, on: :create
+  # Callbacks
   after_update :invalidate_pdf_cache
   after_save :invalidate_unit_pdf_cache, if: :saved_change_to_complete_date?
 
@@ -95,10 +98,6 @@ class Inspection < ApplicationRecord
   validates :unique_report_number,
     uniqueness: {scope: :user_id, allow_blank: true}
   # rubocop:enable Rails/UniqueValidationWithoutIndex
-
-  # Callbacks
-  before_validation :set_inspector_company_from_user, on: :create
-  before_validation :set_inspection_type_from_unit, on: :create
 
   # Scopes
   scope :seed_data, -> { where(is_seed: true) }
