@@ -1,4 +1,14 @@
 /* RPII Theme - Based on light theme with RPII blue (#0e5dc7) */
+
+/* Background with tiled faded logo */
+.rpii {
+	background-image: url('rpii-logo-faded.png');
+	background-repeat: repeat;
+	background-attachment: fixed;
+	background-size: 149px 117px;
+	background-position: center;
+}
+
 .rpii nav a,
 .rpii nav button {
 	background-color: #0e5dc7;
@@ -89,12 +99,11 @@
 	--color-table: #194eb1;
 }
 
-/* Logo container for two logos */
+/* Logo container for centered logo */
 .rpii .logo-container {
 	display: flex;
-	justify-content: space-between;
+	justify-content: center;
 	align-items: center;
-	padding: 0.5rem 1rem;
 	padding: 0.5rem 1rem;
 	max-width: var(--width-content);
 	margin: 0 auto 1rem;
@@ -105,12 +114,12 @@
 }
 
 .rpii .logo.right {
-	justify-content: flex-end;
+	justify-content: center;
 }
 
 .rpii .logo img {
 	width: auto;
-	height: 60px;
+	height: 80px;
 }
 
 .rpii main form {
