@@ -119,10 +119,11 @@
 
 .rpii .logo img {
 	width: auto;
-	height: 80px;
+	height: 89px;
 }
 
 .rpii main form {
+	background: white;
 	border-image: linear-gradient(
 			to right,
 			var(--color-bg-secondary) 0%,
@@ -141,4 +142,8 @@
 
 .rpii fieldset legend {
 	color: #3a0eb5;
+}
+
+.rpii section aside {
+	background: white;
 }

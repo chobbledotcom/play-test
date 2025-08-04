@@ -144,8 +144,19 @@ class PdfGeneratorService
     pdf.stroke_horizontal_rule
     pdf.move_down 10
 
-    pdf.text inspection.risk_assessment, size: 10
-    pdf.move_down 15
+    # Create a text box constrained to 4 lines with shrink_to_fit
+    line_height = 10 * 1.2  # Normal font size * line height multiplier
+    max_height = line_height * 4  # 4 lines max
+
+    pdf.text_box inspection.risk_assessment,
+      at: [0, pdf.cursor],
+      width: pdf.bounds.width,
+      height: max_height,
+      size: 10,
+      overflow: :shrink_to_fit,
+      min_font_size: 5
+
+    pdf.move_down max_height + 15
   end
 
   def self.generate_assessments_in_ui_order(inspection, assessment_renderer, pdf)

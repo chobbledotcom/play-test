@@ -233,79 +233,134 @@ class PdfGeneratorService
 
     def render_assessments_adaptively(pdf, available_height)
       # First, calculate photo boundary (top edge of unit photo)
-      photo_boundary = calculate_photo_boundary(pdf)
+      calculate_photo_boundary(pdf)
 
       # Save the current state
       start_y = pdf.y
 
-      # Try a dry run with 3 columns to check for overflow
-      overflow = check_for_overflow(pdf, available_height, 3, Configuration::ASSESSMENT_FIELD_TEXT_SIZE_PREFERRED, photo_boundary)
+      # Always use 4 columns for consistency
+      # Calculate photo boundary for 4 columns
+      photo_boundary = calculate_photo_boundary(pdf, 4)
 
-      # Reset cursor position
-      pdf.y = start_y
+      # Try progressively smaller font sizes starting with preferred
+      font_size = Configuration::ASSESSMENT_FIELD_TEXT_SIZE_PREFERRED
+      min_font_size = Configuration::MIN_ASSESSMENT_FONT_SIZE
 
-      if overflow
-        # Use 4 columns with smaller text
-        render_assessments_with_params(pdf, available_height, ASSESSMENT_COLUMNS_COUNT, ASSESSMENT_FIELD_TEXT_SIZE)
-        # Return true to indicate we used compact layout
-        @used_compact_layout = true
-      else
-        # Use 3 columns with larger text
-        render_assessments_with_params(pdf, available_height, 3, Configuration::ASSESSMENT_FIELD_TEXT_SIZE_PREFERRED)
-        @used_compact_layout = false
+      while font_size >= min_font_size
+        overflow = check_for_overflow(pdf, available_height, 4, font_size, photo_boundary)
+        pdf.y = start_y
+
+        if !overflow
+          # Found a font size that works
+          render_assessments_with_params(pdf, available_height, 4, font_size)
+          @used_compact_layout = true
+          return
+        end
+
+        font_size -= 1
       end
+
+      # If we've exhausted all options, use minimum font size anyway
+      # Add a warning if still overflowing
+      final_overflow = check_for_overflow(pdf, available_height, 4, min_font_size, photo_boundary)
+      if final_overflow && !Rails.env.production?
+        # Add debug warning to PDF
+        pdf.fill_color "FF0000"
+        pdf.text "[DEBUG: Content overflow detected - may overlap with photo]", size: 8
+        pdf.fill_color "000000"
+
+        # Draw debug boundary line where we think the photo starts
+        pdf.stroke_color "FF0000"
+        pdf.line_width = 1
+
+        # Calculate column positions for 4 columns
+        total_spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER * 3
+        column_width = (pdf.bounds.width - total_spacer_width) / 4.0
+
+        # Draw line at the third column divider (where 4th column starts)
+        third_col_x = (column_width + Configuration::ASSESSMENT_COLUMN_SPACER) * 3
+
+        # Draw horizontal line where we think photo starts
+        pdf.stroke_horizontal_line third_col_x, pdf.bounds.width, at: photo_boundary + 5
+
+        # Add text label
+        pdf.draw_text "Photo boundary + 5pt buffer", at: [third_col_x, photo_boundary + 10], size: 6
+
+        # Reset stroke color
+        pdf.stroke_color "000000"
+      end
+
+      render_assessments_with_params(pdf, available_height, 4, min_font_size)
+      @used_compact_layout = true
     end
 
-    def calculate_photo_boundary(pdf)
-      # For boundary calculation, use the larger photo size (3 columns)
-      # Calculate column width for 3 columns
-      total_spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER * 2
-      column_width = (pdf.bounds.width - total_spacer_width) / 3.0
+    def calculate_photo_boundary(pdf, columns = 3)
+      # Calculate the exact same photo position that ImageProcessor uses
+      # This matches the logic in ImageProcessor.add_unit_photo_footer
 
-      # Photo width equals one column width
+      # Calculate photo dimensions based on column count
+      total_spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER * (columns - 1)
+      column_width = (pdf.bounds.width - total_spacer_width) / columns.to_f
       photo_width = column_width.round
-      # Assume square photo for worst-case calculation
+
+      # For boundary calculation, assume square photo as worst case
+      # Real photos will be sized maintaining aspect ratio, but this gives us a safe boundary
       photo_height = photo_width
 
-      # Calculate photo position in bottom right corner
-      # Account for footer height on first page
+      # Photo Y position (top edge) - matches ImageProcessor calculation exactly
       if pdf.page_number == 1
         Configuration::FOOTER_HEIGHT + Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
       else
         Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
       end
-
-      # Return the top edge of the photo (photo_y is the top edge in Prawn coordinates)
     end
 
     def check_for_overflow(pdf, available_height, columns, text_size, photo_boundary)
       # Calculate total content height needed
       total_content_height = calculate_total_content_height(text_size)
 
-      # Check if content would spill into third column
-      if columns == 3
-        # Content fills vertically in each column before moving to next
-        # Check if we need more than 2 columns worth of height
-        two_columns_height = available_height * 2
+      # Use available_height (which accounts for footer) for overflow calculations
+      # This matches what we actually give to the column_box
+      column_height = available_height
 
-        if total_content_height > two_columns_height
-          # Content will spill into third column
-          # Calculate how much content goes into third column
-          third_column_content_height = total_content_height - two_columns_height
+      # Check if content spills into 4th column where photo is
+      # Prawn fills columns sequentially, so first 3 columns get full height
+      first_three_columns_capacity = column_height * 3
 
-          # Calculate where third column content would end
-          # Third column starts at top of available area
-          third_column_bottom = pdf.cursor - third_column_content_height
+      # The 4th column starts from the same Y position as other columns (pdf.cursor from top)
+      # But it can only go down to where the photo starts
+      # Photo boundary is from bottom of page, we need to convert to distance from current cursor
+      page_height = pdf.bounds.height
+      photo_top_from_page_top = page_height - photo_boundary
+      fourth_column_available_height = pdf.cursor - photo_top_from_page_top - 5  # 5pt buffer
 
-          # Check if it would overlap with photo
-          # Add 20pt buffer - only switch to 4 columns if we really need to
-          if third_column_bottom < (photo_boundary + 20)
-            return true
-          end
+      # Debug logging for development
+      if !Rails.env.production?
+        Rails.logger.debug "=== Overflow Check Debug ==="
+        Rails.logger.debug { "Font size: #{text_size}" }
+        Rails.logger.debug { "Total content height: #{total_content_height}" }
+        Rails.logger.debug { "Column height (available_height): #{column_height}" }
+        Rails.logger.debug { "First 3 columns capacity: #{first_three_columns_capacity}" }
+        Rails.logger.debug { "4th column available height: #{fourth_column_available_height}" }
+        Rails.logger.debug { "PDF cursor position: #{pdf.cursor}" }
+        Rails.logger.debug { "Photo boundary (top edge from bottom): #{photo_boundary}" }
+
+        if total_content_height > first_three_columns_capacity
+          fourth_column_content = total_content_height - first_three_columns_capacity
+          Rails.logger.debug { "Content spilling into 4th column: #{fourth_column_content}" }
+          Rails.logger.debug { "Would overflow: #{fourth_column_content > fourth_column_available_height}" }
+        else
+          Rails.logger.debug { "All content fits in first 3 columns: no overflow" }
         end
       end
 
-      false
+      # Check if content spills into 4th column and exceeds available space there
+      if total_content_height > first_three_columns_capacity
+        fourth_column_content = total_content_height - first_three_columns_capacity
+        fourth_column_content > fourth_column_available_height
+      else
+        false  # All content fits in first 3 columns
+      end
     end
 
     def calculate_total_content_height(text_size)
@@ -329,6 +384,7 @@ class PdfGeneratorService
     end
 
     def render_assessments_with_params(pdf, available_height, columns, text_size)
+      # Use available_height to respect footer boundaries
       pdf.column_box([0, pdf.cursor], columns: columns, width: pdf.bounds.width, spacer: ASSESSMENT_COLUMN_SPACER, height: available_height) do
         @current_assessment_blocks.each do |block|
           pdf.text block[:title], size: ASSESSMENT_TITLE_SIZE, style: :bold
