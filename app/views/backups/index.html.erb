@@ -1,0 +1,37 @@
+<header>
+  <h1><%= t("backups.title") %></h1>
+</header>
+
+<nav>
+  <ul>
+    <li><%= link_to t("admin.back_to_admin"), admin_path %></li>
+  </ul>
+</nav>
+
+<% if @backups.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th><%= t("backups.filename") %></th>
+        <th><%= t("backups.size") %></th>
+        <th><%= t("backups.created_at") %></th>
+        <th><%= t("backups.actions") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @backups.each do |backup| %>
+        <tr>
+          <td><%= backup[:filename] %></td>
+          <td><%= backup[:size_mb] %> MB</td>
+          <td><%= backup[:last_modified].strftime("%Y-%m-%d %H:%M") %></td>
+          <td>
+            <%= link_to t("backups.download"), download_backups_path(key: backup[:key]), 
+                data: { turbo: false } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p><%= t("backups.no_backups") %></p>
+<% end %>

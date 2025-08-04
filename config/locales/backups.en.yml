@@ -1,0 +1,14 @@
+en:
+  backups:
+    title: "Database Backups"
+    filename: "Filename"
+    size: "Size"
+    created_at: "Created At"
+    actions: "Actions"
+    download: "Download"
+    no_backups: "No backups found."
+    errors:
+      s3_not_enabled: "S3 storage is not enabled."
+      invalid_backup: "Invalid backup requested."
+      download_failed: "Failed to generate download URL."
+      fetch_failed: "Failed to fetch backups from S3."

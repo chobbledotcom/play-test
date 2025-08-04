@@ -11,6 +11,8 @@ en:
     about: "About"
     feedback: "Feedback"
     jobs: "Jobs"
+    admin: "Admin"
+    backups: "Backups"
 
   # Shared UI elements
   shared:
