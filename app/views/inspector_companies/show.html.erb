@@ -1,9 +1,13 @@
 <%= render 'shared/page_header', title: @inspector_company.name %>
 
-<% if current_user&.admin? %>
-  <%= link_to t('ui.edit'),
-    edit_inspector_company_path(@inspector_company) %>
-<% end %>
+<nav>
+  <ul>
+    <% if current_user&.admin? %>
+      <li><%= link_to t('ui.edit'), edit_inspector_company_path(@inspector_company) %></li>
+      <li><%= link_to t('inspector_companies.titles.index'), inspector_companies_path %></li>
+    <% end %>
+  </ul>
+</nav>
 
 <table>
   <tr>

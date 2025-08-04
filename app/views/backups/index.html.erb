@@ -1,0 +1,31 @@
+<header>
+  <h1><%= t("backups.title") %></h1>
+</header>
+
+
+<% if @backups.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th><%= t("backups.filename") %></th>
+        <th><%= t("backups.size") %></th>
+        <th><%= t("backups.created_at") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @backups.each do |backup| %>
+        <% date = backup[:filename].match(/database-(\d{4}-\d{2}-\d{2})\.tar\.gz/)&.[](1) %>
+        <tr>
+          <td>
+            <%= link_to backup[:filename], download_backups_path(date: date), 
+                data: { turbo: false } %>
+          </td>
+          <td><%= backup[:size_mb] %> MB</td>
+          <td><%= backup[:last_modified].strftime("%Y-%m-%d %H:%M") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p><%= t("backups.no_backups") %></p>
+<% end %>

@@ -73,6 +73,16 @@ Rails.application.routes.draw do
   # Inspector Companies
   resources :inspector_companies, except: [:destroy]
 
+  # Admin
+  get "admin", to: "admin#index"
+
+  # Backups
+  resources :backups, only: [:index] do
+    collection do
+      get "download"
+    end
+  end
+
   # Pages (CMS)
   resources :pages, except: [:show]
   get "pages/:slug",

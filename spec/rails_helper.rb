@@ -8,6 +8,7 @@ require "rspec/rails"
 require "factory_bot_rails"
 require "capybara/rspec"
 require "database_cleaner/active_record"
+require "aws-sdk-s3"
 require_relative "../lib/i18n_usage_tracker"
 
 Capybara.raise_server_errors = true
