@@ -17,7 +17,7 @@ module ImageProcessable
 
   private
 
-  sig { params(params_hash: T::Hash[T.untyped, T.untyped], image_fields: T.untyped).returns(T::Hash[T.untyped, T.untyped]) }
+  sig { params(params_hash: T.any(ActionController::Parameters, T::Hash[T.untyped, T.untyped]), image_fields: T.untyped).returns(T.any(ActionController::Parameters, T::Hash[T.untyped, T.untyped])) }
   def process_image_params(params_hash, *image_fields)
     image_fields.each do |field|
       next if params_hash[field].blank?
