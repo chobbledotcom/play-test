@@ -71,7 +71,9 @@ gem "importmap-rails", "~> 2.1"
 
 # Image processing
 gem "image_processing", "~> 1.12"
-gem "ruby-vips", "= 2.2.3"
+# Pin ruby-vips for nixpkgs compatibility
+# Note: Requires libvips to be installed on the system
+gem "ruby-vips", "= 2.2.3", require: false
 
 # QR code generation
 gem "rqrcode"
