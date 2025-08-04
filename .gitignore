@@ -45,3 +45,6 @@
 
 # Ignore terragon setup marker
 .terragon-setup-complete
+
+# Ignore generated Sorbet RBI files (can be regenerated)
+/sorbet/rbi/

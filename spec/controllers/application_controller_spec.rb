@@ -39,37 +39,6 @@ RSpec.describe ApplicationController, type: :controller do
       end
     end
 
-    describe "#table_from_query" do
-      it "extracts table from SELECT query" do
-        sql = 'SELECT * FROM "users" WHERE id = 1'
-        expect(controller.send(:table_from_query, sql)).to eq("users")
-      end
-
-      it "extracts table from INSERT query" do
-        sql = 'INSERT INTO "inspections" (name) VALUES (?)'
-        expect(controller.send(:table_from_query, sql)).to eq("inspections")
-      end
-
-      it "extracts table from UPDATE query" do
-        sql = 'UPDATE "units" SET name = ? WHERE id = ?'
-        expect(controller.send(:table_from_query, sql)).to eq("units")
-      end
-
-      it "extracts table from DELETE query" do
-        sql = 'DELETE FROM "assessments" WHERE id = ?'
-        expect(controller.send(:table_from_query, sql)).to eq("assessments")
-      end
-
-      it "handles queries without quotes" do
-        sql = "SELECT * FROM users WHERE id = 1"
-        expect(controller.send(:table_from_query, sql)).to eq("users")
-      end
-
-      it "returns nil for non-matching queries" do
-        sql = "PRAGMA table_info(users)"
-        expect(controller.send(:table_from_query, sql)).to be_nil
-      end
-    end
 
     describe "#seed_data_action?" do
       it "returns true for add_seeds action on users controller" do
@@ -361,54 +330,16 @@ RSpec.describe ApplicationController, type: :controller do
       end
     end
 
-    describe "#should_check_query_limit?" do
-      it "returns true when debug enabled and not seed action" do
-        allow(controller).to receive(:admin_debug_enabled?).and_return(true)
-        allow(controller).to receive(:seed_data_action?).and_return(false)
-        expect(controller.send(:should_check_query_limit?)).to be true
+    describe "#n_plus_one_detection" do
+      it "is defined as a private method" do
+        expect(controller.private_methods).to include(:n_plus_one_detection)
       end
 
-      it "returns false when debug disabled" do
-        allow(controller).to receive(:admin_debug_enabled?).and_return(false)
-        expect(controller.send(:should_check_query_limit?)).to be false
-      end
-
-      it "returns false for seed data actions" do
-        allow(controller).to receive(:admin_debug_enabled?).and_return(true)
-        allow(controller).to receive(:seed_data_action?).and_return(true)
-        expect(controller.send(:should_check_query_limit?)).to be false
-      end
-    end
-
-    describe "#count_queries_by_table" do
-      it "counts queries by table name" do
-        queries = [
-          {sql: 'SELECT * FROM "users"'},
-          {sql: 'SELECT * FROM "users" WHERE id = 1'},
-          {sql: 'UPDATE "inspections" SET name = ?'},
-          {sql: 'SELECT * FROM "units"'}
-        ]
-        controller.instance_variable_set(:@debug_sql_queries, queries)
-
-        result = controller.send(:count_queries_by_table)
-        expect(result).to eq({"users" => 2, "inspections" => 1, "units" => 1})
-      end
-
-      it "handles empty query list" do
-        controller.instance_variable_set(:@debug_sql_queries, [])
-        result = controller.send(:count_queries_by_table)
-        expect(result).to eq({})
-      end
-
-      it "ignores queries without identifiable tables" do
-        queries = [
-          {sql: "PRAGMA table_info(users)"},
-          {sql: 'SELECT * FROM "users"'}
-        ]
-        controller.instance_variable_set(:@debug_sql_queries, queries)
-
-        result = controller.send(:count_queries_by_table)
-        expect(result).to eq({"users" => 1})
+      it "wraps actions with Prosopite scanning" do
+        expect(Prosopite).to receive(:scan)
+        expect(Prosopite).to receive(:finish)
+        
+        controller.send(:n_plus_one_detection) { "test" }
       end
     end
   end

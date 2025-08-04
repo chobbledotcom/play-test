@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -i bash -I nixpkgs=channel:nixpkgs-unstable -p biome
+#! nix-shell -i bash -I nixpkgs=channel:nixpkgs-unstable -p biome actionlint
 
 biome \
   format \
@@ -14,3 +14,7 @@ biome \
   --no-errors-on-unmatched \
   --files-ignore-unknown=true \
   "./app/assets"
+
+# Run actionlint on GitHub Actions workflows
+echo "Checking GitHub Actions workflows..."
+actionlint

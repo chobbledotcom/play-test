@@ -5,10 +5,12 @@ class ApplicationController < ActionController::Base
   before_action :require_login
   before_action :update_last_active_at
 
-  # Performance tracking for debug info
   before_action :start_debug_timer, if: :admin_debug_enabled?
-  after_action :check_query_limit, if: :should_check_query_limit?
   after_action :cleanup_debug_subscription, if: :admin_debug_enabled?
+
+  unless Rails.env.production? || Rails.env.test?
+    around_action :n_plus_one_detection
+  end
 
   rescue_from StandardError do |exception|
     if Rails.env.production? && should_notify_error?(exception)
@@ -85,10 +87,6 @@ class ApplicationController < ActionController::Base
     Rails.env.development? || current_user&.admin? || impersonating?
   end
 
-  def should_check_query_limit?
-    admin_debug_enabled? && !seed_data_action?
-  end
-
   def seed_data_action?
     seed_actions = %w[add_seeds delete_seeds]
     controller_name == "users" && seed_actions.include?(action_name)
@@ -134,31 +132,11 @@ class ApplicationController < ActionController::Base
     @debug_sql_queries || []
   end
 
-  def check_query_limit
-    table_query_counts = count_queries_by_table
-
-    # Tables to ignore for N+1 detection (Active Storage tables)
-    ignored_tables = %w[active_storage_blobs active_storage_attachments]
-
-    table_query_counts.each do |table, count|
-      # Skip checking for ignored tables
-      next if ignored_tables.include?(table)
-
-      if count > 5
-        log_n_plus_one_queries(table, count)
-        # Log to Sentry instead of raising
-        message = app_i18n(:debug, :n_plus_one_with_limit,
-          table: table, count: count, limit: 5)
-        Sentry.capture_message(message, level: :warning, extra: {
-          table: table,
-          query_count: count,
-          controller: controller_name,
-          action: action_name,
-          request_path: request.path,
-          request_method: request.method
-        })
-      end
-    end
+  def n_plus_one_detection
+    Prosopite.scan
+    yield
+  ensure
+    Prosopite.finish
   end
 
   def processing_image_upload?
@@ -170,40 +148,6 @@ class ApplicationController < ActionController::Base
         params.dig(:unit, :photo).present?
     else
       false
-    end
-  end
-
-  def log_n_plus_one_queries(table, count)
-    error_message = app_i18n(:debug, :n_plus_one_detected,
-      table: table, count: count)
-    Rails.logger.error error_message
-    Rails.logger.error app_i18n(:debug, :queries_for_table, table: table)
-    table_queries = debug_sql_queries.select { |q|
-      table_from_query(q[:sql]) == table
-    }
-    table_queries.each_with_index do |query, i|
-      query_log = app_i18n(:debug, :query_log_entry,
-        name: query[:name], sql: query[:sql])
-      Rails.logger.error "  #{i + 1}. #{query_log}"
-    end
-  end
-
-  def count_queries_by_table
-    debug_sql_queries.each_with_object(Hash.new(0)) do |query, counts|
-      table = table_from_query(query[:sql])
-      counts[table] += 1 if table
-    end
-  end
-
-  def table_from_query(sql)
-    if sql =~ /FROM\s+["']?(\w+)["']?/i
-      $1
-    elsif sql =~ /INSERT\s+INTO\s+["']?(\w+)["']?/i
-      $1
-    elsif sql =~ /UPDATE\s+["']?(\w+)["']?/i
-      $1
-    elsif sql =~ /DELETE\s+FROM\s+["']?(\w+)["']?/i
-      $1
     end
   end
 
