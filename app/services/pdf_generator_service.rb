@@ -174,13 +174,7 @@ class PdfGeneratorService
       # Generate the section using the generic renderer
       renderer = AssessmentRenderer.new
       renderer.generate_assessment_section(pdf, tab_name, assessment)
-      # Deep copy the blocks to avoid reference issues
-      renderer.current_assessment_blocks.each do |block|
-        assessment_renderer.current_assessment_blocks << {
-          title: block[:title],
-          fields: block[:fields].dup
-        }
-      end
+      assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
     end
   end
 
