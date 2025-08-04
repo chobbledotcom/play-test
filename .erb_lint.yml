@@ -28,7 +28,6 @@ linters:
   # Checks for potential XSS vulnerabilities in ERB
   ErbSafety:
     enabled: false
-    better_html_config: .better-html.yml
 
   # Checks for extra blank lines
   ExtraNewline:
