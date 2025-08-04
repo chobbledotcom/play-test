@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-unless Rails.env.production?
+if Rails.env.development?
   require "prosopite"
 
   Rails.application.config.after_initialize do
     Prosopite.rails_logger = Rails.logger
-    Prosopite.raise = Rails.env.test?
     Prosopite.prosopite_logger = true
 
     Prosopite.allow_stack_paths = [

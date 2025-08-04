@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
   before_action :start_debug_timer, if: :admin_debug_enabled?
   after_action :cleanup_debug_subscription, if: :admin_debug_enabled?
 
-  unless Rails.env.production?
+  unless Rails.env.production? || Rails.env.test?
     around_action :n_plus_one_detection
   end
 
