@@ -1,9 +1,16 @@
+# typed: strict
+# frozen_string_literal: true
+
 module InspectionsHelper
+  extend T::Sig
+
+  sig { params(user: User).returns(String) }
   def format_inspection_count(user)
     count = user.inspections.count
     t("inspections.count", count: count)
   end
 
+  sig { params(inspection: Inspection).returns(String) }
   def inspection_result_badge(inspection)
     case inspection.passed
     when true
@@ -15,8 +22,9 @@ module InspectionsHelper
     end
   end
 
+  sig { params(inspection: Inspection).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def inspection_actions(inspection)
-    actions = []
+    actions = T.let([], T::Array[T::Hash[Symbol, T.untyped]])
 
     if inspection.complete?
       # Complete inspections: Switch to In Progress / Log
@@ -54,14 +62,17 @@ module InspectionsHelper
   end
 
   # Tabbed inspection editing helpers
+  sig { params(inspection: Inspection).returns(T::Array[String]) }
   def inspection_tabs(inspection)
     inspection.applicable_tabs
   end
 
+  sig { returns(String) }
   def current_tab
     params[:tab].presence || "inspection"
   end
 
+  sig { params(inspection: Inspection, tab: String).returns(T::Boolean) }
   def assessment_complete?(inspection, tab)
     case tab
     when "inspection"
@@ -78,11 +89,13 @@ module InspectionsHelper
     end
   end
 
+  sig { params(inspection: Inspection, tab: String).returns(String) }
   def tab_name_with_check(inspection, tab)
     name = t("forms.#{tab}.header")
     assessment_complete?(inspection, tab) ? "#{name} ✓" : name
   end
 
+  sig { params(inspection: Inspection, current_tab: String).returns(T.nilable(T::Hash[Symbol, T.untyped])) }
   def next_tab_navigation_info(inspection, current_tab)
     # Don't show continue message on results tab
     return nil if current_tab == "results"
@@ -132,8 +145,9 @@ module InspectionsHelper
     nil
   end
 
+  sig { params(inspection: Inspection, tab: String).returns(Integer) }
   def incomplete_fields_count(inspection, tab)
-    @incomplete_fields_cache ||= {}
+    @incomplete_fields_cache = T.let(@incomplete_fields_cache, T.nilable(T::Hash[String, Integer])) || {}
     cache_key = "#{inspection.id}_#{tab}"
 
     @incomplete_fields_cache[cache_key] ||= case tab

@@ -202,12 +202,12 @@ class InspectionsController < ApplicationController
 
   def partition_inspections(all_inspections)
     @draft_inspections = all_inspections
-      .select { |inspection| inspection.complete_date.nil? }
+      .select { it.complete_date.nil? }
       .sort_by(&:created_at)
 
     @complete_inspections = all_inspections
-      .select { |inspection| inspection.complete_date.present? }
-      .sort_by { |inspection| -inspection.created_at.to_i }
+      .select { it.complete_date.present? }
+      .sort_by { -it.created_at.to_i }
   end
 
   def send_inspections_csv
@@ -289,7 +289,7 @@ class InspectionsController < ApplicationController
   def assessment_permitted_attributes(assessment_type)
     model_class = "Assessments::#{assessment_type.to_s.camelize}".constantize
     all_attributes = model_class.column_names
-    (all_attributes - ASSESSMENT_SYSTEM_ATTRIBUTES).map(&:to_sym)
+    (all_attributes - ASSESSMENT_SYSTEM_ATTRIBUTES).map { it.to_sym }
   end
 
   def filtered_inspections_query_without_order = current_user.inspections

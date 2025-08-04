@@ -1,8 +1,9 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 module UnitsHelper
   extend T::Sig
+
   sig { params(user: User).returns(T::Array[String]) }
   def manufacturer_options(user)
     user.units.distinct.pluck(:manufacturer).compact.compact_blank.sort
@@ -22,7 +23,7 @@ module UnitsHelper
 
   sig { params(unit: Unit).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def unit_actions(unit)
-    actions = [
+    actions = T.let([
       {
         label: I18n.t("units.buttons.view"),
         url: unit_path(unit, anchor: "inspections")
@@ -35,7 +36,7 @@ module UnitsHelper
         label: I18n.t("units.buttons.pdf_report"),
         url: unit_path(unit, format: :pdf)
       }
-    ]
+    ], T::Array[T::Hash[Symbol, T.untyped]])
 
     # Add activity log link for admins and unit owners
     if current_user && (current_user.admin? || unit.user_id == current_user.id)
