@@ -45,8 +45,11 @@ FactoryBot.define do
       after(:create) do |inspection|
         inspection.reload
         inspection.assessment_types.each do |assessment_name, assessment_class|
-          assessment = assessment_class.create!(inspection: inspection)
-          assessment.update!(attributes_for(assessment_name, :complete))
+          # Get existing assessment (auto-created by inspection model)
+          assessment = inspection.send(assessment_name)
+          # Update with complete attributes
+          complete_attrs = FactoryBot.attributes_for(assessment_name, :complete)
+          assessment.update!(complete_attrs)
         end
       end
     end
