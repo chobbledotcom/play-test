@@ -14,10 +14,12 @@ Rails.application.config.after_initialize do
   ]
 
   Prosopite.custom_logger = if defined?(Sentry)
-    lambda do |message|
+    logger = Object.new
+    def logger.warn(message)
       Rails.logger.warn(message)
+      sentry_message = "N+1 Query Detected: #{message}"
       Sentry.capture_message(
-        "N+1 Query Detected: #{message}",
+        sentry_message,
         level: :warning,
         extra: {
           prosopite_message: message,
@@ -25,6 +27,7 @@ Rails.application.config.after_initialize do
         }
       )
     end
+    logger
   else
     Rails.logger
   end
