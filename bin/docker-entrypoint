@@ -15,6 +15,9 @@ if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
   
   echo "Starting supercronic in background..."
   supercronic /tmp/crontab &
+  
+  echo "Starting Solid Queue worker in background..."
+  ./bin/jobs &
 fi
 
 exec "${@}"
