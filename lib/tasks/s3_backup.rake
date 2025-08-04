@@ -30,7 +30,8 @@ namespace :s3 do
 
       path = db_config["database"]
       # Handle relative paths
-      path.start_with?("/") ? path : Rails.root.join(path).to_s
+      path = Rails.root.join(path) unless path.start_with?("/")
+      path
     end
 
     def backup_retention_days = 60
@@ -44,6 +45,7 @@ namespace :s3 do
       validate_s3_config
 
       handle_s3_errors do
+        # Capture backup context for better error reporting
         Sentry.with_scope do |scope|
           scope.set_context("backup", {
             task: "s3:backup:database",
@@ -70,7 +72,7 @@ namespace :s3 do
           print "Creating database backup... "
 
           # Check if database path exists and is valid
-          unless File.exist?(database_path)
+          unless database_path && File.exist?(database_path)
             error_msg = "Database file not found at: #{database_path}"
             puts "\n❌ #{error_msg}"
             Sentry.capture_message(error_msg, level: "error")
@@ -93,7 +95,7 @@ namespace :s3 do
             error_msg = "Failed to create SQLite backup"
             Sentry.capture_message(error_msg, level: "error", extra: {
               command: backup_command,
-              database_path: database_path,
+              database_path: database_path.to_s,
               temp_backup_path: temp_backup_path.to_s
             })
             raise error_msg
@@ -123,7 +125,7 @@ namespace :s3 do
         rescue => e
           # Report any unexpected errors to Sentry with full context
           Sentry.capture_exception(e, extra: {
-            database_path: database_path,
+            database_path: database_path.to_s,
             backup_filename: backup_filename,
             s3_key: s3_key,
             step: "backup_process"
