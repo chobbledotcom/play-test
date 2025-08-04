@@ -41,9 +41,9 @@ run_linter "StandardRB (Ruby formatter/linter)" \
 run_linter "Sorbet (Ruby type checker)" \
   "bundle exec srb tc"
 
-# 3. ERB template linting
+# 3. ERB template linting using rake task
 run_linter "ERB Lint (ERB template linter)" \
-  "bundle exec erb_lint --autocorrect"
+  "bundle exec rake code_standards:erb_lint_fix"
 
 # 4. Security scanning with Brakeman
 run_linter "Brakeman (security scanner)" \
