@@ -46,6 +46,9 @@ Rails.application.configure do
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
 
+  # Use Solid Queue for Active Job
+  config.active_job.queue_adapter = :solid_queue
+
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 

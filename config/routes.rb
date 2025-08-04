@@ -1,4 +1,11 @@
+require "admin_constraint"
+
 Rails.application.routes.draw do
+  # Mount Mission Control Jobs for admin users only
+  constraints AdminConstraint.new do
+    mount MissionControl::Jobs::Engine => "/mission_control"
+  end
+
   get "up" => "rails/health#show", :as => :rails_health_check
 
   get "service-worker" => "rails/pwa#service_worker", :as => :pwa_service_worker

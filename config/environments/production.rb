@@ -72,6 +72,9 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
+  # Use Solid Queue for Active Job
+  config.active_job.queue_adapter = :solid_queue
+
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [:id]
 
