@@ -240,6 +240,7 @@ GEM
       timeout
     net-smtp (0.5.1)
       net-protocol
+    netrc (0.11.0)
     nio4r (2.7.4)
     nokogiri (1.18.8-aarch64-linux-gnu)
       racc (~> 1.4)
@@ -338,11 +339,17 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.2.1)
+    rbi (0.3.6)
+      prism (~> 1.0)
+      rbs (>= 3.4.4)
+    rbs (3.9.4)
+      logger
     rdoc (6.13.1)
       psych (>= 4.0.0)
     regexp_parser (2.10.0)
     reline (0.6.1)
       io-console (~> 0.5)
+    rexml (3.4.1)
     rqrcode (3.1.0)
       chunky_png (~> 1.0)
       rqrcode_core (~> 2.0)
@@ -411,6 +418,22 @@ GEM
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
     smart_properties (1.17.0)
+    sorbet (0.5.12371)
+      sorbet-static (= 0.5.12371)
+    sorbet-runtime (0.5.12371)
+    sorbet-static (0.5.12371-aarch64-linux)
+    sorbet-static (0.5.12371-universal-darwin)
+    sorbet-static (0.5.12371-x86_64-linux)
+    sorbet-static-and-runtime (0.5.12371)
+      sorbet (= 0.5.12371)
+      sorbet-runtime (= 0.5.12371)
+    spoom (1.6.3)
+      erubi (>= 1.10.0)
+      prism (>= 0.28.0)
+      rbi (>= 0.3.3)
+      rexml (>= 3.2.6)
+      sorbet-static-and-runtime (>= 0.5.10187)
+      thor (>= 0.19.2)
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
       logger
@@ -443,6 +466,16 @@ GEM
       lint_roller (~> 1.0)
       rubocop-rails (~> 2.31.0)
     stringio (3.1.7)
+    tapioca (0.16.11)
+      benchmark
+      bundler (>= 2.2.25)
+      netrc (>= 0.11.0)
+      parallel (>= 1.21.0)
+      rbi (~> 0.2)
+      sorbet-static-and-runtime (>= 0.5.11087)
+      spoom (>= 1.2.0)
+      thor (>= 1.2.0)
+      yard-sorbet
     thor (1.4.0)
     timeout (0.4.3)
     ttfunk (1.8.0)
@@ -466,6 +499,10 @@ GEM
       chronic (>= 0.6.3)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yard (0.9.37)
+    yard-sorbet (0.9.0)
+      sorbet-runtime
+      yard
     zeitwerk (2.7.2)
 
 PLATFORMS
@@ -512,10 +549,13 @@ DEPENDENCIES
   sentry-rails
   sentry-ruby
   simplecov
+  sorbet
+  sorbet-runtime
   sprockets-rails
   sqlite3 (>= 1.4)
   standard
   standard-rails
+  tapioca
   turbo-rails (~> 2.0)
   tzinfo-data
   whenever

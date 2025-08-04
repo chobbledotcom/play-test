@@ -49,6 +49,11 @@ group :development, :test do
   # ERB linter with better-html support
   gem "erb_lint", require: false
   gem "better_html", require: false
+
+  # Sorbet type checker
+  gem "sorbet", require: false
+  gem "sorbet-runtime"
+  gem "tapioca", require: false
 end
 
 # PDF generation
