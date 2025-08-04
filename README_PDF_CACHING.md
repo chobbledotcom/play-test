@@ -66,9 +66,11 @@ end
 
 The cache is automatically invalidated in these scenarios:
 
-1. When an inspection is updated (any field change)
-2. When a unit is updated (any field change)
+1. When an inspection is updated (except for `pdf_last_accessed_at` or `updated_at` only changes)
+2. When a unit is updated (except for `updated_at` only changes)
 3. When an inspection is completed (invalidates the unit's cached PDF)
+
+**Note**: The system intelligently skips cache invalidation when only timestamp fields are updated, preventing unnecessary cache purges when PDFs are accessed.
 
 ## Storage
 

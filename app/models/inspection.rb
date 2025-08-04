@@ -497,6 +497,12 @@ class Inspection < ApplicationRecord
   end
 
   def invalidate_pdf_cache
+    # Skip cache invalidation if only pdf_last_accessed_at or updated_at changed
+    changed_attrs = saved_changes.keys
+    ignorable_attrs = ["pdf_last_accessed_at", "updated_at"]
+    
+    return if (changed_attrs - ignorable_attrs).empty?
+    
     PdfCacheService.invalidate_inspection_cache(self)
   end
 

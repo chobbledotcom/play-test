@@ -154,6 +154,12 @@ class Unit < ApplicationRecord
   end
 
   def invalidate_pdf_cache
+    # Skip cache invalidation if only updated_at changed
+    changed_attrs = saved_changes.keys
+    ignorable_attrs = ["updated_at"]
+    
+    return if (changed_attrs - ignorable_attrs).empty?
+    
     PdfCacheService.invalidate_unit_cache(self)
   end
 end
