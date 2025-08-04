@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 class PdfGeneratorService
   require_relative "pdf_generator_service/configuration"
   require_relative "pdf_generator_service/utilities"
   require_relative "pdf_generator_service/header_generator"
   require_relative "pdf_generator_service/table_builder"
-  require_relative "pdf_generator_service/assessment_renderer"
   require_relative "pdf_generator_service/assessment_columns"
   require_relative "pdf_generator_service/position_calculator"
   require_relative "pdf_generator_service/image_orientation_processor"
@@ -20,8 +21,8 @@ class PdfGeneratorService
     Prawn::Document.new(page_size: "A4", page_layout: :portrait) do |pdf|
       Configuration.setup_pdf_fonts(pdf)
 
-      # Initialize assessment renderer
-      assessment_renderer = AssessmentRenderer.new
+      # Initialize array to collect all assessment blocks
+      assessment_blocks = []
 
       # Header section
       HeaderGenerator.generate_inspection_pdf_header(pdf, inspection)
@@ -33,33 +34,28 @@ class PdfGeneratorService
       generate_risk_assessment_section(pdf, inspection)
 
       # Generate all assessment sections in the correct UI order from applicable_tabs
-      generate_assessments_in_ui_order(inspection, assessment_renderer, pdf)
+      generate_assessments_in_ui_order(inspection, assessment_blocks)
 
       # Render all collected assessments in newspaper-style columns
-      assessment_renderer.render_all_assessments_in_columns(pdf)
+      render_assessment_blocks_in_columns(pdf, assessment_blocks)
 
       # Disclaimer footer (only on first page)
       DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
 
       # Add unit photo in bottom right corner
-      # Pass column count info to adjust photo width accordingly
+      # Always use 4 columns for assessments now
       if inspection.unit&.photo
-        column_count = assessment_renderer.used_compact_layout ? 4 : 3
-        ImageProcessor.add_unit_photo_footer(pdf, inspection.unit, column_count)
+        ImageProcessor.add_unit_photo_footer(pdf, inspection.unit, 4)
       end
 
       # Add DRAFT watermark overlay for draft inspections (except in test env)
-      if !inspection.complete? && !Rails.env.test?
-        Utilities.add_draft_watermark(pdf)
-      end
+      Utilities.add_draft_watermark(pdf) if !inspection.complete? && !Rails.env.test?
 
       # Add photos page if photos are attached
       PhotosRenderer.generate_photos_page(pdf, inspection)
 
       # Add debug info page if enabled (admins only)
-      if debug_enabled && debug_queries.present?
-        DebugInfoRenderer.add_debug_info_page(pdf, debug_queries)
-      end
+      DebugInfoRenderer.add_debug_info_page(pdf, debug_queries) if debug_enabled && debug_queries.present?
     end
   end
 
@@ -84,24 +80,21 @@ class PdfGeneratorService
       DisclaimerFooterRenderer.render_disclaimer_footer(pdf, unit.user)
 
       # Add unit photo in bottom right corner (for unit PDFs, always use 3 columns)
-      if unit.photo
-        ImageProcessor.add_unit_photo_footer(pdf, unit, 3)
-      end
+      ImageProcessor.add_unit_photo_footer(pdf, unit, 3) if unit.photo
 
       # Add debug info page if enabled (admins only)
-      if debug_enabled && debug_queries.present?
-        DebugInfoRenderer.add_debug_info_page(pdf, debug_queries)
-      end
+      DebugInfoRenderer.add_debug_info_page(pdf, debug_queries) if debug_enabled && debug_queries.present?
     end
   end
 
   def self.generate_inspection_unit_details(pdf, inspection)
     unit = inspection.unit
 
-    if unit
-      unit_data = TableBuilder.build_unit_details_table_with_inspection(unit, inspection, :inspection)
-      TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.inspection.equipment_details"), unit_data)
-    end
+    return unless unit
+
+    unit_data = TableBuilder.build_unit_details_table_with_inspection(unit, inspection, :inspection)
+    TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.inspection.equipment_details"), unit_data)
+
     # Hide the table entirely when no unit is associated
   end
 
@@ -110,7 +103,7 @@ class PdfGeneratorService
     TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.unit.details"), unit_data)
   end
 
-  def self.generate_unit_details_with_inspection(pdf, unit, last_inspection)
+  def self.generate_unit_details_with_inspection(pdf, unit, _last_inspection)
     unit_data = TableBuilder.build_unit_details_table(unit, :unit)
     TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.unit.details"), unit_data)
   end
@@ -124,15 +117,17 @@ class PdfGeneratorService
       .order(inspection_date: :desc)
 
     if completed_inspections.empty?
-      TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"), [[I18n.t("pdf.unit.no_completed_inspections"), ""]])
+      TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"),
+        [[I18n.t("pdf.unit.no_completed_inspections"), ""]])
     else
       TableBuilder.create_inspection_history_table(pdf, I18n.t("pdf.unit.inspection_history"), completed_inspections)
     end
   end
 
-  def self.generate_unit_inspection_history_with_data(pdf, unit, completed_inspections)
+  def self.generate_unit_inspection_history_with_data(pdf, _unit, completed_inspections)
     if completed_inspections.empty?
-      TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"), [[I18n.t("pdf.unit.no_completed_inspections"), ""]])
+      TableBuilder.create_nice_box_table(pdf, I18n.t("pdf.unit.inspection_history"),
+        [[I18n.t("pdf.unit.no_completed_inspections"), ""]])
     else
       TableBuilder.create_inspection_history_table(pdf, I18n.t("pdf.unit.inspection_history"), completed_inspections)
     end
@@ -146,8 +141,8 @@ class PdfGeneratorService
     pdf.move_down 10
 
     # Create a text box constrained to 4 lines with shrink_to_fit
-    line_height = 10 * 1.2  # Normal font size * line height multiplier
-    max_height = line_height * 4  # 4 lines max
+    line_height = 10 * 1.2 # Normal font size * line height multiplier
+    max_height = line_height * 4 # 4 lines max
 
     pdf.text_box inspection.risk_assessment,
       at: [0, pdf.cursor],
@@ -160,9 +155,9 @@ class PdfGeneratorService
     pdf.move_down max_height + 15
   end
 
-  def self.generate_assessments_in_ui_order(inspection, assessment_renderer, pdf)
+  def self.generate_assessments_in_ui_order(inspection, assessment_blocks)
     # Get the UI order from applicable_tabs (excluding non-assessment tabs)
-    ui_ordered_tabs = inspection.applicable_tabs - ["inspection", "results"]
+    ui_ordered_tabs = inspection.applicable_tabs - %w[inspection results]
 
     ui_ordered_tabs.each do |tab_name|
       assessment_key = :"#{tab_name}_assessment"
@@ -171,11 +166,38 @@ class PdfGeneratorService
       assessment = inspection.send(assessment_key)
       next unless assessment
 
-      # Generate the section using the generic renderer
-      renderer = AssessmentRenderer.new
-      renderer.generate_assessment_section(pdf, tab_name, assessment)
-      assessment_renderer.current_assessment_blocks.concat(renderer.current_assessment_blocks)
+      # Build blocks for this assessment and add to the main array
+      blocks = AssessmentBlockBuilder.build_from_assessment(tab_name, assessment)
+      assessment_blocks.concat(blocks)
     end
+  end
+
+  def self.render_assessment_blocks_in_columns(pdf, assessment_blocks)
+    return if assessment_blocks.empty?
+
+    pdf.text I18n.t("pdf.inspection.assessments_section"), size: 12, style: :bold
+    pdf.stroke_horizontal_rule
+    pdf.move_down 15
+
+    # Calculate available height accounting for footer on first page
+    available_height = if pdf.page_number == 1
+      pdf.cursor - Configuration::FOOTER_HEIGHT
+    else
+      pdf.cursor
+    end
+
+    # Check if we have enough space for at least some content
+    min_content_height = 100  # Minimum height for meaningful content
+    if available_height < min_content_height
+      pdf.start_new_page
+      available_height = pdf.cursor
+    end
+
+    # Render assessments using the column layout
+    renderer = AssessmentColumns.new(assessment_blocks, available_height)
+    renderer.render(pdf)
+
+    pdf.move_down 20
   end
 
   # Helper methods for backward compatibility and testing
