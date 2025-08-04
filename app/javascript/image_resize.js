@@ -153,6 +153,10 @@ class ImageResize {
 					// Clear canvas first
 					ctx.clearRect(0, 0, width, height);
 
+					// Fill with white background for transparent images
+					ctx.fillStyle = "#FFFFFF";
+					ctx.fillRect(0, 0, width, height);
+
 					// Draw image
 					ctx.drawImage(img, 0, 0, width, height);
 
