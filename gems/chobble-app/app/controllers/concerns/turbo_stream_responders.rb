@@ -1,4 +1,5 @@
-module TurboStreamResponders
+module ChobbleApp
+  module TurboStreamResponders
   extend ActiveSupport::Concern
 
   private
@@ -87,5 +88,6 @@ module TurboStreamResponders
         )
       end
     end
+  end
   end
 end

@@ -1,4 +1,5 @@
-module UserActivityCheck
+module ChobbleApp
+  module UserActivityCheck
   extend ActiveSupport::Concern
 
   private
@@ -13,5 +14,6 @@ module UserActivityCheck
   # Override this method in controllers to provide custom redirect logic
   def handle_inactive_user_redirect
     raise NotImplementedError
+  end
   end
 end

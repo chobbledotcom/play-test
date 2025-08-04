@@ -20,6 +20,9 @@ gem "tzinfo-data", platforms: %i[windows jruby]
 gem "chobble-forms"
 gem "en14960"
 
+# Local Chobble App gem with shared infrastructure
+gem "chobble_app", path: "gems/chobble-app"
+
 # Sorbet runtime (needed in all environments)
 gem "sorbet-runtime"
 

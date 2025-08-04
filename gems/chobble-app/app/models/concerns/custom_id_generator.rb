@@ -1,4 +1,5 @@
-module CustomIdGenerator
+module ChobbleApp
+  module CustomIdGenerator
   extend ActiveSupport::Concern
 
   # Standard ID length for all models using CustomIdGenerator
@@ -23,5 +24,6 @@ module CustomIdGenerator
   def generate_custom_id
     scope_conditions = respond_to?(:uniqueness_scope) ? uniqueness_scope : {}
     self.id = self.class.generate_random_id(scope_conditions)
+  end
   end
 end

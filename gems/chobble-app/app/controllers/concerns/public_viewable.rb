@@ -1,4 +1,5 @@
-module PublicViewable
+module ChobbleApp
+  module PublicViewable
   extend ActiveSupport::Concern
 
   included do
@@ -64,5 +65,6 @@ module PublicViewable
 
   def resource_pdf_url
     raise NotImplementedError
+  end
   end
 end
