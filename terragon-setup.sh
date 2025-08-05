@@ -25,7 +25,7 @@ bundle install --jobs 4
 if [ ! -f ".env" ]; then
     echo "Creating .env file..."
     echo "BASE_URL=localhost:3000" > .env
-    echo "SITE_NAME=Play-Test CI" >> .env
+    echo "APP_NAME=Play-Test CI" >> .env
 fi
 
 # Database setup (only if not exists)
