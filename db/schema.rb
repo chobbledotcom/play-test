@@ -421,7 +421,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_130134) do
   end
 
   create_table "user_sessions", force: :cascade do |t|
-    t.string "user_id", null: false
+    t.string "user_id", limit: 12, null: false
     t.string "session_token", null: false
     t.string "ip_address"
     t.string "user_agent"
@@ -474,5 +474,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_130134) do
   add_foreign_key "structure_assessments", "inspections"
   add_foreign_key "units", "users"
   add_foreign_key "user_height_assessments", "inspections"
+  add_foreign_key "user_sessions", "users"
   add_foreign_key "user_sessions", "users"
 end
