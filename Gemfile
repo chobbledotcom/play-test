@@ -42,6 +42,7 @@ group :development, :test do
   gem "capybara"
   gem "cuprite"
   gem "simplecov", require: false
+  gem "simplecov-cobertura", require: false
   gem "pdf-inspector", require: false
   gem "parallel_tests"
   gem "database_cleaner-active_record"
