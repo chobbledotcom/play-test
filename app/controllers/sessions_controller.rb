@@ -34,15 +34,31 @@ class SessionsController < ApplicationController
 
   def handle_successful_login(user)
     should_remember = params.dig(:session, :remember_me) == "1"
+    user_session = create_session_record(user)
+
     create_user_session(user, should_remember)
-    # Create UserSession record
+    session[:session_token] = user_session.session_token
+
+    flash[:notice] = I18n.t("session.login.success")
+    redirect_to inspections_path
+  end
+
+  def create_session_record(user)
+    Rails.logger.info "Creating user session for user #{user.id}"
+    Rails.logger.info "User exists in DB: #{User.exists?(user.id)}"
+    Rails.logger.info "User sessions count before: #{user.user_sessions.count}"
+
     user_session = user.user_sessions.create!(
       ip_address: request.remote_ip,
       user_agent: request.user_agent,
       last_active_at: Time.current
     )
-    session[:session_token] = user_session.session_token
-    flash[:notice] = I18n.t("session.login.success")
-    redirect_to inspections_path
+    Rails.logger.info "User session created: #{user_session.id}"
+    user_session
+  rescue => e
+    Rails.logger.error "Failed to create user session: #{e.message}"
+    Rails.logger.error "User ID: #{user.id}, class: #{user.id.class}"
+    Rails.logger.error e.backtrace.join("\n")
+    raise
   end
 end
