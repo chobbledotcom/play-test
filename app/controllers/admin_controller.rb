@@ -48,7 +48,7 @@ class AdminController < ApplicationController
         {
           name: release["name"],
           tag_name: release["tag_name"],
-          published_at: Time.parse(release["published_at"]),
+          published_at: Time.zone.parse(release["published_at"]),
           body: release["body"],
           html_url: release["html_url"],
           author: release["author"]["login"]
