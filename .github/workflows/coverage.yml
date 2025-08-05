@@ -19,6 +19,7 @@ jobs:
       - name: Run all tests with coverage
         env:
           RAILS_ENV: test
+          SIMPLECOV_COBERTURA: true
         run: |
           bundle exec rails db:migrate
           bundle exec rails parallel:prepare
