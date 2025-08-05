@@ -10,8 +10,7 @@ RSpec.feature "Admin Releases", type: :feature do
         name: "Version 1.2.0",
         tag_name: "v1.2.0",
         published_at: 2.days.ago,
-        body: "<h3>Changes</h3>\n<ul><li>New feature X</li>\n" \
-              "<li>Bug fix Y</li></ul>",
+        body: "<ul><li>New feature X</li>\n<li>Bug fix Y</li></ul>",
         html_url: "https://github.com/chobbledotcom/play-test/releases/v1.2.0",
         author: "developer1",
         is_bot: false

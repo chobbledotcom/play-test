@@ -71,14 +71,22 @@ class AdminController < ApplicationController
     docker_index = body.index("## Docker Images")
     processed_body = docker_index ? body[0...docker_index].strip : body
 
+    # Remove [Read the full changelog here] links
+    changelog_pattern = /\[Read the full changelog here\]\([^)]+\)/
+    processed_body = processed_body.gsub(changelog_pattern, "")
+    processed_body = processed_body.strip
+
     convert_markdown_to_html(processed_body)
   end
 
   def convert_markdown_to_html(text)
-    # Convert headers
-    html = text.gsub(/^### (.+)$/, '<h4>\1</h4>')
-    html = html.gsub(/^## (.+)$/, '<h3>\1</h3>')
-    html = html.gsub(/^# (.+)$/, '<h2>\1</h2>')
+    # Remove headers (they duplicate version info)
+    html = text.gsub(/^### .+$/, "")
+    html = html.gsub(/^## .+$/, "")
+    html = html.gsub(/^# .+$/, "")
+
+    # Clean up extra newlines from removed headers
+    html = html.gsub(/\n{3,}/, "\n\n").strip
 
     # Convert bold and bullet points
     html = html.gsub(/\*\*(.+?)\*\*/, '<strong>\1</strong>')

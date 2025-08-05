@@ -5,7 +5,7 @@ RSpec.feature "Admin Releases Docker Section", type: :feature do
 
   scenario "hides Docker Images section from release body" do
     # Mock the raw API response
-    release_body = "## Changes\n\nNew features\n\n" \
+    release_body = "## Changes\n\n- New features added\n- Bug fixes\n\n" \
                    "## Docker Images\n\nDocker info here"
     release_url = "https://github.com/chobbledotcom/play-test/releases/v2.0.0"
 
@@ -27,8 +27,10 @@ RSpec.feature "Admin Releases Docker Section", type: :feature do
     sign_in(admin_user)
     visit admin_releases_path
 
-    expect(page).to have_content("Changes")
-    expect(page).to have_content("New features")
+    # Headers are stripped, so we shouldn't see "Changes"
+    expect(page).not_to have_content("Changes")
+    expect(page).to have_content("New features added")
+    expect(page).to have_content("Bug fixes")
     expect(page).not_to have_content("Docker Images")
     expect(page).not_to have_content("Docker info here")
   end
