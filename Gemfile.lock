@@ -574,6 +574,7 @@ DEPENDENCIES
   image_processing (~> 1.12)
   importmap-rails (~> 2.1)
   mission_control-jobs (~> 1.0)
+  openssl (= 3.3.0)
   parallel_tests
   pdf-inspector
   pg_query (~> 5.1)
