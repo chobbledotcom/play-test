@@ -46,7 +46,12 @@ module SessionsHelper
     @current_user = nil
   end
 
-  sig { params(email: T.nilable(String), password: T.nilable(String)).returns(T.nilable(T.any(User, T::Boolean))) }
+  sig {
+    params(
+      email: T.nilable(String),
+      password: T.nilable(String)
+    ).returns(T.nilable(T.any(User, T::Boolean)))
+  }
   def authenticate_user(email, password)
     return nil unless email.present? && password.present?
     User.find_by(email: email.downcase)&.authenticate(password)
@@ -56,5 +61,13 @@ module SessionsHelper
   def create_user_session(user, should_remember = false)
     log_in user
     remember_user if should_remember
+  end
+
+  sig { returns(T.nilable(UserSession)) }
+  def current_session
+    return unless session[:session_token]
+    @current_session ||= UserSession.find_by(
+      session_token: session[:session_token]
+    )
   end
 end

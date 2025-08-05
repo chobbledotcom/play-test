@@ -74,6 +74,12 @@ class ApplicationController < ActionController::Base
     return unless current_user.is_a?(User)
 
     current_user.update(last_active_at: Time.current)
+
+    # Update UserSession last_active_at
+    if session[:session_token]
+      token = session[:session_token]
+      UserSession.find_by(session_token: token)&.touch_last_active
+    end
   end
 
   def require_admin
