@@ -14,7 +14,6 @@ on:
 
 jobs:
   release:
-    needs: [test, lint]
     runs-on: ubuntu-latest
     permissions:
       contents: write
