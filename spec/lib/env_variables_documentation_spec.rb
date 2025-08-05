@@ -99,7 +99,7 @@ RSpec.describe "Environment Variables Documentation" do
   end
 
   def search_in_bin_directory(env_vars)
-    Dir.glob(Rails.root.join("bin/*")).each do |file|
+    Rails.root.glob("bin/*").each do |file|
       next unless File.file?(file)
       content = File.read(file)
       extract_env_vars_from_content(content, env_vars)
