@@ -11,7 +11,7 @@ module ApplicationHelper
   sig { params(datetime: T.nilable(T.any(Date, Time, DateTime, ActiveSupport::TimeWithZone))).returns(T.nilable(Date)) }
   def date_for_form(datetime) = datetime&.to_date
 
-  sig { params(html_options: T::Hash[T.untyped, T.untyped], block: T.proc.void).returns(String) }
+  sig { params(html_options: T::Hash[Symbol, String], block: T.proc.void).returns(String) }
   def scrollable_table(html_options = {}, &block)
     content_tag(:div, class: "table-container") do
       content_tag(:table, html_options, &block)
@@ -63,7 +63,7 @@ module ApplicationHelper
     raw snippet.content
   end
 
-  sig { params(name: String, path: String, options: T::Hash[T.untyped, T.untyped]).returns(String) }
+  sig { params(name: String, path: String, options: T::Hash[Symbol, T.any(String, Symbol)]).returns(String) }
   def nav_link_to(name, path, options = {})
     css_class = if current_page?(path) || controller_matches?(path)
       "active"

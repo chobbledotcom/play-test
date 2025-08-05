@@ -106,7 +106,9 @@ class Unit < ApplicationRecord
     end
   end
 
-  sig { returns(T::Hash[Symbol, T.untyped]) }
+  sig {
+    returns(T::Hash[Symbol, T.any(Integer, T.nilable(Date), T.nilable(String))])
+  }
   def inspection_summary
     {
       total_inspections: inspections.count,
