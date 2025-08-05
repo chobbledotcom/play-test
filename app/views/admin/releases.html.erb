@@ -15,17 +15,25 @@
           <h2>
             <%= link_to release[:name] || release[:tag_name], release[:html_url], target: "_blank", rel: "noopener" %>
           </h2>
-          <p>
-            <%= t("admin.releases.published_by", author: release[:author]) %>
-            <time datetime="<%= release[:published_at].iso8601 %>">
-              <%= l(release[:published_at], format: :long) %>
-            </time>
-          </p>
+          <% unless release[:is_bot] %>
+            <p>
+              <%= t("admin.releases.published_by", author: release[:author]) %>
+              <time datetime="<%= release[:published_at].iso8601 %>">
+                <%= l(release[:published_at], format: :long) %>
+              </time>
+            </p>
+          <% else %>
+            <p>
+              <time datetime="<%= release[:published_at].iso8601 %>">
+                <%= l(release[:published_at], format: :long) %>
+              </time>
+            </p>
+          <% end %>
         </header>
         
         <% if release[:body].present? %>
           <div>
-            <%= simple_format(release[:body]) %>
+            <%= release[:body].html_safe %>
           </div>
         <% end %>
       </article>

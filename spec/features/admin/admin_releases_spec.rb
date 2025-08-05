@@ -10,17 +10,20 @@ RSpec.feature "Admin Releases", type: :feature do
         name: "Version 1.2.0",
         tag_name: "v1.2.0",
         published_at: 2.days.ago,
-        body: "## Changes\n- New feature X\n- Bug fix Y",
+        body: "<h3>Changes</h3>\n<ul><li>New feature X</li>\n" \
+              "<li>Bug fix Y</li></ul>",
         html_url: "https://github.com/chobbledotcom/play-test/releases/v1.2.0",
-        author: "developer1"
+        author: "developer1",
+        is_bot: false
       },
       {
         name: "Version 1.1.0",
         tag_name: "v1.1.0",
         published_at: 1.week.ago,
-        body: "Initial release",
+        body: "<p>Initial release</p>",
         html_url: "https://github.com/chobbledotcom/play-test/releases/v1.1.0",
-        author: "developer2"
+        author: "github-actions[bot]",
+        is_bot: true
       }
     ]
   end
@@ -47,10 +50,10 @@ RSpec.feature "Admin Releases", type: :feature do
     expect(page).to have_content("New feature X")
     expect(page).to have_content("Bug fix Y")
 
-    # Check second release
+    # Check second release (bot author)
     second_release_url = sample_releases[1][:html_url]
     expect(page).to have_link("Version 1.1.0", href: second_release_url)
-    expect(page).to have_content("developer2")
+    expect(page).not_to have_content("github-actions[bot]")
     expect(page).to have_content("Initial release")
   end
 
