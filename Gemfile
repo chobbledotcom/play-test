@@ -105,5 +105,5 @@ gem "aws-sdk-s3", require: false
 gem "whenever", require: false
 
 # Pinned versions for nixpkgs compatibility
-gem "psych", "= 5.2.3"
+gem "psych", "5.2.6"
 gem "openssl", "= 3.3.0"
