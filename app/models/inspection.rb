@@ -500,7 +500,13 @@ class Inspection < ApplicationRecord
     applicable_assessments.map { |assessment_key, _| send(assessment_key) }
   end
 
-  sig { returns(T::Array[T::Array[T.untyped]]) }
+  sig {
+    returns(
+      T::Array[
+        T::Array[T.any(Symbol, ActiveRecord::Base, String)]
+      ]
+    )
+  }
   def assessment_validation_data
     assessment_types = %i[
       anchorage

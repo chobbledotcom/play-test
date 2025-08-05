@@ -25,7 +25,7 @@ class Event < ApplicationRecord
     params(
       user: User,
       action: String,
-      resource: T.untyped,
+      resource: ActiveRecord::Base,
       details: T.nilable(String),
       changed_data: T.nilable(T::Hash[String, T.untyped]),
       metadata: T.nilable(T::Hash[String, T.untyped])
