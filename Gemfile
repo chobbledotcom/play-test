@@ -52,7 +52,7 @@ group :development, :test do
 
   # N+1 query detection
   gem "prosopite"
-  gem "pg_query", "~> 5.1"
+  gem "pg_query", "~> 6.1"
 
   # ERB linter with better-html support
   gem "erb_lint", require: false
