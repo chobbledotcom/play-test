@@ -1,0 +1,15 @@
+en:
+  forms:
+    passkeys:
+      header: "Passkeys"
+      fields:
+        nickname: "Nickname"
+      sections:
+        manage: "Manage Passkeys"
+      submit: "Save"
+      messages:
+        no_passkeys: "You haven't registered any passkeys yet."
+        confirm_delete: "Are you sure you want to delete this passkey?"
+        cannot_delete_last: "Cannot delete last passkey"
+        register: "Register new passkey"
+        delete: "Delete"

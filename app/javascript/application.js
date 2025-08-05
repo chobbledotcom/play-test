@@ -9,6 +9,8 @@ import "safety_standards_tabs";
 import "guides_slider";
 import "search";
 import "image_resize";
+import "passkey_registration";
+import "passkey_login";
 
 // external libs
 import "highlight.js";

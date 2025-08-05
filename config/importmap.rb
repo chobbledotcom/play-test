@@ -11,6 +11,8 @@ pin "safety_standards_tabs"
 pin "guides_slider"
 pin "search"
 pin "image_resize"
+pin "passkey_registration"
+pin "passkey_login"
 
 # external libs
 pin "highlight.js", to: "highlight.js"

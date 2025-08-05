@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 unless ENV["DISABLE_SIMPLECOV"] == "true"
   require "simplecov"
 

@@ -1,0 +1,28 @@
+en:
+  users:
+    sections:
+      passkeys: "Passkeys"
+    messages:
+      no_passkeys: "You haven't registered any passkeys yet."
+      confirm_delete_passkey: "Are you sure you want to delete this passkey?"
+  passkeys_table_headers:
+    nickname: "Nickname"
+    actions: "Actions"
+  credentials:
+    messages:
+      could_not_add: "Couldn't add your passkey"
+      verification_failed: "Verification failed"
+      deleted: "Passkey deleted successfully"
+      cannot_delete_last: "Cannot delete your last passkey"
+  
+  sessions:
+    titles:
+      passkey_login: "Login with Passkey"
+    buttons:
+      login_with_passkey: "Login with passkey"
+      authenticate_with_passkey: "Authenticate with Passkey"
+    links:
+      back_to_login: "Back to login"
+    messages:
+      passkey_login_failed: "Passkey authentication failed"
+      passkey_not_found: "Passkey not found"

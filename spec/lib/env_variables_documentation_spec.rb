@@ -24,6 +24,33 @@ RSpec.describe "Environment Variables Documentation" do
     end
   end
 
+  describe "Required environment variables" do
+    it "marks BASE_URL and APP_NAME as required" do
+      # The constant is defined in the initializer
+      expect(::REQUIRED_ENV_VARS).to eq(%w[BASE_URL APP_NAME])
+    end
+
+    it "includes required variables in .env.example with REQUIRED marker" do
+      content = File.read(env_example_path)
+
+      ::REQUIRED_ENV_VARS.each do |var|
+        # Check that the variable exists and has REQUIRED in a comment above it
+        var_pattern = /# .*(REQUIRED).*\n.*\n.*\n.*\n#{var}=/m
+        expect(content).to match(var_pattern),
+          "#{var} should be marked as REQUIRED in .env.example"
+      end
+    end
+
+    it "raises error when required vars are missing" do
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("BASE_URL").and_return(nil)
+
+      expect {
+        load Rails.root.join("config/initializers/required_env_vars.rb")
+      }.to raise_error(/Missing required environment variables/)
+    end
+  end
+
   private
 
   def find_env_variables_in_codebase
