@@ -24,6 +24,8 @@
             jq
             libyaml
             nodejs
+            openssl
+            rubyPackages_3_4.openssl
             rubyPackages_3_4.psych
             rubyPackages_3_4.ruby-vips
             rubyPackages_3_4.sorbet-runtime
