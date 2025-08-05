@@ -22,9 +22,13 @@ module InspectionsHelper
     end
   end
 
-  sig { params(inspection: Inspection).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
+  sig {
+    params(inspection: Inspection).returns(
+      T::Array[T::Hash[Symbol, T.any(String, Symbol, T::Boolean)]]
+    )
+  }
   def inspection_actions(inspection)
-    actions = T.let([], T::Array[T::Hash[Symbol, T.untyped]])
+    actions = T.let([], T::Array[T::Hash[Symbol, T.any(String, Symbol, T::Boolean)]])
 
     if inspection.complete?
       # Complete inspections: Switch to In Progress / Log

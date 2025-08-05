@@ -273,15 +273,7 @@ class UnitsController < ApplicationController
       debug_queries: debug_sql_queries
     )
 
-    case result.type
-    when :redirect
-      redirect_to result.data, allow_other_host: true
-    when :pdf_data
-      send_data result.data,
-        filename: "#{@unit.serial}.pdf",
-        type: "application/pdf",
-        disposition: "inline"
-    end
+    handle_pdf_response(result, "#{@unit.serial}.pdf")
   end
 
   def send_unit_qr_code

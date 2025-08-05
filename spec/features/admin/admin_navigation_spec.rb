@@ -32,13 +32,15 @@ RSpec.feature "Admin Navigation", type: :feature do
     expect(page).to have_link(I18n.t("inspector_companies.titles.index"))
     expect(page).to have_link(I18n.t("navigation.pages"))
     expect(page).to have_link(I18n.t("navigation.jobs"))
+    expect(page).to have_link(I18n.t("navigation.releases"))
   end
 
   scenario "regular user cannot access admin path" do
     sign_in(regular_user)
     visit admin_path
 
-    expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
+    admin_required_msg = I18n.t("forms.session_new.status.admin_required")
+    expect(page).to have_content(admin_required_msg)
     expect(current_path).to eq(root_path)
   end
 

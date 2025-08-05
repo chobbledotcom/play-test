@@ -174,4 +174,25 @@ class ApplicationController < ActionController::Base
 
     true
   end
+
+  def handle_pdf_response(result, filename)
+    case result.type
+    when :redirect
+      Rails.logger.info "PDF response: Redirecting to S3 URL for #{filename}"
+      redirect_to result.data, allow_other_host: true
+    when :stream
+      Rails.logger.info "PDF response: Streaming #{filename} from S3 through Rails"
+      expires_in 0, public: false
+      send_data result.data.download,
+        filename: filename,
+        type: "application/pdf",
+        disposition: "inline"
+    when :pdf_data
+      Rails.logger.info "PDF response: Sending generated PDF data for #{filename}"
+      send_data result.data,
+        filename: filename,
+        type: "application/pdf",
+        disposition: "inline"
+    end
+  end
 end

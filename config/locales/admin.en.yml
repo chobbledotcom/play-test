@@ -1,4 +1,7 @@
 en:
   admin:
     title: "Admin Dashboard"
-    back_to_admin: "Back to Admin"
+    releases:
+      title: "GitHub Releases"
+      no_releases: "No releases found."
+      fetch_error: "Failed to fetch releases from GitHub. Please try again later."
