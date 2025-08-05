@@ -38,6 +38,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-test-db-
 
+      - name: Create .env file
+        run: |
+          echo "BASE_URL=localhost:3000" > .env
+          echo "SITE_NAME=Play-Test CI" >> .env
+
       - name: Prepare database
         env:
           RAILS_ENV: test

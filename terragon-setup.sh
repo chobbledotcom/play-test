@@ -21,6 +21,13 @@ sudo gem install bundler
 echo "Installing gems..."
 bundle install --jobs 4
 
+# Create .env file if it doesn't exist
+if [ ! -f ".env" ]; then
+    echo "Creating .env file..."
+    echo "BASE_URL=localhost:3000" > .env
+    echo "SITE_NAME=Play-Test CI" >> .env
+fi
+
 # Database setup (only if not exists)
 if [ \! -f "storage/development.sqlite3" ]; then
     echo "Creating development database..."
