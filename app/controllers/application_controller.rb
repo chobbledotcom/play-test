@@ -78,7 +78,11 @@ class ApplicationController < ActionController::Base
     # Update UserSession last_active_at
     if session[:session_token]
       token = session[:session_token]
-      UserSession.find_by(session_token: token)&.touch_last_active
+      begin
+        UserSession.find_by(session_token: token)&.touch_last_active
+      rescue => e
+        Rails.logger.error "Failed to update session activity: #{e.message}"
+      end
     end
   end
 

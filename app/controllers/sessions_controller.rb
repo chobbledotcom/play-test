@@ -35,13 +35,21 @@ class SessionsController < ApplicationController
   def handle_successful_login(user)
     should_remember = params.dig(:session, :remember_me) == "1"
     create_user_session(user, should_remember)
-    # Create UserSession record
-    user_session = user.user_sessions.create!(
-      ip_address: request.remote_ip,
-      user_agent: request.user_agent,
-      last_active_at: Time.current
-    )
-    session[:session_token] = user_session.session_token
+
+    # Create UserSession record with error handling
+    begin
+      user_session = user.user_sessions.create!(
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent,
+        last_active_at: Time.current
+      )
+      session[:session_token] = user_session.session_token
+    rescue ActiveRecord::RecordInvalid => e
+      # Log the error but don't fail the login
+      Rails.logger.error "Failed to create user session: #{e.message}"
+      # Continue without session tracking
+    end
+
     flash[:notice] = I18n.t("session.login.success")
     redirect_to inspections_path
   end
