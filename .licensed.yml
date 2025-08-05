@@ -1,6 +1,9 @@
 sources:
   bundler: true
 
+cache_path: .licenses
+
+# All these licenses are compatible with AGPLv3
 allowed:
   - mit
   - apache-2.0
@@ -16,13 +19,11 @@ allowed:
   - cc0-1.0
   - wtfpl
   - 0bsd
+  - gpl-2.0
+  - gpl-3.0
+  - agpl-3.0
 
-# These licenses are generally compatible with AGPLv3
-# but may require attribution or other requirements
+# Mark "other" licenses as reviewed (mostly Ruby stdlib)
 reviewed:
   bundler:
-    - gpl-2.0
-    - gpl-3.0
-    - agpl-3.0
-
-cache_path: .licenses
+    - other

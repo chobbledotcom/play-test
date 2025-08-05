@@ -60,6 +60,10 @@ run_linter "Biome (JavaScript formatter) - app/assets" \
 run_linter "Actionlint (GitHub Actions linter)" \
   "actionlint"
 
+# 7. Update third-party attributions
+run_linter "Update third-party attributions" \
+  "bundle exec rake attributions:generate"
+
 # Summary
 echo -e "\n${YELLOW}========================================${NC}"
 if [ $OVERALL_STATUS -eq 0 ]; then
