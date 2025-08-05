@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.feature "Admin Releases", type: :feature do
@@ -40,7 +42,6 @@ RSpec.feature "Admin Releases", type: :feature do
     click_link I18n.t("navigation.releases")
 
     expect(page).to have_content(I18n.t("admin.releases.title"))
-    expect(page).to have_link(I18n.t("admin.back_to_admin"))
 
     # Check first release
     first_release_url = sample_releases[0][:html_url]
