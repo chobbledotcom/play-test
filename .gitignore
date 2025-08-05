@@ -52,3 +52,6 @@
 
 # Pinned docker versions
 PINNED_VERSION
+
+# Licensed gem cache (can be regenerated)
+/.licenses/
