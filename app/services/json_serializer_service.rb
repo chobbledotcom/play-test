@@ -39,7 +39,7 @@ class JsonSerializerService
       end
     end
 
-    base_url = ENV["BASE_URL"] || Rails.application.routes.default_url_options[:host] || "localhost:3000"
+    base_url = ENV["BASE_URL"]
     data[:urls] = {
       report_pdf: "#{base_url}/units/#{unit.id}.pdf",
       report_json: "#{base_url}/units/#{unit.id}.json",
@@ -68,7 +68,7 @@ class JsonSerializerService
       rpii_inspector_number: inspection.user.rpii_inspector_number
     }
 
-    base_url = ENV["BASE_URL"] || Rails.application.routes.default_url_options[:host] || "localhost:3000"
+    base_url = ENV["BASE_URL"]
     data[:urls] = {
       report_pdf: "#{base_url}/inspections/#{inspection.id}.pdf",
       report_json: "#{base_url}/inspections/#{inspection.id}.json",

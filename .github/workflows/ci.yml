@@ -27,11 +27,6 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup-environment
 
-      - name: Create .env file
-        run: |
-          echo "BASE_URL=localhost:3000" > .env
-          echo "APP_NAME=Play-Test CI" >> .env
-
       - name: Prepare database
         env:
           RAILS_ENV: test

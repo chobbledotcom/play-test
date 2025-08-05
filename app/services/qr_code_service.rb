@@ -13,14 +13,16 @@ class QrCodeService
   def self.generate_inspection_qr_code(inspection)
     require "rqrcode"
 
-    url = "#{ENV["BASE_URL"]}/inspections/#{inspection.id}"
+    base_url = ENV["BASE_URL"]
+    url = "#{base_url}/inspections/#{inspection.id}"
     generate_qr_code_from_url(url)
   end
 
   def self.generate_unit_qr_code(unit)
     require "rqrcode"
 
-    url = "#{ENV["BASE_URL"]}/units/#{unit.id}"
+    base_url = ENV["BASE_URL"]
+    url = "#{base_url}/units/#{unit.id}"
     generate_qr_code_from_url(url)
   end
 
