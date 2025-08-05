@@ -119,9 +119,10 @@ jobs:
           # Run tests inside the Docker container
           docker run --rm \
             -e RAILS_ENV=test \
+            -e DISABLE_SIMPLECOV=true \
             -e RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} \
             play-test:test \
-            sh -c "bundle exec rails db:create db:schema:load && ./bin/test"
+            sh -c "bundle exec rails db:create db:schema:load && bundle exec parallel_rspec spec/ --tag ~js:true"
 
       - name: Build and push Docker images
         uses: docker/build-push-action@v6

@@ -30,7 +30,7 @@ if docker run --rm \
   -e SECRET_KEY_BASE="test_secret_key_base_1234567890abcdef1234567890abcdef1234567890ab" \
   -e DISABLE_SIMPLECOV=true \
   play-test:local-test \
-  sh -c "bundle exec rails db:create db:schema:load && ./bin/test"; then
+  sh -c "bundle exec rails db:create db:schema:load && bundle exec parallel_rspec spec/ --tag ~js:true"; then
   echo -e "${GREEN}✓ Tests passed${NC}"
 else
   echo -e "${RED}✗ Tests failed${NC}"
