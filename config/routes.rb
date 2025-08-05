@@ -20,6 +20,11 @@ Rails.application.routes.draw do
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
 
+  # Credentials (passkeys)
+  resources :credentials, only: [:create, :destroy] do
+    post :callback, on: :collection
+  end
+
   # Users management (full CRUD)
   resources :users do
     member do

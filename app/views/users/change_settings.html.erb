@@ -42,6 +42,34 @@
   <% end %>
 <% end %>
 
+<%= render 'chobble_forms/fieldset', legend: t('users.sections.passkeys') do %>
+  <% if @user.credentials.any? %>
+    <ul>
+      <% @user.credentials.each do |credential| %>
+        <li>
+          <%= credential.nickname %>
+          <% if @user.can_delete_credentials? %>
+            <%= link_to t('users.buttons.delete_passkey'), credential_path(credential), 
+                method: :delete, 
+                data: { confirm: t('users.messages.confirm_delete_passkey') } %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p><%= t('users.messages.no_passkeys') %></p>
+  <% end %>
+  
+  <div class="center">
+    <%= link_to t('users.buttons.register_passkey'), '#', 
+        class: 'button', 
+        data: { 
+          controller: 'passkey-registration',
+          action: 'click->passkey-registration#register'
+        } %>
+  </div>
+<% end %>
+
 <div class="margins center">
   <%= link_to change_password_user_path(current_user) do %>
     <strong>Change Password</strong>

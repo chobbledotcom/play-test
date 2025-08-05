@@ -14,6 +14,9 @@ gem "puma", ">= 5.0"
 gem "solid_queue", "~> 1.0"
 gem "mission_control-jobs", "~> 1.0"
 
+# WebAuthn for passkey support
+gem "webauthn", "~> 3.4"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[windows jruby]
 

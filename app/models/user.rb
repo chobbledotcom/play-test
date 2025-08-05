@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :inspections, dependent: :destroy
   has_many :units, dependent: :destroy
   has_many :events, dependent: :destroy
+  has_many :credentials, dependent: :destroy
   has_one_attached :logo
   has_one_attached :signature
   validate :logo_must_be_image
@@ -40,8 +41,16 @@ class User < ApplicationRecord
   before_save :normalize_rpii_number
   before_create :set_inactive_on_signup
 
+  after_initialize do
+    self.webauthn_id ||= WebAuthn.generate_user_id
+  end
+
   def is_active?
     active_until.nil? || active_until > Date.current
+  end
+
+  def can_delete_credentials?
+    credentials.count > 1
   end
 
   alias_method :can_create_inspection?, :is_active?
