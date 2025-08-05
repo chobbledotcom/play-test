@@ -13,6 +13,7 @@ en:
     jobs: "Jobs"
     admin: "Admin"
     backups: "Backups"
+    releases: "Releases"
 
   # Shared UI elements
   shared:
