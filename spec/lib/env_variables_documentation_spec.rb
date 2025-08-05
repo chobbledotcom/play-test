@@ -24,30 +24,44 @@ RSpec.describe "Environment Variables Documentation" do
     end
   end
 
-  describe "Required environment variables" do
-    it "marks BASE_URL and APP_NAME as required" do
-      # The constant is defined in the initializer
-      expect(::REQUIRED_ENV_VARS).to eq(%w[BASE_URL APP_NAME])
-    end
+  describe "Default environment variables" do
+    it "provides defaults for BASE_URL and APP_NAME" do
+      # Test that defaults are set when ENV vars are not present
+      original_app_name = ENV["APP_NAME"]
+      original_base_url = ENV["BASE_URL"]
 
-    it "includes required variables in .env.example with REQUIRED marker" do
-      content = File.read(env_example_path)
+      begin
+        ENV.delete("APP_NAME")
+        ENV.delete("BASE_URL")
 
-      ::REQUIRED_ENV_VARS.each do |var|
-        # Check that the variable exists and has REQUIRED in a comment above it
-        var_pattern = /# .*(REQUIRED).*\n.*\n.*\n.*\n#{var}=/m
-        expect(content).to match(var_pattern),
-          "#{var} should be marked as REQUIRED in .env.example"
+        # Reload the initializer to test defaults
+        load Rails.root.join("config/initializers/00_default_env_vars.rb")
+
+        expect(ENV["APP_NAME"]).to eq("Play-Test")
+        expect(ENV["BASE_URL"]).to eq("http://localhost:3000")
+      ensure
+        ENV["APP_NAME"] = original_app_name
+        ENV["BASE_URL"] = original_base_url
       end
     end
 
-    it "raises error when required vars are missing" do
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with("BASE_URL").and_return(nil)
+    it "does not override existing values" do
+      original_app_name = ENV["APP_NAME"]
+      original_base_url = ENV["BASE_URL"]
 
-      expect {
-        load Rails.root.join("config/initializers/required_env_vars.rb")
-      }.to raise_error(/Missing required environment variables/)
+      begin
+        ENV["APP_NAME"] = "Custom App"
+        ENV["BASE_URL"] = "https://example.com"
+
+        # Reload the initializer
+        load Rails.root.join("config/initializers/00_default_env_vars.rb")
+
+        expect(ENV["APP_NAME"]).to eq("Custom App")
+        expect(ENV["BASE_URL"]).to eq("https://example.com")
+      ensure
+        ENV["APP_NAME"] = original_app_name
+        ENV["BASE_URL"] = original_base_url
+      end
     end
   end
 

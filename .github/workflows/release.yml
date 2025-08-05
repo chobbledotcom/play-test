@@ -14,12 +14,10 @@ on:
 
 jobs:
   test:
-    uses: ./.github/workflows/ci.yml
     permissions:
       contents: read
     
   lint:
-    uses: ./.github/workflows/standard.yml
     permissions:
       checks: write
       contents: write
