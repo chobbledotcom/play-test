@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This module provides field mappings for assessments
 # Used by both seeds and tests to ensure consistency
 module SeedData
@@ -19,13 +21,13 @@ module SeedData
       password: "password123",
       password_confirmation: "password123",
       name: "Test User #{rand(1..99)}",
-      rpii_inspector_number: nil  # Optional field
+      rpii_inspector_number: nil # Optional field
     }
   end
 
   def self.unit_fields
     {
-      name: "Bouncy Castle #{["Mega", "Super", "Fun", "Party", "Adventure"].sample} #{rand(1..99)}",
+      name: "Bouncy Castle #{%w[Mega Super Fun Party Adventure].sample} #{rand(1..99)}",
       serial: "BC-#{Date.current.year}-#{SecureRandom.hex(4).upcase}",
       manufacturer: ["ABC Inflatables", "XYZ Bounce Co", "Fun Factory", "Party Products Ltd"].sample,
       operator: ["Rental Company #{rand(1..10)}", "Party Hire #{rand(1..5)}", "Events Ltd"].sample,
@@ -37,7 +39,7 @@ module SeedData
   def self.inspection_fields(passed: true)
     {
       inspection_date: Date.current,
-      unique_report_number: "RPT-#{Date.current.year}-#{rand(1000..9999)}",
+      unique_report_number: "RPT-#{Date.current.year}-#{SecureRandom.hex(12)}",
       is_totally_enclosed: [true, false].sample,
       has_slide: [true, false].sample,
       indoor_only: [true, false].sample,
@@ -66,9 +68,7 @@ module SeedData
       pull_strength_pass: check_passed?(passed)
     }
 
-    unless passed
-      fields[:anchor_type_comment] = "Some wear visible on anchor points"
-    end
+    fields[:anchor_type_comment] = "Some wear visible on anchor points" unless passed
 
     fields
   end
@@ -96,9 +96,11 @@ module SeedData
       trough_depth: rand(30..80),
       trough_adjacent_panel_width: rand(300..1000),
       evacuation_time_pass: check_passed?(passed),
-      seam_integrity_comment: passed ?
-        "All seams in good condition" :
-        "Minor thread loosening noted",
+      seam_integrity_comment: if passed
+                                "All seams in good condition"
+                              else
+                                "Minor thread loosening noted"
+                              end,
       stitch_length_comment: "Measured at regular intervals",
       platform_height_comment: "Platform height acceptable for age group"
     }
@@ -137,21 +139,31 @@ module SeedData
       number_of_blowers: 1,
       blower_tube_length: rand(2.0..5.0).round(1),
       blower_tube_length_pass: check_passed?(passed),
-      fan_size_type: passed ?
-        "Fan operating correctly at optimal pressure" :
-        "Fan requires servicing",
-      blower_flap_comment: passed ?
-        "Flap mechanism functioning correctly" :
-        "Flap sticking occasionally",
-      blower_finger_comment: passed ?
-        "Guard secure, no finger trap hazards" :
-        "Guard needs tightening",
-      blower_visual_comment: passed ?
-        "Visual inspection satisfactory" :
-        "Some wear visible on housing",
-      pat_comment: passed ?
-        "PAT test valid until #{(Date.current + 6.months).strftime("%B %Y")}" :
-        "PAT test overdue"
+      fan_size_type: if passed
+                       "Fan operating correctly at optimal pressure"
+                     else
+                       "Fan requires servicing"
+                     end,
+      blower_flap_comment: if passed
+                             "Flap mechanism functioning correctly"
+                           else
+                             "Flap sticking occasionally"
+                           end,
+      blower_finger_comment: if passed
+                               "Guard secure, no finger trap hazards"
+                             else
+                               "Guard needs tightening"
+                             end,
+      blower_visual_comment: if passed
+                               "Visual inspection satisfactory"
+                             else
+                               "Some wear visible on housing"
+                             end,
+      pat_comment: if passed
+                     "PAT test valid until #{(Date.current + 6.months).strftime("%B %Y")}"
+                   else
+                     "PAT test overdue"
+                   end
     }
   end
 
@@ -167,9 +179,11 @@ module SeedData
       play_area_length: rand(3.0..10.0).round(1),
       play_area_width: rand(3.0..8.0).round(1),
       negative_adjustment: rand(0..2.0).round(1),
-      tallest_user_height_comment: passed ?
-        "Capacity within safe limits based on EN 14960:2019" :
-        "Review user capacity - exceeds recommended limits",
+      tallest_user_height_comment: if passed
+                                     "Capacity within safe limits based on EN 14960:2019"
+                                   else
+                                     "Review user capacity - exceeds recommended limits"
+                                   end,
       containing_wall_height_comment: "Measured from base to top of wall",
       play_area_length_comment: "Effective play area after deducting obstacles",
       play_area_width_comment: "Width measured at narrowest point"
@@ -199,19 +213,27 @@ module SeedData
       runout_pass: check_passed?(passed),
       slip_sheet_pass: check_passed?(passed),
       slide_permanent_roof: false,
-      slide_platform_height_comment: passed ?
-        "Platform height compliant with EN 14960:2019" :
-        "Platform height exceeds recommended limits",
+      slide_platform_height_comment: if passed
+                                       "Platform height compliant with EN 14960:2019"
+                                     else
+                                       "Platform height exceeds recommended limits"
+                                     end,
       slide_wall_height_comment: "Wall height measured from slide bed",
-      runout_comment: passed ?
-        "Runout area clear and adequate" :
-        "Runout area needs extending",
-      clamber_netting_comment: passed ?
-        "Netting secure with no gaps" :
-        "Some gaps in netting need attention",
-      slip_sheet_comment: passed ?
-        "Slip sheet in good condition" :
-        "Slip sheet showing wear"
+      runout_comment: if passed
+                        "Runout area clear and adequate"
+                      else
+                        "Runout area needs extending"
+                      end,
+      clamber_netting_comment: if passed
+                                 "Netting secure with no gaps"
+                               else
+                                 "Some gaps in netting need attention"
+                               end,
+      slip_sheet_comment: if passed
+                            "Slip sheet in good condition"
+                          else
+                            "Slip sheet showing wear"
+                          end
     }
   end
 
@@ -220,12 +242,16 @@ module SeedData
       exit_number: rand(1..3),
       exit_number_pass: check_passed?(passed),
       exit_sign_always_visible_pass: check_passed?(passed),
-      exit_number_comment: passed ?
-        "Number of exits compliant with unit size" :
-        "Additional exit required",
-      exit_sign_always_visible_comment: passed ?
-        "Exit signs visible from all points" :
-        "Exit signs obscured from some angles"
+      exit_number_comment: if passed
+                             "Number of exits compliant with unit size"
+                           else
+                             "Additional exit required"
+                           end,
+      exit_sign_always_visible_comment: if passed
+                                          "Exit signs visible from all points"
+                                        else
+                                          "Exit signs obscured from some angles"
+                                        end
     }
   end
 end
