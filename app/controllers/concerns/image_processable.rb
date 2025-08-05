@@ -1,6 +1,8 @@
 # typed: true
 # frozen_string_literal: true
 
+require "vips"
+
 module ImageProcessable
   extend ActiveSupport::Concern
   extend T::Sig
@@ -17,7 +19,14 @@ module ImageProcessable
 
   private
 
-  sig { params(params_hash: T.any(ActionController::Parameters, T::Hash[T.untyped, T.untyped]), image_fields: T.untyped).returns(T.any(ActionController::Parameters, T::Hash[T.untyped, T.untyped])) }
+  sig {
+    params(
+      params_hash: T.any(ActionController::Parameters,
+        T::Hash[T.untyped, T.untyped]),
+      image_fields: T.untyped
+    ).returns(T.any(ActionController::Parameters,
+      T::Hash[T.untyped, T.untyped]))
+  }
   def process_image_params(params_hash, *image_fields)
     image_fields.each do |field|
       next if params_hash[field].blank?
@@ -28,7 +37,8 @@ module ImageProcessable
       begin
         processed_io = process_image(uploaded_file)
         params_hash[field] = processed_io if processed_io
-      rescue ApplicationErrors::NotAnImageError, ApplicationErrors::ImageProcessingError => e
+      rescue ApplicationErrors::NotAnImageError,
+        ApplicationErrors::ImageProcessingError => e
         @image_processing_error = e
         params_hash[field] = nil
       end
@@ -45,9 +55,10 @@ module ImageProcessable
     raise ApplicationErrors::ImageProcessingError unless processed_io
 
     processed_io
-  rescue MiniMagick::Error, MiniMagick::Invalid => e
+  rescue Vips::Error => e
     Rails.logger.error "Image processing failed: #{e.message}"
-    error_message = I18n.t("errors.messages.image_processing_error", error: e.message)
+    error_message = I18n.t("errors.messages.image_processing_error",
+      error: e.message)
     raise ApplicationErrors::ImageProcessingError, error_message
   end
 
@@ -66,7 +77,8 @@ module ImageProcessable
       end
       format.turbo_stream do
         flash.now[:alert] = exception.message
-        render turbo_stream: turbo_stream.replace("flash", partial: "shared/flash")
+        render turbo_stream: turbo_stream.replace("flash",
+          partial: "shared/flash")
       end
     end
   end

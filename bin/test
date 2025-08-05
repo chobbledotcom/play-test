@@ -14,8 +14,8 @@ if [ $# -gt 0 ]; then
     echo -e "${YELLOW}This script runs all tests in parallel.${NC}"
     echo ""
     echo -e "${YELLOW}If you want to run specific tests, use one of these commands:${NC}"
-    echo "  bundle exec rspec path/to/spec.rb        # Run a specific file"
-    echo "  bundle exec rspec path/to/spec.rb:42     # Run test at line 42"
+    echo "  rspec path/to/spec.rb                    # Run a specific file"
+    echo "  rspec path/to/spec.rb:42                 # Run test at line 42"
     echo "  bin/rspec-find                           # Find first failing test"
     echo "  bin/rspec-find path/to/spec              # Find failures in specific path"
     exit 1

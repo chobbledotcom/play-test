@@ -21,7 +21,6 @@
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             gh
-            imagemagick
             jq
             libyaml
             nodejs
