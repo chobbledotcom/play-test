@@ -11,7 +11,19 @@ class InspectorCompany < ApplicationRecord
   has_many :inspections, dependent: :destroy
 
   # Override to filter admin-only fields
-  sig { params(user: T.nilable(User)).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
+  sig {
+    params(user: T.nilable(User)).returns(
+      T::Array[
+        T::Hash[
+          Symbol,
+          T.any(
+            String,
+            T::Array[T::Hash[Symbol, T.any(String, Symbol, Integer, T::Boolean, T::Hash[Symbol, T.any(String, Integer, T::Boolean)])]]
+          )
+        ]
+      ]
+    )
+  }
   def self.form_fields(user: nil)
     fields = super
 
