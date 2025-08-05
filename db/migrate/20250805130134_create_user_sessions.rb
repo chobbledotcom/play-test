@@ -14,7 +14,5 @@ class CreateUserSessions < ActiveRecord::Migration[8.0]
 
     add_index :user_sessions, :session_token, unique: true
     add_index :user_sessions, %i[user_id last_active_at]
-
-    add_foreign_key :user_sessions, :users
   end
 end
