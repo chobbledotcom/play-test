@@ -41,12 +41,8 @@ end
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
-# Load rspec-sorbet for Sorbet type checking matchers if available
-begin
-  require "rspec/sorbet"
-rescue LoadError
-  # rspec-sorbet not available in this environment
-end
+# Load rspec-sorbet for Sorbet type checking matchers
+require "rspec/sorbet"
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
