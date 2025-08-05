@@ -24,6 +24,11 @@ jobs:
           bundle exec rails parallel:prepare
           bundle exec rake coverage:parallel
 
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Deploy to neocities
         uses: bcomnes/deploy-to-neocities@v3
         with:
