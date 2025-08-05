@@ -73,7 +73,7 @@ module ApplicationHelper
     link_to name, path, options.merge(class: css_class)
   end
 
-  sig { params(value: T.any(String, Numeric, NilClass)).returns(T.any(String, Numeric, NilClass)) }
+  sig { params(value: T.untyped).returns(T.untyped) }
   def format_numeric_value(value)
     if value.is_a?(String) &&
         value.match?(/\A-?\d*\.?\d+\z/) &&
