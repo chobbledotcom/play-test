@@ -120,7 +120,7 @@ This is useful for production environments where PDF generation is expensive. Se
 
 - **Check storage statistics**: `bundle exec rake active_storage:stats`
 - **Clean orphaned files (dry run)**: `bundle exec rake active_storage:cleanup_orphaned`
-- **Actually delete files**: `DRY_RUN=false bundle exec rake active_storage:cleanup_orphaned`
+- **Actually delete files**: `CLEANUP_ORPHANED_FILES=true bundle exec rake active_storage:cleanup_orphaned`
 - **Why files get orphaned**: When database is deleted but tmp/storage remains
 - **Test cleanup**: Automatic - rails_helper cleans tmp/storage before/after test suite
 
