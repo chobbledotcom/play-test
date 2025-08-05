@@ -153,7 +153,7 @@ class Inspection < ApplicationRecord
   sig { params(query: String).returns(T::Array[String]) }
   def self.search_values(query) = Array.new(5) { "%#{query}%" }
 
-  sig { params(start_date: T.untyped, end_date: T.untyped).returns(T::Boolean) }
+  sig { params(start_date: T.nilable(T.any(String, Date)), end_date: T.nilable(T.any(String, Date))).returns(T::Boolean) }
   def self.both_dates_present?(start_date, end_date) =
     start_date.present? && end_date.present?
 
