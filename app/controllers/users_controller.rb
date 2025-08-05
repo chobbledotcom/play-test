@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UsersController < ApplicationController
   include TurboStreamResponders
 
@@ -7,12 +9,12 @@ class UsersController < ApplicationController
     update_settings
     update_password
     logout_everywhere_else
-  ]
+  ].freeze
 
   LOGGED_OUT_PATHS = %i[
     create
     new
-  ]
+  ].freeze
 
   skip_before_action :require_login, only: LOGGED_OUT_PATHS
   skip_before_action :update_last_active_at, only: [:update_settings]
@@ -35,11 +37,10 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      if Rails.env.production?
-        NtfyService.notify("new user: #{@user.email}")
-      end
+      NtfyService.notify("new user: #{@user.email}") if Rails.env.production?
 
       log_in @user
+      create_session_record @user
       flash[:notice] = I18n.t("users.messages.account_created")
       redirect_to root_path
     else
@@ -52,9 +53,7 @@ class UsersController < ApplicationController
 
   def update
     # Convert empty string to nil for inspection_company_id
-    if params[:user][:inspection_company_id] == ""
-      params[:user][:inspection_company_id] = nil
-    end
+    params[:user][:inspection_company_id] = nil if params[:user][:inspection_company_id] == ""
 
     if @user.update(user_params)
       handle_update_success(@user, "users.messages.user_updated", users_path)
@@ -207,6 +206,14 @@ class UsersController < ApplicationController
 
   private
 
+  def create_session_record(user)
+    user.user_sessions.create!(
+      ip_address: request.remote_ip,
+      user_agent: request.user_agent,
+      last_active_at: Time.current
+    )
+  end
+
   def get_rpii_error_message(result)
     case result[:error]
     when :blank_number
@@ -244,11 +251,11 @@ class UsersController < ApplicationController
   end
 
   def require_correct_user
-    unless current_user == @user
-      action = action_name.include?("password") ? "password" : "settings"
-      flash[:alert] = I18n.t("users.messages.own_action_only", action: action)
-      redirect_to root_path
-    end
+    return if current_user == @user
+
+    action = action_name.include?("password") ? "password" : "settings"
+    flash[:alert] = I18n.t("users.messages.own_action_only", action: action)
+    redirect_to root_path
   end
 
   def password_params

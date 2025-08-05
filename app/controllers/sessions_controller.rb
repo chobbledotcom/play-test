@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class SessionsController < ApplicationController
-  skip_before_action :require_login, only: [:new, :create, :destroy]
-  before_action :require_logged_out, only: [:new, :create]
+  skip_before_action :require_login, only: %i[new create destroy]
+  before_action :require_logged_out, only: %i[new create]
 
   def new
   end
@@ -21,9 +23,7 @@ class SessionsController < ApplicationController
 
   def destroy
     # Delete current session record
-    if session[:session_token]
-      UserSession.find_by(session_token: session[:session_token])&.destroy
-    end
+    UserSession.find_by(session_token: session[:session_token])&.destroy if session[:session_token]
     session.delete(:session_token)
     log_out
     flash[:notice] = I18n.t("session.logout.success")
@@ -44,21 +44,10 @@ class SessionsController < ApplicationController
   end
 
   def create_session_record(user)
-    Rails.logger.info "Creating user session for user #{user.id}"
-    Rails.logger.info "User exists in DB: #{User.exists?(user.id)}"
-    Rails.logger.info "User sessions count before: #{user.user_sessions.count}"
-
-    user_session = user.user_sessions.create!(
+    user.user_sessions.create!(
       ip_address: request.remote_ip,
       user_agent: request.user_agent,
       last_active_at: Time.current
     )
-    Rails.logger.info "User session created: #{user_session.id}"
-    user_session
-  rescue => e
-    Rails.logger.error "Failed to create user session: #{e.message}"
-    Rails.logger.error "User ID: #{user.id}, class: #{user.id.class}"
-    Rails.logger.error e.backtrace.join("\n")
-    raise
   end
 end

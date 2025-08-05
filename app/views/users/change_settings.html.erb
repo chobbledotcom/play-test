@@ -52,12 +52,10 @@
   <summary><%= t('users.sessions.title') %></summary>
   
   <div class="margins">
-    <%= link_to t('users.sessions.logout_everywhere_else'), 
-        logout_everywhere_else_user_path(current_user),
-        data: { 
-          turbo_method: :delete,
-          turbo_confirm: t('users.sessions.logout_everywhere_confirm')
-        } %>
+    <%= button_to t('users.sessions.logout_everywhere_else'),
+        logout_everywhere_else_user_path(@user),
+        method: :delete,
+        data: { confirm: t('users.sessions.logout_everywhere_confirm') } %>
   </div>
 
   <table>
