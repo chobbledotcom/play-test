@@ -42,50 +42,45 @@
   <% end %>
 <% end %>
 
-<%= render 'chobble_forms/form_context', 
-  model: nil, 
-  i18n_base: 'forms.passkeys',
-  skip_submit: true do |form| %>
-  
-  <%= render 'chobble_forms/fieldset', legend_key: 'manage' do %>
-    <% if @user.credentials.any? %>
-      <table>
-        <thead>
+<fieldset>
+  <legend><%= t('forms.passkeys.sections.manage') %></legend>
+  <% if @user.credentials.any? %>
+    <table>
+      <thead>
+        <tr>
+          <th><%= t('forms.passkeys.table_headers.nickname') %></th>
+          <th><%= t('forms.passkeys.table_headers.actions') %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @user.credentials.each do |credential| %>
           <tr>
-            <th><%= t('forms.passkeys.table_headers.nickname') %></th>
-            <th><%= t('forms.passkeys.table_headers.actions') %></th>
+            <td><%= credential.nickname %></td>
+            <td>
+              <% if @user.can_delete_credentials? %>
+                <%= link_to t('forms.passkeys.buttons.delete'), credential_path(credential), 
+                    method: :delete, 
+                    data: { confirm: t('forms.passkeys.messages.confirm_delete') } %>
+              <% else %>
+                <span style="color: #666;"><%= t('forms.passkeys.messages.cannot_delete_last') %></span>
+              <% end %>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          <% @user.credentials.each do |credential| %>
-            <tr>
-              <td><%= credential.nickname %></td>
-              <td>
-                <% if @user.can_delete_credentials? %>
-                  <%= link_to t('forms.passkeys.buttons.delete'), credential_path(credential), 
-                      method: :delete, 
-                      data: { confirm: t('forms.passkeys.messages.confirm_delete') } %>
-                <% else %>
-                  <span style="color: #666;"><%= t('forms.passkeys.messages.cannot_delete_last') %></span>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    <% else %>
-      <p><%= t('forms.passkeys.messages.no_passkeys') %></p>
-    <% end %>
-    
-    <div class="center" style="margin-top: 1rem;">
-      <button type="button" 
-              class="button" 
-              onclick="registerPasskey()">
-        <%= t('forms.passkeys.buttons.register_new') %>
-      </button>
-    </div>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p><%= t('forms.passkeys.messages.no_passkeys') %></p>
   <% end %>
-<% end %>
+  
+  <div class="center" style="margin-top: 1rem;">
+    <button type="button" 
+            class="button" 
+            onclick="registerPasskey()">
+      <%= t('forms.passkeys.buttons.register_new') %>
+    </button>
+  </div>
+</fieldset>
 
 <div class="margins center">
   <%= link_to change_password_user_path(current_user) do %>
