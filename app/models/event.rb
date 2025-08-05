@@ -27,8 +27,8 @@ class Event < ApplicationRecord
       action: String,
       resource: ActiveRecord::Base,
       details: T.nilable(String),
-      changed_data: T.nilable(T::Hash[String, T.untyped]),
-      metadata: T.nilable(T::Hash[String, T.untyped])
+      changed_data: T.nilable(T::Hash[String, T.any(String, Integer, T::Boolean, NilClass)]),
+      metadata: T.nilable(T::Hash[String, T.any(String, Integer, T::Boolean, NilClass)])
     ).returns(Event)
   end
   def self.log(user:, action:, resource:, details: nil,
@@ -50,7 +50,7 @@ class Event < ApplicationRecord
       user: User,
       action: String,
       details: String,
-      metadata: T.nilable(T::Hash[String, T.untyped])
+      metadata: T.nilable(T::Hash[String, T.any(String, Integer, T::Boolean, NilClass)])
     ).returns(Event)
   end
   def self.log_system_event(user:, action:, details:, metadata: nil)
@@ -77,7 +77,7 @@ class Event < ApplicationRecord
   end
 
   # Get the resource object if it still exists
-  sig { returns(T.nilable(T.untyped)) }
+  sig { returns(T.nilable(ActiveRecord::Base)) }
   def resource_object
     return nil unless resource_type && resource_id
     resource_type.constantize.find_by(id: resource_id)

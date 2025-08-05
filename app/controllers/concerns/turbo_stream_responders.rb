@@ -7,7 +7,7 @@ module TurboStreamResponders
 
   private
 
-  sig { params(success: T::Boolean, message: String, model: T.nilable(ActiveRecord::Base), additional_streams: T::Array[T.untyped]).void }
+  sig { params(success: T::Boolean, message: String, model: T.nilable(ActiveRecord::Base), additional_streams: T::Array[Turbo::Streams::TagBuilder]).void }
   def render_save_message_stream(success:, message:, model: nil, additional_streams: [])
     streams = [
       turbo_stream.replace(
@@ -26,7 +26,7 @@ module TurboStreamResponders
     render turbo_stream: streams
   end
 
-  sig { params(model: ActiveRecord::Base, message_key: T.nilable(String), redirect_path: T.untyped, additional_streams: T::Array[T.untyped]).void }
+  sig { params(model: ActiveRecord::Base, message_key: T.nilable(String), redirect_path: T.any(String, ActiveRecord::Base, NilClass), additional_streams: T::Array[Turbo::Streams::TagBuilder]).void }
   def handle_update_success(model, message_key = nil, redirect_path = nil, additional_streams: [])
     message_key ||= "#{model.class.table_name}.messages.updated"
     redirect_path ||= model

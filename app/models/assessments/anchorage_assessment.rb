@@ -30,7 +30,7 @@ class Assessments::AnchorageAssessment < ApplicationRecord
     (num_low_anchors || 0) + (num_high_anchors || 0)
   end
 
-  sig { returns(T.untyped) }
+  sig { returns(T.any(Object, NilClass)) }
   def anchorage_result
     @anchor_result ||= EN14960.calculate_anchors(
       length: inspection.length,
