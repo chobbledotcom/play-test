@@ -27,7 +27,7 @@ fi
 echo -e "\n${BLUE}Running tests in Docker container...${NC}"
 if docker run --rm \
   -e RAILS_ENV=test \
-  -e RAILS_MASTER_KEY="${RAILS_MASTER_KEY:-dummy_key_for_testing}" \
+  -e SECRET_KEY_BASE="test_secret_key_base_1234567890abcdef1234567890abcdef1234567890ab" \
   play-test:local-test \
   sh -c "bundle exec rails db:create db:schema:load && ./bin/test"; then
   echo -e "${GREEN}✓ Tests passed${NC}"
@@ -39,7 +39,8 @@ fi
 # Test that the container can start
 echo -e "\n${BLUE}Testing container startup...${NC}"
 docker run -d --name test-container \
-  -e RAILS_MASTER_KEY="${RAILS_MASTER_KEY:-dummy_key_for_testing}" \
+  -e RAILS_MASTER_KEY="${RAILS_MASTER_KEY:-}" \
+  -e SECRET_KEY_BASE="${SECRET_KEY_BASE:-test_secret_key_base_1234567890abcdef1234567890abcdef1234567890ab}" \
   -p 3000:3000 \
   play-test:local-test
 
