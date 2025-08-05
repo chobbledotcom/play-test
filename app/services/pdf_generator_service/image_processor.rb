@@ -1,5 +1,6 @@
 class PdfGeneratorService
   class ImageProcessor
+    require "vips"
     include Configuration
 
     def self.generate_qr_code_header(pdf, entity)
@@ -24,18 +25,16 @@ class PdfGeneratorService
       # Calculate photo dimensions based on column count
       attachment = unit.photo
       image = create_image(attachment)
-      photo_width, photo_height = calculate_footer_photo_dimensions(pdf, image, column_count)
+      dimensions = calculate_footer_photo_dimensions(pdf, image, column_count)
+      photo_width, photo_height = dimensions
 
       # Position photo in bottom right corner
       photo_x = pdf_width - photo_width
       # Account for footer height on first page
-      photo_y = if pdf.page_number == 1
-        Configuration::FOOTER_HEIGHT + Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
-      else
-        Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
-      end
+      photo_y = calculate_photo_y(pdf, photo_height)
 
-      render_processed_image(pdf, image, photo_x, photo_y, photo_width, photo_height, attachment)
+      render_processed_image(pdf, image, photo_x, photo_y,
+        photo_width, photo_height, attachment)
     rescue Prawn::Errors::UnsupportedImageType => e
       raise ImageError.build_detailed_error(e, attachment)
     end
@@ -45,9 +44,12 @@ class PdfGeneratorService
 
       attachment = unit.photo
       image = create_image(attachment)
-      _photo_width, photo_height = calculate_footer_photo_dimensions(pdf, image, column_count)
+      dimensions = calculate_footer_photo_dimensions(pdf, image, column_count)
+      _photo_width, photo_height = dimensions
 
-      raise "Photo height calculated as 0 for unit #{unit.id}" if photo_height <= 0
+      if photo_height <= 0
+        raise I18n.t("pdf_generator.errors.zero_photo_height", unit_id: unit.id)
+      end
 
       photo_height
     rescue Prawn::Errors::UnsupportedImageType => e
@@ -65,7 +67,9 @@ class PdfGeneratorService
 
       # Calculate column width based on PDF width and column count
       # Account for column spacers
-      total_spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER * (column_count - 1)
+      spacer_count = column_count - 1
+      spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER
+      total_spacer_width = spacer_width * spacer_count
       column_width = (pdf.bounds.width - total_spacer_width) / column_count.to_f
 
       # Photo width equals one column width
@@ -83,8 +87,8 @@ class PdfGeneratorService
     end
 
     def self.render_processed_image(pdf, image, x, y, width, height, attachment)
-      image.auto_orient
-      processed_image = image.to_blob
+      # Vips automatically handles EXIF orientation
+      processed_image = image.write_to_buffer(".png")
 
       image_options = {
         at: [x, y],
@@ -98,7 +102,16 @@ class PdfGeneratorService
 
     def self.create_image(attachment)
       image_data = attachment.blob.download
-      MiniMagick::Image.read(image_data)
+      Vips::Image.new_from_buffer(image_data, "")
+    end
+
+    def self.calculate_photo_y(pdf, photo_height)
+      if pdf.page_number == 1
+        Configuration::FOOTER_HEIGHT +
+          Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
+      else
+        Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
+      end
     end
   end
 end

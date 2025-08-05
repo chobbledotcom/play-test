@@ -7,7 +7,7 @@ runs:
     - name: Install packages
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: google-chrome-stable curl libjemalloc2 sqlite3 libvips42 imagemagick-6.q16
+        packages: google-chrome-stable curl libjemalloc2 sqlite3 libvips42
         version: 1.3
 
     - name: Set up Ruby
@@ -16,18 +16,3 @@ runs:
         ruby-version: .ruby-version
         bundler-cache: true
         
-    - name: Setup ImageMagick
-      shell: bash
-      run: |
-        if ! command -v identify &> /dev/null; then
-          echo "Setting up ImageMagick symlinks..."
-          for cmd in identify mogrify convert; do
-            BINARY=$(ls /usr/bin/${cmd}-* 2>/dev/null | grep -E "${cmd}-im[0-9]" | head -1)
-            if [ -n "$BINARY" ]; then
-              echo "Creating symlink: $BINARY -> /usr/local/bin/$cmd"
-              sudo ln -sf "$BINARY" "/usr/local/bin/$cmd"
-            else
-              echo "Warning: No binary found for $cmd"
-            fi
-          done
-        fi

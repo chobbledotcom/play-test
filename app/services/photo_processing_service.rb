@@ -1,33 +1,15 @@
 class PhotoProcessingService
-  require "mini_magick"
+  require "vips"
 
-  # Process uploaded photo data: resize to max 1200px, convert to JPEG 75% quality, apply EXIF orientation
+  # Process uploaded photo data: resize to max 1200px, convert to JPEG 75%
   def self.process_upload_data(image_data, original_filename = "photo")
     return nil if image_data.blank?
 
     begin
-      # Create MiniMagick image from data
-      image = MiniMagick::Image.read(image_data)
-
-      # Apply EXIF orientation correction first
-      image.auto_orient
-
-      # Resize to maximum 1200px on longest side
-      image.resize "#{ImageProcessorService::FULL_SIZE}x#{ImageProcessorService::FULL_SIZE}>"
-
-      # Replace transparency with white background before converting to JPEG
-      image.combine_options do |c|
-        c.background "white"
-        c.alpha "remove"
-        c.alpha "off"
-      end
-
-      # Convert to JPEG with 75% quality
-      image.format "jpeg"
-      image.quality "75"
-
-      processed_data = image.to_blob
-
+      image = Vips::Image.new_from_buffer(image_data, "")
+      image = resize_image(image)
+      image = add_white_background(image) if image.has_alpha?
+      processed_data = image.jpegsave_buffer(Q: 75, strip: true)
       processed_filename = change_extension_to_jpg(original_filename)
 
       {
@@ -53,11 +35,11 @@ class PhotoProcessingService
   def self.valid_image_data?(image_data)
     return false if image_data.blank?
 
-    image = MiniMagick::Image.read(image_data)
+    image = Vips::Image.new_from_buffer(image_data, "")
     # Try to get basic image properties to ensure it's valid
     image.width && image.height
     true
-  rescue MiniMagick::Error, MiniMagick::Invalid
+  rescue Vips::Error
     false
   end
 
@@ -79,5 +61,19 @@ class PhotoProcessingService
     "#{basename}.jpg"
   end
 
-  private_class_method :change_extension_to_jpg
+  def self.resize_image(image)
+    max_size = ImageProcessorService::FULL_SIZE
+    return image unless image.width > max_size || image.height > max_size
+
+    scale = [max_size.to_f / image.width, max_size.to_f / image.height].min
+    image.resize(scale)
+  end
+
+  def self.add_white_background(image)
+    background = Vips::Image.black(image.width, image.height).add(255)
+    background.composite2(image, :over)
+  end
+
+  private_class_method :change_extension_to_jpg, :resize_image,
+    :add_white_background
 end
