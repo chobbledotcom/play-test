@@ -17,20 +17,20 @@ module SeedData
 
   def self.user_fields
     {
-      email: "test#{rand(1000..9999)}@example.com",
+      email: "test#{SecureRandom.hex(8)}@example.com",
       password: "password123",
       password_confirmation: "password123",
-      name: "Test User #{rand(1..99)}",
+      name: "Test User #{SecureRandom.hex(4)}",
       rpii_inspector_number: nil # Optional field
     }
   end
 
   def self.unit_fields
     {
-      name: "Bouncy Castle #{%w[Mega Super Fun Party Adventure].sample} #{rand(1..99)}",
+      name: "Bouncy Castle #{%w[Mega Super Fun Party Adventure].sample} #{SecureRandom.hex(4)}",
       serial: "BC-#{Date.current.year}-#{SecureRandom.hex(4).upcase}",
       manufacturer: ["ABC Inflatables", "XYZ Bounce Co", "Fun Factory", "Party Products Ltd"].sample,
-      operator: ["Rental Company #{rand(1..10)}", "Party Hire #{rand(1..5)}", "Events Ltd"].sample,
+      operator: ["Rental Company #{SecureRandom.hex(2)}", "Party Hire #{SecureRandom.hex(2)}", "Events Ltd #{SecureRandom.hex(2)}"].sample,
       manufacture_date: Date.current - rand(365..1825).days,
       description: "Commercial grade inflatable bouncy castle suitable for events"
     }
@@ -135,7 +135,7 @@ module SeedData
       blower_finger_pass: check_passed?(passed),
       blower_visual_pass: check_passed?(passed),
       pat_pass: check_passed_integer?(passed),
-      blower_serial: "FAN-#{rand(1000..9999)}",
+      blower_serial: "FAN-#{SecureRandom.hex(6).upcase}",
       number_of_blowers: 1,
       blower_tube_length: rand(2.0..5.0).round(1),
       blower_tube_length_pass: check_passed?(passed),
