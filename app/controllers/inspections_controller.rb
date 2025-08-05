@@ -382,15 +382,7 @@ class InspectionsController < ApplicationController
     )
     @inspection.update(pdf_last_accessed_at: Time.current)
 
-    case result.type
-    when :redirect
-      redirect_to result.data, allow_other_host: true
-    when :pdf_data
-      send_data result.data,
-        filename: pdf_filename,
-        type: "application/pdf",
-        disposition: "inline"
-    end
+    handle_pdf_response(result, pdf_filename)
   end
 
   def send_inspection_qr_code
