@@ -19,6 +19,17 @@ class SessionsController < ApplicationController
     end
   end
 
+  def destroy
+    # Delete current session record
+    if session[:session_token]
+      UserSession.find_by(session_token: session[:session_token])&.destroy
+    end
+    session.delete(:session_token)
+    log_out
+    flash[:notice] = I18n.t("session.logout.success")
+    redirect_to root_path
+  end
+
   private
 
   def handle_successful_login(user)
@@ -33,16 +44,5 @@ class SessionsController < ApplicationController
     session[:session_token] = user_session.session_token
     flash[:notice] = I18n.t("session.login.success")
     redirect_to inspections_path
-  end
-
-  def destroy
-    # Delete current session record
-    if session[:session_token]
-      UserSession.find_by(session_token: session[:session_token])&.destroy
-    end
-    session.delete(:session_token)
-    log_out
-    flash[:notice] = I18n.t("session.logout.success")
-    redirect_to root_path
   end
 end
