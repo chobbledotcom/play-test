@@ -21,7 +21,7 @@ File.open("ATTRIBUTIONS.md", "w") do |f|
   f.puts
   f.puts "This project uses the following open source dependencies:"
   f.puts
-  f.puts "Generated on: #{Time.now.strftime("%Y-%m-%d")}"
+  f.puts "Generated on: #{Time.now.utc.strftime("%Y-%m-%d")}"
   f.puts "Total dependencies: #{dependencies.count}"
   f.puts
   f.puts "## Dependencies by License"
@@ -44,7 +44,7 @@ end
 # Generate compact JSON for programmatic use
 File.open("attributions.json", "w") do |f|
   f.puts JSON.pretty_generate({
-    generated_at: Time.now.strftime("%Y-%m-%dT%H:%M:%S"),
+    generated_at: Time.now.utc.strftime("%Y-%m-%dT%H:%M:%S"),
     total_dependencies: dependencies.count,
     dependencies: dependencies
   })
