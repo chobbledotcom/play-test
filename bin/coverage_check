@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 def usage
-  puts "Usage: ruby coverage_check.rb <file_path>"
-  puts "Example: ruby coverage_check.rb app/models/user.rb"
+  puts "Usage: bin/coverage_check <file_path>"
+  puts "Example: bin/coverage_check app/models/user.rb"
   exit 1
 end
 
