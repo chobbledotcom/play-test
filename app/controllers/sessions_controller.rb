@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SessionsController < ApplicationController
   skip_before_action :require_login,
     only: [:new, :create, :destroy, :passkey, :passkey_callback]
@@ -14,10 +16,7 @@ class SessionsController < ApplicationController
     password = params.dig(:session, :password)
 
     if (user = authenticate_user(email, password))
-      should_remember = params.dig(:session, :remember_me) == "1"
-      create_user_session(user, should_remember)
-      flash[:notice] = I18n.t("session.login.success")
-      redirect_to inspections_path
+      handle_successful_login(user)
     else
       flash.now[:alert] = I18n.t("session.login.error")
       render :new, status: :unprocessable_entity
@@ -25,6 +24,11 @@ class SessionsController < ApplicationController
   end
 
   def destroy
+    # Delete current session record
+    if session[:session_token]
+      UserSession.find_by(session_token: session[:session_token])&.destroy
+    end
+    session.delete(:session_token)
     log_out
     flash[:notice] = I18n.t("session.logout.success")
     redirect_to root_path
@@ -80,7 +84,11 @@ class SessionsController < ApplicationController
 
     credential.update!(sign_count: webauthn_credential.sign_count)
     user = User.find(credential.user_id)
+
+    # Create session for passkey login
+    user_session = create_session_record(user)
     create_user_session(user, true)
+    session[:session_token] = user_session.session_token
 
     render json: {status: "ok"}, status: :ok
   rescue WebAuthn::Error => e
@@ -89,5 +97,35 @@ class SessionsController < ApplicationController
       status: :unprocessable_entity
   ensure
     session.delete(:passkey_authentication)
+  end
+
+  def handle_successful_login(user)
+    should_remember = params.dig(:session, :remember_me) == "1"
+    user_session = create_session_record(user)
+
+    create_user_session(user, should_remember)
+    session[:session_token] = user_session.session_token
+
+    flash[:notice] = I18n.t("session.login.success")
+    redirect_to inspections_path
+  end
+
+  def create_session_record(user)
+    Rails.logger.info "Creating user session for user #{user.id}"
+    Rails.logger.info "User exists in DB: #{User.exists?(user.id)}"
+    Rails.logger.info "User sessions count before: #{user.user_sessions.count}"
+
+    user_session = user.user_sessions.create!(
+      ip_address: request.remote_ip,
+      user_agent: request.user_agent,
+      last_active_at: Time.current
+    )
+    Rails.logger.info "User session created: #{user_session.id}"
+    user_session
+  rescue => e
+    Rails.logger.error "Failed to create user session: #{e.message}"
+    Rails.logger.error "User ID: #{user.id}, class: #{user.id.class}"
+    Rails.logger.error e.backtrace.join("\n")
+    raise
   end
 end
