@@ -28,6 +28,7 @@ echo -e "\n${BLUE}Running tests in Docker container...${NC}"
 if docker run --rm \
   -e RAILS_ENV=test \
   -e SECRET_KEY_BASE="test_secret_key_base_1234567890abcdef1234567890abcdef1234567890ab" \
+  -e DISABLE_SIMPLECOV=true \
   play-test:local-test \
   sh -c "bundle exec rails db:create db:schema:load && ./bin/test"; then
   echo -e "${GREEN}✓ Tests passed${NC}"
