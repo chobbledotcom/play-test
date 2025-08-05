@@ -3,7 +3,7 @@
 module TestDataHelpers
   # Generate realistic UK mobile numbers (07xxx format)
   def self.british_phone_number
-    "07#{rand(100..999)} #{rand(100..999)} #{rand(1000..9999)}"
+    "07#{rand(100..999)} #{rand(100..999)} #{SecureRandom.hex(2).to_i(16) % 10000}"
   end
 
   # Generate realistic UK postcodes

@@ -7,7 +7,7 @@ def create_unit(name:, serial_prefix:, manufacturer:, operator:, description:)
     SeedData.unit_fields.merge(
       user: $test_user,
       name: name,
-      serial: "#{serial_prefix}-#{rand(1000..9999)}",
+      serial: "#{serial_prefix}-#{SecureRandom.hex(4).upcase}",
       manufacturer: manufacturer,
       operator: operator,
       description: description,
