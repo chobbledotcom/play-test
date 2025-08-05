@@ -14,9 +14,12 @@ NC='\033[0m' # No Color
 
 echo -e "${YELLOW}Building and testing Docker image locally...${NC}\n"
 
-# Build the Docker image
-echo -e "${BLUE}Building Docker image...${NC}"
-if docker build -t play-test:local-test .; then
+# Build the Docker image with development dependencies
+echo -e "${BLUE}Building Docker image with development dependencies...${NC}"
+if docker build \
+  --build-arg BUNDLE_WITHOUT="" \
+  --build-arg RAILS_ENV=test \
+  -t play-test:local-test .; then
   echo -e "${GREEN}✓ Docker build successful${NC}"
 else
   echo -e "${RED}✗ Docker build failed${NC}"
