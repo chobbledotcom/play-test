@@ -4,6 +4,7 @@ A web app for managing safety inspections of inflatable play equipment like boun
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Docker Image](https://img.shields.io/badge/docker-dockerstefn%2Fplay--test-blue)](https://hub.docker.com/r/dockerstefn/play-test)
+[![codecov](https://codecov.io/gh/chobbledotcom/play-test/branch/main/graph/badge.svg?token=6NY2ZHY4R8)](https://codecov.io/gh/chobbledotcom/play-test)
 
 play-test helps inspectors track and document safety checks on inflatable play equipment. It handles equipment records, inspection forms, photo management, and PDF report generation. Makes repeat inspections of the same units quick and straightforward.
 
