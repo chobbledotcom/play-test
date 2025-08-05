@@ -1,0 +1,39 @@
+<header>
+  <h1><%= t("admin.releases.title") %></h1>
+</header>
+
+<main>
+  <% if @releases.empty? %>
+    <p><%= t("admin.releases.no_releases") %></p>
+  <% else %>
+    <% @releases.each do |release| %>
+      <article>
+        <header>
+          <h2>
+            <%= link_to release[:name] || release[:tag_name], release[:html_url], target: "_blank", rel: "noopener" %>
+          </h2>
+          <% unless release[:is_bot] %>
+            <p>
+              <%= t("admin.releases.published_by", author: release[:author]) %>
+              <time datetime="<%= release[:published_at].iso8601 %>">
+                <%= l(release[:published_at], format: :long) %>
+              </time>
+            </p>
+          <% else %>
+            <p>
+              <time datetime="<%= release[:published_at].iso8601 %>">
+                <%= l(release[:published_at], format: :long) %>
+              </time>
+            </p>
+          <% end %>
+        </header>
+        
+        <% if release[:body].present? %>
+          <div>
+            <%= release[:body].html_safe %>
+          </div>
+        <% end %>
+      </article>
+    <% end %>
+  <% end %>
+</main>

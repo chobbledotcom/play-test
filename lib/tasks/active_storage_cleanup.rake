@@ -26,11 +26,11 @@ namespace :active_storage do
         orphaned_count += 1
         orphaned_size += File.size(path)
 
-        if ENV["DRY_RUN"] != "false"
-          puts "Would delete: #{path} (#{File.size(path)} bytes)"
-        else
+        if ENV["CLEANUP_ORPHANED_FILES"] == "true"
           File.delete(path)
           puts "Deleted: #{path}"
+        else
+          puts "Would delete: #{path} (#{File.size(path)} bytes)"
         end
       end
     end
@@ -40,11 +40,11 @@ namespace :active_storage do
       next unless File.directory?(path)
       next unless Dir.empty?(path)
 
-      if ENV["DRY_RUN"] != "false"
-        puts "Would remove empty directory: #{path}"
-      else
+      if ENV["CLEANUP_ORPHANED_FILES"] == "true"
         Dir.rmdir(path)
         puts "Removed empty directory: #{path}"
+      else
+        puts "Would remove empty directory: #{path}"
       end
     end
 
@@ -53,9 +53,9 @@ namespace :active_storage do
     mb_size = orphaned_size / 1024.0 / 1024.0
     puts "Total size: #{"%.2f" % mb_size} MB"
 
-    if ENV["DRY_RUN"] != "false"
+    if ENV["CLEANUP_ORPHANED_FILES"] != "true"
       puts "\nThis was a dry run. To actually delete files, run:"
-      puts "  DRY_RUN=false bundle exec rake active_storage:cleanup_orphaned"
+      puts "  CLEANUP_ORPHANED_FILES=true bundle exec rake active_storage:cleanup_orphaned"
     end
   end
 

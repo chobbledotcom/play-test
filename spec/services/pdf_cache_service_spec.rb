@@ -72,14 +72,37 @@ RSpec.describe PdfCacheService, type: :service do
           allow(cached_pdf).to receive(:download).and_return("cached_pdf_data")
         end
 
-        it "returns a redirect to the cached PDF" do
-          expect(PdfGeneratorService).not_to receive(:generate_inspection_report)
-          expect(described_class).to receive(:generate_signed_url).and_return("https://example.com/signed-url")
+        context "when REDIRECT_TO_S3_PDFS is false" do
+          before do
+            allow(ENV).to receive(:[]).and_call_original
+            allow(ENV).to receive(:[]).with("REDIRECT_TO_S3_PDFS").and_return("false")
+          end
 
-          result = described_class.fetch_or_generate_inspection_pdf(inspection)
-          expect(result).to be_a(PdfCacheService::CacheResult)
-          expect(result.type).to eq(:redirect)
-          expect(result.data).to eq("https://example.com/signed-url")
+          it "returns a stream with the cached PDF attachment" do
+            expect(PdfGeneratorService).not_to receive(:generate_inspection_report)
+
+            result = described_class.fetch_or_generate_inspection_pdf(inspection)
+            expect(result).to be_a(PdfCacheService::CacheResult)
+            expect(result.type).to eq(:stream)
+            expect(result.data).to eq(inspection.cached_pdf)
+          end
+        end
+
+        context "when REDIRECT_TO_S3_PDFS is true" do
+          before do
+            allow(ENV).to receive(:[]).and_call_original
+            allow(ENV).to receive(:[]).with("REDIRECT_TO_S3_PDFS").and_return("true")
+          end
+
+          it "returns a redirect to the cached PDF" do
+            expect(PdfGeneratorService).not_to receive(:generate_inspection_report)
+            expect(described_class).to receive(:generate_signed_url).and_return("https://example.com/signed-url")
+
+            result = described_class.fetch_or_generate_inspection_pdf(inspection)
+            expect(result).to be_a(PdfCacheService::CacheResult)
+            expect(result.type).to eq(:redirect)
+            expect(result.data).to eq("https://example.com/signed-url")
+          end
         end
       end
 
@@ -112,6 +135,8 @@ RSpec.describe PdfCacheService, type: :service do
 
     context "with invalid PDF_CACHE_FROM format" do
       before do
+        # Clear any memoized value from previous tests
+        described_class.instance_eval { @pdf_cache_from_date = nil }
         allow(ENV).to receive(:fetch).and_call_original
         allow(ENV).to receive(:[]).and_call_original
         allow(ENV).to receive(:[]).with("PDF_CACHE_FROM").and_return("invalid-date")

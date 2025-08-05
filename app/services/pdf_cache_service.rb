@@ -30,8 +30,13 @@ class PdfCacheService
     def fetch_or_generate(record, type, **options)
       if record.cached_pdf.attached? && cached_pdf_valid?(record.cached_pdf)
         Rails.logger.info "PDF cache hit for #{type} #{record.id}"
-        url = generate_signed_url(record.cached_pdf)
-        CacheResult.new(type: :redirect, data: url)
+
+        if redirect_to_s3?
+          url = generate_signed_url(record.cached_pdf)
+          CacheResult.new(type: :redirect, data: url)
+        else
+          CacheResult.new(type: :stream, data: record.cached_pdf)
+        end
       else
         Rails.logger.info "PDF cache miss for #{type} #{record.id}"
         generate_and_cache(record, type, **options)
@@ -105,6 +110,10 @@ class PdfCacheService
         filename: filename,
         content_type: "application/pdf"
       )
+    end
+
+    def redirect_to_s3?
+      ActiveModel::Type::Boolean.new.cast(ENV["REDIRECT_TO_S3_PDFS"])
     end
   end
 end

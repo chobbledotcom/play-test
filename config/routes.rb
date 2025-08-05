@@ -82,6 +82,7 @@ Rails.application.routes.draw do
 
   # Admin
   get "admin", to: "admin#index"
+  get "admin/releases", to: "admin#releases", as: :admin_releases
 
   # Backups
   resources :backups, only: [:index] do

@@ -97,7 +97,7 @@ Currently over 90% test coverage:
 bin/test
 
 # Check specific file coverage
-ruby coverage_check.rb app/models/inspection.rb
+bin/coverage_check app/models/inspection.rb
 
 # View detailed HTML report
 open coverage/index.html
