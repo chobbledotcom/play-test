@@ -1,24 +1,24 @@
 /* Passkey login styles */
 .passkey-login-container {
-  margin-top: 1rem;
+	margin-top: 1rem;
 }
 
 .link-button {
-  background: none !important;
-  border: none !important;
-  color: var(--color-link) !important;
-  cursor: pointer;
-  font-size: 0.9rem;
-  text-decoration: underline;
-  font-family: inherit;
-  padding: 0;
+	background: none !important;
+	border: none !important;
+	color: var(--color-link) !important;
+	cursor: pointer;
+	font-size: 0.9rem;
+	text-decoration: underline;
+	font-family: inherit;
+	padding: 0;
 }
 
 .link-button:hover {
-  color: var(--color-link-hover, var(--color-link));
+	color: var(--color-link-hover, var(--color-link));
 }
 
 .link-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+	opacity: 0.6;
+	cursor: not-allowed;
 }

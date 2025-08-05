@@ -66,11 +66,11 @@
             </td>
             <td>
               <% if @user.can_delete_credentials? %>
-                <%= button_to t('forms.passkeys.messages.delete'), 
-                    credential_path(credential), 
-                    method: :delete, 
-                    data: { 
-                      turbo_confirm: t('forms.passkeys.messages.confirm_delete') 
+                <%= button_to t('forms.passkeys.messages.delete'),
+                    credential_path(credential),
+                    method: :delete,
+                    data: {
+                      turbo_confirm: t('forms.passkeys.messages.confirm_delete')
                     },
                     form: { style: "display: inline;" } %>
               <% else %>
@@ -84,10 +84,10 @@
   <% else %>
     <p><%= t('forms.passkeys.messages.no_passkeys') %></p>
   <% end %>
-  
+
   <div class="center" style="margin-top: 1rem;">
-    <button type="button" 
-            class="button" 
+    <button type="button"
+            class="button"
             onclick="registerPasskey()">
       <%= t('forms.passkeys.messages.register') %>
     </button>
@@ -102,7 +102,7 @@
 
 <details>
   <summary><%= t('users.sessions.title') %></summary>
-  
+
   <div class="margins">
     <%= button_to t('users.sessions.logout_everywhere_else'),
         logout_everywhere_else_user_path(@user),

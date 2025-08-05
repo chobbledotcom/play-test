@@ -2,7 +2,7 @@
 
 /* Background with tiled faded logo */
 .rpii {
-	background-image: url('rpii-logo-faded.png');
+	background-image: url("rpii-logo-faded.png");
 	background-repeat: repeat;
 	background-attachment: fixed;
 	background-size: 149px 117px;

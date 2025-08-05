@@ -11,7 +11,7 @@ class ImageResize {
 		this.clearAllFileInputs();
 		this.attachListeners();
 	}
-	
+
 	clearAllFileInputs() {
 		const fileInputs = document.querySelectorAll(
 			'input[type="file"][accept*="image"]',
@@ -19,7 +19,7 @@ class ImageResize {
 		fileInputs.forEach((input) => {
 			const emptyDataTransfer = new DataTransfer();
 			input.files = emptyDataTransfer.files;
-			input.value = '';
+			input.value = "";
 		});
 	}
 
@@ -40,7 +40,7 @@ class ImageResize {
 
 		input.addEventListener("change", async (event) => {
 			if (event.detail && event.detail.imageResizeProcessed) return;
-			
+
 			const files = Array.from(event.target.files);
 			if (files.length === 0) return;
 
@@ -83,10 +83,10 @@ class ImageResize {
 
 		try {
 			const needsProcessing = await this.shouldProcessFile(file);
-			if (!needsProcessing)	return file;
+			if (!needsProcessing) return file;
 
 			const processedBlob = await this.resizeImage(file, canvas);
-			const newName = file.name.replace(/\.[^.]+$/, '.jpg');
+			const newName = file.name.replace(/\.[^.]+$/, ".jpg");
 			const processedFile = new File([processedBlob], newName, {
 				type: "image/jpeg",
 				lastModified: Date.now(),
@@ -102,7 +102,7 @@ class ImageResize {
 	}
 
 	async shouldProcessFile(file) {
-		if (file.type !== 'image/jpeg' || file.size > this.triggerFileSize) {
+		if (file.type !== "image/jpeg" || file.size > this.triggerFileSize) {
 			return true;
 		}
 
@@ -216,15 +216,21 @@ document.addEventListener("turbo:load", () => {
 // This is necessary because Turbo streams don't always trigger the events above
 const observer = new MutationObserver((mutations) => {
 	let hasNewInputs = false;
-	
+
 	mutations.forEach((mutation) => {
 		mutation.addedNodes.forEach((node) => {
-			if (node.nodeType === 1) { // Element node
+			if (node.nodeType === 1) {
+				// Element node
 				// Check if the node itself is a file input or contains file inputs
-				if (node.matches && node.matches('input[type="file"][accept*="image"]')) {
+				if (
+					node.matches &&
+					node.matches('input[type="file"][accept*="image"]')
+				) {
 					hasNewInputs = true;
 				} else if (node.querySelectorAll) {
-					const inputs = node.querySelectorAll('input[type="file"][accept*="image"]');
+					const inputs = node.querySelectorAll(
+						'input[type="file"][accept*="image"]',
+					);
 					if (inputs.length > 0) {
 						hasNewInputs = true;
 					}
@@ -232,7 +238,7 @@ const observer = new MutationObserver((mutations) => {
 			}
 		});
 	});
-	
+
 	if (hasNewInputs) {
 		// Small delay to ensure DOM is ready
 		setTimeout(() => imageResize.attachListeners(), 100);
@@ -243,6 +249,6 @@ const observer = new MutationObserver((mutations) => {
 document.addEventListener("DOMContentLoaded", () => {
 	observer.observe(document.body, {
 		childList: true,
-		subtree: true
+		subtree: true,
 	});
 });
