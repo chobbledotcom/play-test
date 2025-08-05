@@ -99,3 +99,38 @@
     <strong>Change Password</strong>
   <% end %>
 </div>
+
+<details>
+  <summary><%= t('users.sessions.title') %></summary>
+  
+  <div class="margins">
+    <%= button_to t('users.sessions.logout_everywhere_else'),
+        logout_everywhere_else_user_path(@user),
+        method: :delete,
+        data: { confirm: t('users.sessions.logout_everywhere_confirm') } %>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th><%= t('users.sessions.first_active') %></th>
+        <th><%= t('users.sessions.last_active') %></th>
+        <th><%= t('users.sessions.ip_address') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% current_user.user_sessions.active.recent.each do |user_session| %>
+        <tr>
+          <td><%= user_session.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+          <td>
+            <%= user_session.last_active_at.strftime("%Y-%m-%d %H:%M") %>
+            <% if session[:session_token] == user_session.session_token %>
+              <strong>(<%= t('users.sessions.current') %>)</strong>
+            <% end %>
+          </td>
+          <td><%= user_session.ip_address || t('users.sessions.unknown') %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</details>

@@ -40,6 +40,7 @@ Rails.application.routes.draw do
       delete "delete_seeds"
       post "activate"
       patch "deactivate"
+      delete "logout_everywhere_else"
     end
   end
 
