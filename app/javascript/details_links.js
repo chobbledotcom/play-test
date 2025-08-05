@@ -1,27 +1,27 @@
 class DetailsLinks {
-	constructor() {
-		this.setupEventListeners();
-	}
+  constructor() {
+    this.setupEventListeners();
+  }
 
-	setupEventListeners() {
-		document.addEventListener(
-			"click",
-			(e) => {
-				const link = e.target.closest("a");
-				if (link) {
-					const details = link.closest("details");
-					if (details) {
-						e.stopPropagation();
-					}
-				}
-			},
-			true,
-		);
-	}
+  setupEventListeners() {
+    document.addEventListener(
+      "click",
+      (e) => {
+        const link = e.target.closest("a");
+        if (link) {
+          const details = link.closest("details");
+          if (details) {
+            e.stopPropagation();
+          }
+        }
+      },
+      true,
+    );
+  }
 
-	static init() {
-		new DetailsLinks();
-	}
+  static init() {
+    new DetailsLinks();
+  }
 }
 
 document.addEventListener("turbo:load", () => DetailsLinks.init());
