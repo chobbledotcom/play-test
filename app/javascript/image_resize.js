@@ -1,19 +1,29 @@
-// ImageResize - handles image resizing before upload
 class ImageResize {
 	constructor() {
-		this.maxDimension = 1200; // Maximum width or height after resize
-		this.triggerDimension = 2400; // Resize if any dimension exceeds this
-		this.triggerFileSize = 1024 * 1024; // 1MB in bytes
-		this.jpegQuality = 0.9; // 90% JPEG quality
+		this.maxDimension = 1200;
+		this.triggerDimension = 2400;
+		this.triggerFileSize = 1024 * 1024;
+		this.jpegQuality = 0.9;
 		this.processedInputs = new WeakSet();
 	}
 
 	init() {
+		this.clearAllFileInputs();
 		this.attachListeners();
+	}
+	
+	clearAllFileInputs() {
+		const fileInputs = document.querySelectorAll(
+			'input[type="file"][accept*="image"]',
+		);
+		fileInputs.forEach((input) => {
+			const emptyDataTransfer = new DataTransfer();
+			input.files = emptyDataTransfer.files;
+			input.value = '';
+		});
 	}
 
 	attachListeners() {
-		// Find all file inputs that accept images
 		const fileInputs = document.querySelectorAll(
 			'input[type="file"][accept*="image"]',
 		);
@@ -21,35 +31,30 @@ class ImageResize {
 	}
 
 	setupInput(input) {
-		// Skip if already processed
 		if (this.processedInputs.has(input)) return;
 		this.processedInputs.add(input);
 
-		// Create a hidden canvas for this input
 		const canvas = document.createElement("canvas");
 		canvas.style.display = "none";
 		document.body.appendChild(canvas);
 
-		input.addEventListener("change", (event) => {
+		input.addEventListener("change", async (event) => {
+			if (event.detail && event.detail.imageResizeProcessed) return;
+			
 			const files = Array.from(event.target.files);
 			if (files.length === 0) return;
 
-			// Disable the input while processing
 			input.disabled = true;
 
-			// Process files synchronously to maintain user gesture
-			this.processFiles(input, files, canvas)
-				.then((processedFiles) => {
-					// Re-enable input
-					input.disabled = false;
-				})
-				.catch((error) => {
-					console.error("Error processing files:", error);
-					input.disabled = false;
-				});
+			try {
+				const processedFiles = await this.processFiles(input, files, canvas);
+				input.disabled = false;
+			} catch (error) {
+				console.error("Error processing images:", error);
+				input.disabled = false;
+			}
 		});
 
-		// Clean up canvas when input is removed
 		const observer = new MutationObserver((mutations) => {
 			if (!document.body.contains(input)) {
 				canvas.remove();
@@ -67,27 +72,22 @@ class ImageResize {
 			processedFiles.push(processed);
 		}
 
-		// Replace the input's files with processed versions
 		this.replaceInputFiles(input, processedFiles);
 		return processedFiles;
 	}
 
 	async processFile(file, canvas) {
-		// Only process image files
 		if (!file.type.startsWith("image/")) {
 			return file;
 		}
 
 		try {
-			// Check if file needs processing
 			const needsProcessing = await this.shouldProcessFile(file);
-			if (!needsProcessing) {
-				return file;
-			}
+			if (!needsProcessing)	return file;
 
 			const processedBlob = await this.resizeImage(file, canvas);
-			// Create new File object with original name
-			const processedFile = new File([processedBlob], file.name, {
+			const newName = file.name.replace(/\.[^.]+$/, '.jpg');
+			const processedFile = new File([processedBlob], newName, {
 				type: "image/jpeg",
 				lastModified: Date.now(),
 			});
@@ -97,18 +97,15 @@ class ImageResize {
 			return processedFile;
 		} catch (error) {
 			console.error("Error processing image:", error);
-			// Return original file if processing fails
 			return file;
 		}
 	}
 
 	async shouldProcessFile(file) {
-		// Check file size first (quick check)
-		if (file.size > this.triggerFileSize) {
+		if (file.type !== 'image/jpeg' || file.size > this.triggerFileSize) {
 			return true;
 		}
 
-		// Check image dimensions
 		return new Promise((resolve) => {
 			const img = new Image();
 			const url = URL.createObjectURL(file);
@@ -137,34 +134,25 @@ class ImageResize {
 				URL.revokeObjectURL(url);
 
 				try {
-					// Calculate new dimensions
 					const { width, height } = this.calculateDimensions(
 						img.width,
 						img.height,
 					);
 
-					// Set canvas dimensions
 					canvas.width = width;
 					canvas.height = height;
 
-					// Get context and draw
 					const ctx = canvas.getContext("2d", { willReadFrequently: false });
-
-					// Clear canvas first
 					ctx.clearRect(0, 0, width, height);
 
-					// Fill with white background for transparent images
 					ctx.fillStyle = "#FFFFFF";
 					ctx.fillRect(0, 0, width, height);
 
-					// Draw image
 					ctx.drawImage(img, 0, 0, width, height);
 
-					// Convert to blob immediately
 					canvas.toBlob(
 						(blob) => {
 							if (blob) {
-								// Clear canvas after use
 								ctx.clearRect(0, 0, width, height);
 								resolve(blob);
 							} else {
@@ -191,12 +179,9 @@ class ImageResize {
 	calculateDimensions(originalWidth, originalHeight) {
 		const maxDimension = Math.max(originalWidth, originalHeight);
 
-		// No need to resize if already within limits
-		if (maxDimension <= this.maxDimension) {
+		if (maxDimension <= this.maxDimension)
 			return { width: originalWidth, height: originalHeight };
-		}
 
-		// Calculate scale factor
 		const scale = this.maxDimension / maxDimension;
 
 		return {
@@ -206,36 +191,58 @@ class ImageResize {
 	}
 
 	replaceInputFiles(input, files) {
-		// Create new DataTransfer to hold processed files
 		const dataTransfer = new DataTransfer();
-
 		files.forEach((file) => {
 			dataTransfer.items.add(file);
 		});
-
-		// Replace input's files
 		input.files = dataTransfer.files;
 	}
 
 	cleanup() {
-		// Re-process any new inputs that appeared
 		this.attachListeners();
 	}
 }
 
-// Create singleton instance
 const imageResize = new ImageResize();
 
-// Initialize on first load
 document.addEventListener("DOMContentLoaded", () => imageResize.init());
 
-// Reinitialize after Turbo navigation
+// Initialize after Turbo navigation (page changes)
 document.addEventListener("turbo:load", () => {
-	imageResize.cleanup();
 	imageResize.init();
 });
 
-// Handle dynamically loaded content
-document.addEventListener("turbo:frame-load", () => {
-	imageResize.attachListeners();
+// Use MutationObserver to catch any dynamically added inputs
+// This is necessary because Turbo streams don't always trigger the events above
+const observer = new MutationObserver((mutations) => {
+	let hasNewInputs = false;
+	
+	mutations.forEach((mutation) => {
+		mutation.addedNodes.forEach((node) => {
+			if (node.nodeType === 1) { // Element node
+				// Check if the node itself is a file input or contains file inputs
+				if (node.matches && node.matches('input[type="file"][accept*="image"]')) {
+					hasNewInputs = true;
+				} else if (node.querySelectorAll) {
+					const inputs = node.querySelectorAll('input[type="file"][accept*="image"]');
+					if (inputs.length > 0) {
+						hasNewInputs = true;
+					}
+				}
+			}
+		});
+	});
+	
+	if (hasNewInputs) {
+		// Small delay to ensure DOM is ready
+		setTimeout(() => imageResize.attachListeners(), 100);
+	}
+});
+
+// Start observing when DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+	observer.observe(document.body, {
+		childList: true,
+		subtree: true
+	});
 });
