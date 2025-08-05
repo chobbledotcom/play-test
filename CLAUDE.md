@@ -333,8 +333,8 @@ end
 
 ```bash
 # Check coverage for a specific file (extracts from HTML report)
-ruby coverage_check.rb app/models/user.rb
-ruby coverage_check.rb app/controllers/users_controller.rb
+bin/coverage_check app/models/user.rb
+bin/coverage_check app/controllers/users_controller.rb
 
 # View HTML report for detailed line-by-line analysis
 # Open coverage/index.html in browser
@@ -342,9 +342,9 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 
 #### Coverage Analysis Tool
 
-**File Coverage Check** (`coverage_check.rb`):
+**File Coverage Check** (`bin/coverage_check`):
 
-- **Usage**: `ruby coverage_check.rb <file_path>`
+- **Usage**: `bin/coverage_check <file_path>`
 - **Output**: Exact same figures as SimpleCov HTML report
 - **Example output**:
   ```
@@ -357,7 +357,7 @@ ruby coverage_check.rb app/controllers/users_controller.rb
 
 #### Coverage Workflow
 
-1. **After editing a file**: Run `ruby coverage_check.rb <file_path>` to check coverage
+1. **After editing a file**: Run `bin/coverage_check <file_path>` to check coverage
 2. **Before committing**: Ensure no coverage regression
 3. **When coverage drops**: Write tests for uncovered lines immediately
 4. **Focus areas**: Controllers, services, models (business logic)
