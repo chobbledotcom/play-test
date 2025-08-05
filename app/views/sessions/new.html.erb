@@ -20,3 +20,8 @@
       field: :remember_me %>
   <% end %>
 <% end %>
+
+<div class="center" style="margin-top: 1rem;">
+  <%= link_to t('sessions.buttons.login_with_passkey'), passkey_login_path, 
+      style: "font-size: 0.9rem;" %>
+</div>
