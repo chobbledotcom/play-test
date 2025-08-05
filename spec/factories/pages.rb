@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :page do
-    slug { "page-#{rand(10000)}" }
+    slug { "page-#{SecureRandom.hex(6)}" }
     meta_title { "Test Page" }
     meta_description { "Test page description" }
     link_title { "Test Link" }

@@ -3,7 +3,7 @@ FactoryBot.define do
     user
     action { "created" }
     resource_type { "Inspection" }
-    resource_id { "INS#{rand(100000)}" }
+    resource_id { "INS#{SecureRandom.hex(8).upcase}" }
     details { "Created inspection" }
     changed_data { nil }
     metadata { nil }
