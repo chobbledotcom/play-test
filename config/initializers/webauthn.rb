@@ -1,5 +1,12 @@
 WebAuthn.configure do |config|
-  config.allowed_origins = [ENV["WEBAUTHN_ORIGIN"] || "http://localhost:3000"]
-  config.rp_name = Rails.application.class.module_parent_name
-  config.rp_id = ENV["WEBAUTHN_RP_ID"] || "localhost"
+  # Use BASE_URL from environment
+  base_url = ENV["BASE_URL"] || "http://localhost:3000"
+
+  config.allowed_origins = [base_url]
+
+  # Use APP_NAME from environment
+  config.rp_name = ENV["APP_NAME"] || "PlayTest2"
+
+  # Extract domain from BASE_URL
+  config.rp_id = URI.parse(base_url).host
 end

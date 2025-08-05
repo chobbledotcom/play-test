@@ -5,9 +5,9 @@ en:
     messages:
       no_passkeys: "You haven't registered any passkeys yet."
       confirm_delete_passkey: "Are you sure you want to delete this passkey?"
-    passkeys_table_headers:
-      nickname: "Nickname"
-      actions: "Actions"
+  passkeys_table_headers:
+    nickname: "Nickname"
+    actions: "Actions"
   credentials:
     messages:
       could_not_add: "Couldn't add your passkey"

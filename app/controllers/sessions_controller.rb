@@ -31,17 +31,23 @@ class SessionsController < ApplicationController
   end
 
   def passkey
-    # Initiate passkey authentication without username
+    # Get all credentials for this RP to help password managers
+    all_credentials = Credential.all.map do |cred|
+      {
+        id: cred.external_id,
+        type: "public-key"
+      }
+    end
+
+    # Initiate passkey authentication
     get_options = WebAuthn::Credential.options_for_get(
-      user_verification: "required"
+      user_verification: "required",
+      allow_credentials: all_credentials
     )
 
     session[:passkey_authentication] = {challenge: get_options.challenge}
 
-    respond_to do |format|
-      format.html
-      format.json { render json: get_options }
-    end
+    render json: get_options
   end
 
   def passkey_callback

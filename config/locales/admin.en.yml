@@ -5,3 +5,4 @@ en:
       title: "GitHub Releases"
       no_releases: "No releases found."
       fetch_error: "Failed to fetch releases from GitHub. Please try again later."
+      published_by: "Published by %{author} on"

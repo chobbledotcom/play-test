@@ -6,6 +6,15 @@ document.addEventListener("turbo:load", () => {
     button.addEventListener("click", async (event) => {
       event.preventDefault();
       
+      // Show loading state
+      const buttonText = document.getElementById('passkey-button-text');
+      const buttonSpinner = document.getElementById('passkey-button-spinner');
+      if (buttonText && buttonSpinner) {
+        buttonText.textContent = 'Authenticating...';
+        buttonSpinner.style.display = 'inline-block';
+        button.disabled = true;
+      }
+      
       try {
         // Get CSRF token
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -25,6 +34,37 @@ document.addEventListener("turbo:load", () => {
         }
         
         const credentialOptions = await response.json();
+        
+        // Debug logging in development
+        if (window.location.hostname === 'localhost') {
+          console.log("=== WebAuthn Debug Info ===");
+          console.log("Credential options from server:", credentialOptions);
+          console.log("RP ID:", credentialOptions.rpId);
+          console.log("Timeout:", credentialOptions.timeout);
+          console.log("User Verification:", credentialOptions.userVerification);
+          
+          if (credentialOptions.allowCredentials) {
+            console.log("Allow Credentials Count:", credentialOptions.allowCredentials.length);
+            credentialOptions.allowCredentials.forEach((cred, index) => {
+              console.log(`Credential ${index + 1}:`, {
+                id: cred.id,
+                type: cred.type,
+                transports: cred.transports
+              });
+            });
+          } else {
+            console.log("No allowCredentials specified - will use any available credential");
+          }
+          
+          // Update debug info on page
+          const debugInfo = document.getElementById('passkey-debug-info');
+          if (debugInfo) {
+            debugInfo.innerHTML = `
+              <h4>Credential Request Details:</h4>
+              <pre>${JSON.stringify(credentialOptions, null, 2)}</pre>
+            `;
+          }
+        }
         
         // Convert challenge from base64
         credentialOptions.challenge = base64ToArrayBuffer(credentialOptions.challenge);
@@ -76,6 +116,15 @@ document.addEventListener("turbo:load", () => {
       } catch (error) {
         console.error("Passkey authentication error:", error);
         alert(`Failed to authenticate with passkey: ${error.message}`);
+        
+        // Reset button state
+        const buttonText = document.getElementById('passkey-button-text');
+        const buttonSpinner = document.getElementById('passkey-button-spinner');
+        if (buttonText && buttonSpinner) {
+          buttonText.textContent = 'Login with passkey';
+          buttonSpinner.style.display = 'none';
+          button.disabled = false;
+        }
       }
     });
   });

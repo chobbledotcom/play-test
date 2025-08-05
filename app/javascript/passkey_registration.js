@@ -24,6 +24,15 @@ window.registerPasskey = async function() {
     
     const credentialOptions = await response.json();
     
+    // Debug logging in development
+    if (window.location.hostname === 'localhost') {
+      console.log("=== WebAuthn Registration Debug Info ===");
+      console.log("Credential creation options:", credentialOptions);
+      console.log("RP:", credentialOptions.rp);
+      console.log("User:", credentialOptions.user);
+      console.log("Current origin:", window.location.origin);
+    }
+    
     // Convert challenge and user.id from base64
     credentialOptions.challenge = base64ToArrayBuffer(credentialOptions.challenge);
     credentialOptions.user.id = base64ToArrayBuffer(credentialOptions.user.id);
@@ -40,6 +49,12 @@ window.registerPasskey = async function() {
     const credential = await navigator.credentials.create({
       publicKey: credentialOptions
     });
+    
+    // Debug log the created credential
+    if (window.location.hostname === 'localhost') {
+      console.log("Created credential:", credential);
+      console.log("Credential ID:", credential.id);
+    }
     
     // Send credential to server
     const credentialData = {

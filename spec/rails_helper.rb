@@ -26,6 +26,12 @@ begin
 rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
+
+# Configure ActiveStorage for test environment
+require "active_storage"
+ActiveStorage::Current.url_options = {
+  host: "play-test.co.uk"
+}
 RSpec.configure do |config|
   config.before(:each) do
     ENV["ADMIN_EMAILS_PATTERN"] = "^admin\\d*(_[a-f0-9]+)?@example\\.com$"
