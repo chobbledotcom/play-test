@@ -20,3 +20,16 @@
       field: :remember_me %>
   <% end %>
 <% end %>
+
+<div class="center passkey-login-container">
+  <button type="button" 
+          id="passkey-login-button"
+          class="link-button"
+          data-controller="passkey-login"
+          data-action="click->passkey-login#authenticate">
+    <span id="passkey-button-text"><%= t('sessions.buttons.login_with_passkey') %></span>
+    <span id="passkey-button-spinner" class="lds-ring small" style="display: none;">
+      <div></div><div></div><div></div><div></div>
+    </span>
+  </button>
+</div>

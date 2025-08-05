@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
-  skip_before_action :require_login, only: %i[new create destroy]
-  before_action :require_logged_out, only: %i[new create]
+  skip_before_action :require_login,
+    only: [:new, :create, :destroy, :passkey, :passkey_callback]
+  before_action :require_logged_out,
+    only: [:new, :create, :passkey, :passkey_callback]
 
   def new
   end
@@ -23,14 +25,79 @@ class SessionsController < ApplicationController
 
   def destroy
     # Delete current session record
-    UserSession.find_by(session_token: session[:session_token])&.destroy if session[:session_token]
+    if session[:session_token]
+      UserSession.find_by(session_token: session[:session_token])&.destroy
+    end
     session.delete(:session_token)
     log_out
     flash[:notice] = I18n.t("session.logout.success")
     redirect_to root_path
   end
 
+  def passkey
+    # Get all credentials for this RP to help password managers
+    all_credentials = Credential.all.map do |cred|
+      {
+        id: cred.external_id,
+        type: "public-key"
+      }
+    end
+
+    # Initiate passkey authentication
+    get_options = WebAuthn::Credential.options_for_get(
+      user_verification: "required",
+      allow_credentials: all_credentials
+    )
+
+    session[:passkey_authentication] = {challenge: get_options.challenge}
+
+    render json: get_options
+  end
+
+  def passkey_callback
+    webauthn_credential = WebAuthn::Credential.from_get(params)
+    credential = find_credential(webauthn_credential)
+
+    if credential
+      verify_and_sign_in_with_passkey(credential, webauthn_credential)
+    else
+      render json: {errors: [I18n.t("sessions.messages.passkey_not_found")]},
+        status: :unprocessable_entity
+    end
+  end
+
   private
+
+  def find_credential(webauthn_credential)
+    encoded_id = Base64.strict_encode64(webauthn_credential.raw_id)
+    Credential.find_by(external_id: encoded_id)
+  end
+
+  def verify_and_sign_in_with_passkey(credential, webauthn_credential)
+    challenge = session[:passkey_authentication]["challenge"]
+    webauthn_credential.verify(
+      challenge,
+      public_key: credential.public_key,
+      sign_count: credential.sign_count,
+      user_verification: true
+    )
+
+    credential.update!(sign_count: webauthn_credential.sign_count)
+    user = User.find(credential.user_id)
+
+    # Create session for passkey login
+    user_session = create_session_record(user)
+    create_user_session(user, true)
+    session[:session_token] = user_session.session_token
+
+    render json: {status: "ok"}, status: :ok
+  rescue WebAuthn::Error => e
+    error_msg = I18n.t("sessions.messages.passkey_login_failed")
+    render json: "#{error_msg}: #{e.message}",
+      status: :unprocessable_entity
+  ensure
+    session.delete(:passkey_authentication)
+  end
 
   def handle_successful_login(user)
     should_remember = params.dig(:session, :remember_me) == "1"
@@ -44,10 +111,21 @@ class SessionsController < ApplicationController
   end
 
   def create_session_record(user)
-    user.user_sessions.create!(
+    Rails.logger.info "Creating user session for user #{user.id}"
+    Rails.logger.info "User exists in DB: #{User.exists?(user.id)}"
+    Rails.logger.info "User sessions count before: #{user.user_sessions.count}"
+
+    user_session = user.user_sessions.create!(
       ip_address: request.remote_ip,
       user_agent: request.user_agent,
       last_active_at: Time.current
     )
+    Rails.logger.info "User session created: #{user_session.id}"
+    user_session
+  rescue => e
+    Rails.logger.error "Failed to create user session: #{e.message}"
+    Rails.logger.error "User ID: #{user.id}, class: #{user.id.class}"
+    Rails.logger.error e.backtrace.join("\n")
+    raise
   end
 end

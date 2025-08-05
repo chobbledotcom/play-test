@@ -19,6 +19,13 @@ Rails.application.routes.draw do
   get "login", to: "sessions#new"
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
+  get "passkey_login", to: "sessions#passkey", defaults: {format: :json}
+  post "passkey_callback", to: "sessions#passkey_callback"
+
+  # Credentials (passkeys)
+  resources :credentials, only: [:create, :destroy] do
+    post :callback, on: :collection
+  end
 
   # Users management (full CRUD)
   resources :users do

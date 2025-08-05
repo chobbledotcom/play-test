@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_05_130134) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_05_132008) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -58,6 +58,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_130134) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "anchorage_assessments_new_pkey", unique: true
+  end
+
+  create_table "credentials", force: :cascade do |t|
+    t.string "user_id", limit: 12, null: false
+    t.string "external_id", null: false
+    t.string "public_key", null: false
+    t.string "nickname", null: false
+    t.integer "sign_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["external_id"], name: "index_credentials_on_external_id", unique: true
+    t.index ["user_id"], name: "index_credentials_on_user_id"
   end
 
   create_table "enclosed_assessments", id: false, force: :cascade do |t|
@@ -421,7 +433,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_130134) do
   end
 
   create_table "user_sessions", force: :cascade do |t|
-    t.string "user_id", limit: 12, null: false
+    t.string "user_id", null: false
     t.string "session_token", null: false
     t.string "ip_address"
     t.string "user_agent"
@@ -449,6 +461,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_130134) do
     t.string "country"
     t.string "postal_code"
     t.datetime "rpii_verified_date"
+    t.string "webauthn_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["inspection_company_id"], name: "index_users_on_inspection_company_id"
     t.index ["rpii_inspector_number"], name: "index_users_on_rpii_inspector_number", unique: true, where: "rpii_inspector_number IS NOT NULL"
@@ -457,6 +470,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_130134) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "anchorage_assessments", "inspections"
+  add_foreign_key "credentials", "users"
   add_foreign_key "enclosed_assessments", "inspections"
   add_foreign_key "events", "users"
   add_foreign_key "fan_assessments", "inspections"
@@ -474,6 +488,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_130134) do
   add_foreign_key "structure_assessments", "inspections"
   add_foreign_key "units", "users"
   add_foreign_key "user_height_assessments", "inspections"
-  add_foreign_key "user_sessions", "users"
   add_foreign_key "user_sessions", "users"
 end

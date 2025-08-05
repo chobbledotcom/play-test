@@ -42,6 +42,58 @@
   <% end %>
 <% end %>
 
+<fieldset>
+  <legend><%= t('forms.passkeys.sections.manage') %></legend>
+  <% if @user.credentials.any? %>
+    <table>
+      <thead>
+        <tr>
+          <th><%= t('passkeys_table_headers.nickname') %></th>
+          <th><%= t('passkeys_table_headers.actions') %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @user.credentials.each do |credential| %>
+          <tr>
+            <td>
+              <% if Rails.env.development? %>
+                <span title="Credential ID: <%= credential.external_id %>&#10;Sign Count: <%= credential.sign_count %>&#10;Created: <%= credential.created_at %>&#10;WebAuthn User ID: <%= @user.webauthn_id %>&#10;RP ID: <%= WebAuthn.configuration.rp_id %>">
+                  <%= credential.nickname %> ℹ️
+                </span>
+              <% else %>
+                <%= credential.nickname %>
+              <% end %>
+            </td>
+            <td>
+              <% if @user.can_delete_credentials? %>
+                <%= button_to t('forms.passkeys.messages.delete'), 
+                    credential_path(credential), 
+                    method: :delete, 
+                    data: { 
+                      turbo_confirm: t('forms.passkeys.messages.confirm_delete') 
+                    },
+                    form: { style: "display: inline;" } %>
+              <% else %>
+                <span style="color: #666;"><%= t('forms.passkeys.messages.cannot_delete_last') %></span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p><%= t('forms.passkeys.messages.no_passkeys') %></p>
+  <% end %>
+  
+  <div class="center" style="margin-top: 1rem;">
+    <button type="button" 
+            class="button" 
+            onclick="registerPasskey()">
+      <%= t('forms.passkeys.messages.register') %>
+    </button>
+  </div>
+</fieldset>
+
 <div class="margins center">
   <%= link_to change_password_user_path(current_user) do %>
     <strong>Change Password</strong>
