@@ -1,0 +1,48 @@
+---
+name: rack-session
+version: 2.1.1
+type: bundler
+summary: A session implementation for Rack.
+homepage: https://github.com/rack/rack-session
+license: mit
+licenses:
+- sources: license.md
+  text: "# MIT License\n\nCopyright, 2007-2008, by Leah Neukirchen.  \nCopyright,
+    2007-2009, by Scytrin dai Kinthra.  \nCopyright, 2008, by Daniel Roethlisberger.
+    \ \nCopyright, 2009, by Joshua Peek.  \nCopyright, 2009, by Mickaël Riga.  \nCopyright,
+    2010, by Simon Chiang.  \nCopyright, 2010-2011, by José Valim.  \nCopyright, 2010-2013,
+    by James Tucker.  \nCopyright, 2010-2019, by Aaron Patterson.  \nCopyright, 2011,
+    by Max Cantor.  \nCopyright, 2011-2012, by Konstantin Haase.  \nCopyright, 2011,
+    by Will Leinweber.  \nCopyright, 2011, by John Manoogian III.  \nCopyright, 2012,
+    by Yun Huang Yong.  \nCopyright, 2012, by Ravil Bayramgalin.  \nCopyright, 2012,
+    by Timothy Elliott.  \nCopyright, 2012, by Jamie Macey.  \nCopyright, 2012-2015,
+    by Santiago Pastorino.  \nCopyright, 2013, by Andrew Cole.  \nCopyright, 2013,
+    by Postmodern.  \nCopyright, 2013, by Vipul A M.  \nCopyright, 2013, by Charles
+    Hornberger.  \nCopyright, 2014, by Michal Bryxí.  \nCopyright, 2015, by deepj.
+    \ \nCopyright, 2015, by Doug McInnes.  \nCopyright, 2015, by David Runger.  \nCopyright,
+    2015, by Francesco Rodríguez.  \nCopyright, 2015, by Yuichiro Kaneko.  \nCopyright,
+    2015, by Michael Sauter.  \nCopyright, 2016, by Kir Shatrov.  \nCopyright, 2016,
+    by Yann Vanhalewyn.  \nCopyright, 2016, by Jian Weihang.  \nCopyright, 2017, by
+    Jordan Raine.  \nCopyright, 2018, by Dillon Welch.  \nCopyright, 2018, by Yoshiyuki
+    Hirano.  \nCopyright, 2019, by Krzysztof Rybka.  \nCopyright, 2019, by Frederick
+    Cheung.  \nCopyright, 2019, by Adrian Setyadi.  \nCopyright, 2019, by Rafael Mendonça
+    França.  \nCopyright, 2019-2020, by Pavel Rosicky.  \nCopyright, 2019, by Dima
+    Fatko.  \nCopyright, 2019, by Oleh Demianiuk.  \nCopyright, 2020-2023, by Samuel
+    Williams.  \nCopyright, 2020-2022, by Jeremy Evans.  \nCopyright, 2020, by Alex
+    Speller.  \nCopyright, 2020, by Ryuta Kamizono.  \nCopyright, 2020, by Yudai Suzuki.
+    \ \nCopyright, 2020, by Bart de Water.  \nCopyright, 2020, by Alec Clarke.  \nCopyright,
+    2021, by Michael Coyne.  \nCopyright, 2022, by Philip Arndt.  \nCopyright, 2022,
+    by Jon Dufresne.  \n\nPermission is hereby granted, free of charge, to any person
+    obtaining a copy\nof this software and associated documentation files (the \"Software\"),
+    to deal\nin the Software without restriction, including without limitation the
+    rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies
+    of the Software, and to permit persons to whom the Software is\nfurnished to do
+    so, subject to the following conditions:\n\nThe above copyright notice and this
+    permission notice shall be included in all\ncopies or substantial portions of
+    the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS
+    FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR
+    COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER
+    IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION
+    WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+notices: []

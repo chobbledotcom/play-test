@@ -107,3 +107,5 @@ gem "whenever", require: false
 # Pinned versions for nixpkgs compatibility
 gem "psych", "= 5.2.3"
 gem "openssl", "= 3.3.0"
+
+gem "licensed", "~> 5.0", group: :development
