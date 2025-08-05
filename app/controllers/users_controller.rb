@@ -6,6 +6,7 @@ class UsersController < ApplicationController
     change_password
     update_settings
     update_password
+    logout_everywhere_else
   ]
 
   LOGGED_OUT_PATHS = %i[
@@ -194,6 +195,14 @@ class UsersController < ApplicationController
     @user.update(active_until: Time.current)
     flash[:notice] = I18n.t("users.messages.user_deactivated")
     redirect_to edit_user_path(@user)
+  end
+
+  def logout_everywhere_else
+    # Delete all sessions except the current one
+    current_token = session[:session_token]
+    @user.user_sessions.where.not(session_token: current_token).destroy_all
+    flash[:notice] = I18n.t("users.messages.logged_out_everywhere")
+    redirect_to change_settings_user_path(@user)
   end
 
   private

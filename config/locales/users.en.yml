@@ -107,6 +107,7 @@ en:
       user_activated: "User has been activated"
       user_deactivated: "User has been deactivated"
       deactivate_confirm: "Are you sure you want to deactivate %{email}?"
+      logged_out_everywhere: "You have been logged out from all other devices"
 
     errors:
       wrong_password: "Current password is incorrect"
@@ -131,3 +132,13 @@ en:
       success_header: "Verification Successful"
       failure_header: "Verification Failed"
       found_inspector: "Found Inspector"
+
+    sessions:
+      title: "Active Sessions"
+      logout_everywhere_else: "Log out everywhere except here"
+      logout_everywhere_confirm: "This will log you out from all other browsers and devices. Are you sure?"
+      first_active: "First Active"
+      last_active: "Last Active"
+      ip_address: "IP Address"
+      current: "current session"
+      unknown: "Unknown"
