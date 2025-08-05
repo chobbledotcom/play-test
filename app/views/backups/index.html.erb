@@ -16,7 +16,7 @@
         <% date = backup[:filename].match(/database-(\d{4}-\d{2}-\d{2})\.tar\.gz/)&.[](1) %>
         <tr>
           <td>
-            <%= link_to backup[:filename], download_backups_path(date: date), 
+            <%= link_to backup[:filename], download_backups_path(date: date),
                 data: { turbo: false } %>
           </td>
           <td><%= backup[:size_mb] %> MB</td>
