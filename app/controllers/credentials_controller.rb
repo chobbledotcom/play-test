@@ -52,7 +52,11 @@ class CredentialsController < ApplicationController
       external_id: Base64.strict_encode64(webauthn_credential.raw_id)
     )
 
-    if credential.update(credential_params(webauthn_credential))
+    credential_attrs = credential_params(webauthn_credential)
+    # Ensure user_id is set for new records
+    credential_attrs[:user_id] = current_user.id if credential.new_record?
+
+    if credential.update(credential_attrs)
       render json: {status: "ok"}, status: :ok
     else
       error_msg = I18n.t("credentials.messages.could_not_add")
