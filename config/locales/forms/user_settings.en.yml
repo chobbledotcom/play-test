@@ -5,6 +5,7 @@ en:
       sections:
         contact_details: "Contact Details"
         preferences: "Preferences"
+        passkeys: "Passkeys"
       fields:
         name: "Name"
         phone: "Phone"
