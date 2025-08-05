@@ -1,0 +1,14 @@
+---
+name: android_key_attestation
+version: 0.3.0
+type: bundler
+summary: Android key attestation verification
+homepage: https://github.com/bdewater/android_key_attestation
+license: mit
+licenses:
+- sources: README.md
+  text: |-
+    The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+    The gem and its authors are unaffiliated with Google.
+notices: []

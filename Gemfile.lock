@@ -168,6 +168,12 @@ GEM
     factory_bot_rails (6.4.4)
       factory_bot (~> 6.5)
       railties (>= 5.0.0)
+    faraday (2.13.4)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-net_http (3.4.1)
+      net-http (>= 0.5.0)
     ferrum (0.17.1)
       addressable (~> 2.5)
       base64 (~> 0.2)
@@ -185,9 +191,6 @@ GEM
       raabro (~> 1.4)
     globalid (1.2.1)
       activesupport (>= 6.1)
-    google-protobuf (4.31.1)
-      bigdecimal
-      rake (>= 13)
     google-protobuf (4.31.1-aarch64-linux-gnu)
       bigdecimal
       rake (>= 13)
@@ -226,6 +229,22 @@ GEM
     jwt (2.10.2)
       base64
     language_server-protocol (3.17.0.5)
+    licensed (5.0.4)
+      csv (~> 3.3)
+      json (~> 2.6)
+      licensee (~> 9.16)
+      parallel (~> 1.22)
+      pathname-common_prefix (~> 0.0.1)
+      reverse_markdown (>= 2.1, < 4.0)
+      ruby-xxHash (~> 0.4.0)
+      thor (~> 1.2)
+      tomlrb (~> 2.0)
+    licensee (9.18.0)
+      dotenv (>= 2, < 4)
+      octokit (>= 4.20, < 10.0)
+      reverse_markdown (>= 1, < 4)
+      rugged (>= 0.24, < 2.0)
+      thor (>= 0.19, < 2.0)
     lint_roller (1.1.0)
     logger (1.7.0)
     loofah (2.24.0)
@@ -254,6 +273,8 @@ GEM
       railties (>= 7.1)
       stimulus-rails
       turbo-rails
+    net-http (0.6.0)
+      uri
     net-imap (0.5.8)
       date
       net-protocol
@@ -276,6 +297,9 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.9-x86_64-linux-musl)
       racc (~> 1.4)
+    octokit (9.2.0)
+      faraday (>= 1, < 3)
+      sawyer (~> 0.9)
     openssl (3.3.0)
     openssl-signature_algorithm (1.3.0)
       openssl (> 2.0)
@@ -285,6 +309,7 @@ GEM
     parser (3.3.8.0)
       ast (~> 2.4.1)
       racc
+    pathname-common_prefix (0.0.2)
     pdf-core (0.10.0)
     pdf-inspector (1.3.0)
       pdf-reader (>= 1.0, < 3.0.a)
@@ -374,6 +399,8 @@ GEM
     regexp_parser (2.10.0)
     reline (0.6.1)
       io-console (~> 0.5)
+    reverse_markdown (3.0.0)
+      nokogiri
     rexml (3.4.1)
     rqrcode (3.1.0)
       chunky_png (~> 1.0)
@@ -429,8 +456,13 @@ GEM
     ruby-vips (2.2.3)
       ffi (~> 1.12)
       logger
+    ruby-xxHash (0.4.0.2)
+    rugged (1.9.0)
     safety_net_attestation (0.4.0)
       jwt (~> 2.0)
+    sawyer (0.9.2)
+      addressable (>= 2.3.5)
+      faraday (>= 0.17.3, < 3)
     securerandom (0.4.1)
     sentry-rails (5.26.0)
       railties (>= 5.0)
@@ -508,6 +540,7 @@ GEM
       yard-sorbet
     thor (1.4.0)
     timeout (0.4.3)
+    tomlrb (2.0.3)
     tpm-key_attestation (0.14.1)
       bindata (~> 2.4)
       openssl (> 2.0)
@@ -577,6 +610,7 @@ DEPENDENCIES
   factory_bot_rails
   image_processing (~> 1.12)
   importmap-rails (~> 2.1)
+  licensed (~> 5.0)
   mission_control-jobs (~> 1.0)
   openssl (= 3.3.0)
   parallel_tests

@@ -1,0 +1,818 @@
+{
+  "generated_at": "2025-08-05T23:33:53",
+  "total_dependencies": 116,
+  "dependencies": [
+    {
+      "name": "actioncable",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "WebSocket framework for Rails."
+    },
+    {
+      "name": "actionmailbox",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "Inbound email handling framework."
+    },
+    {
+      "name": "actionmailer",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "Email composition and delivery framework (part of Rails)."
+    },
+    {
+      "name": "actionpack",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "Web-flow and rendering framework putting the VC in MVC (part of Rails)."
+    },
+    {
+      "name": "actiontext",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "Rich text framework."
+    },
+    {
+      "name": "actionview",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "Rendering framework putting the V in MVC (part of Rails)."
+    },
+    {
+      "name": "activejob",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "Job framework with pluggable queues."
+    },
+    {
+      "name": "activemodel",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "A toolkit for building modeling frameworks (part of Rails)."
+    },
+    {
+      "name": "activerecord",
+      "version": "8.0.2",
+      "license": "other",
+      "homepage": "https://rubyonrails.org",
+      "summary": "Object-relational mapper framework (part of Rails)."
+    },
+    {
+      "name": "activestorage",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "Local and cloud file storage framework."
+    },
+    {
+      "name": "activesupport",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework."
+    },
+    {
+      "name": "android_key_attestation",
+      "version": "0.3.0",
+      "license": "mit",
+      "homepage": "https://github.com/bdewater/android_key_attestation",
+      "summary": "Android key attestation verification"
+    },
+    {
+      "name": "aws-eventstream",
+      "version": "1.4.0",
+      "license": "apache-2.0",
+      "homepage": "https://github.com/aws/aws-sdk-ruby",
+      "summary": "AWS Event Stream Library"
+    },
+    {
+      "name": "aws-partitions",
+      "version": "1.1138.0",
+      "license": "apache-2.0",
+      "homepage": "https://github.com/aws/aws-sdk-ruby",
+      "summary": "Provides information about AWS partitions, regions, and services."
+    },
+    {
+      "name": "aws-sdk-core",
+      "version": "3.228.0",
+      "license": "apache-2.0",
+      "homepage": "https://github.com/aws/aws-sdk-ruby",
+      "summary": "AWS SDK for Ruby - Core"
+    },
+    {
+      "name": "aws-sdk-kms",
+      "version": "1.108.0",
+      "license": "apache-2.0",
+      "homepage": "https://github.com/aws/aws-sdk-ruby",
+      "summary": "AWS SDK for Ruby - KMS"
+    },
+    {
+      "name": "aws-sdk-s3",
+      "version": "1.196.0",
+      "license": "apache-2.0",
+      "homepage": "https://github.com/aws/aws-sdk-ruby",
+      "summary": "AWS SDK for Ruby - Amazon S3"
+    },
+    {
+      "name": "aws-sigv4",
+      "version": "1.12.1",
+      "license": "apache-2.0",
+      "homepage": "https://github.com/aws/aws-sdk-ruby",
+      "summary": "AWS Signature Version 4 library."
+    },
+    {
+      "name": "base64",
+      "version": "0.3.0",
+      "license": "other",
+      "homepage": "https://github.com/ruby/base64",
+      "summary": "Support for encoding and decoding binary data using a Base64 representation."
+    },
+    {
+      "name": "bcrypt",
+      "version": "3.1.20",
+      "license": "other",
+      "homepage": "https://github.com/bcrypt-ruby/bcrypt-ruby",
+      "summary": "OpenBSD's bcrypt() password hashing algorithm."
+    },
+    {
+      "name": "benchmark",
+      "version": "0.4.0",
+      "license": "other",
+      "homepage": "https://github.com/ruby/benchmark",
+      "summary": "a performance benchmarking library"
+    },
+    {
+      "name": "bigdecimal",
+      "version": "3.1.9",
+      "license": "other",
+      "homepage": "https://github.com/ruby/bigdecimal",
+      "summary": "Arbitrary-precision decimal floating-point number library."
+    },
+    {
+      "name": "bindata",
+      "version": "2.5.1",
+      "license": "bsd-2-clause",
+      "homepage": "https://github.com/dmendel/bindata",
+      "summary": "A declarative way to read and write binary file formats"
+    },
+    {
+      "name": "builder",
+      "version": "3.3.0",
+      "license": "mit",
+      "homepage": "https://github.com/rails/builder",
+      "summary": "Builders for MarkUp."
+    },
+    {
+      "name": "bundler",
+      "version": "2.6.7",
+      "license": "other",
+      "homepage": "https://bundler.io",
+      "summary": "The best way to manage your application's dependencies"
+    },
+    {
+      "name": "cbor",
+      "version": "0.5.9.9",
+      "license": "apache-2.0",
+      "homepage": "http://cbor.io/",
+      "summary": "CBOR, Concise Binary Object Representation."
+    },
+    {
+      "name": "chobble-forms",
+      "version": "0.5.1",
+      "license": "other",
+      "homepage": "https://github.com/chobbledotcom/chobble-forms",
+      "summary": "Semantic Rails forms with strict i18n"
+    },
+    {
+      "name": "chronic",
+      "version": "0.10.2",
+      "license": "mit",
+      "homepage": "http://github.com/mojombo/chronic",
+      "summary": "Natural language date/time parsing."
+    },
+    {
+      "name": "chunky_png",
+      "version": "1.4.0",
+      "license": "mit",
+      "homepage": "https://github.com/wvanbergen/chunky_png/wiki",
+      "summary": "Pure ruby library for read/write, chunk-level access to PNG files"
+    },
+    {
+      "name": "concurrent-ruby",
+      "version": "1.3.5",
+      "license": "other",
+      "homepage": "http://www.concurrent-ruby.com",
+      "summary": "Modern concurrency tools for Ruby. Inspired by Erlang, Clojure, Scala, Haskell, F#, C#, Java, and classic concurrency patterns."
+    },
+    {
+      "name": "connection_pool",
+      "version": "2.5.3",
+      "license": "mit",
+      "homepage": "https://github.com/mperham/connection_pool",
+      "summary": "Generic connection pool for Ruby"
+    },
+    {
+      "name": "cose",
+      "version": "1.3.1",
+      "license": "mit",
+      "homepage": "https://github.com/cedarcode/cose-ruby",
+      "summary": "Ruby implementation of RFC 8152 CBOR Object Signing and Encryption (COSE)"
+    },
+    {
+      "name": "crass",
+      "version": "1.0.6",
+      "license": "mit",
+      "homepage": "https://github.com/rgrove/crass/",
+      "summary": "CSS parser based on the CSS Syntax Level 3 spec."
+    },
+    {
+      "name": "csv",
+      "version": "3.3.5",
+      "license": "other",
+      "homepage": "https://github.com/ruby/csv",
+      "summary": "CSV Reading and Writing"
+    },
+    {
+      "name": "date",
+      "version": "3.4.1",
+      "license": "other",
+      "homepage": "https://github.com/ruby/date",
+      "summary": "A subclass of Object includes Comparable module for handling dates."
+    },
+    {
+      "name": "dotenv",
+      "version": "3.1.8",
+      "license": "mit",
+      "homepage": "https://github.com/bkeepers/dotenv",
+      "summary": "Loads environment variables from `.env`."
+    },
+    {
+      "name": "dotenv-rails",
+      "version": "3.1.8",
+      "license": "mit",
+      "homepage": "https://github.com/bkeepers/dotenv",
+      "summary": "Autoload dotenv in Rails."
+    },
+    {
+      "name": "drb",
+      "version": "2.2.1",
+      "license": "other",
+      "homepage": "https://github.com/ruby/drb",
+      "summary": "Distributed object system for Ruby"
+    },
+    {
+      "name": "en14960",
+      "version": "0.2.0",
+      "license": "other",
+      "homepage": "https://github.com/chobbledotcom/en14960",
+      "summary": "BS EN 14960:2019 safety standard calculators for inflatable play equipment"
+    },
+    {
+      "name": "erubi",
+      "version": "1.13.1",
+      "license": "mit",
+      "homepage": "https://github.com/jeremyevans/erubi",
+      "summary": "Small ERB Implementation"
+    },
+    {
+      "name": "et-orbi",
+      "version": "1.2.11",
+      "license": "mit",
+      "homepage": "https://github.com/floraison/et-orbi",
+      "summary": "time with zones"
+    },
+    {
+      "name": "ffi",
+      "version": "1.17.2",
+      "license": "other",
+      "homepage": "https://github.com/ffi/ffi/wiki",
+      "summary": "Ruby FFI"
+    },
+    {
+      "name": "fugit",
+      "version": "1.11.1",
+      "license": "mit",
+      "homepage": "https://github.com/floraison/fugit",
+      "summary": "time tools for flor"
+    },
+    {
+      "name": "globalid",
+      "version": "1.2.1",
+      "license": "mit",
+      "homepage": "http://www.rubyonrails.org",
+      "summary": "Refer to any model with a URI: gid://app/class/id"
+    },
+    {
+      "name": "i18n",
+      "version": "1.14.7",
+      "license": "mit",
+      "homepage": "https://github.com/ruby-i18n/i18n",
+      "summary": "New wave Internationalization support for Ruby"
+    },
+    {
+      "name": "image_processing",
+      "version": "1.14.0",
+      "license": "mit",
+      "homepage": "https://github.com/janko/image_processing",
+      "summary": "High-level wrapper for processing images for the web with ImageMagick or libvips."
+    },
+    {
+      "name": "importmap-rails",
+      "version": "2.2.2",
+      "license": "mit",
+      "homepage": "https://github.com/rails/importmap-rails",
+      "summary": "Use ESM with importmap to manage modern JavaScript in Rails without transpiling or bundling."
+    },
+    {
+      "name": "io-console",
+      "version": "0.8.0",
+      "license": "other",
+      "homepage": "https://github.com/ruby/io-console",
+      "summary": "Console interface"
+    },
+    {
+      "name": "irb",
+      "version": "1.15.2",
+      "license": "other",
+      "homepage": "https://github.com/ruby/irb",
+      "summary": "Interactive Ruby command-line tool for REPL (Read Eval Print Loop)."
+    },
+    {
+      "name": "jmespath",
+      "version": "1.6.2",
+      "license": "apache-2.0",
+      "homepage": "http://github.com/trevorrowe/jmespath.rb",
+      "summary": "JMESPath - Ruby Edition"
+    },
+    {
+      "name": "jwt",
+      "version": "2.10.2",
+      "license": "other",
+      "homepage": "https://github.com/jwt/ruby-jwt",
+      "summary": "JSON Web Token implementation in Ruby"
+    },
+    {
+      "name": "logger",
+      "version": "1.7.0",
+      "license": "other",
+      "homepage": "https://github.com/ruby/logger",
+      "summary": "Provides a simple logging utility for outputting messages."
+    },
+    {
+      "name": "loofah",
+      "version": "2.24.0",
+      "license": "mit",
+      "homepage": "https://github.com/flavorjones/loofah",
+      "summary": "Loofah is a general library for manipulating and transforming HTML/XML documents and fragments, built on top of Nokogiri."
+    },
+    {
+      "name": "mail",
+      "version": "2.8.1",
+      "license": "mit",
+      "homepage": "https://github.com/mikel/mail",
+      "summary": "Mail provides a nice Ruby DSL for making, sending and reading emails."
+    },
+    {
+      "name": "marcel",
+      "version": "1.0.4",
+      "license": "other",
+      "homepage": "https://github.com/rails/marcel",
+      "summary": "Simple mime type detection using magic numbers, filenames, and extensions"
+    },
+    {
+      "name": "matrix",
+      "version": "0.4.2",
+      "license": "other",
+      "homepage": "https://github.com/ruby/matrix",
+      "summary": "An implementation of Matrix and Vector classes."
+    },
+    {
+      "name": "mini_magick",
+      "version": "5.2.0",
+      "license": "mit",
+      "homepage": "https://github.com/minimagick/minimagick",
+      "summary": "Manipulate images with minimal use of memory via ImageMagick"
+    },
+    {
+      "name": "mini_mime",
+      "version": "1.1.5",
+      "license": "mit",
+      "homepage": "https://github.com/discourse/mini_mime",
+      "summary": "A minimal mime type library"
+    },
+    {
+      "name": "minitest",
+      "version": "5.25.5",
+      "license": "mit",
+      "homepage": "https://github.com/minitest/minitest",
+      "summary": "minitest provides a complete suite of testing facilities supporting TDD, BDD, mocking, and benchmarking"
+    },
+    {
+      "name": "mission_control-jobs",
+      "version": "1.1.0",
+      "license": "mit",
+      "homepage": "https://github.com/rails/mission_control-jobs",
+      "summary": "Operational controls for Active Job"
+    },
+    {
+      "name": "net-imap",
+      "version": "0.5.8",
+      "license": "other",
+      "homepage": "https://github.com/ruby/net-imap",
+      "summary": "Ruby client api for Internet Message Access Protocol"
+    },
+    {
+      "name": "net-pop",
+      "version": "0.1.2",
+      "license": "other",
+      "homepage": "https://github.com/ruby/net-pop",
+      "summary": "Ruby client library for POP3."
+    },
+    {
+      "name": "net-protocol",
+      "version": "0.2.2",
+      "license": "other",
+      "homepage": "https://github.com/ruby/net-protocol",
+      "summary": "The abstract interface for net-* client."
+    },
+    {
+      "name": "net-smtp",
+      "version": "0.5.1",
+      "license": "other",
+      "homepage": "https://github.com/ruby/net-smtp",
+      "summary": "Simple Mail Transfer Protocol client library for Ruby."
+    },
+    {
+      "name": "nio4r",
+      "version": "2.7.4",
+      "license": "other",
+      "homepage": "https://github.com/socketry/nio4r",
+      "summary": "New IO for Ruby"
+    },
+    {
+      "name": "nokogiri",
+      "version": "1.18.9",
+      "license": "other",
+      "homepage": "https://nokogiri.org",
+      "summary": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby."
+    },
+    {
+      "name": "openssl",
+      "version": "3.3.0",
+      "license": "other",
+      "homepage": "https://github.com/ruby/openssl",
+      "summary": "SSL/TLS and general-purpose cryptography for Ruby"
+    },
+    {
+      "name": "openssl-signature_algorithm",
+      "version": "1.3.0",
+      "license": "apache-2.0",
+      "homepage": "https://github.com/cedarcode/openssl-signature_algorithm",
+      "summary": "ECDSA, EdDSA, RSA-PSS and RSA-PKCS#1 algorithms for ruby"
+    },
+    {
+      "name": "pdf-core",
+      "version": "0.10.0",
+      "license": "other",
+      "homepage": "http://prawnpdf.org/",
+      "summary": "Low level PDF generator."
+    },
+    {
+      "name": "pp",
+      "version": "0.6.2",
+      "license": "other",
+      "homepage": "https://github.com/ruby/pp",
+      "summary": "Provides a PrettyPrinter for Ruby objects"
+    },
+    {
+      "name": "prawn",
+      "version": "2.5.0",
+      "license": "other",
+      "homepage": "http://prawnpdf.org/",
+      "summary": "A fast and nimble PDF generator for Ruby"
+    },
+    {
+      "name": "prawn-table",
+      "version": "0.2.2",
+      "license": "other",
+      "homepage": "https://github.com/prawnpdf/prawn-table",
+      "summary": "Provides tables for PrawnPDF"
+    },
+    {
+      "name": "prettyprint",
+      "version": "0.2.0",
+      "license": "other",
+      "homepage": "https://github.com/ruby/prettyprint",
+      "summary": "Implements a pretty printing algorithm for readable structure."
+    },
+    {
+      "name": "psych",
+      "version": "5.2.3",
+      "license": "mit",
+      "homepage": "https://github.com/ruby/psych",
+      "summary": "Psych is a YAML parser and emitter"
+    },
+    {
+      "name": "puma",
+      "version": "6.6.1",
+      "license": "bsd-3-clause",
+      "homepage": "https://puma.io",
+      "summary": "A Ruby/Rack web server built for parallelism."
+    },
+    {
+      "name": "raabro",
+      "version": "1.4.0",
+      "license": "mit",
+      "homepage": "https://github.com/floraison/raabro",
+      "summary": "a very dumb PEG parser library"
+    },
+    {
+      "name": "racc",
+      "version": "1.8.1",
+      "license": "other",
+      "homepage": "https://github.com/ruby/racc",
+      "summary": "Racc is an LALR(1) parser generator"
+    },
+    {
+      "name": "rack",
+      "version": "3.1.16",
+      "license": "mit",
+      "homepage": "https://github.com/rack/rack",
+      "summary": "A modular Ruby webserver interface."
+    },
+    {
+      "name": "rack-cors",
+      "version": "3.0.0",
+      "license": "mit",
+      "homepage": "https://github.com/cyu/rack-cors",
+      "summary": "Middleware for enabling Cross-Origin Resource Sharing in Rack apps"
+    },
+    {
+      "name": "rack-session",
+      "version": "2.1.1",
+      "license": "mit",
+      "homepage": "https://github.com/rack/rack-session",
+      "summary": "A session implementation for Rack."
+    },
+    {
+      "name": "rack-test",
+      "version": "2.2.0",
+      "license": "mit",
+      "homepage": "https://github.com/rack/rack-test",
+      "summary": "Simple testing API built on Rack"
+    },
+    {
+      "name": "rackup",
+      "version": "2.2.1",
+      "license": "mit",
+      "homepage": "https://github.com/rack/rackup",
+      "summary": "A general server command for Rack applications."
+    },
+    {
+      "name": "rails",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "Full-stack web application framework."
+    },
+    {
+      "name": "rails-dom-testing",
+      "version": "2.2.0",
+      "license": "mit",
+      "homepage": "https://github.com/rails/rails-dom-testing",
+      "summary": "Dom and Selector assertions for Rails applications"
+    },
+    {
+      "name": "rails-html-sanitizer",
+      "version": "1.6.2",
+      "license": "mit",
+      "homepage": "https://github.com/rails/rails-html-sanitizer",
+      "summary": "This gem is responsible to sanitize HTML fragments in Rails applications."
+    },
+    {
+      "name": "railties",
+      "version": "8.0.2",
+      "license": "mit",
+      "homepage": "https://rubyonrails.org",
+      "summary": "Tools for creating, working with, and running Rails applications."
+    },
+    {
+      "name": "rake",
+      "version": "13.2.1",
+      "license": "mit",
+      "homepage": "https://github.com/ruby/rake",
+      "summary": "Rake is a Make-like program implemented in Ruby"
+    },
+    {
+      "name": "rdoc",
+      "version": "6.13.1",
+      "license": "other",
+      "homepage": "https://ruby.github.io/rdoc",
+      "summary": "RDoc produces HTML and command-line documentation for Ruby projects"
+    },
+    {
+      "name": "reline",
+      "version": "0.6.1",
+      "license": "other",
+      "homepage": "https://github.com/ruby/reline",
+      "summary": "Alternative GNU Readline or Editline implementation by pure Ruby."
+    },
+    {
+      "name": "rqrcode",
+      "version": "3.1.0",
+      "license": "mit",
+      "homepage": "https://github.com/whomwah/rqrcode",
+      "summary": "A library to encode QR Codes"
+    },
+    {
+      "name": "rqrcode_core",
+      "version": "2.0.0",
+      "license": "mit",
+      "homepage": "https://github.com/whomwah/rqrcode_core",
+      "summary": "A library to encode QR Codes"
+    },
+    {
+      "name": "ruby-vips",
+      "version": "2.2.3",
+      "license": "mit",
+      "homepage": "http://github.com/libvips/ruby-vips",
+      "summary": "A fast image processing library with low memory needs"
+    },
+    {
+      "name": "safety_net_attestation",
+      "version": "0.4.0",
+      "license": "mit",
+      "homepage": "https://github.com/bdewater/safety_net_attestation",
+      "summary": "SafetyNet attestation response verification"
+    },
+    {
+      "name": "securerandom",
+      "version": "0.4.1",
+      "license": "other",
+      "homepage": "https://github.com/ruby/securerandom",
+      "summary": "Interface for secure random number generator."
+    },
+    {
+      "name": "sentry-rails",
+      "version": "5.26.0",
+      "license": "mit",
+      "homepage": "https://github.com/getsentry/sentry-ruby/tree/5.26.0/sentry-rails",
+      "summary": "A gem that provides Rails integration for the Sentry error logger"
+    },
+    {
+      "name": "sentry-ruby",
+      "version": "5.26.0",
+      "license": "mit",
+      "homepage": "https://github.com/getsentry/sentry-ruby/tree/5.26.0/sentry-ruby",
+      "summary": "A gem that provides a client interface for the Sentry error logger"
+    },
+    {
+      "name": "solid_queue",
+      "version": "1.2.1",
+      "license": "mit",
+      "homepage": "https://github.com/rails/solid_queue",
+      "summary": "Database-backed Active Job backend."
+    },
+    {
+      "name": "sorbet-runtime",
+      "version": "0.5.12016",
+      "license": "apache-2.0",
+      "homepage": "https://sorbet.org",
+      "summary": "Sorbet runtime"
+    },
+    {
+      "name": "sprockets",
+      "version": "4.2.2",
+      "license": "mit",
+      "homepage": "https://github.com/rails/sprockets",
+      "summary": "Rack-based asset packaging system"
+    },
+    {
+      "name": "sprockets-rails",
+      "version": "3.5.2",
+      "license": "mit",
+      "homepage": "https://github.com/rails/sprockets-rails",
+      "summary": "Sprockets Rails integration"
+    },
+    {
+      "name": "sqlite3",
+      "version": "2.7.3",
+      "license": "bsd-3-clause",
+      "homepage": "https://github.com/sparklemotion/sqlite3-ruby",
+      "summary": "Ruby library to interface with the SQLite3 database engine (http://www.sqlite.org)."
+    },
+    {
+      "name": "stimulus-rails",
+      "version": "1.3.4",
+      "license": "mit",
+      "homepage": "https://stimulus.hotwired.dev",
+      "summary": "A modest JavaScript framework for the HTML you already have."
+    },
+    {
+      "name": "stringio",
+      "version": "3.1.7",
+      "license": "other",
+      "homepage": "https://github.com/ruby/stringio",
+      "summary": "Pseudo IO on String"
+    },
+    {
+      "name": "thor",
+      "version": "1.4.0",
+      "license": "mit",
+      "homepage": "http://whatisthor.com/",
+      "summary": "Thor is a toolkit for building powerful command-line interfaces."
+    },
+    {
+      "name": "timeout",
+      "version": "0.4.3",
+      "license": "other",
+      "homepage": "https://github.com/ruby/timeout",
+      "summary": "Auto-terminate potentially long-running operations in Ruby."
+    },
+    {
+      "name": "tpm-key_attestation",
+      "version": "0.14.1",
+      "license": "apache-2.0",
+      "homepage": "https://github.com/cedarcode/tpm-key_attestation",
+      "summary": "TPM Key Attestation verifier"
+    },
+    {
+      "name": "ttfunk",
+      "version": "1.8.0",
+      "license": "other",
+      "homepage": "http://prawnpdf.org/",
+      "summary": "TrueType Font Metrics Parser"
+    },
+    {
+      "name": "turbo-rails",
+      "version": "2.0.13",
+      "license": "mit",
+      "homepage": "https://github.com/hotwired/turbo-rails",
+      "summary": "The speed of a single-page web application without having to write any JavaScript."
+    },
+    {
+      "name": "tzinfo",
+      "version": "2.0.6",
+      "license": "mit",
+      "homepage": "https://tzinfo.github.io",
+      "summary": "Time Zone Library"
+    },
+    {
+      "name": "uri",
+      "version": "1.0.3",
+      "license": "other",
+      "homepage": "https://github.com/ruby/uri",
+      "summary": "URI is a module providing classes to handle Uniform Resource Identifiers"
+    },
+    {
+      "name": "useragent",
+      "version": "0.16.11",
+      "license": "mit",
+      "homepage": "https://github.com/gshutler/useragent",
+      "summary": "HTTP User Agent parser"
+    },
+    {
+      "name": "webauthn",
+      "version": "3.4.1",
+      "license": "mit",
+      "homepage": "https://github.com/cedarcode/webauthn-ruby",
+      "summary": "WebAuthn ruby server library"
+    },
+    {
+      "name": "websocket-driver",
+      "version": "0.7.7",
+      "license": "other",
+      "homepage": "https://github.com/faye/websocket-driver-ruby",
+      "summary": "WebSocket protocol handler with pluggable I/O"
+    },
+    {
+      "name": "websocket-extensions",
+      "version": "0.1.5",
+      "license": "other",
+      "homepage": "https://github.com/faye/websocket-extensions-ruby",
+      "summary": "Generic extension manager for WebSocket connections"
+    },
+    {
+      "name": "whenever",
+      "version": "1.0.0",
+      "license": "mit",
+      "homepage": "https://github.com/javan/whenever",
+      "summary": "Cron jobs in ruby."
+    },
+    {
+      "name": "zeitwerk",
+      "version": "2.7.2",
+      "license": "mit",
+      "homepage": "https://github.com/fxn/zeitwerk",
+      "summary": "Efficient and thread-safe constant autoloader"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+---
+name: rackup
+version: 2.2.1
+type: bundler
+summary: A general server command for Rack applications.
+homepage: https://github.com/rack/rackup
+license: mit
+licenses:
+- sources: license.md
+  text: "# MIT License\n\nCopyright, 2007-2009, by Leah Neukirchen.  \nCopyright,
+    2008, by Marc-André Cournoyer.  \nCopyright, 2009, by Aaron Pfeifer.  \nCopyright,
+    2009-2010, by Megan Batty.  \nCopyright, 2009-2010, by Michael Fellinger.  \nCopyright,
+    2009, by Genki Takiuchi.  \nCopyright, 2009, by Joshua Peek.  \nCopyright, 2009,
+    by Yehuda Katz.  \nCopyright, 2009, by Carl Lerche.  \nCopyright, 2010, by Julik
+    Tarkhanov.  \nCopyright, 2010-2016, by James Tucker.  \nCopyright, 2010, by Timur
+    Batyrshin.  \nCopyright, 2010, by Loren Segal.  \nCopyright, 2010, by Andrew Bortz.
+    \ \nCopyright, 2010, by John Barnette.  \nCopyright, 2010, by John Sumsion.  \nCopyright,
+    2011-2018, by Aaron Patterson.  \nCopyright, 2011, by Konstantin Haase.  \nCopyright,
+    2011, by Blake Mizerany.  \nCopyright, 2011, by Tsutomu Kuroda.  \nCopyright,
+    2012, by Jean Boussier.  \nCopyright, 2012, by Trevor Wennblom.  \nCopyright,
+    2012, by Anurag Priyam.  \nCopyright, 2012, by Hrvoje Šimić.  \nCopyright, 2013,
+    by Uchio Kondo.  \nCopyright, 2013, by Tim Moore.  \nCopyright, 2013, by Hal Brodigan.
+    \ \nCopyright, 2013, by Bas Vodde.  \nCopyright, 2013, by Joe Fiorini.  \nCopyright,
+    2014, by Wyatt Pan.  \nCopyright, 2014, by Lenny Marks.  \nCopyright, 2014, by
+    Igor Bochkariov.  \nCopyright, 2014, by Max Cantor.  \nCopyright, 2014, by David
+    Celis.  \nCopyright, 2014-2019, by Rafael França.  \nCopyright, 2014, by Jeremy
+    Kemper.  \nCopyright, 2014, by Richard Schneeman.  \nCopyright, 2015, by Peter
+    Wilmott.  \nCopyright, 2015, by Sean McGivern.  \nCopyright, 2015, by Tadashi
+    Saito.  \nCopyright, 2015, by Martin Hrdlicka.  \nCopyright, 2015, by Zachary
+    Scott.  \nCopyright, 2016, by Sophie Deziel.  \nCopyright, 2016, by Kazuya Hotta.
+    \ \nCopyright, 2017, by Ryunosuke Sato.  \nCopyright, 2017-2024, by Samuel Williams.
+    \ \nCopyright, 2018, by Dillon Welch.  \nCopyright, 2018, by Yoshiyuki Hirano.
+    \ \nCopyright, 2018, by Nick LaMuro.  \nCopyright, 2019, by Krzysztof Rybka.  \nCopyright,
+    2019, by Misaki Shioi.  \nCopyright, 2020-2022, by Jeremy Evans.  \nCopyright,
+    2021, by Katsuhiko Yoshida.  \nCopyright, 2021, by Kang Sheng.  \nCopyright, 2021,
+    by Stephen Paul Weber.  \nCopyright, 2022, by Akira Matsuda.  \nCopyright, 2022,
+    by Andrew Hoglund.  \nCopyright, 2024, by Olle Jonsson.  \nCopyright, 2024, by
+    Geremia Taglialatela.  \nCopyright, 2024, by Petrik de Heus.  \n\nPermission is
+    hereby granted, free of charge, to any person obtaining a copy\nof this software
+    and associated documentation files (the \"Software\"), to deal\nin the Software
+    without restriction, including without limitation the rights\nto use, copy, modify,
+    merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and
+    to permit persons to whom the Software is\nfurnished to do so, subject to the
+    following conditions:\n\nThe above copyright notice and this permission notice
+    shall be included in all\ncopies or substantial portions of the Software.\n\nTHE
+    SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED,
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A
+    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION
+    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+notices: []

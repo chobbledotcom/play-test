@@ -1,0 +1,13 @@
+---
+name: net-smtp
+version: 0.5.1
+type: bundler
+summary: Simple Mail Transfer Protocol client library for Ruby.
+homepage: https://github.com/ruby/net-smtp
+license: other
+licenses:
+- sources: LICENSE.txt
+  text: |
+    All the files in this distribution are covered under either the Ruby license or
+    the BSD-2-Clause license (see the file COPYING).
+notices: []
