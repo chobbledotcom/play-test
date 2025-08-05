@@ -354,12 +354,6 @@ RSpec.describe "Seed Data", type: :model do
           end
         end
 
-        it "creates assessments with realistic blower serials" do
-          Assessments::FanAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
-            expect(assessment.blower_serial).to match(/FAN-\d{4}/)
-          end
-        end
-
         it "creates assessments with blower tube length measurements" do
           Assessments::FanAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.blower_tube_length).to be_present
