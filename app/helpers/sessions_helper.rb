@@ -23,15 +23,44 @@ module SessionsHelper
 
   sig { returns(T.nilable(User)) }
   def current_user
-    if session[:user_id]
-      @current_user ||= User.find_by(id: session[:user_id])
+    @current_user ||= fetch_current_user
+  end
+
+  private
+
+  sig { returns(T.nilable(User)) }
+  def fetch_current_user
+    if session[:session_token]
+      user_from_session_token
+    elsif session[:user_id]
+      User.find_by(id: session[:user_id])
     elsif cookies.signed[:user_id]
-      user = User.find_by(id: cookies.signed[:user_id])
-      return unless user
-      log_in user
-      @current_user = user
+      user_from_cookie
     end
   end
+
+  sig { returns(T.nilable(User)) }
+  def user_from_session_token
+    user_session = UserSession.find_by(session_token: session[:session_token])
+    if user_session
+      user_session.user
+    else
+      # Session token is invalid, clear session
+      session.delete(:user_id)
+      session.delete(:session_token)
+      nil
+    end
+  end
+
+  sig { returns(T.nilable(User)) }
+  def user_from_cookie
+    user = User.find_by(id: cookies.signed[:user_id])
+    return unless user
+    log_in user
+    user
+  end
+
+  public
 
   sig { returns(T::Boolean) }
   def logged_in?

@@ -77,8 +77,7 @@ class ApplicationController < ActionController::Base
 
     # Update UserSession last_active_at
     if session[:session_token]
-      token = session[:session_token]
-      UserSession.find_by(session_token: token)&.touch_last_active
+      current_session&.touch_last_active
     end
   end
 
