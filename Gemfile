@@ -61,7 +61,7 @@ group :development, :test do
   # Sorbet type checker (development only)
   gem "sorbet", require: false
   gem "tapioca", require: false
-  
+
   # Rubocop extension for Sorbet
   gem "rubocop-sorbet", require: false
 end
