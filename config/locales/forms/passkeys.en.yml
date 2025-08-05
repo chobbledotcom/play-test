@@ -2,14 +2,12 @@ en:
   forms:
     passkeys:
       header: "Passkeys"
+      fields:
       sections:
         manage: "Manage Passkeys"
-      table_headers:
-        nickname: "Nickname"
-        actions: "Actions"
       buttons:
+        register: "Register new passkey"
         delete: "Delete"
-        register_new: "Register new passkey"
       messages:
         no_passkeys: "You haven't registered any passkeys yet."
         confirm_delete: "Are you sure you want to delete this passkey?"

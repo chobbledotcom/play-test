@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 unless ENV["DISABLE_SIMPLECOV"] == "true"
   require "simplecov"
 
@@ -38,6 +40,12 @@ end
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
+  require "active_storage"
+
+  ActiveStorage::Current.url_options = {
+    host: "play-test.co.uk"
+  }
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
