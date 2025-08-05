@@ -4,9 +4,9 @@
 }
 
 .link-button {
-  background: none;
-  border: none;
-  color: var(--color-link);
+  background: none !important;
+  border: none !important;
+  color: var(--color-link) !important;
   cursor: pointer;
   font-size: 0.9rem;
   text-decoration: underline;
