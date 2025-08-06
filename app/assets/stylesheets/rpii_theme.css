@@ -122,7 +122,7 @@
   height: 89px;
 }
 
-.rpii main form:not(".button-to") {
+.rpii main form:not(.button-to) {
   background: white;
   border-image: linear-gradient(
       to right,
