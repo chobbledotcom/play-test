@@ -1,6 +1,6 @@
 {
-  "generated_at": "2025-08-05T23:33:53",
-  "total_dependencies": 116,
+  "generated_at": "2025-08-06T02:54:34",
+  "total_dependencies": 121,
   "dependencies": [
     {
       "name": "actioncable",
@@ -162,6 +162,13 @@
       "license": "bsd-2-clause",
       "homepage": "https://github.com/dmendel/bindata",
       "summary": "A declarative way to read and write binary file formats"
+    },
+    {
+      "name": "blueprinter",
+      "version": "1.1.2",
+      "license": "mit",
+      "homepage": "https://github.com/procore-oss/blueprinter",
+      "summary": "Simple Fast Declarative Serialization Library"
     },
     {
       "name": "builder",
@@ -654,6 +661,27 @@
       "summary": "SafetyNet attestation response verification"
     },
     {
+      "name": "sass-rails",
+      "version": "6.0.0",
+      "license": "mit",
+      "homepage": "https://github.com/rails/sass-rails",
+      "summary": "Sass adapter for the Rails asset pipeline."
+    },
+    {
+      "name": "sassc",
+      "version": "2.4.0",
+      "license": "mit",
+      "homepage": "https://github.com/sass/sassc-ruby",
+      "summary": "Use libsass with Ruby!"
+    },
+    {
+      "name": "sassc-rails",
+      "version": "2.1.2",
+      "license": "mit",
+      "homepage": "https://github.com/sass/sassc-rails",
+      "summary": "Integrate SassC-Ruby into Rails."
+    },
+    {
       "name": "securerandom",
       "version": "0.4.1",
       "license": "other",
@@ -729,6 +757,13 @@
       "license": "mit",
       "homepage": "http://whatisthor.com/",
       "summary": "Thor is a toolkit for building powerful command-line interfaces."
+    },
+    {
+      "name": "tilt",
+      "version": "2.6.1",
+      "license": "mit",
+      "homepage": "https://github.com/jeremyevans/tilt",
+      "summary": "Generic interface to multiple Ruby template engines"
     },
     {
       "name": "timeout",

@@ -2,8 +2,8 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2025-08-05
-Total dependencies: 116
+Generated on: 2025-08-06
+Total dependencies: 121
 
 ## Dependencies by License
 
@@ -69,7 +69,7 @@ Total dependencies: 116
   - Ruby library to interface with the SQLite3 database engine (http://www.sqlite.org).
   - Homepage: https://github.com/sparklemotion/sqlite3-ruby
 
-### MIT (61 dependencies)
+### MIT (66 dependencies)
 
 - **actioncable** v8.0.2
   - WebSocket framework for Rails.
@@ -114,6 +114,10 @@ Total dependencies: 116
 - **android_key_attestation** v0.3.0
   - Android key attestation verification
   - Homepage: https://github.com/bdewater/android_key_attestation
+
+- **blueprinter** v1.1.2
+  - Simple Fast Declarative Serialization Library
+  - Homepage: https://github.com/procore-oss/blueprinter
 
 - **builder** v3.3.0
   - Builders for MarkUp.
@@ -263,6 +267,18 @@ Total dependencies: 116
   - SafetyNet attestation response verification
   - Homepage: https://github.com/bdewater/safety_net_attestation
 
+- **sass-rails** v6.0.0
+  - Sass adapter for the Rails asset pipeline.
+  - Homepage: https://github.com/rails/sass-rails
+
+- **sassc** v2.4.0
+  - Use libsass with Ruby!
+  - Homepage: https://github.com/sass/sassc-ruby
+
+- **sassc-rails** v2.1.2
+  - Integrate SassC-Ruby into Rails.
+  - Homepage: https://github.com/sass/sassc-rails
+
 - **sentry-rails** v5.26.0
   - A gem that provides Rails integration for the Sentry error logger
   - Homepage: https://github.com/getsentry/sentry-ruby/tree/5.26.0/sentry-rails
@@ -290,6 +306,10 @@ Total dependencies: 116
 - **thor** v1.4.0
   - Thor is a toolkit for building powerful command-line interfaces.
   - Homepage: http://whatisthor.com/
+
+- **tilt** v2.6.1
+  - Generic interface to multiple Ruby template engines
+  - Homepage: https://github.com/jeremyevans/tilt
 
 - **turbo-rails** v2.0.13
   - The speed of a single-page web application without having to write any JavaScript.
