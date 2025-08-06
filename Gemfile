@@ -36,7 +36,7 @@ group :development, :test do
 
   # N+1 query detection
   gem "prosopite"
-  gem "pg_query", "~> 5.1"
+  gem "pg_query"
 
   # Pinned for nixpkgs
   gem "rugged", "= 1.9.0"
