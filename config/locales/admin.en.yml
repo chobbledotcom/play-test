@@ -15,8 +15,4 @@ en:
         attached_to: "Attached To"
         created_at: "Created"
       attached_to:
-        inspection: "Inspection #%{id}"
-        unit: "Unit %{serial}"
-        page: "Page: %{title}"
-        other: "%{type} #%{id}"
         orphaned: "Orphaned"
