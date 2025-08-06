@@ -1,4 +1,5 @@
 # typed: false
+# frozen_string_literal: true
 
 require "rails_helper"
 
@@ -8,7 +9,6 @@ RSpec.feature "Search page", type: :feature do
 
     # Check that the search box is present with correct attributes
     within "#search" do
-      expect(page).to have_selector("form#homepage-search")
       expect(page).to have_field(type: "text", name: "id")
       expect(page).to have_button(type: "submit")
     end
@@ -20,7 +20,7 @@ RSpec.feature "Search page", type: :feature do
   scenario "can submit search form" do
     visit search_path
 
-    within "#homepage-search" do
+    within "#search" do
       fill_in "id", with: "ABC12345"
       click_button
     end
