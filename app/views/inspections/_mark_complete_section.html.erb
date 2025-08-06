@@ -6,6 +6,7 @@
       object: @inspection,
       object_type: 'inspection',
       description_key: 'assessments.incomplete_fields.description' %>
+    <p><i><%= t('inspections.messages.mark_complete_warning') %></i></p>
     <% if @inspection.incomplete_fields.empty? %>
       <%= button_to t('inspections.buttons.mark_complete'),
         complete_inspection_path(@inspection),
