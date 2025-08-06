@@ -198,7 +198,7 @@ class ApplicationController < ActionController::Base
   end
 
   def not_found
-    render file: "#{Rails.root}/app/views/errors/not_found.html.erb",
+    render file: Rails.root.join("app/views/errors/not_found.html.erb").to_s,
       layout: true,
       status: :not_found
   end
