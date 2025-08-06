@@ -98,7 +98,4 @@ Rails.application.routes.draw do
     to: "pages#show",
     as: :page_by_slug,
     constraints: {slug: /[^\/]+/}
-
-  # Catch all route for 404s - must be at the end
-  match "*path", to: "application#not_found", via: :all
 end
