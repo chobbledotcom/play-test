@@ -42,7 +42,7 @@ class UnitsController < ApplicationController
       format.pdf { send_unit_pdf }
       format.png { send_unit_qr_code }
       format.json do
-        render json: JsonSerializerService.serialize_unit(@unit)
+        render json: UnitBlueprint.render_with_inspections(@unit)
       end
     end
   end
