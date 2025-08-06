@@ -25,7 +25,11 @@
             <% blob.attachments.each do |attachment| %>
               <% if attachment.record %>
                 <% record = attachment.record %>
-                <%= link_to "#{record.class.name} ##{record.id}", record %>
+                <% if record.is_a?(ActiveStorage::VariantRecord) %>
+                  <%= t("admin.files.attached_to.variant_record", id: record.id) %>
+                <% else %>
+                  <%= link_to "#{record.class.name} ##{record.id}", record %>
+                <% end %>
               <% else %>
                 <%= t("admin.files.attached_to.orphaned") %>
               <% end %>
