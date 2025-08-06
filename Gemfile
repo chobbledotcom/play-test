@@ -51,10 +51,6 @@ group :development, :test do
   gem "parallel_tests"
   gem "database_cleaner-active_record"
 
-  # Ruby code formatter and linter
-  gem "standard", require: false
-  gem "standard-rails"
-
   # N+1 query detection
   gem "prosopite"
   gem "pg_query", "~> 5.1"
@@ -77,6 +73,12 @@ group :development, :test do
 
   # Pinned for nixpkgs
   gem "rugged", "= 1.9.0"
+end
+
+group :development do
+  # Ruby code formatter and linter
+  gem "standard", require: false
+  gem "standard-rails", require: false
 end
 
 group :test do
