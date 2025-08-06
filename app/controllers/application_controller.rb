@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   include SessionsHelper
   include ImageProcessable
 
-  before_action :require_login, except: [:not_found]
+  before_action :require_login
   before_action :update_last_active_at
 
   before_action :start_debug_timer, if: :admin_debug_enabled?
