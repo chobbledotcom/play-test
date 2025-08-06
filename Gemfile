@@ -70,7 +70,7 @@ end
 group :test do
   # RSpec matchers for Sorbet
   gem "rspec-sorbet"
-  
+
   # JUnit formatter for RSpec (for CI integration)
   gem "rspec_junit_formatter"
 end
