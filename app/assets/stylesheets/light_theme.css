@@ -1,40 +1,40 @@
 .light nav a,
 .light nav button {
-	background-color: var(--color-link);
-	border: 2px solid var(--color-link);
-	color: var(--color-bg);
-	border-radius: var(--border-radius);
-	text-decoration: none;
-	&:hover {
-		filter: none; /* Remove MVP's brightness filter */
-		transform: translateY(-2px);
-		box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3);
-		background-color: #8a0f8a; /* Lighter purple on hover */
-		border-color: #8a0f8a;
-		text-decoration: none;
-		color: var(--color-bg);
-	}
+  background-color: var(--color-link);
+  border: 2px solid var(--color-link);
+  color: var(--color-bg);
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  &:hover {
+    filter: none; /* Remove MVP's brightness filter */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3);
+    background-color: #8a0f8a; /* Lighter purple on hover */
+    border-color: #8a0f8a;
+    text-decoration: none;
+    color: var(--color-bg);
+  }
 }
 
 .light nav a:active,
 .light nav button:active {
-	transform: translateY(0);
-	box-shadow: 0 2px 6px rgba(108, 12, 108, 0.2);
-	background-color: #4a084a; /* Darker purple on click */
-	border-color: #4a084a;
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(108, 12, 108, 0.2);
+  background-color: #4a084a; /* Darker purple on click */
+  border-color: #4a084a;
 }
 
 .light nav a.active,
 .light nav a.active:hover,
 .light nav button:hover {
-	background-color: var(--color-bg);
-	color: var(--color-link);
-	border: 2px solid var(--color-link);
-	text-decoration: none;
+  background-color: var(--color-bg);
+  color: var(--color-link);
+  border: 2px solid var(--color-link);
+  text-decoration: none;
 }
 
 .light nav a.active:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3);
-	color: var(--color-link);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(108, 12, 108, 0.3);
+  color: var(--color-link);
 }

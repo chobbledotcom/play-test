@@ -45,74 +45,74 @@ a[role="button"]:focus-visible {
 
 /* Remove all image hover effects */
 img {
-	transition: none !important;
+  transition: none !important;
 }
 
 img:hover {
-	transform: none !important;
-	box-shadow: none !important;
-	filter: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 /* Ensure file preview images still display properly */
 .file-preview img {
-	border-radius: 4px;
-	max-width: 100%;
-	height: auto;
+  border-radius: 4px;
+  max-width: 100%;
+  height: auto;
 }
 
 /* Table row hover */
 tbody tr {
-	transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 tbody tr:hover {
-	background-color: rgba(118, 99, 228, 0.05);
+  background-color: rgba(118, 99, 228, 0.05);
 }
 
 /* Form field focus effects */
 input:not([type="submit"]):not([type="button"]):focus,
 textarea:focus,
 select:focus {
-	outline: 2px solid rgba(118, 99, 228, 0.5);
-	outline-offset: 0;
-	border-color: rgb(118, 99, 228);
+  outline: 2px solid rgba(118, 99, 228, 0.5);
+  outline-offset: 0;
+  border-color: rgb(118, 99, 228);
 }
 
 .share-button {
-	transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .share-button:hover {
-	transform: translateY(-1px);
-	box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
 }
 
 .share-button:active {
-	transform: translateY(0);
-	box-shadow: 0 1px 4px rgba(25, 118, 210, 0.2);
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(25, 118, 210, 0.2);
 }
 
 /* Remove default MVP aside hover effect */
 section aside:hover {
-	box-shadow: var(--box-shadow) var(--color-bg-secondary);
-	transform: none;
+  box-shadow: var(--box-shadow) var(--color-bg-secondary);
+  transform: none;
 }
 
 /* Construction banner images should not have hover effects */
 .construction-banner img {
-	transform: none !important;
-	box-shadow: none !important;
-	transition: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  transition: none !important;
 }
 
 .construction-banner img:hover {
-	transform: none !important;
-	box-shadow: none !important;
-	transition: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  transition: none !important;
 }
 
 /* Ensure GIFs are never affected by transitions */
 img[src$=".gif"] {
-	transition: none !important;
+  transition: none !important;
 }

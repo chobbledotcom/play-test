@@ -2,7 +2,10 @@
 #
 # Table name: fan_assessments
 #
-#  inspection_id              :string(12)       not null, primary key
+#  id                         :integer          not null
+#  inspection_id              :string(8)        not null, primary key
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
 #  fan_size_type              :text
 #  blower_flap_pass           :integer
 #  blower_flap_comment        :text
@@ -13,8 +16,6 @@
 #  blower_visual_pass         :boolean
 #  blower_visual_comment      :text
 #  blower_serial              :string
-#  created_at                 :datetime         not null
-#  updated_at                 :datetime         not null
 #  number_of_blowers          :integer
 #  blower_tube_length         :decimal(8, 2)
 #  blower_tube_length_pass    :boolean
@@ -22,7 +23,7 @@
 #
 # Indexes
 #
-#  fan_assessments_new_pkey  (inspection_id) UNIQUE
+#  index_fan_assessments_on_inspection_id  (inspection_id)
 #
 
 # typed: true

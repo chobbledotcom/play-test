@@ -1,73 +1,73 @@
 /* Incomplete Fields Display Styling */
 .incomplete-fields-details {
-	margin: 1rem 0;
-	border: 1px solid #e0e0e0;
-	border-radius: 4px;
-	background-color: #f9f9f9;
+  margin: 1rem 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f9f9f9;
 }
 
 .incomplete-fields-summary {
-	padding: 0.75rem 1rem;
-	cursor: pointer;
-	font-weight: bold;
-	color: var(--color-link);
-	background-color: #f0f0f0;
-	border-radius: 4px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--color-link);
+  background-color: #f0f0f0;
+  border-radius: 4px;
 }
 
 .incomplete-fields-summary:hover {
-	background-color: #e8e8e8;
+  background-color: #e8e8e8;
 }
 
 .incomplete-fields-summary::marker {
-	color: var(--color-link);
+  color: var(--color-link);
 }
 
 .incomplete-fields-content {
-	padding: 1rem;
-	background-color: white;
-	border-top: 1px solid #e0e0e0;
+  padding: 1rem;
+  background-color: white;
+  border-top: 1px solid #e0e0e0;
 }
 
 .incomplete-fields-list {
-	list-style: none;
-	padding: 0;
-	margin: 0.5rem 0 0 0;
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0 0;
 }
 
 .incomplete-fields-list li {
-	padding: 0.5rem 0;
-	border-bottom: 1px solid #f0f0f0;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .incomplete-fields-list li:last-child {
-	border-bottom: none;
+  border-bottom: none;
 }
 
 .field-type {
-	font-size: 0.9em;
-	color: #666;
-	font-style: italic;
-	margin-left: 1rem;
-	white-space: nowrap;
+  font-size: 0.9em;
+  color: #666;
+  font-style: italic;
+  margin-left: 1rem;
+  white-space: nowrap;
 }
 
 #mark-as-complete {
-	border: 2px solid var(--color-bg-secondary);
-	border-radius: var(--border-radius);
-	box-shadow: var(--box-shadow) var(--color-shadow);
-	max-width: var(--width-card-wide);
-	min-width: var(--width-card);
-	padding: 1.5rem;
-	text-align: var(--justify-normal);
-	margin: 2rem auto;
-	background: #ecccec;
+  border: 2px solid var(--color-bg-secondary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow) var(--color-shadow);
+  max-width: var(--width-card-wide);
+  min-width: var(--width-card);
+  padding: 1.5rem;
+  text-align: var(--justify-normal);
+  margin: 2rem auto;
+  background: #ecccec;
 }
 
 #mark-as-complete .incomplete-fields-details {
-	border: 2px solid var(--color-bg-secondary);
+  border: 2px solid var(--color-bg-secondary);
 }
 
 #mark-as-complete form.button_to {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
