@@ -98,4 +98,7 @@ Rails.application.routes.draw do
     to: "pages#show",
     as: :page_by_slug,
     constraints: {slug: /[^\/]+/}
+
+  # Custom error pages
+  match "/404", to: "errors#not_found", via: :all
 end

@@ -66,5 +66,8 @@ module PlayTest
 
       config.i18n.load_path << override_path if File.exist?(override_path)
     end
+
+    # Use custom error pages
+    config.exceptions_app = routes
   end
 end

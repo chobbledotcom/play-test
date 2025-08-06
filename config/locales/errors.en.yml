@@ -8,3 +8,6 @@ en:
       image_processing_failed: "could not be processed"
       image_processing_error: "could not be processed: %{error}"
     unauthorized: "You are not authorized to access this page."
+    not_found:
+      title: "Page not found"
+      message: "The page you are looking for does not exist."
