@@ -11,8 +11,8 @@
   <%= render 'chobble_forms/fieldset', legend_key: 'unit_details' do %>
     <%= render 'chobble_forms/text_field', field: :name, required: true %>
 
-    <%# Unit type - only for admins or test mode %>
-    <% if current_user.admin? || Rails.env.test? %>
+    <%# Unit type - only for development or test mode %>
+    <% if Rails.env.development? || Rails.env.test? %>
       <%= render 'chobble_forms/select', field: :unit_type,
           options: options_for_select([
             [t('units.unit_types.bouncy_castle'), 'bouncy_castle'],

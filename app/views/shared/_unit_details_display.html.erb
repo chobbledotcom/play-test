@@ -19,7 +19,7 @@
     <p><strong><%= FieldUtils.form_field_label('units', 'description') %>:</strong> <%= unit.description %></p>
   <% end %>
 
-  <% if current_user.admin? || Rails.env.test? %>
+  <% if Rails.env.development? || Rails.env.test? %>
     <p><strong><%= FieldUtils.form_field_label('units', 'unit_type') %>:</strong> <%= t("units.unit_types.#{unit.unit_type}") %></p>
   <% end %>
 </div>
