@@ -1,0 +1,21 @@
+.guide-controls {
+  display: flex;
+  max-width: 30rem;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 2rem auto;
+
+  select {
+    margin: 0;
+  }
+
+  // Empty button rule removed - no styles defined
+}
+
+.guide-image {
+  img {
+    border: 2px solid var(--color-link);
+    border-radius: 5px;
+  }
+}
