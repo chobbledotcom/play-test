@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe PdfCacheService, type: :service do
@@ -62,6 +64,8 @@ RSpec.describe PdfCacheService, type: :service do
       end
 
       context "with a valid cached PDF" do
+        let(:user) { inspection.user }
+
         before do
           # Mock a cached PDF attachment
           cached_pdf = double("cached_pdf")
@@ -70,6 +74,10 @@ RSpec.describe PdfCacheService, type: :service do
           blob = double("blob", created_at: Date.parse("2024-02-01"))
           allow(cached_pdf).to receive(:blob).and_return(blob)
           allow(cached_pdf).to receive(:download).and_return("cached_pdf_data")
+
+          # Mock user without attachments by default
+          allow(user).to receive(:signature).and_return(double(attached?: false))
+          allow(user).to receive(:logo).and_return(double(attached?: false))
         end
 
         context "when REDIRECT_TO_S3_PDFS is false" do
@@ -102,6 +110,68 @@ RSpec.describe PdfCacheService, type: :service do
             expect(result).to be_a(PdfCacheService::CacheResult)
             expect(result.type).to eq(:redirect)
             expect(result.data).to eq("https://example.com/signed-url")
+          end
+        end
+
+        context "when user signature is updated after cache" do
+          before do
+            # Mock signature attachment with newer date than cache
+            signature = double("signature")
+            allow(user).to receive(:signature).and_return(signature)
+            allow(signature).to receive(:attached?).and_return(true)
+            signature_blob = double(
+              "signature_blob",
+              created_at: Date.parse("2024-03-01")
+            )
+            allow(signature).to receive(:blob).and_return(signature_blob)
+          end
+
+          it "regenerates the PDF" do
+            pdf_document = double(render: "new_pdf_data")
+            expect(PdfGeneratorService)
+              .to receive(:generate_inspection_report)
+              .with(inspection)
+              .and_return(pdf_document)
+            expect(described_class)
+              .to receive(:store_cached_pdf)
+              .with(inspection, "new_pdf_data")
+
+            result = described_class
+              .fetch_or_generate_inspection_pdf(inspection)
+            expect(result).to be_a(PdfCacheService::CacheResult)
+            expect(result.type).to eq(:pdf_data)
+            expect(result.data).to eq("new_pdf_data")
+          end
+        end
+
+        context "when user logo is updated after cache" do
+          before do
+            # Mock logo attachment with newer date than cache
+            logo = double("logo")
+            allow(user).to receive(:logo).and_return(logo)
+            allow(logo).to receive(:attached?).and_return(true)
+            logo_blob = double(
+              "logo_blob",
+              created_at: Date.parse("2024-03-01")
+            )
+            allow(logo).to receive(:blob).and_return(logo_blob)
+          end
+
+          it "regenerates the PDF" do
+            pdf_document = double(render: "new_pdf_data")
+            expect(PdfGeneratorService)
+              .to receive(:generate_inspection_report)
+              .with(inspection)
+              .and_return(pdf_document)
+            expect(described_class)
+              .to receive(:store_cached_pdf)
+              .with(inspection, "new_pdf_data")
+
+            result = described_class
+              .fetch_or_generate_inspection_pdf(inspection)
+            expect(result).to be_a(PdfCacheService::CacheResult)
+            expect(result.type).to eq(:pdf_data)
+            expect(result.data).to eq("new_pdf_data")
           end
         end
       end
@@ -171,21 +241,75 @@ RSpec.describe PdfCacheService, type: :service do
   describe ".fetch_or_generate_unit_pdf" do
     context "when caching is enabled" do
       before do
-        allow(described_class).to receive(:pdf_cache_from_date).and_return(Date.parse("2024-01-01"))
+        allow(described_class)
+          .to receive(:pdf_cache_from_date)
+          .and_return(Date.parse("2024-01-01"))
       end
 
       it "generates and caches a new PDF when no cache exists" do
         pdf_document = double(render: "unit_pdf_data")
-        expect(PdfGeneratorService).to receive(:generate_unit_report)
+        expect(PdfGeneratorService)
+          .to receive(:generate_unit_report)
           .with(unit)
           .and_return(pdf_document)
 
-        expect(described_class).to receive(:store_cached_pdf).with(unit, "unit_pdf_data")
+        expect(described_class)
+          .to receive(:store_cached_pdf)
+          .with(unit, "unit_pdf_data")
 
         result = described_class.fetch_or_generate_unit_pdf(unit)
         expect(result).to be_a(PdfCacheService::CacheResult)
         expect(result.type).to eq(:pdf_data)
         expect(result.data).to eq("unit_pdf_data")
+      end
+
+      context "with cached PDF and updated user assets" do
+        let(:user) { unit.user }
+
+        before do
+          # Mock a cached PDF attachment
+          cached_pdf = double("cached_pdf")
+          allow(unit).to receive(:cached_pdf).and_return(cached_pdf)
+          allow(cached_pdf).to receive(:attached?).and_return(true)
+          blob = double("blob", created_at: Date.parse("2024-02-01"))
+          allow(cached_pdf).to receive(:blob).and_return(blob)
+
+          # Mock user without attachments by default
+          allow(user).to receive(:signature)
+            .and_return(double(attached?: false))
+          allow(user).to receive(:logo)
+            .and_return(double(attached?: false))
+        end
+
+        context "when user logo is updated after cache" do
+          before do
+            # Mock logo attachment with newer date than cache
+            logo = double("logo")
+            allow(user).to receive(:logo).and_return(logo)
+            allow(logo).to receive(:attached?).and_return(true)
+            logo_blob = double(
+              "logo_blob",
+              created_at: Date.parse("2024-03-01")
+            )
+            allow(logo).to receive(:blob).and_return(logo_blob)
+          end
+
+          it "regenerates the PDF" do
+            pdf_document = double(render: "new_pdf_data")
+            expect(PdfGeneratorService)
+              .to receive(:generate_unit_report)
+              .with(unit)
+              .and_return(pdf_document)
+            expect(described_class)
+              .to receive(:store_cached_pdf)
+              .with(unit, "new_pdf_data")
+
+            result = described_class.fetch_or_generate_unit_pdf(unit)
+            expect(result).to be_a(PdfCacheService::CacheResult)
+            expect(result.type).to eq(:pdf_data)
+            expect(result.data).to eq("new_pdf_data")
+          end
+        end
       end
     end
   end

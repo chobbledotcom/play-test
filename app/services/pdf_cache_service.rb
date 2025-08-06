@@ -1,3 +1,5 @@
+# typed: false
+
 class PdfCacheService
   CacheResult = Struct.new(:type, :data, keyword_init: true)
   # type: :redirect or :pdf_data
@@ -6,7 +8,9 @@ class PdfCacheService
   class << self
     def fetch_or_generate_inspection_pdf(inspection, **options)
       # Never cache incomplete inspections
-      return generate_pdf_result(inspection, :inspection, **options) unless caching_enabled? && inspection.complete?
+      unless caching_enabled? && inspection.complete?
+        return generate_pdf_result(inspection, :inspection, **options)
+      end
 
       fetch_or_generate(inspection, :inspection, **options)
     end
@@ -28,7 +32,10 @@ class PdfCacheService
     private
 
     def fetch_or_generate(record, type, **options)
-      if record.cached_pdf.attached? && cached_pdf_valid?(record.cached_pdf)
+      valid_cache = record.cached_pdf.attached? &&
+        cached_pdf_valid?(record.cached_pdf, record)
+
+      if valid_cache
         Rails.logger.info "PDF cache hit for #{type} #{record.id}"
 
         if redirect_to_s3?
@@ -83,14 +90,44 @@ class PdfCacheService
 
         Date.parse(date_string)
       rescue ArgumentError
-        raise ArgumentError, "Invalid PDF_CACHE_FROM date format: #{date_string}. Expected format: YYYY-MM-DD"
+        error_msg = "Invalid PDF_CACHE_FROM date format: #{date_string}. "
+        error_msg += "Expected format: YYYY-MM-DD"
+        raise ArgumentError, error_msg
       end
     end
 
-    def cached_pdf_valid?(attachment)
+    def cached_pdf_valid?(attachment, record)
       return false unless attachment.blob&.created_at
 
-      attachment.blob.created_at > pdf_cache_from_date.beginning_of_day
+      cache_created_at = attachment.blob.created_at
+      cache_threshold = pdf_cache_from_date.beginning_of_day
+
+      # Check if cache is newer than the threshold date
+      return false unless cache_created_at > cache_threshold
+
+      # Check if user assets were updated after cache
+      !user_assets_updated_after?(record.user, cache_created_at)
+    end
+
+    def user_assets_updated_after?(user, cache_created_at)
+      return false unless user
+
+      if attachment_updated_after?(user.signature, cache_created_at)
+        Rails.logger.info "User signature updated after PDF cache"
+        return true
+      end
+
+      if attachment_updated_after?(user.logo, cache_created_at)
+        Rails.logger.info "User logo updated after PDF cache"
+        return true
+      end
+
+      false
+    end
+
+    def attachment_updated_after?(attachment, reference_time)
+      attachment&.attached? &&
+        attachment.blob.created_at > reference_time
     end
 
     def store_cached_pdf(record, pdf_data)
