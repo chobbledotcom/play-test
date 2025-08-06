@@ -5,6 +5,8 @@
   max-width: 30rem;
   margin: 2rem auto;
   border: none;
+  gap: 0;
+
   input {
     border-radius: 5px 0 0 5px;
     margin: 0;
@@ -12,7 +14,7 @@
 
   button {
     border-radius: 0 5px 5px 0;
-    padding: 0.5rem 1rem;
+    padding: 0.25rem 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
