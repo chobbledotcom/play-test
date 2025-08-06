@@ -65,6 +65,9 @@ group :development, :test do
 
   # Rubocop extension for Sorbet
   gem "rubocop-sorbet", require: false
+
+  # Annotate models with schema info
+  gem "annotate", require: false
 end
 
 group :test do

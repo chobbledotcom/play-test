@@ -1,5 +1,4 @@
-#!/usr/bin/env nix-shell
-#! nix-shell -i bash -I nixpkgs=channel:nixpkgs-unstable -p biome actionlint
+#!/usr/bin/env bash
 
 # bin/lint - Run all linters systematically
 # This script runs all linters except the code_standards gem
@@ -60,7 +59,11 @@ run_linter "Biome (JavaScript formatter) - app/assets" \
 run_linter "Actionlint (GitHub Actions linter)" \
   "actionlint"
 
-# 7. Update third-party attributions
+# 7. Annotate models with schema information
+run_linter "Annotate models" \
+  "bundle exec rake annotate"
+
+# 8. Update third-party attributions
 run_linter "Update third-party attributions" \
   "bundle exec rake attributions:generate"
 

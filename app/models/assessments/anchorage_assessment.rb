@@ -1,3 +1,30 @@
+# == Schema Information
+#
+# Table name: anchorage_assessments
+#
+#  inspection_id              :string(12)       not null, primary key
+#  num_low_anchors            :integer
+#  num_high_anchors           :integer
+#  anchor_accessories_pass    :boolean
+#  anchor_degree_pass         :boolean
+#  anchor_type_pass           :boolean
+#  pull_strength_pass         :boolean
+#  anchor_accessories_comment :text
+#  anchor_degree_comment      :text
+#  anchor_type_comment        :text
+#  pull_strength_comment      :text
+#  num_low_anchors_comment    :text
+#  num_high_anchors_comment   :text
+#  num_low_anchors_pass       :boolean
+#  num_high_anchors_pass      :boolean
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#
+# Indexes
+#
+#  anchorage_assessments_new_pkey  (inspection_id) UNIQUE
+#
+
 # typed: true
 # frozen_string_literal: true
 

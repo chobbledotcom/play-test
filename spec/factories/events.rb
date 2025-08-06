@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: events
+#
+#  id            :integer          not null, primary key
+#  user_id       :string(12)       not null
+#  action        :string           not null
+#  resource_type :string           not null
+#  resource_id   :string(12)
+#  details       :text
+#  changed_data  :json
+#  metadata      :json
+#  created_at    :datetime         not null
+#
+# Indexes
+#
+#  index_events_on_action                         (action)
+#  index_events_on_created_at                     (created_at)
+#  index_events_on_resource_type_and_resource_id  (resource_type,resource_id)
+#  index_events_on_user_id                        (user_id)
+#  index_events_on_user_id_and_created_at         (user_id,created_at)
+#
+
 FactoryBot.define do
   factory :event do
     user
