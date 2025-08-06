@@ -2,28 +2,31 @@
 #
 # Table name: anchorage_assessments
 #
-#  id                         :integer          not null
-#  inspection_id              :string(8)        not null, primary key
-#  num_low_anchors            :integer
-#  num_high_anchors           :integer
+#  anchor_accessories_comment :text
 #  anchor_accessories_pass    :boolean
+#  anchor_degree_comment      :text
 #  anchor_degree_pass         :boolean
+#  anchor_type_comment        :text
 #  anchor_type_pass           :boolean
+#  num_high_anchors           :integer
+#  num_high_anchors_comment   :text
+#  num_high_anchors_pass      :boolean
+#  num_low_anchors            :integer
+#  num_low_anchors_comment    :text
+#  num_low_anchors_pass       :boolean
+#  pull_strength_comment      :text
 #  pull_strength_pass         :boolean
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
-#  anchor_accessories_comment :text
-#  anchor_degree_comment      :text
-#  anchor_type_comment        :text
-#  pull_strength_comment      :text
-#  num_low_anchors_comment    :text
-#  num_high_anchors_comment   :text
-#  num_low_anchors_pass       :boolean
-#  num_high_anchors_pass      :boolean
+#  inspection_id              :string(12)       not null, primary key
 #
 # Indexes
 #
-#  index_anchorage_assessments_on_inspection_id  (inspection_id)
+#  anchorage_assessments_new_pkey  (inspection_id) UNIQUE
+#
+# Foreign Keys
+#
+#  inspection_id  (inspection_id => inspections.id)
 #
 
 # typed: true

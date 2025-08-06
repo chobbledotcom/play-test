@@ -4,23 +4,17 @@ if Rails.env.development?
   namespace :annotate do
     desc "Annotate all models with schema information"
     task models: :environment do
-      require "annotate/annotate_models"
-      AnnotateModels.do_annotations(
-        model_dir: "app/models",
-        show_indexes: true,
-        show_foreign_keys: true,
-        format_bare: true,
-        classified_sort: true,
-        position_in_class: "before",
-        position_in_factory: "before",
-        position_in_test: "before"
-      )
+      system("bundle exec annotaterb models")
+    end
+
+    desc "Annotate routes with routing information"
+    task routes: :environment do
+      system("bundle exec annotaterb routes")
     end
 
     desc "Remove schema annotations from models"
     task remove: :environment do
-      require "annotate/annotate_models"
-      AnnotateModels.remove_annotations
+      system("bundle exec annotaterb models --delete")
     end
   end
 

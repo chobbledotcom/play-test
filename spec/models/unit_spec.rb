@@ -1,3 +1,32 @@
+# == Schema Information
+#
+# Table name: units
+#
+#  id               :string(12)       not null, primary key
+#  description      :string
+#  is_seed          :boolean          default(FALSE), not null
+#  manufacture_date :date
+#  manufacturer     :string
+#  name             :string
+#  operator         :string
+#  serial           :string
+#  unit_type        :string           default("bouncy_castle"), not null
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  user_id          :string(12)       not null
+#
+# Indexes
+#
+#  index_units_on_is_seed                  (is_seed)
+#  index_units_on_manufacturer_and_serial  (manufacturer,serial) UNIQUE
+#  index_units_on_serial_and_user_id       (serial,user_id) UNIQUE
+#  index_units_on_unit_type                (unit_type)
+#  index_units_on_user_id                  (user_id)
+#
+# Foreign Keys
+#
+#  user_id  (user_id => users.id)
+#
 require "rails_helper"
 
 RSpec.describe Unit, type: :model do

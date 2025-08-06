@@ -13,19 +13,19 @@ Total dependencies: 121
   - AWS Event Stream Library
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-partitions** v1.1138.0
+- **aws-partitions** v1.1142.0
   - Provides information about AWS partitions, regions, and services.
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-core** v3.228.0
+- **aws-sdk-core** v3.229.0
   - AWS SDK for Ruby - Core
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-kms** v1.108.0
+- **aws-sdk-kms** v1.110.0
   - AWS SDK for Ruby - KMS
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-s3** v1.196.0
+- **aws-sdk-s3** v1.196.1
   - AWS SDK for Ruby - Amazon S3
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
@@ -353,7 +353,7 @@ Total dependencies: 121
   - a performance benchmarking library
   - Homepage: https://github.com/ruby/benchmark
 
-- **bigdecimal** v3.1.9
+- **bigdecimal** v3.2.2
   - Arbitrary-precision decimal floating-point number library.
   - Homepage: https://github.com/ruby/bigdecimal
 

@@ -6,7 +6,7 @@
     <% platform_height = structure.platform_height %>
     <% slide_assessment = @assessment.inspection.slide_assessment %>
     <% has_permanent_roof = slide_assessment&.slide_permanent_roof %>
-    
+
     <% # Loop through the four preset heights %>
     <% [1.0, 1.2, 1.5, 1.8].each do |user_height| %>
       <% wall_details = EN14960::Calculators::SlideCalculator.get_wall_height_requirement_details(

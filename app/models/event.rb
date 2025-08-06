@@ -3,14 +3,14 @@
 # Table name: events
 #
 #  id            :integer          not null, primary key
-#  user_id       :string(12)       not null
 #  action        :string           not null
-#  resource_type :string           not null
-#  resource_id   :string(12)
-#  details       :text
 #  changed_data  :json
+#  details       :text
 #  metadata      :json
+#  resource_type :string           not null
 #  created_at    :datetime         not null
+#  resource_id   :string(12)
+#  user_id       :string(12)       not null
 #
 # Indexes
 #
@@ -19,6 +19,10 @@
 #  index_events_on_resource_type_and_resource_id  (resource_type,resource_id)
 #  index_events_on_user_id                        (user_id)
 #  index_events_on_user_id_and_created_at         (user_id,created_at)
+#
+# Foreign Keys
+#
+#  user_id  (user_id => users.id)
 #
 
 # typed: true

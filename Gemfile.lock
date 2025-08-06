@@ -77,9 +77,9 @@ GEM
       public_suffix (>= 2.0.2, < 7.0)
     afm (0.2.2)
     android_key_attestation (0.3.0)
-    annotate (2.6.5)
-      activerecord (>= 2.3.0)
-      rake (>= 0.8.7)
+    annotaterb (4.18.0)
+      activerecord (>= 6.0.0)
+      activesupport (>= 6.0.0)
     ast (2.4.3)
     aws-eventstream (1.4.0)
     aws-partitions (1.1142.0)
@@ -102,7 +102,7 @@ GEM
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.3.0)
     bcrypt (3.1.20)
-    benchmark (0.4.0)
+    benchmark (0.4.1)
     better_html (2.1.1)
       actionview (>= 6.0)
       activesupport (>= 6.0)
@@ -155,7 +155,7 @@ GEM
     dotenv-rails (3.1.8)
       dotenv (= 3.1.8)
       railties (>= 6.1)
-    drb (2.2.1)
+    drb (2.2.3)
     en14960 (0.2.0)
     erb_lint (0.9.0)
       activesupport
@@ -392,7 +392,7 @@ GEM
       thor (~> 1.0, >= 1.2.2)
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
-    rake (13.2.1)
+    rake (13.3.0)
     rbi (0.0.17)
       ast
       parser (>= 3.0.0)
@@ -616,7 +616,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  annotate
+  annotaterb
   aws-sdk-s3
   bcrypt
   better_html

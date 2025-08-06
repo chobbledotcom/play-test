@@ -2,19 +2,22 @@
 #
 # Table name: enclosed_assessments
 #
-#  id                               :integer          not null
-#  inspection_id                    :string(8)        not null, primary key
+#  exit_number                      :integer
+#  exit_number_comment              :text
+#  exit_number_pass                 :boolean
+#  exit_sign_always_visible_comment :text
+#  exit_sign_always_visible_pass    :boolean
 #  created_at                       :datetime         not null
 #  updated_at                       :datetime         not null
-#  exit_number                      :integer
-#  exit_number_pass                 :boolean
-#  exit_number_comment              :text
-#  exit_sign_always_visible_pass    :boolean
-#  exit_sign_always_visible_comment :text
+#  inspection_id                    :string(12)       not null, primary key
 #
 # Indexes
 #
-#  index_enclosed_assessments_on_inspection_id  (inspection_id)
+#  enclosed_assessments_new_pkey  (inspection_id) UNIQUE
+#
+# Foreign Keys
+#
+#  inspection_id  (inspection_id => inspections.id)
 #
 
 # typed: true

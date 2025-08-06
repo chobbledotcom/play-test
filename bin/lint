@@ -59,9 +59,9 @@ run_linter "Biome (JavaScript formatter) - app/assets" \
 run_linter "Actionlint (GitHub Actions linter)" \
   "actionlint"
 
-# 7. Annotate models with schema information
-run_linter "Annotate models" \
-  "bundle exec rake annotate"
+# 7. Annotate models and routes with schema information
+run_linter "Annotate models and routes" \
+  "bundle exec annotaterb models && bundle exec annotaterb routes"
 
 # 8. Update third-party attributions
 run_linter "Update third-party attributions" \

@@ -1,3 +1,24 @@
+# == Schema Information
+#
+# Table name: inspector_companies
+#
+#  id          :string(12)       not null, primary key
+#  active      :boolean          default(TRUE)
+#  address     :text             not null
+#  city        :string
+#  country     :string           default("UK")
+#  email       :string
+#  name        :string           not null
+#  notes       :text
+#  phone       :string           not null
+#  postal_code :string
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#
+# Indexes
+#
+#  index_inspector_companies_on_active  (active)
+#
 require "rails_helper"
 
 RSpec.describe InspectorCompany, type: :model do

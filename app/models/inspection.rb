@@ -1,6 +1,49 @@
 # typed: true
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: inspections
+#
+#  id                   :string(12)       not null, primary key
+#  complete_date        :datetime
+#  has_slide            :boolean
+#  height               :decimal(8, 2)
+#  height_comment       :string(1000)
+#  indoor_only          :boolean
+#  inspection_date      :datetime
+#  inspection_type      :string           default("bouncy_castle"), not null
+#  is_seed              :boolean          default(FALSE), not null
+#  is_totally_enclosed  :boolean
+#  length               :decimal(8, 2)
+#  length_comment       :string(1000)
+#  passed               :boolean
+#  pdf_last_accessed_at :datetime
+#  risk_assessment      :text
+#  unique_report_number :string
+#  width                :decimal(8, 2)
+#  width_comment        :string(1000)
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  inspector_company_id :string
+#  unit_id              :string
+#  user_id              :string(12)       not null
+#
+# Indexes
+#
+#  index_inspections_on_inspection_type         (inspection_type)
+#  index_inspections_on_inspector_company_id    (inspector_company_id)
+#  index_inspections_on_is_seed                 (is_seed)
+#  index_inspections_on_unit_id                 (unit_id)
+#  index_inspections_on_user_and_report_number  (user_id,unique_report_number)
+#  index_inspections_on_user_id                 (user_id)
+#
+# Foreign Keys
+#
+#  inspector_company_id  (inspector_company_id => inspector_companies.id)
+#  unit_id               (unit_id => units.id)
+#  user_id               (user_id => users.id)
+#
 class Inspection < ApplicationRecord
   extend T::Sig
 

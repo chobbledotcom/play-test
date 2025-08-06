@@ -65,7 +65,7 @@ group :development do
   gem "rubocop-sorbet", require: false
 
   # Annotate models with schema info
-  gem "annotate", require: false
+  gem "annotaterb", require: false
 
   # License compliance
   gem "licensed", "~> 5.0"

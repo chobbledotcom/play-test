@@ -1,3 +1,31 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id                    :string(12)       not null, primary key
+#  active_until          :date
+#  address               :text
+#  country               :string
+#  email                 :string
+#  last_active_at        :datetime
+#  name                  :string
+#  password_digest       :string
+#  phone                 :string
+#  postal_code           :string
+#  rpii_inspector_number :string
+#  rpii_verified_date    :datetime
+#  theme                 :string           default("light")
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  inspection_company_id :string
+#  webauthn_id           :string
+#
+# Indexes
+#
+#  index_users_on_email                  (email) UNIQUE
+#  index_users_on_inspection_company_id  (inspection_company_id)
+#  index_users_on_rpii_inspector_number  (rpii_inspector_number) UNIQUE WHERE rpii_inspector_number IS NOT NULL
+#
 require "rails_helper"
 
 RSpec.describe User, type: :model do

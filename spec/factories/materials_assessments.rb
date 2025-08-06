@@ -2,31 +2,34 @@
 #
 # Table name: materials_assessments
 #
-#  id                        :integer          not null
-#  inspection_id             :string(8)        not null, primary key
-#  ropes                     :integer
-#  ropes_pass                :integer
-#  retention_netting_pass    :integer
-#  zips_pass                 :integer
-#  windows_pass              :integer
+#  artwork_comment           :text
 #  artwork_pass              :integer
-#  thread_pass               :boolean
+#  fabric_strength_comment   :text
 #  fabric_strength_pass      :boolean
+#  fire_retardant_comment    :text
 #  fire_retardant_pass       :boolean
+#  retention_netting_comment :text
+#  retention_netting_pass    :integer
+#  ropes                     :integer
+#  ropes_comment             :text
+#  ropes_pass                :integer
+#  thread_comment            :text
+#  thread_pass               :boolean
+#  windows_comment           :text
+#  windows_pass              :integer
+#  zips_comment              :text
+#  zips_pass                 :integer
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
-#  ropes_comment             :text
-#  retention_netting_comment :text
-#  zips_comment              :text
-#  windows_comment           :text
-#  artwork_comment           :text
-#  thread_comment            :text
-#  fabric_strength_comment   :text
-#  fire_retardant_comment    :text
+#  inspection_id             :string(12)       not null, primary key
 #
 # Indexes
 #
-#  index_materials_assessments_on_inspection_id  (inspection_id)
+#  materials_assessments_new_pkey  (inspection_id) UNIQUE
+#
+# Foreign Keys
+#
+#  inspection_id  (inspection_id => inspections.id)
 #
 
 FactoryBot.define do

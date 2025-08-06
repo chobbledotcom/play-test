@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: pages
+#
+#  content          :text
+#  is_snippet       :boolean          default(FALSE), not null
+#  link_title       :string
+#  meta_description :text
+#  meta_title       :string
+#  slug             :string           not null, primary key
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#
 require "rails_helper"
 
 RSpec.describe Page, type: :model do

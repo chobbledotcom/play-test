@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-08-06T02:54:34",
+  "generated_at": "2025-08-06T17:53:08",
   "total_dependencies": 121,
   "dependencies": [
     {
@@ -95,28 +95,28 @@
     },
     {
       "name": "aws-partitions",
-      "version": "1.1138.0",
+      "version": "1.1142.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "Provides information about AWS partitions, regions, and services."
     },
     {
       "name": "aws-sdk-core",
-      "version": "3.228.0",
+      "version": "3.229.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - Core"
     },
     {
       "name": "aws-sdk-kms",
-      "version": "1.108.0",
+      "version": "1.110.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - KMS"
     },
     {
       "name": "aws-sdk-s3",
-      "version": "1.196.0",
+      "version": "1.196.1",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - Amazon S3"
@@ -151,7 +151,7 @@
     },
     {
       "name": "bigdecimal",
-      "version": "3.1.9",
+      "version": "3.2.2",
       "license": "other",
       "homepage": "https://github.com/ruby/bigdecimal",
       "summary": "Arbitrary-precision decimal floating-point number library."

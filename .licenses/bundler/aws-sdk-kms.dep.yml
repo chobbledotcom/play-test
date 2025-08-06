@@ -1,6 +1,6 @@
 ---
 name: aws-sdk-kms
-version: 1.108.0
+version: 1.110.0
 type: bundler
 summary: AWS SDK for Ruby - KMS
 homepage: https://github.com/aws/aws-sdk-ruby
