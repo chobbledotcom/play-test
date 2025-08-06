@@ -47,7 +47,7 @@ RSpec.feature "Admin Files", type: :feature do
       within "table" do
         expect(page).to have_content("inspection_photo.jpg")
         expect(page).to have_content("unit_photo.jpg")
-        
+
         # Check for links to attached records
         expect(page).to have_link(
           I18n.t("admin.files.attached_to.inspection", id: inspection.id),
