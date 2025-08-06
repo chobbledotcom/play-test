@@ -1,26 +1,5 @@
 <div id="search">
-<%= render 'chobble_forms/form_context',
-  model: nil,
-  scope: :search,
-  i18n_base: 'forms.search',
-  url: '#',
-  local: true do |form| %>
-
-  <%= render 'chobble_forms/fieldset', legend_key: 'search_details' do %>
-    <%= render 'chobble_forms/select',
-      field: :type,
-      options: options_for_select([
-        [t('forms.search.options.inspection'), 'inspection'],
-        [t('forms.search.options.unit'), 'unit']
-      ], 'unit') %>
-
-    <% setup = form_field_setup(:id, {field: :id}) %>
-    <%= form.label :id, setup[:field_label] %>
-    <%= form.text_field :id,
-      pattern: '[A-Za-z0-9]{8}',
-      placeholder: t('forms.search.placeholders.id', default: nil) %>
-  <% end %>
-<% end %>
+  <%= render 'shared/search_box' %>
 </div>
 
 <article id="search-results" style="display: none;">
@@ -29,25 +8,29 @@
     <thead>
       <tr>
         <th><%= t("search.results.site") %></th>
+        <th><%= t("search.results.type") %></th>
         <th><%= t("search.results.status") %></th>
         <th><%= t("search.results.action") %></th>
       </tr>
     </thead>
     <tbody id="results-body">
       <% @federated_sites.each do |site| %>
-        <tr data-site-name="<%= site[:name] %>" data-site-url="<%= site[:host].present? ? "https://#{site[:host]}" : "" %>">
-          <td>
-            <% if site[:host].present? %>
-              <a href="https://<%= site[:host] %>" target="_blank" rel="noopener">
+        <% ['unit', 'inspection'].each do |type| %>
+          <tr data-site-name="<%= site[:name] %>" data-site-url="<%= site[:host].present? ? "https://#{site[:host]}" : "" %>" data-type="<%= type %>">
+            <td>
+              <% if site[:host].present? %>
+                <a href="https://<%= site[:host] %>" target="_blank" rel="noopener">
+                  <%= t("search.sites.#{site[:name]}") %>
+                </a>
+              <% else %>
                 <%= t("search.sites.#{site[:name]}") %>
-              </a>
-            <% else %>
-              <%= t("search.sites.#{site[:name]}") %>
-            <% end %>
-          </td>
-          <td class="status"><%= t("search.status.waiting") %></td>
-          <td class="action">-</td>
-        </tr>
+              <% end %>
+            </td>
+            <td><%= t("search.types.#{type}") %></td>
+            <td class="status"><%= t("search.status.waiting") %></td>
+            <td class="action">-</td>
+          </tr>
+        <% end %>
       <% end %>
     </tbody>
   </table>
