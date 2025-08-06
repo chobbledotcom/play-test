@@ -1,10 +1,11 @@
-<form action="/search" method="get" id="homepage-search">
+<form action="/search#search" method="get" class="search-form">
   <input
     type="text"
     name="id"
     placeholder="<%= t('search.homepage.placeholder') %>"
     pattern="[A-Za-z0-9]{8}"
     maxlength="8"
+    autocomplete="off"
     required>
   <button type="submit">
     <svg

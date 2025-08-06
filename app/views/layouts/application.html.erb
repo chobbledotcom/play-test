@@ -13,8 +13,10 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= yield :head %>
     <% unless Rails.env.test? %>
-      <script>
+      <script nonce="<%= request.content_security_policy_nonce %>">
         window.goatcounter = {no_onload: true}
         const trackPageView = () => {
           if (typeof window.goatcounter.count === 'function') {
@@ -27,7 +29,8 @@
         document.addEventListener("turbo:load", trackPageView);
       </script>
       <script data-goatcounter="https://analytics.play-test.co.uk/count"
-        async src="https://analytics.play-test.co.uk/count.js"></script>
+        async src="https://analytics.play-test.co.uk/count.js"
+        nonce="<%= request.content_security_policy_nonce %>"></script>
     <% end %>
   </head>
   <body class="<%= effective_theme %>">
@@ -59,8 +62,8 @@
           </li>
           <% if session[:original_admin_id] %>
             <li>
-              <%= link_to t('users.buttons.stop_impersonating'), 
-                  stop_impersonating_user_path(current_user), 
+              <%= link_to t('users.buttons.stop_impersonating'),
+                  stop_impersonating_user_path(current_user),
                   data: { turbo_method: :post } %>
             </li>
           <% end %>

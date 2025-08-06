@@ -104,5 +104,6 @@ Rails.application.routes.draw do
     constraints: {slug: /[^\/]+/}
 
   # Handle error pages when exceptions_app is configured
-  match "/404", to: "application#not_found", via: :all
+  match "/404", to: "errors#not_found", via: :all
+  match "/500", to: "errors#internal_server_error", via: :all
 end

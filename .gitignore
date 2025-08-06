@@ -35,6 +35,7 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+/config/credentials/*
 
 # Ignore site-specific i18n overrides
 /config/site_overrides.yml
@@ -53,3 +54,5 @@
 
 # Pinned docker versions
 PINNED_VERSION
+
+/config/credentials/production.key

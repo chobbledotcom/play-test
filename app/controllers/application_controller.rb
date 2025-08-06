@@ -5,13 +5,13 @@ class ApplicationController < ActionController::Base
   include SessionsHelper
   include ImageProcessable
 
-  before_action :require_login
-  before_action :update_last_active_at
+  before_action :require_login, unless: :skip_authentication?
+  before_action :update_last_active_at, unless: :skip_authentication?
 
   before_action :start_debug_timer, if: :admin_debug_enabled?
   after_action :cleanup_debug_subscription, if: :admin_debug_enabled?
 
-  around_action :n_plus_one_detection unless Rails.env.production?
+  around_action :n_plus_one_detection, unless: -> { Rails.env.production? || skip_authentication? }
 
   rescue_from StandardError do |exception|
     if Rails.env.production? && should_notify_error?(exception)
@@ -48,6 +48,10 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def skip_authentication?
+    false
+  end
 
   def app_i18n(table, key, **args)
     I18n.t("application.#{table}.#{key}", **args)
@@ -195,11 +199,5 @@ class ApplicationController < ActionController::Base
         type: "application/pdf",
         disposition: "inline"
     end
-  end
-
-  def not_found
-    render file: Rails.root.join("app/views/errors/not_found.html.erb").to_s,
-      layout: true,
-      status: :not_found
   end
 end

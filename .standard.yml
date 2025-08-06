@@ -3,3 +3,5 @@ plugins:
 ignore:
   - 'db/seeds/**/*':
     - Style/GlobalVars
+  - 'db/schema.rb':
+    - Rails/CreateTableWithTimestamps
