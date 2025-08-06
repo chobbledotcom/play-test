@@ -16,7 +16,7 @@
 
     <%= yield :head %>
     <% unless Rails.env.test? %>
-      <script>
+      <script nonce="<%= request.content_security_policy_nonce %>">
         window.goatcounter = {no_onload: true}
         const trackPageView = () => {
           if (typeof window.goatcounter.count === 'function') {
@@ -29,7 +29,8 @@
         document.addEventListener("turbo:load", trackPageView);
       </script>
       <script data-goatcounter="https://analytics.play-test.co.uk/count"
-        async src="https://analytics.play-test.co.uk/count.js"></script>
+        async src="https://analytics.play-test.co.uk/count.js"
+        nonce="<%= request.content_security_policy_nonce %>"></script>
     <% end %>
   </head>
   <body class="<%= effective_theme %>">
