@@ -77,15 +77,14 @@ class Assessments::SlideAssessment < ApplicationRecord
     return false unless slide_platform_height.present? &&
       slide_wall_height.present? && !slide_permanent_roof.nil?
 
-    # Get user height from the inspection's user height assessment
-    user_height = inspection.user_height_assessment?&.tallest_user_height
-    return false if user_height.blank?
-
-    EN14960::Calculators::SlideCalculator.meets_height_requirements?(
-      slide_platform_height,
-      user_height,
-      slide_wall_height,
-      slide_permanent_roof
-    )
+    # Check if wall height requirements are met for all preset user heights
+    [1.0, 1.2, 1.5, 1.8].all? do |user_height|
+      EN14960::Calculators::SlideCalculator.meets_height_requirements?(
+        slide_platform_height,
+        user_height,
+        slide_wall_height,
+        slide_permanent_roof
+      )
+    end
   end
 end

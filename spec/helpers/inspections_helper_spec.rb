@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe InspectionsHelper, type: :helper do
@@ -282,8 +284,7 @@ RSpec.describe InspectionsHelper, type: :helper do
         # Clear some required fields
         assessment.update!(
           # Clear fields that actually exist in user_height_assessment
-          containing_wall_height: nil,
-          tallest_user_height: nil
+          containing_wall_height: nil
         )
 
         count = helper.incomplete_fields_count(inspection, "user_height")

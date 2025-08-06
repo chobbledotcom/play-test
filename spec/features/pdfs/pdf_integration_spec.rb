@@ -1,3 +1,6 @@
+# typed: false
+# frozen_string_literal: true
+
 require "rails_helper"
 require "pdf/inspector"
 
@@ -82,9 +85,11 @@ RSpec.feature "PDF Complete Integration", type: :feature do
     expect(pdf_content).to include(report_id_text)
 
     # Validate inspection status with i18n
-    expected_status = inspection.passed? ?
-      I18n.t("pdf.inspection.passed") :
+    expected_status = if inspection.passed?
+      I18n.t("pdf.inspection.passed")
+    else
       I18n.t("pdf.inspection.failed")
+    end
     expect(pdf_content).to include(expected_status)
 
     # Validate key i18n strings are used
@@ -134,8 +139,7 @@ RSpec.feature "PDF Complete Integration", type: :feature do
     # Test with long comments (performance test)
     long_comment = "Detailed assessment comment " * 50
     inspection.user_height_assessment.update(
-      containing_wall_height_comment: long_comment,
-      tallest_user_height_comment: long_comment
+      containing_wall_height_comment: long_comment
     )
 
     start_time = Time.current
@@ -161,7 +165,7 @@ RSpec.feature "PDF Complete Integration", type: :feature do
 
   private
 
-  def get_expected_pdf_label(field_key, field_label, fields, assessment_type)
+  def get_expected_pdf_label(field_key, field_label, fields, _assessment_type)
     base_field = field_key.to_s.sub(/_(pass|comment)$/, "")
 
     if field_key.to_s.end_with?("_pass")

@@ -1,3 +1,6 @@
+# typed: false
+# frozen_string_literal: true
+
 require "rails_helper"
 
 STRUCTURE_SAMPLE_DATA = {
@@ -93,7 +96,6 @@ FAN_SAMPLE_DATA = {
 USER_HEIGHT_SAMPLE_DATA = {
 
   containing_wall_height: 2.5,
-  tallest_user_height: 1.95,
   users_at_1000mm: 15,
   users_at_1200mm: 12,
   users_at_1500mm: 8,
@@ -103,7 +105,6 @@ USER_HEIGHT_SAMPLE_DATA = {
   negative_adjustment: 0.5,
 
   containing_wall_height_comment: "Height adequate for tallest users",
-  tallest_user_height_comment: "Maximum user height checked",
   play_area_length_comment: "Length measurement confirmed",
   play_area_width_comment: "Width adequate for capacity",
   negative_adjustment_comment: "Obstruction reduces usable area"

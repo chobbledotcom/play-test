@@ -170,20 +170,14 @@ module SeedData
   def self.user_height_fields(passed: true)
     {
       containing_wall_height: rand(1.0..2.0).round(1),
-      tallest_user_height: rand(1.2..1.8).round(1),
       users_at_1000mm: rand(0..5),
       users_at_1200mm: rand(2..8),
       users_at_1500mm: rand(4..10),
       users_at_1800mm: rand(2..6),
-      user_count_at_maximum_user_height: rand(1..4),
+      custom_user_height_comment: "Sample custom height comments",
       play_area_length: rand(3.0..10.0).round(1),
       play_area_width: rand(3.0..8.0).round(1),
       negative_adjustment: rand(0..2.0).round(1),
-      tallest_user_height_comment: if passed
-                                     "Capacity within safe limits based on EN 14960:2019"
-                                   else
-                                     "Review user capacity - exceeds recommended limits"
-                                   end,
       containing_wall_height_comment: "Measured from base to top of wall",
       play_area_length_comment: "Effective play area after deducting obstacles",
       play_area_width_comment: "Width measured at narrowest point"

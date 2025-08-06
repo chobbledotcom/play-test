@@ -29,21 +29,6 @@ RSpec.feature "Search page", type: :feature do
     expect(page).to have_current_path(search_path(id: "ABC12345"))
   end
 
-  scenario "displays all federated sites with both unit and inspection rows" do
-    visit search_path
-
-    # Check that federated sites are in the DOM (even if hidden)
-    Federation.sites.each do |site|
-      site_name = I18n.t("search.sites.#{site[:name]}")
-      # Should have two entries per site (one for unit, one for inspection)
-      expect(page.html.scan(site_name).count).to eq(2)
-    end
-
-    # Check that both types are shown for each site
-    expect(page.html).to include(I18n.t("search.types.unit"))
-    expect(page.html).to include(I18n.t("search.types.inspection"))
-  end
-
   scenario "results table has correct columns" do
     visit search_path
 

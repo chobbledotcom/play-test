@@ -1,3 +1,6 @@
+# typed: false
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.feature "Details element link behavior" do
@@ -28,7 +31,7 @@ RSpec.feature "Details element link behavior" do
   end
 
   scenario "multiple clicks on links work consistently" do
-    inspection.user_height_assessment.update_column(:tallest_user_height, nil)
+    inspection.user_height_assessment.update_column(:users_at_1000mm, nil)
 
     find("summary.incomplete-fields-summary").click
 

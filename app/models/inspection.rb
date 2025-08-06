@@ -77,8 +77,6 @@ class Inspection < ApplicationRecord
       dependent: :destroy
   end
 
-  alias_method :tallest_user_height_assessment, :user_height_assessment
-
   # Accept nested attributes for all assessments
   accepts_nested_attributes_for(*ALL_ASSESSMENT_TYPES.keys)
 

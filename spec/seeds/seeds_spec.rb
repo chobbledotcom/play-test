@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Seed Data", type: :model do
@@ -368,7 +370,6 @@ RSpec.describe "Seed Data", type: :model do
           Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
             expect(assessment.containing_wall_height).to be_present
-            expect(assessment.tallest_user_height).to be_present
             expect(assessment.users_at_1000mm).to be_present
             expect(assessment.users_at_1200mm).to be_present
             expect(assessment.users_at_1500mm).to be_present
@@ -385,7 +386,6 @@ RSpec.describe "Seed Data", type: :model do
         it "creates assessments with realistic height values" do
           Assessments::UserHeightAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.containing_wall_height).to be_between(0.5, 3.0)
-            expect(assessment.tallest_user_height).to be_between(1.0, 2.0)
             # platform_height moved to structure_assessment
             structure = assessment.inspection.structure_assessment
             expect(structure.platform_height).to be_between(200, 2000)

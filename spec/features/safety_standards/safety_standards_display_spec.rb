@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require "rails_helper"
@@ -44,9 +45,6 @@ RSpec.feature "Safety Standards Display", type: :feature do
       slide_permanent_roof: false,
       runout: 1.5
     )
-    inspection.user_height_assessment.update!(
-      tallest_user_height: 2.0
-    )
 
     visit_inspection_edit(inspection)
     navigate_to_assessment_tab("slide")
@@ -55,7 +53,6 @@ RSpec.feature "Safety Standards Display", type: :feature do
       # Wall height requirements section
       expect(page).to have_content("Wall Height Requirements")
       expect(page).to have_content("Height range: 0.6m - 3.0m")
-      expect(page).to have_content("Calculation: 2.0m (user height)")
 
       # Runout requirements section
       expect(page).to have_content("Runout Requirements")
@@ -68,7 +65,6 @@ RSpec.feature "Safety Standards Display", type: :feature do
 
   scenario "safety standards info appears in user height assessment form" do
     inspection.user_height_assessment.update!(
-      tallest_user_height: 1.2,
       containing_wall_height: 1.3,
       play_area_length: 5,
       play_area_width: 4
@@ -90,7 +86,6 @@ RSpec.feature "Safety Standards Display", type: :feature do
 
   scenario "shows permanent roof requirement for high platforms" do
     inspection.user_height_assessment.update!(
-      tallest_user_height: 1.8,
       containing_wall_height: 2.3,
       play_area_length: 5,
       play_area_width: 4

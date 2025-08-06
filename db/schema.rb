@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_05_132008) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_06_164418) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -121,7 +121,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_132008) do
     t.index ["inspection_id"], name: "fan_assessments_new_pkey", unique: true
   end
 
-  create_table "inspections", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "inspections", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.datetime "inspection_date"
     t.boolean "passed"
     t.string "user_id", limit: 12, null: false
@@ -152,7 +152,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_132008) do
     t.index ["user_id"], name: "index_inspections_on_user_id"
   end
 
-  create_table "inspector_companies", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "inspector_companies", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.string "name", null: false
     t.string "email"
     t.string "phone", null: false
@@ -391,7 +391,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_132008) do
     t.index ["inspection_id"], name: "structure_assessments_new_pkey", unique: true
   end
 
-  create_table "units", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "units", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.string "name"
     t.string "user_id", limit: 12, null: false
     t.datetime "created_at", null: false
@@ -414,8 +414,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_132008) do
     t.string "inspection_id", limit: 12, null: false
     t.decimal "containing_wall_height", precision: 8, scale: 2
     t.text "containing_wall_height_comment"
-    t.decimal "tallest_user_height", precision: 8, scale: 2
-    t.text "tallest_user_height_comment"
     t.decimal "play_area_length", precision: 8, scale: 2
     t.text "play_area_length_comment"
     t.decimal "play_area_width", precision: 8, scale: 2
@@ -428,7 +426,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_132008) do
     t.integer "users_at_1800mm"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_count_at_maximum_user_height"
+    t.text "custom_user_height_comment"
     t.index ["inspection_id"], name: "user_height_assessments_new_pkey", unique: true
   end
 
@@ -445,7 +443,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_132008) do
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
   end
 
-  create_table "users", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "users", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
     t.datetime "created_at", null: false

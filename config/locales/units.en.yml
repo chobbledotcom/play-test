@@ -90,7 +90,7 @@ en:
       users_at_1200mm: "Users at 1200mm Height"
       users_at_1500mm: "Users at 1500mm Height"
       users_at_1800mm: "Users at 1800mm Height"
-      user_count_at_maximum_user_height: "User Count at Maximum User Height"
+      custom_user_height_comment: "Custom User Height Comments"
       # Enclosed unit fields
       is_totally_enclosed: "Unit is Totally Enclosed"
 

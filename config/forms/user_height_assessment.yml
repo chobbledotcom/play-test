@@ -47,14 +47,5 @@ form_fields:
           step: 1
   - legend_i18n_key: tallest_user_capacity
     fields:
-      - partial: decimal_comment
-        field: tallest_user_height
-        attributes:
-          min: 0.1
-          max: 3
-          step: 0.1
-      - partial: number
-        field: user_count_at_maximum_user_height
-        attributes:
-          min: 0
-          step: 1
+      - partial: text_area
+        field: custom_user_height_comment

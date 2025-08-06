@@ -70,18 +70,20 @@ class Assessments::StructureAssessment < ApplicationRecord
   def meets_height_requirements?
     user_height = inspection.user_height_assessment
     return false unless platform_height.present? &&
-      user_height&.tallest_user_height.present? &&
       user_height&.containing_wall_height.present?
 
     permanent_roof = permanent_roof_status
     return false if permanent_roof.nil?
 
-    EN14960::Calculators::SlideCalculator.meets_height_requirements?(
-      platform_height / 1000.0, # Convert mm to m
-      user_height.tallest_user_height,
-      user_height.containing_wall_height,
-      permanent_roof
-    )
+    # Check if height requirements are met for all preset user heights
+    [1.0, 1.2, 1.5, 1.8].all? do |height|
+      EN14960::Calculators::SlideCalculator.meets_height_requirements?(
+        platform_height / 1000.0, # Convert mm to m
+        height,
+        user_height.containing_wall_height,
+        permanent_roof
+      )
+    end
   end
 
   private

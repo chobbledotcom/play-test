@@ -52,7 +52,6 @@ en:
     tabs:
       general: "General"
       user_height: "Maximum User Height"
-      tallest_user_height: "Maximum User Height" # New key for compatibility
       slide: "Slide"
       structure: "Structure"
       anchorage: "Anchorage"

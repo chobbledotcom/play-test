@@ -1,3 +1,6 @@
+# typed: false
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe "Assessment Safety Calculations", type: :request do
@@ -36,23 +39,6 @@ RSpec.describe "Assessment Safety Calculations", type: :request do
         headers: turbo_headers
 
       expect(response.body).to include("slide_safety_results")
-    end
-
-    it "updates user height calculations" do
-      # First set platform_height on structure assessment
-      inspection.structure_assessment.update!(platform_height: 2000)
-
-      patch inspection_user_height_assessment_path(inspection),
-        params: {
-          assessments_user_height_assessment: {
-            containing_wall_height: 1,
-            tallest_user_height: 1.99
-          }
-        },
-        headers: turbo_headers
-
-      expect(response.body).to include("Height Requirements")
-      expect(response.body).to include("1.99m")
     end
   end
 end

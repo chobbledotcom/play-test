@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require "rails_helper"
@@ -11,7 +12,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
 
   before { sign_in(user) }
 
-  def create_incomplete_inspection_with_multiple_sections
+  define_method(:create_incomplete_inspection_with_multiple_sections) do
     create_incomplete_inspection(
       inspection_fields: %i[inspection_date width length],
       assessment_fields: {
@@ -20,8 +21,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     )
   end
 
-  def create_incomplete_inspection(inspection_fields: [], assessment_fields: {}, **attrs)
-    # Start with complete inspection to avoid validation errors
+  define_method(:create_incomplete_inspection) do |inspection_fields: [], assessment_fields: {}, **attrs|
     inspection = create(:inspection, :completed, {unit:, user:}.merge(attrs))
 
     # Make it incomplete (remove complete_date)
@@ -43,23 +43,25 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     inspection
   end
 
-  def expect_incomplete_fields_summary(count)
+  define_method(:expect_incomplete_fields_summary) do |count|
     show_fields_key = "assessments.incomplete_fields.show_fields"
     summary_text = I18n.t(show_fields_key, count:)
     summary_selector = "summary.incomplete-fields-summary"
     expect(page).to have_css(summary_selector, text: summary_text)
   end
 
-  def expand_incomplete_fields = find("summary.incomplete-fields-summary").click
+  define_method(:expand_incomplete_fields) do
+    find("summary.incomplete-fields-summary").click
+  end
 
-  def expect_incomplete_field(form_name, field_name)
+  define_method(:expect_incomplete_field) do |form_name, field_name|
     field_label = I18n.t("forms.#{form_name}.fields.#{field_name}")
     within(".incomplete-fields-content") do
       expect(page).to have_content(field_label)
     end
   end
 
-  def expect_incomplete_section(form_name, count: nil)
+  define_method(:expect_incomplete_section) do |form_name, count: nil|
     section_header = I18n.t("forms.#{form_name}.header")
     expected_text = count ? "#{section_header} (#{count})" : section_header
     within(".incomplete-fields-content") do
@@ -67,7 +69,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     end
   end
 
-  def expect_no_incomplete_section(form_name)
+  define_method(:expect_no_incomplete_section) do |form_name|
     section_header = I18n.t("forms.#{form_name}.header")
     within(".incomplete-fields-content") do
       expect(page).not_to have_content(section_header)
@@ -103,7 +105,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
       width: 8.0,
       inspection_fields: [:inspection_date],
       assessment_fields: {
-        user_height_assessment: [:tallest_user_height]
+        user_height_assessment: [:users_at_1000mm]
       }
     )
 
@@ -113,7 +115,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     expect_incomplete_section("inspection")
     expect_incomplete_section("user_height")
     expect_incomplete_field("inspection", "inspection_date")
-    expect_incomplete_field("user_height", "tallest_user_height")
+    expect_incomplete_field("user_height", "users_at_1000mm")
   end
 
   scenario "does not show incomplete fields when truly complete" do
@@ -272,8 +274,8 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
         section_fields = field_links.select do |link|
           link[:href].include?(tab_selector)
         end
-        error_msg = "Section '#{section_name}' should have incomplete fields"
-        expect(section_fields.count).to be > 0, error_msg
+        expect(section_fields.count).to be_positive,
+          "Section '#{section_name}' should have incomplete fields"
       end
     end
   end

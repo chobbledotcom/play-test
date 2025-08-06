@@ -295,7 +295,7 @@ class InspectionsController < ApplicationController
   end
 
   def filtered_inspections_query_without_order = current_user.inspections
-    .includes(:inspector_company, unit: {photo_attachment: :blob})
+    .includes(:inspector_company, unit: {photo_attachment: {blob: :attachments}})
     .search(params[:query])
     .filter_by_result(params[:result])
     .filter_by_unit(params[:unit_id])

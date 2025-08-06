@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Inspections Filtering", type: :feature do
@@ -6,9 +8,18 @@ RSpec.feature "Inspections Filtering", type: :feature do
   let(:unit2) { create(:unit, user: user, name: "Unit B") }
   let(:unit3) { create(:unit, user: user, name: "Unit C") }
 
-  let!(:draft_inspection) { create(:inspection, user: user, unit: unit1, complete_date: nil, passed: nil) }
-  let!(:completed_passed) { create(:inspection, user: user, unit: unit2, complete_date: Time.current, passed: true) }
-  let!(:completed_failed) { create(:inspection, user: user, unit: unit3, complete_date: Time.current, passed: false) }
+  let!(:draft_inspection) do
+    create(:inspection, user: user, unit: unit1, complete_date: nil,
+      passed: nil)
+  end
+  let!(:completed_passed) do
+    create(:inspection, user: user, unit: unit2, complete_date: Time.current,
+      passed: true)
+  end
+  let!(:completed_failed) do
+    create(:inspection, user: user, unit: unit3, complete_date: Time.current,
+      passed: false)
+  end
 
   before { sign_in(user) }
 

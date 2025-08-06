@@ -1,8 +1,10 @@
+# typed: false
+
 FactoryBot.define do
   factory :unit do
     association :user
     sequence(:name) { |n| "Test Unit #{n}" }
-    sequence(:serial) { |n| "TEST#{n.to_s.rjust(3, "0")}" }
+    serial { SecureRandom.hex(10) }
     description { "Test Bouncy Castle" }
     manufacturer { "Test Manufacturer" }
     operator { "Test Operator" }

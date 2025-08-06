@@ -1,3 +1,6 @@
+# typed: false
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.feature "Next tab navigation", type: :feature do
@@ -29,7 +32,7 @@ RSpec.feature "Next tab navigation", type: :feature do
 
     # Fill in some fields
     fill_in I18n.t("forms.user_height.fields.containing_wall_height"), with: "2.5"
-    fill_in I18n.t("forms.user_height.fields.tallest_user_height"), with: "1.8"
+    fill_in I18n.t("forms.user_height.fields.users_at_1000mm"), with: "3"
 
     # Save the assessment
     click_button "Save Assessment"
