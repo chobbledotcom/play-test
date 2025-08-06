@@ -204,5 +204,4 @@ class ApplicationController < ActionController::Base
         disposition: "inline"
     end
   end
-
 end
