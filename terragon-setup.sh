@@ -12,7 +12,7 @@ fi
 
 echo "Installing Ruby and dependencies..."
 sudo apt-get update -qq
-sudo apt-get install -y ruby-full ruby-bundler build-essential libsqlite3-dev libyaml-dev libvips-dev
+sudo apt-get install -y ruby-full ruby-bundler build-essential libsqlite3-dev libyaml-dev libvips-dev cmake pkg-config
 
 echo "Installing bundler gem..."
 sudo gem install bundler
