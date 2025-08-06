@@ -1,10 +1,10 @@
 .light pre code.hljs {
-	display: block;
-	overflow-x: auto;
-	padding: 1em;
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
 }
 .light code.hljs {
-	padding: 3px 5px;
+  padding: 3px 5px;
 }
 /*!
   Theme: Default
@@ -22,21 +22,21 @@ as-is from the repository directly without the need for a build step
 Typically this "required" baseline CSS is added by `makestuff.js` during build.
 */
 .light pre code.hljs {
-	display: block;
-	overflow-x: auto;
-	padding: 1em;
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
 }
 .light code.hljs {
-	padding: 3px 5px;
+  padding: 3px 5px;
 }
 /* end baseline CSS */
 .light .hljs {
-	background: #f3f3f3;
-	color: #444;
+  background: #f3f3f3;
+  color: #444;
 }
 /* Base color: saturation 0; */
 .light .hljs-subst {
-	/* default */
+  /* default */
 }
 /* purposely ignored */
 .light .hljs-formula,
@@ -45,15 +45,15 @@ Typically this "required" baseline CSS is added by `makestuff.js` during build.
 .light .hljs-params {
 }
 .light .hljs-comment {
-	color: #697070;
+  color: #697070;
 }
 .light .hljs-tag,
 .light .hljs-punctuation {
-	color: #444a;
+  color: #444a;
 }
 .light .hljs-tag .hljs-name,
 .light .hljs-tag .hljs-attr {
-	color: #444;
+  color: #444;
 }
 /* User color: hue: 0 */
 .light .hljs-type,
@@ -64,11 +64,11 @@ Typically this "required" baseline CSS is added by `makestuff.js` during build.
 .light .hljs-quote,
 .light .hljs-template-tag,
 .light .hljs-deletion {
-	color: #880000;
+  color: #880000;
 }
 .light .hljs-title,
 .light .hljs-section {
-	color: #880000;
+  color: #880000;
 }
 .light .hljs-regexp,
 .light .hljs-symbol,
@@ -78,26 +78,26 @@ Typically this "required" baseline CSS is added by `makestuff.js` during build.
 .light .hljs-selector-attr,
 .light .hljs-operator,
 .light .hljs-selector-pseudo {
-	color: #ab5656;
+  color: #ab5656;
 }
 /* Language color: hue: 90; */
 .light .hljs-literal {
-	color: #695;
+  color: #695;
 }
 .light .hljs-built_in,
 .light .hljs-bullet,
 .light .hljs-code,
 .light .hljs-addition {
-	color: #397300;
+  color: #397300;
 }
 /* Meta color: hue: 200 */
 .light .hljs-meta {
-	color: #1f7199;
+  color: #1f7199;
 }
 .light .hljs-meta .hljs-string {
-	color: #38a;
+  color: #38a;
 }
 /* Misc effects */
 .light .hljs-emphasis {
-	font-style: italic;
+  font-style: italic;
 }

@@ -1,22 +1,22 @@
 /* Search/filter box styling */
 #search-box {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	gap: 1rem;
-	align-items: center;
-	justify-content: center;
-	margin: 2rem auto;
-	border: none;
-	box-shadow: none;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem auto;
+  border: none;
+  box-shadow: none;
 }
 
 #search-box input[type="text"] {
-	width: 30rem;
-	max-width: 100%;
-	margin: 0;
+  width: 30rem;
+  max-width: 100%;
+  margin: 0;
 }
 #search-box select {
-	width: 12rem;
-	margin: 0;
+  width: 12rem;
+  margin: 0;
 }

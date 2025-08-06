@@ -2,6 +2,7 @@
 #
 # Table name: slide_assessments
 #
+#  id                                      :integer          not null
 #  inspection_id                           :string(12)       not null, primary key
 #  slide_platform_height                   :decimal(8, 2)
 #  slide_wall_height                       :decimal(8, 2)
@@ -13,6 +14,8 @@
 #  slip_sheet_pass                         :boolean
 #  slide_permanent_roof                    :boolean
 #  slide_platform_height_comment           :text
+#  created_at                              :datetime         not null
+#  updated_at                              :datetime         not null
 #  slide_wall_height_comment               :text
 #  slide_first_metre_height_comment        :text
 #  slide_beyond_first_metre_height_comment :text
@@ -20,12 +23,10 @@
 #  clamber_netting_comment                 :text
 #  runout_comment                          :text
 #  slip_sheet_comment                      :text
-#  created_at                              :datetime         not null
-#  updated_at                              :datetime         not null
 #
 # Indexes
 #
-#  slide_assessments_new_pkey  (inspection_id) UNIQUE
+#  index_slide_assessments_on_inspection_id  (inspection_id)
 #
 
 FactoryBot.define do

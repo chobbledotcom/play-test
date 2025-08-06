@@ -2,52 +2,52 @@
 
 /* Background with tiled faded logo */
 .rpii {
-	background-image: url("rpii-logo-faded.png");
-	background-repeat: repeat;
-	background-attachment: fixed;
-	background-size: 149px 117px;
-	background-position: center;
+  background-image: url("rpii-logo-faded.png");
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-size: 149px 117px;
+  background-position: center;
 }
 
 .rpii nav a,
 .rpii nav button {
-	background-color: #0e5dc7;
-	border: 2px solid #0e5dc7;
-	color: #fff;
-	border-radius: var(--border-radius);
-	text-decoration: none;
-	&:hover {
-		filter: none; /* Remove MVP's brightness filter */
-		transform: translateY(-2px);
-		box-shadow: 0 6px 16px rgba(14, 93, 199, 0.3);
-		background-color: #1a6dd8; /* Lighter blue on hover */
-		border-color: #1a6dd8;
-		text-decoration: none;
-		color: #fff;
-	}
+  background-color: #0e5dc7;
+  border: 2px solid #0e5dc7;
+  color: #fff;
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  &:hover {
+    filter: none; /* Remove MVP's brightness filter */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(14, 93, 199, 0.3);
+    background-color: #1a6dd8; /* Lighter blue on hover */
+    border-color: #1a6dd8;
+    text-decoration: none;
+    color: #fff;
+  }
 }
 
 .rpii nav a:active,
 .rpii nav button:active {
-	transform: translateY(0);
-	box-shadow: 0 2px 6px rgba(14, 93, 199, 0.2);
-	background-color: #0a4a9a; /* Darker blue on click */
-	border-color: #0a4a9a;
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(14, 93, 199, 0.2);
+  background-color: #0a4a9a; /* Darker blue on click */
+  border-color: #0a4a9a;
 }
 
 .rpii nav a.active,
 .rpii nav a.active:hover,
 .rpii nav button:hover {
-	background-color: #fff;
-	color: #0e5dc7;
-	border: 2px solid #0e5dc7;
-	text-decoration: none;
+  background-color: #fff;
+  color: #0e5dc7;
+  border: 2px solid #0e5dc7;
+  text-decoration: none;
 }
 
 .rpii nav a.active:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 6px 16px rgba(14, 93, 199, 0.3);
-	color: #0e5dc7;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(14, 93, 199, 0.3);
+  color: #0e5dc7;
 }
 
 /* General buttons */
@@ -56,9 +56,9 @@
 .rpii input[type="button"],
 .rpii a[role="button"],
 .rpii .button {
-	background-color: #194eb1;
-	color: #fff;
-	border: 2px solid #194eb1;
+  background-color: #194eb1;
+  color: #fff;
+  border: 2px solid #194eb1;
 }
 
 .rpii button:hover,
@@ -66,84 +66,84 @@
 .rpii input[type="button"]:hover,
 .rpii a[role="button"]:hover,
 .rpii .button:hover {
-	background-color: #2563c7;
-	border-color: #2563c7;
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(25, 78, 177, 0.3);
+  background-color: #2563c7;
+  border-color: #2563c7;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(25, 78, 177, 0.3);
 }
 
 /* Table headers */
 .rpii th {
-	background-color: #194eb1;
-	color: #fff;
+  background-color: #194eb1;
+  color: #fff;
 }
 
 /* Links */
 .rpii a {
-	color: #194eb1;
+  color: #194eb1;
 }
 
 .rpii a:hover {
-	color: #2563c7;
+  color: #2563c7;
 }
 
 /* Table list items hover effect */
 .rpii .table-list-items a:hover {
-	background-color: rgba(25, 78, 177, 0.1);
+  background-color: rgba(25, 78, 177, 0.1);
 }
 
 /* Override CSS variables for consistent theming */
 .rpii {
-	--color-link: #194eb1;
-	--color-bg-secondary: #194eb1;
-	--color-table: #194eb1;
+  --color-link: #194eb1;
+  --color-bg-secondary: #194eb1;
+  --color-table: #194eb1;
 }
 
 /* Logo container for centered logo */
 .rpii .logo-container {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	padding: 0.5rem 1rem;
-	max-width: var(--width-content);
-	margin: 0 auto 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  max-width: var(--width-content);
+  margin: 0 auto 1rem;
 }
 
 .rpii .logo.left {
-	justify-content: flex-start;
+  justify-content: flex-start;
 }
 
 .rpii .logo.right {
-	justify-content: center;
+  justify-content: center;
 }
 
 .rpii .logo img {
-	width: auto;
-	height: 89px;
+  width: auto;
+  height: 89px;
 }
 
 .rpii main form {
-	background: white;
-	border-image: linear-gradient(
-			to right,
-			var(--color-bg-secondary) 0%,
-			#3a0eb5 100%
-		)
-		1;
+  background: white;
+  border-image: linear-gradient(
+      to right,
+      var(--color-bg-secondary) 0%,
+      #3a0eb5 100%
+    )
+    1;
 }
 
 .rpii main form header {
-	background: linear-gradient(
-		to right,
-		var(--color-bg-secondary) 0%,
-		#3a0eb5 100%
-	);
+  background: linear-gradient(
+    to right,
+    var(--color-bg-secondary) 0%,
+    #3a0eb5 100%
+  );
 }
 
 .rpii fieldset legend {
-	color: #3a0eb5;
+  color: #3a0eb5;
 }
 
 .rpii section aside {
-	background: white;
+  background: white;
 }

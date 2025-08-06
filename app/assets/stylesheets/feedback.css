@@ -1,32 +1,32 @@
 /* Feedback button styling */
 
 a[role="button"].feedback-button {
-	position: fixed;
-	bottom: 20px;
-	left: 20px;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 4px;
-	z-index: 100;
-	border: 2px solid var(--color-bg);
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  z-index: 100;
+  border: 2px solid var(--color-bg);
 }
 
 .feedback-button .heart {
-	font-size: 20px;
-	line-height: 1;
+  font-size: 20px;
+  line-height: 1;
 }
 
 /* Mobile adjustments */
 @media (max-width: 600px) {
-	a[role="button"].feedback-button {
-		bottom: 10px;
-		left: 10px;
-		padding: 10px 14px;
-		font-size: 12px;
-	}
+  a[role="button"].feedback-button {
+    bottom: 10px;
+    left: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
 
-	.feedback-button .heart {
-		font-size: 18px;
-	}
+  .feedback-button .heart {
+    font-size: 18px;
+  }
 }

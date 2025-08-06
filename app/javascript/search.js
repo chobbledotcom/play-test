@@ -13,7 +13,7 @@ class FederationSearch {
     if (!this.form) {
       this.form = document.getElementById("homepage-search");
     }
-    
+
     this.resultsContainer = document.getElementById("search-results");
     this.resultsBody = document.getElementById("results-body");
 

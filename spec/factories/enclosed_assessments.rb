@@ -2,18 +2,19 @@
 #
 # Table name: enclosed_assessments
 #
-#  inspection_id                    :string(12)       not null, primary key
+#  id                               :integer          not null
+#  inspection_id                    :string(8)        not null, primary key
+#  created_at                       :datetime         not null
+#  updated_at                       :datetime         not null
 #  exit_number                      :integer
 #  exit_number_pass                 :boolean
 #  exit_number_comment              :text
 #  exit_sign_always_visible_pass    :boolean
 #  exit_sign_always_visible_comment :text
-#  created_at                       :datetime         not null
-#  updated_at                       :datetime         not null
 #
 # Indexes
 #
-#  enclosed_assessments_new_pkey  (inspection_id) UNIQUE
+#  index_enclosed_assessments_on_inspection_id  (inspection_id)
 #
 
 FactoryBot.define do

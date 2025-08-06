@@ -2,7 +2,8 @@
 #
 # Table name: structure_assessments
 #
-#  inspection_id                       :string(12)       not null, primary key
+#  id                                  :integer          not null
+#  inspection_id                       :string(8)        not null, primary key
 #  seam_integrity_pass                 :boolean
 #  air_loss_pass                       :boolean
 #  straight_walls_pass                 :boolean
@@ -19,6 +20,8 @@
 #  entrapment_pass                     :boolean
 #  markings_pass                       :boolean
 #  grounding_pass                      :boolean
+#  created_at                          :datetime         not null
+#  updated_at                          :datetime         not null
 #  seam_integrity_comment              :text
 #  stitch_length_comment               :text
 #  air_loss_comment                    :text
@@ -38,15 +41,13 @@
 #  step_ramp_size                      :integer
 #  step_ramp_size_pass                 :boolean
 #  step_ramp_size_comment              :text
-#  created_at                          :datetime         not null
-#  updated_at                          :datetime         not null
 #  platform_height                     :integer
 #  platform_height_pass                :boolean
 #  platform_height_comment             :text
 #
 # Indexes
 #
-#  structure_assessments_new_pkey  (inspection_id) UNIQUE
+#  index_structure_assessments_on_inspection_id  (inspection_id)
 #
 
 FactoryBot.define do
