@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Git pre-commit hook that runs linters only on changed files
+
+# Run the lint-changed script
+if bin/lint-changed; then
+  exit 0
+else
+  echo ""
+  echo "Pre-commit hook failed. To fix automatically, run:"
+  echo "  bin/lint-changed --fix"
+  echo ""
+  echo "To bypass this hook (not recommended), use:"
+  echo "  git commit --no-verify"
+  exit 1
+fi
