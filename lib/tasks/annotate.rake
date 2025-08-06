@@ -4,22 +4,6 @@ if Rails.env.development?
   namespace :annotate do
     desc "Annotate all models with schema information"
     task models: :environment do
-      ENV["position"] = "before"
-      ENV["position_in_class"] = "before"
-      ENV["position_in_factory"] = "before"
-      ENV["position_in_test"] = "before"
-      ENV["show_indexes"] = "true"
-      ENV["show_foreign_keys"] = "true"
-      ENV["simple_indexes"] = "false"
-      ENV["model_dir"] = "app/models"
-      ENV["format_bare"] = "true"
-      ENV["sort"] = "false"
-      ENV["force"] = "false"
-      ENV["classified_sort"] = "true"
-      ENV["exclude_controllers"] = "true"
-      ENV["exclude_helpers"] = "true"
-      ENV["exclude_scaffolds"] = "true"
-      
       require "annotate/annotate_models"
       AnnotateModels.do_annotations(
         model_dir: "app/models",
