@@ -1,41 +1,46 @@
-#\!/bin/bash
+#!/bin/bash
 set -euo pipefail
 
-# Terragon Labs Rails Setup Script
-# Optimized for Ubuntu 24.04 - runs on every sandbox start
+# Terragon Labs Rails Setup Script - OPTIMIZED FOR SPEED
+# Runs once per new environment - optimized for first-run performance
 
-# Skip if already set up (optimization for repeated runs)
-if [ -f ".terragon-setup-complete" ] && [ -z "${FORCE_SETUP:-}" ]; then
-    echo "Setup already complete. Run with FORCE_SETUP=1 to re-run."
-    exit 0
-fi
+echo "Setting up Terragon Rails environment..."
 
-echo "Installing Ruby and dependencies..."
-sudo apt-get update -qq
-sudo apt-get install -y ruby-full ruby-bundler build-essential libsqlite3-dev libyaml-dev libvips-dev cmake pkg-config sassc
+# Run apt-get update and install in one command (faster)
+echo "Installing system packages..."
+DEBIAN_FRONTEND=noninteractive sudo apt-get update -qq && \
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y -qq \
+    ruby-full ruby-bundler build-essential libsqlite3-dev \
+    libyaml-dev libvips-dev cmake pkg-config sassc \
+    --no-install-recommends
 
-echo "Installing bundler gem..."
-sudo gem install bundler
+# Install bundler with no documentation (faster)
+echo "Installing bundler..."
+sudo gem install bundler --no-document --quiet
 
-# Install Rails dependencies with bundler
-echo "Installing gems..."
-bundle install --jobs 4
+# Install gems with maximum parallelization
+echo "Installing gems (parallel)..."
+bundle install --jobs $(nproc) --retry 2 --quiet
 
-# Database setup (only if not exists)
-if [ \! -f "storage/development.sqlite3" ]; then
-    echo "Creating development database..."
-    bundle exec rails db:create db:migrate db:seed
-fi
+# Create both databases in parallel (big time saver)
+echo "Setting up databases in parallel..."
 
-# Test database setup (only if not exists)
-if [ \! -f "storage/test.sqlite3" ]; then
-    echo "Creating test database..."
-    RAILS_ENV=test bundle exec rails db:create db:migrate
-    bundle exec rails parallel:prepare
-fi
+# Start both database setups in background
+(
+    echo "  Creating development database..."
+    bundle exec rails db:create db:migrate db:seed --trace 2>/dev/null
+) &
+DEV_PID=$!
 
-# Mark setup as complete
-touch .terragon-setup-complete
+(
+    echo "  Creating test database..."
+    RAILS_ENV=test bundle exec rails db:create db:migrate --trace 2>/dev/null
+    bundle exec rails parallel:prepare 2>/dev/null
+) &
+TEST_PID=$!
 
-echo "Rails setup complete\!"
+# Wait for both to complete
+wait $DEV_PID && echo "  ✓ Development database ready"
+wait $TEST_PID && echo "  ✓ Test database ready"
 
+echo "✓ Rails setup complete!"
