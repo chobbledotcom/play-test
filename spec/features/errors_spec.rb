@@ -3,6 +3,15 @@
 require "rails_helper"
 
 RSpec.feature "Error pages", type: :feature do
+  around do |example|
+    # Temporarily disable local request handling to test custom error pages
+    original_value = Rails.application.config.consider_all_requests_local
+    Rails.application.config.consider_all_requests_local = false
+    example.run
+  ensure
+    Rails.application.config.consider_all_requests_local = original_value
+  end
+
   scenario "404 page uses application layout for unknown routes" do
     visit "/non-existent-page-that-should-not-exist"
 
