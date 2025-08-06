@@ -1,5 +1,6 @@
 # typed: false
 # frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: user_height_assessments
