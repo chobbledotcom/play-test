@@ -26,6 +26,7 @@
             libyaml
             nodejs
             openssl
+            pkg-config
             rubyPackages_3_4.openssl
             rubyPackages_3_4.psych
             rubyPackages_3_4.ruby-vips
