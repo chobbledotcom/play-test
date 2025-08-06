@@ -1,57 +1,57 @@
 /* Equipment styling */
 
 .view-equipment {
-	margin-bottom: 2rem;
+  margin-bottom: 2rem;
 }
 
 .equipment form label {
-	display: block;
-	margin-top: 1rem;
-	font-weight: bold;
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
 }
 
 .equipment form input[type="text"] {
-	width: 100%;
-	padding: 0.5rem;
-	border: 1px solid #ddd;
-	border-radius: 4px;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 .equipment form select {
-	width: 100%;
-	padding: 0.5rem;
-	border: 1px solid #ddd;
-	border-radius: 4px;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 /* Removed .actions styles - using nav instead */
 
 .button.small {
-	padding: 0.25rem 0.5rem;
-	font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
 }
 
 .button.danger strong {
-	background-color: #dc3545;
+  background-color: #dc3545;
 }
 
 .search-form {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .search-form input[type="text"] {
-	flex: 1;
-	min-width: 200px;
+  flex: 1;
+  min-width: 200px;
 }
 
 .safety-standards-info {
-	margin: 2rem auto;
-	max-width: 90%;
+  margin: 2rem auto;
+  max-width: 90%;
 }
 
 .safety-standards-info h4 {
-	margin: 0;
+  margin: 0;
 }

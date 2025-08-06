@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 source "https://rubygems.org"
@@ -25,12 +26,26 @@ gem "tzinfo-data", platforms: %i[windows jruby]
 gem "chobble-forms"
 gem "en14960"
 
-# Sorbet runtime (needed in all environments)
+# Sorbet runtime (needed in all environments and
+# pinned for nixpkgs)
 gem "sorbet-runtime", "= 0.5.12016"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
+
+  # N+1 query detection
+  gem "prosopite"
+  gem "pg_query", "~> 5.1"
+
+  # Pinned for nixpkgs
+  gem "rugged", "= 1.9.0"
+end
+
+group :development do
+  # Ruby code formatter and linter
+  gem "standard", require: false
+  gem "standard-rails", require: false
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
@@ -38,30 +53,11 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
-  # Testing
-  gem "rspec-rails"
-  gem "factory_bot_rails"
-  gem "capybara"
-  gem "cuprite"
-  gem "simplecov", require: false
-  gem "simplecov-cobertura", require: false
-  gem "pdf-inspector", require: false
-  gem "parallel_tests"
-  gem "database_cleaner-active_record"
-
-  # Ruby code formatter and linter
-  gem "standard", require: false
-  gem "standard-rails"
-
-  # N+1 query detection
-  gem "prosopite"
-  gem "pg_query", "~> 5.1"
-
   # ERB linter with better-html support
   gem "erb_lint", require: false
   gem "better_html", require: false
 
-  # Sorbet type checker (development only)
+  # Sorbet type checker
   gem "sorbet", require: false
   gem "tapioca", require: false
 
@@ -70,9 +66,27 @@ group :development, :test do
 
   # Annotate models with schema info
   gem "annotate", require: false
+
+  # License compliance
+  gem "licensed", "~> 5.0"
 end
 
 group :test do
+  # Testing framework
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem "capybara"
+  gem "cuprite"
+
+  # Code coverage
+  gem "simplecov", require: false
+  gem "simplecov-cobertura", require: false
+
+  # Test utilities
+  gem "pdf-inspector", require: false
+  gem "parallel_tests"
+  gem "database_cleaner-active_record"
+
   # RSpec matchers for Sorbet
   gem "rspec-sorbet"
 
@@ -91,6 +105,7 @@ gem "importmap-rails", "~> 2.1"
 
 # Image processing
 gem "image_processing", "~> 1.12"
+
 # Pin ruby-vips for nixpkgs compatibility
 # Note: Requires libvips to be installed on the system
 gem "ruby-vips", "= 2.2.3", require: false
@@ -124,8 +139,6 @@ gem "aws-sdk-s3", require: false
 # Cron job management
 gem "whenever", require: false
 
-# Pinned versions for nixpkgs compatibility
+# Pinned for nixpkgs
 gem "psych", "= 5.2.3"
 gem "openssl", "= 3.3.0"
-
-gem "licensed", "~> 5.0", group: :development

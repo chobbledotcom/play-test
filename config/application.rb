@@ -66,5 +66,8 @@ module PlayTest
 
       config.i18n.load_path << override_path if File.exist?(override_path)
     end
+
+    # Use the application to handle all exceptions (including 404s)
+    config.exceptions_app = routes
   end
 end

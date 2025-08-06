@@ -84,6 +84,7 @@ Rails.application.routes.draw do
   # Admin
   get "admin", to: "admin#index"
   get "admin/releases", to: "admin#releases", as: :admin_releases
+  get "admin/files", to: "admin#files", as: :admin_files
 
   # Backups
   resources :backups, only: [:index] do
@@ -98,4 +99,7 @@ Rails.application.routes.draw do
     to: "pages#show",
     as: :page_by_slug,
     constraints: {slug: /[^\/]+/}
+
+  # Handle error pages when exceptions_app is configured
+  match "/404", to: "application#not_found", via: :all
 end

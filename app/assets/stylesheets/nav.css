@@ -1,73 +1,73 @@
 nav {
-	font-family: var(--font-family-secondary);
+  font-family: var(--font-family-secondary);
 }
 
 nav ul {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	gap: 0.5rem;
-	width: 50rem;
-	max-width: 90%;
-	margin: 2rem auto;
-	padding: 0;
-	list-style: none;
-	justify-content: center;
-	align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 50rem;
+  max-width: 90%;
+  margin: 2rem auto;
+  padding: 0;
+  list-style: none;
+  justify-content: center;
+  align-items: center;
 }
 
 nav ul li {
-	padding: 0;
-	margin: 0;
+  padding: 0;
+  margin: 0;
 }
 
 nav ul li,
 nav ul li a,
 nav ul li button {
-	display: block;
-	margin: 0;
-	padding: 0;
-	border: 0;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 nav ul li a,
 nav ul li button {
-	background: none;
-	color: var(--color-link);
-	text-decoration: underline;
-	position: relative;
-	font-weight: normal;
-	font-family: var(--font-family-secondary);
+  background: none;
+  color: var(--color-link);
+  text-decoration: underline;
+  position: relative;
+  font-weight: normal;
+  font-family: var(--font-family-secondary);
 }
 
 nav ul li a:hover,
 nav ul li button:hover {
-	transform: none;
-	box-shadow: none;
+  transform: none;
+  box-shadow: none;
 }
 
 nav form.button_to {
-	margin: 0;
-	min-width: fit-content;
+  margin: 0;
+  min-width: fit-content;
 }
 
 /* Nav-specific button styles - these override the general button styles */
 nav a,
 nav button {
-	/* transition moved to buttons.css */
-	position: relative;
-	transform: translateY(0);
-	display: inline-block;
-	padding: 0.5rem !important;
+  /* transition moved to buttons.css */
+  position: relative;
+  transform: translateY(0);
+  display: inline-block;
+  padding: 0.5rem !important;
 }
 
 nav span {
-	display: block;
-	padding: 0.5rem;
-	color: var(--color-link);
-	border: 2px solid var(--color-link);
-	text-decoration: none;
-	cursor: default;
-	text-align: center;
-	box-sizing: border-box;
+  display: block;
+  padding: 0.5rem;
+  color: var(--color-link);
+  border: 2px solid var(--color-link);
+  text-decoration: none;
+  cursor: default;
+  text-align: center;
+  box-sizing: border-box;
 }

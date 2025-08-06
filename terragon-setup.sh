@@ -1,46 +1,26 @@
 #!/bin/bash
 set -euo pipefail
 
-# Terragon Labs Rails Setup Script - OPTIMIZED FOR SPEED
-# Runs once per new environment - optimized for first-run performance
+curl -fsSL https://install.determinate.systems/nix | sh -s -- install --determinate --no-confirm
 
-echo "Setting up Terragon Rails environment..."
+# Add nix to PATH
+export PATH="$HOME/.nix-profile/bin:$PATH"
 
-# Run apt-get update and install in one command (faster)
-echo "Installing system packages..."
-DEBIAN_FRONTEND=noninteractive sudo apt-get update -qq && \
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -y -qq \
-    ruby-full ruby-bundler build-essential libsqlite3-dev \
-    libyaml-dev libvips-dev cmake pkg-config sassc \
-    --no-install-recommends
+# Run bundle install inside nix develop shell
+echo "Running bundle install in nix develop shell..."
+nix develop --command bundle install
 
-# Install bundler with no documentation (faster)
-echo "Installing bundler..."
-gem install bundler --no-document --quiet
-
-# Install gems with maximum parallelization
-echo "Installing gems (parallel)..."
-bundle install --jobs 4 --quiet
-
-# Create both databases in parallel (big time saver)
-echo "Setting up databases in parallel..."
-
-# Start both database setups in background
-(
-    echo "  Creating development database..."
-    bundle exec rails db:create db:migrate db:seed --trace 2>/dev/null
-) &
-DEV_PID=$!
-
-(
-    echo "  Creating test database..."
-    RAILS_ENV=test bundle exec rails db:create db:migrate --trace 2>/dev/null
-    bundle exec rails parallel:prepare 2>/dev/null
-) &
-TEST_PID=$!
-
-# Wait for both to complete
-wait $DEV_PID && echo "  ✓ Development database ready"
-wait $TEST_PID && echo "  ✓ Test database ready"
-
-echo "✓ Rails setup complete!"
+# Print instructions for Terry
+echo ""
+echo "================== TERRY INSTRUCTIONS =================="
+echo "To run rspec tests with the nix shell, use:"
+echo ""
+echo "  nix develop --command bundle exec rspec"
+echo ""
+echo "Or enter the nix shell first and run commands:"
+echo ""
+echo "  nix develop"
+echo "  bundle exec rspec"
+echo ""
+echo "The nix shell provides all required dependencies."
+echo "========================================================"

@@ -2,7 +2,10 @@
 #
 # Table name: user_height_assessments
 #
+#  id                                :integer          not null
 #  inspection_id                     :string(12)       not null, primary key
+#  created_at                        :datetime         not null
+#  updated_at                        :datetime         not null
 #  containing_wall_height            :decimal(8, 2)
 #  containing_wall_height_comment    :text
 #  tallest_user_height               :decimal(8, 2)
@@ -17,13 +20,11 @@
 #  users_at_1200mm                   :integer
 #  users_at_1500mm                   :integer
 #  users_at_1800mm                   :integer
-#  created_at                        :datetime         not null
-#  updated_at                        :datetime         not null
 #  user_count_at_maximum_user_height :integer
 #
 # Indexes
 #
-#  user_height_assessments_new_pkey  (inspection_id) UNIQUE
+#  index_user_height_assessments_on_inspection_id  (inspection_id)
 #
 
 # typed: true
