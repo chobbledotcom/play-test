@@ -53,7 +53,7 @@ RSpec.describe "About SCSS Compilation" do
         }
 
         normalized_compiled = normalize.call(compiled_css)
-        normalized_expected = normalize.call(expected_css)
+        normalize.call(expected_css)
 
         # Check that all the selectors are present
         expect(normalized_compiled).to include("#about article")
