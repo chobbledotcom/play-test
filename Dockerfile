@@ -13,7 +13,7 @@ WORKDIR /rails
 
 # Install base packages
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 sqlite3 libvips libyaml-dev && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 sqlite3 libvips libyaml-dev sassc && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install supercronic for non-root cron support

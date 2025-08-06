@@ -67,11 +67,17 @@ group :development, :test do
 
   # Rubocop extension for Sorbet
   gem "rubocop-sorbet", require: false
+
+  # Annotate models with schema info
+  gem "annotate", require: false
 end
 
 group :test do
   # RSpec matchers for Sorbet
   gem "rspec-sorbet"
+
+  # JUnit formatter for RSpec (for CI integration)
+  gem "rspec_junit_formatter"
 end
 
 # PDF generation
@@ -100,6 +106,9 @@ gem "csv"
 
 # CORS support for federation
 gem "rack-cors"
+
+# JSON serialization
+gem "blueprinter"
 
 gem "rails-controller-testing", "~> 1.0", groups: %i[development test]
 

@@ -1,3 +1,23 @@
+# == Schema Information
+#
+# Table name: user_sessions
+#
+#  id             :integer          not null, primary key
+#  user_id        :string(12)       not null
+#  session_token  :string           not null
+#  ip_address     :string
+#  user_agent     :string
+#  last_active_at :datetime         not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#
+# Indexes
+#
+#  index_user_sessions_on_session_token               (session_token) UNIQUE
+#  index_user_sessions_on_user_id                     (user_id)
+#  index_user_sessions_on_user_id_and_last_active_at  (user_id,last_active_at)
+#
+
 class UserSession < ApplicationRecord
   belongs_to :user
 

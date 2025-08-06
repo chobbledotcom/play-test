@@ -52,6 +52,16 @@ end
 require "rspec/sorbet"
 
 RSpec.configure do |config|
+  # Configure JUnit formatter when RSPEC_JUNIT_FORMATTER environment variable is set
+  if ENV["RSPEC_JUNIT_FORMATTER"] == "true"
+    require "rspec_junit_formatter"
+    config.add_formatter RspecJunitFormatter
+    # Optionally set output file (defaults to rspec.xml)
+    if ENV["RSPEC_JUNIT_OUTPUT"]
+      config.add_formatter RspecJunitFormatter, ENV["RSPEC_JUNIT_OUTPUT"]
+    end
+  end
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.

@@ -20,13 +20,21 @@ jobs:
         env:
           RAILS_ENV: test
           SIMPLECOV_COBERTURA: true
+          RSPEC_JUNIT_FORMATTER: true
+          RSPEC_JUNIT_OUTPUT: junit.xml
         run: |
           bundle exec rails db:migrate
           bundle exec rails parallel:prepare
           bundle exec rake coverage:parallel
 
-      - name: Upload to Codecov
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 

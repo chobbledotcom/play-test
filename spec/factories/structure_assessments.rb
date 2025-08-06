@@ -1,3 +1,54 @@
+# == Schema Information
+#
+# Table name: structure_assessments
+#
+#  inspection_id                       :string(12)       not null, primary key
+#  seam_integrity_pass                 :boolean
+#  air_loss_pass                       :boolean
+#  straight_walls_pass                 :boolean
+#  sharp_edges_pass                    :boolean
+#  unit_stable_pass                    :boolean
+#  unit_pressure                       :decimal(8, 2)
+#  critical_fall_off_height            :integer
+#  trough_depth                        :integer
+#  stitch_length_pass                  :boolean
+#  evacuation_time_pass                :boolean
+#  critical_fall_off_height_pass       :boolean
+#  unit_pressure_pass                  :boolean
+#  trough_pass                         :boolean
+#  entrapment_pass                     :boolean
+#  markings_pass                       :boolean
+#  grounding_pass                      :boolean
+#  seam_integrity_comment              :text
+#  stitch_length_comment               :text
+#  air_loss_comment                    :text
+#  straight_walls_comment              :text
+#  sharp_edges_comment                 :text
+#  unit_stable_comment                 :text
+#  evacuation_time_comment             :text
+#  critical_fall_off_height_comment    :text
+#  unit_pressure_comment               :text
+#  trough_comment                      :text
+#  entrapment_comment                  :text
+#  markings_comment                    :text
+#  grounding_comment                   :text
+#  trough_depth_comment                :string(1000)
+#  trough_adjacent_panel_width         :integer
+#  trough_adjacent_panel_width_comment :text
+#  step_ramp_size                      :integer
+#  step_ramp_size_pass                 :boolean
+#  step_ramp_size_comment              :text
+#  created_at                          :datetime         not null
+#  updated_at                          :datetime         not null
+#  platform_height                     :integer
+#  platform_height_pass                :boolean
+#  platform_height_comment             :text
+#
+# Indexes
+#
+#  structure_assessments_new_pkey  (inspection_id) UNIQUE
+#
+
 FactoryBot.define do
   factory :structure_assessment, class: "Assessments::StructureAssessment" do
     association :inspection

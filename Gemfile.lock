@@ -77,6 +77,9 @@ GEM
       public_suffix (>= 2.0.2, < 7.0)
     afm (0.2.2)
     android_key_attestation (0.3.0)
+    annotate (2.6.5)
+      activerecord (>= 2.3.0)
+      rake (>= 0.8.7)
     ast (2.4.3)
     aws-eventstream (1.4.0)
     aws-partitions (1.1138.0)
@@ -109,6 +112,7 @@ GEM
       smart_properties
     bigdecimal (3.1.9)
     bindata (2.5.1)
+    blueprinter (1.1.2)
     brakeman (7.1.0)
       racc
     builder (3.3.0)
@@ -425,6 +429,8 @@ GEM
     rspec-sorbet (1.9.2)
       sorbet-runtime
     rspec-support (3.13.4)
+    rspec_junit_formatter (0.6.0)
+      rspec-core (>= 2, < 4, != 2.12.0)
     rubocop (1.75.8)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -610,9 +616,11 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  annotate
   aws-sdk-s3
   bcrypt
   better_html
+  blueprinter
   brakeman
   capybara
   chobble-forms
@@ -643,6 +651,7 @@ DEPENDENCIES
   rqrcode
   rspec-rails
   rspec-sorbet
+  rspec_junit_formatter
   rubocop-rails-omakase
   rubocop-sorbet
   ruby-vips (= 2.2.3)

@@ -1,3 +1,33 @@
+# == Schema Information
+#
+# Table name: slide_assessments
+#
+#  inspection_id                           :string(12)       not null, primary key
+#  slide_platform_height                   :decimal(8, 2)
+#  slide_wall_height                       :decimal(8, 2)
+#  runout                                  :decimal(8, 2)
+#  slide_first_metre_height                :decimal(8, 2)
+#  slide_beyond_first_metre_height         :decimal(8, 2)
+#  clamber_netting_pass                    :integer
+#  runout_pass                             :boolean
+#  slip_sheet_pass                         :boolean
+#  slide_permanent_roof                    :boolean
+#  slide_platform_height_comment           :text
+#  slide_wall_height_comment               :text
+#  slide_first_metre_height_comment        :text
+#  slide_beyond_first_metre_height_comment :text
+#  slide_permanent_roof_comment            :text
+#  clamber_netting_comment                 :text
+#  runout_comment                          :text
+#  slip_sheet_comment                      :text
+#  created_at                              :datetime         not null
+#  updated_at                              :datetime         not null
+#
+# Indexes
+#
+#  slide_assessments_new_pkey  (inspection_id) UNIQUE
+#
+
 # typed: true
 # frozen_string_literal: true
 
