@@ -1,16 +1,18 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe ApplicationController, type: :controller do
   # Create anonymous controller for testing
   controller do
     # Public action for testing filters
-    def index
+    define_method(:index) do
       render plain: "OK"
     end
 
     # Action that skips login requirement
     skip_before_action :require_login, only: :public_action
-    def public_action
+    define_method(:public_action) do
       render plain: "Public"
     end
   end
@@ -202,7 +204,7 @@ RSpec.describe ApplicationController, type: :controller do
         skip_before_action :require_login
         before_action :require_logged_out
 
-        def index
+        define_method(:index) do
           render plain: "OK"
         end
       end
@@ -237,7 +239,7 @@ RSpec.describe ApplicationController, type: :controller do
         skip_before_action :require_login
         before_action :require_admin
 
-        def index
+        define_method(:index) do
           render plain: "OK"
         end
       end
@@ -305,26 +307,11 @@ RSpec.describe ApplicationController, type: :controller do
 
   describe "debug and performance monitoring" do
     describe "#admin_debug_enabled?" do
-      it "returns true in development" do
+      it "simply returns Rails.env.development?" do
         allow(Rails.env).to receive(:development?).and_return(true)
         expect(controller.send(:admin_debug_enabled?)).to be true
-      end
 
-      it "returns true for admin users" do
         allow(Rails.env).to receive(:development?).and_return(false)
-        allow(controller).to receive(:current_user).and_return(admin)
-        expect(controller.send(:admin_debug_enabled?)).to be true
-      end
-
-      it "returns true when impersonating" do
-        allow(Rails.env).to receive(:development?).and_return(false)
-        session[:original_admin_id] = 123
-        expect(controller.send(:admin_debug_enabled?)).to be true
-      end
-
-      it "returns false for regular users in production" do
-        allow(Rails.env).to receive(:development?).and_return(false)
-        allow(controller).to receive(:current_user).and_return(user)
         expect(controller.send(:admin_debug_enabled?)).to be false
       end
     end
@@ -347,7 +334,7 @@ RSpec.describe ApplicationController, type: :controller do
     controller do
       skip_before_action :require_login
 
-      def index
+      define_method(:index) do
         raise StandardError, "Test error"
       end
     end

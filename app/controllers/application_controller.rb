@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
@@ -89,7 +90,7 @@ class ApplicationController < ActionController::Base
   end
 
   def admin_debug_enabled?
-    Rails.env.development? || current_user&.admin? || impersonating?
+    Rails.env.development?
   end
 
   def seed_data_action?
