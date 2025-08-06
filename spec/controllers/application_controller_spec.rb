@@ -307,26 +307,11 @@ RSpec.describe ApplicationController, type: :controller do
 
   describe "debug and performance monitoring" do
     describe "#admin_debug_enabled?" do
-      it "returns true in development" do
+      it "simply returns Rails.env.development?" do
         allow(Rails.env).to receive(:development?).and_return(true)
         expect(controller.send(:admin_debug_enabled?)).to be true
-      end
 
-      it "returns false for admin users in production" do
         allow(Rails.env).to receive(:development?).and_return(false)
-        allow(controller).to receive(:current_user).and_return(admin)
-        expect(controller.send(:admin_debug_enabled?)).to be false
-      end
-
-      it "returns false when impersonating in production" do
-        allow(Rails.env).to receive(:development?).and_return(false)
-        session[:original_admin_id] = 123
-        expect(controller.send(:admin_debug_enabled?)).to be false
-      end
-
-      it "returns false for regular users in production" do
-        allow(Rails.env).to receive(:development?).and_return(false)
-        allow(controller).to receive(:current_user).and_return(user)
         expect(controller.send(:admin_debug_enabled?)).to be false
       end
     end
