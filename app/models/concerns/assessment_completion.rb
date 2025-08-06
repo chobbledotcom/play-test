@@ -85,9 +85,7 @@ module AssessmentCompletion
   def field_is_incomplete?(field)
     value = send(field)
     # Field is incomplete if nil
-    return true if value.nil?
-    # Pass fields with "na" value are also incomplete (pass fields require actual pass/fail value)
-    field.end_with?("_pass") && value == "na"
+    value.nil?
   end
 
   sig { params(field: String).returns(T::Boolean) }
