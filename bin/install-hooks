@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -e
+
+HOOKS_DIR=".git/hooks"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+echo "Installing git hooks..."
+
+# Ensure we're in the project root
+cd "$PROJECT_ROOT"
+
+# Create hooks directory if it doesn't exist
+mkdir -p "$HOOKS_DIR"
+
+# Install pre-commit hook
+if [ -f "hooks/pre-commit" ]; then
+  echo "Installing pre-commit hook..."
+  cp hooks/pre-commit "$HOOKS_DIR/pre-commit"
+  chmod +x "$HOOKS_DIR/pre-commit"
+  echo "✓ Pre-commit hook installed"
+else
+  echo "⚠ No pre-commit hook found in hooks/ directory"
+fi
+
+# Install other hooks (for future use)
+for hook in commit-msg post-checkout post-merge prepare-commit-msg; do
+  if [ -f "hooks/$hook" ]; then
+    echo "Installing $hook hook..."
+    cp "hooks/$hook" "$HOOKS_DIR/$hook"
+    chmod +x "$HOOKS_DIR/$hook"
+    echo "✓ $hook hook installed"
+  fi
+done
+
+echo ""
+echo "Git hooks installation complete!"
+echo "To skip hooks on a single commit, use: git commit --no-verify"
