@@ -1,3 +1,6 @@
+# typed: false
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   include CustomIdGenerator
 
@@ -157,26 +160,26 @@ class User < ApplicationRecord
   end
 
   def set_inactive_on_signup
-    unless instance_variable_get(:@active_until_explicitly_set)
-      self.active_until = Date.current - 1.day
-    end
+    return if instance_variable_get(:@active_until_explicitly_set)
+
+    self.active_until = Date.current - 1.day
   end
 
   def logo_must_be_image
     return unless logo.attached?
 
-    unless logo.blob.content_type.start_with?("image/")
-      errors.add(:logo, "must be an image file")
-      logo.purge
-    end
+    return if logo.blob.content_type.start_with?("image/")
+
+    errors.add(:logo, "must be an image file")
+    logo.purge
   end
 
   def signature_must_be_image
     return unless signature.attached?
 
-    unless signature.blob.content_type.start_with?("image/")
-      errors.add(:signature, "must be an image file")
-      signature.purge
-    end
+    return if signature.blob.content_type.start_with?("image/")
+
+    errors.add(:signature, "must be an image file")
+    signature.purge
   end
 end
