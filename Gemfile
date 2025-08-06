@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 source "https://rubygems.org"
@@ -25,7 +26,8 @@ gem "tzinfo-data", platforms: %i[windows jruby]
 gem "chobble-forms"
 gem "en14960"
 
-# Sorbet runtime (needed in all environments)
+# Sorbet runtime (needed in all environments and
+# pinned for nixpkgs)
 gem "sorbet-runtime", "= 0.5.12016"
 
 group :development, :test do
@@ -70,6 +72,11 @@ group :development, :test do
 
   # Annotate models with schema info
   gem "annotate", require: false
+
+  gem "licensed", "~> 5.0"
+
+  # Pinned for nixpkgs
+  gem "rugged", "= 1.9.0"
 end
 
 group :test do
@@ -91,6 +98,7 @@ gem "importmap-rails", "~> 2.1"
 
 # Image processing
 gem "image_processing", "~> 1.12"
+
 # Pin ruby-vips for nixpkgs compatibility
 # Note: Requires libvips to be installed on the system
 gem "ruby-vips", "= 2.2.3", require: false
@@ -124,8 +132,6 @@ gem "aws-sdk-s3", require: false
 # Cron job management
 gem "whenever", require: false
 
-# Pinned versions for nixpkgs compatibility
+# Pinned for nixpkgs
 gem "psych", "= 5.2.3"
 gem "openssl", "= 3.3.0"
-
-gem "licensed", "~> 5.0", group: :development

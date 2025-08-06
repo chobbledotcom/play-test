@@ -99,4 +99,7 @@ Rails.application.routes.draw do
     to: "pages#show",
     as: :page_by_slug,
     constraints: {slug: /[^\/]+/}
+
+  # Handle error pages when exceptions_app is configured
+  match "/404", to: "application#not_found", via: :all
 end
