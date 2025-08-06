@@ -44,6 +44,10 @@ module PlayTest
     # Don't generate system test files.
     config.generators.system_tests = nil
 
+    # Configure Sass/SCSS compilation to use expanded style
+    config.sass.preferred_syntax = :scss
+    config.sass.style = :expanded
+
     # Preserve full timezone rather than offset in Rails 8.1+
     config.active_support.to_time_preserves_timezone = :zone
 

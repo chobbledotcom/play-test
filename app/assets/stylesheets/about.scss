@@ -1,0 +1,22 @@
+/* About page specific styles */
+#about {
+  article {
+    max-width: 60rem;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  p {
+    text-align: left;
+    line-height: 1.6;
+  }
+
+  table {
+    text-align: left;
+  }
+
+  th,
+  td {
+    text-align: left;
+  }
+}

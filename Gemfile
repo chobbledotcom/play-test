@@ -6,6 +6,8 @@ source "https://rubygems.org"
 gem "rails", "~> 8.0.2"
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
+# SCSS/Sass support for Rails [https://github.com/rails/sass-rails]
+gem "sass-rails", "~> 6.0"
 # Use sqlite3 as the database for Active Record
 gem "sqlite3", ">= 1.4"
 # Use the Puma web server [https://github.com/puma/puma]
