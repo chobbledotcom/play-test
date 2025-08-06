@@ -13,6 +13,8 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= yield :head %>
     <% unless Rails.env.test? %>
       <script>
         window.goatcounter = {no_onload: true}
@@ -59,8 +61,8 @@
           </li>
           <% if session[:original_admin_id] %>
             <li>
-              <%= link_to t('users.buttons.stop_impersonating'), 
-                  stop_impersonating_user_path(current_user), 
+              <%= link_to t('users.buttons.stop_impersonating'),
+                  stop_impersonating_user_path(current_user),
                   data: { turbo_method: :post } %>
             </li>
           <% end %>

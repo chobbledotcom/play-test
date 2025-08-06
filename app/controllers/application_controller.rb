@@ -47,14 +47,10 @@ class ApplicationController < ActionController::Base
     raise exception
   end
 
-  def not_found
-    render "errors/not_found", layout: "application", status: :not_found
-  end
-
   private
 
   def skip_authentication?
-    action_name == "not_found"
+    false
   end
 
   def app_i18n(table, key, **args)
