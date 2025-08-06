@@ -110,7 +110,7 @@ GEM
       erubi (~> 1.4)
       parser (>= 2.4)
       smart_properties
-    bigdecimal (3.1.9)
+    bigdecimal (3.2.2)
     bindata (2.5.1)
     blueprinter (1.1.2)
     brakeman (7.1.0)
@@ -323,8 +323,8 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pg_query (5.1.0)
-      google-protobuf (>= 3.22.3)
+    pg_query (6.1.0)
+      google-protobuf (>= 3.25.3)
     pp (0.6.2)
       prettyprint
     prawn (2.5.0)
@@ -392,7 +392,7 @@ GEM
       thor (~> 1.0, >= 1.2.2)
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
-    rake (13.2.1)
+    rake (13.3.0)
     rbi (0.0.17)
       ast
       parser (>= 3.0.0)
@@ -639,7 +639,7 @@ DEPENDENCIES
   openssl (= 3.3.0)
   parallel_tests
   pdf-inspector
-  pg_query (~> 5.1)
+  pg_query (~> 6.1)
   prawn
   prawn-table
   prosopite
