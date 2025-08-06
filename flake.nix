@@ -20,6 +20,7 @@
       {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
+            cmake
             gh
             jq
             libyaml
@@ -28,6 +29,7 @@
             rubyPackages_3_4.openssl
             rubyPackages_3_4.psych
             rubyPackages_3_4.ruby-vips
+            rubyPackages_3_4.rugged
             rubyPackages_3_4.sorbet-runtime
             ruby_3_4
             sqlite
