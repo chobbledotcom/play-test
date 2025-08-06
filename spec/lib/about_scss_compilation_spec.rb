@@ -1,34 +1,35 @@
+# typed: false
 # frozen_string_literal: true
 
 require "rails_helper"
 
 RSpec.describe "About SCSS Compilation" do
   describe "about.scss compilation" do
-    it "compiles about.scss to match the original about.css structure" do
+    it "compiles about.scss to match the expected CSS structure" do
       # Read the SCSS file
       scss_path = Rails.root.join("app/assets/stylesheets/about.scss")
       scss_content = File.read(scss_path)
 
-      # Expected CSS output (based on the original about.css)
+      # Expected CSS output (using class selector)
       expected_css = <<~CSS
         /* About page specific styles */
-        #about article {
+        .about article {
           max-width: 60rem;
           margin: 0 auto;
           text-align: left;
         }
-        
-        #about p {
+
+        .about p {
           text-align: left;
           line-height: 1.6;
         }
-        
-        #about table {
+
+        .about table {
           text-align: left;
         }
-        
-        #about th,
-        #about td {
+
+        .about th,
+        .about td {
           text-align: left;
         }
       CSS
@@ -56,11 +57,11 @@ RSpec.describe "About SCSS Compilation" do
         normalize.call(expected_css)
 
         # Check that all the selectors are present
-        expect(normalized_compiled).to include("#about article")
-        expect(normalized_compiled).to include("#about p")
-        expect(normalized_compiled).to include("#about table")
-        expect(normalized_compiled).to include("#about th")
-        expect(normalized_compiled).to include("#about td")
+        expect(normalized_compiled).to include(".about article")
+        expect(normalized_compiled).to include(".about p")
+        expect(normalized_compiled).to include(".about table")
+        expect(normalized_compiled).to include(".about th")
+        expect(normalized_compiled).to include(".about td")
 
         # Check that the properties are present
         expect(normalized_compiled).to include("max-width: 60rem")
@@ -74,7 +75,7 @@ RSpec.describe "About SCSS Compilation" do
 
     it "produces functionally equivalent CSS from nested SCSS" do
       scss_content = <<~SCSS
-        #about {
+        .about {
           article {
             max-width: 60rem;
             margin: 0 auto;
@@ -103,11 +104,12 @@ RSpec.describe "About SCSS Compilation" do
         compiled = engine.render
 
         # Verify the compiled output contains all expected rules
-        expect(compiled).to match(/#about article\s*{[^}]*max-width:\s*60rem/)
-        expect(compiled).to match(/#about article\s*{[^}]*margin:\s*0 auto/)
-        expect(compiled).to match(/#about p\s*{[^}]*line-height:\s*1\.6/)
-        expect(compiled).to match(/#about table\s*{[^}]*text-align:\s*left/)
-        expect(compiled).to match(/#about th,\s*#about td\s*{[^}]*text-align:\s*left/)
+        expect(compiled).to match(/\.about article\s*{[^}]*max-width:\s*60rem/)
+        expect(compiled).to match(/\.about article\s*{[^}]*margin:\s*0 auto/)
+        expect(compiled).to match(/\.about p\s*{[^}]*line-height:\s*1\.6/)
+        expect(compiled).to match(/\.about table\s*{[^}]*text-align:\s*left/)
+        about_th_td = /\.about th,\s*\.about td\s*{[^}]*text-align:\s*left/
+        expect(compiled).to match(about_th_td)
       rescue LoadError
         skip "SassC gem not available, skipping compilation test"
       end
