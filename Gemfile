@@ -105,6 +105,9 @@ gem "csv"
 # CORS support for federation
 gem "rack-cors"
 
+# JSON serialization
+gem "blueprinter"
+
 gem "rails-controller-testing", "~> 1.0", groups: %i[development test]
 
 gem "turbo-rails", "~> 2.0"

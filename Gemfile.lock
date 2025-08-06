@@ -112,6 +112,7 @@ GEM
       smart_properties
     bigdecimal (3.1.9)
     bindata (2.5.1)
+    blueprinter (1.1.2)
     brakeman (7.1.0)
       racc
     builder (3.3.0)
@@ -608,6 +609,7 @@ DEPENDENCIES
   aws-sdk-s3
   bcrypt
   better_html
+  blueprinter
   brakeman
   capybara
   chobble-forms

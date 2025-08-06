@@ -1,3 +1,5 @@
+# typed: false
+
 class InspectionsController < ApplicationController
   include InspectionTurboStreams
   include PublicViewable
@@ -38,7 +40,7 @@ class InspectionsController < ApplicationController
       format.pdf { send_inspection_pdf }
       format.png { send_inspection_qr_code }
       format.json do
-        render json: JsonSerializerService.serialize_inspection(@inspection)
+        render json: InspectionBlueprint.render(@inspection)
       end
     end
   end
