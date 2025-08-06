@@ -21,6 +21,7 @@ jobs:
           RAILS_ENV: test
           SIMPLECOV_COBERTURA: true
           RSPEC_JUNIT_FORMATTER: true
+          RSPEC_JUNIT_OUTPUT: junit.xml
         run: |
           bundle exec rails db:migrate
           bundle exec rails parallel:prepare
