@@ -1,0 +1,43 @@
+<header>
+  <h1><%= t("admin.files.title") %></h1>
+</header>
+
+<% if @blobs.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th><%= t("admin.files.table.filename") %></th>
+        <th><%= t("admin.files.table.size") %></th>
+        <th><%= t("admin.files.table.attached_to") %></th>
+        <th><%= t("admin.files.table.created_at") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @blobs.each do |blob| %>
+        <tr>
+          <td>
+            <%= link_to blob.filename.to_s, rails_blob_path(blob, disposition: "attachment") %>
+          </td>
+          <td>
+            <%= number_to_human_size(blob.byte_size) %>
+          </td>
+          <td>
+            <% blob.attachments.each do |attachment| %>
+              <% if attachment.record %>
+                <% record = attachment.record %>
+                <%= link_to "#{record.class.name} ##{record.id}", record %>
+              <% else %>
+                <%= t("admin.files.attached_to.orphaned") %>
+              <% end %>
+            <% end %>
+          </td>
+          <td>
+            <%= blob.created_at.strftime("%Y-%m-%d %H:%M") %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p><%= t("admin.files.no_files") %></p>
+<% end %>

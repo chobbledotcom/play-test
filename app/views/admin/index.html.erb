@@ -9,6 +9,7 @@
     <li><%= link_to t("navigation.pages"), pages_path %></li>
     <li><%= link_to t("navigation.jobs"), "/mission_control" %></li>
     <li><%= link_to t("navigation.releases"), admin_releases_path %></li>
+    <li><%= link_to t("navigation.files"), admin_files_path %></li>
     <% if @show_backups %>
       <li><%= link_to t("navigation.backups"), backups_path %></li>
     <% end %>

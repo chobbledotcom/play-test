@@ -14,6 +14,7 @@ en:
     admin: "Admin"
     backups: "Backups"
     releases: "Releases"
+    files: "Files"
 
   # Shared UI elements
   shared:
