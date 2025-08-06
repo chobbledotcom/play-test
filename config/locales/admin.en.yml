@@ -16,3 +16,4 @@ en:
         created_at: "Created"
       attached_to:
         orphaned: "Orphaned"
+        variant_record: "Variant Record #%{id}"

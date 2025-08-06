@@ -82,8 +82,8 @@ GEM
       rake (>= 0.8.7)
     ast (2.4.3)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1138.0)
-    aws-sdk-core (3.228.0)
+    aws-partitions (1.1142.0)
+    aws-sdk-core (3.229.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -91,10 +91,10 @@ GEM
       bigdecimal
       jmespath (~> 1, >= 1.6.1)
       logger
-    aws-sdk-kms (1.108.0)
-      aws-sdk-core (~> 3, >= 3.227.0)
+    aws-sdk-kms (1.110.0)
+      aws-sdk-core (~> 3, >= 3.228.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.196.0)
+    aws-sdk-s3 (1.196.1)
       aws-sdk-core (~> 3, >= 3.228.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
@@ -110,7 +110,7 @@ GEM
       erubi (~> 1.4)
       parser (>= 2.4)
       smart_properties
-    bigdecimal (3.1.9)
+    bigdecimal (3.2.2)
     bindata (2.5.1)
     blueprinter (1.1.2)
     brakeman (7.1.0)
@@ -323,8 +323,8 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pg_query (5.1.0)
-      google-protobuf (>= 3.22.3)
+    pg_query (6.1.0)
+      google-protobuf (>= 3.25.3)
     pp (0.6.2)
       prettyprint
     prawn (2.5.0)
@@ -508,12 +508,12 @@ GEM
       fugit (~> 1.11.0)
       railties (>= 7.1)
       thor (>= 1.3.1)
-    sorbet (0.5.12371)
-      sorbet-static (= 0.5.12371)
+    sorbet (0.5.12374)
+      sorbet-static (= 0.5.12374)
     sorbet-runtime (0.5.12016)
-    sorbet-static (0.5.12371-aarch64-linux)
-    sorbet-static (0.5.12371-universal-darwin)
-    sorbet-static (0.5.12371-x86_64-linux)
+    sorbet-static (0.5.12374-aarch64-linux)
+    sorbet-static (0.5.12374-universal-darwin)
+    sorbet-static (0.5.12374-x86_64-linux)
     spoom (1.1.16)
       sorbet (>= 0.5.10187)
       sorbet-runtime (>= 0.5.9204)
@@ -639,7 +639,7 @@ DEPENDENCIES
   openssl (= 3.3.0)
   parallel_tests
   pdf-inspector
-  pg_query (~> 5.1)
+  pg_query
   prawn
   prawn-table
   prosopite
