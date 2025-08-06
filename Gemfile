@@ -34,42 +34,9 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
 
-  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
-  gem "brakeman", require: false
-
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
-  gem "rubocop-rails-omakase", require: false
-
-  # Testing
-  gem "rspec-rails"
-  gem "factory_bot_rails"
-  gem "capybara"
-  gem "cuprite"
-  gem "simplecov", require: false
-  gem "simplecov-cobertura", require: false
-  gem "pdf-inspector", require: false
-  gem "parallel_tests"
-  gem "database_cleaner-active_record"
-
   # N+1 query detection
   gem "prosopite"
   gem "pg_query", "~> 5.1"
-
-  # ERB linter with better-html support
-  gem "erb_lint", require: false
-  gem "better_html", require: false
-
-  # Sorbet type checker (development only)
-  gem "sorbet", require: false
-  gem "tapioca", require: false
-
-  # Rubocop extension for Sorbet
-  gem "rubocop-sorbet", require: false
-
-  # Annotate models with schema info
-  gem "annotate", require: false
-
-  gem "licensed", "~> 5.0"
 
   # Pinned for nixpkgs
   gem "rugged", "= 1.9.0"
@@ -79,9 +46,47 @@ group :development do
   # Ruby code formatter and linter
   gem "standard", require: false
   gem "standard-rails", require: false
+
+  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
+  gem "brakeman", require: false
+
+  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
+  gem "rubocop-rails-omakase", require: false
+
+  # ERB linter with better-html support
+  gem "erb_lint", require: false
+  gem "better_html", require: false
+
+  # Sorbet type checker
+  gem "sorbet", require: false
+  gem "tapioca", require: false
+
+  # Rubocop extension for Sorbet
+  gem "rubocop-sorbet", require: false
+
+  # Annotate models with schema info
+  gem "annotate", require: false
+
+  # License compliance
+  gem "licensed", "~> 5.0"
 end
 
 group :test do
+  # Testing framework
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem "capybara"
+  gem "cuprite"
+  
+  # Code coverage
+  gem "simplecov", require: false
+  gem "simplecov-cobertura", require: false
+  
+  # Test utilities
+  gem "pdf-inspector", require: false
+  gem "parallel_tests"
+  gem "database_cleaner-active_record"
+  
   # RSpec matchers for Sorbet
   gem "rspec-sorbet"
 
