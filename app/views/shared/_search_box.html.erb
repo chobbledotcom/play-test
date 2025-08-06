@@ -1,0 +1,24 @@
+<form action="/search" method="get" id="homepage-search">
+  <input
+    type="text"
+    name="id"
+    placeholder="<%= t('search.homepage.placeholder') %>"
+    pattern="[A-Za-z0-9]{8}"
+    maxlength="8"
+    required>
+  <button type="submit">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24">
+      <path
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.5"
+        d="m14 14l2.5 2.5m-.067 2.025a1.48 1.48 0 1 1 2.092-2.092l3.042 3.042a1.48 1.48 0 1 1-2.092 2.092zM16 9A7 7 0 1 0 2 9a7 7 0 0 0 14 0" />
+    </svg>
+  </button>
+</form>

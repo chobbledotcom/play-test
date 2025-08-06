@@ -11,6 +11,7 @@ en:
     results:
       heading: "Search Results"
       site: "Site"
+      type: "Type"
       status: "Status"
       action: "Action"
     status:
@@ -19,6 +20,9 @@ en:
       found: "Found"
       not_found: "Not found"
       error: "Error"
+    types:
+      unit: "Unit"
+      inspection: "Inspection"
   
   # Form translations for search
   forms:

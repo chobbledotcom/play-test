@@ -7,9 +7,13 @@ class FederationSearch {
   }
 
   init() {
-    // Find the form inside the search div
+    // Find the form inside the search div or use the homepage search form
     const searchDiv = document.getElementById("search");
     this.form = searchDiv ? searchDiv.querySelector("form") : null;
+    if (!this.form) {
+      this.form = document.getElementById("homepage-search");
+    }
+    
     this.resultsContainer = document.getElementById("search-results");
     this.resultsBody = document.getElementById("results-body");
 
@@ -24,7 +28,7 @@ class FederationSearch {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get("id");
     if (id) {
-      const idField = this.form.querySelector('input[name="search[id]"]');
+      const idField = this.form.querySelector('input[name="id"]');
       if (idField) {
         idField.value = id;
         this.performSearch();
@@ -34,8 +38,7 @@ class FederationSearch {
 
   performSearch() {
     const formData = new FormData(this.form);
-    const type = formData.get("search[type]");
-    const id = formData.get("search[id]").toUpperCase();
+    const id = formData.get("id").toUpperCase();
 
     // Show results container
     this.resultsContainer.style.display = "block";
@@ -50,9 +53,10 @@ class FederationSearch {
       actionCell.textContent = "-";
     });
 
-    // Check each site
+    // Check each site for both units and inspections
     rows.forEach((row) => {
       const siteUrl = row.dataset.siteUrl;
+      const type = row.dataset.type;
       this.checkSite(row, siteUrl, type, id);
     });
   }
