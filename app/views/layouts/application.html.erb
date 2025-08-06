@@ -57,6 +57,13 @@
           <li>
             <%= button_to t("sessions.buttons.log_out"), logout_path, method: :delete %>
           </li>
+          <% if session[:original_admin_id] %>
+            <li>
+              <%= link_to t('users.buttons.stop_impersonating'), 
+                  stop_impersonating_user_path(current_user), 
+                  data: { turbo_method: :post } %>
+            </li>
+          <% end %>
         </ul>
       </nav>
     <% end %>

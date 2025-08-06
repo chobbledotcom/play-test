@@ -1,3 +1,4 @@
+# typed: strict
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
@@ -9,6 +10,7 @@ class UsersController < ApplicationController
     update_settings
     update_password
     logout_everywhere_else
+    stop_impersonating
   ].freeze
 
   LOGGED_OUT_PATHS = %i[
@@ -37,7 +39,11 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      NtfyService.notify("new user: #{@user.email}") if Rails.env.production?
+      if Rails.env.production?
+        notification = I18n.t("users.messages.new_user_notification",
+          email: @user.email)
+        NtfyService.notify(notification)
+      end
 
       log_in @user
       create_session_record @user
@@ -85,11 +91,24 @@ class UsersController < ApplicationController
     end
   end
 
+  extend T::Sig
+
+  sig { void }
   def impersonate
-    # Store original admin user ID before impersonating
     session[:original_admin_id] = current_user.id if current_user.admin?
-    log_in @user
+    switch_to_user(@user)
     flash[:notice] = I18n.t("users.messages.impersonating", email: @user.email)
+    redirect_to root_path
+  end
+
+  sig { void }
+  def stop_impersonating
+    return redirect_to root_path unless session[:original_admin_id]
+
+    admin_user = User.find(session[:original_admin_id])
+    switch_to_user(admin_user)
+    session.delete(:original_admin_id)
+    flash[:notice] = I18n.t("users.messages.stopped_impersonating")
     redirect_to root_path
   end
 
@@ -206,6 +225,15 @@ class UsersController < ApplicationController
 
   private
 
+  sig { params(user: User).void }
+  def switch_to_user(user)
+    UserSession.find_by(session_token: session[:session_token])&.destroy
+    user_session = create_session_record(user)
+    session[:user_id] = user.id
+    session[:session_token] = user_session.session_token
+  end
+
+  sig { params(user: User).returns(UserSession) }
   def create_session_record(user)
     user.user_sessions.create!(
       ip_address: request.remote_ip,

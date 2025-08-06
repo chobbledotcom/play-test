@@ -1,3 +1,5 @@
+# typed: false
+
 Rails.application.routes.draw do
   # Mount Mission Control Jobs (authentication handled by initializer)
   mount MissionControl::Jobs::Engine => "/mission_control"
@@ -35,6 +37,7 @@ Rails.application.routes.draw do
       get "change_settings"
       patch "update_settings"
       post "impersonate"
+      post "stop_impersonating"
       post "verify_rpii"
       post "add_seeds"
       delete "delete_seeds"
