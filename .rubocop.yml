@@ -5,8 +5,19 @@ inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 require:
   - ./lib/rubocop/cop/custom/ternary_line_breaks
 
+# Load plugins
+plugins:
+  - rubocop-sorbet
+
 # Enable custom cops
 Custom/TernaryLineBreaks:
+  Enabled: true
+
+# Enable Sorbet cops
+Sorbet/BlockMethodDefinition:
+  Enabled: true
+  
+Sorbet/Refinement:
   Enabled: true
 
 # Overwrite or add rules to create your own house style
