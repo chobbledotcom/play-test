@@ -57,7 +57,7 @@
         </ul>
       </nav>
     <% end %>
-    <main id="main">
+    <main id="main" class="<%= @page&.slug if defined?(@page) && @page %>">
       <% flash.each do |type, message| %>
         <article class="<%= type %>">
           <%= message %>
