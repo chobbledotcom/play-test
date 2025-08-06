@@ -107,4 +107,3 @@ RSpec.describe "About SCSS Compilation" do
     end
   end
 end
-
