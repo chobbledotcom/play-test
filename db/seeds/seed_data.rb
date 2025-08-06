@@ -18,8 +18,6 @@ module SeedData
   def self.user_fields
     {
       email: "test#{SecureRandom.hex(8)}@example.com",
-      password: "password123",
-      password_confirmation: "password123",
       name: "Test User #{SecureRandom.hex(4)}",
       rpii_inspector_number: nil # Optional field
     }
