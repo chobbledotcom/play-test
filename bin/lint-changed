@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+
+# Script to run linters only on changed files between current branch and remote main
+# Usage: bin/lint-changed [--fix]
+
+set -euo pipefail
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Check if --fix flag is passed
+FIX_FLAG=""
+if [[ "${1:-}" == "--fix" ]]; then
+  FIX_FLAG="--fix"
+fi
+
+echo -e "${YELLOW}Fetching latest from remote...${NC}"
+git fetch origin main --quiet
+
+# Get list of changed files compared to origin/main
+echo -e "${YELLOW}Finding changed files...${NC}"
+CHANGED_FILES=$(git diff --name-only origin/main...HEAD --diff-filter=ACM)
+
+if [ -z "$CHANGED_FILES" ]; then
+  echo -e "${GREEN}No files changed compared to origin/main${NC}"
+  exit 0
+fi
+
+# Separate files by type
+RUBY_FILES=""
+ERB_FILES=""
+JS_FILES=""
+CSS_FILES=""
+
+while IFS= read -r file; do
+  if [[ -f "$file" ]]; then
+    case "$file" in
+      *.rb)
+        RUBY_FILES="$RUBY_FILES $file"
+        ;;
+      *.erb|*.html.erb)
+        ERB_FILES="$ERB_FILES $file"
+        ;;
+      *.js|*.jsx|*.ts|*.tsx)
+        JS_FILES="$JS_FILES $file"
+        ;;
+      *.css|*.scss)
+        CSS_FILES="$CSS_FILES $file"
+        ;;
+    esac
+  fi
+done <<< "$CHANGED_FILES"
+
+# Track if any linter fails
+FAILED=0
+
+# Run StandardRB on Ruby files
+if [ -n "$RUBY_FILES" ]; then
+  echo -e "\n${YELLOW}Running StandardRB on Ruby files...${NC}"
+  if bundle exec standardrb $FIX_FLAG $RUBY_FILES; then
+    echo -e "${GREEN}StandardRB passed${NC}"
+  else
+    echo -e "${RED}StandardRB failed${NC}"
+    FAILED=1
+  fi
+fi
+
+# Run erb_lint on ERB files
+if [ -n "$ERB_FILES" ]; then
+  echo -e "\n${YELLOW}Running erb_lint on ERB files...${NC}"
+  if [ -n "$FIX_FLAG" ]; then
+    if bundle exec erb_lint --autocorrect $ERB_FILES; then
+      echo -e "${GREEN}erb_lint passed${NC}"
+    else
+      echo -e "${RED}erb_lint failed${NC}"
+      FAILED=1
+    fi
+  else
+    if bundle exec erb_lint $ERB_FILES; then
+      echo -e "${GREEN}erb_lint passed${NC}"
+    else
+      echo -e "${RED}erb_lint failed${NC}"
+      FAILED=1
+    fi
+  fi
+fi
+
+# Run Biome on JS/TS files if biome.json exists
+if [ -n "$JS_FILES" ] && [ -f "biome.json" ]; then
+  echo -e "\n${YELLOW}Running Biome on JS/TS files...${NC}"
+  if [ -n "$FIX_FLAG" ]; then
+    if npx @biomejs/biome check --write $JS_FILES; then
+      echo -e "${GREEN}Biome passed${NC}"
+    else
+      echo -e "${RED}Biome failed${NC}"
+      FAILED=1
+    fi
+  else
+    if npx @biomejs/biome check $JS_FILES; then
+      echo -e "${GREEN}Biome passed${NC}"
+    else
+      echo -e "${RED}Biome failed${NC}"
+      FAILED=1
+    fi
+  fi
+fi
+
+# Summary
+echo -e "\n${YELLOW}=== Lint Summary ===${NC}"
+echo "Changed files checked:"
+[ -n "$RUBY_FILES" ] && echo "  Ruby files: $(echo $RUBY_FILES | wc -w)"
+[ -n "$ERB_FILES" ] && echo "  ERB files: $(echo $ERB_FILES | wc -w)"
+[ -n "$JS_FILES" ] && echo "  JS/TS files: $(echo $JS_FILES | wc -w)"
+[ -n "$CSS_FILES" ] && echo "  CSS files: $(echo $CSS_FILES | wc -w)"
+
+if [ $FAILED -eq 0 ]; then
+  echo -e "\n${GREEN}All linters passed!${NC}"
+  exit 0
+else
+  echo -e "\n${RED}Some linters failed. Fix the issues before committing.${NC}"
+  exit 1
+fi
