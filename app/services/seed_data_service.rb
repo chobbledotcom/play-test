@@ -1,3 +1,5 @@
+# typed: false
+
 class SeedDataService
   CASTLE_IMAGE_COUNT = 5
   UNIT_COUNT = 20
@@ -84,17 +86,42 @@ class SeedDataService
         {name: "Double Bungee Run", manufacturer: "Party Castle Manufacturers", width: 4.0, length: 10.0, height: 2.5}
       ]
 
+      # Pre-generate all unit IDs to avoid N+1 queries
+      unit_ids = generate_unit_ids_batch(user, unit_count)
+
+      # Pre-load existing unit IDs to avoid repeated existence checks
+      existing_ids = user.units.pluck(:id).to_set
+
       unit_count.times do |i|
         config = unit_configs[i % unit_configs.length]
-        unit = create_unit_from_config(user, config, i)
+        unit = create_unit_from_config(user, config, i, unit_ids[i], existing_ids)
         # Make half of units have incomplete most recent inspection
         should_have_incomplete_inspection = i.even?
         create_inspections_for_unit(unit, user, config, inspection_count, has_incomplete_recent: should_have_incomplete_inspection)
       end
     end
 
-    def create_unit_from_config(user, config, index)
-      unit = user.units.create!(
+    def generate_unit_ids_batch(user, count)
+      ids = []
+      existing_ids = user.units.pluck(:id).to_set
+
+      count.times do
+        loop do
+          id = SecureRandom.alphanumeric(CustomIdGenerator::ID_LENGTH).upcase
+          unless existing_ids.include?(id)
+            ids << id
+            existing_ids << id
+            break
+          end
+        end
+      end
+
+      ids
+    end
+
+    def create_unit_from_config(user, config, index, unit_id, existing_ids)
+      unit = user.units.build(
+        id: unit_id,
         name: "#{config[:name]} ##{index + 1}",
         serial: "SEED-#{Date.current.year}-#{SecureRandom.hex(4).upcase}",
         description: generate_description(config[:name]),
@@ -102,6 +129,7 @@ class SeedDataService
         operator: STEFAN_OWNER_NAMES.sample,
         is_seed: true
       )
+      unit.save!
 
       # Attach random castle image if available
       # For test environment, skip images as castle files don't exist
