@@ -5,11 +5,16 @@ require "rails_helper"
 RSpec.feature "Error pages", type: :feature do
   around do |example|
     # Temporarily disable local request handling to test custom error pages
-    original_value = Rails.application.config.consider_all_requests_local
+    original_local = Rails.application.config.consider_all_requests_local
+    original_exceptions = Rails.application.config.action_dispatch.show_exceptions
+    
     Rails.application.config.consider_all_requests_local = false
+    Rails.application.config.action_dispatch.show_exceptions = true
+    
     example.run
   ensure
-    Rails.application.config.consider_all_requests_local = original_value
+    Rails.application.config.consider_all_requests_local = original_local
+    Rails.application.config.action_dispatch.show_exceptions = original_exceptions
   end
 
   scenario "404 page uses application layout for unknown routes" do
