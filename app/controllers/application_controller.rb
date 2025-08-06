@@ -5,13 +5,13 @@ class ApplicationController < ActionController::Base
   include SessionsHelper
   include ImageProcessable
 
-  before_action :require_login
-  before_action :update_last_active_at
+  before_action :require_login, except: [:not_found]
+  before_action :update_last_active_at, except: [:not_found]
 
-  before_action :start_debug_timer, if: :admin_debug_enabled?
-  after_action :cleanup_debug_subscription, if: :admin_debug_enabled?
+  before_action :start_debug_timer, if: :admin_debug_enabled?, except: [:not_found]
+  after_action :cleanup_debug_subscription, if: :admin_debug_enabled?, except: [:not_found]
 
-  around_action :n_plus_one_detection unless Rails.env.production?
+  around_action :n_plus_one_detection, except: [:not_found], unless: Rails.env.production?
 
   rescue_from StandardError do |exception|
     if Rails.env.production? && should_notify_error?(exception)
