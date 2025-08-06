@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require "prosopite"
@@ -7,6 +8,7 @@ Rails.application.config.active_record.query_log_tags_enabled = true
 Rails.application.config.after_initialize do
   Prosopite.rails_logger = Rails.logger
   Prosopite.prosopite_logger = true
+  Prosopite.raise = true if Rails.env.development?
 
   Prosopite.allow_stack_paths = %w[
     mission_control
@@ -15,7 +17,7 @@ Rails.application.config.after_initialize do
 
   Prosopite.custom_logger = if defined?(Sentry)
     logger = Object.new
-    def logger.warn(message)
+    logger.define_singleton_method(:warn) do |message|
       Rails.logger.warn(message)
       sentry_message = "N+1 Query Detected: #{message}"
       Sentry.capture_message(

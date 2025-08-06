@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 class AdminController < ApplicationController
@@ -20,7 +21,7 @@ class AdminController < ApplicationController
   def files
     @blobs = ActiveStorage::Blob
       .where.not(id: ActiveStorage::VariantRecord.select(:blob_id))
-      .includes(:attachments)
+      .includes(attachments: :record)
       .order(created_at: :desc)
   end
 
