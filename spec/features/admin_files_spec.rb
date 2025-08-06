@@ -12,7 +12,8 @@ RSpec.feature "Admin Files", type: :feature do
     click_link I18n.t("navigation.files")
 
     expect(page).to have_content(I18n.t("admin.files.title"))
-    expect(page).to have_selector("table")
+    # When no files exist, should show no files message instead of table
+    expect(page).to have_content(I18n.t("admin.files.no_files"))
   end
 
   scenario "shows no files message when empty" do
@@ -27,13 +28,13 @@ RSpec.feature "Admin Files", type: :feature do
 
     before do
       # Create some test attachments
-      inspection.pdf.attach(
-        io: StringIO.new("test pdf content"),
-        filename: "inspection.pdf",
-        content_type: "application/pdf"
+      inspection.photo_1.attach(
+        io: StringIO.new("test image content"),
+        filename: "inspection_photo.jpg",
+        content_type: "image/jpeg"
       )
 
-      unit.photos.attach(
+      unit.photo.attach(
         io: StringIO.new("test image"),
         filename: "unit_photo.jpg",
         content_type: "image/jpeg"
@@ -44,7 +45,7 @@ RSpec.feature "Admin Files", type: :feature do
       visit admin_files_path
 
       within "table" do
-        expect(page).to have_content("inspection.pdf")
+        expect(page).to have_content("inspection_photo.jpg")
         expect(page).to have_content("unit_photo.jpg")
         
         # Check for links to attached records
@@ -62,7 +63,7 @@ RSpec.feature "Admin Files", type: :feature do
     scenario "provides download links for files" do
       visit admin_files_path
 
-      expect(page).to have_link("inspection.pdf")
+      expect(page).to have_link("inspection_photo.jpg")
       expect(page).to have_link("unit_photo.jpg")
     end
   end
