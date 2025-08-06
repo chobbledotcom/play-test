@@ -8,7 +8,7 @@ export PATH="$HOME/.nix-profile/bin:$PATH"
 
 # Run bundle install inside nix develop shell
 echo "Running bundle install in nix develop shell..."
-nix develop --command 'MAKE="make --jobs 4" bundle install'
+nix develop --command bundle install
 
 # Print instructions for Terry
 echo ""
