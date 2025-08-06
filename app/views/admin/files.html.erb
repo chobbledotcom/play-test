@@ -25,16 +25,7 @@
             <% blob.attachments.each do |attachment| %>
               <% if attachment.record %>
                 <% record = attachment.record %>
-                <% case record %>
-                <% when Inspection %>
-                  <%= link_to t("admin.files.attached_to.inspection", id: record.id), inspection_path(record) %>
-                <% when Unit %>
-                  <%= link_to t("admin.files.attached_to.unit", serial: record.serial), unit_path(record) %>
-                <% when Page %>
-                  <%= link_to t("admin.files.attached_to.page", title: record.title), page_by_slug_path(record.slug) %>
-                <% else %>
-                  <%= t("admin.files.attached_to.other", type: record.class.name, id: record.id) %>
-                <% end %>
+                <%= link_to "#{record.class.name} ##{record.id}", record %>
               <% else %>
                 <%= t("admin.files.attached_to.orphaned") %>
               <% end %>

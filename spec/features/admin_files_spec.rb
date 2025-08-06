@@ -50,11 +50,11 @@ RSpec.feature "Admin Files", type: :feature do
 
         # Check for links to attached records
         expect(page).to have_link(
-          I18n.t("admin.files.attached_to.inspection", id: inspection.id),
+          "Inspection ##{inspection.id}",
           href: inspection_path(inspection)
         )
         expect(page).to have_link(
-          I18n.t("admin.files.attached_to.unit", serial: unit.serial),
+          "Unit ##{unit.id}",
           href: unit_path(unit)
         )
       end
