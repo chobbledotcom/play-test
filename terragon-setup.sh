@@ -1,26 +1,40 @@
-#!/bin/bash
+#\!/bin/bash
 set -euo pipefail
 
-curl -fsSL https://install.determinate.systems/nix | sh -s -- install --determinate --no-confirm
+# Terragon Labs Rails Setup Script
+# Optimized for Ubuntu 24.04 - runs on every sandbox start
 
-# Add nix to PATH
-export PATH="$HOME/.nix-profile/bin:$PATH"
+# Skip if already set up (optimization for repeated runs)
+if [ -f ".terragon-setup-complete" ] && [ -z "${FORCE_SETUP:-}" ]; then
+    echo "Setup already complete. Run with FORCE_SETUP=1 to re-run."
+    exit 0
+fi
 
-# Run bundle install inside nix develop shell
-echo "Running bundle install in nix develop shell..."
-nix develop --command bundle install
+echo "Installing Ruby and dependencies..."
+sudo apt-get update -qq
+sudo apt-get install -y ruby-full ruby-bundler build-essential cmake pkg-config libsqlite3-dev libyaml-dev libvips-dev cmake pkg-config sassc
 
-# Print instructions for Terry
-echo ""
-echo "================== TERRY INSTRUCTIONS =================="
-echo "To run rspec tests with the nix shell, use:"
-echo ""
-echo "  nix develop --command bundle exec rspec"
-echo ""
-echo "Or enter the nix shell first and run commands:"
-echo ""
-echo "  nix develop"
-echo "  bundle exec rspec"
-echo ""
-echo "The nix shell provides all required dependencies."
-echo "========================================================"
+echo "Installing bundler gem..."
+sudo gem install bundler
+
+# Install Rails dependencies with bundler
+echo "Installing gems..."
+bundle install --jobs 4
+
+# Database setup (only if not exists)
+if [ \! -f "storage/development.sqlite3" ]; then
+    echo "Creating development database..."
+    bundle exec rails db:create db:migrate db:seed
+fi
+
+# Test database setup (only if not exists)
+if [ \! -f "storage/test.sqlite3" ]; then
+    echo "Creating test database..."
+    RAILS_ENV=test bundle exec rails db:create db:migrate
+    bundle exec rails parallel:prepare
+fi
+
+# Mark setup as complete
+touch .terragon-setup-complete
+
+echo "Rails setup complete\!"
