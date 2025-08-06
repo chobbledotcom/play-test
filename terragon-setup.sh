@@ -16,11 +16,11 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get install -y -qq \
 
 # Install bundler with no documentation (faster)
 echo "Installing bundler..."
-sudo gem install bundler --no-document --quiet
+gem install bundler --no-document --quiet
 
 # Install gems with maximum parallelization
 echo "Installing gems (parallel)..."
-bundle install --jobs $(nproc) --retry 2 --quiet
+bundle install --jobs 4 --quiet
 
 # Create both databases in parallel (big time saver)
 echo "Setting up databases in parallel..."
