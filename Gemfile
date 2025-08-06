@@ -77,16 +77,16 @@ group :test do
   gem "factory_bot_rails"
   gem "capybara"
   gem "cuprite"
-  
+
   # Code coverage
   gem "simplecov", require: false
   gem "simplecov-cobertura", require: false
-  
+
   # Test utilities
   gem "pdf-inspector", require: false
   gem "parallel_tests"
   gem "database_cleaner-active_record"
-  
+
   # RSpec matchers for Sorbet
   gem "rspec-sorbet"
 
