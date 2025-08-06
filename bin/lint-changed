@@ -92,14 +92,14 @@ fi
 if [ -n "$JS_FILES" ] && [ -f "biome.json" ]; then
   echo -e "\n${YELLOW}Running Biome on JS/TS files...${NC}"
   if [ -n "$FIX_FLAG" ]; then
-    if npx @biomejs/biome check --write $JS_FILES; then
+    if biome check --write $JS_FILES; then
       echo -e "${GREEN}Biome passed${NC}"
     else
       echo -e "${RED}Biome failed${NC}"
       FAILED=1
     fi
   else
-    if npx @biomejs/biome check $JS_FILES; then
+    if biome check $JS_FILES; then
       echo -e "${GREEN}Biome passed${NC}"
     else
       echo -e "${RED}Biome failed${NC}"
