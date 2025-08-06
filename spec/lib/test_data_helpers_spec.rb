@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe TestDataHelpers do
@@ -5,8 +7,8 @@ RSpec.describe TestDataHelpers do
     it "generates valid UK mobile number format" do
       phone = described_class.british_phone_number
 
-      expect(phone).to match(/\A07\d{3} \d{3} \d{4}\z/)
-      expect(phone.length).to eq(14) # "07xxx xxx xxxx"
+      expect(phone).to match(/\A07\d{3} \d{3} \d{3}\z/)
+      expect(phone.length).to eq(13) # "07xxx xxx xxx"
     end
 
     it "always starts with 07" do
