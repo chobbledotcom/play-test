@@ -11,7 +11,7 @@ echo "Installing system packages..."
 DEBIAN_FRONTEND=noninteractive sudo apt-get update -qq && \
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y -qq \
     ruby-full ruby-bundler build-essential libsqlite3-dev \
-    libyaml-dev libvips-dev cmake pkg-config \
+    libyaml-dev libvips-dev cmake pkg-config sassc \
     --no-install-recommends
 
 # Install bundler with no documentation (faster)
