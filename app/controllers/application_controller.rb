@@ -13,9 +13,6 @@ class ApplicationController < ActionController::Base
 
   around_action :n_plus_one_detection unless Rails.env.production?
 
-  rescue_from ActiveRecord::RecordNotFound, with: :not_found
-  rescue_from ActionController::RoutingError, with: :not_found
-
   rescue_from StandardError do |exception|
     if Rails.env.production? && should_notify_error?(exception)
       user_email = current_user&.email || app_i18n(:errors, :not_logged_in)
