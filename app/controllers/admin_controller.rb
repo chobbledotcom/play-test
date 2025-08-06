@@ -17,6 +17,13 @@ class AdminController < ApplicationController
     flash.now[:error] = t("admin.releases.fetch_error")
   end
 
+  def files
+    @blobs = ActiveStorage::Blob
+      .where.not(id: ActiveStorage::VariantRecord.select(:blob_id))
+      .includes(:attachments)
+      .order(created_at: :desc)
+  end
+
   private
 
   def fetch_github_releases
