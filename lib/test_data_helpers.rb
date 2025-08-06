@@ -1,9 +1,11 @@
+# typed: false
+
 # Shared test data helpers for generating realistic British data
 # Used by both factories and seeds for non-critical test data generation
 module TestDataHelpers
   # Generate realistic UK mobile numbers (07xxx format)
   def self.british_phone_number
-    "07#{rand(100..999)} #{rand(100..999)} #{SecureRandom.hex(2).to_i(16) % 10000}"
+    "07#{rand(100..999)} #{rand(100..999)} #{rand(1000..9999)}"
   end
 
   # Generate realistic UK postcodes
