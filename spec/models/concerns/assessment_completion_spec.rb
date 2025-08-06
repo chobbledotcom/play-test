@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe AssessmentCompletion, type: :model do
@@ -118,15 +120,14 @@ RSpec.describe AssessmentCompletion, type: :model do
         expect(assessment.incomplete_fields).not_to include(:ropes)
       end
 
-      it "still includes the pass field in incomplete fields (pass fields are always required)" do
-        expect(assessment.incomplete_fields).to include(:ropes_pass)
+      it "does not include the pass field in incomplete fields (NA is a valid selection)" do
+        expect(assessment.incomplete_fields).not_to include(:ropes_pass)
       end
 
-      it "only shows pass field as incomplete in grouped results" do
+      it "does not show either field as incomplete in grouped results" do
         grouped = assessment.incomplete_fields_grouped
         expect(grouped[:ropes]).to be_nil
-        expect(grouped[:ropes_pass]).to be_present
-        expect(grouped[:ropes_pass][:fields]).to eq([:ropes_pass])
+        expect(grouped[:ropes_pass]).to be_nil
       end
     end
 
@@ -135,8 +136,8 @@ RSpec.describe AssessmentCompletion, type: :model do
         assessment.update!(retention_netting_pass: "na")
       end
 
-      it "still includes the field in incomplete fields (pass fields are always required)" do
-        expect(assessment.incomplete_fields).to include(:retention_netting_pass)
+      it "does not include the field in incomplete fields (NA is a valid selection)" do
+        expect(assessment.incomplete_fields).not_to include(:retention_netting_pass)
       end
     end
 

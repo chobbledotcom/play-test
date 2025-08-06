@@ -489,5 +489,4 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_05_132008) do
   add_foreign_key "units", "users"
   add_foreign_key "user_height_assessments", "inspections"
   add_foreign_key "user_sessions", "users"
-  add_foreign_key "user_sessions", "users"
 end
