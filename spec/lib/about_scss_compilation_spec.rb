@@ -34,40 +34,14 @@ RSpec.describe "About SCSS Compilation" do
         }
       CSS
 
-      # Try to compile the SCSS using SassC if available
+      # Compile the SCSS using SassC
       begin
         require "sassc"
         engine = SassC::Engine.new(scss_content, style: :expanded)
         compiled_css = engine.render
 
-        # Normalize whitespace for comparison
-        # Remove extra spaces, normalize line endings
-        normalize = ->(str) {
-          str.strip
-            .gsub(/\/\*.*?\*\//m, "") # Remove comments for comparison
-            .gsub(/\s+/, " ")
-            .gsub(/\s*{\s*/, " { ")
-            .gsub(/\s*}\s*/, " } ")
-            .gsub(/\s*;\s*/, "; ")
-            .gsub(/}\s*/, "}\n")
-            .strip
-        }
-
-        normalized_compiled = normalize.call(compiled_css)
-        normalize.call(expected_css)
-
-        # Check that all the selectors are present
-        expect(normalized_compiled).to include(".about article")
-        expect(normalized_compiled).to include(".about p")
-        expect(normalized_compiled).to include(".about table")
-        expect(normalized_compiled).to include(".about th")
-        expect(normalized_compiled).to include(".about td")
-
-        # Check that the properties are present
-        expect(normalized_compiled).to include("max-width: 60rem")
-        expect(normalized_compiled).to include("margin: 0 auto")
-        expect(normalized_compiled).to include("text-align: left")
-        expect(normalized_compiled).to include("line-height: 1.6")
+        # Direct comparison with expanded style
+        expect(compiled_css.strip).to eq(expected_css.strip)
       rescue LoadError
         skip "SassC gem not available, skipping compilation test"
       end
@@ -98,21 +72,39 @@ RSpec.describe "About SCSS Compilation" do
         }
       SCSS
 
+      expected_css = <<~CSS
+        .about article {
+          max-width: 60rem;
+          margin: 0 auto;
+          text-align: left;
+        }
+
+        .about p {
+          text-align: left;
+          line-height: 1.6;
+        }
+
+        .about table {
+          text-align: left;
+        }
+
+        .about th,
+        .about td {
+          text-align: left;
+        }
+      CSS
+
       begin
         require "sassc"
         engine = SassC::Engine.new(scss_content, style: :expanded)
         compiled = engine.render
 
-        # Verify the compiled output contains all expected rules
-        expect(compiled).to match(/\.about article\s*{[^}]*max-width:\s*60rem/)
-        expect(compiled).to match(/\.about article\s*{[^}]*margin:\s*0 auto/)
-        expect(compiled).to match(/\.about p\s*{[^}]*line-height:\s*1\.6/)
-        expect(compiled).to match(/\.about table\s*{[^}]*text-align:\s*left/)
-        about_th_td = /\.about th,\s*\.about td\s*{[^}]*text-align:\s*left/
-        expect(compiled).to match(about_th_td)
+        # Direct comparison with expanded style
+        expect(compiled.strip).to eq(expected_css.strip)
       rescue LoadError
         skip "SassC gem not available, skipping compilation test"
       end
     end
   end
 end
+
