@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require "active_support/core_ext/integer/time"
@@ -27,7 +28,7 @@ Rails.application.configure do
   config.action_controller.perform_caching = false
   config.cache_store = :null_store
 
-  config.assets.debug = false
+  # config.assets.debug = false # Commented out - Rails 8 issue
 
   # Render exception templates for rescuable exceptions and raise for other exceptions.
   config.action_dispatch.show_exceptions = :rescuable
@@ -35,7 +36,6 @@ Rails.application.configure do
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
 
-  # Override the default Active Storage service for test environment
   config.active_storage.service = :test
 
   # Print deprecation notices to the stderr.

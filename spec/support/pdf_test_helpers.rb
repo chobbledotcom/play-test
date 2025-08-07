@@ -1,3 +1,5 @@
+# typed: false
+
 module PdfTestHelpers
   # Extract all text content from a PDF
   def pdf_text_content(pdf_data)
@@ -154,7 +156,7 @@ module PdfTestHelpers
       # Group fields to understand which are rendered together
       field_groups = {}
       fields.each_key do |field_key|
-        base_field = FieldUtils.strip_field_suffix(field_key)
+        base_field = ChobbleForms::FieldUtils.strip_field_suffix(field_key)
         field_groups[base_field] ||= []
         field_groups[base_field] << field_key
       end

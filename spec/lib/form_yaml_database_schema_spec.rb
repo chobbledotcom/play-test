@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 # System columns that should be excluded from validation
@@ -55,8 +57,9 @@ PARTIAL_ALLOWED_ATTRIBUTES = {
 
 RSpec.describe "Form YAML Database Schema Validation" do
   # Helper to load form YAML configuration
-  def load_form_config(assessment_type)
-    config_path = Rails.root.join("config/forms/#{assessment_type}.yml")
+  define_method(:load_form_config) do |assessment_type|
+    config_path = En14960Assessments::Engine.root
+      .join("config/forms/#{assessment_type}.yml")
     return nil unless File.exist?(config_path)
 
     yaml_content = YAML.load_file(config_path)
@@ -64,7 +67,7 @@ RSpec.describe "Form YAML Database Schema Validation" do
   end
 
   # Helper to get all fields from form config
-  def get_all_form_fields(form_config)
+  define_method(:get_all_form_fields) do |form_config|
     return [] unless form_config
 
     fields = []
@@ -74,14 +77,16 @@ RSpec.describe "Form YAML Database Schema Validation" do
         partial = field_config["partial"]
 
         fields << field
-        fields.concat(FieldUtils.get_composite_fields(field, partial))
+        composite_fields = ChobbleForms::FieldUtils
+          .get_composite_fields(field, partial)
+        fields.concat(composite_fields)
       end
     end
     fields
   end
 
   # Helper to get database columns for an assessment
-  def get_database_columns(table_name)
+  define_method(:get_database_columns) do |table_name|
     ActiveRecord::Base.connection.columns(table_name).map(&:name)
   end
 
@@ -110,8 +115,9 @@ RSpec.describe "Form YAML Database Schema Validation" do
         # they might be covered by "num_low_anchors" with a composite partial
         missing_fields = missing_fields.reject do |field|
           # Check if this is a _pass or _comment field that has a base field
-          if FieldUtils.is_composite_field?(field)
-            base_field = FieldUtils.strip_field_suffix(field)
+          if ChobbleForms::FieldUtils.is_composite_field?(field)
+            base_field = ChobbleForms::FieldUtils
+              .strip_field_suffix(field)
             form_fields.include?(base_field)
           else
             false
