@@ -38,6 +38,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          submodules: recursive
       
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1

@@ -11,5 +11,10 @@ jobs:
       checks: write
       contents: write
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
     - name: Run Standard Ruby linter
       uses: standardrb/standard-ruby-action@v1
