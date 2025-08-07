@@ -4,3 +4,6 @@
 [submodule "gems/en14960"]
 	path = gems/en14960
 	url = git@github.com:chobbledotcom/en14960.git
+[submodule "gems/en14960-assessments"]
+	path = gems/en14960-assessments
+	url = git@github.com:chobbledotcom/en14960-assessments.git
