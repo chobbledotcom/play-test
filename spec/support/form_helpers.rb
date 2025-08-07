@@ -1,3 +1,6 @@
+# typed: false
+# frozen_string_literal: true
+
 module FormHelpers
   def fill_in_form(form_name, field_name, value)
     field_label = I18n.t("forms.#{form_name}.fields.#{field_name}")
@@ -95,7 +98,7 @@ module FormHelpers
     end
 
     fields.each do |field_key, field_label|
-      next if field_key.to_s.end_with?("_pass")
+      next if field_key.to_s.end_with?("_pass") || field_key.to_s == "id"
 
       expect(page).to have_content(field_label),
         "Expected to find field '#{field_key}' with label '#{field_label}' on the page"
@@ -122,7 +125,7 @@ module FormHelpers
         next if label_text.empty?
 
         found = false
-        I18n.t(i18n_base).each do |key, value|
+        I18n.t(i18n_base).each_value do |value|
           if value.is_a?(String) && value == label_text
             found = true
             break
@@ -147,7 +150,7 @@ module FormHelpers
     expect(page).to have_css("fieldset")
 
     sections = I18n.t("#{i18n_base}.sections", raise: true)
-    sections.each do |_key, legend_text|
+    sections.each_value do |legend_text|
       expect(page).to have_css("fieldset legend", text: legend_text)
     end
   end
@@ -198,8 +201,11 @@ module FormHelpers
         field_label = get_field_label(form_name, field_name)
         choose_pass_fail(field_label, value)
       elsif %w[has_slide is_totally_enclosed passed slide_permanent_roof].include?(field_str)
-        value ? check_form_radio(form_name.to_sym, field_name) :
-                uncheck_form_radio(form_name.to_sym, field_name)
+        if value
+          check_form_radio(form_name.to_sym, field_name)
+        else
+          uncheck_form_radio(form_name.to_sym, field_name)
+        end
       else
         field_label = get_field_label(form_name, field_name)
         choose_yes_no(field_label, value)

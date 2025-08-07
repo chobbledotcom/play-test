@@ -9,21 +9,13 @@
 <div class="table-list inspections-list">
   <!-- Header row -->
   <div class="table-list-header">
-    <% if show_photo %>
-      <span class="col-photo"><%= FieldUtils.form_field_label('units', 'photo') %></span>
-    <% end %>
-    <span class="col-id"><%= FieldUtils.form_field_label('inspection', 'id') %></span>
-    <% if show_name %>
-      <span class="col-name"><%= FieldUtils.form_field_label('units', 'name') %></span>
-    <% end %>
-    <% if show_serial %>
-      <span class="col-serial"><%= FieldUtils.form_field_label('units', 'serial') %></span>
-    <% end %>
-    <span class="col-last-inspection"><%= t('inspections.fields.last_inspection') %></span>
-    <% if show_inspector %>
-      <span class="col-inspector"><%= FieldUtils.form_field_label('inspection', 'inspector') %></span>
-    <% end %>
-    <span class="col-result"><%= FieldUtils.form_field_label('inspection', 'result') %></span>
+    <%= render 'shared/table_column', field: 'photo', model: 'units', show: show_photo, header: true %>
+    <%= render 'shared/table_column', field: 'id', model: 'inspection', header: true %>
+    <%= render 'shared/table_column', field: 'name', model: 'units', show: show_name, header: true %>
+    <%= render 'shared/table_column', field: 'serial', model: 'units', show: show_serial, header: true %>
+    <%= render 'shared/table_column', field: 'last-inspection', i18n_key: 'inspections.fields.last_inspection', header: true %>
+    <%= render 'shared/table_column', field: 'inspector', model: 'inspection', show: show_inspector, header: true %>
+    <%= render 'shared/table_column', field: 'result', model: 'inspection', header: true %>
   </div>
 
   <!-- Data rows -->
@@ -37,42 +29,38 @@
       %>
       <li>
         <%= link_to target_path, class: "table-list-link" do %>
-          <% if show_photo %>
-            <span class="col-photo" data-label="<%= FieldUtils.form_field_label('units', 'photo') %>">
-              <% if !inspection.complete? && inspection.unit&.photo&.attached? %>
-                <%= render 'shared/image',
-                    image: inspection.unit.photo,
-                    size: :thumbnail,
-                    alt: "#{inspection.unit.name} photo" %>
-              <% elsif !inspection.complete? %>
-                <%= image_tag "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='system-ui' font-size='10'%3ENo Photo%3C/text%3E%3C/svg%3E",
-                    alt: t('units.messages.no_photo'),
-                    width: 60,
-                    height: 60 %>
-              <% end %>
-            </span>
+          <%= render 'shared/table_column', field: 'photo', model: 'units', show: show_photo do %>
+            <% if !inspection.complete? && inspection.unit&.photo&.attached? %>
+              <%= render 'shared/image',
+                  image: inspection.unit.photo,
+                  size: :thumbnail,
+                  alt: "#{inspection.unit.name} photo" %>
+            <% elsif !inspection.complete? %>
+              <%= image_tag "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='system-ui' font-size='10'%3ENo Photo%3C/text%3E%3C/svg%3E",
+                  alt: t('units.messages.no_photo'),
+                  width: 60,
+                  height: 60 %>
+            <% end %>
           <% end %>
-          <span class="col-id" data-label="<%= FieldUtils.form_field_label('inspection', 'id') %>">
-            <%= inspection.id %>
-          </span>
-          <% if show_name %>
-            <span class="col-name" data-label="<%= FieldUtils.form_field_label('units', 'name') %>">
-              <% if inspection.unit.nil? %>
-                <span class="badge">[<%= t("inspections.labels.no_unit") %>]</span>
-              <% end %>
-              <%= inspection.unit&.name.presence || t('inspections.messages.unnamed') %>
-            </span>
+          <%= render 'shared/table_column', field: 'id', model: 'inspection', item: inspection %>
+          <%= render 'shared/table_column', field: 'name', model: 'units', show: show_name do %>
+            <% if inspection.unit.nil? %>
+              <span class="badge">[<%= t("inspections.labels.no_unit") %>]</span>
+            <% end %>
+            <%= inspection.unit&.name.presence || t('inspections.messages.unnamed') %>
           <% end %>
-          <% if show_serial %>
-            <span class="col-serial" data-label="<%= FieldUtils.form_field_label('units', 'serial') %>">
-              <%= inspection.unit&.serial.presence || t('inspections.messages.missing_serial') %>
-            </span>
+          <%= render 'shared/table_column', field: 'serial', model: 'units', show: show_serial do %>
+            <%= inspection.unit&.serial.presence || t('inspections.messages.missing_serial') %>
           <% end %>
-          <span class="col-last-inspection" data-label="<%= t('inspections.fields.last_inspection') %>"><%= render_time(inspection.inspection_date) %></span>
-          <% if show_inspector %>
-            <span class="col-inspector" data-label="<%= FieldUtils.form_field_label('inspection', 'inspector') %>"><%= inspection.inspector_company&.name %></span>
+          <%= render 'shared/table_column', field: 'last-inspection', i18n_key: 'inspections.fields.last_inspection' do %>
+            <%= render_time(inspection.inspection_date) %>
           <% end %>
-          <span class="col-result" data-label="<%= FieldUtils.form_field_label('inspection', 'result') %>"><%= inspection_result_badge(inspection) %></span>
+          <%= render 'shared/table_column', field: 'inspector', model: 'inspection', show: show_inspector do %>
+            <%= inspection.inspector_company&.name %>
+          <% end %>
+          <%= render 'shared/table_column', field: 'result', model: 'inspection' do %>
+            <%= inspection_result_badge(inspection) %>
+          <% end %>
         <% end %>
       </li>
     <% end %>

@@ -23,8 +23,8 @@ gem "webauthn", "~> 3.4"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[windows jruby]
 
-gem "chobble-forms"
-gem "en14960"
+gem "chobble-forms", path: "gems/chobble-forms"
+gem "en14960", path: "gems/en14960"
 gem "en14960-assessments", path: "gems/en14960-assessments"
 
 # Sorbet runtime (needed in all environments and

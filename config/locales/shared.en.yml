@@ -54,6 +54,7 @@ en:
     assessment_completion: "Assessment Completion"
     field_comment_placeholder: "%{field} comment"
     error: "Error"
+    metres_by: "m ×"
 
   # Common messages
   ui:

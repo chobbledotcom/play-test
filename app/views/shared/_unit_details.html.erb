@@ -25,12 +25,12 @@
     <ul class="unit-details-list">
 
       <li>
-        <strong><%= FieldUtils.form_field_label('inspection', 'inspection_date') %>:</strong>
+        <strong><%= ChobbleForms::FieldUtils.form_field_label('inspection', 'inspection_date') %>:</strong>
         <span><%= render_time(inspection.inspection_date) %></span>
       </li>
 
       <li>
-        <strong><%= FieldUtils.form_field_label('inspection', 'reinspection_date') %>:</strong>
+        <strong><%= ChobbleForms::FieldUtils.form_field_label('inspection', 'reinspection_date') %>:</strong>
         <span><%= render_time(inspection.reinspection_date) %></span>
       </li>
 
@@ -53,29 +53,29 @@
     <%# Unit Details Section %>
     <ul class="unit-details-list">
       <li>
-        <strong><%= FieldUtils.form_field_label('units', 'name') %>:</strong>
+        <strong><%= ChobbleForms::FieldUtils.form_field_label('units', 'name') %>:</strong>
         <span><%= link_to unit.name, unit_path(unit) %></span>
       </li>
 
       <li>
-        <strong><%= FieldUtils.form_field_label('units', 'manufacturer') %>:</strong>
+        <strong><%= ChobbleForms::FieldUtils.form_field_label('units', 'manufacturer') %>:</strong>
         <span><%= link_to unit.manufacturer,
                          units_path(manufacturer: unit.manufacturer, anchor: "main"),
                          title: "View all units manufactured by #{unit.manufacturer}" %></span>
       </li>
 
       <li>
-        <strong><%= FieldUtils.form_field_label('units', 'serial') %>:</strong>
+        <strong><%= ChobbleForms::FieldUtils.form_field_label('units', 'serial') %>:</strong>
         <span><%= unit.serial %></span>
       </li>
 
       <li>
-        <strong><%= FieldUtils.form_field_label('units', 'description') %>:</strong>
+        <strong><%= ChobbleForms::FieldUtils.form_field_label('units', 'description') %>:</strong>
         <span><%= unit.description %></span>
       </li>
 
       <li>
-        <strong><%= FieldUtils.form_field_label('units', 'operator') %>:</strong>
+        <strong><%= ChobbleForms::FieldUtils.form_field_label('units', 'operator') %>:</strong>
         <span><%= link_to unit.operator,
                          units_path(operator: unit.operator, anchor: "main"),
                          title: "View all units operated by #{unit.operator}" %></span>
@@ -84,13 +84,13 @@
       <% if last_inspection %>
         <li>
           <strong><%= t("units.fields.size_unit") %>:</strong>
-          <span><%= last_inspection.width %>m × <%= last_inspection.length %>m × <%= last_inspection.height %>m</span>
+          <span><%= last_inspection.width %><%= t("shared.metres_by") %> <%= last_inspection.length %><%= t("shared.metres_by") %> <%= last_inspection.height %>m</span>
         </li>
       <% end %>
 
       <% if unit.manufacture_date %>
         <li>
-          <strong><%= FieldUtils.form_field_label('units', 'manufacture_date') %>:</strong>
+          <strong><%= ChobbleForms::FieldUtils.form_field_label('units', 'manufacture_date') %>:</strong>
           <span><%= unit.manufacture_date.strftime("%B %d, %Y") %></span>
         </li>
       <% end %>

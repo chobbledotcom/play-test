@@ -1,0 +1,49 @@
+<%#
+  Table column partial for consistent column rendering across tables
+
+  Required parameters:
+  - field: The field name (e.g., 'photo', 'name', 'id')
+
+  One of these is required:
+  - model: The model name for ChobbleForms label lookup (e.g., 'units', 'inspection')
+  - i18n_key: Full i18n key for label (e.g., 'inspections.fields.last_inspection')
+
+  Optional parameters:
+  - show: Boolean to conditionally render the column (default: true)
+  - header: Boolean indicating if this is a header row (default: false)
+  - item: The object to read the field value from (for data rows without a block)
+
+  Content is passed as a block, or auto-generated for headers and simple field values
+%>
+<%
+  show = local_assigns.fetch(:show, true)
+  header = local_assigns.fetch(:header, false)
+  field = local_assigns[:field]
+
+  raise ArgumentError, "table_column partial requires 'field' parameter" unless field
+
+  # Determine label - must have either i18n_key or model
+  if local_assigns[:i18n_key]
+    label = t(local_assigns[:i18n_key])
+  elsif local_assigns[:model]
+    label = ChobbleForms::FieldUtils.form_field_label(local_assigns[:model], field)
+  else
+    raise ArgumentError, "table_column partial requires either 'i18n_key' or 'model' parameter"
+  end
+%>
+
+<% if show %>
+  <span class="col-<%= field %>" data-label="<%= label %>">
+    <% if header %>
+      <%= label %>
+    <% elsif local_assigns[:item] %>
+      <%= local_assigns[:item].public_send(field) %>
+    <% elsif block_given? %>
+      <%= yield %>
+    <% else %>
+      <% raise ArgumentError, "table_column partial requires either a block, header: true, or item parameter" %>
+    <% end %>
+  </span>
+<% elsif block_given? %>
+  <% yield %>
+<% end %>
