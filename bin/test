@@ -21,24 +21,50 @@ if [ $# -gt 0 ]; then
     exit 1
 fi
 
-echo -e "${YELLOW}🧪 Running tests in parallel...${NC}"
+# Track overall test status
+overall_result=0
+
+# First, run tests for all gems
+for gem_dir in gems/*/; do
+    if [ -d "$gem_dir" ] && [ -f "${gem_dir}Gemfile" ]; then
+        gem_name=$(basename "$gem_dir")
+        echo -e "${BLUE}🔷 Testing gem: ${gem_name}${NC}"
+        
+        # Create temp file for gem output
+        gem_output=$(mktemp)
+        
+        # Run gem tests
+        if (cd "$gem_dir" && bundle exec rspec --format progress) > "$gem_output" 2>&1; then
+            echo -e "${GREEN}  ✅ ${gem_name} tests passed!${NC}"
+        else
+            echo -e "${RED}  ❌ ${gem_name} tests failed!${NC}"
+            echo -e "${YELLOW}  📋 Output:${NC}"
+            cat "$gem_output" | sed 's/^/    /'
+            overall_result=1
+        fi
+        
+        rm -f "$gem_output"
+        echo ""
+    fi
+done
+
+# Then run main app tests
+echo -e "${YELLOW}🧪 Running main app tests in parallel...${NC}"
 
 # Create a temporary file to capture the output
 temp_output=$(mktemp)
 
 # Run tests and capture all output
 if bundle exec parallel_rspec spec/ > "$temp_output" 2>&1; then
-    echo -e "${GREEN}✅ Tests passed!${NC}"
+    echo -e "${GREEN}✅ Main app tests passed!${NC}"
     
     # Show full output minus coverage noise
     grep -v "Coverage report generated for" "$temp_output" | \
     grep -v "^Line Coverage:" | \
     grep -v "^Branch Coverage:" | \
     grep -v "Stopped processing SimpleCov"
-    
-    cleanup_result=0
 else
-    echo -e "${RED}❌ Tests failed!${NC}"
+    echo -e "${RED}❌ Main app tests failed!${NC}"
     
     # Show full output minus coverage noise
     echo -e "${YELLOW}📋 Full test output:${NC}"
@@ -47,9 +73,9 @@ else
     grep -v "^Branch Coverage:" | \
     grep -v "Stopped processing SimpleCov"
     
-    cleanup_result=1
+    overall_result=1
 fi
 
 # Cleanup
 rm -f "$temp_output"
-exit $cleanup_result
+exit $overall_result

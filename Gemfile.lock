@@ -1,3 +1,15 @@
+PATH
+  remote: gems/en14960-assessments
+  specs:
+    en14960-assessments (0.1.0)
+      image_processing
+      prawn
+      prawn-table
+      rails (>= 7.0.0)
+      rqrcode
+      stimulus-rails
+      turbo-rails
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -630,6 +642,7 @@ DEPENDENCIES
   debug
   dotenv-rails
   en14960
+  en14960-assessments!
   erb_lint
   factory_bot_rails
   image_processing (~> 1.12)

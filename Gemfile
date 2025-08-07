@@ -25,6 +25,7 @@ gem "tzinfo-data", platforms: %i[windows jruby]
 
 gem "chobble-forms"
 gem "en14960"
+gem "en14960-assessments", path: "gems/en14960-assessments"
 
 # Sorbet runtime (needed in all environments and
 # pinned for nixpkgs)
