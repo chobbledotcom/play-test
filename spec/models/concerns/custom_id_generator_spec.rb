@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe CustomIdGenerator, type: :concern do
@@ -13,12 +15,22 @@ RSpec.describe CustomIdGenerator, type: :concern do
     it "generates an ID with the configured length" do
       id = test_class.generate_random_id
       expect(id.length).to eq(CustomIdGenerator::ID_LENGTH)
-      expect(id).to match(/\A[A-Z0-9]{#{CustomIdGenerator::ID_LENGTH}}\z/o)
+      # Update regex to exclude ambiguous characters
+      expect(id).to match(/\A[A-Z2-9]{#{CustomIdGenerator::ID_LENGTH}}\z/o)
     end
 
-    it "generates an 8-character alphanumeric uppercase ID" do
+    it "generates an 8-char ID without ambiguous characters" do
       id = test_class.generate_random_id
-      expect(id).to match(/\A[A-Z0-9]{8}\z/)
+      expect(id).to match(/\A[A-Z2-9]{8}\z/)
+      expect(id).not_to match(/[0O1IL]/)
+    end
+
+    it "excludes ambiguous characters (0, O, 1, I, L)" do
+      # Generate multiple IDs to ensure no ambiguous characters appear
+      100.times do
+        id = test_class.generate_random_id
+        expect(id).not_to include("0", "O", "1", "I", "L")
+      end
     end
 
     it "generates unique IDs" do
@@ -43,7 +55,8 @@ RSpec.describe CustomIdGenerator, type: :concern do
 
       test_class.generate_random_id(scope_conditions)
 
-      expect(test_class).to have_received(:exists?).with(hash_including(scope_conditions))
+      expect(test_class).to have_received(:exists?)
+        .with(hash_including(scope_conditions))
     end
   end
 
@@ -60,7 +73,7 @@ RSpec.describe CustomIdGenerator, type: :concern do
       # Trigger the callback
       instance.send(:generate_custom_id)
 
-      expect(instance.id).to match(/\A[A-Z0-9]{8}\z/)
+      expect(instance.id).to match(/\A[A-Z2-9]{8}\z/)
     end
 
     it "does not override existing ID" do
@@ -78,15 +91,18 @@ RSpec.describe CustomIdGenerator, type: :concern do
       # Add uniqueness_scope method to test class
       test_class.define_method(:uniqueness_scope) { {user_id: 1} }
 
-      allow(test_class).to receive(:generate_random_id).and_return("TESTID123456")
+      allow(test_class).to receive(:generate_random_id)
+        .and_return("TESTID123456")
 
       instance.send(:generate_custom_id)
 
-      expect(test_class).to have_received(:generate_random_id).with({user_id: 1})
+      expect(test_class).to have_received(:generate_random_id)
+        .with({user_id: 1})
     end
 
-    it "calls generate_random_id with empty scope if no uniqueness_scope method" do
-      allow(test_class).to receive(:generate_random_id).and_return("TESTID123456")
+    it "calls generate_random_id with empty scope without uniqueness_scope" do
+      allow(test_class).to receive(:generate_random_id)
+        .and_return("TESTID123456")
 
       instance.send(:generate_custom_id)
 

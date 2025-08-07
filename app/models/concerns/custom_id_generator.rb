@@ -8,6 +8,9 @@ module CustomIdGenerator
   # Standard ID length for all models using CustomIdGenerator
   ID_LENGTH = 8
 
+  # Ambiguous characters to exclude from IDs
+  AMBIGUOUS_CHARS = %w[0 O 1 I L].freeze
+
   included do
     self.primary_key = "id"
     before_create :generate_custom_id, if: -> { id.blank? }
@@ -16,10 +19,17 @@ module CustomIdGenerator
   class_methods do
     extend T::Sig
 
-    sig { params(scope_conditions: T::Hash[T.untyped, T.untyped]).returns(String) }
+    sig do
+      params(scope_conditions: T::Hash[T.untyped, T.untyped]).returns(String)
+    end
     def generate_random_id(scope_conditions = {})
       loop do
-        id = SecureRandom.alphanumeric(CustomIdGenerator::ID_LENGTH).upcase
+        raw_id = SecureRandom.alphanumeric(32).upcase
+        filtered_chars = raw_id.chars.reject do |char|
+          AMBIGUOUS_CHARS.include?(char)
+        end
+        id = filtered_chars.first(ID_LENGTH).join
+        next if id.length < ID_LENGTH
         break id unless exists?({id: id}.merge(scope_conditions))
       end
     end
