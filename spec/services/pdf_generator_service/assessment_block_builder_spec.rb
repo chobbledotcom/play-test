@@ -1,4 +1,7 @@
+# typed: false
+
 require "rails_helper"
+require Rails.root.join("db/seeds/seed_data")
 
 RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
   let(:inspection) { create(:inspection) }
@@ -9,7 +12,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     context "with a materials assessment" do
       before do
         # Use SeedData to populate with realistic test data
-        materials_assessment.update!(SeedData.materials_fields(passed: true))
+        materials_assessment.update!(En14960Assessments::SeedData.materials_fields(passed: true))
         # Override specific fields for test cases
         materials_assessment.update!(
           fabric_strength_comment: "Good fabric strength",
@@ -36,7 +39,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
         end
         puts "=== TOTAL: #{blocks.size} blocks ==="
 
-        # Based on SeedData.materials_fields, expect appropriate number
+        # Based on En14960Assessments::SeedData.materials_fields, expect appropriate number
         expect(blocks.size).to eq(10) # Update based on actual output
       end
 
@@ -83,7 +86,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     context "with assessment having regular fields and pass/fail fields" do
       before do
         # Use SeedData which has both regular fields (ropes: numeric) and pass/fail fields
-        materials_assessment.update!(SeedData.materials_fields(passed: true))
+        materials_assessment.update!(En14960Assessments::SeedData.materials_fields(passed: true))
       end
 
       let(:blocks) do
@@ -110,11 +113,11 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
   describe "multiple assessments" do
     before do
       # Set up materials assessment using SeedData
-      materials_assessment.update!(SeedData.materials_fields(passed: true))
+      materials_assessment.update!(En14960Assessments::SeedData.materials_fields(passed: true))
       materials_assessment.update!(fabric_strength_comment: "Good fabric")
 
       # Set up structure assessment using SeedData
-      structure_assessment.update!(SeedData.structure_fields(passed: false))
+      structure_assessment.update!(En14960Assessments::SeedData.structure_fields(passed: false))
       structure_assessment.update!(seam_integrity_comment: "Too narrow")
     end
 

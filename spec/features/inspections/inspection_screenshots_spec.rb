@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 require "timeout"
 require Rails.root.join("db/seeds/seed_data")

@@ -269,7 +269,7 @@ class SeedDataService
       passed,
       is_incomplete
     )
-      fields = SeedData.send("#{assessment_type}_fields", passed: passed)
+      fields = En14960Assessments::SeedData.send("#{assessment_type}_fields", passed: passed)
 
       if assessment_key == :user_height_assessment && inspection.length && inspection.width
         fields[:play_area_length] = inspection.length * 0.8
