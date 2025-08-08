@@ -6,6 +6,7 @@ class InspectionsController < ApplicationController
   include UserActivityCheck
 
   skip_before_action :require_login, only: %i[show]
+  before_action :check_assessments_enabled
   before_action :set_inspection, except: %i[create index]
   before_action :check_inspection_owner, except: %i[create index show]
   before_action :validate_unit_ownership, only: %i[update]
@@ -201,6 +202,10 @@ class InspectionsController < ApplicationController
   end
 
   private
+
+  def check_assessments_enabled
+    head :not_found unless ENV["HAS_ASSESSMENTS"] == "true"
+  end
 
   def partition_inspections(all_inspections)
     @draft_inspections = all_inspections
