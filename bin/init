@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+echo "Initializing project..."
+
+# Update git submodules
+echo "Updating git submodules..."
+git submodule update --init --recursive
+
+# Install Ruby dependencies
+echo "Installing Ruby dependencies..."
+bundle install
+
+# Copy .env.example to .env if it doesn't exist
+if [ ! -f .env ]; then
+  if [ -f .env.example ]; then
+    echo "Creating .env from .env.example..."
+    cp .env.example .env
+  else
+    echo "Warning: .env.example not found, skipping .env creation"
+  fi
+else
+  echo ".env already exists, skipping..."
+fi
+
+echo "Initialization complete!"

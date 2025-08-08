@@ -1,0 +1,9 @@
+---
+name: en14960-assessments
+version: 0.1.0
+type: bundler
+summary: EN14960 safety assessments for inflatable play equipment
+homepage: https://github.com/chobbledotcom/en14960-assessments
+license: other
+licenses: []
+notices: []

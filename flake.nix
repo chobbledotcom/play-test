@@ -47,6 +47,7 @@
             echo "Ruby $(ruby --version) with Rails $(rails --version)"
             echo ""
             echo "Scripts available:"
+            echo "  init           - Initialize project (submodules, bundle, .env)"
             echo "  rspec-find     - Find first failing test with details"
             echo "  rspec-memory   - Run tests with memory profiling"
             echo "  rspec-quick    - Run tests quickly with in-memory DB"

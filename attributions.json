@@ -1,6 +1,6 @@
 {
-  "generated_at": "2025-08-06T17:53:08",
-  "total_dependencies": 121,
+  "generated_at": "2025-08-08T15:37:58",
+  "total_dependencies": 122,
   "dependencies": [
     {
       "name": "actioncable",
@@ -144,7 +144,7 @@
     },
     {
       "name": "benchmark",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "license": "other",
       "homepage": "https://github.com/ruby/benchmark",
       "summary": "a performance benchmarking library"
@@ -193,7 +193,7 @@
     },
     {
       "name": "chobble-forms",
-      "version": "0.5.1",
+      "version": "0.5.3",
       "license": "other",
       "homepage": "https://github.com/chobbledotcom/chobble-forms",
       "summary": "Semantic Rails forms with strict i18n"
@@ -270,7 +270,7 @@
     },
     {
       "name": "drb",
-      "version": "2.2.1",
+      "version": "2.2.3",
       "license": "other",
       "homepage": "https://github.com/ruby/drb",
       "summary": "Distributed object system for Ruby"
@@ -281,6 +281,13 @@
       "license": "other",
       "homepage": "https://github.com/chobbledotcom/en14960",
       "summary": "BS EN 14960:2019 safety standard calculators for inflatable play equipment"
+    },
+    {
+      "name": "en14960-assessments",
+      "version": "0.1.0",
+      "license": "other",
+      "homepage": "https://github.com/chobbledotcom/en14960-assessments",
+      "summary": "EN14960 safety assessments for inflatable play equipment"
     },
     {
       "name": "erubi",
@@ -613,7 +620,7 @@
     },
     {
       "name": "rake",
-      "version": "13.2.1",
+      "version": "13.3.0",
       "license": "mit",
       "homepage": "https://github.com/ruby/rake",
       "summary": "Rake is a Make-like program implemented in Ruby"

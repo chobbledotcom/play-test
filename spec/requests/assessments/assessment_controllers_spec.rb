@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Assessment Controllers", type: :request do
@@ -13,9 +15,10 @@ RSpec.describe "Assessment Controllers", type: :request do
     it "updates structure assessment" do
       # Create assessment by visiting inspection
       get edit_inspection_path(inspection)
+      assessment = inspection.structure_assessment
 
       patch inspection_structure_assessment_path(inspection), params: {
-        assessments_structure_assessment: {
+        assessment.class.model_name.param_key => {
           seam_integrity_pass: true,
           stitch_length_pass: true
         }
@@ -32,9 +35,10 @@ RSpec.describe "Assessment Controllers", type: :request do
     it "updates user height assessment" do
       # Create assessment by visiting inspection
       get edit_inspection_path(inspection)
+      assessment = inspection.user_height_assessment
 
       patch inspection_user_height_assessment_path(inspection), params: {
-        assessments_user_height_assessment: {
+        assessment.class.model_name.param_key => {
           containing_wall_height: 1.8,
           users_at_1500mm: 25
         }
@@ -52,9 +56,10 @@ RSpec.describe "Assessment Controllers", type: :request do
     it "updates materials assessment" do
       # Create assessment by visiting inspection
       get edit_inspection_path(inspection)
+      assessment = inspection.materials_assessment
 
       patch inspection_materials_assessment_path(inspection), params: {
-        assessments_materials_assessment: {
+        assessment.class.model_name.param_key => {
           ropes: 30,
           fabric_strength_pass: true
         }
@@ -71,9 +76,10 @@ RSpec.describe "Assessment Controllers", type: :request do
     it "updates slide assessment" do
       # Create assessment by visiting inspection
       get edit_inspection_path(inspection)
+      assessment = inspection.slide_assessment
 
       patch inspection_slide_assessment_path(inspection), params: {
-        assessments_slide_assessment: {
+        assessment.class.model_name.param_key => {
           slide_platform_height: 2.5,
           clamber_netting_pass: :pass
         }

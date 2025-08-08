@@ -94,8 +94,8 @@ module AssessmentController
 
   sig { returns(Symbol) }
   def param_key
-    # e.g. "FanAssessmentsController" -> :assessments_fan_assessment
-    :"assessments_#{controller_name.singularize}"
+    # Use the model's actual param_key to avoid namespace mismatches
+    assessment_class.model_name.param_key.to_sym
   end
 
   sig { returns(T::Array[String]) }
@@ -122,7 +122,8 @@ module AssessmentController
   # Automatically derive from controller name
   sig { returns(T.class_of(ActiveRecord::Base)) }
   def assessment_class
-    # e.g. "MaterialsAssessmentsController" -> Assessments::MaterialsAssessment
+    # e.g. "MaterialsAssessmentsController"
+    # -> Assessments::MaterialsAssessment
     "Assessments::#{controller_name.singularize.camelize}".constantize
   end
 

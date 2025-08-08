@@ -7,6 +7,7 @@ en:
         manufacture: "Manufacture"
         data: "Data"
       fields:
+        id: "ID"
         name: "Unit Name"
         unit_type: "Unit Type"
         serial: "Manufacturer Serial Number"

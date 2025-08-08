@@ -14,10 +14,11 @@ RSpec.describe "Assessment Safety Calculations", type: :request do
     it "updates anchorage calculations" do
       # Set inspection dimensions so calculations can be performed
       inspection.update!(width: 10, height: 5, length: 15)
+      assessment = inspection.anchorage_assessment
 
       patch inspection_anchorage_assessment_path(inspection),
         params: {
-          assessments_anchorage_assessment: {
+          assessment.class.model_name.param_key => {
             num_low_anchors: 4,
             num_high_anchors: 3
           }
@@ -29,10 +30,11 @@ RSpec.describe "Assessment Safety Calculations", type: :request do
 
     it "updates slide runout calculations" do
       inspection.slide_assessment.update!(slide_platform_height: 2.0)
+      assessment = inspection.slide_assessment
 
       patch inspection_slide_assessment_path(inspection),
         params: {
-          assessments_slide_assessment: {
+          assessment.class.model_name.param_key => {
             runout: 1.5
           }
         },

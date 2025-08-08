@@ -551,12 +551,12 @@ SAFETY_CHECK_COUNT = MATERIAL_CHECKS.length
 def passed_checks_count = MATERIAL_CHECKS.count { _1 == true }  # Actual computation
 
 # GOOD - Use constants directly in views and other models
-<%= MaterialsAssessment::SAFETY_CHECK_COUNT %>
+<%= MaterialsAssessments::SAFETY_CHECK_COUNT %>
 
 # GOOD - Handle different assessment types explicitly
 case assessment
 when MaterialsAssessment
-  MaterialsAssessment::SAFETY_CHECK_COUNT
+  MaterialsAssessments::SAFETY_CHECK_COUNT
 else
   assessment.respond_to?(:safety_check_count) ? assessment.safety_check_count : 0
 end

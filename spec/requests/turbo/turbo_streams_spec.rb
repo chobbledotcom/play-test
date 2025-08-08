@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Turbo Streams", type: :request do
@@ -61,7 +63,9 @@ RSpec.describe "Turbo Streams", type: :request do
       context "#{assessment_type} assessment" do
         let(:assessment) { inspection.send(assessment_type) }
         let(:path) { send("inspection_#{assessment_type}_path", inspection) }
-        let(:params) { {"assessments_#{assessment_type.to_s.classify.underscore}" => {id: assessment.id}} }
+        let(:params) do
+          {assessment.class.model_name.param_key => {id: assessment.id}}
+        end
 
         it "accepts turbo stream updates" do
           patch path, params: params, headers: turbo_headers
@@ -76,7 +80,12 @@ RSpec.describe "Turbo Streams", type: :request do
           expect(response.body).to include("mark_complete_section")
 
           # Only some assessments have safety results
-          if %i[anchorage_assessment slide_assessment user_height_assessment].include?(assessment_type)
+          safety_assessments = %i[
+            anchorage_assessment
+            slide_assessment
+            user_height_assessment
+          ]
+          if safety_assessments.include?(assessment_type)
             frame_name = assessment_type.to_s.gsub("_assessment", "")
             expect(response.body).to include("#{frame_name}_safety_results")
           end
@@ -86,5 +95,6 @@ RSpec.describe "Turbo Streams", type: :request do
   end
 
   # RPII verification uses format.turbo_stream instead of Accept headers
-  # It's tested separately in spec/features/users/rpii_verification_with_turbo_spec.rb
+  # It's tested separately in
+  # spec/features/users/rpii_verification_with_turbo_spec.rb
 end
