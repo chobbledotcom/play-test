@@ -2,7 +2,7 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2025-08-06
+Generated on: 2025-08-08
 Total dependencies: 121
 
 ## Dependencies by License
@@ -247,7 +247,7 @@ Total dependencies: 121
   - Tools for creating, working with, and running Rails applications.
   - Homepage: https://rubyonrails.org
 
-- **rake** v13.2.1
+- **rake** v13.3.0
   - Rake is a Make-like program implemented in Ruby
   - Homepage: https://github.com/ruby/rake
 
@@ -349,7 +349,7 @@ Total dependencies: 121
   - OpenBSD's bcrypt() password hashing algorithm.
   - Homepage: https://github.com/bcrypt-ruby/bcrypt-ruby
 
-- **benchmark** v0.4.0
+- **benchmark** v0.4.1
   - a performance benchmarking library
   - Homepage: https://github.com/ruby/benchmark
 
@@ -361,7 +361,7 @@ Total dependencies: 121
   - The best way to manage your application's dependencies
   - Homepage: https://bundler.io
 
-- **chobble-forms** v0.5.1
+- **chobble-forms** v0.5.3
   - Semantic Rails forms with strict i18n
   - Homepage: https://github.com/chobbledotcom/chobble-forms
 
@@ -377,7 +377,7 @@ Total dependencies: 121
   - A subclass of Object includes Comparable module for handling dates.
   - Homepage: https://github.com/ruby/date
 
-- **drb** v2.2.1
+- **drb** v2.2.3
   - Distributed object system for Ruby
   - Homepage: https://github.com/ruby/drb
 
