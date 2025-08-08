@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 # Set default values for environment variables if not already set
@@ -5,3 +6,4 @@
 
 ENV["APP_NAME"] ||= "Play-Test"
 ENV["BASE_URL"] ||= "http://localhost:3000"
+ENV["HAS_ASSESSMENTS"] ||= "true"

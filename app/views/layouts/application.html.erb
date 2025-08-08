@@ -43,8 +43,10 @@
       <% end %>
       <nav>
         <ul>
-          <li><%= nav_link_to t('navigation.inspections'), inspections_path %></li>
-          <li><%= nav_link_to t('navigation.units'), units_path %></li>
+          <% if ENV['HAS_ASSESSMENTS'] == 'true' %>
+            <li><%= nav_link_to t('navigation.inspections'), inspections_path %></li>
+            <li><%= nav_link_to t('navigation.units'), units_path %></li>
+          <% end %>
           <% if Rails.env.development? || Rails.env.test? %>
             <li><%= nav_link_to t('navigation.search'), search_path %></li>
           <% end %>

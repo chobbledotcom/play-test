@@ -9,6 +9,7 @@ class UnitsController < ApplicationController
   include UserActivityCheck
 
   skip_before_action :require_login, only: %i[show]
+  before_action :check_assessments_enabled
   before_action :set_unit, only: %i[destroy edit log show update]
   before_action :check_unit_owner, only: %i[destroy edit update]
   before_action :check_log_access, only: %i[log]
@@ -263,6 +264,10 @@ class UnitsController < ApplicationController
   def check_log_access
     # Only unit owners can view logs
     head :not_found unless owns_resource?
+  end
+
+  def check_assessments_enabled
+    head :not_found unless ENV["HAS_ASSESSMENTS"] == "true"
   end
 
   def send_unit_pdf
