@@ -20,7 +20,7 @@ RSpec.feature "Materials Assessment N/A Functionality", type: :feature do
     visit edit_inspection_path(inspection, tab: "materials")
 
     # Choose the N/A radio button for ropes
-    field_id = "materials_assessment_ropes_pass_na"
+    field_id = "assessments_materials_assessment_ropes_pass_na"
     choose field_id
 
     # Submit the form
@@ -33,7 +33,7 @@ RSpec.feature "Materials Assessment N/A Functionality", type: :feature do
     visit edit_inspection_path(inspection, tab: "materials")
 
     # N/A checkbox should still be checked
-    field_id = "materials_assessment_ropes_pass_na"
+    field_id = "assessments_materials_assessment_ropes_pass_na"
     expect(page).to have_checked_field(field_id)
 
     # Verify in the database

@@ -1,3 +1,6 @@
+# typed: false
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe I18nUsageTracker do
@@ -102,7 +105,7 @@ RSpec.describe I18nUsageTracker do
         end
 
         it "handles array scope" do
-          described_class.track_key("created", scope: ["users", "messages"])
+          described_class.track_key("created", scope: %w[users messages])
 
           expect(described_class.used_keys).to include("users.messages.created")
           expect(described_class.used_keys).to include("users.messages")
@@ -183,8 +186,8 @@ RSpec.describe I18nUsageTracker do
       report = described_class.usage_report
 
       expect(report).to include(:total_keys, :used_keys, :unused_keys, :usage_percentage, :unused_key_list)
-      expect(report[:total_keys]).to be > 0
-      expect(report[:used_keys]).to be > 0
+      expect(report[:total_keys]).not_to be 0
+      expect(report[:used_keys]).not_to be 0
       expect(report[:unused_keys]).to be >= 0
       expect(report[:usage_percentage]).to be_between(0, 100)
       expect(report[:unused_key_list]).to be_an(Array)
@@ -202,7 +205,7 @@ RSpec.describe I18nUsageTracker do
       report = described_class.usage_report
 
       expect(report[:total_keys]).to eq(5)
-      expect(report[:used_keys]).to eq(5)  # All keys tracked
+      expect(report[:used_keys]).to eq(5) # All keys tracked
       expect(report[:unused_keys]).to eq(0)
       expect(report[:usage_percentage]).to eq(100.0)
     end

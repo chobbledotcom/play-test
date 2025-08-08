@@ -1,4 +1,5 @@
 # typed: false
+# frozen_string_literal: true
 
 require "rails_helper"
 
@@ -58,8 +59,7 @@ PARTIAL_ALLOWED_ATTRIBUTES = {
 RSpec.describe "Form YAML Database Schema Validation" do
   # Helper to load form YAML configuration
   define_method(:load_form_config) do |assessment_type|
-    config_path = Assessments::Engine.root
-      .join("config/forms/#{assessment_type}.yml")
+    config_path = Rails.root.join("config/forms/#{assessment_type}.yml")
     return nil unless File.exist?(config_path)
 
     yaml_content = YAML.load_file(config_path)
@@ -124,9 +124,7 @@ RSpec.describe "Form YAML Database Schema Validation" do
           end
         end
 
-        if missing_fields.any?
-          missing_fields_by_assessment[assessment_type] = missing_fields
-        end
+        missing_fields_by_assessment[assessment_type] = missing_fields if missing_fields.any?
       end
 
       if missing_fields_by_assessment.any?
@@ -160,9 +158,7 @@ RSpec.describe "Form YAML Database Schema Validation" do
         legend_counts = legend_keys.tally
         duplicates = legend_counts.select { |_, count| count > 1 }.keys
 
-        if duplicates.any?
-          duplicate_legends_by_assessment[assessment_type] = duplicates
-        end
+        duplicate_legends_by_assessment[assessment_type] = duplicates if duplicates.any?
       end
 
       if duplicate_legends_by_assessment.any?
@@ -221,13 +217,13 @@ RSpec.describe "Form YAML Database Schema Validation" do
               end
             end
 
-            unless allowed_partials.include?(partial)
-              errors << <<~MSG
-                #{assessment_type}:
-                  Field '#{field}' (#{column_type}) uses '#{partial}' partial
-                  Allowed partials: #{allowed_partials.join(", ")}
-              MSG
-            end
+            next if allowed_partials.include?(partial)
+
+            errors << <<~MSG
+              #{assessment_type}:
+                Field '#{field}' (#{column_type}) uses '#{partial}' partial
+                Allowed partials: #{allowed_partials.join(", ")}
+            MSG
           end
         end
       end
@@ -260,13 +256,13 @@ RSpec.describe "Form YAML Database Schema Validation" do
         # Find fields that exist in form but not in database
         extra_fields = form_fields - db_columns
 
-        if extra_fields.any?
-          errors << <<~MSG
-            #{assessment_type}:
-              Extra fields defined in form but not in database:
-              #{extra_fields.map { |f| "  - #{f}" }.join("\n")}
-          MSG
-        end
+        next unless extra_fields.any?
+
+        errors << <<~MSG
+          #{assessment_type}:
+            Extra fields defined in form but not in database:
+            #{extra_fields.map { |f| "  - #{f}" }.join("\n")}
+        MSG
       end
 
       if errors.any?
@@ -387,13 +383,13 @@ RSpec.describe "Form YAML Database Schema Validation" do
 
             # Check for disallowed attributes
             disallowed = attributes.keys - allowed
-            if disallowed.any?
-              disallowed_attrs = disallowed.join(", ")
-              errors << <<~MSG
-                #{assessment_type}: #{field} (#{partial}) has disallowed
-                attributes: #{disallowed_attrs}
-              MSG
-            end
+            next unless disallowed.any?
+
+            disallowed_attrs = disallowed.join(", ")
+            errors << <<~MSG
+              #{assessment_type}: #{field} (#{partial}) has disallowed
+              attributes: #{disallowed_attrs}
+            MSG
           end
         end
       end
