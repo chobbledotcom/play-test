@@ -16,43 +16,43 @@ end
 
 def create_anchorage_assessment(inspection, passed)
   inspection.anchorage_assessment.update!(
-    SeedData.anchorage_fields(passed: passed)
+    En14960Assessments::SeedData.anchorage_fields(passed: passed)
   )
 end
 
 def create_structure_assessment(inspection, passed)
   inspection.structure_assessment.update!(
-    SeedData.structure_fields(passed: passed)
+    En14960Assessments::SeedData.structure_fields(passed: passed)
   )
 end
 
 def create_materials_assessment(inspection, passed)
   inspection.materials_assessment.update!(
-    SeedData.materials_fields(passed: passed)
+    En14960Assessments::SeedData.materials_fields(passed: passed)
   )
 end
 
 def create_fan_assessment(inspection, passed)
   inspection.fan_assessment.update!(
-    SeedData.fan_fields(passed: passed)
+    En14960Assessments::SeedData.fan_fields(passed: passed)
   )
 end
 
 def create_user_height_assessment(inspection, unit, passed)
   inspection.user_height_assessment.update!(
-    SeedData.user_height_fields(passed: passed)
+    En14960Assessments::SeedData.user_height_fields(passed: passed)
   )
 end
 
 def create_slide_assessment(inspection, passed)
   inspection.slide_assessment.update!(
-    SeedData.slide_fields(passed: passed)
+    En14960Assessments::SeedData.slide_fields(passed: passed)
   )
 end
 
 def create_enclosed_assessment(inspection, passed)
   inspection.enclosed_assessment.update!(
-    SeedData.enclosed_fields(passed: passed)
+    En14960Assessments::SeedData.enclosed_fields(passed: passed)
   )
 end
 
@@ -134,7 +134,7 @@ in_progress = Inspection.create!(
 )
 
 in_progress.anchorage_assessment.update!(
-  SeedData.anchorage_fields(passed: true).merge(
+  En14960Assessments::SeedData.anchorage_fields(passed: true).merge(
     num_low_anchors: 8,
     num_high_anchors: 0
   )

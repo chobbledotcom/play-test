@@ -10,7 +10,7 @@ en:
         unit_configuration: "Unit Configuration"
         inspection_results: "Inspection Results"
       fields:
-        id: "Public Inspection ID"
+        id: "Report ID"
         inspection_date: "Inspection Date"
         reinspection_date: "Reinspection Date"
         unique_report_number: "Internal ID"

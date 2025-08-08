@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 require "timeout"
 require Rails.root.join("db/seeds/seed_data")
@@ -196,10 +198,12 @@ class InspectionWorkflow
   def fill_assessment_tab(tab_name)
     visit edit_inspection_path(@inspection, tab: tab_name)
 
-    field_data = SeedData.send(
-      "#{tab_name}_fields",
-      passed: true
-    )
+    # Results tab uses the main SeedData module, assessments use the gem
+    field_data = if tab_name == "results"
+      SeedData.send("#{tab_name}_fields", passed: true)
+    else
+      En14960Assessments::SeedData.send("#{tab_name}_fields", passed: true)
+    end
 
     field_data.each do |field_name, value|
       fill_assessment_field(tab_name, field_name, value)
