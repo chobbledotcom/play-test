@@ -89,7 +89,6 @@ en:
       rpii_registration_number: "RPII Registration Number"
       unique_report_number: "Internal ID"
       internal_id: "Internal ID"
-      id: "Public Inspection ID"
       inspection_company_name: "Inspection Company Name"
       overall_result: "Overall Result"
       passed: "Pass"

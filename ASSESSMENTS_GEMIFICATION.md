@@ -110,11 +110,31 @@ When moving assessment seed data, these files typically need updates:
 
 This systematic approach ensures clean migration without breaking existing functionality.
 
+## Assessment Factories Migration Status
+
+### Completed ✅
+- [x] Assessment seed data methods moved to gem (`En14960Assessments::SeedData`)
+- [x] Assessment factories copied to gem (`gems/en14960-assessments/spec/factories/`)
+- [x] Assessment factories working in main app (`spec/factories/`)
+
+### Pending ❌
+- [ ] Configure FactoryBot to load factories from gem automatically
+- [ ] Remove duplicate factory files from main app (keeping for now until gem loading works)
+- [ ] Test gem factories load properly in production/CI environments
+
+### Current State
+- **Assessment seed data**: Successfully gemified ✅
+- **Assessment factories**: Duplicated in both main app and gem (needs proper configuration)
+
+The main blocker is configuring FactoryBot to automatically load factories from the gem. The gem's engine configuration should handle this, but currently isn't working as expected.
+
 ## Verification Checklist
 
 After migration is complete:
-- [ ] All assessment field methods exist in the gem
-- [ ] All tests pass in both the main app and the gem
-- [ ] No references to deleted methods remain in the main app
-- [ ] Seeds still generate correctly
-- [ ] Integration tests still pass
+- [x] All assessment field methods exist in the gem
+- [x] All tests pass in both the main app and the gem  
+- [x] No references to deleted methods remain in the main app
+- [x] Seeds still generate correctly
+- [x] Integration tests still pass
+- [ ] FactoryBot loads gem factories automatically
+- [ ] No duplicate factory files exist

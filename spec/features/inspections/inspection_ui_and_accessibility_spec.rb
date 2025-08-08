@@ -1,3 +1,6 @@
+# typed: false
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.feature "Inspection UI and Accessibility", type: :feature do
@@ -39,7 +42,7 @@ RSpec.feature "Inspection UI and Accessibility", type: :feature do
     end
 
     within_fieldset("forms.inspection.sections.public_information") do
-      expect(page).to have_content(I18n.t("inspections.fields.id"))
+      expect(page).to have_content(I18n.t("forms.inspection.fields.id"))
       expect(page).to have_link(I18n.t("inspections.buttons.download_pdf"))
       expect(page).to have_link(I18n.t("inspections.buttons.download_qr_code"))
     end
