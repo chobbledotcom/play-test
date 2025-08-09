@@ -149,9 +149,6 @@ Rails.application.routes.draw do
 
   get "up" => "rails/health#show", :as => :rails_health_check
 
-  get "service-worker" => "rails/pwa#service_worker", :as => :pwa_service_worker
-  get "manifest" => "rails/pwa#manifest", :as => :pwa_manifest
-
   root to: "pages#show", defaults: {slug: "/"}
   get "guides", to: "guides#index"
   get "guides/*path", to: "guides#show", as: :guide
