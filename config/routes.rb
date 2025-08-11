@@ -3,8 +3,6 @@
 #                            Prefix Verb   URI Pattern                                                                                       Controller#Action
 #              mission_control_jobs        /mission_control                                                                                  MissionControl::Jobs::Engine
 #                rails_health_check GET    /up(.:format)                                                                                     rails/health#show
-#                pwa_service_worker GET    /service-worker(.:format)                                                                         rails/pwa#service_worker
-#                      pwa_manifest GET    /manifest(.:format)                                                                               rails/pwa#manifest
 #                              root GET    /                                                                                                 pages#show {slug: "/"}
 #                            guides GET    /guides(.:format)                                                                                 guides#index
 #                             guide GET    /guides/*path(.:format)                                                                           guides#show

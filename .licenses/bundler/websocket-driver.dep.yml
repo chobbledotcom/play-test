@@ -1,6 +1,6 @@
 ---
 name: websocket-driver
-version: 0.7.7
+version: 0.8.0
 type: bundler
 summary: WebSocket protocol handler with pluggable I/O
 homepage: https://github.com/faye/websocket-driver-ruby

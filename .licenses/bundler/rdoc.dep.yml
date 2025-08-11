@@ -1,6 +1,6 @@
 ---
 name: rdoc
-version: 6.13.1
+version: 6.14.2
 type: bundler
 summary: RDoc produces HTML and command-line documentation for Ruby projects
 homepage: https://ruby.github.io/rdoc
@@ -95,7 +95,7 @@ notices:
       * lib/rdoc/generator/template/darkfish/images
 
     SDoc::
-      Portions of SDoc by (???????????? ????????????????????) Vladimir Kolesnikov are included
+      Portions of SDoc by (Володя Колесников) Vladimir Kolesnikov are included
       under the MIT license as RDoc::Generator::JsonIndex.  See
       lib/rdoc/generator/json_index.rb for license information.
 
@@ -120,7 +120,7 @@ notices:
     Fonts::
       Source Code Pro is (c) 2010, 2012 Adobe Systems Incorporated.
 
-      Lato is (c) 2010 ??ukasz Dziedzic.
+      Lato is (c) 2010 Łukasz Dziedzic.
 
       Both fonts are used under the SIL Open Font License, Version 1.1.  The
       license is available at http://scripts.sil.org/OFL

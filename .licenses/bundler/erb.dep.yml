@@ -1,11 +1,15 @@
 ---
-name: io-console
-version: 0.8.1
+name: erb
+version: 5.0.2
 type: bundler
-summary: Console interface
-homepage: https://github.com/ruby/io-console
+summary: An easy to use but powerful templating system for Ruby.
+homepage: https://github.com/ruby/erb
 license: other
 licenses:
+- sources: LICENSE.txt
+  text: |
+    All the files in this distribution are covered under either the Ruby's
+    license (see the file COPYING) or BSD-2-Clause license (see the file BSDL).
 - sources: COPYING
   text: |
     Ruby is copyrighted free software by Yukihiro Matsumoto <matz@netlab.jp>.

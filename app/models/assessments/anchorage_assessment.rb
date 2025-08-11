@@ -2,6 +2,7 @@
 #
 # Table name: anchorage_assessments
 #
+#  id                         :integer          not null
 #  anchor_accessories_comment :text
 #  anchor_accessories_pass    :boolean
 #  anchor_degree_comment      :text
@@ -18,11 +19,11 @@
 #  pull_strength_pass         :boolean
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
-#  inspection_id              :string(12)       not null, primary key
+#  inspection_id              :string(8)        not null, primary key
 #
 # Indexes
 #
-#  anchorage_assessments_new_pkey  (inspection_id) UNIQUE
+#  index_anchorage_assessments_on_inspection_id  (inspection_id)
 #
 # Foreign Keys
 #

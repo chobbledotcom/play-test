@@ -5,7 +5,7 @@
 #
 # Table name: users
 #
-#  id                    :string(12)       not null, primary key
+#  id                    :string(8)        not null, primary key
 #  active_until          :date
 #  address               :text
 #  country               :string

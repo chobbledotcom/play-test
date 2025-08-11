@@ -1,6 +1,6 @@
 {
-  "generated_at": "2025-08-08T21:52:20",
-  "total_dependencies": 121,
+  "generated_at": "2025-08-11T19:23:40",
+  "total_dependencies": 122,
   "dependencies": [
     {
       "name": "actioncable",
@@ -193,7 +193,7 @@
     },
     {
       "name": "chobble-forms",
-      "version": "0.5.3",
+      "version": "0.5.4",
       "license": "other",
       "homepage": "https://github.com/chobbledotcom/chobble-forms",
       "summary": "Semantic Rails forms with strict i18n"
@@ -283,6 +283,13 @@
       "summary": "BS EN 14960:2019 safety standard calculators for inflatable play equipment"
     },
     {
+      "name": "erb",
+      "version": "5.0.2",
+      "license": "other",
+      "homepage": "https://github.com/ruby/erb",
+      "summary": "An easy to use but powerful templating system for Ruby."
+    },
+    {
       "name": "erubi",
       "version": "1.13.1",
       "license": "mit",
@@ -340,7 +347,7 @@
     },
     {
       "name": "io-console",
-      "version": "0.8.0",
+      "version": "0.8.1",
       "license": "other",
       "homepage": "https://github.com/ruby/io-console",
       "summary": "Console interface"
@@ -375,7 +382,7 @@
     },
     {
       "name": "loofah",
-      "version": "2.24.0",
+      "version": "2.24.1",
       "license": "mit",
       "homepage": "https://github.com/flavorjones/loofah",
       "summary": "Loofah is a general library for manipulating and transforming HTML/XML documents and fragments, built on top of Nokogiri."
@@ -431,7 +438,7 @@
     },
     {
       "name": "net-imap",
-      "version": "0.5.8",
+      "version": "0.5.9",
       "license": "other",
       "homepage": "https://github.com/ruby/net-imap",
       "summary": "Ruby client api for Internet Message Access Protocol"
@@ -550,7 +557,7 @@
     },
     {
       "name": "rack",
-      "version": "3.1.16",
+      "version": "3.2.0",
       "license": "mit",
       "homepage": "https://github.com/rack/rack",
       "summary": "A modular Ruby webserver interface."
@@ -592,7 +599,7 @@
     },
     {
       "name": "rails-dom-testing",
-      "version": "2.2.0",
+      "version": "2.3.0",
       "license": "mit",
       "homepage": "https://github.com/rails/rails-dom-testing",
       "summary": "Dom and Selector assertions for Rails applications"
@@ -620,14 +627,14 @@
     },
     {
       "name": "rdoc",
-      "version": "6.13.1",
+      "version": "6.14.2",
       "license": "other",
       "homepage": "https://ruby.github.io/rdoc",
       "summary": "RDoc produces HTML and command-line documentation for Ruby projects"
     },
     {
       "name": "reline",
-      "version": "0.6.1",
+      "version": "0.6.2",
       "license": "other",
       "homepage": "https://github.com/ruby/reline",
       "summary": "Alternative GNU Readline or Editline implementation by pure Ruby."
@@ -823,7 +830,7 @@
     },
     {
       "name": "websocket-driver",
-      "version": "0.7.7",
+      "version": "0.8.0",
       "license": "other",
       "homepage": "https://github.com/faye/websocket-driver-ruby",
       "summary": "WebSocket protocol handler with pluggable I/O"
@@ -844,7 +851,7 @@
     },
     {
       "name": "zeitwerk",
-      "version": "2.7.2",
+      "version": "2.7.3",
       "license": "mit",
       "homepage": "https://github.com/fxn/zeitwerk",
       "summary": "Efficient and thread-safe constant autoloader"

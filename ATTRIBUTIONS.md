@@ -2,8 +2,8 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2025-08-08
-Total dependencies: 121
+Generated on: 2025-08-11
+Total dependencies: 122
 
 ## Dependencies by License
 
@@ -179,7 +179,7 @@ Total dependencies: 121
   - Use ESM with importmap to manage modern JavaScript in Rails without transpiling or bundling.
   - Homepage: https://github.com/rails/importmap-rails
 
-- **loofah** v2.24.0
+- **loofah** v2.24.1
   - Loofah is a general library for manipulating and transforming HTML/XML documents and fragments, built on top of Nokogiri.
   - Homepage: https://github.com/flavorjones/loofah
 
@@ -211,7 +211,7 @@ Total dependencies: 121
   - a very dumb PEG parser library
   - Homepage: https://github.com/floraison/raabro
 
-- **rack** v3.1.16
+- **rack** v3.2.0
   - A modular Ruby webserver interface.
   - Homepage: https://github.com/rack/rack
 
@@ -235,7 +235,7 @@ Total dependencies: 121
   - Full-stack web application framework.
   - Homepage: https://rubyonrails.org
 
-- **rails-dom-testing** v2.2.0
+- **rails-dom-testing** v2.3.0
   - Dom and Selector assertions for Rails applications
   - Homepage: https://github.com/rails/rails-dom-testing
 
@@ -331,11 +331,11 @@ Total dependencies: 121
   - Cron jobs in ruby.
   - Homepage: https://github.com/javan/whenever
 
-- **zeitwerk** v2.7.2
+- **zeitwerk** v2.7.3
   - Efficient and thread-safe constant autoloader
   - Homepage: https://github.com/fxn/zeitwerk
 
-### OTHER (41 dependencies)
+### OTHER (42 dependencies)
 
 - **activerecord** v8.0.2
   - Object-relational mapper framework (part of Rails).
@@ -361,7 +361,7 @@ Total dependencies: 121
   - The best way to manage your application's dependencies
   - Homepage: https://bundler.io
 
-- **chobble-forms** v0.5.3
+- **chobble-forms** v0.5.4
   - Semantic Rails forms with strict i18n
   - Homepage: https://github.com/chobbledotcom/chobble-forms
 
@@ -385,11 +385,15 @@ Total dependencies: 121
   - BS EN 14960:2019 safety standard calculators for inflatable play equipment
   - Homepage: https://github.com/chobbledotcom/en14960
 
+- **erb** v5.0.2
+  - An easy to use but powerful templating system for Ruby.
+  - Homepage: https://github.com/ruby/erb
+
 - **ffi** v1.17.2
   - Ruby FFI
   - Homepage: https://github.com/ffi/ffi/wiki
 
-- **io-console** v0.8.0
+- **io-console** v0.8.1
   - Console interface
   - Homepage: https://github.com/ruby/io-console
 
@@ -413,7 +417,7 @@ Total dependencies: 121
   - An implementation of Matrix and Vector classes.
   - Homepage: https://github.com/ruby/matrix
 
-- **net-imap** v0.5.8
+- **net-imap** v0.5.9
   - Ruby client api for Internet Message Access Protocol
   - Homepage: https://github.com/ruby/net-imap
 
@@ -465,11 +469,11 @@ Total dependencies: 121
   - Racc is an LALR(1) parser generator
   - Homepage: https://github.com/ruby/racc
 
-- **rdoc** v6.13.1
+- **rdoc** v6.14.2
   - RDoc produces HTML and command-line documentation for Ruby projects
   - Homepage: https://ruby.github.io/rdoc
 
-- **reline** v0.6.1
+- **reline** v0.6.2
   - Alternative GNU Readline or Editline implementation by pure Ruby.
   - Homepage: https://github.com/ruby/reline
 
@@ -493,7 +497,7 @@ Total dependencies: 121
   - URI is a module providing classes to handle Uniform Resource Identifiers
   - Homepage: https://github.com/ruby/uri
 
-- **websocket-driver** v0.7.7
+- **websocket-driver** v0.8.0
   - WebSocket protocol handler with pluggable I/O
   - Homepage: https://github.com/faye/websocket-driver-ruby
 

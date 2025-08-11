@@ -20,6 +20,7 @@
       {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
+            actionlint
             cmake
             gh
             jq
