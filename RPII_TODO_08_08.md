@@ -13,8 +13,8 @@
 **Total time: 130m = 2 hours, £200**
 
 - **done** (5m) Public Inspection ID => Report ID
-- (10m) Delete interal ID
-- (10m) "Save Inspection" => "Save & Continue" if there's something incomplete
+- **done** (10m) Delete interal ID
+- **done** (10m) "Save Inspection" => "Save & Continue" if there's something incomplete
 - (20m) If play area is greater than unit dimensions, add a breakdown bit
 - (30m) Not applicable / zeroes. Add a checkbox to some fields (eg trough depth) for N/A, which actually just sets a zero in the database
 - (20m) BounceSafe logo on PDF at the top, company logo (RPII badge) at the bottom next to the signature
