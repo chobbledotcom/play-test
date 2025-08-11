@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 # Units Controller Request Tests (formerly Equipment)
@@ -590,7 +592,7 @@ RSpec.describe "Units", type: :request do
           }
         }
 
-        expect(response).to redirect_to(inspection_path(inspection))
+        expect(response).to redirect_to(edit_inspection_path(inspection))
         expect(flash[:notice]).to include("created successfully and linked")
 
         inspection.reload

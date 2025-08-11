@@ -33,3 +33,4 @@ en:
         visual_damage: "Visual damage detected"
         pat_failure: "PAT test failed"
       submit: "Save Assessment"
+      submit_continue: "Save & Continue"

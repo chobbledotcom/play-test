@@ -34,6 +34,7 @@ en:
         compliant: "Compliant"
         non_compliant: "Non-Compliant (Requires %{required} total anchors, has %{actual})"
       submit: "Save Assessment"
+      submit_continue: "Save & Continue"
       errors:
         header:
           one: "1 error prevented this assessment from being saved:"

@@ -17,3 +17,4 @@ en:
         safety_checks: "Safety Checks"
         critical_failures: "Critical Failures"
       submit: "Save Assessment"
+      submit_continue: "Save & Continue"

@@ -1,9 +1,25 @@
+# typed: false
+
 require "rails_helper"
 
-ALLOWED_TOP_LEVEL_KEYS = %w[header sections fields placeholders hints status summary submit issues errors compliance messages].freeze
+ALLOWED_TOP_LEVEL_KEYS = %w[
+  compliance
+  errors
+  fields
+  header
+  hints
+  issues
+  messages
+  placeholders
+  sections
+  status
+  submit
+  submit_continue
+  summary
+].freeze
 
 RSpec.describe "Form I18n Structure" do
-  def check_form_locale_file(file_path)
+  define_method(:check_form_locale_file) do |file_path|
     locale_data = YAML.load_file(file_path)
     form_name = File.basename(file_path, ".en.yml")
 

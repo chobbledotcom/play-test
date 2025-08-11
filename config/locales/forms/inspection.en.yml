@@ -27,6 +27,7 @@ en:
         risk_assessment: "Risk Assessment"
         unit_id: "Unit Selection"
       submit: "Save Inspection"
+      submit_continue: "Save & Continue"
       errors:
         header:
           one: "1 error prevented this inspection from being saved:"

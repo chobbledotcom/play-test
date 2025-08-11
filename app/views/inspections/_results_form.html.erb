@@ -1,6 +1,12 @@
+<%
+  # Check if there are incomplete fields for this inspection
+  has_incomplete_fields = @inspection.incomplete_fields.any?
+  submit_key = has_incomplete_fields ? "submit_continue" : "submit"
+%>
 <%= render 'chobble_forms/form_context',
   model: @inspection,
-  i18n_base: 'forms.results' do |form| %>
+  i18n_base: 'forms.results',
+  submit_key: submit_key do |form| %>
   <%= hidden_field_tag :tab, 'results' %>
   <%= render 'chobble_forms/fieldset', legend_key: 'comments' do %>
     <% comments_found = false %>

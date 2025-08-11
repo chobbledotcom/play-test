@@ -1,6 +1,12 @@
+<%
+  # Check if there are incomplete fields on the inspection tab
+  has_incomplete_fields = @inspection.inspection_tab_incomplete_fields.any?
+  submit_key = has_incomplete_fields ? "submit_continue" : "submit"
+%>
 <%= render 'chobble_forms/form_context',
   model: @inspection,
-  i18n_base: 'forms.inspection' do |form| %>
+  i18n_base: 'forms.inspection',
+  submit_key: submit_key do |form| %>
   <%= render 'chobble_forms/fieldset', legend_key: 'current_unit' do %>
     <% if @inspection.unit.present? %>
       <%= render 'shared/unit_details_display', unit: @inspection.unit %>

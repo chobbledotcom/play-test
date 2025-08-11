@@ -24,3 +24,4 @@ en:
         compliant: "Compliant"
         non_compliant: "Non-Compliant (Requires %{required}m minimum)"
       submit: "Save Assessment"
+      submit_continue: "Save & Continue"

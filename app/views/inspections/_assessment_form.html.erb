@@ -11,11 +11,16 @@
   when 'user_height' then ['shared/safety_standards/wall_height_requirements']
   else []
   end
+  
+  # Check if there are incomplete fields for this inspection
+  has_incomplete_fields = assessment.inspection.incomplete_fields.any?
+  submit_key = has_incomplete_fields ? "submit_continue" : "submit"
 %>
 
 <%= render 'chobble_forms/form_context',
   model: assessment,
   i18n_base: "forms.#{assessment_type}",
+  submit_key: submit_key,
   url: send("inspection_#{assessment_type}_assessment_path", @inspection) do |form| %>
   <%= hidden_field_tag :tab, assessment_type %>
   <%= render 'chobble_forms/fields', model: assessment %>
