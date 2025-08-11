@@ -2,6 +2,8 @@
 
 ## Bugs (free)
 
+**done**
+
 - (bug) Test registration
 - (bug) Bounce back to the edit inspection you were editing when creating a new unit from it, not view
 - (bug) Number of blowers - change step to 1
@@ -10,7 +12,7 @@
 
 **Total time: 130m = 2 hours, £200**
 
-- (5m) Public Inspection ID => Report ID
+- **done** (5m) Public Inspection ID => Report ID
 - (10m) Delete interal ID
 - (10m) "Save Inspection" => "Save & Continue" if there's something incomplete
 - (20m) If play area is greater than unit dimensions, add a breakdown bit
