@@ -14,6 +14,7 @@ en:
         users_at_1200mm: "Users at 1.2m"
         users_at_1500mm: "Users at 1.5m"
         users_at_1800mm: "Users at 1.8m"
+        custom_user_height: "Custom User Height"
         custom_user_height_comment: "Custom User Height Comments"
         play_area_length: "Play Area Length (m)"
         play_area_width: "Play Area Width (m)"

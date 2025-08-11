@@ -379,6 +379,11 @@ fieldset#user_capacity > * {
   flex-wrap: wrap;
 }
 
+.form-actions input,
+.form-actions a {
+  margin: 0;
+}
+
 /* Secondary button styling */
 .secondary[role="button"],
 a.secondary[role="button"] {
