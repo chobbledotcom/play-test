@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Unit Inspection Association", type: :feature do
@@ -8,7 +10,7 @@ RSpec.feature "Unit Inspection Association", type: :feature do
     sign_in(user)
   end
 
-  def fill_unit_field(field, value)
+  define_method(:fill_unit_field) do |field, value|
     fill_in I18n.t("forms.units.fields.#{field}"), with: value
   end
 
@@ -42,7 +44,7 @@ RSpec.feature "Unit Inspection Association", type: :feature do
 
       expect(page).to have_content(I18n.t("units.messages.created_from_inspection"))
 
-      expect(current_path).to eq(inspection_path(inspection))
+      expect(current_path).to eq(edit_inspection_path(inspection))
 
       unit = user.units.find_by(serial: "UFI-2024-001")
       expect(unit).to be_present

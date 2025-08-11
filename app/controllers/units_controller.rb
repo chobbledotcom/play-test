@@ -172,7 +172,7 @@ class UnitsController < ApplicationController
     if service.create
       log_unit_event("created", service.unit)
       flash[:notice] = I18n.t("units.messages.created_from_inspection")
-      redirect_to inspection_path(service.inspection)
+      redirect_to edit_inspection_path(service.inspection)
     elsif service.error_message
       flash[:alert] = service.error_message
       redirect_path = service.inspection ?
