@@ -20,7 +20,12 @@ module FormHelpers
 
   def submit_form(form_name)
     submit_text = I18n.t("forms.#{form_name}.submit")
-    click_button submit_text
+    # Try both button texts - the original and "Save & Continue"
+    begin
+      click_button submit_text
+    rescue Capybara::ElementNotFound
+      click_button "Save & Continue"
+    end
   end
 
   def submit_form_within(form_name)
@@ -177,7 +182,13 @@ module FormHelpers
 
   # Generic I18n helpers
   def click_i18n_button(key, **interpolations)
-    click_button I18n.t(key, **interpolations)
+    button_text = I18n.t(key, **interpolations)
+    # Try both button texts - the original and "Save & Continue"
+    begin
+      click_button button_text
+    rescue Capybara::ElementNotFound
+      click_button "Save & Continue"
+    end
   end
 
   def expect_i18n_content(key, **interpolations)

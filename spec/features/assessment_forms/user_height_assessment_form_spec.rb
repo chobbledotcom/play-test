@@ -48,7 +48,7 @@ RSpec.feature "User Height Assessment", type: :feature do
       fill_in_form :user_height, :play_area_width, "8.0"
       fill_in_form :user_height, :negative_adjustment, "2.0"
 
-      click_button I18n.t("inspections.buttons.save_assessment")
+      click_i18n_button "inspections.buttons.save_assessment"
 
       expect_updated_message
 
@@ -69,7 +69,7 @@ RSpec.feature "User Height Assessment", type: :feature do
     it "displays validation errors for invalid data" do
       fill_in_form :user_height, :containing_wall_height, "-1"
 
-      click_button I18n.t("inspections.buttons.save_assessment")
+      click_i18n_button "inspections.buttons.save_assessment"
 
       expect(page.status_code).to eq(422)
 

@@ -19,7 +19,7 @@ RSpec.feature "Next tab navigation", type: :feature do
     visit edit_inspection_path(inspection, tab: "inspection")
 
     # Save the form
-    click_button "Save Inspection"
+    submit_form(:inspection)
 
     # Should redirect to show page with success message
     expect(page).to have_content(I18n.t("inspections.messages.updated"))
@@ -35,7 +35,7 @@ RSpec.feature "Next tab navigation", type: :feature do
     fill_in I18n.t("forms.user_height.fields.users_at_1000mm"), with: "3"
 
     # Save the assessment
-    click_button "Save Assessment"
+    submit_form(:user_height)
 
     # Should redirect to show page with success message
     expect(page).to have_content(I18n.t("inspections.messages.updated"))

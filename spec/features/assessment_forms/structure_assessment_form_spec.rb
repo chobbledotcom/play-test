@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Structure Assessment Form", type: :feature do
@@ -7,21 +9,21 @@ RSpec.feature "Structure Assessment Form", type: :feature do
 
   before { sign_in(user) }
 
-  def field_prefix
+  define_method(:field_prefix) do
     "forms.structure.fields"
   end
 
-  def get_label(field)
+  define_method(:get_label) do |field|
     key = "#{field_prefix}.#{field}"
     label = I18n.t(key, default: nil)
     label || I18n.t(key.gsub(/_pass$/, ""))
   end
 
-  def choose_structure_field(field, value)
+  define_method(:choose_structure_field) do |field, value|
     choose_pass_fail(get_label(field), value)
   end
 
-  def fill_structure_field(field, value)
+  define_method(:fill_structure_field) do |field, value|
     fill_in get_label(field), with: value.to_s
   end
 
@@ -59,7 +61,7 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     choose_structure_field :markings_pass, true
     choose_structure_field :grounding_pass, true
 
-    click_button I18n.t("forms.structure.submit")
+    submit_form :structure
 
     expect_updated_message
 

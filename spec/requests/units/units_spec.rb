@@ -155,7 +155,7 @@ RSpec.describe "Units", type: :request do
         fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
         fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
 
-        click_button I18n.t("forms.units.submit")
+        submit_form :units
 
         expect(page).to have_content(I18n.t("units.messages.created"))
         expect(page).to have_content("New Test Unit")
@@ -170,7 +170,7 @@ RSpec.describe "Units", type: :request do
         visit new_unit_path
 
         # Submit form with missing required fields
-        click_button I18n.t("forms.units.submit")
+        submit_form :units
 
         expect(page).to have_http_status(:unprocessable_entity)
         expect_form_errors :units
@@ -187,7 +187,7 @@ RSpec.describe "Units", type: :request do
         fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
         fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
 
-        click_button I18n.t("forms.units.submit")
+        submit_form :units
 
         expect(page).to have_http_status(:unprocessable_entity)
         expect(page).to have_content("has already been taken")
@@ -220,7 +220,7 @@ RSpec.describe "Units", type: :request do
 
         fill_in I18n.t("forms.units.fields.name"), with: "Updated Unit Name"
         fill_in I18n.t("forms.units.fields.description"), with: "Updated Description"
-        click_button I18n.t("forms.units.submit")
+        submit_form :units
 
         expect(page).to have_content(I18n.t("units.messages.updated"))
         expect(page).to have_content("Updated Unit Name")
@@ -234,7 +234,7 @@ RSpec.describe "Units", type: :request do
         visit edit_unit_path(unit)
 
         fill_in I18n.t("forms.units.fields.name"), with: ""
-        click_button I18n.t("forms.units.submit")
+        submit_form :units
 
         expect(page).to have_http_status(:unprocessable_entity)
         expect_form_errors :units
@@ -376,7 +376,7 @@ RSpec.describe "Units", type: :request do
           attach_file "Photo", Rails.root.join("spec/fixtures/files/test_image.jpg")
         end
 
-        click_button I18n.t("forms.units.submit")
+        submit_form :units
 
         expect(page).to have_content(I18n.t("units.messages.created"))
 
@@ -449,7 +449,7 @@ RSpec.describe "Units", type: :request do
       fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
       fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
 
-      click_button I18n.t("forms.units.submit")
+      submit_form :units
 
       created_unit = user.units.find_by(serial: "PROTECT123")
       expect(created_unit).to be_present

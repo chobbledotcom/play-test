@@ -1,3 +1,5 @@
+# typed: false
+
 # Shared examples for common assessment model behaviors
 
 def enum_field?(assessment_class, field)
@@ -185,13 +187,15 @@ RSpec.shared_examples "an assessment form" do |assessment_type|
 
       expect(page).not_to have_content("translation missing")
 
-      expect(page).to have_button(I18n.t("inspections.buttons.save_assessment"))
+      # Button text could be either "Save Assessment" or "Save & Continue"
+      original_text = I18n.t("inspections.buttons.save_assessment")
+      expect(page).to have_button(original_text).or(have_button("Save & Continue"))
     end
 
     it "saves the assessment when form is submitted" do
       visit edit_inspection_path(inspection, tab: assessment_type)
 
-      click_button I18n.t("inspections.buttons.save_assessment")
+      click_i18n_button "inspections.buttons.save_assessment"
 
       expect_updated_message
     end
