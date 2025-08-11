@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Assessment Access Control", type: :feature do
@@ -7,7 +9,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
   let(:unit1) { create(:unit, user: user1) }
   let(:unit2) { create(:unit, user: user2) }
   let(:inspection1) { create(:inspection, user: user1, unit: unit1) }
-  let(:inspection2) { create(:inspection, user: user2, unit: unit2, unique_report_number: "TEST-REPORT-123") }
+  let(:inspection2) { create(:inspection, user: user2, unit: unit2) }
 
   scenario "prevents viewing another user's inspection assessment form" do
     sign_in(user1)

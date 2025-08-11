@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Dirty form warning", js: true do
@@ -15,7 +17,7 @@ RSpec.feature "Dirty form warning", js: true do
   scenario "tracks form changes and provides save options" do
     expect(page).not_to have_css("#dirty-form-indicator", visible: true)
 
-    fill_in_form :inspection, :unique_report_number, "NEW123"
+    fill_in_form :inspection, :inspection_date, 1.day.ago.strftime("%Y-%m-%d")
     expect(page).to have_css("#dirty-form-indicator", visible: true)
     expect(page).to have_content("Unsaved changes")
 
@@ -28,7 +30,7 @@ RSpec.feature "Dirty form warning", js: true do
   end
 
   scenario "warns before navigating away with unsaved changes" do
-    fill_in_form :inspection, :unique_report_number, "UNSAVED123"
+    fill_in_form :inspection, :inspection_date, 2.days.ago.strftime("%Y-%m-%d")
 
     dismiss_confirm do
       click_link I18n.t("inspections.buttons.qr_and_pdf")

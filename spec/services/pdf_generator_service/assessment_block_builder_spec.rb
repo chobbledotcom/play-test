@@ -1,3 +1,6 @@
+# typed: false
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
@@ -23,26 +26,12 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       end
 
       it "creates the correct number of blocks" do
-        puts "\n=== ACTUAL BLOCKS CREATED ==="
-        blocks.each_with_index do |block, i|
-          case block.type
-          when :header
-            puts "#{i + 1}. HEADER: #{block.name}"
-          when :value
-            puts "#{i + 1}. VALUE: #{block.pass_fail.inspect} #{block.name} #{block.value}"
-          when :comment
-            puts "#{i + 1}. COMMENT: #{block.comment}"
-          end
-        end
-        puts "=== TOTAL: #{blocks.size} blocks ==="
-
-        # Based on SeedData.materials_fields, expect appropriate number
         expect(blocks.size).to eq(10) # Update based on actual output
       end
 
       it "creates blocks in the correct order" do
-        expect(blocks.map(&:type)).to eq([
-          :header, :value, :value, :value, :value, :value, :value, :value, :comment, :value
+        expect(blocks.map(&:type)).to eq(%i[
+          header value value value value value value value comment value
         ])
       end
 

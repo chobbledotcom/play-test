@@ -1,3 +1,5 @@
+# typed: false
+
 # Helper methods for inspection-related feature tests
 # These methods hide i18n complexity and make tests more readable
 module InspectionTestHelpers
@@ -37,10 +39,6 @@ module InspectionTestHelpers
   end
 
   # Form filling - use the generic form helpers
-
-  def fill_in_report_number(value)
-    fill_in_form(:inspection, :unique_report_number, value)
-  end
 
   def fill_in_risk_assessment(value)
     # Risk assessment is now on the results tab
@@ -82,15 +80,6 @@ module InspectionTestHelpers
   end
 
   # Button expectations
-  def expect_suggested_id_button(inspection)
-    expected_text = I18n.t("inspections.buttons.use_suggested_id", id: inspection.id)
-    expect(page).to have_button(expected_text)
-  end
-
-  def expect_no_suggested_id_button(inspection)
-    expected_text = I18n.t("inspections.buttons.use_suggested_id", id: inspection.id)
-    expect(page).not_to have_button(expected_text)
-  end
 
   def expect_safety_standard(table, key, **args)
     string = I18n.t("safety_standards.#{table}.#{key}", **args)

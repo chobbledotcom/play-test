@@ -20,7 +20,6 @@
 #  passed               :boolean
 #  pdf_last_accessed_at :datetime
 #  risk_assessment      :text
-#  unique_report_number :string
 #  width                :decimal(8, 2)
 #  width_comment        :string(1000)
 #  created_at           :datetime         not null
@@ -35,7 +34,6 @@
 #  index_inspections_on_inspector_company_id    (inspector_company_id)
 #  index_inspections_on_is_seed                 (is_seed)
 #  index_inspections_on_unit_id                 (unit_id)
-#  index_inspections_on_user_and_report_number  (user_id,unique_report_number)
 #  index_inspections_on_user_id                 (user_id)
 #
 # Foreign Keys
@@ -87,7 +85,6 @@ class Inspection < ApplicationRecord
     photo_2
     photo_3
     risk_assessment
-    unique_report_number
     unit_id
     width
   ].freeze
@@ -95,7 +92,6 @@ class Inspection < ApplicationRecord
   REQUIRED_TO_COMPLETE_FIELDS =
     USER_EDITABLE_PARAMS - %i[
       risk_assessment
-      unique_report_number
     ]
 
   belongs_to :user
@@ -141,10 +137,6 @@ class Inspection < ApplicationRecord
   end
 
   validates :inspection_date, presence: true
-  # rubocop:disable Rails/UniqueValidationWithoutIndex
-  validates :unique_report_number,
-    uniqueness: {scope: :user_id, allow_blank: true}
-  # rubocop:enable Rails/UniqueValidationWithoutIndex
 
   # Scopes
   scope :seed_data, -> { where(is_seed: true) }
@@ -186,13 +178,12 @@ class Inspection < ApplicationRecord
   # Helper methods for scopes
   sig { returns(String) }
   def self.search_conditions
-    "inspections.id LIKE ? OR " \
-    "inspections.unique_report_number LIKE ? OR units.serial LIKE ? OR " \
+    "inspections.id LIKE ? OR units.serial LIKE ? OR " \
     "units.manufacturer LIKE ? OR units.name LIKE ?"
   end
 
   sig { params(query: String).returns(T::Array[String]) }
-  def self.search_values(query) = Array.new(5) { "%#{query}%" }
+  def self.search_values(query) = Array.new(4) { "%#{query}%" }
 
   sig { params(start_date: T.nilable(T.any(String, Date)), end_date: T.nilable(T.any(String, Date))).returns(T::Boolean) }
   def self.both_dates_present?(start_date, end_date) =

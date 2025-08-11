@@ -39,7 +39,6 @@ module SeedData
   def self.inspection_fields(passed: true)
     {
       inspection_date: Date.current,
-      unique_report_number: "RPT-#{Date.current.year}-#{SecureRandom.hex(12)}",
       is_totally_enclosed: [true, false].sample,
       has_slide: [true, false].sample,
       indoor_only: [true, false].sample,

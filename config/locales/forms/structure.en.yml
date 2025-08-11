@@ -5,6 +5,7 @@ en:
       sections:
         fabric_construction: "Fabric and Construction"
         structural_safety: "Structural Safety and Measurements"
+        structural_safety_footer: "Please note additional readings in comments"
         trough_assessment: "Trough Assessment"
         safety_compliance: "Safety Compliance"
       fields:

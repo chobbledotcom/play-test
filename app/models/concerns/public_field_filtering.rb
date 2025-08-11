@@ -1,3 +1,5 @@
+# typed: false
+
 # Shared concern for defining which fields should be excluded from public output
 # Used by both PDF generation and JSON serialization to ensure consistency
 module PublicFieldFiltering
@@ -14,7 +16,6 @@ module PublicFieldFiltering
     inspector_company_id
     inspection_id
     is_seed
-    unique_report_number
   ].freeze
 
   # Additional fields to exclude from PDFs specifically

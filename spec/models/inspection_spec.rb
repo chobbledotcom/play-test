@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 # == Schema Information
@@ -19,7 +20,6 @@
 #  passed               :boolean
 #  pdf_last_accessed_at :datetime
 #  risk_assessment      :text
-#  unique_report_number :string
 #  width                :decimal(8, 2)
 #  width_comment        :string(1000)
 #  created_at           :datetime         not null
@@ -34,7 +34,6 @@
 #  index_inspections_on_inspector_company_id    (inspector_company_id)
 #  index_inspections_on_is_seed                 (is_seed)
 #  index_inspections_on_unit_id                 (unit_id)
-#  index_inspections_on_user_and_report_number  (user_id,unique_report_number)
 #  index_inspections_on_user_id                 (user_id)
 #
 # Foreign Keys

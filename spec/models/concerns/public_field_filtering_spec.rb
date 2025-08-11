@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe PublicFieldFiltering do
@@ -6,11 +8,11 @@ RSpec.describe PublicFieldFiltering do
     Class.new do
       include PublicFieldFiltering
 
-      def self.name
+      define_singleton_method(:name) do
         "TestClass"
       end
 
-      def self.column_names
+      define_singleton_method(:column_names) do
         %w[
           id
           name
@@ -29,11 +31,11 @@ RSpec.describe PublicFieldFiltering do
     Class.new do
       include PublicFieldFiltering
 
-      def self.name
+      define_singleton_method(:name) do
         "Unit"
       end
 
-      def self.column_names
+      define_singleton_method(:column_names) do
         %w[
           id
           name
@@ -61,7 +63,6 @@ RSpec.describe PublicFieldFiltering do
           inspector_company_id
           inspection_id
           is_seed
-          unique_report_number
         ]
 
         expect(described_class::EXCLUDED_FIELDS).to eq(expected_fields)

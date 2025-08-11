@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 # Business Logic: Inspection Lifecycle Management Feature Tests
@@ -5,8 +6,6 @@
 # Tests the user-centric inspection lifecycle management, including:
 # - Editing completed inspections (user control maintained)
 # - Toggling between complete/incomplete states
-# - Manual entry of unique report numbers
-# - Report number suggestion functionality with Turbo
 
 require "rails_helper"
 
@@ -45,74 +44,6 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
     end
   end
 
-  describe "unique report number management" do
-    let(:inspection) { create(:inspection, user: user, unit: unit, unique_report_number: nil) }
-
-    it "allows manual entry of unique report number" do
-      visit edit_inspection_path(inspection)
-
-      fill_in_report_number("CUSTOM-2024-001")
-      click_submit_button
-
-      expect_updated_message
-      expect(inspection.reload.unique_report_number).to eq("CUSTOM-2024-001")
-
-      # Verify event was logged with change data
-      event = Event.where(resource_type: "Inspection", resource_id: inspection.id, action: "updated").first
-      expect(event).to be_present
-      expect(event.user).to eq(user)
-      expect(event.changed_data).to be_present
-      expect(event.changed_data["unique_report_number"]["from"]).to be_nil
-      expect(event.changed_data["unique_report_number"]["to"]).to eq("CUSTOM-2024-001")
-    end
-
-    it "shows suggestion button when unique report number is empty" do
-      visit edit_inspection_path(inspection)
-
-      expect_suggested_id_button(inspection)
-    end
-
-    it "fills field with inspection ID when suggestion button is clicked" do
-      visit edit_inspection_path(inspection)
-
-      expect_suggested_id_button(inspection)
-
-      fill_in_report_number(inspection.id)
-
-      click_submit_button
-
-      expect(inspection.reload.unique_report_number).to eq(inspection.id)
-
-      visit edit_inspection_path(inspection)
-      expect_no_suggested_id_button(inspection)
-    end
-
-    it "does not show suggestion button when unique report number exists" do
-      inspection_with_number = create(:inspection,
-        user: user,
-        unit: unit,
-        unique_report_number: "EXISTING-123")
-
-      visit edit_inspection_path(inspection_with_number)
-
-      expect_no_suggested_id_button(inspection_with_number)
-    end
-
-    it "allows clearing and re-suggesting report number" do
-      inspection.update!(unique_report_number: "EXISTING-123")
-
-      visit edit_inspection_path(inspection)
-
-      fill_in_report_number("")
-      click_submit_button
-
-      expect(inspection.reload.unique_report_number).to eq("")
-
-      visit edit_inspection_path(inspection)
-      expect_suggested_id_button(inspection)
-    end
-  end
-
   describe "completion workflow" do
     let(:unit) { create(:unit, user: user) }
     let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
@@ -121,32 +52,16 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
       inspection.un_complete!(user)
     end
 
-    it "can complete inspection without report number" do
+    it "can complete inspection" do
       visit edit_inspection_path(inspection)
       click_mark_complete_button
       expect_marked_complete_message
       expect(inspection.reload.complete?).to be true
-      expect(inspection.unique_report_number).to be_nil
 
       # Verify event was logged
       event = Event.where(resource_type: "Inspection", resource_id: inspection.id, action: "completed").first
       expect(event).to be_present
       expect(event.user).to eq(user)
-    end
-
-    it "can complete inspection with user-provided report number" do
-      visit edit_inspection_path(inspection)
-
-      fill_in_report_number("USER-REPORT-456")
-      click_submit_button
-
-      visit edit_inspection_path(inspection)
-      click_mark_complete_button
-
-      inspection.reload
-      expect(inspection.user_height_assessment.incomplete_fields).to eq([])
-      expect(inspection.complete?).to be true
-      expect(inspection.unique_report_number).to eq("USER-REPORT-456")
     end
   end
 

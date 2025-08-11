@@ -573,9 +573,6 @@ RSpec.describe "Seed Data", type: :model do
 
         unit_serials = Unit.pluck(:serial)
         expect(unit_serials.uniq.length).to eq(unit_serials.length)
-
-        report_numbers = Inspection.where.not(unique_report_number: nil).pluck(:unique_report_number)
-        expect(report_numbers.uniq.length).to eq(report_numbers.length)
       end
     end
 
