@@ -18,7 +18,7 @@
 - (20m) If play area is greater than unit dimensions, add a breakdown bit
 - (30m) Not applicable / zeroes. Add a checkbox to some fields (eg trough depth) for N/A, which actually just sets a zero in the database
 - (20m) BounceSafe logo on PDF at the top, company logo (RPII badge) at the bottom next to the signature
-- (5m) Unit Pressure - add a note "Please note additional readings in comments"
+- **done** (5m) Unit Pressure - add a note "Please note additional readings in comments"
 - (20m) Save button on user count should fill in the user counts to zero if missed, and explain as much
 - (5m) Rename "Operator" to "Controller / Owner"
 - (10m) NTFY notification app - send Nigel a link to install on his phone, add a channel for registrations and errors
