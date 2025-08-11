@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "User Logo Upload", type: :feature do
@@ -18,7 +20,7 @@ RSpec.feature "User Logo Upload", type: :feature do
       Rails.root.join("spec/fixtures/files/test_image.jpg")
 
     # Submit the form
-    click_button I18n.t("forms.user_settings.submit")
+    submit_form :user_settings
 
     # Wait for turbo to complete
     expect(page).to have_content(I18n.t("users.messages.settings_updated"))

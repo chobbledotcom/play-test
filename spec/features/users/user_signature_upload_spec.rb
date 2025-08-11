@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "User Signature Upload", type: :feature do
@@ -18,7 +20,7 @@ RSpec.feature "User Signature Upload", type: :feature do
         Rails.root.join("spec/fixtures/files/test_image.jpg")
     end
 
-    click_button I18n.t("forms.user_settings.submit")
+    submit_form :user_settings
 
     expect(page).to have_content(I18n.t("users.messages.settings_updated"))
 
@@ -35,7 +37,7 @@ RSpec.feature "User Signature Upload", type: :feature do
         Rails.root.join("spec/fixtures/files/test.txt")
     end
 
-    click_button I18n.t("forms.user_settings.submit")
+    submit_form :user_settings
 
     # Should show validation error
     expect(page).to have_content(I18n.t("errors.messages.invalid_image_format"))

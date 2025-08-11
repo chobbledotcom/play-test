@@ -36,7 +36,7 @@ RSpec.feature "Indoor only field in inspection form", type: :feature do
       choose_yes_no(indoor_only_field, true)
     end
 
-    click_button I18n.t("forms.inspection.submit")
+    submit_form :inspection
 
     # Find the inspection we just created for this specific unit
     inspection = unit.inspections.order(created_at: :desc).first

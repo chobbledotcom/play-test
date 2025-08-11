@@ -49,7 +49,7 @@ module TurboStreamResponders
   sig { params(model: ActiveRecord::Base, view: Symbol, block: T.nilable(T.proc.params(format: T.untyped).void)).void }
   def handle_update_failure(model, view = :edit, &block)
     respond_to do |format|
-      format.html { render view, status: :unprocessable_entity }
+      format.html { render view, status: :unprocessable_content }
       format.json do
         render json: {
           status: I18n.t("shared.api.error"),
@@ -87,7 +87,7 @@ module TurboStreamResponders
   sig { params(model: ActiveRecord::Base, view: Symbol).void }
   def handle_create_failure(model, view = :new)
     respond_to do |format|
-      format.html { render view, status: :unprocessable_entity }
+      format.html { render view, status: :unprocessable_content }
       format.turbo_stream do
         render_save_message_stream(
           success: false,

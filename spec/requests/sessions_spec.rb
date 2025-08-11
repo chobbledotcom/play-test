@@ -40,7 +40,7 @@ RSpec.describe "Sessions", type: :request do
           }
         }.not_to change { UserSession.count }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include(I18n.t("session.login.error"))
       end
     end

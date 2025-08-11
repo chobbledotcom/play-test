@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Logout Everywhere Else", type: :feature do
@@ -8,7 +10,7 @@ RSpec.feature "Logout Everywhere Else", type: :feature do
     visit login_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "password123"
-    click_button I18n.t("forms.session_new.submit")
+    submit_form :session_new
 
     expect(page).to have_current_path(inspections_path)
 
@@ -18,7 +20,7 @@ RSpec.feature "Logout Everywhere Else", type: :feature do
       visit login_path
       fill_in "Email", with: user.email
       fill_in "Password", with: "password123"
-      click_button I18n.t("forms.session_new.submit")
+      submit_form :session_new
 
       expect(page).to have_current_path(inspections_path)
     end
@@ -63,7 +65,7 @@ RSpec.feature "Logout Everywhere Else", type: :feature do
     visit login_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "password123"
-    click_button I18n.t("forms.session_new.submit")
+    submit_form :session_new
 
     # Go to settings
     visit change_settings_user_path(user)

@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Inspection Prefilling", type: :feature do
@@ -28,7 +30,7 @@ RSpec.feature "Inspection Prefilling", type: :feature do
     width_field = find_form_field(:inspection, :width)
     expect(width_field.value).to eq("123.45")
 
-    click_button I18n.t("forms.inspection.submit")
+    submit_form :inspection
     expect_updated_message
 
     visit edit_inspection_path(new_inspection)

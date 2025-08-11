@@ -2,6 +2,7 @@
 #
 # Table name: materials_assessments
 #
+#  id                        :integer          not null
 #  artwork_comment           :text
 #  artwork_pass              :integer
 #  fabric_strength_comment   :text
@@ -21,11 +22,11 @@
 #  zips_pass                 :integer
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
-#  inspection_id             :string(12)       not null, primary key
+#  inspection_id             :string(8)        not null, primary key
 #
 # Indexes
 #
-#  materials_assessments_new_pkey  (inspection_id) UNIQUE
+#  index_materials_assessments_on_inspection_id  (inspection_id)
 #
 # Foreign Keys
 #

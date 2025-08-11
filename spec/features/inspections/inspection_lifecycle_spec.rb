@@ -157,7 +157,7 @@ RSpec.feature "Inspection Lifecycle Management", type: :feature do
           Rails.root.join("spec/fixtures/files/test_image.jpg")
       end
 
-      click_button I18n.t("forms.results.submit")
+      submit_form :results
 
       expect(page).to have_content(I18n.t("inspections.messages.updated"))
 

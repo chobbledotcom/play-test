@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Trough Fields in Structure Assessment", type: :feature do
@@ -23,7 +25,7 @@ RSpec.feature "Trough Fields in Structure Assessment", type: :feature do
       fill_in_form :structure, :trough_depth, "150"
       fill_in_form :structure, :trough_adjacent_panel_width, "75"
 
-      click_button I18n.t("forms.structure.submit")
+      submit_form :structure
 
       expect_updated_message
 

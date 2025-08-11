@@ -2,6 +2,7 @@
 #
 # Table name: structure_assessments
 #
+#  id                                  :integer          not null
 #  air_loss_comment                    :text
 #  air_loss_pass                       :boolean
 #  critical_fall_off_height            :integer
@@ -42,11 +43,11 @@
 #  unit_stable_pass                    :boolean
 #  created_at                          :datetime         not null
 #  updated_at                          :datetime         not null
-#  inspection_id                       :string(12)       not null, primary key
+#  inspection_id                       :string(8)        not null, primary key
 #
 # Indexes
 #
-#  structure_assessments_new_pkey  (inspection_id) UNIQUE
+#  index_structure_assessments_on_inspection_id  (inspection_id)
 #
 # Foreign Keys
 #

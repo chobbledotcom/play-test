@@ -182,7 +182,7 @@ class UnitsController < ApplicationController
     else
       @unit = service.unit
       @inspection = service.inspection
-      render :new_from_inspection, status: :unprocessable_entity
+      render :new_from_inspection, status: :unprocessable_content
     end
   end
 

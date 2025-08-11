@@ -31,7 +31,7 @@ RSpec.feature "Turbo incomplete fields update", js: true do
     height_label = I18n.t("forms.user_height.fields.users_at_1000mm")
     fill_in height_label, with: "2"
 
-    click_button I18n.t("forms.user_height.submit")
+    submit_form :user_height
 
     # expect(page).to have_css("#mark-as-complete", wait: 3)
 

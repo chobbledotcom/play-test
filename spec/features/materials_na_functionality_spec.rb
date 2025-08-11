@@ -24,7 +24,7 @@ RSpec.feature "Materials Assessment N/A Functionality", type: :feature do
     choose field_id
 
     # Submit the form
-    click_button "Save Assessment"
+    submit_form(:materials)
 
     # Should see success message
     expect(page).to have_content("Inspection updated successfully")

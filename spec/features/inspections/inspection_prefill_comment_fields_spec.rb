@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Inspection Prefilling Comment Fields", type: :feature do
@@ -6,7 +8,7 @@ RSpec.feature "Inspection Prefilling Comment Fields", type: :feature do
 
   before { sign_in(user) }
 
-  def verify_field_and_comment(field_label, expected_value, expected_comment)
+  define_method(:verify_field_and_comment) do |field_label, expected_value, expected_comment|
     field = find_field(field_label)
     expect(field.value).to eq(expected_value.to_s)
 
@@ -63,7 +65,7 @@ RSpec.feature "Inspection Prefilling Comment Fields", type: :feature do
       "Length includes platform"
     )
 
-    click_button I18n.t("forms.inspection.submit")
+    submit_form :inspection
     expect_updated_message
   end
 end

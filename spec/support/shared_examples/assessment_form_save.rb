@@ -1,3 +1,5 @@
+# typed: false
+
 RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
   describe "#{assessment_type} assessment form" do
     let(:user) { create(:user) }
@@ -19,16 +21,16 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
 
     private
 
-    def traits_for_assessment(type)
+    define_method(:traits_for_assessment) do |type|
       (type == :enclosed) ? {is_totally_enclosed: true} : {}
     end
 
-    def visit_assessment_tab(type)
+    define_method(:visit_assessment_tab) do |type|
       tab = (type == :user_height) ? "user_height" : type.to_s
       visit edit_inspection_path(inspection, tab: tab)
     end
 
-    def fill_assessment_fields(type, data)
+    define_method(:fill_assessment_fields) do |type, data|
       i18n_base = "forms.#{type}"
       fields = I18n.t("#{i18n_base}.fields")
 
@@ -40,26 +42,26 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
       end
     end
 
-    def submit_and_verify(type, data)
-      click_button I18n.t("forms.#{type}.submit")
+    define_method(:submit_and_verify) do |type, data|
+      submit_form type
       expect_updated_message
       verify_saved_values(inspection, type, data)
     end
 
-    def skip_field?(field_key, data)
+    define_method(:skip_field?) do |field_key, data|
       return false unless field_key.to_s.end_with?("_pass")
 
       base_key = field_key.to_s.chomp("_pass").to_sym
       data.key?(base_key) && data[base_key].is_a?(Numeric)
     end
 
-    def validate_field_exists(field_key, fields, i18n_base)
+    define_method(:validate_field_exists) do |field_key, fields, i18n_base|
       return if fields.key?(field_key) || field_key.to_s.end_with?("_comment")
 
       raise "Field #{field_key} missing from #{i18n_base}.fields.#{field_key}"
     end
 
-    def fill_field(field_key, value, fields, data)
+    define_method(:fill_field) do |field_key, value, fields, data|
       field_label = fields[field_key]
 
       case value
@@ -76,7 +78,7 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
       end
     end
 
-    def fill_boolean_field(field_key, value, label, data)
+    define_method(:fill_boolean_field) do |field_key, value, label, data|
       pass_key = :"#{field_key}_pass"
 
       if data.key?(pass_key)
@@ -87,14 +89,14 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
       end
     end
 
-    def fill_numeric_field(field_key, value, label, data)
+    define_method(:fill_numeric_field) do |field_key, value, label, data|
       fill_in label, with: value.to_s
 
       pass_key = :"#{field_key}_pass"
       choose_pass_fail(label, data[pass_key]) if data.key?(pass_key)
     end
 
-    def fill_string_field(field_key, value, fields)
+    define_method(:fill_string_field) do |field_key, value, fields|
       if field_key.to_s.end_with?("_comment")
         fill_comment_field(field_key, value, fields)
       else
@@ -102,7 +104,7 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
       end
     end
 
-    def fill_comment_field(field_key, value, fields)
+    define_method(:fill_comment_field) do |field_key, value, fields|
       base_key = field_key.to_s.chomp("_comment").to_sym
       base_label = fields[base_key]
 
@@ -113,11 +115,11 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
       end
     end
 
-    def enum_pass_field?(field_key, value)
+    define_method(:enum_pass_field?) do |field_key, value|
       field_key.to_s.end_with?("_pass") && %w[pass fail na].include?(value)
     end
 
-    def fill_comment_directly(base_key, value)
+    define_method(:fill_comment_directly) do |base_key, value|
       checkbox = find(:css, "input[type='checkbox'][id*='#{base_key}_has_comment_']")
       checkbox.check unless checkbox.checked?
 
@@ -125,7 +127,7 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
       textarea.set(value)
     end
 
-    def fill_comment_in_context(base_key, base_label, value)
+    define_method(:fill_comment_in_context) do |base_key, base_label, value|
       containers = ["form-grid", "radio-comment", "number-radio-comment"]
       filled = false
 
@@ -151,7 +153,7 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
       fill_comment_directly(base_key, value) unless filled
     end
 
-    def verify_saved_values(inspection, assessment_type, sample_data)
+    define_method(:verify_saved_values) do |inspection, assessment_type, sample_data|
       inspection.reload
       assessment = inspection.send("#{assessment_type}_assessment")
 

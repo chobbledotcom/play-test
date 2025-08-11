@@ -71,7 +71,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
 
     fill_in_form(:anchorage, :num_low_anchors, "8")
     fill_in_form(:anchorage, :num_high_anchors, "6")
-    click_button I18n.t("inspections.buttons.save_assessment")
+    click_i18n_button "inspections.buttons.save_assessment"
 
     expect_updated_message
 
@@ -84,7 +84,7 @@ RSpec.feature "Assessment Access Control", type: :feature do
     sign_in(user1)
     visit edit_inspection_path(inspection1, tab: "user_height")
     fill_in I18n.t("forms.user_height.fields.containing_wall_height"), with: "2.5"
-    click_button I18n.t("inspections.buttons.save_assessment")
+    click_i18n_button "inspections.buttons.save_assessment"
     expect_updated_message
 
     click_button I18n.t("sessions.buttons.log_out")

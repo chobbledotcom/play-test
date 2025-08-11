@@ -75,7 +75,7 @@ class InspectionsController < ApplicationController
 
     if @image_processing_error
       flash.now[:alert] = @image_processing_error.message
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
       return
     end
 
@@ -355,7 +355,7 @@ class InspectionsController < ApplicationController
 
     # Unit ID not found or doesn't belong to user - security issue
     flash[:alert] = I18n.t("inspections.errors.invalid_unit")
-    render :edit, status: :unprocessable_entity
+    render :edit, status: :unprocessable_content
   end
 
   def handle_successful_update
@@ -374,7 +374,7 @@ class InspectionsController < ApplicationController
 
   def handle_failed_update
     respond_to do |format|
-      format.html { render :edit, status: :unprocessable_entity }
+      format.html { render :edit, status: :unprocessable_content }
       format.json { render json: {status: I18n.t("shared.api.error"), errors: @inspection.errors.full_messages} }
       format.turbo_stream { render turbo_stream: error_turbo_streams }
     end

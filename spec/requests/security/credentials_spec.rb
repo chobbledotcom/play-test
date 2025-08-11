@@ -130,7 +130,7 @@ RSpec.describe "Credentials", type: :request do
           }
         }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         parsed = JSON.parse(response.body)
         expect(parsed["errors"]).to be_present
       end

@@ -1,6 +1,6 @@
 ---
 name: chobble-forms
-version: 0.5.3
+version: 0.5.4
 type: bundler
 summary: Semantic Rails forms with strict i18n
 homepage: https://github.com/chobbledotcom/chobble-forms

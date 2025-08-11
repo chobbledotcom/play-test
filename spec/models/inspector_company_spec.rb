@@ -2,7 +2,7 @@
 #
 # Table name: inspector_companies
 #
-#  id          :string(12)       not null, primary key
+#  id          :string(8)        not null, primary key
 #  active      :boolean          default(TRUE)
 #  address     :text             not null
 #  city        :string

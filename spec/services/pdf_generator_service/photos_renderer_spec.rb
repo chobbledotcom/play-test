@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe PdfGeneratorService::PhotosRenderer do
@@ -297,11 +299,17 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
     let(:image_data) { "fake_image_data" }
     let(:bounds) { instance_double("Bounds", width: 500) }
     let(:photo_attached_one) { double("ActiveStorage::Attached::One") }
+    let(:photo_record) { double("Unit", id: 1, serial: "TEST123") }
 
     before do
       allow(photo_attached_one).to receive(:blob).and_return(photo_blob)
+      allow(photo_attached_one).to receive(:record).and_return(photo_record)
       allow(photo_blob).to receive(:download)
       allow(photo_blob).to receive(:metadata).and_return({width: 800, height: 600})
+      allow(photo_blob).to receive(:filename).and_return(double(to_s: "test.jpg"))
+      allow(photo_blob).to receive(:byte_size).and_return(1024)
+      allow(photo_blob).to receive(:content_type).and_return("image/jpeg")
+      allow(photo_blob).to receive(:signed_id).and_return("test_signed_id")
       allow(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).and_return(image_data)
       allow(pdf).to receive(:bounds).and_return(bounds)
       allow(pdf).to receive(:cursor).and_return(700)
@@ -366,7 +374,8 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
       it "raises ImageError with details" do
         expect(PdfGeneratorService::ImageError).to receive(:build_detailed_error)
-        expect { described_class.render_photo(pdf, photo_attached_one, "Test Label", 300) }.to raise_error
+          .and_return(Prawn::Errors::UnsupportedImageType.new("Detailed error"))
+        expect { described_class.render_photo(pdf, photo_attached_one, "Test Label", 300) }.to raise_error(Prawn::Errors::UnsupportedImageType)
       end
     end
 
@@ -378,7 +387,7 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
 
       it "does not call add_photo_label" do
         expect(described_class).not_to receive(:add_photo_label)
-        expect { described_class.render_photo(pdf, photo_attached_one, "Test Label", 300) }.to raise_error
+        expect { described_class.render_photo(pdf, photo_attached_one, "Test Label", 300) }.to raise_error(Prawn::Errors::UnsupportedImageType)
       end
     end
   end
@@ -467,9 +476,10 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       it "raises ImageError with details" do
         expect(PdfGeneratorService::ImageError).to receive(:build_detailed_error)
           .with(instance_of(Prawn::Errors::UnsupportedImageType), photo_attached_one)
+          .and_return(Prawn::Errors::UnsupportedImageType.new("Detailed error"))
         expect {
           described_class.render_image_to_pdf(pdf, image_data, 100, 400, 300, photo_attached_one)
-        }.to raise_error
+        }.to raise_error(Prawn::Errors::UnsupportedImageType)
       end
     end
   end
@@ -600,8 +610,9 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       it "stops processing after first error" do
         expect(pdf).to receive(:image).once  # Only the first photo
         expect(PdfGeneratorService::ImageError).to receive(:build_detailed_error)
+          .and_return(Prawn::Errors::UnsupportedImageType.new("Detailed error"))
 
-        expect { described_class.generate_photos_page(pdf, inspection) }.to raise_error
+        expect { described_class.generate_photos_page(pdf, inspection) }.to raise_error(Prawn::Errors::UnsupportedImageType)
       end
     end
   end

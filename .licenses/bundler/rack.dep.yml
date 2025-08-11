@@ -1,6 +1,6 @@
 ---
 name: rack
-version: 3.1.16
+version: 3.2.0
 type: bundler
 summary: A modular Ruby webserver interface.
 homepage: https://github.com/rack/rack
@@ -32,6 +32,7 @@ licenses:
   text: |-
     Rack is released under the [MIT License](MIT-LICENSE).
 
-    [Rack Specification]: SPEC.rdoc
+    [Rack Specification]: https://rack.github.io/rack/main/SPEC_rdoc.html
+    [Documentation]: https://rack.github.io/rack/
     [Security Policy]: SECURITY.md
 notices: []

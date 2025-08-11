@@ -269,7 +269,7 @@ RSpec.describe "Inspections", type: :request do
       it "handles invalid unit_id" do
         other_unit = create(:unit, user: other_user)
         patch "/inspections/#{inspection.id}", params: {inspection: {unit_id: other_unit.id}}
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(flash[:alert]).to match(/invalid.*unit/i)
       end
 

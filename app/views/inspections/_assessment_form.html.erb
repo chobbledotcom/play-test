@@ -11,7 +11,7 @@
   when 'user_height' then ['shared/safety_standards/wall_height_requirements']
   else []
   end
-  
+
   # Check if there are incomplete fields for this inspection
   has_incomplete_fields = assessment.inspection.incomplete_fields.any?
   submit_key = has_incomplete_fields ? "submit_continue" : "submit"
