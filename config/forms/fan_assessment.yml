@@ -5,6 +5,7 @@ form_fields:
         field: fan_size_type
       - partial: number
         field: number_of_blowers
+          step: 1
       - partial: text_field
         field: blower_serial
       - partial: number_pass_fail_comment
