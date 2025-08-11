@@ -29,6 +29,9 @@ en:
 
   # ActiveRecord validation messages
   activerecord:
+    attributes:
+      unit:
+        operator: "Controller / Owner"
     errors:
       messages:
         not_an_image: "must be an image file"

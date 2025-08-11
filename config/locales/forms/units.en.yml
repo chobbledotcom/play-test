@@ -13,7 +13,7 @@ en:
         serial: "Manufacturer Serial Number"
         manufacturer: "Manufacturer"
         description: "Description"
-        operator: "Operator"
+        operator: "Controller / Owner"
         manufacture_date: "Manufacture Date"
         photo: "Photo"
       submit: "Save Unit"
