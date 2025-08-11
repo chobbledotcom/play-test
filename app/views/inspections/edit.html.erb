@@ -41,7 +41,7 @@
     <div class="edit-inspection">
       <% case current_tab %>
       <% when 'inspection' %>
-        <%= render 'inspections/form' %>
+        <%= render 'inspections/form', inspection: @inspection %>
       <% when 'results' %>
         <%= render 'inspections/results_form' %>
       <% else %>
