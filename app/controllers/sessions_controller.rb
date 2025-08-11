@@ -20,7 +20,7 @@ class SessionsController < ApplicationController
       handle_successful_login(user)
     else
       flash.now[:alert] = I18n.t("session.login.error")
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -63,7 +63,7 @@ class SessionsController < ApplicationController
       verify_and_sign_in_with_passkey(credential, webauthn_credential)
     else
       render json: {errors: [I18n.t("sessions.messages.passkey_not_found")]},
-        status: :unprocessable_entity
+        status: :unprocessable_content
     end
   end
 
@@ -95,7 +95,7 @@ class SessionsController < ApplicationController
   rescue WebAuthn::Error => e
     error_msg = I18n.t("sessions.messages.passkey_login_failed")
     render json: "#{error_msg}: #{e.message}",
-      status: :unprocessable_entity
+      status: :unprocessable_content
   ensure
     session.delete(:passkey_authentication)
   end

@@ -24,7 +24,7 @@ class CredentialsController < ApplicationController
   rescue WebAuthn::Error => e
     error_msg = I18n.t("credentials.messages.verification_failed")
     render json: "#{error_msg}: #{e.message}",
-      status: :unprocessable_entity
+      status: :unprocessable_content
   ensure
     session.delete(:current_registration)
   end
@@ -60,7 +60,7 @@ class CredentialsController < ApplicationController
       render json: {status: "ok"}, status: :ok
     else
       error_msg = I18n.t("credentials.messages.could_not_add")
-      render json: error_msg, status: :unprocessable_entity
+      render json: error_msg, status: :unprocessable_content
     end
   end
 

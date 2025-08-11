@@ -84,7 +84,7 @@ RSpec.describe "Users", type: :request do
           password_confirmation: "newpassword"
         })
 
-        expect(page).to have_http_status(:unprocessable_entity)
+        expect(page).to have_http_status(:unprocessable_content)
         expect(user.reload.authenticate(I18n.t("test.password"))).to be_truthy
       end
 
@@ -128,7 +128,7 @@ RSpec.describe "Users", type: :request do
         allow_any_instance_of(User).to receive(:update).and_return(false)
 
         patch update_settings_user_path(user), params: settings_params
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "does not allow changing another user's settings" do
@@ -224,7 +224,7 @@ RSpec.describe "Users", type: :request do
 
       it "renders error when user update fails" do
         patch user_path(regular_user), params: update_user_params(email: "")
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -242,7 +242,7 @@ RSpec.describe "Users", type: :request do
   end
 
   def expect_validation_error(field)
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(assigns(:user).errors[field]).to be_present if assigns(:user)
   end
 
@@ -309,7 +309,7 @@ RSpec.describe "Users", type: :request do
       }
 
       patch update_password_user_path(user), params: password_params
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 

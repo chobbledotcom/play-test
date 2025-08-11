@@ -135,7 +135,7 @@ RSpec.describe "Pages", type: :request do
 
         it "returns unprocessable entity" do
           post pages_path, params: invalid_params
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
     end
@@ -186,7 +186,7 @@ RSpec.describe "Pages", type: :request do
           patch page_path(page), params: {
             page: {slug: ""}
           }
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
     end

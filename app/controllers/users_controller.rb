@@ -50,7 +50,7 @@ class UsersController < ApplicationController
       flash[:notice] = I18n.t("users.messages.account_created")
       redirect_to root_path
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -83,11 +83,11 @@ class UsersController < ApplicationController
         flash[:notice] = I18n.t("users.messages.password_updated")
         redirect_to root_path
       else
-        render :change_password, status: :unprocessable_entity
+        render :change_password, status: :unprocessable_content
       end
     else
       @user.errors.add(:current_password, I18n.t("users.errors.wrong_password"))
-      render :change_password, status: :unprocessable_entity
+      render :change_password, status: :unprocessable_content
     end
   end
 

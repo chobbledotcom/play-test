@@ -172,7 +172,7 @@ RSpec.describe "Units", type: :request do
         # Submit form with missing required fields
         submit_form :units
 
-        expect(page).to have_http_status(:unprocessable_entity)
+        expect(page).to have_http_status(:unprocessable_content)
         expect_form_errors :units
       end
 
@@ -189,7 +189,7 @@ RSpec.describe "Units", type: :request do
 
         submit_form :units
 
-        expect(page).to have_http_status(:unprocessable_entity)
+        expect(page).to have_http_status(:unprocessable_content)
         expect(page).to have_content("has already been taken")
       end
     end
@@ -236,7 +236,7 @@ RSpec.describe "Units", type: :request do
         fill_in I18n.t("forms.units.fields.name"), with: ""
         submit_form :units
 
-        expect(page).to have_http_status(:unprocessable_entity)
+        expect(page).to have_http_status(:unprocessable_content)
         expect_form_errors :units
       end
 
@@ -609,7 +609,7 @@ RSpec.describe "Units", type: :request do
           }
         }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(assigns(:unit).errors).to be_present
       end
 
