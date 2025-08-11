@@ -202,7 +202,6 @@ class SeedDataService
         complete_date: is_complete ?
           inspection_date.to_time + rand(INSPECTION_DURATION_RANGE).hours :
           nil,
-        unique_report_number: generate_report_number(user.inspection_company, inspection_date),
         is_seed: true,
         passed: is_complete ? passed : nil,
         risk_assessment: generate_risk_assessment(passed),
@@ -214,11 +213,6 @@ class SeedDataService
         is_totally_enclosed: config[:is_totally_enclosed] || false,
         indoor_only: [true, false].sample
       }
-    end
-
-    def generate_report_number(company, date)
-      company_prefix = company&.name&.split&.map(&:first)&.join&.upcase || "SEED"
-      "#{company_prefix}-#{date.year}-#{SecureRandom.hex(4).upcase}"
     end
 
     def generate_risk_assessment(passed)

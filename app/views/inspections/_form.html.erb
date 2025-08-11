@@ -47,22 +47,6 @@
         <small class="help-text"><%= t('inspections.fields.reinspection_date_help') %></small>
       </p>
     </div>
-
-    <div id="unique_report_number_section">
-      <%= form.label :unique_report_number, t('inspections.fields.unique_report_number') %>
-      <%= form.text_field :unique_report_number %>
-      <% if @inspection.unique_report_number.blank? && @inspection.persisted? %>
-        <button type="button"
-          onclick="document.getElementById('inspection_unique_report_number').value = '<%= @inspection.id %>'; this.style.display = 'none';">
-          <%= t('inspections.buttons.use_suggested_id', id: @inspection.id) %>
-        </button>
-      <% end %>
-      <div>
-        <small class="help-text">
-          <%= t('inspections.fields.internal_id_help') %>
-        </small>
-      </div>
-    </div>
   <% end %>
 
   <%= render 'chobble_forms/fields', model: @inspection %>

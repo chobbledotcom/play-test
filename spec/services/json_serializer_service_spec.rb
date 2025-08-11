@@ -57,7 +57,7 @@ RSpec.describe JsonSerializerService do
 
         # Verify no IDs are included
         expect(json[:inspection_history].first).not_to have_key(:id)
-        expect(json[:inspection_history].first).to have_key(:unique_report_number)
+        expect(json[:inspection_history].first).to have_key(:inspector_company)
       end
     end
 
@@ -251,8 +251,8 @@ RSpec.describe JsonSerializerService do
         expect(json).to have_key(field.to_sym)
       end
 
-      # Verify unique_report_number is NOT included
-      expect(json).not_to have_key(:unique_report_number)
+      # Verify internal fields are NOT included
+      expect(json).not_to have_key(:user_id)
     end
   end
 end

@@ -48,8 +48,7 @@ class UnitBlueprint < Blueprinter::Base
           inspection_date: inspection.inspection_date,
           passed: inspection.passed,
           complete: inspection.complete?,
-          inspector_company: inspection.inspector_company&.name,
-          unique_report_number: inspection.unique_report_number
+          inspector_company: inspection.inspector_company&.name
         }
       end
       json[:total_inspections] = completed.count

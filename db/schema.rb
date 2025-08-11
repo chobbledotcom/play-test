@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_06_164418) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_11_162534) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -129,7 +129,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_06_164418) do
     t.datetime "updated_at", null: false
     t.datetime "pdf_last_accessed_at"
     t.string "unit_id"
-    t.string "unique_report_number"
     t.string "inspector_company_id"
     t.decimal "width", precision: 8, scale: 2
     t.decimal "length", precision: 8, scale: 2
@@ -148,7 +147,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_06_164418) do
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
     t.index ["is_seed"], name: "index_inspections_on_is_seed"
     t.index ["unit_id"], name: "index_inspections_on_unit_id"
-    t.index ["user_id", "unique_report_number"], name: "index_inspections_on_user_and_report_number"
     t.index ["user_id"], name: "index_inspections_on_user_id"
   end
 
@@ -486,5 +484,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_06_164418) do
   add_foreign_key "structure_assessments", "inspections"
   add_foreign_key "units", "users"
   add_foreign_key "user_height_assessments", "inspections"
+  add_foreign_key "user_sessions", "users"
   add_foreign_key "user_sessions", "users"
 end

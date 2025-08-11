@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require "rails_helper"
@@ -63,9 +64,7 @@ RSpec.feature "Indoor only field in inspection form", type: :feature do
 
   private
 
-  def fill_in_inspection_form
-    fill_in I18n.t("forms.inspection.fields.unique_report_number"),
-      with: "TEST001"
+  define_method(:fill_in_inspection_form) do
     fill_in I18n.t("forms.inspection.fields.inspection_date"),
       with: Date.current.strftime("%Y-%m-%d")
     fill_in I18n.t("forms.inspection.fields.width"), with: "5.5"

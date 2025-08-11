@@ -37,8 +37,7 @@ RSpec.feature "User Impersonation", type: :feature do
 
     # Should see regular user's inspections
     inspection = regular_user.inspections.first
-    identifier = inspection.unique_report_number || inspection.id
-    expect(page).to have_content(identifier)
+    expect(page).to have_content(inspection.id)
   end
 
   scenario "admin can stop impersonating" do

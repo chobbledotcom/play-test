@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Inspection Deletion Security", type: :feature do
@@ -20,7 +22,6 @@ RSpec.feature "Inspection Deletion Security", type: :feature do
 
     # Capture inspection details before deletion
     inspection_id = inspection.id
-    report_number = inspection.unique_report_number
     inspection_date = inspection.inspection_date
 
     expect {
@@ -34,7 +35,6 @@ RSpec.feature "Inspection Deletion Security", type: :feature do
     event = Event.where(resource_type: "Inspection", resource_id: inspection_id, action: "deleted").first
     expect(event).to be_present
     expect(event.user).to eq(user)
-    expect(event.metadata["unique_report_number"]).to eq(report_number)
     expect(event.metadata["inspection_date"]).to eq(inspection_date.iso8601(3))
   end
 

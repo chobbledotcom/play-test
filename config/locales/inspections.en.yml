@@ -87,7 +87,6 @@ en:
       inspector_company_prompt: "-- Select company (optional) --"
       public_information: "Public Information"
       rpii_registration_number: "RPII Registration Number"
-      unique_report_number: "Internal ID"
       internal_id: "Internal ID"
       inspection_company_name: "Inspection Company Name"
       overall_result: "Overall Result"

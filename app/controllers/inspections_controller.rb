@@ -101,7 +101,6 @@ class InspectionsController < ApplicationController
 
     # Capture inspection details before deletion for the audit log
     inspection_details = {
-      unique_report_number: @inspection.unique_report_number,
       inspection_date: @inspection.inspection_date,
       unit_serial: @inspection.unit&.serial,
       unit_name: @inspection.unit&.name,
@@ -450,7 +449,6 @@ class InspectionsController < ApplicationController
     is_seed
     passed
     pdf_last_accessed_at
-    unique_report_number
     unit_id
     updated_at
     user_id
