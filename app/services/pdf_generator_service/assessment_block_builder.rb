@@ -29,27 +29,42 @@ class PdfGeneratorService
       field_groups.each do |base, fields|
         # Add value block
         main_field = fields[:base] || fields[:pass]
-        next unless main_field
 
-        value = @assessment.send(main_field)
-        label = get_field_label(fields)
-        pass_value = determine_pass_value(fields, main_field, value)
-        is_pass_field = main_field.to_s.end_with?("_pass")
+        if main_field
+          value = @assessment.send(main_field)
+          label = get_field_label(fields)
+          pass_value = determine_pass_value(fields, main_field, value)
+          is_pass_field = main_field.to_s.end_with?("_pass")
 
-        # For boolean fields that aren't pass/fail fields
-        blocks << if [true, false].include?(value) && !is_pass_field && pass_value.nil?
-          AssessmentBlock.new(
-            type: :value,
-            name: label,
-            value: value ? I18n.t("shared.yes") : I18n.t("shared.no")
-          )
-        else
-          AssessmentBlock.new(
-            type: :value,
-            pass_fail: pass_value,
-            name: label,
-            value: is_pass_field ? nil : value
-          )
+          # For boolean fields that aren't pass/fail fields
+          is_bool_non_pass = [true, false].include?(value) &&
+            !is_pass_field && pass_value.nil?
+          blocks << if is_bool_non_pass
+            AssessmentBlock.new(
+              type: :value,
+              name: label,
+              value: value ? I18n.t("shared.yes") : I18n.t("shared.no")
+            )
+          else
+            AssessmentBlock.new(
+              type: :value,
+              pass_fail: pass_value,
+              name: label,
+              value: is_pass_field ? nil : value
+            )
+          end
+        elsif fields[:comment]
+          # Handle standalone comment fields (no base or pass field)
+          label = get_field_label(fields)
+          comment = @assessment.send(fields[:comment])
+          if comment.present?
+            # Add a label block for the standalone comment
+            blocks << AssessmentBlock.new(
+              type: :value,
+              name: label,
+              value: nil
+            )
+          end
         end
 
         # Add comment block if present
@@ -118,14 +133,17 @@ class PdfGeneratorService
     end
 
     def get_field_label(fields)
-      base_name = extract_base_field_name(fields[:pass].to_s) if fields[:pass]
-
-      # Try in order: base field, pass field, base name
+      # Try in order: base field, pass field, comment field
       if fields[:base]
         field_label(fields[:base])
       elsif fields[:pass]
         field_label(fields[:pass])
+      elsif fields[:comment]
+        # For standalone comment fields, use the comment field itself
+        field_label(fields[:comment])
       else
+        # Fallback - should not happen
+        base_name = extract_base_field_name(fields.values.first.to_s)
         field_label(base_name)
       end
     end

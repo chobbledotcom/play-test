@@ -144,4 +144,72 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       expect(field_names).not_to be_empty
     end
   end
+
+  describe "standalone comment fields" do
+    context "with user_height assessment" do
+      let(:user_height_assessment) { inspection.user_height_assessment }
+
+      before do
+        user_height_assessment.update!(
+          custom_user_height_comment: "Maximum height is 2.5m for safety"
+        )
+      end
+
+      let(:blocks) do
+        described_class.build_from_assessment("user_height", user_height_assessment)
+      end
+
+      it "creates blocks for standalone comment field" do
+        # Find the custom_user_height_comment blocks
+        custom_height_blocks = blocks.select do |b|
+          (b.value? && b.name == I18n.t("forms.user_height.fields.custom_user_height_comment")) ||
+            (b.comment? && b.comment == "Maximum height is 2.5m for safety")
+        end
+
+        expect(custom_height_blocks.size).to eq(2)
+
+        # Should have a label block
+        label_block = custom_height_blocks.find(&:value?)
+        expect(label_block).to be_present
+        expect(label_block.name).to eq(I18n.t("forms.user_height.fields.custom_user_height_comment"))
+        expect(label_block.value).to be_nil
+
+        # Should have a comment block
+        comment_block = custom_height_blocks.find(&:comment?)
+        expect(comment_block).to be_present
+        expect(comment_block.comment).to eq("Maximum height is 2.5m for safety")
+      end
+
+      it "does not create blocks for empty standalone comment" do
+        user_height_assessment.update!(custom_user_height_comment: "")
+        blocks = described_class.build_from_assessment("user_height", user_height_assessment)
+
+        # Should not have any blocks for the empty comment
+        custom_height_blocks = blocks.select do |b|
+          (b.value? && b.name == I18n.t("forms.user_height.fields.custom_user_height_comment")) ||
+            b.comment?
+        end
+
+        # Find only the custom_user_height_comment related blocks
+        custom_comment_blocks = custom_height_blocks.select do |b|
+          b.name == I18n.t("forms.user_height.fields.custom_user_height_comment") ||
+            b.comment == ""
+        end
+
+        expect(custom_comment_blocks).to be_empty
+      end
+
+      it "handles nil standalone comment" do
+        user_height_assessment.update!(custom_user_height_comment: nil)
+        blocks = described_class.build_from_assessment("user_height", user_height_assessment)
+
+        # Should not have any blocks for the nil comment
+        custom_height_blocks = blocks.select do |b|
+          b.value? && b.name == I18n.t("forms.user_height.fields.custom_user_height_comment")
+        end
+
+        expect(custom_height_blocks).to be_empty
+      end
+    end
+  end
 end
