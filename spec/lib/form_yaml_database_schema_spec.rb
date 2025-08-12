@@ -42,7 +42,7 @@ PARTIAL_ALLOWED_ATTRIBUTES = {
   "number_pass_fail_comment" => %w[step min max],
   "number_pass_fail_na_comment" => %w[step min max],
   "decimal_comment" => %w[step min max],
-  "integer_comment" => %w[step min max],
+  "integer_comment" => %w[step min max add_not_applicable],
   # Most partials don't allow any attributes
   "text_field" => [],
   "text_area" => [],
