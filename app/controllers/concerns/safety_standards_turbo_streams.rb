@@ -7,8 +7,10 @@ module SafetyStandardsTurboStreams
 
   private
 
-  sig { returns(T::Array[T.untyped]) }
-  def success_turbo_streams
+  sig do
+    params(additional_info: T.nilable(String)).returns(T::Array[T.untyped])
+  end
+  def success_turbo_streams(additional_info: nil)
     super + safety_standards_turbo_streams
   end
 

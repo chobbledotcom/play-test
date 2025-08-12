@@ -7,12 +7,14 @@ module InspectionTurboStreams
 
   private
 
-  sig { returns(T::Array[T.untyped]) }
-  def success_turbo_streams
+  sig do
+    params(additional_info: T.nilable(String)).returns(T::Array[T.untyped])
+  end
+  def success_turbo_streams(additional_info: nil)
     [
       mark_complete_section_stream,
       save_message_stream(success: true),
-      assessment_save_message_stream(success: true),
+      assessment_save_message_stream(success: true, additional_info:),
       *photo_update_streams
     ].compact
   end
@@ -47,39 +49,63 @@ module InspectionTurboStreams
     )
   end
 
-  sig { params(success: T::Boolean).returns(T.untyped) }
-  def assessment_save_message_stream(success:)
+  sig do
+    params(success: T::Boolean, additional_info: T.nilable(String))
+      .returns(T.untyped)
+  end
+  def assessment_save_message_stream(success:, additional_info: nil)
+    locals = save_message_locals(success:, dom_id: "form_save_message")
+    locals[:additional_info] = additional_info if additional_info
+
     turbo_stream.replace(
       "form_save_message",
       partial: "shared/save_message",
-      locals: save_message_locals(success: success, dom_id: "form_save_message")
+      locals:
     )
   end
 
-  sig { params(success: T::Boolean, dom_id: String).returns(T::Hash[Symbol, T.untyped]) }
+  sig do
+    params(success: T::Boolean, dom_id: String)
+      .returns(T::Hash[Symbol, T.untyped])
+  end
   def save_message_locals(success:, dom_id:)
     if success
-      current_tab_name = params[:tab].presence || "inspection"
-      nav_info = helpers.next_tab_navigation_info(@inspection, current_tab_name)
-
-      {
-        dom_id: dom_id,
-        success: true,
-        message: t("inspections.messages.updated"),
-        inspection: @inspection
-      }.tap do |locals|
-        if nav_info
-          locals[:next_tab] = nav_info[:tab]
-          locals[:skip_incomplete] = nav_info[:skip_incomplete]
-          locals[:incomplete_count] = nav_info[:incomplete_count] if nav_info[:skip_incomplete]
-        end
-      end
+      success_message_locals(dom_id)
     else
       {
         dom_id: dom_id,
         errors: @inspection.errors.full_messages,
         message: t("shared.messages.save_failed")
       }
+    end
+  end
+
+  sig { params(dom_id: String).returns(T::Hash[Symbol, T.untyped]) }
+  def success_message_locals(dom_id)
+    current_tab_name = params[:tab].presence || "inspection"
+    nav_info = helpers.next_tab_navigation_info(@inspection, current_tab_name)
+
+    {
+      dom_id: dom_id,
+      success: true,
+      message: t("inspections.messages.updated"),
+      inspection: @inspection
+    }.tap do |locals|
+      add_navigation_info(locals, nav_info) if nav_info
+    end
+  end
+
+  sig do
+    params(
+      locals: T::Hash[Symbol, T.untyped],
+      nav_info: T::Hash[Symbol, T.untyped]
+    ).void
+  end
+  def add_navigation_info(locals, nav_info)
+    locals[:next_tab] = nav_info[:tab]
+    locals[:skip_incomplete] = nav_info[:skip_incomplete]
+    if nav_info[:skip_incomplete]
+      locals[:incomplete_count] = nav_info[:incomplete_count]
     end
   end
 

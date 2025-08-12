@@ -17,8 +17,10 @@ module AssessmentController
 
   sig { void }
   def update
+    # Apply any model-specific preprocessing (like setting defaults)
+    preprocess_values if respond_to?(:preprocess_values, true)
+
     if @assessment.update(assessment_params)
-      @assessment.reload  # Ensure we have fresh data for turbo streams
       handle_successful_update
     else
       handle_failed_update
@@ -29,9 +31,11 @@ module AssessmentController
 
   sig { void }
   def handle_successful_update
+    additional_info = build_additional_info
+
     respond_to do |format|
       format.html do
-        flash[:notice] = I18n.t("inspections.messages.updated")
+        flash[:notice] = build_flash_message(additional_info)
         redirect_to @inspection
       end
       format.json do
@@ -41,8 +45,24 @@ module AssessmentController
         }
         render json: success_response
       end
-      format.turbo_stream { render turbo_stream: success_turbo_streams }
+      format.turbo_stream do
+        render turbo_stream: success_turbo_streams(additional_info:)
+      end
     end
+  end
+
+  # Override in specific controllers to provide additional info
+  sig { returns(T.nilable(String)) }
+  def build_additional_info
+    nil
+  end
+
+  sig { params(additional_info: T.nilable(String)).returns(String) }
+  def build_flash_message(additional_info)
+    base_message = I18n.t("inspections.messages.updated")
+    return base_message unless additional_info
+
+    "#{base_message} #{additional_info}"
   end
 
   sig { void }
@@ -50,7 +70,8 @@ module AssessmentController
     respond_to do |format|
       format.html { render_edit_with_errors }
       format.json do
-        render json: {errors: @assessment.errors}, status: :unprocessable_content
+        errors = {errors: @assessment.errors}
+        render json: errors, status: :unprocessable_content
       end
       format.turbo_stream { render turbo_stream: error_turbo_streams }
     end

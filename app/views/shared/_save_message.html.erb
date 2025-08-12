@@ -12,6 +12,9 @@
 <% else %>
   <div class="success" id="<%= local_assigns[:dom_id] || 'form_save_message' %>">
     <%= message_text || t('shared.messages.saved_successfully') %>
+    <% if local_assigns[:additional_info] %>
+      <br><%= local_assigns[:additional_info] %>
+    <% end %>
     <% if local_assigns[:next_tab] && local_assigns[:inspection] %>
       <br>
       <%

@@ -158,6 +158,7 @@ en:
       created_without_unit: "Inspection created successfully without unit. You can add a unit later."
       updated: "Inspection updated successfully."
       deleted: "Inspection deleted successfully."
+      user_height_defaults_applied: "The following fields were set to zero: %{fields}"
       delete_complete_denied: "Cannot delete completed inspections. Only administrators can delete completed inspections."
       dimensions_replaced: "Dimensions replaced from unit successfully"
       dimensions_replace_failed: "Failed to replace dimensions: %{errors}"
