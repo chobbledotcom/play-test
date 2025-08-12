@@ -36,8 +36,8 @@ jobs:
         run: |
           echo "Running ERB lint with autocorrect..."
           
-          # Run erb_lint and capture both fixes and remaining issues
-          if bundle exec erb_lint --autocorrect > erb_lint_output.txt 2>&1; then
+          # Run erb_lint using rake task and capture both fixes and remaining issues
+          if bundle exec rake code_standards:erb_lint_fix > erb_lint_output.txt 2>&1; then
             echo "erb_clean=true" >> $GITHUB_OUTPUT
             echo "No ERB lint issues found or all were auto-fixed"
           else
