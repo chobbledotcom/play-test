@@ -1,16 +1,18 @@
+# typed: false
+
 require "rails_helper"
 require Rails.root.join("db/seeds/seed_data")
 
 RSpec.describe "Users", type: :request do
   # Helper to fill in multiple form fields at once
-  def fill_in_form_fields(form_name, fields)
+  define_method(:fill_in_form_fields) do |form_name, fields|
     fields.each do |field, value|
       fill_in_form(form_name, field, value) if value.present?
     end
   end
 
   # Helper to fill and submit a form in one go
-  def fill_and_submit_form(form_name, fields)
+  define_method(:fill_and_submit_form) do |form_name, fields|
     fill_in_form_fields(form_name, fields)
     submit_form(form_name)
   end
@@ -144,21 +146,21 @@ RSpec.describe "Users", type: :request do
     end
   end
 
-  def expect_access_allowed(response)
+  define_method(:expect_access_allowed) do |response|
     expect(response).to have_http_status(200)
   end
 
-  def expect_redirect_with_notice(response, path = users_path)
+  define_method(:expect_redirect_with_notice) do |response, path = users_path|
     expect(response).to redirect_to(path)
     expect(flash[:notice]).to be_present
   end
 
-  def expect_access_denied(response)
+  define_method(:expect_access_denied) do |response|
     expect(response).to redirect_to(root_path)
     expect(flash[:alert]).to be_present
   end
 
-  def update_user_params(overrides = {})
+  define_method(:update_user_params) do |overrides = {}|
     {
       user: {
         email: "updated@example.com",
@@ -236,12 +238,12 @@ RSpec.describe "Users", type: :request do
     end
   end
 
-  def valid_user_params(overrides = {})
+  define_method(:valid_user_params) do |overrides = {}|
     user_data = SeedData.user_fields.merge(rpii_inspector_number: "RPII123")
     {user: user_data.merge(overrides)}
   end
 
-  def expect_validation_error(field)
+  define_method(:expect_validation_error) do |field|
     expect(response).to have_http_status(:unprocessable_content)
     expect(assigns(:user).errors[field]).to be_present if assigns(:user)
   end
@@ -258,10 +260,22 @@ RSpec.describe "Users", type: :request do
       it "sends notification in production environment" do
         allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
 
-        params = valid_user_params
+        params = {
+          user: {
+            email: "hello@example.com",
+            password: "password123",
+            password_confirmation: "password123",
+            name: "Test User",
+            rpii_inspector_number: "TEST123"
+          }
+        }
         post "/register", params: params
 
-        expect(NtfyService).to have_received(:notify).with("new user: #{params[:user][:email]}")
+        expect(NtfyService).to have_received(:notify)
+          .with("new user: hello@example.com", channel: :developer)
+
+        expect(NtfyService).to have_received(:notify)
+          .with("new user: h***o@e*****e.com", channel: :admin)
       end
 
       it "does not send notification in non-production environment" do
