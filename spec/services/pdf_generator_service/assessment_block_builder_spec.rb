@@ -139,16 +139,8 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
   describe "field ordering" do
     it "follows the form configuration order" do
       blocks = described_class.build_from_assessment("materials", materials_assessment)
-
-      # Skip header, get field names in order
       field_blocks = blocks.drop(1).select(&:value?)
       field_names = field_blocks.map(&:name)
-
-      # Should follow the order defined in MaterialsAssessment.form_fields
-      # This will help us verify the ordering is working correctly
-      puts "Field order in blocks:"
-      field_names.each_with_index { |name, i| puts "#{i + 1}. #{name}" }
-
       expect(field_names).not_to be_empty
     end
   end

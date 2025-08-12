@@ -177,6 +177,10 @@ class ApplicationController < ActionController::Base
       return false if csrf_ignored_actions.include?(action)
     end
 
+    if exception.is_a?(ActionController::InvalidCrossOriginRequest)
+      return false unless logged_in?
+    end
+
     true
   end
 

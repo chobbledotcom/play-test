@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 return if Rails.env.test?
@@ -15,21 +16,15 @@ Sentry.init do |config|
     if hint[:exception]
       exception = hint[:exception]
 
-      if exception.is_a?(ActionController::InvalidAuthenticityToken)
-        csrf_ignored_actions = [
-          ["sessions", "create"],
-          ["users", "create"]
-        ]
+      # Use the same filtering logic as ntfy notifications
+      if event.contexts && event.contexts[:rack_env]
+        env = event.contexts[:rack_env]
+        if env["action_controller.instance"]
+          controller = env["action_controller.instance"]
 
-        if event.contexts && event.contexts[:rack_env]
-          env = event.contexts[:rack_env]
-          if env["action_controller.instance"]
-            controller = env["action_controller.instance"]
-            controller_name = controller.controller_name
-            action_name = controller.action_name
-
-            action = [controller_name, action_name]
-            return nil if csrf_ignored_actions.include?(action)
+          # Use ApplicationController's should_notify_error? method
+          unless controller.send(:should_notify_error?, exception)
+            return nil
           end
         end
       end
