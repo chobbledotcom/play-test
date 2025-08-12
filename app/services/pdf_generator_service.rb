@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 class PdfGeneratorService
@@ -41,13 +42,11 @@ class PdfGeneratorService
 
       # Disclaimer footer (only on first page)
       DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
-      disclaimer_height = DisclaimerFooterRenderer.measure_footer_height(pdf, inspection.user)
+      disclaimer_height = DisclaimerFooterRenderer.measure_footer_height(pdf)
 
       # Add unit photo in bottom right corner
       photo_height = ImageProcessor.measure_unit_photo_height(pdf, inspection.unit, 4)
-      if inspection.unit&.photo
-        ImageProcessor.add_unit_photo_footer(pdf, inspection.unit, 4)
-      end
+      ImageProcessor.add_unit_photo_footer(pdf, inspection.unit, 4) if inspection.unit&.photo
 
       # Reset cursor to render assessments with proper space accounting
       pdf.move_cursor_to(cursor_before_footer)
@@ -194,11 +193,11 @@ class PdfGeneratorService
     end
 
     # Check if we have enough space for at least some content
-    min_content_height = 100  # Minimum height for meaningful content
+    min_content_height = 100 # Minimum height for meaningful content
     if available_height < min_content_height
       pdf.start_new_page
       available_height = pdf.cursor
-      0  # No footer on new pages
+      0 # No footer on new pages
     end
 
     # Render assessments using the column layout with measured footer space
