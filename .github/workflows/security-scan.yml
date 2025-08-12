@@ -17,11 +17,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-          bundler-cache: true
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
 
       - name: Scan for common Rails security vulnerabilities
         run: bin/brakeman --no-pager
@@ -32,11 +29,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-          bundler-cache: true
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
         run: bin/importmap audit
