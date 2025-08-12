@@ -145,6 +145,103 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     end
   end
 
+  describe "not applicable fields (add_not_applicable)" do
+    context "with structure assessment having trough_depth field" do
+      let(:structure_assessment) { inspection.structure_assessment }
+
+      it "skips trough_depth field when value is 0" do
+        structure_assessment.update!(
+          trough_depth: 0,
+          trough_depth_comment: "Not applicable to this unit"
+        )
+
+        blocks = described_class.build_from_assessment("structure", structure_assessment)
+
+        # Should not have any blocks for trough_depth when it's 0
+        trough_blocks = blocks.select do |b|
+          b.name&.include?(I18n.t("forms.structure.fields.trough_depth"))
+        end
+
+        expect(trough_blocks).to be_empty
+      end
+
+      it "includes trough_depth field when value is non-zero" do
+        structure_assessment.update!(
+          trough_depth: 5,
+          trough_depth_comment: "Good depth"
+        )
+
+        blocks = described_class.build_from_assessment("structure", structure_assessment)
+
+        # Should have blocks for trough_depth when it's not 0
+        trough_blocks = blocks.select do |b|
+          (b.value? && b.name == I18n.t("forms.structure.fields.trough_depth")) ||
+            (b.comment? && b.comment == "Good depth")
+        end
+
+        expect(trough_blocks.size).to eq(2) # Value block and comment block
+      end
+
+      it "includes trough_depth field when value is nil" do
+        structure_assessment.update!(
+          trough_depth: nil,
+          trough_depth_comment: ""
+        )
+
+        blocks = described_class.build_from_assessment("structure", structure_assessment)
+
+        # Should have value block for trough_depth when it's nil (not set)
+        trough_blocks = blocks.select do |b|
+          b.value? && b.name == I18n.t("forms.structure.fields.trough_depth")
+        end
+
+        expect(trough_blocks.size).to eq(1)
+        expect(trough_blocks.first.value).to be_nil
+      end
+
+      it "handles related fields correctly when main field is skipped" do
+        structure_assessment.update!(
+          trough_depth: 0,
+          trough_depth_comment: "N/A comment",
+          trough_pass: true
+        )
+
+        blocks = described_class.build_from_assessment("structure", structure_assessment)
+
+        # trough_depth should be skipped (value is 0)
+        depth_blocks = blocks.select do |b|
+          b.name&.include?(I18n.t("forms.structure.fields.trough_depth"))
+        end
+        expect(depth_blocks).to be_empty
+
+        # But trough_pass should still be included
+        pass_blocks = blocks.select do |b|
+          b.name&.include?(I18n.t("forms.structure.fields.trough_pass"))
+        end
+        expect(pass_blocks).not_to be_empty
+      end
+    end
+
+    context "with fields that don't have add_not_applicable" do
+      it "includes fields with value 0 when they don't have add_not_applicable" do
+        # Regular integer field without add_not_applicable
+        structure_assessment.update!(
+          trough_adjacent_panel_width: 0,
+          trough_adjacent_panel_width_comment: "Zero width"
+        )
+
+        blocks = described_class.build_from_assessment("structure", structure_assessment)
+
+        # Should include the field even though value is 0
+        width_blocks = blocks.select do |b|
+          b.name&.include?("adjacent") || b.comment == "Zero width"
+        end
+
+        expect(width_blocks).not_to be_empty
+      end
+    end
+  end
+
   describe "standalone comment fields" do
     context "with user_height assessment" do
       let(:user_height_assessment) { inspection.user_height_assessment }

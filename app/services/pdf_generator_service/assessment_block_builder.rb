@@ -11,6 +11,7 @@ class PdfGeneratorService
     def initialize(assessment_type, assessment)
       @assessment_type = assessment_type
       @assessment = assessment
+      @not_applicable_fields = get_not_applicable_fields
     end
 
     def build
@@ -27,9 +28,13 @@ class PdfGeneratorService
       field_groups = group_assessment_fields(ordered_fields)
 
       field_groups.each do |base, fields|
-        # Add value block
+        # Skip if this is a not-applicable field with value 0
         main_field = fields[:base] || fields[:pass]
+        if main_field && field_is_not_applicable?(main_field)
+          next
+        end
 
+        # Add value block
         if main_field
           value = @assessment.send(main_field)
           label = get_field_label(fields)
@@ -156,6 +161,23 @@ class PdfGeneratorService
       return @assessment.send(fields[:pass]) if fields[:pass]
       return value if main_field.to_s.end_with?("_pass")
       nil
+    end
+
+    def get_not_applicable_fields
+      return [] unless @assessment.class.respond_to?(:form_fields)
+
+      @assessment.class.form_fields
+        .flat_map { |section| section[:fields] }
+        .select { |field| field[:attributes]&.dig(:add_not_applicable) }
+        .map { |field| field[:field].to_sym }
+    end
+
+    def field_is_not_applicable?(field)
+      return false unless @not_applicable_fields.include?(field)
+
+      value = @assessment.send(field)
+      # Field is not applicable if it has add_not_applicable and value is 0
+      value.present? && value.to_i == 0
     end
   end
 end
