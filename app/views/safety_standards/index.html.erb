@@ -8,12 +8,11 @@
 
   <nav id="safety-standard-tabs">
     <ul>
-      <li><a href="#anchorage">Anchorage</a></li>
-      <li><a href="#user-capacity">User Capacity</a></li>
-      <li><a href="#slides">Slides</a></li>
-      <li><a href="#material">Material</a></li>
-      <li><a href="#fan">Fan</a></li>
-      <li><a href="#additional">Additional</a></li>
+      <li><a href="#anchorage"><%= t('safety_standards.tabs.anchorage') %></a></li>
+      <li><a href="#user-capacity"><%= t('safety_standards.tabs.user_capacity') %></a></li>
+      <li><a href="#slides"><%= t('safety_standards.tabs.slides') %></a></li>
+      <li><a href="#material"><%= t('safety_standards.tabs.material') %></a></li>
+      <li><a href="#fan"><%= t('safety_standards.tabs.fan') %></a></li>
     </ul>
   </nav>
 
@@ -23,6 +22,5 @@
     <%= render 'slides_tab' %>
     <%= render 'material_tab' %>
     <%= render 'fan_tab' %>
-    <%= render 'additional_tab' %>
   </div>
 </article>

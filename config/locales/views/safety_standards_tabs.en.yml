@@ -74,18 +74,6 @@ en:
             - ["1.5m", "65kg"]
             - ["1.8m", "85kg"]
     
-    additional:
-      title: "Additional Safety Requirements"
-      requirements:
-        title: "Additional Safety Requirements"
-        items:
-          - "Maximum evacuation time: 30 seconds"
-          - "Maximum fall height: 0.6m (600mm)"
-          - "Multiple exits required for >15 users"
-          - "First metre gradient: Special requirements for slides"
-          - "Surface requirements: Non-slip surface material required"
-          - "Edge protection: Rounded edges and smooth transitions"
-    
     slides:
       title: "Slide Safety Requirements"
       runout_requirements:

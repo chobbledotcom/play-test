@@ -2,6 +2,12 @@ en:
   safety_standards:
     title: "EN 14960:2019 Calculators"
     subtitle: "EN 14960:2019 Requirements for Inflatable Play Equipment"
+    tabs:
+      anchorage: "Anchorage"
+      user_capacity: "User Capacity"
+      slides: "Slides"
+      material: "Material"
+      fan: "Fan"
     compliant: "Compliant"
 
     anchor_requirements:
