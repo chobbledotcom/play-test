@@ -16,6 +16,14 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup-environment
       
+      - name: Cache Sorbet RBI files
+        uses: actions/cache@v4
+        with:
+          path: sorbet/rbi
+          key: ${{ runner.os }}-sorbet-rbi-${{ hashFiles('**/Gemfile.lock', 'db/schema.rb') }}
+          restore-keys: |
+            ${{ runner.os }}-sorbet-rbi-
+      
       - name: Generate Sorbet RBI files
         run: |
           bundle exec tapioca gems
