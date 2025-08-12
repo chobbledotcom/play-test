@@ -6,6 +6,52 @@ class UserHeightAssessmentsController < ApplicationController
 
   private
 
+  def success_turbo_streams(additional_info: nil)
+    # Call parent which includes SafetyStandardsTurboStreams
+    streams = super
+
+    # Add our field update streams if any fields were defaulted
+    return streams unless @fields_defaulted_to_zero&.any?
+
+    streams + field_update_streams
+  end
+
+  def field_update_streams
+    form_config = assessment_class.form_fields
+
+    @fields_defaulted_to_zero.map do |field|
+      field_config = find_field_config(form_config, field)
+      next unless field_config
+
+      build_field_turbo_stream(field, field_config)
+    end.compact
+  end
+
+  def build_field_turbo_stream(field, field_config)
+    turbo_stream.replace(
+      field,
+      partial: "chobble_forms/field_turbo_response",
+      locals: {
+        model: @assessment,
+        field:,
+        partial: field_config[:partial],
+        i18n_base: "forms.user_height",
+        attributes: field_config[:attributes] || {}
+      }
+    )
+  end
+
+  def find_field_config(form_config, field_name)
+    # The YAML loads field names as strings, not symbols
+    field_str = field_name.to_s
+    form_config.each do |fieldset|
+      fieldset[:fields].each do |field_config|
+        return field_config if field_config[:field] == field_str
+      end
+    end
+    nil
+  end
+
   def preprocess_values
     @fields_defaulted_to_zero = []
 
