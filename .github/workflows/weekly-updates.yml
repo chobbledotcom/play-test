@@ -1,0 +1,127 @@
+name: "Weekly: Update Annotations & Attributions"
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # Every Monday at 2am UTC
+  workflow_dispatch:  # Allow manual triggering
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Full history for better git operations
+      
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+      
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Create or switch to update branch
+        run: |
+          git checkout -B automated/annotations-attributions
+      
+      - name: Update model annotations
+        run: bundle exec annotaterb models
+        continue-on-error: true
+      
+      - name: Update route annotations
+        run: bundle exec annotaterb routes
+        continue-on-error: true
+      
+      - name: Generate third-party attributions
+        run: bundle exec rake attributions:generate
+        continue-on-error: true
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected:"
+            git diff --stat
+          fi
+      
+      - name: Commit changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git add -A
+          git commit -m "Update annotations and attributions
+          
+          - Updated model annotations based on current schema
+          - Updated route annotations based on current routes
+          - Regenerated third-party attributions from Gemfile
+          
+          [Automated weekly update]"
+      
+      - name: Push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git push -f origin automated/annotations-attributions
+      
+      - name: Create or update pull request
+        if: steps.check_changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if PR already exists
+          PR_NUMBER=$(gh pr list --head automated/annotations-attributions --json number --jq '.[0].number' || echo "")
+          
+          if [ -z "$PR_NUMBER" ]; then
+            echo "Creating new PR..."
+            gh pr create \
+              --title "Update Attributions & Annotations" \
+              --body "## Weekly Automated Update
+          
+          This PR contains automated updates for:
+          - 📝 Model annotations (from database schema)
+          - 🛣️ Route annotations (from Rails routes)
+          - 📦 Third-party attributions (from dependencies)
+          
+          ### Files Changed
+          \`\`\`
+          $(git diff --stat origin/main...HEAD)
+          \`\`\`
+          
+          Please review the changes and merge if they look correct.
+          
+          ---
+          *This PR is automatically generated weekly and will be updated if new changes are detected.*" \
+              --base main \
+              --head automated/annotations-attributions
+          else
+            echo "PR #$PR_NUMBER already exists, updating..."
+            # Update the PR body to reflect latest changes
+            gh pr edit "$PR_NUMBER" \
+              --body "## Weekly Automated Update
+          
+          This PR contains automated updates for:
+          - 📝 Model annotations (from database schema)
+          - 🛣️ Route annotations (from Rails routes)
+          - 📦 Third-party attributions (from dependencies)
+          
+          ### Files Changed
+          \`\`\`
+          $(git diff --stat origin/main...HEAD)
+          \`\`\`
+          
+          Please review the changes and merge if they look correct.
+          
+          ---
+          *This PR is automatically generated weekly and will be updated if new changes are detected.*
+          *Last updated: $(date -u '+%Y-%m-%d %H:%M UTC')*"
+          fi
