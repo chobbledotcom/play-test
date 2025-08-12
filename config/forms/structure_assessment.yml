@@ -43,6 +43,7 @@ form_fields:
         field: trough_depth
         attributes:
           min: 0
+          add_not_applicable: true
       - partial: integer_comment
         field: trough_adjacent_panel_width
         attributes:

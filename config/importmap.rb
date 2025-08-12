@@ -1,9 +1,12 @@
+# typed: false
+
 # Pin npm packages by running ./bin/importmap
 
 pin "application"
 pin "@hotwired/turbo-rails", to: "turbo.min.js"
-pin "comment_toggles"
-pin "na_toggles"
+pin "comment_toggles", to: "comment_toggles.js"
+pin "na_toggles", to: "na_toggles.js"
+pin "na_number_toggles", to: "na_number_toggles.js"
 pin "details_links"
 pin "dirty_forms"
 pin "share_buttons"
