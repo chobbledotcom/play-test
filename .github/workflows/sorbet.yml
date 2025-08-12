@@ -1,0 +1,35 @@
+name: Sorbet Type Check
+
+on:
+  workflow_call:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      
+      - name: Generate Sorbet RBI files
+        run: |
+          bundle exec tapioca gems
+          bundle exec tapioca dsl
+      
+      - name: Run Sorbet type check
+        run: bundle exec srb typecheck
+        continue-on-error: true  # Don't fail the build initially while you fix type errors
+      
+      - name: Run Sorbet in strict mode (subset of files)
+        run: |
+          # Check only files that have typed: strict or typed: true
+          bundle exec srb typecheck --typed=strict
+        continue-on-error: true

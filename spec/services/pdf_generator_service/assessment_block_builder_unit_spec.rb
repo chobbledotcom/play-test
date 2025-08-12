@@ -227,7 +227,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       blocks = builder.build
 
       # Should create header and value block even with nil values
-      expect(blocks.select(&:value?).size).to be >= 1
+      expect(blocks.count(&:value?)).to be >= 1
       # Should not create comment block for nil comment
       expect(blocks.select(&:comment?)).to be_empty
     end

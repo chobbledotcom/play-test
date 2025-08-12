@@ -4,7 +4,7 @@ namespace :ntfy do
     # Always test the developer channel
     channel = :developer
     timestamp = Time.zone.now
-    message = "Test notification from PatLog at #{timestamp}"
+    message = "Test notification from play-test at #{timestamp}"
 
     puts "Sending test notification to channel: #{channel}"
     puts "Message: #{message}"
