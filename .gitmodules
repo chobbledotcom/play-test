@@ -1,3 +1,3 @@
 [submodule "gems/chobble-forms"]
 	path = gems/chobble-forms
-	url = git@github.com:chobbledotcom/chobble-forms.git
+	url = https://github.com/chobbledotcom/chobble-forms.git
