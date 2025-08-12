@@ -50,7 +50,7 @@ class PdfGeneratorService
       # Check what content we have
       has_signature = user&.signature&.attached?
       has_user_logo = ENV["PDF_LOGO"].present? && user&.logo&.attached?
-      bounds_width = pdf.bounds.width
+      pdf.bounds.width
 
       first_row = [
         pdf.make_cell(
@@ -97,14 +97,12 @@ class PdfGeneratorService
         caption_row << pdf.make_cell(content: "", borders: [], padding: 0) if has_user_logo
       end
 
-      num_columns = first_row.length
-      padding_total = (num_columns - 2) * 10
-      adjusted_width = bounds_width - padding_total
+      first_row.length
 
       table_data = [first_row]
       # table_data << caption_row if has_signature
 
-      pdf.table(table_data, width: adjusted_width) do |t|
+      pdf.table(table_data) do |t|
         t.cells.borders = []
       end
     end

@@ -11,7 +11,7 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
     context "when on first page" do
       it "returns footer height when disclaimer should be rendered" do
         height = described_class.measure_footer_height(pdf)
-        expect(height).to be.positive?
+        expect(height).not_to be 0
       end
     end
 

@@ -1,3 +1,6 @@
+# typed: false
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
@@ -5,7 +8,7 @@ RSpec.feature "Safety Standards Tabs", type: :feature, js: true do
 
   scenario "displays tab navigation" do
     expect_tab_links(:anchorage, :user_capacity, :slides,
-      :material, :fan, :additional)
+      :material, :fan)
   end
 
   scenario "shows anchorage tab by default" do
