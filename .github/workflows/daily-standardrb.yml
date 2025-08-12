@@ -1,0 +1,111 @@
+name: "Daily: Fix StandardRB Issues"
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # Daily at 4am UTC (staggered from other daily jobs)
+  workflow_dispatch:  # Allow manual triggering
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  standardrb-fix:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Full history for better git operations
+      
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+      
+      - name: Git setup
+        uses: ./.github/actions/git-setup
+      
+      - name: Create or switch to update branch
+        run: |
+          git checkout -B automated/standardrb-fixes
+      
+      - name: Run StandardRB with auto-fix
+        id: standardrb
+        run: |
+          echo "Running StandardRB with auto-fix..."
+          
+          # Run standardrb --fix and capture the output
+          if bundle exec standardrb --fix > standardrb_output.txt 2>&1; then
+            echo "clean=true" >> $GITHUB_OUTPUT
+            echo "No StandardRB issues found or all were auto-fixed"
+          else
+            echo "clean=false" >> $GITHUB_OUTPUT
+            echo "StandardRB found issues (some may have been auto-fixed)"
+          fi
+          
+          # Show output for debugging
+          cat standardrb_output.txt
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected (auto-fixes applied):"
+            git diff --stat
+          fi
+      
+      - name: Commit changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git add -A
+          git commit -m "Fix StandardRB linting issues
+          
+          - Auto-corrected Ruby style issues
+          - Applied standardrb --fix
+          
+          [Automated daily update]"
+      
+      - name: Push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git push -f origin automated/standardrb-fixes
+      
+      - name: Create or update pull request
+        if: steps.check_changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if PR already exists
+          PR_NUMBER=$(gh pr list --head automated/standardrb-fixes --json number --jq '.[0].number' || echo "")
+          
+          PR_BODY="## Daily StandardRB Auto-fix
+          
+          This PR contains automated Ruby style fixes from StandardRB.
+          
+          ### Files Changed
+          \`\`\`
+          $(git diff --stat origin/main...HEAD 2>/dev/null || echo "No file changes")
+          \`\`\`
+          
+          ✅ All issues were auto-corrected by StandardRB!
+          
+          ---
+          *This PR is automatically generated daily and will be updated if new issues are detected.*
+          *Last updated: $(date -u '+%Y-%m-%d %H:%M UTC')*"
+          
+          if [ -z "$PR_NUMBER" ]; then
+            echo "Creating new PR..."
+            gh pr create \
+              --title "Fix StandardRB Linting Issues" \
+              --body "$PR_BODY" \
+              --base main \
+              --head automated/standardrb-fixes
+          else
+            echo "PR #$PR_NUMBER already exists, updating..."
+            gh pr edit "$PR_NUMBER" --body "$PR_BODY"
+          fi

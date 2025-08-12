@@ -17,9 +17,9 @@ jobs:
             const workflows = [
               'coverage.yml',
               'daily-erb-lint.yml',
+              'daily-standardrb.yml',
               'security-scan.yml',
-              'sorbet.yml', 
-              'standard.yml',
+              'sorbet.yml',
               'test-ruby.yml',
               'weekly-updates.yml'
             ];
@@ -29,26 +29,35 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: workflow,
-                per_page: 1,
-                status: 'completed'
+                per_page: 1
               });
               return data.workflow_runs[0];
             };
             
-            const statusEmoji = (conclusion) => ({
-              'success': '💚',
-              'failure': '💀',
-              'cancelled': '⚠️'
-            }[conclusion] || '❓');
+            const statusEmoji = (status, conclusion) => {
+              if (status === 'in_progress' || status === 'queued') return '🚴';
+              return {
+                'success': '💚',
+                'failure': '💀',
+                'cancelled': '⚠️'
+              }[conclusion] || '❓';
+            };
             
             const results = await Promise.all(
               workflows.map(async (workflow) => {
                 const run = await getWorkflowRun(workflow);
                 if (!run) return `⏳ ${workflow} - no runs yet`;
                 
-                const emoji = statusEmoji(run.conclusion);
-                const date = new Date(run.created_at).toISOString().split('T')[0];
-                return `${emoji} [${workflow}](${run.html_url}) - ${date}`;
+                const emoji = statusEmoji(run.status, run.conclusion);
+                const runDate = new Date(run.created_at);
+                const date = runDate.toISOString().split('T')[0];
+                const time = runDate.toLocaleTimeString('en-GB', {
+                  timeZone: 'GMT',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true
+                }).toLowerCase();
+                return `${emoji} [${workflow}](${run.html_url}) - ${date} ${time}`;
               })
             );
             

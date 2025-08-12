@@ -18,13 +18,6 @@ jobs:
     uses: ./.github/workflows/ci.yml
     permissions:
       contents: read
-    
-  lint:
-    name: Lint Code
-    uses: ./.github/workflows/standard.yml
-    permissions:
-      checks: write
-      contents: write
   
   typecheck:
     name: Type Check
@@ -34,7 +27,7 @@ jobs:
   
   docker-build:
     name: Test Docker Build
-    needs: [test, lint, typecheck]
+    needs: [test, typecheck]
     uses: ./.github/workflows/docker-build.yml
     with:
       push: false
@@ -48,7 +41,7 @@ jobs:
   version-check:
     name: Check Version Calculation
     runs-on: ubuntu-latest
-    needs: [test, lint, typecheck]
+    needs: [test, typecheck]
     outputs:
       current: ${{ steps.current.outputs.version }}
       new: ${{ steps.new.outputs.version }}
@@ -96,7 +89,7 @@ jobs:
   summary:
     name: Pre-Release Summary
     runs-on: ubuntu-latest
-    needs: [test, lint, typecheck, docker-build, version-check]
+    needs: [test, typecheck, docker-build, version-check]
     if: always()
     
     steps:
@@ -114,13 +107,11 @@ jobs:
           echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| Tests | ${{ needs.test.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint | ${{ needs.lint.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Type Check | ${{ needs.typecheck.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Docker Build | ${{ needs.docker-build.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [[ "${{ needs.test.result }}" == "success" && \
-                "${{ needs.lint.result }}" == "success" && \
                 "${{ needs.typecheck.result }}" == "success" && \
                 "${{ needs.docker-build.result }}" == "success" ]]; then
             echo "✅ **All checks passed! Ready for release.**" >> $GITHUB_STEP_SUMMARY

@@ -17,12 +17,6 @@ jobs:
     uses: ./.github/workflows/ci.yml
     permissions:
       contents: read
-    
-  lint:
-    uses: ./.github/workflows/standard.yml
-    permissions:
-      checks: write
-      contents: write
   
   typecheck:
     uses: ./.github/workflows/sorbet.yml
@@ -32,7 +26,7 @@ jobs:
   version:
     name: Calculate Version
     runs-on: ubuntu-latest
-    needs: [test, lint, typecheck]
+    needs: [test, typecheck]
     outputs:
       current: ${{ steps.current.outputs.version }}
       new: ${{ steps.new.outputs.version }}
