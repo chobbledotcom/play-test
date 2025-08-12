@@ -55,6 +55,7 @@ en:
     field_comment_placeholder: "%{field} comment"
     error: "Error"
     metres_by: "m ×"
+    metres_squared: "m²"
 
   # Common messages
   ui:

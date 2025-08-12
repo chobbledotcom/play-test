@@ -1,18 +1,14 @@
+<%# Locals: assessment_type (string), inspection (Inspection instance) %>
 <%
-  # Assessment type passed in as local variable
-  assessment = @inspection.send("#{assessment_type}_assessment")
-
-  # Determine which assessments have safety standards displays
+  assessment = inspection.send("#{assessment_type}_assessment")
   has_safety_standards = %w[anchorage slide user_height].include?(assessment_type)
 
-  # Reference partials for safety standards (only some assessments have them)
   reference_partials = case assessment_type
   when 'slide' then ['shared/safety_standards/slide_safety_requirements']
   when 'user_height' then ['shared/safety_standards/wall_height_requirements']
   else []
   end
 
-  # Check if there are incomplete fields for this inspection
   has_incomplete_fields = assessment.inspection.incomplete_fields.any?
   submit_key = has_incomplete_fields ? "submit_continue" : "submit"
 %>
@@ -21,7 +17,7 @@
   model: assessment,
   i18n_base: "forms.#{assessment_type}",
   submit_key: submit_key,
-  url: send("inspection_#{assessment_type}_assessment_path", @inspection) do |form| %>
+  url: send("inspection_#{assessment_type}_assessment_path", inspection) do |form| %>
   <%= hidden_field_tag :tab, assessment_type %>
   <%= render 'chobble_forms/fields', model: assessment %>
 
@@ -30,8 +26,8 @@
         reference_partials: reference_partials,
         dynamic_content: -> do %>
       <%= turbo_frame_tag "#{assessment_type}_safety_results" do %>
-        <% @assessment = assessment %>
-        <%= render "assessments/#{assessment_type}_safety_results" %>
+        <%= render "assessments/#{assessment_type}_safety_results",
+            assessment: assessment %>
       <% end %>
     <% end %>
   <% end %>

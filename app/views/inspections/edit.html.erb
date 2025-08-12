@@ -45,7 +45,9 @@
       <% when 'results' %>
         <%= render 'inspections/results_form' %>
       <% else %>
-        <%= render 'inspections/assessment_form', assessment_type: current_tab %>
+        <%= render 'inspections/assessment_form',
+            assessment_type: current_tab,
+            inspection: @inspection %>
       <% end %>
     </div>
 

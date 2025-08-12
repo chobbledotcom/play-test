@@ -18,7 +18,8 @@ module SafetyStandardsTurboStreams
   def safety_standards_turbo_streams
     [turbo_stream.replace(
       safety_results_frame_id,
-      partial: safety_results_partial
+      partial: safety_results_partial,
+      locals: {assessment: @assessment}
     )]
   end
 

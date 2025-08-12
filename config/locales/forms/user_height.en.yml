@@ -18,7 +18,7 @@ en:
         custom_user_height_comment: "Custom User Height Comments"
         play_area_length: "Play Area Length (m)"
         play_area_width: "Play Area Width (m)"
-        negative_adjustment: "Negative Play Space Adjustment (m2)"
+        negative_adjustment: "Negative Play Space Adjustment (m²)"
       placeholders:
         height: "Enter height in meters"
         user_count: "Number of users"

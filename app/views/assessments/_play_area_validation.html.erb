@@ -1,0 +1,48 @@
+<%# Play Area Validation Partial %>
+<%# Locals: validation_result (hash from validate_play_area) %>
+<% t_base = 'safety_standards.user_height.play_area_validation' %>
+
+<div class="play-area-validation <%= validation_result[:valid] ? 'validation-passed' : 'validation-failed' %>">
+  <h4><%= t("#{t_base}.title") %></h4>
+
+  <% if validation_result[:valid] %>
+    <p class="text-notice">
+      <i class="fa fa-check-circle"></i>
+      <%= t("#{t_base}.passed") %>
+    </p>
+  <% else %>
+    <p class="text-error">
+      <i class="fa fa-exclamation-triangle"></i>
+      <%= t("#{t_base}.failed") %>
+    </p>
+    <ul class="validation-errors">
+      <% validation_result[:errors].each do |error| %>
+        <li><%= error %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <% if (m = validation_result[:measurements]).present? %>
+    <div class="validation-measurements">
+      <p><%= t("#{t_base}.measurements") %>:</p>
+      <ul>
+        <li>
+          <%= t("#{t_base}.unit_dimensions") %>:
+          <%= m[:unit_length] %><%= t('shared.metres_by') %> <%= m[:unit_width] %>m
+        </li>
+        <li>
+          <%= t("#{t_base}.play_area_dimensions") %>:
+          <%= m[:play_area_length] %><%= t('shared.metres_by') %> <%= m[:play_area_width] %>m
+        </li>
+        <li>
+          <%= t("#{t_base}.total_play_area") %>:
+          <%= m[:total_play_area] %><%= t('shared.metres_squared') %>
+        </li>
+        <li>
+          <%= t("#{t_base}.negative_adjustment") %>:
+          <%= m[:negative_adjustment_area] %><%= t('shared.metres_squared') %>
+        </li>
+      </ul>
+    </div>
+  <% end %>
+</div>

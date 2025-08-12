@@ -46,5 +46,39 @@ module Assessments
 
     validates :inspection_id,
       uniqueness: true
+
+    sig { returns(T::Hash[Symbol, T.untyped]) }
+    def validate_play_area
+      return {valid: false, errors: ["Inspection not found"]} unless inspection
+
+      unit_length = inspection.length
+      unit_width = inspection.width
+
+      # Check if we have all required measurements
+      if [unit_length, unit_width, play_area_length, play_area_width].any?(&:nil?)
+        return {
+          valid: false,
+          errors: ["Missing required measurements for play area validation"],
+          measurements: {}
+        }
+      end
+
+      # Use the negative_adjustment value, defaulting to 0 if nil
+      adjustment = negative_adjustment || 0
+
+      # Call the EN14960 validator
+      EN14960.validate_play_area(
+        unit_length: unit_length,
+        unit_width: unit_width,
+        play_area_length: play_area_length,
+        play_area_width: play_area_width,
+        negative_adjustment_area: adjustment
+      )
+    end
+
+    sig { returns(T::Boolean) }
+    def play_area_valid?
+      validate_play_area[:valid]
+    end
   end
 end

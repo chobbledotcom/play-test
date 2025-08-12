@@ -53,6 +53,15 @@ en:
       capacity_1500mm: "1.5m users: %{count} (0.60 per m²)"
       capacity_1800mm: "1.8m users: %{count} (0.5 per m²)"
       max_user_height_note: "Capacity calculated for users up to %{height}m tall"
+      play_area_validation:
+        title: "Play Area Measurement Validation"
+        passed: "Play area measurements are valid"
+        failed: "Play area measurements have validation errors"
+        measurements: "Measurements"
+        unit_dimensions: "Unit dimensions (L×W)"
+        play_area_dimensions: "Play area (L×W)"
+        total_play_area: "Total play area"
+        negative_adjustment: "Negative adjustment area"
 
     calculators:
       result_title: "Result"

@@ -1,35 +1,36 @@
 <%# Slide Safety Standards Results Partial %>
-<% if @assessment&.slide_platform_height.present? %>
-  <% platform_height = @assessment.slide_platform_height %>
+<%# Locals: assessment (SlideAssessment instance) %>
+<% if assessment&.slide_platform_height.present? %>
+  <% platform_height = assessment.slide_platform_height %>
 
   <%= render 'shared/safety_info_box',
       content: -> do %>
 
     <%# Wall Height Requirements with Breakdown for each preset height %>
-    <% if @assessment.slide_wall_height.present? %>
+    <% if assessment.slide_wall_height.present? %>
       <% [1.0, 1.2, 1.5, 1.8].each do |user_height| %>
         <% wall_details = EN14960::Calculators::SlideCalculator.get_wall_height_requirement_details(
              platform_height,
              user_height,
-             @assessment.slide_permanent_roof
+             assessment.slide_permanent_roof
            ) %>
 
         <%= render 'assessments/safety_standard_with_breakdown',
             title: "#{t('safety_standards.slide_requirements.wall_height_requirements')} (#{user_height}m users)",
             calculator_result: wall_details,
-            passed: @assessment.meets_wall_height_requirements? %>
+            passed: assessment.meets_wall_height_requirements? %>
       <% end %>
     <% end %>
 
     <%# Runout Requirements with Breakdown %>
-    <% if @assessment.runout.present? %>
+    <% if assessment.runout.present? %>
       <br>
       <% runout_result = EN14960.calculate_slide_runout(
            platform_height,
            has_stop_wall: false
          ) %>
 
-      <% # Convert to the expected format %>
+      <%# Convert to the expected format %>
       <% runout_details = {
            text: "#{t('safety_standards.calculators.runout.required_runout_result')}: #{runout_result.value}#{runout_result.value_suffix}",
            breakdown: runout_result.breakdown
@@ -38,7 +39,7 @@
       <%= render 'assessments/safety_standard_with_breakdown',
           title: t('safety_standards.slide_requirements.runout_requirements'),
           calculator_result: runout_details,
-          passed: @assessment.meets_runout_requirements?,
+          passed: assessment.meets_runout_requirements?,
           show_compliance: true %>
     <% end %>
   <% end %>

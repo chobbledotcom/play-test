@@ -1,16 +1,17 @@
-<%# locals: () %>
+<%# Anchorage Safety Standards Results Partial %>
+<%# Locals: assessment (AnchorageAssessment instance) %>
 <%= render 'shared/safety_info_box',
   content: -> do %>
-  <% if @assessment.required_anchors > 0 %>
-    <% # Build the anchorage details in the expected format %>
+  <% if assessment.required_anchors > 0 %>
+    <%# Build the anchorage details in the expected format %>
     <% anchor_details = {
-         text: "#{t('safety_standards.anchor_requirements.required')} #{@assessment.required_anchors}",
-         breakdown: @assessment.anchorage_breakdown
+         text: "#{t('safety_standards.anchor_requirements.required')} #{assessment.required_anchors}",
+         breakdown: assessment.anchorage_breakdown
        } %>
 
     <%= render 'assessments/safety_standard_with_breakdown',
         title: t('safety_standards.anchor_requirements.title'),
         calculator_result: anchor_details,
-        passed: @assessment.total_anchors&.positive? ? @assessment.meets_anchor_requirements? : nil %>
+        passed: assessment.total_anchors&.positive? ? assessment.meets_anchor_requirements? : nil %>
   <% end %>
 <% end %>
