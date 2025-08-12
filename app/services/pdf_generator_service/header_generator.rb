@@ -1,3 +1,5 @@
+# typed: false
+
 class PdfGeneratorService
   class HeaderGenerator
     include Configuration
@@ -72,6 +74,16 @@ class PdfGeneratorService
       end
 
       def prepare_logo(user)
+        # Check if PDF_LOGO env variable is set to override user logo
+        if ENV["PDF_LOGO"].present?
+          logo_filename = ENV["PDF_LOGO"]
+          logo_path = Rails.root.join("app", "assets", "images", logo_filename)
+          logo_data = File.read(logo_path, mode: "rb")
+          logo_height = Configuration::LOGO_HEIGHT
+          logo_width = logo_height * 2 + 10
+          return [logo_width, logo_data, nil]
+        end
+
         return [0, nil, nil] unless user&.logo&.attached?
 
         logo_data = user.logo.download
