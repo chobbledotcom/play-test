@@ -30,7 +30,6 @@ jobs:
       - name: Prepare database
         env:
           RAILS_ENV: test
-          CACHE_HIT: ${{ steps.db-cache.outputs.cache-hit }}
         run: |
           bundle exec rails db:migrate
           bundle exec rails parallel:prepare
