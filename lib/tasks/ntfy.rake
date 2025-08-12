@@ -1,7 +1,8 @@
 namespace :ntfy do
   desc "Send a test notification to ntfy.sh"
   task test: :environment do
-    channel = ENV["CHANNEL"]&.to_sym || :developer
+    # Always test the developer channel
+    channel = :developer
     timestamp = Time.zone.now
     message = "Test notification from PatLog at #{timestamp}"
 
@@ -20,11 +21,10 @@ namespace :ntfy do
 
     channels.each do |ch|
       response = NtfyService.send(:send_to_channel, message, ch)
+      code = response.code
       if response.is_a?(Net::HTTPSuccess)
-        code = response.code
         puts "Notification sent successfully to #{ch}! Response code: #{code}"
       else
-        code = response.code
         msg = response.message
         puts "Failed to send to #{ch}. Response: #{code} #{msg}"
       end
