@@ -39,11 +39,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      if Rails.env.production?
-        notification = I18n.t("users.messages.new_user_notification",
-          email: @user.email)
-        NtfyService.notify(notification)
-      end
+      send_new_user_notifications(@user) if Rails.env.production?
 
       log_in @user
       create_session_record @user
@@ -298,5 +294,19 @@ class UsersController < ApplicationController
     permitted_params = params.require(:user).permit(settings_fields)
 
     process_image_params(permitted_params, :logo, :signature)
+  end
+
+  def send_new_user_notifications(user)
+    developer_notification = I18n.t("users.messages.new_user_notification",
+      email: user.email)
+
+    NtfyService.notify(developer_notification, channel: :developer)
+
+    anonymized_email = helpers.anonymise_email(user.email)
+
+    admin_notification = I18n.t("users.messages.new_user_notification",
+      email: anonymized_email)
+
+    NtfyService.notify(admin_notification, channel: :admin)
   end
 end

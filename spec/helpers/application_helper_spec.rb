@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe ApplicationHelper, type: :helper do
@@ -191,6 +193,47 @@ RSpec.describe ApplicationHelper, type: :helper do
         large_num = 1e10
         expect(helper.format_numeric_value(large_num)).to be_a(String)
       end
+    end
+  end
+
+  describe "#anonymise_email" do
+    it "anonymises simple email addresses" do
+      expect(helper.anonymise_email("hello@example.com"))
+        .to eq("h***o@e*****e.com")
+    end
+
+    it "handles short local parts" do
+      expect(helper.anonymise_email("ab@example.com"))
+        .to eq("ab@e*****e.com")
+    end
+
+    it "handles short domain names" do
+      expect(helper.anonymise_email("test@ab.com"))
+        .to eq("t**t@ab.com")
+    end
+
+    it "handles emails without TLD" do
+      expect(helper.anonymise_email("user@localhost"))
+        .to eq("u**r@l*******t")
+    end
+
+    it "handles long email addresses" do
+      expect(helper.anonymise_email("verylongemailaddress@verylongdomainname.com"))
+        .to eq("v******************s@v****************e.com")
+    end
+
+    it "handles emails with numbers" do
+      expect(helper.anonymise_email("user123@test456.org"))
+        .to eq("u*****3@t*****6.org")
+    end
+
+    it "returns non-email strings unchanged" do
+      expect(helper.anonymise_email("not an email")).to eq("not an email")
+    end
+
+    it "handles emails with multiple dots in domain" do
+      expect(helper.anonymise_email("user@mail.example.co.uk"))
+        .to eq("u**r@m**l.example.co.uk")
     end
   end
 end

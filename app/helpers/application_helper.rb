@@ -90,7 +90,35 @@ module ApplicationHelper
     )
   end
 
+  sig { params(email: String).returns(String) }
+  def anonymise_email(email)
+    return email unless email.include?("@")
+
+    local_part, domain = email.split("@", 2)
+    domain_parts = domain.split(".", 2)
+
+    anonymised_local = anonymise_string(local_part)
+    anonymised_domain_name = anonymise_string(domain_parts[0])
+
+    if domain_parts.length > 1
+      "#{anonymised_local}@#{anonymised_domain_name}.#{domain_parts[1]}"
+    else
+      "#{anonymised_local}@#{anonymised_domain_name}"
+    end
+  end
+
   private
+
+  sig { params(str: String).returns(String) }
+  def anonymise_string(str)
+    return str if str.length <= 2
+
+    first_char = str[0]
+    last_char = str[-1]
+    middle_length = str.length - 2
+
+    "#{first_char}#{"*" * middle_length}#{last_char}"
+  end
 
   sig { params(path: String).returns(T::Boolean) }
   def controller_matches?(path)
