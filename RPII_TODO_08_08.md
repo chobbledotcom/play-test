@@ -11,7 +11,7 @@
 **todo**
 
 - custom user height comment not showing in pdfs
-- remove additional tab from safety standards
+- **done** remove additional tab from safety standards
 
 ## RPII Adjustments
 
