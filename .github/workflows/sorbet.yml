@@ -24,6 +24,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-sorbet-rbi-
       
+      - name: Setup database
+        env:
+          RAILS_ENV: test
+        run: |
+          bundle exec rails db:migrate
+      
       - name: Generate Sorbet RBI files
         run: |
           bundle exec tapioca gems

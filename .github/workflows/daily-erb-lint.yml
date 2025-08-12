@@ -1,0 +1,154 @@
+name: "Daily: Fix ERB Linting Issues"
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Daily at 3am UTC
+  workflow_dispatch:  # Allow manual triggering
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write  # For PR comments
+
+jobs:
+  erb-lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Full history for better git operations
+      
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+      
+      - name: Git setup
+        uses: ./.github/actions/git-setup
+      
+      - name: Create or switch to update branch
+        run: |
+          git checkout -B automated/erb-lint-fixes
+      
+      - name: Run ERB lint with autocorrect
+        id: erb_lint
+        run: |
+          echo "Running ERB lint with autocorrect..."
+          
+          # Run erb_lint and capture both fixes and remaining issues
+          if bundle exec erb_lint --autocorrect > erb_lint_output.txt 2>&1; then
+            echo "erb_clean=true" >> $GITHUB_OUTPUT
+            echo "No ERB lint issues found or all were auto-fixed"
+          else
+            echo "erb_clean=false" >> $GITHUB_OUTPUT
+            echo "ERB lint found issues (some may have been auto-fixed)"
+          fi
+          
+          # Extract unfixed offenses if any
+          if grep -q "Offenses:" erb_lint_output.txt; then
+            echo "has_unfixed=true" >> $GITHUB_OUTPUT
+            # Save the output for later use in PR comment
+            cat erb_lint_output.txt > unfixed_issues.txt
+          else
+            echo "has_unfixed=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Show output for debugging
+          cat erb_lint_output.txt
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected (auto-fixes applied):"
+            git diff --stat
+          fi
+      
+      - name: Commit changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git add -A
+          git commit -m "Fix ERB linting issues
+          
+          - Auto-corrected ERB template issues
+          - Applied erb_lint --autocorrect fixes
+          
+          [Automated daily update]"
+      
+      - name: Push changes
+        if: steps.check_changes.outputs.changed == 'true' || steps.erb_lint.outputs.has_unfixed == 'true'
+        run: |
+          git push -f origin automated/erb-lint-fixes
+      
+      - name: Create or update pull request
+        if: steps.check_changes.outputs.changed == 'true' || steps.erb_lint.outputs.has_unfixed == 'true'
+        id: create_pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if PR already exists
+          PR_NUMBER=$(gh pr list --head automated/erb-lint-fixes --json number --jq '.[0].number' || echo "")
+          
+          # Prepare PR body
+          if [ "${{ steps.erb_lint.outputs.has_unfixed }}" == "true" ]; then
+            UNFIXED_MSG="
+          ⚠️ **Manual fixes required** - Some issues could not be auto-corrected.
+          See the comment below for details."
+          else
+            UNFIXED_MSG="✅ All issues were auto-corrected!"
+          fi
+          
+          PR_BODY="## Daily ERB Lint Auto-fix
+          
+          This PR contains automated ERB template fixes.
+          
+          $UNFIXED_MSG
+          
+          ### Files Changed
+          \`\`\`
+          $(git diff --stat origin/main...HEAD 2>/dev/null || echo "No file changes")
+          \`\`\`
+          
+          ---
+          *This PR is automatically generated daily and will be updated if new issues are detected.*
+          *Last updated: $(date -u '+%Y-%m-%d %H:%M UTC')*"
+          
+          if [ -z "$PR_NUMBER" ]; then
+            echo "Creating new PR..."
+            PR_NUMBER=$(gh pr create \
+              --title "Fix ERB Linting Issues" \
+              --body "$PR_BODY" \
+              --base main \
+              --head automated/erb-lint-fixes \
+              --json number --jq '.number')
+            echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          else
+            echo "PR #$PR_NUMBER already exists, updating..."
+            gh pr edit "$PR_NUMBER" --body "$PR_BODY"
+            echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Add comment for unfixed issues
+        if: steps.erb_lint.outputs.has_unfixed == 'true' && steps.create_pr.outputs.pr_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Format the unfixed issues for the comment
+          COMMENT_BODY="## 🔧 Manual Fixes Required
+          
+          The following ERB lint issues could not be auto-corrected and need manual attention:
+          
+          \`\`\`
+          $(cat unfixed_issues.txt | grep -A 1000 "Offenses:" || cat unfixed_issues.txt)
+          \`\`\`
+          
+          Please review and fix these issues manually before merging."
+          
+          # Post comment to PR
+          gh pr comment ${{ steps.create_pr.outputs.pr_number }} \
+            --body "$COMMENT_BODY"

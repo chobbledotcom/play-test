@@ -23,10 +23,8 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup-environment
       
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Git setup
+        uses: ./.github/actions/git-setup
       
       - name: Create or switch to update branch
         run: |
