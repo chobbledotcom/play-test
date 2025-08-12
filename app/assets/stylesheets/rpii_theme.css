@@ -144,6 +144,7 @@
   color: #3a0eb5;
 }
 
-.rpii section aside {
+.rpii section aside,
+.rpii table {
   background: white;
 }
