@@ -1,10 +1,12 @@
+# typed: false
+
 require "net/http"
 
 class NtfyService
   class << self
-    def notify(message)
+    def notify(message, channel: :developer)
       Thread.new do
-        send_notification(message)
+        send_notifications(message, channel)
       rescue => e
         Rails.logger.error("NtfyService error: #{e.message}")
       ensure
@@ -14,11 +16,28 @@ class NtfyService
 
     private
 
-    def send_notification(message)
-      channel = ENV["NTFY_CHANNEL"]
-      return if channel.blank?
+    def send_notifications(message, channel)
+      channels = determine_channels(channel)
+      channels.each { |ch| send_to_channel(message, ch) }
+    end
 
-      uri = URI.parse("https://ntfy.sh/#{channel}")
+    def determine_channels(channel)
+      case channel
+      when :developer
+        [ENV["NTFY_CHANNEL_DEVELOPER"]].compact
+      when :admin
+        [ENV["NTFY_CHANNEL_ADMIN"]].compact
+      when :both
+        [ENV["NTFY_CHANNEL_DEVELOPER"], ENV["NTFY_CHANNEL_ADMIN"]].compact
+      else
+        []
+      end
+    end
+
+    def send_to_channel(message, channel_url)
+      return if channel_url.blank?
+
+      uri = URI.parse("https://ntfy.sh/#{channel_url}")
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
 
