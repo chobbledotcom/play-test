@@ -1,6 +1,6 @@
 ---
 name: bundler
-version: 2.6.7
+version: 2.7.1
 type: bundler
 summary: The best way to manage your application's dependencies
 homepage: https://bundler.io

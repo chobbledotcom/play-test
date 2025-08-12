@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-08-12T14:03:54",
+  "generated_at": "2025-08-12T23:17:41",
   "total_dependencies": 122,
   "dependencies": [
     {
@@ -179,7 +179,7 @@
     },
     {
       "name": "bundler",
-      "version": "2.6.7",
+      "version": "2.7.1",
       "license": "other",
       "homepage": "https://bundler.io",
       "summary": "The best way to manage your application's dependencies"
@@ -193,7 +193,7 @@
     },
     {
       "name": "chobble-forms",
-      "version": "0.5.4",
+      "version": "0.5.6",
       "license": "other",
       "homepage": "https://github.com/chobbledotcom/chobble-forms",
       "summary": "Semantic Rails forms with strict i18n"
@@ -277,7 +277,7 @@
     },
     {
       "name": "en14960",
-      "version": "0.2.0",
+      "version": "0.2.3",
       "license": "other",
       "homepage": "https://github.com/chobbledotcom/en14960",
       "summary": "BS EN 14960:2019 safety standard calculators for inflatable play equipment"

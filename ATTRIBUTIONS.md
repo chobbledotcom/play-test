@@ -357,11 +357,11 @@ Total dependencies: 122
   - Arbitrary-precision decimal floating-point number library.
   - Homepage: https://github.com/ruby/bigdecimal
 
-- **bundler** v2.6.7
+- **bundler** v2.7.1
   - The best way to manage your application's dependencies
   - Homepage: https://bundler.io
 
-- **chobble-forms** v0.5.4
+- **chobble-forms** v0.5.6
   - Semantic Rails forms with strict i18n
   - Homepage: https://github.com/chobbledotcom/chobble-forms
 
@@ -381,7 +381,7 @@ Total dependencies: 122
   - Distributed object system for Ruby
   - Homepage: https://github.com/ruby/drb
 
-- **en14960** v0.2.0
+- **en14960** v0.2.3
   - BS EN 14960:2019 safety standard calculators for inflatable play equipment
   - Homepage: https://github.com/chobbledotcom/en14960
 

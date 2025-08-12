@@ -1,6 +1,6 @@
 ---
 name: en14960
-version: 0.2.0
+version: 0.2.3
 type: bundler
 summary: BS EN 14960:2019 safety standard calculators for inflatable play equipment
 homepage: https://github.com/chobbledotcom/en14960
