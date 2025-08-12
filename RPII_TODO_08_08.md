@@ -8,6 +8,11 @@
 - (bug) Bounce back to the edit inspection you were editing when creating a new unit from it, not view
 - (bug) Number of blowers - change step to 1
 
+**todo**
+
+- custom user height comment not showing in pdfs
+- remove additional tab from safety standards
+
 ## RPII Adjustments
 
 **Total time: 130m = 2 hours, £200**
