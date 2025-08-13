@@ -1,11 +1,21 @@
-# typed: false
+# typed: strict
+
+require "sorbet-runtime"
 
 class PdfCacheService
+  extend T::Sig
+
   CacheResult = Struct.new(:type, :data, keyword_init: true)
   # type: :redirect or :pdf_data
   # data: URL string for redirect, or PDF binary data
 
   class << self
+    extend T::Sig
+
+    sig do
+      params(inspection: Inspection, options: T.untyped)
+        .returns(CacheResult)
+    end
     def fetch_or_generate_inspection_pdf(inspection, **options)
       # Never cache incomplete inspections
       unless caching_enabled? && inspection.complete?
@@ -15,22 +25,32 @@ class PdfCacheService
       fetch_or_generate(inspection, :inspection, **options)
     end
 
+    sig { params(unit: Unit, options: T.untyped).returns(CacheResult) }
     def fetch_or_generate_unit_pdf(unit, **options)
       return generate_pdf_result(unit, :unit, **options) unless caching_enabled?
 
       fetch_or_generate(unit, :unit, **options)
     end
 
+    sig { params(inspection: Inspection).void }
     def invalidate_inspection_cache(inspection)
       invalidate_cache(inspection)
     end
 
+    sig { params(unit: Unit).void }
     def invalidate_unit_cache(unit)
       invalidate_cache(unit)
     end
 
     private
 
+    sig do
+      params(
+        record: T.any(Inspection, Unit),
+        type: Symbol,
+        options: T.untyped
+      ).returns(CacheResult)
+    end
     def fetch_or_generate(record, type, **options)
       valid_cache = record.cached_pdf.attached? &&
         cached_pdf_valid?(record.cached_pdf, record)
@@ -50,12 +70,26 @@ class PdfCacheService
       end
     end
 
+    sig do
+      params(
+        record: T.any(Inspection, Unit),
+        type: Symbol,
+        options: T.untyped
+      ).returns(CacheResult)
+    end
     def generate_and_cache(record, type, **options)
       result = generate_pdf_result(record, type, **options)
       store_cached_pdf(record, result.data)
       result
     end
 
+    sig do
+      params(
+        record: T.any(Inspection, Unit),
+        type: Symbol,
+        options: T.untyped
+      ).returns(CacheResult)
+    end
     def generate_pdf_result(record, type, **options)
       pdf_document = case type
       when :inspection
@@ -67,22 +101,26 @@ class PdfCacheService
       CacheResult.new(type: :pdf_data, data: pdf_document.render)
     end
 
+    sig { params(record: T.any(Inspection, Unit)).void }
     def invalidate_cache(record)
       return unless caching_enabled?
 
       record.cached_pdf.purge if record.cached_pdf.attached?
     end
 
+    sig { returns(T::Boolean) }
     def caching_enabled?
       pdf_cache_from_date.present?
     end
 
+    sig { params(attachment: T.untyped).returns(String) }
     def generate_signed_url(attachment)
       # Generate a signed URL that expires in 1 hour
       # The URL includes a timestamp in the signed parameters
       attachment.blob.url(expires_in: 1.hour, disposition: "inline")
     end
 
+    sig { returns(T.nilable(Date)) }
     def pdf_cache_from_date
       @pdf_cache_from_date ||= begin
         date_string = ENV["PDF_CACHE_FROM"]
@@ -96,6 +134,12 @@ class PdfCacheService
       end
     end
 
+    sig do
+      params(
+        attachment: T.untyped,
+        record: T.any(Inspection, Unit)
+      ).returns(T::Boolean)
+    end
     def cached_pdf_valid?(attachment, record)
       return false unless attachment.blob&.created_at
 
@@ -109,6 +153,12 @@ class PdfCacheService
       !user_assets_updated_after?(record.user, cache_created_at)
     end
 
+    sig do
+      params(
+        user: T.nilable(User),
+        cache_created_at: T.any(ActiveSupport::TimeWithZone, Date, Time)
+      ).returns(T::Boolean)
+    end
     def user_assets_updated_after?(user, cache_created_at)
       return false unless user
 
@@ -125,11 +175,23 @@ class PdfCacheService
       false
     end
 
+    sig do
+      params(
+        attachment: T.untyped,
+        reference_time: T.any(ActiveSupport::TimeWithZone, Date, Time)
+      ).returns(T::Boolean)
+    end
     def attachment_updated_after?(attachment, reference_time)
       attachment&.attached? &&
         attachment.blob.created_at > reference_time
     end
 
+    sig do
+      params(
+        record: T.any(Inspection, Unit),
+        pdf_data: String
+      ).void
+    end
     def store_cached_pdf(record, pdf_data)
       # Purge old cached PDF if exists
       record.cached_pdf.purge if record.cached_pdf.attached?
@@ -149,6 +211,7 @@ class PdfCacheService
       )
     end
 
+    sig { returns(T::Boolean) }
     def redirect_to_s3?
       ActiveModel::Type::Boolean.new.cast(ENV["REDIRECT_TO_S3_PDFS"])
     end
