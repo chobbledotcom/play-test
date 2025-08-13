@@ -34,5 +34,9 @@ jobs:
           bundle exec tapioca dsl
       
       - name: Run Sorbet type check
-        run: bundle exec srb typecheck --ignore=db/schema.rb --ignore=config/routes.rb
-        continue-on-error: true  # Don't fail the build initially while you fix type errors
+        run: |
+          bundle exec srb typecheck \
+            --ignore=db/schema.rb \
+            --ignore=db/migrate/* \
+            --ignore=config/routes.rb
+        continue-on-error: false
