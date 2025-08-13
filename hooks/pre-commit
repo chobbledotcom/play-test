@@ -28,6 +28,11 @@ JS_FILES=""
 
 while IFS= read -r file; do
   if [[ -f "$file" ]]; then
+    # Skip vendor and sorbet/rbi files
+    if [[ "$file" == vendor/* ]] || [[ "$file" == sorbet/rbi/* ]]; then
+      continue
+    fi
+    
     case "$file" in
       *.rb)
         RUBY_FILES="$RUBY_FILES $file"
