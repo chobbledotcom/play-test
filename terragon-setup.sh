@@ -17,6 +17,10 @@ sudo apt-get install -y ruby-full ruby-bundler build-essential cmake pkg-config 
 echo "Installing bundler gem..."
 sudo gem install bundler
 
+# Configure bundler to exclude development, production, and CI-only gem groups
+echo "Configuring bundler to skip development, production, and CI-only gems..."
+bundle config set --local without 'development production ci_annotations ci_coverage'
+
 # Install Rails dependencies with bundler
 echo "Installing gems..."
 bundle install --jobs 4

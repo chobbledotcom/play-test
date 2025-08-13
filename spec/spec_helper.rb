@@ -1,33 +1,39 @@
 # typed: false
 # frozen_string_literal: true
 
+# Only load SimpleCov if it's available (not excluded via bundle config)
 unless ENV["DISABLE_SIMPLECOV"] == "true"
-  require "simplecov"
+  begin
+    require "simplecov"
 
-  # Configure formatters based on environment variable
-  if ENV["SIMPLECOV_COBERTURA"] == "true"
-    require "simplecov-cobertura"
-    SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
-  end
-
-  SimpleCov.start "rails" do
-    add_filter "/spec/"
-    add_filter "/config/"
-    add_filter "/vendor/"
-    add_filter "/db/seeds/"
-    add_filter "db/seeds.rb"
-
-    # Enable branch coverage for better insights
-    enable_coverage :branch
-
-    # Set minimum coverage percentage (lowered for development)
-    minimum_coverage 25
-
-    # Configure for parallel tests - SimpleCov handles this automatically
-    if ENV["TEST_ENV_NUMBER"]
-      command_name "RSpec-#{ENV["TEST_ENV_NUMBER"]}"
-      merge_timeout 3600
+    # Configure formatters based on environment variable
+    if ENV["SIMPLECOV_COBERTURA"] == "true"
+      require "simplecov-cobertura"
+      SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
     end
+
+    SimpleCov.start "rails" do
+      add_filter "/spec/"
+      add_filter "/config/"
+      add_filter "/vendor/"
+      add_filter "/db/seeds/"
+      add_filter "db/seeds.rb"
+
+      # Enable branch coverage for better insights
+      enable_coverage :branch
+
+      # Set minimum coverage percentage (lowered for development)
+      minimum_coverage 25
+
+      # Configure for parallel tests - SimpleCov handles this automatically
+      if ENV["TEST_ENV_NUMBER"]
+        command_name "RSpec-#{ENV["TEST_ENV_NUMBER"]}"
+        merge_timeout 3600
+      end
+    end
+  rescue LoadError
+    # SimpleCov not available (excluded in development setup)
+    # Tests will run without coverage reporting
   end
 end
 
@@ -52,7 +58,7 @@ end
 require "rspec/sorbet"
 
 RSpec.configure do |config|
-  # Configure JUnit formatter when RSPEC_JUNIT_FORMATTER environment variable is set
+  # Configure JUnit formatter when RSPEC_JUNIT_FORMATTER env var is set
   if ENV["RSPEC_JUNIT_FORMATTER"] == "true"
     require "rspec_junit_formatter"
     config.add_formatter RspecJunitFormatter

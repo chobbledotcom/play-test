@@ -23,6 +23,12 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup-environment
       
+      - name: Install CI annotation gems
+        run: |
+          bundle config unset --local without
+          bundle config set --local with 'ci_annotations'
+          bundle install
+      
       - name: Git setup
         uses: ./.github/actions/git-setup
       

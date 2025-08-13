@@ -37,9 +37,6 @@ group :development, :test do
   # N+1 query detection
   gem "prosopite"
   gem "pg_query"
-
-  # Pinned for nixpkgs
-  gem "rugged", "= 1.9.0"
 end
 
 group :development do
@@ -63,12 +60,6 @@ group :development do
 
   # Rubocop extension for Sorbet
   gem "rubocop-sorbet", require: false
-
-  # Annotate models with schema info
-  gem "annotaterb", require: false
-
-  # License compliance
-  gem "licensed", "~> 5.0"
 end
 
 group :test do
@@ -78,10 +69,6 @@ group :test do
   gem "capybara"
   gem "cuprite"
 
-  # Code coverage
-  gem "simplecov", require: false
-  gem "simplecov-cobertura", require: false
-
   # Test utilities
   gem "pdf-inspector", require: false
   gem "parallel_tests"
@@ -89,9 +76,6 @@ group :test do
 
   # RSpec matchers for Sorbet
   gem "rspec-sorbet"
-
-  # JUnit formatter for RSpec (for CI integration)
-  gem "rspec_junit_formatter"
 end
 
 # PDF generation
@@ -136,9 +120,30 @@ gem "sentry-rails"
 # S3-compatible storage
 gem "aws-sdk-s3", require: false
 
-# Cron job management
-gem "whenever", require: false
+# Production-only gems
+group :production do
+  # Cron job management
+  gem "whenever", require: false
+end
 
 # Pinned for nixpkgs
 gem "psych", "= 5.2.3"
 gem "openssl", "= 3.3.0"
+
+# CI-only groups - excluded in development setup
+group :ci_annotations do
+  # Annotate models with schema info
+  gem "annotaterb", require: false
+
+  # License compliance
+  gem "licensed", "~> 5.0"
+end
+
+group :ci_coverage, :test do
+  # Code coverage
+  gem "simplecov", require: false
+  gem "simplecov-cobertura", require: false
+  
+  # JUnit formatter for RSpec (for CI integration)
+  gem "rspec_junit_formatter"
+end
