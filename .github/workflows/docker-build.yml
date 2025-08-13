@@ -91,5 +91,5 @@ jobs:
       - name: Test Docker image
         if: '!inputs.push'
         run: |
-          docker run --rm play-test:${{ inputs.version }} rails --version
+          docker run --rm play-test:${{ inputs.version }} bundle exec rails --version
           docker run --rm play-test:${{ inputs.version }} ruby --version
