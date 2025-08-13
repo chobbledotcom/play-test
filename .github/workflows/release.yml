@@ -21,7 +21,7 @@ jobs:
   version:
     name: Calculate Version
     runs-on: ubuntu-latest
-    needs: [test, typecheck]
+    needs: [test]
     outputs:
       current: ${{ steps.current.outputs.version }}
       new: ${{ steps.new.outputs.version }}
