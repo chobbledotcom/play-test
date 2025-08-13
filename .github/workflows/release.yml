@@ -1,4 +1,4 @@
-name: Release
+iame: Release
 
 on:
   workflow_dispatch:
@@ -14,12 +14,7 @@ on:
 
 jobs:
   test:
-    uses: ./.github/workflows/ci.yml
-    permissions:
-      contents: read
-  
-  typecheck:
-    uses: ./.github/workflows/sorbet.yml
+    uses: ./.github/workflows/test.yml
     permissions:
       contents: read
   
