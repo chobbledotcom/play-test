@@ -1,6 +1,7 @@
-# typed: false
+# typed: strict
 
 class SeedDataService
+  extend T::Sig
   CASTLE_IMAGE_COUNT = 5
   UNIT_COUNT = 20
   INSPECTION_COUNT = 5
@@ -24,6 +25,9 @@ class SeedDataService
   ].freeze
 
   class << self
+    extend T::Sig
+
+    sig { params(user: User, unit_count: Integer, inspection_count: Integer).returns(T::Boolean) }
     def add_seeds_for_user(user, unit_count: UNIT_COUNT, inspection_count: INSPECTION_COUNT)
       raise "User already has seed data" if user.has_seed_data?
 
@@ -37,6 +41,7 @@ class SeedDataService
       true
     end
 
+    sig { params(user: User).returns(T::Boolean) }
     def delete_seeds_for_user(user)
       ActiveRecord::Base.transaction do
         # Delete inspections first (due to foreign key constraints)
@@ -49,8 +54,9 @@ class SeedDataService
 
     private
 
+    sig { void }
     def ensure_castle_blobs_exist
-      @castle_images = []
+      @castle_images = T.let([], T::Array[T::Hash[Symbol, T.untyped]])
 
       (1..CASTLE_IMAGE_COUNT).each do |i|
         filename = "castle-#{i}.jpg"
@@ -69,6 +75,7 @@ class SeedDataService
       Rails.logger.warn I18n.t("seed_data.logging.no_castle_images") if @castle_images.empty?
     end
 
+    sig { params(user: User, unit_count: Integer, inspection_count: Integer).void }
     def create_seed_units_for_user(user, unit_count, inspection_count)
       # Mix of unit types similar to existing seeds
       unit_configs = [
@@ -97,6 +104,7 @@ class SeedDataService
       end
     end
 
+    sig { params(user: User, count: Integer).returns(T::Array[String]) }
     def generate_unit_ids_batch(user, count)
       ids = []
       existing_ids = user.units.pluck(:id).to_set
@@ -115,6 +123,7 @@ class SeedDataService
       ids
     end
 
+    sig { params(user: User, config: T::Hash[Symbol, T.untyped], index: Integer, unit_id: String, existing_ids: T::Set[String]).returns(Unit) }
     def create_unit_from_config(user, config, index, unit_id, existing_ids)
       unit = user.units.build(
         id: unit_id,
@@ -142,6 +151,7 @@ class SeedDataService
       unit
     end
 
+    sig { params(name: String).returns(String) }
     def generate_description(name)
       case name
       when /Castle/
@@ -161,6 +171,7 @@ class SeedDataService
       end
     end
 
+    sig { params(unit: Unit, user: User, config: T::Hash[Symbol, T.untyped], inspection_count: Integer, has_incomplete_recent: T::Boolean).void }
     def create_inspections_for_unit(unit, user, config, inspection_count, has_incomplete_recent: false)
       offset_days = rand(INSPECTION_OFFSET_RANGE)
 
@@ -169,6 +180,7 @@ class SeedDataService
       end
     end
 
+    sig { params(unit: Unit, user: User, config: T::Hash[Symbol, T.untyped], offset_days: Integer, index: Integer, has_incomplete_recent: T::Boolean).void }
     def create_single_inspection(unit, user, config, offset_days, index, has_incomplete_recent)
       inspection_date = calculate_inspection_date(offset_days, index)
       passed = determine_pass_status(index)
@@ -181,15 +193,18 @@ class SeedDataService
       create_assessments_for_inspection(inspection, unit, config, passed: passed)
     end
 
+    sig { params(offset_days: Integer, index: Integer).returns(Date) }
     def calculate_inspection_date(offset_days, index)
       days_ago = offset_days + (index * INSPECTION_INTERVAL_DAYS)
       Date.current - days_ago.days
     end
 
+    sig { params(index: Integer).returns(T::Boolean) }
     def determine_pass_status(index)
       (index == 0) ? (rand < HIGH_PASS_RATE) : (rand < NORMAL_PASS_RATE)
     end
 
+    sig { params(unit: Unit, user: User, config: T::Hash[Symbol, T.untyped], inspection_date: Date, passed: T::Boolean, is_complete: T::Boolean).returns(T::Hash[Symbol, T.untyped]) }
     def build_inspection_attributes(unit, user, config, inspection_date, passed, is_complete)
       {
         unit: unit,
@@ -211,6 +226,7 @@ class SeedDataService
       }
     end
 
+    sig { params(passed: T::Boolean).returns(String) }
     def generate_risk_assessment(passed)
       if passed
         [
@@ -236,6 +252,7 @@ class SeedDataService
       end
     end
 
+    sig { params(inspection: Inspection, unit: Unit, config: T::Hash[Symbol, T.untyped], passed: T::Boolean).void }
     def create_assessments_for_inspection(inspection, unit, config, passed: true)
       is_incomplete = inspection.complete_date.nil?
 
@@ -252,6 +269,7 @@ class SeedDataService
       end
     end
 
+    sig { params(inspection: Inspection, assessment_key: Symbol, assessment_type: String, passed: T::Boolean, is_incomplete: T::Boolean).void }
     def create_assessment(
       inspection,
       assessment_key,
@@ -270,6 +288,7 @@ class SeedDataService
       inspection.send(assessment_key).update!(fields)
     end
 
+    sig { params(fields: T::Hash[Symbol, T.untyped], is_incomplete: T::Boolean).returns(T::Hash[Symbol, T.untyped]) }
     def randomly_remove_fields(fields, is_incomplete)
       return fields unless is_incomplete
       return fields unless rand(0..1) == 0 # empty 50% of assessments
