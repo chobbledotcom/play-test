@@ -58,12 +58,19 @@ class SorbetChangeChecker
   private
 
   def get_changed_files
-    if @staged_only
+    files = if @staged_only
       # Get staged files
-      `git diff --cached --name-only --diff-filter=ACM`.split("\n").select { |f| f.end_with?('.rb') }
+      `git diff --cached --name-only --diff-filter=ACM`.split("\n")
     else
       # Get all changed files compared to main branch
-      `git diff main --name-only --diff-filter=ACM`.split("\n").select { |f| f.end_with?('.rb') }
+      `git diff main --name-only --diff-filter=ACM`.split("\n")
+    end
+    
+    # Filter for Ruby files and exclude RBI files
+    files.select do |f| 
+      f.end_with?('.rb') && 
+      !f.start_with?('sorbet/rbi/') &&
+      !f.end_with?('.rbi')
     end
   end
 
