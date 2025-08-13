@@ -20,11 +20,23 @@ skopeo copy docker://git.chobble.com/chobble/play-test:latest dir:/tmp/play-test
 echo "Extracting Ruby and gems from image layers..."
 cd /tmp/play-test-image
 
-# Extract all layer tars that contain Ruby/bundle files
-for layer in *.tar; do
-    if tar -tf "$layer" | grep -q "usr/local/bundle\|usr/local/lib/ruby\|usr/local/bin/ruby"; then
-        echo "Extracting from layer: $layer"
-        sudo tar -xf "$layer" -C / 2>/dev/null || true
+# Skopeo stores layers as individual files, not tars
+# Extract all layers (they're already uncompressed)
+for layer in *; do
+    if [ -f "$layer" ]; then
+        echo "Checking layer: $layer"
+        # Try to extract as tar, handling both compressed and uncompressed
+        if file "$layer" | grep -q "gzip"; then
+            if zcat "$layer" | tar -t 2>/dev/null | grep -q "usr/local/bundle\|usr/local/lib/ruby\|usr/local/bin/ruby"; then
+                echo "Extracting from compressed layer: $layer"
+                sudo zcat "$layer" | tar -x -C / 2>/dev/null || true
+            fi
+        else
+            if tar -tf "$layer" 2>/dev/null | grep -q "usr/local/bundle\|usr/local/lib/ruby\|usr/local/bin/ruby"; then
+                echo "Extracting from layer: $layer"
+                sudo tar -xf "$layer" -C / 2>/dev/null || true
+            fi
+        fi
     fi
 done
 
