@@ -38,11 +38,17 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
+      - name: Run all tests with coverage (normal format)
+        env:
+          RAILS_ENV: test
+        run: |
+          bundle exec rake coverage:parallel
+  
       - name: Deploy to neocities
         uses: bcomnes/deploy-to-neocities@v3
         with:
           api_key: ${{ secrets.COVERAGE_NEOCITIES_API_KEY }}
-          cleanup: false
+          cleanup: true
           neocities_supporter: true
           preview_before_deploy: false
           dist_dir: coverage
