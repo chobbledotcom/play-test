@@ -1,5 +1,6 @@
+# typed: false
+
 require "rails_helper"
-require Rails.root.join("db/seeds/seed_data")
 
 RSpec.describe "users/new.html.erb", type: :view do
   before do

@@ -23,10 +23,6 @@ class SeedDataService
     "Steff's Soft Play"
   ].freeze
 
-  # Load seed helpers
-  require Rails.root.join("lib/test_data_helpers")
-  require Rails.root.join("db/seeds/seed_data")
-
   class << self
     def add_seeds_for_user(user, unit_count: UNIT_COUNT, inspection_count: INSPECTION_COUNT)
       raise "User already has seed data" if user.has_seed_data?

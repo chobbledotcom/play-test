@@ -2,18 +2,6 @@
 # frozen_string_literal: true
 
 class PdfGeneratorService
-  require_relative "pdf_generator_service/configuration"
-  require_relative "pdf_generator_service/utilities"
-  require_relative "pdf_generator_service/header_generator"
-  require_relative "pdf_generator_service/table_builder"
-  require_relative "pdf_generator_service/assessment_columns"
-  require_relative "pdf_generator_service/position_calculator"
-  require_relative "pdf_generator_service/image_orientation_processor"
-  require_relative "pdf_generator_service/image_processor"
-  require_relative "pdf_generator_service/debug_info_renderer"
-  require_relative "pdf_generator_service/photos_renderer"
-  require_relative "pdf_generator_service/disclaimer_footer_renderer"
-
   include Configuration
 
   def self.generate_inspection_report(inspection, debug_enabled: false, debug_queries: [])

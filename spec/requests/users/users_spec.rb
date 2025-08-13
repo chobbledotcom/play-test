@@ -1,7 +1,6 @@
 # typed: false
 
 require "rails_helper"
-require Rails.root.join("db/seeds/seed_data")
 
 RSpec.describe "Users", type: :request do
   # Helper to fill in multiple form fields at once

@@ -1,5 +1,3 @@
-require_relative "seed_data"
-
 Rails.logger.debug "Creating inspections and assessments..."
 
 def create_assessments_for_inspection(inspection, unit, passed: true)

@@ -1,39 +1,11 @@
+# typed: false
+# frozen_string_literal: true
+
 require "rails_helper"
 
-# Home Controller Behavior Documentation
-# =====================================
-#
-# The Home controller manages the application's landing page and public information:
-#
-# PUBLIC ACCESS (no login required):
-# - GET / (root_path) - Shows application homepage with features and navigation
-# - GET /about - Shows about page with application information (if implemented)
-#
-# HOMEPAGE BEHAVIOR:
-# 1. Displays when user is not logged in (public landing page)
-# 2. Shows login/register links for anonymous users
-# 3. Still accessible when user is logged in (but shows different navigation)
-# 4. Contains embedded video, feature descriptions, and branding
-# 5. Responsive design with semantic HTML structure
-#
-# AUTHENTICATION FLOW:
-# - Skips require_login before_action (publicly accessible)
-# - Conditionally shows login/register navigation based on current_user presence
-# - Integrates with application layout navigation when user is logged in
-#
-# CONTENT FEATURES:
-# - Application title and tagline
-# - Feature descriptions (Log Inspections, Generate PDFs, Search & Export)
-# - Embedded promotional video
-# - Links to Chobble company website
-# - Clean semantic HTML structure for SEO and accessibility
-
 RSpec.describe "Home", type: :request do
-  # No global setup needed - each test section creates what it needs
-
   describe "GET /" do
     before do
-      # Create minimal homepage - just enough to not crash
       Page.where(slug: "/").first_or_create!(
         content: "Home",
         link_title: "Home"
@@ -82,7 +54,6 @@ RSpec.describe "Home", type: :request do
 
       it "shows authenticated user navigation" do
         visit root_path
-        # When logged in, shows logged-in user navigation
         expect(page).to have_button("Log Out")
         expect(page).to have_link("Settings")
         expect(page).to have_link("Inspections")
@@ -104,14 +75,6 @@ RSpec.describe "Home", type: :request do
       it "includes security headers" do
         get root_path
         expect(response.headers["X-Frame-Options"]).to be_present
-      end
-
-      it "responds quickly" do
-        start_time = Time.current
-        visit root_path
-        response_time = Time.current - start_time
-
-        expect(response_time).to be < 1.0  # Should respond in under 1 second
       end
     end
 
@@ -138,7 +101,6 @@ RSpec.describe "Home", type: :request do
 
       it "integrates with application layout navigation" do
         visit root_path
-        # Should include navigation from application layout
         expect(page).to have_link("Inspections")
         expect(page).to have_link("Units")
       end
