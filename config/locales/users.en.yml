@@ -1,6 +1,8 @@
 en:
   # User Management
   users:
+    title: "Users"
+    
     titles:
       register: "Register"
       edit: "Edit User"
@@ -21,6 +23,11 @@ en:
     fields:
       email: "Email"
       password: "Password"
+      admin: "Admin"
+      registered: "Registered"
+      last_active: "Last Active"
+      inspections: "Inspections"
+      sort: "Sort by"
 
     forms:
       email: "Email"
@@ -61,6 +68,15 @@ en:
     labels:
       activated_at: "Activated At"
       deactivated_at: "Deactivated At"
+      yes: "Yes"
+      no: "No"
+      never: "Never"
+    
+    sort:
+      newest: "Newest First"
+      oldest: "Oldest First"
+      most_active: "Most Recently Active"
+      most_inspections: "Most Inspections"
 
     buttons:
       register: "Register"

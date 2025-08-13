@@ -1,33 +1,47 @@
-<article class="users">
-  <header><h1>Users</h1></header>
-  <%= scrollable_table do %>
-    <thead>
-      <tr>
-        <th>Email</th>
-        <th>Admin</th>
-        <th>Registered</th>
-        <th>Last Active</th>
-        <th>Inspections</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @users.each do |user| %>
-        <tr>
-          <td><%= link_to user.email, edit_user_path(user) %></td>
-          <td><%= user.admin? ? "Yes" : "No" %></td>
-          <td title="<%= user.created_at.strftime('%d/%m/%Y') %>">
-            <%= time_ago_in_words(user.created_at) %>
-          </td>
-          <% if user.last_active_at %>
-            <td title="<%= user.last_active_at.strftime('%d/%m/%Y') %>">
-              <%= time_ago_in_words(user.last_active_at) %>
-            </td>
-          <% else %>
-            <td>Never</td>
+<%= render 'shared/page_header', title: t('users.title') %>
+
+<%= render 'sort_form' %>
+
+<div class="table-list users-list">
+  <!-- Header row -->
+  <div class="table-list-header">
+    <%= render 'shared/table_column', field: 'email', model: 'users', header: true %>
+    <%= render 'shared/table_column', field: 'admin', i18n_key: 'users.fields.admin', header: true %>
+    <%= render 'shared/table_column', field: 'registered', i18n_key: 'users.fields.registered', header: true %>
+    <%= render 'shared/table_column', field: 'last_active', i18n_key: 'users.fields.last_active', header: true %>
+    <%= render 'shared/table_column', field: 'inspections', i18n_key: 'users.fields.inspections', header: true %>
+  </div>
+
+  <!-- Data rows -->
+  <ul class="table-list-items">
+    <% @users.each do |user| %>
+      <li>
+        <%= link_to edit_user_path(user), class: "table-list-link" do %>
+          <%= render 'shared/table_column', field: 'email', model: 'users' do %>
+            <%= user.email %>
           <% end %>
-          <td><%= @inspection_counts[user.id] || 0 %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  <% end %>
-</article>
+          <%= render 'shared/table_column', field: 'admin', i18n_key: 'users.fields.admin' do %>
+            <%= user.admin? ? t('users.labels.yes') : t('users.labels.no') %>
+          <% end %>
+          <%= render 'shared/table_column', field: 'registered', i18n_key: 'users.fields.registered' do %>
+            <span title="<%= user.created_at.strftime('%d/%m/%Y') %>">
+              <%= time_ago_in_words(user.created_at) %>
+            </span>
+          <% end %>
+          <%= render 'shared/table_column', field: 'last_active', i18n_key: 'users.fields.last_active' do %>
+            <% if user.last_active_at %>
+              <span title="<%= user.last_active_at.strftime('%d/%m/%Y') %>">
+                <%= time_ago_in_words(user.last_active_at) %>
+              </span>
+            <% else %>
+              <%= t('users.labels.never') %>
+            <% end %>
+          <% end %>
+          <%= render 'shared/table_column', field: 'inspections', i18n_key: 'users.fields.inspections' do %>
+            <%= @inspection_counts[user.id] || 0 %>
+          <% end %>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>

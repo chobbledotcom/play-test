@@ -1,0 +1,14 @@
+<div class="filter-bar">
+  <%= form_with url: users_path, method: :get, local: true do |form| %>
+    <%= form.label :sort, t('users.fields.sort'), for: "sort_field" %>
+    <%= form.select :sort,
+      options_for_select([
+        [t('users.sort.newest'), ''],
+        [t('users.sort.oldest'), 'oldest'],
+        [t('users.sort.most_active'), 'most_active'],
+        [t('users.sort.most_inspections'), 'most_inspections']
+      ], params[:sort]),
+      {},
+      { id: "sort_field", onchange: "this.form.submit();" } %>
+  <% end %>
+</div>
