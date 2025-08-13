@@ -15,7 +15,7 @@ on:
 jobs:
   test:
     name: Run Tests
-    uses: ./.github/workflows/ci.yml
+    uses: ./.github/workflows/test-ruby.yml
     permissions:
       contents: read
   
