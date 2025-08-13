@@ -45,11 +45,18 @@ if [ -d "/tmp/docker-extract/usr/local/lib/ruby" ]; then
     sudo cp -ar /tmp/docker-extract/usr/local/lib/ruby /usr/local/lib/ 2>/dev/null || true
 fi
 
-# Also copy Ruby shared libraries
-if [ -f "/tmp/docker-extract/usr/local/lib/libruby.so.3.4" ]; then
-    sudo cp -a /tmp/docker-extract/usr/local/lib/libruby* /usr/local/lib/ 2>/dev/null || true
-    sudo ldconfig  # Update shared library cache
+# Copy all libraries but don't overwrite existing ones
+echo "Copying libraries (without overwriting)..."
+if [ -d "/tmp/docker-extract/usr/local/lib" ]; then
+    sudo cp -rn /tmp/docker-extract/usr/local/lib/* /usr/local/lib/ 2>/dev/null || true
 fi
+
+if [ -d "/tmp/docker-extract/usr/lib/x86_64-linux-gnu" ]; then
+    sudo cp -rn /tmp/docker-extract/usr/lib/x86_64-linux-gnu/* /usr/lib/x86_64-linux-gnu/ 2>/dev/null || true
+fi
+
+# Update shared library cache
+sudo ldconfig
 
 if [ -d "/tmp/docker-extract/usr/local/include/ruby-3.4.0" ]; then
     sudo cp -ar /tmp/docker-extract/usr/local/include/ruby-3.4.0 /usr/local/include/ 2>/dev/null || true
@@ -99,9 +106,16 @@ echo "Configuring bundler..."
 echo "Installing production gems..."
 /usr/local/bin/bundle install --jobs 4
 
+# Generate a secret key for production
+echo "Generating secret key..."
+SECRET_KEY_BASE=$(/usr/local/bin/bundle exec rails secret)
+
 # Database setup in production mode (since we don't have dev/test gems)
 echo "Setting up databases..."
-RAILS_ENV=production /usr/local/bin/bundle exec rails db:create db:migrate db:seed
+RAILS_ENV=production SECRET_KEY_BASE=$SECRET_KEY_BASE /usr/local/bin/bundle exec rails db:create db:migrate db:seed
+
+# Save the secret key for future use
+echo "export SECRET_KEY_BASE=$SECRET_KEY_BASE" >> ~/.bashrc
 
 # Mark setup as complete
 touch .terragon-setup-complete
