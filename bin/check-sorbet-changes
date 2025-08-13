@@ -76,7 +76,7 @@ class SorbetChangeChecker
   end
 
   def check_file(file)
-    content = File.read(file)
+    content = File.read(file, encoding: 'UTF-8')
     lines = content.lines
     
     # Check if file has typed signature
