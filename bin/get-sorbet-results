@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+# Fetch the latest Sorbet run results from GitHub Actions and save to sorbet-results.txt
+
+set -euo pipefail
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}Fetching latest Sorbet results from GitHub Actions...${NC}"
+
+# Get the latest workflow run that includes Sorbet checks
+WORKFLOW_NAME="Sorbet Type Check"
+
+# Get the latest run ID for the workflow
+echo -e "${BLUE}Finding latest workflow run...${NC}"
+RUN_ID=$(gh run list --workflow="$WORKFLOW_NAME" --limit 1 --json databaseId --jq '.[0].databaseId')
+
+if [ -z "$RUN_ID" ]; then
+  echo -e "${RED}No workflow runs found for workflow: $WORKFLOW_NAME${NC}"
+  exit 1
+fi
+
+echo -e "${BLUE}Found run ID: $RUN_ID${NC}"
+
+# Get the job that runs Sorbet (adjust job name as needed)
+echo -e "${BLUE}Fetching job details...${NC}"
+JOB_ID=$(gh run view "$RUN_ID" --json jobs --jq '.jobs[] | select(.name | contains("sorbet") or contains("Sorbet") or contains("type") or contains("Type")) | .databaseId' | head -1)
+
+if [ -z "$JOB_ID" ]; then
+  # If no Sorbet-specific job, try to get any job and look for Sorbet output
+  echo -e "${YELLOW}No Sorbet-specific job found, checking all jobs...${NC}"
+  JOB_ID=$(gh run view "$RUN_ID" --json jobs --jq '.jobs[0].databaseId')
+fi
+
+if [ -z "$JOB_ID" ]; then
+  echo -e "${RED}No jobs found for run $RUN_ID${NC}"
+  exit 1
+fi
+
+echo -e "${BLUE}Fetching logs for job $JOB_ID...${NC}"
+
+# Download the logs and extract Sorbet output
+gh run view "$RUN_ID" --log > temp_logs.txt
+
+# Look for Sorbet output in the logs
+echo -e "${BLUE}Extracting Sorbet results...${NC}"
+
+# Extract only the Sorbet error lines and summary
+# Look for lines with .rb: pattern (Sorbet errors) or Errors: summary
+grep -E "(\.rb:[0-9]+:|Errors: [0-9]+|No errors! Great job)" temp_logs.txt | \
+  sed 's/^[^	]*	//' | \
+  sed 's/^Run Sorbet type check[[:space:]]*//' | \
+  sed -E 's/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+Z[[:space:]]*//' > sorbet-results.txt
+
+# Clean up temp file
+rm -f temp_logs.txt
+
+# Check if we got any results
+if [ -s sorbet-results.txt ]; then
+  echo -e "${GREEN}✓ Sorbet results saved to sorbet-results.txt${NC}"
+  
+  # Show summary
+  if grep -q "Errors: 0" sorbet-results.txt; then
+    echo -e "${GREEN}✓ No Sorbet errors found in the latest run${NC}"
+  elif grep -q "Errors:" sorbet-results.txt; then
+    ERRORS=$(grep -oE "Errors: [0-9]+" sorbet-results.txt | tail -1)
+    echo -e "${YELLOW}⚠ $ERRORS found in the latest run${NC}"
+  fi
+  
+  # Show file size
+  SIZE=$(wc -l < sorbet-results.txt)
+  echo -e "${BLUE}Saved $SIZE lines of output${NC}"
+else
+  echo -e "${RED}No Sorbet output found in the workflow logs${NC}"
+  echo -e "${YELLOW}This might mean:${NC}"
+  echo "  - Sorbet is not configured in the GitHub Actions workflow"
+  echo "  - The workflow name '$WORKFLOW_NAME' is incorrect"
+  echo "  - Sorbet output is in a different format"
+  
+  # Save raw logs for debugging
+  gh run view "$RUN_ID" --log > sorbet-results.txt
+  echo -e "${BLUE}Raw logs saved to sorbet-results.txt for debugging${NC}"
+fi

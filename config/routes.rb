@@ -1,3 +1,6 @@
+# typed: strict
+# frozen_string_literal: true
+
 # == Route Map
 #
 #                            Prefix Verb   URI Pattern                                                                                       Controller#Action
@@ -139,8 +142,6 @@
 #                        jobs GET    /:status/jobs(.:format)                                        mission_control/jobs/jobs#index
 #                        root GET    /                                                              mission_control/jobs/queues#index
 
-# typed: false
-
 Rails.application.routes.draw do
   # Mount Mission Control Jobs (authentication handled by initializer)
   mount MissionControl::Jobs::Engine => "/mission_control"
@@ -163,7 +164,7 @@ Rails.application.routes.draw do
   post "passkey_callback", to: "sessions#passkey_callback"
 
   # Credentials (passkeys)
-  resources :credentials, only: [:create, :destroy] do
+  resources :credentials, only: %i[create destroy] do
     post :callback, on: :collection
   end
 
@@ -239,7 +240,7 @@ Rails.application.routes.draw do
   get "pages/:slug",
     to: "pages#show",
     as: :page_by_slug,
-    constraints: {slug: /[^\/]+/}
+    constraints: {slug: %r{[^/]+}}
 
   # Handle error pages when exceptions_app is configured
   match "/404", to: "errors#not_found", via: :all
