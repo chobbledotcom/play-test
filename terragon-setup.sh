@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-# Terragon Labs Rails Setup Script - Extract from Docker Version
-# Extracts Ruby/gems from Docker image without running containers
+# Terragon Labs Rails Setup Script - Skopeo Version
+# Uses skopeo to download Docker image without Docker daemon
 
 # Skip if already set up (optimization for repeated runs)
 if [ -f ".terragon-setup-complete" ] && [ -z "${FORCE_SETUP:-}" ]; then
@@ -10,30 +10,26 @@ if [ -f ".terragon-setup-complete" ] && [ -z "${FORCE_SETUP:-}" ]; then
     exit 0
 fi
 
-echo "Pulling production Docker image..."
-docker pull git.chobble.com/chobble/play-test:latest
+echo "Installing skopeo..."
+sudo apt-get update
+sudo apt install -y skopeo
 
-echo "Extracting Ruby and gems from Docker image..."
-# Create a temporary container (not running)
-container_id=$(docker create git.chobble.com/chobble/play-test:latest)
+echo "Downloading Docker image with skopeo..."
+skopeo copy docker://git.chobble.com/chobble/play-test:latest dir:/tmp/play-test-image
 
-# Extract the bundle directory and Ruby installation
-echo "Copying bundle and Ruby files..."
-docker cp $container_id:/usr/local/bundle /tmp/bundle.tar
-sudo tar -xf /tmp/bundle.tar -C /usr/local/
-rm /tmp/bundle.tar
+echo "Extracting Ruby and gems from image layers..."
+cd /tmp/play-test-image
 
-# Extract Ruby if needed (the image uses ruby:3.4.3-slim as base)
-docker cp $container_id:/usr/local/lib/ruby /tmp/ruby.tar
-sudo tar -xf /tmp/ruby.tar -C /usr/local/lib/
-rm /tmp/ruby.tar
+# Extract all layer tars that contain Ruby/bundle files
+for layer in *.tar; do
+    if tar -tf "$layer" | grep -q "usr/local/bundle\|usr/local/lib/ruby\|usr/local/bin/ruby"; then
+        echo "Extracting from layer: $layer"
+        sudo tar -xf "$layer" -C / 2>/dev/null || true
+    fi
+done
 
-docker cp $container_id:/usr/local/bin/ruby /tmp/ruby-bin.tar
-sudo tar -xf /tmp/ruby-bin.tar -C /usr/local/bin/
-rm /tmp/ruby-bin.tar
-
-# Clean up container
-docker rm $container_id
+cd -
+rm -rf /tmp/play-test-image
 
 # Set up environment
 export GEM_HOME=/usr/local/bundle
