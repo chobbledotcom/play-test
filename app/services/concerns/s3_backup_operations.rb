@@ -1,17 +1,25 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 module S3BackupOperations
   extend ActiveSupport::Concern
+  extend T::Sig
+  extend T::Helpers
+
+  requires_ancestor { Kernel }
 
   private
 
+  sig { returns(String) }
   def backup_dir = "db_backups"
 
+  sig { returns(Integer) }
   def backup_retention_days = 60
 
+  sig { returns(Pathname) }
   def temp_dir = Rails.root.join("tmp/backups")
 
+  sig { returns(T.any(String, Pathname)) }
   def database_path
     db_config = Rails.configuration.database_configuration[Rails.env]
 
@@ -24,6 +32,7 @@ module S3BackupOperations
     path.start_with?("/") ? path : Rails.root.join(path)
   end
 
+  sig { params(timestamp: String).returns(Pathname) }
   def create_tar_gz(timestamp)
     backup_filename = "database-#{timestamp}.sqlite3"
     compressed_filename = "database-#{timestamp}.tar.gz"
@@ -39,6 +48,7 @@ module S3BackupOperations
     dest_path
   end
 
+  sig { params(service: T.untyped).returns(Integer) }
   def cleanup_old_backups(service)
     bucket = service.send(:bucket)
     cutoff_date = Time.current - backup_retention_days.days
