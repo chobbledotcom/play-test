@@ -137,12 +137,13 @@ jobs:
           
           if [ -z "$PR_NUMBER" ]; then
             echo "Creating new PR..."
-            PR_NUMBER=$(gh pr create \
+            gh pr create \
               --title "Fix ERB Linting Issues" \
               --body "$PR_BODY" \
               --base main \
-              --head automated/erb-lint-fixes \
-              --json number --jq '.number')
+              --head automated/erb-lint-fixes
+            # Get the PR number we just created
+            PR_NUMBER=$(gh pr list --head automated/erb-lint-fixes --json number --jq '.[0].number')
             echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
           else
             echo "PR #$PR_NUMBER already exists, updating..."
