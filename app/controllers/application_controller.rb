@@ -1,7 +1,8 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  extend T::Sig
   include SessionsHelper
   include ImageProcessable
 
@@ -49,18 +50,22 @@ class ApplicationController < ActionController::Base
 
   private
 
+  sig { returns(T::Boolean) }
   def skip_authentication?
     false
   end
 
+  sig { params(table: Symbol, key: Symbol, args: T.untyped).returns(String) }
   def app_i18n(table, key, **args)
     I18n.t("application.#{table}.#{key}", **args)
   end
 
+  sig { params(form: Symbol, key: Symbol, args: T.untyped).returns(String) }
   def form_i18n(form, key, **args)
     I18n.t("forms.#{form}.#{key}", **args)
   end
 
+  sig { void }
   def require_login
     return if logged_in?
 
@@ -68,6 +73,7 @@ class ApplicationController < ActionController::Base
     redirect_to login_path
   end
 
+  sig { void }
   def require_logged_out
     return unless logged_in?
 
@@ -75,6 +81,7 @@ class ApplicationController < ActionController::Base
     redirect_to inspections_path
   end
 
+  sig { void }
   def update_last_active_at
     return unless current_user.is_a?(User)
 
@@ -86,6 +93,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  sig { void }
   def require_admin
     return if current_user&.admin?
 
@@ -93,19 +101,23 @@ class ApplicationController < ActionController::Base
     redirect_to root_path
   end
 
+  sig { returns(T::Boolean) }
   def admin_debug_enabled?
     Rails.env.development?
   end
 
+  sig { returns(T::Boolean) }
   def seed_data_action?
     seed_actions = %w[add_seeds delete_seeds]
     controller_name == "users" && seed_actions.include?(action_name)
   end
 
+  sig { returns(T::Boolean) }
   def impersonating?
     session[:original_admin_id].present?
   end
 
+  sig { void }
   def start_debug_timer
     @debug_start_time = Time.current
     @debug_sql_queries = []
@@ -130,16 +142,19 @@ class ApplicationController < ActionController::Base
     :debug_render_time,
     :debug_sql_queries
 
+  sig { returns(T.nilable(Float)) }
   def debug_render_time
     return unless @debug_start_time
 
     ((Time.current - @debug_start_time) * 1000).round(2)
   end
 
+  sig { returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def debug_sql_queries
     @debug_sql_queries || []
   end
 
+  sig { void }
   def n_plus_one_detection
     Prosopite.scan
     yield
@@ -147,6 +162,7 @@ class ApplicationController < ActionController::Base
     Prosopite.finish
   end
 
+  sig { returns(T::Boolean) }
   def processing_image_upload?
     case controller_name
     when "users"
@@ -159,6 +175,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  sig { void }
   def cleanup_debug_subscription
     return unless @debug_subscription
 
@@ -166,6 +183,7 @@ class ApplicationController < ActionController::Base
     @debug_subscription = nil
   end
 
+  sig { params(exception: StandardError).returns(T::Boolean) }
   def should_notify_error?(exception)
     if exception.is_a?(ActionController::InvalidAuthenticityToken)
       csrf_ignored_actions = [
@@ -184,6 +202,7 @@ class ApplicationController < ActionController::Base
     true
   end
 
+  sig { params(result: T.untyped, filename: String).void }
   def handle_pdf_response(result, filename)
     case result.type
     when :redirect
