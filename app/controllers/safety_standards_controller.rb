@@ -1,10 +1,14 @@
+# typed: strict
+
 class SafetyStandardsController < ApplicationController
+  extend T::Sig
+
   skip_before_action :require_login
   skip_before_action :verify_authenticity_token, only: [:index]
 
-  CALCULATION_TYPES = %w[anchors slide_runout wall_height user_capacity].freeze
+  CALCULATION_TYPES = T.let(%w[anchors slide_runout wall_height user_capacity].freeze, T::Array[String])
 
-  API_EXAMPLE_PARAMS = {
+  API_EXAMPLE_PARAMS = T.let({
     anchors: {
       type: "anchors",
       length: 5.0,
@@ -27,9 +31,9 @@ class SafetyStandardsController < ApplicationController
       negative_adjustment_area: 15.0,
       max_user_height: 1.5
     }
-  }.freeze
+  }.freeze, T::Hash[Symbol, T::Hash[Symbol, T.untyped]])
 
-  API_EXAMPLE_RESPONSES = {
+  API_EXAMPLE_RESPONSES = T.let({
     anchors: {
       passed: true,
       status: "Calculation completed successfully",
@@ -98,8 +102,9 @@ class SafetyStandardsController < ApplicationController
         ]
       }
     }
-  }.freeze
+  }.freeze, T::Hash[Symbol, T::Hash[Symbol, T.untyped]])
 
+  sig { void }
   def index
     @calculation_metadata = calculation_metadata
 
@@ -112,10 +117,12 @@ class SafetyStandardsController < ApplicationController
 
   private
 
+  sig { returns(T::Boolean) }
   def post_request_with_calculation?
     request.post? && params[:calculation].present?
   end
 
+  sig { void }
   def handle_calculation_post
     type = params[:calculation][:type]
     calculate_safety_standard if CALCULATION_TYPES.include?(type)
@@ -127,6 +134,7 @@ class SafetyStandardsController < ApplicationController
     end
   end
 
+  sig { void }
   def handle_calculation_get
     if params[:calculation].present?
       type = params[:calculation][:type]
@@ -138,17 +146,20 @@ class SafetyStandardsController < ApplicationController
     end
   end
 
+  sig { void }
   def redirect_with_calculation_params
     redirect_to safety_standards_path(
       calculation: params[:calculation].to_unsafe_h
     )
   end
 
+  sig { void }
   def calculate_safety_standard
     type = params[:calculation][:type]
     send("calculate_#{type}") if CALCULATION_TYPES.include?(type)
   end
 
+  sig { void }
   def calculate_anchors
     dimensions = extract_dimensions(:length, :width, :height)
 
@@ -159,6 +170,7 @@ class SafetyStandardsController < ApplicationController
     end
   end
 
+  sig { void }
   def calculate_slide_runout
     height = param_to_float(:platform_height)
     has_stop_wall = params[:calculation][:has_stop_wall] == "1"
@@ -170,6 +182,7 @@ class SafetyStandardsController < ApplicationController
     end
   end
 
+  sig { void }
   def calculate_wall_height
     platform_height = param_to_float(:platform_height)
     user_height = param_to_float(:user_height)
@@ -183,6 +196,7 @@ class SafetyStandardsController < ApplicationController
     end
   end
 
+  sig { void }
   def calculate_user_capacity
     length = param_to_float(:length)
     width = param_to_float(:width)
@@ -199,20 +213,24 @@ class SafetyStandardsController < ApplicationController
     end
   end
 
+  sig { params(keys: Symbol).returns(T::Hash[Symbol, Float]) }
   def extract_dimensions(*keys)
     keys.index_with { |key| param_to_float(key) }
   end
 
+  sig { params(key: Symbol).returns(Float) }
   def param_to_float(key)
     params[:calculation][key].to_f
   end
 
+  sig { params(type: Symbol, error_key: Symbol).void }
   def set_error(type, error_key)
     error_msg = t("safety_standards.errors.#{error_key}")
     instance_variable_set("@#{type}_error", error_msg)
     instance_variable_set("@#{type}_result", nil)
   end
 
+  sig { params(platform_height: Float, has_stop_wall: T::Boolean).returns(T.untyped) }
   def build_runout_result(platform_height, has_stop_wall)
     EN14960.calculate_slide_runout(
       platform_height,
@@ -220,12 +238,14 @@ class SafetyStandardsController < ApplicationController
     )
   end
 
+  sig { params(platform_height: Float, user_height: Float).returns(T.untyped) }
   def build_wall_height_result(platform_height, user_height)
     EN14960.calculate_wall_height(
       platform_height, user_height
     )
   end
 
+  sig { returns(T::Hash[Symbol, T.untyped]) }
   def build_json_response
     type = params[:calculation][:type]
     return invalid_type_response(type) unless CALCULATION_TYPES.include?(type)
@@ -233,6 +253,7 @@ class SafetyStandardsController < ApplicationController
     build_typed_json_response(type)
   end
 
+  sig { params(type: T.nilable(String)).returns(T::Hash[Symbol, T.untyped]) }
   def invalid_type_response(type)
     {
       passed: false,
@@ -242,6 +263,7 @@ class SafetyStandardsController < ApplicationController
     }
   end
 
+  sig { params(message: String).returns(T::Hash[Symbol, T.untyped]) }
   def error_response(message)
     {
       passed: false,
@@ -250,6 +272,7 @@ class SafetyStandardsController < ApplicationController
     }
   end
 
+  sig { params(type: String).returns(T::Hash[Symbol, T.untyped]) }
   def build_typed_json_response(type)
     calculate_safety_standard
 
@@ -262,6 +285,7 @@ class SafetyStandardsController < ApplicationController
     end
   end
 
+  sig { params(type: String).returns([T.nilable(T.untyped), T.nilable(String)]) }
   def get_calculation_results(type)
     result_var = "@#{type}_result"
     error_var = "@#{type}_error"
@@ -272,6 +296,7 @@ class SafetyStandardsController < ApplicationController
     [result, error]
   end
 
+  sig { params(type: String, result: T.untyped).returns(T::Hash[Symbol, T.untyped]) }
   def build_success_response(type, result)
     json_result = if type == "user_capacity"
       build_user_capacity_json(result)
@@ -292,6 +317,7 @@ class SafetyStandardsController < ApplicationController
     }
   end
 
+  sig { params(error: T.nilable(String)).returns(T::Hash[Symbol, T.untyped]) }
   def build_error_response(error)
     {
       passed: false,
@@ -300,6 +326,7 @@ class SafetyStandardsController < ApplicationController
     }
   end
 
+  sig { params(result: T.untyped).returns(T::Hash[Symbol, T.untyped]) }
   def build_user_capacity_json(result)
     return result unless result.is_a?(EN14960::CalculatorResponse)
 
@@ -321,6 +348,7 @@ class SafetyStandardsController < ApplicationController
     }
   end
 
+  sig { returns(T::Hash[Symbol, T::Hash[Symbol, T.untyped]]) }
   def calculation_metadata
     {
       anchors: anchor_metadata,
@@ -330,6 +358,7 @@ class SafetyStandardsController < ApplicationController
     }
   end
 
+  sig { returns(T::Hash[Symbol, T.untyped]) }
   def anchor_metadata
     {
       title: t("safety_standards.metadata.anchor_title"),
@@ -344,6 +373,7 @@ class SafetyStandardsController < ApplicationController
     }
   end
 
+  sig { returns(T::Hash[Symbol, T.untyped]) }
   def slide_runout_metadata
     {
       title: t("safety_standards.metadata.slide_runout_title"),
@@ -359,6 +389,7 @@ class SafetyStandardsController < ApplicationController
     }
   end
 
+  sig { returns(T::Hash[Symbol, T.untyped]) }
   def wall_height_metadata
     {
       title: t("safety_standards.metadata.wall_height_title"),
@@ -373,6 +404,7 @@ class SafetyStandardsController < ApplicationController
     }
   end
 
+  sig { returns(T::Hash[Symbol, T.untyped]) }
   def user_capacity_metadata
     {
       title: t("safety_standards.metadata.user_capacity_title"),
