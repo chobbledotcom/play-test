@@ -156,7 +156,17 @@ class SafetyStandardsController < ApplicationController
   sig { void }
   def calculate_safety_standard
     type = params[:calculation][:type]
-    send("calculate_#{type}") if CALCULATION_TYPES.include?(type)
+    
+    case type
+    when "anchors"
+      calculate_anchors
+    when "slide_runout"
+      calculate_slide_runout
+    when "wall_height"
+      calculate_wall_height
+    when "user_capacity"
+      calculate_user_capacity
+    end
   end
 
   sig { void }
