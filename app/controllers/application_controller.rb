@@ -60,7 +60,7 @@ class ApplicationController < ActionController::Base
     I18n.t("application.#{table}.#{key}", **args)
   end
 
-  sig { params(form: Symbol, key: Symbol, args: T.untyped).returns(String) }
+  sig { params(form: Symbol, key: T.any(Symbol, String), args: T.untyped).returns(String) }
   def form_i18n(form, key, **args)
     I18n.t("forms.#{form}.#{key}", **args)
   end
@@ -69,7 +69,7 @@ class ApplicationController < ActionController::Base
   def require_login
     return if logged_in?
 
-    flash[:alert] = form_i18n(:session_new, "status.login_required")
+    flash[:alert] = form_i18n(:session_new, :"status.login_required")
     redirect_to login_path
   end
 
@@ -77,7 +77,7 @@ class ApplicationController < ActionController::Base
   def require_logged_out
     return unless logged_in?
 
-    flash[:alert] = form_i18n(:session_new, "status.already_logged_in")
+    flash[:alert] = form_i18n(:session_new, :"status.already_logged_in")
     redirect_to inspections_path
   end
 
