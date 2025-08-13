@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 class S3BackupService
@@ -26,10 +27,8 @@ class S3BackupService
       # Generate backup filename
       timestamp = Time.current.strftime("%Y-%m-%d")
       backup_filename = "database-#{timestamp}.sqlite3"
-      compressed_filename = "database-#{timestamp}.tar.gz"
       temp_backup_path = temp_dir.join(backup_filename)
-      temp_compressed_path = temp_dir.join(compressed_filename)
-      s3_key = "#{backup_dir}/#{compressed_filename}"
+      s3_key = "#{backup_dir}/database-#{timestamp}.tar.gz"
 
       begin
         # Create SQLite backup
@@ -68,7 +67,7 @@ class S3BackupService
 
         # Compress the backup
         log_info "Compressing backup..."
-        create_tar_gz(temp_backup_path, temp_compressed_path)
+        temp_compressed_path = create_tar_gz(timestamp)
         log_info "Backup compressed successfully"
 
         # Upload to S3
@@ -107,7 +106,7 @@ class S3BackupService
       ensure
         # Clean up temp files
         FileUtils.rm_f(temp_backup_path)
-        FileUtils.rm_f(temp_compressed_path)
+        FileUtils.rm_f(temp_dir.join("database-#{timestamp}.tar.gz"))
       end
     end
   end

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 module S3BackupOperations
@@ -9,63 +10,33 @@ module S3BackupOperations
 
   def backup_retention_days = 60
 
-  def temp_dir
-    unless Rails.root
-      error_msg = "Rails.root is nil - cannot determine temp directory"
-      Sentry.capture_message(error_msg, level: "error")
-      raise error_msg
-    end
-    Rails.root.join("tmp/backups")
-  end
+  def temp_dir = Rails.root.join("tmp/backups")
 
   def database_path
     db_config = Rails.configuration.database_configuration[Rails.env]
 
-    # Handle multi-database configuration (e.g., production with primary/queue)
-    if db_config.is_a?(Hash) && db_config.key?("primary")
-      db_config = db_config["primary"]
-    end
+    # Handle multi-database configuration
+    db_config = db_config["primary"] if db_config.is_a?(Hash) && db_config.key?("primary")
 
-    unless db_config && db_config["database"]
-      error_msg = "Database configuration missing for #{Rails.env} environment"
-      Sentry.capture_message(error_msg, level: "error", extra: {
-        rails_env: Rails.env,
-        db_config: Rails.configuration.database_configuration[Rails.env]
-      })
-      raise error_msg
-    end
+    raise "Database not configured for #{Rails.env}" unless db_config["database"]
 
     path = db_config["database"]
-    # Handle relative paths
-    path = Rails.root.join(path) unless path.start_with?("/")
-    path
+    path.start_with?("/") ? path : Rails.root.join(path)
   end
 
-  def create_tar_gz(source_path, dest_path)
-    # Check if tar command is available
-    unless system("which tar > /dev/null 2>&1")
-      error_msg = "tar command not found - required for backup compression"
-      Sentry.capture_message(error_msg, level: "error", extra: {
-        environment: Rails.env,
-        path: ENV["PATH"]
-      })
-      raise error_msg
-    end
+  def create_tar_gz(timestamp)
+    backup_filename = "database-#{timestamp}.sqlite3"
+    compressed_filename = "database-#{timestamp}.tar.gz"
+    source_path = temp_dir.join(backup_filename)
+    dest_path = temp_dir.join(compressed_filename)
 
-    # Use system tar command for reliable compression
     dir_name = File.dirname(source_path)
     base_name = File.basename(source_path)
 
-    # Use array form to prevent command injection
-    unless system("tar", "-czf", dest_path.to_s, "-C", dir_name.to_s, base_name.to_s, exception: true)
-      error_msg = "Failed to create tar archive"
-      Sentry.capture_message(error_msg, level: "error", extra: {
-        command: "tar -czf #{dest_path} -C #{dir_name} #{base_name}",
-        source_path: source_path,
-        dest_path: dest_path
-      })
-      raise error_msg
-    end
+    system("tar", "-czf", dest_path.to_s, "-C", dir_name.to_s,
+      base_name.to_s, exception: true)
+
+    dest_path
   end
 
   def cleanup_old_backups(service)
