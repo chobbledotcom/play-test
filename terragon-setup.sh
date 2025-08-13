@@ -10,6 +10,10 @@ if [ -f ".terragon-setup-complete" ] && [ -z "${FORCE_SETUP:-}" ]; then
     exit 0
 fi
 
+echo "Installing aria2 for parallel downloads..."
+sudo apt-get update -qq
+sudo apt-get install -y aria2
+
 echo "Installing apt-fast for faster package downloads..."
 if ! command -v apt-fast &> /dev/null; then
     /bin/bash -c "$(curl -sL https://git.io/vokNn)"
