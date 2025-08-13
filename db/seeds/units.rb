@@ -1,5 +1,3 @@
-require_relative "seed_data"
-
 Rails.logger.debug "Creating units..."
 
 def create_unit(name:, serial_prefix:, manufacturer:, operator:, description:)

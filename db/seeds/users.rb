@@ -1,5 +1,3 @@
-require_relative "seed_data"
-
 Rails.logger.debug "Creating users..."
 
 def generate_secure_password

@@ -5,9 +5,6 @@
 Rails.logger.debug "Starting seed data creation..."
 Rails.logger.debug { "Environment: #{Rails.env}" }
 
-# Load shared test data helpers
-require_relative "../lib/test_data_helpers"
-
 # Load seed files in correct order
 load Rails.root.join("db/seeds/cleanup.rb")
 load Rails.root.join("db/seeds/pages.rb")

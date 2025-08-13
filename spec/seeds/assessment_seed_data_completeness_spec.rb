@@ -1,5 +1,6 @@
+# typed: false
+
 require "rails_helper"
-require Rails.root.join("db/seeds/seed_data")
 
 RSpec.describe "SeedData assessment field completeness" do
   # Assessment types that have corresponding seed data methods
