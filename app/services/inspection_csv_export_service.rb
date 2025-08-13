@@ -1,8 +1,25 @@
+# typed: strict
+# frozen_string_literal: true
+
+require "sorbet-runtime"
+require "csv"
+
 class InspectionCsvExportService
+  extend T::Sig
+
+  sig do
+    params(
+      inspections: T.any(
+        ActiveRecord::Relation,
+        T::Array[Inspection]
+      )
+    ).void
+  end
   def initialize(inspections)
     @inspections = inspections
   end
 
+  sig { returns(String) }
   def generate
     CSV.generate(headers: true) do |csv|
       csv << headers
@@ -15,6 +32,7 @@ class InspectionCsvExportService
 
   private
 
+  sig { returns(T::Array[String]) }
   def headers
     # All inspection column names (excluding foreign keys we'll handle specially)
     excluded_columns = %w[user_id inspector_company_id unit_id]
@@ -30,6 +48,7 @@ class InspectionCsvExportService
     headers
   end
 
+  sig { params(inspection: Inspection).returns(T::Array[T.untyped]) }
   def row_data(inspection)
     headers.map do |header|
       case header

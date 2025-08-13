@@ -1,5 +1,7 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
+
+require "sorbet-runtime"
 
 # == Schema Information
 #
@@ -30,7 +32,13 @@
 #  index_users_on_rpii_inspector_number  (rpii_inspector_number) UNIQUE WHERE rpii_inspector_number IS NOT NULL
 #
 class User < ApplicationRecord
+  extend T::Sig
   include CustomIdGenerator
+
+  # Type alias for RPII verification results
+  RpiiVerificationResult = T.type_alias do
+    T::Hash[Symbol, T.untyped]
+  end
 
   has_secure_password
 
@@ -77,20 +85,24 @@ class User < ApplicationRecord
     self.webauthn_id ||= WebAuthn.generate_user_id
   end
 
+  sig { returns(T::Boolean) }
   def is_active?
     active_until.nil? || active_until > Date.current
   end
 
+  sig { returns(T::Boolean) }
   def can_delete_credentials?
     credentials.count > 1
   end
 
   alias_method :can_create_inspection?, :is_active?
 
+  sig { returns(String) }
   def inactive_user_message
     I18n.t("users.messages.user_inactive")
   end
 
+  sig { returns(T::Boolean) }
   def admin?
     admin_pattern = ENV["ADMIN_EMAILS_PATTERN"]
     return false if admin_pattern.blank?
@@ -103,31 +115,42 @@ class User < ApplicationRecord
     end
   end
 
+  sig do
+    params(
+      value: T.nilable(T.any(Date, String, Time, ActiveSupport::TimeWithZone))
+    ).void
+  end
   def active_until=(value)
     @active_until_explicitly_set = true
     super
   end
 
+  sig { returns(T::Boolean) }
   def has_company?
     inspection_company_id.present? || inspection_company.present?
   end
 
+  sig { returns(T.nilable(String)) }
   def display_phone
     has_company? ? inspection_company.phone : phone
   end
 
+  sig { returns(T.nilable(String)) }
   def display_address
     has_company? ? inspection_company.address : address
   end
 
+  sig { returns(T.nilable(String)) }
   def display_country
     has_company? ? inspection_company.country : country
   end
 
+  sig { returns(T.nilable(String)) }
   def display_postal_code
     has_company? ? inspection_company.postal_code : postal_code
   end
 
+  sig { returns(RpiiVerificationResult) }
   def verify_rpii_inspector_number
     if rpii_inspector_number.blank?
       return {valid: false, error: :blank_number}
@@ -145,10 +168,12 @@ class User < ApplicationRecord
     end
   end
 
+  sig { returns(T::Boolean) }
   def rpii_verified?
     rpii_verified_date.present?
   end
 
+  sig { params(inspector: T::Hash[Symbol, T.untyped]).returns(RpiiVerificationResult) }
   def handle_valid_rpii_result(inspector)
     if inspector[:name].present? && names_match?(name, inspector[:name])
       update(rpii_verified_date: Time.current)
@@ -159,14 +184,17 @@ class User < ApplicationRecord
     end
   end
 
+  sig { returns(T::Boolean) }
   def has_seed_data?
     units.seed_data.exists? || inspections.seed_data.exists?
   end
 
+  sig { returns(T::Boolean) }
   def validate_name?
     new_record? || name_changed?
   end
 
+  sig { params(user_name: T.nilable(String), inspector_name: T.nilable(String)).returns(T::Boolean) }
   def names_match?(user_name, inspector_name)
     normalized_user = user_name.to_s.strip.downcase
     normalized_inspector = inspector_name.to_s.strip.downcase
@@ -179,20 +207,24 @@ class User < ApplicationRecord
     user_parts.all? { |part| inspector_parts.include?(part) }
   end
 
+  sig { void }
   def downcase_email
     self.email = email.downcase
   end
 
+  sig { void }
   def normalize_rpii_number
     self.rpii_inspector_number = nil if rpii_inspector_number.blank?
   end
 
+  sig { void }
   def set_inactive_on_signup
     return if instance_variable_get(:@active_until_explicitly_set)
 
     self.active_until = Date.current - 1.day
   end
 
+  sig { void }
   def logo_must_be_image
     return unless logo.attached?
 
@@ -202,6 +234,7 @@ class User < ApplicationRecord
     logo.purge
   end
 
+  sig { void }
   def signature_must_be_image
     return unless signature.attached?
 
