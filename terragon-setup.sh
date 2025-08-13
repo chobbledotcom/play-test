@@ -10,11 +10,6 @@ if [ -f ".terragon-setup-complete" ] && [ -z "${FORCE_SETUP:-}" ]; then
     exit 0
 fi
 
-# Start Docker daemon
-echo "Starting Docker daemon..."
-sudo systemctl start docker
-sudo systemctl enable docker
-
 echo "Pulling production Docker image..."
 docker pull git.chobble.com/chobble/play-test:latest
 
