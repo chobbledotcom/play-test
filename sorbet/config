@@ -2,5 +2,4 @@
 .
 --ignore=/spec/
 --ignore=/test/
---ignore=/sorbet/rbi/
 --ignore=/vendor/
