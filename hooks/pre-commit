@@ -105,6 +105,23 @@ if [ -n "$JS_FILES" ] && [ -f "biome.json" ]; then
   fi
 fi
 
+# Check Sorbet signatures before final validation
+if [ -n "$RUBY_FILES" ]; then
+  echo -e "\n${YELLOW}Checking Sorbet signatures in changed code...${NC}"
+  
+  if [ -x "bin/check-sorbet-changes" ]; then
+    if ! bin/check-sorbet-changes; then
+      echo -e "${RED}Sorbet signature check failed${NC}"
+      echo ""
+      echo "Please add proper Sorbet signatures to new/modified code."
+      echo "To bypass this check (not recommended), use: git commit --no-verify"
+      exit 1
+    fi
+  else
+    echo -e "${YELLOW}Sorbet checker not found at bin/check-sorbet-changes, skipping...${NC}"
+  fi
+fi
+
 # Now check again to see if there are any remaining issues
 FAILED=0
 

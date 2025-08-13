@@ -1,0 +1,232 @@
+#!/usr/bin/env ruby
+# typed: strict
+
+require 'json'
+require 'open3'
+
+# This script checks that any new or modified Ruby code has proper Sorbet signatures.
+# It enforces:
+# 1. New files must have a typed: signature (at least typed: false)
+# 2. New methods must have sig blocks if in typed: strict files
+# 3. Modified methods must add sig blocks if they don't have them
+
+class SorbetChangeChecker
+  RED = "\033[0;31m"
+  GREEN = "\033[0;32m"
+  YELLOW = "\033[1;33m"
+  BLUE = "\033[0;34m"
+  NC = "\033[0m" # No Color
+
+  def initialize(staged_only: true)
+    @staged_only = staged_only
+    @violations = []
+  end
+
+  def check_changes
+    changed_files = get_changed_files
+    
+    if changed_files.empty?
+      puts "#{GREEN}No Ruby files to check#{NC}"
+      return true
+    end
+
+    puts "#{YELLOW}Checking Sorbet signatures in changed code...#{NC}"
+    
+    changed_files.each do |file|
+      next unless File.exist?(file)
+      check_file(file)
+    end
+
+    if @violations.empty?
+      puts "#{GREEN}✓ All Sorbet checks passed!#{NC}"
+      true
+    else
+      puts "\n#{RED}✗ Sorbet signature violations found:#{NC}\n\n"
+      @violations.each { |v| puts "  #{v}" }
+      puts "\n#{YELLOW}Please add proper Sorbet signatures to the affected code.#{NC}"
+      puts "For new files, add at minimum: # typed: false"
+      puts "For new/modified methods in typed files, add sig blocks."
+      puts "\nExample:"
+      puts "  sig { params(name: String).returns(String) }"
+      puts "  def greet(name)"
+      puts "    \"Hello, \#{name}!\""
+      puts "  end"
+      false
+    end
+  end
+
+  private
+
+  def get_changed_files
+    if @staged_only
+      # Get staged files
+      `git diff --cached --name-only --diff-filter=ACM`.split("\n").select { |f| f.end_with?('.rb') }
+    else
+      # Get all changed files compared to main branch
+      `git diff main --name-only --diff-filter=ACM`.split("\n").select { |f| f.end_with?('.rb') }
+    end
+  end
+
+  def check_file(file)
+    content = File.read(file)
+    lines = content.lines
+    
+    # Check if file has typed signature
+    typed_level = get_typed_level(lines)
+    
+    if typed_level.nil?
+      # New file or file missing typed signature
+      if is_new_file?(file)
+        @violations << "#{RED}#{file}:1#{NC} - New file missing Sorbet typed signature"
+      else
+        # For existing files, only check if we're modifying the top of the file
+        if file_header_modified?(file)
+          @violations << "#{YELLOW}#{file}:1#{NC} - Modified file missing Sorbet typed signature (consider adding)"
+        end
+      end
+      return
+    end
+
+    # Only enforce sig blocks for typed: strict or typed: strong files
+    return unless typed_level == 'strict' || typed_level == 'strong'
+
+    # For new files, check ALL methods. For existing files, only check changed methods
+    if is_new_file?(file)
+      check_all_methods_for_sigs(file, lines, typed_level)
+    else
+      # Check changed/new methods for sig blocks
+      changed_lines = get_changed_line_numbers(file)
+      return if changed_lines.empty?
+      check_methods_for_sigs(file, lines, changed_lines, typed_level)
+    end
+  end
+
+  def get_typed_level(lines)
+    # Check first 5 lines for typed comment
+    lines.first(5).each do |line|
+      if line =~ /^\s*#\s*typed:\s*(\w+)/
+        return $1
+      end
+    end
+    nil
+  end
+
+  def is_new_file?(file)
+    # Check if file is completely new (not in HEAD)
+    !system("git cat-file -e HEAD:#{file} 2>/dev/null")
+  end
+
+  def file_header_modified?(file)
+    # Check if first 5 lines are modified
+    changed_lines = get_changed_line_numbers(file)
+    !(changed_lines & (1..5).to_a).empty?
+  end
+
+  def get_changed_line_numbers(file)
+    # Get line numbers that are added or modified
+    lines = []
+    
+    # Use git diff to get changed hunks
+    diff_output = if @staged_only
+      `git diff --cached -U0 -- "#{file}"`
+    else
+      `git diff HEAD -U0 -- "#{file}"`
+    end
+    
+    current_line = 0
+    diff_output.lines.each do |line|
+      if line =~ /^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@/
+        start_line = $1.to_i
+        count = $2 ? $2.to_i : 1
+        lines.concat((start_line...(start_line + count)).to_a)
+      end
+    end
+    
+    lines
+  end
+
+  def check_all_methods_for_sigs(file, lines, typed_level)
+    has_sig = false
+    
+    lines.each_with_index do |line, index|
+      line_num = index + 1
+      
+      # Check for sig block
+      if line =~ /^\s*sig\s*\{/ || line =~ /^\s*sig\s+do/
+        has_sig = true
+      end
+      
+      # Check for method definition
+      if line =~ /^\s*def\s+(\w+)/
+        method_name = $1
+        
+        if !has_sig && !skip_sig_for_method?(method_name)
+          @violations << "#{RED}#{file}:#{line_num}#{NC} - Method '#{method_name}' in new #{typed_level} file needs a sig block"
+        end
+        
+        # Reset for next method
+        has_sig = false
+      end
+    end
+  end
+
+  def check_methods_for_sigs(file, lines, changed_lines, typed_level)
+    in_method = false
+    method_start = nil
+    method_name = nil
+    has_sig = false
+    
+    lines.each_with_index do |line, index|
+      line_num = index + 1
+      
+      # Check for sig block
+      if line =~ /^\s*sig\s*\{/ || line =~ /^\s*sig\s+do/
+        has_sig = true
+      end
+      
+      # Check for method definition
+      if line =~ /^\s*def\s+(\w+)/
+        method_name = $1
+        method_start = line_num
+        
+        # Check if this method or its sig is in changed lines
+        sig_range = ([line_num - 3, 1].max...line_num).to_a
+        method_touched = changed_lines.include?(line_num) || !(changed_lines & sig_range).empty?
+        
+        if method_touched && !has_sig
+          # Skip certain methods that don't need sigs
+          unless skip_sig_for_method?(method_name)
+            @violations << "#{RED}#{file}:#{line_num}#{NC} - Method '#{method_name}' in #{typed_level} file needs a sig block"
+          end
+        end
+        
+        # Reset for next method
+        has_sig = false
+      end
+    end
+  end
+
+  def skip_sig_for_method?(method_name)
+    # Some methods don't need sigs (Rails callbacks, etc.)
+    %w[
+      initialize
+      before_validation
+      after_validation
+      before_save
+      after_save
+      before_create
+      after_create
+      before_update
+      after_update
+      before_destroy
+      after_destroy
+    ].include?(method_name)
+  end
+end
+
+# Run the checker
+if __FILE__ == $0
+  staged_only = !ARGV.include?('--all')
+  checker = SorbetChangeChecker.new(staged_only: staged_only)
+  exit(checker.check_changes ? 0 : 1)
+end

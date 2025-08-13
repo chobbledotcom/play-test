@@ -2,6 +2,50 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Sorbet Type Checking
+
+The codebase uses Sorbet for gradual type checking. A Git pre-commit hook enforces Sorbet signatures on new and modified code:
+
+### Requirements for New Code
+
+1. **All new Ruby files** must have a Sorbet typed signature at the top (minimum `# typed: false`)
+2. **New files with `# typed: strict` or `# typed: strong`** must have sig blocks for all methods
+3. **Modified methods in typed files** must add sig blocks if they don't already have them
+
+### Sorbet Signature Examples
+
+```ruby
+# typed: strict
+
+class Example
+  extend T::Sig
+  
+  sig { params(name: String).returns(String) }
+  def greet(name)
+    I18n.t("greetings.hello", name: name)
+  end
+  
+  sig { params(x: Integer, y: Integer).returns(Integer) }
+  def calculate(x, y)
+    x + y
+  end
+end
+```
+
+### Checking Sorbet Compliance
+
+- **Automatic check on commit**: The pre-commit hook runs `bin/check-sorbet-changes`
+- **Manual check**: Run `bin/check-sorbet-changes` to check staged files
+- **Check all changes**: Run `bin/check-sorbet-changes --all` to check all changes vs main branch
+- **Bypass hook** (not recommended): `git commit --no-verify`
+
+### Gradual Adoption Strategy
+
+- Existing files without changes don't need Sorbet signatures
+- When editing a file, only the modified methods need sig blocks (in strict/strong files)
+- Start with `# typed: false` and upgrade to `strict` when ready
+- Use `# typed: strict` for new files where possible
+
 ## PDF Caching
 
 The system supports caching generated PDFs in S3/object storage to improve performance. To enable:
