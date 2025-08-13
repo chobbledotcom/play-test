@@ -45,8 +45,9 @@ jobs:
             echo "ERB lint found issues (some may have been auto-fixed)"
           fi
           
-          # Extract unfixed offenses if any
-          if grep -q "Offenses:" erb_lint_output.txt; then
+          # Check if there are any violations that couldn't be auto-fixed
+          # erb_lint shows "Failed: X files" and "Total violations: X" in the summary
+          if grep -q "Failed:" erb_lint_output.txt && grep -q "Total violations:" erb_lint_output.txt; then
             echo "has_unfixed=true" >> $GITHUB_OUTPUT
             # Save the output for later use in PR comment
             cat erb_lint_output.txt > unfixed_issues.txt
@@ -77,6 +78,22 @@ jobs:
           
           - Auto-corrected ERB template issues
           - Applied erb_lint --autocorrect fixes
+          
+          [Automated daily update]"
+      
+      - name: Create tracking file if only manual fixes needed
+        if: steps.check_changes.outputs.changed == 'false' && steps.erb_lint.outputs.has_unfixed == 'true'
+        run: |
+          echo "This branch tracks ERB lint violations that need manual fixes" > .erb-lint-tracking
+          echo "Generated: $(date -u '+%Y-%m-%d %H:%M UTC')" >> .erb-lint-tracking
+          echo "" >> .erb-lint-tracking
+          echo "Total violations found: $(grep 'Total violations:' erb_lint_output.txt | grep -o '[0-9]\+')" >> .erb-lint-tracking
+          echo "Files with violations: $(grep 'Failed:' erb_lint_output.txt | grep -o '[0-9]\+')" >> .erb-lint-tracking
+          git add .erb-lint-tracking
+          git commit -m "Track ERB lint violations requiring manual fixes
+          
+          No auto-fixable issues found, but manual fixes are needed.
+          See PR for full details.
           
           [Automated daily update]"
       
@@ -144,7 +161,7 @@ jobs:
           The following ERB lint issues could not be auto-corrected and need manual attention:
           
           \`\`\`
-          $(cat unfixed_issues.txt | grep -A 1000 "Offenses:" || cat unfixed_issues.txt)
+          $(cat unfixed_issues.txt)
           \`\`\`
           
           Please review and fix these issues manually before merging."
