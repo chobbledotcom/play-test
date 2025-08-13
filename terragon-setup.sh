@@ -4,40 +4,21 @@ set -euo pipefail
 # Terragon Labs Rails Setup Script
 # Optimized for Ubuntu 24.04 - runs on every sandbox start
 
-# Set PATH for ruby-install Ruby if it exists
-if [ -d "$HOME/.rubies/ruby-3.4.3" ]; then
-    export PATH="$HOME/.rubies/ruby-3.4.3/bin:$PATH"
-fi
-
 # Skip if already set up (optimization for repeated runs)
 if [ -f ".terragon-setup-complete" ] && [ -z "${FORCE_SETUP:-}" ]; then
     echo "Setup already complete. Run with FORCE_SETUP=1 to re-run."
     exit 0
 fi
 
-echo "Installing build dependencies..."
-sudo apt-get update -qq
-sudo apt-get install -y build-essential cmake pkg-config libsqlite3-dev libyaml-dev libvips-dev sassc wget tar libssl-dev libreadline-dev zlib1g-dev
-
-# Install ruby-install if not already present
-if ! command -v ruby-install &> /dev/null; then
-    echo "Installing ruby-install..."
-    wget -q https://github.com/postmodern/ruby-install/releases/download/v0.10.1/ruby-install-0.10.1.tar.gz
-    tar -xzf ruby-install-0.10.1.tar.gz
-    cd ruby-install-0.10.1/
-    sudo make install >/dev/null 2>&1
-    cd ..
-    rm -rf ruby-install-0.10.1*
+echo "Installing apt-fast for faster package downloads..."
+if ! command -v apt-fast &> /dev/null; then
+    /bin/bash -c "$(curl -sL https://git.io/vokNn)"
 fi
 
-# Install Ruby 3.4.3 if not already installed
-if [ ! -d "$HOME/.rubies/ruby-3.4.3" ]; then
-    echo "Installing Ruby 3.4.3 (this may take a few minutes)..."
-    ruby-install --no-install-deps ruby 3.4.3
-fi
-
-# Set up PATH for the installed Ruby
-export PATH="$HOME/.rubies/ruby-3.4.3/bin:$PATH"
+echo "Installing Ruby and dependencies..."
+sudo apt-fast update -qq
+# Use ruby3.4 package which provides Ruby 3.4.1 - close enough for test VM
+sudo apt-fast install -y ruby3.4 ruby3.4-dev build-essential cmake pkg-config libsqlite3-dev libyaml-dev libvips-dev sassc
 
 echo "Installing bundler gem..."
 gem install bundler
