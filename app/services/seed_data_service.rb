@@ -2,14 +2,14 @@
 
 class SeedDataService
   extend T::Sig
-  CASTLE_IMAGE_COUNT = 5
-  UNIT_COUNT = 20
-  INSPECTION_COUNT = 5
-  INSPECTION_INTERVAL_DAYS = 364
-  INSPECTION_OFFSET_RANGE = 0..365
-  INSPECTION_DURATION_RANGE = 1..4
-  HIGH_PASS_RATE = 0.95
-  NORMAL_PASS_RATE = 0.85
+  CASTLE_IMAGE_COUNT = T.let(5, Integer)
+  UNIT_COUNT = T.let(20, Integer)
+  INSPECTION_COUNT = T.let(5, Integer)
+  INSPECTION_INTERVAL_DAYS = T.let(364, Integer)
+  INSPECTION_OFFSET_RANGE = T.let(0..365, T::Range[Integer])
+  INSPECTION_DURATION_RANGE = T.let(1..4, T::Range[Integer])
+  HIGH_PASS_RATE = T.let(0.95, Float)
+  NORMAL_PASS_RATE = T.let(0.85, Float)
 
   # Stefan-variant owner names as per existing seeds
   STEFAN_OWNER_NAMES = [
