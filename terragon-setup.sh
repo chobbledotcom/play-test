@@ -35,8 +35,7 @@ fi
 
 echo "Installing Ruby and dependencies..."
 sudo apt-fast update -qq
-# Use ruby3.4 package which provides Ruby 3.4.1 - close enough for test VM
-sudo apt-fast install -y ruby3.4 ruby3.4-dev build-essential cmake pkg-config libsqlite3-dev libyaml-dev libvips-dev sassc
+sudo apt-fast install -y ruby ruby-dev build-essential cmake pkg-config libsqlite3-dev libyaml-dev libvips-dev sassc
 
 echo "Installing bundler gem..."
 gem install bundler
