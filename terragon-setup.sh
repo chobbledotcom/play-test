@@ -1,8 +1,8 @@
-#\!/bin/bash
+#!/bin/bash
 set -euo pipefail
 
-# Terragon Labs Rails Setup Script
-# Optimized for Ubuntu 24.04 - runs on every sandbox start
+# Terragon Labs Rails Setup Script - Docker Version
+# Uses pre-built Docker image instead of apt installs
 
 # Skip if already set up (optimization for repeated runs)
 if [ -f ".terragon-setup-complete" ] && [ -z "${FORCE_SETUP:-}" ]; then
@@ -10,58 +10,26 @@ if [ -f ".terragon-setup-complete" ] && [ -z "${FORCE_SETUP:-}" ]; then
     exit 0
 fi
 
-echo "Installing aria2 for parallel downloads..."
-if ! type aria2c >/dev/null 2>&1; then
-    sudo apt-get update -qq
-    sudo apt-get install -y aria2
-fi
+echo "Pulling production Docker image..."
+docker pull git.chobble.com/chobble/play-test:latest
 
-echo "Installing apt-fast for faster package downloads..."
-if ! command -v apt-fast &> /dev/null; then
-    apt_fast_url='https://raw.githubusercontent.com/ilikenwf/apt-fast/master'
-    
-    # Remove apt-fast from old location
-    sudo rm -f /usr/local/sbin/apt-fast
-    
-    # Download and install apt-fast
-    sudo curl -sL "$apt_fast_url/apt-fast" -o /usr/local/bin/apt-fast
-    sudo chmod +x /usr/local/bin/apt-fast
-    
-    # Download config if it doesn't exist
-    if [ ! -f /etc/apt-fast.conf ]; then
-        sudo curl -sL "$apt_fast_url/apt-fast.conf" -o /etc/apt-fast.conf
-    fi
-fi
+# Database setup using Docker
+echo "Setting up databases..."
+docker run --rm -v "$PWD:/app" -w /app -e RAILS_ENV=development \
+  git.chobble.com/chobble/play-test:latest \
+  bash -c "rails db:create db:migrate db:seed && RAILS_ENV=test rails db:create db:migrate"
 
-echo "Installing Ruby and dependencies..."
-sudo apt-fast update -qq
-sudo apt-fast install -y ruby ruby-dev build-essential cmake pkg-config libsqlite3-dev libyaml-dev libvips-dev sassc
-
-echo "Installing bundler gem..."
-gem install bundler
-
-# Configure bundler to exclude development, production, and CI-only gem groups
-echo "Configuring bundler to skip development, production, and CI-only gems..."
-bundle config set --local without 'development production ci_annotations ci_coverage'
-
-# Install Rails dependencies with bundler
-echo "Installing gems..."
-bundle install --jobs 4
-
-# Database setup (only if not exists)
-if [ \! -f "storage/development.sqlite3" ]; then
-    echo "Creating development database..."
-    bundle exec rails db:create db:migrate db:seed
-fi
-
-# Test database setup (only if not exists)
-if [ \! -f "storage/test.sqlite3" ]; then
-    echo "Creating test database..."
-    RAILS_ENV=test bundle exec rails db:create db:migrate
-    bundle exec rails parallel:prepare
-fi
+# Create universal helper script
+echo '#!/bin/bash
+docker run -it --rm -p 3000:3000 -v "$PWD:/app" -w /app -e RAILS_ENV=development \
+  git.chobble.com/chobble/play-test:latest "$@"' > dr
+chmod +x dr
 
 # Mark setup as complete
 touch .terragon-setup-complete
 
-echo "Rails setup complete\!"
+echo "Rails setup complete!"
+echo "Use ./dr to run any Rails command:"
+echo "  ./dr rails s -b 0.0.0.0   # Start server"
+echo "  ./dr rails c               # Console"
+echo "  ./dr bash                  # Shell"
