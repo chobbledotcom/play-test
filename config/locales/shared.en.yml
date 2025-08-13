@@ -1,4 +1,8 @@
 en:
+  # Prosopite N+1 detection
+  prosopite:
+    n_plus_one_detected: "N+1 Query Detected: %{message}"
+    
   # Navigation
   navigation:
     inspections: "Inspections"
