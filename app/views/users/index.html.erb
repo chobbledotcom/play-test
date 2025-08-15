@@ -21,7 +21,7 @@
             <%= user.email %>
           <% end %>
           <%= render 'shared/table_column', field: 'admin', i18n_key: 'users.fields.admin' do %>
-            <%= user.admin? ? t('users.labels.yes') : t('users.labels.no') %>
+            <%= user.admin? ? t('shared.yes') : t('shared.no') %>
           <% end %>
           <%= render 'shared/table_column', field: 'registered', i18n_key: 'users.fields.registered' do %>
             <span title="<%= user.created_at.strftime('%d/%m/%Y') %>">
@@ -34,7 +34,7 @@
                 <%= time_ago_in_words(user.last_active_at) %>
               </span>
             <% else %>
-              <%= t('users.labels.never') %>
+              <%= t('users.messages.last_active_never') %>
             <% end %>
           <% end %>
           <%= render 'shared/table_column', field: 'inspections', i18n_key: 'users.fields.inspections' do %>

@@ -68,9 +68,6 @@ en:
     labels:
       activated_at: "Activated At"
       deactivated_at: "Deactivated At"
-      yes: "Yes"
-      no: "No"
-      never: "Never"
     
     sort:
       newest: "Newest First"

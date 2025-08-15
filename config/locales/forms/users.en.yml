@@ -1,0 +1,9 @@
+en:
+  forms:
+    users:
+      fields:
+        email: "Email"
+        admin: "Admin"
+        registered: "Registered"
+        last_active: "Last Active"
+        inspections: "Inspections"
