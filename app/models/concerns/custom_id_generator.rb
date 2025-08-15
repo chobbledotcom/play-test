@@ -20,13 +20,13 @@ module CustomIdGenerator
     extend T::Sig
 
     sig do
-      params(scope_conditions: T::Hash[T.untyped, T.untyped]).returns(String)
+      params(scope_conditions: T::Hash[T.untyped, T.untyped]).returns String
     end
     def generate_random_id(scope_conditions = {})
       loop do
         raw_id = SecureRandom.alphanumeric(32).upcase
         filtered_chars = raw_id.chars.reject do |char|
-          AMBIGUOUS_CHARS.include?(char)
+          AMBIGUOUS_CHARS.include? char
         end
         id = filtered_chars.first(ID_LENGTH).join
         next if id.length < ID_LENGTH
@@ -40,6 +40,6 @@ module CustomIdGenerator
   sig { void }
   def generate_custom_id
     scope_conditions = respond_to?(:uniqueness_scope) ? uniqueness_scope : {}
-    self.id = self.class.generate_random_id(scope_conditions)
+    self.id = self.class.generate_random_id scope_conditions
   end
 end

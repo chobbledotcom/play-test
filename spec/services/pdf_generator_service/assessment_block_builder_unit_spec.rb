@@ -116,28 +116,27 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     it "uses pass field label when no base field" do
       fields = {pass: :fabric_strength_pass, comment: :fabric_strength_comment}
 
-      expect(I18n).to receive(:t!).with("forms.materials.fields.fabric_strength_pass").and_return("Fabric Pass Label")
+      expect(I18n).to receive(:t!).with("forms.materials.fields.fabric_strength").and_return("Fabric strength")
 
       label = builder.send(:get_field_label, fields)
-      expect(label).to eq("Fabric Pass Label")
+      expect(label).to eq("Fabric strength")
     end
 
     it "uses comment field label for standalone comments" do
       fields = {comment: :custom_comment}
 
-      expect(I18n).to receive(:t!).with("forms.materials.fields.custom_comment").and_return("Custom Comment Label")
+      expect(I18n).to receive(:t!).with("forms.materials.fields.custom").and_return("Custom Comment Label")
 
       label = builder.send(:get_field_label, fields)
       expect(label).to eq("Custom Comment Label")
     end
 
-    it "falls back to base name from first available field" do
+    it "raises error for unknown field types" do
       fields = {unknown_type: :some_field}
 
-      expect(I18n).to receive(:t!).with("forms.materials.fields.some_field").and_return("Fallback Label")
-
-      label = builder.send(:get_field_label, fields)
-      expect(label).to eq("Fallback Label")
+      expect {
+        builder.send(:get_field_label, fields)
+      }.to raise_error(RuntimeError, /No valid field type found/)
     end
   end
 
@@ -320,11 +319,11 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
         expect(ropes_block.pass_fail).to eq("pass")
 
         # Boolean false should remain false
-        fabric_block = value_blocks.find { |b| b.name == I18n.t("forms.materials.fields.fabric_strength_pass") }
+        fabric_block = value_blocks.find { |b| b.name == I18n.t("forms.materials.fields.fabric_strength") }
         expect(fabric_block.pass_fail).to eq(false)
 
         # Boolean true should remain true
-        thread_block = value_blocks.find { |b| b.name == I18n.t("forms.materials.fields.thread_pass") }
+        thread_block = value_blocks.find { |b| b.name == I18n.t("forms.materials.fields.thread") }
         expect(thread_block.pass_fail).to eq(true)
       end
     end

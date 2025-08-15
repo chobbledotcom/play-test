@@ -20,8 +20,26 @@ Sorbet/BlockMethodDefinition:
 Sorbet/Refinement:
   Enabled: true
 
+# Remove unnecessary parentheses from method calls
+Style/MethodCallWithArgsParentheses:
+  Enabled: true
+  EnforcedStyle: omit_parentheses
+  AllowParenthesesInMultilineCall: false
+  AllowParenthesesInChaining: false
+  AllowParenthesesInCamelCaseMethod: false
+
 # Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+
+# Set maximum line length
+Layout/LineLength:
+  Max: 80
+  AllowURI: true
+  URISchemes:
+    - http
+    - https
+
+# Set maximum method length
+Metrics/MethodLength:
+  Max: 20
+  CountComments: false  # Don't count comment lines
+  CountAsOne: []  # You can specify what to count as one line (e.g., ['array', 'hash', 'heredoc'])

@@ -77,7 +77,7 @@ RSpec.describe AssessmentCompletion, type: :model do
 
         expect(grouped[:ropes]).to be_present
         expect(grouped[:ropes][:fields]).to contain_exactly(:ropes, :ropes_pass)
-        expect(grouped[:ropes][:partial]).to eq("number_pass_fail_na_comment")
+        expect(grouped[:ropes][:partial]).to eq(:number_pass_fail_na_comment)
       end
     end
 

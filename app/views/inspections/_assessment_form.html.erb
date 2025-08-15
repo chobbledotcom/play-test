@@ -1,11 +1,11 @@
-<%# Locals: assessment_type (string), inspection (Inspection instance) %>
+<%# Locals: assessment_type (symbol), inspection (Inspection instance) %>
 <%
   assessment = inspection.send("#{assessment_type}_assessment")
-  has_safety_standards = %w[anchorage slide user_height].include?(assessment_type)
+  has_safety_standards = %i[anchorage slide user_height].include?(assessment_type)
 
   reference_partials = case assessment_type
-  when 'slide' then ['shared/safety_standards/slide_safety_requirements']
-  when 'user_height' then ['shared/safety_standards/wall_height_requirements']
+  when :slide then ['shared/safety_standards/slide_safety_requirements']
+  when :user_height then ['shared/safety_standards/wall_height_requirements']
   else []
   end
 
@@ -17,6 +17,7 @@
   model: assessment,
   i18n_base: "forms.#{assessment_type}",
   submit_key: submit_key,
+  excluded_prefill_fields: InspectionsController::NOT_COPIED_FIELDS,
   url: send("inspection_#{assessment_type}_assessment_path", inspection) do |form| %>
   <%= hidden_field_tag :tab, assessment_type %>
   <%= render 'chobble_forms/fields', model: assessment %>

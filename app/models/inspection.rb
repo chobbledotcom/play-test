@@ -48,6 +48,7 @@ class Inspection < ApplicationRecord
   include CustomIdGenerator
   include FormConfigurable
   include ValidationConfigurable
+  include SymbolizedAttributes
 
   PASS_FAIL_NA = {fail: 0, pass: 1, na: 2}.freeze
 
@@ -72,6 +73,13 @@ class Inspection < ApplicationRecord
 
   ALL_ASSESSMENT_TYPES =
     CASTLE_ASSESSMENT_TYPES.merge(PILLOW_ASSESSMENT_TYPES).freeze
+
+  # All possible tab names (derived from assessment types plus fixed tabs)
+  ALL_POSSIBLE_TABS = (
+    [:inspection] +
+    ALL_ASSESSMENT_TYPES.keys.map { |k| k.to_s.chomp("_assessment").to_sym } +
+    [:results]
+  ).freeze
 
   USER_EDITABLE_PARAMS = %i[
     has_slide
@@ -122,16 +130,16 @@ class Inspection < ApplicationRecord
   # Override assessment getters to auto-create if missing
   ALL_ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
     # Auto-create version
-    define_method(assessment_name) do
+    define_method assessment_name do
       super() || assessment_class.find_or_create_by!(inspection: self)
     end
 
     # Non-creating version for safe navigation
-    define_method("#{assessment_name}?") do
+    define_method "#{assessment_name}?" do
       if association(assessment_name).loaded?
-        send(assessment_name)
+        send assessment_name
       else
-        assessment_class.find_by(inspection: self)
+        assessment_class.find_by inspection: self
       end
     end
   end
@@ -160,68 +168,70 @@ class Inspection < ApplicationRecord
     end
   }
   scope :filter_by_unit, lambda { |unit_id|
-    where(unit_id: unit_id) if unit_id.present?
+    where unit_id: unit_id if unit_id.present?
   }
   scope :filter_by_operator, lambda { |operator|
     if operator.present?
-      joins(:unit).where(units: {operator: operator})
+      joins(:unit).where units: {operator: operator}
     else
       all
     end
   }
   scope :filter_by_date_range, lambda { |start_date, end_date|
     range = start_date..end_date
-    where(inspection_date: range) if both_dates_present?(start_date, end_date)
+    where inspection_date: range if both_dates_present? start_date, end_date
   }
   scope :overdue, -> { where("inspection_date < ?", Time.zone.today - 1.year) }
 
   # Helper methods for scopes
-  sig { returns(String) }
+  sig { returns String }
   def self.search_conditions
     "inspections.id LIKE ? OR units.serial LIKE ? OR " \
     "units.manufacturer LIKE ? OR units.name LIKE ?"
   end
 
-  sig { params(query: String).returns(T::Array[String]) }
+  sig { params(query: String).returns T::Array[String] }
   def self.search_values(query) = Array.new(4) { "%#{query}%" }
 
-  sig { params(start_date: T.nilable(T.any(String, Date)), end_date: T.nilable(T.any(String, Date))).returns(T::Boolean) }
+  sig do
+    params(start_date: T.nilable(T.any(String, Date)), end_date: T.nilable(T.any(String, Date))).returns T::Boolean
+  end
   def self.both_dates_present?(start_date, end_date) =
     start_date.present? && end_date.present?
 
   # Calculated fields
-  sig { returns(T.nilable(Date)) }
+  sig { returns T.nilable(Date) }
   def reinspection_date
     return nil if inspection_date.blank?
 
     (inspection_date + 1.year).to_date
   end
 
-  sig { returns(T.nilable(Numeric)) }
+  sig { returns T.nilable(Numeric) }
   def area
     return nil unless width && length
 
     width * length
   end
 
-  sig { returns(T.nilable(Numeric)) }
+  sig { returns T.nilable(Numeric) }
   def volume
     return nil unless width && length && height
 
     width * length * height
   end
 
-  sig { returns(T::Boolean) }
+  sig { returns T::Boolean }
   def complete?
     complete_date.present?
   end
 
-  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
+  sig { returns T::Hash[Symbol, T.class_of(ApplicationRecord)] }
   def assessment_types
     bouncing_pillow? ? PILLOW_ASSESSMENT_TYPES : CASTLE_ASSESSMENT_TYPES
   end
 
-  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
+  sig { returns T::Hash[Symbol, T.class_of(ApplicationRecord)] }
   def applicable_assessments
     if bouncing_pillow?
       pillow_applicable_assessments
@@ -232,7 +242,7 @@ class Inspection < ApplicationRecord
 
   private
 
-  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
+  sig { returns T::Hash[Symbol, T.class_of(ApplicationRecord)] }
   def castle_applicable_assessments
     CASTLE_ASSESSMENT_TYPES.select do |assessment_key, _|
       case assessment_key
@@ -248,7 +258,7 @@ class Inspection < ApplicationRecord
     end
   end
 
-  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
+  sig { returns T::Hash[Symbol, T.class_of(ApplicationRecord)] }
   def pillow_applicable_assessments
     PILLOW_ASSESSMENT_TYPES
   end
@@ -256,42 +266,50 @@ class Inspection < ApplicationRecord
   public
 
   # Iterate over only applicable assessments with a block
-  sig { params(block: T.proc.params(assessment_key: Symbol, assessment_class: T.class_of(ApplicationRecord), assessment: ApplicationRecord).void).void }
+  sig do
+    params(
+      block: T.proc.params(
+        assessment_key: Symbol,
+        assessment_class: T.class_of(ApplicationRecord),
+        assessment: ApplicationRecord
+      ).void
+    ).void
+  end
   def each_applicable_assessment(&block)
     applicable_assessments.each do |assessment_key, assessment_class|
-      assessment = send(assessment_key)
-      yield(assessment_key, assessment_class, assessment) if block_given?
+      assessment = send assessment_key
+      yield assessment_key, assessment_class, assessment if block_given?
     end
   end
 
   # Check if a specific assessment is applicable
-  sig { params(assessment_key: Symbol).returns(T::Boolean) }
+  sig { params(assessment_key: Symbol).returns T::Boolean }
   def assessment_applicable?(assessment_key)
-    applicable_assessments.key?(assessment_key)
+    applicable_assessments.key? assessment_key
   end
 
   # Returns tabs in the order they appear in the UI
-  sig { returns(T::Array[String]) }
+  sig { returns T::Array[Symbol] }
   def applicable_tabs
-    tabs = ["inspection"]
+    tabs = [:inspection]
 
     # Get applicable assessments for this inspection type
-    applicable = applicable_assessments.keys.map { |k| k.to_s.chomp("_assessment") }
+    applicable = applicable_assessments.keys.map { |k| k.to_s.chomp("_assessment").to_sym }
 
     # Add tabs in the correct UI order
-    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed]
+    ordered_tabs = %i[user_height slide structure anchorage materials fan enclosed]
     ordered_tabs.each do |tab|
-      tabs << tab if applicable.include?(tab)
+      tabs << tab if applicable.include? tab
     end
 
     # Add results tab at the end
-    tabs << "results"
+    tabs << :results
 
     tabs
   end
 
   # Advanced methods
-  sig { returns(T::Boolean) }
+  sig { returns T::Boolean }
   def can_be_completed?
     unit.present? &&
       all_assessments_complete? &&
@@ -305,7 +323,7 @@ class Inspection < ApplicationRecord
       !indoor_only.nil?
   end
 
-  sig { returns(T::Hash[Symbol, T.any(T::Boolean, T::Array[String])]) }
+  sig { returns T::Hash[Symbol, T.any(T::Boolean, T::Array[String])] }
   def completion_status
     complete = complete?
     all_assessments_complete = all_assessments_complete?
@@ -320,10 +338,10 @@ class Inspection < ApplicationRecord
     }
   end
 
-  sig { returns(T::Boolean) }
+  sig { returns T::Boolean }
   def can_mark_complete? = can_be_completed?
 
-  sig { returns(T::Array[String]) }
+  sig { returns T::Array[String] }
   def completion_errors
     errors = []
     errors << "Unit is required" if unit.blank?
@@ -340,7 +358,7 @@ class Inspection < ApplicationRecord
     errors
   end
 
-  sig { returns(T::Array[String]) }
+  sig { returns T::Array[String] }
   def get_missing_assessments
     missing = []
 
@@ -352,7 +370,7 @@ class Inspection < ApplicationRecord
       next if assessment&.complete?
 
       # Get the assessment type without "_assessment" suffix
-      assessment_type = assessment_key.to_s.sub("_assessment", "")
+      assessment_type = assessment_key.to_s.sub "_assessment", ""
       # Get the name from the form header
       missing << I18n.t("forms.#{assessment_type}.header")
     end
@@ -362,22 +380,22 @@ class Inspection < ApplicationRecord
 
   sig { params(user: User).void }
   def complete!(user)
-    update!(complete_date: Time.current)
-    log_audit_action("completed", user, "Inspection completed")
+    update! complete_date: Time.current
+    log_audit_action "completed", user, "Inspection completed"
   end
 
   sig { params(user: User).void }
   def un_complete!(user)
-    update!(complete_date: nil)
-    log_audit_action("marked_incomplete", user, "Inspection completed")
+    update! complete_date: nil
+    log_audit_action "marked_incomplete", user, "Inspection completed"
   end
 
-  sig { returns(T::Array[String]) }
+  sig { returns T::Array[String] }
   def validate_completeness
     assessment_validation_data.filter_map do |name, assessment, message|
       # Convert the symbol name (e.g., :slide) to assessment key (e.g., :slide_assessment)
       assessment_key = :"#{name}_assessment"
-      next unless assessment_applicable?(assessment_key)
+      next unless assessment_applicable? assessment_key
 
       message if assessment.present? && !assessment.complete?
     end
@@ -385,27 +403,26 @@ class Inspection < ApplicationRecord
 
   sig { params(action: String, user: T.nilable(User), details: String).void }
   def log_audit_action(action, user, details)
-    Event.log(
+    Event.log \
       user: user,
       action: action,
       resource: self,
       details: details
-    )
   rescue => e
     # Fallback to logging if Event creation fails
-    Rails.logger.error("Failed to create event: #{e.message}")
-    Rails.logger.info("Inspection #{id}: #{action} by #{user&.email} - #{details}")
+    Rails.logger.error "Failed to create event: #{e.message}"
+    Rails.logger.info "Inspection #{id}: #{action} by #{user&.email} - #{details}"
   end
 
-  sig { params(form: T.any(Symbol, String), field: T.any(Symbol, String)).returns(String) }
+  sig { params(form: Symbol, field: Symbol).returns String }
   def field_label(form, field)
     key = "forms.#{form}.fields.#{field}"
     # Try the field as-is first
-    label = I18n.t(key, default: nil)
+    label = I18n.t key, default: nil
     # Try removing _pass and/or _comment suffixes
     if label.nil?
-      base_field = ChobbleForms::FieldUtils.strip_field_suffix(field)
-      label = I18n.t("forms.#{form}.fields.#{base_field}", default: nil)
+      base_field = ChobbleForms::FieldUtils.strip_field_suffix field
+      label = I18n.t "forms.#{form}.fields.#{base_field}", default: nil
     end
     # Try adding _pass suffix
     label = I18n.t("#{key}_pass", default: nil) if label.nil? && !field.to_s.end_with?("_pass")
@@ -413,7 +430,7 @@ class Inspection < ApplicationRecord
     label || I18n.t(key)
   end
 
-  sig { returns(T::Array[Symbol]) }
+  sig { returns T::Array[Symbol] }
   def inspection_tab_incomplete_fields
     # Fields required for the inspection tab specifically (excludes passed which is on results tab)
     fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
@@ -422,14 +439,14 @@ class Inspection < ApplicationRecord
       .select { |f| send(f).nil? }
   end
 
-  sig { returns(T::Array[T::Hash[Symbol, T.any(Symbol, String, T::Array[T::Hash[Symbol, T.any(Symbol, String)]])]]) }
+  sig { returns T::Array[T::Hash[Symbol, T.any(Symbol, String, T::Array[T::Hash[Symbol, T.any(Symbol, String)]])]] }
   def incomplete_fields
     output = []
 
     # Process tabs in the same order as applicable_tabs
     applicable_tabs.each do |tab|
       case tab
-      when "inspection"
+      when :inspection
         # Get incomplete fields for the inspection tab (excluding passed)
         inspection_tab_fields =
           inspection_tab_incomplete_fields
@@ -443,7 +460,7 @@ class Inspection < ApplicationRecord
           }
         end
 
-      when "results"
+      when :results
         # Get incomplete fields for the results tab
         results_fields = []
         results_fields << {field: :passed, label: field_label(:results, :passed)} if passed.nil?
@@ -459,7 +476,7 @@ class Inspection < ApplicationRecord
       else
         # All other tabs are assessment tabs
         assessment_key = :"#{tab}_assessment"
-        assessment = send(assessment_key) if respond_to?(assessment_key)
+        assessment = send(assessment_key) if respond_to? assessment_key
 
         if assessment
           grouped_fields = assessment.incomplete_fields_grouped
@@ -467,11 +484,11 @@ class Inspection < ApplicationRecord
 
           grouped_fields.each do |base_field, info|
             # Determine what's missing
-            has_value_missing = info[:fields].include?(base_field)
-            has_pass_missing = info[:fields].include?(:"#{base_field}_pass")
+            has_value_missing = info[:fields].include? base_field
+            has_pass_missing = info[:fields].include? :"#{base_field}_pass"
 
             # Get the base label
-            base_label = field_label(tab.to_sym, base_field)
+            base_label = field_label tab.to_sym, base_field
 
             # Construct the full label
             label = if has_value_missing && has_pass_missing
@@ -515,30 +532,29 @@ class Inspection < ApplicationRecord
     self.inspection_type = unit.unit_type
   end
 
-  sig { returns(T::Boolean) }
+  sig { returns T::Boolean }
   def all_assessments_complete?
     required_assessment_completions.all?
   end
 
-  sig { returns(T::Array[T::Boolean]) }
+  sig { returns T::Array[T::Boolean] }
   def required_assessment_completions
     applicable_assessments.map do |assessment_key, _|
       send(assessment_key)&.complete?
     end
   end
 
-  sig { returns(T::Array[ApplicationRecord]) }
+  sig { returns T::Array[ApplicationRecord] }
   def all_assessments
-    applicable_assessments.map { |assessment_key, _| send(assessment_key) }
+    applicable_assessments.map { |assessment_key, _| send assessment_key }
   end
 
-  sig {
-    returns(
+  sig do
+    returns \
       T::Array[
         T::Array[T.any(Symbol, ActiveRecord::Base, String)]
       ]
-    )
-  }
+  end
   def assessment_validation_data
     assessment_types = %i[
       anchorage
@@ -551,8 +567,8 @@ class Inspection < ApplicationRecord
     ]
 
     assessment_types.map do |type|
-      assessment = send("#{type}_assessment")
-      message = I18n.t("inspections.validation.#{type}_incomplete")
+      assessment = send "#{type}_assessment"
+      message = I18n.t "inspections.validation.#{type}_incomplete"
       [type, assessment, message]
     end
   end
@@ -564,7 +580,7 @@ class Inspection < ApplicationRecord
 
       # Check if blob exists and has content_type
       if photo.blob && !photo.blob.content_type.to_s.start_with?("image/")
-        errors.add(field_name, I18n.t("activerecord.errors.messages.not_an_image"))
+        errors.add field_name, I18n.t("activerecord.errors.messages.not_an_image")
         photo.purge
       end
     end
@@ -574,15 +590,15 @@ class Inspection < ApplicationRecord
   def invalidate_pdf_cache
     # Skip cache invalidation if only pdf_last_accessed_at or updated_at changed
     changed_attrs = saved_changes.keys
-    ignorable_attrs = ["pdf_last_accessed_at", "updated_at"]
+    ignorable_attrs = %w[pdf_last_accessed_at updated_at]
 
     return if (changed_attrs - ignorable_attrs).empty?
 
-    PdfCacheService.invalidate_inspection_cache(self)
+    PdfCacheService.invalidate_inspection_cache self
   end
 
   sig { void }
   def invalidate_unit_pdf_cache
-    PdfCacheService.invalidate_unit_cache(unit) if unit
+    PdfCacheService.invalidate_unit_cache unit if unit
   end
 end

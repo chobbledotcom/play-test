@@ -1,38 +1,40 @@
+<%# Locals: inspection (Inspection instance) %>
 <%
   # Check if there are incomplete fields for this inspection
-  has_incomplete_fields = @inspection.incomplete_fields.any?
+  has_incomplete_fields = inspection.incomplete_fields.any?
   submit_key = has_incomplete_fields ? "submit_continue" : "submit"
 %>
 <%= render 'chobble_forms/form_context',
-  model: @inspection,
+  model: inspection,
   i18n_base: 'forms.results',
-  submit_key: submit_key do |form| %>
+  submit_key: submit_key,
+  excluded_prefill_fields: [:passed] do |form| %>
   <%= hidden_field_tag :tab, 'results' %>
   <%= render 'chobble_forms/fieldset', legend_key: 'comments' do %>
     <% comments_found = false %>
     <% comment_items = [] %>
 
-    <% # Get all comment fields from the inspection itself %>
-    <% @inspection.attributes.each do |field_name, value| %>
+    <%# Get all comment fields from the inspection itself %>
+    <% inspection.attributes.each do |field_name, value| %>
       <% if field_name.end_with?('_comment') && value.present? %>
         <% comments_found = true %>
-        <% base_field = field_name.chomp('_comment') %>
-        <% label = @inspection.field_label(:inspection, base_field) %>
+        <% base_field = ChobbleForms::FieldUtils.strip_field_suffix(field_name) %>
+        <% label = inspection.field_label(:inspection, base_field) %>
         <% comment_items << { label: label, value: value } %>
       <% end %>
     <% end %>
 
-    <% # Get all comment fields from assessments %>
-    <% @inspection.applicable_assessments.each do |assessment_key, assessment_class| %>
-      <% assessment = @inspection.send(assessment_key) %>
+    <%# Get all comment fields from assessments %>
+    <% inspection.applicable_assessments.each do |assessment_key, assessment_class| %>
+      <% assessment = inspection.send(assessment_key) %>
       <% next unless assessment %>
 
       <% assessment.attributes.each do |field_name, value| %>
         <% if field_name.end_with?('_comment') && value.present? %>
           <% comments_found = true %>
-          <% form_name = assessment_key.to_s.gsub(/_assessment$/, '') %>
-          <% base_field = field_name.chomp('_comment') %>
-          <% label = @inspection.field_label(form_name, base_field) %>
+          <% form_name = ChobbleForms::FieldUtils.form_name_from_assessment(assessment_key) %>
+          <% base_field = ChobbleForms::FieldUtils.strip_field_suffix(field_name) %>
+          <% label = inspection.field_label(form_name, base_field) %>
           <% comment_items << { label: label, value: value } %>
         <% end %>
       <% end %>

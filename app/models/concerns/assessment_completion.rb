@@ -5,7 +5,7 @@ module AssessmentCompletion
   extend ActiveSupport::Concern
   extend T::Sig
 
-  SYSTEM_FIELDS = %w[
+  SYSTEM_FIELDS = %i[
     id
     inspection_id
     created_at
@@ -20,10 +20,9 @@ module AssessmentCompletion
   sig { returns(T::Array[Symbol]) }
   def incomplete_fields
     (attributes.keys - SYSTEM_FIELDS)
-      .select { |f| !f.end_with?("_comment") }
-      .select { |f| field_is_incomplete?(f) }
-      .reject { |f| field_allows_nil_when_na?(f) }
-      .map { |f| f.to_sym }
+      .select { |f| !f.to_s.end_with?("_comment") }
+      .select { |f| field_is_incomplete?(f.to_s) }
+      .reject { |f| field_allows_nil_when_na?(f.to_s) }
   end
 
   sig { returns(T::Hash[Symbol, T::Hash[Symbol, T.untyped]]) }
@@ -42,7 +41,7 @@ module AssessmentCompletion
       section[:fields].each do |field_config|
         field = field_config[:field]
         partial = field_config[:partial]
-        field_to_partial[field.to_sym] = partial
+        field_to_partial[field] = partial
 
         # Also map composite fields
         composite_fields = ChobbleForms::FieldUtils.get_composite_fields(field, partial)
@@ -62,11 +61,11 @@ module AssessmentCompletion
     incomplete.each do |field|
       next if processed.include?(field)
 
-      base_field = ChobbleForms::FieldUtils.strip_field_suffix(field).to_sym
+      base_field = ChobbleForms::FieldUtils.strip_field_suffix(field)
       partial = field_to_partial[field] || field_to_partial[base_field]
 
       # Find all related incomplete fields for this base
-      related = incomplete.select { |f| ChobbleForms::FieldUtils.strip_field_suffix(f).to_sym == base_field }
+      related = incomplete.select { |f| ChobbleForms::FieldUtils.strip_field_suffix(f) == base_field }
 
       key = (related.size > 1) ? base_field : field
       grouped[key] = {

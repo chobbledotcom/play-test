@@ -3,14 +3,14 @@
 require "rails_helper"
 
 RSpec.feature "Save & Continue button", type: :feature do
-  let(:user) { create(:user) }
-  let(:unit) { create(:unit, user: user) }
-  let(:complete_inspection) { create(:inspection, :completed, unit: unit, user: user) }
+  let(:user) { create :user }
+  let(:unit) { create :unit, user: user }
+  let(:complete_inspection) { create :inspection, :completed, unit: unit, user: user }
 
   before do
-    sign_in(user)
+    sign_in user
     # Remove complete_date to make it editable
-    complete_inspection.update!(complete_date: nil)
+    complete_inspection.update! complete_date: nil
   end
 
   describe "Complete inspection" do
@@ -45,7 +45,7 @@ RSpec.feature "Save & Continue button", type: :feature do
     before do
       # Make the inspection incomplete by removing the passed field
       # Also remove width to make inspection tab incomplete
-      complete_inspection.update!(passed: nil, width: nil)
+      complete_inspection.update! passed: nil, width: nil
     end
 
     scenario "shows 'Save & Continue' on inspection tab when inspection has incomplete fields" do
@@ -83,7 +83,7 @@ RSpec.feature "Save & Continue button", type: :feature do
   describe "Dynamic button text update" do
     scenario "button text changes from 'Save & Continue' to 'Save Results' when passed field is filled" do
       # Start with incomplete inspection (no passed field)
-      complete_inspection.update!(passed: nil)
+      complete_inspection.update! passed: nil
 
       visit edit_inspection_path(complete_inspection, tab: "results")
 
@@ -91,7 +91,7 @@ RSpec.feature "Save & Continue button", type: :feature do
       expect(page).to have_button("Save & Continue")
 
       # Fill in the passed field using the helper
-      choose_pass_fail(I18n.t("forms.results.fields.passed"), true)
+      choose_pass_fail I18n.t("forms.results.fields.passed"), true
 
       # Save and revisit the page
       click_button "Save & Continue"

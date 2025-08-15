@@ -4,25 +4,24 @@
 require "rails_helper"
 
 RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
-  let(:inspection) { create(:inspection) }
-  let(:materials_assessment) { create(:materials_assessment, inspection: inspection) }
-  let(:structure_assessment) { create(:structure_assessment, inspection: inspection) }
+  let(:inspection) { create :inspection }
+  let(:materials_assessment) { create :materials_assessment, inspection: inspection }
+  let(:structure_assessment) { create :structure_assessment, inspection: inspection }
 
   describe ".build_from_assessment" do
     context "with a materials assessment" do
       before do
         # Use SeedData to populate with realistic test data
-        materials_assessment.update!(SeedData.materials_fields(passed: true))
+        materials_assessment.update! SeedData.materials_fields(passed: true)
         # Override specific fields for test cases
-        materials_assessment.update!(
+        materials_assessment.update! \
           fabric_strength_comment: "Good fabric strength",
           ropes_comment: "", # Empty comment should not create block
           thread_comment: nil # Nil comment should not create block
-        )
       end
 
-      let(:blocks) do
-        described_class.build_from_assessment("materials", materials_assessment)
+      let :blocks do
+        described_class.build_from_assessment "materials", materials_assessment
       end
 
       it "creates the correct number of blocks" do
@@ -51,7 +50,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
         thread_block = blocks[6] # Thread block
         expect(thread_block.type).to eq(:value)
         expect(thread_block.pass_fail).to eq(true) # From seed data
-        expect(thread_block.name).to eq(I18n.t("forms.materials.fields.thread_pass"))
+        expect(thread_block.name).to eq(I18n.t("forms.materials.fields.thread"))
       end
 
       it "creates comment blocks only when comments have content" do
@@ -72,11 +71,11 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     context "with assessment having regular fields and pass/fail fields" do
       before do
         # Use SeedData which has both regular fields (ropes: numeric) and pass/fail fields
-        materials_assessment.update!(SeedData.materials_fields(passed: true))
+        materials_assessment.update! SeedData.materials_fields(passed: true)
       end
 
-      let(:blocks) do
-        described_class.build_from_assessment("materials", materials_assessment)
+      let :blocks do
+        described_class.build_from_assessment "materials", materials_assessment
       end
 
       it "handles regular fields correctly" do
@@ -99,17 +98,17 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
   describe "multiple assessments" do
     before do
       # Set up materials assessment using SeedData
-      materials_assessment.update!(SeedData.materials_fields(passed: true))
-      materials_assessment.update!(fabric_strength_comment: "Good fabric")
+      materials_assessment.update! SeedData.materials_fields(passed: true)
+      materials_assessment.update! fabric_strength_comment: "Good fabric"
 
       # Set up structure assessment using SeedData
-      structure_assessment.update!(SeedData.structure_fields(passed: false))
-      structure_assessment.update!(seam_integrity_comment: "Too narrow")
+      structure_assessment.update! SeedData.structure_fields(passed: false)
+      structure_assessment.update! seam_integrity_comment: "Too narrow"
     end
 
     it "creates correct blocks for multiple assessments" do
-      materials_blocks = described_class.build_from_assessment("materials", materials_assessment)
-      structure_blocks = described_class.build_from_assessment("structure", structure_assessment)
+      materials_blocks = described_class.build_from_assessment "materials", materials_assessment
+      structure_blocks = described_class.build_from_assessment "structure", structure_assessment
 
       # Combine like the main PDF generator does
       all_blocks = materials_blocks + structure_blocks
@@ -138,7 +137,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
 
   describe "field ordering" do
     it "follows the form configuration order" do
-      blocks = described_class.build_from_assessment("materials", materials_assessment)
+      blocks = described_class.build_from_assessment "materials", materials_assessment
       field_blocks = blocks.drop(1).select(&:value?)
       field_names = field_blocks.map(&:name)
       expect(field_names).not_to be_empty
@@ -150,28 +149,26 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       let(:structure_assessment) { inspection.structure_assessment }
 
       it "skips trough_depth field when value is 0" do
-        structure_assessment.update!(
+        structure_assessment.update! \
           trough_depth: 0,
           trough_depth_comment: "Not applicable to this unit"
-        )
 
-        blocks = described_class.build_from_assessment("structure", structure_assessment)
+        blocks = described_class.build_from_assessment "structure", structure_assessment
 
         # Should not have any blocks for trough_depth when it's 0
         trough_blocks = blocks.select do |b|
-          b.name&.include?(I18n.t("forms.structure.fields.trough_depth"))
+          b.name&.include? I18n.t("forms.structure.fields.trough_depth")
         end
 
         expect(trough_blocks).to be_empty
       end
 
       it "includes trough_depth field when value is non-zero" do
-        structure_assessment.update!(
+        structure_assessment.update! \
           trough_depth: 5,
           trough_depth_comment: "Good depth"
-        )
 
-        blocks = described_class.build_from_assessment("structure", structure_assessment)
+        blocks = described_class.build_from_assessment "structure", structure_assessment
 
         # Should have blocks for trough_depth when it's not 0
         trough_blocks = blocks.select do |b|
@@ -183,12 +180,11 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       end
 
       it "includes trough_depth field when value is nil" do
-        structure_assessment.update!(
+        structure_assessment.update! \
           trough_depth: nil,
           trough_depth_comment: ""
-        )
 
-        blocks = described_class.build_from_assessment("structure", structure_assessment)
+        blocks = described_class.build_from_assessment "structure", structure_assessment
 
         # Should have value block for trough_depth when it's nil (not set)
         trough_blocks = blocks.select do |b|
@@ -200,23 +196,22 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       end
 
       it "handles related fields correctly when main field is skipped" do
-        structure_assessment.update!(
+        structure_assessment.update! \
           trough_depth: 0,
           trough_depth_comment: "N/A comment",
           trough_pass: true
-        )
 
-        blocks = described_class.build_from_assessment("structure", structure_assessment)
+        blocks = described_class.build_from_assessment "structure", structure_assessment
 
         # trough_depth should be skipped (value is 0)
         depth_blocks = blocks.select do |b|
-          b.name&.include?(I18n.t("forms.structure.fields.trough_depth"))
+          b.name&.include? I18n.t("forms.structure.fields.trough_depth")
         end
         expect(depth_blocks).to be_empty
 
         # But trough_pass should still be included
         pass_blocks = blocks.select do |b|
-          b.name&.include?(I18n.t("forms.structure.fields.trough_pass"))
+          b.name&.include? I18n.t("forms.structure.fields.trough")
         end
         expect(pass_blocks).not_to be_empty
       end
@@ -225,12 +220,11 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     context "with fields that don't have add_not_applicable" do
       it "includes fields with value 0 when they don't have add_not_applicable" do
         # Regular integer field without add_not_applicable
-        structure_assessment.update!(
+        structure_assessment.update! \
           trough_adjacent_panel_width: 0,
           trough_adjacent_panel_width_comment: "Zero width"
-        )
 
-        blocks = described_class.build_from_assessment("structure", structure_assessment)
+        blocks = described_class.build_from_assessment "structure", structure_assessment
 
         # Should include the field even though value is 0
         width_blocks = blocks.select do |b|
@@ -247,19 +241,18 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       let(:user_height_assessment) { inspection.user_height_assessment }
 
       before do
-        user_height_assessment.update!(
+        user_height_assessment.update! \
           custom_user_height_comment: "Maximum height is 2.5m for safety"
-        )
       end
 
-      let(:blocks) do
-        described_class.build_from_assessment("user_height", user_height_assessment)
+      let :blocks do
+        described_class.build_from_assessment "user_height", user_height_assessment
       end
 
       it "creates blocks for standalone comment field" do
         # Find the custom_user_height_comment blocks
         custom_height_blocks = blocks.select do |b|
-          (b.value? && b.name == I18n.t("forms.user_height.fields.custom_user_height_comment")) ||
+          (b.value? && b.name == I18n.t("forms.user_height.fields.custom_user_height")) ||
             (b.comment? && b.comment == "Maximum height is 2.5m for safety")
         end
 
@@ -268,7 +261,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
         # Should have a label block
         label_block = custom_height_blocks.find(&:value?)
         expect(label_block).to be_present
-        expect(label_block.name).to eq(I18n.t("forms.user_height.fields.custom_user_height_comment"))
+        expect(label_block.name).to eq(I18n.t("forms.user_height.fields.custom_user_height"))
         expect(label_block.value).to be_nil
 
         # Should have a comment block
@@ -278,18 +271,18 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       end
 
       it "does not create blocks for empty standalone comment" do
-        user_height_assessment.update!(custom_user_height_comment: "")
-        blocks = described_class.build_from_assessment("user_height", user_height_assessment)
+        user_height_assessment.update! custom_user_height_comment: ""
+        blocks = described_class.build_from_assessment "user_height", user_height_assessment
 
         # Should not have any blocks for the empty comment
         custom_height_blocks = blocks.select do |b|
-          (b.value? && b.name == I18n.t("forms.user_height.fields.custom_user_height_comment")) ||
+          (b.value? && b.name == I18n.t("forms.user_height.fields.custom_user_height")) ||
             b.comment?
         end
 
-        # Find only the custom_user_height_comment related blocks
+        # Find only the custom_user_height related blocks
         custom_comment_blocks = custom_height_blocks.select do |b|
-          b.name == I18n.t("forms.user_height.fields.custom_user_height_comment") ||
+          b.name == I18n.t("forms.user_height.fields.custom_user_height") ||
             b.comment == ""
         end
 
@@ -297,12 +290,12 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       end
 
       it "handles nil standalone comment" do
-        user_height_assessment.update!(custom_user_height_comment: nil)
-        blocks = described_class.build_from_assessment("user_height", user_height_assessment)
+        user_height_assessment.update! custom_user_height_comment: nil
+        blocks = described_class.build_from_assessment "user_height", user_height_assessment
 
         # Should not have any blocks for the nil comment
         custom_height_blocks = blocks.select do |b|
-          b.value? && b.name == I18n.t("forms.user_height.fields.custom_user_height_comment")
+          b.value? && b.name == I18n.t("forms.user_height.fields.custom_user_height")
         end
 
         expect(custom_height_blocks).to be_empty

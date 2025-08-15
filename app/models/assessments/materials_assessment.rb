@@ -42,6 +42,7 @@ class Assessments::MaterialsAssessment < ApplicationRecord
   include AssessmentCompletion
   include FormConfigurable
   include ValidationConfigurable
+  include SymbolizedAttributes
 
   self.primary_key = "inspection_id"
 

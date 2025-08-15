@@ -4,7 +4,7 @@
 require "rails_helper"
 
 # System columns that should be excluded from validation
-SYSTEM_COLUMNS = %w[inspection_id created_at updated_at].freeze
+SYSTEM_COLUMNS = %i[inspection_id created_at updated_at].freeze
 
 # Assessment types to validate
 ASSESSMENT_TYPES = %w[
@@ -38,22 +38,22 @@ PARTIAL_TYPE_MAPPINGS = {
 # Define allowed attributes for each partial type
 PARTIAL_ALLOWED_ATTRIBUTES = {
   # Number fields can have step, min, max
-  "number" => %w[step min max],
-  "number_pass_fail_comment" => %w[step min max],
-  "number_pass_fail_na_comment" => %w[step min max],
-  "decimal_comment" => %w[step min max],
-  "integer_comment" => %w[step min max add_not_applicable],
+  number: %w[step min max],
+  number_pass_fail_comment: %w[step min max],
+  number_pass_fail_na_comment: %w[step min max],
+  decimal_comment: %w[step min max],
+  integer_comment: %w[step min max add_not_applicable],
   # Most partials don't allow any attributes
-  "text_field" => [],
-  "text_area" => [],
-  "pass_fail" => [],
-  "pass_fail_comment" => [],
-  "pass_fail_na_comment" => [],
-  "checkbox" => [],
-  "yes_no_radio" => [],
-  "yes_no_radio_comment" => [],
-  "comment" => [],
-  "radio_comment" => []
+  text_field: [],
+  text_area: [],
+  pass_fail: [],
+  pass_fail_comment: [],
+  pass_fail_na_comment: [],
+  checkbox: [],
+  yes_no_radio: [],
+  yes_no_radio_comment: [],
+  comment: [],
+  radio_comment: []
 }.freeze
 
 RSpec.describe "Form YAML Database Schema Validation" do
@@ -63,7 +63,8 @@ RSpec.describe "Form YAML Database Schema Validation" do
     return nil unless File.exist?(config_path)
 
     yaml_content = YAML.load_file(config_path)
-    yaml_content["form_fields"]
+    yaml_content.deep_symbolize_keys!
+    yaml_content[:form_fields]
   end
 
   # Helper to get all fields from form config
@@ -72,9 +73,9 @@ RSpec.describe "Form YAML Database Schema Validation" do
 
     fields = []
     form_config.each do |fieldset|
-      fieldset["fields"].each do |field_config|
-        field = field_config["field"]
-        partial = field_config["partial"]
+      fieldset[:fields].each do |field_config|
+        field = field_config[:field].to_sym
+        partial = field_config[:partial].to_sym
 
         fields << field
         composite_fields = ChobbleForms::FieldUtils
@@ -87,7 +88,7 @@ RSpec.describe "Form YAML Database Schema Validation" do
 
   # Helper to get database columns for an assessment
   define_method(:get_database_columns) do |table_name|
-    ActiveRecord::Base.connection.columns(table_name).map(&:name)
+    ActiveRecord::Base.connection.columns(table_name).map(&:name).map(&:to_sym)
   end
 
   describe "Task 1: Database Column Coverage" do
@@ -124,7 +125,9 @@ RSpec.describe "Form YAML Database Schema Validation" do
           end
         end
 
-        missing_fields_by_assessment[assessment_type] = missing_fields if missing_fields.any?
+        if missing_fields.any?
+          missing_fields_by_assessment[assessment_type] = missing_fields
+        end
       end
 
       if missing_fields_by_assessment.any?
@@ -152,13 +155,15 @@ RSpec.describe "Form YAML Database Schema Validation" do
         next unless form_config
 
         # Get all legend keys
-        legend_keys = form_config.map { |fieldset| fieldset["legend_i18n_key"] }
+        legend_keys = form_config.map { |fieldset| fieldset[:legend_i18n_key] }
 
         # Find duplicates
         legend_counts = legend_keys.tally
         duplicates = legend_counts.select { |_, count| count > 1 }.keys
 
-        duplicate_legends_by_assessment[assessment_type] = duplicates if duplicates.any?
+        if duplicates.any?
+          duplicate_legends_by_assessment[assessment_type] = duplicates
+        end
       end
 
       if duplicate_legends_by_assessment.any?
@@ -193,9 +198,9 @@ RSpec.describe "Form YAML Database Schema Validation" do
         end
 
         form_config.each do |fieldset|
-          fieldset["fields"].each do |field_config|
-            field = field_config["field"]
-            partial = field_config["partial"]
+          fieldset[:fields].each do |field_config|
+            field = field_config[:field]
+            partial = field_config[:partial]
 
             # Check if field exists in database
             unless column_types[field]
@@ -288,64 +293,44 @@ RSpec.describe "Form YAML Database Schema Validation" do
         db_columns = get_database_columns(table_name)
 
         form_config.each do |fieldset|
-          fieldset["fields"].each do |field_config|
-            field = field_config["field"]
-            partial = field_config["partial"]
+          fieldset[:fields].each do |field_config|
+            field = field_config[:field]
+            partial = field_config[:partial]
+
+            # Build list of required columns for this field/partial combination
+            required_columns = []
 
             # Check composite fields have all required columns
             case partial
-            when "pass_fail_comment", "pass_fail_na_comment"
-              if field.end_with?("_pass")
+            when :pass_fail_comment, :pass_fail_na_comment
+              if field.to_s.end_with?("_pass")
                 # Field ending in _pass should have matching _comment field
-                base_field = field.gsub(/_pass$/, "")
-                comment_field = "#{base_field}_comment"
+                base_field = field.to_s.gsub(/_pass$/, "")
+                required_columns << :"#{base_field}_comment"
               else
                 # Base field should have both _pass and _comment
-                pass_field = "#{field}_pass"
-                comment_field = "#{field}_comment"
-                unless db_columns.include?(pass_field)
-                  errors << <<~MSG
-                    #{assessment_type}: #{pass_field} missing for #{field}
-                  MSG
-                end
+                required_columns << :"#{field}_pass"
+                required_columns << :"#{field}_comment"
               end
-              unless db_columns.include?(comment_field)
-                errors << <<~MSG
-                  #{assessment_type}: #{comment_field} missing for #{field}
-                MSG
-              end
-            when "number_pass_fail_comment", "number_pass_fail_na_comment"
+            when :number_pass_fail_comment, :number_pass_fail_na_comment
               # Base field should exist, plus _pass and _comment
-              unless db_columns.include?(field)
-                errors << <<~MSG
-                  #{assessment_type}: #{field} missing
-                MSG
-              end
-              pass_field = "#{field}_pass"
-              comment_field = "#{field}_comment"
-              unless db_columns.include?(pass_field)
-                errors << <<~MSG
-                  #{assessment_type}: #{pass_field} missing for #{field}
-                MSG
-              end
-              unless db_columns.include?(comment_field)
-                errors << <<~MSG
-                  #{assessment_type}: #{comment_field} missing for #{field}
-                MSG
-              end
-            when "decimal_comment", "integer_comment", "yes_no_radio_comment"
+              required_columns << field
+              required_columns << :"#{field}_pass"
+              required_columns << :"#{field}_comment"
+            when :decimal_comment, :integer_comment, :yes_no_radio_comment
               # Base field should exist, plus _comment
-              unless db_columns.include?(field)
-                errors << <<~MSG
-                  #{assessment_type}: #{field} missing
-                MSG
-              end
-              comment_field = "#{field}_comment"
-              unless db_columns.include?(comment_field)
-                errors << <<~MSG
-                  #{assessment_type}: #{comment_field} missing for #{field}
-                MSG
-              end
+              required_columns << field
+              required_columns << :"#{field}_comment"
+            end
+
+            # Check all required columns exist in database
+            missing_columns = required_columns - db_columns
+            if missing_columns.any?
+              missing_list = missing_columns.join(", ")
+              field_partial = "#{field} (#{partial})"
+              errors << <<~MSG
+                #{assessment_type}: Missing for #{field_partial}: #{missing_list}
+              MSG
             end
           end
         end
@@ -370,10 +355,10 @@ RSpec.describe "Form YAML Database Schema Validation" do
         next unless form_config
 
         form_config.each do |fieldset|
-          fieldset["fields"].each do |field_config|
-            field = field_config["field"]
-            partial = field_config["partial"]
-            attributes = field_config["attributes"] || {}
+          fieldset[:fields].each do |field_config|
+            field = field_config[:field]
+            partial = field_config[:partial]
+            attributes = field_config[:attributes] || {}
 
             # Get allowed attributes for this partial
             allowed = PARTIAL_ALLOWED_ATTRIBUTES[partial]

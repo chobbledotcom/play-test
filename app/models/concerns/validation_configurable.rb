@@ -7,7 +7,9 @@ module ValidationConfigurable
 
   included do
     # Apply validations when the concern is included
-    if ancestors.include?(FormConfigurable)
+    # Need to check if the including class has FormConfigurable
+    # Use self instead of ancestors since we're in the class context
+    if included_modules.include?(FormConfigurable)
       apply_form_validations
     end
   end
@@ -28,9 +30,19 @@ module ValidationConfigurable
         next unless section[:fields]
 
         section[:fields].each do |field_config|
-          apply_validation_for_field(field_config)
+          # Normalize field config to ensure symbols
+          normalized_config = normalize_field_config(field_config)
+          apply_validation_for_field(normalized_config)
         end
       end
+    end
+
+    sig { params(field_config: T::Hash[Symbol, T.untyped]).returns(T::Hash[Symbol, T.untyped]) }
+    def normalize_field_config(field_config)
+      config = field_config.dup
+      config[:field] = config[:field].to_sym
+      config[:partial] = config[:partial].to_sym
+      config
     end
 
     private
@@ -48,9 +60,9 @@ module ValidationConfigurable
       end
 
       case partial
-      when "decimal_comment", "decimal"
+      when :decimal_comment, :decimal
         apply_decimal_validation(field, attributes)
-      when "number", "number_pass_fail_na_comment"
+      when :number, :number_pass_fail_na_comment
         apply_number_validation(field, attributes)
       end
     end

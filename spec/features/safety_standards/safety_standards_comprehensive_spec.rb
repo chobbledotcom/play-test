@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Safety Standards Comprehensive Tests" do
@@ -24,7 +26,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         height: 3.0
       })
 
-      expect_anchor_result(8)
+      expect_anchor_result 8
     end
 
     scenario "form submission via POST (no JS)" do
@@ -34,7 +36,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
       submit_anchor_form
 
       expect(current_url).to include("calculation")
-      expect_anchor_result(8)
+      expect_anchor_result 8
     end
   end
 
@@ -49,28 +51,28 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         fill_anchor_form(**valid_anchor_params)
         submit_anchor_form
 
-        expect_anchor_result(8)
+        expect_anchor_result 8
         expect(current_url).to eq(url_before)
       end
 
       scenario "runout calculation updates without reload" do
         visit safety_standards_path
-        navigate_to_standard_tab(:slides)
+        navigate_to_standard_tab :slides
 
         fill_runout_form(**valid_runout_params)
         submit_runout_form
 
-        expect_runout_result(required_runout: 1.25)
+        expect_runout_result required_runout: 1.25
       end
 
       scenario "wall height calculation updates without reload" do
         visit safety_standards_path
-        navigate_to_standard_tab(:slides)
+        navigate_to_standard_tab :slides
 
         fill_wall_height_form(**valid_wall_params)
         submit_wall_height_form
 
-        expect_wall_height_result("Required Wall Height: 1.5m")
+        expect_wall_height_result "Required Wall Height: 1.5m"
       end
     end
 
@@ -79,8 +81,8 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         visit safety_standards_path
 
         # The forms have min values that prevent submitting zeros
-        within_form("safety_standards_anchors") do
-          field = find_form_field("safety_standards_anchors", "length")
+        within_form :safety_standards_anchors do
+          field = find_form_field :safety_standards_anchors, :length
           expect(field["min"]).to eq("1.0")
         end
       end
@@ -95,19 +97,19 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         submit_anchor_form
 
         # Submit slide forms
-        navigate_to_standard_tab(:slides)
+        navigate_to_standard_tab :slides
         fill_runout_form(**valid_runout_params)
         submit_runout_form
         fill_wall_height_form(**valid_wall_params)
         submit_wall_height_form
 
         # Verify all results
-        navigate_to_standard_tab(:anchorage)
-        expect_anchor_result(8)
+        navigate_to_standard_tab :anchorage
+        expect_anchor_result 8
 
-        navigate_to_standard_tab(:slides)
-        expect_runout_result(required_runout: 1.25)
-        expect_wall_height_result("Required Wall Height: 1.5m")
+        navigate_to_standard_tab :slides
+        expect_runout_result required_runout: 1.25
+        expect_wall_height_result "Required Wall Height: 1.5m"
       end
 
       scenario "form values persist after submission" do
@@ -117,11 +119,11 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         submit_anchor_form
 
         # Verify form values persist
-        within_form("safety_standards_anchors") do
-          form_name = "safety_standards_anchors"
-          expect(find_form_field(form_name, "length").value).to eq("5.0")
-          expect(find_form_field(form_name, "width").value).to eq("5.0")
-          expect(find_form_field(form_name, "height").value).to eq("3.0")
+        within_form :safety_standards_anchors do
+          form_name = :safety_standards_anchors
+          expect(find_form_field(form_name, :length).value).to eq("5.0")
+          expect(find_form_field(form_name, :width).value).to eq("5.0")
+          expect(find_form_field(form_name, :height).value).to eq("3.0")
         end
       end
     end
@@ -130,7 +132,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
   describe "API tests", type: :request do
     include_context "calculation parameters"
 
-    def api_request(params)
+    define_method :api_request do |params|
       post safety_standards_path,
         params: {calculation: params}.to_json,
         headers: {
@@ -139,7 +141,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         }
     end
 
-    def turbo_request(params)
+    define_method :turbo_request do |params|
       post safety_standards_path,
         params: {calculation: params},
         headers: {Accept: "text/vnd.turbo-stream.html"}
@@ -152,16 +154,16 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         expect(response).to be_successful
         expect(response.content_type).to include("application/json")
 
-        json = JSON.parse(response.body)
+        json = JSON.parse response.body
         expect(json).to have_key("passed")
         expect(json).to have_key("status")
         expect(json).to have_key("result")
       end
 
       it "always includes status explanation" do
-        api_request(type: "anchors", length: 0, width: 0, height: 0)
+        api_request type: "anchors", length: 0, width: 0, height: 0
 
-        json = JSON.parse(response.body)
+        json = JSON.parse response.body
         expect(json["passed"]).to be false
         expect(json["status"]).to be_present
         expect(json["status"]).not_to eq("")
@@ -191,7 +193,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
           when "wall_height" then {type: type, user_height: 1.5}
           end
 
-          turbo_request(params)
+          turbo_request params
           expect(response.body).to include(%(target="#{target}"))
         end
       end
@@ -204,12 +206,12 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
     it "handles anchor errors via POST" do
       params = {type: "anchors", **invalid_anchor_params}
       post safety_standards_path, params: {calculation: params}
-      redirect_path = safety_standards_path(calculation: params)
+      redirect_path = safety_standards_path calculation: params
       expect(response).to redirect_to(redirect_path)
 
       follow_redirect!
       expect(response.body).to include("Error:")
-      error_msg = I18n.t("safety_standards.errors.invalid_dimensions")
+      error_msg = I18n.t "safety_standards.errors.invalid_dimensions"
       expect(response.body).to include(error_msg)
     end
   end

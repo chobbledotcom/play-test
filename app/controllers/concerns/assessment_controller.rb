@@ -6,9 +6,11 @@ module AssessmentController
   extend T::Sig
   include UserActivityCheck
   include InspectionTurboStreams
+  include InspectionTabs
 
   included do
     before_action :set_inspection
+    before_action :set_current_tab, only: :update
     before_action :check_inspection_owner
     before_action :require_user_active
     before_action :set_assessment
@@ -18,9 +20,9 @@ module AssessmentController
   sig { void }
   def update
     # Apply any model-specific preprocessing (like setting defaults)
-    preprocess_values if respond_to?(:preprocess_values, true)
+    preprocess_values if respond_to? :preprocess_values, true
 
-    if @assessment.update(assessment_params)
+    if @assessment.update assessment_params
       handle_successful_update
     else
       handle_failed_update
@@ -35,7 +37,7 @@ module AssessmentController
 
     respond_to do |format|
       format.html do
-        flash[:notice] = build_flash_message(additional_info)
+        flash[:notice] = build_flash_message additional_info
         redirect_to @inspection
       end
       format.json do
@@ -52,14 +54,14 @@ module AssessmentController
   end
 
   # Override in specific controllers to provide additional info
-  sig { returns(T.nilable(String)) }
+  sig { returns T.nilable(String) }
   def build_additional_info
     nil
   end
 
-  sig { params(additional_info: T.nilable(String)).returns(String) }
+  sig { params(additional_info: T.nilable(String)).returns String }
   def build_flash_message(additional_info)
-    base_message = I18n.t("inspections.messages.updated")
+    base_message = I18n.t "inspections.messages.updated"
     return base_message unless additional_info
 
     "#{base_message} #{additional_info}"
@@ -79,7 +81,6 @@ module AssessmentController
 
   sig { void }
   def render_edit_with_errors
-    params[:tab] = assessment_type
     @inspection.association(assessment_association).target = @assessment
     render "inspections/edit", status: :unprocessable_content
   end
@@ -103,23 +104,23 @@ module AssessmentController
 
   sig { void }
   def set_assessment
-    @assessment = @inspection.send(assessment_association)
+    @assessment = @inspection.send assessment_association
   end
 
   # Default implementation that permits all attributes except sensitive ones
   # Can be overridden in including controllers if needed
-  sig { returns(ActionController::Parameters) }
+  sig { returns ActionController::Parameters }
   def assessment_params
-    params.require(param_key).permit(permitted_attributes)
+    params.require(param_key).permit permitted_attributes
   end
 
-  sig { returns(Symbol) }
+  sig { returns Symbol }
   def param_key
     # Use the model's actual param_key to avoid namespace mismatches
     assessment_class.model_name.param_key.to_sym
   end
 
-  sig { returns(T::Array[String]) }
+  sig { returns T::Array[String] }
   def permitted_attributes
     # Get all attributes except sensitive ones
     excluded_attrs = %w[id inspection_id created_at updated_at]
@@ -127,21 +128,21 @@ module AssessmentController
   end
 
   # Automatically derive from controller name
-  sig { returns(String) }
+  sig { returns String }
   def assessment_association
     # e.g. "MaterialsAssessmentsController" -> "materials_assessment"
     controller_name.singularize
   end
 
   # Automatically derive from controller name
-  sig { returns(String) }
+  sig { returns Symbol }
   def assessment_type
-    # e.g. "MaterialsAssessmentsController" -> "materials"
-    controller_name.singularize.sub(/_assessment$/, "")
+    # e.g. "MaterialsAssessmentsController" -> :materials
+    controller_name.singularize.sub(/_assessment$/, "").to_sym
   end
 
   # Automatically derive from controller name
-  sig { returns(T.class_of(ActiveRecord::Base)) }
+  sig { returns T.class_of(ActiveRecord::Base) }
   def assessment_class
     # e.g. "MaterialsAssessmentsController"
     # -> Assessments::MaterialsAssessment

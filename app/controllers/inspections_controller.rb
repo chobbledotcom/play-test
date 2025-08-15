@@ -1,13 +1,16 @@
 # typed: false
+# frozen_string_literal: true
 
 class InspectionsController < ApplicationController
   include InspectionTurboStreams
+  include InspectionTabs
   include PublicViewable
   include UserActivityCheck
 
   skip_before_action :require_login, only: %i[show]
   before_action :check_assessments_enabled
   before_action :set_inspection, except: %i[create index]
+  before_action :set_current_tab, only: %i[edit update]
   before_action :check_inspection_owner, except: %i[create index show]
   before_action :validate_unit_ownership, only: %i[update]
   before_action :redirect_if_complete,
@@ -18,7 +21,7 @@ class InspectionsController < ApplicationController
 
   def index
     all_inspections = filtered_inspections_query_without_order.to_a
-    partition_inspections(all_inspections)
+    partition_inspections all_inspections
 
     @title = build_index_title
     @has_any_inspections = all_inspections.any?
@@ -26,7 +29,7 @@ class InspectionsController < ApplicationController
     respond_to do |format|
       format.html
       format.csv do
-        log_inspection_event("exported", nil, "Exported #{@complete_inspections.count} inspections to CSV")
+        log_inspection_event "exported", nil, "Exported #{@complete_inspections.count} inspections to CSV"
         send_inspections_csv
       end
     end
@@ -54,7 +57,7 @@ class InspectionsController < ApplicationController
     ).create
 
     if result[:success]
-      log_inspection_event("created", result[:inspection])
+      log_inspection_event "created", result[:inspection]
       flash[:notice] = result[:message]
       redirect_to edit_inspection_path(result[:inspection])
     else
@@ -64,7 +67,6 @@ class InspectionsController < ApplicationController
   end
 
   def edit
-    validate_tab_parameter
     set_previous_inspection
   end
 
@@ -79,13 +81,13 @@ class InspectionsController < ApplicationController
       return
     end
 
-    if @inspection.update(params_to_update)
-      changed_data = calculate_changes(
+    if @inspection.update params_to_update
+      changed_data = calculate_changes \
         previous_attributes,
         @inspection.attributes,
         inspection_params.keys
-      )
-      log_inspection_event("updated", @inspection, nil, changed_data)
+
+      log_inspection_event "updated", @inspection, nil, changed_data
       handle_successful_update
     else
       handle_failed_update
@@ -94,7 +96,7 @@ class InspectionsController < ApplicationController
 
   def destroy
     if @inspection.complete?
-      alert_message = I18n.t("inspections.messages.delete_complete_denied")
+      alert_message = I18n.t "inspections.messages.delete_complete_denied"
       redirect_to inspection_path(@inspection), alert: alert_message
       return
     end
@@ -109,13 +111,13 @@ class InspectionsController < ApplicationController
 
     @inspection.destroy
     # Log the deletion with the inspection details in metadata
-    Event.log(
+    Event.log \
       user: current_user,
       action: "deleted",
       resource: @inspection,
       details: nil,
       metadata: inspection_details
-    )
+
     redirect_to inspections_path, notice: I18n.t("inspections.messages.deleted")
   end
 
@@ -124,38 +126,38 @@ class InspectionsController < ApplicationController
       .includes(photo_attachment: :blob)
       .search(params[:search])
       .by_manufacturer(params[:manufacturer])
-      .order(:name)
-    @title = t("inspections.titles.select_unit")
+      .order :name
+    @title = t "inspections.titles.select_unit"
 
     render :select_unit
   end
 
   def update_unit
-    unit = current_user.units.find_by(id: params[:unit_id])
+    unit = current_user.units.find_by id: params[:unit_id]
 
     unless unit
-      flash[:alert] = t("inspections.errors.invalid_unit")
+      flash[:alert] = t "inspections.errors.invalid_unit"
       redirect_to select_unit_inspection_path(@inspection) and return
     end
 
     @inspection.unit = unit
 
     if @inspection.save
-      handle_successful_unit_update(unit)
+      handle_successful_unit_update unit
     else
       handle_failed_unit_update
     end
   end
 
   def handle_successful_unit_update(unit)
-    log_inspection_event("unit_changed", @inspection, "Unit changed to #{unit.name}")
-    flash[:notice] = t("inspections.messages.unit_changed", unit_name: unit.name)
+    log_inspection_event "unit_changed", @inspection, "Unit changed to #{unit.name}"
+    flash[:notice] = t "inspections.messages.unit_changed", unit_name: unit.name
     redirect_to edit_inspection_path(@inspection)
   end
 
   def handle_failed_unit_update
-    error_messages = @inspection.errors.full_messages.join(", ")
-    flash[:alert] = t("inspections.messages.unit_change_failed", errors: error_messages)
+    error_messages = @inspection.errors.full_messages.join ", "
+    flash[:alert] = t "inspections.messages.unit_change_failed", errors: error_messages
     redirect_to select_unit_inspection_path(@inspection)
   end
 
@@ -163,41 +165,41 @@ class InspectionsController < ApplicationController
     validation_errors = @inspection.validate_completeness
 
     if validation_errors.any?
-      error_list = validation_errors.join(", ")
+      error_list = validation_errors.join ", "
       flash[:alert] =
-        t("inspections.messages.cannot_complete", errors: error_list)
+        t "inspections.messages.cannot_complete", errors: error_list
       redirect_to edit_inspection_path(@inspection)
       return
     end
 
-    @inspection.complete!(current_user)
-    log_inspection_event("completed", @inspection)
-    flash[:notice] = t("inspections.messages.marked_complete")
+    @inspection.complete! current_user
+    log_inspection_event "completed", @inspection
+    flash[:notice] = t "inspections.messages.marked_complete"
     redirect_to @inspection
   end
 
   def mark_draft
-    if @inspection.update(complete_date: nil)
-      log_inspection_event("marked_draft", @inspection)
-      flash[:notice] = t("inspections.messages.marked_in_progress")
+    if @inspection.update complete_date: nil
+      log_inspection_event "marked_draft", @inspection
+      flash[:notice] = t "inspections.messages.marked_in_progress"
     else
-      error_messages = @inspection.errors.full_messages.join(", ")
-      flash[:alert] = t("inspections.messages.mark_in_progress_failed",
-        errors: error_messages)
+      error_messages = @inspection.errors.full_messages.join ", "
+      flash[:alert] = t "inspections.messages.mark_in_progress_failed",
+        errors: error_messages
     end
     redirect_to edit_inspection_path(@inspection)
   end
 
   def log
-    @events = Event.for_resource(@inspection).recent.includes(:user)
-    @title = I18n.t("inspections.titles.log", inspection: @inspection.id)
+    @events = Event.for_resource(@inspection).recent.includes :user
+    @title = I18n.t "inspections.titles.log", inspection: @inspection.id
   end
 
   def inspection_params
     base_params = build_base_params
-    add_assessment_params(base_params)
+    add_assessment_params base_params
 
-    process_image_params(base_params, :photo_1, :photo_2, :photo_3)
+    process_image_params base_params, :photo_1, :photo_2, :photo_3
   end
 
   private
@@ -218,28 +220,17 @@ class InspectionsController < ApplicationController
 
   def send_inspections_csv
     csv_data = InspectionCsvExportService.new(@complete_inspections).generate
-    filename = I18n.t("inspections.export.csv_filename", date: Time.zone.today)
+    filename = I18n.t "inspections.export.csv_filename", date: Time.zone.today
     send_data csv_data, filename: filename
-  end
-
-  def validate_tab_parameter
-    return if params[:tab].blank?
-
-    valid_tabs = helpers.inspection_tabs(@inspection)
-    unless valid_tabs.include?(params[:tab])
-      redirect_to edit_inspection_path(@inspection),
-        alert: I18n.t("inspections.messages.invalid_tab")
-    end
   end
 
   def validate_inspection_completability
     return unless @inspection.complete?
     return if @inspection.can_mark_complete?
 
-    error_message = I18n.t(
+    error_message = I18n.t \
       "inspections.errors.invalid_completion_state",
       errors: @inspection.completion_errors.join(", ")
-    )
 
     inspection_errors = @inspection.completion_errors
     Rails.logger.error "Inspection #{@inspection.id} is marked complete " \
@@ -265,29 +256,29 @@ class InspectionsController < ApplicationController
   # This ensures mappings stay in sync with the model definition
   ASSESSMENT_TAB_MAPPING = Inspection::ALL_ASSESSMENT_TYPES
     .each_with_object({}) do |(method_name, _), hash|
-      # Convert :user_height_assessment to "user_height"
-      tab_name = method_name.to_s.gsub(/_assessment$/, "")
-      hash[tab_name] = method_name
-    end.freeze
+    # Convert :user_height_assessment to "user_height"
+    tab_name = method_name.to_s.gsub(/_assessment$/, "")
+    hash[tab_name] = method_name
+  end.freeze
 
   ASSESSMENT_CLASS_MAPPING = Inspection::ALL_ASSESSMENT_TYPES
     .each_with_object({}) do |(method_name, klass), hash|
-      # Convert :user_height_assessment to "user_height"
-      tab_name = method_name.to_s.gsub(/_assessment$/, "")
-      hash[tab_name] = klass
-    end.freeze
+    # Convert :user_height_assessment to "user_height"
+    tab_name = method_name.to_s.gsub(/_assessment$/, "")
+    hash[tab_name] = klass
+  end.freeze
 
   def build_base_params
     params.require(:inspection).permit(*Inspection::USER_EDITABLE_PARAMS)
   end
 
   def add_assessment_params(base_params)
-    Inspection::ALL_ASSESSMENT_TYPES.each do |ass_type, _ass_class|
+    Inspection::ALL_ASSESSMENT_TYPES.each_key do |ass_type|
       ass_key = "#{ass_type}_attributes"
       next if params[:inspection][ass_key].blank?
 
       ass_params = params[:inspection][ass_key]
-      permitted_ass_params = assessment_permitted_attributes(ass_type)
+      permitted_ass_params = assessment_permitted_attributes ass_type
       base_params[ass_key] = ass_params.permit(*permitted_ass_params)
     end
   end
@@ -295,7 +286,7 @@ class InspectionsController < ApplicationController
   def assessment_permitted_attributes(assessment_type)
     model_class = "Assessments::#{assessment_type.to_s.camelize}".constantize
     all_attributes = model_class.column_names
-    (all_attributes - ASSESSMENT_SYSTEM_ATTRIBUTES).map { it.to_sym }
+    (all_attributes - ASSESSMENT_SYSTEM_ATTRIBUTES).map(&:to_sym)
   end
 
   def filtered_inspections_query_without_order = current_user.inspections
@@ -331,17 +322,17 @@ class InspectionsController < ApplicationController
   def redirect_if_complete
     return unless @inspection.complete?
 
-    flash[:notice] = I18n.t("inspections.messages.cannot_edit_complete")
+    flash[:notice] = I18n.t "inspections.messages.cannot_edit_complete"
     redirect_to @inspection
   end
 
   def build_index_title
-    title = I18n.t("inspections.titles.index")
+    title = I18n.t "inspections.titles.index"
     return title unless params[:result]
 
     status = case params[:result]
-    in "passed" then I18n.t("inspections.status.passed")
-    in "failed" then I18n.t("inspections.status.failed")
+    in "passed" then I18n.t "inspections.status.passed"
+    in "failed" then I18n.t "inspections.status.failed"
     else params[:result]
     end
     "#{title} - #{status}"
@@ -350,18 +341,18 @@ class InspectionsController < ApplicationController
   def validate_unit_ownership
     return unless inspection_params[:unit_id]
 
-    unit = current_user.units.find_by(id: inspection_params[:unit_id])
+    unit = current_user.units.find_by id: inspection_params[:unit_id]
     return if unit
 
     # Unit ID not found or doesn't belong to user - security issue
-    flash[:alert] = I18n.t("inspections.errors.invalid_unit")
+    flash[:alert] = I18n.t "inspections.errors.invalid_unit"
     render :edit, status: :unprocessable_content
   end
 
   def handle_successful_update
     respond_to do |format|
       format.html do
-        flash[:notice] = I18n.t("inspections.messages.updated")
+        flash[:notice] = I18n.t "inspections.messages.updated"
         redirect_to @inspection
       end
       format.json do
@@ -381,18 +372,18 @@ class InspectionsController < ApplicationController
   end
 
   def send_inspection_pdf
-    result = PdfCacheService.fetch_or_generate_inspection_pdf(
+    result = PdfCacheService.fetch_or_generate_inspection_pdf \
       @inspection,
       debug_enabled: admin_debug_enabled?,
       debug_queries: debug_sql_queries
-    )
-    @inspection.update(pdf_last_accessed_at: Time.current)
 
-    handle_pdf_response(result, pdf_filename)
+    @inspection.update pdf_last_accessed_at: Time.current
+
+    handle_pdf_response result, pdf_filename
   end
 
   def send_inspection_qr_code
-    qr_code_png = QrCodeService.generate_qr_code(@inspection)
+    qr_code_png = QrCodeService.generate_qr_code @inspection
 
     send_data qr_code_png,
       filename: qr_code_filename,
@@ -411,23 +402,23 @@ class InspectionsController < ApplicationController
 
   def pdf_filename
     identifier = @inspection.unit&.serial || @inspection.id
-    I18n.t("inspections.export.pdf_filename", identifier: identifier)
+    I18n.t "inspections.export.pdf_filename", identifier: identifier
   end
 
   def qr_code_filename
     identifier = @inspection.unit&.serial || @inspection.id
-    I18n.t("inspections.export.qr_filename", identifier: identifier)
+    I18n.t "inspections.export.qr_filename", identifier: identifier
   end
 
   def resource_pdf_url
-    inspection_path(@inspection, format: :pdf)
+    inspection_path @inspection, format: :pdf
   end
 
   def handle_inactive_user_redirect
     if action_name == "create"
       unit_id = params[:unit_id] || params.dig(:inspection, :unit_id)
       if unit_id.present?
-        unit = current_user.units.find_by(id: unit_id)
+        unit = current_user.units.find_by id: unit_id
         redirect_to unit ? unit_path(unit) : inspections_path
       else
         redirect_to inspections_path
@@ -439,7 +430,7 @@ class InspectionsController < ApplicationController
     end
   end
 
-  NOT_COPIED_FIELDS = %w[
+  NOT_COPIED_FIELDS = %i[
     complete_date
     created_at
     id
@@ -452,7 +443,7 @@ class InspectionsController < ApplicationController
     unit_id
     updated_at
     user_id
-  ]
+  ].freeze
 
   def set_previous_inspection
     @previous_inspection = @inspection.unit&.last_inspection
@@ -462,7 +453,7 @@ class InspectionsController < ApplicationController
     current_object, previous_object, column_names = get_prefill_objects
 
     column_names.each do |field|
-      next if NOT_COPIED_FIELDS.include?(field)
+      next if NOT_COPIED_FIELDS.include? field
       next if previous_object&.send(field).nil?
       next unless current_object.send(field).nil?
 
@@ -471,37 +462,36 @@ class InspectionsController < ApplicationController
   end
 
   def get_prefill_objects
-    case params[:tab]
-    when "inspection", "", nil
-      [@inspection, @previous_inspection, Inspection.column_names]
-    when "results"
-      # Results tab uses inspection fields directly, not an assessment
-      # Only risk_assessment should be prefilled, not passed
-      [@inspection, @previous_inspection, ["risk_assessment"]]
+    tab_string = @current_tab.to_s
+
+    case @current_tab
+    when :inspection, :results
+      [@inspection, @previous_inspection, Inspection.column_names.map(&:to_sym)]
     else
-      assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
-      assessment_class = ASSESSMENT_CLASS_MAPPING[params[:tab]]
+      assessment_method = ASSESSMENT_TAB_MAPPING[tab_string]
+      assessment_class = ASSESSMENT_CLASS_MAPPING[tab_string]
       [
         @inspection.public_send(assessment_method),
         @previous_inspection.public_send(assessment_method),
-        assessment_class.column_names
+        assessment_class.column_names.map(&:to_sym)
       ]
     end
   end
 
   def translate_field_name(field)
-    is_comment = ChobbleForms::FieldUtils.is_comment_field?(field)
-    is_pass = ChobbleForms::FieldUtils.is_pass_field?(field)
-    field_base = ChobbleForms::FieldUtils.strip_field_suffix(field)
-    i18n_base = "forms.#{params[:tab]}.fields"
+    is_comment = ChobbleForms::FieldUtils.is_comment_field? field
+    is_pass = ChobbleForms::FieldUtils.is_pass_field? field
+    field_base = ChobbleForms::FieldUtils.strip_field_suffix field
+    tab = @current_tab || :inspection
+    i18n_base = "forms.#{tab}.fields"
 
-    translated = I18n.t("#{i18n_base}.#{field_base}", default: nil)
-    translated ||= I18n.t("#{i18n_base}.#{field}", default: field.humanize)
+    translated = I18n.t "#{i18n_base}.#{field_base}", default: nil
+    translated ||= I18n.t "#{i18n_base}.#{field}"
 
     if is_comment
-      translated += " (#{I18n.t("shared.comment")})"
+      translated += " (#{I18n.t "shared.comment"})"
     elsif is_pass
-      translated += " (#{I18n.t("shared.pass")}/#{I18n.t("shared.fail")})"
+      translated += " (#{I18n.t "shared.pass"}/#{I18n.t "shared.fail"})"
     end
 
     translated
@@ -511,21 +501,21 @@ class InspectionsController < ApplicationController
     return unless current_user
 
     if inspection
-      Event.log(
+      Event.log \
         user: current_user,
         action: action,
         resource: inspection,
         details: details,
         changed_data: changed_data
-      )
+
     else
       # For events without a specific inspection (like CSV export)
-      Event.log_system_event(
+      Event.log_system_event \
         user: current_user,
         action: action,
         details: details,
         metadata: {resource_type: "Inspection"}
-      )
+
     end
   rescue => e
     Rails.logger.error "Failed to log inspection event: #{e.message}"
@@ -538,12 +528,12 @@ class InspectionsController < ApplicationController
       previous_value = previous_attributes[key]
       current_value = current_attributes[key]
 
-      if previous_value != current_value
-        changes[key] = {
-          "from" => previous_value,
-          "to" => current_value
-        }
-      end
+      next unless previous_value != current_value
+
+      changes[key] = {
+        "from" => previous_value,
+        "to" => current_value
+      }
     end
 
     changes.presence

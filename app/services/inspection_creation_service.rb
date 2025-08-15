@@ -41,6 +41,7 @@ class InspectionCreationService
   COPY_FROM_LAST_INSPECTION_FIELDS = T.let(
     %i[
       has_slide
+      indoor_only
       is_totally_enclosed
       length
       width

@@ -12,7 +12,7 @@
       <ul>
         <% inspection_tabs(@inspection).each do |tab| %>
           <li>
-            <% if current_tab == tab %>
+            <% if @current_tab == tab %>
               <span><%= tab_name_with_check(@inspection, tab) %></span>
             <% else %>
               <%= link_to tab_name_with_check(@inspection, tab),
@@ -39,14 +39,14 @@
     <% end %>
 
     <div class="edit-inspection">
-      <% case current_tab %>
-      <% when 'inspection' %>
+      <% case @current_tab %>
+      <% when :inspection %>
         <%= render 'inspections/form', inspection: @inspection %>
-      <% when 'results' %>
-        <%= render 'inspections/results_form' %>
+      <% when :results %>
+        <%= render 'inspections/results_form', inspection: @inspection %>
       <% else %>
         <%= render 'inspections/assessment_form',
-            assessment_type: current_tab,
+            assessment_type: @current_tab,
             inspection: @inspection %>
       <% end %>
     </div>

@@ -8,7 +8,7 @@ module InspectionTurboStreams
   private
 
   sig do
-    params(additional_info: T.nilable(String)).returns(T::Array[T.untyped])
+    params(additional_info: T.nilable(String)).returns T::Array[T.untyped]
   end
   def success_turbo_streams(additional_info: nil)
     [
@@ -19,7 +19,7 @@ module InspectionTurboStreams
     ].compact
   end
 
-  sig { returns(T::Array[T.untyped]) }
+  sig { returns T::Array[T.untyped] }
   def error_turbo_streams
     [
       mark_complete_section_stream,
@@ -28,49 +28,46 @@ module InspectionTurboStreams
     ]
   end
 
-  sig { returns(T.untyped) }
+  sig { returns T.untyped }
   def mark_complete_section_stream
-    turbo_stream.replace(
+    turbo_stream.replace \
       "mark_complete_section_#{@inspection.id}",
       partial: "inspections/mark_complete_section",
       locals: {inspection: @inspection}
-    )
   end
 
-  sig { params(success: T::Boolean).returns(T.untyped) }
+  sig { params(success: T::Boolean).returns T.untyped }
   def save_message_stream(success:)
-    turbo_stream.replace(
+    turbo_stream.replace \
       "inspection_save_message",
       partial: "shared/save_message",
       locals: save_message_locals(
         success: success,
         dom_id: "inspection_save_message"
       )
-    )
   end
 
   sig do
     params(success: T::Boolean, additional_info: T.nilable(String))
-      .returns(T.untyped)
+      .returns T.untyped
   end
   def assessment_save_message_stream(success:, additional_info: nil)
-    locals = save_message_locals(success:, dom_id: "form_save_message")
+    locals = save_message_locals success:, dom_id: "form_save_message"
     locals[:additional_info] = additional_info if additional_info
 
-    turbo_stream.replace(
+    turbo_stream.replace \
       "form_save_message",
       partial: "shared/save_message",
       locals:
-    )
   end
 
   sig do
     params(success: T::Boolean, dom_id: String)
-      .returns(T::Hash[Symbol, T.untyped])
+      .returns T::Hash[Symbol, T.untyped]
   end
   def save_message_locals(success:, dom_id:)
     if success
-      success_message_locals(dom_id)
+      success_message_locals dom_id
     else
       {
         dom_id: dom_id,
@@ -80,10 +77,10 @@ module InspectionTurboStreams
     end
   end
 
-  sig { params(dom_id: String).returns(T::Hash[Symbol, T.untyped]) }
+  sig { params(dom_id: String).returns T::Hash[Symbol, T.untyped] }
   def success_message_locals(dom_id)
-    current_tab_name = params[:tab].presence || "inspection"
-    nav_info = helpers.next_tab_navigation_info(@inspection, current_tab_name)
+    current_tab_name = helpers.normalize_tab_param params[:tab]
+    nav_info = helpers.next_tab_navigation_info @inspection, current_tab_name
 
     {
       dom_id: dom_id,
@@ -91,7 +88,7 @@ module InspectionTurboStreams
       message: t("inspections.messages.updated"),
       inspection: @inspection
     }.tap do |locals|
-      add_navigation_info(locals, nav_info) if nav_info
+      add_navigation_info locals, nav_info if nav_info
     end
   end
 
@@ -109,14 +106,14 @@ module InspectionTurboStreams
     end
   end
 
-  sig { returns(T::Array[T.untyped]) }
+  sig { returns T::Array[T.untyped] }
   def photo_update_streams
     return [] unless params[:inspection]
 
     %i[photo_1 photo_2 photo_3].filter_map do |photo_field|
       next if params[:inspection][photo_field].blank?
 
-      turbo_stream.replace(
+      turbo_stream.replace \
         "inspection_#{photo_field}_field",
         partial: "chobble_forms/file_field_turbo_response",
         locals: {
@@ -126,7 +123,6 @@ module InspectionTurboStreams
           i18n_base: "forms.results",
           accept: "image/*"
         }
-      )
     end
   end
 end

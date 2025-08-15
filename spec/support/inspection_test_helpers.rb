@@ -3,6 +3,8 @@
 # Helper methods for inspection-related feature tests
 # These methods hide i18n complexity and make tests more readable
 module InspectionTestHelpers
+  extend T::Sig
+
   # Include FormHelpers to reuse existing methods
   include FormHelpers
 
@@ -19,7 +21,7 @@ module InspectionTestHelpers
   end
 
   def click_submit_button
-    submit_form(:inspection)
+    submit_form :inspection
   end
 
   def click_add_inspection_button
@@ -42,7 +44,7 @@ module InspectionTestHelpers
 
   def fill_in_risk_assessment(value)
     # Risk assessment is now on the results tab
-    fill_in_form(:results, :risk_assessment, value)
+    fill_in_form :results, :risk_assessment, value
   end
 
   # Expectations for messages
@@ -90,8 +92,8 @@ module InspectionTestHelpers
   def fill_assessments_with_complete_data(inspection)
     inspection.reload
     inspection.assessment_types.each do |assessment_name, _|
-      assessment = inspection.send(assessment_name)
-      assessment.update!(attributes_for(assessment_name, :complete))
+      assessment = inspection.send assessment_name
+      assessment.update! attributes_for(assessment_name, :complete)
     end
   end
 
@@ -114,7 +116,7 @@ module InspectionTestHelpers
 
   # Field filling methods for inspection workflow
   def fill_inspection_field(field_name, value)
-    if BOOLEAN_FIELDS.include?(field_name.to_s)
+    if BOOLEAN_FIELDS.include? field_name.to_s
       value ?
         check_form_radio(:inspection, field_name) :
         uncheck_form_radio(:inspection, field_name)
@@ -123,20 +125,21 @@ module InspectionTestHelpers
     end
   end
 
+  sig { params(tab_name: Symbol, field_name: Symbol, value: T.untyped).void }
   def fill_assessment_field(tab_name, field_name, value)
-    return if field_name.to_s.end_with?("_comment")
+    return if field_name.to_s.end_with? "_comment"
 
-    field_label = get_field_label(tab_name, field_name)
+    field_label = get_field_label tab_name, field_name
 
     case value
     when true, false
       if field_name.to_s.end_with?("_pass") || field_name.to_s == "passed"
-        choose_pass_fail(field_label, value)
-      elsif BOOLEAN_FIELDS.include?(field_name.to_s)
+        choose_pass_fail field_label, value
+      elsif BOOLEAN_FIELDS.include? field_name.to_s
         value ? check_form_radio(tab_name.to_sym, field_name) :
                 uncheck_form_radio(tab_name.to_sym, field_name)
       else
-        choose_yes_no(field_label, value)
+        choose_yes_no field_label, value
       end
     when :pass, "pass"
       choose_pass_fail(field_label, true)
@@ -146,13 +149,13 @@ module InspectionTestHelpers
       # For now, skip N/A values as the test uses passing values
       # The form should support N/A but we don't need to test it here
     else
-      fill_in_form(tab_name.to_sym, field_name, value) if value.present?
+      fill_in_form tab_name.to_sym, field_name, value if value.present?
     end
   end
 
   # Unit-related button methods
   def click_units_button(key, confirm: false)
-    translation = I18n.t("units.buttons.#{key}")
+    translation = I18n.t "units.buttons.#{key}"
     if confirm && page.driver.respond_to?(:accept_modal)
       accept_confirm do
         click_button translation
@@ -163,7 +166,7 @@ module InspectionTestHelpers
   end
 
   def expect_units_message(key)
-    expect_i18n_content("units.messages.#{key}")
+    expect_i18n_content "units.messages.#{key}"
   end
 end
 

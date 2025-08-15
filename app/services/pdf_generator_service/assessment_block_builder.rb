@@ -2,6 +2,7 @@
 
 class PdfGeneratorService
   class AssessmentBlockBuilder
+    extend T::Sig
     include Configuration
 
     def self.build_from_assessment(assessment_type, assessment)
@@ -147,14 +148,14 @@ class PdfGeneratorService
         # For standalone comment fields, use the comment field itself
         field_label(fields[:comment])
       else
-        # Fallback - should not happen
-        base_name = extract_base_field_name(fields.values.first.to_s)
-        field_label(base_name)
+        raise "No valid field type found in fields: #{fields.inspect}"
       end
     end
 
+    sig { params(field_name: Symbol).returns(String) }
     def field_label(field_name)
-      I18n.t!("forms.#{@assessment_type}.fields.#{field_name}")
+      base_field_name = ChobbleForms::FieldUtils.strip_field_suffix(field_name)
+      I18n.t!("forms.#{@assessment_type}.fields.#{base_field_name}")
     end
 
     def determine_pass_value(fields, main_field, value)

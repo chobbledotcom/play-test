@@ -31,6 +31,7 @@ end
 # end
 
 class InspectionWorkflow
+  extend T::Sig
   include Capybara::DSL
   include RSpec::Matchers
   include Rails.application.routes.url_helpers
@@ -63,8 +64,9 @@ class InspectionWorkflow
     self
   end
 
+  sig { returns T::Array[Symbol] }
   def applicable_tabs
-    @inspection.reload.applicable_tabs.reject { |tab| tab == "inspection" }
+    @inspection.reload.applicable_tabs.reject { |tab| tab == :inspection }
   end
 
   private
@@ -95,7 +97,7 @@ class InspectionWorkflow
 
   def register_new_user
     # Ensure homepage exists
-    Page.find_or_create_by!(slug: "/") do |page|
+    Page.find_or_create_by! slug: "/" do |page|
       page.link_title = "Home"
       page.content = "<h1>Welcome</h1>"
     end
@@ -106,11 +108,12 @@ class InspectionWorkflow
 
     user_data = SeedData.user_fields
     user_data.each do |field_name, value|
+      next if value.nil?
       fill_in_form :user_new, field_name, value
     end
 
     submit_form :user_new
-    User.find_by!(email: user_data[:email])
+    User.find_by! email: user_data[:email]
   end
 
   def verify_inactive_user_warning
@@ -118,7 +121,7 @@ class InspectionWorkflow
   end
 
   def activate_user
-    @user.update!(active_until: Date.current + 1.day)
+    @user.update! active_until: Date.current + 1.day
   end
 
   def verify_no_warning_after_activation
@@ -133,11 +136,10 @@ class InspectionWorkflow
     click_link "Units"
 
     expect(page).to have_content "Add Unit"
-    click_units_button("add_unit")
+    click_units_button "add_unit"
 
-    unit_data = SeedData.unit_fields.merge(
+    unit_data = SeedData.unit_fields.merge \
       name: "Test Bouncy Castle"
-    )
 
     unit_data.each do |field_name, value|
       fill_in_form :units, field_name, value
@@ -147,7 +149,7 @@ class InspectionWorkflow
       from: t("forms.units.fields.unit_type")
 
     submit_form :units
-    expect_units_message("created")
+    expect_units_message "created"
 
     Unit.find_by!(
       name: unit_data[:name],
@@ -161,7 +163,7 @@ class InspectionWorkflow
     visit root_path
     click_link "Units"
     click_link "Test Bouncy Castle"
-    click_units_button("add_inspection")
+    click_units_button "add_inspection"
     expect(page).to have_content(t("inspections.titles.edit"))
     expect(page).to have_current_path(/inspections\/\w+\/edit/)
     @unit.inspections.order(created_at: :desc).first.tap do |inspection|
@@ -171,41 +173,44 @@ class InspectionWorkflow
   end
 
   def fill_general_inspection_details
-    field_data = SeedData.inspection_fields(passed: true)
+    field_data = SeedData.inspection_fields passed: true
     field_data[:has_slide] = @options[:has_slide]
     field_data[:is_totally_enclosed] = @options[:is_totally_enclosed]
     field_data[:indoor_only] = @options[:indoor_only] || false
 
     field_data.each do |field_name, value|
-      fill_inspection_field(field_name, value)
+      fill_inspection_field field_name, value
     end
     click_submit_button
   end
 
   def fill_all_assessments
     applicable_tabs.each_with_index do |tab_name, index|
-      verify_assessment_check_marks(completed_tabs: applicable_tabs[0...index])
-      fill_assessment_tab(tab_name)
+      verify_assessment_check_marks completed_tabs: applicable_tabs[0...index]
+      fill_assessment_tab tab_name
       if index < applicable_tabs.length - 1
         verify_inspection_not_completable
       end
     end
 
-    verify_assessment_check_marks(completed_tabs: applicable_tabs)
+    verify_assessment_check_marks completed_tabs: applicable_tabs
   end
 
+  sig { params(tab_name: Symbol).void }
   def fill_assessment_tab(tab_name)
     visit edit_inspection_path(@inspection, tab: tab_name)
 
-    field_data = SeedData.send(
+    # Make sure we're on the right tab
+    expect(page).to have_content(t("forms.#{tab_name}.header"))
+
+    field_data = SeedData.send \
       "#{tab_name}_fields",
       passed: true
-    )
 
     field_data.each do |field_name, value|
-      fill_assessment_field(tab_name, field_name, value)
+      fill_assessment_field tab_name, field_name, value
     end
-    submit_form tab_name.to_sym
+    submit_form tab_name
     expect_updated_message
   end
 
@@ -223,25 +228,25 @@ class InspectionWorkflow
   def verify_assessment_check_marks(completed_tabs:)
     visit edit_inspection_path(@inspection)
 
-    within("nav#tabs") do
-      if page.has_css?("span", text: t("forms.inspection.header"))
-        expect(page).to have_css("span", text: "#{t("forms.inspection.header")} ✓")
+    within "nav#tabs" do
+      if page.has_css? "span", text: t("forms.inspection.header")
+        expect(page).to have_css("span", text: "#{t "forms.inspection.header"} ✓")
       else
-        expect(page).to have_link("#{t("forms.inspection.header")} ✓")
+        expect(page).to have_link("#{t "forms.inspection.header"} ✓")
       end
 
       # Check each assessment tab
       applicable_tabs.each do |tab_name|
-        tab_text = t("forms.#{tab_name}.header")
+        tab_text = t "forms.#{tab_name}.header"
 
-        if completed_tabs.include?(tab_name)
+        if completed_tabs.include? tab_name
           # Should have check mark
-          if page.has_css?("span", text: tab_text)
+          if page.has_css? "span", text: tab_text
             expect(page).to have_css("span", text: "#{tab_text} ✓")
           else
             expect(page).to have_link("#{tab_text} ✓")
           end
-        elsif page.has_css?("span", text: tab_text)
+        elsif page.has_css? "span", text: tab_text
           # Should NOT have check mark
           expect(page).to have_css("span", text: tab_text)
           expect(page).not_to have_css("span", text: "#{tab_text} ✓")
@@ -304,26 +309,25 @@ class InspectionWorkflow
   end
 
   def update_first_inspection_dates
-    @inspection.update!(
+    @inspection.update! \
       inspection_date: 7.days.ago,
       complete_date: 7.days.ago
-    )
   end
 
   def create_second_inspection
     visit unit_path(@unit)
-    click_units_button("add_inspection")
+    click_units_button "add_inspection"
     @second_inspection = @unit.inspections.order(created_at: :desc).first
   end
 
   def verify_boolean_fields_prefilled
     if @options[:has_slide]
-      has_slide_yes = find('input[type="radio"][name="inspection[has_slide]"][value="true"]')
+      has_slide_yes = find 'input[type="radio"][name="inspection[has_slide]"][value="true"]'
       expect(has_slide_yes).to be_checked
     end
 
     if @options[:is_totally_enclosed]
-      is_enclosed_yes = find('input[type="radio"][name="inspection[is_totally_enclosed]"][value="true"]')
+      is_enclosed_yes = find 'input[type="radio"][name="inspection[is_totally_enclosed]"][value="true"]'
       expect(is_enclosed_yes).to be_checked
     end
   end
@@ -341,12 +345,12 @@ class InspectionWorkflow
     applicable_tabs.each do |tab_name|
       visit edit_inspection_path(@second_inspection, tab: tab_name)
 
-      if tab_name == "results"
+      if tab_name == :results
         # The passed field is not prefilled, so we need to fill it manually
         # This is correct behavior - each inspection's pass/fail must be determined independently
-        field_data = SeedData.send("#{tab_name}_fields", passed: true)
+        field_data = SeedData.send "#{tab_name}_fields", passed: true
         field_data.each do |field_name, value|
-          fill_assessment_field(tab_name, field_name, value)
+          fill_assessment_field tab_name, field_name, value
         end
       end
 
@@ -354,11 +358,14 @@ class InspectionWorkflow
       expect_updated_message
 
       @second_inspection.reload
-      if tab_name == "results"
+      if tab_name == :results
         # Results tab doesn't have an assessment model
         expect(@second_inspection.passed).to be true
+      elsif tab_name == :inspection
+        # Inspection tab doesn't have an assessment model
+        # Just verify the inspection fields are filled
       else
-        assessment = @second_inspection.send("#{tab_name}_assessment")
+        assessment = @second_inspection.send "#{tab_name}_assessment"
         expect(assessment.complete?).to be true
       end
     end
@@ -390,14 +397,14 @@ class InspectionWorkflow
     click_link "Test Bouncy Castle"
     click_link t("ui.edit")
     expect(page).not_to have_content I18n.t("units.buttons.delete")
-    expect_units_message("not_deletable")
+    expect_units_message "not_deletable"
 
     @unit.reload
     expect(@unit.deletable?).to eq(false)
   end
 
   def verify_change_unit_functionality
-    other_unit = create(:unit, user: @user, name: "Alternative Unit")
+    other_unit = create :unit, user: @user, name: "Alternative Unit"
 
     visit edit_inspection_path(@inspection)
     click_link t("inspections.buttons.change_unit")
@@ -405,7 +412,7 @@ class InspectionWorkflow
     expect(page).to have_current_path(select_unit_inspection_path(@inspection))
     expect(page).to have_content(other_unit.name)
 
-    other_user_unit = create(:unit, user: create(:user), name: "Other User's Unit")
+    other_user_unit = create :unit, user: create(:user), name: "Other User's Unit"
     visit current_path
     expect(page).not_to have_content(other_user_unit.name)
   end
@@ -424,7 +431,7 @@ class InspectionWorkflow
     if @options[:unit_type] == :bouncy_castle
       expected_tabs << "slide" if @options[:has_slide]
       expected_tabs << "enclosed" if @options[:is_totally_enclosed]
-      expected_tabs.delete("anchorage") if @options[:indoor_only]
+      expected_tabs.delete "anchorage" if @options[:indoor_only]
     end
 
     expected_tabs.each do |tab|

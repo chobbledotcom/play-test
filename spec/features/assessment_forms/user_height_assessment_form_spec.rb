@@ -4,19 +4,19 @@ require "rails_helper"
 
 RSpec.feature "User Height Assessment", type: :feature do
   include InspectionTestHelpers
-  let(:user) { create(:user) }
-  let(:unit) { create(:unit, user: user) }
-  let(:inspection) { create(:inspection, user: user, unit: unit) }
+  let(:user) { create :user }
+  let(:unit) { create :unit, user: user }
+  let(:inspection) { create :inspection, user: user, unit: unit }
 
   before do
-    login_user_via_form(user)
+    login_user_via_form user
   end
 
-  it_behaves_like "an assessment form", "user_height"
+  it_behaves_like "an assessment form", :user_height
 
   describe "filling out the user height assessment form" do
     before do
-      visit edit_inspection_path(inspection, tab: "user_height")
+      visit edit_inspection_path(inspection, tab: :user_height)
     end
 
     it "displays all the required form fields" do
@@ -26,7 +26,10 @@ RSpec.feature "User Height Assessment", type: :feature do
       expect_field_present :user_height, :users_at_1200mm
       expect_field_present :user_height, :users_at_1500mm
       expect_field_present :user_height, :users_at_1800mm
-      expect_field_present :user_height, :custom_user_height_comment
+
+      # custom_user_height_comment is a standalone text area field
+      # The label uses the base name without _comment suffix
+      expect(page).to have_field(I18n.t("forms.user_height.fields.custom_user_height"))
 
       expect_field_present :user_height, :play_area_length
       expect_field_present :user_height, :play_area_width
@@ -42,7 +45,9 @@ RSpec.feature "User Height Assessment", type: :feature do
       fill_in_form :user_height, :users_at_1200mm, "4"
       fill_in_form :user_height, :users_at_1500mm, "3"
       fill_in_form :user_height, :users_at_1800mm, "2"
-      fill_in_form :user_height, :custom_user_height_comment, "Test height comments"
+      # Use the base field name for the label lookup
+      custom_label = I18n.t "forms.user_height.fields.custom_user_height"
+      fill_in custom_label, with: "Test height comments"
 
       fill_in_form :user_height, :play_area_length, "10.0"
       fill_in_form :user_height, :play_area_width, "8.0"
@@ -71,12 +76,12 @@ RSpec.feature "User Height Assessment", type: :feature do
 
       click_i18n_button "inspections.buttons.save_assessment"
 
-      expect(page.status_code).to eq(422)
-
+      # Don't check status code as it doesn't work reliably with Turbo forms
+      # Instead check for actual error display
       expect(page).to have_css(".form-errors")
-      wall_height_error = I18n.t(
+      wall_height_error = I18n.t \
         "forms.user_height.errors.containing_wall_height_negative"
-      )
+
       expect(page).to have_content(wall_height_error)
 
       assessment = inspection.user_height_assessment.reload

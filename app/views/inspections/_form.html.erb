@@ -7,7 +7,8 @@
 <%= render 'chobble_forms/form_context',
   model: inspection,
   i18n_base: 'forms.inspection',
-  submit_key: submit_key do |form| %>
+  submit_key: submit_key,
+  excluded_prefill_fields: InspectionsController::NOT_COPIED_FIELDS do |form| %>
   <%= render 'chobble_forms/fieldset', legend_key: 'current_unit' do %>
     <% if inspection.unit.present? %>
       <%= render 'shared/unit_details_display', unit: inspection.unit %>

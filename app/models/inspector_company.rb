@@ -33,7 +33,7 @@ class InspectorCompany < ApplicationRecord
 
   # Override to filter admin-only fields
   sig {
-    params(user: T.nilable(User)).returns(
+    params(user: T.nilable(User)).returns \
       T::Array[
         T::Hash[
           Symbol,
@@ -43,7 +43,6 @@ class InspectorCompany < ApplicationRecord
           )
         ]
       ]
-    )
   }
   def self.form_fields(user: nil)
     fields = super
@@ -77,7 +76,7 @@ class InspectorCompany < ApplicationRecord
   }
   scope :search_by_term, ->(term) {
     return all if term.blank?
-    where("name LIKE ?", "%#{term}%")
+    where "name LIKE ?", "%#{term}%"
   }
 
   # Callbacks
@@ -86,31 +85,31 @@ class InspectorCompany < ApplicationRecord
   # Methods
   # Credentials validation moved to individual inspector level (User model)
 
-  sig { returns(String) }
+  sig { returns String }
   def full_address
-    [address, city, postal_code].compact.join(", ")
+    [address, city, postal_code].compact.join ", "
   end
 
-  sig { returns(Integer) }
+  sig { returns Integer }
   def inspection_count
     inspections.count
   end
 
-  sig { params(limit: Integer).returns(ActiveRecord::Relation) }
+  sig { params(limit: Integer).returns ActiveRecord::Relation }
   def recent_inspections(limit = 10)
     # Will be enhanced when Unit relationship is added
-    inspections.order(inspection_date: :desc).limit(limit)
+    inspections.order(inspection_date: :desc).limit limit
   end
 
-  sig { params(total: T.nilable(Integer), passed: T.nilable(Integer)).returns(Float) }
+  sig { params(total: T.nilable(Integer), passed: T.nilable(Integer)).returns Float }
   def pass_rate(total = nil, passed = nil)
     total ||= inspections.count
     passed ||= inspections.passed.count
     return 0.0 if total == 0
-    (passed.to_f / total * 100).round(2)
+    (passed.to_f / total * 100).round 2
   end
 
-  sig { returns(T::Hash[Symbol, T.any(Integer, Float)]) }
+  sig { returns T::Hash[Symbol, T.any(Integer, Float)] }
   def company_statistics
     # Use group to get all counts in a single query
     counts = inspections.group(:passed).count
@@ -127,7 +126,7 @@ class InspectorCompany < ApplicationRecord
     }
   end
 
-  sig { returns(T.nilable(ActiveStorage::Attached::One)) }
+  sig { returns T.nilable(ActiveStorage::Attached::One) }
   def logo_url
     logo.attached? ? logo : nil
   end

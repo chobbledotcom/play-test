@@ -16,6 +16,7 @@ en:
         name: "Unit Name"
         inspector: "Inspector Name"
         result: "Result"
+        last_inspection: "Last Inspection"
         width: "Width (m)"
         length: "Length (m)"
         height: "Height (m)"
