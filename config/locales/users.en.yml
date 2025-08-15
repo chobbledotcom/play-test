@@ -23,10 +23,6 @@ en:
     fields:
       email: "Email"
       password: "Password"
-      admin: "Admin"
-      registered: "Registered"
-      last_active: "Last Active"
-      inspections: "Inspections"
       sort: "Sort by"
 
     forms:
