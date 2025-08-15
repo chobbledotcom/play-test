@@ -12,6 +12,10 @@ en:
         rpii_inspector_number: "RPII Inspector No"
         active_until: "Active Until"
         inspection_company_id: "Inspection Company"
+        admin: "Admin"
+        registered: "Registered"
+        last_active: "Last Active"
+        inspections: "Inspections"
       submit: "Update User"
       errors:
         header:
