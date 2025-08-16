@@ -66,13 +66,13 @@ module Assessments
       # Use the negative_adjustment value, defaulting to 0 if nil
       adjustment = negative_adjustment || 0
 
-      # Call the EN14960 validator
+      # Call the EN14960 validator - convert BigDecimal to Float
       EN14960.validate_play_area(
-        unit_length: unit_length,
-        unit_width: unit_width,
-        play_area_length: play_area_length,
-        play_area_width: play_area_width,
-        negative_adjustment_area: adjustment
+        unit_length: unit_length.to_f,
+        unit_width: unit_width.to_f,
+        play_area_length: play_area_length.to_f,
+        play_area_width: play_area_width.to_f,
+        negative_adjustment_area: adjustment.to_f
       )
     end
 
