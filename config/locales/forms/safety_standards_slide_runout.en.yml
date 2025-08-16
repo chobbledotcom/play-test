@@ -1,10 +1,11 @@
+---
 en:
   forms:
     safety_standards_slide_runout:
-      header: "Calculate Required Runout Length"
+      header: Calculate Required Runout Length
       sections:
-        input: "Input Parameters"
+        input: Input Parameters
       fields:
-        platform_height: "Platform Height (m)"
-        has_stop_wall: "Stop-wall fitted at end of runout"
-      submit: "Calculate Runout"
+        has_stop_wall: Stop-wall fitted at end of runout
+        platform_height: Platform Height (m)
+      submit: Calculate Runout

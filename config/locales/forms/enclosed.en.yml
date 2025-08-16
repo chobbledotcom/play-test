@@ -1,20 +1,22 @@
+---
 en:
   forms:
     enclosed:
-      header: "Totally Enclosed"
+      header: Totally Enclosed
       sections:
-        exit_requirements: "Exit Requirements"
+        exit_requirements: Exit Requirements
       fields:
-        exit_number: "Number of Exits"
-        exit_number_pass: "Number of Exits"
-        exit_sign_always_visible_pass: "Exit Sign Always Visible"
+        exit_number: Number of Exits
+        exit_number_pass: Number of Exits
+        exit_sign_always_visible: Exit Sign Always Visible
+        exit_sign_always_visible_pass: Exit Sign Always Visible
       status:
-        checks_passed: "Fields completed"
-        completion: "Assessment Completion"
+        checks_passed: Fields completed
+        completion: Assessment Completion
       summary:
-        title: "Assessment Summary"
-        completion: "Completion"
-        safety_checks: "Safety Checks"
-        critical_failures: "Critical Failures"
-      submit: "Save Assessment"
-      submit_continue: "Save & Continue"
+        title: Assessment Summary
+        completion: Completion
+        safety_checks: Safety Checks
+        critical_failures: Critical Failures
+      submit: Save Assessment
+      submit_continue: Save & Continue

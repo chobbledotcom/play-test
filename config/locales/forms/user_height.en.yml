@@ -1,47 +1,54 @@
+---
 en:
   forms:
     user_height:
-      header: "User Height/Count"
+      header: User Height/Count
       sections:
-        height_measurements: "Height Measurements"
-        height_measurements_footer: "This is not slides - that's the next page"
-        user_capacity: "User Capacity"
-        tallest_user_capacity: "User Capacity (Maximum)"
-        play_area: "Play Area"
+        height_measurements: Height Measurements
+        height_measurements_footer: This is not slides - that's the next page
+        user_capacity: User Capacity
+        tallest_user_capacity: User Capacity (Maximum)
+        play_area: Play Area
       fields:
-        containing_wall_height: "Main Wall Height (m)"
-        users_at_1000mm: "Users at 1m"
-        users_at_1200mm: "Users at 1.2m"
-        users_at_1500mm: "Users at 1.5m"
-        users_at_1800mm: "Users at 1.8m"
-        custom_user_height: "Custom User Height"
-        custom_user_height_comment: "Custom User Height Comments"
-        play_area_length: "Play Area Length (m)"
-        play_area_width: "Play Area Width (m)"
-        negative_adjustment: "Negative Play Space Adjustment (m²)"
+        containing_wall_height: Main Wall Height (m)
+        custom_user_height: Custom User Height
+        custom_user_height_comment: Custom User Height Comments
+        negative_adjustment: Negative Play Space Adjustment (m²)
+        play_area_length: Play Area Length (m)
+        play_area_width: Play Area Width (m)
+        users_at_1000mm: Users at 1m
+        users_at_1200mm: Users at 1.2m
+        users_at_1500mm: Users at 1.5m
+        users_at_1800mm: Users at 1.8m
       placeholders:
-        height: "Enter height in meters"
-        user_count: "Number of users"
-        dimension: "Enter dimension in meters"
+        height: Enter height in meters
+        user_count: Number of users
+        dimension: Enter dimension in meters
       hints:
-        containing_wall_height: "Height of the containing platform wall from ground level (meters)"
-        play_area_dimension: "Internal dimensions of the play area (meters)"
-        negative_adjustment: "Area deduction for obstacles or unusable space (square meters)"
+        containing_wall_height: Height of the containing platform wall from ground
+          level (meters)
+        play_area_dimension: Internal dimensions of the play area (meters)
+        negative_adjustment: Area deduction for obstacles or unusable space (square
+          meters)
       status:
-        height_requirement: "Height Requirement"
-        checks_passed: "Fields completed"
-        completion: "Assessment Completion"
-      submit: "Save Assessment"
-      submit_continue: "Save & Continue"
+        height_requirement: Height Requirement
+        checks_passed: Fields completed
+        completion: Assessment Completion
+      submit: Save Assessment
+      submit_continue: Save & Continue
       errors:
         header:
-          one: "1 error prevented this assessment from being saved:"
+          one: '1 error prevented this assessment from being saved:'
           other: "%{count} errors prevented this assessment from being saved:"
-        containing_wall_height_negative: "Containing wall height must be greater than or equal to 0"
-        users_at_1000mm_negative: "Users at 1m must be greater than or equal to 0"
-        users_at_1200mm_negative: "Users at 1.2m must be greater than or equal to 0"
-        users_at_1500mm_negative: "Users at 1.5m must be greater than or equal to 0"
-        users_at_1800mm_negative: "Users at 1.8m must be greater than or equal to 0"
-        play_area_length_negative: "Play area length must be greater than or equal to 0"
-        play_area_width_negative: "Play area width must be greater than or equal to 0"
-        negative_adjustment_negative: "Negative adjustment must be greater than or equal to 0"
+        containing_wall_height_negative: Containing wall height must be greater than
+          or equal to 0
+        users_at_1000mm_negative: Users at 1m must be greater than or equal to 0
+        users_at_1200mm_negative: Users at 1.2m must be greater than or equal to 0
+        users_at_1500mm_negative: Users at 1.5m must be greater than or equal to 0
+        users_at_1800mm_negative: Users at 1.8m must be greater than or equal to 0
+        play_area_length_negative: Play area length must be greater than or equal
+          to 0
+        play_area_width_negative: Play area width must be greater than or equal to
+          0
+        negative_adjustment_negative: Negative adjustment must be greater than or
+          equal to 0

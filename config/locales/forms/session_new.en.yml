@@ -1,17 +1,18 @@
+---
 en:
   forms:
     session_new:
-      header: "Log in"
+      header: Log in
       sections:
-        credentials: "Login Credentials"
+        credentials: Login Credentials
       status:
-        admin_required: "Admin required"
-        login_required: "Login required"
-        already_logged_in: "Already logged in"
+        admin_required: Admin required
+        login_required: Login required
+        already_logged_in: Already logged in
       fields:
-        email: "Email"
-        password: "Password"
-        remember_me: "Remember Me"
-      submit: "Log in"
+        email: Email
+        password: Password
+        remember_me: Remember Me
+      submit: Log in
       messages:
-        register_link: "Register"
+        register_link: Register

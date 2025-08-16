@@ -1,22 +1,23 @@
+---
 en:
   forms:
     user_settings:
-      header: "User Settings"
+      header: User Settings
       sections:
-        contact_details: "Contact Details"
-        preferences: "Preferences"
-        passkeys: "Passkeys"
+        contact_details: Contact Details
+        preferences: Preferences
+        passkeys: Passkeys
       fields:
-        name: "Name"
-        phone: "Phone"
-        address: "Address"
-        country: "Country"
-        postal_code: "Postal Code"
-        theme: "Theme"
-        logo: "Company Logo"
-        signature: "Signature"
+        address: Address
+        country: Country
+        logo: Company Logo
+        name: Name
+        phone: Phone
+        postal_code: Postal Code
+        signature: Signature
+        theme: Theme
       errors:
         header:
-          one: "1 error prevented these settings from being saved:"
+          one: '1 error prevented these settings from being saved:'
           other: "%{count} errors prevented these settings from being saved:"
-      submit: "Update Settings"
+      submit: Update Settings
