@@ -1,11 +1,11 @@
 <div class="table-list units-list">
   <!-- Header row -->
   <div class="table-list-header">
-    <%= render 'shared/table_column', field: 'photo', model: 'units', header: true %>
-    <%= render 'shared/table_column', field: 'id', model: 'units', header: true %>
-    <%= render 'shared/table_column', field: 'name', model: 'units', header: true %>
-    <%= render 'shared/table_column', field: 'manufacturer', model: 'units', header: true %>
-    <%= render 'shared/table_column', field: 'serial', model: 'units', header: true %>
+    <%= render 'shared/table_column', field: :photo, model: :units, header: true %>
+    <%= render 'shared/table_column', field: :id, model: :units, header: true %>
+    <%= render 'shared/table_column', field: :name, model: :units, header: true %>
+    <%= render 'shared/table_column', field: :manufacturer, model: :units, header: true %>
+    <%= render 'shared/table_column', field: :serial, model: :units, header: true %>
   </div>
 
   <!-- Data rows -->
@@ -13,7 +13,7 @@
     <% unit.each do |item| %>
       <li>
         <%= link_to item, class: "table-list-link" do %>
-          <%= render 'shared/table_column', field: 'photo', model: 'units' do %>
+          <%= render 'shared/table_column', field: :photo, model: :units do %>
             <% if item.photo.attached? %>
               <%= render 'shared/image',
                   image: item.photo,
@@ -26,10 +26,10 @@
                   height: 60 %>
             <% end %>
           <% end %>
-          <%= render 'shared/table_column', field: 'id', model: 'units', item: item %>
-          <%= render 'shared/table_column', field: 'name', model: 'units', item: item %>
-          <%= render 'shared/table_column', field: 'manufacturer', model: 'units', item: item %>
-          <%= render 'shared/table_column', field: 'serial', model: 'units', item: item %>
+          <%= render 'shared/table_column', field: :id, model: :units, item: item %>
+          <%= render 'shared/table_column', field: :name, model: :units, item: item %>
+          <%= render 'shared/table_column', field: :manufacturer, model: :units, item: item %>
+          <%= render 'shared/table_column', field: :serial, model: :units, item: item %>
         <% end %>
       </li>
     <% end %>
