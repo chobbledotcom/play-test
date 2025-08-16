@@ -40,6 +40,7 @@ class Assessments::SlideAssessment < ApplicationRecord
   extend T::Sig
   include AssessmentLogging
   include AssessmentCompletion
+  include ColumnNameSyms
   include FormConfigurable
   include ValidationConfigurable
 

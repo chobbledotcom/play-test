@@ -56,13 +56,19 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
     end
 
     define_method(:validate_field_exists) do |field_key, fields, i18n_base|
-      return if fields.key?(field_key) || field_key.to_s.end_with?("_comment")
+      return if field_key.to_s.end_with?("_comment")
 
-      raise "Field #{field_key} missing from #{i18n_base}.fields.#{field_key}"
+      # Always use base field name for i18n lookup
+      lookup_key = ChobbleForms::FieldUtils.strip_field_suffix(field_key).to_sym
+      return if fields.key?(lookup_key)
+
+      raise "Field #{lookup_key} missing from #{i18n_base}.fields.#{lookup_key}"
     end
 
     define_method(:fill_field) do |field_key, value, fields, data|
-      field_label = fields[field_key]
+      # Always use base field name for i18n lookup
+      lookup_key = ChobbleForms::FieldUtils.strip_field_suffix(field_key).to_sym
+      field_label = fields[lookup_key]
 
       case value
       when true, false

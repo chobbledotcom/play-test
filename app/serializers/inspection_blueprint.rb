@@ -5,16 +5,17 @@ class InspectionBlueprint < Blueprinter::Base
   # Define public fields dynamically to avoid database access at load time
   def self.define_public_fields
     return if @fields_defined
-    Inspection.column_names.each do |column|
+
+    Inspection.column_name_syms.each do |column|
       next if PublicFieldFiltering::EXCLUDED_FIELDS.include?(column)
-      # Special handling for date/time fields
-      if %w[inspection_date complete_date].include?(column)
-        field column.to_sym do |inspection|
+
+      if %i[inspection_date complete_date].include?(column)
+        field column do |inspection|
           value = inspection.send(column)
           value&.strftime(JsonDateTransformer::API_DATE_FORMAT)
         end
       else
-        field column.to_sym
+        field column
       end
     end
     @fields_defined = true
@@ -26,16 +27,12 @@ class InspectionBlueprint < Blueprinter::Base
     super
   end
 
-  # Add computed fields
-  field :complete do |inspection|
-    inspection.complete?
-  end
+  field :complete, &:complete?
 
   field :passed do |inspection|
     inspection.passed? if inspection.complete?
   end
 
-  # Add inspector info
   field :inspector do |inspection|
     {
       name: inspection.user.name,
@@ -43,7 +40,6 @@ class InspectionBlueprint < Blueprinter::Base
     }
   end
 
-  # Add URLs
   field :urls do |inspection|
     base_url = ENV["BASE_URL"]
     {
@@ -53,7 +49,6 @@ class InspectionBlueprint < Blueprinter::Base
     }
   end
 
-  # Add unit info
   field :unit do |inspection|
     if inspection.unit
       {
@@ -66,21 +61,23 @@ class InspectionBlueprint < Blueprinter::Base
     end
   end
 
-  # Add assessments
   field :assessments do |inspection|
     assessments = {}
     inspection.each_applicable_assessment do |key, klass, assessment|
-      if assessment
-        # Use dynamic fields based on the assessment class
-        assessment_data = {}
-        public_fields = klass.column_names -
-          PublicFieldFiltering::EXCLUDED_FIELDS
-        public_fields.each do |field|
-          value = assessment.send(field)
-          assessment_data[field.to_sym] = value unless value.nil?
-        end
-        assessments[key] = assessment_data
+      next unless assessment
+
+      assessment_data = {}
+
+      public_fields =
+        klass.column_name_syms -
+        PublicFieldFiltering::EXCLUDED_FIELDS
+
+      public_fields.each do |field|
+        value = assessment.send(field)
+        assessment_data[field] = value unless value.nil?
       end
+
+      assessments[key] = assessment_data
     end
     assessments
   end

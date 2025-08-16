@@ -16,10 +16,10 @@ form_fields:
           step: 0.1
           max: 10
       - partial: pass_fail_na_comment
-        field: blower_flap_pass
+        field: blower_flap
       - partial: pass_fail_comment
-        field: blower_finger_pass
+        field: blower_finger
       - partial: pass_fail_na_comment
-        field: pat_pass
+        field: pat
       - partial: pass_fail_comment
-        field: blower_visual_pass
+        field: blower_visual

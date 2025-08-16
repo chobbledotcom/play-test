@@ -1,4 +1,5 @@
 # typed: false
+# frozen_string_literal: true
 
 # Wrapper service for backward compatibility with tests
 # Now delegates to Blueprinter serializers
@@ -31,7 +32,7 @@ class JsonSerializerService
 
   def self.serialize_assessment(assessment, klass)
     excluded = PublicFieldFiltering::EXCLUDED_FIELDS
-    assessment_fields = klass.column_names - excluded
+    assessment_fields = klass.column_name_syms - excluded
 
     data = {}
     assessment_fields.each do |field|

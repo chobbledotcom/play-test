@@ -25,11 +25,11 @@ form_fields:
       - partial: yes_no_radio_comment
         field: slide_permanent_roof
       - partial: pass_fail_na_comment
-        field: clamber_netting_pass
+        field: clamber_netting
       - partial: number_pass_fail_comment
         field: runout
         attributes:
           min: 0
           max: 50
       - partial: pass_fail_comment
-        field: slip_sheet_pass
+        field: slip_sheet
