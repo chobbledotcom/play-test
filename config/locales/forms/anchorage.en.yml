@@ -7,15 +7,11 @@ en:
         anchor_counts: Anchor Counts
         anchor_quality: Anchor Quality
       fields:
-        anchor_accessories: Correct anchor accessories
-        anchor_accessories_pass: Correct anchor accessories
-        anchor_degree: Anchors between 30-45°
-        anchor_degree_pass: Anchors between 30-45°
-        anchor_type: Anchors permanently closed and metal
-        anchor_type_pass: Anchors permanently closed and metal
-        num_high_anchors: High anchor points
         num_low_anchors: Low anchor points
-        pull_strength: Pull strength test
+        num_high_anchors: High anchor points
+        anchor_accessories_pass: Correct anchor accessories
+        anchor_degree_pass: Anchors between 30-45°
+        anchor_type_pass: Anchors permanently closed and metal
         pull_strength_pass: Pull strength test
       status:
         checks_passed: Fields completed

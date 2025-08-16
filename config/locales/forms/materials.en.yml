@@ -14,21 +14,14 @@ en:
       sections:
         materials_assessment: Materials Assessment
       fields:
-        artwork: Artwork
-        artwork_pass: Artwork
-        fabric_strength: Fabric strength
-        fabric_strength_pass: Fabric strength
-        fire_retardant: Fire retardent
-        fire_retardant_pass: Fire retardent
-        retention_netting: Retention netting
-        retention_netting_pass: Retention netting
         ropes: Ropes (mm)
-        thread: Thread
-        thread_pass: Thread
-        windows: Windows
-        windows_pass: Windows
-        zips: Zips
+        retention_netting_pass: Retention netting
         zips_pass: Zips
+        windows_pass: Windows
+        artwork_pass: Artwork
+        thread_pass: Thread
+        fabric_strength_pass: Fabric strength
+        fire_retardant_pass: Fire retardent
       status:
         checks_passed: Fields completed
         completion: Assessment Completion

@@ -8,14 +8,14 @@ en:
         preferences: Preferences
         passkeys: Passkeys
       fields:
-        address: Address
-        country: Country
-        logo: Company Logo
         name: Name
         phone: Phone
+        address: Address
+        country: Country
         postal_code: Postal Code
-        signature: Signature
         theme: Theme
+        logo: Company Logo
+        signature: Signature
       errors:
         header:
           one: '1 error prevented these settings from being saved:'

@@ -8,15 +8,15 @@ en:
         manufacture: Manufacture
         data: Data
       fields:
-        description: Description
         id: ID
-        manufacture_date: Manufacture Date
-        manufacturer: Manufacturer
         name: Unit Name
-        operator: Controller / Owner
-        photo: Photo
-        serial: Manufacturer Serial Number
         unit_type: Unit Type
+        serial: Manufacturer Serial Number
+        manufacturer: Manufacturer
+        description: Description
+        operator: Controller / Owner
+        manufacture_date: Manufacture Date
+        photo: Photo
       submit: Save Unit
       errors:
         header:

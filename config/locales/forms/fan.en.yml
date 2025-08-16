@@ -7,19 +7,15 @@ en:
         fan_assessment: Fan Assessment
         fan_assessment_footer: You must test and log for every blower for this unit
       fields:
-        blower_finger: Finger probe tests
-        blower_finger_pass: Finger probe tests
-        blower_flap: Return flaps present
-        blower_flap_pass: Return flaps present
+        fan_size_type: Blower sizes
         blower_serial: Blower serial numbers
         blower_tube_length: Blower Tube Length (m)
         blower_tube_length_pass: Blower Tube Length (m)
-        blower_visual: Visual inspections
-        blower_visual_pass: Visual inspections
-        fan_size_type: Blower sizes
-        number_of_blowers: Number of blowers
-        pat: PATs
+        blower_flap_pass: Return flaps present
+        blower_finger_pass: Finger probe tests
         pat_pass: PATs
+        blower_visual_pass: Visual inspections
+        number_of_blowers: Number of blowers
       status:
         checks_passed: Fields completed
         completion: Assessment Completion

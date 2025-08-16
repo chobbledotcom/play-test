@@ -9,7 +9,7 @@ en:
         result: Calculation Results
       fields:
         length: Length (m)
-        max_user_height: Maximum User Height (m)
-        negative_adjustment_area: Obstacle/Adjustment Area (m²)
         width: Width (m)
+        negative_adjustment_area: Obstacle/Adjustment Area (m²)
+        max_user_height: Maximum User Height (m)
       submit: Calculate Capacity

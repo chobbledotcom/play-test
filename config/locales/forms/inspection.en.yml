@@ -11,21 +11,21 @@ en:
         unit_configuration: Unit Configuration
         inspection_results: Inspection Results
       fields:
-        has_slide: Has slide
-        height: Height (m)
         id: Report ID
-        indoor_only: Indoor use only
         inspection_date: Inspection Date
-        inspector: Inspector Name
-        is_totally_enclosed: Is totally enclosed
-        length: Length (m)
-        name: Unit Name
-        passed: Passed
         reinspection_date: Reinspection Date
+        name: Unit Name
+        inspector: Inspector Name
         result: Result
+        width: Width (m)
+        length: Length (m)
+        height: Height (m)
+        has_slide: Has slide
+        is_totally_enclosed: Is totally enclosed
+        indoor_only: Indoor use only
+        passed: Passed
         risk_assessment: Risk Assessment
         unit_id: Unit Selection
-        width: Width (m)
       submit: Save Inspection
       submit_continue: Save & Continue
       errors:

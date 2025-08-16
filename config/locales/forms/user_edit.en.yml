@@ -6,17 +6,17 @@ en:
       sections:
         account_details: Account Details
       fields:
-        active_until: Active Until
-        admin: Admin
-        email: Email
-        inspection_company_id: Inspection Company
-        inspections: Inspections
-        last_active: Last Active
         name: Name
+        email: Email
         password: New Password
         password_confirmation: Password confirmation
-        registered: Registered
         rpii_inspector_number: RPII Inspector No
+        active_until: Active Until
+        inspection_company_id: Inspection Company
+        admin: Admin
+        registered: Registered
+        last_active: Last Active
+        inspections: Inspections
       submit: Update User
       errors:
         header:

@@ -8,7 +8,6 @@ en:
       fields:
         exit_number: Number of Exits
         exit_number_pass: Number of Exits
-        exit_sign_always_visible: Exit Sign Always Visible
         exit_sign_always_visible_pass: Exit Sign Always Visible
       status:
         checks_passed: Fields completed
