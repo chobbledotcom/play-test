@@ -1,23 +1,24 @@
+---
 en:
   forms:
     user_edit:
-      header: "Edit User"
+      header: Edit User
       sections:
-        account_details: "Account Details"
+        account_details: Account Details
       fields:
-        name: "Name"
-        email: "Email"
-        password: "New Password"
-        password_confirmation: "Password confirmation"
-        rpii_inspector_number: "RPII Inspector No"
-        active_until: "Active Until"
-        inspection_company_id: "Inspection Company"
-        admin: "Admin"
-        registered: "Registered"
-        last_active: "Last Active"
-        inspections: "Inspections"
-      submit: "Update User"
+        name: Name
+        email: Email
+        password: New Password
+        password_confirmation: Password confirmation
+        rpii_inspector_number: RPII Inspector No
+        active_until: Active Until
+        inspection_company_id: Inspection Company
+        admin: Admin
+        registered: Registered
+        last_active: Last Active
+        inspections: Inspections
+      submit: Update User
       errors:
         header:
-          one: "1 error prevented this user from being saved:"
-          other: "%{count} errors prevented this user from being saved:"
+          one: '1 error prevented this user from being saved:'
+          other: '%{count} errors prevented this user from being saved:'

@@ -1,0 +1,9 @@
+extends: default
+ignore: |
+  .gems/
+  .licenses/
+  gems/
+rules:
+  line-length: disable
+  document-start:
+    present: false

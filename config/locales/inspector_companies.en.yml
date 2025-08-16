@@ -1,72 +1,63 @@
+---
 en:
   # Inspector Companies Management
   inspector_companies:
     titles:
-      index: "Companies"
-      new: "New Inspector Company"
-      edit: "Edit Inspector Company"
-      show: "Company Details"
-
+      index: Companies
+      new: New Inspector Company
+      edit: Edit Inspector Company
+      show: Company Details
     headers:
-      company_details: "Company Details"
-      contact_information: "Contact Information"
-      company_status: "Company Status"
-      company_statistics: "Company Statistics"
-      recent_inspections: "Recent Inspections"
-
+      company_details: Company Details
+      contact_information: Contact Information
+      company_status: Company Status
+      company_statistics: Company Statistics
+      recent_inspections: Recent Inspections
     sections:
-      search_and_filter: "Search and Filter"
-
+      search_and_filter: Search and Filter
     forms:
-      search: "Search"
-      active: "Active"
-      name: "Company Name"
-      rpii_registration_number: "RPII Registration Number"
-      email: "Email"
-      phone: "Phone"
-      address: "Address"
-      city: "City"
-      state: "State"
-      postal_code: "Postal Code"
-      country: "Country"
-      notes: "Notes"
-      logo: "Company Logo"
-
+      search: Search
+      active: Active
+      name: Company Name
+      rpii_registration_number: RPII Registration Number
+      email: Email
+      phone: Phone
+      address: Address
+      city: City
+      state: State
+      postal_code: Postal Code
+      country: Country
+      notes: Notes
+      logo: Company Logo
     status:
-      active: "Active"
-      archived: "Archived"
-      yes: "Yes"
-      no: "No"
+      active: Active
+      archived: Archived
+      yes: 'Yes'
+      no: 'No'
       # Credential validation moved to inspector level
-
     buttons:
-      create: "Create Company"
-      update: "Update Company"
-      search: "Search"
-      new_company: "New Company"
-      view_all_inspections: "View all inspections"
-
+      create: Create Company
+      update: Update Company
+      search: Search
+      new_company: New Company
+      view_all_inspections: View all inspections
     messages:
-      created: "Inspector company created successfully."
-      updated: "Inspector company updated successfully."
-      not_found: "Inspector company not found."
-      no_companies: "No inspector companies found"
-
+      created: Inspector company created successfully.
+      updated: Inspector company updated successfully.
+      not_found: Inspector company not found.
+      no_companies: No inspector companies found
     errors:
       header:
-        one: "Could not save company because there is 1 error:"
-        other: "Could not save company because there are %{count} errors:"
-
+        one: 'Could not save company because there is 1 error:'
+        other: 'Could not save company because there are %{count} errors:'
     search:
-      placeholder: "Search by name or RPII number..."
-      active_filter: "Active Filter"
-
+      placeholder: Search by name or RPII number...
+      active_filter: Active Filter
     filters:
-      all_companies: "All Companies"
-
+      all_companies: All Companies
     statistics:
-      total_inspections: "Total Inspections"
-      passed_inspections: "Passed"
-      failed_inspections: "Failed"
-      pass_rate: "Pass Rate"
-      active_since: "Active Since"
+      total_inspections: Total Inspections
+      passed_inspections: Passed
+      failed_inspections: Failed
+      pass_rate: Pass Rate
+      active_since: Active Since

@@ -1,36 +1,37 @@
+---
 en:
   forms:
     fan:
-      header: "Fan/Blower"
+      header: Fan/Blower
       sections:
-        fan_assessment: "Fan Assessment"
-        fan_assessment_footer: "You must test and log for every blower for this unit"
+        fan_assessment: Fan Assessment
+        fan_assessment_footer: You must test and log for every blower for this unit
       fields:
-        fan_size_type: "Blower sizes"
-        blower_serial: "Blower serial numbers"
-        blower_tube_length: "Blower Tube Length (m)"
-        blower_tube_length_pass: "Blower Tube Length (m)"
-        blower_flap_pass: "Return flaps present"
-        blower_finger_pass: "Finger probe tests"
-        pat_pass: "PATs"
-        blower_visual_pass: "Visual inspections"
-        number_of_blowers: "Number of blowers"
+        fan_size_type: Blower sizes
+        blower_serial: Blower serial numbers
+        blower_tube_length: Blower Tube Length (m)
+        blower_tube_length_pass: Blower Tube Length (m)
+        blower_flap_pass: Return flaps present
+        blower_finger_pass: Finger probe tests
+        pat_pass: PATs
+        blower_visual_pass: Visual inspections
+        number_of_blowers: Number of blowers
       status:
-        checks_passed: "Fields completed"
-        completion: "Assessment Completion"
+        checks_passed: Fields completed
+        completion: Assessment Completion
       summary:
-        title: "Assessment Summary"
-        completion: "Completion"
-        safety_checks: "Safety Checks"
-        blower_checks: "Blower Checks"
-        electrical_safety: "Electrical Safety"
-        safety_issues: "Safety Issues"
-        overall_status: "Overall Status"
-        all_checks_passed: "All safety checks passed"
+        title: Assessment Summary
+        completion: Completion
+        safety_checks: Safety Checks
+        blower_checks: Blower Checks
+        electrical_safety: Electrical Safety
+        safety_issues: Safety Issues
+        overall_status: Overall Status
+        all_checks_passed: All safety checks passed
       issues:
-        blower_flap: "Blower flap check failed"
-        finger_guards: "Finger guard check failed"
-        visual_damage: "Visual damage detected"
-        pat_failure: "PAT test failed"
-      submit: "Save Assessment"
-      submit_continue: "Save & Continue"
+        blower_flap: Blower flap check failed
+        finger_guards: Finger guard check failed
+        visual_damage: Visual damage detected
+        pat_failure: PAT test failed
+      submit: Save Assessment
+      submit_continue: Save & Continue

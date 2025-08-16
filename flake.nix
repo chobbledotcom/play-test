@@ -35,6 +35,8 @@
             rubyPackages_3_4.sorbet-runtime
             ruby_3_4
             sqlite
+            yamlfix
+            yamllint
           ];
 
           # Use bundler to manage Rails version instead of Nix

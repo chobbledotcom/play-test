@@ -1,211 +1,211 @@
+---
 en:
   safety_standards:
-    title: "EN 14960:2019 Calculators"
-    subtitle: "EN 14960:2019 Requirements for Inflatable Play Equipment"
+    title: EN 14960:2019 Calculators
+    subtitle: EN 14960:2019 Requirements for Inflatable Play Equipment
     tabs:
-      anchorage: "Anchorage"
-      user_capacity: "User Capacity"
-      slides: "Slides"
-      material: "Material"
-      fan: "Fan"
-    compliant: "Compliant"
-
+      anchorage: Anchorage
+      user_capacity: User Capacity
+      slides: Slides
+      material: Material
+      fan: Fan
+    compliant: Compliant
     anchor_requirements:
-      title: "Anchor Requirements (box model)"
-      description: "Anchors must be calculated based on the play area to ensure adequate ground restraint."
-      unit_area: "Unit Area (m²)"
-      required_anchors: "Required Anchors"
-      under_70: "Under 70m²"
-      70_to_100: "70-100m²"
-      100_to_125: "100-125m²"
-      125_to_150: "125-150m²"
-      150_to_175: "150-175m²"
-      175_to_200: "175-200m²"
-      over_200: "Over 200m²"
-      add_one_per_15: "Add 1 per 15m²"
-      total_anchors: "Total Anchors:"
-      required: "Required Anchors:"
-      compliance_status: "Compliance Status:"
-
+      title: Anchor Requirements (box model)
+      description: Anchors must be calculated based on the play area to ensure adequate
+        ground restraint.
+      unit_area: Unit Area (m²)
+      required_anchors: Required Anchors
+      under_70: Under 70m²
+      70_to_100: 70-100m²
+      100_to_125: 100-125m²
+      125_to_150: 125-150m²
+      150_to_175: 150-175m²
+      175_to_200: 175-200m²
+      over_200: Over 200m²
+      add_one_per_15: Add 1 per 15m²
+      total_anchors: 'Total Anchors:'
+      required: 'Required Anchors:'
+      compliance_status: 'Compliance Status:'
     slide_requirements:
-      title: "EN 14960:2019 Slide Requirements"
-      wall_height_requirements: "Wall Height Requirements"
-      runout_requirements: "Runout Requirements"
-      platform_height_requirement: "EN 14960:2019 Requirement:"
-      minimum_runout: "Minimum runout"
-      runout_formula: "(50% of platform height or 300mm minimum)"
-      no_walls_required: "No containing walls required"
-      walls_equal_height: "Walls must be at least %{height}m (equal to platform height)"
-      walls_125_height: "Walls must be at least %{height}m (1.25x platform height)"
-      walls_125_plus_roof: "Walls must be at least %{height}m + permanent roof required"
-
+      title: EN 14960:2019 Slide Requirements
+      wall_height_requirements: Wall Height Requirements
+      runout_requirements: Runout Requirements
+      platform_height_requirement: 'EN 14960:2019 Requirement:'
+      minimum_runout: Minimum runout
+      runout_formula: (50% of platform height or 300mm minimum)
+      no_walls_required: No containing walls required
+      walls_equal_height: Walls must be at least %{height}m (equal to platform height)
+      walls_125_height: Walls must be at least %{height}m (1.25x platform height)
+      walls_125_plus_roof: Walls must be at least %{height}m + permanent roof required
     user_height:
-      title: "User Height Requirements"
-      height_requirements: "Height Requirements"
-      no_walls_required: "No containing walls required"
-      walls_equal_user_height: "Containing walls must be at least %{height}m (equal to user height)"
-      walls_125_user_height: "Containing walls must be at least %{height}m (1.25x user height)"
-      walls_125_plus_roof_required: "Containing walls must be at least %{height}m + permanent roof required"
-      roof_status: "Permanent Roof"
-      calculated_capacities: "Calculated Capacities:"
-      capacity_1000mm: "1.0m users: %{count} (1 per m²)"
-      capacity_1200mm: "1.2m users: %{count} (0.75 per m²)"
-      capacity_1500mm: "1.5m users: %{count} (0.60 per m²)"
-      capacity_1800mm: "1.8m users: %{count} (0.5 per m²)"
-      max_user_height_note: "Capacity calculated for users up to %{height}m tall"
+      title: User Height Requirements
+      height_requirements: Height Requirements
+      no_walls_required: No containing walls required
+      walls_equal_user_height: Containing walls must be at least %{height}m (equal
+        to user height)
+      walls_125_user_height: Containing walls must be at least %{height}m (1.25x user
+        height)
+      walls_125_plus_roof_required: Containing walls must be at least %{height}m +
+        permanent roof required
+      roof_status: Permanent Roof
+      calculated_capacities: 'Calculated Capacities:'
+      capacity_1000mm: '1.0m users: %{count} (1 per m²)'
+      capacity_1200mm: '1.2m users: %{count} (0.75 per m²)'
+      capacity_1500mm: '1.5m users: %{count} (0.60 per m²)'
+      capacity_1800mm: '1.8m users: %{count} (0.5 per m²)'
+      max_user_height_note: Capacity calculated for users up to %{height}m tall
       play_area_validation:
-        title: "Play Area Measurement Validation"
-        passed: "Play area measurements are valid"
-        failed: "Play area measurements have validation errors"
-        measurements: "Measurements"
-        unit_dimensions: "Unit dimensions (L×W)"
-        play_area_dimensions: "Play area (L×W)"
-        total_play_area: "Total play area"
-        negative_adjustment: "Negative adjustment area"
-
+        title: Play Area Measurement Validation
+        passed: Play area measurements are valid
+        failed: Play area measurements have validation errors
+        measurements: Measurements
+        unit_dimensions: Unit dimensions (L×W)
+        play_area_dimensions: Play area (L×W)
+        total_play_area: Total play area
+        negative_adjustment: Negative adjustment area
     calculators:
-      result_title: "Result"
-      result: "Result"
-      breakdown_title: "Breakdown"
-      
+      result_title: Result
+      result: Result
+      breakdown_title: Breakdown
       anchor:
-        title: "Calculate Required Anchors"
-        description: "Anchors must be calculated based on the play area to ensure adequate ground restraint for wind loads."
-        area_label: "Area (m²):"
-        area_placeholder: "e.g. 25.0"
-        submit: "Calculate Anchors"
-        result_title: "Result:"
-        area_result: "Area:"
-        required_result: "Calculated Total Anchors"
-        calculation_result: "Calculation:"
-        front_back_area_label: "Front/back area"
-        sides_area_label: "Sides area"
-        front_back_anchors_label: "Front & back anchor counts"
-        left_right_anchors_label: "Left & right anchor counts"
-        total_anchors_label: "Calculated total anchors"
-        en_minimum_label: "EN 14960 minimum"
-        minimum_required: "Minimum %{minimum} anchors required, using %{minimum}"
-
+        title: Calculate Required Anchors
+        description: Anchors must be calculated based on the play area to ensure adequate
+          ground restraint for wind loads.
+        area_label: 'Area (m²):'
+        area_placeholder: e.g. 25.0
+        submit: Calculate Anchors
+        result_title: 'Result:'
+        area_result: 'Area:'
+        required_result: Calculated Total Anchors
+        calculation_result: 'Calculation:'
+        front_back_area_label: Front/back area
+        sides_area_label: Sides area
+        front_back_anchors_label: Front & back anchor counts
+        left_right_anchors_label: Left & right anchor counts
+        total_anchors_label: Calculated total anchors
+        en_minimum_label: EN 14960 minimum
+        minimum_required: Minimum %{minimum} anchors required, using %{minimum}
       user_capacity:
-        title: "Calculate User Capacity"
-        description: "Based on age-appropriate space allocation per user by height category."
-        length_label: "Length (m):"
-        width_label: "Width (m):"
-        adjustment_label: "Negative Play Space Adjustment (m²):"
-        length_placeholder: "e.g. 5.0"
-        width_placeholder: "e.g. 4.0"
-        adjustment_placeholder: "e.g. 2.0 (optional)"
-        submit: "Calculate Capacity"
-        result_title: "Result:"
-        dimensions_result: "Dimensions:"
-        total_area_result: "Total Area:"
-        negative_adjustment_result: "Negative Play Space Adjustment:"
-        usable_area_result: "Usable Area:"
-        capacities_result: "User Capacities:"
-
+        title: Calculate User Capacity
+        description: Based on age-appropriate space allocation per user by height
+          category.
+        length_label: 'Length (m):'
+        width_label: 'Width (m):'
+        adjustment_label: 'Negative Play Space Adjustment (m²):'
+        length_placeholder: e.g. 5.0
+        width_placeholder: e.g. 4.0
+        adjustment_placeholder: e.g. 2.0 (optional)
+        submit: Calculate Capacity
+        result_title: 'Result:'
+        dimensions_result: 'Dimensions:'
+        total_area_result: 'Total Area:'
+        negative_adjustment_result: 'Negative Play Space Adjustment:'
+        usable_area_result: 'Usable Area:'
+        capacities_result: 'User Capacities:'
       runout:
-        title: "Calculate Required Runout Length"
-        height_label: "Platform Height (m):"
-        height_placeholder: "e.g. 2.5"
-        submit: "Calculate Runout"
-        result_title: "Result:"
-        platform_height_result: "Platform Height:"
-        stop_wall_status: "Stop-wall:"
-        stop_wall_fitted: "Fitted (adds 0.5m)"
-        required_runout_result: "Required Runout"
-        calculation_breakdown: "Calculation:"
-        calculation_label: "50% calculation"
-        minimum_label: "Minimum requirement"
-        base_runout_label: "Base runout"
-        stop_wall_addition_label: "Stop-wall addition"
-        maximum_of: "Maximum of"
-        and: "and"
-
+        title: Calculate Required Runout Length
+        height_label: 'Platform Height (m):'
+        height_placeholder: e.g. 2.5
+        submit: Calculate Runout
+        result_title: 'Result:'
+        platform_height_result: 'Platform Height:'
+        stop_wall_status: 'Stop-wall:'
+        stop_wall_fitted: Fitted (adds 0.5m)
+        required_runout_result: Required Runout
+        calculation_breakdown: 'Calculation:'
+        calculation_label: 50% calculation
+        minimum_label: Minimum requirement
+        base_runout_label: Base runout
+        stop_wall_addition_label: Stop-wall addition
+        maximum_of: Maximum of
+        and: and
       wall_height:
-        title: "Calculate Wall Height Requirements"
-        user_height_label: "Maximum User Height (m):"
-        user_height_placeholder: "e.g. 1.5"
-        submit: "Calculate Wall Height"
-        result_title: "Result:"
-        platform_height_result: "Platform Height:"
-        user_height_result: "Maximum User Height:"
-        requirement_result: "Requirement:"
-        additional_result: "Additional:"
-        roof_required: "Permanent roof required"
-        required_wall_height_result: "Required Wall Height"
-
+        title: Calculate Wall Height Requirements
+        user_height_label: 'Maximum User Height (m):'
+        user_height_placeholder: e.g. 1.5
+        submit: Calculate Wall Height
+        result_title: 'Result:'
+        platform_height_result: 'Platform Height:'
+        user_height_result: 'Maximum User Height:'
+        requirement_result: 'Requirement:'
+        additional_result: 'Additional:'
+        roof_required: Permanent roof required
+        required_wall_height_result: Required Wall Height
     errors:
-      invalid_area: "Please enter a valid area greater than 0"
-      invalid_length: "Please enter a valid length greater than 0"
-      invalid_width: "Please enter a valid width greater than 0"
-      invalid_height: "Please enter a valid height greater than 0"
-      invalid_dimensions: "Please enter valid dimensions greater than 0"
-      calculation_failed: "Calculation failed - please check your inputs"
-    
+      invalid_area: Please enter a valid area greater than 0
+      invalid_length: Please enter a valid length greater than 0
+      invalid_width: Please enter a valid width greater than 0
+      invalid_height: Please enter a valid height greater than 0
+      invalid_dimensions: Please enter valid dimensions greater than 0
+      calculation_failed: Calculation failed - please check your inputs
     wall_heights:
-      requirements_by_platform: "Requirements by Platform Height"
-      platform_height: "Platform Height"
-      wall_requirement: "Wall Requirement"
-      under_600mm: "Under 0.6m"
-      no_walls_required: "No containing walls required"
-      600mm_to_3m: "0.6m - 3.0m"
-      3m_to_6m: "3.0m - 6.0m"
-      over_6m: "Over 6.0m"
-      height_range: "Height range"
-      requirement: "Requirement"
-      calculation: "Calculation"
-      equal_to_user_height: "%{height}m (user height)"
-      additional_requirement: "Additional requirement"
-      permanent_roof_required: "Permanent roof required"
-      exceeds_safe_limits: "Platform height exceeds safe limits"
-      status: "Status"
-      walls_equal_user_height: "Walls must be at least %{height}m (equal to user height)"
-      walls_125_user_height: "Walls must be at least %{height}m (1.25× user height)"
-      walls_125x_user_height: "Walls 1.25× user height"
-      walls_125x_plus_roof: "Walls 1.25× user height + permanent roof required"
-      walls_125_plus_roof_required: "Walls must be at least %{height}m + permanent roof required"
-      alternative_requirement: "Alternative requirement"
-      permanent_roof_alternative: "Permanent roof (can replace heightened walls)"
-      permanent_roof: "Permanent roof"
-      roof_fitted: "Fitted ✓"
-      roof_not_fitted: "Not fitted ✗"
-      roof_required_and_fitted: "Required and fitted ✓"
-      roof_required_but_not_fitted: "Required but not fitted ✗"
-    
+      requirements_by_platform: Requirements by Platform Height
+      platform_height: Platform Height
+      wall_requirement: Wall Requirement
+      under_600mm: Under 0.6m
+      no_walls_required: No containing walls required
+      600mm_to_3m: 0.6m - 3.0m
+      3m_to_6m: 3.0m - 6.0m
+      over_6m: Over 6.0m
+      height_range: Height range
+      requirement: Requirement
+      calculation: Calculation
+      equal_to_user_height: '%{height}m (user height)'
+      additional_requirement: Additional requirement
+      permanent_roof_required: Permanent roof required
+      exceeds_safe_limits: Platform height exceeds safe limits
+      status: Status
+      walls_equal_user_height: Walls must be at least %{height}m (equal to user height)
+      walls_125_user_height: Walls must be at least %{height}m (1.25× user height)
+      walls_125x_user_height: Walls 1.25× user height
+      walls_125x_plus_roof: Walls 1.25× user height + permanent roof required
+      walls_125_plus_roof_required: Walls must be at least %{height}m + permanent
+        roof required
+      alternative_requirement: Alternative requirement
+      permanent_roof_alternative: Permanent roof (can replace heightened walls)
+      permanent_roof: Permanent roof
+      roof_fitted: Fitted ✓
+      roof_not_fitted: Not fitted ✗
+      roof_required_and_fitted: Required and fitted ✓
+      roof_required_but_not_fitted: Required but not fitted ✗
     slides:
-      runout_calculator_title: "Slide Runout Calculator"
-      wall_height_calculator_title: "Wall Height Calculator"
-    
+      runout_calculator_title: Slide Runout Calculator
+      wall_height_calculator_title: Wall Height Calculator
     user_capacity_section:
-      capacity_guidelines: "Capacity Guidelines"
-      capacity_description: "User capacity is calculated based on the play area and the height of users. Taller users require more space for safe play."
-      user_height: "User Height"
-      space_required: "Space Required"
-      users_per_m2: "Users per m²"
-      important_notes: "Important Notes"
+      capacity_guidelines: Capacity Guidelines
+      capacity_description: User capacity is calculated based on the play area and
+        the height of users. Taller users require more space for safe play.
+      user_height: User Height
+      space_required: Space Required
+      users_per_m2: Users per m²
+      important_notes: Important Notes
       notes:
-        allowed_heights: "Only calculate capacity for user heights that are allowed on the unit"
-        height_restriction: "If a unit has a maximum user height restriction, do not calculate capacity for taller users"
-        round_down: "Always round down fractional users for safety"
-        consider_obstacles: "Consider obstacles and unusable areas when calculating total play area"
-    
+        allowed_heights: Only calculate capacity for user heights that are allowed
+          on the unit
+        height_restriction: If a unit has a maximum user height restriction, do not
+          calculate capacity for taller users
+        round_down: Always round down fractional users for safety
+        consider_obstacles: Consider obstacles and unusable areas when calculating
+          total play area
     api:
-      invalid_calculation_type: "Invalid calculation type: %{type}"
-      none_provided: "none provided"
-      calculation_failed: "Calculation failed: %{error}"
-      calculation_success: "Calculation completed successfully"
-      unknown_error: "Calculation failed with unknown error"
-    
+      invalid_calculation_type: 'Invalid calculation type: %{type}'
+      none_provided: none provided
+      calculation_failed: 'Calculation failed: %{error}'
+      calculation_success: Calculation completed successfully
+      unknown_error: Calculation failed with unknown error
     metadata:
-      anchor_title: "Anchor Requirements"
-      slide_runout_title: "Slide Runout Requirements"
-      slide_runout_description: "Minimum runout distance for safe slide deceleration."
-      wall_height_title: "Wall Height Requirements"
-      wall_height_description: "Containing wall heights must scale with user height based on platform height thresholds."
-      user_capacity_title: "User Capacity Calculation"
-      anchor_formula: "((Area × 114.0 × 1.5) ÷ 1600.0)"
-      runout_formula: "50% of platform height, minimum 300mm"
-      wall_height_formula: "Tiered requirements based on platform height thresholds"
-      user_capacity_formula: "Area ÷ space_per_user (varies by height: 1-2 m² per user)"
-      standard_reference: "EN 14960:2019"
-      requirement_text_unit: "requirement text"
+      anchor_title: Anchor Requirements
+      slide_runout_title: Slide Runout Requirements
+      slide_runout_description: Minimum runout distance for safe slide deceleration.
+      wall_height_title: Wall Height Requirements
+      wall_height_description: Containing wall heights must scale with user height
+        based on platform height thresholds.
+      user_capacity_title: User Capacity Calculation
+      anchor_formula: ((Area × 114.0 × 1.5) ÷ 1600.0)
+      runout_formula: 50% of platform height, minimum 300mm
+      wall_height_formula: Tiered requirements based on platform height thresholds
+      user_capacity_formula: 'Area ÷ space_per_user (varies by height: 1-2 m² per
+        user)'
+      standard_reference: EN 14960:2019
+      requirement_text_unit: requirement text
