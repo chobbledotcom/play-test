@@ -143,7 +143,7 @@ group :ci_coverage, :test do
   # Code coverage
   gem "simplecov", require: false
   gem "simplecov-cobertura", require: false
-  
+
   # JUnit formatter for RSpec (for CI integration)
   gem "rspec_junit_formatter"
 end
