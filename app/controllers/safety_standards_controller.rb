@@ -156,7 +156,7 @@ class SafetyStandardsController < ApplicationController
   sig { void }
   def calculate_safety_standard
     type = params[:calculation][:type]
-    
+
     case type
     when "anchors"
       calculate_anchors
