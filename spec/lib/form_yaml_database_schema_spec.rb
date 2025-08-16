@@ -57,14 +57,7 @@ PARTIAL_ALLOWED_ATTRIBUTES = {
 }.freeze
 
 RSpec.describe "Form YAML Database Schema Validation" do
-  # Helper to load form YAML configuration
-  define_method(:load_form_config) do |assessment_type|
-    config_path = Rails.root.join("config/forms/#{assessment_type}.yml")
-    return nil unless File.exist?(config_path)
-
-    yaml_content = YAML.load_file(config_path)
-    yaml_content["form_fields"]
-  end
+  include FormHelpers
 
   # Helper to get all fields from form config
   define_method(:get_all_form_fields) do |form_config|
@@ -72,9 +65,9 @@ RSpec.describe "Form YAML Database Schema Validation" do
 
     fields = []
     form_config.each do |fieldset|
-      fieldset["fields"].each do |field_config|
-        field = field_config["field"]
-        partial = field_config["partial"]
+      fieldset[:fields].each do |field_config|
+        field = field_config[:field]
+        partial = field_config[:partial]
 
         fields << field
         composite_fields = ChobbleForms::FieldUtils
@@ -96,10 +89,9 @@ RSpec.describe "Form YAML Database Schema Validation" do
 
       ASSESSMENT_TYPES.each do |assessment_type|
         table_name = assessment_type.pluralize
-        form_config = load_form_config(assessment_type)
-
-        # Skip if form config doesn't exist
-        next unless form_config
+        config_path = Rails.root.join("config/forms/#{assessment_type}.yml")
+        yaml_content = get_form_config(config_path)
+        form_config = yaml_content[:form_fields]
 
         # Get database columns excluding system columns
         db_columns = get_database_columns(table_name) - SYSTEM_COLUMNS
@@ -148,8 +140,9 @@ RSpec.describe "Form YAML Database Schema Validation" do
       duplicate_legends_by_assessment = {}
 
       ASSESSMENT_TYPES.each do |assessment_type|
-        form_config = load_form_config(assessment_type)
-        next unless form_config
+        config_path = Rails.root.join("config/forms/#{assessment_type}.yml")
+        yaml_content = get_form_config(config_path)
+        form_config = yaml_content[:form_fields]
 
         # Get all legend keys
         legend_keys = form_config.map { |fieldset| fieldset["legend_i18n_key"] }
@@ -183,8 +176,9 @@ RSpec.describe "Form YAML Database Schema Validation" do
 
       ASSESSMENT_TYPES.each do |assessment_type|
         table_name = assessment_type.pluralize
-        form_config = load_form_config(assessment_type)
-        next unless form_config
+        config_path = Rails.root.join("config/forms/#{assessment_type}.yml")
+        yaml_content = get_form_config(config_path)
+        form_config = yaml_content[:form_fields]
 
         # Get column types from database
         columns = ActiveRecord::Base.connection.columns(table_name)
@@ -244,8 +238,9 @@ RSpec.describe "Form YAML Database Schema Validation" do
 
       ASSESSMENT_TYPES.each do |assessment_type|
         table_name = assessment_type.pluralize
-        form_config = load_form_config(assessment_type)
-        next unless form_config
+        config_path = Rails.root.join("config/forms/#{assessment_type}.yml")
+        yaml_content = get_form_config(config_path)
+        form_config = yaml_content[:form_fields]
 
         # Get all database columns
         db_columns = get_database_columns(table_name)
@@ -281,8 +276,9 @@ RSpec.describe "Form YAML Database Schema Validation" do
 
       ASSESSMENT_TYPES.each do |assessment_type|
         table_name = assessment_type.pluralize
-        form_config = load_form_config(assessment_type)
-        next unless form_config
+        config_path = Rails.root.join("config/forms/#{assessment_type}.yml")
+        yaml_content = get_form_config(config_path)
+        form_config = yaml_content[:form_fields]
 
         # Get all database columns
         db_columns = get_database_columns(table_name)
@@ -366,8 +362,9 @@ RSpec.describe "Form YAML Database Schema Validation" do
       errors = []
 
       ASSESSMENT_TYPES.each do |assessment_type|
-        form_config = load_form_config(assessment_type)
-        next unless form_config
+        config_path = Rails.root.join("config/forms/#{assessment_type}.yml")
+        yaml_content = get_form_config(config_path)
+        form_config = yaml_content[:form_fields]
 
         form_config.each do |fieldset|
           fieldset["fields"].each do |field_config|
