@@ -4,7 +4,7 @@ en:
       header: User Height/Count
       sections:
         height_measurements: Height Measurements
-        height_measurements_footer: This is not slides - that's the next page
+        height_measurements_footer: "This is not slides - that's the next page"
         user_capacity: User Capacity
         tallest_user_capacity: User Capacity (Maximum)
         play_area: Play Area
@@ -35,8 +35,8 @@ en:
       submit_continue: Save & Continue
       errors:
         header:
-          one: 1 error prevented this assessment from being saved:
-          other: %{count} errors prevented this assessment from being saved:
+          one: "1 error prevented this assessment from being saved:"
+          other: "%{count} errors prevented this assessment from being saved:"
         containing_wall_height_negative: Containing wall height must be greater than or equal to 0
         users_at_1000mm_negative: Users at 1m must be greater than or equal to 0
         users_at_1200mm_negative: Users at 1.2m must be greater than or equal to 0

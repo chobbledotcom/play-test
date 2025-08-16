@@ -92,7 +92,7 @@ en:
       admin_no: "No"
       last_active_never: Never
       user_inactive: Your account is not currently active. Please contact an administrator.
-      impersonate_confirm: You will be logged in as %{email}. You'll need to log out to return to your admin account.
+      impersonate_confirm: "You will be logged in as %{email}. You'll need to log out to return to your admin account."
       delete_confirm: Are you sure?
       account_created: Account created
       user_updated: User updated
@@ -101,7 +101,7 @@ en:
       settings_updated: Settings updated
       impersonating: You are now impersonating %{email}
       stopped_impersonating: You have stopped impersonating and returned to your admin account
-      new_user_notification: new user: %{email}
+      new_user_notification: "new user: %{email}"
       own_action_only: You can only change your own %{action}
       inherited_from_company: These details are inherited from your company and cannot be edited here.
       rpii_verified: RPII inspector number verified successfully
@@ -109,7 +109,7 @@ en:
       rpii_verified_on: Verified on %{date}
       rpii_blank_number: RPII inspector number is required
       rpii_blank_name: User name is required for verification
-      rpii_name_mismatch: Name mismatch: User name '%{user_name}' does not match inspector name '%{inspector_name}'
+      rpii_name_mismatch: "Name mismatch: User name '%{user_name}' does not match inspector name '%{inspector_name}'"
       rpii_not_found: RPII inspector number not found
       seeds_added: Successfully added seed data for user
       seeds_failed: Failed to add seed data
@@ -126,8 +126,8 @@ en:
       logo_must_be_image: must be an image file
       signature_must_be_image: must be an image file
       header:
-        one: Could not save user because there is 1 error:
-        other: Could not save user because there are %{count} errors:
+        one: "Could not save user because there is 1 error:"
+        other: "Could not save user because there are %{count} errors:"
 
     options:
       time_full: Show Full Time

@@ -17,15 +17,15 @@ en:
   # Common Rails conventions
   date:
     formats:
-      default: %Y-%m-%d
-      short: %b %d
-      long: %B %d, %Y
+      default: "%Y-%m-%d"
+      short: "%b %d"
+      long: "%B %d, %Y"
 
   time:
     formats:
-      default: %a, %d %b %Y %H:%M:%S %z
-      short: %d %b %H:%M
-      long: %B %d, %Y %H:%M
+      default: "%a, %d %b %Y %H:%M:%S %z"
+      short: "%d %b %H:%M"
+      long: "%B %d, %Y %H:%M"
 
   # ActiveRecord validation messages
   activerecord:

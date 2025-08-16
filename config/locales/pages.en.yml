@@ -40,4 +40,4 @@ en:
         is_snippet: This is a snippet (not a standalone page)
       submit: Save Page
       errors:
-        header: Please correct the following errors:
+        header: "Please correct the following errors:"

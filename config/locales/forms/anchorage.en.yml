@@ -37,5 +37,5 @@ en:
       submit_continue: Save & Continue
       errors:
         header:
-          one: 1 error prevented this assessment from being saved:
-          other: %{count} errors prevented this assessment from being saved:
+          one: "1 error prevented this assessment from being saved:"
+          other: "%{count} errors prevented this assessment from being saved:"

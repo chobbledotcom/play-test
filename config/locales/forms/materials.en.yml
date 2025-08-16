@@ -27,4 +27,4 @@ en:
       submit: Save Assessment
       submit_continue: Save & Continue
       errors:
-        header: Please fix the following errors:
+        header: "Please fix the following errors:"

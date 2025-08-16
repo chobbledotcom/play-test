@@ -2,17 +2,17 @@ en:
   # Validation Messages
   errors:
     messages:
-      cant_be_blank: can't be blank
+      cant_be_blank: "can't be blank"
       is_invalid: is invalid
       invalid_image_format: must be a valid image file
       image_processing_failed: could not be processed
-      image_processing_error: could not be processed: %{error}
+      image_processing_error: "could not be processed: %{error}"
     unauthorized: You are not authorized to access this page.
     not_found:
       title: Page not found
       message: The page you are looking for does not exist.
     internal_server_error:
       title: Internal server error
-      message: We're sorry, but something went wrong.
+      message: "We're sorry, but something went wrong."
     redirect_message: Taking you back to the homepage in 10 seconds, or
     redirect_link: click here to go there now

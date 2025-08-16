@@ -1,10 +1,10 @@
 en:
   safety_standards_tabs:
     slide_safety:
-      title: EN 14960:2019 Slide Safety Requirements
+      title: "EN 14960:2019 Slide Safety Requirements"
       runout_requirements:
-        title: Runout Requirements:
-        formula: Formula:
+        title: "Runout Requirements:"
+        formula: "Formula:"
         formula_text: Required Runout = max(Platform Height × 0.5, 0.3m)
         example: "Example: 2.5m platform requires max(2.5 × 0.5, 0.3) = 1.25m runout"
         minimum_length: "Minimum length: 50% of highest platform height"
@@ -13,7 +13,7 @@ en:
         stop_wall: "If stop wall fitted: adds 50cm to required run-out length"
         wall_height_runout: "Wall height on run-out sides: 50% of user height"
       containing_wall_heights:
-        title: Containing Platform Wall Heights for Slides:
+        title: "Containing Platform Wall Heights for Slides:"
         platform_height: Platform Height
         requirement: Requirement
         under_600mm: Under 600mm

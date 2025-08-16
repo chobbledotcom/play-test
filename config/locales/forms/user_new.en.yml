@@ -13,5 +13,5 @@ en:
       submit: Register
       errors:
         header:
-          one: 1 error prevented registration:
-          other: %{count} errors prevented registration:
+          one: "1 error prevented registration:"
+          other: "%{count} errors prevented registration:"

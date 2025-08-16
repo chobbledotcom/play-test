@@ -2,10 +2,10 @@ en:
   seed_data:
     logging:
       starting_creation: Starting seed creation for user %{user_id}
-      castle_images_found: Castle images found: %{count}
+      castle_images_found: "Castle images found: %{count}"
       creation_completed: Seed creation completed
-      failed_to_create: Failed to create seed data: %{error}
-      failed_to_delete: Failed to delete seed data: %{error}
+      failed_to_create: "Failed to create seed data: %{error}"
+      failed_to_delete: "Failed to delete seed data: %{error}"
       no_castle_images: No castle images found
     descriptions:
       traditional_castle: Traditional bouncy castle suitable for parties and events

@@ -54,8 +54,8 @@ en:
 
     errors:
       header:
-        one: Could not save company because there is 1 error:
-        other: Could not save company because there are %{count} errors:
+        one: "Could not save company because there is 1 error:"
+        other: "Could not save company because there are %{count} errors:"
 
     search:
       placeholder: Search by name or RPII number...

@@ -19,5 +19,5 @@ en:
       submit: Save Unit
       errors:
         header:
-          one: 1 error prevented this unit from being saved:
-          other: %{count} errors prevented this unit from being saved:
+          one: "1 error prevented this unit from being saved:"
+          other: "%{count} errors prevented this unit from being saved:"

@@ -48,7 +48,7 @@ en:
         size_m: Size (m)
         date: Date
         inspector: Inspector
-        inspector_with_rpii: %{name} (%{rpii_label} %{rpii_number})
+        inspector_with_rpii: "%{name} (%{rpii_label} %{rpii_number})"
         result: Result
         expiry_date: Expiry Date
         na: N/A
@@ -59,5 +59,5 @@ en:
       unit_meters: m
 
     table:
-      unit_label_column_width_left: 140
-      unit_label_column_width_right: 100
+      unit_label_column_width_left: "140"
+      unit_label_column_width_right: "100"

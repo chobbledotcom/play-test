@@ -76,7 +76,7 @@ en:
     labels:
       inspection_date: Inspection Date
       dimensions: Dimensions
-      all_count: All (%{count})
+      all_count: "All (%{count})"
       from_last_inspection: (from last inspection)
       unit_reports: Unit
       last_inspection_reports: Last Inspection
@@ -85,7 +85,7 @@ en:
       play_area_length: Play Area Length (m)
       play_area_width: Play Area Width (m)
       negative_adjustment: Negative Play Space Adjustment (m²)
-      slide_permanent_roof: Slide Has Permanent Roof"
+      slide_permanent_roof: "Slide Has Permanent Roof"
       users_at_1000mm: Users at 1000mm Height
       users_at_1200mm: Users at 1200mm Height
       users_at_1500mm: Users at 1500mm Height
@@ -118,16 +118,16 @@ en:
       click_here: Click here
 
     validations:
-      name_blank: Name can't be blank
-      manufacturer_blank: Manufacturer can't be blank
-      serial_blank: Serial can't be blank
-      serial: Serial number can't be blank
-      description_blank: Description can't be blank
-      operator_blank: Controller / Owner can't be blank
-      location_blank: Location can't be blank
-      width_blank: Width can't be blank
-      length_blank: Length can't be blank
-      height_blank: Height can't be blank
+      name_blank: "Name can't be blank"
+      manufacturer_blank: "Manufacturer can't be blank"
+      serial_blank: "Serial can't be blank"
+      serial: "Serial number can't be blank"
+      description_blank: "Description can't be blank"
+      operator_blank: "Controller / Owner can't be blank"
+      location_blank: "Location can't be blank"
+      width_blank: "Width can't be blank"
+      length_blank: "Length can't be blank"
+      height_blank: "Height can't be blank"
       width_range: Width must be greater than 0
       length_range: Length must be less than 200
       height_range: Height must be greater than 0
@@ -135,8 +135,8 @@ en:
 
     errors:
       header:
-        one: Could not save unit because there is 1 error:
-        other: Could not save unit because there are %{count} errors:
+        one: "Could not save unit because there is 1 error:"
+        other: "Could not save unit because there are %{count} errors:"
       inspection_not_found: Inspection not found
       inspection_has_unit: This inspection already has a unit associated with it
       invalid_image: Photo must be a valid image file

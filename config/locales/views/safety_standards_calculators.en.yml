@@ -2,7 +2,7 @@ en:
   safety_standards:
     calculators:
       anchor:
-        description: Calculate required anchors for a given inflatable area based on EN 14960:2019 standards.
+        description: "Calculate required anchors for a given inflatable area based on EN 14960:2019 standards."
       user_capacity:
         description: Calculate the maximum number of users based on playing area dimensions and user height restrictions.
         total_area: Total area

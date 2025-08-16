@@ -10,7 +10,7 @@ en:
     labels:
       screenshots:
         one: 1 screenshot
-        other: %{count} screenshots
+        other: "%{count} screenshots"
       updated: Last updated
     
     links:
