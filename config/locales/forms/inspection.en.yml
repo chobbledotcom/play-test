@@ -31,4 +31,4 @@ en:
       errors:
         header:
           one: '1 error prevented this inspection from being saved:'
-          other: "%{count} errors prevented this inspection from being saved:"
+          other: '%{count} errors prevented this inspection from being saved:'

@@ -1,17 +1,18 @@
+---
 en:
   seed_data:
     logging:
-      starting_creation: "Starting seed creation for user %{user_id}"
-      castle_images_found: "Castle images found: %{count}"
-      creation_completed: "Seed creation completed"
-      failed_to_create: "Failed to create seed data: %{error}"
-      failed_to_delete: "Failed to delete seed data: %{error}"
-      no_castle_images: "No castle images found"
+      starting_creation: Starting seed creation for user %{user_id}
+      castle_images_found: 'Castle images found: %{count}'
+      creation_completed: Seed creation completed
+      failed_to_create: 'Failed to create seed data: %{error}'
+      failed_to_delete: 'Failed to delete seed data: %{error}'
+      no_castle_images: No castle images found
     descriptions:
-      traditional_castle: "Traditional bouncy castle suitable for parties and events"
-      combination_slide: "Combination unit with integrated slide for added fun"
-      soft_play: "Enclosed soft play area ideal for younger children"
-      assault_course: "Challenging obstacle course for active play"
-      gladiator: "Interactive duel platform for competitive games"
-      bungee_run: "Two-lane bungee run for racing fun"
-      default: "Quality inflatable entertainment unit"
+      traditional_castle: Traditional bouncy castle suitable for parties and events
+      combination_slide: Combination unit with integrated slide for added fun
+      soft_play: Enclosed soft play area ideal for younger children
+      assault_course: Challenging obstacle course for active play
+      gladiator: Interactive duel platform for competitive games
+      bungee_run: Two-lane bungee run for racing fun
+      default: Quality inflatable entertainment unit

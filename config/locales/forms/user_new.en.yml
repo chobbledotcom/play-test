@@ -15,4 +15,4 @@ en:
       errors:
         header:
           one: '1 error prevented registration:'
-          other: "%{count} errors prevented registration:"
+          other: '%{count} errors prevented registration:'

@@ -1,19 +1,20 @@
+---
 en:
   admin:
-    title: "Admin Dashboard"
+    title: Admin Dashboard
     releases:
-      title: "GitHub Releases"
-      no_releases: "No releases found."
-      fetch_error: "Failed to fetch releases from GitHub. Please try again later."
-      published_by: "Published by %{author} on"
+      title: GitHub Releases
+      no_releases: No releases found.
+      fetch_error: Failed to fetch releases from GitHub. Please try again later.
+      published_by: Published by %{author} on
     files:
-      title: "ActiveStorage Files"
-      no_files: "No files found."
+      title: ActiveStorage Files
+      no_files: No files found.
       table:
-        filename: "Filename"
-        size: "Size"
-        attached_to: "Attached To"
-        created_at: "Created"
+        filename: Filename
+        size: Size
+        attached_to: Attached To
+        created_at: Created
       attached_to:
-        orphaned: "Orphaned"
-        variant_record: "Variant Record #%{id}"
+        orphaned: Orphaned
+        variant_record: 'Variant Record #%{id}'

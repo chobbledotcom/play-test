@@ -21,4 +21,4 @@ en:
       errors:
         header:
           one: '1 error prevented this user from being saved:'
-          other: "%{count} errors prevented this user from being saved:"
+          other: '%{count} errors prevented this user from being saved:'

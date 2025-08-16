@@ -1,13 +1,11 @@
+---
 test:
   service: Disk
   root: <%= Rails.root.join("tmp/storage") %>
-
 local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
-  paths:
-    - <%= Rails.root.join("storage/images") %>
-
+  paths: [<%= Rails.root.join("storage/images") %>]
 s3_host:
   service: S3
   endpoint: <%= ENV["S3_ENDPOINT"] %>

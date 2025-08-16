@@ -1,179 +1,164 @@
+---
 en:
   # Units Management
   units:
     titles:
-      new: "New Unit"
-      edit: "Edit Unit"
-      index: "Units"
-      show: "Unit Details"
-      new_from_inspection: "Create Unit from Inspection"
-      log: "Activity Log - %{unit}"
-
+      new: New Unit
+      edit: Edit Unit
+      index: Units
+      show: Unit Details
+      new_from_inspection: Create Unit from Inspection
+      log: Activity Log - %{unit}
     search:
-      placeholder: "Serial number or name"
-
+      placeholder: Serial number or name
     headers:
-      unit_details: "Unit Details"
-      dimensions: "Dimensions (in metres)"
-      basic_dimensions: "Basic Dimensions"
-      anchorage_dimensions: "Anchorage Specifications"
-      structure_dimensions: "Structure Specifications"
-      slide_dimensions: "Slide Specifications"
-      user_height_dimensions: "Maximum User Height & Capacity"
-      user_capacity: "User Capacity at Various Heights"
-      enclosed_dimensions: "Enclosed Unit Specifications"
-      other_dimensions: "Other Specifications"
-      inspection_history: "Inspection History"
-      qr_code: "Report QR Code"
-      report_link: "Report PDF Link"
-      report_json_link: "Report JSON Link"
-      unit_report: "Unit Report"
-      inspection_details: "Inspection Details"
-
+      unit_details: Unit Details
+      dimensions: Dimensions (in metres)
+      basic_dimensions: Basic Dimensions
+      anchorage_dimensions: Anchorage Specifications
+      structure_dimensions: Structure Specifications
+      slide_dimensions: Slide Specifications
+      user_height_dimensions: Maximum User Height & Capacity
+      user_capacity: User Capacity at Various Heights
+      enclosed_dimensions: Enclosed Unit Specifications
+      other_dimensions: Other Specifications
+      inspection_history: Inspection History
+      qr_code: Report QR Code
+      report_link: Report PDF Link
+      report_json_link: Report JSON Link
+      unit_report: Unit Report
+      inspection_details: Inspection Details
     status:
-      overdue: "Overdue"
-
+      overdue: Overdue
     sections:
-      filters: "Filter Units"
-      search: "Search Units"
-      basic_information: "Basic Information"
-      unit_details: "Unit details"
-      basic_dimensions: "Basic dimensions"
-      anchorage_dimensions: "Anchorage Specifications"
-      structure_dimensions: "Structure Specifications"
-      slide_dimensions: "Slide Specifications"
-      user_height_dimensions: "Maximum User Height & Capacity"
-      user_capacity: "User Capacity at Various Heights"
-      enclosed_dimensions: "Enclosed Unit Specifications"
-      other_dimensions: "Other Specifications"
-
+      filters: Filter Units
+      search: Search Units
+      basic_information: Basic Information
+      unit_details: Unit details
+      basic_dimensions: Basic dimensions
+      anchorage_dimensions: Anchorage Specifications
+      structure_dimensions: Structure Specifications
+      slide_dimensions: Slide Specifications
+      user_height_dimensions: Maximum User Height & Capacity
+      user_capacity: User Capacity at Various Heights
+      enclosed_dimensions: Enclosed Unit Specifications
+      other_dimensions: Other Specifications
     fields:
-      id: "ID"
-      name: "Unit Name"
-      serial: "Serial"
-      manufacturer: "Manufacturer"
-      has_slide: "Has Slide"
-      operator: "Controller / Owner"
-      description: "Description"
-      photo: "Photo"
-      width: "Width"
-      length: "Length"
-      height: "Height"
-      size_unit: "Size"
-      manufacture_date: "Manufacture Date"
-      reports: "Reports"
-      qr_code: "QR Code"
-      latest_inspection: "Latest Inspection"
-
+      id: ID
+      name: Unit Name
+      serial: Serial
+      manufacturer: Manufacturer
+      has_slide: Has Slide
+      operator: Controller / Owner
+      description: Description
+      photo: Photo
+      width: Width
+      length: Length
+      height: Height
+      size_unit: Size
+      manufacture_date: Manufacture Date
+      reports: Reports
+      qr_code: QR Code
+      latest_inspection: Latest Inspection
     slide_status:
-      with_slide: "With Slide"
-      without_slide: "Without Slide"
-    
+      with_slide: With Slide
+      without_slide: Without Slide
     unit_types:
-      bouncy_castle: "Bouncy Castle"
-      bouncing_pillow: "Bouncing Pillow"
-
+      bouncy_castle: Bouncy Castle
+      bouncing_pillow: Bouncing Pillow
     labels:
-      inspection_date: "Inspection Date"
-      dimensions: "Dimensions"
-      all_count: "All (%{count})"
-      from_last_inspection: "(from last inspection)"
-      unit_reports: "Unit"
-      last_inspection_reports: "Last Inspection"
-
-      user_height: "Maximum User Height (m)" # Backward compatibility
-      play_area_length: "Play Area Length (m)"
-      play_area_width: "Play Area Width (m)"
-      negative_adjustment: "Negative Play Space Adjustment (m²)"
+      inspection_date: Inspection Date
+      dimensions: Dimensions
+      all_count: All (%{count})
+      from_last_inspection: (from last inspection)
+      unit_reports: Unit
+      last_inspection_reports: Last Inspection
+      user_height: Maximum User Height (m)  # Backward compatibility
+      play_area_length: Play Area Length (m)
+      play_area_width: Play Area Width (m)
+      negative_adjustment: Negative Play Space Adjustment (m²)
       slide_permanent_roof: Slide Has Permanent Roof"
-      users_at_1000mm: "Users at 1000mm Height"
-      users_at_1200mm: "Users at 1200mm Height"
-      users_at_1500mm: "Users at 1500mm Height"
-      users_at_1800mm: "Users at 1800mm Height"
-      custom_user_height_comment: "Custom User Height Comments"
+      users_at_1000mm: Users at 1000mm Height
+      users_at_1200mm: Users at 1200mm Height
+      users_at_1500mm: Users at 1500mm Height
+      users_at_1800mm: Users at 1800mm Height
+      custom_user_height_comment: Custom User Height Comments
       # Enclosed unit fields
-      is_totally_enclosed: "Unit is Totally Enclosed"
-
+      is_totally_enclosed: Unit is Totally Enclosed
     conditions:
-      excellent: "Excellent"
-      good: "Good"
-      fair: "Fair"
-      poor: "Poor"
-      needs_repair: "Needs Repair"
-      select_prompt: "Select condition..."
-
+      excellent: Excellent
+      good: Good
+      fair: Fair
+      poor: Poor
+      needs_repair: Needs Repair
+      select_prompt: Select condition...
     buttons:
-      view: "View Inspections"
-      create: "Create Unit"
-      update: "Update Unit"
-      delete: "Delete"
-      pdf_report: "PDF Report"
-      add_inspection: "Add Inspection"
-      add_unit: "Add Unit"
-      export_csv: "Export CSV"
-      download_pdf: "Download PDF"
-
+      view: View Inspections
+      create: Create Unit
+      update: Update Unit
+      delete: Delete
+      pdf_report: PDF Report
+      add_inspection: Add Inspection
+      add_unit: Add Unit
+      export_csv: Export CSV
+      download_pdf: Download PDF
     actions:
-      select: "Select"
-      click_here: "Click here"
-
+      select: Select
+      click_here: Click here
     validations:
-      name_blank: "Name can't be blank"
-      manufacturer_blank: "Manufacturer can't be blank"
-      serial_blank: "Serial can't be blank"
-      serial: "Serial number can't be blank"
-      description_blank: "Description can't be blank"
-      operator_blank: "Controller / Owner can't be blank"
-      location_blank: "Location can't be blank"
-      width_blank: "Width can't be blank"
-      length_blank: "Length can't be blank"
-      height_blank: "Height can't be blank"
-      width_range: "Width must be greater than 0"
-      length_range: "Length must be less than 200"
-      height_range: "Height must be greater than 0"
-      save_error: "Did not save"
-
+      name_blank: Name can't be blank
+      manufacturer_blank: Manufacturer can't be blank
+      serial_blank: Serial can't be blank
+      serial: Serial number can't be blank
+      description_blank: Description can't be blank
+      operator_blank: Controller / Owner can't be blank
+      location_blank: Location can't be blank
+      width_blank: Width can't be blank
+      length_blank: Length can't be blank
+      height_blank: Height can't be blank
+      width_range: Width must be greater than 0
+      length_range: Length must be less than 200
+      height_range: Height must be greater than 0
+      save_error: Did not save
     errors:
       header:
-        one: "Could not save unit because there is 1 error:"
-        other: "Could not save unit because there are %{count} errors:"
-      inspection_not_found: "Inspection not found"
-      inspection_has_unit: "This inspection already has a unit associated with it"
-      invalid_image: "Photo must be a valid image file"
-
+        one: 'Could not save unit because there is 1 error:'
+        other: 'Could not save unit because there are %{count} errors:'
+      inspection_not_found: Inspection not found
+      inspection_has_unit: This inspection already has a unit associated with it
+      invalid_image: Photo must be a valid image file
     messages:
-      add_inspection_confirm: "Create a new inspection for this unit?"
-      no_inspections: "No inspections recorded for this unit."
-      no_complete_inspections: "No complete inspections are saved for this unit"
-      created_from_inspection: "Unit created successfully and linked to inspection."
-      dimensions_will_be_copied: "Dimensions will be automatically copied from the inspection."
-      created: "Unit created"
-      updated: "Unit updated"
-      deleted: "Unit deleted"
-      delete_failed: "Failed to delete unit"
-      not_found: "Unit not found"
-      access_denied: "Access denied"
-      not_deletable: "You cannot delete this unit because it has completed inspections attached to it."
-      delete_confirm: "Are you sure? This cannot be undone."
-      no_photo: "No photo"
-      no_units_found: "No units found."
-      view_full_photo: "View full size photo"
-      photo_of: "Photo of %{name}"
-      inspection_company_required: "You must be assigned to an inspection company to create units."
-      pdf_not_supported: "Your browser does not support PDFs."
-      pdf_not_supported_html: "Your browser does not support PDFs."
-
+      add_inspection_confirm: Create a new inspection for this unit?
+      no_inspections: No inspections recorded for this unit.
+      no_complete_inspections: No complete inspections are saved for this unit
+      created_from_inspection: Unit created successfully and linked to inspection.
+      dimensions_will_be_copied: Dimensions will be automatically copied from the
+        inspection.
+      created: Unit created
+      updated: Unit updated
+      deleted: Unit deleted
+      delete_failed: Failed to delete unit
+      not_found: Unit not found
+      access_denied: Access denied
+      not_deletable: You cannot delete this unit because it has completed inspections
+        attached to it.
+      delete_confirm: Are you sure? This cannot be undone.
+      no_photo: No photo
+      no_units_found: No units found.
+      view_full_photo: View full size photo
+      photo_of: Photo of %{name}
+      inspection_company_required: You must be assigned to an inspection company to
+        create units.
+      pdf_not_supported: Your browser does not support PDFs.
+      pdf_not_supported_html: Your browser does not support PDFs.
     accessibility:
-      qr_code_alt: "QR Code for Unit Inspection History Report"
-
+      qr_code_alt: QR Code for Unit Inspection History Report
     share:
-      button: "Share / Copy"
-      title: "Inflatable Unit %{name} Report"
-      copied: "Copied!"
-
+      button: Share / Copy
+      title: Inflatable Unit %{name} Report
+      copied: Copied!
     forms:
-      search: "Search units..."
-    
+      search: Search units...
     links:
-      back_to_unit: "Back to Unit"
-      view_log: "Log"
+      back_to_unit: Back to Unit
+      view_log: Log

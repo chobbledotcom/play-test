@@ -1,156 +1,149 @@
+---
 en:
   # User Management
   users:
-    title: "Users"
-    
+    title: Users
     titles:
-      register: "Register"
-      edit: "Edit User"
-      settings: "Your Settings"
-      change_password: "Change Password"
-      index: "Users"
-
+      register: Register
+      edit: Edit User
+      settings: Your Settings
+      change_password: Change Password
+      index: Users
     headers:
-      user_details: "User Details"
-
+      user_details: User Details
     sections:
-      account_details: "Account Details"
-      contact_details: "Contact Details"
-      password_change: "Change Password"
-      preferences: "Preferences"
-      update_user: "Update User"
-
+      account_details: Account Details
+      contact_details: Contact Details
+      password_change: Change Password
+      preferences: Preferences
+      update_user: Update User
     fields:
-      email: "Email"
-      password: "Password"
-      sort: "Sort by"
-
+      email: Email
+      password: Password
+      sort: Sort by
     forms:
-      email: "Email"
-      password: "Password"
-      password_confirmation: "Password confirmation"
-      current_password: "Current password"
-      password_help: "New Password (leave blank if no change)"
-      rpii_inspector_number: "RPII Inspector No"
-      active_until: "Active Until"
-      inspection_company_id: "Inspection Company"
-      theme: "Theme"
-      company_prompt: "Select inspection company..."
-      no_company: "No Company"
-      name: "Name"
-      phone: "Phone"
-      address: "Address"
-      country: "Country"
-      postal_code: "Postcode"
-
+      email: Email
+      password: Password
+      password_confirmation: Password confirmation
+      current_password: Current password
+      password_help: New Password (leave blank if no change)
+      rpii_inspector_number: RPII Inspector No
+      active_until: Active Until
+      inspection_company_id: Inspection Company
+      theme: Theme
+      company_prompt: Select inspection company...
+      no_company: No Company
+      name: Name
+      phone: Phone
+      address: Address
+      country: Country
+      postal_code: Postcode
     edit:
-      email: "Email"
-      password: "New Password"
-      password_confirmation: "Password confirmation"
-      current_password: "Current password"
-      password_help: "New Password (leave blank if no change)"
-      rpii_inspector_number: "RPII Inspector No"
-      active_until: "Active Until"
-      inspection_company_id: "Inspection Company"
-      theme: "Theme"
-      company_prompt: "Select inspection company..."
-      no_company: "No Company"
-      name: "Name"
-      phone: "Phone"
-      address: "Address"
-      country: "Country"
-      postal_code: "Postcode"
-
+      email: Email
+      password: New Password
+      password_confirmation: Password confirmation
+      current_password: Current password
+      password_help: New Password (leave blank if no change)
+      rpii_inspector_number: RPII Inspector No
+      active_until: Active Until
+      inspection_company_id: Inspection Company
+      theme: Theme
+      company_prompt: Select inspection company...
+      no_company: No Company
+      name: Name
+      phone: Phone
+      address: Address
+      country: Country
+      postal_code: Postcode
     labels:
-      activated_at: "Activated At"
-      deactivated_at: "Deactivated At"
-    
+      activated_at: Activated At
+      deactivated_at: Deactivated At
     sort:
-      newest: "Newest First"
-      oldest: "Oldest First"
-      most_active: "Most Recently Active"
-      most_inspections: "Most Inspections"
-
+      newest: Newest First
+      oldest: Oldest First
+      most_active: Most Recently Active
+      most_inspections: Most Inspections
     buttons:
-      register: "Register"
-      update_user: "Update User"
-      update_settings: "Update Settings"
-      update_password: "Update Password"
-      delete: "Delete"
-      change_password: "Change Password"
-      impersonate: "Log in as %{email}"
-      stop_impersonating: "Stop Impersonating"
-      verify_rpii: "Verify RPII Number"
-      add_seeds: "Add Seeds"
-      delete_seeds: "Delete Seeds"
-      activate: "Activate User"
-      deactivate: "Deactivate User"
-
+      register: Register
+      update_user: Update User
+      update_settings: Update Settings
+      update_password: Update Password
+      delete: Delete
+      change_password: Change Password
+      impersonate: Log in as %{email}
+      stop_impersonating: Stop Impersonating
+      verify_rpii: Verify RPII Number
+      add_seeds: Add Seeds
+      delete_seeds: Delete Seeds
+      activate: Activate User
+      deactivate: Deactivate User
     messages:
-      no_users: "No users found"
-      admin_yes: "Yes"
-      admin_no: "No"
-      last_active_never: "Never"
-      user_inactive: "Your account is not currently active. Please contact an administrator."
-      impersonate_confirm: "You will be logged in as %{email}. You'll need to log out to return to your admin account."
-      delete_confirm: "Are you sure?"
-      account_created: "Account created"
-      user_updated: "User updated"
-      user_deleted: "User deleted"
-      password_updated: "Password updated"
-      settings_updated: "Settings updated"
-      impersonating: "You are now impersonating %{email}"
-      stopped_impersonating: "You have stopped impersonating and returned to your admin account"
-      new_user_notification: "new user: %{email}"
-      own_action_only: "You can only change your own %{action}"
-      inherited_from_company: "These details are inherited from your company and cannot be edited here."
-      rpii_verified: "RPII inspector number verified successfully"
-      rpii_verification_failed: "RPII inspector number verification failed"
-      rpii_verified_on: "Verified on %{date}"
-      rpii_blank_number: "RPII inspector number is required"
-      rpii_blank_name: "User name is required for verification"
-      rpii_name_mismatch: "Name mismatch: User name '%{user_name}' does not match inspector name '%{inspector_name}'"
-      rpii_not_found: "RPII inspector number not found"
-      seeds_added: "Successfully added seed data for user"
-      seeds_failed: "Failed to add seed data"
-      seeds_deleted: "Successfully deleted seed data for user"
-      seeds_delete_failed: "Failed to delete seed data"
-      delete_seeds_confirm: "Are you sure you want to delete all seed data for %{email}? This will remove all seed units and inspections."
-      user_activated: "User has been activated"
-      user_deactivated: "User has been deactivated"
-      deactivate_confirm: "Are you sure you want to deactivate %{email}?"
-      logged_out_everywhere: "You have been logged out from all other devices"
-
+      no_users: No users found
+      admin_yes: 'Yes'
+      admin_no: 'No'
+      last_active_never: Never
+      user_inactive: Your account is not currently active. Please contact an administrator.
+      impersonate_confirm: You will be logged in as %{email}. You'll need to log out
+        to return to your admin account.
+      delete_confirm: Are you sure?
+      account_created: Account created
+      user_updated: User updated
+      user_deleted: User deleted
+      password_updated: Password updated
+      settings_updated: Settings updated
+      impersonating: You are now impersonating %{email}
+      stopped_impersonating: You have stopped impersonating and returned to your admin
+        account
+      new_user_notification: 'new user: %{email}'
+      own_action_only: You can only change your own %{action}
+      inherited_from_company: These details are inherited from your company and cannot
+        be edited here.
+      rpii_verified: RPII inspector number verified successfully
+      rpii_verification_failed: RPII inspector number verification failed
+      rpii_verified_on: Verified on %{date}
+      rpii_blank_number: RPII inspector number is required
+      rpii_blank_name: User name is required for verification
+      rpii_name_mismatch: "Name mismatch: User name '%{user_name}' does not match\
+        \ inspector name '%{inspector_name}'"
+      rpii_not_found: RPII inspector number not found
+      seeds_added: Successfully added seed data for user
+      seeds_failed: Failed to add seed data
+      seeds_deleted: Successfully deleted seed data for user
+      seeds_delete_failed: Failed to delete seed data
+      delete_seeds_confirm: Are you sure you want to delete all seed data for %{email}?
+        This will remove all seed units and inspections.
+      user_activated: User has been activated
+      user_deactivated: User has been deactivated
+      deactivate_confirm: Are you sure you want to deactivate %{email}?
+      logged_out_everywhere: You have been logged out from all other devices
     errors:
-      wrong_password: "Current password is incorrect"
-      logo_must_be_image: "must be an image file"
-      signature_must_be_image: "must be an image file"
+      wrong_password: Current password is incorrect
+      logo_must_be_image: must be an image file
+      signature_must_be_image: must be an image file
       header:
-        one: "Could not save user because there is 1 error:"
-        other: "Could not save user because there are %{count} errors:"
-
+        one: 'Could not save user because there is 1 error:'
+        other: 'Could not save user because there are %{count} errors:'
     options:
-      time_full: "Show Full Time"
-      time_day: "Show Day Only"
-      theme_light: "Light"
-      theme_dark: "Dark"
-      theme_default: "Default"
-
+      time_full: Show Full Time
+      time_day: Show Day Only
+      theme_light: Light
+      theme_dark: Dark
+      theme_default: Default
     verification:
-      details_header: "RPII Verification Details"
-      name: "Inspector Name"
-      number: "Inspector Number"
-      qualifications: "Qualifications"
-      success_header: "Verification Successful"
-      failure_header: "Verification Failed"
-      found_inspector: "Found Inspector"
-
+      details_header: RPII Verification Details
+      name: Inspector Name
+      number: Inspector Number
+      qualifications: Qualifications
+      success_header: Verification Successful
+      failure_header: Verification Failed
+      found_inspector: Found Inspector
     sessions:
-      title: "Active Sessions"
-      logout_everywhere_else: "Log out everywhere except here"
-      logout_everywhere_confirm: "This will log you out from all other browsers and devices. Are you sure?"
-      first_active: "First Active"
-      last_active: "Last Active"
-      ip_address: "IP Address"
-      current: "current session"
-      unknown: "Unknown"
+      title: Active Sessions
+      logout_everywhere_else: Log out everywhere except here
+      logout_everywhere_confirm: This will log you out from all other browsers and
+        devices. Are you sure?
+      first_active: First Active
+      last_active: Last Active
+      ip_address: IP Address
+      current: current session
+      unknown: Unknown

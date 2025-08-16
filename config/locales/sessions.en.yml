@@ -1,22 +1,22 @@
+---
 en:
   # Session/Login
   session:
     login:
-      title: "Log in"
+      title: Log in
       fields:
-        email: "Email"
-        password: "Password"
-        password_label: "Password"
-        remember_me: "Remember Me"
-      submit: "Log in"
-      success: "Logged in"
-      error: "Invalid email/password combination"
+        email: Email
+        password: Password
+        password_label: Password
+        remember_me: Remember Me
+      submit: Log in
+      success: Logged in
+      error: Invalid email/password combination
       sections:
-        credentials: "Login Credentials"
+        credentials: Login Credentials
     logout:
-      success: "Logged out"
-
+      success: Logged out
   sessions:
     buttons:
-      log_in: "Log in"
-      log_out: "Log Out"
+      log_in: Log in
+      log_out: Log Out

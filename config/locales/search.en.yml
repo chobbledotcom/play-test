@@ -1,39 +1,40 @@
+---
 en:
   # Search functionality
   search:
-    title: "Search Federated Sites"
+    title: Search Federated Sites
     homepage:
-      placeholder: "Unit or Inspection ID (8 letters)"
+      placeholder: Unit or Inspection ID (8 letters)
     sites:
-      current_site: "Current Site"
-      play_test: "Play Test"
-      rpii_play_test: "RPII"
+      current_site: Current Site
+      play_test: Play Test
+      rpii_play_test: RPII
     results:
-      heading: "Search Results"
-      site: "Site"
-      type: "Type"
-      status: "Status"
-      action: "Action"
+      heading: Search Results
+      site: Site
+      type: Type
+      status: Status
+      action: Action
     status:
-      waiting: "Waiting..."
-      searching: "Searching..."
-      found: "Found"
-      not_found: "Not found"
-      error: "Error"
+      waiting: Waiting...
+      searching: Searching...
+      found: Found
+      not_found: Not found
+      error: Error
     types:
-      unit: "Unit"
-      inspection: "Inspection"
-  
+      unit: Unit
+      inspection: Inspection
+
   # Form translations for search
   forms:
     search:
-      header: "Search Units & Inspections"
+      header: Search Units & Inspections
       sections:
-        search_details: "Search Details"
+        search_details: Search Details
       fields:
-        type: "Type"
-        id: "ID (8 characters)"
+        type: Type
+        id: ID (8 characters)
       options:
-        inspection: "Inspection"
-        unit: "Unit"
-      submit: "Search"
+        inspection: Inspection
+        unit: Unit
+      submit: Search

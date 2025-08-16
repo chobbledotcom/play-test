@@ -1,3 +1,4 @@
+---
 en:
   activerecord:
     models:
@@ -14,7 +15,6 @@ en:
         changed_data: Changes
         metadata: Metadata
         created_at: Created at
-  
   events:
     actions:
       created: Created
@@ -33,7 +33,7 @@ en:
       logged_successfully: Event logged successfully
       no_events_found: No events found
       view_changes: View changes
-      changed_from_to: "%{from} → %{to}"
+      changed_from_to: '%{from} → %{to}'
       empty: (empty)
     labels:
       recent_activity: Recent Activity
