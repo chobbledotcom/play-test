@@ -24,7 +24,7 @@ RSpec.describe "users/index.html.erb", type: :view do
   it "displays user information in table" do
     render
 
-    expect(rendered).to have_selector("table")
+    expect(rendered).to have_selector(".table-list")
     expect(rendered).to include(admin_user.email)
     expect(rendered).to include(regular_user1.email)
     expect(rendered).to include(regular_user2.email)
@@ -58,8 +58,8 @@ RSpec.describe "users/index.html.erb", type: :view do
 
     render
 
-    # The view still shows the table structure even when empty
-    expect(rendered).to have_selector("tbody")
+    # The view still shows the table-list structure even when empty
+    expect(rendered).to have_selector(".table-list-items")
     expect(rendered).to include("Users")
   end
 
@@ -69,6 +69,6 @@ RSpec.describe "users/index.html.erb", type: :view do
     # Based on the rendered output, there might not be a creation link visible
     # or it might have different text. Let's check if it shows user management features
     expect(rendered).to include("Users")
-    expect(rendered).to have_selector("table")
+    expect(rendered).to have_selector(".table-list")
   end
 end

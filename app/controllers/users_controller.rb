@@ -25,7 +25,7 @@ class UsersController < ApplicationController
   before_action :require_correct_user, only: NON_ADMIN_PATHS
 
   def index
-    @users = User.all
+    @users = apply_sort(User.all)
     @inspection_counts = Inspection
       .where(user_id: @users.pluck(:id))
       .group(:user_id)
@@ -220,6 +220,22 @@ class UsersController < ApplicationController
   end
 
   private
+
+  sig { params(scope: T.untyped).returns(T.untyped) }
+  def apply_sort(scope)
+    case params[:sort]
+    when "oldest"
+      scope.order(created_at: :asc)
+    when "most_active"
+      scope.order(last_active_at: :desc)
+    when "most_inspections"
+      scope.left_joins(:inspections)
+        .group("users.id")
+        .order("COUNT(inspections.id) DESC")
+    else
+      scope.order(created_at: :desc) # newest first is default
+    end
+  end
 
   sig { params(user: User).void }
   def switch_to_user(user)
