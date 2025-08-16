@@ -1,23 +1,23 @@
 en:
   forms:
     units:
-      header: "Unit Form"
+      header: Unit Form
       sections:
-        unit_details: "Unit Details"
-        manufacture: "Manufacture"
-        data: "Data"
+        unit_details: Unit Details
+        manufacture: Manufacture
+        data: Data
       fields:
-        id: "ID"
-        name: "Unit Name"
-        unit_type: "Unit Type"
-        serial: "Manufacturer Serial Number"
-        manufacturer: "Manufacturer"
-        description: "Description"
-        operator: "Controller / Owner"
-        manufacture_date: "Manufacture Date"
-        photo: "Photo"
-      submit: "Save Unit"
+        id: ID
+        name: Unit Name
+        unit_type: Unit Type
+        serial: Manufacturer Serial Number
+        manufacturer: Manufacturer
+        description: Description
+        operator: Controller / Owner
+        manufacture_date: Manufacture Date
+        photo: Photo
+      submit: Save Unit
       errors:
         header:
-          one: "1 error prevented this unit from being saved:"
-          other: "%{count} errors prevented this unit from being saved:"
+          one: 1 error prevented this unit from being saved:
+          other: %{count} errors prevented this unit from being saved:

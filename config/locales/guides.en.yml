@@ -1,17 +1,17 @@
 en:
   guides:
     titles:
-      index: "User Guides"
+      index: User Guides
     
     messages:
-      no_guides: "No guides available. Run tests with CAPTURE_GUIDE_SCREENSHOTS=true to generate guides."
-      not_found: "Guide not found"
+      no_guides: No guides available. Run tests with CAPTURE_GUIDE_SCREENSHOTS=true to generate guides.
+      not_found: Guide not found
     
     labels:
       screenshots:
-        one: "1 screenshot"
-        other: "%{count} screenshots"
-      updated: "Last updated"
+        one: 1 screenshot
+        other: %{count} screenshots
+      updated: Last updated
     
     links:
-      back_to_index: "← Back to all guides"
+      back_to_index: ← Back to all guides

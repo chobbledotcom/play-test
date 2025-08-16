@@ -1,31 +1,31 @@
 en:
   application:
     errors:
-      production_error_subject: "500 Error in play-test"
-      not_logged_in: "Not logged in"
-      user_label: "User"
-      controller_label: "Controller"
-      path_label: "Path"
-      method_label: "Method"
-      ip_label: "IP"
-      backtrace_label: "Backtrace (first 5 lines)"
+      production_error_subject: 500 Error in play-test
+      not_logged_in: Not logged in
+      user_label: User
+      controller_label: Controller
+      path_label: Path
+      method_label: Method
+      ip_label: IP
+      backtrace_label: Backtrace (first 5 lines)
 
     debug:
-      n_plus_one_detected: "N+1 query detected: %{table} table was queried too many times"
-      n_plus_one_with_limit: "N+1 query detected: %{table} table was queried too many times"
-      table_query_count: "%{table} was queried %{count} times"
-      queries_for_table: "Queries for %{table}:"
-      query_log_entry: "%{name}: %{sql}"
+      n_plus_one_detected: N+1 query detected: %{table} table was queried too many times
+      n_plus_one_with_limit: N+1 query detected: %{table} table was queried too many times
+      table_query_count: %{table} was queried %{count} times
+      queries_for_table: Queries for %{table}:
+      query_log_entry: %{name}: %{sql}
 
   concerns:
     public_viewable:
-      check_resource_owner_missing: "Including controller must implement check_resource_owner"
-      owns_resource_missing: "Including controller must implement owns_resource?"
-      pdf_filename_missing: "Including controller must implement pdf_filename"
-      resource_pdf_url_missing: "Including controller must implement resource_pdf_url"
+      check_resource_owner_missing: Including controller must implement check_resource_owner
+      owns_resource_missing: Including controller must implement owns_resource?
+      pdf_filename_missing: Including controller must implement pdf_filename
+      resource_pdf_url_missing: Including controller must implement resource_pdf_url
 
     user_activity_check:
-      handle_inactive_redirect_missing: "Controllers using UserActivityCheck must implement handle_inactive_user_redirect"
+      handle_inactive_redirect_missing: Controllers using UserActivityCheck must implement handle_inactive_user_redirect
 
     inspection_turbo_streams:
       status_value_html: '<span class="value">%{status}</span>'

@@ -1,43 +1,43 @@
 en:
   navigation:
-    pages: "Pages"
+    pages: Pages
   
   pages:
     index:
-      title: "Manage Pages"
-      new_page: "New Page"
-      slug: "URL Slug"
-      link_title: "Link Title"
-      meta_title: "Meta Title"
+      title: Manage Pages
+      new_page: New Page
+      slug: URL Slug
+      link_title: Link Title
+      meta_title: Meta Title
     
     new:
-      title: "New Page"
+      title: New Page
     
     edit:
-      title: "Edit Page"
-      delete: "Delete Page"
-      confirm_delete: "Are you sure you want to delete this page?"
+      title: Edit Page
+      delete: Delete Page
+      confirm_delete: Are you sure you want to delete this page?
     
     messages:
-      created: "Page created successfully"
-      updated: "Page updated successfully"
-      destroyed: "Page deleted successfully"
-      no_pages_found: "No pages found"
+      created: Page created successfully
+      updated: Page updated successfully
+      destroyed: Page deleted successfully
+      no_pages_found: No pages found
   
   forms:
     pages:
-      header: "Page Details"
+      header: Page Details
       sections:
-        page_details: "Page Details"
-        seo_metadata: "SEO Metadata"
-        content: "Content"
+        page_details: Page Details
+        seo_metadata: SEO Metadata
+        content: Content
       fields:
-        slug: "URL Slug"
-        link_title: "Link Title"
-        meta_title: "Meta Title"
-        meta_description: "Meta Description"
-        content: "Page Content (HTML)"
-        is_snippet: "This is a snippet (not a standalone page)"
-      submit: "Save Page"
+        slug: URL Slug
+        link_title: Link Title
+        meta_title: Meta Title
+        meta_description: Meta Description
+        content: Page Content (HTML)
+        is_snippet: This is a snippet (not a standalone page)
+      submit: Save Page
       errors:
-        header: "Please correct the following errors:"
+        header: Please correct the following errors:

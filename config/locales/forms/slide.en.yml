@@ -1,27 +1,27 @@
 en:
   forms:
     slide:
-      header: "Slide"
+      header: Slide
       sections:
-        slide_dimensions: "Slide Measurements"
+        slide_dimensions: Slide Measurements
       fields:
-        slide_platform_height: "Slide Platform Height (m)"
-        slide_wall_height: "Containing Platform Wall Height (m)"
-        slide_first_metre_height: "First Metre of Slide Wall Height (m)"
-        slide_beyond_first_metre_height: "Remaining Slide Wall Height (m)"
-        slide_permanent_roof: "Permanent Roof Fitted to Top of Slide?"
-        clamber_netting_pass: "Steps / Clamber Netting"
-        runout: "Slide Run Out (m)"
-        runout_pass: "Slide Run Out (m)"
-        slip_sheet_pass: "Slip Sheet Integrity"
+        slide_platform_height: Slide Platform Height (m)
+        slide_wall_height: Containing Platform Wall Height (m)
+        slide_first_metre_height: First Metre of Slide Wall Height (m)
+        slide_beyond_first_metre_height: Remaining Slide Wall Height (m)
+        slide_permanent_roof: Permanent Roof Fitted to Top of Slide?
+        clamber_netting_pass: Steps / Clamber Netting
+        runout: Slide Run Out (m)
+        runout_pass: Slide Run Out (m)
+        slip_sheet_pass: Slip Sheet Integrity
       status:
-        runout_requirement: "Runout Requirement"
-        height_requirement: "Height Requirement"
-        checks_passed: "Checks Passed"
-        completion: "Completion"
+        runout_requirement: Runout Requirement
+        height_requirement: Height Requirement
+        checks_passed: Checks Passed
+        completion: Completion
       compliance:
-        not_assessed: "Not Assessed"
-        compliant: "Compliant"
-        non_compliant: "Non-Compliant (Requires %{required}m minimum)"
-      submit: "Save Assessment"
-      submit_continue: "Save & Continue"
+        not_assessed: Not Assessed
+        compliant: Compliant
+        non_compliant: Non-Compliant (Requires %{required}m minimum)
+      submit: Save Assessment
+      submit_continue: Save & Continue

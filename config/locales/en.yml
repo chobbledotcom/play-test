@@ -17,30 +17,30 @@ en:
   # Common Rails conventions
   date:
     formats:
-      default: "%Y-%m-%d"
-      short: "%b %d"
-      long: "%B %d, %Y"
+      default: %Y-%m-%d
+      short: %b %d
+      long: %B %d, %Y
 
   time:
     formats:
-      default: "%a, %d %b %Y %H:%M:%S %z"
-      short: "%d %b %H:%M"
-      long: "%B %d, %Y %H:%M"
+      default: %a, %d %b %Y %H:%M:%S %z
+      short: %d %b %H:%M
+      long: %B %d, %Y %H:%M
 
   # ActiveRecord validation messages
   activerecord:
     attributes:
       unit:
-        operator: "Controller / Owner"
+        operator: Controller / Owner
     errors:
       messages:
-        not_an_image: "must be an image file"
+        not_an_image: must be an image file
       models:
         user:
           attributes:
             current_password:
-              incorrect: "is incorrect"
+              incorrect: is incorrect
         unit:
           attributes:
             base:
-              has_complete_inspections: "Cannot delete unit with completed inspections"
+              has_complete_inspections: Cannot delete unit with completed inspections

@@ -1,78 +1,78 @@
 en:
   # Prosopite N+1 detection
   prosopite:
-    n_plus_one_detected: "N+1 Query Detected: %{message}"
+    n_plus_one_detected: N+1 Query Detected: %{message}
     
   # Navigation
   navigation:
-    inspections: "Inspections"
-    units: "Units"
-    search: "Search"
-    users: "Users"
-    settings: "Settings"
-    safety_standards: "Safety Standards"
-    guides: "Guides"
-    about: "About"
-    feedback: "Feedback"
-    jobs: "Jobs"
-    admin: "Admin"
-    backups: "Backups"
-    releases: "Releases"
-    files: "Files"
+    inspections: Inspections
+    units: Units
+    search: Search
+    users: Users
+    settings: Settings
+    safety_standards: Safety Standards
+    guides: Guides
+    about: About
+    feedback: Feedback
+    jobs: Jobs
+    admin: Admin
+    backups: Backups
+    releases: Releases
+    files: Files
 
   # Shared UI elements
   shared:
     actions:
-      edit: "Edit"
-      delete: "Delete"
-      back: "Back"
-      save: "Save"
-      cancel: "Cancel"
-      close: "Close"
+      edit: Edit
+      delete: Delete
+      back: Back
+      save: Save
+      cancel: Cancel
+      close: Close
     safety_standards:
-      view_standards: "View Safety Standards"
+      view_standards: View Safety Standards
     messages:
-      saved_successfully: "Saved successfully"
-      save_failed: "Save failed"
+      saved_successfully: Saved successfully
+      save_failed: Save failed
       invalid_image_format: "Cannot display: invalid image format"
-      link_copied: "Link copied to clipboard!"
-      pdf_not_supported: "Your browser does not support PDFs"
+      link_copied: Link copied to clipboard!
+      pdf_not_supported: Your browser does not support PDFs
     api:
-      success: "success"
-      error: "error"
+      success: success
+      error: error
     buttons:
-      cancel: "Cancel"
-      share: "Share"
-      download_pdf: "Download PDF"
+      cancel: Cancel
+      share: Share
+      download_pdf: Download PDF
     "yes": "Yes"
     "no": "No"
-    view_full_size: "View full size"
-    comment: "Comment"
-    comments: "Comments"
-    pass: "Pass"
-    fail: "Fail"
-    not_applicable: "Not Applicable"
-    pass_pdf: "[PASS]"
-    fail_pdf: "[FAIL]"
-    na_pdf: "[N/A]"
-    assessment_completion: "Assessment Completion"
-    field_comment_placeholder: "%{field} comment"
-    error: "Error"
-    metres_by: "m ×"
-    metres_squared: "m²"
+    view_full_size: View full size
+    comment: Comment
+    comments: Comments
+    pass: Pass
+    fail: Fail
+    not_applicable: Not Applicable
+    pass_pdf: [PASS]
+    fail_pdf: [FAIL]
+    na_pdf: [N/A]
+    assessment_completion: Assessment Completion
+    field_comment_placeholder: %{field} comment
+    error: Error
+    metres_by: m ×
+    metres_squared: m²
 
   # Common messages
   ui:
-    actions: "Actions"
-    view: "View"
-    edit: "Edit"
-    delete: "Delete"
-    archive: "Archive"
-    unarchive: "Unarchive"
+    actions: Actions
+    view: View
+    edit: Edit
+    delete: Delete
+    archive: Archive
+    unarchive: Unarchive
     buttons:
-      submit: "Submit"
-      clear: "Clear"
-      search: "Search"
-      clear_filters: "Reset"
-      cancel: "Cancel"
+      submit: Submit
+      clear: Clear
+      search: Search
+      clear_filters: Reset
+      cancel: Cancel
 

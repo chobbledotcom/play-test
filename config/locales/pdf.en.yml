@@ -2,61 +2,61 @@ en:
   # PDF Generator
   pdf:
     inspection:
-      passed: "PASSED"
-      failed: "FAILED"
-      in_progress: "IN PROGRESS"
-      equipment_details: "Inspection Overview"
-      risk_assessment: "Risk Assessment"
-      assessments_section: "Assessment Results"
-      photos_section: "Photos"
-      no_assessment_data: "No %{assessment_type} data available"
+      passed: PASSED
+      failed: FAILED
+      in_progress: IN PROGRESS
+      equipment_details: Inspection Overview
+      risk_assessment: Risk Assessment
+      assessments_section: Assessment Results
+      photos_section: Photos
+      no_assessment_data: No %{assessment_type} data available
       watermark:
-        draft: "DRAFT"
+        draft: DRAFT
       fields:
-        inspector: "Inspector"
-        inspected_by: "Inspected by"
-        issued: "Issued"
-        issued_date: "Issued Date"
-        expiry_date: "Expiry Date"
-        rpii_inspector_no: "RPII Inspector No"
-        report_id: "Report ID"
-        size_m: "Size (m)"
-        passed: "PASSED"
-        failed: "FAILED"
-        incomplete: "INCOMPLETE"
-        na: "N/A"
-        size: "Size"
-        size_with_unit: "Size (m)"
-        unit_meters: "m"
-        photo_1_label: "Photo 1"
-        photo_2_label: "Photo 2"
-        photo_3_label: "Photo 3"
+        inspector: Inspector
+        inspected_by: Inspected by
+        issued: Issued
+        issued_date: Issued Date
+        expiry_date: Expiry Date
+        rpii_inspector_no: RPII Inspector No
+        report_id: Report ID
+        size_m: Size (m)
+        passed: PASSED
+        failed: FAILED
+        incomplete: INCOMPLETE
+        na: N/A
+        size: Size
+        size_with_unit: Size (m)
+        unit_meters: m
+        photo_1_label: Photo 1
+        photo_2_label: Photo 2
+        photo_3_label: Photo 3
 
     disclaimer:
-      header: "Disclaimer"
-      text: "I confirm that I inspected this inflatable device and that all details contained within this inspection report are a true representation of what I found and observed during my inspection process."
+      header: Disclaimer
+      text: I confirm that I inspected this inflatable device and that all details contained within this inspection report are a true representation of what I found and observed during my inspection process.
 
     signature:
-      caption: "Signature of Inspector"
+      caption: Signature of Inspector
 
     unit:
-      details: "Unit Details"
-      inspection_history: "Inspection History"
-      no_completed_inspections: "No completed inspections"
+      details: Unit Details
+      inspection_history: Inspection History
+      no_completed_inspections: No completed inspections
       fields:
-        unit_id: "Unit ID"
-        size_m: "Size (m)"
-        date: "Date"
-        inspector: "Inspector"
-        inspector_with_rpii: "%{name} (%{rpii_label} %{rpii_number})"
-        result: "Result"
-        expiry_date: "Expiry Date"
-        na: "N/A"
+        unit_id: Unit ID
+        size_m: Size (m)
+        date: Date
+        inspector: Inspector
+        inspector_with_rpii: %{name} (%{rpii_label} %{rpii_number})
+        result: Result
+        expiry_date: Expiry Date
+        na: N/A
 
     dimensions:
-      size: "Size"
-      size_with_unit: "Size (m)"
-      unit_meters: "m"
+      size: Size
+      size_with_unit: Size (m)
+      unit_meters: m
 
     table:
       unit_label_column_width_left: 140
