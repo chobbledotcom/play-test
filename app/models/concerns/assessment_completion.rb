@@ -45,7 +45,7 @@ module AssessmentCompletion
         field_to_partial[field.to_sym] = partial
 
         # Also map composite fields
-        composite_fields = ChobbleForms::FieldUtils.get_composite_fields(field, partial)
+        composite_fields = ChobbleForms::FieldUtils.get_composite_fields(field.to_sym, partial.to_sym)
         composite_fields.each do |cf|
           field_to_partial[cf.to_sym] = partial
         end

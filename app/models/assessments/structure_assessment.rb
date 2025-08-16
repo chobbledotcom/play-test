@@ -84,7 +84,7 @@ class Assessments::StructureAssessment < ApplicationRecord
       EN14960::Calculators::SlideCalculator.meets_height_requirements?(
         platform_height / 1000.0, # Convert mm to m
         height,
-        user_height.containing_wall_height,
+        user_height.containing_wall_height.to_f,
         permanent_roof
       )
     end

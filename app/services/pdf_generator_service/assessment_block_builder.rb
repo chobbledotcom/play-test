@@ -105,7 +105,7 @@ class PdfGeneratorService
           ordered_fields << field_name.to_sym
 
           # Use consolidated method to get composite fields
-          composite_fields = ChobbleForms::FieldUtils.get_composite_fields(field_name, partial_name)
+          composite_fields = ChobbleForms::FieldUtils.get_composite_fields(field_name.to_sym, partial_name.to_sym)
           composite_fields.each do |composite_field|
             ordered_fields << composite_field.to_sym if @assessment.respond_to?(composite_field)
           end
