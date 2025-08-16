@@ -26,7 +26,7 @@
   if local_assigns[:i18n_key]
     label = t(local_assigns[:i18n_key])
   elsif local_assigns[:model]
-    label = ChobbleForms::FieldUtils.form_field_label(local_assigns[:model], field)
+    label = ChobbleForms::FieldUtils.form_field_label(local_assigns[:model].to_sym, field.to_sym)
   else
     raise ArgumentError, "table_column partial requires either 'i18n_key' or 'model' parameter"
   end

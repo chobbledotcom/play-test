@@ -16,8 +16,8 @@ module UnitsHelper
 
   sig { returns(String) }
   def unit_search_placeholder
-    serial_label = ChobbleForms::FieldUtils.form_field_label("units", "serial")
-    name_label = ChobbleForms::FieldUtils.form_field_label("units", "name")
+    serial_label = ChobbleForms::FieldUtils.form_field_label(:units, :serial)
+    name_label = ChobbleForms::FieldUtils.form_field_label(:units, :name)
     "#{serial_label} or #{name_label.downcase}"
   end
 
