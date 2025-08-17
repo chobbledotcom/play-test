@@ -50,7 +50,6 @@
 .terragon-setup-complete
 
 # Ignore generated Sorbet RBI files (can be regenerated)
-/sorbet/rbi/
 .sorbet-results
 
 # Pinned docker versions

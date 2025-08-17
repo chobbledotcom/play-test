@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# All-in-one script to run Sorbet in a Ubuntu container on NixOS
+
+set -e
+
+CONTAINER_NAME="sorbet-ubuntu"
+WORKDIR=$(pwd)
+
+# Create container (will skip if already exists)
+distrobox create --yes --name "$CONTAINER_NAME" --image ubuntu:22.04
+
+# Install dependencies only if needed
+distrobox enter "$CONTAINER_NAME" -- bash -c "
+    if ! command -v ruby &> /dev/null; then
+        echo 'Installing Ruby and dependencies...'
+        sudo apt-get update && \
+        sudo apt-get install -y ruby ruby-dev build-essential git
+    fi
+    
+    if ! gem list -i sorbet &> /dev/null; then
+        echo 'Installing Sorbet gems...'
+        sudo gem install bundler sorbet sorbet-runtime
+    fi
+"
+
+# Bundle install
+echo "Installing bundle dependencies..."
+distrobox enter "$CONTAINER_NAME" -- bash -c "cd '$WORKDIR' && bundle install"
+
+# Run Sorbet type checking (ignoring .gems folder)
+echo "Running Sorbet type check..."
+distrobox enter "$CONTAINER_NAME" -- bash -c "cd '$WORKDIR' && bundle exec srb tc --ignore=.gems/"
+
+# Also run the check-sorbet-changes script if provided as an argument
+if [[ "$1" == "--check-changes" ]]; then
+    echo "Running Sorbet changes check..."
+    distrobox enter "$CONTAINER_NAME" -- bash -c "cd '$WORKDIR' && bin/check-sorbet-changes"
+elif [[ "$1" == "--all" ]]; then
+    echo "Running Sorbet changes check on all files..."
+    distrobox enter "$CONTAINER_NAME" -- bash -c "cd '$WORKDIR' && bin/check-sorbet-changes --all"
+fi

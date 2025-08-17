@@ -3,6 +3,7 @@
 
 module InspectionsHelper
   extend T::Sig
+  include ControllerContext
 
   sig { params(user: User).returns(String) }
   def format_inspection_count(user)
