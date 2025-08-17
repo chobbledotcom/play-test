@@ -479,8 +479,10 @@ class InspectionsController < ApplicationController
       [@inspection, @previous_inspection, Inspection.column_name_syms]
     when "results"
       # Results tab uses inspection fields directly, not an assessment
-      # Only risk_assessment should be prefilled, not passed
-      [@inspection, @previous_inspection, [:risk_assessment]]
+      # Include all fields shown on results tab: passed, risk_assessment, and photos
+      # NOT_COPIED_FIELDS will filter out fields that shouldn't be prefilled
+      results_fields = [:passed, :risk_assessment, :photo_1, :photo_2, :photo_3]
+      [@inspection, @previous_inspection, results_fields]
     else
       assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
       assessment_class = ASSESSMENT_CLASS_MAPPING[params[:tab]]
