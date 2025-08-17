@@ -218,12 +218,12 @@ RSpec.describe "Form YAML Database Schema Validation" do
             end
 
             # If partial contains pass_fail, it needs the _pass field
-            if partial.include?("pass_fail")
+            if partial.to_s.include?("pass_fail")
               required_fields << "#{field}_pass"
             end
 
             # If partial contains comment, it needs the _comment field
-            if partial.include?("comment")
+            if partial.to_s.include?("comment")
               required_fields << "#{field}_comment"
             end
 
