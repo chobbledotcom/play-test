@@ -297,8 +297,7 @@ class InspectionsController < ApplicationController
 
   def assessment_permitted_attributes(assessment_type)
     model_class = "Assessments::#{assessment_type.to_s.camelize}".constantize
-    all_attributes = model_class.column_name_syms
-    (all_attributes - ASSESSMENT_SYSTEM_ATTRIBUTES).map(&:to_sym)
+    model_class.column_name_syms - ASSESSMENT_SYSTEM_ATTRIBUTES
   end
 
   def filtered_inspections_query_without_order = current_user.inspections
