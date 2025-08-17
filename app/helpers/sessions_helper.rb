@@ -4,21 +4,16 @@
 module SessionsHelper
   extend T::Sig
 
-  sig { params(user: User).void }
-  def log_in(user)
-    session[:user_id] = user.id
-  end
-
   sig { void }
   def remember_user
-    if current_user
-      cookies.permanent.signed[:user_id] = current_user.id
+    if session[:session_token]
+      cookies.permanent.signed[:session_token] = session[:session_token]
     end
   end
 
   sig { void }
   def forget_user
-    cookies.delete(:user_id)
+    cookies.delete(:session_token)
   end
 
   sig { returns(T.nilable(User)) }
@@ -32,10 +27,8 @@ module SessionsHelper
   def fetch_current_user
     if session[:session_token]
       user_from_session_token
-    elsif session[:user_id]
-      User.find_by(id: session[:user_id])
-    elsif cookies.signed[:user_id]
-      user_from_cookie
+    elsif cookies.signed[:session_token]
+      user_from_cookie_token
     end
   end
 
@@ -46,18 +39,26 @@ module SessionsHelper
       user_session.user
     else
       # Session token is invalid, clear session
-      session.delete(:user_id)
       session.delete(:session_token)
       nil
     end
   end
 
   sig { returns(T.nilable(User)) }
-  def user_from_cookie
-    user = User.find_by(id: cookies.signed[:user_id])
-    return unless user
-    log_in user
-    user
+  def user_from_cookie_token
+    token = cookies.signed[:session_token]
+    return unless token
+
+    user_session = UserSession.find_by(session_token: token)
+    if user_session
+      # Restore session from cookie
+      session[:session_token] = token
+      user_session.user
+    else
+      # Invalid cookie token, clear it
+      cookies.delete(:session_token)
+      nil
+    end
   end
 
   public
@@ -69,7 +70,7 @@ module SessionsHelper
 
   sig { void }
   def log_out
-    session.delete(:user_id)
+    session.delete(:session_token)
     session.delete(:original_admin_id)  # Clear impersonation tracking
     forget_user
     @current_user = nil
@@ -86,10 +87,9 @@ module SessionsHelper
     User.find_by(email: email.downcase)&.authenticate(password)
   end
 
-  sig { params(user: User, should_remember: T::Boolean).void }
-  def create_user_session(user, should_remember = false)
-    log_in user
-    remember_user if should_remember
+  sig { params(user: User).void }
+  def create_user_session(user)
+    remember_user
   end
 
   sig { returns(T.nilable(UserSession)) }

@@ -7,16 +7,16 @@ form_fields:
         attributes:
           min: 0
       - partial: pass_fail_na_comment
-        field: retention_netting_pass
+        field: retention_netting
       - partial: pass_fail_na_comment
-        field: zips_pass
+        field: zips
       - partial: pass_fail_na_comment
-        field: windows_pass
+        field: windows
       - partial: pass_fail_na_comment
-        field: artwork_pass
+        field: artwork
       - partial: pass_fail_comment
-        field: thread_pass
+        field: thread
       - partial: pass_fail_comment
-        field: fabric_strength_pass
+        field: fabric_strength
       - partial: pass_fail_comment
-        field: fire_retardant_pass
+        field: fire_retardant

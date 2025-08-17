@@ -9,13 +9,13 @@
 <div class="table-list inspections-list">
   <!-- Header row -->
   <div class="table-list-header">
-    <%= render 'shared/table_column', field: 'photo', model: 'units', show: show_photo, header: true %>
-    <%= render 'shared/table_column', field: 'id', model: 'inspection', header: true %>
-    <%= render 'shared/table_column', field: 'name', model: 'units', show: show_name, header: true %>
-    <%= render 'shared/table_column', field: 'serial', model: 'units', show: show_serial, header: true %>
-    <%= render 'shared/table_column', field: 'last-inspection', i18n_key: 'inspections.fields.last_inspection', header: true %>
-    <%= render 'shared/table_column', field: 'inspector', model: 'inspection', show: show_inspector, header: true %>
-    <%= render 'shared/table_column', field: 'result', model: 'inspection', header: true %>
+    <%= render 'shared/table_column', field: :photo, model: :units, show: show_photo, header: true %>
+    <%= render 'shared/table_column', field: :id, model: :inspection, header: true %>
+    <%= render 'shared/table_column', field: :name, model: :units, show: show_name, header: true %>
+    <%= render 'shared/table_column', field: :serial, model: :units, show: show_serial, header: true %>
+    <%= render 'shared/table_column', field: :"last-inspection", i18n_key: 'inspections.fields.last_inspection', header: true %>
+    <%= render 'shared/table_column', field: :inspector, model: :inspection, show: show_inspector, header: true %>
+    <%= render 'shared/table_column', field: :result, model: :inspection, header: true %>
   </div>
 
   <!-- Data rows -->
@@ -29,7 +29,7 @@
       %>
       <li>
         <%= link_to target_path, class: "table-list-link" do %>
-          <%= render 'shared/table_column', field: 'photo', model: 'units', show: show_photo do %>
+          <%= render 'shared/table_column', field: :photo, model: :units, show: show_photo do %>
             <% if !inspection.complete? && inspection.unit&.photo&.attached? %>
               <%= render 'shared/image',
                   image: inspection.unit.photo,
@@ -42,23 +42,23 @@
                   height: 60 %>
             <% end %>
           <% end %>
-          <%= render 'shared/table_column', field: 'id', model: 'inspection', item: inspection %>
-          <%= render 'shared/table_column', field: 'name', model: 'units', show: show_name do %>
+          <%= render 'shared/table_column', field: :id, model: :inspection, item: inspection %>
+          <%= render 'shared/table_column', field: :name, model: :units, show: show_name do %>
             <% if inspection.unit.nil? %>
               <span class="badge">[<%= t("inspections.labels.no_unit") %>]</span>
             <% end %>
             <%= inspection.unit&.name.presence || t('inspections.messages.unnamed') %>
           <% end %>
-          <%= render 'shared/table_column', field: 'serial', model: 'units', show: show_serial do %>
+          <%= render 'shared/table_column', field: :serial, model: :units, show: show_serial do %>
             <%= inspection.unit&.serial.presence || t('inspections.messages.missing_serial') %>
           <% end %>
-          <%= render 'shared/table_column', field: 'last-inspection', i18n_key: 'inspections.fields.last_inspection' do %>
+          <%= render 'shared/table_column', field: :"last-inspection", i18n_key: 'inspections.fields.last_inspection' do %>
             <%= render_time(inspection.inspection_date) %>
           <% end %>
-          <%= render 'shared/table_column', field: 'inspector', model: 'inspection', show: show_inspector do %>
+          <%= render 'shared/table_column', field: :inspector, model: :inspection, show: show_inspector do %>
             <%= inspection.inspector_company&.name %>
           <% end %>
-          <%= render 'shared/table_column', field: 'result', model: 'inspection' do %>
+          <%= render 'shared/table_column', field: :result, model: :inspection do %>
             <%= inspection_result_badge(inspection) %>
           <% end %>
         <% end %>

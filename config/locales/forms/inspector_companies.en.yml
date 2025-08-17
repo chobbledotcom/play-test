@@ -13,7 +13,6 @@ en:
         phone: Phone Number
         address: Address
         city: City
-        state: State/Province
         postal_code: Postal Code
         country: Country
         active: Active

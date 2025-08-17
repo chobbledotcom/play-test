@@ -99,15 +99,21 @@ class PdfGeneratorService
         section[:fields].each do |field_config|
           field_name = field_config[:field]
           partial_name = field_config[:partial]
-          next unless @assessment.respond_to?(field_name)
 
-          # Add base field
-          ordered_fields << field_name.to_sym
-
-          # Use consolidated method to get composite fields
+          # Get composite fields first to check if any exist
           composite_fields = ChobbleForms::FieldUtils.get_composite_fields(field_name, partial_name)
+
+          # Skip if neither the base field nor any composite fields exist
+          has_base = @assessment.respond_to?(field_name)
+          has_composites = composite_fields.any? { |cf| @assessment.respond_to?(cf) }
+          next unless has_base || has_composites
+
+          # Add base field if it exists
+          ordered_fields << field_name if has_base
+
+          # Add composite fields that exist
           composite_fields.each do |composite_field|
-            ordered_fields << composite_field.to_sym if @assessment.respond_to?(composite_field)
+            ordered_fields << composite_field if @assessment.respond_to?(composite_field)
           end
         end
       end
@@ -120,7 +126,7 @@ class PdfGeneratorService
         field_str = field.to_s
         next unless @assessment.respond_to?(field_str)
 
-        base_field = extract_base_field_name(field_str)
+        base_field = ChobbleForms::FieldUtils.strip_field_suffix(field)
         groups[base_field] ||= {}
 
         field_type = case field_str
@@ -133,23 +139,20 @@ class PdfGeneratorService
       end
     end
 
-    def extract_base_field_name(field_str)
-      field_str.sub(/_(pass|comment)$/, "")
-    end
-
     def get_field_label(fields)
       # Try in order: base field, pass field, comment field
       if fields[:base]
         field_label(fields[:base])
       elsif fields[:pass]
-        field_label(fields[:pass])
-      elsif fields[:comment]
-        # For standalone comment fields, use the comment field itself
-        field_label(fields[:comment])
-      else
-        # Fallback - should not happen
-        base_name = extract_base_field_name(fields.values.first.to_s)
+        # For pass fields, use the base field name for the label
+        base_name = ChobbleForms::FieldUtils.strip_field_suffix(fields[:pass])
         field_label(base_name)
+      elsif fields[:comment]
+        # For standalone comment fields, use the base field name
+        base_name = ChobbleForms::FieldUtils.strip_field_suffix(fields[:comment])
+        field_label(base_name)
+      else
+        raise "No valid fields found: #{fields}"
       end
     end
 

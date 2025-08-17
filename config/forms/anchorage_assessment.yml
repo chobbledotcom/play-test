@@ -15,10 +15,10 @@ form_fields:
   - legend_i18n_key: anchor_quality
     fields:
       - partial: pass_fail_comment
-        field: anchor_accessories_pass
+        field: anchor_accessories
       - partial: pass_fail_comment
-        field: anchor_degree_pass
+        field: anchor_degree
       - partial: pass_fail_comment
-        field: anchor_type_pass
+        field: anchor_type
       - partial: pass_fail_comment
-        field: pull_strength_pass
+        field: pull_strength

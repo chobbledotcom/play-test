@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
+  include SessionManagement
   include TurboStreamResponders
 
   NON_ADMIN_PATHS = %i[
@@ -41,8 +42,7 @@ class UsersController < ApplicationController
     if @user.save
       send_new_user_notifications(@user) if Rails.env.production?
 
-      log_in @user
-      create_session_record @user
+      establish_user_session(@user)
       flash[:notice] = I18n.t("users.messages.account_created")
       redirect_to root_path
     else
@@ -239,19 +239,8 @@ class UsersController < ApplicationController
 
   sig { params(user: User).void }
   def switch_to_user(user)
-    UserSession.find_by(session_token: session[:session_token])&.destroy
-    user_session = create_session_record(user)
-    session[:user_id] = user.id
-    session[:session_token] = user_session.session_token
-  end
-
-  sig { params(user: User).returns(UserSession) }
-  def create_session_record(user)
-    user.user_sessions.create!(
-      ip_address: request.remote_ip,
-      user_agent: request.user_agent,
-      last_active_at: Time.current
-    )
+    terminate_current_session if session[:session_token]
+    establish_user_session(user)
   end
 
   def get_rpii_error_message(result)

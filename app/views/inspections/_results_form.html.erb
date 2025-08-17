@@ -6,7 +6,8 @@
 <%= render 'chobble_forms/form_context',
   model: @inspection,
   i18n_base: 'forms.results',
-  submit_key: submit_key do |form| %>
+  submit_key: submit_key,
+  excluded_prefill_fields: [:passed] do |form| %>
   <%= hidden_field_tag :tab, 'results' %>
   <%= render 'chobble_forms/fieldset', legend_key: 'comments' do %>
     <% comments_found = false %>

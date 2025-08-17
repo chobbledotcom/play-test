@@ -15,13 +15,13 @@ en:
         materials_assessment: Materials Assessment
       fields:
         ropes: Ropes (mm)
-        retention_netting_pass: Retention netting
-        zips_pass: Zips
-        windows_pass: Windows
-        artwork_pass: Artwork
-        thread_pass: Thread
-        fabric_strength_pass: Fabric strength
-        fire_retardant_pass: Fire retardent
+        retention_netting: Retention netting
+        zips: Zips
+        windows: Windows
+        artwork: Artwork
+        thread: Thread
+        fabric_strength: Fabric strength
+        fire_retardant: Fire retardent
       status:
         checks_passed: Fields completed
         completion: Assessment Completion

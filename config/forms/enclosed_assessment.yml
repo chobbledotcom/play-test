@@ -7,4 +7,4 @@ form_fields:
         attributes:
           min: 1
       - partial: pass_fail_comment
-        field: exit_sign_always_visible_pass
+        field: exit_sign_always_visible

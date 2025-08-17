@@ -13,7 +13,7 @@ RSpec.describe JsonSerializerService do
       json = JsonSerializerService.serialize_unit(unit)
 
       # Get expected fields using same reflection as service
-      expected_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
+      expected_fields = Unit.column_name_syms - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Check all expected fields are present (if they have values)
       expected_fields.each do |field|
@@ -81,7 +81,7 @@ RSpec.describe JsonSerializerService do
       json = JsonSerializerService.serialize_inspection(inspection)
 
       # Get expected fields using same reflection as service
-      expected_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
+      expected_fields = Inspection.column_name_syms - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Check all expected fields are present (if they have values)
       expected_fields.each do |field|
@@ -180,7 +180,7 @@ RSpec.describe JsonSerializerService do
 
         # Get expected fields
         excluded = PublicFieldFiltering::EXCLUDED_FIELDS
-        expected_fields = Assessments::UserHeightAssessment.column_names - excluded
+        expected_fields = Assessments::UserHeightAssessment.column_name_syms - excluded
 
         expected_fields.each do |field|
           value = inspection.user_height_assessment.send(field)
@@ -225,7 +225,7 @@ RSpec.describe JsonSerializerService do
       json = JsonSerializerService.serialize_unit(unit)
 
       # Count included fields
-      included_fields = Unit.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
+      included_fields = Unit.column_name_syms - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Verify we're including the expected number of fields
       expect(included_fields.count).to eq(7)
@@ -241,7 +241,7 @@ RSpec.describe JsonSerializerService do
       json = JsonSerializerService.serialize_inspection(inspection)
 
       # Count included fields
-      included_fields = Inspection.column_names - PublicFieldFiltering::EXCLUDED_FIELDS
+      included_fields = Inspection.column_name_syms - PublicFieldFiltering::EXCLUDED_FIELDS
 
       # Verify we're including the expected number of fields (after removing inspection_location)
       expect(included_fields.count).to eq(14)

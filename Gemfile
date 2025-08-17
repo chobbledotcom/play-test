@@ -23,7 +23,7 @@ gem "webauthn", "~> 3.4"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[windows jruby]
 
-gem "chobble-forms" # , path: "gems/chobble-forms"
+gem "chobble-forms"
 gem "en14960"
 
 # Sorbet runtime (needed in all environments and
@@ -143,7 +143,7 @@ group :ci_coverage, :test do
   # Code coverage
   gem "simplecov", require: false
   gem "simplecov-cobertura", require: false
-  
+
   # JUnit formatter for RSpec (for CI integration)
   gem "rspec_junit_formatter"
 end

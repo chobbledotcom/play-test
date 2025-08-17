@@ -44,7 +44,7 @@
         <p><%= t('inspections.safety_standards.capacity_by_height') %></p>
         <ul>
           <% [1.0, 1.2, 1.5, 1.8].each do |user_height| %>
-            <% capacity_result = EN14960.calculate_user_capacity(inspection.length, inspection.width, user_height) %>
+            <% capacity_result = EN14960.calculate_user_capacity(inspection.length.to_f, inspection.width.to_f, user_height) %>
             <% capacity = capacity_result.value %>
             <li><%= "#{user_height}m users: #{capacity[:users_1000mm]} at 1m, #{capacity[:users_1200mm]} at 1.2m, #{capacity[:users_1500mm]} at 1.5m, #{capacity[:users_1800mm]} at 1.8m" %></li>
           <% end %>

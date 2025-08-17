@@ -14,17 +14,17 @@ RSpec.describe ValidationConfigurable do
       def self.test_fields
         [
           {
-            partial: "text_field",
+            partial: :text_field,
             field: :inspection_date,
             attributes: {required: true}
           },
           {
-            partial: "decimal",
+            partial: :decimal,
             field: :width,
             attributes: {required: true, min: 1, max: 100}
           },
           {
-            partial: "number",
+            partial: :number,
             field: :height,
             attributes: {min: 10}
           }

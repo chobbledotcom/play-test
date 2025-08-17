@@ -3,21 +3,21 @@ form_fields:
   - legend_i18n_key: fabric_construction
     fields:
       - partial: pass_fail_comment
-        field: seam_integrity_pass
+        field: seam_integrity
       - partial: pass_fail_comment
-        field: stitch_length_pass
+        field: stitch_length
       - partial: pass_fail_comment
-        field: air_loss_pass
+        field: air_loss
       - partial: pass_fail_comment
-        field: straight_walls_pass
+        field: straight_walls
       - partial: pass_fail_comment
-        field: sharp_edges_pass
+        field: sharp_edges
   - legend_i18n_key: structural_safety
     fields:
       - partial: pass_fail_comment
-        field: unit_stable_pass
+        field: unit_stable
       - partial: pass_fail_comment
-        field: evacuation_time_pass
+        field: evacuation_time
       - partial: number_pass_fail_comment
         field: step_ramp_size
         attributes:
@@ -50,12 +50,12 @@ form_fields:
         attributes:
           min: 0
       - partial: pass_fail_comment
-        field: trough_pass
+        field: trough
   - legend_i18n_key: safety_compliance
     fields:
       - partial: pass_fail_comment
-        field: entrapment_pass
+        field: entrapment
       - partial: pass_fail_comment
-        field: markings_pass
+        field: markings
       - partial: pass_fail_comment
-        field: grounding_pass
+        field: grounding

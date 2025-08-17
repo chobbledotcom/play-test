@@ -51,7 +51,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
         thread_block = blocks[6] # Thread block
         expect(thread_block.type).to eq(:value)
         expect(thread_block.pass_fail).to eq(true) # From seed data
-        expect(thread_block.name).to eq(I18n.t("forms.materials.fields.thread_pass"))
+        expect(thread_block.name).to eq(I18n.t("forms.materials.fields.thread"))
       end
 
       it "creates comment blocks only when comments have content" do
@@ -215,8 +215,10 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
         expect(depth_blocks).to be_empty
 
         # But trough_pass should still be included
+        # Look for blocks that have the trough label (not trough_depth)
+        trough_label = I18n.t("forms.structure.fields.trough")
         pass_blocks = blocks.select do |b|
-          b.name&.include?(I18n.t("forms.structure.fields.trough_pass"))
+          b.name == trough_label
         end
         expect(pass_blocks).not_to be_empty
       end
@@ -259,7 +261,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       it "creates blocks for standalone comment field" do
         # Find the custom_user_height_comment blocks
         custom_height_blocks = blocks.select do |b|
-          (b.value? && b.name == I18n.t("forms.user_height.fields.custom_user_height_comment")) ||
+          (b.value? && b.name == I18n.t("forms.user_height.fields.custom_user_height")) ||
             (b.comment? && b.comment == "Maximum height is 2.5m for safety")
         end
 
@@ -268,7 +270,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
         # Should have a label block
         label_block = custom_height_blocks.find(&:value?)
         expect(label_block).to be_present
-        expect(label_block.name).to eq(I18n.t("forms.user_height.fields.custom_user_height_comment"))
+        expect(label_block.name).to eq(I18n.t("forms.user_height.fields.custom_user_height"))
         expect(label_block.value).to be_nil
 
         # Should have a comment block

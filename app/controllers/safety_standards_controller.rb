@@ -250,9 +250,24 @@ class SafetyStandardsController < ApplicationController
 
   sig { params(platform_height: Float, user_height: Float).returns(T.untyped) }
   def build_wall_height_result(platform_height, user_height)
-    EN14960.calculate_wall_height(
-      platform_height, user_height
-    )
+    # Workaround for EN14960 v0.4.0 bug where it returns Integer 0 instead of Float 0.0
+    # when platform_height < 0.6
+    begin
+      EN14960.calculate_wall_height(
+        platform_height, user_height
+      )
+    rescue TypeError => e
+      if e.message.include?("got type Integer with value 0")
+        # Return the expected response for no walls required
+        EN14960::CalculatorResponse.new(
+          value: 0.0,
+          value_suffix: "m",
+          breakdown: [["No walls required", "Platform height < 0.6m"]]
+        )
+      else
+        raise e
+      end
+    end
   end
 
   sig { returns(T::Hash[Symbol, T.untyped]) }
