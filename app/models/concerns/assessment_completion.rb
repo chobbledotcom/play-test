@@ -5,7 +5,7 @@ module AssessmentCompletion
   extend ActiveSupport::Concern
   extend T::Sig
 
-  SYSTEM_FIELDS = %w[
+  SYSTEM_FIELDS = %i[
     id
     inspection_id
     created_at
@@ -23,7 +23,6 @@ module AssessmentCompletion
       .select { |f| !f.end_with?("_comment") }
       .select { |f| field_is_incomplete?(f) }
       .reject { |f| field_allows_nil_when_na?(f) }
-      .map { |f| f.to_sym }
   end
 
   sig { returns(T::Hash[Symbol, T::Hash[Symbol, T.untyped]]) }
@@ -81,14 +80,14 @@ module AssessmentCompletion
 
   private
 
-  sig { params(field: String).returns(T::Boolean) }
+  sig { params(field: Symbol).returns(T::Boolean) }
   def field_is_incomplete?(field)
     value = send(field)
     # Field is incomplete if nil
     value.nil?
   end
 
-  sig { params(field: String).returns(T::Boolean) }
+  sig { params(field: Symbol).returns(T::Boolean) }
   def field_allows_nil_when_na?(field)
     # Pass fields are always required, even if set to "na"
     return false if field.end_with?("_pass")
