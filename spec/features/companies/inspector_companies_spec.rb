@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Inspector Companies", type: :feature do
@@ -128,7 +130,6 @@ RSpec.describe "Inspector Companies", type: :feature do
       fill_in_form :inspector_companies, :phone, "01234567890"
       fill_in_form :inspector_companies, :address, "123 Test Street"
       fill_in_form :inspector_companies, :city, "Test City"
-      fill_in_form :inspector_companies, :state, "Test State"
       fill_in_form :inspector_companies, :postal_code, "TE1 2ST"
       check_form :inspector_companies, :active
       fill_in_form :inspector_companies, :notes, "Test notes"

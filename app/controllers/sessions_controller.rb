@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
+  include SessionManagement
   skip_before_action :require_login,
     only: [:new, :create, :destroy, :passkey, :passkey_callback]
   before_action :require_logged_out,
@@ -25,11 +26,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    # Delete current session record
-    if session[:session_token]
-      UserSession.find_by(session_token: session[:session_token])&.destroy
-    end
-    session.delete(:session_token)
+    terminate_current_session
     log_out
     flash[:notice] = I18n.t("session.logout.success")
     redirect_to root_path
@@ -87,9 +84,7 @@ class SessionsController < ApplicationController
     user = User.find(credential.user_id)
 
     # Create session for passkey login
-    user_session = create_session_record(user)
-    create_user_session(user, true)
-    session[:session_token] = user_session.session_token
+    establish_user_session(user)
 
     render json: {status: "ok"}, status: :ok
   rescue WebAuthn::Error => e
@@ -101,21 +96,8 @@ class SessionsController < ApplicationController
   end
 
   def handle_successful_login(user)
-    should_remember = params.dig(:session, :remember_me) == "1"
-    user_session = create_session_record(user)
-
-    create_user_session(user, should_remember)
-    session[:session_token] = user_session.session_token
-
+    establish_user_session(user)
     flash[:notice] = I18n.t("session.login.success")
     redirect_to inspections_path
-  end
-
-  def create_session_record(user)
-    user.user_sessions.create!(
-      ip_address: request.remote_ip,
-      user_agent: request.user_agent,
-      last_active_at: Time.current
-    )
   end
 end

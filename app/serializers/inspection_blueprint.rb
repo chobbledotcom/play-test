@@ -27,7 +27,9 @@ class InspectionBlueprint < Blueprinter::Base
     super
   end
 
-  field :complete, &:complete?
+  field :complete do |inspection|
+    inspection.complete?
+  end
 
   field :passed do |inspection|
     inspection.passed? if inspection.complete?

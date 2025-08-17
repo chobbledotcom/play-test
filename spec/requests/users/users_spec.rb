@@ -291,7 +291,9 @@ RSpec.describe "Users", type: :request do
       post "/register", params: params
 
       created_user = User.find_by(email: params[:user][:email])
-      expect(session[:user_id]).to eq(created_user.id)
+      expect(session[:session_token]).not_to be_nil
+      user_session = UserSession.find_by(session_token: session[:session_token])
+      expect(user_session&.user).to eq(created_user)
     end
 
     it "handles password confirmation mismatch" do
@@ -378,7 +380,9 @@ RSpec.describe "Users", type: :request do
       post impersonate_user_path(target_user)
 
       expect(session[:original_admin_id]).to eq(admin.id)
-      expect(session[:user_id]).to eq(target_user.id)
+      expect(session[:session_token]).not_to be_nil
+      user_session = UserSession.find_by(session_token: session[:session_token])
+      expect(user_session&.user).to eq(target_user)
     end
 
     it "handles impersonation when admin flag is present" do

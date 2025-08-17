@@ -15,6 +15,7 @@ RSpec.describe "Seed Data", type: :model do
       Event.destroy_all
       Inspection.destroy_all
       Unit.destroy_all
+      UserSession.destroy_all
       User.destroy_all
       InspectorCompany.destroy_all
 

@@ -442,7 +442,7 @@ class InspectionsController < ApplicationController
     end
   end
 
-  NOT_COPIED_FIELDS = %w[
+  NOT_COPIED_FIELDS = %i[
     complete_date
     created_at
     id
@@ -497,7 +497,8 @@ class InspectionsController < ApplicationController
     is_comment = ChobbleForms::FieldUtils.is_comment_field?(field)
     is_pass = ChobbleForms::FieldUtils.is_pass_field?(field)
     field_base = ChobbleForms::FieldUtils.strip_field_suffix(field)
-    i18n_base = "forms.#{params[:tab]}.fields"
+    tab_name = params[:tab] || :inspection
+    i18n_base = "forms.#{tab_name}.fields"
 
     translated = I18n.t("#{i18n_base}.#{field_base}", default: nil)
     translated ||= I18n.t("#{i18n_base}.#{field}")
