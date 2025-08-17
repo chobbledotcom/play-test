@@ -2,39 +2,39 @@
 form_fields:
   - legend_i18n_key: company_details
     fields:
-      - partial: text_field
-        field: name
+      - partial: :text_field
+        field: :name
         attributes:
           required: true
-      - partial: text_field
-        field: email
+      - partial: :text_field
+        field: :email
         attributes:
           type: email_field
-      - partial: text_field
-        field: phone
+      - partial: :text_field
+        field: :phone
         attributes:
           type: telephone_field
           required: true
   - legend_i18n_key: contact_information
     fields:
-      - partial: text_area
-        field: address
+      - partial: :text_area
+        field: :address
         attributes:
           rows: 3
           required: true
-      - partial: text_field
-        field: city
-      - partial: text_field
-        field: postal_code
-      - partial: text_field
-        field: country
+      - partial: :text_field
+        field: :city
+      - partial: :text_field
+        field: :postal_code
+      - partial: :text_field
+        field: :country
   - legend_i18n_key: company_status
     fields:
-      - partial: checkbox
-        field: active
-      - partial: text_area
-        field: notes
+      - partial: :checkbox
+        field: :active
+      - partial: :text_area
+        field: :notes
         attributes:
           rows: 4
-      - partial: file_field
-        field: logo
+      - partial: :file_field
+        field: :logo

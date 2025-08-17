@@ -3,20 +3,9 @@
 
 module FormHelpers
   # Load form YAML configuration with fully symbolized keys
-  # Returns the full YAML content with all keys and field/partial values symbolized
+  # Returns the full YAML content with all keys symbolized
   def get_form_config(path)
-    yaml_content = YAML.load_file(path).deep_symbolize_keys!
-
-    # Also symbolize field and partial values if form_fields exist
-    yaml_content[:form_fields]&.each do |fieldset|
-      fieldset[:fields].map! do |field_config|
-        field_config[:field] = field_config[:field].to_sym
-        field_config[:partial] = field_config[:partial].to_sym
-        field_config
-      end
-    end
-
-    yaml_content
+    YAML.load_file(path).deep_symbolize_keys!
   end
 
   def fill_in_form(form_name, field_name, value)

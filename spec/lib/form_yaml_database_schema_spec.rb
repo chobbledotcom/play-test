@@ -211,20 +211,19 @@ RSpec.describe "Form YAML Database Schema Validation" do
             # Determine which database fields need to exist
             # based on partial name
             required_fields = []
-            partial_str = partial.to_s
 
             # If partial doesn't start with pass_fail, it needs the base field
-            unless partial_str.start_with?("pass_fail")
+            unless partial.start_with?("pass_fail")
               required_fields << field.to_s
             end
 
             # If partial contains pass_fail, it needs the _pass field
-            if partial_str.include?("pass_fail")
+            if partial.to_s.include?("pass_fail")
               required_fields << "#{field}_pass"
             end
 
             # If partial contains comment, it needs the _comment field
-            if partial_str.include?("comment")
+            if partial.to_s.include?("comment")
               required_fields << "#{field}_comment"
             end
 
