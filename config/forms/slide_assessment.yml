@@ -3,33 +3,33 @@ form_fields:
   - legend_i18n_key: slide_dimensions
     fields:
       - partial: decimal_comment
-        field: slide_platform_height
+        field: :slide_platform_height
         attributes:
           min: 0
           max: 50
       - partial: decimal_comment
-        field: slide_wall_height
+        field: :slide_wall_height
         attributes:
           min: 0
           max: 50
       - partial: decimal_comment
-        field: slide_first_metre_height
+        field: :slide_first_metre_height
         attributes:
           min: 0
           max: 50
       - partial: decimal_comment
-        field: slide_beyond_first_metre_height
+        field: :slide_beyond_first_metre_height
         attributes:
           min: 0
           max: 50
       - partial: yes_no_radio_comment
-        field: slide_permanent_roof
+        field: :slide_permanent_roof
       - partial: pass_fail_na_comment
-        field: clamber_netting
+        field: :clamber_netting
       - partial: number_pass_fail_comment
-        field: runout
+        field: :runout
         attributes:
           min: 0
           max: 50
       - partial: pass_fail_comment
-        field: slip_sheet
+        field: :slip_sheet

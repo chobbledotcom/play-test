@@ -21,14 +21,7 @@ module FormConfigurable
       yaml_content = YAML.load_file(config_path)
       yaml_content["form_fields"].map do |fieldset|
         fieldset = fieldset.deep_symbolize_keys
-        # Also symbolize the field and partial values
-        if fieldset[:fields]
-          fieldset[:fields] = fieldset[:fields].map do |field_config|
-            field_config[:field] = field_config[:field].to_sym
-            field_config[:partial] = field_config[:partial].to_sym
-            field_config
-          end
-        end
+        # Fields now have symbols directly in YAML, no conversion needed
         fieldset
       end
     end

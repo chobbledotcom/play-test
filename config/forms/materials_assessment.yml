@@ -2,21 +2,21 @@
 form_fields:
   - legend_i18n_key: materials_assessment
     fields:
-      - partial: number_pass_fail_na_comment
-        field: ropes
+      - partial: :number_pass_fail_na_comment
+        field: :ropes
         attributes:
           min: 0
-      - partial: pass_fail_na_comment
-        field: retention_netting
-      - partial: pass_fail_na_comment
-        field: zips
-      - partial: pass_fail_na_comment
-        field: windows
-      - partial: pass_fail_na_comment
-        field: artwork
-      - partial: pass_fail_comment
-        field: thread
-      - partial: pass_fail_comment
-        field: fabric_strength
-      - partial: pass_fail_comment
-        field: fire_retardant
+      - partial: :pass_fail_na_comment
+        field: :retention_netting
+      - partial: :pass_fail_na_comment
+        field: :zips
+      - partial: :pass_fail_na_comment
+        field: :windows
+      - partial: :pass_fail_na_comment
+        field: :artwork
+      - partial: :pass_fail_comment
+        field: :thread
+      - partial: :pass_fail_comment
+        field: :fabric_strength
+      - partial: :pass_fail_comment
+        field: :fire_retardant

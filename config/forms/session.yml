@@ -3,14 +3,14 @@ form_fields:
   - legend_i18n_key: credentials
     fields:
       - partial: text_field
-        field: email
+        field: :email
         attributes:
           type: email_field
           required: true
       - partial: text_field
-        field: password
+        field: :password
         attributes:
           type: password_field
           required: true
       - partial: checkbox
-        field: remember_me
+        field: :remember_me

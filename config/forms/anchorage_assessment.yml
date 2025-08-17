@@ -3,22 +3,22 @@ form_fields:
   - legend_i18n_key: anchor_counts
     fields:
       - partial: number_pass_fail_comment
-        field: num_low_anchors
+        field: :num_low_anchors
         attributes:
           step: 1
           min: 0
       - partial: number_pass_fail_comment
-        field: num_high_anchors
+        field: :num_high_anchors
         attributes:
           step: 1
           min: 0
   - legend_i18n_key: anchor_quality
     fields:
       - partial: pass_fail_comment
-        field: anchor_accessories
+        field: :anchor_accessories
       - partial: pass_fail_comment
-        field: anchor_degree
+        field: :anchor_degree
       - partial: pass_fail_comment
-        field: anchor_type
+        field: :anchor_type
       - partial: pass_fail_comment
-        field: pull_strength
+        field: :pull_strength
