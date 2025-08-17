@@ -3,6 +3,7 @@
 
 module SessionsHelper
   extend T::Sig
+  include ControllerContext
 
   sig { void }
   def remember_user
