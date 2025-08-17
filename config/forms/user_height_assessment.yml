@@ -2,51 +2,51 @@
 form_fields:
   - legend_i18n_key: height_measurements
     fields:
-      - partial: decimal_comment
+      - partial: :decimal_comment
         field: :containing_wall_height
         attributes:
           min: 0
           max: 50
   - legend_i18n_key: play_area
     fields:
-      - partial: decimal_comment
+      - partial: :decimal_comment
         field: :play_area_length
         attributes:
           min: 0
           max: 200
-      - partial: decimal_comment
+      - partial: :decimal_comment
         field: :play_area_width
         attributes:
           min: 0
           max: 200
-      - partial: decimal_comment
+      - partial: :decimal_comment
         field: :negative_adjustment
         attributes:
           min: 0
           max: 200
   - legend_i18n_key: user_capacity
     fields:
-      - partial: number
-        field: users_at_1000mm
+      - partial: :number
+        field: :users_at_1000mm
         attributes:
           min: 0
           step: 1
-      - partial: number
-        field: users_at_1200mm
+      - partial: :number
+        field: :users_at_1200mm
         attributes:
           min: 0
           step: 1
-      - partial: number
-        field: users_at_1500mm
+      - partial: :number
+        field: :users_at_1500mm
         attributes:
           min: 0
           step: 1
-      - partial: number
-        field: users_at_1800mm
+      - partial: :number
+        field: :users_at_1800mm
         attributes:
           min: 0
           step: 1
   - legend_i18n_key: tallest_user_capacity
     fields:
-      - partial: text_area
+      - partial: :text_area
         field: :custom_user_height_comment

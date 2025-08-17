@@ -2,26 +2,26 @@
 form_fields:
   - legend_i18n_key: unit_dimensions
     fields:
-      - partial: decimal_comment
+      - partial: :decimal_comment
         field: :width
         attributes:
           min: 0
           max: 200
-      - partial: decimal_comment
+      - partial: :decimal_comment
         field: :length
         attributes:
           min: 0
           max: 200
-      - partial: decimal_comment
+      - partial: :decimal_comment
         field: :height
         attributes:
           min: 0
           max: 50
   - legend_i18n_key: unit_configuration
     fields:
-      - partial: yes_no_radio
+      - partial: :yes_no_radio
         field: :has_slide
-      - partial: yes_no_radio
+      - partial: :yes_no_radio
         field: :is_totally_enclosed
-      - partial: yes_no_radio
+      - partial: :yes_no_radio
         field: :indoor_only

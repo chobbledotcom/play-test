@@ -78,7 +78,7 @@ RSpec.describe "Form YAML Database Schema Validation" do
 
         # Only add base field if partial doesn't start with pass_fail
         # (for pass_fail partials, only the _pass field exists in DB)
-        unless partial.start_with?("pass_fail")
+        unless partial.to_s.start_with?("pass_fail")
           fields << field
         end
 
