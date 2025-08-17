@@ -1,14 +1,17 @@
-# typed: false
+# typed: strict
 
 # Shared test data helpers for generating realistic British data
 # Used by both factories and seeds for non-critical test data generation
 module TestDataHelpers
+  extend T::Sig
   # Generate realistic UK mobile numbers (07xxx xxx xxx - 11 digits)
+  sig { returns(String) }
   def self.british_phone_number
     "07#{rand(100..999)} #{rand(100..999)} #{rand(100..999)}"
   end
 
   # Generate realistic UK postcodes
+  sig { returns(String) }
   def self.british_postcode
     prefixes = %w[SW SE NW N E W EC WC B M L G EH CF BS OX CB]
     prefix = prefixes.sample
@@ -17,6 +20,7 @@ module TestDataHelpers
   end
 
   # Generate realistic UK street addresses
+  sig { returns(String) }
   def self.british_address
     streets = %w[
       High\ Street
@@ -56,11 +60,13 @@ module TestDataHelpers
     Belfast
   ].freeze
 
+  sig { returns(String) }
   def self.british_city
     BRITISH_CITIES.sample
   end
 
   # Generate a British company name variation
+  sig { params(base_name: String).returns(String) }
   def self.british_company_name(base_name)
     suffixes = ["Ltd", "UK", "Services", "Solutions", "Group", "& Co"]
     "#{base_name} #{suffixes.sample}"

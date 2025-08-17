@@ -142,12 +142,6 @@ RSpec.describe TestDataHelpers do
       end
     end
 
-    context "with nil base name" do
-      it "handles nil gracefully" do
-        expect { described_class.british_company_name(nil) }.not_to raise_error
-      end
-    end
-
     it "generates different company names for same base" do
       base_name = "TestCorp"
       names = 10.times.map { described_class.british_company_name(base_name) }
