@@ -10,7 +10,7 @@ module FormConfigurable
 
     sig { params(user: T.nilable(User)).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
     def form_fields(user: nil)
-      @form_config ||= load_form_config_from_yaml
+      @form_fields ||= load_form_config_from_yaml
     end
 
     sig { returns(T::Array[T::Hash[Symbol, T.untyped]]) }
@@ -24,9 +24,8 @@ module FormConfigurable
         # Also symbolize the field and partial values
         if fieldset[:fields]
           fieldset[:fields] = fieldset[:fields].map do |field_config|
-            field_config = field_config.deep_symbolize_keys
-            field_config[:field] = field_config[:field].to_sym if field_config[:field]
-            field_config[:partial] = field_config[:partial].to_sym if field_config[:partial]
+            field_config[:field] = field_config[:field].to_sym
+            field_config[:partial] = field_config[:partial].to_sym
             field_config
           end
         end
