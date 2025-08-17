@@ -5,9 +5,7 @@ module FormHelpers
   # Load form YAML configuration with fully symbolized keys
   # Returns the full YAML content with all keys symbolized
   def get_form_config(path)
-    yaml_content = YAML.load_file(path).deep_symbolize_keys!
-    # Fields now have symbols directly in YAML, no conversion needed
-    yaml_content
+    YAML.load_file(path).deep_symbolize_keys!
   end
 
   def fill_in_form(form_name, field_name, value)
