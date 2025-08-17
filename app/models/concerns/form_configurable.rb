@@ -19,11 +19,8 @@ module FormConfigurable
       file_name = name.demodulize.underscore
       config_path = Rails.root.join("config/forms/#{file_name}.yml")
       yaml_content = YAML.load_file(config_path)
-      yaml_content["form_fields"].map do |fieldset|
-        fieldset = fieldset.deep_symbolize_keys
-        # Fields now have symbols directly in YAML, no conversion needed
-        fieldset
-      end
+      yaml_content.deep_symbolize_keys
+      yaml_content[:form_fields]
     end
   end
 end
