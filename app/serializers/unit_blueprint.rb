@@ -5,16 +5,17 @@ class UnitBlueprint < Blueprinter::Base
   # Define public fields dynamically to avoid database access at load time
   def self.define_public_fields
     return if @fields_defined
-    Unit.column_names.each do |column|
+
+    Unit.column_name_syms.each do |column|
       next if PublicFieldFiltering::EXCLUDED_FIELDS.include?(column)
-      # Special handling for date/time fields
-      if %w[manufacture_date].include?(column)
-        field column.to_sym do |unit|
+
+      if %i[manufacture_date].include?(column)
+        field column do |unit|
           value = unit.send(column)
           value&.strftime(JsonDateTransformer::API_DATE_FORMAT)
         end
       else
-        field column.to_sym
+        field column
       end
     end
     @fields_defined = true

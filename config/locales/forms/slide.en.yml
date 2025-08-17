@@ -11,10 +11,10 @@ en:
         slide_first_metre_height: First Metre of Slide Wall Height (m)
         slide_beyond_first_metre_height: Remaining Slide Wall Height (m)
         slide_permanent_roof: Permanent Roof Fitted to Top of Slide?
-        clamber_netting_pass: Steps / Clamber Netting
+        clamber_netting: Steps / Clamber Netting
         runout: Slide Run Out (m)
-        runout_pass: Slide Run Out (m)
-        slip_sheet_pass: Slip Sheet Integrity
+        runout: Slide Run Out (m)
+        slip_sheet: Slip Sheet Integrity
       status:
         runout_requirement: Runout Requirement
         height_requirement: Height Requirement

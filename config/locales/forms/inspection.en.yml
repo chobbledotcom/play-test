@@ -26,6 +26,7 @@ en:
         passed: Passed
         risk_assessment: Risk Assessment
         unit_id: Unit Selection
+        complete_date: Date Completed
       submit: Save Inspection
       submit_continue: Save & Continue
       errors:

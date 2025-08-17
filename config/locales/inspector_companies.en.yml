@@ -24,7 +24,6 @@ en:
       phone: Phone
       address: Address
       city: City
-      state: State
       postal_code: Postal Code
       country: Country
       notes: Notes

@@ -126,7 +126,7 @@ GEM
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
     cbor (0.5.9.9)
-    chobble-forms (0.5.6)
+    chobble-forms (0.7.2)
       rails (>= 8.0.0)
       sorbet-runtime (~> 0.5)
     chronic (0.10.2)
@@ -156,7 +156,8 @@ GEM
       dotenv (= 3.1.8)
       railties (>= 6.1)
     drb (2.2.3)
-    en14960 (0.2.3)
+    en14960 (0.4.0)
+      sorbet-runtime (~> 0.5)
     erb (5.0.2)
     erb_lint (0.9.0)
       activesupport

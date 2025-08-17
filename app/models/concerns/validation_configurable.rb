@@ -48,20 +48,20 @@ module ValidationConfigurable
       end
 
       case partial
-      when "decimal_comment", "decimal"
+      when :decimal_comment, :decimal
         apply_decimal_validation(field, attributes)
-      when "number", "number_pass_fail_na_comment"
+      when :number, :number_pass_fail_na_comment
         apply_number_validation(field, attributes)
       end
     end
 
-    sig { params(field: T.any(String, Symbol), attributes: T::Hash[Symbol, T.untyped]).void }
+    sig { params(field: Symbol, attributes: T::Hash[Symbol, T.untyped]).void }
     def apply_decimal_validation(field, attributes)
       options = build_numericality_options(attributes)
       validates field, numericality: options, allow_blank: true
     end
 
-    sig { params(field: T.any(String, Symbol), attributes: T::Hash[Symbol, T.untyped]).void }
+    sig { params(field: Symbol, attributes: T::Hash[Symbol, T.untyped]).void }
     def apply_number_validation(field, attributes)
       options = build_numericality_options(attributes)
       options[:only_integer] = true

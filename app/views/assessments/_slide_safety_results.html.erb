@@ -1,7 +1,7 @@
 <%# Slide Safety Standards Results Partial %>
 <%# Locals: assessment (SlideAssessment instance) %>
 <% if assessment&.slide_platform_height.present? %>
-  <% platform_height = assessment.slide_platform_height %>
+  <% platform_height = assessment.slide_platform_height.to_f %>
 
   <%= render 'shared/safety_info_box',
       content: -> do %>

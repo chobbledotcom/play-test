@@ -1,4 +1,5 @@
 # typed: false
+# frozen_string_literal: true
 
 require "rails_helper"
 
@@ -13,7 +14,7 @@ RSpec.describe PublicFieldFiltering do
       end
 
       define_singleton_method(:column_names) do
-        %w[
+        %i[
           id
           name
           email
@@ -36,7 +37,7 @@ RSpec.describe PublicFieldFiltering do
       end
 
       define_singleton_method(:column_names) do
-        %w[
+        %i[
           id
           name
           serial
@@ -53,7 +54,7 @@ RSpec.describe PublicFieldFiltering do
   describe "constants" do
     describe "EXCLUDED_FIELDS" do
       it "contains system and metadata fields" do
-        expected_fields = %w[
+        expected_fields = %i[
           id
           created_at
           updated_at
@@ -75,7 +76,7 @@ RSpec.describe PublicFieldFiltering do
 
     describe "PDF_EXCLUDED_FIELDS" do
       it "contains PDF-specific excluded fields" do
-        expected_fields = %w[
+        expected_fields = %i[
           complete_date
           inspection_date
         ]
@@ -103,7 +104,7 @@ RSpec.describe PublicFieldFiltering do
 
     describe "EXCLUDED_COMPUTED_FIELDS" do
       it "contains computed field exclusions" do
-        expect(described_class::EXCLUDED_COMPUTED_FIELDS).to eq(%w[reinspection_date])
+        expect(described_class::EXCLUDED_COMPUTED_FIELDS).to eq(%i[reinspection_date])
       end
 
       it "is frozen to prevent modification" do
@@ -116,7 +117,7 @@ RSpec.describe PublicFieldFiltering do
     describe ".public_fields" do
       context "for non-Unit classes" do
         it "excludes only EXCLUDED_FIELDS" do
-          expected_fields = %w[name email active description]
+          expected_fields = %i[active description email name]
 
           expect(test_class.public_fields).to eq(expected_fields)
         end
@@ -137,7 +138,7 @@ RSpec.describe PublicFieldFiltering do
         end
 
         it "excludes EXCLUDED_FIELDS" do
-          expected_fields = %w[name serial manufacturer description]
+          expected_fields = %i[description manufacturer name serial]
 
           expect(unit_class.public_fields).to eq(expected_fields)
         end
@@ -195,7 +196,7 @@ RSpec.describe PublicFieldFiltering do
         described_class::PDF_EXCLUDED_FIELDS,
         described_class::EXCLUDED_COMPUTED_FIELDS
       ].each do |field_array|
-        expect(field_array).to all(be_a(String))
+        expect(field_array).to all(be_a(Symbol))
         expect(field_array).to all(be_present)
       end
     end

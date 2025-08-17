@@ -21,6 +21,7 @@ FILTER_PATTERNS=(
     "Finished in [0-9]+\\.[0-9]+ seconds \\(files took [0-9]+\\.[0-9]+ seconds to load\\)"
     "Capybara starting Puma"
     "⚠️  SLOW: [0-9]+\\.[0-9]+s - .*"
+    "Warning: coverage data provided by Coverage \\[[0-9]+\\] exceeds number of lines in .*"
 )
 
 # Function to apply filters to a line

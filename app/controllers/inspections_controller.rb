@@ -1,6 +1,9 @@
 # typed: false
+# frozen_string_literal: true
 
 class InspectionsController < ApplicationController
+  extend T::Sig
+
   include InspectionTurboStreams
   include PublicViewable
   include UserActivityCheck
@@ -226,10 +229,10 @@ class InspectionsController < ApplicationController
     return if params[:tab].blank?
 
     valid_tabs = helpers.inspection_tabs(@inspection)
-    unless valid_tabs.include?(params[:tab])
-      redirect_to edit_inspection_path(@inspection),
-        alert: I18n.t("inspections.messages.invalid_tab")
-    end
+    return if valid_tabs.include?(params[:tab])
+
+    redirect_to edit_inspection_path(@inspection),
+      alert: I18n.t("inspections.messages.invalid_tab")
   end
 
   def validate_inspection_completability
@@ -265,24 +268,24 @@ class InspectionsController < ApplicationController
   # This ensures mappings stay in sync with the model definition
   ASSESSMENT_TAB_MAPPING = Inspection::ALL_ASSESSMENT_TYPES
     .each_with_object({}) do |(method_name, _), hash|
-      # Convert :user_height_assessment to "user_height"
-      tab_name = method_name.to_s.gsub(/_assessment$/, "")
-      hash[tab_name] = method_name
-    end.freeze
+    # Convert :user_height_assessment to "user_height"
+    tab_name = method_name.to_s.gsub(/_assessment$/, "")
+    hash[tab_name] = method_name
+  end.freeze
 
   ASSESSMENT_CLASS_MAPPING = Inspection::ALL_ASSESSMENT_TYPES
     .each_with_object({}) do |(method_name, klass), hash|
-      # Convert :user_height_assessment to "user_height"
-      tab_name = method_name.to_s.gsub(/_assessment$/, "")
-      hash[tab_name] = klass
-    end.freeze
+    # Convert :user_height_assessment to "user_height"
+    tab_name = method_name.to_s.gsub(/_assessment$/, "")
+    hash[tab_name] = klass
+  end.freeze
 
   def build_base_params
     params.require(:inspection).permit(*Inspection::USER_EDITABLE_PARAMS)
   end
 
   def add_assessment_params(base_params)
-    Inspection::ALL_ASSESSMENT_TYPES.each do |ass_type, _ass_class|
+    Inspection::ALL_ASSESSMENT_TYPES.each_key do |ass_type|
       ass_key = "#{ass_type}_attributes"
       next if params[:inspection][ass_key].blank?
 
@@ -294,8 +297,7 @@ class InspectionsController < ApplicationController
 
   def assessment_permitted_attributes(assessment_type)
     model_class = "Assessments::#{assessment_type.to_s.camelize}".constantize
-    all_attributes = model_class.column_names
-    (all_attributes - ASSESSMENT_SYSTEM_ATTRIBUTES).map { it.to_sym }
+    model_class.column_name_syms - ASSESSMENT_SYSTEM_ATTRIBUTES
   end
 
   def filtered_inspections_query_without_order = current_user.inspections
@@ -439,7 +441,7 @@ class InspectionsController < ApplicationController
     end
   end
 
-  NOT_COPIED_FIELDS = %w[
+  NOT_COPIED_FIELDS = %i[
     complete_date
     created_at
     id
@@ -452,16 +454,16 @@ class InspectionsController < ApplicationController
     unit_id
     updated_at
     user_id
-  ]
+  ].freeze
 
   def set_previous_inspection
     @previous_inspection = @inspection.unit&.last_inspection
     return if !@previous_inspection || @previous_inspection.id == @inspection.id
 
     @prefilled_fields = []
-    current_object, previous_object, column_names = get_prefill_objects
+    current_object, previous_object, column_name_syms = get_prefill_objects
 
-    column_names.each do |field|
+    column_name_syms.each do |field|
       next if NOT_COPIED_FIELDS.include?(field)
       next if previous_object&.send(field).nil?
       next unless current_object.send(field).nil?
@@ -473,30 +475,34 @@ class InspectionsController < ApplicationController
   def get_prefill_objects
     case params[:tab]
     when "inspection", "", nil
-      [@inspection, @previous_inspection, Inspection.column_names]
+      [@inspection, @previous_inspection, Inspection.column_name_syms]
     when "results"
       # Results tab uses inspection fields directly, not an assessment
-      # Only risk_assessment should be prefilled, not passed
-      [@inspection, @previous_inspection, ["risk_assessment"]]
+      # Include all fields shown on results tab: passed, risk_assessment, and photos
+      # NOT_COPIED_FIELDS will filter out fields that shouldn't be prefilled
+      results_fields = [:passed, :risk_assessment, :photo_1, :photo_2, :photo_3]
+      [@inspection, @previous_inspection, results_fields]
     else
       assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
       assessment_class = ASSESSMENT_CLASS_MAPPING[params[:tab]]
       [
         @inspection.public_send(assessment_method),
         @previous_inspection.public_send(assessment_method),
-        assessment_class.column_names
+        assessment_class.column_name_syms
       ]
     end
   end
 
+  sig { params(field: Symbol).returns String }
   def translate_field_name(field)
     is_comment = ChobbleForms::FieldUtils.is_comment_field?(field)
     is_pass = ChobbleForms::FieldUtils.is_pass_field?(field)
     field_base = ChobbleForms::FieldUtils.strip_field_suffix(field)
-    i18n_base = "forms.#{params[:tab]}.fields"
+    tab_name = params[:tab] || :inspection
+    i18n_base = "forms.#{tab_name}.fields"
 
     translated = I18n.t("#{i18n_base}.#{field_base}", default: nil)
-    translated ||= I18n.t("#{i18n_base}.#{field}", default: field.humanize)
+    translated ||= I18n.t("#{i18n_base}.#{field}")
 
     if is_comment
       translated += " (#{I18n.t("shared.comment")})"
@@ -538,12 +544,12 @@ class InspectionsController < ApplicationController
       previous_value = previous_attributes[key]
       current_value = current_attributes[key]
 
-      if previous_value != current_value
-        changes[key] = {
-          "from" => previous_value,
-          "to" => current_value
-        }
-      end
+      next unless previous_value != current_value
+
+      changes[key] = {
+        "from" => previous_value,
+        "to" => current_value
+      }
     end
 
     changes.presence

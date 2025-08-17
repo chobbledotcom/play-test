@@ -40,6 +40,7 @@ class Assessments::SlideAssessment < ApplicationRecord
   extend T::Sig
   include AssessmentLogging
   include AssessmentCompletion
+  include ColumnNameSyms
   include FormConfigurable
   include ValidationConfigurable
 
@@ -53,7 +54,7 @@ class Assessments::SlideAssessment < ApplicationRecord
   def meets_runout_requirements?
     return false unless runout.present? && slide_platform_height.present?
     EN14960::Calculators::SlideCalculator.meets_runout_requirements?(
-      runout, slide_platform_height
+      runout.to_f, slide_platform_height.to_f
     )
   end
 
@@ -61,7 +62,7 @@ class Assessments::SlideAssessment < ApplicationRecord
   def required_runout_length
     return nil if slide_platform_height.blank?
     EN14960::Calculators::SlideCalculator.calculate_runout_value(
-      slide_platform_height
+      slide_platform_height.to_f
     )
   end
 
@@ -84,9 +85,9 @@ class Assessments::SlideAssessment < ApplicationRecord
     # Check if wall height requirements are met for all preset user heights
     [1.0, 1.2, 1.5, 1.8].all? do |user_height|
       EN14960::Calculators::SlideCalculator.meets_height_requirements?(
-        slide_platform_height,
+        slide_platform_height.to_f,
         user_height,
-        slide_wall_height,
+        slide_wall_height.to_f,
         slide_permanent_roof
       )
     end

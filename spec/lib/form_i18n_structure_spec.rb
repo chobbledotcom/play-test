@@ -19,12 +19,14 @@ ALLOWED_TOP_LEVEL_KEYS = %w[
 ].freeze
 
 RSpec.describe "Form I18n Structure" do
+  include FormHelpers
+
   define_method(:check_form_locale_file) do |file_path|
-    locale_data = YAML.load_file(file_path)
-    form_name = File.basename(file_path, ".en.yml")
+    locale_data = get_form_config(file_path)
+    form_filename = File.basename(file_path, ".en.yml")
 
     # Navigate to the form data
-    form_data = locale_data.dig("en", "forms", form_name)
+    form_data = locale_data.dig(:en, :forms, form_filename)
     return [] unless form_data
 
     # Get all top-level keys
@@ -63,13 +65,13 @@ RSpec.describe "Form I18n Structure" do
     all_keys = {}
 
     form_files.each do |file|
-      locale_data = YAML.load_file(file)
-      form_name = File.basename(file, ".en.yml")
-      form_data = locale_data.dig("en", "forms", form_name)
+      locale_data = get_form_config(file)
+      form_filename = File.basename(file, ".en.yml")
+      form_data = locale_data.dig(:en, :forms, form_filename)
 
       next unless form_data
 
-      all_keys[form_name] = form_data.keys.sort
+      all_keys[form_filename] = form_data.keys.sort
     end
 
     # Verify each form has the required structure

@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Sessions", type: :request do
@@ -50,6 +52,8 @@ RSpec.describe "Sessions", type: :request do
     let(:user) { create(:user) }
 
     before do
+      # Clean up any existing sessions first
+      UserSession.destroy_all
       login_as(user)
     end
 

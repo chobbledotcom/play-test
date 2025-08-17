@@ -6,7 +6,23 @@ require "rails_helper"
 RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
   let(:inspection) { create(:inspection) }
   let(:assessment) { inspection.materials_assessment }
-  let(:builder) { described_class.new("materials", assessment) }
+  let(:builder) { described_class.new("mock_form", assessment) }
+
+  define_method(:mock_form_translations) do
+    allow(I18n).to receive(:t).and_call_original
+    allow(I18n).to receive(:t).with("forms.mock_form.header")
+      .and_return("Mock Form Header")
+    allow(I18n).to receive(:t!).and_call_original
+    allow(I18n).to receive(:t!).with("forms.mock_form.fields.ropes")
+      .and_return("Ropes")
+    allow(I18n).to receive(:t!).with("forms.mock_form.fields.fabric_strength")
+      .and_return("Fabric Strength")
+    allow(I18n).to receive(:t!).with("forms.mock_form.fields.thread")
+      .and_return("Thread")
+    allow(I18n).to receive(:t!).with(anything) do |key|
+      key.to_s.split(".").last.humanize if key.to_s.start_with?("forms.mock_form.fields.")
+    end
+  end
 
   describe "#group_assessment_fields (private method)" do
     it "groups fields correctly by base name" do
@@ -24,12 +40,12 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       groups = builder.send(:group_assessment_fields, field_keys)
 
       # Note: standalone_comment won't be grouped because assessment doesn't respond to it
-      expect(groups.keys).to contain_exactly("ropes", "fabric_strength", "thread")
-      expect(groups["ropes"]).to eq(base: :ropes, pass: :ropes_pass, comment: :ropes_comment)
-      fabric_group = groups["fabric_strength"]
+      expect(groups.keys).to contain_exactly(:ropes, :fabric_strength, :thread)
+      expect(groups[:ropes]).to eq(base: :ropes, pass: :ropes_pass, comment: :ropes_comment)
+      fabric_group = groups[:fabric_strength]
       expect(fabric_group[:pass]).to eq(:fabric_strength_pass)
       expect(fabric_group[:comment]).to eq(:fabric_strength_comment)
-      expect(groups["thread"]).to eq(pass: :thread_pass)
+      expect(groups[:thread]).to eq(pass: :thread_pass)
     end
 
     it "ignores fields that the assessment doesn't respond to" do
@@ -42,8 +58,8 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
 
       groups = builder.send(:group_assessment_fields, field_keys)
 
-      expect(groups.keys).to contain_exactly("ropes")
-      expect(groups["ropes"]).to include(base: :ropes, pass: :ropes_pass)
+      expect(groups.keys).to contain_exactly(:ropes)
+      expect(groups[:ropes]).to include(base: :ropes, pass: :ropes_pass)
     end
 
     it "handles fields with multiple underscores correctly" do
@@ -61,40 +77,11 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
 
       groups = builder.send(:group_assessment_fields, field_keys)
 
-      expect(groups["very_long_field_name"]).to eq(
+      expect(groups[:very_long_field_name]).to eq(
         base: :very_long_field_name,
         pass: :very_long_field_name_pass,
         comment: :very_long_field_name_comment
       )
-    end
-  end
-
-  describe "#extract_base_field_name (private method)" do
-    it "removes _pass suffix" do
-      expect(builder.send(:extract_base_field_name, "field_pass")).to eq("field")
-      expect(builder.send(:extract_base_field_name, "complex_field_pass")).to eq("complex_field")
-    end
-
-    it "removes _comment suffix" do
-      expect(builder.send(:extract_base_field_name, "field_comment")).to eq("field")
-      expect(builder.send(:extract_base_field_name, "complex_field_comment")).to eq("complex_field")
-    end
-
-    it "returns the field unchanged if no suffix" do
-      expect(builder.send(:extract_base_field_name, "regular_field")).to eq("regular_field")
-      expect(builder.send(:extract_base_field_name, "field")).to eq("field")
-    end
-
-    it "handles edge cases correctly" do
-      # Field ending with pass but not _pass
-      expect(builder.send(:extract_base_field_name, "bypass")).to eq("bypass")
-
-      # Field ending with comment but not _comment
-      expect(builder.send(:extract_base_field_name, "document")).to eq("document")
-
-      # Field with multiple potential suffixes (only removes the last one)
-      expect(builder.send(:extract_base_field_name, "pass_comment")).to eq("pass")
-      expect(builder.send(:extract_base_field_name, "comment_pass")).to eq("comment")
     end
   end
 
@@ -107,7 +94,8 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     it "prioritizes base field label" do
       fields = {base: :ropes, pass: :ropes_pass, comment: :ropes_comment}
 
-      expect(I18n).to receive(:t!).with("forms.materials.fields.ropes").and_return("Ropes Label")
+      expect(I18n).to receive(:t!).with("forms.mock_form.fields.ropes")
+        .and_return("Ropes Label")
 
       label = builder.send(:get_field_label, fields)
       expect(label).to eq("Ropes Label")
@@ -116,7 +104,8 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     it "uses pass field label when no base field" do
       fields = {pass: :fabric_strength_pass, comment: :fabric_strength_comment}
 
-      expect(I18n).to receive(:t!).with("forms.materials.fields.fabric_strength_pass").and_return("Fabric Pass Label")
+      expect(I18n).to receive(:t!).with("forms.mock_form.fields.fabric_strength")
+        .and_return("Fabric Pass Label")
 
       label = builder.send(:get_field_label, fields)
       expect(label).to eq("Fabric Pass Label")
@@ -125,19 +114,19 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     it "uses comment field label for standalone comments" do
       fields = {comment: :custom_comment}
 
-      expect(I18n).to receive(:t!).with("forms.materials.fields.custom_comment").and_return("Custom Comment Label")
+      expect(I18n).to receive(:t!).with("forms.mock_form.fields.custom")
+        .and_return("Custom Comment Label")
 
       label = builder.send(:get_field_label, fields)
       expect(label).to eq("Custom Comment Label")
     end
 
-    it "falls back to base name from first available field" do
+    it "raises error for unknown field types" do
       fields = {unknown_type: :some_field}
 
-      expect(I18n).to receive(:t!).with("forms.materials.fields.some_field").and_return("Fallback Label")
-
-      label = builder.send(:get_field_label, fields)
-      expect(label).to eq("Fallback Label")
+      expect {
+        builder.send(:get_field_label, fields)
+      }.to raise_error(RuntimeError, "No valid fields found: {unknown_type: :some_field}")
     end
   end
 
@@ -205,8 +194,9 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
   describe "edge cases and boundary conditions" do
     it "handles assessment with no fields gracefully" do
       allow(assessment).to receive(:class).and_return(double(form_fields: []))
+      mock_form_translations
 
-      blocks = described_class.build_from_assessment("materials", assessment)
+      blocks = described_class.build_from_assessment("mock_form", assessment)
 
       expect(blocks.size).to eq(1) # Just the header
       expect(blocks.first.type).to eq(:header)
@@ -216,13 +206,14 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       allow(assessment).to receive(:ropes).and_return(nil)
       allow(assessment).to receive(:ropes_pass).and_return(nil)
       allow(assessment).to receive(:ropes_comment).and_return(nil)
+      mock_form_translations
 
-      builder = described_class.new("materials", assessment)
+      builder = described_class.new("mock_form", assessment)
       fields = {base: :ropes, pass: :ropes_pass, comment: :ropes_comment}
 
       # Mock the field grouping
       allow(builder).to receive(:get_form_config_fields).and_return([:ropes, :ropes_pass, :ropes_comment])
-      allow(builder).to receive(:group_assessment_fields).and_return({"ropes" => fields})
+      allow(builder).to receive(:group_assessment_fields).and_return({ropes: fields})
 
       blocks = builder.build
 
@@ -232,6 +223,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       expect(blocks.select(&:comment?)).to be_empty
     end
 
+<<<<<<< HEAD
     it "correctly identifies pass fields vs other boolean fields" do
       # Test that the builder correctly distinguishes between actual pass/fail fields
       # and other fields that might have "pass" in their name
@@ -263,15 +255,6 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       fields_without_pass = {base: :ropes}
       pass_value = builder.send(:determine_pass_value, fields_without_pass, :ropes, 25)
       expect(pass_value).to be_nil
-    end
-
-    it "handles deeply nested field names" do
-      field_name = :very_deeply_nested_field_name_with_many_underscores_pass
-      base_name = "very_deeply_nested_field_name_with_many_underscores"
-
-      # Just test the extraction logic without mocking the assessment
-      result = builder.send(:extract_base_field_name, field_name.to_s)
-      expect(result).to eq(base_name)
     end
   end
 
@@ -312,8 +295,8 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       end
     end
 
-    context "with materials assessment having mixed field types" do
-      let(:builder) { described_class.new("materials", assessment) }
+    context "with mock assessment having mixed field types" do
+      let(:builder) { described_class.new("mock_form", assessment) }
 
       before do
         assessment.update!(
@@ -327,19 +310,30 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       end
 
       it "handles different pass_fail value types correctly" do
+        mock_form_translations
+
         blocks = builder.build
         value_blocks = blocks.select(&:value?)
 
         # String "pass" should be converted to pass indicator
-        ropes_block = value_blocks.find { |b| b.name == I18n.t("forms.materials.fields.ropes") }
+        ropes_block = value_blocks.find do |b|
+          b.name == "Ropes"
+        end
+        expect(ropes_block).not_to be_nil
         expect(ropes_block.pass_fail).to eq("pass")
 
-        # Boolean false should remain false
-        fabric_block = value_blocks.find { |b| b.name == I18n.t("forms.materials.fields.fabric_strength_pass") }
+        # Boolean false should remain false - fabric_strength has no base field, only pass field
+        fabric_block = value_blocks.find do |b|
+          b.name&.include?("Fabric")
+        end
+        expect(fabric_block).not_to be_nil
         expect(fabric_block.pass_fail).to eq(false)
 
-        # Boolean true should remain true
-        thread_block = value_blocks.find { |b| b.name == I18n.t("forms.materials.fields.thread_pass") }
+        # Boolean true should remain true - thread has no base field, only pass field
+        thread_block = value_blocks.find do |b|
+          b.name&.include?("Thread")
+        end
+        expect(thread_block).not_to be_nil
         expect(thread_block.pass_fail).to eq(true)
       end
     end

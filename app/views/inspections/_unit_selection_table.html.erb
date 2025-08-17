@@ -1,11 +1,11 @@
 <div class="table-list units-list">
   <!-- Header row -->
   <div class="table-list-header">
-    <%= render 'shared/table_column', field: 'photo', model: 'units', header: true %>
-    <%= render 'shared/table_column', field: 'name', model: 'units', header: true %>
-    <%= render 'shared/table_column', field: 'manufacturer', model: 'units', header: true %>
-    <%= render 'shared/table_column', field: 'serial', model: 'units', header: true %>
-    <%= render 'shared/table_column', field: 'action', i18n_key: 'units.actions.select', header: true %>
+    <%= render 'shared/table_column', field: :photo, model: :units, header: true %>
+    <%= render 'shared/table_column', field: :name, model: :units, header: true %>
+    <%= render 'shared/table_column', field: :manufacturer, model: :units, header: true %>
+    <%= render 'shared/table_column', field: :serial, model: :units, header: true %>
+    <%= render 'shared/table_column', field: :action, i18n_key: 'units.actions.select', header: true %>
   </div>
 
   <!-- Data rows -->
@@ -13,7 +13,7 @@
     <% units.each do |item| %>
       <li>
         <div class="table-list-content">
-          <%= render 'shared/table_column', field: 'photo', model: 'units' do %>
+          <%= render 'shared/table_column', field: :photo, model: :units do %>
             <% if item.photo.attached? %>
               <%= render 'shared/image',
                   image: item.photo,
@@ -23,10 +23,10 @@
               <span style="color: #ccc;"><%= t('units.messages.no_photo') %></span>
             <% end %>
           <% end %>
-          <%= render 'shared/table_column', field: 'name', model: 'units', item: item %>
-          <%= render 'shared/table_column', field: 'manufacturer', model: 'units', item: item %>
-          <%= render 'shared/table_column', field: 'serial', model: 'units', item: item %>
-          <%= render 'shared/table_column', field: 'action', i18n_key: 'units.actions.select' do %>
+          <%= render 'shared/table_column', field: :name, model: :units, item: item %>
+          <%= render 'shared/table_column', field: :manufacturer, model: :units, item: item %>
+          <%= render 'shared/table_column', field: :serial, model: :units, item: item %>
+          <%= render 'shared/table_column', field: :action, i18n_key: 'units.actions.select' do %>
             <%= button_to t('units.actions.select'),
                 update_unit_inspection_path(inspection, unit_id: item.id),
                 method: :patch,

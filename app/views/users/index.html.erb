@@ -5,11 +5,11 @@
 <div class="table-list users-list">
   <!-- Header row -->
   <div class="table-list-header">
-    <%= render 'shared/table_column', field: 'email', model: 'user_edit', header: true %>
-    <%= render 'shared/table_column', field: 'admin', model: 'user_edit', header: true %>
-    <%= render 'shared/table_column', field: 'registered', model: 'user_edit', header: true %>
-    <%= render 'shared/table_column', field: 'last_active', model: 'user_edit', header: true %>
-    <%= render 'shared/table_column', field: 'inspections', model: 'user_edit', header: true %>
+    <%= render 'shared/table_column', field: :email, model: :user_edit, header: true %>
+    <%= render 'shared/table_column', field: :admin, model: :user_edit, header: true %>
+    <%= render 'shared/table_column', field: :registered, model: :user_edit, header: true %>
+    <%= render 'shared/table_column', field: :last_active, model: :user_edit, header: true %>
+    <%= render 'shared/table_column', field: :inspections, model: :user_edit, header: true %>
   </div>
 
   <!-- Data rows -->
@@ -17,18 +17,18 @@
     <% @users.each do |user| %>
       <li>
         <%= link_to edit_user_path(user), class: "table-list-link" do %>
-          <%= render 'shared/table_column', field: 'email', model: 'user_edit' do %>
+          <%= render 'shared/table_column', field: :email, model: :user_edit do %>
             <%= user.email %>
           <% end %>
-          <%= render 'shared/table_column', field: 'admin', model: 'user_edit' do %>
+          <%= render 'shared/table_column', field: :admin, model: :user_edit do %>
             <%= user.admin? ? t('shared.yes') : t('shared.no') %>
           <% end %>
-          <%= render 'shared/table_column', field: 'registered', model: 'user_edit' do %>
+          <%= render 'shared/table_column', field: :registered, model: :user_edit do %>
             <span title="<%= user.created_at.strftime('%d/%m/%Y') %>">
               <%= time_ago_in_words(user.created_at) %>
             </span>
           <% end %>
-          <%= render 'shared/table_column', field: 'last_active', model: 'user_edit' do %>
+          <%= render 'shared/table_column', field: :last_active, model: :user_edit do %>
             <% if user.last_active_at %>
               <span title="<%= user.last_active_at.strftime('%d/%m/%Y') %>">
                 <%= time_ago_in_words(user.last_active_at) %>
@@ -37,7 +37,7 @@
               <%= t('users.messages.last_active_never') %>
             <% end %>
           <% end %>
-          <%= render 'shared/table_column', field: 'inspections', model: 'user_edit' do %>
+          <%= render 'shared/table_column', field: :inspections, model: :user_edit do %>
             <%= @inspection_counts[user.id] || 0 %>
           <% end %>
         <% end %>
