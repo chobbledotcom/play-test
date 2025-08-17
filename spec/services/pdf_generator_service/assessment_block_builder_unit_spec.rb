@@ -232,22 +232,37 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       expect(blocks.select(&:comment?)).to be_empty
     end
 
-    it "handles boolean fields that look like pass fields" do
-      # Skip this test as it requires mocking methods that don't exist
-      skip "Requires complex mocking of non-existent methods"
-
-      builder = described_class.new("materials", assessment)
-      allow(builder).to receive(:get_form_config_fields).and_return([:bypass])
-
-      blocks = builder.build
-      value_blocks = blocks.select(&:value?)
-
-      bypass_block = value_blocks.find { |b| b.name&.include?("bypass") }
-      if bypass_block
-        # Should treat as regular boolean, not pass/fail
-        expect(bypass_block.value).to eq(I18n.t("shared.yes"))
-        expect(bypass_block.pass_fail).to be_nil
-      end
+    it "correctly identifies pass fields vs other boolean fields" do
+      # Test that the builder correctly distinguishes between actual pass/fail fields
+      # and other fields that might have "pass" in their name
+      
+      # Test with known pass field from materials assessment
+      assessment.fabric_strength_pass = true
+      fields = {pass: :fabric_strength_pass}
+      
+      pass_value = builder.send(:determine_pass_value, fields, :fabric_strength_pass, true)
+      expect(pass_value).to eq(true)
+      
+      # Test field extraction logic for fields with "pass" in the name
+      base_name = builder.send(:extract_base_field_name, "fabric_strength_pass")
+      expect(base_name).to eq("fabric_strength")
+      
+      # Test with another known pass field
+      base_name = builder.send(:extract_base_field_name, "thread_pass")
+      expect(base_name).to eq("thread")
+      
+      # Test that when main field is the pass field itself, it returns the assessment value
+      assessment.thread_pass = false
+      fields_with_only_pass = {pass: :thread_pass}
+      pass_value = builder.send(:determine_pass_value, fields_with_only_pass, :thread_pass, true)
+      # When the main field IS the pass field, it returns the value from assessment
+      expect(pass_value).to eq(false)
+      
+      # Test that fields without pass suffix return nil for pass_fail
+      assessment.ropes = 25
+      fields_without_pass = {base: :ropes}
+      pass_value = builder.send(:determine_pass_value, fields_without_pass, :ropes, 25)
+      expect(pass_value).to be_nil
     end
 
     it "handles deeply nested field names" do
