@@ -48,8 +48,6 @@ class ApplicationController < ActionController::Base
     raise exception
   end
 
-  private
-
   sig { returns(T::Boolean) }
   def skip_authentication?
     false
@@ -95,9 +93,9 @@ class ApplicationController < ActionController::Base
     current_user.update(last_active_at: Time.current)
 
     # Update UserSession last_active_at
-    if session[:session_token]
-      current_session&.touch_last_active
-    end
+    return unless session[:session_token]
+
+    current_session&.touch_last_active
   end
 
   sig { void }
@@ -202,9 +200,7 @@ class ApplicationController < ActionController::Base
       return false if csrf_ignored_actions.include?(action)
     end
 
-    if exception.is_a?(ActionController::InvalidCrossOriginRequest)
-      return false unless logged_in?
-    end
+    return false if exception.is_a?(ActionController::InvalidCrossOriginRequest) && !logged_in?
 
     true
   end

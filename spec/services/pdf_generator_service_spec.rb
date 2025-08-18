@@ -159,18 +159,18 @@ RSpec.describe PdfGeneratorService, pdf: true do
     it "would add draft watermark to incomplete inspections in production" do
       # Watermarks are disabled in test environment to prevent test instability
       # This test verifies the logic for applying watermarks would work correctly
-      
+
       # Verify draft inspection is incomplete
       expect(draft_inspection).not_to be_complete
-      
+
       # Test that we can generate PDF without errors
       pdf = PdfGeneratorService.generate_inspection_report(draft_inspection)
       expect { pdf.render }.not_to raise_error
-      
+
       # In production, the watermark would be added via Utilities.add_draft_watermark
       # when inspection.complete? is false and Rails.env.test? is false
       expect(Rails.env).to be_test # Confirm we're in test environment
-      
+
       # If we were not in test environment, watermark would be applied
       allow(Rails.env).to receive(:test?).and_return(false)
       expect(draft_inspection.complete?).to eq(false) # This would trigger watermark in production
