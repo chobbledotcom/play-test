@@ -36,7 +36,5 @@ jobs:
       - name: Run Sorbet type check
         run: |
           bundle exec srb typecheck \
-            --ignore=db/schema.rb \
-            --ignore=db/migrate \
-            --ignore=config/routes.rb
+            --ignore=.gems/
         continue-on-error: false
