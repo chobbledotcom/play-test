@@ -1,6 +1,6 @@
 ---
 name: activerecord
-version: 8.0.2
+version: 8.0.2.1
 type: bundler
 summary: Object-relational mapper framework (part of Rails).
 homepage: https://rubyonrails.org

@@ -1,14 +1,14 @@
 ---
-name: actionpack
-version: 8.0.2.1
+name: simplecov-html
+version: 0.13.2
 type: bundler
-summary: Web-flow and rendering framework putting the VC in MVC (part of Rails).
-homepage: https://rubyonrails.org
+summary: Default HTML formatter for SimpleCov code coverage tool for ruby 2.4+
+homepage: https://github.com/simplecov-ruby/simplecov-html
 license: mit
 licenses:
-- sources: MIT-LICENSE
-  text: |+
-    Copyright (c) David Heinemeier Hansson
+- sources: LICENSE
+  text: |
+    Copyright (c) 2010-2013 Christoph Olszowka
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
@@ -28,10 +28,4 @@ licenses:
     LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
     WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-- sources: README.rdoc
-  text: |-
-    Action Pack is released under the MIT license:
-
-    * https://opensource.org/licenses/MIT
 notices: []
