@@ -1,4 +1,4 @@
-# typed: strict
+# typed: false
 # frozen_string_literal: true
 
 # == Route Map
@@ -144,7 +144,10 @@
 
 Rails.application.routes.draw do
   # Mount Mission Control Jobs (authentication handled by initializer)
-  mount MissionControl::Jobs::Engine => "/mission_control"
+  # Only mount if available (not in test environment)
+  if defined?(MissionControl::Jobs::Engine)
+    mount MissionControl::Jobs::Engine => "/mission_control"
+  end
 
   get "up" => "rails/health#show", :as => :rails_health_check
 

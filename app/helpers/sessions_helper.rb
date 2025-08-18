@@ -7,9 +7,9 @@ module SessionsHelper
 
   sig { void }
   def remember_user
-    if session[:session_token]
-      cookies.permanent.signed[:session_token] = session[:session_token]
-    end
+    return unless session[:session_token]
+
+    cookies.permanent.signed[:session_token] = session[:session_token]
   end
 
   sig { void }
@@ -72,30 +72,32 @@ module SessionsHelper
   sig { void }
   def log_out
     session.delete(:session_token)
-    session.delete(:original_admin_id)  # Clear impersonation tracking
+    session.delete(:original_admin_id) # Clear impersonation tracking
     forget_user
     @current_user = nil
   end
 
-  sig {
+  sig do
     params(
       email: T.nilable(String),
       password: T.nilable(String)
     ).returns(T.nilable(T.any(User, T::Boolean)))
-  }
+  end
   def authenticate_user(email, password)
     return nil unless email.present? && password.present?
+
     User.find_by(email: email.downcase)&.authenticate(password)
   end
 
   sig { params(user: User).void }
-  def create_user_session(user)
+  def create_user_session(_user)
     remember_user
   end
 
   sig { returns(T.nilable(UserSession)) }
   def current_session
     return unless session[:session_token]
+
     @current_session ||= UserSession.find_by(
       session_token: session[:session_token]
     )

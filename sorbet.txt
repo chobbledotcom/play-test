@@ -1,0 +1,11 @@
+Distrobox named 'sorbet-ubuntu' already exists.
+To enter, run:
+
+distrobox enter sorbet-ubuntu
+
+Installing bundle dependencies...
+Bundle complete! 56 Gemfile dependencies, 209 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.
+2 installed gems you directly depend on are looking for funding.
+  Run `bundle fund` for details
+Running Sorbet type check...

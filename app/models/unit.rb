@@ -88,7 +88,7 @@ class Unit < ApplicationRecord
 
   scope :inspection_due, -> {
     joins(:inspections)
-      .merge(Inspection.completed)
+      .merge(Inspection.complete)
       .group("units.id")
       .having("MAX(inspections.complete_date) + INTERVAL #{EN14960::Constants::REINSPECTION_INTERVAL_DAYS} DAY <= CURRENT_DATE")
   }

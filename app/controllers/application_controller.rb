@@ -55,9 +55,16 @@ class ApplicationController < ActionController::Base
     false
   end
 
+  # Class method version for use in rescue_from blocks
+  sig { params(table: Symbol, key: Symbol, args: T.untyped).returns(String) }
+  def self.app_i18n(table, key, **args)
+    I18n.t("application.#{table}.#{key}", **args)
+  end
+
+  # Instance method delegates to class method
   sig { params(table: Symbol, key: Symbol, args: T.untyped).returns(String) }
   def app_i18n(table, key, **args)
-    I18n.t("application.#{table}.#{key}", **args)
+    self.class.app_i18n(table, key, **args)
   end
 
   sig { params(form: Symbol, key: T.any(Symbol, String), args: T.untyped).returns(String) }
