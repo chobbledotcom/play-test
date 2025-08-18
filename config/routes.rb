@@ -142,6 +142,8 @@
 #                        jobs GET    /:status/jobs(.:format)                                        mission_control/jobs/jobs#index
 #                        root GET    /                                                              mission_control/jobs/queues#index
 
+# typed: strict
+
 Rails.application.routes.draw do
   # Mount Mission Control Jobs (authentication handled by initializer)
   # Only mount if available (not in test environment)

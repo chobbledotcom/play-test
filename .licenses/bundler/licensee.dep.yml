@@ -1,16 +1,16 @@
 ---
-name: actionmailbox
-version: 8.0.2.1
+name: licensee
+version: 9.18.0
 type: bundler
-summary: Inbound email handling framework.
-homepage: https://rubyonrails.org
+summary: A Ruby Gem to detect open source project licenses
+homepage: https://github.com/benbalter/licensee
 license: mit
 licenses:
-- sources: MIT-LICENSE
+- sources: LICENSE.md
   text: |
     MIT License
 
-    Copyright (c) 37signals LLC
+    Copyright (c) 2014-2021 Ben Balter and Licensee contributors
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,4 @@ licenses:
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-- sources: README.md
-  text: Action Mailbox is released under the [MIT License](https://opensource.org/licenses/MIT).
 notices: []

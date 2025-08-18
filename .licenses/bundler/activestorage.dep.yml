@@ -1,6 +1,6 @@
 ---
 name: activestorage
-version: 8.0.2
+version: 8.0.2.1
 type: bundler
 summary: Local and cloud file storage framework.
 homepage: https://rubyonrails.org

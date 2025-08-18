@@ -2,12 +2,16 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2025-08-12
-Total dependencies: 122
+Generated on: 2025-08-18
+Total dependencies: 148
 
 ## Dependencies by License
 
-### APACHE-2.0 (11 dependencies)
+### APACHE-2.0 (13 dependencies)
+
+- **addressable** v2.8.7
+  - URI Implementation
+  - Homepage: https://github.com/sporkmonger/addressable
 
 - **aws-eventstream** v1.4.0
   - AWS Event Stream Library
@@ -45,6 +49,10 @@ Total dependencies: 122
   - ECDSA, EdDSA, RSA-PSS and RSA-PKCS#1 algorithms for ruby
   - Homepage: https://github.com/cedarcode/openssl-signature_algorithm
 
+- **simplecov-cobertura** v3.0.0
+  - SimpleCov Cobertura Formatter
+  - Homepage: https://github.com/jessebs/simplecov-cobertura
+
 - **sorbet-runtime** v0.5.12016
   - Sorbet runtime
   - Homepage: https://sorbet.org
@@ -53,11 +61,15 @@ Total dependencies: 122
   - TPM Key Attestation verifier
   - Homepage: https://github.com/cedarcode/tpm-key_attestation
 
-### BSD-2-CLAUSE (1 dependencies)
+### BSD-2-CLAUSE (2 dependencies)
 
 - **bindata** v2.5.1
   - A declarative way to read and write binary file formats
   - Homepage: https://github.com/dmendel/bindata
+
+- **rexml** v3.4.1
+  - An XML toolkit for Ruby
+  - Homepage: https://github.com/ruby/rexml
 
 ### BSD-3-CLAUSE (2 dependencies)
 
@@ -69,45 +81,45 @@ Total dependencies: 122
   - Ruby library to interface with the SQLite3 database engine (http://www.sqlite.org).
   - Homepage: https://github.com/sparklemotion/sqlite3-ruby
 
-### MIT (66 dependencies)
+### MIT (83 dependencies)
 
-- **actioncable** v8.0.2
+- **actioncable** v8.0.2.1
   - WebSocket framework for Rails.
   - Homepage: https://rubyonrails.org
 
-- **actionmailbox** v8.0.2
+- **actionmailbox** v8.0.2.1
   - Inbound email handling framework.
   - Homepage: https://rubyonrails.org
 
-- **actionmailer** v8.0.2
+- **actionmailer** v8.0.2.1
   - Email composition and delivery framework (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **actionpack** v8.0.2
+- **actionpack** v8.0.2.1
   - Web-flow and rendering framework putting the VC in MVC (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **actiontext** v8.0.2
+- **actiontext** v8.0.2.1
   - Rich text framework.
   - Homepage: https://rubyonrails.org
 
-- **actionview** v8.0.2
+- **actionview** v8.0.2.1
   - Rendering framework putting the V in MVC (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **activejob** v8.0.2
+- **activejob** v8.0.2.1
   - Job framework with pluggable queues.
   - Homepage: https://rubyonrails.org
 
-- **activemodel** v8.0.2
+- **activemodel** v8.0.2.1
   - A toolkit for building modeling frameworks (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **activestorage** v8.0.2
+- **activestorage** v8.0.2.1
   - Local and cloud file storage framework.
   - Homepage: https://rubyonrails.org
 
-- **activesupport** v8.0.2
+- **activesupport** v8.0.2.1
   - A toolkit of support libraries and Ruby core extensions extracted from the Rails framework.
   - Homepage: https://rubyonrails.org
 
@@ -143,6 +155,10 @@ Total dependencies: 122
   - CSS parser based on the CSS Syntax Level 3 spec.
   - Homepage: https://github.com/rgrove/crass/
 
+- **docile** v1.4.1
+  - Docile keeps your Ruby DSLs tame and well-behaved.
+  - Homepage: https://ms-ati.github.io/docile/
+
 - **dotenv** v3.1.8
   - Loads environment variables from `.env`.
   - Homepage: https://github.com/bkeepers/dotenv
@@ -158,6 +174,10 @@ Total dependencies: 122
 - **et-orbi** v1.2.11
   - time with zones
   - Homepage: https://github.com/floraison/et-orbi
+
+- **faraday** v2.13.4
+  - HTTP/REST API client library.
+  - Homepage: https://lostisland.github.io/faraday
 
 - **fugit** v1.11.1
   - time tools for flor
@@ -178,6 +198,14 @@ Total dependencies: 122
 - **importmap-rails** v2.2.2
   - Use ESM with importmap to manage modern JavaScript in Rails without transpiling or bundling.
   - Homepage: https://github.com/rails/importmap-rails
+
+- **licensed** v5.0.4
+  - Extract and validate the licenses of dependencies.
+  - Homepage: https://github.com/github/licensed
+
+- **licensee** v9.18.0
+  - A Ruby Gem to detect open source project licenses
+  - Homepage: https://github.com/benbalter/licensee
 
 - **loofah** v2.24.1
   - Loofah is a general library for manipulating and transforming HTML/XML documents and fragments, built on top of Nokogiri.
@@ -203,9 +231,21 @@ Total dependencies: 122
   - Operational controls for Active Job
   - Homepage: https://github.com/rails/mission_control-jobs
 
+- **octokit** v9.2.0
+  - Ruby toolkit for working with the GitHub API
+  - Homepage: https://github.com/octokit/octokit.rb
+
+- **parallel** v1.27.0
+  - Run any kind of code in parallel processes
+  - Homepage: https://github.com/grosser/parallel
+
 - **psych** v5.2.3
   - Psych is a YAML parser and emitter
   - Homepage: https://github.com/ruby/psych
+
+- **public_suffix** v6.0.2
+  - Domain name parser based on the Public Suffix List.
+  - Homepage: https://simonecarletti.com/code/publicsuffix-ruby
 
 - **raabro** v1.4.0
   - a very dumb PEG parser library
@@ -231,7 +271,7 @@ Total dependencies: 122
   - A general server command for Rack applications.
   - Homepage: https://github.com/rack/rackup
 
-- **rails** v8.0.2
+- **rails** v8.0.2.1
   - Full-stack web application framework.
   - Homepage: https://rubyonrails.org
 
@@ -243,7 +283,7 @@ Total dependencies: 122
   - This gem is responsible to sanitize HTML fragments in Rails applications.
   - Homepage: https://github.com/rails/rails-html-sanitizer
 
-- **railties** v8.0.2
+- **railties** v8.0.2.1
   - Tools for creating, working with, and running Rails applications.
   - Homepage: https://rubyonrails.org
 
@@ -259,9 +299,29 @@ Total dependencies: 122
   - A library to encode QR Codes
   - Homepage: https://github.com/whomwah/rqrcode_core
 
+- **rspec-core** v3.13.5
+  - rspec-core-3.13.5
+  - Homepage: https://rspec.info
+
+- **rspec-support** v3.13.4
+  - rspec-support-3.13.4
+  - Homepage: https://rspec.info
+
+- **rspec_junit_formatter** v0.6.0
+  - RSpec JUnit XML formatter
+  - Homepage: https://github.com/sj26/rspec_junit_formatter
+
 - **ruby-vips** v2.2.3
   - A fast image processing library with low memory needs
   - Homepage: http://github.com/libvips/ruby-vips
+
+- **ruby-xxHash** v0.4.0.2
+  - A pure Ruby implementation of xxhash.
+  - Homepage: https://github.com/justinwsmith/ruby-xxhash
+
+- **rugged** v1.9.0
+  - Rugged is a Ruby binding to the libgit2 linkable library
+  - Homepage: https://github.com/libgit2/rugged
 
 - **safety_net_attestation** v0.4.0
   - SafetyNet attestation response verification
@@ -279,6 +339,10 @@ Total dependencies: 122
   - Integrate SassC-Ruby into Rails.
   - Homepage: https://github.com/sass/sassc-rails
 
+- **sawyer** v0.9.2
+  - Secret User Agent of HTTP
+  - Homepage: https://github.com/lostisland/sawyer
+
 - **sentry-rails** v5.26.0
   - A gem that provides Rails integration for the Sentry error logger
   - Homepage: https://github.com/getsentry/sentry-ruby/tree/5.26.0/sentry-rails
@@ -286,6 +350,18 @@ Total dependencies: 122
 - **sentry-ruby** v5.26.0
   - A gem that provides a client interface for the Sentry error logger
   - Homepage: https://github.com/getsentry/sentry-ruby/tree/5.26.0/sentry-ruby
+
+- **simplecov** v0.22.0
+  - Code coverage for Ruby
+  - Homepage: https://github.com/simplecov-ruby/simplecov
+
+- **simplecov-html** v0.13.2
+  - Default HTML formatter for SimpleCov code coverage tool for ruby 2.4+
+  - Homepage: https://github.com/simplecov-ruby/simplecov-html
+
+- **simplecov_json_formatter** v0.1.4
+  - JSON formatter for SimpleCov
+  - Homepage: https://github.com/fede-moya/simplecov_json_formatter
 
 - **solid_queue** v1.2.1
   - Database-backed Active Job backend.
@@ -311,6 +387,10 @@ Total dependencies: 122
   - Generic interface to multiple Ruby template engines
   - Homepage: https://github.com/jeremyevans/tilt
 
+- **tomlrb** v2.0.3
+  - A racc based toml parser
+  - Homepage: https://github.com/fbernier/tomlrb
+
 - **turbo-rails** v2.0.13
   - The speed of a single-page web application without having to write any JavaScript.
   - Homepage: https://github.com/hotwired/turbo-rails
@@ -335,11 +415,15 @@ Total dependencies: 122
   - Efficient and thread-safe constant autoloader
   - Homepage: https://github.com/fxn/zeitwerk
 
-### OTHER (42 dependencies)
+### OTHER (47 dependencies)
 
-- **activerecord** v8.0.2
+- **activerecord** v8.0.2.1
   - Object-relational mapper framework (part of Rails).
   - Homepage: https://rubyonrails.org
+
+- **annotaterb** v4.18.0
+  - A gem for generating annotations for Rails projects.
+  - Homepage: https://github.com/drwl/annotaterb
 
 - **base64** v0.3.0
   - Support for encoding and decoding binary data using a Base64 representation.
@@ -357,11 +441,11 @@ Total dependencies: 122
   - Arbitrary-precision decimal floating-point number library.
   - Homepage: https://github.com/ruby/bigdecimal
 
-- **bundler** v2.7.1
+- **bundler** v2.6.7
   - The best way to manage your application's dependencies
   - Homepage: https://bundler.io
 
-- **chobble-forms** v0.5.6
+- **chobble-forms** v0.7.2
   - Semantic Rails forms with strict i18n
   - Homepage: https://github.com/chobbledotcom/chobble-forms
 
@@ -381,13 +465,17 @@ Total dependencies: 122
   - Distributed object system for Ruby
   - Homepage: https://github.com/ruby/drb
 
-- **en14960** v0.2.3
+- **en14960** v0.4.2
   - BS EN 14960:2019 safety standard calculators for inflatable play equipment
   - Homepage: https://github.com/chobbledotcom/en14960
 
 - **erb** v5.0.2
   - An easy to use but powerful templating system for Ruby.
   - Homepage: https://github.com/ruby/erb
+
+- **faraday-net_http** v3.4.1
+  - Faraday adapter for Net::HTTP
+  - Homepage: https://github.com/lostisland/faraday-net_http
 
 - **ffi** v1.17.2
   - Ruby FFI
@@ -400,6 +488,10 @@ Total dependencies: 122
 - **irb** v1.15.2
   - Interactive Ruby command-line tool for REPL (Read Eval Print Loop).
   - Homepage: https://github.com/ruby/irb
+
+- **json** v2.13.0
+  - JSON Implementation for Ruby
+  - Homepage: https://github.com/ruby/json
 
 - **jwt** v2.10.2
   - JSON Web Token implementation in Ruby
@@ -416,6 +508,10 @@ Total dependencies: 122
 - **matrix** v0.4.2
   - An implementation of Matrix and Vector classes.
   - Homepage: https://github.com/ruby/matrix
+
+- **net-http** v0.6.0
+  - HTTP client api for Ruby.
+  - Homepage: https://github.com/ruby/net-http
 
 - **net-imap** v0.5.9
   - Ruby client api for Internet Message Access Protocol
@@ -444,6 +540,10 @@ Total dependencies: 122
 - **openssl** v3.3.0
   - SSL/TLS and general-purpose cryptography for Ruby
   - Homepage: https://github.com/ruby/openssl
+
+- **pathname-common_prefix** v0.0.2
+  - Calculate prefix commont to some pathnames
+  - Homepage: https://gitlab.com/KitaitiMakoto/pathname-common_prefix
 
 - **pdf-core** v0.10.0
   - Low level PDF generator.
@@ -504,4 +604,10 @@ Total dependencies: 122
 - **websocket-extensions** v0.1.5
   - Generic extension manager for WebSocket connections
   - Homepage: https://github.com/faye/websocket-extensions-ruby
+
+### WTFPL (1 dependencies)
+
+- **reverse_markdown** v3.0.0
+  - Convert html code into markdown.
+  - Homepage: http://github.com/xijo/reverse_markdown
 
