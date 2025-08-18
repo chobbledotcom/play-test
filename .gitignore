@@ -51,6 +51,9 @@
 
 # Ignore generated Sorbet RBI files (can be regenerated)
 .sorbet-results
+sorbet/rbi/gems/
+sorbet/rbi/dsl/
+sorbet/rbi/annotations/
 
 # Pinned docker versions
 PINNED_VERSION
