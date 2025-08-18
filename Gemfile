@@ -14,7 +14,7 @@ gem "sqlite3", ">= 1.4"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Using in-memory queue for background processing
-gem "solid_queue", "~> 1.0", require: false
+gem "solid_queue"
 
 # WebAuthn for passkey support
 gem "webauthn", "~> 3.4"
