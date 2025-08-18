@@ -30,9 +30,10 @@ jobs:
       
       - name: Generate Sorbet RBI files
         run: |
-          bundle exec tapioca annotations
-          bundle exec tapioca gems
-          bundle exec tapioca dsl
+          RUNNING_TAPIOCA=true \
+            bundle exec tapioca annotations && \
+            bundle exec tapioca gems && \
+            bundle exec tapioca dsl
       
       - name: Run Sorbet type check
         run: |
