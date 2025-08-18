@@ -52,6 +52,7 @@
 # Ignore generated Sorbet RBI files (can be regenerated)
 .sorbet-results
 sorbet/rbi/dsl/*
+sorbet/rbi/gems/*
 sorbet/rbi/annotations/*
 !sorbet/rbi/manual/
 
