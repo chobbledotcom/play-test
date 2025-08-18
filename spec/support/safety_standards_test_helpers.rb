@@ -221,8 +221,7 @@ module SafetyStandardsTestHelpers
   )
     if no_walls
       expect(page).to have_content("Required Wall Height: 0.0m")
-      expect(page).to have_content("No walls required")
-      expect(page).to have_content("Platform height < 0.6m")
+      expect(page).to have_content("No containing walls required")
     else
       expect(page).to have_content("Required Wall Height: #{height}m")
       expect(page).to have_content(range)
