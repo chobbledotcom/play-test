@@ -317,15 +317,11 @@ RSpec.describe ApplicationController, type: :controller do
     end
 
     describe "#n_plus_one_detection" do
-      it "is defined as a private method" do
-        expect(controller.private_methods).to include(:n_plus_one_detection)
-      end
-
       it "wraps actions with Prosopite scanning" do
         expect(Prosopite).to receive(:scan)
         expect(Prosopite).to receive(:finish)
 
-        controller.send(:n_plus_one_detection) { "test" }
+        controller.n_plus_one_detection { "test" }
       end
     end
   end

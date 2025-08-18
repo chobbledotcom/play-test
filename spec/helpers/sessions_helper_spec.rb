@@ -172,7 +172,7 @@ RSpec.describe SessionsHelper, type: :helper do
     it "remembers the user" do
       expect(helper).to receive(:remember_user)
 
-      helper.create_user_session(user)
+      helper.create_user_session
     end
   end
 

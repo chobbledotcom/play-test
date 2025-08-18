@@ -89,8 +89,8 @@ module SessionsHelper
     User.find_by(email: email.downcase)&.authenticate(password)
   end
 
-  sig { params(user: User).void }
-  def create_user_session(_user)
+  sig { void }
+  def create_user_session
     remember_user
   end
 
