@@ -1,14 +1,14 @@
 ---
-name: actionpack
-version: 8.0.2.1
+name: rspec_junit_formatter
+version: 0.6.0
 type: bundler
-summary: Web-flow and rendering framework putting the VC in MVC (part of Rails).
-homepage: https://rubyonrails.org
+summary: RSpec JUnit XML formatter
+homepage: https://github.com/sj26/rspec_junit_formatter
 license: mit
 licenses:
-- sources: MIT-LICENSE
-  text: |+
-    Copyright (c) David Heinemeier Hansson
+- sources: LICENSE
+  text: |
+    Copyright (c) 2011-2022 Samuel Cochran
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
@@ -28,10 +28,6 @@ licenses:
     LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
     WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-- sources: README.rdoc
-  text: |-
-    Action Pack is released under the MIT license:
-
-    * https://opensource.org/licenses/MIT
+- sources: README.md
+  text: The MIT License, see [LICENSE](./LICENSE).
 notices: []

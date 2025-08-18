@@ -1,4 +1,3 @@
-# typed: strict
 # frozen_string_literal: true
 
 # == Route Map
@@ -141,6 +140,8 @@
 #                         job GET    /jobs/:id(.:format)                                            mission_control/jobs/jobs#show
 #                        jobs GET    /:status/jobs(.:format)                                        mission_control/jobs/jobs#index
 #                        root GET    /                                                              mission_control/jobs/queues#index
+
+# typed: strict
 
 Rails.application.routes.draw do
   # Mount Mission Control Jobs (authentication handled by initializer)

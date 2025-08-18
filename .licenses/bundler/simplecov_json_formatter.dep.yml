@@ -1,16 +1,14 @@
 ---
-name: actionmailbox
-version: 8.0.2.1
+name: simplecov_json_formatter
+version: 0.1.4
 type: bundler
-summary: Inbound email handling framework.
-homepage: https://rubyonrails.org
+summary: JSON formatter for SimpleCov
+homepage: https://github.com/fede-moya/simplecov_json_formatter
 license: mit
 licenses:
-- sources: MIT-LICENSE
+- sources: Auto-generated MIT license text
   text: |
     MIT License
-
-    Copyright (c) 37signals LLC
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +27,4 @@ licenses:
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-- sources: README.md
-  text: Action Mailbox is released under the [MIT License](https://opensource.org/licenses/MIT).
 notices: []
