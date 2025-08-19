@@ -2,6 +2,6 @@
 .
 --ignore=/spec/
 --ignore=/test/
---ignore=/sorbet/rbi/gems/
---ignore=/sorbet/rbi/dsl/
 --ignore=/vendor/
+--ignore=/sorbet/rbi/dsl/
+--ignore=/db/

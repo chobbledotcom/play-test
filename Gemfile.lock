@@ -624,7 +624,7 @@ DEPENDENCIES
   sentry-ruby
   simplecov
   simplecov-cobertura
-  solid_queue (~> 1.0)
+  solid_queue
   sorbet
   sorbet-runtime (= 0.5.12016)
   sprockets-rails

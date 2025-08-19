@@ -14,7 +14,7 @@ module SessionManagement
     )
 
     session[:session_token] = user_session.session_token
-    create_user_session(user)
+    create_user_session
 
     user_session
   end

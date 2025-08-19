@@ -23,11 +23,11 @@ module InspectionsHelper
     end
   end
 
-  sig {
+  sig do
     params(inspection: Inspection).returns(
       T::Array[T::Hash[Symbol, T.any(String, Symbol, T::Boolean)]]
     )
-  }
+  end
   def inspection_actions(inspection)
     actions = T.let([], T::Array[T::Hash[Symbol, T.any(String, Symbol, T::Boolean)]])
 
@@ -115,18 +115,16 @@ module InspectionsHelper
     current_tab_incomplete = !assessment_complete?(inspection, current_tab)
 
     # Find first incomplete tab after current (excluding results for now)
-    next_incomplete = tabs_after.find { |tab|
+    next_incomplete = tabs_after.find do |tab|
       tab != "results" && !assessment_complete?(inspection, tab)
-    }
+    end
 
     # If current tab is incomplete and there's a next tab available
     if current_tab_incomplete && tabs_after.any?
       incomplete_count = incomplete_fields_count(inspection, current_tab)
 
       # If there's an incomplete tab after, user should skip current incomplete
-      if next_incomplete
-        return {tab: next_incomplete, skip_incomplete: true, incomplete_count: incomplete_count}
-      end
+      return {tab: next_incomplete, skip_incomplete: true, incomplete_count: incomplete_count} if next_incomplete
 
       # If results tab is incomplete, user should skip to results
       if tabs_after.include?("results") && inspection.passed.nil?
@@ -138,14 +136,10 @@ module InspectionsHelper
     end
 
     # Current tab is complete, just suggest next incomplete tab
-    if next_incomplete
-      return {tab: next_incomplete, skip_incomplete: false}
-    end
+    return {tab: next_incomplete, skip_incomplete: false} if next_incomplete
 
     # Check if results tab is incomplete
-    if tabs_after.include?("results") && inspection.passed.nil?
-      return {tab: "results", skip_incomplete: false}
-    end
+    return {tab: "results", skip_incomplete: false} if tabs_after.include?("results") && inspection.passed.nil?
 
     nil
   end

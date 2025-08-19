@@ -226,27 +226,27 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     it "correctly identifies pass fields vs other boolean fields" do
       # Test that the builder correctly distinguishes between actual pass/fail fields
       # and other fields that might have "pass" in their name
-      
+
       # Test with known pass field from materials assessment
       assessment.fabric_strength_pass = true
       fields = {pass: :fabric_strength_pass}
-      
+
       pass_value = builder.send(:determine_pass_value, fields, :fabric_strength_pass, true)
       expect(pass_value).to eq(true)
-      
+
       # Test field grouping logic for fields with "pass" in the name
       field_keys = [:fabric_strength_pass, :fabric_strength_comment, :thread_pass]
       groups = builder.send(:group_assessment_fields, field_keys)
       expect(groups.keys).to include(:fabric_strength, :thread)
       expect(groups[:fabric_strength][:pass]).to eq(:fabric_strength_pass)
-      
+
       # Test that when main field is the pass field itself, it returns the assessment value
       assessment.thread_pass = false
       fields_with_only_pass = {pass: :thread_pass}
       pass_value = builder.send(:determine_pass_value, fields_with_only_pass, :thread_pass, true)
       # When the main field IS the pass field, it returns the value from assessment
       expect(pass_value).to eq(false)
-      
+
       # Test that fields without pass suffix return nil for pass_fail
       assessment.ropes = 25
       fields_without_pass = {base: :ropes}

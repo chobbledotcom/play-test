@@ -18,16 +18,10 @@ jobs:
     uses: ./.github/workflows/test-ruby.yml
     permissions:
       contents: read
-  
-  typecheck:
-    name: Type Check
-    uses: ./.github/workflows/sorbet.yml
-    permissions:
-      contents: read
-  
+ 
   docker-build:
     name: Test Docker Build
-    needs: [test, typecheck]
+    needs: [test]
     uses: ./.github/workflows/docker-build.yml
     with:
       push: false

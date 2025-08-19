@@ -48,16 +48,21 @@ class ApplicationController < ActionController::Base
     raise exception
   end
 
-  private
-
   sig { returns(T::Boolean) }
   def skip_authentication?
     false
   end
 
+  # Class method version for use in rescue_from blocks
+  sig { params(table: Symbol, key: Symbol, args: T.untyped).returns(String) }
+  def self.app_i18n(table, key, **args)
+    I18n.t("application.#{table}.#{key}", **args)
+  end
+
+  # Instance method delegates to class method
   sig { params(table: Symbol, key: Symbol, args: T.untyped).returns(String) }
   def app_i18n(table, key, **args)
-    I18n.t("application.#{table}.#{key}", **args)
+    self.class.app_i18n(table, key, **args)
   end
 
   sig { params(form: Symbol, key: T.any(Symbol, String), args: T.untyped).returns(String) }
@@ -88,9 +93,9 @@ class ApplicationController < ActionController::Base
     current_user.update(last_active_at: Time.current)
 
     # Update UserSession last_active_at
-    if session[:session_token]
-      current_session&.touch_last_active
-    end
+    return unless session[:session_token]
+
+    current_session&.touch_last_active
   end
 
   sig { void }
@@ -195,9 +200,7 @@ class ApplicationController < ActionController::Base
       return false if csrf_ignored_actions.include?(action)
     end
 
-    if exception.is_a?(ActionController::InvalidCrossOriginRequest)
-      return false unless logged_in?
-    end
+    return false if exception.is_a?(ActionController::InvalidCrossOriginRequest) && !logged_in?
 
     true
   end

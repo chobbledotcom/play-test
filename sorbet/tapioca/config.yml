@@ -1,3 +1,8 @@
 gem:
   exclude:
     - aws-sdk-core  # Contains example tokens that trigger GitHub secret scanning
+    - spoom  # Incompatibility with rbi 0.3.6
+    - solid_queue  # ActiveModel loading issue
+dsl:
+  exclude:
+    - Tapioca::Dsl::Compilers::ActiveJob  # SolidQueue adapter loading issue

@@ -10,7 +10,10 @@ module ControllerContext
 
   abstract!
 
-  # Core Rails controller methods
+  # These methods are provided by ActionController/ActionView
+  # We declare them as abstract so Sorbet knows about them
+  # but doesn't provide implementations that would override Rails
+
   sig { abstract.returns(T.untyped) }
   def session
   end
@@ -31,15 +34,15 @@ module ControllerContext
   def flash
   end
 
-  sig { abstract.returns(T.untyped) }
-  def redirect_to
+  sig { abstract.params(args: T.untyped).returns(T.untyped) }
+  def redirect_to(*args)
   end
 
-  sig { abstract.returns(T.untyped) }
-  def render
+  sig { abstract.params(args: T.untyped).returns(T.untyped) }
+  def render(*args)
   end
 
-  sig { abstract.returns(T.untyped) }
-  def respond_to
+  sig { abstract.params(args: T.untyped, block: T.untyped).returns(T.untyped) }
+  def respond_to(*args, &block)
   end
 end
