@@ -62,15 +62,6 @@ class Assessments::AnchorageAssessment < ApplicationRecord
     (num_low_anchors || 0) + (num_high_anchors || 0)
   end
 
-  sig { returns(T.any(Object, NilClass)) }
-  def anchorage_result
-    @anchor_result ||= EN14960.calculate_anchors(
-      length: inspection.length.to_f,
-      width: inspection.width.to_f,
-      height: inspection.height.to_f
-    )
-  end
-
   sig { returns(Integer) }
   def required_anchors
     return 0 if inspection.volume.blank?
@@ -81,5 +72,16 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   def anchorage_breakdown
     return [] unless inspection.volume
     anchorage_result.breakdown
+  end
+
+  private
+
+  sig { returns(T.any(Object, NilClass)) }
+  def anchorage_result
+    @anchor_result ||= EN14960.calculate_anchors(
+      length: inspection.length.to_f,
+      width: inspection.width.to_f,
+      height: inspection.height.to_f
+    )
   end
 end
