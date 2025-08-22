@@ -13,6 +13,22 @@ RSpec.describe S3BackupService do
   let(:compressed_filename) { "database-#{timestamp}.tar.gz" }
   let(:s3_key) { "db_backups/#{compressed_filename}" }
 
+  # Helper method to mock tar compression and create the compressed file
+  def mock_tar_compression(service, content_size: 1000)
+    allow(service).to receive(:system).with(
+      "tar", "-czf", anything,
+      "-C", anything, anything,
+      exception: true
+    ) do |*args|
+      # Extract the destination path from the tar command arguments
+      dest_path = args[2]
+      # Create the compressed file that would be created by tar
+      FileUtils.touch(dest_path)
+      File.write(dest_path, "compressed content" * content_size)
+      true
+    end
+  end
+
   before do
     allow(Time).to receive(:current).and_return(Time.zone.parse("2024-01-15 10:00:00"))
     allow(ENV).to receive(:[]).and_call_original
@@ -85,19 +101,8 @@ RSpec.describe S3BackupService do
           exception: true
         ).and_return(true)
 
-        # Mock tar compression and create the compressed file when called
-        allow(service).to receive(:system).with(
-          "tar", "-czf", anything,
-          "-C", anything, anything,
-          exception: true
-        ) do |*args|
-          # Extract the destination path from the tar command arguments
-          dest_path = args[2]
-          # Create the compressed file that would be created by tar
-          FileUtils.touch(dest_path)
-          File.write(dest_path, "compressed content" * 1000)
-          true
-        end
+        # Mock tar compression
+        mock_tar_compression(service)
 
         # Mock S3 upload
         allow(s3_service).to receive(:upload)
@@ -341,18 +346,8 @@ RSpec.describe S3BackupService do
           exception: true
         ).and_return(true)
 
-        allow(service).to receive(:system).with(
-          "tar", "-czf", /database-2025-12-31\.tar\.gz/,
-          "-C", anything, "database-2025-12-31.sqlite3",
-          exception: true
-        ) do |*args|
-          # Extract the destination path from the tar command arguments
-          dest_path = args[2]
-          # Create the compressed file that would be created by tar
-          FileUtils.touch(dest_path)
-          File.write(dest_path, "compressed content" * 1000)
-          true
-        end
+        # Mock tar compression
+        mock_tar_compression(service)
         allow(s3_service).to receive(:upload)
         allow(bucket).to receive(:objects).and_return([])
 
@@ -377,19 +372,8 @@ RSpec.describe S3BackupService do
           exception: true
         ).and_return(true)
 
-        # Mock tar compression and create the compressed file when called
-        allow(service).to receive(:system).with(
-          "tar", "-czf", anything,
-          "-C", anything, anything,
-          exception: true
-        ) do |*args|
-          # Extract the destination path from the tar command arguments
-          dest_path = args[2]
-          # Create the compressed file that would be created by tar
-          FileUtils.touch(dest_path)
-          File.write(dest_path, "compressed content" * 1000)
-          true
-        end
+        # Mock tar compression
+        mock_tar_compression(service)
         
         allow(s3_service).to receive(:upload)
       end
