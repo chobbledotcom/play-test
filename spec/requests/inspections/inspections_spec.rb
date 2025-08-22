@@ -741,11 +741,14 @@ RSpec.describe "Inspections", type: :request do
       end
 
       it "serves JSON via .json format" do
-        allow(JsonSerializerService).to receive(:serialize_inspection).and_return({id: inspection.id})
-
         get "/inspections/#{inspection.id}.json"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("application/json")
+        
+        json = JSON.parse(response.body)
+        expect(json).to be_present
+        expect(json).to have_key("complete")
+        expect(json).to have_key("urls")
       end
 
       it "serves QR code via .png format" do

@@ -58,7 +58,8 @@ class PdfGeneratorService
 
     def self.process_image_with_orientation(attachment)
       image = create_image(attachment)
-      ImageOrientationProcessor.process_with_orientation(image)
+      # Vips automatically handles EXIF orientation
+      image.write_to_buffer(".png")
     end
 
     def self.calculate_footer_photo_dimensions(pdf, image, column_count = 3)
