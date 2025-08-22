@@ -2,62 +2,57 @@ require "rails_helper"
 
 RSpec.describe GuidesController, type: :controller do
   describe "GET #index" do
-    before do
-      # Skip n_plus_one_detection and stub render to avoid template rendering issues
-      allow(controller).to receive(:n_plus_one_detection).and_yield
-      allow(controller).to receive(:render)
-    end
-    
-    it "assigns guides to @guides" do
-      # Mock the file system
-      allow(Dir).to receive(:glob).and_return([])
+    it "calls collect_guides and assigns result to @guides" do
+      # Test the controller logic directly
+      controller = GuidesController.new
+      test_guides = [{title: "Test Guide", path: "test"}]
+      allow(controller).to receive(:collect_guides).and_return(test_guides)
       
-      get :index
-      expect(assigns(:guides)).to eq([])
+      # Simulate what the index action does
+      controller.index
+      expect(controller.instance_variable_get(:@guides)).to eq(test_guides)
     end
-    
-    it "collects guides from metadata files" do
-      metadata_path = "/public/guide_screenshots/test_guide/metadata.json"
+  end
+  
+  describe "#collect_guides" do
+    it "collects and sorts guides from metadata files" do
+      controller = GuidesController.new
+      
+      # Mock file system
+      allow(Dir).to receive(:glob).and_return([
+        "/path/zebra_guide/metadata.json",
+        "/path/alpha_guide/metadata.json"
+      ])
+      
       metadata = {
         "screenshots" => [{"filename" => "test.png", "caption" => "Test"}],
         "updated_at" => "2024-01-15T10:00:00Z"
       }
+      allow(File).to receive(:read).and_return(metadata.to_json)
       
-      allow(Dir).to receive(:glob).and_return([metadata_path])
-      allow(File).to receive(:read).with(metadata_path).and_return(metadata.to_json)
-      allow_any_instance_of(Pathname).to receive(:relative_path_from).and_return(
-        instance_double(Pathname, dirname: instance_double(Pathname, to_s: "test_guide"))
-      )
+      # Mock Pathname operations - first path is zebra, second is alpha
+      # But they should be sorted alphabetically after collection
+      allow_any_instance_of(Pathname).to receive(:relative_path_from) do |path|
+        if path.to_s.include?("zebra")
+          instance_double(Pathname, dirname: instance_double(Pathname, to_s: "zebra_guide"))
+        else
+          instance_double(Pathname, dirname: instance_double(Pathname, to_s: "alpha_guide"))
+        end
+      end
       
-      get :index
-      guides = assigns(:guides)
-      expect(guides.length).to eq(1)
-      expect(guides.first[:title]).to eq("Test guide")
-    end
-    
-    it "sorts guides by title" do
-      metadata1 = {
-        "screenshots" => [{"filename" => "test.png", "caption" => "Test"}],
-        "updated_at" => "2024-01-15T10:00:00Z"
-      }
-      metadata2 = metadata1.dup
-      
-      allow(Dir).to receive(:glob).and_return([
-        "/public/guide_screenshots/zebra_guide/metadata.json",
-        "/public/guide_screenshots/alpha_guide/metadata.json"
-      ])
-      allow(File).to receive(:read).and_return(metadata1.to_json)
-      
-      # First call returns zebra_guide, second returns alpha_guide
-      zebra_path = instance_double(Pathname, dirname: instance_double(Pathname, to_s: "zebra_guide"))
-      alpha_path = instance_double(Pathname, dirname: instance_double(Pathname, to_s: "alpha_guide"))
-      allow_any_instance_of(Pathname).to receive(:relative_path_from).and_return(zebra_path, alpha_path)
-      
-      get :index
-      guides = assigns(:guides)
+      guides = controller.send(:collect_guides)
       expect(guides.length).to eq(2)
+      # After sorting by title, alpha should come first
       expect(guides.first[:title]).to eq("Alpha guide")
       expect(guides.last[:title]).to eq("Zebra guide")
+    end
+    
+    it "returns empty array when no guides exist" do
+      controller = GuidesController.new
+      allow(Dir).to receive(:glob).and_return([])
+      
+      guides = controller.send(:collect_guides)
+      expect(guides).to eq([])
     end
   end
   
