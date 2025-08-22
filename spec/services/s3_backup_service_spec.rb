@@ -85,16 +85,19 @@ RSpec.describe S3BackupService do
           exception: true
         ).and_return(true)
 
-        # Mock tar compression
+        # Mock tar compression and create the compressed file when called
         allow(service).to receive(:system).with(
           "tar", "-czf", anything,
           "-C", anything, anything,
           exception: true
-        ).and_return(true)
-
-        # Create mock compressed file
-        FileUtils.touch(temp_compressed_path)
-        File.write(temp_compressed_path, "compressed content" * 1000)
+        ) do |*args|
+          # Extract the destination path from the tar command arguments
+          dest_path = args[2]
+          # Create the compressed file that would be created by tar
+          FileUtils.touch(dest_path)
+          File.write(dest_path, "compressed content" * 1000)
+          true
+        end
 
         # Mock S3 upload
         allow(s3_service).to receive(:upload)
@@ -342,9 +345,14 @@ RSpec.describe S3BackupService do
           "tar", "-czf", /database-2025-12-31\.tar\.gz/,
           "-C", anything, "database-2025-12-31.sqlite3",
           exception: true
-        ).and_return(true)
-
-        FileUtils.touch(temp_compressed_path)
+        ) do |*args|
+          # Extract the destination path from the tar command arguments
+          dest_path = args[2]
+          # Create the compressed file that would be created by tar
+          FileUtils.touch(dest_path)
+          File.write(dest_path, "compressed content" * 1000)
+          true
+        end
         allow(s3_service).to receive(:upload)
         allow(bucket).to receive(:objects).and_return([])
 
@@ -358,8 +366,31 @@ RSpec.describe S3BackupService do
       let(:temp_compressed_path) { temp_dir.join(compressed_filename) }
 
       before do
+        # Default stub for any system calls
         allow(service).to receive(:system).and_return(true)
-        FileUtils.touch(temp_compressed_path)
+        
+        # Mock database backup creation
+        allow(service).to receive(:system).with(
+          "sqlite3",
+          anything,
+          /\.backup/,
+          exception: true
+        ).and_return(true)
+
+        # Mock tar compression and create the compressed file when called
+        allow(service).to receive(:system).with(
+          "tar", "-czf", anything,
+          "-C", anything, anything,
+          exception: true
+        ) do |*args|
+          # Extract the destination path from the tar command arguments
+          dest_path = args[2]
+          # Create the compressed file that would be created by tar
+          FileUtils.touch(dest_path)
+          File.write(dest_path, "compressed content" * 1000)
+          true
+        end
+        
         allow(s3_service).to receive(:upload)
       end
 
