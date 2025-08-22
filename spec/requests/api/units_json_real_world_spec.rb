@@ -64,10 +64,6 @@ RSpec.describe "Unit JSON real-world scenarios", type: :request do
         found_unit = Unit.find_by(id: unit.id.upcase)
         expect(found_unit).to eq(unit)
 
-        # Test serializer directly with the found unit
-        json = JsonSerializerService.serialize_unit(found_unit)
-        expect(json[:inspection_history]).to be_present
-
         # Now test through the actual endpoint
         get "/units/#{unit.id}.json"
         response_json = JSON.parse(response.body)

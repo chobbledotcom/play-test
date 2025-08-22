@@ -83,9 +83,10 @@ RSpec.describe "Unit JSON inspection history", type: :request do
       expect(unit_with_inspections.inspections.first.complete?).to eq(true)
     end
 
-    it "returns correct data when called directly on model" do
-      # Test the serializer directly
-      json = JsonSerializerService.serialize_unit(unit.reload)
+    it "returns correct data through the API endpoint" do
+      # Test through the actual endpoint
+      get "/units/#{unit.id}.json"
+      json = JSON.parse(response.body, symbolize_names: true)
 
       expect(json[:inspection_history]).to be_present
       expect(json[:inspection_history].length).to eq(1)
