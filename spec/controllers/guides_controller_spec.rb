@@ -3,12 +3,9 @@ require "rails_helper"
 RSpec.describe GuidesController, type: :controller do
   describe "GET #index" do
     before do
-      # Mock the response to avoid template rendering
-      allow(controller).to receive(:respond_to) do |&block|
-        mock_responder = double("responder")
-        allow(mock_responder).to receive(:html)
-        block.call(mock_responder) if block
-      end
+      # Skip n_plus_one_detection and stub render to avoid template rendering issues
+      allow(controller).to receive(:n_plus_one_detection).and_yield
+      allow(controller).to receive(:render)
     end
     
     it "assigns guides to @guides" do
@@ -68,12 +65,10 @@ RSpec.describe GuidesController, type: :controller do
     let(:guide_path) { "test_guide" }
     
     before do
-      # Mock the response to avoid template rendering
-      allow(controller).to receive(:respond_to) do |&block|
-        mock_responder = double("responder")
-        allow(mock_responder).to receive(:html)
-        block.call(mock_responder) if block
-      end
+      # Skip n_plus_one_detection and stub render/redirect to avoid template rendering issues
+      allow(controller).to receive(:n_plus_one_detection).and_yield
+      allow(controller).to receive(:render)
+      allow(controller).to receive(:redirect_to)
     end
     
     context "when metadata file exists" do
@@ -116,14 +111,18 @@ RSpec.describe GuidesController, type: :controller do
         allow(Rails).to receive_message_chain(:public_path, :join).and_return(
           instance_double(Pathname, join: metadata_file)
         )
+        # Don't stub redirect_to for these tests
+        allow(controller).to receive(:render)
       end
       
       it "redirects to guides path when metadata doesn't exist" do
+        allow(controller).to receive(:redirect_to).and_call_original
         get :show, params: { path: guide_path }
         expect(response).to redirect_to(guides_path)
       end
       
       it "sets flash alert when guide not found" do
+        allow(controller).to receive(:redirect_to).and_call_original
         get :show, params: { path: guide_path }
         expect(flash[:alert]).to eq(I18n.t("guides.messages.not_found"))
       end
