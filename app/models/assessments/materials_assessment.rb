@@ -54,9 +54,4 @@ class Assessments::MaterialsAssessment < ApplicationRecord
   enum :artwork_pass, Inspection::PASS_FAIL_NA, prefix: true
 
   after_update :log_assessment_update, if: :saved_changes?
-
-  sig { returns(T::Boolean) }
-  def ropes_compliant?
-    EN14960.valid_rope_diameter?(ropes)
-  end
 end

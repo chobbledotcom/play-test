@@ -66,16 +66,6 @@ class Assessments::SlideAssessment < ApplicationRecord
     )
   end
 
-  sig { returns(String) }
-  def runout_compliance_status
-    return I18n.t("forms.slide.compliance.not_assessed") if runout.blank?
-    if meets_runout_requirements?
-      I18n.t("forms.slide.compliance.compliant")
-    else
-      I18n.t("forms.slide.compliance.non_compliant",
-        required: required_runout_length)
-    end
-  end
 
   sig { returns(T::Boolean) }
   def meets_wall_height_requirements?
