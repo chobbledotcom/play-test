@@ -144,7 +144,7 @@ RSpec.describe "Sessions", type: :request do
     context "with valid passkey authentication" do
       it "authenticates user and creates session" do
         # Set up session by calling passkey endpoint first
-        challenge = setup_passkey_session
+        setup_passkey_session
 
         # Mock WebAuthn credential
         mock_webauthn_credential = instance_double(
