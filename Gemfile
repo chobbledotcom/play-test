@@ -27,7 +27,7 @@ gem "en14960"
 
 # Sorbet runtime (needed in all environments and
 # pinned for nixpkgs)
-gem "sorbet-runtime", "= 0.5.12016"
+gem "sorbet-runtime", "0.5.12435"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
