@@ -229,8 +229,8 @@ RSpec.describe Inspection, type: :model do
     it "handles end date correctly with DateTime fields" do
       # Date ranges with DateTime columns only include times before midnight of end date + 1
       on_end_early = create(:inspection, inspection_date: Time.zone.local(2024, 1, 30, 23, 59, 59))
-      after_end = create(:inspection, inspection_date: Time.zone.local(2024, 1, 31, 0, 0, 1))
-      
+      create(:inspection, inspection_date: Time.zone.local(2024, 1, 31, 0, 0, 1))
+
       result = Inspection.filter_by_date_range(start_date, end_date)
       expect(result).to include(on_end_early)
       # Note: Rails Date ranges exclude times on the end date itself for DateTime fields
