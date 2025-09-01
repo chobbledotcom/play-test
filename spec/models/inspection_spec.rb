@@ -466,8 +466,9 @@ RSpec.describe Inspection, type: :model do
       expect(yielded_keys).to include(:slide_assessment)
     end
 
-    it "works without a block given" do
-      expect { inspection.each_applicable_assessment }.not_to raise_error
+    it "requires a block to be given" do
+      # The method has a Sorbet signature requiring a block
+      expect { inspection.each_applicable_assessment }.to raise_error(TypeError)
     end
   end
 
