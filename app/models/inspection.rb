@@ -305,21 +305,6 @@ class Inspection < ApplicationRecord
       !indoor_only.nil?
   end
 
-  sig { returns(T::Hash[Symbol, T.any(T::Boolean, T::Array[String])]) }
-  def completion_status
-    complete = complete?
-    all_assessments_complete = all_assessments_complete?
-    missing_assessments = get_missing_assessments
-    can_be_completed = can_be_completed?
-
-    {
-      complete:,
-      all_assessments_complete:,
-      missing_assessments:,
-      can_be_completed:
-    }
-  end
-
   sig { returns(T::Boolean) }
   def can_mark_complete? = can_be_completed?
 
@@ -391,10 +376,6 @@ class Inspection < ApplicationRecord
       resource: self,
       details: details
     )
-  rescue => e
-    # Fallback to logging if Event creation fails
-    Rails.logger.error("Failed to create event: #{e.message}")
-    Rails.logger.info("Inspection #{id}: #{action} by #{user&.email} - #{details}")
   end
 
   sig { params(form: T.any(Symbol, String), field: T.any(Symbol, String)).returns(String) }
