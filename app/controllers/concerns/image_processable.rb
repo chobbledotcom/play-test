@@ -77,8 +77,9 @@ module ImageProcessable
       end
       format.turbo_stream do
         flash.now[:alert] = exception.message
-        render turbo_stream: turbo_stream.replace("flash",
-          partial: "shared/flash")
+        # For turbo_stream, we just need to redirect back with the flash message
+        # The application layout will handle rendering the flash
+        redirect_back(fallback_location: root_path, status: :see_other)
       end
     end
   end

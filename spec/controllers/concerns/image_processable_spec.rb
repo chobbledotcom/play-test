@@ -21,7 +21,8 @@ RSpec.describe ImageProcessable, type: :controller do
     define_method(:upload) do
       processed_io = process_image(params[:file])
       render json: {success: true, processed: processed_io.present?}
-    rescue ApplicationErrors::NotAnImageError, ApplicationErrors::ImageProcessingError => e
+    rescue ApplicationErrors::NotAnImageError,
+      ApplicationErrors::ImageProcessingError => e
       handle_image_error(e)
     end
 
@@ -29,7 +30,8 @@ RSpec.describe ImageProcessable, type: :controller do
       validate_image!(params[:file])
       render json: {valid: true}
     rescue ApplicationErrors::NotAnImageError => e
-      render json: {valid: false, error: e.message}, status: :unprocessable_entity
+      render json: {valid: false, error: e.message},
+        status: :unprocessable_entity
     end
 
     # Test methods for rescue_from handlers
@@ -48,7 +50,8 @@ RSpec.describe ImageProcessable, type: :controller do
     # Test method for handle_image_error
     define_method(:test_error) do
       raise params[:error_type].constantize.new(params[:message])
-    rescue ApplicationErrors::NotAnImageError, ApplicationErrors::ImageProcessingError => e
+    rescue ApplicationErrors::NotAnImageError,
+      ApplicationErrors::ImageProcessingError => e
       handle_image_error(e)
     end
   end
@@ -129,7 +132,8 @@ RSpec.describe ImageProcessable, type: :controller do
 
     context "when processing invalid images" do
       it "sets field to nil when image is invalid" do
-        allow(PhotoProcessingService).to receive(:valid_image?).and_return(false)
+        allow(PhotoProcessingService).to receive(:valid_image?)
+          .and_return(false)
 
         post :create, params: {item: {photo: invalid_file, name: "Test"}}
 
@@ -139,8 +143,10 @@ RSpec.describe ImageProcessable, type: :controller do
       end
 
       it "sets field to nil when processing fails" do
-        allow(PhotoProcessingService).to receive(:valid_image?).and_return(true)
-        allow(PhotoProcessingService).to receive(:process_upload).and_return(nil)
+        allow(PhotoProcessingService).to receive(:valid_image?)
+          .and_return(true)
+        allow(PhotoProcessingService).to receive(:process_upload)
+          .and_return(nil)
 
         post :create, params: {item: {photo: valid_image, name: "Test"}}
 
@@ -150,7 +156,8 @@ RSpec.describe ImageProcessable, type: :controller do
       end
 
       it "handles ApplicationErrors::NotAnImageError" do
-        allow(PhotoProcessingService).to receive(:valid_image?).and_return(false)
+        allow(PhotoProcessingService).to receive(:valid_image?)
+          .and_return(false)
 
         expect {
           post :create, params: {item: {photo: invalid_file}}
@@ -183,7 +190,8 @@ RSpec.describe ImageProcessable, type: :controller do
       it "returns processed image IO" do
         processed_io = StringIO.new("processed_data")
         allow(PhotoProcessingService).to receive(:valid_image?).and_return(true)
-        allow(PhotoProcessingService).to receive(:process_upload).and_return(processed_io)
+        allow(PhotoProcessingService).to receive(:process_upload)
+          .and_return(processed_io)
 
         post :upload, params: {file: valid_image}
 
@@ -196,35 +204,41 @@ RSpec.describe ImageProcessable, type: :controller do
 
     context "when image is invalid" do
       it "raises NotAnImageError" do
-        allow(PhotoProcessingService).to receive(:valid_image?).and_return(false)
+        allow(PhotoProcessingService).to receive(:valid_image?)
+          .and_return(false)
 
         post :upload, params: {file: valid_image}
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:alert]).to eq(I18n.t("errors.messages.invalid_image_format"))
+        msg = I18n.t("errors.messages.invalid_image_format")
+        expect(flash[:alert]).to eq(msg)
       end
     end
 
     context "when processing fails" do
       it "raises ImageProcessingError when process_upload returns nil" do
         allow(PhotoProcessingService).to receive(:valid_image?).and_return(true)
-        allow(PhotoProcessingService).to receive(:process_upload).and_return(nil)
+        allow(PhotoProcessingService).to receive(:process_upload)
+          .and_return(nil)
 
         post :upload, params: {file: valid_image}
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:alert]).to eq(I18n.t("errors.messages.image_processing_failed"))
+        msg = I18n.t("errors.messages.image_processing_failed")
+        expect(flash[:alert]).to eq(msg)
       end
 
       it "handles Vips::Error and logs the error" do
         vips_error = Vips::Error.new("Vips processing failed")
         allow(PhotoProcessingService).to receive(:valid_image?).and_return(true)
-        allow(PhotoProcessingService).to receive(:process_upload).and_raise(vips_error)
+        allow(PhotoProcessingService).to receive(:process_upload)
+          .and_raise(vips_error)
         allow(Rails.logger).to receive(:error)
 
         post :upload, params: {file: valid_image}
 
-        expect(Rails.logger).to have_received(:error).with("Image processing failed: Vips processing failed")
+        error_msg = "Image processing failed: Vips processing failed"
+        expect(Rails.logger).to have_received(:error).with(error_msg)
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to include("Vips processing failed")
       end
@@ -254,7 +268,8 @@ RSpec.describe ImageProcessable, type: :controller do
       expect(response).to have_http_status(:unprocessable_entity)
       parsed_response = JSON.parse(response.body)
       expect(parsed_response["valid"]).to be false
-      expect(parsed_response["error"]).to eq(I18n.t("errors.messages.invalid_image_format"))
+      msg = I18n.t("errors.messages.invalid_image_format")
+      expect(parsed_response["error"]).to eq(msg)
     end
   end
 
@@ -274,7 +289,8 @@ RSpec.describe ImageProcessable, type: :controller do
         request.env["HTTP_REFERER"] = "/previous_page"
 
         post :test_error, params: {
-          error_type: "ApplicationErrors::ImageProcessingError",
+          error_type:
+            "ApplicationErrors::ImageProcessingError",
           message: "Processing failed"
         }
 
@@ -284,14 +300,14 @@ RSpec.describe ImageProcessable, type: :controller do
     end
 
     context "with turbo_stream format" do
-      it "sets flash.now and renders turbo stream" do
+      it "sets flash.now and redirects with see_other status" do
         post :test_error, params: {
           error_type: "ApplicationErrors::NotAnImageError",
           message: "Invalid image"
         }, format: :turbo_stream
 
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to include("text/vnd.turbo-stream.html")
+        expect(response).to have_http_status(:see_other)
+        expect(response).to redirect_to(root_path)
         expect(flash.now[:alert]).to eq("Invalid image")
       end
     end
@@ -328,7 +344,8 @@ RSpec.describe ImageProcessable, type: :controller do
         item: {photo: valid_image, name: "Test"}
       )
 
-      result = controller.send(:process_image_params, controller.params[:item], :photo)
+      result = controller.send(:process_image_params,
+        controller.params[:item], :photo)
 
       expect(result).to be_a(ActionController::Parameters)
       expect(result[:name]).to eq("Test")
