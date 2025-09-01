@@ -352,6 +352,56 @@ RSpec.describe Inspection, type: :model do
     end
   end
 
+  describe "#area" do
+    it "returns nil when width is nil" do
+      inspection.width = nil
+      inspection.length = 10
+      expect(inspection.area).to be_nil
+    end
+
+    it "returns nil when length is nil" do
+      inspection.width = 10
+      inspection.length = nil
+      expect(inspection.area).to be_nil
+    end
+
+    it "returns width * length when both present" do
+      inspection.width = 5.5
+      inspection.length = 7.2
+      expect(inspection.area).to eq(39.6)
+    end
+  end
+
+  describe "#volume" do
+    it "returns nil when width is nil" do
+      inspection.width = nil
+      inspection.length = 10
+      inspection.height = 5
+      expect(inspection.volume).to be_nil
+    end
+
+    it "returns nil when length is nil" do
+      inspection.width = 10
+      inspection.length = nil
+      inspection.height = 5
+      expect(inspection.volume).to be_nil
+    end
+
+    it "returns nil when height is nil" do
+      inspection.width = 10
+      inspection.length = 10
+      inspection.height = nil
+      expect(inspection.volume).to be_nil
+    end
+
+    it "returns width * length * height when all present" do
+      inspection.width = 5.5
+      inspection.length = 7.2
+      inspection.height = 3.3
+      expect(inspection.volume).to eq(130.68)
+    end
+  end
+
   describe "#complete!" do
     it "sets complete_date and logs audit action" do
       inspection.complete_date = nil
@@ -360,6 +410,104 @@ RSpec.describe Inspection, type: :model do
 
       inspection.complete!(user)
       expect(inspection.complete_date).not_to be_nil
+    end
+  end
+
+  describe "#un_complete!" do
+    it "sets complete_date to nil and logs audit action" do
+      inspection.complete_date = Time.current
+      expect(inspection).to receive(:log_audit_action)
+        .with("marked_incomplete", user, "Inspection completed")
+
+      inspection.un_complete!(user)
+      expect(inspection.complete_date).to be_nil
+    end
+  end
+
+  describe "#each_applicable_assessment" do
+    it "yields each applicable assessment with key, class, and instance" do
+      yielded_assessments = []
+      
+      inspection.each_applicable_assessment do |key, klass, assessment|
+        yielded_assessments << [key, klass, assessment]
+      end
+      
+      # Should yield all applicable assessments for a castle
+      expect(yielded_assessments.map(&:first)).to include(
+        :user_height_assessment,
+        :structure_assessment,
+        :materials_assessment,
+        :fan_assessment
+      )
+      
+      # Each yielded assessment should have the correct class
+      yielded_assessments.each do |key, klass, assessment|
+        expect(assessment).to be_a(klass)
+      end
+    end
+
+    it "only yields slide assessment when has_slide is true" do
+      inspection.has_slide = false
+      yielded_keys = []
+      
+      inspection.each_applicable_assessment do |key, _, _|
+        yielded_keys << key
+      end
+      
+      expect(yielded_keys).not_to include(:slide_assessment)
+      
+      inspection.has_slide = true
+      yielded_keys = []
+      
+      inspection.each_applicable_assessment do |key, _, _|
+        yielded_keys << key
+      end
+      
+      expect(yielded_keys).to include(:slide_assessment)
+    end
+
+    it "works without a block given" do
+      expect { inspection.each_applicable_assessment }.not_to raise_error
+    end
+  end
+
+  describe "#completion_errors" do
+    it "returns empty array when everything is complete" do
+      completed_inspection = create(:inspection, :completed)
+      expect(completed_inspection.completion_errors).to be_empty
+    end
+
+    it "includes unit error when unit is missing" do
+      inspection.unit = nil
+      errors = inspection.completion_errors
+      expect(errors).to include("Unit is required")
+    end
+
+    it "includes incomplete field information for each tab" do
+      inspection.user_height_assessment.update(containing_wall_height: nil)
+      errors = inspection.completion_errors
+      
+      expect(errors.any? { |e| e.include?(I18n.t("forms.user_height.header")) }).to be true
+    end
+
+    it "formats errors with tab name and field labels" do
+      inspection.passed = nil
+      errors = inspection.completion_errors
+      
+      expect(errors.any? { |e| e.include?(I18n.t("forms.results.header")) }).to be true
+    end
+  end
+
+  describe "#log_audit_action" do
+    it "creates an event log entry" do
+      expect(Event).to receive(:log).with(
+        user: user,
+        action: "test_action",
+        resource: inspection,
+        details: "Test details"
+      )
+      
+      inspection.log_audit_action("test_action", user, "Test details")
     end
   end
 
