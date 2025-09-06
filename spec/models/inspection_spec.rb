@@ -229,8 +229,8 @@ RSpec.describe Inspection, type: :model do
     it "handles end date correctly with DateTime fields" do
       # Date ranges with DateTime columns only include times before midnight of end date + 1
       on_end_early = create(:inspection, inspection_date: Time.zone.local(2024, 1, 30, 23, 59, 59))
-      after_end = create(:inspection, inspection_date: Time.zone.local(2024, 1, 31, 0, 0, 1))
-      
+      create(:inspection, inspection_date: Time.zone.local(2024, 1, 31, 0, 0, 1))
+
       result = Inspection.filter_by_date_range(start_date, end_date)
       expect(result).to include(on_end_early)
       # Note: Rails Date ranges exclude times on the end date itself for DateTime fields
@@ -427,11 +427,11 @@ RSpec.describe Inspection, type: :model do
   describe "#each_applicable_assessment" do
     it "yields each applicable assessment with key, class, and instance" do
       yielded_assessments = []
-      
+
       inspection.each_applicable_assessment do |key, klass, assessment|
         yielded_assessments << [key, klass, assessment]
       end
-      
+
       # Should yield all applicable assessments for a castle
       expect(yielded_assessments.map(&:first)).to include(
         :user_height_assessment,
@@ -439,7 +439,7 @@ RSpec.describe Inspection, type: :model do
         :materials_assessment,
         :fan_assessment
       )
-      
+
       # Each yielded assessment should have the correct class
       yielded_assessments.each do |key, klass, assessment|
         expect(assessment).to be_a(klass)
@@ -449,20 +449,20 @@ RSpec.describe Inspection, type: :model do
     it "only yields slide assessment when has_slide is true" do
       inspection.has_slide = false
       yielded_keys = []
-      
+
       inspection.each_applicable_assessment do |key, _, _|
         yielded_keys << key
       end
-      
+
       expect(yielded_keys).not_to include(:slide_assessment)
-      
+
       inspection.has_slide = true
       yielded_keys = []
-      
+
       inspection.each_applicable_assessment do |key, _, _|
         yielded_keys << key
       end
-      
+
       expect(yielded_keys).to include(:slide_assessment)
     end
 
@@ -487,14 +487,14 @@ RSpec.describe Inspection, type: :model do
     it "includes incomplete field information for each tab" do
       inspection.user_height_assessment.update(containing_wall_height: nil)
       errors = inspection.completion_errors
-      
+
       expect(errors.any? { |e| e.include?(I18n.t("forms.user_height.header")) }).to be true
     end
 
     it "formats errors with tab name and field labels" do
       inspection.passed = nil
       errors = inspection.completion_errors
-      
+
       expect(errors.any? { |e| e.include?(I18n.t("forms.results.header")) }).to be true
     end
   end
@@ -507,7 +507,7 @@ RSpec.describe Inspection, type: :model do
         resource: inspection,
         details: "Test details"
       )
-      
+
       inspection.log_audit_action("test_action", user, "Test details")
     end
   end
