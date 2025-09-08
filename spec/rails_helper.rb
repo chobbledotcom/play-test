@@ -36,7 +36,7 @@ ActiveStorage::Current.url_options = {
 }
 RSpec.configure do |config|
   config.before(:each) do
-    ENV["ADMIN_EMAILS_PATTERN"] = "^admin\\d*(_[a-f0-9]+)?@example\\.com$"
+    Rails.configuration.admin_emails_pattern = "^admin\\d*(_[a-f0-9]+)?@example\\.com$"
     DatabaseCleaner.strategy = :transaction
   end
 

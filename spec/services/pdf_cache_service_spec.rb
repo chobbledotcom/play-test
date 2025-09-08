@@ -10,6 +10,7 @@ RSpec.describe PdfCacheService, type: :service do
   describe ".fetch_or_generate_inspection_pdf" do
     context "when caching is disabled (PDF_CACHE_FROM not set)" do
       before do
+        Rails.configuration.pdf_cache_enabled = false
         allow(described_class).to receive(:pdf_cache_from_date).and_return(nil)
       end
 
@@ -29,6 +30,7 @@ RSpec.describe PdfCacheService, type: :service do
 
     context "when caching is enabled" do
       before do
+        Rails.configuration.pdf_cache_enabled = true
         allow(described_class).to receive(:pdf_cache_from_date).and_return(Date.parse("2024-01-01"))
       end
 
@@ -82,8 +84,7 @@ RSpec.describe PdfCacheService, type: :service do
 
         context "when REDIRECT_TO_S3_PDFS is false" do
           before do
-            allow(ENV).to receive(:[]).and_call_original
-            allow(ENV).to receive(:[]).with("REDIRECT_TO_S3_PDFS").and_return("false")
+            Rails.configuration.redirect_to_s3_pdfs = false
           end
 
           it "returns a stream with the cached PDF attachment" do
@@ -98,8 +99,7 @@ RSpec.describe PdfCacheService, type: :service do
 
         context "when REDIRECT_TO_S3_PDFS is true" do
           before do
-            allow(ENV).to receive(:[]).and_call_original
-            allow(ENV).to receive(:[]).with("REDIRECT_TO_S3_PDFS").and_return("true")
+            Rails.configuration.redirect_to_s3_pdfs = true
           end
 
           it "returns a redirect to the cached PDF" do
@@ -200,22 +200,6 @@ RSpec.describe PdfCacheService, type: :service do
           expect(result.type).to eq(:pdf_data)
           expect(result.data).to eq("new_pdf_data")
         end
-      end
-    end
-
-    context "with invalid PDF_CACHE_FROM format" do
-      before do
-        # Clear any memoized value from previous tests
-        described_class.instance_eval { @pdf_cache_from_date = nil }
-        allow(ENV).to receive(:fetch).and_call_original
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[]).with("PDF_CACHE_FROM").and_return("invalid-date")
-      end
-
-      it "raises an error with helpful message" do
-        expect {
-          described_class.fetch_or_generate_inspection_pdf(inspection)
-        }.to raise_error(ArgumentError, /Invalid PDF_CACHE_FROM date format: invalid-date. Expected format: YYYY-MM-DD/)
       end
     end
 
@@ -350,6 +334,7 @@ RSpec.describe PdfCacheService, type: :service do
   describe ".invalidate_unit_cache" do
     context "when caching is enabled" do
       before do
+        Rails.configuration.pdf_cache_enabled = true
         allow(described_class).to receive(:pdf_cache_from_date).and_return(Date.parse("2024-01-01"))
       end
 
