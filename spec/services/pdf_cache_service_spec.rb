@@ -302,6 +302,7 @@ RSpec.describe PdfCacheService, type: :service do
   describe ".invalidate_inspection_cache" do
     context "when caching is enabled" do
       before do
+        Rails.configuration.pdf_cache_enabled = true
         allow(described_class).to receive(:pdf_cache_from_date).and_return(Date.parse("2024-01-01"))
       end
 
