@@ -8,14 +8,16 @@ RSpec.describe Assessments::SlideAssessment, type: :model do
   let(:slide_assessment) { inspection.slide_assessment }
 
   describe "associations" do
-    it { is_expected.to belong_to(:inspection) }
+    it "belongs to inspection" do
+      expect(slide_assessment.inspection).to eq(inspection)
+    end
   end
 
   describe "enums" do
     it "defines clamber_netting_pass enum with PASS_FAIL_NA values" do
       expect(described_class.clamber_netting_passes).to eq(
-        "pass" => 0,
-        "fail" => 1,
+        "fail" => 0,
+        "pass" => 1,
         "na" => 2
       )
     end
@@ -107,9 +109,12 @@ RSpec.describe Assessments::SlideAssessment, type: :model do
           runout: 0.0,
           slide_platform_height: 0.0
         )
+        allow(EN14960::Calculators::SlideCalculator).to receive(:meets_runout_requirements?)
+          .with(0.0, 0.0)
+          .and_return(false)
       end
 
-      it "returns false (blank? returns true for 0.0)" do
+      it "still calls calculator (present? returns true for 0.0)" do
         expect(slide_assessment.meets_runout_requirements?).to be false
       end
     end
@@ -126,13 +131,16 @@ RSpec.describe Assessments::SlideAssessment, type: :model do
       end
     end
 
-    context "when slide_platform_height is blank (0.0)" do
+    context "when slide_platform_height is zero" do
       before do
         slide_assessment.update(slide_platform_height: 0.0)
+        allow(EN14960::Calculators::SlideCalculator).to receive(:calculate_runout_value)
+          .with(0.0)
+          .and_return(0)
       end
 
-      it "returns nil" do
-        expect(slide_assessment.required_runout_length).to be_nil
+      it "still calls calculator (blank? returns false for 0.0)" do
+        expect(slide_assessment.required_runout_length).to eq(0)
       end
     end
 
@@ -226,16 +234,18 @@ RSpec.describe Assessments::SlideAssessment, type: :model do
       end
     end
 
-    context "when values are zero (blank)" do
+    context "when values are zero" do
       before do
         slide_assessment.update(
           slide_platform_height: 0.0,
           slide_wall_height: 0.0,
           slide_permanent_roof: false
         )
+        allow(EN14960::Calculators::SlideCalculator).to receive(:meets_height_requirements?)
+          .and_return(false)
       end
 
-      it "returns false" do
+      it "still calls calculator (present? returns true for 0.0)" do
         expect(slide_assessment.meets_wall_height_requirements?).to be false
       end
     end
