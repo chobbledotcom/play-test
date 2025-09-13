@@ -429,7 +429,7 @@ RSpec.describe RpiiVerificationService do
           id: "12345",
           raw_value: "John Smith (RPII, API)"
         })
-        
+
         result = described_class.send(:parse_inspector_item, item)
 
         expect(result).to eq({
@@ -455,7 +455,7 @@ RSpec.describe RpiiVerificationService do
           id: "unique-id",
           raw_value: "Jane Doe (67890) - RPII"
         })
-        
+
         result = described_class.send(:parse_inspector_item, item)
 
         expect(result).to eq({
