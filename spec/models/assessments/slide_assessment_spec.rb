@@ -329,7 +329,7 @@ RSpec.describe Assessments::SlideAssessment, type: :model do
             .once
           expect(EN14960::Calculators::SlideCalculator).not_to receive(:meets_height_requirements?)
             .with(3.0, 1.2, 0.5, false)
-          
+
           slide_assessment.meets_wall_height_requirements?
         end
       end
