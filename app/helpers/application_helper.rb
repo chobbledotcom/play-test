@@ -20,40 +20,40 @@ module ApplicationHelper
 
   sig { returns(String) }
   def effective_theme
-    ENV["THEME"] || current_user&.theme || "light"
+    Rails.configuration.forced_theme || current_user&.theme || "light"
   end
 
   sig { returns(T::Boolean) }
-  def theme_selector_disabled? = ENV["THEME"].present?
+  def theme_selector_disabled? = Rails.configuration.forced_theme.present?
 
   sig { returns(String) }
   def logo_path
-    ENV["LOGO_PATH"] || "logo.svg"
+    Rails.configuration.logo_path
   end
 
   sig { returns(String) }
   def logo_alt_text
-    ENV["LOGO_ALT"] || "play-test logo"
+    Rails.configuration.logo_alt
   end
 
   sig { returns(T.nilable(String)) }
   def left_logo_path
-    ENV["LEFT_LOGO_PATH"]
+    Rails.configuration.left_logo_path
   end
 
   sig { returns(String) }
   def left_logo_alt
-    ENV["LEFT_LOGO_ALT"] || "Logo"
+    Rails.configuration.left_logo_alt
   end
 
   sig { returns(T.nilable(String)) }
   def right_logo_path
-    ENV["RIGHT_LOGO_PATH"]
+    Rails.configuration.right_logo_path
   end
 
   sig { returns(String) }
   def right_logo_alt
-    ENV["RIGHT_LOGO_ALT"] || "Logo"
+    Rails.configuration.right_logo_alt
   end
 
   sig { params(slug: String).returns(T.any(String, ActiveSupport::SafeBuffer)) }

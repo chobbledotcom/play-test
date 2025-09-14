@@ -29,7 +29,7 @@ distrobox enter "$CONTAINER_NAME" -- bash -c "cd '$WORKDIR' && bundle install"
 
 # Run Sorbet type checking (ignoring .gems folder)
 echo "Running Sorbet type check..."
-distrobox enter "$CONTAINER_NAME" -- bash -c "cd '$WORKDIR' && bundle exec srb tc --ignore=.gems/"
+distrobox enter "$CONTAINER_NAME" -- bash -c "cd '$WORKDIR' && bundle exec srb typecheck --ignore=.gems/"
 
 # Also run the check-sorbet-changes script if provided as an argument
 if [[ "$1" == "--check-changes" ]]; then

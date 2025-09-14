@@ -110,7 +110,7 @@ class PdfCacheService
 
     sig { returns(T::Boolean) }
     def caching_enabled?
-      pdf_cache_from_date.present?
+      Rails.configuration.pdf_cache_enabled
     end
 
     sig { params(attachment: T.untyped).returns(String) }
@@ -122,16 +122,7 @@ class PdfCacheService
 
     sig { returns(T.nilable(Date)) }
     def pdf_cache_from_date
-      @pdf_cache_from_date ||= begin
-        date_string = ENV["PDF_CACHE_FROM"]
-        return nil if date_string.blank?
-
-        Date.parse(date_string)
-      rescue ArgumentError
-        error_msg = "Invalid PDF_CACHE_FROM date format: #{date_string}. "
-        error_msg += "Expected format: YYYY-MM-DD"
-        raise ArgumentError, error_msg
-      end
+      Rails.configuration.pdf_cache_from
     end
 
     sig do
@@ -213,7 +204,7 @@ class PdfCacheService
 
     sig { returns(T::Boolean) }
     def redirect_to_s3?
-      ActiveModel::Type::Boolean.new.cast(ENV["REDIRECT_TO_S3_PDFS"])
+      Rails.configuration.redirect_to_s3_pdfs
     end
   end
 end

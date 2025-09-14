@@ -29,7 +29,7 @@ class UnitBlueprint < Blueprinter::Base
 
   # Add URLs (available in all views)
   field :urls do |unit|
-    base_url = ENV["BASE_URL"]
+    base_url = Rails.configuration.base_url
     {
       report_pdf: "#{base_url}/units/#{unit.id}.pdf",
       report_json: "#{base_url}/units/#{unit.id}.json",

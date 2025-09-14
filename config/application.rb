@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require_relative "boot"
@@ -51,19 +52,53 @@ module PlayTest
     # Preserve full timezone rather than offset in Rails 8.1+
     config.active_support.to_time_preserves_timezone = :zone
 
-    config.active_storage.service =
-      if ENV["USE_S3_STORAGE"]
-        :s3_host
-      else
-        :local
-      end
+    # === Environment Variable Configuration ===
+    # Centralized configuration for all application-level ENV variables
+    # No rescues - if a value exists, we assume it's in the correct format
+
+    # Storage Configuration
+    config.use_s3_storage = ENV["USE_S3_STORAGE"] == "true"
+    config.active_storage.service = config.use_s3_storage ? :s3_host : :local
     config.active_storage.service_urls_expire_in = 1.day
+    config.s3_endpoint = ENV["S3_ENDPOINT"]
+    config.s3_bucket = ENV["S3_BUCKET"]
+    config.s3_region = ENV["S3_REGION"]
+
+    # PDF Generation Configuration
+    config.pdf_cache_enabled = ENV["PDF_CACHE_FROM"].present?
+    if ENV["PDF_CACHE_FROM"].present?
+      config.pdf_cache_from = Date.parse(ENV["PDF_CACHE_FROM"])
+    end
+    config.redirect_to_s3_pdfs = ENV["REDIRECT_TO_S3_PDFS"] == "true"
+    config.pdf_logo = ENV["PDF_LOGO"]
+
+    # Theme and UI Configuration
+    config.forced_theme = ENV["THEME"] # If set, overrides user preference
+    config.logo_path = ENV.fetch("LOGO_PATH", "logo.svg")
+    config.logo_alt = ENV.fetch("LOGO_ALT", "play-test logo")
+    config.left_logo_path = ENV["LEFT_LOGO_PATH"]
+    config.left_logo_alt = ENV.fetch("LEFT_LOGO_ALT", "Logo")
+    config.right_logo_path = ENV["RIGHT_LOGO_PATH"]
+    config.right_logo_alt = ENV.fetch("RIGHT_LOGO_ALT", "Logo")
+
+    # Features and Functionality
+    config.has_assessments = ENV["HAS_ASSESSMENTS"] == "true"
+    config.simple_user_activation = ENV["SIMPLE_USER_ACTIVATION"] == "true"
+    config.admin_emails_pattern = ENV["ADMIN_EMAILS_PATTERN"]
+    config.base_url = ENV.fetch("BASE_URL", "http://localhost:3000")
+    config.app_name = ENV.fetch("APP_NAME", "Play-Test")
+
+    # Notification Configuration
+    config.ntfy_channel_developer = ENV["NTFY_CHANNEL_DEVELOPER"]
+    config.ntfy_channel_admin = ENV["NTFY_CHANNEL_ADMIN"]
+
+    # I18n Configuration
+    default_overrides = Rails.root.join("config/site_overrides.yml").to_s
+    config.i18n_overrides_path = ENV.fetch("I18N_OVERRIDES_PATH", default_overrides)
 
     # Add site-specific i18n overrides
     config.before_initialize do
-      override_path = ENV["I18N_OVERRIDES_PATH"].presence ||
-        Rails.root.join("config/site_overrides.yml").to_s
-
+      override_path = config.i18n_overrides_path
       config.i18n.load_path << override_path if File.exist?(override_path)
     end
 
