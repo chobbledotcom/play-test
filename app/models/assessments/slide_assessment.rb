@@ -66,7 +66,6 @@ class Assessments::SlideAssessment < ApplicationRecord
     )
   end
 
-
   sig { returns(T::Boolean) }
   def meets_wall_height_requirements?
     return false unless slide_platform_height.present? &&

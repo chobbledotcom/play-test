@@ -92,7 +92,7 @@ RSpec.describe S3BackupService do
       before do
         # Default stub for any system calls
         allow(service).to receive(:system).and_return(true)
-        
+
         # Mock database backup creation
         allow(service).to receive(:system).with(
           "sqlite3",
@@ -333,12 +333,12 @@ RSpec.describe S3BackupService do
         expected_compressed = "database-2025-12-31.tar.gz"
         expected_s3_key = "db_backups/database-2025-12-31.tar.gz"
 
-        temp_backup_path = temp_dir.join(expected_backup)
-        temp_compressed_path = temp_dir.join(expected_compressed)
+        temp_dir.join(expected_backup)
+        temp_dir.join(expected_compressed)
 
         # Default stub
         allow(service).to receive(:system).and_return(true)
-        
+
         allow(service).to receive(:system).with(
           "sqlite3",
           anything,
@@ -363,7 +363,7 @@ RSpec.describe S3BackupService do
       before do
         # Default stub for any system calls
         allow(service).to receive(:system).and_return(true)
-        
+
         # Mock database backup creation
         allow(service).to receive(:system).with(
           "sqlite3",
@@ -374,7 +374,7 @@ RSpec.describe S3BackupService do
 
         # Mock tar compression
         mock_tar_compression(service)
-        
+
         allow(s3_service).to receive(:upload)
       end
 

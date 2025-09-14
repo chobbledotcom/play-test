@@ -71,7 +71,7 @@ RSpec.describe BaseAssessmentBlueprint, type: :serializer do
 
     it "uses PublicFieldFiltering::EXCLUDED_FIELDS constant" do
       all_excluded_fields = PublicFieldFiltering::EXCLUDED_FIELDS
-      
+
       # Create a class with all excluded fields plus some public ones
       comprehensive_class = Class.new do
         define_singleton_method(:column_name_syms) do

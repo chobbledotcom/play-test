@@ -413,7 +413,7 @@ RSpec.describe "Inspections", type: :request do
 
           inspection.reload
           expect(inspection.unit).to eq(unit1)
-          
+
           # Verify event logging
           event = Event.for_resource(inspection).last
           expect(event.action).to eq("unit_changed")
@@ -424,7 +424,6 @@ RSpec.describe "Inspections", type: :request do
           patch "/inspections/#{inspection.id}/update_unit", params: {unit_id: "invalid"}
           expect_redirect_with_alert(select_unit_inspection_path(inspection), /invalid.*unit/i)
         end
-
       end
     end
 
@@ -495,7 +494,7 @@ RSpec.describe "Inspections", type: :request do
 
     describe "HEAD requests" do
       let(:inspection) { create(:inspection, user: user, unit: unit) }
-      
+
       it "returns 200 OK for HEAD request" do
         head "/inspections/#{inspection.id}"
         expect(response).to have_http_status(:ok)
@@ -505,7 +504,7 @@ RSpec.describe "Inspections", type: :request do
 
     describe "GET /log" do
       let(:inspection) { create(:inspection, user: user, unit: unit) }
-      
+
       before do
         # Create some events for the inspection
         Event.log(
@@ -532,7 +531,6 @@ RSpec.describe "Inspections", type: :request do
       end
     end
 
-
     describe "prefill functionality" do
       let(:previous_inspection) do
         create(:inspection, :completed,
@@ -552,8 +550,8 @@ RSpec.describe "Inspections", type: :request do
 
       describe "translate_field_name" do
         it "translates field names for prefill display" do
-          get "/inspections/#{new_inspection.id}/edit", params: { tab: "inspection" }
-          
+          get "/inspections/#{new_inspection.id}/edit", params: {tab: "inspection"}
+
           expect(response).to have_http_status(:success)
           # The prefilled_fields will be set if there are fields to prefill
           expect(assigns(:prefilled_fields)).to be_an(Array)
@@ -565,9 +563,9 @@ RSpec.describe "Inspections", type: :request do
             containing_wall_height: 100,
             containing_wall_height_comment: "Test comment"
           )
-          
-          get "/inspections/#{new_inspection.id}/edit", params: { tab: "user_height" }
-          
+
+          get "/inspections/#{new_inspection.id}/edit", params: {tab: "user_height"}
+
           expect(response).to have_http_status(:success)
           expect(assigns(:previous_inspection)).to eq(previous_inspection)
           # Prefilled fields would include the ground_clearance fields
@@ -593,7 +591,7 @@ RSpec.describe "Inspections", type: :request do
 
     describe "validate_tab_parameter" do
       let(:inspection) { create(:inspection, user: user, unit: unit) }
-      
+
       it "redirects with invalid tab parameter" do
         get "/inspections/#{inspection.id}/edit", params: {tab: "invalid_tab"}
 
@@ -642,12 +640,12 @@ RSpec.describe "Inspections", type: :request do
 
     describe "calculate_changes" do
       let(:inspection) { create(:inspection, user: user, unit: unit) }
-      
+
       it "tracks changes correctly in update" do
         # Store original values
         original_passed = inspection.passed
-        original_risk = inspection.risk_assessment
-        
+        inspection.risk_assessment
+
         patch "/inspections/#{inspection.id}", params: {
           inspection: {
             passed: !original_passed,
@@ -656,7 +654,7 @@ RSpec.describe "Inspections", type: :request do
         }
 
         expect(response).to redirect_to(inspection_path(inspection))
-        
+
         # Check the event was logged with changed data
         event = Event.for_resource(inspection).last
         expect(event.action).to eq("updated")
@@ -666,8 +664,8 @@ RSpec.describe "Inspections", type: :request do
       end
 
       it "ignores unchanged values" do
-        original_value = inspection.risk_assessment
-        
+        inspection.risk_assessment
+
         patch "/inspections/#{inspection.id}", params: {
           inspection: {
             risk_assessment: "New risk",
@@ -676,7 +674,7 @@ RSpec.describe "Inspections", type: :request do
         }
 
         expect(response).to redirect_to(inspection_path(inspection))
-        
+
         # Check that only changed fields are in changed_data
         event = Event.for_resource(inspection).last
         expect(event.action).to eq("updated")
@@ -712,14 +710,14 @@ RSpec.describe "Inspections", type: :request do
         end
 
         context "in production environment" do
-          before do 
+          before do
             allow(Rails.env).to receive(:local?).and_return(false)
             allow(Rails.logger).to receive(:error)
           end
 
           it "logs error but continues" do
             get "/inspections/#{invalid_complete_inspection.id}"
-            
+
             expect(Rails.logger).to have_received(:error).with(/DATA INTEGRITY ERROR/)
             expect(response).to have_http_status(:success)
           end
@@ -744,7 +742,7 @@ RSpec.describe "Inspections", type: :request do
         get "/inspections/#{inspection.id}.json"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("application/json")
-        
+
         json = JSON.parse(response.body)
         expect(json).to be_present
         expect(json).to have_key("complete")
