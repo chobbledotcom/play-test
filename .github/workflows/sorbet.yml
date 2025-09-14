@@ -2,9 +2,6 @@ name: Sorbet Type Check
 
 on:
   workflow_call:
-  pull_request:
-  push:
-    branches: [main]
 
 jobs:
   typecheck:
