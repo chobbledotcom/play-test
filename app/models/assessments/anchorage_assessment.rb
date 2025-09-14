@@ -58,9 +58,7 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   end
 
   sig { returns(Integer) }
-  def total_anchors
-    (num_low_anchors || 0) + (num_high_anchors || 0)
-  end
+  def total_anchors = (num_low_anchors || 0) + (num_high_anchors || 0)
 
   sig { returns(Integer) }
   def required_anchors

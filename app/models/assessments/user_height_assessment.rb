@@ -50,24 +50,31 @@ module Assessments
 
     sig { returns(T::Hash[Symbol, T.untyped]) }
     def validate_play_area
-      return {valid: false, errors: ["Inspection not found"]} unless inspection
-
       unit_length = inspection.length
       unit_width = inspection.width
 
-      # Check if we have all required measurements
-      if [unit_length, unit_width, play_area_length, play_area_width].any?(&:nil?)
-        return {
-          valid: false,
-          errors: ["Missing required measurements for play area validation"],
-          measurements: {}
-        }
-      end
+      measurements = [
+        unit_length,
+        unit_width,
+        play_area_length,
+        play_area_width
+      ]
+      return missing_measurements_result if measurements.any?(&:nil?)
 
-      # Use the negative_adjustment value, defaulting to 0 if nil
+      call_en14960_validator(unit_length, unit_width)
+    end
+
+    private
+
+    sig {
+      params(
+        unit_length: T.nilable(BigDecimal),
+        unit_width: T.nilable(BigDecimal)
+      ).returns(T::Hash[Symbol, T.untyped])
+    }
+    def call_en14960_validator(unit_length, unit_width)
       adjustment = negative_adjustment || 0
 
-      # Call the EN14960 validator - convert BigDecimal to Float
       EN14960.validate_play_area(
         unit_length: unit_length.to_f,
         unit_width: unit_width.to_f,
@@ -77,9 +84,13 @@ module Assessments
       )
     end
 
-    sig { returns(T::Boolean) }
-    def play_area_valid?
-      validate_play_area[:valid]
+    sig { returns(T::Hash[Symbol, T.untyped]) }
+    def missing_measurements_result
+      {
+        valid: false,
+        errors: [I18n.t("assessments.user_height.errors.missing_measurements")],
+        measurements: {}
+      }
     end
   end
 end

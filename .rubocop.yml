@@ -4,6 +4,7 @@ inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 # Load custom cops
 require:
   - ./lib/rubocop/cop/custom/ternary_line_breaks
+  - ./lib/rubocop/cop/custom/one_line_methods
 
 # Load plugins
 plugins:
@@ -11,6 +12,9 @@ plugins:
 
 # Enable custom cops
 Custom/TernaryLineBreaks:
+  Enabled: true
+
+Custom/OneLineMethods:
   Enabled: true
 
 # Enable Sorbet cops
