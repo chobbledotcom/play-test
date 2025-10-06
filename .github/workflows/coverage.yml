@@ -44,11 +44,16 @@ jobs:
         run: |
           bundle exec rake coverage:parallel
   
-      - name: Deploy to neocities
-        uses: bcomnes/deploy-to-neocities@v3
+      - name: Deploy to Bunny
+        uses: R-J-dev/bunny-deploy@v2.0.6
         with:
-          api_key: ${{ secrets.COVERAGE_NEOCITIES_API_KEY }}
-          cleanup: true
-          neocities_supporter: true
-          preview_before_deploy: false
-          dist_dir: coverage
+          access-key: ${{ secrets.BUNNY_ACCESS_KEY }}
+          directory-to-upload: coverage
+          storage-endpoint: "https://storage.bunnycdn.com"
+          storage-zone-name: "play-test-coverage"
+          storage-zone-password: ${{ secrets.BUNNY_STORAGE_ZONE_PASSWORD }}
+          concurrency: "5"
+          enable-delete-action: true
+          enable-purge-pull-zone: true
+          pull-zone-id: "4593821"
+          replication-timeout: "15000"
