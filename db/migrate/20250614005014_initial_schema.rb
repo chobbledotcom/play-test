@@ -119,8 +119,8 @@ class InitialSchema < ActiveRecord::Migration[8.0]
     end
 
     # Assessment Tables
-    create_table "anchorage_assessments", force: :cascade do |t|
-      t.string "inspection_id", limit: 8, null: false
+    create_table "anchorage_assessments", id: false, force: :cascade do |t|
+      t.string "inspection_id", limit: 12, null: false
       t.integer "num_low_anchors"
       t.integer "num_high_anchors"
       t.boolean "anchor_accessories_pass"
@@ -137,27 +137,25 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.text "num_high_anchors_comment"
       t.boolean "num_low_anchors_pass"
       t.boolean "num_high_anchors_pass"
-      t.index ["inspection_id"], name: "index_anchorage_assessments_on_inspection_id"
+      t.index ["inspection_id"], name: "anchorage_assessments_new_pkey", unique: true
     end
 
-    create_table "enclosed_assessments", force: :cascade do |t|
-      t.string "inspection_id", limit: 8, null: false
-      t.datetime "created_at", null: false
-      t.datetime "updated_at", null: false
+    create_table "enclosed_assessments", id: false, force: :cascade do |t|
+      t.string "inspection_id", limit: 12, null: false
       t.integer "exit_number"
       t.boolean "exit_number_pass"
       t.text "exit_number_comment"
       t.boolean "exit_sign_always_visible_pass"
       t.text "exit_sign_always_visible_comment"
-      t.index ["inspection_id"], name: "index_enclosed_assessments_on_inspection_id"
-    end
-
-    create_table "fan_assessments", force: :cascade do |t|
-      t.string "inspection_id", limit: 8, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
+      t.index ["inspection_id"], name: "enclosed_assessments_new_pkey", unique: true
+    end
+
+    create_table "fan_assessments", id: false, force: :cascade do |t|
+      t.string "inspection_id", limit: 12, null: false
       t.text "fan_size_type"
-      t.boolean "blower_flap_pass"
+      t.integer "blower_flap_pass", limit: 1
       t.text "blower_flap_comment"
       t.boolean "blower_finger_pass"
       t.text "blower_finger_comment"
@@ -168,25 +166,23 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.string "blower_serial"
       t.boolean "blower_serial_pass"
       t.text "blower_serial_comment"
-      t.index ["inspection_id"], name: "index_fan_assessments_on_inspection_id"
+      t.datetime "created_at", null: false
+      t.datetime "updated_at", null: false
+      t.index ["inspection_id"], name: "fan_assessments_new_pkey", unique: true
     end
 
-    create_table "materials_assessments", force: :cascade do |t|
-      t.string "inspection_id", limit: 8, null: false
-      t.decimal "ropes", precision: 8, scale: 2
-      t.boolean "ropes_pass"
-      t.boolean "clamber_netting_pass"
-      t.boolean "retention_netting_pass"
-      t.boolean "zips_pass"
-      t.boolean "windows_pass"
-      t.boolean "artwork_pass"
+    create_table "materials_assessments", id: false, force: :cascade do |t|
+      t.string "inspection_id", limit: 12, null: false
+      t.integer "ropes"
+      t.integer "ropes_pass", limit: 1
+      t.integer "retention_netting_pass", limit: 1
+      t.integer "zips_pass", limit: 1
+      t.integer "windows_pass", limit: 1
+      t.integer "artwork_pass", limit: 1
       t.boolean "thread_pass"
       t.boolean "fabric_strength_pass"
       t.boolean "fire_retardant_pass"
-      t.datetime "created_at", null: false
-      t.datetime "updated_at", null: false
       t.text "ropes_comment"
-      t.text "clamber_netting_comment"
       t.text "retention_netting_comment"
       t.text "zips_comment"
       t.text "windows_comment"
@@ -194,28 +190,23 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.text "thread_comment"
       t.text "fabric_strength_comment"
       t.text "fire_retardant_comment"
-      t.string "marking_comment", limit: 1000
-      t.string "instructions_comment", limit: 1000
-      t.string "inflated_stability_comment", limit: 1000
-      t.string "protrusions_comment", limit: 1000
-      t.string "critical_defects_comment", limit: 1000
-      t.index ["inspection_id"], name: "index_materials_assessments_on_inspection_id"
+      t.datetime "created_at", null: false
+      t.datetime "updated_at", null: false
+      t.index ["inspection_id"], name: "materials_assessments_new_pkey", unique: true
     end
 
-    create_table "slide_assessments", force: :cascade do |t|
+    create_table "slide_assessments", id: false, force: :cascade do |t|
       t.string "inspection_id", limit: 12, null: false
       t.decimal "slide_platform_height", precision: 8, scale: 2
       t.decimal "slide_wall_height", precision: 8, scale: 2
       t.decimal "runout", precision: 8, scale: 2
       t.decimal "slide_first_metre_height", precision: 8, scale: 2
       t.decimal "slide_beyond_first_metre_height", precision: 8, scale: 2
-      t.boolean "clamber_netting_pass"
+      t.integer "clamber_netting_pass", limit: 1
       t.boolean "runout_pass"
       t.boolean "slip_sheet_pass"
       t.boolean "slide_permanent_roof"
       t.text "slide_platform_height_comment"
-      t.datetime "created_at", null: false
-      t.datetime "updated_at", null: false
       t.text "slide_wall_height_comment"
       t.text "slide_first_metre_height_comment"
       t.text "slide_beyond_first_metre_height_comment"
@@ -223,46 +214,36 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.text "clamber_netting_comment"
       t.text "runout_comment"
       t.text "slip_sheet_comment"
-      t.index ["inspection_id"], name: "index_slide_assessments_on_inspection_id"
+      t.datetime "created_at", null: false
+      t.datetime "updated_at", null: false
+      t.index ["inspection_id"], name: "slide_assessments_new_pkey", unique: true
     end
 
-    # Structure assessments - WITHOUT step_size fields
-    create_table "structure_assessments", force: :cascade do |t|
-      t.string "inspection_id", limit: 8, null: false
+    create_table "structure_assessments", id: false, force: :cascade do |t|
+      t.string "inspection_id", limit: 12, null: false
       t.boolean "seam_integrity_pass"
-      t.boolean "uses_lock_stitching_pass"
       t.boolean "air_loss_pass"
       t.boolean "straight_walls_pass"
       t.boolean "sharp_edges_pass"
       t.boolean "unit_stable_pass"
-      t.decimal "stitch_length", precision: 8, scale: 2
-      t.decimal "evacuation_time", precision: 8, scale: 2
       t.decimal "unit_pressure", precision: 8, scale: 2
-      t.decimal "blower_tube_length", precision: 8, scale: 2
-      t.decimal "critical_fall_off_height", precision: 8, scale: 2
-      t.decimal "trough_depth", precision: 8, scale: 2
+      t.integer "critical_fall_off_height"
+      t.integer "trough_depth"
       t.boolean "stitch_length_pass"
-      t.boolean "blower_tube_length_pass"
       t.boolean "evacuation_time_pass"
-      # Removed: t.boolean "step_size_pass"
       t.boolean "critical_fall_off_height_pass"
       t.boolean "unit_pressure_pass"
       t.boolean "trough_pass"
       t.boolean "entrapment_pass"
       t.boolean "markings_pass"
       t.boolean "grounding_pass"
-      t.datetime "created_at", null: false
-      t.datetime "updated_at", null: false
       t.text "seam_integrity_comment"
-      t.text "uses_lock_stitching_comment"
       t.text "stitch_length_comment"
       t.text "air_loss_comment"
       t.text "straight_walls_comment"
       t.text "sharp_edges_comment"
-      t.text "blower_tube_length_comment"
       t.text "unit_stable_comment"
       t.text "evacuation_time_comment"
-      # Removed: t.text "step_size_comment"
       t.text "critical_fall_off_height_comment"
       t.text "unit_pressure_comment"
       t.text "trough_comment"
@@ -270,34 +251,23 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.text "markings_comment"
       t.text "grounding_comment"
       t.string "trough_depth_comment", limit: 1000
-      # Removed: t.string "trough_width_comment", limit: 1000
-      t.string "tubes_present_comment", limit: 1000
-      t.string "netting_comment", limit: 1000
-      t.string "ventilation_comment", limit: 1000
-      t.string "step_heights_comment", limit: 1000
-      t.string "opening_dimension_comment", limit: 1000
-      t.string "entrances_comment", limit: 1000
-      t.string "fabric_integrity_comment", limit: 1000
-      t.boolean "trough_depth_pass"
-      t.decimal "trough_adjacent_panel_width", precision: 8, scale: 2
-      t.boolean "trough_adjacent_panel_width_pass"
+      t.integer "trough_adjacent_panel_width"
       t.text "trough_adjacent_panel_width_comment"
-      t.decimal "step_ramp_size", precision: 8, scale: 2
+      t.integer "step_ramp_size"
       t.boolean "step_ramp_size_pass"
       t.text "step_ramp_size_comment"
-      t.index ["inspection_id"], name: "index_structure_assessments_on_inspection_id"
-    end
-
-    create_table "user_height_assessments", force: :cascade do |t|
-      t.string "inspection_id", limit: 12, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
+      t.integer "platform_height"
+      t.boolean "platform_height_pass"
+      t.text "platform_height_comment"
+      t.index ["inspection_id"], name: "structure_assessments_new_pkey", unique: true
+    end
+
+    create_table "user_height_assessments", id: false, force: :cascade do |t|
+      t.string "inspection_id", limit: 12, null: false
       t.decimal "containing_wall_height", precision: 8, scale: 2
       t.text "containing_wall_height_comment"
-      t.decimal "platform_height", precision: 8, scale: 2
-      t.text "platform_height_comment"
-      t.decimal "tallest_user_height", precision: 8, scale: 2
-      t.text "tallest_user_height_comment"
       t.decimal "play_area_length", precision: 8, scale: 2
       t.text "play_area_length_comment"
       t.decimal "play_area_width", precision: 8, scale: 2
@@ -308,7 +278,10 @@ class InitialSchema < ActiveRecord::Migration[8.0]
       t.integer "users_at_1200mm"
       t.integer "users_at_1500mm"
       t.integer "users_at_1800mm"
-      t.index ["inspection_id"], name: "index_user_height_assessments_on_inspection_id"
+      t.datetime "created_at", null: false
+      t.datetime "updated_at", null: false
+      t.text "custom_user_height_comment"
+      t.index ["inspection_id"], name: "user_height_assessments_new_pkey", unique: true
     end
 
     # Foreign Keys
