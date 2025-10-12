@@ -51,6 +51,18 @@ class UnitsController < ApplicationController
   def new = @unit = Unit.new
 
   def create
+    # Check if UNIT_BADGES is enabled and ID is provided
+    if unit_badges_enabled? && params[:unit][:id].present?
+      normalized_id = normalize_unit_id(params[:unit][:id])
+
+      # Check if unit with this ID already exists
+      existing_unit = Unit.find_by(id: normalized_id)
+      if existing_unit
+        flash[:notice] = I18n.t("units.messages.existing_unit_found")
+        redirect_to existing_unit and return
+      end
+    end
+
     @unit = current_user.units.build(unit_params)
 
     if @image_processing_error
@@ -231,7 +243,7 @@ class UnitsController < ApplicationController
   end
 
   def unit_params
-    permitted_params = params.require(:unit).permit(*%i[
+    permitted_fields = %i[
       description
       manufacture_date
       manufacturer
@@ -240,9 +252,24 @@ class UnitsController < ApplicationController
       photo
       serial
       unit_type
-    ])
+    ]
+
+    # Add :id to permitted fields if UNIT_BADGES is enabled
+    permitted_fields << :id if unit_badges_enabled?
+
+    permitted_params = params.require(:unit).permit(*permitted_fields)
 
     process_image_params(permitted_params, :photo)
+  end
+
+  sig { returns(T::Boolean) }
+  def unit_badges_enabled?
+    ENV["UNIT_BADGES"] == "true"
+  end
+
+  sig { params(raw_id: String).returns(String) }
+  def normalize_unit_id(raw_id)
+    raw_id.gsub(/\s+/, "").upcase[0, 8]
   end
 
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")

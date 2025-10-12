@@ -51,7 +51,9 @@ class Unit < ApplicationRecord
   validate :photo_must_be_image
 
   # Callbacks
-  before_create :generate_custom_id
+  before_validation :normalize_id, on: :create, if: -> { unit_badges_enabled? }
+  before_create :generate_custom_id, unless: -> { unit_badges_enabled? }
+  before_create :validate_badge_id, if: -> { unit_badges_enabled? }
   after_update :invalidate_pdf_cache
   before_destroy :check_complete_inspections
   before_destroy :destroy_draft_inspections
@@ -59,6 +61,7 @@ class Unit < ApplicationRecord
   # All fields are required for Units
   validates :name, :serial, :description, :manufacturer, :operator, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
+  validates :id, presence: true, if: -> { unit_badges_enabled? && new_record? }
 
   # Scopes - enhanced from original Equipment and new Unit functionality
   scope :seed_data, -> { where(is_seed: true) }
@@ -210,5 +213,31 @@ class Unit < ApplicationRecord
     return if (changed_attrs - ignorable_attrs).empty?
 
     PdfCacheService.invalidate_unit_cache(self)
+  end
+
+  sig { returns(T::Boolean) }
+  def unit_badges_enabled?
+    ENV["UNIT_BADGES"] == "true"
+  end
+
+  sig { void }
+  def normalize_id
+    return unless id.present?
+
+    # Strip spaces, uppercase, and trim to 8 characters
+    normalized = id.gsub(/\s+/, "").upcase[0, 8]
+    self.id = normalized
+  end
+
+  sig { void }
+  def validate_badge_id
+    return unless id.present?
+
+    # Check if badge exists
+    unless Badge.exists?(id: id)
+      error_msg = I18n.t("units.validations.invalid_badge_id")
+      errors.add(:id, error_msg)
+      throw(:abort)
+    end
   end
 end

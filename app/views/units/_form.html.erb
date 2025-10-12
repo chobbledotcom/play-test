@@ -9,6 +9,11 @@
   i18n_base: 'forms.units',
   url: form_url do |form| %>
   <%= render 'chobble_forms/fieldset', legend_key: 'unit_details' do %>
+    <%# Show ID field when UNIT_BADGES is enabled and creating new unit %>
+    <% if ENV["UNIT_BADGES"] == "true" && !unit.persisted? %>
+      <%= render 'chobble_forms/text_field', field: :id, required: true %>
+    <% end %>
+
     <%= render 'chobble_forms/text_field', field: :name, required: true %>
 
     <%# Unit type - only for development or test mode %>
