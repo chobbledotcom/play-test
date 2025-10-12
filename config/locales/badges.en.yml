@@ -39,4 +39,10 @@ en:
         count: "Number of Badges to Generate"
         note: "Note"
       submit: "Create Batch"
-      submit_edit: "Update Batch"
+    badge_batch_edit:
+      header: "Edit Badge Batch"
+      sections:
+        batch_details: "Batch Details"
+      fields:
+        note: "Note"
+      submit: "Update Batch"

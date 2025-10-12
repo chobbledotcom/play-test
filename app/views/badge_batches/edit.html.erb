@@ -1,16 +1,8 @@
-<header>
-  <h1><%= t("badges.titles.edit_batch", id: @badge_batch.id) %></h1>
-</header>
-
-<%= form_with model: @badge_batch, url: badge_batch_path(@badge_batch) do |form| %>
-  <fieldset>
-    <legend><%= t("forms.badge_batch.sections.batch_details") %></legend>
-
-    <label for="badge_batch_note">
-      <%= t("forms.badge_batch.fields.note") %>
-    </label>
-    <%= form.text_area :note %>
-  </fieldset>
-
-  <%= form.submit t("forms.badge_batch.submit_edit") %>
+<%= render 'chobble_forms/form_context',
+  model: @badge_batch,
+  i18n_base: 'forms.badge_batch_edit',
+  url: badge_batch_path(@badge_batch) do |form| %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'batch_details' do %>
+    <%= render 'chobble_forms/text_area', field: :note %>
+  <% end %>
 <% end %>
