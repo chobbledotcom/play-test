@@ -9,12 +9,17 @@ RSpec.feature "Unit Badge Validation", type: :feature do
 
   before do
     sign_in(user)
-    visit new_unit_path
   end
 
   context "when UNIT_BADGES is enabled" do
-    before { allow(ENV).to receive(:[]).with("UNIT_BADGES").and_return("true") }
-    after { allow(ENV).to receive(:[]).and_call_original }
+    before do
+      ENV["UNIT_BADGES"] = "true"
+      visit new_unit_path
+    end
+
+    after do
+      ENV.delete("UNIT_BADGES")
+    end
 
     scenario "shows ID field on new unit form" do
       expect_field_present(:units, :id)
@@ -92,8 +97,10 @@ RSpec.feature "Unit Badge Validation", type: :feature do
   end
 
   context "when UNIT_BADGES is disabled" do
-    before { allow(ENV).to receive(:[]).with("UNIT_BADGES").and_return(nil) }
-    after { allow(ENV).to receive(:[]).and_call_original }
+    before do
+      ENV.delete("UNIT_BADGES")
+      visit new_unit_path
+    end
 
     scenario "does not show ID field on new unit form" do
       expect_field_not_present(:units, :id)

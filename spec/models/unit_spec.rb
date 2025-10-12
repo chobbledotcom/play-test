@@ -89,8 +89,8 @@ RSpec.describe Unit, type: :model do
 
   describe "UNIT_BADGES feature" do
     context "when UNIT_BADGES is enabled" do
-      before { allow(ENV).to receive(:[]).with("UNIT_BADGES").and_return("true") }
-      after { allow(ENV).to receive(:[]).and_call_original }
+      before { ENV["UNIT_BADGES"] = "true" }
+      after { ENV.delete("UNIT_BADGES") }
 
       describe "#normalize_id" do
         it "strips spaces from ID" do
@@ -143,8 +143,7 @@ RSpec.describe Unit, type: :model do
     end
 
     context "when UNIT_BADGES is disabled" do
-      before { allow(ENV).to receive(:[]).with("UNIT_BADGES").and_return(nil) }
-      after { allow(ENV).to receive(:[]).and_call_original }
+      before { ENV.delete("UNIT_BADGES") }
 
       it "generates custom ID automatically" do
         unit = build(:unit, user: user)
