@@ -17,35 +17,34 @@ RSpec.feature "Unit Badge Validation", type: :feature do
     after { allow(ENV).to receive(:[]).and_call_original }
 
     scenario "shows ID field on new unit form" do
-      expect(page).to have_field(I18n.t("forms.units.fields.id"))
+      expect_field_present(:units, :id)
     end
 
     scenario "creates unit with valid badge ID" do
-      fill_in I18n.t("forms.units.fields.id"), with: badge.id
-      fill_in I18n.t("forms.units.fields.name"), with: "Test Unit"
-      fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
-      fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
-      fill_in I18n.t("forms.units.fields.serial"), with: "TEST123"
-      fill_in I18n.t("forms.units.fields.description"), with: "Test description"
+      fill_in_form(:units, :id, badge.id)
+      fill_in_form(:units, :name, "Test Unit")
+      fill_in_form(:units, :operator, "Test Operator")
+      fill_in_form(:units, :manufacturer, "Test Manufacturer")
+      fill_in_form(:units, :serial, "TEST123")
+      fill_in_form(:units, :description, "Test description")
 
-      click_button I18n.t("forms.units.submit")
+      submit_form(:units)
 
       expect(page).to have_content("Test Unit")
       expect(Unit.find_by(id: badge.id)).to be_present
     end
 
     scenario "normalizes ID by stripping spaces and uppercasing" do
-      # Badge ID with spaces and lowercase
       badge_id_with_spaces = "  #{badge.id.downcase}  "
 
-      fill_in I18n.t("forms.units.fields.id"), with: badge_id_with_spaces
-      fill_in I18n.t("forms.units.fields.name"), with: "Test Unit"
-      fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
-      fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
-      fill_in I18n.t("forms.units.fields.serial"), with: "TEST123"
-      fill_in I18n.t("forms.units.fields.description"), with: "Test description"
+      fill_in_form(:units, :id, badge_id_with_spaces)
+      fill_in_form(:units, :name, "Test Unit")
+      fill_in_form(:units, :operator, "Test Operator")
+      fill_in_form(:units, :manufacturer, "Test Manufacturer")
+      fill_in_form(:units, :serial, "TEST123")
+      fill_in_form(:units, :description, "Test description")
 
-      click_button I18n.t("forms.units.submit")
+      submit_form(:units)
 
       expect(Unit.find_by(id: badge.id.upcase)).to be_present
     end
@@ -53,41 +52,40 @@ RSpec.feature "Unit Badge Validation", type: :feature do
     scenario "redirects to existing unit when ID already exists" do
       existing_unit = create(:unit, id: badge.id, user: user)
 
-      fill_in I18n.t("forms.units.fields.id"), with: badge.id
-      fill_in I18n.t("forms.units.fields.name"), with: "Test Unit"
-      fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
-      fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
-      fill_in I18n.t("forms.units.fields.serial"), with: "TEST123"
-      fill_in I18n.t("forms.units.fields.description"), with: "Test description"
+      fill_in_form(:units, :id, badge.id)
+      fill_in_form(:units, :name, "Test Unit")
+      fill_in_form(:units, :operator, "Test Operator")
+      fill_in_form(:units, :manufacturer, "Test Manufacturer")
+      fill_in_form(:units, :serial, "TEST123")
+      fill_in_form(:units, :description, "Test description")
 
-      click_button I18n.t("forms.units.submit")
+      submit_form(:units)
 
-      expect(page).to have_content(I18n.t("units.messages.existing_unit_found"))
+      expect_i18n_content("units.messages.existing_unit_found")
       expect(current_path).to eq(unit_path(existing_unit))
     end
 
     scenario "shows error when badge ID is invalid" do
-      fill_in I18n.t("forms.units.fields.id"), with: "INVALID9"
-      fill_in I18n.t("forms.units.fields.name"), with: "Test Unit"
-      fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
-      fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
-      fill_in I18n.t("forms.units.fields.serial"), with: "TEST123"
-      fill_in I18n.t("forms.units.fields.description"), with: "Test description"
+      fill_in_form(:units, :id, "INVALID9")
+      fill_in_form(:units, :name, "Test Unit")
+      fill_in_form(:units, :operator, "Test Operator")
+      fill_in_form(:units, :manufacturer, "Test Manufacturer")
+      fill_in_form(:units, :serial, "TEST123")
+      fill_in_form(:units, :description, "Test description")
 
-      click_button I18n.t("forms.units.submit")
+      submit_form(:units)
 
-      error_msg = I18n.t("units.validations.invalid_badge_id")
-      expect(page).to have_content(error_msg)
+      expect_i18n_content("units.validations.invalid_badge_id")
     end
 
     scenario "shows error when ID is blank" do
-      fill_in I18n.t("forms.units.fields.name"), with: "Test Unit"
-      fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
-      fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
-      fill_in I18n.t("forms.units.fields.serial"), with: "TEST123"
-      fill_in I18n.t("forms.units.fields.description"), with: "Test description"
+      fill_in_form(:units, :name, "Test Unit")
+      fill_in_form(:units, :operator, "Test Operator")
+      fill_in_form(:units, :manufacturer, "Test Manufacturer")
+      fill_in_form(:units, :serial, "TEST123")
+      fill_in_form(:units, :description, "Test description")
 
-      click_button I18n.t("forms.units.submit")
+      submit_form(:units)
 
       expect(page).to have_content("can't be blank")
     end
@@ -98,17 +96,17 @@ RSpec.feature "Unit Badge Validation", type: :feature do
     after { allow(ENV).to receive(:[]).and_call_original }
 
     scenario "does not show ID field on new unit form" do
-      expect(page).not_to have_field(I18n.t("forms.units.fields.id"))
+      expect_field_not_present(:units, :id)
     end
 
     scenario "creates unit without requiring badge ID" do
-      fill_in I18n.t("forms.units.fields.name"), with: "Test Unit"
-      fill_in I18n.t("forms.units.fields.operator"), with: "Test Operator"
-      fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
-      fill_in I18n.t("forms.units.fields.serial"), with: "TEST123"
-      fill_in I18n.t("forms.units.fields.description"), with: "Test description"
+      fill_in_form(:units, :name, "Test Unit")
+      fill_in_form(:units, :operator, "Test Operator")
+      fill_in_form(:units, :manufacturer, "Test Manufacturer")
+      fill_in_form(:units, :serial, "TEST123")
+      fill_in_form(:units, :description, "Test description")
 
-      click_button I18n.t("forms.units.submit")
+      submit_form(:units)
 
       expect(page).to have_content("Test Unit")
       created_unit = Unit.find_by(name: "Test Unit")
