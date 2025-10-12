@@ -58,7 +58,8 @@ class DirtyForms {
       formAction.includes("/login") ||
       formAction.includes("/register") ||
       formAction.includes("/safety_standards") ||
-      formAction.includes("/search")
+      formAction.includes("/search") ||
+      formAction.includes("/badge_batches")
     ) {
       return;
     }

@@ -1,0 +1,37 @@
+<%= render 'shared/page_header', title: t('badges.titles.show_badge', id: @badge.id) %>
+
+<ul class="unit-details-list">
+  <li>
+    <strong><%= t("badges.fields.badge_id") %>:</strong>
+    <span><%= @badge.id %></span>
+  </li>
+
+  <li>
+    <strong><%= t("badges.fields.batch") %>:</strong>
+    <span><%= link_to t("badges.titles.show", id: @badge_batch.id), badge_batch_path(@badge_batch) %></span>
+  </li>
+
+  <li>
+    <strong><%= t("badges.fields.batch_created_at") %>:</strong>
+    <span><%= l(@badge_batch.created_at, format: :long) %></span>
+  </li>
+
+  <% if @badge_batch.note.present? %>
+    <li>
+      <strong><%= t("badges.fields.batch_note") %>:</strong>
+      <span><%= @badge_batch.note %></span>
+    </li>
+  <% end %>
+
+  <% if @badge.note.present? %>
+    <li>
+      <strong><%= t("badges.fields.badge_note") %>:</strong>
+      <span><%= @badge.note %></span>
+    </li>
+  <% end %>
+</ul>
+
+<% if @units.any? %>
+  <h4><%= t("badges.titles.associated_units") %></h4>
+  <%= render 'units/unit_table', unit: @units %>
+<% end %>

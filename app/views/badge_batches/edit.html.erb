@@ -1,0 +1,8 @@
+<%= render 'chobble_forms/form_context',
+  model: @badge_batch,
+  i18n_base: 'forms.badge_batch_edit',
+  url: badge_batch_path(@badge_batch) do |form| %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'batch_details' do %>
+    <%= render 'chobble_forms/text_area', field: :note %>
+  <% end %>
+<% end %>
