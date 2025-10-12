@@ -1,9 +1,14 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Unit Inspection History", type: :feature do
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user) }
-  let(:inspection) { create(:inspection, user: user, unit: unit, inspection_date: 1.week.ago) }
+  let(:inspection) do
+    date = 1.week.ago
+    create(:inspection, user: user, unit: unit, inspection_date: date)
+  end
 
   before do
     sign_in(user)
@@ -22,23 +27,29 @@ RSpec.describe "Unit Inspection History", type: :feature do
       expect(page).to have_content(I18n.t("inspections.fields.result"))
     end
 
-    it "displays inspection with assigned company" do
-      expect(inspection.inspector_company).to be_present
+    it "displays inspector name from user" do
+      inspection
 
       visit unit_path(unit)
 
-      expect(page).to have_content(I18n.t("inspections.fields.last_inspection"))
       expect(page).to have_content(I18n.t("inspections.fields.inspector"))
-      expect(page).to have_content(inspection.inspector_company.name)
+      expect(page).to have_content(user.name)
     end
 
-    it "displays inspector company name when present" do
-      inspector_company = create(:inspector_company, name: "Test Inspector Co")
-      inspection.update!(inspector_company: inspector_company)
+    it "displays different inspector names for different users" do
+      inspection
+      other_user = create(:user, name: "Jane Inspector")
+      create(
+        :inspection,
+        user: other_user,
+        unit: unit,
+        inspection_date: 2.weeks.ago
+      )
 
       visit unit_path(unit)
 
-      expect(page).to have_content("Test Inspector Co")
+      expect(page).to have_content(user.name)
+      expect(page).to have_content(other_user.name)
     end
   end
 end

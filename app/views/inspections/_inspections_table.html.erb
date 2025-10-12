@@ -56,7 +56,7 @@
             <%= render_time(inspection.inspection_date) %>
           <% end %>
           <%= render 'shared/table_column', field: :inspector, model: :inspection, show: show_inspector do %>
-            <%= inspection.inspector_company&.name %>
+            <%= inspection.user.name %>
           <% end %>
           <%= render 'shared/table_column', field: :result, model: :inspection do %>
             <%= inspection_result_badge(inspection) %>

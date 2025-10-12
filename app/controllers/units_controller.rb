@@ -50,7 +50,7 @@ class UnitsController < ApplicationController
     return head :ok if request.head?
 
     @inspections = @unit.inspections
-      .includes(inspector_company: {logo_attachment: :blob})
+      .includes(:user, inspector_company: {logo_attachment: :blob})
       .order(inspection_date: :desc)
 
     respond_to do |format|
