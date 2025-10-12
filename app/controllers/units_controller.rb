@@ -10,6 +10,7 @@ class UnitsController < ApplicationController
 
   skip_before_action :require_login, only: %i[show]
   before_action :check_assessments_enabled
+  before_action :require_admin, only: %i[all]
   before_action :set_unit, only: %i[destroy edit log show update]
   before_action :check_unit_owner, only: %i[destroy edit update]
   before_action :check_log_access, only: %i[log]
@@ -17,7 +18,7 @@ class UnitsController < ApplicationController
   before_action :no_index
 
   def index
-    @units = filtered_units_query
+    @units = apply_filters(current_user.units)
     @title = build_index_title
 
     respond_to do |format|
@@ -31,9 +32,7 @@ class UnitsController < ApplicationController
   end
 
   def all
-    head :not_found and return unless current_user&.admin?
-
-    @units = filtered_all_units_query
+    @units = apply_filters(Unit.all)
     @title = I18n.t("units.titles.all_units")
 
     respond_to do |format|
@@ -323,8 +322,8 @@ class UnitsController < ApplicationController
     unit_path(@unit, format: :pdf)
   end
 
-  def filtered_units_query
-    units = current_user.units.includes(photo_attachment: :blob)
+  def apply_filters(units)
+    units = units.includes(photo_attachment: :blob)
     units = units.search(params[:query])
     units = units.overdue if params[:status] == "overdue"
     units = units.by_manufacturer(params[:manufacturer])
@@ -332,13 +331,8 @@ class UnitsController < ApplicationController
     units.order(created_at: :desc)
   end
 
-  def filtered_all_units_query
-    units = Unit.includes(photo_attachment: :blob)
-    units = units.search(params[:query])
-    units = units.overdue if params[:status] == "overdue"
-    units = units.by_manufacturer(params[:manufacturer])
-    units = units.by_operator(params[:operator])
-    units.order(created_at: :desc)
+  def require_admin
+    head :not_found unless current_user&.admin?
   end
 
   def build_index_title
