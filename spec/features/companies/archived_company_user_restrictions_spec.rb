@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Inactive User Restrictions", type: :feature do
@@ -35,11 +37,11 @@ RSpec.feature "Inactive User Restrictions", type: :feature do
       expect(page).to have_content(I18n.t("users.messages.user_inactive"))
     end
 
-    scenario "shows archived company in inspection history" do
+    scenario "shows inspector name in inspection history" do
       existing_inspection
       visit unit_path(unit)
 
-      expect(page).to have_content("Archived Company")
+      expect(page).to have_content(inactive_user.name)
       formatted_date = existing_inspection.inspection_date&.strftime("%b %d, %Y") || "No date"
       expect(page).to have_content(formatted_date)
     end
