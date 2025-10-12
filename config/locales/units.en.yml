@@ -120,6 +120,8 @@ en:
       length_range: Length must be less than 200
       height_range: Height must be greater than 0
       save_error: Did not save
+      invalid_badge_id: That ID seems to be invalid, please double-check it and
+        try again
     errors:
       header:
         one: 'Could not save unit because there is 1 error:'
@@ -151,6 +153,8 @@ en:
         create units.
       pdf_not_supported: Your browser does not support PDFs.
       pdf_not_supported_html: Your browser does not support PDFs.
+      existing_unit_found: A unit with that ID already exists. Redirected to existing
+        unit.
     accessibility:
       qr_code_alt: QR Code for Unit Inspection History Report
     share:
