@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_11_162534) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_12_134703) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -58,6 +58,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_162534) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "anchorage_assessments_new_pkey", unique: true
+  end
+
+  create_table "badge_batches", force: :cascade do |t|
+    t.text "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "count"
+  end
+
+  create_table "badges", id: { type: :string, limit: 8 }, force: :cascade do |t|
+    t.integer "badge_batch_id", null: false
+    t.text "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["badge_batch_id"], name: "index_badges_on_badge_batch_id"
+    t.index ["id"], name: "index_badges_on_id", unique: true
   end
 
   create_table "credentials", force: :cascade do |t|
@@ -121,7 +137,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_162534) do
     t.index ["inspection_id"], name: "fan_assessments_new_pkey", unique: true
   end
 
-  create_table "inspections", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "inspections", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.datetime "inspection_date"
     t.boolean "passed"
     t.string "user_id", limit: 12, null: false
@@ -150,7 +166,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_162534) do
     t.index ["user_id"], name: "index_inspections_on_user_id"
   end
 
-  create_table "inspector_companies", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "inspector_companies", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.string "name", null: false
     t.string "email"
     t.string "phone", null: false
@@ -389,7 +405,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_162534) do
     t.index ["inspection_id"], name: "structure_assessments_new_pkey", unique: true
   end
 
-  create_table "units", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "units", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.string "name"
     t.string "user_id", limit: 12, null: false
     t.datetime "created_at", null: false
@@ -441,7 +457,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_162534) do
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
   end
 
-  create_table "users", id: {type: :string, limit: 12}, force: :cascade do |t|
+  create_table "users", id: { type: :string, limit: 12 }, force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
     t.datetime "created_at", null: false
@@ -466,6 +482,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_162534) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "anchorage_assessments", "inspections"
+  add_foreign_key "badges", "badge_batches"
   add_foreign_key "credentials", "users"
   add_foreign_key "enclosed_assessments", "inspections"
   add_foreign_key "events", "users"

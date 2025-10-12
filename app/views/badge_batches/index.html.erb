@@ -1,0 +1,56 @@
+<%= render 'shared/page_header', title: t("badges.titles.index") %>
+
+<nav>
+  <%= link_to t("badges.buttons.new_batch"), new_badge_batch_path %>
+</nav>
+
+<% if @badge_batches.any? %>
+  <div class="table-list badge-batches-list">
+    <div class="table-list-header">
+      <%= render 'shared/table_column',
+        field: :id,
+        i18n_key: "badges.fields.id",
+        header: true %>
+      <%= render 'shared/table_column',
+        field: :count,
+        i18n_key: "badges.fields.count",
+        header: true %>
+      <%= render 'shared/table_column',
+        field: :created_at,
+        i18n_key: "badges.fields.created_at",
+        header: true %>
+      <%= render 'shared/table_column',
+        field: :note,
+        i18n_key: "badges.fields.note",
+        header: true %>
+    </div>
+
+    <ul class="table-list-items">
+      <% @badge_batches.each do |batch| %>
+        <li>
+          <%= link_to badge_batch_path(batch), class: "table-list-link" do %>
+            <%= render 'shared/table_column',
+              field: :id,
+              i18n_key: "badges.fields.id",
+              item: batch %>
+            <%= render 'shared/table_column',
+              field: :count,
+              i18n_key: "badges.fields.count",
+              item: batch %>
+            <%= render 'shared/table_column',
+              field: :created_at,
+              i18n_key: "badges.fields.created_at" do %>
+              <%= l(batch.created_at, format: :long) %>
+            <% end %>
+            <%= render 'shared/table_column',
+              field: :note,
+              i18n_key: "badges.fields.note",
+              item: batch %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% else %>
+  <p><%= t("badges.messages.no_batches") %></p>
+<% end %>

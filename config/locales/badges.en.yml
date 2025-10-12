@@ -2,22 +2,25 @@ en:
   badges:
     titles:
       edit: "Edit Badge %{id}"
+      edit_batch: "Edit Badge Batch #%{id}"
       index: "Badge Batches"
       new: "Create New Badge Batch"
       show: "Badge Batch #%{id}"
     fields:
-      badge_count: "Number of Badges"
       badge_id: "Badge ID"
+      count: "Number of Badges"
       created_at: "Date Created"
       id: "ID"
       note: "Notes"
     buttons:
       back: "Back to Batches"
-      edit: "Edit"
+      edit: "Edit Badge"
+      edit_batch: "Edit Batch"
       new_batch: "Create New Batch"
     messages:
       badge_updated: "Badge note updated successfully"
       batch_created: "Created batch with %{count} badges"
+      batch_updated: "Badge batch updated successfully"
       no_badges: "No badges in this batch"
       no_batches: "No badge batches created yet"
   forms:
@@ -36,3 +39,4 @@ en:
         count: "Number of Badges to Generate"
         note: "Note"
       submit: "Create Batch"
+      submit_edit: "Update Batch"

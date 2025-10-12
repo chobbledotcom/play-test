@@ -1,0 +1,21 @@
+<header>
+  <h1><%= t("badges.titles.new") %></h1>
+</header>
+
+<%= form_with model: @badge_batch, url: badge_batches_path do |form| %>
+  <fieldset>
+    <legend><%= t("forms.badge_batch.sections.batch_details") %></legend>
+
+    <label for="badge_batch_count">
+      <%= t("forms.badge_batch.fields.count") %>
+    </label>
+    <%= form.number_field :count, required: true %>
+
+    <label for="badge_batch_note">
+      <%= t("forms.badge_batch.fields.note") %>
+    </label>
+    <%= form.text_area :note %>
+  </fieldset>
+
+  <%= form.submit t("forms.badge_batch.submit") %>
+<% end %>

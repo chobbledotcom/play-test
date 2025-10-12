@@ -32,7 +32,8 @@ RSpec.feature "Badge Management", type: :feature do
 
     click_button I18n.t("forms.badge_batch.submit")
 
-    expect(page).to have_content(I18n.t("badges.messages.batch_created", count: 10))
+    batch_created_msg = I18n.t("badges.messages.batch_created", count: 10)
+    expect(page).to have_content(batch_created_msg)
     expect(page).to have_content("Test batch")
   end
 
@@ -40,11 +41,13 @@ RSpec.feature "Badge Management", type: :feature do
     batch = create(:badge_batch, :with_badges, note: "Sample batch")
 
     visit badge_batches_path
-    click_link batch.id.to_s
+    within("li", text: batch.id.to_s) do
+      click_link
+    end
 
     expect(page).to have_content(I18n.t("badges.titles.show", id: batch.id))
     expect(page).to have_content("Sample batch")
-    expect(page).to have_content(batch.badges.count.to_s)
+    expect(page).to have_content(batch.count.to_s)
   end
 
   scenario "admin can view individual badges in a batch" do
@@ -63,7 +66,9 @@ RSpec.feature "Badge Management", type: :feature do
     badge = create(:badge, badge_batch: batch, note: "Original note")
 
     visit badge_batch_path(batch)
-    click_link I18n.t("badges.buttons.edit")
+    within("li", text: badge.id) do
+      click_link
+    end
 
     expect(page).to have_content(I18n.t("badges.titles.edit", id: badge.id))
 
@@ -75,18 +80,34 @@ RSpec.feature "Badge Management", type: :feature do
   end
 
   scenario "badge batch shows correct badge count" do
-    batch = create(:badge_batch)
+    batch = create(:badge_batch, count: 3)
     create_list(:badge, 3, badge_batch: batch)
 
     visit badge_batches_path
 
-    within("tr", text: batch.id.to_s) do
+    within("li", text: batch.id.to_s) do
       expect(page).to have_content("3")
     end
   end
 
+  scenario "admin can edit badge batch note" do
+    batch = create(:badge_batch, note: "Original batch note")
+
+    visit badge_batch_path(batch)
+    click_link I18n.t("badges.buttons.edit_batch")
+
+    batch_edit_title = I18n.t("badges.titles.edit_batch", id: batch.id)
+    expect(page).to have_content(batch_edit_title)
+
+    fill_in I18n.t("forms.badge_batch.fields.note"), with: "Updated batch note"
+    click_button I18n.t("forms.badge_batch.submit_edit")
+
+    expect(page).to have_content(I18n.t("badges.messages.batch_updated"))
+    expect(page).to have_content("Updated batch note")
+  end
+
   scenario "regular user cannot access badges" do
-    sign_out
+    logout
     sign_in(regular_user)
 
     visit badge_batches_path

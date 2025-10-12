@@ -60,6 +60,56 @@ RSpec.describe CustomIdGenerator, type: :concern do
     end
   end
 
+  describe ".generate_random_ids" do
+    it "generates the requested number of IDs" do
+      ids = test_class.generate_random_ids(10)
+      expect(ids.length).to eq(10)
+    end
+
+    it "generates unique IDs within the batch" do
+      ids = test_class.generate_random_ids(50)
+      expect(ids.uniq.length).to eq(50)
+    end
+
+    it "generates IDs of correct length" do
+      ids = test_class.generate_random_ids(10)
+
+      ids.each do |id|
+        expect(id.length).to eq(8)
+      end
+    end
+
+    it "excludes ambiguous characters from all IDs" do
+      ids = test_class.generate_random_ids(100)
+      ambiguous_chars = %w[0 O 1 I L]
+
+      ids.each do |id|
+        ambiguous_chars.each do |char|
+          expect(id).not_to include(char)
+        end
+      end
+    end
+
+    it "returns empty array for zero count" do
+      ids = test_class.generate_random_ids(0)
+      expect(ids).to eq([])
+    end
+
+    it "returns empty array for negative count" do
+      ids = test_class.generate_random_ids(-5)
+      expect(ids).to eq([])
+    end
+
+    it "checks database in batches to avoid existing IDs" do
+      allow(test_class).to receive(:where).and_call_original
+
+      test_class.generate_random_ids(10)
+
+      # Should check the database for existing IDs
+      expect(test_class).to have_received(:where)
+    end
+  end
+
   describe "when included in a model" do
     let(:instance) { test_class.new }
 
