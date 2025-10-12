@@ -7,7 +7,15 @@
   <% end %>
 <% end %>
 
-<% if current_user.units.any? %>
+<% if current_user&.admin? && !request.path.include?("/all") %>
+  <%= button_to all_units_path,
+      method: :get do %>
+    <strong><%= t('units.buttons.all_units') %></strong>
+  <% end %>
+<% end %>
+
+<% show_filters = request.path.include?("/all") ? Unit.any? : current_user.units.any? %>
+<% if show_filters %>
   <%= render "filter_form" %>
 <% end %>
 

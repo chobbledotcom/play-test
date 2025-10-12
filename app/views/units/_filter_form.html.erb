@@ -1,4 +1,6 @@
-<%= form_with url: units_path, method: :get, data: { turbo: false }, id: "search-box" do |form| %>
+<% filter_path = request.path.include?("/all") ? all_units_path : units_path %>
+<% filter_user = request.path.include?("/all") ? nil : current_user %>
+<%= form_with url: filter_path, method: :get, data: { turbo: false }, id: "search-box" do |form| %>
     <%= form.text_field :query,
         placeholder: unit_search_placeholder,
         value: params[:query],
@@ -9,14 +11,14 @@
         {}, { onchange: "this.form.submit();" } %>
 
     <%= form.select :manufacturer,
-        options_for_select([["All Manufacturers", ""]] + manufacturer_options(current_user).map { |m| [m, m] }, params[:manufacturer]),
+        options_for_select([["All Manufacturers", ""]] + manufacturer_options(filter_user).map { |m| [m, m] }, params[:manufacturer]),
         {}, { onchange: "this.form.submit();" } %>
 
     <%= form.select :operator,
-        options_for_select([["All Operators", ""]] + operator_options(current_user).map { |o| [o, o] }, params[:operator]),
+        options_for_select([["All Operators", ""]] + operator_options(filter_user).map { |o| [o, o] }, params[:operator]),
         {}, { onchange: "this.form.submit();" } %>
 
     <% if params[:status].present? || params[:manufacturer].present? || params[:operator].present? || params[:query].present? %>
-      <%= link_to t("ui.buttons.clear_filters"), units_path %>
+      <%= link_to t("ui.buttons.clear_filters"), filter_path %>
     <% end %>
 <% end %>
