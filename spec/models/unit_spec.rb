@@ -87,6 +87,79 @@ RSpec.describe Unit, type: :model do
     end
   end
 
+  describe "UNIT_BADGES feature" do
+    context "when UNIT_BADGES is enabled" do
+      before { allow(ENV).to receive(:[]).with("UNIT_BADGES").and_return("true") }
+      after { allow(ENV).to receive(:[]).and_call_original }
+
+      describe "#normalize_id" do
+        it "strips spaces from ID" do
+          unit = build(:unit, id: "AB CD EF GH")
+          unit.valid?
+          expect(unit.id).to eq("ABCDEFGH")
+        end
+
+        it "uppercases ID" do
+          unit = build(:unit, id: "abcdefgh")
+          unit.valid?
+          expect(unit.id).to eq("ABCDEFGH")
+        end
+
+        it "trims ID to 8 characters" do
+          unit = build(:unit, id: "ABCDEFGHIJKLMNOP")
+          unit.valid?
+          expect(unit.id).to eq("ABCDEFGH")
+        end
+
+        it "handles combination of spaces, lowercase, and extra chars" do
+          unit = build(:unit, id: "  ab cd ef gh  ij kl")
+          unit.valid?
+          expect(unit.id).to eq("ABCDEFGH")
+        end
+      end
+
+      describe "#validate_badge_id" do
+        let(:badge_batch) { create(:badge_batch) }
+        let(:badge) { create(:badge, badge_batch: badge_batch) }
+
+        it "allows save when badge ID exists" do
+          unit = build(:unit, id: badge.id, user: user)
+          expect(unit.save).to be true
+        end
+
+        it "prevents save when badge ID does not exist" do
+          unit = build(:unit, id: "NOTFOUND", user: user)
+          expect(unit.save).to be false
+          error_msg = I18n.t("units.validations.invalid_badge_id")
+          expect(unit.errors[:id]).to include(error_msg)
+        end
+
+        it "validates ID presence" do
+          unit = build(:unit, id: nil, user: user)
+          expect(unit).not_to be_valid
+          expect(unit.errors[:id]).to be_present
+        end
+      end
+    end
+
+    context "when UNIT_BADGES is disabled" do
+      before { allow(ENV).to receive(:[]).with("UNIT_BADGES").and_return(nil) }
+      after { allow(ENV).to receive(:[]).and_call_original }
+
+      it "generates custom ID automatically" do
+        unit = build(:unit, user: user)
+        expect(unit.id).to be_nil
+        unit.save!
+        expect(unit.id).to match(/\A[A-Z0-9]{8}\z/)
+      end
+
+      it "does not require ID to be set" do
+        unit = build(:unit, user: user)
+        expect(unit).to be_valid
+      end
+    end
+  end
+
   describe "photo attachment" do
     let(:unit) { create(:unit) }
 
