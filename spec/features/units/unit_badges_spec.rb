@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.feature "Unit Badge Validation", type: :feature do
-  let(:user) { create(:user, :with_company) }
+  let(:user) { create(:user) }
   let(:badge_batch) { create(:badge_batch) }
   let(:badge) { create(:badge, badge_batch: badge_batch) }
 
