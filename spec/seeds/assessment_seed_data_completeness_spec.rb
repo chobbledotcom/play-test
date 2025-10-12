@@ -24,6 +24,8 @@ RSpec.describe "SeedData assessment field completeness" do
 
       # Get all columns from the database schema
       let(:db_columns) do
+        # Clear schema cache to avoid stale data in parallel test runs
+        ActiveRecord::Base.connection.schema_cache.clear!
         ActiveRecord::Base.connection.columns(table_name).map(&:name)
       end
 
@@ -98,6 +100,8 @@ RSpec.describe "SeedData assessment field completeness" do
   describe "inspection fields" do
     let(:seed_fields) { SeedData.inspection_fields(passed: true) }
     let(:db_columns) do
+      # Clear schema cache to avoid stale data in parallel test runs
+      ActiveRecord::Base.connection.schema_cache.clear!
       ActiveRecord::Base.connection.columns("inspections").map(&:name)
     end
 
