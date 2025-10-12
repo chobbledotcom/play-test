@@ -1,13 +1,19 @@
 en:
   badges:
     titles:
+      associated_units: "Units with this Badge"
       edit: "Edit Badge %{id}"
       edit_batch: "Edit Badge Batch #%{id}"
       index: "Badge Batches"
       new: "Create New Badge Batch"
       show: "Badge Batch #%{id}"
+      show_badge: "Badge %{id}"
     fields:
       badge_id: "Badge ID"
+      badge_note: "Badge Note"
+      batch: "Batch"
+      batch_created_at: "Batch Created"
+      batch_note: "Batch Note"
       count: "Number of Badges"
       created_at: "Date Created"
       id: "ID"
@@ -17,12 +23,16 @@ en:
       edit: "Edit Badge"
       edit_batch: "Edit Batch"
       new_batch: "Create New Batch"
+    search:
+      placeholder: "Search for badge ID..."
     messages:
       badge_updated: "Badge note updated successfully"
       batch_created: "Created batch with %{count} badges"
       batch_updated: "Badge batch updated successfully"
       no_badges: "No badges in this batch"
       no_batches: "No badge batches created yet"
+      search_not_found: "Badge '%{query}' not found"
+      search_success: "Badge found"
   forms:
     badge:
       header: "Edit Badge Note"

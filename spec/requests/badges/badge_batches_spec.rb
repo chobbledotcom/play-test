@@ -43,6 +43,30 @@ RSpec.describe "BadgeBatches", type: :request do
     end
   end
 
+  describe "Badge search" do
+    before { login_as(admin_user) }
+
+    it "redirects to badge show when badge exists" do
+      batch = create(:badge_batch)
+      badge = create(:badge, badge_batch: batch)
+
+      get search_badge_batches_path, params: {query: badge.id}
+      expect(response).to redirect_to(badge_path(badge))
+      expect(flash[:success]).to be_present
+    end
+
+    it "redirects to index with error when badge not found" do
+      get search_badge_batches_path, params: {query: "NOTFOUND"}
+      expect(response).to redirect_to(badge_batches_path)
+      expect(flash[:alert]).to be_present
+    end
+
+    it "redirects to index when query is blank" do
+      get search_badge_batches_path, params: {query: ""}
+      expect(response).to redirect_to(badge_batches_path)
+    end
+  end
+
   describe "Edge cases" do
     before { login_as(admin_user) }
 

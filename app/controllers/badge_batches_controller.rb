@@ -48,6 +48,25 @@ class BadgeBatchesController < ApplicationController
     end
   end
 
+  def search
+    query = params[:query]&.strip&.upcase
+
+    if query.blank?
+      redirect_to badge_batches_path
+      return
+    end
+
+    badge = Badge.find_by(id: query)
+
+    if badge
+      flash[:success] = t("badges.messages.search_success")
+      redirect_to badge_path(badge)
+    else
+      flash[:alert] = t("badges.messages.search_not_found", query: query)
+      redirect_to badge_batches_path
+    end
+  end
+
   private
 
   def set_badge_batch

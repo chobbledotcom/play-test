@@ -172,4 +172,36 @@ RSpec.feature "Badge Management", type: :feature do
       expect(page).to have_content(badge.id)
     end
   end
+
+  scenario "searching for existing badge shows badge details" do
+    batch = create(:badge_batch)
+    badge = create(:badge, badge_batch: batch)
+
+    visit search_badge_batches_path(query: badge.id)
+
+    expect(page).to have_content(I18n.t("badges.messages.search_success"))
+    badge_title = I18n.t("badges.titles.show_badge", id: badge.id)
+    expect(page).to have_content(badge_title)
+    expect(current_path).to eq(badge_path(badge))
+  end
+
+  scenario "searching for nonexistent badge shows error" do
+    visit search_badge_batches_path(query: "NOTFOUND")
+
+    error_msg = I18n.t("badges.messages.search_not_found", query: "NOTFOUND")
+    expect(page).to have_content(error_msg)
+    expect(current_path).to eq(badge_batches_path)
+  end
+
+  scenario "badge show page displays batch information" do
+    batch = create(:badge_batch, note: "Test batch note")
+    badge = create(:badge, badge_batch: batch, note: "Test badge note")
+
+    visit badge_path(badge)
+
+    expect(page).to have_content(badge.id)
+    expect(page).to have_link(I18n.t("badges.titles.show", id: batch.id))
+    expect(page).to have_content("Test batch note")
+    expect(page).to have_content("Test badge note")
+  end
 end

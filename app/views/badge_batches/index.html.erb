@@ -4,6 +4,13 @@
   <%= link_to t("badges.buttons.new_batch"), new_badge_batch_path %>
 </nav>
 
+<%= form_with url: search_badge_batches_path, method: :get, data: { turbo: false }, id: "search-box" do |form| %>
+  <%= form.text_field :query,
+      placeholder: t('badges.search.placeholder'),
+      value: params[:query],
+      onkeyup: "if(event.key === 'Enter') this.form.submit();" %>
+<% end %>
+
 <% if @badge_batches.any? %>
   <div class="table-list badge-batches-list">
     <div class="table-list-header">

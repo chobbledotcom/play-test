@@ -27,6 +27,21 @@ RSpec.describe "Badges", type: :request do
     end
   end
 
+  describe "Badge show" do
+    before { login_as(admin_user) }
+
+    it "returns http success" do
+      get badge_path(badge)
+      expect(response).to have_http_status(:success)
+    end
+
+    it "shows badge and batch details" do
+      get badge_path(badge)
+      expect(response.body).to include(badge.id)
+      expect(response.body).to include(batch.id.to_s)
+    end
+  end
+
   describe "Badge updates" do
     before { login_as(admin_user) }
 
