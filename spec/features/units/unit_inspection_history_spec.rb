@@ -27,43 +27,29 @@ RSpec.describe "Unit Inspection History", type: :feature do
       expect(page).to have_content(I18n.t("inspections.fields.result"))
     end
 
-    it "displays inspection with assigned company" do
-      expect(inspection.inspector_company).to be_present
+    it "displays inspector name from user" do
+      inspection
 
       visit unit_path(unit)
 
-      expect(page).to have_content(I18n.t("inspections.fields.last_inspection"))
       expect(page).to have_content(I18n.t("inspections.fields.inspector"))
-      expect(page).to have_content(inspection.inspector_company.name)
+      expect(page).to have_content(user.name)
     end
 
-    it "displays inspector company name when present" do
-      inspector_company = create(:inspector_company, name: "Test Inspector Co")
-      inspection.update!(inspector_company: inspector_company)
+    it "displays different inspector names for different users" do
+      inspection
+      other_user = create(:user, name: "Jane Inspector")
+      create(
+        :inspection,
+        user: other_user,
+        unit: unit,
+        inspection_date: 2.weeks.ago
+      )
 
       visit unit_path(unit)
 
-      expect(page).to have_content("Test Inspector Co")
-    end
-
-    context "when inspection has no inspector company" do
-      it "displays message when inspector company is missing" do
-        date = 1.week.ago
-        inspection_no_company = create(
-          :inspection,
-          user: user,
-          unit: unit,
-          inspection_date: date
-        )
-        inspection_no_company.update_column(:inspector_company_id, nil)
-        inspection_no_company.reload
-        expect(inspection_no_company.inspector_company).to be_nil
-
-        visit unit_path(unit)
-
-        expect(page).to have_content(I18n.t("inspections.fields.inspector"))
-        expect(page).to have_content(I18n.t("inspections.messages.no_company"))
-      end
+      expect(page).to have_content(user.name)
+      expect(page).to have_content(other_user.name)
     end
   end
 end
