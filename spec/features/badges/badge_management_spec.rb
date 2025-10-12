@@ -25,7 +25,7 @@ RSpec.feature "Badge Management", type: :feature do
     visit badge_batches_path
 
     click_link I18n.t("badges.buttons.new_batch")
-    expect(page).to have_content(I18n.t("badges.titles.new"))
+    expect(page).to have_content(I18n.t("forms.badge_batch.header"))
 
     fill_in I18n.t("forms.badge_batch.fields.count"), with: 10
     fill_in I18n.t("forms.badge_batch.fields.note"), with: "Test batch"
@@ -96,14 +96,13 @@ RSpec.feature "Badge Management", type: :feature do
     visit badge_batch_path(batch)
     click_link I18n.t("badges.buttons.edit_batch")
 
-    batch_edit_title = I18n.t("badges.titles.edit_batch", id: batch.id)
-    expect(page).to have_content(batch_edit_title)
+    expect(page).to have_content(I18n.t("forms.badge_batch_edit.header"))
 
-    fill_in I18n.t("forms.badge_batch.fields.note"), with: "Updated batch note"
-    click_button I18n.t("forms.badge_batch.submit_edit")
+    fill_in I18n.t("forms.badge_batch_edit.fields.note"), with: "Updated note"
+    click_button I18n.t("forms.badge_batch_edit.submit")
 
     expect(page).to have_content(I18n.t("badges.messages.batch_updated"))
-    expect(page).to have_content("Updated batch note")
+    expect(page).to have_content("Updated note")
   end
 
   scenario "regular user cannot access badges" do
