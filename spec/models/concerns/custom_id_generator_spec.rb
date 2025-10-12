@@ -48,16 +48,6 @@ RSpec.describe CustomIdGenerator, type: :concern do
       expect(test_class).to have_received(:exists?).twice
       expect(id).to match(/\A[A-Z0-9]{8}\z/)
     end
-
-    it "accepts scope conditions for uniqueness checking" do
-      scope_conditions = {user_id: 1}
-      allow(test_class).to receive(:exists?).and_return(false)
-
-      test_class.generate_random_id(scope_conditions)
-
-      expect(test_class).to have_received(:exists?)
-        .with(hash_including(scope_conditions))
-    end
   end
 
   describe ".generate_random_ids" do
@@ -137,26 +127,13 @@ RSpec.describe CustomIdGenerator, type: :concern do
       expect(instance.id.blank?).to be_falsy
     end
 
-    it "calls uniqueness_scope if model responds to it" do
-      # Add uniqueness_scope method to test class
-      test_class.define_method(:uniqueness_scope) { {user_id: 1} }
-
+    it "calls generate_random_id when creating" do
       allow(test_class).to receive(:generate_random_id)
-        .and_return("TESTID123456")
+        .and_return("TESTID12")
 
       instance.send(:generate_custom_id)
 
-      expect(test_class).to have_received(:generate_random_id)
-        .with({user_id: 1})
-    end
-
-    it "calls generate_random_id with empty scope without uniqueness_scope" do
-      allow(test_class).to receive(:generate_random_id)
-        .and_return("TESTID123456")
-
-      instance.send(:generate_custom_id)
-
-      expect(test_class).to have_received(:generate_random_id).with({})
+      expect(test_class).to have_received(:generate_random_id).with(no_args)
     end
   end
 end
