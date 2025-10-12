@@ -102,9 +102,43 @@ echo "Configuring bundler..."
 /usr/local/bin/bundle config set --local without 'development test ci_annotations ci_coverage'
 /usr/local/bin/bundle config set --local deployment false
 
-# Install any missing production gems
-echo "Installing production gems..."
-/usr/local/bin/bundle install --jobs 4
+# Install any missing production gems in background with progress reporting
+echo "Installing production gems in background..."
+LOG_FILE="/tmp/bundle-install-$$.log"
+/usr/local/bin/bundle install --jobs 4 > "$LOG_FILE" 2>&1 &
+BUNDLE_PID=$!
+
+echo "Bundle install running (PID: $BUNDLE_PID)"
+echo "Log file: $LOG_FILE"
+
+# Monitor the bundle install process
+SECONDS=0
+while kill -0 $BUNDLE_PID 2>/dev/null; do
+    echo "Bundle install still running... ${SECONDS}s elapsed"
+    # Show last few lines of output
+    if [ -f "$LOG_FILE" ]; then
+        echo "Latest output:"
+        tail -n 3 "$LOG_FILE" | sed 's/^/  /'
+    fi
+    sleep 5
+done
+
+# Wait for the process to complete and get exit code
+wait $BUNDLE_PID
+BUNDLE_EXIT_CODE=$?
+
+echo ""
+echo "Bundle install completed after ${SECONDS}s"
+if [ $BUNDLE_EXIT_CODE -ne 0 ]; then
+    echo "Bundle install failed! Exit code: $BUNDLE_EXIT_CODE"
+    echo "Full log:"
+    cat "$LOG_FILE"
+    rm -f "$LOG_FILE"
+    exit $BUNDLE_EXIT_CODE
+fi
+
+echo "Bundle install succeeded"
+rm -f "$LOG_FILE"
 
 # Generate a secret key for production
 echo "Generating secret key..."
