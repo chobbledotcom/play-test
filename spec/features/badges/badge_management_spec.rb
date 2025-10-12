@@ -116,4 +116,61 @@ RSpec.feature "Badge Management", type: :feature do
     expect(page).to have_content(admin_required_msg)
     expect(current_path).to eq(root_path)
   end
+
+  scenario "clicking batch row navigates to batch details" do
+    batch = create(:badge_batch, :with_badges, note: "Row click test")
+
+    visit badge_batches_path
+
+    within("li", text: batch.id.to_s) do
+      click_link
+    end
+
+    expect(current_path).to eq(badge_batch_path(batch))
+    expect(page).to have_content("Row click test")
+  end
+
+  scenario "clicking badge row navigates to badge edit" do
+    batch = create(:badge_batch)
+    badge = create(:badge, badge_batch: batch, note: "Badge row test")
+
+    visit badge_batch_path(batch)
+
+    within("li", text: badge.id) do
+      click_link
+    end
+
+    expect(current_path).to eq(edit_badge_path(badge))
+    expect(page).to have_content(I18n.t("badges.titles.edit", id: badge.id))
+  end
+
+  scenario "back button navigates from batch to index" do
+    batch = create(:badge_batch)
+
+    visit badge_batch_path(batch)
+    click_link I18n.t("badges.buttons.back")
+
+    expect(current_path).to eq(badge_batches_path)
+  end
+
+  scenario "displaying batch count in index" do
+    batch = create(:badge_batch, count: 25)
+
+    visit badge_batches_path
+
+    within("li", text: batch.id.to_s) do
+      expect(page).to have_content("25")
+    end
+  end
+
+  scenario "viewing all badges in a batch" do
+    batch = create(:badge_batch, count: 3)
+    badges = create_list(:badge, 3, badge_batch: batch)
+
+    visit badge_batch_path(batch)
+
+    badges.each do |badge|
+      expect(page).to have_content(badge.id)
+    end
+  end
 end
