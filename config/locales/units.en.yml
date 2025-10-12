@@ -3,12 +3,13 @@ en:
   # Units Management
   units:
     titles:
-      new: New Unit
+      all_units: All Units
       edit: Edit Unit
       index: Units
-      show: Unit Details
-      new_from_inspection: Create Unit from Inspection
       log: Activity Log - %{unit}
+      new: New Unit
+      new_from_inspection: Create Unit from Inspection
+      show: Unit Details
     search:
       placeholder: Serial number or name
     headers:
@@ -93,15 +94,16 @@ en:
       needs_repair: Needs Repair
       select_prompt: Select condition...
     buttons:
-      view: View Inspections
-      create: Create Unit
-      update: Update Unit
-      delete: Delete
-      pdf_report: PDF Report
       add_inspection: Add Inspection
       add_unit: Add Unit
-      export_csv: Export CSV
+      all_units: All Units
+      create: Create Unit
+      delete: Delete
       download_pdf: Download PDF
+      export_csv: Export CSV
+      pdf_report: PDF Report
+      update: Update Unit
+      view: View Inspections
     actions:
       select: Select
       click_here: Click here

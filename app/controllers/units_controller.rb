@@ -30,6 +30,22 @@ class UnitsController < ApplicationController
     end
   end
 
+  def all
+    head :not_found and return unless current_user&.admin?
+
+    @units = filtered_all_units_query
+    @title = I18n.t("units.titles.all_units")
+
+    respond_to do |format|
+      format.html { render :index }
+      format.csv do
+        log_unit_event("exported", nil, "Exported #{@units.count} units to CSV")
+        csv_data = UnitCsvExportService.new(@units).generate
+        send_data csv_data, filename: "all-units-#{Time.zone.today}.csv"
+      end
+    end
+  end
+
   def show
     # Handle federation HEAD requests
     return head :ok if request.head?
@@ -309,6 +325,15 @@ class UnitsController < ApplicationController
 
   def filtered_units_query
     units = current_user.units.includes(photo_attachment: :blob)
+    units = units.search(params[:query])
+    units = units.overdue if params[:status] == "overdue"
+    units = units.by_manufacturer(params[:manufacturer])
+    units = units.by_operator(params[:operator])
+    units.order(created_at: :desc)
+  end
+
+  def filtered_all_units_query
+    units = Unit.includes(photo_attachment: :blob)
     units = units.search(params[:query])
     units = units.overdue if params[:status] == "overdue"
     units = units.by_manufacturer(params[:manufacturer])

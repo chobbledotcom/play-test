@@ -182,6 +182,9 @@ Rails.application.routes.draw do
 
   # Units
   resources :units do
+    collection do
+      get "all"
+    end
     member do
       get "unified_edit"
       patch "unified_update"
