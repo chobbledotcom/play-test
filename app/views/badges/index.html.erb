@@ -1,0 +1,32 @@
+<header>
+  <h1><%= t("badges.titles.index") %></h1>
+</header>
+
+<nav>
+  <%= link_to t("badges.buttons.new_batch"), new_badge_batch_path %>
+</nav>
+
+<% if @badge_batches.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th><%= t("badges.fields.id") %></th>
+        <th><%= t("badges.fields.badge_count") %></th>
+        <th><%= t("badges.fields.created_at") %></th>
+        <th><%= t("badges.fields.note") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @badge_batches.each do |batch| %>
+        <tr>
+          <td><%= link_to batch.id, badge_batch_path(batch) %></td>
+          <td><%= batch.badge_count %></td>
+          <td><%= l(batch.created_at, format: :long) %></td>
+          <td><%= batch.note %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p><%= t("badges.messages.no_batches") %></p>
+<% end %>

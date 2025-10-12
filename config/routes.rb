@@ -209,6 +209,10 @@ Rails.application.routes.draw do
   get "admin/releases", to: "admin#releases", as: :admin_releases
   get "admin/files", to: "admin#files", as: :admin_files
 
+  # Badges (admin-only)
+  resources :badge_batches, path: "badges", only: %i[index show new create], as: :badge_batches
+  resources :badges, only: %i[edit update]
+
   # Backups
   resources :backups, only: [:index] do
     collection do

@@ -1,0 +1,13 @@
+<header>
+  <h1><%= t("badges.titles.edit", id: @badge.id) %></h1>
+</header>
+
+<%= render 'chobble_forms/form_context',
+  model: @badge,
+  i18n_base: 'forms.badge',
+  url: badge_path(@badge),
+  method: :patch do |form| %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'badge_details' do %>
+    <%= render 'chobble_forms/text_area', field: :note %>
+  <% end %>
+<% end %>

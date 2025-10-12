@@ -1,0 +1,13 @@
+<header>
+  <h1><%= t("badges.titles.new") %></h1>
+</header>
+
+<%= render 'chobble_forms/form_context',
+  model: @badge_batch,
+  i18n_base: 'forms.badge_batch',
+  url: badge_batches_path do |form| %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'batch_details' do %>
+    <%= render 'chobble_forms/number_field', field: :count, required: true %>
+    <%= render 'chobble_forms/text_area', field: :note %>
+  <% end %>
+<% end %>
