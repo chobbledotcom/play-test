@@ -6,11 +6,12 @@ RSpec.describe SeedDataService do
   describe ".add_seeds_for_user" do
     context "when user has no seed data" do
       it "returns true on success" do
-        expect(described_class.add_seeds_for_user(user)).to be true
+        result = described_class.add_seeds_for_user(user, unit_count: 1, inspection_count: 1)
+        expect(result).to be true
       end
 
       it "creates complete inspections with all assessments" do
-        described_class.add_seeds_for_user(user)
+        described_class.add_seeds_for_user(user, unit_count: 1, inspection_count: 1)
 
         inspection = user.inspections.seed_data.complete.first
         expect(inspection.user_height_assessment).to be_present
@@ -62,7 +63,7 @@ RSpec.describe SeedDataService do
   describe ".delete_seeds_for_user" do
     context "when user has seed data" do
       before do
-        described_class.add_seeds_for_user(user)
+        described_class.add_seeds_for_user(user, unit_count: 1, inspection_count: 1)
       end
 
       it "returns true on success" do
@@ -72,7 +73,7 @@ RSpec.describe SeedDataService do
 
     context "when deletion fails" do
       before do
-        described_class.add_seeds_for_user(user)
+        described_class.add_seeds_for_user(user, unit_count: 1, inspection_count: 1)
         allow_any_instance_of(ActiveRecord::Relation).to receive(:destroy_all)
           .and_raise(StandardError)
       end
