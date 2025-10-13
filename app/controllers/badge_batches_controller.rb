@@ -23,8 +23,8 @@ class BadgeBatchesController < ApplicationController
 
     timestamp = Time.current
     badge_records = badge_ids.map do |id|
-      {id: id, badge_batch_id: badge_batch.id, created_at: timestamp,
-       updated_at: timestamp}
+      { id: id, badge_batch_id: badge_batch.id, created_at: timestamp,
+       updated_at: timestamp }
     end
     Badge.insert_all(badge_records)
 
@@ -74,7 +74,7 @@ class BadgeBatchesController < ApplicationController
   private
 
   def set_badge_batch
-    @badge_batch = BadgeBatch.find(params[:id])
+    @badge_batch = BadgeBatch.includes(badges: :unit).find(params[:id])
   end
 
   def badge_batch_params

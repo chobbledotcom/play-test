@@ -67,7 +67,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_12_134703) do
     t.integer "count"
   end
 
-  create_table "badges", id: {type: :string, limit: 8}, force: :cascade do |t|
+  create_table "badges", id: { type: :string, limit: 8 }, force: :cascade do |t|
     t.integer "badge_batch_id", null: false
     t.text "note"
     t.datetime "created_at", null: false

@@ -7,6 +7,7 @@ class Badge < ApplicationRecord
   include CustomIdGenerator
 
   belongs_to :badge_batch
+  has_one :unit, foreign_key: :id, primary_key: :id
 
   def badge_id = id
 
