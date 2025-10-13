@@ -9,8 +9,11 @@ RSpec.describe QrCodeService do
   let(:base_url) { "https://example.com" }
 
   before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("BASE_URL").and_return(base_url)
+    Rails.configuration.base_url = base_url
+  end
+
+  after do
+    Rails.configuration.base_url = "http://localhost:3000"
   end
 
   shared_examples "generates QR code" do |record_type|
@@ -77,7 +80,8 @@ RSpec.describe QrCodeService do
   end
 
   context "when BASE_URL is not set" do
-    before { allow(ENV).to receive(:[]).with("BASE_URL").and_return(nil) }
+    before { Rails.configuration.base_url = nil }
+    after { Rails.configuration.base_url = "http://localhost:3000" }
 
     %i[inspection unit].each do |record_type|
       it "raises TypeError for #{record_type} QR generation" do
