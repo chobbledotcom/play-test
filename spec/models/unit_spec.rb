@@ -89,6 +89,72 @@ RSpec.describe Unit, type: :model do
     end
   end
 
+  describe "LOCK_UNITS_DAYS feature" do
+    describe ".lock_days_threshold" do
+      context "when LOCK_UNITS_DAYS is set" do
+        before { ENV["LOCK_UNITS_DAYS"] = "90" }
+        after { ENV.delete("LOCK_UNITS_DAYS") }
+
+        it "returns the configured number of days" do
+          expect(Unit.lock_days_threshold).to eq(90)
+        end
+      end
+
+      context "when LOCK_UNITS_DAYS is not set" do
+        before { ENV.delete("LOCK_UNITS_DAYS") }
+
+        it "returns nil" do
+          expect(Unit.lock_days_threshold).to be_nil
+        end
+      end
+
+      context "when LOCK_UNITS_DAYS is empty string" do
+        before { ENV["LOCK_UNITS_DAYS"] = "" }
+        after { ENV.delete("LOCK_UNITS_DAYS") }
+
+        it "returns nil" do
+          expect(Unit.lock_days_threshold).to be_nil
+        end
+      end
+    end
+
+    describe "#locked_for_non_admin?" do
+      context "when LOCK_UNITS_DAYS is set" do
+        before { ENV["LOCK_UNITS_DAYS"] = "90" }
+        after { ENV.delete("LOCK_UNITS_DAYS") }
+
+        it "returns true for units older than threshold" do
+          unit = create(:unit, created_at: 91.days.ago)
+          expect(unit.locked_for_non_admin?).to be true
+        end
+
+        it "returns false for units newer than threshold" do
+          unit = create(:unit, created_at: 89.days.ago)
+          expect(unit.locked_for_non_admin?).to be false
+        end
+
+        it "returns true for units exactly at threshold" do
+          unit = create(:unit, created_at: 90.days.ago)
+          expect(unit.locked_for_non_admin?).to be true
+        end
+
+        it "returns false for new units" do
+          unit = create(:unit)
+          expect(unit.locked_for_non_admin?).to be false
+        end
+      end
+
+      context "when LOCK_UNITS_DAYS is not set" do
+        before { ENV.delete("LOCK_UNITS_DAYS") }
+
+        it "returns false regardless of unit age" do
+          old_unit = create(:unit, created_at: 365.days.ago)
+          expect(old_unit.locked_for_non_admin?).to be false
+        end
+      end
+    end
+  end
+
   describe "UNIT_BADGES feature" do
     context "when UNIT_BADGES is enabled" do
       before { ENV["UNIT_BADGES"] = "true" }

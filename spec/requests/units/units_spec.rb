@@ -692,6 +692,85 @@ RSpec.describe "Units", type: :request do
     end
   end
 
+  describe "LOCK_UNITS_DAYS enforcement" do
+    let(:old_unit) { create(:unit, user: user, created_at: 91.days.ago) }
+    let(:new_unit) { create(:unit, user: user, created_at: 30.days.ago) }
+
+    before do
+      ENV["LOCK_UNITS_DAYS"] = "90"
+      login_as(user)
+    end
+
+    after do
+      ENV.delete("LOCK_UNITS_DAYS")
+    end
+
+    describe "GET /units/:id/edit" do
+      it "redirects to show page for locked units" do
+        get edit_unit_path(old_unit)
+        expect(response).to redirect_to(unit_path(old_unit))
+        msg = I18n.t("units.messages.locked_unit", days: 90)
+        expect(flash[:alert]).to eq(msg)
+      end
+
+      it "allows access for new units" do
+        get edit_unit_path(new_unit)
+        expect(response).to have_http_status(:success)
+      end
+    end
+
+    describe "PATCH /units/:id" do
+      it "returns forbidden for locked units" do
+        patch unit_path(old_unit), params: {
+          unit: {name: "Updated Name"}
+        }
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "allows updates for new units" do
+        patch unit_path(new_unit), params: {
+          unit: {name: "Updated Name"}
+        }
+        expect(response).to have_http_status(:found)
+        new_unit.reload
+        expect(new_unit.name).to eq("Updated Name")
+      end
+    end
+
+    describe "DELETE /units/:id" do
+      it "returns forbidden for locked units" do
+        delete unit_path(old_unit)
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "allows deletion of new units without inspections" do
+        delete unit_path(new_unit)
+        expect(response).to redirect_to(units_path)
+        expect(Unit.exists?(new_unit.id)).to be false
+      end
+    end
+
+    context "when LOCK_UNITS_DAYS is not set" do
+      before do
+        ENV.delete("LOCK_UNITS_DAYS")
+      end
+
+      it "allows editing old units" do
+        get edit_unit_path(old_unit)
+        expect(response).to have_http_status(:success)
+      end
+
+      it "allows updating old units" do
+        patch unit_path(old_unit), params: {
+          unit: {name: "Updated Old Unit"}
+        }
+        expect(response).to have_http_status(:found)
+        old_unit.reload
+        expect(old_unit.name).to eq("Updated Old Unit")
+      end
+    end
+  end
+
   describe "Access control and error handling" do
     describe "inactive user restrictions" do
       let(:inactive_user) { create(:user, active_until: Date.current - 1.day) }

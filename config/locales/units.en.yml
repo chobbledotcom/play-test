@@ -157,6 +157,10 @@ en:
       pdf_not_supported_html: Your browser does not support PDFs.
       existing_unit_found: A unit with that ID already exists. Redirected to existing
         unit.
+      locked_unit: This unit cannot be edited because it is more than %{days} days
+        old. Please contact an administrator if you need to make changes.
+      locked_unit_notice: This unit is more than %{days} days old and can only be
+        edited by an admin user.
     accessibility:
       qr_code_alt: QR Code for Unit Inspection History Report
     share:

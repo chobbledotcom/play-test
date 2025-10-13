@@ -183,6 +183,20 @@ class Unit < ApplicationRecord
       .having("MAX(inspections.inspection_date) <= ?", cutoff_date)
   end
 
+  sig { returns(T.nilable(Integer)) }
+  def self.lock_days_threshold
+    days = ENV["LOCK_UNITS_DAYS"]
+    return nil if days.blank?
+    days.to_i
+  end
+
+  sig { returns(T::Boolean) }
+  def locked_for_non_admin?
+    threshold = Unit.lock_days_threshold
+    return false if threshold.nil?
+    created_at <= threshold.days.ago
+  end
+
   private
 
   sig { void }

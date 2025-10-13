@@ -13,6 +13,7 @@ class UnitsController < ApplicationController
   before_action :require_admin, only: %i[all]
   before_action :set_unit, only: %i[destroy edit log show update]
   before_action :check_unit_owner, only: %i[destroy edit update]
+  before_action :check_unit_locked, only: %i[destroy edit update]
   before_action :check_log_access, only: %i[log]
   before_action :require_user_active, only: %i[create new edit update]
   before_action :no_index
@@ -304,7 +305,22 @@ class UnitsController < ApplicationController
   end
 
   def check_unit_owner
+    return if current_user&.admin?
     head :not_found unless owns_resource?
+  end
+
+  def check_unit_locked
+    return if current_user&.admin?
+    return unless @unit&.locked_for_non_admin?
+
+    threshold = Unit.lock_days_threshold
+    if action_name == "edit"
+      msg = I18n.t("units.messages.locked_unit", days: threshold)
+      flash[:alert] = msg
+      redirect_to @unit
+    else
+      head :forbidden
+    end
   end
 
   def check_log_access
