@@ -126,7 +126,7 @@ GEM
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
     cbor (0.5.9.9)
-    chobble-forms (0.7.2)
+    chobble-forms (0.8.0)
       rails (>= 8.0.0)
       sorbet-runtime (~> 0.5)
     chronic (0.10.2)
