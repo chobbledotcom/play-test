@@ -1,3 +1,5 @@
+# typed: false
+
 # == Schema Information
 #
 # Table name: units
@@ -118,7 +120,7 @@ RSpec.describe Unit, type: :model do
         end
       end
 
-      describe "#validate_badge_id" do
+      describe "#badge_id_valid" do
         let(:badge_batch) { create(:badge_batch) }
         let(:badge) { create(:badge, badge_batch: badge_batch) }
 
