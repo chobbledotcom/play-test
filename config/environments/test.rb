@@ -60,7 +60,8 @@ Rails.application.configure do
   # Use test adapter for Active Job in tests
   config.active_job.queue_adapter = :test
 
-  # Default feature flags to true for tests
+  # Default feature flags for tests
   config.has_assessments = true
   config.unit_badges_enabled = false
+  config.simple_user_activation = false
 end
