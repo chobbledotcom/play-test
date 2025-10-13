@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require "rails_helper"
@@ -119,6 +120,42 @@ RSpec.feature "Unit Badge Validation", type: :feature do
       created_unit = Unit.find_by(name: "Test Unit")
       expect(created_unit).to be_present
       expect(created_unit.id).to match(/\A[A-Z0-9]{8}\z/)
+    end
+  end
+
+  context "ID field immutability on edit" do
+    let(:unit_with_badge) { create(:unit, id: badge.id, user: user) }
+
+    before do
+      ENV["UNIT_BADGES"] = "true"
+    end
+
+    after do
+      ENV.delete("UNIT_BADGES")
+    end
+
+    scenario "does not show ID field on edit form" do
+      visit edit_unit_path(unit_with_badge)
+      expect_field_not_present(:units, :id)
+    end
+
+    scenario "ID remains unchanged after editing other fields" do
+      original_id = unit_with_badge.id
+
+      visit edit_unit_path(unit_with_badge)
+      fill_in_form(:units, :name, "Updated Name")
+      submit_form(:units)
+
+      expect_i18n_content("units.messages.updated")
+
+      unit_with_badge.reload
+      expect(unit_with_badge.id).to eq(original_id)
+      expect(unit_with_badge.name).to eq("Updated Name")
+    end
+
+    scenario "shows badge ID in display format on edit page" do
+      visit edit_unit_path(unit_with_badge)
+      expect(page).to have_content(badge.id)
     end
   end
 end

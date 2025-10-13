@@ -9,9 +9,15 @@
   i18n_base: 'forms.units',
   url: form_url do |form| %>
   <%= render 'chobble_forms/fieldset', legend_key: 'unit_details' do %>
-    <%# Show ID field when UNIT_BADGES is enabled and creating new unit %>
-    <% if ENV["UNIT_BADGES"] == "true" && !unit.persisted? %>
-      <%= render 'chobble_forms/text_field', field: :id, required: true %>
+    <%# Show ID field when UNIT_BADGES is enabled %>
+    <% if ENV["UNIT_BADGES"] == "true" %>
+      <% if unit.persisted? %>
+        <%# Display ID as read-only for existing units %>
+        <%= render 'chobble_forms/display_field', field: :id %>
+      <% else %>
+        <%# Editable ID field for new units %>
+        <%= render 'chobble_forms/text_field', field: :id, required: true %>
+      <% end %>
     <% end %>
 
     <%= render 'chobble_forms/text_field', field: :name, required: true %>
