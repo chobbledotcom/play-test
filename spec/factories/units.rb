@@ -40,6 +40,18 @@ FactoryBot.define do
     manufacture_date { 1.year.ago }
     is_seed { false }
 
+    trait :with_badge do
+      transient do
+        badge_batch { nil }
+      end
+
+      after(:build) do |unit, evaluator|
+        batch = evaluator.badge_batch || FactoryBot.create(:badge_batch, count: 1)
+        badge = FactoryBot.create(:badge, badge_batch: batch)
+        unit.id = badge.id
+      end
+    end
+
     # Variation with different values
     trait :with_different_values do
       name { "Different Test Unit" }

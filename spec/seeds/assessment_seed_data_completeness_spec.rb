@@ -31,7 +31,7 @@ RSpec.describe "SeedData assessment field completeness" do
 
       # Columns that are system-managed and don't need to be in seed data
       let(:system_columns) do
-        %w[inspection_id created_at updated_at]
+        %w[id inspection_id created_at updated_at]
       end
 
       # Comment fields are optional

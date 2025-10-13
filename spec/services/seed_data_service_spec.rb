@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe SeedDataService do
@@ -11,7 +13,7 @@ RSpec.describe SeedDataService do
       end
 
       it "creates complete inspections with all assessments" do
-        described_class.add_seeds_for_user(user, unit_count: 1, inspection_count: 1)
+        described_class.add_seeds_for_user(user, unit_count: 1, inspection_count: 2)
 
         inspection = user.inspections.seed_data.complete.first
         expect(inspection.user_height_assessment).to be_present
