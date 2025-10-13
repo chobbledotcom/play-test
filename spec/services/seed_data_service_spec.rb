@@ -11,9 +11,10 @@ RSpec.describe SeedDataService do
       end
 
       it "creates complete inspections with all assessments" do
-        described_class.add_seeds_for_user(user, unit_count: 1, inspection_count: 1)
+        described_class.add_seeds_for_user(user, unit_count: 1, inspection_count: 2)
 
         inspection = user.inspections.seed_data.complete.first
+        expect(inspection).to be_present
         expect(inspection.user_height_assessment).to be_present
         expect(inspection.structure_assessment).to be_present
         expect(inspection.anchorage_assessment).to be_present
