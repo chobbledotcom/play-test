@@ -58,6 +58,11 @@
       </li>
 
       <li>
+        <strong><%= t("units.fields.id") %>:</strong>
+        <span><%= unit.id %></span>
+      </li>
+
+      <li>
         <strong><%= ChobbleForms::FieldUtils.form_field_label(:units, :manufacturer) %>:</strong>
         <span><%= link_to unit.manufacturer,
                          units_path(manufacturer: unit.manufacturer, anchor: "main"),
