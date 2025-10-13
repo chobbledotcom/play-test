@@ -64,4 +64,5 @@ Rails.application.configure do
   config.has_assessments = true
   config.unit_badges_enabled = false
   config.simple_user_activation = false
+  config.unit_reports_unbranded = false
 end
