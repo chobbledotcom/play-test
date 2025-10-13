@@ -283,7 +283,7 @@ class UnitsController < ApplicationController
 
   sig { returns(T::Boolean) }
   def unit_badges_enabled?
-    ENV["UNIT_BADGES"] == "true"
+    Rails.configuration.unit_badges_enabled
   end
 
   sig { params(raw_id: String).returns(String) }
@@ -313,7 +313,7 @@ class UnitsController < ApplicationController
   end
 
   def check_assessments_enabled
-    head :not_found unless ENV["HAS_ASSESSMENTS"] == "true"
+    head :not_found unless Rails.configuration.has_assessments
   end
 
   def send_unit_pdf

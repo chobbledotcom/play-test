@@ -10,7 +10,7 @@
   url: form_url do |form| %>
   <%= render 'chobble_forms/fieldset', legend_key: 'unit_details' do %>
     <%# Show ID field when UNIT_BADGES is enabled %>
-    <% if ENV["UNIT_BADGES"] == "true" %>
+    <% if Rails.configuration.unit_badges_enabled %>
       <% if unit.persisted? %>
         <%# Display ID as read-only for existing units %>
         <%= render 'chobble_forms/display_field', field: :id %>
