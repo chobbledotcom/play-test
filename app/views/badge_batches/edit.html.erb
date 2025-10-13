@@ -18,6 +18,14 @@
 <% end %>
 
 <% if @badges.any? %>
+  <div class="center">
+    <p>
+      <%= link_to export_badge_batch_path(@badge_batch) do %>
+        <strong><%= t('badges.buttons.export_csv') %></strong>
+      <% end %>
+    </p>
+  </div>
+
   <div class="table-list badges-list">
     <div class="table-list-header">
       <%= render 'shared/table_column',
