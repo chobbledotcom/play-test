@@ -66,9 +66,8 @@ module PlayTest
 
     # PDF Generation Configuration
     config.pdf_cache_enabled = ENV["PDF_CACHE_FROM"].present?
-    if ENV["PDF_CACHE_FROM"].present?
-      config.pdf_cache_from = Date.parse(ENV["PDF_CACHE_FROM"])
-    end
+    pdf_cache_date = ENV["PDF_CACHE_FROM"]
+    config.pdf_cache_from = pdf_cache_date.present? ? Date.parse(pdf_cache_date) : nil
     config.redirect_to_s3_pdfs = ENV["REDIRECT_TO_S3_PDFS"] == "true"
     config.pdf_logo = ENV["PDF_LOGO"]
 

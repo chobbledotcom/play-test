@@ -133,6 +133,7 @@ class PdfCacheService
     end
     def cached_pdf_valid?(attachment, record)
       return false unless attachment.blob&.created_at
+      return false unless pdf_cache_from_date
 
       cache_created_at = attachment.blob.created_at
       cache_threshold = pdf_cache_from_date.beginning_of_day

@@ -45,7 +45,8 @@ RSpec.feature "Badge Management", type: :feature do
       click_link
     end
 
-    expect(page).to have_content(I18n.t("badges.titles.edit_batch", id: batch.id))
+    title = I18n.t("badges.titles.edit_batch", id: batch.id)
+    expect(page).to have_content(title)
     expect(page).to have_content("Sample batch")
     expect(page).to have_content(batch.count.to_s)
   end
@@ -193,5 +194,23 @@ RSpec.feature "Badge Management", type: :feature do
     expect(page).to have_link(I18n.t("badges.titles.edit_batch", id: batch.id))
     expect(page).to have_content("Test batch note")
     expect(page).to have_content("Test badge note")
+  end
+
+  scenario "admin can export badge batch to CSV" do
+    batch = create(:badge_batch, note: "Export test batch")
+    create(:badge, id: "EXPT0001", badge_batch: batch)
+    create(:badge, id: "EXPT0002", badge_batch: batch, note: "Badge note")
+
+    visit edit_badge_batch_path(batch)
+
+    expect(page).to have_link(I18n.t("badges.buttons.export_csv"))
+    click_link I18n.t("badges.buttons.export_csv")
+
+    expect(page.response_headers["Content-Type"]).to include("text/csv")
+    csv_data = page.body
+    expect(csv_data).to include("Badge ID,Batch Creation Date")
+    expect(csv_data).to include("EXPT0001")
+    expect(csv_data).to include("EXPT0002")
+    expect(csv_data).to include("Export test batch")
   end
 end

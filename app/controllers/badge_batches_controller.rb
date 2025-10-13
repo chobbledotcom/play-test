@@ -3,7 +3,7 @@
 
 class BadgeBatchesController < ApplicationController
   before_action :require_admin
-  before_action :set_badge_batch, only: %i[edit update]
+  before_action :set_badge_batch, only: %i[edit export update]
 
   def index
     @badge_batches = BadgeBatch.includes(:badges).order(created_at: :desc)
@@ -23,8 +23,8 @@ class BadgeBatchesController < ApplicationController
 
     timestamp = Time.current
     badge_records = badge_ids.map do |id|
-      { id: id, badge_batch_id: badge_batch.id, created_at: timestamp,
-       updated_at: timestamp }
+      {id: id, badge_batch_id: badge_batch.id, created_at: timestamp,
+       updated_at: timestamp}
     end
     Badge.insert_all(badge_records)
 
@@ -34,6 +34,13 @@ class BadgeBatchesController < ApplicationController
 
   def edit
     @badges = @badge_batch.badges.order(:id)
+  end
+
+  def export
+    csv_data = BadgeBatchCsvExportService.new(@badge_batch).generate
+    batch_id = @badge_batch.id
+    today = Time.zone.today
+    send_data csv_data, filename: "badge-batch-#{batch_id}-#{today}.csv"
   end
 
   def update

@@ -127,7 +127,7 @@ Rails.application.routes.draw do
 
   get "favicon.ico", to: redirect("icon.svg")
 
-  root to: "pages#show", defaults: { slug: "/" }
+  root to: "pages#show", defaults: {slug: "/"}
   get "guides", to: "guides#index"
   get "guides/*path", to: "guides#show", as: :guide
   get "safety_standards", to: "safety_standards#index"
@@ -139,7 +139,7 @@ Rails.application.routes.draw do
   get "login", to: "sessions#new"
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
-  get "passkey_login", to: "sessions#passkey", defaults: { format: :json }
+  get "passkey_login", to: "sessions#passkey", defaults: {format: :json}
   post "passkey_callback", to: "sessions#passkey_callback"
 
   # Credentials (passkeys)
@@ -166,7 +166,7 @@ Rails.application.routes.draw do
   end
 
   # Inspections
-  resources :inspections, except: [ :new ] do
+  resources :inspections, except: [:new] do
     member do
       get "select_unit"
       patch "update_unit"
@@ -178,7 +178,7 @@ Rails.application.routes.draw do
     end
 
     Inspection::ALL_ASSESSMENT_TYPES.each_key do |assessment_type|
-      resource assessment_type, only: [ :update ]
+      resource assessment_type, only: [:update]
     end
   end
 
@@ -203,7 +203,7 @@ Rails.application.routes.draw do
     as: "create_unit_from_inspection"
 
   # Inspector Companies
-  resources :inspector_companies, except: [ :destroy ]
+  resources :inspector_companies, except: [:destroy]
 
   # Admin
   get "admin", to: "admin#index"
@@ -212,6 +212,9 @@ Rails.application.routes.draw do
 
   # Badges (admin-only)
   resources :badge_batches, only: %i[index new create edit update] do
+    member do
+      get :export
+    end
     collection do
       get :search, path: "search", as: :search
     end
@@ -219,18 +222,18 @@ Rails.application.routes.draw do
   resources :badges, only: %i[edit update]
 
   # Backups
-  resources :backups, only: [ :index ] do
+  resources :backups, only: [:index] do
     collection do
       get "download"
     end
   end
 
   # Pages (CMS)
-  resources :pages, except: [ :show ]
+  resources :pages, except: [:show]
   get "pages/:slug",
     to: "pages#show",
     as: :page_by_slug,
-    constraints: { slug: %r{[^/]+} }
+    constraints: {slug: %r{[^/]+}}
 
   # Handle error pages when exceptions_app is configured
   match "/404", to: "errors#not_found", via: :all
