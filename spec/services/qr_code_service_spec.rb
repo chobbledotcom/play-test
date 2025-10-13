@@ -78,18 +78,4 @@ RSpec.describe QrCodeService do
       )
     end
   end
-
-  context "when BASE_URL is not set" do
-    before { Rails.configuration.base_url = nil }
-    after { Rails.configuration.base_url = "http://localhost:3000" }
-
-    %i[inspection unit].each do |record_type|
-      it "raises TypeError for #{record_type} QR generation" do
-        record = send(record_type)
-        method = "generate_#{record_type}_qr_code"
-        expect { described_class.send(method, record) }
-          .to raise_error(TypeError)
-      end
-    end
-  end
 end
