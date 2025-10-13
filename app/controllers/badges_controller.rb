@@ -13,7 +13,7 @@ class BadgesController < ApplicationController
   def update
     if @badge.update(note_params)
       flash[:success] = t("badges.messages.badge_updated")
-      redirect_to badge_batch_path(@badge.badge_batch)
+      redirect_to edit_badge_batch_path(@badge.badge_batch)
     else
       render :edit
     end
