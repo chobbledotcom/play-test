@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Admin Navigation", type: :feature do
@@ -46,8 +48,11 @@ RSpec.feature "Admin Navigation", type: :feature do
 
   context "with S3 enabled" do
     before do
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with("USE_S3_STORAGE").and_return("true")
+      Rails.configuration.use_s3_storage = true
+    end
+
+    after do
+      Rails.configuration.use_s3_storage = false
     end
 
     scenario "admin sees backups link when S3 is enabled" do
@@ -60,8 +65,7 @@ RSpec.feature "Admin Navigation", type: :feature do
 
   context "without S3 enabled" do
     before do
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with("USE_S3_STORAGE").and_return(nil)
+      Rails.configuration.use_s3_storage = false
     end
 
     scenario "admin does not see backups link when S3 is disabled" do
