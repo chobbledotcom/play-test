@@ -60,8 +60,7 @@ class Unit < ApplicationRecord
   # All fields are required for Units
   validates :name, :serial, :description, :manufacturer, :operator, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
-  validates :id, presence: true, if: -> { unit_badges_enabled? && new_record? }
-  validate :badge_id_exists, on: :create, if: -> { unit_badges_enabled? && id.present? }
+  validate :badge_id_valid, on: :create, if: -> { unit_badges_enabled? }
 
   # Scopes - enhanced from original Equipment and new Unit functionality
   scope :seed_data, -> { where(is_seed: true) }
@@ -230,8 +229,11 @@ class Unit < ApplicationRecord
   end
 
   sig { void }
-  def badge_id_exists
-    return if id.blank?
+  def badge_id_valid
+    if id.blank?
+      errors.add(:id, :blank)
+      return
+    end
 
     # Check if badge exists
     unless Badge.exists?(id: id)
