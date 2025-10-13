@@ -49,7 +49,7 @@ RSpec.describe "Badges", type: :request do
       patch badge_path(badge), params: { badge: { note: "Updated note" } }
       badge.reload
       expect(badge.note).to eq("Updated note")
-      expect(response).to redirect_to(edit_badge_batch_path(batch))
+      expect(response).to redirect_to(badge_batch_path(batch))
     end
   end
 
