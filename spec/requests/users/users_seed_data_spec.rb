@@ -63,7 +63,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
     context "as admin" do
       before do
         login_as(admin_user)
-        SeedDataService.add_seeds_for_user(test_user)
+        SeedDataService.add_seeds_for_user(test_user, unit_count: 1, inspection_count: 1)
       end
 
       it "deletes seed data and redirects with success message" do
@@ -81,7 +81,7 @@ RSpec.describe "Users Seed Data Management", type: :request do
     context "as non-admin" do
       before do
         login_as(regular_user)
-        SeedDataService.add_seeds_for_user(test_user)
+        SeedDataService.add_seeds_for_user(test_user, unit_count: 1, inspection_count: 1)
       end
 
       it "redirects to root with error" do
