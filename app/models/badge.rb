@@ -7,4 +7,8 @@ class Badge < ApplicationRecord
   include CustomIdGenerator
 
   belongs_to :badge_batch
+
+  def badge_id = id
+
+  def batch_note = badge_batch.note
 end

@@ -1,6 +1,4 @@
-<header>
-  <h1><%= t("badges.titles.edit", id: @badge.id) %></h1>
-</header>
+<%= render 'shared/page_header', title: t('badges.titles.edit', id: @badge.id) %>
 
 <%= render 'chobble_forms/form_context',
   model: @badge,
@@ -8,6 +6,27 @@
   url: badge_path(@badge),
   method: :patch do |form| %>
   <%= render 'chobble_forms/fieldset', legend_key: 'badge_details' do %>
+    <%= render 'chobble_forms/display_field', field: :badge_id %>
+    
+    <div>
+      <label><%= t('forms.badge.fields.batch') %></label>
+      <p><%= link_to t("badges.titles.edit_batch", id: @badge_batch.id), edit_badge_batch_path(@badge_batch) %></p>
+    </div>
+    
+    <div>
+      <label><%= t('forms.badge.fields.batch_created_at') %></label>
+      <p><%= l(@badge_batch.created_at, format: :long) %></p>
+    </div>
+    
+    <% if @badge_batch.note.present? %>
+      <%= render 'chobble_forms/display_field', field: :batch_note %>
+    <% end %>
+    
     <%= render 'chobble_forms/text_area', field: :note %>
   <% end %>
+<% end %>
+
+<% if @units.any? %>
+  <h4><%= t("badges.titles.associated_units") %></h4>
+  <%= render 'units/unit_table', unit: @units %>
 <% end %>

@@ -45,7 +45,7 @@ RSpec.feature "Badge Management", type: :feature do
       click_link
     end
 
-    expect(page).to have_content(I18n.t("badges.titles.show", id: batch.id))
+    expect(page).to have_content(I18n.t("badges.titles.edit_batch", id: batch.id))
     expect(page).to have_content("Sample batch")
     expect(page).to have_content(batch.count.to_s)
   end
@@ -65,7 +65,7 @@ RSpec.feature "Badge Management", type: :feature do
     batch = create(:badge_batch)
     badge = create(:badge, badge_batch: batch, note: "Original note")
 
-    visit badge_batch_path(batch)
+    visit edit_badge_batch_path(batch)
     within("li", text: badge.id) do
       click_link
     end
@@ -93,8 +93,7 @@ RSpec.feature "Badge Management", type: :feature do
   scenario "admin can edit badge batch note" do
     batch = create(:badge_batch, note: "Original batch note")
 
-    visit badge_batch_path(batch)
-    click_link I18n.t("badges.buttons.edit_batch")
+    visit edit_badge_batch_path(batch)
 
     expect(page).to have_content(I18n.t("forms.badge_batch_edit.header"))
 
@@ -133,7 +132,7 @@ RSpec.feature "Badge Management", type: :feature do
     batch = create(:badge_batch)
     badge = create(:badge, badge_batch: batch, note: "Badge row test")
 
-    visit badge_batch_path(batch)
+    visit edit_badge_batch_path(batch)
 
     within("li", text: badge.id) do
       click_link
@@ -141,15 +140,6 @@ RSpec.feature "Badge Management", type: :feature do
 
     expect(current_path).to eq(edit_badge_path(badge))
     expect(page).to have_content(I18n.t("badges.titles.edit", id: badge.id))
-  end
-
-  scenario "back button navigates from batch to index" do
-    batch = create(:badge_batch)
-
-    visit badge_batch_path(batch)
-    click_link I18n.t("badges.buttons.back")
-
-    expect(current_path).to eq(badge_batches_path)
   end
 
   scenario "displaying batch count in index" do
@@ -166,23 +156,23 @@ RSpec.feature "Badge Management", type: :feature do
     batch = create(:badge_batch, count: 3)
     badges = create_list(:badge, 3, badge_batch: batch)
 
-    visit badge_batch_path(batch)
+    visit edit_badge_batch_path(batch)
 
     badges.each do |badge|
       expect(page).to have_content(badge.id)
     end
   end
 
-  scenario "searching for existing badge shows badge details" do
+  scenario "searching for existing badge shows badge edit page" do
     batch = create(:badge_batch)
     badge = create(:badge, badge_batch: batch)
 
     visit search_badge_batches_path(query: badge.id)
 
     expect(page).to have_content(I18n.t("badges.messages.search_success"))
-    badge_title = I18n.t("badges.titles.show_badge", id: badge.id)
+    badge_title = I18n.t("badges.titles.edit", id: badge.id)
     expect(page).to have_content(badge_title)
-    expect(current_path).to eq(badge_path(badge))
+    expect(current_path).to eq(edit_badge_path(badge))
   end
 
   scenario "searching for nonexistent badge shows error" do
@@ -193,14 +183,14 @@ RSpec.feature "Badge Management", type: :feature do
     expect(current_path).to eq(badge_batches_path)
   end
 
-  scenario "badge show page displays batch information" do
+  scenario "badge edit page displays batch information" do
     batch = create(:badge_batch, note: "Test batch note")
     badge = create(:badge, badge_batch: batch, note: "Test badge note")
 
-    visit badge_path(badge)
+    visit edit_badge_path(badge)
 
     expect(page).to have_content(badge.id)
-    expect(page).to have_link(I18n.t("badges.titles.show", id: batch.id))
+    expect(page).to have_link(I18n.t("badges.titles.edit_batch", id: batch.id))
     expect(page).to have_content("Test batch note")
     expect(page).to have_content("Test badge note")
   end

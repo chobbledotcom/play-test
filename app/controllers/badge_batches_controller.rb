@@ -3,14 +3,10 @@
 
 class BadgeBatchesController < ApplicationController
   before_action :require_admin
-  before_action :set_badge_batch, only: %i[show edit update]
+  before_action :set_badge_batch, only: %i[edit update]
 
   def index
     @badge_batches = BadgeBatch.includes(:badges).order(created_at: :desc)
-  end
-
-  def show
-    @badges = @badge_batch.badges.order(:id)
   end
 
   def new
@@ -27,22 +23,23 @@ class BadgeBatchesController < ApplicationController
 
     timestamp = Time.current
     badge_records = badge_ids.map do |id|
-      {id: id, badge_batch_id: badge_batch.id, created_at: timestamp,
-       updated_at: timestamp}
+      { id: id, badge_batch_id: badge_batch.id, created_at: timestamp,
+       updated_at: timestamp }
     end
     Badge.insert_all(badge_records)
 
     flash[:success] = t("badges.messages.batch_created", count: count)
-    redirect_to badge_batch_path(badge_batch)
+    redirect_to edit_badge_batch_path(badge_batch)
   end
 
   def edit
+    @badges = @badge_batch.badges.order(:id)
   end
 
   def update
     if @badge_batch.update(note_param)
       flash[:success] = t("badges.messages.batch_updated")
-      redirect_to badge_batch_path(@badge_batch)
+      redirect_to edit_badge_batch_path(@badge_batch)
     else
       render :edit
     end
@@ -60,7 +57,7 @@ class BadgeBatchesController < ApplicationController
 
     if badge
       flash[:success] = t("badges.messages.search_success")
-      redirect_to badge_path(badge)
+      redirect_to edit_badge_path(badge)
     else
       flash[:alert] = t("badges.messages.search_not_found", query: query)
       redirect_to badge_batches_path

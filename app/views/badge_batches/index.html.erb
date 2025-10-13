@@ -35,7 +35,7 @@
     <ul class="table-list-items">
       <% @badge_batches.each do |batch| %>
         <li>
-          <%= link_to badge_batch_path(batch), class: "table-list-link" do %>
+          <%= link_to edit_badge_batch_path(batch), class: "table-list-link" do %>
             <%= render 'shared/table_column',
               field: :id,
               i18n_key: "badges.fields.id",

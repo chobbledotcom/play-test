@@ -39,7 +39,11 @@ en:
       sections:
         badge_details: "Badge Details"
       fields:
-        note: "Note"
+        badge_id: "Badge ID"
+        batch: "Batch"
+        batch_created_at: "Batch Created"
+        batch_note: "Batch Note"
+        note: "Badge Note"
       submit: "Update Badge"
     badge_batch:
       header: "Create Badge Batch"
@@ -54,5 +58,8 @@ en:
       sections:
         batch_details: "Batch Details"
       fields:
+        id: "Batch ID"
+        created_at: "Created"
+        count: "Number of Badges"
         note: "Note"
       submit: "Update Batch"
