@@ -23,14 +23,14 @@ class PdfGeneratorService
       pdf.move_down Configuration::STATUS_SPACING
     end
 
-    def self.generate_unit_pdf_header(pdf, unit)
-      create_unit_header(pdf, unit)
+    def self.generate_unit_pdf_header(pdf, unit, unbranded: false)
+      create_unit_header(pdf, unit, unbranded: unbranded)
       # Generate QR code in top left corner
       ImageProcessor.generate_qr_code_header(pdf, unit)
     end
 
-    def self.create_unit_header(pdf, unit)
-      user = unit.user
+    def self.create_unit_header(pdf, unit, unbranded: false)
+      user = unbranded ? nil : unit.user
       unit_id_text = build_unit_id_text(unit)
 
       render_header_with_logo(pdf, user) do |logo_width|
