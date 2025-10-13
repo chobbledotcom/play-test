@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe PdfGeneratorService::HeaderGenerator do
@@ -7,18 +9,18 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
   let(:expected_logo_width) { logo_height * 2 + 10 }
 
   describe ".prepare_logo" do
-    context "when PDF_LOGO environment variable is set" do
+    context "when PDF_LOGO configuration is set" do
       let(:logo_filename) { "test_logo.png" }
       let(:logo_path) { Rails.root.join("app", "assets", "images", logo_filename) }
       let(:logo_data) { "fake logo data" }
 
       before do
-        ENV["PDF_LOGO"] = logo_filename
+        Rails.configuration.pdf_logo = logo_filename
         allow(File).to receive(:read).with(logo_path, mode: "rb").and_return(logo_data)
       end
 
       after do
-        ENV["PDF_LOGO"] = nil
+        Rails.configuration.pdf_logo = nil
       end
 
       it "returns logo data from the specified file" do
@@ -50,9 +52,9 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
       end
     end
 
-    context "when PDF_LOGO environment variable is not set" do
+    context "when PDF_LOGO configuration is not set" do
       before do
-        ENV["PDF_LOGO"] = nil
+        Rails.configuration.pdf_logo = nil
       end
 
       context "when user is nil" do
@@ -114,11 +116,11 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
 
     context "with empty PDF_LOGO value" do
       before do
-        ENV["PDF_LOGO"] = ""
+        Rails.configuration.pdf_logo = ""
       end
 
       after do
-        ENV["PDF_LOGO"] = nil
+        Rails.configuration.pdf_logo = nil
       end
 
       it "treats empty string as not set" do

@@ -42,7 +42,8 @@ class PdfGeneratorService
 
       # Check what content we have
       has_signature = user&.signature&.attached?
-      has_user_logo = ENV["PDF_LOGO"].present? && user&.logo&.attached?
+      pdf_logo = Rails.configuration.pdf_logo
+      has_user_logo = pdf_logo.present? && user&.logo&.attached?
       pdf.bounds.width
 
       first_row = [
