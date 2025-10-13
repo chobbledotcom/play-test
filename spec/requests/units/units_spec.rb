@@ -646,6 +646,52 @@ RSpec.describe "Units", type: :request do
     end
   end
 
+  describe "Unit badge ID immutability" do
+    let(:badge_batch) { create(:badge_batch) }
+    let(:badge1) { create(:badge, badge_batch: badge_batch) }
+    let(:badge2) { create(:badge, badge_batch: badge_batch) }
+
+    before do
+      ENV["UNIT_BADGES"] = "true"
+      login_as(user)
+    end
+
+    after do
+      ENV.delete("UNIT_BADGES")
+    end
+
+    it "prevents changing ID on update via raw request" do
+      unit_with_badge = create(:unit, id: badge1.id, user: user)
+      original_id = unit_with_badge.id
+
+      patch unit_path(unit_with_badge), params: {
+        unit: {
+          id: badge2.id,
+          name: "Updated Name"
+        }
+      }
+
+      unit_with_badge.reload
+      expect(unit_with_badge.id).to eq(original_id)
+      expect(unit_with_badge.name).to eq("Updated Name")
+    end
+
+    it "ignores ID parameter in update requests" do
+      unit_with_badge = create(:unit, id: badge1.id, user: user)
+
+      patch unit_path(unit_with_badge), params: {
+        unit: {
+          id: "NEWID123",
+          description: "Updated Description"
+        }
+      }
+
+      unit_with_badge.reload
+      expect(unit_with_badge.id).to eq(badge1.id)
+      expect(unit_with_badge.description).to eq("Updated Description")
+    end
+  end
+
   describe "Access control and error handling" do
     describe "inactive user restrictions" do
       let(:inactive_user) { create(:user, active_until: Date.current - 1.day) }
