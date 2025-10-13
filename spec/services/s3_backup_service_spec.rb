@@ -14,7 +14,7 @@ RSpec.describe S3BackupService do
   let(:s3_key) { "db_backups/#{compressed_filename}" }
 
   # Helper method to mock tar compression and create the compressed file
-  def mock_tar_compression(service, content_size: 1000)
+  define_method(:mock_tar_compression) do |service, content_size: 1000|
     allow(service).to receive(:system).with(
       "tar", "-czf", anything,
       "-C", anything, anything,
@@ -22,6 +22,8 @@ RSpec.describe S3BackupService do
     ) do |*args|
       # Extract the destination path from the tar command arguments
       dest_path = args[2]
+      # Ensure parent directory exists before creating the file
+      FileUtils.mkdir_p(File.dirname(dest_path))
       # Create the compressed file that would be created by tar
       FileUtils.touch(dest_path)
       File.write(dest_path, "compressed content" * content_size)
