@@ -99,6 +99,48 @@ RSpec.describe PdfGeneratorService, pdf: true do
       expect(pdf_text).to include(I18n.t("pdf.unit.details"))
     end
 
+    context "when UNIT_REPORTS_UNBRANDED is enabled" do
+      around do |example|
+        original_value = ENV["UNIT_REPORTS_UNBRANDED"]
+        ENV["UNIT_REPORTS_UNBRANDED"] = "true"
+        example.run
+        ENV["UNIT_REPORTS_UNBRANDED"] = original_value
+      end
+
+      it "does not include disclaimer footer" do
+        pdf = PdfGeneratorService.generate_unit_report(unit)
+        pdf_text = pdf_text_content(pdf.render)
+
+        expect(pdf_text).not_to include(I18n.t("pdf.disclaimer.header"))
+        expect(pdf_text).not_to include(I18n.t("pdf.disclaimer.text"))
+      end
+
+      it "does not include user logo in header" do
+        user.logo.attach(fixture_file_upload("test_image.jpg", "image/jpeg"))
+
+        pdf = PdfGeneratorService.generate_unit_report(unit)
+        rendered_pdf = pdf.render
+
+        expect { pdf.render }.not_to raise_error
+      end
+    end
+
+    context "when UNIT_REPORTS_UNBRANDED is disabled" do
+      around do |example|
+        original_value = ENV["UNIT_REPORTS_UNBRANDED"]
+        ENV["UNIT_REPORTS_UNBRANDED"] = "false"
+        example.run
+        ENV["UNIT_REPORTS_UNBRANDED"] = original_value
+      end
+
+      it "includes disclaimer footer" do
+        pdf = PdfGeneratorService.generate_unit_report(unit)
+        pdf_text = pdf_text_content(pdf.render)
+
+        expect(pdf_text).to include(I18n.t("pdf.disclaimer.header"))
+      end
+    end
+
     it "displays unit fields with I18n labels" do
       pdf = PdfGeneratorService.generate_unit_report(unit)
       pdf_text = pdf_text_content(pdf.render)

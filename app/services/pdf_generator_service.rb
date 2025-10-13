@@ -56,6 +56,8 @@ class PdfGeneratorService
   def self.generate_unit_report(unit, debug_enabled: false, debug_queries: [])
     require "prawn/table"
 
+    unbranded = ENV["UNIT_REPORTS_UNBRANDED"] == "true"
+
     # Preload all inspections once to avoid N+1 queries
     completed_inspections = unit.inspections
       .includes(:user, inspector_company: {logo_attachment: :blob})
@@ -66,12 +68,12 @@ class PdfGeneratorService
 
     Prawn::Document.new(page_size: "A4", page_layout: :portrait) do |pdf|
       Configuration.setup_pdf_fonts(pdf)
-      HeaderGenerator.generate_unit_pdf_header(pdf, unit)
+      HeaderGenerator.generate_unit_pdf_header(pdf, unit, unbranded: unbranded)
       generate_unit_details_with_inspection(pdf, unit, last_inspection)
       generate_unit_inspection_history_with_data(pdf, unit, completed_inspections)
 
-      # Disclaimer footer (only on first page)
-      DisclaimerFooterRenderer.render_disclaimer_footer(pdf, unit.user)
+      # Disclaimer footer (only on first page, not for unbranded reports)
+      DisclaimerFooterRenderer.render_disclaimer_footer(pdf, unit.user, unbranded: unbranded)
 
       # Add unit photo in bottom right corner (for unit PDFs, always use 3 columns)
       ImageProcessor.add_unit_photo_footer(pdf, unit, 3) if unit.photo
