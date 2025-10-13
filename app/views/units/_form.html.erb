@@ -77,6 +77,8 @@
   <%# Only show data fieldset if unit is persisted %>
   <% if unit.persisted? %>
     <%= render 'chobble_forms/fieldset', legend_key: 'data' do %>
+      <%= render 'chobble_forms/display_field', field: :id %>
+
       <%# Display size from last inspection (read-only) %>
       <% if unit.last_inspection %>
         <div>
