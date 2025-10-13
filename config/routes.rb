@@ -1,4 +1,3 @@
-# typed: false
 # == Route Map
 #
 #                            Prefix Verb   URI Pattern                                                                                       Controller#Action
@@ -67,6 +66,7 @@
 #                                   PATCH  /inspections/:id(.:format)                                                                        inspections#update
 #                                   PUT    /inspections/:id(.:format)                                                                        inspections#update
 #                                   DELETE /inspections/:id(.:format)                                                                        inspections#destroy
+#                         all_units GET    /units/all(.:format)                                                                              units#all
 #                 unified_edit_unit GET    /units/:id/unified_edit(.:format)                                                                 units#unified_edit
 #               unified_update_unit PATCH  /units/:id/unified_update(.:format)                                                               units#unified_update
 #                          log_unit GET    /units/:id/log(.:format)                                                                          units#log
@@ -90,6 +90,18 @@
 #                             admin GET    /admin(.:format)                                                                                  admin#index
 #                    admin_releases GET    /admin/releases(.:format)                                                                         admin#releases
 #                       admin_files GET    /admin/files(.:format)                                                                            admin#files
+#              search_badge_batches GET    /badge_batches/search(.:format)                                                                   badge_batches#search
+#                     badge_batches GET    /badge_batches(.:format)                                                                          badge_batches#index
+#                                   POST   /badge_batches(.:format)                                                                          badge_batches#create
+#                   new_badge_batch GET    /badge_batches/new(.:format)                                                                      badge_batches#new
+#                  edit_badge_batch GET    /badge_batches/:id/edit(.:format)                                                                 badge_batches#edit
+#                       badge_batch GET    /badge_batches/:id(.:format)                                                                      badge_batches#show
+#                                   PATCH  /badge_batches/:id(.:format)                                                                      badge_batches#update
+#                                   PUT    /badge_batches/:id(.:format)                                                                      badge_batches#update
+#                        edit_badge GET    /badges/:id/edit(.:format)                                                                        badges#edit
+#                             badge GET    /badges/:id(.:format)                                                                             badges#show
+#                                   PATCH  /badges/:id(.:format)                                                                             badges#update
+#                                   PUT    /badges/:id(.:format)                                                                             badges#update
 #                  download_backups GET    /backups/download(.:format)                                                                       backups#download
 #                           backups GET    /backups(.:format)                                                                                backups#index
 #                             pages GET    /pages(.:format)                                                                                  pages#index
@@ -114,8 +126,8 @@
 #                rails_disk_service GET    /rails/active_storage/disk/:encoded_key/*filename(.:format)                                       active_storage/disk#show
 #         update_rails_disk_service PUT    /rails/active_storage/disk/:encoded_token(.:format)                                               active_storage/disk#update
 #              rails_direct_uploads POST   /rails/active_storage/direct_uploads(.:format)                                                    active_storage/direct_uploads#create
-# frozen_string_literal: true
 
+# typed: false
 Rails.application.routes.draw do
   # Mount Mission Control Jobs (authentication handled by initializer)
   # Only mount if available (not in test environment)
