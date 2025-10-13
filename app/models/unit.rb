@@ -53,7 +53,6 @@ class Unit < ApplicationRecord
   # Callbacks
   before_validation :normalize_id, on: :create, if: -> { unit_badges_enabled? }
   before_create :generate_custom_id, unless: -> { unit_badges_enabled? }
-  before_create :validate_badge_id, if: -> { unit_badges_enabled? }
   after_update :invalidate_pdf_cache
   before_destroy :check_complete_inspections
   before_destroy :destroy_draft_inspections
@@ -62,6 +61,7 @@ class Unit < ApplicationRecord
   validates :name, :serial, :description, :manufacturer, :operator, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
   validates :id, presence: true, if: -> { unit_badges_enabled? && new_record? }
+  validate :badge_id_exists, on: :create, if: -> { unit_badges_enabled? && id.present? }
 
   # Scopes - enhanced from original Equipment and new Unit functionality
   scope :seed_data, -> { where(is_seed: true) }
@@ -222,7 +222,7 @@ class Unit < ApplicationRecord
 
   sig { void }
   def normalize_id
-    return unless id.present?
+    return if id.blank?
 
     # Strip spaces, uppercase, and trim to 8 characters
     normalized = id.gsub(/\s+/, "").upcase[0, 8]
@@ -230,14 +230,13 @@ class Unit < ApplicationRecord
   end
 
   sig { void }
-  def validate_badge_id
-    return unless id.present?
+  def badge_id_exists
+    return if id.blank?
 
     # Check if badge exists
     unless Badge.exists?(id: id)
       error_msg = I18n.t("units.validations.invalid_badge_id")
       errors.add(:id, error_msg)
-      throw(:abort)
     end
   end
 end

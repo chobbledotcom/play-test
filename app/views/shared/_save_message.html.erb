@@ -8,6 +8,13 @@
 <% if message_type == "error" %>
   <div class="error" id="<%= local_assigns[:dom_id] || 'form_save_message' %>">
     <%= message_text || t('shared.messages.save_failed') %>
+    <% if local_assigns[:errors].present? %>
+      <ul>
+        <% local_assigns[:errors].each do |error| %>
+          <li><%= error %></li>
+        <% end %>
+      </ul>
+    <% end %>
   </div>
 <% else %>
   <div class="success" id="<%= local_assigns[:dom_id] || 'form_save_message' %>">
