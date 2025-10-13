@@ -30,7 +30,7 @@ class PdfGeneratorService
 
       # Disclaimer footer (only on first page)
       DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
-      disclaimer_height = DisclaimerFooterRenderer.measure_footer_height(pdf)
+      disclaimer_height = DisclaimerFooterRenderer.measure_footer_height(unbranded: false)
 
       # Add unit photo in bottom right corner
       photo_height = ImageProcessor.measure_unit_photo_height(pdf, inspection.unit, 4)

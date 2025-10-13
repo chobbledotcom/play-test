@@ -9,7 +9,6 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
 
   describe ".render_disclaimer_footer" do
     before do
-      allow(described_class).to receive(:should_render_footer?).and_return(true)
       allow(described_class).to receive(:render_footer_content)
       allow(pdf).to receive(:cursor).and_return(500)
       allow(pdf).to receive(:move_cursor_to)
@@ -18,7 +17,7 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
       allow(pdf.bounds).to receive(:width).and_return(540)
     end
 
-    context "when should render footer" do
+    context "when branded" do
       it "saves and restores cursor position" do
         original_y = 500
         expect(pdf).to receive(:cursor).and_return(original_y)
@@ -45,28 +44,8 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
       end
     end
 
-    context "when should not render footer" do
-      before do
-        allow(described_class).to receive(:should_render_footer?)
-          .and_return(false)
-      end
-
-      it "does not render anything" do
-        expect(pdf).not_to receive(:bounding_box)
-        expect(described_class).not_to receive(:render_footer_content)
-        described_class.render_disclaimer_footer(pdf, user)
-      end
-    end
-
-    context "when unbranded is true" do
-      before do
-        allow(described_class).to receive(:should_render_footer?)
-          .and_call_original
-      end
-
+    context "when unbranded" do
       it "does not render footer" do
-        allow(pdf).to receive(:page_number).and_return(1)
-        allow(pdf).to receive(:cursor).and_return(500)
         expect(pdf).not_to receive(:bounding_box)
         described_class.render_disclaimer_footer(pdf, user, unbranded: true)
       end
@@ -194,52 +173,19 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
     end
   end
 
-  describe ".should_render_footer?" do
-    it "returns true for first page when not unbranded" do
-      allow(pdf).to receive(:page_number).and_return(1)
-      expect(described_class.should_render_footer?(pdf, false)).to be true
-    end
-
-    it "returns false for subsequent pages" do
-      allow(pdf).to receive(:page_number).and_return(2)
-      expect(described_class.should_render_footer?(pdf, false)).to be false
-    end
-
-    it "returns false when unbranded is true" do
-      allow(pdf).to receive(:page_number).and_return(1)
-      expect(described_class.should_render_footer?(pdf, true)).to be false
-    end
-  end
-
   describe ".measure_footer_height" do
-    context "when should render footer" do
-      before do
-        allow(described_class).to receive(:should_render_footer?)
-          .and_return(true)
-      end
-
+    context "when branded" do
       it "returns footer height" do
-        expect(described_class.measure_footer_height(pdf)).to eq(
+        result = described_class.measure_footer_height(unbranded: false)
+        expect(result).to eq(
           PdfGeneratorService::Configuration::FOOTER_HEIGHT
         )
       end
     end
 
-    context "when should not render footer" do
-      before do
-        allow(described_class).to receive(:should_render_footer?)
-          .and_return(false)
-      end
-
+    context "when unbranded" do
       it "returns 0" do
-        expect(described_class.measure_footer_height(pdf)).to eq(0)
-      end
-    end
-
-    context "when unbranded is true" do
-      it "returns 0" do
-        allow(pdf).to receive(:page_number).and_return(1)
-        result = described_class.measure_footer_height(pdf, unbranded: true)
+        result = described_class.measure_footer_height(unbranded: true)
         expect(result).to eq(0)
       end
     end

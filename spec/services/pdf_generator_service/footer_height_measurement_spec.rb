@@ -8,17 +8,18 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
   let(:pdf) { Prawn::Document.new }
 
   describe "#measure_footer_height" do
-    context "when on first page" do
-      it "returns footer height when disclaimer should be rendered" do
-        height = described_class.measure_footer_height(pdf)
-        expect(height).not_to be 0
+    context "when branded" do
+      it "returns footer height" do
+        height = described_class.measure_footer_height(unbranded: false)
+        expect(height).to eq(
+          PdfGeneratorService::Configuration::FOOTER_HEIGHT
+        )
       end
     end
 
-    context "when not on first page" do
-      it "returns 0 when disclaimer should not be rendered" do
-        pdf.start_new_page
-        height = described_class.measure_footer_height(pdf)
+    context "when unbranded" do
+      it "returns 0" do
+        height = described_class.measure_footer_height(unbranded: true)
         expect(height).to eq(0)
       end
     end
