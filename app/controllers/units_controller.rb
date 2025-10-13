@@ -270,7 +270,11 @@ class UnitsController < ApplicationController
     ]
 
     # Add :id to permitted fields if UNIT_BADGES is enabled
-    permitted_fields << :id if unit_badges_enabled?
+    # but only for create actions (not update)
+    create_actions = %w[create create_from_inspection]
+    if unit_badges_enabled? && create_actions.include?(action_name)
+      permitted_fields << :id
+    end
 
     permitted_params = params.require(:unit).permit(*permitted_fields)
 
