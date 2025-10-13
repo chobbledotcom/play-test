@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Backups Management", type: :feature do
@@ -5,8 +7,11 @@ RSpec.feature "Backups Management", type: :feature do
   let(:regular_user) { create(:user, :active_user) }
 
   before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("USE_S3_STORAGE").and_return("true")
+    Rails.configuration.use_s3_storage = true
+  end
+
+  after do
+    Rails.configuration.use_s3_storage = false
   end
 
   scenario "admin can access backups page" do
@@ -65,12 +70,14 @@ RSpec.feature "Backups Management", type: :feature do
   end
 
   scenario "redirects if S3 not enabled" do
-    allow(ENV).to receive(:[]).with("USE_S3_STORAGE").and_return(nil)
+    Rails.configuration.use_s3_storage = false
 
     sign_in(admin_user)
     visit backups_path
 
     expect(page).to have_content(I18n.t("backups.errors.s3_not_enabled"))
     expect(current_path).to eq(admin_path)
+
+    Rails.configuration.use_s3_storage = true
   end
 end

@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Backups", type: :request do
@@ -5,8 +7,11 @@ RSpec.describe "Backups", type: :request do
   let(:regular_user) { create(:user, :active_user) }
 
   before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("USE_S3_STORAGE").and_return("true")
+    Rails.configuration.use_s3_storage = true
+  end
+
+  after do
+    Rails.configuration.use_s3_storage = false
   end
 
   describe "GET /backups/download" do
