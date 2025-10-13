@@ -31,7 +31,7 @@ RSpec.describe ImageProcessable, type: :controller do
       render json: {valid: true}
     rescue ApplicationErrors::NotAnImageError => e
       render json: {valid: false, error: e.message},
-        status: :unprocessable_entity
+        status: :unprocessable_content
     end
 
     # Test methods for rescue_from handlers
@@ -265,7 +265,7 @@ RSpec.describe ImageProcessable, type: :controller do
 
       post :validate, params: {file: valid_image}
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       parsed_response = JSON.parse(response.body)
       expect(parsed_response["valid"]).to be false
       msg = I18n.t("errors.messages.invalid_image_format")
