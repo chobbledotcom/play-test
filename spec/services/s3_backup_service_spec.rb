@@ -53,7 +53,7 @@ RSpec.describe S3BackupService do
   describe "#perform" do
     context "when S3 is not enabled" do
       before do
-        allow(ENV).to receive(:[]).with("USE_S3_STORAGE").and_return("false")
+        Rails.configuration.use_s3_storage = false
         # Mock FileUtils to avoid errors in ensure block
         allow(FileUtils).to receive(:rm_f)
       end
