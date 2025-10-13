@@ -6,7 +6,7 @@ class PdfGeneratorService
     include Configuration
 
     def self.render_disclaimer_footer(pdf, user, unbranded: false)
-      return unless should_render_footer?(pdf, unbranded)
+      return if unbranded
 
       # Save current position
       original_y = pdf.cursor
@@ -30,15 +30,8 @@ class PdfGeneratorService
       pdf.move_cursor_to original_y
     end
 
-    def self.measure_footer_height(pdf, unbranded: false)
-      return 0 unless should_render_footer?(pdf, unbranded)
-
-      FOOTER_HEIGHT
-    end
-
-    def self.should_render_footer?(pdf, unbranded)
-      # Only render on first page and not for unbranded reports
-      pdf.page_number == 1 && !unbranded
+    def self.measure_footer_height(unbranded:)
+      unbranded ? 0 : FOOTER_HEIGHT
     end
 
     def self.render_footer_content(pdf, user)
