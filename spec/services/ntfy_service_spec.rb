@@ -19,11 +19,8 @@ RSpec.describe NtfyService do
 
     context "when no channels are configured" do
       before do
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[])
-          .with("NTFY_CHANNEL_DEVELOPER").and_return(nil)
-        allow(ENV).to receive(:[])
-          .with("NTFY_CHANNEL_ADMIN").and_return(nil)
+        Rails.configuration.ntfy_channel_developer = nil
+        Rails.configuration.ntfy_channel_admin = nil
       end
 
       it "does not attempt HTTP requests" do
@@ -35,11 +32,12 @@ RSpec.describe NtfyService do
 
     context "when developer channel is configured" do
       before do
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[])
-          .with("NTFY_CHANNEL_DEVELOPER").and_return("dev-channel")
-        allow(ENV).to receive(:[])
-          .with("NTFY_CHANNEL_ADMIN").and_return(nil)
+        Rails.configuration.ntfy_channel_developer = "dev-channel"
+        Rails.configuration.ntfy_channel_admin = nil
+      end
+
+      after do
+        Rails.configuration.ntfy_channel_developer = nil
       end
 
       it "sends to developer channel by default" do
@@ -57,11 +55,12 @@ RSpec.describe NtfyService do
 
     context "when admin channel is configured" do
       before do
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[])
-          .with("NTFY_CHANNEL_DEVELOPER").and_return(nil)
-        allow(ENV).to receive(:[])
-          .with("NTFY_CHANNEL_ADMIN").and_return("admin-channel")
+        Rails.configuration.ntfy_channel_developer = nil
+        Rails.configuration.ntfy_channel_admin = "admin-channel"
+      end
+
+      after do
+        Rails.configuration.ntfy_channel_admin = nil
       end
 
       it "sends to admin channel when specified" do
@@ -79,11 +78,13 @@ RSpec.describe NtfyService do
 
     context "when both channels are configured" do
       before do
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[])
-          .with("NTFY_CHANNEL_DEVELOPER").and_return("dev-channel")
-        allow(ENV).to receive(:[])
-          .with("NTFY_CHANNEL_ADMIN").and_return("admin-channel")
+        Rails.configuration.ntfy_channel_developer = "dev-channel"
+        Rails.configuration.ntfy_channel_admin = "admin-channel"
+      end
+
+      after do
+        Rails.configuration.ntfy_channel_developer = nil
+        Rails.configuration.ntfy_channel_admin = nil
       end
 
       it "sends to both channels when :both is specified" do
