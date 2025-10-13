@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require "active_support/core_ext/integer/time"
@@ -58,4 +59,8 @@ Rails.application.configure do
 
   # Use test adapter for Active Job in tests
   config.active_job.queue_adapter = :test
+
+  # Default feature flags to true for tests
+  config.has_assessments = true
+  config.unit_badges_enabled = false
 end

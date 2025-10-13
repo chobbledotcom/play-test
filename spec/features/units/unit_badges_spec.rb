@@ -9,12 +9,7 @@ RSpec.feature "Unit Badge Validation", type: :feature do
   let(:badge) { create(:badge, badge_batch: badge_batch) }
 
   before do
-    Rails.configuration.has_assessments = true
     sign_in(user)
-  end
-
-  after do
-    Rails.configuration.has_assessments = false
   end
 
   context "when UNIT_BADGES is enabled" do
