@@ -125,6 +125,8 @@ Rails.application.routes.draw do
 
   get "up" => "rails/health#show", :as => :rails_health_check
 
+  get "favicon.ico", to: redirect("icon.svg")
+
   root to: "pages#show", defaults: { slug: "/" }
   get "guides", to: "guides#index"
   get "guides/*path", to: "guides#show", as: :guide
