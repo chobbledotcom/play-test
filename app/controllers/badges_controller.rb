@@ -3,14 +3,11 @@
 
 class BadgesController < ApplicationController
   before_action :require_admin
-  before_action :set_badge, only: %i[show edit update]
-
-  def show
-    @badge_batch = @badge.badge_batch
-    @units = Unit.where(id: @badge.id)
-  end
+  before_action :set_badge, only: %i[edit update]
 
   def edit
+    @badge_batch = @badge.badge_batch
+    @units = Unit.where(id: @badge.id)
   end
 
   def update

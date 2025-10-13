@@ -27,16 +27,16 @@ RSpec.describe "Badges", type: :request do
     end
   end
 
-  describe "Badge show" do
+  describe "Badge edit" do
     before { login_as(admin_user) }
 
     it "returns http success" do
-      get badge_path(badge)
+      get edit_badge_path(badge)
       expect(response).to have_http_status(:success)
     end
 
     it "shows badge and batch details" do
-      get badge_path(badge)
+      get edit_badge_path(badge)
       expect(response.body).to include(badge.id)
       expect(response.body).to include(batch.id.to_s)
     end
@@ -46,10 +46,10 @@ RSpec.describe "Badges", type: :request do
     before { login_as(admin_user) }
 
     it "updates badge note and redirects to batch" do
-      patch badge_path(badge), params: {badge: {note: "Updated note"}}
+      patch badge_path(badge), params: { badge: { note: "Updated note" } }
       badge.reload
       expect(badge.note).to eq("Updated note")
-      expect(response).to redirect_to(badge_batch_path(batch))
+      expect(response).to redirect_to(edit_badge_batch_path(batch))
     end
   end
 

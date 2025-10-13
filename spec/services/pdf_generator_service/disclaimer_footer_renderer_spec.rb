@@ -57,10 +57,26 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
         described_class.render_disclaimer_footer(pdf, user)
       end
     end
+
+    context "when unbranded is true" do
+      before do
+        allow(described_class).to receive(:should_render_footer?)
+          .and_call_original
+      end
+
+      it "does not render footer" do
+        allow(pdf).to receive(:page_number).and_return(1)
+        allow(pdf).to receive(:cursor).and_return(500)
+        expect(pdf).not_to receive(:bounding_box)
+        described_class.render_disclaimer_footer(pdf, user, unbranded: true)
+      end
+    end
   end
 
   describe ".render_footer_content" do
-    let(:signature) { double("signature", attached?: true, download: "sig_data") }
+    let(:signature) do
+      double("signature", attached?: true, download: "sig_data")
+    end
     let(:logo) { double("logo", attached?: true, download: "logo_data") }
 
     before do
@@ -179,14 +195,19 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
   end
 
   describe ".should_render_footer?" do
-    it "returns true for first page" do
+    it "returns true for first page when not unbranded" do
       allow(pdf).to receive(:page_number).and_return(1)
-      expect(described_class.should_render_footer?(pdf)).to be true
+      expect(described_class.should_render_footer?(pdf, false)).to be true
     end
 
     it "returns false for subsequent pages" do
       allow(pdf).to receive(:page_number).and_return(2)
-      expect(described_class.should_render_footer?(pdf)).to be false
+      expect(described_class.should_render_footer?(pdf, false)).to be false
+    end
+
+    it "returns false when unbranded is true" do
+      allow(pdf).to receive(:page_number).and_return(1)
+      expect(described_class.should_render_footer?(pdf, true)).to be false
     end
   end
 
@@ -212,6 +233,14 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
 
       it "returns 0" do
         expect(described_class.measure_footer_height(pdf)).to eq(0)
+      end
+    end
+
+    context "when unbranded is true" do
+      it "returns 0" do
+        allow(pdf).to receive(:page_number).and_return(1)
+        result = described_class.measure_footer_height(pdf, unbranded: true)
+        expect(result).to eq(0)
       end
     end
   end
