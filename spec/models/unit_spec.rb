@@ -91,8 +91,8 @@ RSpec.describe Unit, type: :model do
 
   describe "UNIT_BADGES feature" do
     context "when UNIT_BADGES is enabled" do
-      before { ENV["UNIT_BADGES"] = "true" }
-      after { ENV.delete("UNIT_BADGES") }
+      before { Rails.configuration.unit_badges_enabled = true }
+      after { Rails.configuration.unit_badges_enabled = false }
 
       describe "#normalize_id" do
         it "strips spaces from ID" do

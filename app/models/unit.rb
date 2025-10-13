@@ -216,6 +216,8 @@ class Unit < ApplicationRecord
 
   sig { returns(T::Boolean) }
   def unit_badges_enabled?
+    # In test, check ENV for Capybara compatibility (separate process)
+    return ENV["UNIT_BADGES"] == "true" if Rails.env.test?
     Rails.configuration.unit_badges_enabled
   end
 
