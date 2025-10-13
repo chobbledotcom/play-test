@@ -10,23 +10,23 @@ RSpec.describe SeedDataService do
         expect(result).to be true
       end
 
-      it "creates complete inspections with all assessments" do
-        described_class.add_seeds_for_user(user, unit_count: 1, inspection_count: 2)
+      it "creates inspections with all assessments" do
+        described_class.add_seeds_for_user(user, unit_count: 2, inspection_count: 1)
 
-        inspection = user.inspections.seed_data.complete.first
-        expect(inspection).to be_present
-        expect(inspection.user_height_assessment).to be_present
-        expect(inspection.structure_assessment).to be_present
-        expect(inspection.anchorage_assessment).to be_present
-        expect(inspection.materials_assessment).to be_present
-        expect(inspection.fan_assessment).to be_present
+        complete_inspection = user.inspections.seed_data.complete.first
+        expect(complete_inspection).to be_present
+        expect(complete_inspection.user_height_assessment).to be_present
+        expect(complete_inspection.structure_assessment).to be_present
+        expect(complete_inspection.anchorage_assessment).to be_present
+        expect(complete_inspection.materials_assessment).to be_present
+        expect(complete_inspection.fan_assessment).to be_present
 
-        if inspection.has_slide?
-          expect(inspection.slide_assessment).to be_present
+        if complete_inspection.has_slide?
+          expect(complete_inspection.slide_assessment).to be_present
         end
 
-        if inspection.is_totally_enclosed?
-          expect(inspection.enclosed_assessment).to be_present
+        if complete_inspection.is_totally_enclosed?
+          expect(complete_inspection.enclosed_assessment).to be_present
         end
       end
     end
