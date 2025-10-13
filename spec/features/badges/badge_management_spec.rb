@@ -55,7 +55,7 @@ RSpec.feature "Badge Management", type: :feature do
     badge1 = create(:badge, badge_batch: batch)
     badge2 = create(:badge, badge_batch: batch)
 
-    visit badge_batch_path(batch)
+    visit edit_badge_batch_path(batch)
 
     expect(page).to have_content(badge1.id)
     expect(page).to have_content(badge2.id)
@@ -115,7 +115,7 @@ RSpec.feature "Badge Management", type: :feature do
     expect(current_path).to eq(root_path)
   end
 
-  scenario "clicking batch row navigates to batch details" do
+  scenario "clicking batch row navigates to batch edit" do
     batch = create(:badge_batch, :with_badges, note: "Row click test")
 
     visit badge_batches_path
@@ -124,7 +124,7 @@ RSpec.feature "Badge Management", type: :feature do
       click_link
     end
 
-    expect(current_path).to eq(badge_batch_path(batch))
+    expect(current_path).to eq(edit_badge_batch_path(batch))
     expect(page).to have_content("Row click test")
   end
 
