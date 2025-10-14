@@ -1,6 +1,11 @@
 
 <%= render 'shared/page_header', title: t('units.titles.show') %>
 <%= render 'shared/action_buttons', actions: unit_actions(@unit) %>
+<% if @unit.locked_for_non_admin? && !current_user&.admin? %>
+  <aside class="notice">
+    <%= t('units.messages.locked_unit_notice', days: Unit.lock_days_threshold) %>
+  </aside>
+<% end %>
 <%= render 'unit_details', unit: @unit %>
 <h4 id="inspections"><%= t('units.headers.inspection_history') %></h4>
 <% if @inspections.any? %>
