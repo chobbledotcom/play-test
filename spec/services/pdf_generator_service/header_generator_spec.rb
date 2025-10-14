@@ -23,7 +23,6 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
           logo: logo_filename
         )
         Rails.configuration.pdf = test_pdf_config
-        Rails.configuration.pdf_logo = logo_filename # Legacy accessor
         allow(File).to receive(:read).with(logo_path, mode: "rb").and_return(logo_data)
       end
 
@@ -36,7 +35,6 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
           logo: nil
         )
         Rails.configuration.pdf = default_config
-        Rails.configuration.pdf_logo = nil
       end
 
       it "returns logo data from the specified file" do
@@ -77,7 +75,6 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
           logo: nil
         )
         Rails.configuration.pdf = default_config
-        Rails.configuration.pdf_logo = nil
       end
 
       context "when user is nil" do
@@ -146,7 +143,6 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
           logo: ""
         )
         Rails.configuration.pdf = empty_config
-        Rails.configuration.pdf_logo = ""
       end
 
       after do
@@ -157,7 +153,6 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
           logo: nil
         )
         Rails.configuration.pdf = default_config
-        Rails.configuration.pdf_logo = nil
       end
 
       it "treats empty string as not set" do

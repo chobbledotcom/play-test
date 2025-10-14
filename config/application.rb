@@ -70,12 +70,6 @@ module PlayTest
     # PDF Generation Configuration (typed)
     config.pdf = PdfConfig.from_env(ENV.to_h)
 
-    # Legacy individual accessors (deprecated - use config.pdf instead)
-    config.pdf_cache_enabled = config.pdf.cache_enabled
-    config.pdf_cache_from = config.pdf.cache_from
-    config.redirect_to_s3_pdfs = config.pdf.redirect_to_s3
-    config.pdf_logo = config.pdf.logo
-
     # Theme and UI Configuration
     config.forced_theme = ENV["THEME"] # If set, overrides user preference
     config.logo_path = ENV.fetch("LOGO_PATH", "logo.svg")

@@ -110,7 +110,7 @@ class PdfCacheService
 
     sig { returns(T::Boolean) }
     def caching_enabled?
-      Rails.configuration.pdf_cache_enabled
+      Rails.configuration.pdf.cache_enabled
     end
 
     sig { params(attachment: T.untyped).returns(String) }
@@ -122,7 +122,7 @@ class PdfCacheService
 
     sig { returns(T.nilable(Date)) }
     def pdf_cache_from_date
-      Rails.configuration.pdf_cache_from
+      Rails.configuration.pdf.cache_from
     end
 
     sig do
@@ -205,7 +205,7 @@ class PdfCacheService
 
     sig { returns(T::Boolean) }
     def redirect_to_s3?
-      Rails.configuration.redirect_to_s3_pdfs
+      Rails.configuration.pdf.redirect_to_s3
     end
   end
 end
