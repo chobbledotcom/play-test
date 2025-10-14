@@ -30,6 +30,7 @@ require_relative "../app/config/units_config"
 require_relative "../app/config/users_config"
 require_relative "../app/config/s3_config"
 require_relative "../app/config/theme_config"
+require_relative "../app/config/observability_config"
 
 module PlayTest
   class Application < Rails::Application
@@ -82,9 +83,8 @@ module PlayTest
     config.base_url = ENV.fetch("BASE_URL", "http://localhost:3000")
     config.app_name = ENV.fetch("APP_NAME", "Play-Test")
 
-    # Notification Configuration
-    config.ntfy_channel_developer = ENV["NTFY_CHANNEL_DEVELOPER"]
-    config.ntfy_channel_admin = ENV["NTFY_CHANNEL_ADMIN"]
+    # Observability Configuration (typed)
+    config.observability = ObservabilityConfig.from_env(ENV.to_h)
 
     # Unit Configuration (typed)
     config.units = UnitsConfig.from_env(ENV.to_h)

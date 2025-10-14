@@ -7,6 +7,16 @@ RSpec.describe NtfyService do
     let(:test_message) { "Test notification message" }
     let(:http_double) { instance_double(Net::HTTP) }
 
+    define_method(:set_ntfy_channels) do |developer: nil, admin: nil|
+      config = ObservabilityConfig.new(
+        ntfy_channel_developer: developer,
+        ntfy_channel_admin: admin,
+        sentry_dsn: nil,
+        git_commit: nil
+      )
+      Rails.configuration.observability = config
+    end
+
     before do
       allow(Net::HTTP).to receive(:new).and_return(http_double)
       allow(http_double).to receive(:use_ssl=)
@@ -19,8 +29,7 @@ RSpec.describe NtfyService do
 
     context "when no channels are configured" do
       before do
-        Rails.configuration.ntfy_channel_developer = nil
-        Rails.configuration.ntfy_channel_admin = nil
+        set_ntfy_channels
       end
 
       it "does not attempt HTTP requests" do
@@ -32,12 +41,11 @@ RSpec.describe NtfyService do
 
     context "when developer channel is configured" do
       before do
-        Rails.configuration.ntfy_channel_developer = "dev-channel"
-        Rails.configuration.ntfy_channel_admin = nil
+        set_ntfy_channels(developer: "dev-channel")
       end
 
       after do
-        Rails.configuration.ntfy_channel_developer = nil
+        set_ntfy_channels
       end
 
       it "sends to developer channel by default" do
@@ -55,12 +63,11 @@ RSpec.describe NtfyService do
 
     context "when admin channel is configured" do
       before do
-        Rails.configuration.ntfy_channel_developer = nil
-        Rails.configuration.ntfy_channel_admin = "admin-channel"
+        set_ntfy_channels(admin: "admin-channel")
       end
 
       after do
-        Rails.configuration.ntfy_channel_admin = nil
+        set_ntfy_channels
       end
 
       it "sends to admin channel when specified" do
@@ -78,13 +85,11 @@ RSpec.describe NtfyService do
 
     context "when both channels are configured" do
       before do
-        Rails.configuration.ntfy_channel_developer = "dev-channel"
-        Rails.configuration.ntfy_channel_admin = "admin-channel"
+        set_ntfy_channels(developer: "dev-channel", admin: "admin-channel")
       end
 
       after do
-        Rails.configuration.ntfy_channel_developer = nil
-        Rails.configuration.ntfy_channel_admin = nil
+        set_ntfy_channels
       end
 
       it "sends to both channels when :both is specified" do

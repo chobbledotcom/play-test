@@ -24,13 +24,13 @@ class NtfyService
     def determine_channels(channel)
       case channel
       when :developer
-        [Rails.configuration.ntfy_channel_developer].compact
+        [Rails.configuration.observability.ntfy_channel_developer].compact
       when :admin
-        [Rails.configuration.ntfy_channel_admin].compact
+        [Rails.configuration.observability.ntfy_channel_admin].compact
       when :both
         channels = [
-          Rails.configuration.ntfy_channel_developer,
-          Rails.configuration.ntfy_channel_admin
+          Rails.configuration.observability.ntfy_channel_developer,
+          Rails.configuration.observability.ntfy_channel_admin
         ]
         channels.compact
       else
