@@ -13,11 +13,11 @@ RSpec.feature "Creating inspection from unit search", type: :feature do
 
   context "when UNIT_BADGES is enabled" do
     before do
-      Rails.configuration.unit_badges = true
+      Rails.configuration.units = UnitsConfig.new(badges_enabled: true, reports_unbranded: false)
     end
 
     after do
-      Rails.configuration.unit_badges = false
+      Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false)
     end
 
     scenario "index page shows 'Create Inspection from Unit' button" do
@@ -123,7 +123,11 @@ RSpec.feature "Creating inspection from unit search", type: :feature do
 
   context "when UNIT_BADGES is disabled" do
     before do
-      Rails.configuration.unit_badges = false
+      Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false)
+    end
+
+    after do
+      Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false)
     end
 
     scenario "index page shows original 'Add Inspection' button" do

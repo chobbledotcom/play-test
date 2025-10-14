@@ -1,7 +1,7 @@
 <%= render 'shared/page_header', title: @title %>
 
 <% if current_user.is_active? %>
-  <% if Rails.configuration.unit_badges %>
+  <% if Rails.configuration.units.badges_enabled %>
     <%= link_to new_inspection_from_unit_path do %>
       <button><strong><%= t('inspections.buttons.add_inspection_from_unit') %></strong></button>
     <% end %>

@@ -236,7 +236,7 @@ class InspectionsController < ApplicationController
 
   sig { returns(T::Boolean) }
   def unit_badges_enabled?
-    Rails.configuration.unit_badges
+    Rails.configuration.units.badges_enabled
   end
 
   def partition_inspections(all_inspections)
