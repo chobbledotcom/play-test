@@ -74,10 +74,10 @@ class PdfGeneratorService
       end
 
       def prepare_logo(user)
-        # Check if PDF_LOGO config is set to override user logo
-        if Rails.configuration.pdf_logo.present?
-          logo_filename = Rails.configuration.pdf_logo
-          logo_path = Rails.root.join("app", "assets", "images", logo_filename)
+        # Check if PDF logo config is set to override user logo
+        pdf_logo = Rails.configuration.pdf.logo
+        if pdf_logo.present?
+          logo_path = Rails.root.join("app", "assets", "images", pdf_logo)
           logo_data = File.read(logo_path, mode: "rb")
           logo_height = Configuration::LOGO_HEIGHT
           logo_width = logo_height * 2 + 10

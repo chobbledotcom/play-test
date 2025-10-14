@@ -15,11 +15,27 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
       let(:logo_data) { "fake logo data" }
 
       before do
-        Rails.configuration.pdf_logo = logo_filename
+        # Create a PdfConfig with logo set
+        test_pdf_config = PdfConfig.new(
+          cache_enabled: false,
+          cache_from: nil,
+          redirect_to_s3: false,
+          logo: logo_filename
+        )
+        Rails.configuration.pdf = test_pdf_config
+        Rails.configuration.pdf_logo = logo_filename # Legacy accessor
         allow(File).to receive(:read).with(logo_path, mode: "rb").and_return(logo_data)
       end
 
       after do
+        # Reset to default config
+        default_config = PdfConfig.new(
+          cache_enabled: false,
+          cache_from: nil,
+          redirect_to_s3: false,
+          logo: nil
+        )
+        Rails.configuration.pdf = default_config
         Rails.configuration.pdf_logo = nil
       end
 
@@ -54,6 +70,13 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
 
     context "when PDF_LOGO configuration is not set" do
       before do
+        default_config = PdfConfig.new(
+          cache_enabled: false,
+          cache_from: nil,
+          redirect_to_s3: false,
+          logo: nil
+        )
+        Rails.configuration.pdf = default_config
         Rails.configuration.pdf_logo = nil
       end
 
@@ -116,10 +139,24 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
 
     context "with empty PDF_LOGO value" do
       before do
+        empty_config = PdfConfig.new(
+          cache_enabled: false,
+          cache_from: nil,
+          redirect_to_s3: false,
+          logo: ""
+        )
+        Rails.configuration.pdf = empty_config
         Rails.configuration.pdf_logo = ""
       end
 
       after do
+        default_config = PdfConfig.new(
+          cache_enabled: false,
+          cache_from: nil,
+          redirect_to_s3: false,
+          logo: nil
+        )
+        Rails.configuration.pdf = default_config
         Rails.configuration.pdf_logo = nil
       end
 

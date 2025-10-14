@@ -24,6 +24,9 @@ require "dotenv/load"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Load typed configuration classes
+require_relative "../app/config/pdf_config"
+
 module PlayTest
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
@@ -64,12 +67,14 @@ module PlayTest
     config.s3_bucket = ENV["S3_BUCKET"]
     config.s3_region = ENV["S3_REGION"]
 
-    # PDF Generation Configuration
-    config.pdf_cache_enabled = ENV["PDF_CACHE_FROM"].present?
-    pdf_cache_date = ENV["PDF_CACHE_FROM"]
-    config.pdf_cache_from = pdf_cache_date.present? ? Date.parse(pdf_cache_date) : nil
-    config.redirect_to_s3_pdfs = ENV["REDIRECT_TO_S3_PDFS"] == "true"
-    config.pdf_logo = ENV["PDF_LOGO"]
+    # PDF Generation Configuration (typed)
+    config.pdf = PdfConfig.from_env(ENV.to_h)
+
+    # Legacy individual accessors (deprecated - use config.pdf instead)
+    config.pdf_cache_enabled = config.pdf.cache_enabled
+    config.pdf_cache_from = config.pdf.cache_from
+    config.redirect_to_s3_pdfs = config.pdf.redirect_to_s3
+    config.pdf_logo = config.pdf.logo
 
     # Theme and UI Configuration
     config.forced_theme = ENV["THEME"] # If set, overrides user preference
