@@ -652,12 +652,12 @@ RSpec.describe "Units", type: :request do
     let(:badge2) { create(:badge, badge_batch: badge_batch) }
 
     before do
-      Rails.configuration.unit_badges_enabled = true
+      Rails.configuration.units = UnitsConfig.new(badges_enabled: true, reports_unbranded: false)
       login_as(user)
     end
 
     after do
-      Rails.configuration.unit_badges_enabled = false
+      Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false)
     end
 
     it "prevents changing ID on update via raw request" do

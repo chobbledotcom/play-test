@@ -26,6 +26,7 @@ Bundler.require(*Rails.groups)
 
 # Load typed configuration classes
 require_relative "../app/config/pdf_config"
+require_relative "../app/config/units_config"
 
 module PlayTest
   class Application < Rails::Application
@@ -90,9 +91,8 @@ module PlayTest
     config.ntfy_channel_developer = ENV["NTFY_CHANNEL_DEVELOPER"]
     config.ntfy_channel_admin = ENV["NTFY_CHANNEL_ADMIN"]
 
-    # Unit Configuration
-    config.unit_badges_enabled = ENV["UNIT_BADGES"] == "true"
-    config.unit_reports_unbranded = ENV["UNIT_REPORTS_UNBRANDED"] == "true"
+    # Unit Configuration (typed)
+    config.units = UnitsConfig.from_env(ENV.to_h)
 
     # I18n Configuration
     default_overrides = Rails.root.join("config/site_overrides.yml").to_s

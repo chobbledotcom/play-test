@@ -62,9 +62,7 @@ Rails.application.configure do
 
   # Default feature flags for tests
   config.has_assessments = true
-  config.unit_badges_enabled = false
   config.simple_user_activation = false
-  config.unit_reports_unbranded = false
 
   # Default base_url for tests (same as production default)
   config.base_url ||= "http://localhost:3000"

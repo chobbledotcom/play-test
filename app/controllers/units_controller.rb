@@ -283,7 +283,7 @@ class UnitsController < ApplicationController
 
   sig { returns(T::Boolean) }
   def unit_badges_enabled?
-    Rails.configuration.unit_badges_enabled
+    Rails.configuration.units.badges_enabled
   end
 
   sig { params(raw_id: String).returns(String) }
