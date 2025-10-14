@@ -24,6 +24,15 @@ require "dotenv/load"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Load typed configuration classes
+require_relative "../app/config/pdf_config"
+require_relative "../app/config/units_config"
+require_relative "../app/config/users_config"
+require_relative "../app/config/s3_config"
+require_relative "../app/config/theme_config"
+require_relative "../app/config/observability_config"
+require_relative "../app/config/app_config"
+
 module PlayTest
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
@@ -56,40 +65,29 @@ module PlayTest
     # Centralized configuration for all application-level ENV variables
     # No rescues - if a value exists, we assume it's in the correct format
 
-    # Storage Configuration
-    config.use_s3_storage = ENV["USE_S3_STORAGE"] == "true"
-    config.active_storage.service = config.use_s3_storage ? :s3_host : :local
+    # Storage Configuration (typed)
+    config.s3 = S3Config.from_env(ENV.to_h)
+    service = config.s3.enabled ? :s3_host : :local
+    config.active_storage.service = service
     config.active_storage.service_urls_expire_in = 1.day
-    config.s3_endpoint = ENV["S3_ENDPOINT"]
-    config.s3_bucket = ENV["S3_BUCKET"]
-    config.s3_region = ENV["S3_REGION"]
 
-    # PDF Generation Configuration
-    config.pdf_cache_enabled = ENV["PDF_CACHE_FROM"].present?
-    pdf_cache_date = ENV["PDF_CACHE_FROM"]
-    config.pdf_cache_from = pdf_cache_date.present? ? Date.parse(pdf_cache_date) : nil
-    config.redirect_to_s3_pdfs = ENV["REDIRECT_TO_S3_PDFS"] == "true"
-    config.pdf_logo = ENV["PDF_LOGO"]
+    # PDF Generation Configuration (typed)
+    config.pdf = PdfConfig.from_env(ENV.to_h)
 
-    # Theme and UI Configuration
-    config.forced_theme = ENV["THEME"] # If set, overrides user preference
-    config.logo_path = ENV.fetch("LOGO_PATH", "logo.svg")
-    config.logo_alt = ENV.fetch("LOGO_ALT", "play-test logo")
-    config.left_logo_path = ENV["LEFT_LOGO_PATH"]
-    config.left_logo_alt = ENV.fetch("LEFT_LOGO_ALT", "Logo")
-    config.right_logo_path = ENV["RIGHT_LOGO_PATH"]
-    config.right_logo_alt = ENV.fetch("RIGHT_LOGO_ALT", "Logo")
+    # Theme and UI Configuration (typed)
+    config.theme = ThemeConfig.from_env(ENV.to_h)
 
-    # Features and Functionality
-    config.has_assessments = ENV["HAS_ASSESSMENTS"] == "true"
-    config.simple_user_activation = ENV["SIMPLE_USER_ACTIVATION"] == "true"
-    config.admin_emails_pattern = ENV["ADMIN_EMAILS_PATTERN"]
-    config.base_url = ENV.fetch("BASE_URL", "http://localhost:3000")
-    config.app_name = ENV.fetch("APP_NAME", "Play-Test")
+    # Application Configuration (typed)
+    config.app = AppConfig.from_env(ENV.to_h)
 
-    # Notification Configuration
-    config.ntfy_channel_developer = ENV["NTFY_CHANNEL_DEVELOPER"]
-    config.ntfy_channel_admin = ENV["NTFY_CHANNEL_ADMIN"]
+    # Users / Auth Configuration (typed)
+    config.users = UsersConfig.from_env(ENV.to_h)
+
+    # Observability Configuration (typed)
+    config.observability = ObservabilityConfig.from_env(ENV.to_h)
+
+    # Unit Configuration (typed)
+    config.units = UnitsConfig.from_env(ENV.to_h)
 
     # I18n Configuration
     default_overrides = Rails.root.join("config/site_overrides.yml").to_s

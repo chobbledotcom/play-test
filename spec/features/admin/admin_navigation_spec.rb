@@ -1,8 +1,30 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Admin Navigation", type: :feature do
   let(:admin_user) { create(:user, :admin, :without_company) }
   let(:regular_user) { create(:user, :active_user) }
+
+  define_method(:set_s3_enabled) do
+    config = S3Config.new(
+      enabled: true,
+      endpoint: "https://s3.example.com",
+      bucket: "test-bucket",
+      region: "us-east-1"
+    )
+    Rails.configuration.s3 = config
+  end
+
+  define_method(:set_s3_disabled) do
+    config = S3Config.new(
+      enabled: false,
+      endpoint: nil,
+      bucket: nil,
+      region: nil
+    )
+    Rails.configuration.s3 = config
+  end
 
   scenario "admin user sees Admin link in navigation" do
     sign_in(admin_user)
@@ -46,8 +68,11 @@ RSpec.feature "Admin Navigation", type: :feature do
 
   context "with S3 enabled" do
     before do
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with("USE_S3_STORAGE").and_return("true")
+      set_s3_enabled
+    end
+
+    after do
+      set_s3_disabled
     end
 
     scenario "admin sees backups link when S3 is enabled" do
@@ -60,8 +85,7 @@ RSpec.feature "Admin Navigation", type: :feature do
 
   context "without S3 enabled" do
     before do
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with("USE_S3_STORAGE").and_return(nil)
+      set_s3_disabled
     end
 
     scenario "admin does not see backups link when S3 is disabled" do

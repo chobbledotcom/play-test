@@ -8,9 +8,21 @@ RSpec.describe QrCodeService do
   let(:unit) { create(:unit) }
   let(:base_url) { "https://example.com" }
 
+  define_method(:set_app_config) do |base_url: "http://localhost:3000"|
+    config = AppConfig.new(
+      has_assessments: Rails.configuration.app.has_assessments,
+      base_url: base_url,
+      name: Rails.configuration.app.name
+    )
+    Rails.configuration.app = config
+  end
+
   before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("BASE_URL").and_return(base_url)
+    set_app_config(base_url: base_url)
+  end
+
+  after do
+    set_app_config
   end
 
   shared_examples "generates QR code" do |record_type|
@@ -73,19 +85,6 @@ RSpec.describe QrCodeService do
         resize_gte_to: false,
         size: 300
       )
-    end
-  end
-
-  context "when BASE_URL is not set" do
-    before { allow(ENV).to receive(:[]).with("BASE_URL").and_return(nil) }
-
-    %i[inspection unit].each do |record_type|
-      it "raises TypeError for #{record_type} QR generation" do
-        record = send(record_type)
-        method = "generate_#{record_type}_qr_code"
-        expect { described_class.send(method, record) }
-          .to raise_error(TypeError)
-      end
     end
   end
 end

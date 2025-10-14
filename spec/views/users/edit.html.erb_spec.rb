@@ -26,7 +26,7 @@ RSpec.describe "users/edit.html.erb", type: :view do
     expect(rendered).to have_field("Name")
     expect(rendered).to have_field("RPII Inspector No")
 
-    if Rails.configuration.simple_user_activation
+    if Rails.configuration.users.simple_activation
       # Check for activation status display instead of field
       expect(rendered).to have_content(I18n.t("users.labels.activated_at")) ||
         have_content(I18n.t("users.labels.deactivated_at"))

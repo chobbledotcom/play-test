@@ -8,18 +8,26 @@ RSpec.feature "Unit Badge Validation", type: :feature do
   let(:badge_batch) { create(:badge_batch) }
   let(:badge) { create(:badge, badge_batch: badge_batch) }
 
+  define_method(:set_units_config) do |badges_enabled:, reports_unbranded: false|
+    config = UnitsConfig.new(
+      badges_enabled: badges_enabled,
+      reports_unbranded: reports_unbranded
+    )
+    Rails.configuration.units = config
+  end
+
   before do
     sign_in(user)
   end
 
   context "when UNIT_BADGES is enabled" do
     before do
-      ENV["UNIT_BADGES"] = "true"
+      set_units_config(badges_enabled: true)
       visit new_unit_path
     end
 
     after do
-      ENV.delete("UNIT_BADGES")
+      set_units_config(badges_enabled: false)
     end
 
     scenario "shows ID field on new unit form" do
@@ -99,7 +107,7 @@ RSpec.feature "Unit Badge Validation", type: :feature do
 
   context "when UNIT_BADGES is disabled" do
     before do
-      ENV.delete("UNIT_BADGES")
+      set_units_config(badges_enabled: false)
       visit new_unit_path
     end
 
@@ -127,11 +135,11 @@ RSpec.feature "Unit Badge Validation", type: :feature do
     let(:unit_with_badge) { create(:unit, id: badge.id, user: user) }
 
     before do
-      ENV["UNIT_BADGES"] = "true"
+      set_units_config(badges_enabled: true)
     end
 
     after do
-      ENV.delete("UNIT_BADGES")
+      set_units_config(badges_enabled: false)
     end
 
     scenario "does not show ID field on edit form" do

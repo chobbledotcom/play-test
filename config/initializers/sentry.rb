@@ -7,7 +7,9 @@ require "sentry-ruby"
 require "sentry-rails"
 
 Sentry.init do |config|
-  config.dsn = ENV["SENTRY_DSN"]
+  observability = Rails.configuration.observability
+
+  config.dsn = observability.sentry_dsn
   config.enabled_environments = %w[production]
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
   config.send_default_pii = false
@@ -23,5 +25,7 @@ Sentry.init do |config|
     event
   end
 
-  config.release = ENV["RENDER_GIT_COMMIT"] if ENV["RENDER_GIT_COMMIT"].present?
+  if observability.git_commit.present?
+    config.release = observability.git_commit
+  end
 end

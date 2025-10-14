@@ -5,7 +5,7 @@ class AdminController < ApplicationController
   before_action :require_admin
 
   def index
-    @show_backups = ENV["USE_S3_STORAGE"] == "true"
+    @show_backups = Rails.configuration.s3.enabled
   end
 
   def releases

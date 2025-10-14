@@ -33,7 +33,7 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       expect_field_present(:user_edit, :email)
       expect_field_present(:user_edit, :rpii_inspector_number)
 
-      if ENV["SIMPLE_USER_ACTIVATION"] == "true"
+      if Rails.configuration.users.simple_activation
         # Check for activation status display instead of field
         expect(page).to have_content(I18n.t("users.labels.activated_at")) ||
           have_content(I18n.t("users.labels.deactivated_at"))
@@ -85,7 +85,7 @@ RSpec.feature "User Name Editing Permissions", type: :feature do
       visit change_settings_user_path(regular_user)
 
       # Theme field is only shown if forced_theme is not set
-      if Rails.configuration.forced_theme.blank?
+      if Rails.configuration.theme.forced_theme.blank?
         expect_field_present(:user_settings, :theme)
 
         theme_field = I18n.t("forms.user_settings.fields.theme")

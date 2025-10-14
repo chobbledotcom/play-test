@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Inspections", type: :request do
@@ -18,27 +20,36 @@ RSpec.describe "Inspections", type: :request do
   end
 
   # Helper methods
-  def expect_redirect_with_alert(path, alert_pattern = nil)
+  define_method(:set_app_config) do |has_assessments: true|
+    config = AppConfig.new(
+      has_assessments: has_assessments,
+      base_url: Rails.configuration.app.base_url,
+      name: Rails.configuration.app.name
+    )
+    Rails.configuration.app = config
+  end
+
+  define_method(:expect_redirect_with_alert) do |path, alert_pattern = nil|
     expect(response).to redirect_to(path)
     expect(flash[:alert]).to be_present
     expect(flash[:alert]).to match(alert_pattern) if alert_pattern
   end
 
-  def expect_success_with_notice(notice_pattern = nil)
+  define_method(:expect_success_with_notice) do |notice_pattern = nil|
     expect(response).to have_http_status(:redirect)
     follow_redirect!
     expect(response).to have_http_status(:success)
     expect(flash[:notice]).to match(notice_pattern) if notice_pattern
   end
 
-  def mock_failing_save(error_messages = ["Validation error"])
+  define_method(:mock_failing_save) do |error_messages = ["Validation error"]|
     allow_any_instance_of(Inspection).to receive(:save).and_return(false)
     allow_any_instance_of(Inspection).to receive(:errors).and_return(
       double(full_messages: error_messages)
     )
   end
 
-  def mock_failing_update(error_messages = ["Update error"])
+  define_method(:mock_failing_update) do |error_messages = ["Update error"]|
     allow_any_instance_of(Inspection).to receive(:update).and_return(false)
     allow_any_instance_of(Inspection).to receive(:errors).and_return(
       double(full_messages: error_messages)
@@ -118,9 +129,12 @@ RSpec.describe "Inspections", type: :request do
 
   describe "assessments disabled" do
     before do
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with("HAS_ASSESSMENTS").and_return("false")
+      set_app_config(has_assessments: false)
       login_as(user)
+    end
+
+    after do
+      set_app_config
     end
 
     it "returns 404 when assessments are disabled" do

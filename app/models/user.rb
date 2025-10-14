@@ -104,7 +104,7 @@ class User < ApplicationRecord
 
   sig { returns(T::Boolean) }
   def admin?
-    admin_pattern = Rails.configuration.admin_emails_pattern
+    admin_pattern = Rails.configuration.users.admin_emails_pattern
     return false if admin_pattern.blank?
 
     begin

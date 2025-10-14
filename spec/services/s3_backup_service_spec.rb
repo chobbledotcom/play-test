@@ -31,10 +31,30 @@ RSpec.describe S3BackupService do
     end
   end
 
+  define_method(:set_s3_enabled) do
+    config = S3Config.new(
+      enabled: true,
+      endpoint: "https://s3.example.com",
+      bucket: "test-bucket",
+      region: "us-east-1"
+    )
+    Rails.configuration.s3 = config
+  end
+
+  define_method(:set_s3_disabled) do
+    config = S3Config.new(
+      enabled: false,
+      endpoint: nil,
+      bucket: nil,
+      region: nil
+    )
+    Rails.configuration.s3 = config
+  end
+
   before do
     allow(Time).to receive(:current).and_return(Time.zone.parse("2024-01-15 10:00:00"))
+    set_s3_enabled
     allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("USE_S3_STORAGE").and_return("true")
     allow(ENV).to receive(:[]).with("S3_ENDPOINT").and_return("https://s3.example.com")
     allow(ENV).to receive(:[]).with("S3_ACCESS_KEY_ID").and_return("access_key")
     allow(ENV).to receive(:[]).with("S3_SECRET_ACCESS_KEY").and_return("secret_key")
@@ -46,13 +66,14 @@ RSpec.describe S3BackupService do
   end
 
   after do
+    set_s3_disabled
     FileUtils.rm_rf(temp_dir)
   end
 
   describe "#perform" do
     context "when S3 is not enabled" do
       before do
-        allow(ENV).to receive(:[]).with("USE_S3_STORAGE").and_return("false")
+        set_s3_disabled
         # Mock FileUtils to avoid errors in ensure block
         allow(FileUtils).to receive(:rm_f)
       end

@@ -9,17 +9,25 @@ RSpec.describe PdfCacheService, type: :service do
 
   shared_context "with caching enabled" do
     before do
-      Rails.configuration.pdf_cache_enabled = true
-      allow(described_class)
-        .to receive(:pdf_cache_from_date)
-        .and_return(Date.parse("2024-01-01"))
+      cached_config = PdfConfig.new(
+        cache_enabled: true,
+        cache_from: Date.parse("2024-01-01"),
+        redirect_to_s3: false,
+        logo: nil
+      )
+      Rails.configuration.pdf = cached_config
     end
   end
 
   shared_context "with caching disabled" do
     before do
-      Rails.configuration.pdf_cache_enabled = false
-      allow(described_class).to receive(:pdf_cache_from_date).and_return(nil)
+      uncached_config = PdfConfig.new(
+        cache_enabled: false,
+        cache_from: nil,
+        redirect_to_s3: false,
+        logo: nil
+      )
+      Rails.configuration.pdf = uncached_config
     end
   end
 
@@ -114,7 +122,13 @@ RSpec.describe PdfCacheService, type: :service do
 
         context "when REDIRECT_TO_S3_PDFS is false" do
           before do
-            Rails.configuration.redirect_to_s3_pdfs = false
+            no_redirect_config = PdfConfig.new(
+              cache_enabled: true,
+              cache_from: Date.parse("2024-01-01"),
+              redirect_to_s3: false,
+              logo: nil
+            )
+            Rails.configuration.pdf = no_redirect_config
           end
 
           it "returns a stream with the cached PDF attachment" do
@@ -129,7 +143,13 @@ RSpec.describe PdfCacheService, type: :service do
 
         context "when REDIRECT_TO_S3_PDFS is true" do
           before do
-            Rails.configuration.redirect_to_s3_pdfs = true
+            redirect_config = PdfConfig.new(
+              cache_enabled: true,
+              cache_from: Date.parse("2024-01-01"),
+              redirect_to_s3: true,
+              logo: nil
+            )
+            Rails.configuration.pdf = redirect_config
           end
 
           it "returns a redirect to the cached PDF" do

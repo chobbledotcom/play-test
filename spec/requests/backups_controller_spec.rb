@@ -1,12 +1,37 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Backups", type: :request do
   let(:admin_user) { create(:user, :admin, :without_company) }
   let(:regular_user) { create(:user, :active_user) }
 
+  define_method(:set_s3_enabled) do
+    config = S3Config.new(
+      enabled: true,
+      endpoint: "https://s3.example.com",
+      bucket: "test-bucket",
+      region: "us-east-1"
+    )
+    Rails.configuration.s3 = config
+  end
+
+  define_method(:set_s3_disabled) do
+    config = S3Config.new(
+      enabled: false,
+      endpoint: nil,
+      bucket: nil,
+      region: nil
+    )
+    Rails.configuration.s3 = config
+  end
+
   before do
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with("USE_S3_STORAGE").and_return("true")
+    set_s3_enabled
+  end
+
+  after do
+    set_s3_disabled
   end
 
   describe "GET /backups/download" do

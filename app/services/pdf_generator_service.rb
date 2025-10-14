@@ -56,7 +56,7 @@ class PdfGeneratorService
   def self.generate_unit_report(unit, debug_enabled: false, debug_queries: [])
     require "prawn/table"
 
-    unbranded = ENV["UNIT_REPORTS_UNBRANDED"] == "true"
+    unbranded = Rails.configuration.units.reports_unbranded
 
     # Preload all inspections once to avoid N+1 queries
     completed_inspections = unit.inspections

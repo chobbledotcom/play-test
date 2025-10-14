@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require "active_support/core_ext/integer/time"
@@ -58,4 +59,17 @@ Rails.application.configure do
 
   # Use test adapter for Active Job in tests
   config.active_job.queue_adapter = :test
+
+  # Default app config for tests
+  config.app = AppConfig.new(
+    has_assessments: true,
+    base_url: config.app.base_url,
+    name: config.app.name
+  )
+
+  # Admin email pattern for tests (matches factory :admin trait)
+  config.users = UsersConfig.new(
+    simple_activation: config.users.simple_activation,
+    admin_emails_pattern: "^admin.*@example\\.com$"
+  )
 end

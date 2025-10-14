@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require "rails_helper"
@@ -101,10 +102,11 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
     context "when UNIT_REPORTS_UNBRANDED is enabled" do
       around do |example|
-        original_value = ENV["UNIT_REPORTS_UNBRANDED"]
-        ENV["UNIT_REPORTS_UNBRANDED"] = "true"
+        original_config = Rails.configuration.units
+        config = UnitsConfig.new(badges_enabled: false, reports_unbranded: true)
+        Rails.configuration.units = config
         example.run
-        ENV["UNIT_REPORTS_UNBRANDED"] = original_value
+        Rails.configuration.units = original_config
       end
 
       it "does not include disclaimer footer" do
@@ -119,7 +121,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
         user.logo.attach(fixture_file_upload("test_image.jpg", "image/jpeg"))
 
         pdf = PdfGeneratorService.generate_unit_report(unit)
-        rendered_pdf = pdf.render
+        pdf.render
 
         expect { pdf.render }.not_to raise_error
       end
@@ -127,10 +129,11 @@ RSpec.describe PdfGeneratorService, pdf: true do
 
     context "when UNIT_REPORTS_UNBRANDED is disabled" do
       around do |example|
-        original_value = ENV["UNIT_REPORTS_UNBRANDED"]
-        ENV["UNIT_REPORTS_UNBRANDED"] = "false"
+        original_config = Rails.configuration.units
+        config = UnitsConfig.new(badges_enabled: false, reports_unbranded: false)
+        Rails.configuration.units = config
         example.run
-        ENV["UNIT_REPORTS_UNBRANDED"] = original_value
+        Rails.configuration.units = original_config
       end
 
       it "includes disclaimer footer" do

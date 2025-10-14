@@ -5,7 +5,7 @@
     <%= render 'chobble_forms/text_field', field: :password, type: :password_field %>
     <%= render 'chobble_forms/text_field', field: :password_confirmation, type: :password_field %>
     <%= render 'chobble_forms/text_field', field: :rpii_inspector_number %>
-    <% if ENV["SIMPLE_USER_ACTIVATION"] == "true" %>
+    <% if Rails.configuration.users.simple_activation %>
       <%
         if @user.active_until&.future?
           label_key = 'users.labels.activated_at'
@@ -44,7 +44,7 @@
   </article>
 <% end %>
 
-<% if ENV["SIMPLE_USER_ACTIVATION"] == "true" %>
+<% if Rails.configuration.users.simple_activation %>
   <% if @user.active_until&.future? %>
     <article>
       <%= button_to t('users.buttons.deactivate'),

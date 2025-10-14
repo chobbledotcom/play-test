@@ -43,7 +43,7 @@
       <% end %>
       <nav>
         <ul>
-          <% if ENV['HAS_ASSESSMENTS'] == 'true' %>
+          <% if Rails.configuration.app.has_assessments %>
             <li><%= nav_link_to t('navigation.inspections'), inspections_path %></li>
             <li><%= nav_link_to t('navigation.units'), units_path %></li>
           <% end %>

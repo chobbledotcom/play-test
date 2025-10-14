@@ -20,7 +20,7 @@ class QrCodeService
   def self.generate_inspection_qr_code(inspection)
     require "rqrcode"
 
-    base_url = T.must(ENV["BASE_URL"])
+    base_url = T.must(Rails.configuration.app.base_url)
     url = "#{base_url}/inspections/#{inspection.id}"
     generate_qr_code_from_url(url)
   end
@@ -29,7 +29,7 @@ class QrCodeService
   def self.generate_unit_qr_code(unit)
     require "rqrcode"
 
-    base_url = T.must(ENV["BASE_URL"])
+    base_url = T.must(Rails.configuration.app.base_url)
     url = "#{base_url}/units/#{unit.id}"
     generate_qr_code_from_url(url)
   end

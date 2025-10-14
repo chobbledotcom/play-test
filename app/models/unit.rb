@@ -216,7 +216,7 @@ class Unit < ApplicationRecord
 
   sig { returns(T::Boolean) }
   def unit_badges_enabled?
-    ENV["UNIT_BADGES"] == "true"
+    Rails.configuration.units.badges_enabled
   end
 
   sig { void }
