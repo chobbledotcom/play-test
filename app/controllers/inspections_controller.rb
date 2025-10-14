@@ -206,7 +206,7 @@ class InspectionsController < ApplicationController
   private
 
   def check_assessments_enabled
-    head :not_found unless Rails.configuration.has_assessments
+    head :not_found unless Rails.configuration.app.has_assessments
   end
 
   def partition_inspections(all_inspections)

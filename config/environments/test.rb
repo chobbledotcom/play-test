@@ -60,12 +60,12 @@ Rails.application.configure do
   # Use test adapter for Active Job in tests
   config.active_job.queue_adapter = :test
 
-  # Default feature flags for tests
-  config.has_assessments = true
-  # config.users defaults from application.rb
-
-  # Default base_url for tests (same as production default)
-  config.base_url ||= "http://localhost:3000"
+  # Default app config for tests
+  config.app = AppConfig.new(
+    has_assessments: true,
+    base_url: config.app.base_url,
+    name: config.app.name
+  )
 
   # Admin email pattern for tests (matches factory :admin trait)
   config.users = UsersConfig.new(

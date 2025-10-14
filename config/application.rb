@@ -31,6 +31,7 @@ require_relative "../app/config/users_config"
 require_relative "../app/config/s3_config"
 require_relative "../app/config/theme_config"
 require_relative "../app/config/observability_config"
+require_relative "../app/config/app_config"
 
 module PlayTest
   class Application < Rails::Application
@@ -76,12 +77,11 @@ module PlayTest
     # Theme and UI Configuration (typed)
     config.theme = ThemeConfig.from_env(ENV.to_h)
 
-    # Features and Functionality
-    config.has_assessments = ENV["HAS_ASSESSMENTS"] == "true"
+    # Application Configuration (typed)
+    config.app = AppConfig.from_env(ENV.to_h)
+
     # Users / Auth Configuration (typed)
     config.users = UsersConfig.from_env(ENV.to_h)
-    config.base_url = ENV.fetch("BASE_URL", "http://localhost:3000")
-    config.app_name = ENV.fetch("APP_NAME", "Play-Test")
 
     # Observability Configuration (typed)
     config.observability = ObservabilityConfig.from_env(ENV.to_h)

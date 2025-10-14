@@ -313,7 +313,7 @@ class UnitsController < ApplicationController
   end
 
   def check_assessments_enabled
-    head :not_found unless Rails.configuration.has_assessments
+    head :not_found unless Rails.configuration.app.has_assessments
   end
 
   def send_unit_pdf

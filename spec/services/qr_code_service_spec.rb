@@ -8,12 +8,21 @@ RSpec.describe QrCodeService do
   let(:unit) { create(:unit) }
   let(:base_url) { "https://example.com" }
 
+  define_method(:set_app_config) do |base_url: "http://localhost:3000"|
+    config = AppConfig.new(
+      has_assessments: Rails.configuration.app.has_assessments,
+      base_url: base_url,
+      name: Rails.configuration.app.name
+    )
+    Rails.configuration.app = config
+  end
+
   before do
-    Rails.configuration.base_url = base_url
+    set_app_config(base_url: base_url)
   end
 
   after do
-    Rails.configuration.base_url = "http://localhost:3000"
+    set_app_config
   end
 
   shared_examples "generates QR code" do |record_type|

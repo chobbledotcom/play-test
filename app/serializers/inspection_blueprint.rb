@@ -43,7 +43,7 @@ class InspectionBlueprint < Blueprinter::Base
   end
 
   field :urls do |inspection|
-    base_url = Rails.configuration.base_url
+    base_url = Rails.configuration.app.base_url
     {
       report_pdf: "#{base_url}/inspections/#{inspection.id}.pdf",
       report_json: "#{base_url}/inspections/#{inspection.id}.json",

@@ -20,6 +20,15 @@ RSpec.describe "Inspections", type: :request do
   end
 
   # Helper methods
+  define_method(:set_app_config) do |has_assessments: true|
+    config = AppConfig.new(
+      has_assessments: has_assessments,
+      base_url: Rails.configuration.app.base_url,
+      name: Rails.configuration.app.name
+    )
+    Rails.configuration.app = config
+  end
+
   define_method(:expect_redirect_with_alert) do |path, alert_pattern = nil|
     expect(response).to redirect_to(path)
     expect(flash[:alert]).to be_present
@@ -120,12 +129,12 @@ RSpec.describe "Inspections", type: :request do
 
   describe "assessments disabled" do
     before do
-      Rails.configuration.has_assessments = false
+      set_app_config(has_assessments: false)
       login_as(user)
     end
 
     after do
-      Rails.configuration.has_assessments = true
+      set_app_config
     end
 
     it "returns 404 when assessments are disabled" do
