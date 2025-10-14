@@ -1,17 +1,23 @@
 <%= render 'shared/page_header', title: @title %>
 
 <% if current_user.is_active? %>
-  <%= button_to inspections_path,
-      method: :post,
-      params: {
-        inspection: {
-          inspection_date: Date.current
-        }
-      },
-      data: {
-        turbo_confirm: t('inspections.messages.create_without_unit_confirm')
-      } do %>
-    <strong><%= t('inspections.buttons.add_inspection') %></strong>
+  <% if Rails.configuration.unit_badges %>
+    <%= link_to new_inspection_from_unit_path do %>
+      <button><strong><%= t('inspections.buttons.add_inspection_from_unit') %></strong></button>
+    <% end %>
+  <% else %>
+    <%= button_to inspections_path,
+        method: :post,
+        params: {
+          inspection: {
+            inspection_date: Date.current
+          }
+        },
+        data: {
+          turbo_confirm: t('inspections.messages.create_without_unit_confirm')
+        } do %>
+      <strong><%= t('inspections.buttons.add_inspection') %></strong>
+    <% end %>
   <% end %>
 <% end %>
 

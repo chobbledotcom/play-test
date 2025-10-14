@@ -9,6 +9,7 @@ en:
     titles:
       edit: Edit Inspection
       new: New Inspection
+      new_from_unit: Create Inspection from Unit
       show: Inspection Details
       index: Inspections
       select_unit: Select Unit for Inspection
@@ -31,10 +32,12 @@ en:
       inspection_details: Inspection Details
       status_and_results: Status and Results
       search: Search Inspections
+      search_unit: Search for Unit
     forms:
       search: Search
     search:
       placeholder: Inspection ID, internal ID, or unit serial
+      unit_id_placeholder: Enter Unit ID (e.g. ABC12345)
     filters:
       all_statuses: All Statuses
       all_results: All Results
@@ -55,6 +58,7 @@ en:
       unit_name: Unit Name
       unit_id: Select Unit (Required)
       unit_select: Select Unit (Required)
+      search_unit_id: Unit ID
       has_slide: Has Slide
       manufacturer: Manufacturer
       serial: Manufacturer Serial Number
@@ -123,6 +127,9 @@ en:
       create_and_continue: Create and Continue
       add_via_units: Add Inspection (Select Unit First)
       add_inspection: Add Inspection
+      add_inspection_from_unit: Create Inspection from Unit
+      create_inspection_for_unit: Create Inspection for This Unit
+      search: Search
       save_assessment: Save Assessment
       create_unit: Create Unit
       download_pdf: Download the PDF
@@ -173,6 +180,11 @@ en:
       unnamed: Unnamed
       missing_serial: Missing
       photo_of: Photo of %{name}
+      search_unit_prompt: Enter the Unit ID to search for a unit and create an inspection.
+      badge_exists_create_unit: This badge ID exists but has no unit associated with
+        it. You need to create a unit for this badge first.
+      invalid_unit_id: No unit or badge found with this ID. Please check the ID and
+        try again.
       unit_selection_notice: Select a unit below to update this inspection. Clicking
         a unit will replace the current unit.
       unit_selection_confirm: Are you sure you want to change to unit '%{unit_name}'?
@@ -210,6 +222,8 @@ en:
         errors: %{errors}'
       invalid_unit: Invalid unit selection
       creation_failed: 'Failed to create inspection: %{errors}'
+      direct_creation_disabled: Direct inspection creation is disabled. Please search
+        for a unit first.
       not_found: Inspection record not found
       access_denied: Access denied
     safety_standards:

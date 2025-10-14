@@ -145,7 +145,8 @@ RSpec.describe Unit, type: :model do
     end
 
     context "when UNIT_BADGES is disabled" do
-      before { ENV.delete("UNIT_BADGES") }
+      before { Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false) }
+      after { Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false) }
 
       it "generates custom ID automatically" do
         unit = build(:unit, user: user)

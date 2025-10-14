@@ -10,14 +10,15 @@ class InspectionsController < ApplicationController
 
   skip_before_action :require_login, only: %i[show]
   before_action :check_assessments_enabled
-  before_action :set_inspection, except: %i[create index]
-  before_action :check_inspection_owner, except: %i[create index show]
+  before_action :check_unit_badges_for_create, only: %i[create]
+  before_action :set_inspection, except: %i[create index new_from_unit]
+  before_action :check_inspection_owner, except: %i[create index show new_from_unit]
   before_action :validate_unit_ownership, only: %i[update]
   before_action :redirect_if_complete,
-    except: %i[create index destroy mark_draft show log]
-  before_action :require_user_active, only: %i[create edit update]
+    except: %i[create index destroy mark_draft show log new_from_unit]
+  before_action :require_user_active, only: %i[create edit update new_from_unit]
   before_action :validate_inspection_completability, only: %i[show edit]
-  before_action :no_index
+  before_action :no_index, except: %i[new_from_unit]
 
   def index
     all_inspections = filtered_inspections_query_without_order.to_a
@@ -46,6 +47,22 @@ class InspectionsController < ApplicationController
       format.json do
         render json: InspectionBlueprint.render(@inspection)
       end
+    end
+  end
+
+  def new_from_unit
+    @title = t("inspections.titles.new_from_unit")
+
+    return unless params[:search].present?
+
+    normalized_search = params[:search].gsub(/\s+/, "").upcase[0, 8]
+
+    @unit = Unit
+      .includes(photo_attachment: :blob)
+      .find_by(id: normalized_search)
+
+    if @unit.nil?
+      @badge = Badge.find_by(id: normalized_search)
     end
   end
 
@@ -209,6 +226,19 @@ class InspectionsController < ApplicationController
     head :not_found unless Rails.configuration.app.has_assessments
   end
 
+  def check_unit_badges_for_create
+    return unless unit_badges_enabled?
+    return if params[:unit_id].present?
+
+    flash[:alert] = t("inspections.errors.direct_creation_disabled")
+    redirect_to new_inspection_from_unit_path
+  end
+
+  sig { returns(T::Boolean) }
+  def unit_badges_enabled?
+    Rails.configuration.unit_badges
+  end
+
   def partition_inspections(all_inspections)
     @draft_inspections = all_inspections
       .select { |inspection| inspection.complete_date.nil? }
@@ -301,7 +331,7 @@ class InspectionsController < ApplicationController
   end
 
   def filtered_inspections_query_without_order = current_user.inspections
-    .includes(:inspector_company, unit: {photo_attachment: {blob: :attachments}})
+    .includes(:inspector_company, unit: { photo_attachment: { blob: :attachments } })
     .search(params[:query])
     .filter_by_result(params[:result])
     .filter_by_unit(params[:unit_id])
@@ -314,7 +344,7 @@ class InspectionsController < ApplicationController
       .includes(
         :user, :inspector_company,
         *Inspection::ALL_ASSESSMENT_TYPES.keys,
-        unit: {photo_attachment: :blob},
+        unit: { photo_attachment: :blob },
         photo_1_attachment: :blob,
         photo_2_attachment: :blob,
         photo_3_attachment: :blob
@@ -367,8 +397,8 @@ class InspectionsController < ApplicationController
         redirect_to @inspection
       end
       format.json do
-        render json: {status: I18n.t("shared.api.success"),
-                      inspection: @inspection}
+        render json: { status: I18n.t("shared.api.success"),
+                      inspection: @inspection }
       end
       format.turbo_stream { render turbo_stream: success_turbo_streams }
     end
@@ -377,7 +407,7 @@ class InspectionsController < ApplicationController
   def handle_failed_update
     respond_to do |format|
       format.html { render :edit, status: :unprocessable_content }
-      format.json { render json: {status: I18n.t("shared.api.error"), errors: @inspection.errors.full_messages} }
+      format.json { render json: { status: I18n.t("shared.api.error"), errors: @inspection.errors.full_messages } }
       format.turbo_stream { render turbo_stream: error_turbo_streams }
     end
   end
@@ -475,13 +505,13 @@ class InspectionsController < ApplicationController
   def get_prefill_objects
     case params[:tab]
     when "inspection", "", nil
-      [@inspection, @previous_inspection, Inspection.column_name_syms]
+      [ @inspection, @previous_inspection, Inspection.column_name_syms ]
     when "results"
       # Results tab uses inspection fields directly, not an assessment
       # Include all fields shown on results tab: passed, risk_assessment, and photos
       # NOT_COPIED_FIELDS will filter out fields that shouldn't be prefilled
-      results_fields = [:passed, :risk_assessment, :photo_1, :photo_2, :photo_3]
-      [@inspection, @previous_inspection, results_fields]
+      results_fields = [ :passed, :risk_assessment, :photo_1, :photo_2, :photo_3 ]
+      [ @inspection, @previous_inspection, results_fields ]
     else
       assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
       assessment_class = ASSESSMENT_CLASS_MAPPING[params[:tab]]
@@ -530,7 +560,7 @@ class InspectionsController < ApplicationController
         user: current_user,
         action: action,
         details: details,
-        metadata: {resource_type: "Inspection"}
+        metadata: { resource_type: "Inspection" }
       )
     end
   rescue => e

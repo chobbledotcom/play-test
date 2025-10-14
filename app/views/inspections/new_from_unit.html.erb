@@ -1,0 +1,65 @@
+<%= render 'shared/page_header', title: @title %>
+
+<%= form_with url: new_inspection_from_unit_path, method: :get do |form| %>
+  <fieldset>
+    <legend><%= t('inspections.sections.search_unit') %></legend>
+    
+    <%= form.label :search, t('inspections.fields.search_unit_id') %>
+    <%= form.text_field :search, 
+        value: params[:search],
+        placeholder: t('inspections.search.unit_id_placeholder'),
+        autofocus: true %>
+    
+    <%= form.submit t('inspections.buttons.search') %>
+  </fieldset>
+<% end %>
+
+<% if params[:search].present? %>
+  <% if @unit %>
+    <%= render 'chobble_forms/form_context',
+        model: nil,
+        scope: :unit_display,
+        i18n_base: 'forms.units',
+        url: nil do |form| %>
+      <%= render 'chobble_forms/fieldset', legend_key: 'unit_details' do %>
+        <%= render 'chobble_forms/display_field', field: :id, value: @unit.id %>
+        <%= render 'chobble_forms/display_field', field: :name, value: @unit.name %>
+        <%= render 'chobble_forms/display_field', field: :serial, value: @unit.serial %>
+        <%= render 'chobble_forms/display_field', field: :manufacturer, value: @unit.manufacturer %>
+        <%= render 'chobble_forms/display_field', field: :operator, value: @unit.operator %>
+        <%= render 'chobble_forms/display_field', field: :description, value: @unit.description %>
+        
+        <% if @unit.last_inspection %>
+          <%= render 'chobble_forms/display_field', 
+              field: :size, 
+              value: "#{@unit.last_inspection.width}m × #{@unit.last_inspection.length}m × #{@unit.last_inspection.height}m" %>
+        <% end %>
+      <% end %>
+    <% end %>
+    
+    <% if @unit.photo.attached? %>
+      <%= render 'shared/attached_image', attachment: @unit.photo %>
+    <% end %>
+    
+    <%= button_to inspections_path,
+        method: :post,
+        params: { unit_id: @unit.id } do %>
+      <strong><%= t('inspections.buttons.create_inspection_for_unit') %></strong>
+    <% end %>
+    
+  <% elsif @badge %>
+    <article>
+      <p><%= t('inspections.messages.badge_exists_create_unit') %></p>
+      <%= link_to new_unit_path(id: @badge.id) do %>
+        <button><%= t('units.buttons.create') %></button>
+      <% end %>
+    </article>
+    
+  <% else %>
+    <article>
+      <p><%= t('inspections.messages.invalid_unit_id') %></p>
+    </article>
+  <% end %>
+<% else %>
+  <p><%= t('inspections.messages.search_unit_prompt') %></p>
+<% end %>
