@@ -17,7 +17,6 @@ en:
         operator: Controller / Owner
         manufacture_date: Manufacture Date
         photo: Photo
-        size: Size
       submit: Save Unit
       errors:
         header:
