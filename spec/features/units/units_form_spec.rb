@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Units Form", type: :feature do
@@ -13,6 +15,11 @@ RSpec.describe "Units Form", type: :feature do
     end
 
     it "successfully creates a unit with valid data" do
+      if Rails.configuration.units.badges_enabled
+        badge = create(:badge, badge_batch: create(:badge_batch))
+        fill_in_form :units, :id, badge.id
+      end
+
       fill_in_form :units, :name, "Test Bouncy Castle"
       fill_in_form :units, :manufacturer, "JumpCo"
       fill_in_form :units, :serial, "ASSET-001"
@@ -38,12 +45,17 @@ RSpec.describe "Units Form", type: :feature do
     it "shows validation errors for missing required fields" do
       submit_form :units
 
-      expect_form_errors :units, count: 5
+      expected_count = Rails.configuration.units.badges_enabled ? 6 : 5
+      expect_form_errors :units, count: expected_count
       expect(page).to have_content(I18n.t("units.validations.name_blank"))
       expect(page).to have_content(I18n.t("units.validations.manufacturer_blank"))
       expect(page).to have_content(I18n.t("units.validations.serial_blank"))
       expect(page).to have_content(I18n.t("units.validations.description_blank"))
       expect(page).to have_content(I18n.t("units.validations.operator_blank"))
+
+      if Rails.configuration.units.badges_enabled
+        expect(page).to have_content(I18n.t("units.validations.id_blank"))
+      end
     end
 
     it "validates serial uniqueness per user" do

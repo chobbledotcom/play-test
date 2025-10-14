@@ -108,6 +108,7 @@ en:
       select: Select
       click_here: Click here
     validations:
+      id_blank: ID can't be blank
       name_blank: Name can't be blank
       manufacturer_blank: Manufacturer can't be blank
       serial_blank: Serial can't be blank

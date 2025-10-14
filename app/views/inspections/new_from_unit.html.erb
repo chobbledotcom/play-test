@@ -3,13 +3,13 @@
 <%= form_with url: new_inspection_from_unit_path, method: :get do |form| %>
   <fieldset>
     <legend><%= t('inspections.sections.search_unit') %></legend>
-    
+
     <%= form.label :search, t('inspections.fields.search_unit_id') %>
-    <%= form.text_field :search, 
+    <%= form.text_field :search,
         value: params[:search],
         placeholder: t('inspections.search.unit_id_placeholder'),
         autofocus: true %>
-    
+
     <%= form.submit t('inspections.buttons.search') %>
   </fieldset>
 <% end %>
@@ -28,25 +28,34 @@
         <%= render 'chobble_forms/display_field', field: :manufacturer, value: @unit.manufacturer %>
         <%= render 'chobble_forms/display_field', field: :operator, value: @unit.operator %>
         <%= render 'chobble_forms/display_field', field: :description, value: @unit.description %>
-        
+
         <% if @unit.last_inspection %>
-          <%= render 'chobble_forms/display_field', 
-              field: :size, 
-              value: "#{@unit.last_inspection.width}m × #{@unit.last_inspection.length}m × #{@unit.last_inspection.height}m" %>
+          <div>
+            <label><%= t("forms.units.display_fields.width") %></label>
+            <p><%= @unit.last_inspection.width %>m</p>
+          </div>
+          <div>
+            <label><%= t("forms.units.display_fields.length") %></label>
+            <p><%= @unit.last_inspection.length %>m</p>
+          </div>
+          <div>
+            <label><%= t("forms.units.display_fields.height") %></label>
+            <p><%= @unit.last_inspection.height %>m</p>
+          </div>
         <% end %>
       <% end %>
     <% end %>
-    
+
     <% if @unit.photo.attached? %>
       <%= render 'shared/attached_image', attachment: @unit.photo %>
     <% end %>
-    
+
     <%= button_to inspections_path,
         method: :post,
         params: { unit_id: @unit.id } do %>
       <strong><%= t('inspections.buttons.create_inspection_for_unit') %></strong>
     <% end %>
-    
+
   <% elsif @badge %>
     <article>
       <p><%= t('inspections.messages.badge_exists_create_unit') %></p>
@@ -54,7 +63,7 @@
         <button><%= t('units.buttons.create') %></button>
       <% end %>
     </article>
-    
+
   <% else %>
     <article>
       <p><%= t('inspections.messages.invalid_unit_id') %></p>
