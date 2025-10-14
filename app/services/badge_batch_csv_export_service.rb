@@ -55,6 +55,6 @@ class BadgeBatchCsvExportService
 
   sig { returns(String) }
   def base_url
-    Rails.application.config.base_url || "https://example.com"
+    Rails.configuration.app.base_url
   end
 end
