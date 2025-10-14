@@ -28,6 +28,7 @@ Bundler.require(*Rails.groups)
 require_relative "../app/config/pdf_config"
 require_relative "../app/config/units_config"
 require_relative "../app/config/users_config"
+require_relative "../app/config/s3_config"
 
 module PlayTest
   class Application < Rails::Application
@@ -61,13 +62,11 @@ module PlayTest
     # Centralized configuration for all application-level ENV variables
     # No rescues - if a value exists, we assume it's in the correct format
 
-    # Storage Configuration
-    config.use_s3_storage = ENV["USE_S3_STORAGE"] == "true"
-    config.active_storage.service = config.use_s3_storage ? :s3_host : :local
+    # Storage Configuration (typed)
+    config.s3 = S3Config.from_env(ENV.to_h)
+    service = config.s3.use_s3_storage ? :s3_host : :local
+    config.active_storage.service = service
     config.active_storage.service_urls_expire_in = 1.day
-    config.s3_endpoint = ENV["S3_ENDPOINT"]
-    config.s3_bucket = ENV["S3_BUCKET"]
-    config.s3_region = ENV["S3_REGION"]
 
     # PDF Generation Configuration (typed)
     config.pdf = PdfConfig.from_env(ENV.to_h)

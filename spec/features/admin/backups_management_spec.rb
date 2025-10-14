@@ -6,12 +6,32 @@ RSpec.feature "Backups Management", type: :feature do
   let(:admin_user) { create(:user, :admin, :without_company) }
   let(:regular_user) { create(:user, :active_user) }
 
+  define_method(:set_s3_enabled) do
+    config = S3Config.new(
+      use_s3_storage: true,
+      s3_endpoint: "https://s3.example.com",
+      s3_bucket: "test-bucket",
+      s3_region: "us-east-1"
+    )
+    Rails.configuration.s3 = config
+  end
+
+  define_method(:set_s3_disabled) do
+    config = S3Config.new(
+      use_s3_storage: false,
+      s3_endpoint: nil,
+      s3_bucket: nil,
+      s3_region: nil
+    )
+    Rails.configuration.s3 = config
+  end
+
   before do
-    Rails.configuration.use_s3_storage = true
+    set_s3_enabled
   end
 
   after do
-    Rails.configuration.use_s3_storage = false
+    set_s3_disabled
   end
 
   scenario "admin can access backups page" do
@@ -70,7 +90,7 @@ RSpec.feature "Backups Management", type: :feature do
   end
 
   scenario "redirects if S3 not enabled" do
-    Rails.configuration.use_s3_storage = false
+    set_s3_disabled
 
     sign_in(admin_user)
     visit backups_path
@@ -78,6 +98,6 @@ RSpec.feature "Backups Management", type: :feature do
     expect(page).to have_content(I18n.t("backups.errors.s3_not_enabled"))
     expect(current_path).to eq(admin_path)
 
-    Rails.configuration.use_s3_storage = true
+    set_s3_enabled
   end
 end
