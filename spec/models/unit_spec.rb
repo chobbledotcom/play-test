@@ -82,6 +82,10 @@ RSpec.describe Unit, type: :model do
 
   describe "custom ID generation" do
     it "generates a custom ID before creation" do
+      # Skip if badges enabled (IDs come from badges instead)
+      badges_enabled = Rails.configuration.units.badges_enabled
+      skip "Not applicable when UNIT_BADGES is enabled" if badges_enabled
+
       unit = build(:unit)
       expect(unit.id).to be_nil
       unit.save!

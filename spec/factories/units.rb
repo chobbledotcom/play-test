@@ -65,8 +65,12 @@ FactoryBot.define do
       end
     end
 
+    # with_badge trait: for explicitly creating a badge when badges disabled
+    # When UNIT_BADGES=true, badges are created automatically by default
     trait :with_badge do
       after(:build) do |unit, evaluator|
+        # Only create badge if badges are disabled globally
+        # (when enabled, the default callback already handles it)
         unless Rails.configuration.units.badges_enabled
           batch = evaluator.badge_batch ||
             FactoryBot.create(:badge_batch, count: 1)

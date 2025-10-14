@@ -17,6 +17,10 @@ en:
         operator: Controller / Owner
         manufacture_date: Manufacture Date
         photo: Photo
+      display_fields:
+        width: Width
+        length: Length
+        height: Height
       submit: Save Unit
       errors:
         header:

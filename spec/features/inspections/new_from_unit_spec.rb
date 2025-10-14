@@ -109,15 +109,21 @@ RSpec.feature "Creating inspection from unit search", type: :feature do
       expect(page).to have_css("img")
     end
 
-    scenario "unit with last inspection displays size" do
-      create(:inspection, :completed, unit: unit, width: 5, length: 4, height: 3)
+    scenario "unit with last inspection displays dimensions" do
+      inspection_attrs = {unit: unit, width: 5, length: 4, height: 3}
+      create(:inspection, :completed, **inspection_attrs)
 
       visit new_inspection_from_unit_path
 
       fill_in I18n.t("inspections.fields.search_unit_id"), with: unit.id
       click_button I18n.t("inspections.buttons.search")
 
-      expect(page).to have_content("5m × 4m × 3m")
+      expect(page).to have_content("5.0m")
+      expect(page).to have_content("4.0m")
+      expect(page).to have_content("3.0m")
+      expect(page).to have_content(I18n.t("forms.units.display_fields.width"))
+      expect(page).to have_content(I18n.t("forms.units.display_fields.length"))
+      expect(page).to have_content(I18n.t("forms.units.display_fields.height"))
     end
   end
 
