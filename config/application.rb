@@ -29,6 +29,7 @@ require_relative "../app/config/pdf_config"
 require_relative "../app/config/units_config"
 require_relative "../app/config/users_config"
 require_relative "../app/config/s3_config"
+require_relative "../app/config/theme_config"
 
 module PlayTest
   class Application < Rails::Application
@@ -71,14 +72,8 @@ module PlayTest
     # PDF Generation Configuration (typed)
     config.pdf = PdfConfig.from_env(ENV.to_h)
 
-    # Theme and UI Configuration
-    config.forced_theme = ENV["THEME"] # If set, overrides user preference
-    config.logo_path = ENV.fetch("LOGO_PATH", "logo.svg")
-    config.logo_alt = ENV.fetch("LOGO_ALT", "play-test logo")
-    config.left_logo_path = ENV["LEFT_LOGO_PATH"]
-    config.left_logo_alt = ENV.fetch("LEFT_LOGO_ALT", "Logo")
-    config.right_logo_path = ENV["RIGHT_LOGO_PATH"]
-    config.right_logo_alt = ENV.fetch("RIGHT_LOGO_ALT", "Logo")
+    # Theme and UI Configuration (typed)
+    config.theme = ThemeConfig.from_env(ENV.to_h)
 
     # Features and Functionality
     config.has_assessments = ENV["HAS_ASSESSMENTS"] == "true"
