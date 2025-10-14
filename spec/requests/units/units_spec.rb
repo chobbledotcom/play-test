@@ -441,9 +441,13 @@ RSpec.describe "Units", type: :request do
     it "prevents mass assignment of protected attributes" do
       visit new_unit_path
 
-      # Attempt to set user_id via form manipulation would be blocked by controller
+      if Rails.configuration.units.badges_enabled
+        badge = create(:badge, badge_batch: create(:badge_batch))
+        fill_in I18n.t("forms.units.fields.id"), with: badge.id
+      end
+
+      # Attempt to set user_id via form manipulation would be blocked
       fill_in I18n.t("forms.units.fields.name"), with: "Protected Unit"
-      # Has slide checkbox defaults to unchecked
       fill_in I18n.t("forms.units.fields.manufacturer"), with: "Test Manufacturer"
       fill_in I18n.t("forms.units.fields.serial"), with: "PROTECT123"
       fill_in I18n.t("forms.units.fields.description"), with: "Test Description"
@@ -614,7 +618,7 @@ RSpec.describe "Units", type: :request do
       end
 
       it "redirects if inspection not found during creation" do
-        post "/inspections/999999/create_unit", params: { unit: { name: "Test" } }
+        post "/inspections/999999/create_unit", params: {unit: {name: "Test"}}
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to eq(I18n.t("units.errors.inspection_not_found"))
       end
@@ -622,7 +626,7 @@ RSpec.describe "Units", type: :request do
       it "redirects if inspection already has unit during creation" do
         inspection_with_unit = create(:inspection, user: user, unit: unit)
         post "/inspections/#{inspection_with_unit.id}/create_unit", params: {
-          unit: { name: "Test" }
+          unit: {name: "Test"}
         }
         expect(response).to redirect_to(inspection_path(inspection_with_unit))
         expect(flash[:alert]).to eq(I18n.t("units.errors.inspection_has_unit"))
@@ -637,8 +641,8 @@ RSpec.describe "Units", type: :request do
 
     it "handles successful update with turbo stream" do
       patch unit_path(unit), params: {
-        unit: { name: "Updated via Turbo" }
-      }, headers: { "Accept" => "text/vnd.turbo-stream.html" }
+        unit: {name: "Updated via Turbo"}
+      }, headers: {"Accept" => "text/vnd.turbo-stream.html"}
 
       expect(response).to have_http_status(:success)
       expect(response.content_type).to include("turbo-stream")

@@ -40,15 +40,39 @@ FactoryBot.define do
     manufacture_date { 1.year.ago }
     is_seed { false }
 
-    trait :with_badge do
-      transient do
-        badge_batch { nil }
-      end
+    transient do
+      badge_batch { nil }
+      explicit_id { :not_set }
+    end
 
-      after(:build) do |unit, evaluator|
-        batch = evaluator.badge_batch || FactoryBot.create(:badge_batch, count: 1)
+    # Automatically create badge when UNIT_BADGES=true
+    # Only if id was not explicitly set (even to nil)
+    after(:build) do |unit, evaluator|
+      badges_enabled = Rails.configuration.units.badges_enabled
+      id_not_explicitly_set = evaluator.explicit_id == :not_set
+
+      should_create_badge = badges_enabled &&
+        id_not_explicitly_set &&
+        unit.id.blank?
+
+      if should_create_badge
+        batch = evaluator.badge_batch ||
+          FactoryBot.create(:badge_batch, count: 1)
         badge = FactoryBot.create(:badge, badge_batch: batch)
         unit.id = badge.id
+      elsif evaluator.explicit_id != :not_set
+        unit.id = evaluator.explicit_id
+      end
+    end
+
+    trait :with_badge do
+      after(:build) do |unit, evaluator|
+        unless Rails.configuration.units.badges_enabled
+          batch = evaluator.badge_batch ||
+            FactoryBot.create(:badge_batch, count: 1)
+          badge = FactoryBot.create(:badge, badge_batch: batch)
+          unit.id = badge.id
+        end
       end
     end
 

@@ -108,13 +108,13 @@ RSpec.describe Unit, type: :model do
         end
 
         it "trims ID to 8 characters" do
-          unit = build(:unit, id: "ABCDEFGHIJKLMNOP")
+          unit = build(:unit, explicit_id: "ABCDEFGHIJKLMNOP")
           unit.valid?
           expect(unit.id).to eq("ABCDEFGH")
         end
 
         it "handles combination of spaces, lowercase, and extra chars" do
-          unit = build(:unit, id: "  ab cd ef gh  ij kl")
+          unit = build(:unit, explicit_id: "  ab cd ef gh  ij kl")
           unit.valid?
           expect(unit.id).to eq("ABCDEFGH")
         end
@@ -125,19 +125,19 @@ RSpec.describe Unit, type: :model do
         let(:badge) { create(:badge, badge_batch: badge_batch) }
 
         it "allows save when badge ID exists" do
-          unit = build(:unit, id: badge.id, user: user)
+          unit = build(:unit, explicit_id: badge.id, user: user)
           expect(unit.save).to be true
         end
 
         it "prevents save when badge ID does not exist" do
-          unit = build(:unit, id: "NOTFOUND", user: user)
+          unit = build(:unit, explicit_id: "NOTFOUND", user: user)
           expect(unit.save).to be false
           error_msg = I18n.t("units.validations.invalid_badge_id")
           expect(unit.errors[:id]).to include(error_msg)
         end
 
         it "validates ID presence" do
-          unit = build(:unit, id: nil, user: user)
+          unit = build(:unit, explicit_id: nil, user: user)
           expect(unit).not_to be_valid
           expect(unit.errors[:id]).to be_present
         end
