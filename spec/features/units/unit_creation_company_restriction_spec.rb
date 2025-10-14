@@ -126,7 +126,7 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       sign_in(admin_user)
       visit edit_user_path(active_user)
 
-      if Rails.configuration.simple_user_activation
+      if Rails.configuration.users.simple_activation
         # Use the deactivate button
         click_button I18n.t("users.buttons.deactivate")
       else

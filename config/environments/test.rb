@@ -62,8 +62,14 @@ Rails.application.configure do
 
   # Default feature flags for tests
   config.has_assessments = true
-  config.simple_user_activation = false
+  # config.users defaults from application.rb
 
   # Default base_url for tests (same as production default)
   config.base_url ||= "http://localhost:3000"
+
+  # Admin email pattern for tests (matches factory :admin trait)
+  config.users = UsersConfig.new(
+    simple_activation: config.users.simple_activation,
+    admin_emails_pattern: "^admin.*@example\\.com$"
+  )
 end

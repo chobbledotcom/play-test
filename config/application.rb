@@ -27,6 +27,7 @@ Bundler.require(*Rails.groups)
 # Load typed configuration classes
 require_relative "../app/config/pdf_config"
 require_relative "../app/config/units_config"
+require_relative "../app/config/users_config"
 
 module PlayTest
   class Application < Rails::Application
@@ -82,8 +83,8 @@ module PlayTest
 
     # Features and Functionality
     config.has_assessments = ENV["HAS_ASSESSMENTS"] == "true"
-    config.simple_user_activation = ENV["SIMPLE_USER_ACTIVATION"] == "true"
-    config.admin_emails_pattern = ENV["ADMIN_EMAILS_PATTERN"]
+    # Users / Auth Configuration (typed)
+    config.users = UsersConfig.from_env(ENV.to_h)
     config.base_url = ENV.fetch("BASE_URL", "http://localhost:3000")
     config.app_name = ENV.fetch("APP_NAME", "Play-Test")
 

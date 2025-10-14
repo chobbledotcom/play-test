@@ -17,7 +17,7 @@ RSpec.feature "Admin User Management", type: :feature do
 
     visit edit_user_path(regular_user)
 
-    if Rails.configuration.simple_user_activation
+    if Rails.configuration.users.simple_activation
       # Deactivate the user
       click_button I18n.t("users.buttons.deactivate")
       expect(page).to have_content(I18n.t("users.messages.user_deactivated"))
