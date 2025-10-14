@@ -8,20 +8,20 @@ RSpec.feature "Backups Management", type: :feature do
 
   define_method(:set_s3_enabled) do
     config = S3Config.new(
-      use_s3_storage: true,
-      s3_endpoint: "https://s3.example.com",
-      s3_bucket: "test-bucket",
-      s3_region: "us-east-1"
+      enabled: true,
+      endpoint: "https://s3.example.com",
+      bucket: "test-bucket",
+      region: "us-east-1"
     )
     Rails.configuration.s3 = config
   end
 
   define_method(:set_s3_disabled) do
     config = S3Config.new(
-      use_s3_storage: false,
-      s3_endpoint: nil,
-      s3_bucket: nil,
-      s3_region: nil
+      enabled: false,
+      endpoint: nil,
+      bucket: nil,
+      region: nil
     )
     Rails.configuration.s3 = config
   end

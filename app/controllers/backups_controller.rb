@@ -25,7 +25,7 @@ class BackupsController < ApplicationController
   private
 
   def ensure_s3_enabled
-    return if Rails.configuration.s3.use_s3_storage
+    return if Rails.configuration.s3.enabled
 
     flash[:error] = t("backups.errors.s3_not_enabled")
     redirect_to admin_path

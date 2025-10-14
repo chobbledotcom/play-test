@@ -64,7 +64,7 @@ module PlayTest
 
     # Storage Configuration (typed)
     config.s3 = S3Config.from_env(ENV.to_h)
-    service = config.s3.use_s3_storage ? :s3_host : :local
+    service = config.s3.enabled ? :s3_host : :local
     config.active_storage.service = service
     config.active_storage.service_urls_expire_in = 1.day
 

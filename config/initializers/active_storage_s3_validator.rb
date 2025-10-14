@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # Validate S3 configuration when USE_S3_STORAGE is enabled
-if Rails.configuration.s3.use_s3_storage
+if Rails.configuration.s3.enabled
   Rails.application.config.after_initialize do
     required_vars = %w[S3_ENDPOINT S3_ACCESS_KEY_ID S3_SECRET_ACCESS_KEY S3_BUCKET]
     missing_vars = required_vars.select { |var| ENV[var].nil? }

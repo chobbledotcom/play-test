@@ -9,7 +9,7 @@ module S3RakeHelpers
   include S3BackupOperations
 
   def ensure_s3_enabled
-    return if Rails.configuration.s3.use_s3_storage
+    return if Rails.configuration.s3.enabled
 
     error_msg = "S3 storage is not enabled. Set USE_S3_STORAGE=true in your .env file"
     Rails.logger.debug { "❌ #{error_msg}" }

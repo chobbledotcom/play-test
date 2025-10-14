@@ -6,7 +6,7 @@ module S3Helpers
   private
 
   def ensure_s3_enabled
-    raise "S3 storage is not enabled" unless Rails.configuration.s3.use_s3_storage
+    raise "S3 storage is not enabled" unless Rails.configuration.s3.enabled
   end
 
   def validate_s3_config
