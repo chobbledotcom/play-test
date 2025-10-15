@@ -109,13 +109,33 @@ class SeedDataService
       ids = []
       existing_ids = user.units.pluck(:id).to_set
 
-      count.times do
-        loop do
-          id = SecureRandom.alphanumeric(CustomIdGenerator::ID_LENGTH).upcase
-          unless existing_ids.include?(id)
-            ids << id
-            existing_ids << id
-            break
+      # When unit_badges is enabled, create badges for seed units
+      if Rails.configuration.units.badges_enabled
+        batch = BadgeBatch.create!(
+          note: "Seed data badges for #{user.email}"
+        )
+
+        count.times do
+          loop do
+            id = SecureRandom.alphanumeric(CustomIdGenerator::ID_LENGTH).upcase
+            unless existing_ids.include?(id) || Badge.exists?(id: id)
+              Badge.create!(id: id, badge_batch: batch)
+              ids << id
+              existing_ids << id
+              break
+            end
+          end
+        end
+      else
+        # Original behavior when unit_badges is disabled
+        count.times do
+          loop do
+            id = SecureRandom.alphanumeric(CustomIdGenerator::ID_LENGTH).upcase
+            unless existing_ids.include?(id)
+              ids << id
+              existing_ids << id
+              break
+            end
           end
         end
       end
@@ -125,6 +145,8 @@ class SeedDataService
 
     sig { params(user: User, config: T::Hash[Symbol, T.untyped], index: Integer, unit_id: String, existing_ids: T::Set[String]).returns(Unit) }
     def create_unit_from_config(user, config, index, unit_id, existing_ids)
+      # Always use the unit_id - when unit_badges is enabled, generate_unit_ids_batch
+      # creates badges for these IDs
       unit = user.units.build(
         id: unit_id,
         name: "#{config[:name]} ##{index + 1}",

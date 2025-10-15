@@ -30,6 +30,71 @@ RSpec.describe SeedDataService do
           expect(inspection.enclosed_assessment).to be_present
         end
       end
+
+      context "when UNIT_BADGES is enabled" do
+        before do
+          allow(Rails.configuration.units).to receive(:badges_enabled)
+            .and_return(true)
+        end
+
+        it "creates badges for seed units" do
+          described_class.add_seeds_for_user(user, unit_count: 3, inspection_count: 1)
+
+          seed_units = user.units.seed_data
+          expect(seed_units.count).to eq(3)
+
+          seed_units.each do |unit|
+            expect(Badge.exists?(id: unit.id)).to be true
+          end
+        end
+
+        it "creates a badge batch for seed badges" do
+          initial_batch_count = BadgeBatch.count
+
+          described_class.add_seeds_for_user(user, unit_count: 3, inspection_count: 1)
+
+          expect(BadgeBatch.count).to eq(initial_batch_count + 1)
+
+          batch = BadgeBatch.last
+          expect(batch.note).to include("Seed data badges")
+          expect(batch.note).to include(user.email)
+        end
+
+        it "associates seed unit badges with the badge batch" do
+          described_class.add_seeds_for_user(user, unit_count: 3, inspection_count: 1)
+
+          batch = BadgeBatch.last
+          seed_units = user.units.seed_data
+
+          seed_units.each do |unit|
+            badge = Badge.find(unit.id)
+            expect(badge.badge_batch).to eq(batch)
+          end
+        end
+      end
+
+      context "when UNIT_BADGES is disabled" do
+        before do
+          allow(Rails.configuration.units).to receive(:badges_enabled)
+            .and_return(false)
+        end
+
+        it "does not create badges for seed units" do
+          initial_badge_count = Badge.count
+
+          described_class.add_seeds_for_user(user, unit_count: 3, inspection_count: 1)
+
+          expect(Badge.count).to eq(initial_badge_count)
+        end
+
+        it "does not create badge batches" do
+          initial_batch_count = BadgeBatch.count
+
+          described_class.add_seeds_for_user(user, unit_count: 3, inspection_count: 1)
+
+          expect(BadgeBatch.count).to eq(initial_batch_count)
+        end
+      end
     end
 
     context "when user already has seed data" do
