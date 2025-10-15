@@ -382,7 +382,12 @@ class InspectionsController < ApplicationController
   def validate_unit_ownership
     return unless inspection_params[:unit_id]
 
-    unit = current_user.units.find_by(id: inspection_params[:unit_id])
+    unit = if unit_badges_enabled?
+      Unit.find_by(id: inspection_params[:unit_id])
+    else
+      current_user.units.find_by(id: inspection_params[:unit_id])
+    end
+
     return if unit
 
     # Unit ID not found or doesn't belong to user - security issue
