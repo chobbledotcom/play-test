@@ -2,8 +2,8 @@
 
 <% if current_user.is_active? %>
   <% if Rails.configuration.units.badges_enabled %>
-    <%= link_to new_inspection_from_unit_path do %>
-      <button><strong><%= t('inspections.buttons.add_inspection_from_unit') %></strong></button>
+    <%= link_to new_inspection_from_unit_path, role: "button" do %>
+      <%= t('inspections.buttons.add_inspection_from_unit') %>
     <% end %>
   <% else %>
     <%= button_to inspections_path,

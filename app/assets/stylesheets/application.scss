@@ -256,3 +256,14 @@ h4 {
 .text-alert {
 	color: #ff9900;
 }
+
+dl {
+	dt {
+		font-weight: bold;
+		margin-top: 0.5rem;
+	}
+	
+	dd {
+		margin-left: 1rem;
+	}
+}

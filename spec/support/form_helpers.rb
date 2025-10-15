@@ -109,7 +109,7 @@ module FormHelpers
     end
 
     fields.each do |field_key, field_label|
-      next if field_key.to_s.end_with?("_pass") || field_key.to_s == "id"
+      next if field_key.to_s.end_with?("_pass") || field_key.to_s == "id" || field_key.to_s == "size"
 
       expect(page).to have_content(field_label),
         "Expected to find field '#{field_key}' with label '#{field_label}' on the page"

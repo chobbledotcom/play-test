@@ -15,6 +15,7 @@ class UnitsController < ApplicationController
   before_action :check_unit_owner, only: %i[destroy edit update]
   before_action :check_log_access, only: %i[log]
   before_action :require_user_active, only: %i[create new edit update]
+  before_action :validate_badge_id_param, only: %i[new create]
   before_action :no_index
 
   def index
@@ -65,23 +66,16 @@ class UnitsController < ApplicationController
 
   def new
     @unit = Unit.new
-    @unit.id = params[:id] if params[:id].present?
+
+    if @validated_badge_id.present?
+      @unit.id = @validated_badge_id
+      @prefilled_badge = true
+    end
   end
 
   def create
-    # Check if UNIT_BADGES is enabled and ID is provided
-    if unit_badges_enabled? && params[:unit][:id].present?
-      normalized_id = normalize_unit_id(params[:unit][:id])
-
-      # Check if unit with this ID already exists
-      existing_unit = Unit.find_by(id: normalized_id)
-      if existing_unit
-        flash[:notice] = I18n.t("units.messages.existing_unit_found")
-        redirect_to existing_unit and return
-      end
-    end
-
     @unit = current_user.units.build(unit_params)
+    @prefilled_badge = @validated_badge_id.present?
 
     if @image_processing_error
       flash.now[:alert] = @image_processing_error.message
@@ -217,6 +211,30 @@ class UnitsController < ApplicationController
   end
 
   private
+
+  def validate_badge_id_param
+    return unless unit_badges_enabled?
+
+    id_param = (action_name == "new") ? params[:id] : params.dig(:unit, :id)
+    return unless id_param.present?
+
+    normalized_id = normalize_unit_id(id_param)
+
+    # Check if unit already exists with this ID
+    existing_unit = Unit.find_by(id: normalized_id)
+    if existing_unit
+      flash[:notice] = I18n.t("units.messages.existing_unit_found")
+      redirect_to existing_unit and return
+    end
+
+    # Check if badge exists
+    unless Badge.exists?(id: normalized_id)
+      flash[:alert] = I18n.t("units.validations.invalid_badge_id")
+      redirect_to units_path and return
+    end
+
+    @validated_badge_id = normalized_id
+  end
 
   def log_unit_event(action, unit, details = nil, changed_data = nil)
     return unless current_user

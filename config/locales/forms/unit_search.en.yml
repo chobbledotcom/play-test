@@ -1,0 +1,10 @@
+---
+en:
+  forms:
+    unit_search:
+      header: Create Inspection from Unit
+      sections:
+        search_unit: Search for Unit
+      fields:
+        search: Unit ID
+      submit: Search

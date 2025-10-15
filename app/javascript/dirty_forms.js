@@ -59,7 +59,8 @@ class DirtyForms {
       formAction.includes("/register") ||
       formAction.includes("/safety_standards") ||
       formAction.includes("/search") ||
-      formAction.includes("/badge_batches")
+      formAction.includes("/badge_batches") ||
+      formAction.includes("/new_inspection_from_unit")
     ) {
       return;
     }

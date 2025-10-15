@@ -41,9 +41,7 @@ RSpec.feature "Badge Management", type: :feature do
     batch = create(:badge_batch, :with_badges, note: "Sample batch")
 
     visit badge_batches_path
-    within("li", text: batch.id.to_s) do
-      click_link
-    end
+    click_link href: edit_badge_batch_path(batch)
 
     title = I18n.t("badges.titles.edit_batch", id: batch.id)
     expect(page).to have_content(title)
@@ -86,7 +84,7 @@ RSpec.feature "Badge Management", type: :feature do
 
     visit badge_batches_path
 
-    within("li", text: batch.id.to_s) do
+    within(:xpath, "//a[@href='#{edit_badge_batch_path(batch)}']") do
       expect(page).to have_content("3")
     end
   end
@@ -121,9 +119,7 @@ RSpec.feature "Badge Management", type: :feature do
 
     visit badge_batches_path
 
-    within("li", text: batch.id.to_s) do
-      click_link
-    end
+    click_link href: edit_badge_batch_path(batch)
 
     expect(current_path).to eq(edit_badge_batch_path(batch))
     expect(page).to have_content("Row click test")
@@ -148,7 +144,7 @@ RSpec.feature "Badge Management", type: :feature do
 
     visit badge_batches_path
 
-    within("li", text: batch.id.to_s) do
+    within(:xpath, "//a[@href='#{edit_badge_batch_path(batch)}']") do
       expect(page).to have_content("25")
     end
   end

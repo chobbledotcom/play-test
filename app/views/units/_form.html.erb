@@ -11,9 +11,12 @@
   <%= render 'chobble_forms/fieldset', legend_key: 'unit_details' do %>
     <%# Show ID field when UNIT_BADGES is enabled %>
     <% if Rails.configuration.units.badges_enabled %>
-      <% if unit.persisted? %>
-        <%# Display ID as read-only for existing units %>
+      <% if unit.persisted? || @prefilled_badge %>
+        <%# Display ID as read-only for existing units or pre-filled badges %>
         <%= render 'chobble_forms/display_field', field: :id %>
+        <% if @prefilled_badge %>
+          <%= form.hidden_field :id %>
+        <% end %>
       <% else %>
         <%# Editable ID field for new units %>
         <%= render 'chobble_forms/text_field', field: :id, required: true %>
