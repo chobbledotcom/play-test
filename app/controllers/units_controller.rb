@@ -50,7 +50,7 @@ class UnitsController < ApplicationController
     return head :ok if request.head?
 
     @inspections = @unit.inspections
-      .includes(:user, inspector_company: { logo_attachment: :blob })
+      .includes(:user, inspector_company: {logo_attachment: :blob})
       .order(inspection_date: :desc)
 
     respond_to do |format|
@@ -235,7 +235,7 @@ class UnitsController < ApplicationController
         user: current_user,
         action: action,
         details: details,
-        metadata: { resource_type: "Unit" }
+        metadata: {resource_type: "Unit"}
       )
     end
   rescue => e
@@ -370,7 +370,7 @@ class UnitsController < ApplicationController
   end
 
   def build_index_title
-    title_parts = [ I18n.t("units.titles.index") ]
+    title_parts = [I18n.t("units.titles.index")]
     if params[:status] == "overdue"
       title_parts << I18n.t("units.status.overdue")
     end
