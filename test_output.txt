@@ -1,0 +1,111 @@
+[1;33m🧪 Running main app tests in parallel...[0m
+
+2 processes for 200 specs, ~ 100 specs per process
+...............F....FFFFF.F.................................................F...............................................................................................................................
+..........................................................................................................FFF...........................
+F.F.FFFFF..FFFFFFF.FFFFFFFF...FF...........................FFFFFFFFFFFFFFFFFFFFFFFFF.F.FF...F........F..F..F..F..F..............................................................................................F.........F........F.........F........F.FF.........F.F...................................FF.FF.F.FFF...........................................................................................................................................................................F.FFF.....F..........................................................................FF.F..FF.FF.F.FF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF..................F.....FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....FFFFFFFFFFFFFFFFFFF.......................F...............FF..F...F..F..............FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.[1/10] app/views/users/index.html.erb                               ✅ (2.5s)
+............[1/10] app/views/users/index.html.erb                               .................................FFFFFFFF...FF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFF..F........FFFFFFF..F............F......FFFFFFFFFFFFFFFFFFFFFFFFFFFFF......FFFFFFFFFFFFFFFF...............................................................
+F........F....FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....F...F....F...F....F.FFFFFFFFFF.................F....FFFF...F.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....F...FFFFFFFFFF..FFF..FFF..FFFFFF............................FFFFFFFF..............................................................................FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF..............FFF.F.F.FFFFFFFFF...............................................................FFFFFFFFFFFFFFFFFF.............FF.F.....FFFF....FFFF..........FFFFFFFFFFFFFFFFFF..................F....F..FFF..............FFFFF.F.F.F.F.F.F......................F.FFFFF.FFFF.FF.....F.F...F....F.F.F.F..F.F.......................FF.....FFFFF.FFFFFF...FFF.............................
+FFFFFF..
+Failures:
+  1) Unit Deletion Restrictions when unit has no inspections successfully deletes unit via UI with JavaScript
+     Got 0 failures and 2 other errors:
+     1.1) Failure/Error: visit login_path
+          Ferrum::BinaryNotFoundError:
+            Could not find an executable for the browser. Try to make it available on the PATH or set environment variable for example BROWSER_PATH="/usr/bin/chrome"
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:33:in 'Ferrum::Browser::Command#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:22:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:22:in 'Ferrum::Browser::Command.build'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/process.rb:82:in 'Ferrum::Browser::Process#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:274:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:274:in 'Ferrum::Browser#start'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:136:in 'Ferrum::Browser#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/browser.rb:15:in 'Capybara::Cuprite::Browser#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:52:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:52:in 'Capybara::Cuprite::Driver#browser'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:57:in 'Capybara::Cuprite::Driver#visit'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara/session.rb:281:in 'Capybara::Session#visit'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara/dsl.rb:52:in 'Method#call'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara/dsl.rb:52:in 'Capybara::DSL#visit'
+          # ./spec/support/login_helpers.rb:16:in 'LoginHelpers#sign_in'
+          # ./spec/features/units/unit_deletion_restrictions_spec.rb:8:in 'block (2 levels) in <top (required)>'
+          # ./spec/support/slow_test_detector.rb:39:in 'block (2 levels) in <top (required)>'
+     1.2) Failure/Error: example.run
+          Ferrum::BinaryNotFoundError:
+            Could not find an executable for the browser. Try to make it available on the PATH or set environment variable for example BROWSER_PATH="/usr/bin/chrome"
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:33:in 'Ferrum::Browser::Command#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:22:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:22:in 'Ferrum::Browser::Command.build'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/process.rb:82:in 'Ferrum::Browser::Process#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:274:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:274:in 'Ferrum::Browser#start'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:136:in 'Ferrum::Browser#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/browser.rb:15:in 'Capybara::Cuprite::Browser#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:52:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:52:in 'Capybara::Cuprite::Driver#browser'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:132:in 'Capybara::Cuprite::Driver#reset!'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara/session.rb:132:in 'Capybara::Session#reset!'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'block in Capybara.reset_sessions!'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'Enumerable#reverse_each'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'Capybara.reset_sessions!'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara/rspec.rb:20:in 'block (2 levels) in <top (required)>'
+          # ./spec/support/slow_test_detector.rb:39:in 'block (2 levels) in <top (required)>'
+  2) Unit Deletion Restrictions when unit has completed inspections hides delete button on unit edit page
+     Got 0 failures and 2 other errors:
+     2.1) Failure/Error: visit login_path
+          Ferrum::BinaryNotFoundError:
+            Could not find an executable for the browser. Try to make it available on the PATH or set environment variable for example BROWSER_PATH="/usr/bin/chrome"
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:33:in 'Ferrum::Browser::Command#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:22:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:22:in 'Ferrum::Browser::Command.build'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/process.rb:82:in 'Ferrum::Browser::Process#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:274:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:274:in 'Ferrum::Browser#start'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:136:in 'Ferrum::Browser#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/browser.rb:15:in 'Capybara::Cuprite::Browser#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:52:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:52:in 'Capybara::Cuprite::Driver#browser'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:57:in 'Capybara::Cuprite::Driver#visit'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara/session.rb:281:in 'Capybara::Session#visit'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara/dsl.rb:52:in 'Method#call'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara/dsl.rb:52:in 'Capybara::DSL#visit'
+          # ./spec/support/login_helpers.rb:16:in 'LoginHelpers#sign_in'
+          # ./spec/features/units/unit_deletion_restrictions_spec.rb:8:in 'block (2 levels) in <top (required)>'
+          # ./spec/support/slow_test_detector.rb:39:in 'block (2 levels) in <top (required)>'
+     2.2) Failure/Error: example.run
+          Ferrum::BinaryNotFoundError:
+            Could not find an executable for the browser. Try to make it available on the PATH or set environment variable for example BROWSER_PATH="/usr/bin/chrome"
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:33:in 'Ferrum::Browser::Command#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:22:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:22:in 'Ferrum::Browser::Command.build'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/process.rb:82:in 'Ferrum::Browser::Process#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:274:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:274:in 'Ferrum::Browser#start'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:136:in 'Ferrum::Browser#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/browser.rb:15:in 'Capybara::Cuprite::Browser#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:52:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:52:in 'Capybara::Cuprite::Driver#browser'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:132:in 'Capybara::Cuprite::Driver#reset!'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara/session.rb:132:in 'Capybara::Session#reset!'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'block in Capybara.reset_sessions!'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'Enumerable#reverse_each'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara.rb:327:in 'Capybara.reset_sessions!'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara/rspec.rb:20:in 'block (2 levels) in <top (required)>'
+          # ./spec/support/slow_test_detector.rb:39:in 'block (2 levels) in <top (required)>'
+  3) Unit Deletion Restrictions when unit has completed inspections hides delete button on unit show page
+     Got 0 failures and 2 other errors:
+     3.1) Failure/Error: visit login_path
+          Ferrum::BinaryNotFoundError:
+            Could not find an executable for the browser. Try to make it available on the PATH or set environment variable for example BROWSER_PATH="/usr/bin/chrome"
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:33:in 'Ferrum::Browser::Command#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:22:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/command.rb:22:in 'Ferrum::Browser::Command.build'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser/process.rb:82:in 'Ferrum::Browser::Process#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:274:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:274:in 'Ferrum::Browser#start'
+          # /usr/local/bundle/ruby/3.4.0/gems/ferrum-0.17.1/lib/ferrum/browser.rb:136:in 'Ferrum::Browser#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/browser.rb:15:in 'Capybara::Cuprite::Browser#initialize'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:52:in 'Class#new'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:52:in 'Capybara::Cuprite::Driver#browser'
+          # /usr/local/bundle/ruby/3.4.0/gems/cuprite-0.17/lib/capybara/cuprite/driver.rb:57:in 'Capybara::Cuprite::Driver#visit'
+          # /usr/local/bundle/ruby/3.4.0/gems/capybara-3.40.0/lib/capybara/session.rb:281:in 'Capybara::Session#visit'
