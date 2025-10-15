@@ -147,4 +147,76 @@ RSpec.feature "Shared Unit Inspections with Badges", type: :feature do
       expect(inspection.unit_id).to eq(unit.id)
     end
   end
+
+  context "when UNIT_BADGES is disabled" do
+    before do
+      set_units_config(badges_enabled: false)
+    end
+
+    scenario "user B cannot create inspection for user A's unit" do
+      # User A creates a unit (without badges, gets auto-generated ID)
+      sign_in(user_a)
+      visit new_unit_path
+
+      fill_in_form(:units, :name, "User A's Unit")
+      fill_in_form(:units, :operator, "Test Operator")
+      fill_in_form(:units, :manufacturer, "Test Manufacturer")
+      fill_in_form(:units, :serial, "USERA123")
+      fill_in_form(:units, :description, "Private unit for user A")
+
+      submit_form(:units)
+
+      expect(page).to have_content("User A's Unit")
+      unit = Unit.find_by(name: "User A's Unit")
+      expect(unit).to be_present
+      expect(unit.user_id).to eq(user_a.id)
+
+      logout
+
+      # User B tries to create inspection for User A's unit
+      sign_in(user_b)
+
+      # Try via new_from_unit path (should fail to find)
+      visit new_inspection_from_unit_path
+      search_field_key = "inspections.fields.search_unit_id"
+      fill_in I18n.t(search_field_key), with: unit.id
+      click_i18n_button("inspections.buttons.search")
+
+      # Unit should be found (show page is public)
+      expect(page).to have_content(unit.name)
+      create_button_key = "inspections.buttons.create_inspection_for_unit"
+      expect(page).to have_button(I18n.t(create_button_key))
+
+      # But creating inspection should fail
+      click_i18n_button(create_button_key)
+
+      # Should redirect with error
+      expect_i18n_content("inspections.errors.invalid_unit")
+      expect(current_path).to eq("/")
+    end
+
+    scenario "user can only create inspections for own units" do
+      # User A creates a unit
+      sign_in(user_a)
+      create(:unit, user: user_a)
+      logout
+
+      # User B creates a unit
+      sign_in(user_b)
+      unit_b = create(:unit, user: user_b)
+
+      # User B can create inspection for their own unit
+      visit new_inspection_from_unit_path
+      search_field_key = "inspections.fields.search_unit_id"
+      fill_in I18n.t(search_field_key), with: unit_b.id
+      click_i18n_button("inspections.buttons.search")
+
+      expect(page).to have_content(unit_b.name)
+      create_button_key = "inspections.buttons.create_inspection_for_unit"
+      click_i18n_button(create_button_key)
+
+      expect(current_path).to match(%r{/inspections/[A-Z0-9]{8}/edit})
+      expect_i18n_content("inspections.messages.created")
+    end
+  end
 end
