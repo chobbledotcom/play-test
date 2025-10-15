@@ -191,6 +191,112 @@ RSpec.describe "Unit Badges Security", type: :request do
     end
   end
 
+  describe "PATCH /inspections/:id with unit_id update" do
+    context "when UNIT_BADGES is enabled" do
+      before do
+        set_units_config(badges_enabled: true)
+        login_as(user_b)
+      end
+
+      after do
+        set_units_config(badges_enabled: false)
+      end
+
+      it "allows updating inspection to use another user's unit" do
+        # User A creates a unit with badge
+        unit_a = create(:unit, id: badge.id, user: user_a)
+
+        # User B creates their own inspection (without a unit initially)
+        inspection = create(:inspection, user: user_b, unit: nil)
+
+        # User B updates their inspection to use User A's unit
+        patch "/inspections/#{inspection.id}",
+          params: {inspection: {unit_id: unit_a.id}}
+
+        expect(response).to have_http_status(:redirect)
+        follow_redirect!
+        expect(response).to have_http_status(:success)
+
+        inspection.reload
+        expect(inspection.unit_id).to eq(unit_a.id)
+      end
+
+      it "allows changing from one badge unit to another" do
+        unit_a = create(:unit, id: badge.id, user: user_a)
+        badge_b = create(:badge)
+        unit_b = create(:unit, id: badge_b.id, user: user_a)
+
+        # User B creates inspection with unit_a
+        inspection = create(:inspection, user: user_b, unit: unit_a)
+
+        # User B changes to unit_b (also owned by user_a)
+        patch "/inspections/#{inspection.id}",
+          params: {inspection: {unit_id: unit_b.id}}
+
+        expect(response).to have_http_status(:redirect)
+        follow_redirect!
+        expect(response).to have_http_status(:success)
+
+        inspection.reload
+        expect(inspection.unit_id).to eq(unit_b.id)
+      end
+    end
+
+    context "when UNIT_BADGES is disabled" do
+      before do
+        set_units_config(badges_enabled: false)
+        login_as(user_b)
+      end
+
+      it "prevents updating to use another user's unit" do
+        unit_a = create(:unit, user: user_a)
+        inspection = create(:inspection, user: user_b, unit: nil)
+
+        # User B tries to update to use User A's unit
+        patch "/inspections/#{inspection.id}",
+          params: {inspection: {unit_id: unit_a.id}}
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(flash[:alert]).to match(/invalid unit/i)
+
+        inspection.reload
+        expect(inspection.unit_id).to be_nil
+      end
+
+      it "allows updating inspection to use own unit" do
+        unit_b = create(:unit, user: user_b)
+        inspection = create(:inspection, user: user_b, unit: nil)
+
+        # User B updates their inspection to use their own unit
+        patch "/inspections/#{inspection.id}",
+          params: {inspection: {unit_id: unit_b.id}}
+
+        expect(response).to have_http_status(:redirect)
+        follow_redirect!
+        expect(response).to have_http_status(:success)
+
+        inspection.reload
+        expect(inspection.unit_id).to eq(unit_b.id)
+      end
+
+      it "prevents changing from own to another user's unit" do
+        unit_a = create(:unit, user: user_a)
+        unit_b = create(:unit, user: user_b)
+        inspection = create(:inspection, user: user_b, unit: unit_b)
+
+        # User B tries to change to User A's unit
+        patch "/inspections/#{inspection.id}",
+          params: {inspection: {unit_id: unit_a.id}}
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(flash[:alert]).to match(/invalid unit/i)
+
+        inspection.reload
+        expect(inspection.unit_id).to eq(unit_b.id)
+      end
+    end
+  end
+
   describe "edge cases and attack vectors" do
     before do
       set_units_config(badges_enabled: false)
