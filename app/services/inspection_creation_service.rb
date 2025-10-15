@@ -35,7 +35,16 @@ class InspectionCreationService
 
   sig { returns(T.nilable(Unit)) }
   def find_and_validate_unit
-    @user.units.find_by(id: @unit_id)
+    if unit_badges_enabled?
+      Unit.find_by(id: @unit_id)
+    else
+      @user.units.find_by(id: @unit_id)
+    end
+  end
+
+  sig { returns(T::Boolean) }
+  def unit_badges_enabled?
+    Rails.configuration.units.badges_enabled
   end
 
   COPY_FROM_LAST_INSPECTION_FIELDS = T.let(
