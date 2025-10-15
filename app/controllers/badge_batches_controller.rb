@@ -23,8 +23,8 @@ class BadgeBatchesController < ApplicationController
 
     timestamp = Time.current
     badge_records = badge_ids.map do |id|
-      { id: id, badge_batch_id: badge_batch.id, created_at: timestamp,
-       updated_at: timestamp }
+      {id: id, badge_batch_id: badge_batch.id, created_at: timestamp,
+       updated_at: timestamp}
     end
     Badge.insert_all(badge_records)
 

@@ -46,7 +46,7 @@ RSpec.describe "Badges", type: :request do
     before { login_as(admin_user) }
 
     it "updates badge note and redirects to batch edit" do
-      patch badge_path(badge), params: { badge: { note: "Updated note" } }
+      patch badge_path(badge), params: {badge: {note: "Updated note"}}
       badge.reload
       expect(badge.note).to eq("Updated note")
       expect(response).to redirect_to(edit_badge_batch_path(batch))
