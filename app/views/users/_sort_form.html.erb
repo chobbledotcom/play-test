@@ -1,5 +1,5 @@
 <div class="filter-bar">
-  <%= form_with url: users_path, method: :get, local: true do |form| %>
+  <%= form_with url: users_path, method: :get, class: "button_to", local: true do |form| %>
     <%= form.label :sort, t('users.fields.sort'), for: "sort_field" %>
     <%= form.select :sort,
       options_for_select([

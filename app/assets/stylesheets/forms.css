@@ -135,7 +135,7 @@ form *:target {
 
 .form-grid input[type="number"],
 .form-grid input[type="text"][inputmode="decimal"] {
-  width: 5rem;
+  width: 7rem;
   text-align: left;
   padding: 0.4rem;
   font-variant-numeric: tabular-nums;
