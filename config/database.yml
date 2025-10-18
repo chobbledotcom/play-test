@@ -9,6 +9,14 @@ default: &default
   adapter: sqlite3
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
+  # Enable WAL mode for Litestream replication
+  # WAL mode is required for Litestream to track changes
+  pragmas:
+    journal_mode: wal
+    busy_timeout: 5000
+    synchronous: normal
+    mmap_size: 134217728
+    journal_size_limit: 67108864
 development:
   <<: *default
   database: storage/development.sqlite3

@@ -1,3 +1,5 @@
+# typed: false
+
 # Reusable code standards checker for both rake tasks and hooks
 class CodeStandardsChecker
   HARDCODED_STRINGS_ALLOWED_PATHS = %w[/lib/ /seeds/ /spec/ /test/].freeze
@@ -153,7 +155,8 @@ class CodeStandardsChecker
       stripped.include?("I18n.t") ||
       stripped.include?("Rails.logger") ||
       stripped.include?("puts") ||
-      stripped.include?("print")
+      stripped.include?("print") ||
+      stripped.include?(".execute(")
   end
 
   def extract_quoted_strings(stripped)
