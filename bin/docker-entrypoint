@@ -7,6 +7,31 @@ fi
 
 # If running the rails server then create or migrate existing database
 if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
+  # Restore databases from S3 using Litestream if enabled and databases don't exist
+  if [ "${LITESTREAM_ENABLED}" == "true" ]; then
+    echo "Litestream is enabled. Checking for databases to restore..."
+
+    # Restore production database if it doesn't exist
+    if [ ! -f "storage/production.sqlite3" ]; then
+      echo "Production database not found locally. Attempting to restore from S3..."
+      bundle exec litestream restore -config config/litestream.yml storage/production.sqlite3 || {
+        echo "No backup found in S3 or restore failed. Will create new database."
+      }
+    else
+      echo "Production database already exists locally."
+    fi
+
+    # Restore production queue database if it doesn't exist
+    if [ ! -f "storage/production_queue.sqlite3" ]; then
+      echo "Production queue database not found locally. Attempting to restore from S3..."
+      bundle exec litestream restore -config config/litestream.yml storage/production_queue.sqlite3 || {
+        echo "No backup found in S3 or restore failed. Will create new database."
+      }
+    else
+      echo "Production queue database already exists locally."
+    fi
+  fi
+
   ./bin/rails db:prepare
   
   echo "Setting up cron jobs with whenever..."
@@ -15,9 +40,15 @@ if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
   
   echo "Starting supercronic in background..."
   supercronic /tmp/crontab &
-  
+
   echo "Starting Solid Queue worker in background..."
   ./bin/jobs &
+
+  # Start Litestream replication if enabled
+  if [ "${LITESTREAM_ENABLED}" == "true" ]; then
+    echo "Starting Litestream replication in background..."
+    bundle exec litestream replicate -config config/litestream.yml &
+  fi
 fi
 
 exec "${@}"
