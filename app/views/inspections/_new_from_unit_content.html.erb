@@ -5,12 +5,12 @@
     url: new_inspection_from_unit_path,
     method: :post do |form| %>
   <p><%= t('inspections.messages.search_unit_prompt') %></p>
-  
+
   <%= render 'chobble_forms/fieldset', legend_key: 'search_unit' do %>
     <%= @_current_form.label :search, t('forms.unit_search.fields.search') %>
     <%= @_current_form.text_field :search, value: @search_term, maxlength: CustomIdGenerator::ID_LENGTH + 4 %>
   <% end %>
-  
+
   <div id="form_save_message"></div>
 <% end %>
 

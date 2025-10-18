@@ -6,12 +6,12 @@
   url: badge_batch_path(@badge_batch) do |form| %>
   <%= render 'chobble_forms/fieldset', legend_key: 'batch_details' do %>
     <%= render 'chobble_forms/display_field', field: :id %>
-    
+
     <div>
       <label><%= t('forms.badge_batch_edit.fields.created_at') %></label>
       <p><%= l(@badge_batch.created_at, format: :long) %></p>
     </div>
-    
+
     <%= render 'chobble_forms/display_field', field: :count %>
     <%= render 'chobble_forms/text_area', field: :note %>
   <% end %>

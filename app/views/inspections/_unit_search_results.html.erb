@@ -3,49 +3,49 @@
     <% if @unit %>
       <article class="success">
         <h3><%= t("forms.units.sections.unit_details") %></h3>
-        
+
         <dl>
           <dt><%= t("forms.units.fields.id") %></dt>
           <dd><%= @unit.id %></dd>
-          
+
           <dt><%= t("forms.units.fields.name") %></dt>
           <dd><%= @unit.name %></dd>
-          
+
           <dt><%= t("forms.units.fields.serial") %></dt>
           <dd><%= @unit.serial %></dd>
-          
+
           <dt><%= t("forms.units.fields.manufacturer") %></dt>
           <dd><%= @unit.manufacturer %></dd>
-          
+
           <dt><%= t("forms.units.fields.operator") %></dt>
           <dd><%= @unit.operator %></dd>
-          
+
           <dt><%= t("forms.units.fields.description") %></dt>
           <dd><%= @unit.description %></dd>
-          
+
           <% if @unit.last_inspection %>
             <dt><%= t("forms.units.display_fields.width") %></dt>
             <dd><%= @unit.last_inspection.width %>m</dd>
-            
+
             <dt><%= t("forms.units.display_fields.length") %></dt>
             <dd><%= @unit.last_inspection.length %>m</dd>
-            
+
             <dt><%= t("forms.units.display_fields.height") %></dt>
             <dd><%= @unit.last_inspection.height %>m</dd>
           <% end %>
         </dl>
-        
+
         <% if @unit.photo.attached? %>
           <%= render 'shared/attached_image', attachment: @unit.photo %>
         <% end %>
-        
+
         <%= button_to inspections_path,
             method: :post,
             params: { unit_id: @unit.id } do %>
           <strong><%= t('inspections.buttons.create_inspection_for_unit') %></strong>
         <% end %>
       </article>
-      
+
     <% elsif @badge %>
       <article class="notice">
         <p><%= t('inspections.messages.badge_exists_create_unit') %></p>
@@ -55,7 +55,7 @@
           <% end %>
         </p>
       </article>
-      
+
     <% else %>
       <article class="alert">
         <%= t('inspections.messages.invalid_unit_id') %>
