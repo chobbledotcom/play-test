@@ -59,6 +59,32 @@ RSpec.describe "Litestream Configuration" do
     end
   end
 
+  describe "typed configuration" do
+    let(:config_class_path) do
+      Rails.root.join("app/config/litestream_config.rb")
+    end
+
+    it "has a typed config class" do
+      expect(File.exist?(config_class_path)).to be true
+    end
+
+    it "is registered in Rails configuration" do
+      expect(Rails.configuration).to respond_to(:litestream_config)
+      expect(Rails.configuration.litestream_config).to be_a(LitestreamConfig)
+    end
+
+    it "loads configuration from environment variables" do
+      config = Rails.configuration.litestream_config
+
+      expect(config.enabled).to be_in([true, false])
+      expect(config).to respond_to(:s3_bucket)
+      expect(config).to respond_to(:s3_endpoint)
+      expect(config).to respond_to(:s3_region)
+      expect(config).to respond_to(:access_key_id)
+      expect(config).to respond_to(:secret_access_key)
+    end
+  end
+
   describe "initializer" do
     let(:initializer_path) do
       Rails.root.join("config/initializers/litestream.rb")
@@ -68,24 +94,27 @@ RSpec.describe "Litestream Configuration" do
       expect(File.exist?(initializer_path)).to be true
     end
 
-    it "configures S3 credentials from environment variables" do
+    it "uses Rails.configuration.litestream_config" do
       content = File.read(initializer_path)
 
-      expect(content).to include("LITESTREAM_S3_BUCKET")
-      expect(content).to include("LITESTREAM_ACCESS_KEY_ID")
-      expect(content).to include("LITESTREAM_SECRET_ACCESS_KEY")
+      expect(content).to include("Rails.configuration.litestream_config")
       expect(content).to include("replica_bucket")
       expect(content).to include("replica_key_id")
       expect(content).to include("replica_access_key")
     end
 
-    it "configures optional S3 endpoint and region" do
+    it "configures litestream gem from typed config" do
       content = File.read(initializer_path)
 
-      expect(content).to include("LITESTREAM_S3_ENDPOINT")
-      expect(content).to include("LITESTREAM_S3_REGION")
       expect(content).to include("replica_endpoint")
       expect(content).to include("replica_region")
+    end
+
+    it "only runs when litestream is enabled" do
+      content = File.read(initializer_path)
+
+      expect(content).to include("return unless")
+      expect(content).to include(".enabled")
     end
   end
 
@@ -93,7 +122,7 @@ RSpec.describe "Litestream Configuration" do
     let(:puma_config_path) { Rails.root.join("config/puma.rb") }
     let(:puma_config_content) { File.read(puma_config_path) }
 
-    it "loads Litestream plugin in production when enabled" do
+    it "loads Litestream plugin when enabled" do
       expect(puma_config_content).to include("plugin :litestream")
     end
 
@@ -101,8 +130,9 @@ RSpec.describe "Litestream Configuration" do
       expect(puma_config_content).to include("LITESTREAM_ENABLED")
     end
 
-    it "only runs in production environment" do
-      expect(puma_config_content).to include("production")
+    it "runs in all environments except test" do
+      expect(puma_config_content).to include('!= "test"')
+      expect(puma_config_content).to include("rails_env")
     end
   end
 

@@ -32,11 +32,11 @@ port ENV.fetch("PORT", 3000)
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
 
-# Run Litestream replication in production when enabled
+# Run Litestream replication when enabled (except in test environment)
 rails_env = ENV.fetch("RAILS_ENV", "development")
 litestream_enabled = ENV["LITESTREAM_ENABLED"] == "true"
 
-if rails_env == "production" && litestream_enabled
+if rails_env != "test" && litestream_enabled
   plugin :litestream
 end
 
