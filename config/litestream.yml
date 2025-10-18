@@ -2,6 +2,20 @@
 # See https://litestream.io/reference/config/ for full documentation
 
 dbs:
+  - path: storage/development.sqlite3
+    replicas:
+      - type: s3
+        bucket: ${LITESTREAM_S3_BUCKET}
+        path: development.sqlite3
+        endpoint: ${LITESTREAM_S3_ENDPOINT}
+        region: ${LITESTREAM_S3_REGION}
+        access-key-id: ${LITESTREAM_ACCESS_KEY_ID}
+        secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}
+        sync-interval: 10s
+        retention: 168h
+        retention-check-interval: 1h
+        snapshot-interval: 24h
+
   - path: storage/production.sqlite3
     replicas:
       - type: s3
