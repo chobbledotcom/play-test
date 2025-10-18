@@ -119,6 +119,9 @@ gem "sentry-rails"
 # S3-compatible storage
 gem "aws-sdk-s3", require: false
 
+# SQLite replication to S3
+gem "litestream"
+
 # Production and development gems
 group :development, :production do
   # Mission Control for managing background jobs

@@ -232,6 +232,13 @@ GEM
       rugged (>= 0.24, < 2.0)
       thor (>= 0.19, < 2.0)
     lint_roller (1.1.0)
+    litestream (0.14.0-x86_64-linux)
+      actionpack (>= 7.0)
+      actionview (>= 7.0)
+      activejob (>= 7.0)
+      activesupport (>= 7.0)
+      railties (>= 7.0)
+      sqlite3
     logger (1.7.0)
     loofah (2.24.1)
       crass (~> 1.0.2)
@@ -599,6 +606,7 @@ DEPENDENCIES
   image_processing (~> 1.12)
   importmap-rails (~> 2.1)
   licensed (~> 5.0)
+  litestream
   mission_control-jobs (~> 1.0)
   openssl (= 3.3.0)
   parallel_tests

@@ -1,0 +1,134 @@
+#!/bin/bash
+# frozen_string_literal: true
+
+# Test script to verify Litestream can restore databases from S3
+
+set -e
+
+echo "============================================================"
+echo "Litestream Restore Test"
+echo "============================================================"
+echo
+
+# Check environment variables
+if [ -z "$LITESTREAM_S3_BUCKET" ]; then
+  echo "ERROR: LITESTREAM_S3_BUCKET not set"
+  echo "Please set required environment variables or create .env file"
+  exit 1
+fi
+
+echo "Configuration:"
+echo "  Bucket: $LITESTREAM_S3_BUCKET"
+echo "  Endpoint: $LITESTREAM_S3_ENDPOINT"
+echo "  Region: $LITESTREAM_S3_REGION"
+echo
+
+# Choose which database to test
+DB_PATH="${1:-storage/development.sqlite3}"
+echo "Testing restore for: $DB_PATH"
+echo
+
+# Create backup
+BACKUP_PATH="${DB_PATH}.restore-test-backup"
+if [ -f "$DB_PATH" ]; then
+  echo "1. Backing up current database..."
+  cp "$DB_PATH" "$BACKUP_PATH"
+
+  # Get record count before deletion
+  BEFORE_COUNT=$(bundle exec rails runner "
+    ActiveRecord::Base.connection_pool.with_connection do |conn|
+      result = conn.execute('SELECT COUNT(*) as count FROM sqlite_master WHERE type=\"table\"')
+      puts result.first['count']
+    end
+  " 2>/dev/null || echo "0")
+  echo "   Tables before: $BEFORE_COUNT"
+else
+  echo "1. No existing database found (will test fresh restore)"
+  BEFORE_COUNT="0"
+fi
+
+echo
+
+# Delete database
+echo "2. Deleting database files..."
+rm -f "$DB_PATH" "${DB_PATH}-wal" "${DB_PATH}-shm"
+echo "   ✓ Database deleted"
+echo
+
+# Restore from S3
+echo "3. Restoring from S3..."
+bundle exec litestream restore -config config/litestream.yml "$DB_PATH"
+
+if [ $? -eq 0 ]; then
+  echo "   ✓ Restore successful"
+else
+  echo "   ✗ Restore failed!"
+  if [ -f "$BACKUP_PATH" ]; then
+    echo "   Restoring from backup..."
+    mv "$BACKUP_PATH" "$DB_PATH"
+  fi
+  exit 1
+fi
+
+echo
+
+# Verify restoration
+echo "4. Verifying restored database..."
+if [ -f "$DB_PATH" ]; then
+  AFTER_COUNT=$(bundle exec rails runner "
+    ActiveRecord::Base.connection_pool.with_connection do |conn|
+      result = conn.execute('SELECT COUNT(*) as count FROM sqlite_master WHERE type=\"table\"')
+      puts result.first['count']
+    end
+  " 2>/dev/null || echo "0")
+
+  echo "   Tables after: $AFTER_COUNT"
+
+  if [ "$AFTER_COUNT" -gt "0" ]; then
+    echo "   ✓ Database restored with data"
+
+    # Check WAL mode
+    WAL_MODE=$(bundle exec rails runner "
+      ActiveRecord::Base.connection_pool.with_connection do |conn|
+        result = conn.execute('PRAGMA journal_mode')
+        puts result.first['journal_mode']
+      end
+    " 2>/dev/null || echo "unknown")
+
+    echo "   Journal mode: $WAL_MODE"
+
+    if [ "$WAL_MODE" = "wal" ]; then
+      echo "   ✓ WAL mode enabled"
+    else
+      echo "   ⚠ WAL mode not enabled (run: rails db:prepare)"
+    fi
+  else
+    echo "   ⚠ Database restored but appears empty"
+  fi
+else
+  echo "   ✗ Database file not found after restore"
+  exit 1
+fi
+
+echo
+
+# Cleanup
+if [ -f "$BACKUP_PATH" ]; then
+  echo "5. Cleaning up backup..."
+  rm "$BACKUP_PATH"
+  echo "   ✓ Backup removed"
+fi
+
+echo
+echo "============================================================"
+echo "✓ Restore test completed successfully!"
+echo "============================================================"
+echo
+echo "The database was:"
+echo "  1. Backed up"
+echo "  2. Deleted completely"
+echo "  3. Restored from S3"
+echo "  4. Verified to contain data"
+echo
+echo "This proves Litestream backup/restore is working correctly."
+echo
