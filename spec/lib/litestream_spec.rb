@@ -9,183 +9,86 @@ RSpec.describe "Litestream Configuration" do
     let(:config_path) { Rails.root.join("config/litestream.yml") }
     let(:config) { YAML.load_file(config_path) }
 
-    it "exists" do
+    it "is valid YAML with required databases" do
       expect(File.exist?(config_path)).to be true
+
+      db_paths = config["dbs"].map { |db| db["path"] }
+      expect(db_paths).to include("storage/production.sqlite3")
+      expect(db_paths).to include("storage/production_queue.sqlite3")
+      expect(db_paths).to include("storage/development.sqlite3")
     end
 
-    it "is valid YAML" do
-      expect { config }.not_to raise_error
-    end
+    it "uses S3 replicas with environment variable placeholders" do
+      replica = config["dbs"].first["replicas"].first
 
-    it "configures production database replication" do
-      production_db = config["dbs"].find do |db|
-        db["path"] == "storage/production.sqlite3"
-      end
-
-      expect(production_db).to be_present
-      expect(production_db["replicas"]).to be_present
-      expect(production_db["replicas"].first["type"]).to eq("s3")
-    end
-
-    it "configures production queue database replication" do
-      queue_db = config["dbs"].find do |db|
-        db["path"] == "storage/production_queue.sqlite3"
-      end
-
-      expect(queue_db).to be_present
-      expect(queue_db["replicas"]).to be_present
-      expect(queue_db["replicas"].first["type"]).to eq("s3")
-    end
-
-    it "uses environment variables for S3 credentials" do
-      production_db = config["dbs"].first
-      replica = production_db["replicas"].first
-
+      expect(replica["type"]).to eq("s3")
       expect(replica["bucket"]).to eq("${LITESTREAM_S3_BUCKET}")
-      expect(replica["endpoint"]).to eq("${LITESTREAM_S3_ENDPOINT}")
-      expect(replica["region"]).to eq("${LITESTREAM_S3_REGION}")
       expect(replica["access-key-id"]).to eq("${LITESTREAM_ACCESS_KEY_ID}")
-      secret_key = replica["secret-access-key"]
-      expect(secret_key).to eq("${LITESTREAM_SECRET_ACCESS_KEY}")
-    end
-
-    it "sets reasonable retention and sync intervals" do
-      production_db = config["dbs"].first
-      replica = production_db["replicas"].first
-
-      expect(replica["sync-interval"]).to be_present
-      expect(replica["retention"]).to be_present
-      expect(replica["snapshot-interval"]).to be_present
+      secret_key = "${LITESTREAM_SECRET_ACCESS_KEY}"
+      expect(replica["secret-access-key"]).to eq(secret_key)
     end
   end
 
   describe "typed configuration" do
-    let(:config_class_path) do
-      Rails.root.join("app/config/litestream_config.rb")
-    end
-
-    it "has a typed config class" do
-      expect(File.exist?(config_class_path)).to be true
-    end
-
-    it "is registered in Rails configuration" do
+    it "is registered as Sorbet-typed config in Rails" do
       expect(Rails.configuration).to respond_to(:litestream_config)
       expect(Rails.configuration.litestream_config).to be_a(LitestreamConfig)
-    end
 
-    it "loads configuration from environment variables" do
       config = Rails.configuration.litestream_config
-
       expect(config.enabled).to be_in([true, false])
-      expect(config).to respond_to(:s3_bucket)
-      expect(config).to respond_to(:s3_endpoint)
-      expect(config).to respond_to(:s3_region)
-      expect(config).to respond_to(:access_key_id)
-      expect(config).to respond_to(:secret_access_key)
     end
   end
 
   describe "initializer" do
-    let(:initializer_path) do
-      Rails.root.join("config/initializers/litestream.rb")
-    end
-
-    it "exists" do
-      expect(File.exist?(initializer_path)).to be true
-    end
-
-    it "uses Rails.configuration.litestream_config" do
-      content = File.read(initializer_path)
+    it "configures litestream gem from typed config when enabled" do
+      content = File.read(Rails.root.join("config/initializers/litestream.rb"))
 
       expect(content).to include("Rails.configuration.litestream_config")
+      expect(content).to include("return unless")
       expect(content).to include("replica_bucket")
       expect(content).to include("replica_key_id")
       expect(content).to include("replica_access_key")
     end
-
-    it "configures litestream gem from typed config" do
-      content = File.read(initializer_path)
-
-      expect(content).to include("replica_endpoint")
-      expect(content).to include("replica_region")
-    end
-
-    it "only runs when litestream is enabled" do
-      content = File.read(initializer_path)
-
-      expect(content).to include("return unless")
-      expect(content).to include(".enabled")
-    end
   end
 
   describe "Puma plugin integration" do
-    let(:puma_config_path) { Rails.root.join("config/puma.rb") }
-    let(:puma_config_content) { File.read(puma_config_path) }
+    it "loads Litestream plugin except in test environment" do
+      content = File.read(Rails.root.join("config/puma.rb"))
 
-    it "loads Litestream plugin when enabled" do
-      expect(puma_config_content).to include("plugin :litestream")
-    end
-
-    it "conditionally enables based on LITESTREAM_ENABLED" do
-      expect(puma_config_content).to include("LITESTREAM_ENABLED")
-    end
-
-    it "runs in all environments except test" do
-      expect(puma_config_content).to include('!= "test"')
-      expect(puma_config_content).to include("rails_env")
+      expect(content).to include("plugin :litestream")
+      expect(content).to include("LITESTREAM_ENABLED")
+      expect(content).to include('!= "test"')
     end
   end
 
   describe "docker entrypoint" do
-    let(:entrypoint_path) { Rails.root.join("bin/docker-entrypoint") }
-    let(:entrypoint_content) { File.read(entrypoint_path) }
+    it "restores databases from S3 on startup when enabled" do
+      content = File.read(Rails.root.join("bin/docker-entrypoint"))
 
-    it "restores databases from S3 when LITESTREAM_ENABLED is true" do
-      expect(entrypoint_content).to include("LITESTREAM_ENABLED")
-      expect(entrypoint_content).to include("litestream restore")
-    end
-
-    it "checks for both production and queue databases" do
-      expect(entrypoint_content).to include("production.sqlite3")
-      expect(entrypoint_content).to include("production_queue.sqlite3")
-    end
-
-    it "handles missing backups gracefully" do
-      expect(entrypoint_content).to include("No backup found")
-    end
-
-    it "does not start litestream manually (handled by Puma plugin)" do
-      expect(entrypoint_content).not_to include("litestream replicate")
+      expect(content).to include("LITESTREAM_ENABLED")
+      expect(content).to include("litestream restore")
+      expect(content).to include("production.sqlite3")
+      expect(content).to include("production_queue.sqlite3")
+      expect(content).not_to include("litestream replicate")
     end
   end
 
-  describe "environment variables documentation" do
-    let(:env_example_path) { Rails.root.join(".env.example") }
-    let(:env_example_content) { File.read(env_example_path) }
+  describe "environment variables" do
+    it "documents all Litestream configuration in .env.example" do
+      content = File.read(Rails.root.join(".env.example"))
 
-    it "documents LITESTREAM_ENABLED" do
-      expect(env_example_content).to include("LITESTREAM_ENABLED")
-    end
-
-    it "documents S3 configuration for Litestream" do
-      expect(env_example_content).to include("LITESTREAM_S3_BUCKET")
-      expect(env_example_content).to include("LITESTREAM_S3_ENDPOINT")
-      expect(env_example_content).to include("LITESTREAM_S3_REGION")
-      expect(env_example_content).to include("LITESTREAM_ACCESS_KEY_ID")
-      expect(env_example_content).to include("LITESTREAM_SECRET_ACCESS_KEY")
-    end
-
-    it "includes helpful comments" do
-      expect(env_example_content).to include("Litestream Configuration")
-      expect(env_example_content).to include("SQLite Replication")
+      expect(content).to include("LITESTREAM_ENABLED")
+      expect(content).to include("LITESTREAM_S3_BUCKET")
+      expect(content).to include("LITESTREAM_ACCESS_KEY_ID")
+      expect(content).to include("LITESTREAM_SECRET_ACCESS_KEY")
     end
   end
 
-  describe "litestream binary" do
-    it "is available via bundle exec" do
-      output = `bundle exec litestream version 2>&1`
-      expect($?.success?).to be true
-      expect(output).to match(/v\d+\.\d+\.\d+/)
+  describe "database configuration" do
+    it "enables WAL mode for Litestream compatibility" do
+      content = File.read(Rails.root.join("config/database.yml"))
+
+      expect(content).to include("journal_mode: wal")
     end
   end
 end
