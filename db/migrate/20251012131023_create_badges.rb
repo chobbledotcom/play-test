@@ -4,7 +4,7 @@
 class CreateBadges < ActiveRecord::Migration[8.0]
   def change
     create_table :badges, id: false do |t|
-      t.string :id, limit: 8, null: false, primary_key: true
+      t.string :id, limit: 8, null: false, primary_key: true # rubocop:disable Rails/DangerousColumnNames
       t.references :badge_batch, null: false, foreign_key: true
       t.text :note
 

@@ -5,6 +5,7 @@
     <p>
       <strong><%= t("debug.render_time") %>:</strong> <%= debug_render_time || "N/A" %> ms<br>
       <strong><%= t("debug.query_count") %>:</strong> <%= debug_sql_queries.size %><br>
+      <strong><%= t("debug.total_rows") %>:</strong> <%= debug_sql_queries.sum { |q| q[:row_count] || 0 } %><br>
       <% if Rails.env.development? %>
         <strong><%= t("debug.environment") %>:</strong> <%= t("debug.development") %><br>
       <% end %>
@@ -22,6 +23,7 @@
           <tr>
             <th><%= t("debug.query") %></th>
             <th><%= t("debug.duration") %></th>
+            <th><%= t("debug.rows") %></th>
             <th><%= t("debug.name") %></th>
           </tr>
         </thead>
@@ -30,6 +32,7 @@
             <tr>
               <td><%= query[:sql] %></td>
               <td><%= query[:duration] %> ms</td>
+              <td><%= query[:row_count] || 0 %></td>
               <td><%= query[:name] %></td>
             </tr>
           <% end %>

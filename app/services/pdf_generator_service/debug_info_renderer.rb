@@ -1,3 +1,5 @@
+# typed: false
+
 class PdfGeneratorService
   class DebugInfoRenderer
     include Configuration
@@ -14,18 +16,21 @@ class PdfGeneratorService
       pdf.move_down 10
 
       # Summary info
+      total_rows = queries.sum { |q| q[:row_count] || 0 }
       pdf.text "#{I18n.t("debug.query_count")}: #{queries.size}", size: NICE_TABLE_TEXT_SIZE
+      pdf.text "#{I18n.t("debug.total_rows")}: #{total_rows}", size: NICE_TABLE_TEXT_SIZE
       pdf.move_down 10
 
       # Build table data
       table_data = [
-        [I18n.t("debug.query"), I18n.t("debug.duration"), I18n.t("debug.name")]
+        [I18n.t("debug.query"), I18n.t("debug.duration"), I18n.t("debug.rows"), I18n.t("debug.name")]
       ]
 
       queries.each do |query|
         table_data << [
           query[:sql],
           "#{query[:duration]} ms",
+          query[:row_count] || 0,
           query[:name] || ""
         ]
       end
@@ -44,9 +49,10 @@ class PdfGeneratorService
         t.cells.size = 8
 
         # Column widths
-        t.columns(0).width = pdf.bounds.width * 0.6  # Query column gets most space
-        t.columns(1).width = pdf.bounds.width * 0.2  # Duration
-        t.columns(2).width = pdf.bounds.width * 0.2  # Name
+        t.columns(0).width = pdf.bounds.width * 0.5  # Query column gets most space
+        t.columns(1).width = pdf.bounds.width * 0.15  # Duration
+        t.columns(2).width = pdf.bounds.width * 0.1  # Rows
+        t.columns(3).width = pdf.bounds.width * 0.25  # Name
 
         # Alternating row colors
         (1..table_data.length - 1).each do |i|
