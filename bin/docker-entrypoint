@@ -43,12 +43,6 @@ if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
 
   echo "Starting Solid Queue worker in background..."
   ./bin/jobs &
-
-  # Start Litestream replication if enabled
-  if [ "${LITESTREAM_ENABLED}" == "true" ]; then
-    echo "Starting Litestream replication in background..."
-    bundle exec litestream replicate -config config/litestream.yml &
-  fi
 fi
 
 exec "${@}"

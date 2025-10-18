@@ -68,11 +68,41 @@ RSpec.describe "Litestream Configuration" do
       expect(File.exist?(initializer_path)).to be true
     end
 
-    it "only configures Litestream when LITESTREAM_ENABLED is true" do
+    it "configures S3 credentials from environment variables" do
       content = File.read(initializer_path)
 
-      enabled_check = 'ENV["LITESTREAM_ENABLED"] == "true"'
-      expect(content).to include(enabled_check)
+      expect(content).to include("LITESTREAM_S3_BUCKET")
+      expect(content).to include("LITESTREAM_ACCESS_KEY_ID")
+      expect(content).to include("LITESTREAM_SECRET_ACCESS_KEY")
+      expect(content).to include("replica_bucket")
+      expect(content).to include("replica_key_id")
+      expect(content).to include("replica_access_key")
+    end
+
+    it "configures optional S3 endpoint and region" do
+      content = File.read(initializer_path)
+
+      expect(content).to include("LITESTREAM_S3_ENDPOINT")
+      expect(content).to include("LITESTREAM_S3_REGION")
+      expect(content).to include("replica_endpoint")
+      expect(content).to include("replica_region")
+    end
+  end
+
+  describe "Puma plugin integration" do
+    let(:puma_config_path) { Rails.root.join("config/puma.rb") }
+    let(:puma_config_content) { File.read(puma_config_path) }
+
+    it "loads Litestream plugin in production when enabled" do
+      expect(puma_config_content).to include("plugin :litestream")
+    end
+
+    it "conditionally enables based on LITESTREAM_ENABLED" do
+      expect(puma_config_content).to include("LITESTREAM_ENABLED")
+    end
+
+    it "only runs in production environment" do
+      expect(puma_config_content).to include("production")
     end
   end
 
@@ -85,10 +115,6 @@ RSpec.describe "Litestream Configuration" do
       expect(entrypoint_content).to include("litestream restore")
     end
 
-    it "starts litestream replication in background" do
-      expect(entrypoint_content).to include("litestream replicate")
-    end
-
     it "checks for both production and queue databases" do
       expect(entrypoint_content).to include("production.sqlite3")
       expect(entrypoint_content).to include("production_queue.sqlite3")
@@ -96,6 +122,10 @@ RSpec.describe "Litestream Configuration" do
 
     it "handles missing backups gracefully" do
       expect(entrypoint_content).to include("No backup found")
+    end
+
+    it "does not start litestream manually (handled by Puma plugin)" do
+      expect(entrypoint_content).not_to include("litestream replicate")
     end
   end
 
