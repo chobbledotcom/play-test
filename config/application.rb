@@ -25,13 +25,14 @@ require "dotenv/load"
 Bundler.require(*Rails.groups)
 
 # Load typed configuration classes
+require_relative "../app/config/app_config"
+require_relative "../app/config/litestream_config"
+require_relative "../app/config/observability_config"
 require_relative "../app/config/pdf_config"
-require_relative "../app/config/units_config"
-require_relative "../app/config/users_config"
 require_relative "../app/config/s3_config"
 require_relative "../app/config/theme_config"
-require_relative "../app/config/observability_config"
-require_relative "../app/config/app_config"
+require_relative "../app/config/units_config"
+require_relative "../app/config/users_config"
 
 module PlayTest
   class Application < Rails::Application
@@ -89,9 +90,15 @@ module PlayTest
     # Unit Configuration (typed)
     config.units = UnitsConfig.from_env(ENV.to_h)
 
+    # Litestream Configuration (typed)
+    # Note: stored as config.litestream_config (not config.litestream)
+    # because litestream gem uses config.litestream for its own settings
+    config.litestream_config = LitestreamConfig.from_env(ENV.to_h)
+
     # I18n Configuration
     default_overrides = Rails.root.join("config/site_overrides.yml").to_s
-    config.i18n_overrides_path = ENV.fetch("I18N_OVERRIDES_PATH", default_overrides)
+    overrides_env_key = "I18N_OVERRIDES_PATH"
+    config.i18n_overrides_path = ENV.fetch(overrides_env_key, default_overrides)
 
     # Add site-specific i18n overrides
     config.before_initialize do

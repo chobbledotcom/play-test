@@ -1,0 +1,26 @@
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash -p envsubst
+set -e
+
+# Load .env file if it exists
+if [ -f .env ]; then
+  export $(cat .env | grep -v '^#' | xargs)
+fi
+
+if [ "${LITESTREAM_ENABLED}" == "true" ]; then
+  echo "Litestream enabled. Checking for databases to restore..."
+  
+  LITESTREAM_CONFIG=$(mktemp)
+  envsubst < config/litestream.yml > "$LITESTREAM_CONFIG"
+  
+  if [ ! -f "storage/development.sqlite3" ]; then
+    echo "Restoring development database from S3..."
+    bundle exec litestream restore -config "$LITESTREAM_CONFIG" storage/development.sqlite3 || {
+      echo "No backup found or restore failed. Will create new database."
+    }
+  fi
+  
+  rm -f "$LITESTREAM_CONFIG"
+fi
+
+exec bundle exec rails server

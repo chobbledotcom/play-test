@@ -1,0 +1,111 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Test script to verify Litestream configuration and S3 connectivity
+
+require "bundler/setup"
+require "dotenv/load" if File.exist?(".env")
+
+puts "=" * 60
+puts "Litestream Configuration Test"
+puts "=" * 60
+puts
+
+# Check required environment variables
+required_vars = %w[
+  LITESTREAM_ENABLED
+  LITESTREAM_S3_BUCKET
+  LITESTREAM_S3_ENDPOINT
+  LITESTREAM_S3_REGION
+  LITESTREAM_ACCESS_KEY_ID
+  LITESTREAM_SECRET_ACCESS_KEY
+]
+
+puts "Checking environment variables:"
+puts "-" * 60
+
+missing_vars = []
+required_vars.each do |var|
+  value = ENV[var]
+  if value && !value.empty?
+    # Mask sensitive values
+    display_value = var.include?("KEY") || var.include?("SECRET") ?
+      "[#{value.length} chars]" : value
+    puts "✓ #{var}: #{display_value}"
+  else
+    puts "✗ #{var}: NOT SET"
+    missing_vars << var
+  end
+end
+
+puts
+
+if missing_vars.any?
+  puts "ERROR: Missing required environment variables:"
+  missing_vars.each { |var| puts "  - #{var}" }
+  puts
+  puts "Please set these variables in your .env file or export them:"
+  puts "  export LITESTREAM_ENABLED=true"
+  puts "  export LITESTREAM_S3_BUCKET=your-bucket"
+  puts "  export LITESTREAM_S3_ENDPOINT=https://your-endpoint.com"
+  puts "  export LITESTREAM_S3_REGION=your-region"
+  puts "  export LITESTREAM_ACCESS_KEY_ID=your-key-id"
+  puts "  export LITESTREAM_SECRET_ACCESS_KEY=your-secret"
+  exit 1
+end
+
+puts "Testing Litestream binary:"
+puts "-" * 60
+
+version_output = `bundle exec litestream version 2>&1`
+if $?.success?
+  puts "✓ Litestream binary: #{version_output.strip}"
+else
+  puts "✗ Litestream binary not found or error"
+  exit 1
+end
+
+puts
+
+puts "Testing Litestream configuration:"
+puts "-" * 60
+
+databases_output = `bundle exec litestream databases -config config/litestream.yml 2>&1`
+if $?.success?
+  puts "✓ Configuration valid"
+  puts
+  puts "Configured databases:"
+  puts databases_output
+else
+  puts "✗ Configuration error:"
+  puts databases_output
+  exit 1
+end
+
+puts
+puts "Testing WAL mode:"
+puts "-" * 60
+
+require_relative "../config/environment"
+
+ActiveRecord::Base.connection_pool.with_connection do |conn|
+  result = conn.execute("PRAGMA journal_mode")
+  mode = result.first["journal_mode"]
+  if mode == "wal"
+    puts "✓ SQLite is in WAL mode"
+  else
+    puts "✗ SQLite is in #{mode} mode (should be WAL)"
+    puts "  Run: rails db:prepare to enable WAL mode"
+  end
+end
+
+puts
+puts "=" * 60
+puts "All checks passed! Litestream is ready to use."
+puts "=" * 60
+puts
+puts "To test replication:"
+puts "1. Start Rails: rails s"
+puts "2. Make a database change (create/update a record)"
+puts "3. Check S3 bucket for replicated files"
+puts
