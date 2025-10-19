@@ -4,8 +4,10 @@ en:
     title: Debug Info
     render_time: Page render time
     query_count: SQL queries
+    total_rows: Total rows read
     query: Query
     duration: Duration
+    rows: Rows
     name: Name
     environment: Environment
     development: Development

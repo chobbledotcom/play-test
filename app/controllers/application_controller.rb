@@ -135,7 +135,8 @@ class ApplicationController < ActionController::Base
         @debug_sql_queries << {
           sql: payload[:sql],
           duration: ((finish - start) * 1000).round(2),
-          name: payload[:name]
+          name: payload[:name],
+          row_count: payload[:row_count] || 0
         }
       end
     end
