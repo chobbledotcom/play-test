@@ -56,7 +56,7 @@ RSpec.feature "Admin Text Replacements", type: :feature do
     expect(page).to have_content("Custom Text Replacements")
   end
 
-  scenario "admin can delete a text replacement" do
+  scenario "admin can delete a text replacement", js: true do
     replacement = create(:text_replacement,
       i18n_key: "en.test.key",
       value: "Test Value")
@@ -73,15 +73,19 @@ RSpec.feature "Admin Text Replacements", type: :feature do
     expect(page).not_to have_content("Test Value")
   end
 
-  scenario "requires admin access" do
-    sign_out
-    non_admin = create(:user)
-    sign_in(non_admin)
+  context "non-admin user" do
+    let(:non_admin_user) { create(:user) }
 
-    visit admin_text_replacements_path
+    before do
+      sign_in(non_admin_user)
+    end
 
-    expect(page).to have_current_path(root_path)
-    expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
+    scenario "requires admin access" do
+      visit admin_text_replacements_path
+
+      expect(page).to have_current_path(root_path)
+      expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
+    end
   end
 
   scenario "validation errors are displayed" do

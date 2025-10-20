@@ -20,11 +20,22 @@ class AdminTextReplacementsController < ApplicationController
   def create
     @text_replacement = TextReplacement.new(text_replacement_params)
     if @text_replacement.save
-      handle_create_success(
-        @text_replacement,
-        "admin_text_replacements.messages.created",
-        admin_text_replacements_path
-      )
+      respond_to do |format|
+        format.html do
+          msg = I18n.t("admin_text_replacements.messages.created")
+          redirect_to admin_text_replacements_path, notice: msg
+        end
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "form_save_message",
+            partial: "shared/save_message",
+            locals: {
+              message: I18n.t("admin_text_replacements.messages.created"),
+              type: "success"
+            }
+          )
+        end
+      end
     else
       @available_keys = TextReplacement.available_i18n_keys
       handle_create_failure(@text_replacement)
