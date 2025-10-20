@@ -345,7 +345,7 @@ class UnitsController < ApplicationController
       debug_queries: debug_sql_queries
     )
 
-    handle_pdf_response(result, "#{@unit.serial}.pdf")
+    handle_pdf_response(result, pdf_filename)
   end
 
   def send_unit_qr_code
@@ -367,7 +367,9 @@ class UnitsController < ApplicationController
   end
 
   def pdf_filename
-    "#{@unit.serial}.pdf"
+    prefix = Rails.configuration.units.pdf_filename_prefix
+    type_name = I18n.t("units.export.pdf_type")
+    "#{prefix}#{type_name}-#{@unit.id}.pdf"
   end
 
   def resource_pdf_url

@@ -258,6 +258,7 @@ en:
       csv_filename: inspections-%{date}.csv
       pdf_filename: '%{identifier}.pdf'
       qr_filename: '%{identifier}_QR.png'
+      pdf_type: Inspection
     validation:
       anchorage_incomplete: Anchorage Assessment incomplete
       enclosed_incomplete: Totally Enclosed Assessment incomplete

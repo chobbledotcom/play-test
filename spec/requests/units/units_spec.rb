@@ -491,7 +491,8 @@ RSpec.describe "Units", type: :request do
         get unit_path(unit, format: :pdf)
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("application/pdf")
-        expect(response.headers["Content-Disposition"]).to include("#{unit.serial}.pdf")
+        expected_filename = "Unit-#{unit.id}.pdf"
+        expect(response.headers["Content-Disposition"]).to include(expected_filename)
       end
     end
 
@@ -511,7 +512,8 @@ RSpec.describe "Units", type: :request do
         get "/units/#{unit.id}.pdf"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("application/pdf")
-        expect(response.headers["Content-Disposition"]).to include("#{unit.serial}.pdf")
+        expected_filename = "Unit-#{unit.id}.pdf"
+        expect(response.headers["Content-Disposition"]).to include(expected_filename)
       end
 
       it "returns JSON for .json format" do

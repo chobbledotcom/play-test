@@ -164,6 +164,8 @@ en:
       button: Share / Copy
       title: Inflatable Unit %{name} Report
       copied: Copied!
+    export:
+      pdf_type: Unit
     forms:
       search: Search units...
     links:

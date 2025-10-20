@@ -455,8 +455,9 @@ class InspectionsController < ApplicationController
   end
 
   def pdf_filename
-    identifier = @inspection.unit&.serial || @inspection.id
-    I18n.t("inspections.export.pdf_filename", identifier: identifier)
+    prefix = Rails.configuration.units.pdf_filename_prefix
+    type_name = I18n.t("inspections.export.pdf_type")
+    "#{prefix}#{type_name}-#{@inspection.id}.pdf"
   end
 
   def qr_code_filename

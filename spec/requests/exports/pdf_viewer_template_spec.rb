@@ -14,7 +14,8 @@ RSpec.describe "PDF Viewer Template", type: :request do
         expect(response.body).to include("<iframe")
         expect(response.body).to include(inspection_path(inspection, format: :pdf))
         expect(response.body).to include("<title>")
-        expect(response.body).to include("#{inspection.unit&.serial || inspection.id}.pdf")
+        expected_filename = "Inspection-#{inspection.id}.pdf"
+        expect(response.body).to include(expected_filename)
 
         # Should NOT include the normal application layout elements
         expect(response.body).not_to include("nav")
@@ -39,7 +40,8 @@ RSpec.describe "PDF Viewer Template", type: :request do
         expect(response.body).to include("<iframe")
         expect(response.body).to include(unit_path(unit, format: :pdf))
         expect(response.body).to include("<title>")
-        expect(response.body).to include("#{unit.serial}.pdf")
+        expected_filename = "Unit-#{unit.id}.pdf"
+        expect(response.body).to include(expected_filename)
 
         # Should NOT include the normal application layout elements
         expect(response.body).not_to include("nav")
@@ -84,7 +86,8 @@ RSpec.describe "PDF Viewer Template", type: :request do
         expect(response).to have_http_status(:success)
         expect(response.body).to include("<iframe")
         expect(response.body).to include(inspection_path(inspection, format: :pdf))
-        expect(response.body).to include("#{inspection.unit&.serial || inspection.id}.pdf")
+        expected_filename = "Inspection-#{inspection.id}.pdf"
+        expect(response.body).to include(expected_filename)
 
         # Should NOT include the normal application layout elements
         expect(response.body).not_to include("nav")
@@ -97,7 +100,8 @@ RSpec.describe "PDF Viewer Template", type: :request do
         expect(response).to have_http_status(:success)
         expect(response.body).to include("<iframe")
         expect(response.body).to include(unit_path(unit, format: :pdf))
-        expect(response.body).to include("#{unit.serial}.pdf")
+        expected_filename = "Unit-#{unit.id}.pdf"
+        expect(response.body).to include(expected_filename)
 
         # Should NOT include the normal application layout elements
         expect(response.body).not_to include("nav")
