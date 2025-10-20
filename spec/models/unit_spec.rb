@@ -95,8 +95,8 @@ RSpec.describe Unit, type: :model do
 
   describe "UNIT_BADGES feature" do
     context "when UNIT_BADGES is enabled" do
-      before { Rails.configuration.units = UnitsConfig.new(badges_enabled: true, reports_unbranded: false) }
-      after { Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false) }
+      before { Rails.configuration.units = UnitsConfig.new(badges_enabled: true, reports_unbranded: false, pdf_filename_prefix: "") }
+      after { Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false, pdf_filename_prefix: "") }
 
       describe "#normalize_id" do
         it "strips spaces from ID" do
@@ -149,8 +149,8 @@ RSpec.describe Unit, type: :model do
     end
 
     context "when UNIT_BADGES is disabled" do
-      before { Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false) }
-      after { Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false) }
+      before { Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false, pdf_filename_prefix: "") }
+      after { Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false, pdf_filename_prefix: "") }
 
       it "generates custom ID automatically" do
         unit = build(:unit, user: user)

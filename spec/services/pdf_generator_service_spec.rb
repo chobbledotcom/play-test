@@ -103,7 +103,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
     context "when UNIT_REPORTS_UNBRANDED is enabled" do
       around do |example|
         original_config = Rails.configuration.units
-        config = UnitsConfig.new(badges_enabled: false, reports_unbranded: true)
+        config = UnitsConfig.new(badges_enabled: false, reports_unbranded: true, pdf_filename_prefix: "")
         Rails.configuration.units = config
         example.run
         Rails.configuration.units = original_config
@@ -130,7 +130,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
     context "when UNIT_REPORTS_UNBRANDED is disabled" do
       around do |example|
         original_config = Rails.configuration.units
-        config = UnitsConfig.new(badges_enabled: false, reports_unbranded: false)
+        config = UnitsConfig.new(badges_enabled: false, reports_unbranded: false, pdf_filename_prefix: "")
         Rails.configuration.units = config
         example.run
         Rails.configuration.units = original_config

@@ -11,7 +11,8 @@ RSpec.feature "Unit Badge Validation", type: :feature do
   define_method(:set_units_config) do |badges_enabled:, reports_unbranded: false|
     config = UnitsConfig.new(
       badges_enabled: badges_enabled,
-      reports_unbranded: reports_unbranded
+      reports_unbranded: reports_unbranded,
+      pdf_filename_prefix: ""
     )
     Rails.configuration.units = config
   end
