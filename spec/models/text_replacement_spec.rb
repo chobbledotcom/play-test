@@ -37,7 +37,7 @@ RSpec.describe TextReplacement, type: :model do
       keys = TextReplacement.available_i18n_keys
       expect(keys).to be_an(Array)
       expect(keys).to include("en.admin_text_replacements.title")
-      expect(keys).to be_sorted
+      expect(keys).to eq(keys.sort)
     end
   end
 
