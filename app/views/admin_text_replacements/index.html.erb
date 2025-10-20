@@ -1,0 +1,13 @@
+<%= render 'shared/page_header', title: t('admin_text_replacements.index.title') %>
+
+<p><%= t('admin_text_replacements.description') %></p>
+
+<%= button_to new_admin_text_replacement_path, method: :get do %>
+  <strong><%= t('admin_text_replacements.index.add_new') %></strong>
+<% end %>
+
+<% if @text_replacements.any? %>
+  <%= render 'tree', tree: @tree %>
+<% else %>
+  <p><%= t('admin_text_replacements.index.empty') %></p>
+<% end %>

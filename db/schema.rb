@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_12_134703) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_20_100000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -403,6 +403,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_12_134703) do
     t.boolean "platform_height_pass"
     t.text "platform_height_comment"
     t.index ["inspection_id"], name: "structure_assessments_new_pkey", unique: true
+  end
+
+  create_table "text_replacements", force: :cascade do |t|
+    t.string "i18n_key", null: false
+    t.text "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["i18n_key"], name: "index_text_replacements_on_i18n_key", unique: true
   end
 
   create_table "units", id: { type: :string, limit: 12 }, force: :cascade do |t|

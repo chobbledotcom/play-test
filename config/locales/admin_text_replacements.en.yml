@@ -1,0 +1,30 @@
+en:
+  admin_text_replacements:
+    title: Text Replacements
+    description: Override i18n translations for site-specific customisation
+    index:
+      title: Text Replacements
+      empty: No text replacements configured
+      add_new: Add New Replacement
+    tree:
+      value: "Value: %{value}"
+    messages:
+      created: Text replacement created successfully
+      updated: Text replacement updated successfully
+      destroyed: Text replacement deleted successfully
+    buttons:
+      delete: Delete
+      edit: Edit
+  forms:
+    admin_text_replacements:
+      header: Add Text Replacement
+      sections:
+        replacement_details: Replacement Details
+      fields:
+        i18n_key: I18n Key
+        value: Replacement Value
+      submit: Create Replacement
+      errors:
+        header:
+          one: "1 error prevented this replacement from being saved:"
+          other: "%{count} errors prevented this replacement from being saved:"
