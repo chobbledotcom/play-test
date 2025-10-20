@@ -11,6 +11,14 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.0].define(version: 2025_10_20_100000) do
+  create_table "_litestream_lock", id: false, force: :cascade do |t|
+    t.integer "id"
+  end
+
+  create_table "_litestream_seq", force: :cascade do |t|
+    t.integer "seq"
+  end
+
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -490,6 +498,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_20_100000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "anchorage_assessments", "inspections"
+  add_foreign_key "badges", "badge_batches"
   add_foreign_key "credentials", "users"
   add_foreign_key "enclosed_assessments", "inspections"
   add_foreign_key "events", "users"
