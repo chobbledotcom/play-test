@@ -1,0 +1,42 @@
+<%= render 'shared/page_header', title: t('forms.admin_text_replacements.header') %>
+
+<div id="form_save_message"></div>
+
+<%= form_with(
+  model: @text_replacement,
+  url: admin_text_replacements_path,
+  method: :post
+) do |form| %>
+  <% if @text_replacement.errors.any? %>
+    <div class="error">
+      <h3><%= t('forms.admin_text_replacements.errors.header', count: @text_replacement.errors.count) %></h3>
+      <ul>
+        <% @text_replacement.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <fieldset>
+    <legend><%= t('forms.admin_text_replacements.sections.replacement_details') %></legend>
+
+    <label for="text_replacement_i18n_key">
+      <%= t('forms.admin_text_replacements.fields.i18n_key') %>
+    </label>
+    <%= form.select(
+      :i18n_key,
+      options_for_select(@available_keys),
+      { include_blank: "Select an i18n key..." },
+      { required: true }
+    ) %>
+
+    <label for="text_replacement_value">
+      <%= t('forms.admin_text_replacements.fields.value') %>
+    </label>
+    <%= form.text_area :value, required: true, rows: 4 %>
+  </fieldset>
+
+  <%= form.submit t('forms.admin_text_replacements.submit') %>
+  <%= button_to t('admin_text_replacements.buttons.back_to_list'), admin_text_replacements_path, method: :get %>
+<% end %>

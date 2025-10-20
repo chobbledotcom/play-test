@@ -222,6 +222,7 @@ Rails.application.routes.draw do
   get "admin", to: "admin#index"
   get "admin/releases", to: "admin#releases", as: :admin_releases
   get "admin/files", to: "admin#files", as: :admin_files
+  resources :admin_text_replacements, only: %i[index new create destroy]
 
   # Badges (admin-only)
   resources :badge_batches, only: %i[index new create edit update] do
