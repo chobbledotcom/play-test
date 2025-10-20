@@ -2,8 +2,8 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2025-10-13
-Total dependencies: 148
+Generated on: 2025-10-20
+Total dependencies: 150
 
 ## Dependencies by License
 
@@ -17,19 +17,19 @@ Total dependencies: 148
   - AWS Event Stream Library
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-partitions** v1.1142.0
+- **aws-partitions** v1.1174.0
   - Provides information about AWS partitions, regions, and services.
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-core** v3.229.0
+- **aws-sdk-core** v3.233.0
   - AWS SDK for Ruby - Core
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-kms** v1.110.0
+- **aws-sdk-kms** v1.114.0
   - AWS SDK for Ruby - KMS
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-s3** v1.196.1
+- **aws-sdk-s3** v1.200.0
   - AWS SDK for Ruby - Amazon S3
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
@@ -67,13 +67,13 @@ Total dependencies: 148
   - A declarative way to read and write binary file formats
   - Homepage: https://github.com/dmendel/bindata
 
-- **rexml** v3.4.1
+- **rexml** v3.4.2
   - An XML toolkit for Ruby
   - Homepage: https://github.com/ruby/rexml
 
 ### BSD-3-CLAUSE (2 dependencies)
 
-- **puma** v6.6.1
+- **puma** v7.1.0
   - A Ruby/Rack web server built for parallelism.
   - Homepage: https://puma.io
 
@@ -143,7 +143,7 @@ Total dependencies: 148
   - Pure ruby library for read/write, chunk-level access to PNG files
   - Homepage: https://github.com/wvanbergen/chunky_png/wiki
 
-- **connection_pool** v2.5.3
+- **connection_pool** v2.5.4
   - Generic connection pool for Ruby
   - Homepage: https://github.com/mperham/connection_pool
 
@@ -223,7 +223,7 @@ Total dependencies: 148
   - A minimal mime type library
   - Homepage: https://github.com/discourse/mini_mime
 
-- **minitest** v5.25.5
+- **minitest** v5.26.0
   - minitest provides a complete suite of testing facilities supporting TDD, BDD, mocking, and benchmarking
   - Homepage: https://github.com/minitest/minitest
 
@@ -251,7 +251,7 @@ Total dependencies: 148
   - a very dumb PEG parser library
   - Homepage: https://github.com/floraison/raabro
 
-- **rack** v3.2.0
+- **rack** v3.2.3
   - A modular Ruby webserver interface.
   - Homepage: https://github.com/rack/rack
 
@@ -343,13 +343,13 @@ Total dependencies: 148
   - Secret User Agent of HTTP
   - Homepage: https://github.com/lostisland/sawyer
 
-- **sentry-rails** v5.26.0
+- **sentry-rails** v5.28.0
   - A gem that provides Rails integration for the Sentry error logger
-  - Homepage: https://github.com/getsentry/sentry-ruby/tree/5.26.0/sentry-rails
+  - Homepage: https://github.com/getsentry/sentry-ruby/tree/5.28.0/sentry-rails
 
-- **sentry-ruby** v5.26.0
+- **sentry-ruby** v5.28.0
   - A gem that provides a client interface for the Sentry error logger
-  - Homepage: https://github.com/getsentry/sentry-ruby/tree/5.26.0/sentry-ruby
+  - Homepage: https://github.com/getsentry/sentry-ruby/tree/5.28.0/sentry-ruby
 
 - **simplecov** v0.22.0
   - Code coverage for Ruby
@@ -415,13 +415,13 @@ Total dependencies: 148
   - Efficient and thread-safe constant autoloader
   - Homepage: https://github.com/fxn/zeitwerk
 
-### OTHER (47 dependencies)
+### OTHER (49 dependencies)
 
 - **activerecord** v8.0.2.1
   - Object-relational mapper framework (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **annotaterb** v4.18.0
+- **annotaterb** v4.19.0
   - A gem for generating annotations for Rails projects.
   - Homepage: https://github.com/drwl/annotaterb
 
@@ -437,7 +437,7 @@ Total dependencies: 148
   - a performance benchmarking library
   - Homepage: https://github.com/ruby/benchmark
 
-- **bigdecimal** v3.2.2
+- **bigdecimal** v3.3.1
   - Arbitrary-precision decimal floating-point number library.
   - Homepage: https://github.com/ruby/bigdecimal
 
@@ -445,7 +445,7 @@ Total dependencies: 148
   - The best way to manage your application's dependencies
   - Homepage: https://bundler.io
 
-- **chobble-forms** v0.7.2
+- **chobble-forms** v0.8.1
   - Semantic Rails forms with strict i18n
   - Homepage: https://github.com/chobbledotcom/chobble-forms
 
@@ -469,7 +469,7 @@ Total dependencies: 148
   - BS EN 14960:2019 safety standard calculators for inflatable play equipment
   - Homepage: https://github.com/chobbledotcom/en14960
 
-- **erb** v5.0.2
+- **erb** v5.1.1
   - An easy to use but powerful templating system for Ruby.
   - Homepage: https://github.com/ruby/erb
 
@@ -496,6 +496,10 @@ Total dependencies: 148
 - **jwt** v2.10.2
   - JSON Web Token implementation in Ruby
   - Homepage: https://github.com/jwt/ruby-jwt
+
+- **litestream** v0.14.0
+  - Integrate Litestream with the RubyGems infrastructure.
+  - Homepage: https://github.com/fractaledmind/litestream-ruby
 
 - **logger** v1.7.0
   - Provides a simple logging utility for outputting messages.
@@ -533,7 +537,7 @@ Total dependencies: 148
   - New IO for Ruby
   - Homepage: https://github.com/socketry/nio4r
 
-- **nokogiri** v1.18.9
+- **nokogiri** v1.18.10
   - Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby.
   - Homepage: https://nokogiri.org
 
@@ -549,7 +553,7 @@ Total dependencies: 148
   - Low level PDF generator.
   - Homepage: http://prawnpdf.org/
 
-- **pp** v0.6.2
+- **pp** v0.6.3
   - Provides a PrettyPrinter for Ruby objects
   - Homepage: https://github.com/ruby/pp
 
@@ -569,7 +573,7 @@ Total dependencies: 148
   - Racc is an LALR(1) parser generator
   - Homepage: https://github.com/ruby/racc
 
-- **rdoc** v6.14.2
+- **rdoc** v6.15.0
   - RDoc produces HTML and command-line documentation for Ruby projects
   - Homepage: https://ruby.github.io/rdoc
 
@@ -589,11 +593,15 @@ Total dependencies: 148
   - Auto-terminate potentially long-running operations in Ruby.
   - Homepage: https://github.com/ruby/timeout
 
+- **tsort** v0.2.0
+  - Topological sorting using Tarjan's algorithm
+  - Homepage: https://github.com/ruby/tsort
+
 - **ttfunk** v1.8.0
   - TrueType Font Metrics Parser
   - Homepage: http://prawnpdf.org/
 
-- **uri** v1.0.3
+- **uri** v1.0.4
   - URI is a module providing classes to handle Uniform Resource Identifiers
   - Homepage: https://github.com/ruby/uri
 

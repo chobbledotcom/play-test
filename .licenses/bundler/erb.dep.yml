@@ -1,6 +1,6 @@
 ---
 name: erb
-version: 5.0.2
+version: 5.1.1
 type: bundler
 summary: An easy to use but powerful templating system for Ruby.
 homepage: https://github.com/ruby/erb
@@ -69,5 +69,16 @@ licenses:
        WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
        PURPOSE.
 - sources: README.md
-  text: The gem is available as open source under the terms of the [2-Clause BSD License](https://opensource.org/licenses/BSD-2-Clause).
+  text: |-
+    This software is available as open source under the terms
+    of the [2-Clause BSD License][2-clause bsd license].
+
+    [2-clause bsd license]: https://opensource.org/licenses/BSD-2-Clause
+    [erb executable]:       rdoc-ref:erb_executable.md
+    [erb issues]:           https://github.com/ruby/erb/issues
+    [rdoc]:                 https://ruby.github.io/rdoc/
+    [ruby/erb]:             https://github.com/ruby/erb
+    [ruby toolbox]:         https://www.ruby-toolbox.com/categories/template_engines
+    [sprintf]:              https://docs.ruby-lang.org/en/master/Kernel.html#method-i-sprintf
+    [template processor]:   https://en.wikipedia.org/wiki/Template_processor_
 notices: []

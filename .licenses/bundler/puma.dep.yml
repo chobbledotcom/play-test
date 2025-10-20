@@ -1,6 +1,6 @@
 ---
 name: puma
-version: 6.6.1
+version: 7.1.0
 type: bundler
 summary: A Ruby/Rack web server built for parallelism.
 homepage: https://puma.io
