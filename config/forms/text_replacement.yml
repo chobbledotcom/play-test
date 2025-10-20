@@ -1,0 +1,13 @@
+---
+form_fields:
+  - legend_i18n_key: replacement_details
+    fields:
+      - partial: :select_field
+        field: :i18n_key
+        attributes:
+          required: true
+      - partial: :text_area
+        field: :value
+        attributes:
+          rows: 4
+          required: true

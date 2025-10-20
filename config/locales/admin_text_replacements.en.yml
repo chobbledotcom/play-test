@@ -10,10 +10,11 @@ en:
       value: "Value: %{value}"
     messages:
       created: Text replacement created successfully
+      updated: Text replacement updated successfully
       destroyed: Text replacement deleted successfully
     buttons:
       delete: Delete
-      back_to_list: Back to List
+      edit: Edit
   forms:
     admin_text_replacements:
       header: Add Text Replacement

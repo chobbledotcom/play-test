@@ -5,7 +5,7 @@ class AdminTextReplacementsController < ApplicationController
   include TurboStreamResponders
 
   before_action :require_admin
-  before_action :set_text_replacement, only: %i[destroy]
+  before_action :set_text_replacement, only: %i[edit update destroy]
 
   def index
     @text_replacements = TextReplacement.order(:i18n_key)
@@ -39,6 +39,34 @@ class AdminTextReplacementsController < ApplicationController
     else
       @available_keys = TextReplacement.available_i18n_keys
       handle_create_failure(@text_replacement)
+    end
+  end
+
+  def edit
+    @available_keys = TextReplacement.available_i18n_keys
+  end
+
+  def update
+    if @text_replacement.update(text_replacement_params)
+      respond_to do |format|
+        format.html do
+          msg = I18n.t("admin_text_replacements.messages.updated")
+          redirect_to admin_text_replacements_path, notice: msg
+        end
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "form_save_message",
+            partial: "shared/save_message",
+            locals: {
+              message: I18n.t("admin_text_replacements.messages.updated"),
+              type: "success"
+            }
+          )
+        end
+      end
+    else
+      @available_keys = TextReplacement.available_i18n_keys
+      handle_update_failure(@text_replacement)
     end
   end
 

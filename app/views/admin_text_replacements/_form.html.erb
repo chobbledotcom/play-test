@@ -1,0 +1,15 @@
+<%= render 'chobble_forms/form_context', model: @text_replacement, i18n_base: 'forms.admin_text_replacements' do |form| %>
+  <%= render 'chobble_forms/fieldset', legend_key: 'replacement_details' do %>
+    <label for="text_replacement_i18n_key">
+      <%= t('forms.admin_text_replacements.fields.i18n_key') %>
+    </label>
+    <%= form.select(
+      :i18n_key,
+      options_for_select(@available_keys, @text_replacement.i18n_key),
+      { include_blank: "Select an i18n key..." },
+      { required: true }
+    ) %>
+
+    <%= render 'chobble_forms/text_area', field: :value, required: true, rows: 4 %>
+  <% end %>
+<% end %>

@@ -14,6 +14,8 @@
 class TextReplacement < ApplicationRecord
   extend T::Sig
 
+  include FormConfigurable
+
   validates :i18n_key, presence: true, uniqueness: true
   validates :value, presence: true
 
@@ -31,7 +33,7 @@ class TextReplacement < ApplicationRecord
   sig {
     params(
       prefix: String,
-      hash: T::Hash[T.untyped, T.untyped]
+      hash: T::Hash[String, T.any(String, T::Hash[String, T.untyped])]
     ).returns(T::Array[String])
   }
   def self.flatten_keys(prefix, hash)
@@ -48,7 +50,7 @@ class TextReplacement < ApplicationRecord
   end
 
   # Returns a nested hash structure for displaying in tree view
-  sig { returns(T::Hash[String, T.untyped]) }
+  sig { returns(T::Hash[String, T::Hash[String, T.untyped]]) }
   def self.tree_structure
     all.each_with_object({}) do |replacement, tree|
       parts = replacement.i18n_key.split(".")
