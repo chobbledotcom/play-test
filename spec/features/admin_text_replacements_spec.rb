@@ -3,9 +3,10 @@ require "rails_helper"
 RSpec.feature "Admin Text Replacements", type: :feature do
   let(:admin_user) { create(:user, :admin) }
 
-  before do
-    sign_in(admin_user)
-  end
+  context "as admin user" do
+    before do
+      sign_in(admin_user)
+    end
 
   scenario "admin can access text replacements from dashboard" do
     visit admin_path
@@ -73,6 +74,15 @@ RSpec.feature "Admin Text Replacements", type: :feature do
     expect(page).not_to have_content("Test Value")
   end
 
+    scenario "validation errors are displayed" do
+      visit new_admin_text_replacement_path
+
+      click_button I18n.t("forms.admin_text_replacements.submit")
+
+      expect(page).to have_content("can't be blank")
+    end
+  end
+
   context "non-admin user" do
     let(:non_admin_user) { create(:user) }
 
@@ -86,13 +96,5 @@ RSpec.feature "Admin Text Replacements", type: :feature do
       expect(page).to have_current_path(root_path)
       expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
     end
-  end
-
-  scenario "validation errors are displayed" do
-    visit new_admin_text_replacement_path
-
-    click_button I18n.t("forms.admin_text_replacements.submit")
-
-    expect(page).to have_content("can't be blank")
   end
 end
