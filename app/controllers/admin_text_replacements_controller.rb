@@ -20,20 +20,14 @@ class AdminTextReplacementsController < ApplicationController
   def create
     @text_replacement = TextReplacement.new(text_replacement_params)
     if @text_replacement.save
+      msg = I18n.t("admin_text_replacements.messages.created")
       respond_to do |format|
         format.html do
-          msg = I18n.t("admin_text_replacements.messages.created")
-          redirect_to admin_text_replacements_path, notice: msg
+          flash[:notice] = msg
+          redirect_to admin_text_replacements_path
         end
         format.turbo_stream do
-          render turbo_stream: turbo_stream.replace(
-            "form_save_message",
-            partial: "shared/save_message",
-            locals: {
-              message: I18n.t("admin_text_replacements.messages.created"),
-              type: "success"
-            }
-          )
+          render_save_message_stream(success: true, message: msg)
         end
       end
     else
@@ -48,22 +42,11 @@ class AdminTextReplacementsController < ApplicationController
 
   def update
     if @text_replacement.update(text_replacement_params)
-      respond_to do |format|
-        format.html do
-          msg = I18n.t("admin_text_replacements.messages.updated")
-          redirect_to admin_text_replacements_path, notice: msg
-        end
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace(
-            "form_save_message",
-            partial: "shared/save_message",
-            locals: {
-              message: I18n.t("admin_text_replacements.messages.updated"),
-              type: "success"
-            }
-          )
-        end
-      end
+      handle_update_success(
+        @text_replacement,
+        "admin_text_replacements.messages.updated",
+        admin_text_replacements_path
+      )
     else
       @available_keys = TextReplacement.available_i18n_keys
       handle_update_failure(@text_replacement)
