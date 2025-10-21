@@ -11,13 +11,10 @@ RSpec.describe "Unit Badges Security", type: :request do
 
   describe "POST /inspections with unit_id parameter" do
     context "when UNIT_BADGES is enabled" do
-      before do
-        enable_unit_badges
-        login_as(user_b)
-      end
+      around { |example| with_unit_badges_enabled(&example) }
 
-      after do
-        disable_unit_badges
+      before do
+        login_as(user_b)
       end
 
       it "allows creating inspection for another user's unit" do
@@ -52,8 +49,9 @@ RSpec.describe "Unit Badges Security", type: :request do
     end
 
     context "when UNIT_BADGES is disabled" do
+      around { |example| with_unit_badges_disabled(&example) }
+
       before do
-        disable_unit_badges
         login_as(user_b)
       end
 
@@ -129,8 +127,9 @@ RSpec.describe "Unit Badges Security", type: :request do
   end
 
   describe "security boundary enforcement" do
+    around { |example| with_unit_badges_disabled(&example) }
+
     before do
-      disable_unit_badges
       login_as(user_b)
     end
 
@@ -185,13 +184,10 @@ RSpec.describe "Unit Badges Security", type: :request do
 
   describe "PATCH /inspections/:id with unit_id update" do
     context "when UNIT_BADGES is enabled" do
-      before do
-        enable_unit_badges
-        login_as(user_b)
-      end
+      around { |example| with_unit_badges_enabled(&example) }
 
-      after do
-        disable_unit_badges
+      before do
+        login_as(user_b)
       end
 
       it "allows updating inspection to use another user's unit" do
@@ -235,8 +231,9 @@ RSpec.describe "Unit Badges Security", type: :request do
     end
 
     context "when UNIT_BADGES is disabled" do
+      around { |example| with_unit_badges_disabled(&example) }
+
       before do
-        disable_unit_badges
         login_as(user_b)
       end
 
@@ -290,8 +287,9 @@ RSpec.describe "Unit Badges Security", type: :request do
   end
 
   describe "edge cases and attack vectors" do
+    around { |example| with_unit_badges_disabled(&example) }
+
     before do
-      disable_unit_badges
       login_as(user_b)
     end
 

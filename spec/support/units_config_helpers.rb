@@ -2,31 +2,23 @@
 # frozen_string_literal: true
 
 module UnitsConfigHelpers
-  # Enables unit badges feature with optional unbranded reports
-  def enable_unit_badges(unbranded: false)
-    set_units_config(badges_enabled: true, unbranded: unbranded)
-  end
-
-  # Disables unit badges feature
-  def disable_unit_badges
-    set_units_config(badges_enabled: false)
-  end
-
-  # Temporarily enables unit badges for the duration of a block
-  # Automatically restores previous state after the block
+  # Use with around hook to temporarily enable unit badges
+  # Example:
+  #   around { |example| with_unit_badges_enabled(&example) }
   def with_unit_badges_enabled(unbranded: false)
     previous_config = Rails.configuration.units
-    enable_unit_badges(unbranded: unbranded)
+    set_units_config(badges_enabled: true, unbranded: unbranded)
     yield
   ensure
     Rails.configuration.units = previous_config
   end
 
-  # Temporarily disables unit badges for the duration of a block
-  # Automatically restores previous state after the block
+  # Use with around hook to temporarily disable unit badges
+  # Example:
+  #   around { |example| with_unit_badges_disabled(&example) }
   def with_unit_badges_disabled
     previous_config = Rails.configuration.units
-    disable_unit_badges
+    set_units_config(badges_enabled: false)
     yield
   ensure
     Rails.configuration.units = previous_config
@@ -34,7 +26,6 @@ module UnitsConfigHelpers
 
   private
 
-  # Internal helper to set the UnitsConfig
   def set_units_config(badges_enabled:, unbranded: false)
     config = UnitsConfig.new(
       badges_enabled: badges_enabled,

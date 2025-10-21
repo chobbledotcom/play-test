@@ -13,13 +13,10 @@ RSpec.feature "Unit Badge Validation", type: :feature do
   end
 
   context "when UNIT_BADGES is enabled" do
-    before do
-      enable_unit_badges
-      visit new_unit_path
-    end
+    around { |example| with_unit_badges_enabled(&example) }
 
-    after do
-      disable_unit_badges
+    before do
+      visit new_unit_path
     end
 
     scenario "shows ID field on new unit form" do
@@ -98,8 +95,9 @@ RSpec.feature "Unit Badge Validation", type: :feature do
   end
 
   context "when UNIT_BADGES is disabled" do
+    around { |example| with_unit_badges_disabled(&example) }
+
     before do
-      disable_unit_badges
       visit new_unit_path
     end
 
@@ -124,15 +122,9 @@ RSpec.feature "Unit Badge Validation", type: :feature do
   end
 
   context "ID field immutability on edit" do
+    around { |example| with_unit_badges_enabled(&example) }
+
     let(:unit_with_badge) { create(:unit, id: badge.id, user: user) }
-
-    before do
-      enable_unit_badges
-    end
-
-    after do
-      disable_unit_badges
-    end
 
     scenario "does not show ID field on edit form" do
       visit edit_unit_path(unit_with_badge)
