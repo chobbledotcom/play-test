@@ -42,10 +42,7 @@ RSpec.describe SeedDataService do
       end
 
       context "when UNIT_BADGES is enabled" do
-        before do
-          allow(Rails.configuration.units).to receive(:badges_enabled)
-            .and_return(true)
-        end
+        around { |example| with_unit_badges_enabled(&example) }
 
         include_examples "basic seed creation"
 
@@ -101,10 +98,7 @@ RSpec.describe SeedDataService do
       end
 
       context "when UNIT_BADGES is disabled" do
-        before do
-          allow(Rails.configuration.units).to receive(:badges_enabled)
-            .and_return(false)
-        end
+        around { |example| with_unit_badges_disabled(&example) }
 
         include_examples "basic seed creation"
 
@@ -204,19 +198,13 @@ RSpec.describe SeedDataService do
     end
 
     context "when UNIT_BADGES is enabled" do
-      before do
-        allow(Rails.configuration.units).to receive(:badges_enabled)
-          .and_return(true)
-      end
+      around { |example| with_unit_badges_enabled(&example) }
 
       include_examples "seed deletion"
     end
 
     context "when UNIT_BADGES is disabled" do
-      before do
-        allow(Rails.configuration.units).to receive(:badges_enabled)
-          .and_return(false)
-      end
+      around { |example| with_unit_badges_disabled(&example) }
 
       include_examples "seed deletion"
     end
