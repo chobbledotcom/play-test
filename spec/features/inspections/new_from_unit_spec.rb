@@ -20,16 +20,10 @@ RSpec.feature "Creating inspection from unit search", type: :feature do
   end
 
   context "when UNIT_BADGES is enabled" do
+    around { |example| with_unit_badges_enabled(&example) }
+
     let(:badge) { create(:badge) }
     let!(:unit) { create(:unit, user: user, id: badge.id) }
-
-    before do
-      Rails.configuration.units = UnitsConfig.new(badges_enabled: true, reports_unbranded: false, pdf_filename_prefix: "")
-    end
-
-    after do
-      Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false, pdf_filename_prefix: "")
-    end
 
     scenario "index page shows 'Create Inspection from Unit' button" do
       visit inspections_path
@@ -108,13 +102,7 @@ RSpec.feature "Creating inspection from unit search", type: :feature do
   end
 
   context "when UNIT_BADGES is disabled" do
-    before do
-      Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false, pdf_filename_prefix: "")
-    end
-
-    after do
-      Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false, pdf_filename_prefix: "")
-    end
+    around { |example| with_unit_badges_disabled(&example) }
 
     scenario "index page shows original 'Add Inspection' button" do
       visit inspections_path
