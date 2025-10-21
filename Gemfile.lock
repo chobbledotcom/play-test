@@ -112,7 +112,7 @@ GEM
       smart_properties
     bigdecimal (3.3.1)
     bindata (2.5.1)
-    blueprinter (1.1.2)
+    blueprinter (1.2.1)
     brakeman (7.1.0)
       racc
     builder (3.3.0)
