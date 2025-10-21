@@ -10,22 +10,8 @@ RSpec.feature "Shared Unit Inspections with Badges", type: :feature do
   let(:badge_batch) { create(:badge_batch, count: 1) }
   let(:badge) { create(:badge, badge_batch: badge_batch) }
 
-  define_method(:set_units_config) do |badges_enabled:, unbranded: false|
-    config = UnitsConfig.new(
-      badges_enabled: badges_enabled,
-      reports_unbranded: unbranded
-    )
-    Rails.configuration.units = config
-  end
-
   context "when UNIT_BADGES is enabled" do
-    before do
-      set_units_config(badges_enabled: true)
-    end
-
-    after do
-      set_units_config(badges_enabled: false)
-    end
+    around { |example| with_unit_badges_enabled(&example) }
 
     scenario "user B can create inspection for unit created by user A" do
       # Admin creates a badge batch (already done via let)
@@ -149,9 +135,7 @@ RSpec.feature "Shared Unit Inspections with Badges", type: :feature do
   end
 
   context "when UNIT_BADGES is disabled" do
-    before do
-      set_units_config(badges_enabled: false)
-    end
+    around { |example| with_unit_badges_disabled(&example) }
 
     scenario "user B cannot create inspection for user A's unit" do
       # User A creates a unit (without badges, gets auto-generated ID)

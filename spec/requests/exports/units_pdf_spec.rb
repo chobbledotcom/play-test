@@ -46,7 +46,8 @@ RSpec.describe "Units PDF Generation", type: :request do
       get_pdf("/units/#{unit.id}.pdf")
 
       content_disposition = page.driver.response.headers["Content-Disposition"]
-      expect(content_disposition).to include("#{unit.serial}.pdf")
+      expected_filename = "Unit-#{unit.id}.pdf"
+      expect(content_disposition).to include(expected_filename)
       expect(content_disposition).to include("inline")
     end
   end

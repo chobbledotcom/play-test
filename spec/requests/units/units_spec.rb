@@ -491,7 +491,8 @@ RSpec.describe "Units", type: :request do
         get unit_path(unit, format: :pdf)
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("application/pdf")
-        expect(response.headers["Content-Disposition"]).to include("#{unit.serial}.pdf")
+        expected_filename = "Unit-#{unit.id}.pdf"
+        expect(response.headers["Content-Disposition"]).to include(expected_filename)
       end
     end
 
@@ -511,7 +512,8 @@ RSpec.describe "Units", type: :request do
         get "/units/#{unit.id}.pdf"
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include("application/pdf")
-        expect(response.headers["Content-Disposition"]).to include("#{unit.serial}.pdf")
+        expected_filename = "Unit-#{unit.id}.pdf"
+        expect(response.headers["Content-Disposition"]).to include(expected_filename)
       end
 
       it "returns JSON for .json format" do
@@ -651,17 +653,14 @@ RSpec.describe "Units", type: :request do
   end
 
   describe "Unit badge ID immutability" do
+    around { |example| with_unit_badges_enabled(&example) }
+
     let(:badge_batch) { create(:badge_batch) }
     let(:badge1) { create(:badge, badge_batch: badge_batch) }
     let(:badge2) { create(:badge, badge_batch: badge_batch) }
 
     before do
-      Rails.configuration.units = UnitsConfig.new(badges_enabled: true, reports_unbranded: false)
       login_as(user)
-    end
-
-    after do
-      Rails.configuration.units = UnitsConfig.new(badges_enabled: false, reports_unbranded: false)
     end
 
     it "prevents changing ID on update via raw request" do
