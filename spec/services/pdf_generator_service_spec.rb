@@ -101,13 +101,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
     end
 
     context "when UNIT_REPORTS_UNBRANDED is enabled" do
-      around do |example|
-        original_config = Rails.configuration.units
-        config = UnitsConfig.new(badges_enabled: false, reports_unbranded: true, pdf_filename_prefix: "")
-        Rails.configuration.units = config
-        example.run
-        Rails.configuration.units = original_config
-      end
+      around { |example| with_unit_badges_enabled(unbranded: true) }
 
       it "does not include disclaimer footer" do
         pdf = PdfGeneratorService.generate_unit_report(unit)
@@ -128,13 +122,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
     end
 
     context "when UNIT_REPORTS_UNBRANDED is disabled" do
-      around do |example|
-        original_config = Rails.configuration.units
-        config = UnitsConfig.new(badges_enabled: false, reports_unbranded: false, pdf_filename_prefix: "")
-        Rails.configuration.units = config
-        example.run
-        Rails.configuration.units = original_config
-      end
+      around { |example| with_unit_badges_disabled(&example) }
 
       it "includes disclaimer footer" do
         pdf = PdfGeneratorService.generate_unit_report(unit)
