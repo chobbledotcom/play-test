@@ -1,22 +1,23 @@
 <%
-  form_url = @text_replacement.persisted? ?
-    admin_text_replacement_path(@text_replacement) :
+  text_replacement = local_assigns[:text_replacement] || @text_replacement
+  available_keys = local_assigns[:available_keys] || @available_keys
+
+  form_url = text_replacement.persisted? ?
+    admin_text_replacement_path(text_replacement) :
     admin_text_replacements_path
+
+  select_options = available_keys.map { |key| [key, key] }
 %>
 <%= render 'chobble_forms/form_context',
-  model: @text_replacement,
+  model: text_replacement,
   i18n_base: 'forms.admin_text_replacements',
   url: form_url do |form| %>
   <%= render 'chobble_forms/fieldset', legend_key: 'replacement_details' do %>
-    <label for="text_replacement_i18n_key">
-      <%= t('forms.admin_text_replacements.fields.i18n_key') %>
-    </label>
-    <%= form.select(
-      :i18n_key,
-      options_for_select(@available_keys, @text_replacement.i18n_key),
-      { include_blank: "Select an i18n key..." },
-      { required: true }
-    ) %>
+    <%= render 'chobble_forms/select',
+        field: :i18n_key,
+        options: select_options,
+        combobox: true,
+        required: true %>
 
     <%= render 'chobble_forms/text_area', field: :value, required: true, rows: 4 %>
   <% end %>
