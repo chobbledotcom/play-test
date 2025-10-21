@@ -9,24 +9,15 @@ RSpec.describe "Unit Badges Security", type: :request do
   let(:badge_batch) { create(:badge_batch, count: 1) }
   let(:badge) { create(:badge, badge_batch: badge_batch) }
 
-  define_method(:set_units_config) do |badges_enabled:, unbranded: false|
-    config = UnitsConfig.new(
-      badges_enabled: badges_enabled,
-      reports_unbranded: unbranded,
-      pdf_filename_prefix: ""
-    )
-    Rails.configuration.units = config
-  end
-
   describe "POST /inspections with unit_id parameter" do
     context "when UNIT_BADGES is enabled" do
       before do
-        set_units_config(badges_enabled: true)
+        enable_unit_badges
         login_as(user_b)
       end
 
       after do
-        set_units_config(badges_enabled: false)
+        disable_unit_badges
       end
 
       it "allows creating inspection for another user's unit" do
@@ -62,7 +53,7 @@ RSpec.describe "Unit Badges Security", type: :request do
 
     context "when UNIT_BADGES is disabled" do
       before do
-        set_units_config(badges_enabled: false)
+        disable_unit_badges
         login_as(user_b)
       end
 
@@ -139,7 +130,7 @@ RSpec.describe "Unit Badges Security", type: :request do
 
   describe "security boundary enforcement" do
     before do
-      set_units_config(badges_enabled: false)
+      disable_unit_badges
       login_as(user_b)
     end
 
@@ -195,12 +186,12 @@ RSpec.describe "Unit Badges Security", type: :request do
   describe "PATCH /inspections/:id with unit_id update" do
     context "when UNIT_BADGES is enabled" do
       before do
-        set_units_config(badges_enabled: true)
+        enable_unit_badges
         login_as(user_b)
       end
 
       after do
-        set_units_config(badges_enabled: false)
+        disable_unit_badges
       end
 
       it "allows updating inspection to use another user's unit" do
@@ -245,7 +236,7 @@ RSpec.describe "Unit Badges Security", type: :request do
 
     context "when UNIT_BADGES is disabled" do
       before do
-        set_units_config(badges_enabled: false)
+        disable_unit_badges
         login_as(user_b)
       end
 
@@ -300,7 +291,7 @@ RSpec.describe "Unit Badges Security", type: :request do
 
   describe "edge cases and attack vectors" do
     before do
-      set_units_config(badges_enabled: false)
+      disable_unit_badges
       login_as(user_b)
     end
 
