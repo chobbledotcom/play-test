@@ -5,10 +5,11 @@ module UnitsConfigHelpers
   # Use with around hook to temporarily enable unit badges
   # Example:
   #   around { |example| with_unit_badges_enabled(&example) }
-  def with_unit_badges_enabled(unbranded: false, &block)
+  #   around { |example| with_unit_badges_enabled(unbranded: true, &example) }
+  def with_unit_badges_enabled(unbranded: false)
     previous_config = Rails.configuration.units
     set_units_config(badges_enabled: true, unbranded: unbranded)
-    block.call
+    yield
   ensure
     Rails.configuration.units = previous_config
   end
@@ -16,10 +17,10 @@ module UnitsConfigHelpers
   # Use with around hook to temporarily disable unit badges
   # Example:
   #   around { |example| with_unit_badges_disabled(&example) }
-  def with_unit_badges_disabled(&block)
+  def with_unit_badges_disabled
     previous_config = Rails.configuration.units
     set_units_config(badges_enabled: false)
-    block.call
+    yield
   ensure
     Rails.configuration.units = previous_config
   end

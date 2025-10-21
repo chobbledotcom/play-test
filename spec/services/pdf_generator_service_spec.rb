@@ -101,7 +101,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
     end
 
     context "when UNIT_REPORTS_UNBRANDED is enabled" do
-      around { |example| with_unit_badges_enabled(unbranded: true) }
+      around { |example| with_unit_badges_enabled(unbranded: true, &example) }
 
       it "does not include disclaimer footer" do
         pdf = PdfGeneratorService.generate_unit_report(unit)
