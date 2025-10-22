@@ -1,9 +1,11 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 # Shared concern for defining which fields should be excluded from public output
 # Used by both PDF generation and JSON serialization to ensure consistency
 module PublicFieldFiltering
+  extend T::Sig
+  extend T::Helpers
   extend ActiveSupport::Concern
   include ColumnNameSyms
 
@@ -35,11 +37,15 @@ module PublicFieldFiltering
   ].freeze
 
   class_methods do
+    extend T::Sig
+
+    sig { returns(T::Array[Symbol]) }
     def public_fields
       column_name_syms - EXCLUDED_FIELDS
     end
 
-    def excluded_fields_for_assessment(_klass_name)
+    sig { params(klass_name: T.untyped).returns(T::Array[Symbol]) }
+    def excluded_fields_for_assessment(klass_name)
       EXCLUDED_FIELDS
     end
   end
