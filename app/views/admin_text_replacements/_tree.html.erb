@@ -10,17 +10,15 @@
       <strong><%= key %></strong>
       <% if subtree.is_a?(Hash) %>
         <% if subtree.key?(:_value) %>
-          <div>
-            <%= t('admin_text_replacements.tree.value', value: subtree[:_value]) %>
-            <%= link_to t('admin_text_replacements.buttons.edit'), edit_admin_text_replacement_path(subtree[:_id]) %>
-            <%= button_to(
-              admin_text_replacement_path(subtree[:_id]),
-              method: :delete,
-              data: { turbo_confirm: "Are you sure?" }
-            ) do %>
-              <%= t('admin_text_replacements.buttons.delete') %>
-            <% end %>
-          </div>
+          <%= t('admin_text_replacements.tree.value', value: subtree[:_value]) %>
+          <%= link_to t('admin_text_replacements.buttons.edit'), edit_admin_text_replacement_path(subtree[:_id]) %>
+          <%= button_to(
+            admin_text_replacement_path(subtree[:_id]),
+            method: :delete,
+            data: { turbo_confirm: "Are you sure?" }
+          ) do %>
+            <%= t('admin_text_replacements.buttons.delete') %>
+          <% end %>
         <% end %>
         <% if subtree.except(:_value, :_id).any? %>
           <%= render 'tree', tree: subtree.except(:_value, :_id), parent_key: full_key %>
