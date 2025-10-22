@@ -37,8 +37,6 @@
 /config/master.key
 /config/credentials/*
 
-# Ignore site-specific i18n overrides
-/config/site_overrides.yml
 .direnv
 .gems
 

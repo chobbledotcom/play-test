@@ -96,14 +96,19 @@ module PlayTest
     config.litestream_config = LitestreamConfig.from_env(ENV.to_h)
 
     # I18n Configuration
-    default_overrides = Rails.root.join("config/site_overrides.yml").to_s
-    overrides_env_key = "I18N_OVERRIDES_PATH"
-    config.i18n_overrides_path = ENV.fetch(overrides_env_key, default_overrides)
+    # Text replacements are loaded from the database after initialization
+    config.after_initialize do
+      Rails.application.reloader.to_prepare do
+        next unless ActiveRecord::Base.connection.table_exists?(:text_replacements)
 
-    # Add site-specific i18n overrides
-    config.before_initialize do
-      override_path = config.i18n_overrides_path
-      config.i18n.load_path << override_path if File.exist?(override_path)
+        TextReplacement.all.each do |replacement|
+          keys = replacement.i18n_key.split(".")
+          locale = keys.shift
+          nested_hash = keys.reverse.reduce(replacement.value) { |acc, key| { key => acc } }
+
+          I18n.backend.store_translations(locale.to_sym, nested_hash)
+        end
+      end
     end
 
     # Use the application to handle all exceptions (including 404s)

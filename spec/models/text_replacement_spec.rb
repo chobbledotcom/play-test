@@ -1,3 +1,5 @@
+# typed: false
+
 # == Schema Information
 #
 # Table name: text_replacements
@@ -58,10 +60,10 @@ RSpec.describe TextReplacement, type: :model do
     end
 
     it "handles multiple replacements in the same namespace" do
-      r1 = create(:text_replacement,
+      create(:text_replacement,
         i18n_key: "en.forms.test.fields.name",
         value: "Name")
-      r2 = create(:text_replacement,
+      create(:text_replacement,
         i18n_key: "en.forms.test.fields.email",
         value: "Email")
 
@@ -80,6 +82,47 @@ RSpec.describe TextReplacement, type: :model do
       expect(replacement).to be_persisted
       expect(replacement.i18n_key).to eq("en.forms.test.submit")
       expect(replacement.value).to eq("Submit Form")
+    end
+  end
+
+  describe "i18n integration" do
+    after do
+      I18n.backend.reload!
+    end
+
+    it "overrides i18n translations after creation" do
+      original_value = I18n.t("admin_text_replacements.title")
+      expect(original_value).to eq("Text Replacements")
+
+      create(:text_replacement,
+        i18n_key: "en.admin_text_replacements.title",
+        value: "Custom Replacements")
+
+      expect(I18n.t("admin_text_replacements.title")).to eq("Custom Replacements")
+    end
+
+    it "removes override when replacement is destroyed" do
+      replacement = create(:text_replacement,
+        i18n_key: "en.admin_text_replacements.title",
+        value: "Custom Replacements")
+
+      expect(I18n.t("admin_text_replacements.title")).to eq("Custom Replacements")
+
+      replacement.destroy
+
+      expect(I18n.t("admin_text_replacements.title")).to eq("Text Replacements")
+    end
+
+    it "updates i18n when replacement value changes" do
+      replacement = create(:text_replacement,
+        i18n_key: "en.admin_text_replacements.title",
+        value: "Custom Replacements")
+
+      expect(I18n.t("admin_text_replacements.title")).to eq("Custom Replacements")
+
+      replacement.update(value: "Updated Replacements")
+
+      expect(I18n.t("admin_text_replacements.title")).to eq("Updated Replacements")
     end
   end
 end

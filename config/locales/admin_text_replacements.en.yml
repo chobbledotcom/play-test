@@ -1,7 +1,7 @@
 en:
   admin_text_replacements:
     title: Text Replacements
-    description: Override i18n translations for site-specific customisation
+    description: Override i18n translations for site-specific customisation. Changes take effect immediately without restart.
     index:
       title: Text Replacements
       empty: No text replacements configured
