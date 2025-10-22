@@ -1,14 +1,24 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class JsonDateTransformer < Blueprinter::Transformer
+  extend T::Sig
+
   # ISO 8601 date format for JSON API responses
   API_DATE_FORMAT = "%Y-%m-%d"
 
+  sig do
+    params(
+      hash: T::Hash[T.untyped, T.untyped],
+      _object: T.untyped,
+      _options: T.untyped
+    ).returns(T.untyped)
+  end
   def transform(hash, _object, _options)
     transform_value(hash)
   end
 
+  sig { params(value: T.untyped).returns(T.untyped) }
   def transform_value(value)
     case value
     when Hash

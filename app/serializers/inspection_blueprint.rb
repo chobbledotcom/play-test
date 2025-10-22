@@ -1,8 +1,11 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class InspectionBlueprint < Blueprinter::Base
+  extend T::Sig
+
   # Define public fields dynamically to avoid database access at load time
+  sig { returns(T.nilable(T::Boolean)) }
   def self.define_public_fields
     return if @fields_defined
 
@@ -22,6 +25,7 @@ class InspectionBlueprint < Blueprinter::Base
   end
 
   # Override render to ensure fields are defined
+  sig { params(object: T.untyped, options: T::Hash[T.untyped, T.untyped]).returns(String) }
   def self.render(object, options = {})
     define_public_fields
     super

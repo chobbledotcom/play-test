@@ -1,10 +1,13 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class S3BackupService
+  extend T::Sig
+
   include S3Helpers
   include S3BackupOperations
 
+  sig { returns(T::Hash[Symbol, T.untyped]) }
   def perform
     ensure_s3_enabled
     validate_s3_config

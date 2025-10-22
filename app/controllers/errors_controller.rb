@@ -1,10 +1,13 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class ErrorsController < ApplicationController
+  extend T::Sig
+
   skip_before_action :require_login
   skip_before_action :update_last_active_at
 
+  sig { void }
   def not_found
     capture_exception_for_sentry
 
@@ -18,6 +21,7 @@ class ErrorsController < ApplicationController
     end
   end
 
+  sig { void }
   def internal_server_error
     capture_exception_for_sentry
 
@@ -33,6 +37,7 @@ class ErrorsController < ApplicationController
 
   private
 
+  sig { void }
   def capture_exception_for_sentry
     return unless Rails.env.production?
 
