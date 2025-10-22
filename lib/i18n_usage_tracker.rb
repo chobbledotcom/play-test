@@ -18,6 +18,10 @@ module I18nUsageTracker
       @used_keys = Set.new
     end
 
+    def load_tracked_keys(keys_array)
+      keys_array.each { |key| @used_keys << key }
+    end
+
     def track_key(key, options = {})
       return unless tracking_enabled && key
 
@@ -98,11 +102,10 @@ module I18nUsageTracker
   @tracking_enabled = false
 
   at_exit do
-    return unless ENV["I18N_TRACKING_ENABLED"] == "true"
-    return unless used_keys.any?
-
-    results_path = Rails.root.join("tmp/i18n_tracking_results.json")
-    results_path.write(used_keys.to_a.to_json)
+    if ENV["I18N_TRACKING_ENABLED"] == "true" && used_keys.any?
+      results_path = Rails.root.join("tmp/i18n_tracking_results.json")
+      results_path.write(used_keys.to_a.to_json)
+    end
   end
 end
 

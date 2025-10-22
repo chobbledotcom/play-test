@@ -10,12 +10,13 @@ namespace :locale do
     puts "Running test suite..."
     success = system("bin/rspec --format progress")
 
-    # Read tracking results from saved file
     results_file = Rails.root.join("tmp/i18n_tracking_results.json")
     if File.exist?(results_file)
       used_keys = JSON.parse(File.read(results_file))
-      I18nUsageTracker.instance_variable_set(:@used_keys, Set.new(used_keys))
-      File.delete(results_file) # Clean up
+      I18nUsageTracker.load_tracked_keys(used_keys)
+      File.delete(results_file)
+    else
+      puts "Warning: No tracking results file found!"
     end
 
     # Generate report
@@ -63,12 +64,13 @@ namespace :locale do
     puts "Running test suite (this may take a while)..."
     system("bin/rspec --format progress > /dev/null 2>&1")
 
-    # Read tracking results from saved file
     results_file = Rails.root.join("tmp/i18n_tracking_results.json")
     if File.exist?(results_file)
       used_keys = JSON.parse(File.read(results_file))
-      I18nUsageTracker.instance_variable_set(:@used_keys, Set.new(used_keys))
-      File.delete(results_file) # Clean up
+      I18nUsageTracker.load_tracked_keys(used_keys)
+      File.delete(results_file)
+    else
+      puts "Warning: No tracking results file found!"
     end
 
     # Generate report
