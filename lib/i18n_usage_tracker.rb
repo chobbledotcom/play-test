@@ -16,6 +16,7 @@ module I18nUsageTracker
 
     def reset!
       @used_keys = Set.new
+      @tracking_enabled = false
     end
 
     def load_tracked_keys(keys_array)
@@ -40,7 +41,7 @@ module I18nUsageTracker
         locale_files.each do |file|
           yaml_content = YAML.load_file(file)
           yaml_content.each do |_locale, content|
-            extract_keys(content, [], keys)
+            extract_keys_from_hash(content, [], keys)
           end
         end
 
@@ -87,13 +88,13 @@ module I18nUsageTracker
       track_key_and_parents(full_key)
     end
 
-    def extract_keys(hash, current_path, keys)
+    def extract_keys_from_hash(hash, current_path, keys)
       hash.each do |key, value|
         new_path = current_path + [key.to_s]
         full_key = new_path.join(".")
         keys << full_key
 
-        extract_keys(value, new_path, keys) if value.is_a?(Hash)
+        extract_keys_from_hash(value, new_path, keys) if value.is_a?(Hash)
       end
     end
   end
