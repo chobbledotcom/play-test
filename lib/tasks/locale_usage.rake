@@ -7,9 +7,8 @@ namespace :locale do
     # Enable tracking by setting environment variable
     ENV["I18N_TRACKING_ENABLED"] = "true"
 
-    # Run the test suite
     puts "Running test suite..."
-    success = system("bundle exec rspec --format progress")
+    success = system("bin/rspec --format progress")
 
     # Read tracking results from saved file
     results_file = Rails.root.join("tmp/i18n_tracking_results.json")
@@ -61,9 +60,8 @@ namespace :locale do
     # Enable tracking by setting environment variable
     ENV["I18N_TRACKING_ENABLED"] = "true"
 
-    # Run tests quietly
     puts "Running test suite (this may take a while)..."
-    system("bundle exec rspec --format progress > /dev/null 2>&1")
+    system("bin/rspec --format progress > /dev/null 2>&1")
 
     # Read tracking results from saved file
     results_file = Rails.root.join("tmp/i18n_tracking_results.json")
@@ -103,9 +101,8 @@ namespace :locale do
     I18nUsageTracker.reset!
     I18nUsageTracker.tracking_enabled = true
 
-    # Run tests quietly
     puts "Running test suite..."
-    system("bundle exec rspec --format progress > /dev/null 2>&1")
+    system("bin/rspec --format progress > /dev/null 2>&1")
 
     # Disable tracking
     I18nUsageTracker.tracking_enabled = false

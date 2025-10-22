@@ -98,10 +98,11 @@ module I18nUsageTracker
   @tracking_enabled = false
 
   at_exit do
-    if tracking_enabled && used_keys.any?
-      results_path = Rails.root.join("tmp/i18n_tracking_results.json")
-      results_path.write(used_keys.to_a.to_json)
-    end
+    return unless ENV["I18N_TRACKING_ENABLED"] == "true"
+    return unless used_keys.any?
+
+    results_path = Rails.root.join("tmp/i18n_tracking_results.json")
+    results_path.write(used_keys.to_a.to_json)
   end
 end
 
