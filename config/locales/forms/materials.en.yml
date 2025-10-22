@@ -3,14 +3,6 @@ en:
   forms:
     materials:
       header: Materials
-      summary:
-        title: Materials Assessment Summary
-        critical_materials: Critical Materials Check
-        additional_materials: Additional Materials Check
-        rope_specifications: Rope Specifications Check
-        overall_materials: Overall Materials Assessment
-        test_requirements: Test Requirements
-        non_critical_issues: Non-Critical Issues
       sections:
         materials_assessment: Materials Assessment
       fields:
@@ -22,10 +14,5 @@ en:
         thread: Thread
         fabric_strength: Fabric strength
         fire_retardant: Fire retardent
-      status:
-        checks_passed: Fields completed
-        completion: Assessment Completion
       submit: Save Assessment
       submit_continue: Save & Continue
-      errors:
-        header: 'Please fix the following errors:'
