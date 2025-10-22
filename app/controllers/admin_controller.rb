@@ -1,13 +1,17 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 class AdminController < ApplicationController
+  extend T::Sig
+
   before_action :require_admin
 
+  sig { void }
   def index
     @show_backups = Rails.configuration.s3.enabled
   end
 
+  sig { void }
   def releases
     @releases = Rails.cache.fetch("github_releases", expires_in: 1.hour) do
       fetch_github_releases
@@ -18,6 +22,7 @@ class AdminController < ApplicationController
     flash.now[:error] = t("admin.releases.fetch_error")
   end
 
+  sig { void }
   def files
     @blobs = ActiveStorage::Blob
       .where.not(id: ActiveStorage::VariantRecord.select(:blob_id))
@@ -27,11 +32,13 @@ class AdminController < ApplicationController
 
   private
 
+  sig { returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def fetch_github_releases
     response = make_github_api_request
     parse_github_response(response)
   end
 
+  sig { returns(Net::HTTPResponse) }
   def make_github_api_request
     require "net/http"
 
@@ -48,6 +55,7 @@ class AdminController < ApplicationController
     http.request(request)
   end
 
+  sig { params(response: Net::HTTPResponse).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
   def parse_github_response(response)
     require "json"
 
@@ -60,6 +68,7 @@ class AdminController < ApplicationController
     end
   end
 
+  sig { params(release: T::Hash[String, T.untyped]).returns(T::Hash[Symbol, T.untyped]) }
   def format_release(release)
     {
       name: release["name"],
@@ -72,6 +81,7 @@ class AdminController < ApplicationController
     }
   end
 
+  sig { params(body: T.nilable(String)).returns(T.nilable(String)) }
   def process_release_body(body)
     return nil if body.blank?
 
@@ -87,6 +97,7 @@ class AdminController < ApplicationController
     convert_markdown_to_html(processed_body)
   end
 
+  sig { params(text: String).returns(String) }
   def convert_markdown_to_html(text)
     # Remove headers (they duplicate version info)
     html = text.gsub(/^### .+$/, "")
@@ -104,11 +115,13 @@ class AdminController < ApplicationController
     wrap_paragraphs(html)
   end
 
+  sig { params(text: String).returns(String) }
   def convert_bullet_points(text)
     html = text.gsub(/^- (.+)$/, '<li>\1</li>')
     html.gsub(/(<li>.*<\/li>)/m) { |match| "<ul>#{match}</ul>" }
   end
 
+  sig { params(text: String).returns(String) }
   def wrap_paragraphs(text)
     text.split("\n\n").map do |paragraph|
       next if paragraph.strip.empty?

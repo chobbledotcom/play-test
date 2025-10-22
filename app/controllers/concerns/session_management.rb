@@ -1,11 +1,14 @@
-# typed: false
+# typed: strict
 # frozen_string_literal: true
 
 module SessionManagement
+  extend T::Sig
+  extend T::Helpers
   extend ActiveSupport::Concern
 
   private
 
+  sig { params(user: User).returns(UserSession) }
   def establish_user_session(user)
     user_session = user.user_sessions.create!(
       ip_address: request.remote_ip,
@@ -19,6 +22,7 @@ module SessionManagement
     user_session
   end
 
+  sig { void }
   def terminate_current_session
     return unless session[:session_token]
 
