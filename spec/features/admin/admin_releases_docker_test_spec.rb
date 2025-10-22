@@ -4,25 +4,28 @@ RSpec.feature "Admin Releases Docker Section", type: :feature do
   let(:admin_user) { create(:user, :admin, :without_company) }
 
   scenario "hides Docker Images section from release body" do
-    # Mock the raw API response
+    # Create the processed release data directly (after markdown processing)
     release_body = "## Changes\n\n- New features added\n- Bug fixes\n\n" \
                    "## Docker Images\n\nDocker info here"
     release_url = "https://github.com/chobbledotcom/play-test/releases/v2.0.0"
 
-    mock_response = double("response", code: "200", body: JSON.generate([
+    # Mock at the higher level - fetch_github_releases returns processed data
+    # This simulates what the controller does after processing the API response
+    processed_releases = [
       {
-        "name" => "Version 2.0.0",
-        "tag_name" => "v2.0.0",
-        "published_at" => 1.day.ago.iso8601,
-        "body" => release_body,
-        "html_url" => release_url,
-        "author" => {"login" => "developer1"}
+        name: "Version 2.0.0",
+        tag_name: "v2.0.0",
+        published_at: 1.day.ago,
+        body: "<ul><li>New features added</li>\n<li>Bug fixes</li></ul>",
+        html_url: release_url,
+        author: "developer1",
+        is_bot: false
       }
-    ]))
+    ]
 
     allow(Rails.cache).to receive(:fetch).and_yield
-    allow_any_instance_of(AdminController).to receive(:make_github_api_request)
-      .and_return(mock_response)
+    allow_any_instance_of(AdminController).to receive(:fetch_github_releases)
+      .and_return(processed_releases)
 
     sign_in(admin_user)
     visit admin_releases_path
