@@ -1,6 +1,6 @@
 ---
 name: rdoc
-version: 6.14.2
+version: 6.15.0
 type: bundler
 summary: RDoc produces HTML and command-line documentation for Ruby projects
 homepage: https://ruby.github.io/rdoc
@@ -67,14 +67,11 @@ licenses:
        IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
        WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
        PURPOSE.
-- sources: README.rdoc
+- sources: README.md
   text: |-
-    RDoc is Copyright (c) 2001-2003 Dave Thomas, The Pragmatic Programmers.
-    Portions (c) 2007-2011 Eric Hodel.  Portions copyright others, see individual
-    files and LEGAL.rdoc for details.
+    RDoc is Copyright (c) 2001-2003 Dave Thomas, The Pragmatic Programmers. Portions (c) 2007-2011 Eric Hodel.  Portions copyright others, see individual files and LEGAL.rdoc for details.
 
-    RDoc is free software, and may be redistributed under the terms specified in
-    LICENSE.rdoc.
+    RDoc is free software, and may be redistributed under the terms specified in LICENSE.rdoc.
 notices:
 - sources: LEGAL.rdoc
   text: |-

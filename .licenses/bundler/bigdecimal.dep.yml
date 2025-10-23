@@ -1,6 +1,6 @@
 ---
 name: bigdecimal
-version: 3.2.2
+version: 3.3.1
 type: bundler
 summary: Arbitrary-precision decimal floating-point number library.
 homepage: https://github.com/ruby/bigdecimal

@@ -1,6 +1,6 @@
 ---
 name: pp
-version: 0.6.2
+version: 0.6.3
 type: bundler
 summary: Provides a PrettyPrinter for Ruby objects
 homepage: https://github.com/ruby/pp

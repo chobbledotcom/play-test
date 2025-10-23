@@ -1,6 +1,6 @@
 {
-  "generated_at": "2025-10-13T03:06:54",
-  "total_dependencies": 148,
+  "generated_at": "2025-10-20T03:12:27",
+  "total_dependencies": 150,
   "dependencies": [
     {
       "name": "actioncable",
@@ -95,7 +95,7 @@
     },
     {
       "name": "annotaterb",
-      "version": "4.18.0",
+      "version": "4.19.0",
       "license": "other",
       "homepage": "https://github.com/drwl/annotaterb",
       "summary": "A gem for generating annotations for Rails projects."
@@ -109,28 +109,28 @@
     },
     {
       "name": "aws-partitions",
-      "version": "1.1142.0",
+      "version": "1.1174.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "Provides information about AWS partitions, regions, and services."
     },
     {
       "name": "aws-sdk-core",
-      "version": "3.229.0",
+      "version": "3.233.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - Core"
     },
     {
       "name": "aws-sdk-kms",
-      "version": "1.110.0",
+      "version": "1.114.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - KMS"
     },
     {
       "name": "aws-sdk-s3",
-      "version": "1.196.1",
+      "version": "1.200.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - Amazon S3"
@@ -165,7 +165,7 @@
     },
     {
       "name": "bigdecimal",
-      "version": "3.2.2",
+      "version": "3.3.1",
       "license": "other",
       "homepage": "https://github.com/ruby/bigdecimal",
       "summary": "Arbitrary-precision decimal floating-point number library."
@@ -207,7 +207,7 @@
     },
     {
       "name": "chobble-forms",
-      "version": "0.7.2",
+      "version": "0.8.1",
       "license": "other",
       "homepage": "https://github.com/chobbledotcom/chobble-forms",
       "summary": "Semantic Rails forms with strict i18n"
@@ -235,7 +235,7 @@
     },
     {
       "name": "connection_pool",
-      "version": "2.5.3",
+      "version": "2.5.4",
       "license": "mit",
       "homepage": "https://github.com/mperham/connection_pool",
       "summary": "Generic connection pool for Ruby"
@@ -305,7 +305,7 @@
     },
     {
       "name": "erb",
-      "version": "5.0.2",
+      "version": "5.1.1",
       "license": "other",
       "homepage": "https://github.com/ruby/erb",
       "summary": "An easy to use but powerful templating system for Ruby."
@@ -430,6 +430,13 @@
       "summary": "A Ruby Gem to detect open source project licenses"
     },
     {
+      "name": "litestream",
+      "version": "0.14.0",
+      "license": "other",
+      "homepage": "https://github.com/fractaledmind/litestream-ruby",
+      "summary": "Integrate Litestream with the RubyGems infrastructure."
+    },
+    {
       "name": "logger",
       "version": "1.7.0",
       "license": "other",
@@ -480,7 +487,7 @@
     },
     {
       "name": "minitest",
-      "version": "5.25.5",
+      "version": "5.26.0",
       "license": "mit",
       "homepage": "https://github.com/minitest/minitest",
       "summary": "minitest provides a complete suite of testing facilities supporting TDD, BDD, mocking, and benchmarking"
@@ -536,7 +543,7 @@
     },
     {
       "name": "nokogiri",
-      "version": "1.18.9",
+      "version": "1.18.10",
       "license": "other",
       "homepage": "https://nokogiri.org",
       "summary": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby."
@@ -585,7 +592,7 @@
     },
     {
       "name": "pp",
-      "version": "0.6.2",
+      "version": "0.6.3",
       "license": "other",
       "homepage": "https://github.com/ruby/pp",
       "summary": "Provides a PrettyPrinter for Ruby objects"
@@ -627,7 +634,7 @@
     },
     {
       "name": "puma",
-      "version": "6.6.1",
+      "version": "7.1.0",
       "license": "bsd-3-clause",
       "homepage": "https://puma.io",
       "summary": "A Ruby/Rack web server built for parallelism."
@@ -648,7 +655,7 @@
     },
     {
       "name": "rack",
-      "version": "3.2.0",
+      "version": "3.2.3",
       "license": "mit",
       "homepage": "https://github.com/rack/rack",
       "summary": "A modular Ruby webserver interface."
@@ -718,7 +725,7 @@
     },
     {
       "name": "rdoc",
-      "version": "6.14.2",
+      "version": "6.15.0",
       "license": "other",
       "homepage": "https://ruby.github.io/rdoc",
       "summary": "RDoc produces HTML and command-line documentation for Ruby projects"
@@ -739,7 +746,7 @@
     },
     {
       "name": "rexml",
-      "version": "3.4.1",
+      "version": "3.4.2",
       "license": "bsd-2-clause",
       "homepage": "https://github.com/ruby/rexml",
       "summary": "An XML toolkit for Ruby"
@@ -844,16 +851,16 @@
     },
     {
       "name": "sentry-rails",
-      "version": "5.26.0",
+      "version": "5.28.0",
       "license": "mit",
-      "homepage": "https://github.com/getsentry/sentry-ruby/tree/5.26.0/sentry-rails",
+      "homepage": "https://github.com/getsentry/sentry-ruby/tree/5.28.0/sentry-rails",
       "summary": "A gem that provides Rails integration for the Sentry error logger"
     },
     {
       "name": "sentry-ruby",
-      "version": "5.26.0",
+      "version": "5.28.0",
       "license": "mit",
-      "homepage": "https://github.com/getsentry/sentry-ruby/tree/5.26.0/sentry-ruby",
+      "homepage": "https://github.com/getsentry/sentry-ruby/tree/5.28.0/sentry-ruby",
       "summary": "A gem that provides a client interface for the Sentry error logger"
     },
     {
@@ -969,6 +976,13 @@
       "summary": "TPM Key Attestation verifier"
     },
     {
+      "name": "tsort",
+      "version": "0.2.0",
+      "license": "other",
+      "homepage": "https://github.com/ruby/tsort",
+      "summary": "Topological sorting using Tarjan's algorithm"
+    },
+    {
       "name": "ttfunk",
       "version": "1.8.0",
       "license": "other",
@@ -991,7 +1005,7 @@
     },
     {
       "name": "uri",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "license": "other",
       "homepage": "https://github.com/ruby/uri",
       "summary": "URI is a module providing classes to handle Uniform Resource Identifiers"

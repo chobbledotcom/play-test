@@ -1,6 +1,6 @@
 ---
 name: annotaterb
-version: 4.18.0
+version: 4.19.0
 type: bundler
 summary: A gem for generating annotations for Rails projects.
 homepage: https://github.com/drwl/annotaterb
