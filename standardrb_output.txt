@@ -34,5 +34,10 @@ Supported parameters are:
   - Enabled
 standard: Use Ruby Standard Style (https://github.com/standardrb/standard)
   app/controllers/units_controller.rb:219:12: Rails/Blank: Use `if id_param.blank?` instead of `unless id_param.present?`.
-  db/migrate/20251012131023_create_badges.rb:7:16: Rails/DangerousColumnNames: Avoid dangerous column names.
-standard: Run `standardrb --fix-unsafely` to DANGEROUSLY fix one problem.
+  config/application.rb:104:29: Rails/FindEach: Use `find_each` instead of `each`.
+  spec/lib/litestream_spec.rb:44:17: Rails/RootPathnameMethods: `Rails.root` is a `Pathname`, so you can use `Rails.root.join("config/initializers/litestream.rb").read`.
+  spec/lib/litestream_spec.rb:56:17: Rails/RootPathnameMethods: `Rails.root` is a `Pathname`, so you can use `Rails.root.join("config/puma.rb").read`.
+  spec/lib/litestream_spec.rb:66:17: Rails/RootPathnameMethods: `Rails.root` is a `Pathname`, so you can use `Rails.root.join("bin/docker-entrypoint").read`.
+  spec/lib/litestream_spec.rb:78:17: Rails/RootPathnameMethods: `Rails.root` is a `Pathname`, so you can use `Rails.root.join(".env.example").read`.
+  spec/lib/litestream_spec.rb:89:17: Rails/RootPathnameMethods: `Rails.root` is a `Pathname`, so you can use `Rails.root.join("config/database.yml").read`.
+standard: Run `standardrb --fix-unsafely` to DANGEROUSLY fix 7 problems.

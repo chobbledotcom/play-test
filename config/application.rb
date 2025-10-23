@@ -104,7 +104,7 @@ module PlayTest
         TextReplacement.all.each do |replacement|
           keys = replacement.i18n_key.split(".")
           locale = keys.shift
-          nested_hash = keys.reverse.reduce(replacement.value) { |acc, key| { key => acc } }
+          nested_hash = keys.reverse.reduce(replacement.value) { |acc, key| {key => acc} }
 
           I18n.backend.store_translations(locale.to_sym, nested_hash)
         end
