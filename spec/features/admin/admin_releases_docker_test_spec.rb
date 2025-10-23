@@ -5,8 +5,6 @@ RSpec.feature "Admin Releases Docker Section", type: :feature do
 
   scenario "hides Docker Images section from release body" do
     # Create the processed release data directly (after markdown processing)
-    release_body = "## Changes\n\n- New features added\n- Bug fixes\n\n" \
-                   "## Docker Images\n\nDocker info here"
     release_url = "https://github.com/chobbledotcom/play-test/releases/v2.0.0"
 
     # Mock at the higher level - fetch_github_releases returns processed data

@@ -128,6 +128,7 @@
 #              rails_direct_uploads POST   /rails/active_storage/direct_uploads(.:format)                                                    active_storage/direct_uploads#create
 
 # typed: false
+
 Rails.application.routes.draw do
   # Mount Mission Control Jobs (authentication handled by initializer)
   # Only mount if available (not in test environment)

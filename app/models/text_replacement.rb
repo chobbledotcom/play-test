@@ -79,7 +79,7 @@ class TextReplacement < ApplicationRecord
     if destroyed?
       I18n.backend.reload!
     else
-      nested_hash = keys.reverse.reduce(value) { |acc, key| { key => acc } }
+      nested_hash = keys.reverse.reduce(value) { |acc, key| {key => acc} }
       I18n.backend.store_translations(locale.to_sym, nested_hash)
     end
   end
