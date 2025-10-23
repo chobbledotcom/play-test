@@ -10,6 +10,7 @@
 %>
 <%= render 'chobble_forms/form_context',
   model: text_replacement,
+  autocomplete: false,
   i18n_base: 'forms.admin_text_replacements',
   url: form_url do |form| %>
   <%= render 'chobble_forms/fieldset', legend_key: 'replacement_details' do %>

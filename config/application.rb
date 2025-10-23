@@ -95,22 +95,6 @@ module PlayTest
     # because litestream gem uses config.litestream for its own settings
     config.litestream_config = LitestreamConfig.from_env(ENV.to_h)
 
-    # I18n Configuration
-    # Text replacements are loaded from the database after initialization
-    config.after_initialize do
-      Rails.application.reloader.to_prepare do
-        next unless ActiveRecord::Base.connection.table_exists?(:text_replacements)
-
-        TextReplacement.all.each do |replacement|
-          keys = replacement.i18n_key.split(".")
-          locale = keys.shift
-          nested_hash = keys.reverse.reduce(replacement.value) { |acc, key| {key => acc} }
-
-          I18n.backend.store_translations(locale.to_sym, nested_hash)
-        end
-      end
-    end
-
     # Use the application to handle all exceptions (including 404s)
     config.exceptions_app = routes
   end

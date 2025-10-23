@@ -19,7 +19,7 @@ class TextReplacement < ApplicationRecord
   validates :i18n_key, presence: true, uniqueness: true
   validates :value, presence: true
 
-  after_commit :reload_i18n_translation
+  after_commit :reload_i18n_cache
 
   # Returns all i18n keys available in the application
   sig { returns(T::Array[String]) }
@@ -72,15 +72,7 @@ class TextReplacement < ApplicationRecord
   private
 
   sig { void }
-  def reload_i18n_translation
-    keys = i18n_key.split(".")
-    locale = keys.shift
-
-    if destroyed?
-      I18n.backend.reload!
-    else
-      nested_hash = keys.reverse.reduce(value) { |acc, key| {key => acc} }
-      I18n.backend.store_translations(locale.to_sym, nested_hash)
-    end
+  def reload_i18n_cache
+    DatabaseI18nBackend.reload_cache if defined?(DatabaseI18nBackend)
   end
 end

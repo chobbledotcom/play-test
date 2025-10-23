@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Admin Text Replacements", type: :feature do
@@ -63,14 +65,16 @@ RSpec.feature "Admin Text Replacements", type: :feature do
         value: "Test Value")
 
       visit admin_text_replacements_path
-
       expect(page).to have_content("Test Value")
+
+      click_link I18n.t("admin_text_replacements.buttons.edit")
 
       accept_confirm do
         click_button I18n.t("admin_text_replacements.buttons.delete")
       end
 
       expect(page).to have_content(I18n.t("admin_text_replacements.messages.destroyed"))
+      expect(page).to have_current_path(admin_text_replacements_path)
       expect(page).not_to have_content("Test Value")
     end
 

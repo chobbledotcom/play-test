@@ -12,6 +12,7 @@ en:
       created: Text replacement created successfully
       updated: Text replacement updated successfully
       destroyed: Text replacement deleted successfully
+      delete_confirm: Are you sure you want to delete this text replacement?
     buttons:
       delete: Delete
       edit: Edit

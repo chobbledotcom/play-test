@@ -7,7 +7,13 @@
 <% end %>
 
 <% if @text_replacements.any? %>
-  <%= render 'tree', tree: @tree %>
+  <div style="
+    text-align: left;
+    max-width: 500px;
+    margin: 2rem auto;
+  ">
+    <%= render 'tree', tree: @tree %>
+  </div>
 <% else %>
   <p><%= t('admin_text_replacements.index.empty') %></p>
 <% end %>

@@ -1,3 +1,9 @@
 <%= render 'shared/page_header', title: t('forms.admin_text_replacements.header') %>
 
 <%= render 'form' %>
+
+<%= button_to t('admin_text_replacements.buttons.delete'),
+  admin_text_replacement_path(@text_replacement),
+  class: "danger",
+  method: :delete,
+  data: { turbo_confirm: t('admin_text_replacements.messages.delete_confirm') } %>

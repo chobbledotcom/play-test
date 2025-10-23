@@ -5,22 +5,21 @@
 
 <ul>
   <% tree_local.each do |key, subtree| %>
-    <% full_key = parent_key.present? ? "#{parent_key}.#{key}" : key %>
     <li>
       <strong><%= key %></strong>
       <% if subtree.is_a?(Hash) %>
-        <% if subtree.key?(:_value) %>
-          <%= t('admin_text_replacements.tree.value', value: subtree[:_value]) %>
-          <%= link_to t('admin_text_replacements.buttons.edit'), edit_admin_text_replacement_path(subtree[:_id]) %>
-          <%= button_to(
-            admin_text_replacement_path(subtree[:_id]),
-            method: :delete,
-            data: { turbo_confirm: "Are you sure?" }
-          ) do %>
-            <%= t('admin_text_replacements.buttons.delete') %>
-          <% end %>
+        <% if subtree[:_value] %>
+          <ul>
+            <li>
+              <%= t('admin_text_replacements.tree.value', value: subtree[:_value]) %>
+              <%= link_to t('admin_text_replacements.buttons.edit'),
+                edit_admin_text_replacement_path(subtree[:_id])
+              %>
+            </li>
+          </ul>
         <% end %>
         <% if subtree.except(:_value, :_id).any? %>
+          <% full_key = parent_key.present? ? "#{parent_key}.#{key}" : key %>
           <%= render 'tree', tree: subtree.except(:_value, :_id), parent_key: full_key %>
         <% end %>
       <% end %>
