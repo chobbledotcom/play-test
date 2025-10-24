@@ -32,17 +32,3 @@ dbs:
         retention-check-interval: 1h
         # Snapshot interval
         snapshot-interval: 24h
-
-  - path: storage/production_queue.sqlite3
-    replicas:
-      - type: s3
-        bucket: ${LITESTREAM_S3_BUCKET}
-        path: production_queue.sqlite3
-        endpoint: ${LITESTREAM_S3_ENDPOINT}
-        region: ${LITESTREAM_S3_REGION}
-        access-key-id: ${LITESTREAM_ACCESS_KEY_ID}
-        secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}
-        sync-interval: 10s
-        retention: 168h
-        retention-check-interval: 1h
-        snapshot-interval: 24h

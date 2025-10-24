@@ -41,7 +41,7 @@ RSpec.describe "Litestream Configuration" do
 
   describe "initializer" do
     it "configures litestream gem from typed config when enabled" do
-      content = File.read(Rails.root.join("config/initializers/litestream.rb"))
+      content = Rails.root.join("config/initializers/litestream.rb").read
 
       expect(content).to include("Rails.configuration.litestream_config")
       expect(content).to include("return unless")
@@ -53,7 +53,7 @@ RSpec.describe "Litestream Configuration" do
 
   describe "Puma plugin integration" do
     it "loads Litestream plugin except in test environment" do
-      content = File.read(Rails.root.join("config/puma.rb"))
+      content = Rails.root.join("config/puma.rb").read
 
       expect(content).to include("plugin :litestream")
       expect(content).to include("LITESTREAM_ENABLED")
@@ -63,7 +63,7 @@ RSpec.describe "Litestream Configuration" do
 
   describe "docker entrypoint" do
     it "restores databases from S3 on startup when enabled" do
-      content = File.read(Rails.root.join("bin/docker-entrypoint"))
+      content = Rails.root.join("bin/docker-entrypoint").read
 
       expect(content).to include("LITESTREAM_ENABLED")
       expect(content).to include("litestream restore")
@@ -75,7 +75,7 @@ RSpec.describe "Litestream Configuration" do
 
   describe "environment variables" do
     it "documents all Litestream configuration in .env.example" do
-      content = File.read(Rails.root.join(".env.example"))
+      content = Rails.root.join(".env.example").read
 
       expect(content).to include("LITESTREAM_ENABLED")
       expect(content).to include("LITESTREAM_S3_BUCKET")
@@ -86,7 +86,7 @@ RSpec.describe "Litestream Configuration" do
 
   describe "database configuration" do
     it "enables WAL mode for Litestream compatibility" do
-      content = File.read(Rails.root.join("config/database.yml"))
+      content = Rails.root.join("config/database.yml").read
 
       expect(content).to include("journal_mode: wal")
     end

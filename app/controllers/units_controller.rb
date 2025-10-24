@@ -216,7 +216,7 @@ class UnitsController < ApplicationController
     return unless unit_badges_enabled?
 
     id_param = (action_name == "new") ? params[:id] : params.dig(:unit, :id)
-    return unless id_param.present?
+    return if id_param.blank?
 
     normalized_id = normalize_unit_id(id_param)
 
