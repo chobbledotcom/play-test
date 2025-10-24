@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.feature "Inspection Unit Selection", type: :feature do
   include InspectionTestHelpers
+
   let(:user) { create(:user) }
   let!(:unit1) { create(:unit, user: user, name: "Bouncy Castle 1", serial: "BC001", manufacturer: "Acme", operator: "John Doe", description: "Large bouncy castle") }
   let!(:unit2) { create(:unit, user: user, name: "Bouncy Castle 2", serial: "BC002", manufacturer: "Beta Corp") }

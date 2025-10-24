@@ -274,7 +274,7 @@ class CodeStandardsChecker
   end
 
   def extract_method_name(stripped)
-    stripped.match(/def\s+([^\s\(]+)/)[1]
+    stripped.match(/def\s+([^\s(]+)/)[1]
   end
 
   def build_method_info(method_name, start_line, end_line, file_path)

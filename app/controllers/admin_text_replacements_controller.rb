@@ -62,15 +62,15 @@ class AdminTextReplacementsController < ApplicationController
   def i18n_value
     key = params[:key]
     if key.blank?
-      render json: { value: "" }, status: :ok
+      render json: {value: ""}, status: :ok
       return
     end
 
     i18n_key = key.sub(/^en\./, "")
     value = I18n.t(i18n_key)
-    render json: { value: value.to_s }
+    render json: {value: value.to_s}
   rescue I18n::MissingTranslationData
-    render json: { value: "" }, status: :ok
+    render json: {value: ""}, status: :ok
   end
 
   private
