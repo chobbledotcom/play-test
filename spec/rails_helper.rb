@@ -4,13 +4,16 @@ require "spec_helper"
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 
-abort("The Rails environment is running in production mode!") if Rails.env.production?
+if Rails.env.production?
+  abort("The Rails environment is running in production mode!")
+end
 
 require "rspec/rails"
 require "factory_bot_rails"
 require "capybara/rspec"
 require "database_cleaner/active_record"
 require "aws-sdk-s3"
+require "active_storage/service/s3_service"
 require_relative "../lib/i18n_usage_tracker"
 
 Capybara.raise_server_errors = true
@@ -36,7 +39,8 @@ ActiveStorage::Current.url_options = {
 }
 RSpec.configure do |config|
   config.before(:each) do
-    Rails.configuration.admin_emails_pattern = "^admin\\d*(_[a-f0-9]+)?@example\\.com$"
+    admin_pattern = "^admin\\d*(_[a-f0-9]+)?@example\\.com$"
+    Rails.configuration.admin_emails_pattern = admin_pattern
     DatabaseCleaner.strategy = :transaction
   end
 
