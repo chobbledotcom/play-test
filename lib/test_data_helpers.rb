@@ -4,6 +4,7 @@
 # Used by both factories and seeds for non-critical test data generation
 module TestDataHelpers
   extend T::Sig
+
   # Generate realistic UK mobile numbers (07xxx xxx xxx - 11 digits)
   sig { returns(String) }
   def self.british_phone_number

@@ -4,6 +4,7 @@ require "rails_helper"
 
 RSpec.feature "Assessment Access Control", type: :feature do
   include InspectionTestHelpers
+
   let(:user1) { create(:user) }
   let(:user2) { create(:user) }
   let(:unit1) { create(:unit, user: user1) }
