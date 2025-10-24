@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe "Safety Standards Comprehensive Tests" do
   include SafetyStandardsTestHelpers
+
   shared_context "calculation parameters" do
     let(:valid_anchor_params) { {length: 5.0, width: 5.0, height: 3.0} }
     let(:invalid_anchor_params) { {length: 0, width: 0, height: 0} }
