@@ -1,9 +1,13 @@
 # typed: false
 # frozen_string_literal: true
 
-# This module provides field mappings for assessments
-# Used by both seeds and tests to ensure consistency
 module SeedData
+  PASS = "Pass"
+  FAIL = "Fail"
+  GOOD = "Good"
+  WEAR = "Wear"
+  OK = "OK"
+
   def self.check_passed?(inspection_passed)
     return true if inspection_passed
 
@@ -28,12 +32,12 @@ module SeedData
 
   def self.unit_fields
     {
-      name: "Bouncy Castle #{%w[Mega Super Fun Party Adventure].sample} #{SecureRandom.hex(4)}",
+      name: "Castle #{SecureRandom.hex(4)}",
       serial: "BC-#{Date.current.year}-#{SecureRandom.hex(4).upcase}",
-      manufacturer: ["ABC Inflatables", "XYZ Bounce Co", "Fun Factory", "Party Products Ltd"].sample,
-      operator: ["Rental Company #{SecureRandom.hex(2)}", "Party Hire #{SecureRandom.hex(2)}", "Events Ltd #{SecureRandom.hex(2)}"].sample,
+      manufacturer: "Test Mfg",
+      operator: "Test Op",
       manufacture_date: Date.current - rand(365..1825).days,
-      description: "Commercial grade inflatable bouncy castle suitable for events"
+      description: "Test unit"
     }
   end
 
@@ -52,7 +56,7 @@ module SeedData
   def self.results_fields(passed: true)
     {
       passed: passed,
-      risk_assessment: "Low risk - all safety features functional and tested"
+      risk_assessment: PASS
     }
   end
 
@@ -68,7 +72,7 @@ module SeedData
       pull_strength_pass: check_passed?(passed)
     }
 
-    fields[:anchor_type_comment] = "Some wear visible on anchor points" unless passed
+    fields[:anchor_type_comment] = WEAR unless passed
 
     fields
   end
@@ -113,13 +117,13 @@ module SeedData
       users_at_1200mm: rand(2..8),
       users_at_1500mm: rand(4..10),
       users_at_1800mm: rand(2..6),
-      custom_user_height_comment: "Sample custom height comments",
+      custom_user_height_comment: OK,
       play_area_length: rand(3.0..10.0).round(1),
       play_area_width: rand(3.0..8.0).round(1),
       negative_adjustment: rand(0..2.0).round(1),
-      containing_wall_height_comment: "Measured from base to top of wall",
-      play_area_length_comment: "Effective play area after deducting obstacles",
-      play_area_width_comment: "Width measured at narrowest point"
+      containing_wall_height_comment: OK,
+      play_area_length_comment: OK,
+      play_area_width_comment: OK
     }
   end
 
@@ -146,16 +150,8 @@ module SeedData
       exit_number: rand(1..3),
       exit_number_pass: check_passed?(passed),
       exit_sign_always_visible_pass: check_passed?(passed),
-      exit_number_comment: if passed
-                             "Number of exits compliant with unit size"
-                           else
-                             "Additional exit required"
-                           end,
-      exit_sign_always_visible_comment: if passed
-                                          "Exit signs visible from all points"
-                                        else
-                                          "Exit signs obscured from some angles"
-                                        end
+      exit_number_comment: passed ? PASS : FAIL,
+      exit_sign_always_visible_comment: passed ? PASS : FAIL
     }
   end
 
@@ -192,28 +188,27 @@ module SeedData
 
   def self.structure_comments(passed)
     {
-      seam_integrity_comment: passed ? "All seams in good condition" : "Minor thread loosening noted",
-      stitch_length_comment: "Measured at regular intervals",
-      platform_height_comment: "Platform height acceptable for age group"
+      seam_integrity_comment: passed ? GOOD : WEAR,
+      stitch_length_comment: OK,
+      platform_height_comment: OK
     }
   end
 
   def self.materials_comments(passed)
-    if passed
-      {fabric_strength_comment: "Fabric in good condition"}
-    else
-      {ropes_comment: "Rope shows signs of wear", fabric_strength_comment: "Minor surface wear noted"}
-    end
+    passed ? {fabric_strength_comment: GOOD} : {
+      ropes_comment: WEAR,
+      fabric_strength_comment: WEAR
+    }
   end
 
   def self.fan_comments(passed)
-    expiry_date = (Date.current + 6.months).strftime("%B %Y")
+    expiry = (Date.current + 6.months).strftime("%B %Y")
     {
-      fan_size_type: passed ? "Fan operating correctly at optimal pressure" : "Fan requires servicing",
-      blower_flap_comment: passed ? "Flap mechanism functioning correctly" : "Flap sticking occasionally",
-      blower_finger_comment: passed ? "Guard secure, no finger trap hazards" : "Guard needs tightening",
-      blower_visual_comment: passed ? "Visual inspection satisfactory" : "Some wear visible on housing",
-      pat_comment: passed ? "PAT test valid until #{expiry_date}" : "PAT test overdue"
+      fan_size_type: passed ? PASS : FAIL,
+      blower_flap_comment: passed ? PASS : FAIL,
+      blower_finger_comment: passed ? PASS : FAIL,
+      blower_visual_comment: passed ? PASS : FAIL,
+      pat_comment: passed ? "Valid #{expiry}" : "Overdue"
     }
   end
 
@@ -227,11 +222,11 @@ module SeedData
 
   def self.slide_comments(passed)
     {
-      slide_platform_height_comment: passed ? "Platform height compliant with EN 14960:2019" : "Platform height exceeds recommended limits",
-      slide_wall_height_comment: "Wall height measured from slide bed",
-      runout_comment: passed ? "Runout area clear and adequate" : "Runout area needs extending",
-      clamber_netting_comment: passed ? "Netting secure with no gaps" : "Some gaps in netting need attention",
-      slip_sheet_comment: passed ? "Slip sheet in good condition" : "Slip sheet showing wear"
+      slide_platform_height_comment: passed ? PASS : FAIL,
+      slide_wall_height_comment: OK,
+      runout_comment: passed ? PASS : FAIL,
+      clamber_netting_comment: passed ? PASS : FAIL,
+      slip_sheet_comment: passed ? GOOD : WEAR
     }
   end
 end
