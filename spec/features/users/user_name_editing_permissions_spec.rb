@@ -4,6 +4,7 @@ require "rails_helper"
 
 RSpec.feature "User Name Editing Permissions", type: :feature do
   include InspectionTestHelpers
+
   let(:admin_user) { create(:user, :admin, :without_company) }
   let(:regular_user) { create(:user, :without_company, email: "user@example.com", name: "Original Name") }
   let!(:inspector_company) { create(:inspector_company, active: true) }

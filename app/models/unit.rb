@@ -32,6 +32,7 @@
 #
 class Unit < ApplicationRecord
   extend T::Sig
+
   self.table_name = "units"
   include CustomIdGenerator
 

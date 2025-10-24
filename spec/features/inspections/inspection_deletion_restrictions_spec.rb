@@ -4,6 +4,7 @@ require "rails_helper"
 
 RSpec.feature "Inspection Deletion Security", type: :feature do
   include InspectionTestHelpers
+
   let(:user) { create(:user) }
 
   before { sign_in(user) }
