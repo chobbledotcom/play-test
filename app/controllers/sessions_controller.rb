@@ -3,6 +3,7 @@
 
 class SessionsController < ApplicationController
   include SessionManagement
+
   skip_before_action :require_login,
     only: [:new, :create, :destroy, :passkey, :passkey_callback]
   before_action :require_logged_out,

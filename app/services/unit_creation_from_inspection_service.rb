@@ -3,6 +3,7 @@
 
 class UnitCreationFromInspectionService
   extend T::Sig
+
   sig { returns(T::Array[String]) }
   attr_reader :errors
 

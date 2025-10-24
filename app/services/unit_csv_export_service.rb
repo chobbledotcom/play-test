@@ -3,6 +3,7 @@
 
 class UnitCsvExportService
   extend T::Sig
+
   ATTRIBUTES = %w[id name manufacturer serial].freeze
 
   sig { params(units: ActiveRecord::Relation).void }

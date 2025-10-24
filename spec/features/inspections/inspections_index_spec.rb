@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.feature "Inspections Index Page", type: :feature do
   include InspectionTestHelpers
+
   let(:inspector_company) { create(:inspector_company) }
   let(:user) { create(:user, inspection_company: inspector_company) }
   let(:unit) { create(:unit, user: user) }
