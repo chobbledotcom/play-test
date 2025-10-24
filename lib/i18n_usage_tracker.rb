@@ -134,26 +134,25 @@ module I18n
   end
 end
 
-if defined?(ActionView::Helpers::TranslationHelper)
-  module ActionView::Helpers::TranslationHelper
-    alias_method :original_t, :t
-    alias_method :original_translate, :translate
+# Monkey-patch ActionView::Helpers::TranslationHelper to track i18n usage
+module ActionView::Helpers::TranslationHelper
+  alias_method :original_t, :t
+  alias_method :original_translate, :translate
 
-    def t(key, **options)
-      track_usage(key, options)
-      original_t(key, **options)
-    end
+  def t(key, **options)
+    track_usage(key, options)
+    original_t(key, **options)
+  end
 
-    def translate(key, **options)
-      track_usage(key, options)
-      original_translate(key, **options)
-    end
+  def translate(key, **options)
+    track_usage(key, options)
+    original_translate(key, **options)
+  end
 
-    private
+  private
 
-    def track_usage(key, options)
-      return unless I18nUsageTracker.tracking_enabled
-      I18nUsageTracker.track_key(key, options)
-    end
+  def track_usage(key, options)
+    return unless I18nUsageTracker.tracking_enabled
+    I18nUsageTracker.track_key(key, options)
   end
 end

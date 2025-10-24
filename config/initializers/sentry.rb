@@ -15,7 +15,7 @@ Sentry.init do |config|
   config.send_default_pii = false
 
   config.before_send = lambda do |event, hint|
-    if defined?(Current) && Current.user
+    if Current.user
       event.user = {
         id: Current.user.id,
         email: Current.user.email

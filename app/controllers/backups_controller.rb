@@ -34,11 +34,9 @@ class BackupsController < ApplicationController
   def get_s3_service
     service = ActiveStorage::Blob.service
 
-    # Only check S3Service class if it's loaded (production/S3 environments)
-    if defined?(ActiveStorage::Service::S3Service)
-      unless service.is_a?(ActiveStorage::Service::S3Service)
-        raise t("backups.errors.s3_not_configured")
-      end
+    # Verify we're using S3 storage (already checked s3.enabled in before_action)
+    unless service.is_a?(ActiveStorage::Service::S3Service)
+      raise t("backups.errors.s3_not_configured")
     end
 
     service
