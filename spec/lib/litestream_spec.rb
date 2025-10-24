@@ -14,7 +14,6 @@ RSpec.describe "Litestream Configuration" do
 
       db_paths = config["dbs"].map { |db| db["path"] }
       expect(db_paths).to include("storage/production.sqlite3")
-      expect(db_paths).to include("storage/production_queue.sqlite3")
       expect(db_paths).to include("storage/development.sqlite3")
     end
 
@@ -35,7 +34,7 @@ RSpec.describe "Litestream Configuration" do
       expect(Rails.configuration.litestream_config).to be_a(LitestreamConfig)
 
       config = Rails.configuration.litestream_config
-      expect(config.enabled).to be_in([true, false])
+      expect(config.enabled).to be_in([ true, false ])
     end
   end
 
@@ -68,7 +67,6 @@ RSpec.describe "Litestream Configuration" do
       expect(content).to include("LITESTREAM_ENABLED")
       expect(content).to include("litestream restore")
       expect(content).to include("production.sqlite3")
-      expect(content).to include("production_queue.sqlite3")
       expect(content).not_to include("litestream replicate")
     end
   end

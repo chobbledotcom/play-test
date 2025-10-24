@@ -20,16 +20,6 @@ if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
     else
       echo "Production database already exists locally."
     fi
-
-    # Restore production queue database if it doesn't exist
-    if [ ! -f "storage/production_queue.sqlite3" ]; then
-      echo "Production queue database not found locally. Attempting to restore from S3..."
-      bundle exec litestream restore -config config/litestream.yml storage/production_queue.sqlite3 || {
-        echo "No backup found in S3 or restore failed. Will create new database."
-      }
-    else
-      echo "Production queue database already exists locally."
-    fi
   fi
 
   ./bin/rails db:prepare
