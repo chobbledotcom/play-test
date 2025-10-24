@@ -4,6 +4,7 @@ require "rails_helper"
 
 RSpec.feature "User Height Assessment", type: :feature do
   include InspectionTestHelpers
+
   let(:user) { create(:user) }
   let(:unit) { create(:unit, user: user) }
   let(:inspection) { create(:inspection, user: user, unit: unit) }

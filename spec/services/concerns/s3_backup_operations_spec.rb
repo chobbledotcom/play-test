@@ -7,6 +7,7 @@ RSpec.describe S3BackupOperations do
   let(:test_class) do
     Class.new do
       include S3BackupOperations
+
       public :backup_dir, :backup_retention_days, :temp_dir,
         :database_path, :create_tar_gz, :cleanup_old_backups
     end
