@@ -218,6 +218,9 @@ GEM
     jwt (2.10.2)
       base64
     language_server-protocol (3.17.0.5)
+    libsql_activerecord (0.0.2)
+      activerecord (~> 8.0)
+      turso_libsql (~> 0.2)
     licensed (5.0.4)
       csv (~> 3.3)
       json (~> 2.6)
@@ -560,6 +563,8 @@ GEM
     turbo-rails (2.0.13)
       actionpack (>= 7.1.0)
       railties (>= 7.1.0)
+    turso_libsql (0.2.1)
+      ffi (~> 1.17)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.2.0)
@@ -612,6 +617,7 @@ DEPENDENCIES
   factory_bot_rails
   image_processing (~> 1.12)
   importmap-rails (~> 2.1)
+  libsql_activerecord
   licensed (~> 5.0)
   litestream
   mission_control-jobs (~> 1.0)

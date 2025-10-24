@@ -18,8 +18,10 @@ default: &default
     mmap_size: 134217728
     journal_size_limit: 67108864
 development:
-  <<: *default
-  database: storage/development.sqlite3
+  adapter: libsql
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  url: <%= ENV['DATABASE_URL'] %>
+  auth_token: <%= ENV['DATABASE_ACCESS_TOKEN'] %>
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.

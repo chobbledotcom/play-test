@@ -11,6 +11,8 @@ gem "sprockets-rails"
 gem "sass-rails", "~> 6.0"
 # Use sqlite3 as the database for Active Record
 gem "sqlite3", ">= 1.4"
+# Use libsql for Turso database support
+gem "libsql_activerecord"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Using in-memory queue for background processing
