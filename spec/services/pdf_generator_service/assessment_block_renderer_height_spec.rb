@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe PdfGeneratorService::AssessmentBlockRenderer do
@@ -36,7 +38,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockRenderer do
       let(:column_width) { 120 } # Same as COLUMN_WIDTH
       let(:font_size) { 7 }
 
-      def test_text_height(text, description)
+      define_method(:test_text_height) do |text, description|
         box = Prawn::Text::Box.new(
           text,
           document: pdf,

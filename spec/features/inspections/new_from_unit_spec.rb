@@ -9,12 +9,12 @@ RSpec.feature "Creating inspection from unit search", type: :feature do
     sign_in(user)
   end
 
-  def search_for_unit(unit_id)
+  define_method(:search_for_unit) do |unit_id|
     fill_in I18n.t("forms.unit_search.fields.search"), with: unit_id
     click_button I18n.t("forms.unit_search.submit")
   end
 
-  def expect_unit_found(unit)
+  define_method(:expect_unit_found) do |unit|
     expect(page).to have_content(unit.name)
     expect(page).to have_button(I18n.t("inspections.buttons.create_inspection_for_unit"))
   end

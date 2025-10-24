@@ -65,7 +65,7 @@ RSpec.feature "Inspection UI and Accessibility", type: :feature do
 
   private
 
-  def within_fieldset(i18n_key, &block)
+  define_method(:within_fieldset) do |i18n_key, &block|
     within("fieldset", text: I18n.t(i18n_key), &block)
   end
 end

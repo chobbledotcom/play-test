@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Inspections Index Page", type: :feature do
@@ -7,7 +9,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
   let(:user) { create(:user, inspection_company: inspector_company) }
   let(:unit) { create(:unit, user: user) }
 
-  def create_user_inspection(attributes = {})
+  define_method(:create_user_inspection) do |attributes = {}|
     defaults = {
       user: user,
       unit: unit,
@@ -16,7 +18,7 @@ RSpec.feature "Inspections Index Page", type: :feature do
     create(:inspection, defaults.merge(attributes))
   end
 
-  def create_other_user_inspection(other_user, other_unit, attributes = {})
+  define_method(:create_other_user_inspection) do |other_user, other_unit, attributes = {}|
     defaults = {
       user: other_user,
       unit: other_unit,

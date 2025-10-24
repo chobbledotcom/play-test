@@ -74,7 +74,7 @@ class Assessments::AnchorageAssessment < ApplicationRecord
 
   private
 
-  sig { returns(T.any(Object, NilClass)) }
+  sig { returns(T.nilable(Object)) }
   def anchorage_result
     @anchor_result ||= EN14960.calculate_anchors(
       length: inspection.length.to_f,

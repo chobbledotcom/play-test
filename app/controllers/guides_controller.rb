@@ -1,3 +1,5 @@
+# typed: false
+
 class GuidesController < ApplicationController
   skip_before_action :require_login
 

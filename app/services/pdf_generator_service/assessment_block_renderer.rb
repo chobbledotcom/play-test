@@ -1,3 +1,5 @@
+# typed: false
+
 class PdfGeneratorService
   class AssessmentBlockRenderer
     include Configuration

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 # This module provides field mappings for assessments

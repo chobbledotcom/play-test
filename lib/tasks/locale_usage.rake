@@ -1,3 +1,5 @@
+# typed: false
+
 namespace :locale do
   desc "Run tests and track locale key usage"
   task track_usage: :environment do

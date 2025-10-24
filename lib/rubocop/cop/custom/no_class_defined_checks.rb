@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 module RuboCop
@@ -33,7 +34,7 @@ module RuboCop
 
         # Pattern to detect constant references (classes/modules)
         # Constants start with uppercase letter
-        CONSTANT_PATTERN = /\A[A-Z]/.freeze
+        CONSTANT_PATTERN = /\A[A-Z]/
 
         def on_defined?(node)
           return unless node.arguments.any?

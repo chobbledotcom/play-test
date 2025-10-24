@@ -54,8 +54,8 @@ class Event < ApplicationRecord
       action: String,
       resource: ActiveRecord::Base,
       details: T.nilable(String),
-      changed_data: T.nilable(T::Hash[String, T.any(String, Integer, T::Boolean, NilClass)]),
-      metadata: T.nilable(T::Hash[String, T.any(String, Integer, T::Boolean, NilClass)])
+      changed_data: T.nilable(T::Hash[String, T.nilable(T.any(String, Integer, T::Boolean))]),
+      metadata: T.nilable(T::Hash[String, T.nilable(T.any(String, Integer, T::Boolean))])
     ).returns(Event)
   end
   def self.log(user:, action:, resource:, details: nil,
@@ -77,7 +77,7 @@ class Event < ApplicationRecord
       user: User,
       action: String,
       details: String,
-      metadata: T.nilable(T::Hash[String, T.any(String, Integer, T::Boolean, NilClass)])
+      metadata: T.nilable(T::Hash[String, T.nilable(T.any(String, Integer, T::Boolean))])
     ).returns(Event)
   end
   def self.log_system_event(user:, action:, details:, metadata: nil)

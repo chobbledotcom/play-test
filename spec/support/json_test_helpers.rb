@@ -1,3 +1,5 @@
+# typed: false
+
 module JsonTestHelpers
   # Fields that should never appear in JSON responses
   SENSITIVE_FIELDS = %w[

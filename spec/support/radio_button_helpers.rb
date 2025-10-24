@@ -1,3 +1,5 @@
+# typed: false
+
 module RadioButtonHelpers
   BOOLEANS_BY_FORM = {
     inspection: %i[has_slide is_totally_enclosed passed],

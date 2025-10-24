@@ -165,7 +165,7 @@ RSpec.feature "PDF Complete Integration", type: :feature do
 
   private
 
-  def get_expected_pdf_label(field_key, field_label, fields, _assessment_type)
+  define_method(:get_expected_pdf_label) do |field_key, field_label, fields, _assessment_type|
     base_field = field_key.to_s.sub(/_(pass|comment)$/, "")
 
     if field_key.to_s.end_with?("_pass")
@@ -176,7 +176,7 @@ RSpec.feature "PDF Complete Integration", type: :feature do
     field_label
   end
 
-  def extract_pdf_text(pdf_data)
+  define_method(:extract_pdf_text) do |pdf_data|
     reader = PDF::Reader.new(StringIO.new(pdf_data))
     reader.pages.map(&:text).join(" ")
   end

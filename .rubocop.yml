@@ -11,6 +11,9 @@ require:
 plugins:
   - rubocop-sorbet
 
+AllCops:
+  NewCops: enable
+
 # Enable custom cops
 Custom/TernaryLineBreaks:
   Enabled: true

@@ -1,3 +1,5 @@
+# typed: false
+
 module AssessmentHelpers
   # Helper method to get or apply traits to existing assessments created by inspection callbacks
   # This avoids uniqueness constraint violations when testing assessment behavior

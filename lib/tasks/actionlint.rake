@@ -1,3 +1,5 @@
+# typed: false
+
 namespace :actionlint do
   desc "Run actionlint to check GitHub Actions workflows"
   task :check do

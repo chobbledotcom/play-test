@@ -1,3 +1,5 @@
+# typed: false
+
 module GuideScreenshotHelpers
   GUIDE_SCREENSHOTS_ROOT = Rails.public_path.join("guide_screenshots")
 

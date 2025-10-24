@@ -34,7 +34,7 @@ RSpec.describe "Litestream Configuration" do
       expect(Rails.configuration.litestream_config).to be_a(LitestreamConfig)
 
       config = Rails.configuration.litestream_config
-      expect(config.enabled).to be_in([ true, false ])
+      expect(config.enabled).to be_in([true, false])
     end
   end
 

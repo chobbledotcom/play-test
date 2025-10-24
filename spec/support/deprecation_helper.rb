@@ -1,3 +1,5 @@
+# typed: false
+
 # Helper for printing detailed deprecation warnings in tests
 module DeprecationHelper
   def print_deprecation(message, trait_name: nil)

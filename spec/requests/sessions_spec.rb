@@ -134,8 +134,7 @@ RSpec.describe "Sessions", type: :request do
     let(:credential) { create(:credential, user: user, sign_count: 5) }
     let(:challenge) { SecureRandom.hex(32) }
 
-    def setup_passkey_session
-      # First call the passkey endpoint to set up the session
+    define_method(:setup_passkey_session) do
       get "/passkey_login", headers: {"Accept" => "application/json"}
       json_response = JSON.parse(response.body)
       json_response["challenge"]

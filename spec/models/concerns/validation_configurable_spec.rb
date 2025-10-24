@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe ValidationConfigurable do
@@ -5,13 +7,13 @@ RSpec.describe ValidationConfigurable do
     Class.new(ApplicationRecord) do
       self.table_name = "inspections"
 
-      def self.name
+      define_singleton_method(:name) do
         "TestModel"
       end
 
       include FormConfigurable
 
-      def self.test_fields
+      define_singleton_method(:test_fields) do
         [
           {
             partial: :text_field,
@@ -31,7 +33,7 @@ RSpec.describe ValidationConfigurable do
         ]
       end
 
-      def self.form_fields
+      define_singleton_method(:form_fields) do
         [{legend_i18n_key: "test_section", fields: test_fields}]
       end
 

@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "PDF API Endpoints", type: :request do
@@ -191,8 +193,7 @@ RSpec.describe "PDF API Endpoints", type: :request do
 
   private
 
-  def logout
-    # Clear authentication for public access tests
+  define_method(:logout) do
     reset_session if respond_to?(:reset_session)
   end
 end

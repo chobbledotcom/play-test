@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 # Federation configuration for searching across multiple sites

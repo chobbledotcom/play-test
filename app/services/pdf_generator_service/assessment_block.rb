@@ -1,3 +1,5 @@
+# typed: false
+
 class PdfGeneratorService
   class AssessmentBlock
     attr_reader :type, :pass_fail, :name, :value, :comment

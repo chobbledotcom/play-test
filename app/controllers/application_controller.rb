@@ -210,7 +210,7 @@ class ApplicationController < ActionController::Base
         %w[users create]
       ]
 
-      action = [ controller_name, action_name ]
+      action = [controller_name, action_name]
       return false if csrf_ignored_actions.include?(action)
     end
 

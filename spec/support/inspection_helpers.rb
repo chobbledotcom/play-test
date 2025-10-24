@@ -1,3 +1,5 @@
+# typed: false
+
 module InspectionHelpers
   include DeprecationHelper
 

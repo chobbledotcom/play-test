@@ -1,3 +1,5 @@
+# typed: false
+
 namespace :code_standards do
   desc "Check code standards violations (read-only)"
   task check: :environment do
@@ -11,7 +13,7 @@ namespace :code_standards do
       lib
     ]
 
-    def ruby_files_in(directory)
+    define_method(:ruby_files_in) do |directory|
       Dir.glob(Rails.root.join("#{directory}/**/*.rb").to_s)
     end
 

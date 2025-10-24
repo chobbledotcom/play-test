@@ -1,3 +1,5 @@
+# typed: false
+
 class PdfGeneratorService
   class AssessmentColumns
     # Include configuration for column spacing and font sizes

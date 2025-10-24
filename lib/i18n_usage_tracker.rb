@@ -1,3 +1,5 @@
+# typed: false
+
 module I18nUsageTracker
   SKIPPED_PREFIXES = %w[
     activemodel.

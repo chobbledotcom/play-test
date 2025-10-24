@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 class SentryTestJob < ApplicationJob
@@ -21,7 +22,9 @@ class SentryTestJob < ApplicationJob
       end
 
       Rails.logger.info "Sentry configuration:"
-      Rails.logger.info "  DSN: #{result[:configuration][:dsn_configured] ? "Configured" : "Not configured"}"
+      Rails.logger.info "  DSN: #{result[:configuration][:dsn_configured] ?
+        "Configured" :
+        "Not configured"}"
       Rails.logger.info "  Environment: #{result[:configuration][:environment]}"
       Rails.logger.info "  Enabled environments: #{result[:configuration][:enabled_environments].join(", ")}"
     end

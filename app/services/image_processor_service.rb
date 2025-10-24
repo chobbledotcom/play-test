@@ -1,3 +1,5 @@
+# typed: false
+
 class ImageProcessorService
   FULL_SIZE = 1200
   THUMBNAIL_SIZE = 200

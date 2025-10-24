@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Inspection Unit Selection", type: :feature do
@@ -174,27 +176,27 @@ RSpec.feature "Inspection Unit Selection", type: :feature do
 
   private
 
-  def select_unit_button(unit)
+  define_method(:select_unit_button) do |unit|
     within "li", text: unit.name do
       click_button I18n.t("units.actions.select")
     end
   end
 
-  def expect_unit_details(unit)
+  define_method(:expect_unit_details) do |unit|
     expect(page).to have_content(unit.name)
     expect(page).to have_content(unit.serial)
     expect(page).to have_content(unit.manufacturer)
   end
 
-  def expect_units_visible(*units)
+  define_method(:expect_units_visible) do |*units|
     units.each { |unit| expect(page).to have_content(unit.name) }
   end
 
-  def expect_units_not_visible(*units)
+  define_method(:expect_units_not_visible) do |*units|
     units.each { |unit| expect(page).not_to have_content(unit.name) }
   end
 
-  def create_complete_inspection
+  define_method(:create_complete_inspection) do
     create(:inspection, :completed, user: user, unit: unit1)
   end
 end
