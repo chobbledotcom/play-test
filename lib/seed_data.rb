@@ -8,6 +8,10 @@ module SeedData
   WEAR = "Wear"
   OK = "OK"
 
+  def self.pass_fail_fields(passed, *fields)
+    fields.to_h { |field| [field, passed ? PASS : FAIL] }
+  end
+
   def self.check_passed?(inspection_passed)
     return true if inspection_passed
 
@@ -149,10 +153,14 @@ module SeedData
     {
       exit_number: rand(1..3),
       exit_number_pass: check_passed?(passed),
-      exit_sign_always_visible_pass: check_passed?(passed),
-      exit_number_comment: passed ? PASS : FAIL,
-      exit_sign_always_visible_comment: passed ? PASS : FAIL
-    }
+      exit_sign_always_visible_pass: check_passed?(passed)
+    }.merge(
+      pass_fail_fields(
+        passed,
+        :exit_number_comment,
+        :exit_sign_always_visible_comment
+      )
+    )
   end
 
   def self.structure_pass_fields(passed)
@@ -203,13 +211,13 @@ module SeedData
 
   def self.fan_comments(passed)
     expiry = (Date.current + 6.months).strftime("%B %Y")
-    {
-      fan_size_type: passed ? PASS : FAIL,
-      blower_flap_comment: passed ? PASS : FAIL,
-      blower_finger_comment: passed ? PASS : FAIL,
-      blower_visual_comment: passed ? PASS : FAIL,
-      pat_comment: passed ? "Valid #{expiry}" : "Overdue"
-    }
+    pass_fail_fields(
+      passed,
+      :fan_size_type,
+      :blower_flap_comment,
+      :blower_finger_comment,
+      :blower_visual_comment
+    ).merge(pat_comment: passed ? "Valid #{expiry}" : "Overdue")
   end
 
   def self.calculate_slide_runout(required_runout, passed)
@@ -221,12 +229,14 @@ module SeedData
   end
 
   def self.slide_comments(passed)
-    {
-      slide_platform_height_comment: passed ? PASS : FAIL,
+    pass_fail_fields(
+      passed,
+      :slide_platform_height_comment,
+      :runout_comment,
+      :clamber_netting_comment
+    ).merge(
       slide_wall_height_comment: OK,
-      runout_comment: passed ? PASS : FAIL,
-      clamber_netting_comment: passed ? PASS : FAIL,
       slip_sheet_comment: passed ? GOOD : WEAR
-    }
+    )
   end
 end

@@ -126,8 +126,8 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       expect(comment_text).to eq([
         "Good fabric",
         "Too narrow",
-        "Measured at regular intervals",
-        "Platform height acceptable for age group"
+        SeedData::OK,
+        SeedData::OK
       ])
 
       # Should not have empty comments
