@@ -16,7 +16,11 @@ class PdfGeneratorService
     end
 
     def self.render_footer_in_bounding_box(pdf, user)
-      pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width, height: FOOTER_HEIGHT) do
+      pdf.bounding_box(
+        [0, pdf.cursor],
+        width: pdf.bounds.width,
+        height: FOOTER_HEIGHT
+      ) do
         pdf.move_down FOOTER_TOP_PADDING
         render_footer_content(pdf, user)
       end
@@ -85,9 +89,11 @@ class PdfGeneratorService
     end
 
     def self.render_disclaimer_header(pdf)
-      pdf.text I18n.t("pdf.disclaimer.header"),
+      pdf.text(
+        I18n.t("pdf.disclaimer.header"),
         size: DISCLAIMER_HEADER_SIZE,
         style: :bold
+      )
       pdf.stroke_horizontal_rule
     end
   end

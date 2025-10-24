@@ -23,14 +23,39 @@ class PdfGeneratorService
 
       attachment = unit.photo
       image = create_image(attachment)
-      photo_width, photo_height = calculate_footer_photo_dimensions(pdf, image, column_count)
+      dimensions = calculate_footer_photo_dimensions(pdf, image, column_count)
+      photo_width, photo_height = dimensions
 
+      position_and_render_photo(
+        pdf,
+        image,
+        photo_width,
+        photo_height,
+        attachment
+      )
+    rescue Prawn::Errors::UnsupportedImageType => e
+      raise ImageError.build_detailed_error(e, attachment)
+    end
+
+    def self.position_and_render_photo(
+      pdf,
+      image,
+      photo_width,
+      photo_height,
+      attachment
+    )
       photo_x = pdf.bounds.width - photo_width
       photo_y = calculate_photo_y(pdf, photo_height)
 
-      render_processed_image(pdf, image, photo_x, photo_y, photo_width, photo_height, attachment)
-    rescue Prawn::Errors::UnsupportedImageType => e
-      raise ImageError.build_detailed_error(e, attachment)
+      render_processed_image(
+        pdf,
+        image,
+        photo_x,
+        photo_y,
+        photo_width,
+        photo_height,
+        attachment
+      )
     end
 
     def self.measure_unit_photo_height(pdf, unit, column_count = 3)
@@ -58,7 +83,11 @@ class PdfGeneratorService
 
     def self.calculate_footer_photo_dimensions(pdf, image, column_count = 3)
       photo_width = calculate_column_width(pdf.bounds.width, column_count)
-      photo_height = calculate_photo_height(image.width, image.height, photo_width)
+      photo_height = calculate_photo_height(
+        image.width,
+        image.height,
+        photo_width
+      )
       [photo_width, photo_height]
     end
 
@@ -69,7 +98,11 @@ class PdfGeneratorService
       ((pdf_width - total_spacer_width) / column_count.to_f).round
     end
 
-    def self.calculate_photo_height(original_width, original_height, photo_width)
+    def self.calculate_photo_height(
+      original_width,
+      original_height,
+      photo_width
+    )
       return photo_width if original_width.zero? || original_height.zero?
 
       aspect_ratio = original_width.to_f / original_height.to_f

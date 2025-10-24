@@ -4,19 +4,51 @@
 class PdfGeneratorService
   include Configuration
 
-  def self.generate_inspection_report(inspection, debug_enabled: false, debug_queries: [])
+  def self.generate_inspection_report(
+    inspection,
+    debug_enabled: false,
+    debug_queries: []
+  )
     require "prawn/table"
 
     Prawn::Document.new(page_size: "A4", page_layout: :portrait) do |pdf|
-      Configuration.setup_pdf_fonts(pdf)
-      assessment_blocks = []
-
-      generate_inspection_header_and_sections(pdf, inspection, assessment_blocks)
-      footer_data = measure_and_render_footer_components(pdf, inspection)
-      render_assessment_blocks_in_columns(pdf, assessment_blocks, footer_data[:disclaimer], footer_data[:photo])
-
-      add_inspection_overlays_and_pages(pdf, inspection, debug_enabled, debug_queries)
+      generate_inspection_report_content(
+        pdf,
+        inspection,
+        debug_enabled,
+        debug_queries
+      )
     end
+  end
+
+  def self.generate_inspection_report_content(
+    pdf,
+    inspection,
+    debug_enabled,
+    debug_queries
+  )
+    Configuration.setup_pdf_fonts(pdf)
+    assessment_blocks = []
+
+    generate_inspection_header_and_sections(
+      pdf,
+      inspection,
+      assessment_blocks
+    )
+    footer_data = measure_and_render_footer_components(pdf, inspection)
+    render_assessment_blocks_in_columns(
+      pdf,
+      assessment_blocks,
+      footer_data[:disclaimer],
+      footer_data[:photo]
+    )
+
+    add_inspection_overlays_and_pages(
+      pdf,
+      inspection,
+      debug_enabled,
+      debug_queries
+    )
   end
 
   def self.generate_inspection_header_and_sections(pdf, inspection, assessment_blocks)

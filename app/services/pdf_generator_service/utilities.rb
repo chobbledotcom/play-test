@@ -16,7 +16,7 @@ class PdfGeneratorService
 
     def self.format_date(date)
       return I18n.t("pdf.inspection.fields.na") if date.nil?
-      date.strftime("%-d %B, %Y")
+      date.strftime(I18n.t("date.formats.pdf"))
     end
 
     def self.format_pass_fail(value)
@@ -66,7 +66,8 @@ class PdfGeneratorService
     end
 
     def self.render_watermark_text(pdf, x, y)
-      pdf.text_box I18n.t("pdf.inspection.watermark.draft"),
+      pdf.text_box(
+        I18n.t("pdf.inspection.watermark.draft"),
         at: [x, y],
         width: WATERMARK_WIDTH,
         height: WATERMARK_HEIGHT,
@@ -74,6 +75,7 @@ class PdfGeneratorService
         style: :bold,
         align: :center,
         valign: :top
+      )
     end
   end
 end
