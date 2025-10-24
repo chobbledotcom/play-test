@@ -87,6 +87,10 @@ RSpec.describe TextReplacement, type: :model do
   end
 
   describe "i18n integration" do
+    before do
+      I18n.backend.reload!
+    end
+
     after do
       I18n.backend.reload!
     end
