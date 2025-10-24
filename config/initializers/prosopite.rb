@@ -17,7 +17,8 @@ if Rails.env.local?
       solid_queue
     ]
 
-    Prosopite.custom_logger = if defined?(Sentry)
+    # Send Prosopite warnings to Sentry in production
+    Prosopite.custom_logger = if Rails.env.production?
       logger = Object.new
       logger.define_singleton_method(:warn) do |message|
         Rails.logger.warn(message)

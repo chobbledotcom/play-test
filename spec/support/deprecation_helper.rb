@@ -47,6 +47,4 @@ module DeprecationHelper
 end
 
 # Include in FactoryBot to make it available in factory definitions
-if defined?(FactoryBot)
-  FactoryBot::SyntaxRunner.include(DeprecationHelper)
-end
+FactoryBot::SyntaxRunner.include(DeprecationHelper)
