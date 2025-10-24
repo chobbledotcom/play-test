@@ -4,7 +4,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.2"
+gem "rails", "~> 8.1.0"
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 # SCSS/Sass support for Rails [https://github.com/rails/sass-rails]
@@ -136,7 +136,7 @@ end
 
 # Pinned for nixpkgs
 gem "psych", "= 5.2.3"
-gem "openssl", "= 3.3.0"
+gem "openssl", "3.3.1"
 
 # CI-only groups - excluded in development setup
 group :ci_annotations do
