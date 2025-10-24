@@ -1,0 +1,489 @@
+
+================================================================================
+CODE STANDARDS REPORT
+================================================================================
+LINE LENGTH VIOLATIONS (245):
+--------------------------------------------------
+/app/controllers/admin_controller.rb:58 Line 58: 91 chars (max 80)
+/app/controllers/admin_controller.rb:71 Line 71: 89 chars (max 80)
+/app/controllers/application_controller.rb:15 Line 15: 99 chars (max 80)
+/app/controllers/application_controller.rb:68 Line 68: 91 chars (max 80)
+/app/controllers/application_controller.rb:143 Line 143: 88 chars (max 80)
+/app/controllers/application_controller.rb:217 Line 217: 95 chars (max 80)
+/app/controllers/application_controller.rb:229 Line 229: 83 chars (max 80)
+/app/controllers/application_controller.rb:236 Line 236: 82 chars (max 80)
+/app/controllers/concerns/turbo_stream_responders.rb:10 Line 10: 155 chars (max 80)
+/app/controllers/concerns/turbo_stream_responders.rb:11 Line 11: 88 chars (max 80)
+/app/controllers/concerns/turbo_stream_responders.rb:29 Line 29: 199 chars (max 80)
+/app/controllers/concerns/turbo_stream_responders.rb:30 Line 30: 98 chars (max 80)
+/app/controllers/concerns/turbo_stream_responders.rb:49 Line 49: 119 chars (max 80)
+/app/controllers/guides_controller.rb:33 Line 33: 88 chars (max 80)
+/app/controllers/guides_controller.rb:34 Line 34: 105 chars (max 80)
+/app/controllers/guides_controller.rb:50 Line 50: 107 chars (max 80)
+/app/controllers/inspections_controller.rb:15 Line 15: 84 chars (max 80)
+/app/controllers/inspections_controller.rb:33 Line 33: 107 chars (max 80)
+/app/controllers/inspections_controller.rb:60 Line 60: 94 chars (max 80)
+/app/controllers/inspections_controller.rb:73 Line 73: 138 chars (max 80)
+/app/controllers/inspections_controller.rb:179 Line 179: 85 chars (max 80)
+/app/controllers/inspections_controller.rb:180 Line 180: 81 chars (max 80)
+/app/controllers/inspections_controller.rb:186 Line 186: 88 chars (max 80)
+/app/controllers/inspections_controller.rb:291 Line 291: 83 chars (max 80)
+/app/controllers/inspections_controller.rb:292 Line 292: 84 chars (max 80)
+/app/controllers/inspections_controller.rb:342 Line 342: 81 chars (max 80)
+/app/controllers/inspections_controller.rb:423 Line 423: 113 chars (max 80)
+/app/controllers/inspections_controller.rb:525 Line 525: 84 chars (max 80)
+/app/controllers/inspections_controller.rb:560 Line 560: 81 chars (max 80)
+/app/controllers/safety_standards_controller.rb:9 Line 9: 104 chars (max 80)
+/app/controllers/safety_standards_controller.rb:243 Line 243: 86 chars (max 80)
+/app/controllers/safety_standards_controller.rb:296 Line 296: 81 chars (max 80)
+/app/controllers/safety_standards_controller.rb:307 Line 307: 85 chars (max 80)
+/app/controllers/units_controller.rb:133 Line 133: 84 chars (max 80)
+/app/controllers/users_controller.rb:58 Line 58: 94 chars (max 80)
+/app/controllers/users_controller.rb:276 Line 276: 108 chars (max 80)
+/app/models/assessments/slide_assessment.rb:25 Line 25: 82 chars (max 80)
+/app/models/concerns/form_configurable.rb:11 Line 11: 87 chars (max 80)
+/app/models/concerns/validation_configurable.rb:71 Line 71: 94 chars (max 80)
+/app/models/event.rb:57 Line 57: 94 chars (max 80)
+/app/models/event.rb:58 Line 58: 89 chars (max 80)
+/app/models/event.rb:80 Line 80: 89 chars (max 80)
+/app/models/inspection.rb:188 Line 188: 122 chars (max 80)
+/app/models/inspection.rb:259 Line 259: 152 chars (max 80)
+/app/models/inspection.rb:279 Line 279: 84 chars (max 80)
+/app/models/inspection.rb:282 Line 282: 83 chars (max 80)
+/app/models/inspection.rb:321 Line 321: 81 chars (max 80)
+/app/models/inspection.rb:363 Line 363: 90 chars (max 80)
+/app/models/inspection.rb:381 Line 381: 91 chars (max 80)
+/app/models/inspection.rb:392 Line 392: 95 chars (max 80)
+/app/models/inspection.rb:399 Line 399: 99 chars (max 80)
+/app/models/inspection.rb:406 Line 406: 117 chars (max 80)
+/app/models/inspection.rb:430 Line 430: 96 chars (max 80)
+/app/models/inspection.rb:543 Line 543: 95 chars (max 80)
+/app/models/inspection.rb:548 Line 548: 83 chars (max 80)
+/app/models/inspector_company.rb:42 Line 42: 134 chars (max 80)
+/app/models/inspector_company.rb:105 Line 105: 86 chars (max 80)
+/app/models/unit.rb:46 Line 46: 96 chars (max 80)
+/app/models/unit.rb:47 Line 47: 89 chars (max 80)
+/app/models/unit.rb:62 Line 62: 82 chars (max 80)
+/app/models/unit.rb:83 Line 83: 105 chars (max 80)
+/app/models/unit.rb:84 Line 84: 85 chars (max 80)
+/app/models/unit.rb:96 Line 96: 128 chars (max 80)
+/app/models/unit.rb:103 Line 103: 97 chars (max 80)
+/app/models/unit.rb:119 Line 119: 99 chars (max 80)
+/app/models/unit.rb:181 Line 181: 84 chars (max 80)
+/app/models/user.rb:32 Line 32: 111 chars (max 80)
+/app/models/user.rb:176 Line 176: 87 chars (max 80)
+/app/models/user.rb:197 Line 197: 101 chars (max 80)
+/app/services/concerns/s3_backup_operations.rb:27 Line 27: 90 chars (max 80)
+/app/services/concerns/s3_backup_operations.rb:29 Line 29: 81 chars (max 80)
+/app/services/concerns/s3_helpers.rb:14 Line 14: 83 chars (max 80)
+/app/services/inspection_creation_service.rb:95 Line 95: 86 chars (max 80)
+/app/services/inspection_csv_export_service.rb:41 Line 41: 89 chars (max 80)
+/app/services/ntfy_service.rb:48 Line 48: 94 chars (max 80)
+/app/services/pdf_generator_service/assessment_block_builder.rb:104 Line 104: 100 chars (max 80)
+/app/services/pdf_generator_service/assessment_block_builder.rb:108 Line 108: 85 chars (max 80)
+/app/services/pdf_generator_service/assessment_block_builder.rb:116 Line 116: 89 chars (max 80)
+/app/services/pdf_generator_service/assessment_block_builder.rb:152 Line 152: 81 chars (max 80)
+/app/services/pdf_generator_service/assessment_block_renderer.rb:81 Line 81: 85 chars (max 80)
+/app/services/pdf_generator_service/assessment_block_renderer.rb:82 Line 82: 86 chars (max 80)
+/app/services/pdf_generator_service/assessment_block_renderer.rb:104 Line 104: 92 chars (max 80)
+/app/services/pdf_generator_service/assessment_columns.rb:94 Line 94: 82 chars (max 80)
+/app/services/pdf_generator_service/assessment_columns.rb:180 Line 180: 95 chars (max 80)
+/app/services/pdf_generator_service/configuration.rb:42 Line 42: 83 chars (max 80)
+/app/services/pdf_generator_service/configuration.rb:82 Line 82: 83 chars (max 80)
+/app/services/pdf_generator_service/configuration.rb:83 Line 83: 100 chars (max 80)
+/app/services/pdf_generator_service/debug_info_renderer.rb:20 Line 20: 92 chars (max 80)
+/app/services/pdf_generator_service/debug_info_renderer.rb:21 Line 21: 89 chars (max 80)
+/app/services/pdf_generator_service/debug_info_renderer.rb:26 Line 26: 101 chars (max 80)
+/app/services/pdf_generator_service/debug_info_renderer.rb:52 Line 52: 83 chars (max 80)
+/app/services/pdf_generator_service/disclaimer_footer_renderer.rb:91 Line 91: 91 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:8 Line 8: 82 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:11 Line 11: 86 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:20 Line 20: 85 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:24 Line 24: 89 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:27 Line 27: 84 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:33 Line 33: 95 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:34 Line 34: 86 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:36 Line 36: 83 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:40 Line 40: 103 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:43 Line 43: 90 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:57 Line 57: 85 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:70 Line 70: 83 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:71 Line 71: 83 chars (max 80)
+/app/services/pdf_generator_service/position_calculator.rb:72 Line 72: 85 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:78 Line 78: 81 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:219 Line 219: 161 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:222 Line 222: 163 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:225 Line 225: 163 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:234 Line 234: 94 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:235 Line 235: 86 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:236 Line 236: 82 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:241 Line 241: 85 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:246 Line 246: 161 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:249 Line 249: 163 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:252 Line 252: 163 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:257 Line 257: 108 chars (max 80)
+/app/services/pdf_generator_service/table_builder.rb:268 Line 268: 97 chars (max 80)
+/app/services/pdf_generator_service/utilities.rb:44 Line 44: 91 chars (max 80)
+/app/services/pdf_generator_service/utilities.rb:45 Line 45: 103 chars (max 80)
+/app/services/pdf_generator_service.rb:7 Line 7: 90 chars (max 80)
+/app/services/pdf_generator_service.rb:25 Line 25: 85 chars (max 80)
+/app/services/pdf_generator_service.rb:33 Line 33: 90 chars (max 80)
+/app/services/pdf_generator_service.rb:36 Line 36: 86 chars (max 80)
+/app/services/pdf_generator_service.rb:37 Line 37: 93 chars (max 80)
+/app/services/pdf_generator_service.rb:43 Line 43: 98 chars (max 80)
+/app/services/pdf_generator_service.rb:46 Line 46: 85 chars (max 80)
+/app/services/pdf_generator_service.rb:52 Line 52: 106 chars (max 80)
+/app/services/pdf_generator_service.rb:73 Line 73: 82 chars (max 80)
+/app/services/pdf_generator_service.rb:76 Line 76: 93 chars (max 80)
+/app/services/pdf_generator_service.rb:78 Line 78: 83 chars (max 80)
+/app/services/pdf_generator_service.rb:82 Line 82: 106 chars (max 80)
+/app/services/pdf_generator_service.rb:91 Line 91: 100 chars (max 80)
+/app/services/pdf_generator_service.rb:92 Line 92: 102 chars (max 80)
+/app/services/pdf_generator_service.rb:99 Line 99: 86 chars (max 80)
+/app/services/pdf_generator_service.rb:104 Line 104: 86 chars (max 80)
+/app/services/pdf_generator_service.rb:108 Line 108: 81 chars (max 80)
+/app/services/pdf_generator_service.rb:109 Line 109: 85 chars (max 80)
+/app/services/pdf_generator_service.rb:116 Line 116: 84 chars (max 80)
+/app/services/pdf_generator_service.rb:119 Line 119: 117 chars (max 80)
+/app/services/pdf_generator_service.rb:123 Line 123: 88 chars (max 80)
+/app/services/pdf_generator_service.rb:125 Line 125: 84 chars (max 80)
+/app/services/pdf_generator_service.rb:128 Line 128: 117 chars (max 80)
+/app/services/pdf_generator_service.rb:135 Line 135: 91 chars (max 80)
+/app/services/pdf_generator_service.rb:166 Line 166: 81 chars (max 80)
+/app/services/pdf_generator_service.rb:171 Line 171: 103 chars (max 80)
+/app/services/pdf_generator_service.rb:174 Line 174: 81 chars (max 80)
+/app/services/pdf_generator_service.rb:194 Line 194: 87 chars (max 80)
+/app/services/s3_backup_service.rb:25 Line 25: 91 chars (max 80)
+/app/services/s3_backup_service.rb:43 Line 43: 87 chars (max 80)
+/app/services/s3_backup_service.rb:45 Line 45: 81 chars (max 80)
+/app/services/s3_backup_service.rb:58 Line 58: 88 chars (max 80)
+/app/services/seed_data_service.rb:31 Line 31: 98 chars (max 80)
+/app/services/seed_data_service.rb:32 Line 32: 92 chars (max 80)
+/app/services/seed_data_service.rb:36 Line 36: 89 chars (max 80)
+/app/services/seed_data_service.rb:38 Line 38: 101 chars (max 80)
+/app/services/seed_data_service.rb:51 Line 51: 104 chars (max 80)
+/app/services/seed_data_service.rb:71 Line 71: 83 chars (max 80)
+/app/services/seed_data_service.rb:76 Line 76: 93 chars (max 80)
+/app/services/seed_data_service.rb:79 Line 79: 83 chars (max 80)
+/app/services/seed_data_service.rb:83 Line 83: 123 chars (max 80)
+/app/services/seed_data_service.rb:84 Line 84: 111 chars (max 80)
+/app/services/seed_data_service.rb:85 Line 85: 138 chars (max 80)
+/app/services/seed_data_service.rb:86 Line 86: 147 chars (max 80)
+/app/services/seed_data_service.rb:87 Line 87: 137 chars (max 80)
+/app/services/seed_data_service.rb:88 Line 88: 139 chars (max 80)
+/app/services/seed_data_service.rb:89 Line 89: 114 chars (max 80)
+/app/services/seed_data_service.rb:90 Line 90: 118 chars (max 80)
+/app/services/seed_data_service.rb:101 Line 101: 82 chars (max 80)
+/app/services/seed_data_service.rb:104 Line 104: 131 chars (max 80)
+/app/services/seed_data_service.rb:147 Line 147: 143 chars (max 80)
+/app/services/seed_data_service.rb:149 Line 149: 85 chars (max 80)
+/app/services/seed_data_service.rb:166 Line 166: 84 chars (max 80)
+/app/services/seed_data_service.rb:197 Line 197: 145 chars (max 80)
+/app/services/seed_data_service.rb:198 Line 198: 103 chars (max 80)
+/app/services/seed_data_service.rb:202 Line 202: 91 chars (max 80)
+/app/services/seed_data_service.rb:206 Line 206: 156 chars (max 80)
+/app/services/seed_data_service.rb:207 Line 207: 95 chars (max 80)
+/app/services/seed_data_service.rb:213 Line 213: 93 chars (max 80)
+/app/services/seed_data_service.rb:216 Line 216: 81 chars (max 80)
+/app/services/seed_data_service.rb:230 Line 230: 182 chars (max 80)
+/app/services/seed_data_service.rb:231 Line 231: 93 chars (max 80)
+/app/services/seed_data_service.rb:256 Line 256: 184 chars (max 80)
+/app/services/seed_data_service.rb:257 Line 257: 184 chars (max 80)
+/app/services/seed_data_service.rb:258 Line 258: 206 chars (max 80)
+/app/services/seed_data_service.rb:259 Line 259: 190 chars (max 80)
+/app/services/seed_data_service.rb:260 Line 260: 184 chars (max 80)
+/app/services/seed_data_service.rb:261 Line 261: 194 chars (max 80)
+/app/services/seed_data_service.rb:262 Line 262: 173 chars (max 80)
+/app/services/seed_data_service.rb:263 Line 263: 178 chars (max 80)
+/app/services/seed_data_service.rb:267 Line 267: 188 chars (max 80)
+/app/services/seed_data_service.rb:268 Line 268: 191 chars (max 80)
+/app/services/seed_data_service.rb:269 Line 269: 195 chars (max 80)
+/app/services/seed_data_service.rb:270 Line 270: 197 chars (max 80)
+/app/services/seed_data_service.rb:271 Line 271: 182 chars (max 80)
+/app/services/seed_data_service.rb:272 Line 272: 198 chars (max 80)
+/app/services/seed_data_service.rb:273 Line 273: 180 chars (max 80)
+/app/services/seed_data_service.rb:278 Line 278: 115 chars (max 80)
+/app/services/seed_data_service.rb:279 Line 279: 81 chars (max 80)
+/app/services/seed_data_service.rb:282 Line 282: 84 chars (max 80)
+/app/services/seed_data_service.rb:295 Line 295: 143 chars (max 80)
+/app/services/seed_data_service.rb:305 Line 305: 91 chars (max 80)
+/app/services/seed_data_service.rb:314 Line 314: 117 chars (max 80)
+/app/services/sentry_test_service.rb:11 Line 11: 93 chars (max 80)
+/app/services/sentry_test_service.rb:13 Line 13: 106 chars (max 80)
+/app/services/sentry_test_service.rb:21 Line 21: 97 chars (max 80)
+/app/services/sentry_test_service.rb:38 Line 38: 123 chars (max 80)
+/app/services/sentry_test_service.rb:56 Line 56: 86 chars (max 80)
+/app/services/sentry_test_service.rb:62 Line 62: 87 chars (max 80)
+/app/services/unit_creation_from_inspection_service.rb:10 Line 10: 99 chars (max 80)
+/app/helpers/application_helper.rb:8 Line 8: 122 chars (max 80)
+/app/helpers/application_helper.rb:11 Line 11: 120 chars (max 80)
+/app/helpers/application_helper.rb:14 Line 14: 91 chars (max 80)
+/app/helpers/application_helper.rb:66 Line 66: 109 chars (max 80)
+/app/helpers/inspections_helper.rb:22 Line 22: 81 chars (max 80)
+/app/helpers/inspections_helper.rb:32 Line 32: 85 chars (max 80)
+/app/helpers/inspections_helper.rb:84 Line 84: 91 chars (max 80)
+/app/helpers/inspections_helper.rb:87 Line 87: 86 chars (max 80)
+/app/helpers/inspections_helper.rb:103 Line 103: 108 chars (max 80)
+/app/helpers/inspections_helper.rb:127 Line 127: 113 chars (max 80)
+/app/helpers/inspections_helper.rb:131 Line 131: 90 chars (max 80)
+/app/helpers/inspections_helper.rb:142 Line 142: 111 chars (max 80)
+/app/helpers/inspections_helper.rb:149 Line 149: 105 chars (max 80)
+/app/helpers/units_helper.rb:29 Line 29: 83 chars (max 80)
+/app/helpers/units_helper.rb:48 Line 48: 81 chars (max 80)
+/app/helpers/users_helper.rb:18 Line 18: 101 chars (max 80)
+/app/jobs/application_job.rb:8 Line 8: 82 chars (max 80)
+/app/jobs/s3_backup_job.rb:16 Line 16: 105 chars (max 80)
+/app/jobs/sentry_test_job.rb:21 Line 21: 93 chars (max 80)
+/app/jobs/sentry_test_job.rb:29 Line 29: 109 chars (max 80)
+/lib/database_i18n_backend.rb:26 Line 26: 85 chars (max 80)
+/lib/erb_lint_runner.rb:86 Line 86: 92 chars (max 80)
+/lib/s3_rake_helpers.rb:14 Line 14: 86 chars (max 80)
+/lib/s3_rake_helpers.rb:20 Line 20: 83 chars (max 80)
+/lib/s3_rake_helpers.rb:24 Line 24: 89 chars (max 80)
+/lib/s3_rake_helpers.rb:41 Line 41: 102 chars (max 80)
+/lib/seed_data.rb:31 Line 31: 96 chars (max 80)
+/lib/seed_data.rb:33 Line 33: 101 chars (max 80)
+/lib/seed_data.rb:34 Line 34: 139 chars (max 80)
+/lib/seed_data.rb:36 Line 36: 82 chars (max 80)
+/lib/seed_data.rb:71 Line 71: 85 chars (max 80)
+/lib/seed_data.rb:163 Line 163: 90 chars (max 80)
+/lib/seed_data.rb:211 Line 211: 85 chars (max 80)
+/lib/seed_data.rb:213 Line 213: 83 chars (max 80)
+
+HARDCODED STRING VIOLATIONS (160):
+--------------------------------------------------
+/app/controllers/admin_controller.rb:52 Line 52: Hardcoded string 'Accept' - use I18n.t() instead
+/app/controllers/admin_controller.rb:53 Line 53: Hardcoded string 'User-Agent' - use I18n.t() instead
+/app/controllers/admin_controller.rb:53 Line 53: Hardcoded string 'PlayTest-Admin' - use I18n.t() instead
+/app/controllers/admin_controller.rb:65 Line 65: Hardcoded string 'GitHub API returned #{response.code}: #{response.body}' - use I18n.t() instead
+/app/controllers/admin_controller.rb:89 Line 89: Hardcoded string '## Docker Images' - use I18n.t() instead
+/app/controllers/backups_controller.rb:108 Line 108: Hardcoded string 'attachment; filename=\' - use I18n.t() instead
+/app/controllers/inspections_controller.rb:33 Line 33: Hardcoded string 'Exported #{@complete_inspections.count} inspections to CSV' - use I18n.t() instead
+/app/controllers/inspections_controller.rb:179 Line 179: Hardcoded string 'Unit changed to #{unit.name}' - use I18n.t() instead
+/app/controllers/inspections_controller.rb:287 Line 287: Hardcoded string 'but has errors: #{inspection_errors}' - use I18n.t() instead
+/app/controllers/inspections_controller.rb:291 Line 291: Hardcoded string 'In tests, use create(:inspection, :completed) to avoid this.' - use I18n.t() instead
+/app/controllers/inspections_controller.rb:292 Line 292: Hardcoded string 'DATA INTEGRITY ERROR: #{error_message}. #{test_message}' - use I18n.t() instead
+/app/controllers/inspections_controller.rb:348 Line 348: Hardcoded string 'X-Robots-Tag' - use I18n.t() instead
+/app/controllers/inspections_controller.rb:577 Line 577: Hardcoded string 'Inspection' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:39 Line 39: Hardcoded string 'Calculation completed successfully' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:44 Line 44: Hardcoded string 'Front/back area' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:44 Line 44: Hardcoded string '5.0m (W) × 3.0m (H) = 15.0m²' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:45 Line 45: Hardcoded string 'Sides area' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:45 Line 45: Hardcoded string '5.0m (L) × 3.0m (H) = 15.0m²' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:46 Line 46: Hardcoded string 'Front & back anchor counts' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:46 Line 46: Hardcoded string '((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:47 Line 47: Hardcoded string 'Left & right anchor counts' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:47 Line 47: Hardcoded string '((15.0 × 114.0 * 1.5) ÷ 1600.0 = 2' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:48 Line 48: Hardcoded string 'Calculated total anchors' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:48 Line 48: Hardcoded string '(2 + 2) × 2 = 8' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:54 Line 54: Hardcoded string 'Calculation completed successfully' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:59 Line 59: Hardcoded string '50% calculation' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:59 Line 59: Hardcoded string '2.5m × 0.5 = 1.25m' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:60 Line 60: Hardcoded string 'Minimum requirement' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:60 Line 60: Hardcoded string '0.3m (300mm)' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:61 Line 61: Hardcoded string 'Base runout' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:61 Line 61: Hardcoded string 'Maximum of 1.25m and 0.3m = 1.25m' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:67 Line 67: Hardcoded string 'Calculation completed successfully' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:72 Line 72: Hardcoded string 'Height range' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:72 Line 72: Hardcoded string '0.6m - 3.0m' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:73 Line 73: Hardcoded string 'Calculation' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:73 Line 73: Hardcoded string '1.5m (user height)' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:79 Line 79: Hardcoded string 'Calculation completed successfully' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:94 Line 94: Hardcoded string 'Total area' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:94 Line 94: Hardcoded string '10m × 8m = 80m²' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:95 Line 95: Hardcoded string 'Obstacles/adjustments' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:95 Line 95: Hardcoded string '- 15m²' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:96 Line 96: Hardcoded string 'Usable area' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:97 Line 97: Hardcoded string 'Capacity calculations' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:97 Line 97: Hardcoded string 'Based on usable area' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:98 Line 98: Hardcoded string '1m users' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:98 Line 98: Hardcoded string '65 ÷ 1 = 65 users' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:99 Line 99: Hardcoded string '1.2m users' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:99 Line 99: Hardcoded string '65 ÷ 1.3 = 48 users' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:100 Line 100: Hardcoded string '1.5m users' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:100 Line 100: Hardcoded string '65 ÷ 1.7 = 39 users' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:101 Line 101: Hardcoded string '1.8m users' - use I18n.t() instead
+/app/controllers/safety_standards_controller.rb:101 Line 101: Hardcoded string 'Not allowed (exceeds height limit)' - use I18n.t() instead
+/app/controllers/units_controller.rb:28 Line 28: Hardcoded string 'Exported #{@units.count} units to CSV' - use I18n.t() instead
+/app/controllers/units_controller.rb:30 Line 30: Hardcoded string 'units-#{Time.zone.today}.csv' - use I18n.t() instead
+/app/controllers/units_controller.rb:42 Line 42: Hardcoded string 'Exported #{@units.count} units to CSV' - use I18n.t() instead
+/app/controllers/units_controller.rb:44 Line 44: Hardcoded string 'all-units-#{Time.zone.today}.csv' - use I18n.t() instead
+/app/controllers/units_controller.rb:256 Line 256: Hardcoded string 'Unit' - use I18n.t() instead
+/app/controllers/units_controller.rb:315 Line 315: Hardcoded string 'X-Robots-Tag' - use I18n.t() instead
+/app/controllers/units_controller.rb:355 Line 355: Hardcoded string '#{@unit.serial}_QR.png' - use I18n.t() instead
+/app/controllers/users_controller.rb:234 Line 234: Hardcoded string 'COUNT(inspections.id) DESC' - use I18n.t() instead
+/app/models/concerns/assessment_logging.rb:20 Line 20: Hardcoded string '#{assessment_type} updated' - use I18n.t() instead
+/app/models/event.rb:40 Line 40: Hardcoded string 'System' - use I18n.t() instead
+/app/models/event.rb:87 Line 87: Hardcoded string 'System' - use I18n.t() instead
+/app/models/inspection.rb:150 Line 150: Hardcoded string 'LEFT JOIN units ON units.id = inspections.unit_id' - use I18n.t() instead
+/app/models/inspection.rb:176 Line 176: Hardcoded string 'inspection_date < ?' - use I18n.t() instead
+/app/models/inspection.rb:314 Line 314: Hardcoded string 'Unit is required' - use I18n.t() instead
+/app/models/inspection.rb:333 Line 333: Hardcoded string 'Unit' - use I18n.t() instead
+/app/models/inspection.rb:351 Line 351: Hardcoded string 'Inspection completed' - use I18n.t() instead
+/app/models/inspection.rb:357 Line 357: Hardcoded string 'Inspection completed' - use I18n.t() instead
+/app/models/inspection.rb:459 Line 459: Hardcoded string '#{base_label} (+ Pass/Fail)' - use I18n.t() instead
+/app/models/inspection.rb:461 Line 461: Hardcoded string '#{base_label} Pass/Fail' - use I18n.t() instead
+/app/models/inspector_company.rb:80 Line 80: Hardcoded string 'name LIKE ?' - use I18n.t() instead
+/app/models/unit.rb:46 Line 46: Hardcoded string 'Inspection' - use I18n.t() instead
+/app/models/unit.rb:47 Line 47: Hardcoded string 'Inspection' - use I18n.t() instead
+/app/models/unit.rb:96 Line 96: Hardcoded string 'MAX(inspections.complete_date) + INTERVAL #{EN14960::Constants::REINSPECTION_INTERVAL_DAYS} DAY <= CURRENT_DATE' - use I18n.t() instead
+/app/models/unit.rb:108 Line 108: Hardcoded string 'Passed' - use I18n.t() instead
+/app/models/unit.rb:108 Line 108: Hardcoded string 'Failed' - use I18n.t() instead
+/app/models/unit.rb:130 Line 130: Hardcoded string 'Never Inspected' - use I18n.t() instead
+/app/models/unit.rb:133 Line 133: Hardcoded string 'Overdue' - use I18n.t() instead
+/app/models/unit.rb:135 Line 135: Hardcoded string 'Compliant' - use I18n.t() instead
+/app/models/unit.rb:137 Line 137: Hardcoded string 'Non-Compliant' - use I18n.t() instead
+/app/models/unit.rb:184 Line 184: Hardcoded string 'MAX(inspections.inspection_date) <= ?' - use I18n.t() instead
+/app/models/unit.rb:202 Line 202: Hardcoded string 'must be an image file' - use I18n.t() instead
+/app/models/user.rb:56 Line 56: Hardcoded string 'InspectorCompany' - use I18n.t() instead
+/app/models/user.rb:233 Line 233: Hardcoded string 'must be an image file' - use I18n.t() instead
+/app/models/user.rb:243 Line 243: Hardcoded string 'must be an image file' - use I18n.t() instead
+/app/models/user_session.rb:35 Line 35: Hardcoded string 'last_active_at > ?' - use I18n.t() instead
+/app/services/badge_batch_csv_export_service.rb:28 Line 28: Hardcoded string 'Badge ID' - use I18n.t() instead
+/app/services/badge_batch_csv_export_service.rb:29 Line 29: Hardcoded string 'Batch Creation Date' - use I18n.t() instead
+/app/services/badge_batch_csv_export_service.rb:30 Line 30: Hardcoded string 'Batch Notes' - use I18n.t() instead
+/app/services/badge_batch_csv_export_service.rb:31 Line 31: Hardcoded string 'Badge Notes' - use I18n.t() instead
+/app/services/badge_batch_csv_export_service.rb:32 Line 32: Hardcoded string 'Used' - use I18n.t() instead
+/app/services/badge_batch_csv_export_service.rb:39 Line 39: Hardcoded string '%Y-%m-%d %H:%M:%S' - use I18n.t() instead
+/app/services/concerns/s3_backup_operations.rb:29 Line 29: Hardcoded string 'Database not configured for #{Rails.env}' - use I18n.t() instead
+/app/services/concerns/s3_helpers.rb:10 Line 10: Hardcoded string 'S3 storage is not enabled' - use I18n.t() instead
+/app/services/concerns/s3_helpers.rb:17 Line 17: Hardcoded string 'Missing S3 config: #{missing_vars.join(' - use I18n.t() instead
+/app/services/inspection_creation_service.rb:82 Line 82: Hardcoded string 'new inspection by #{@user.email}' - use I18n.t() instead
+/app/services/ntfy_service.rb:57 Line 57: Hardcoded string 'Title' - use I18n.t() instead
+/app/services/ntfy_service.rb:57 Line 57: Hardcoded string 'play-test notification' - use I18n.t() instead
+/app/services/ntfy_service.rb:58 Line 58: Hardcoded string 'Priority' - use I18n.t() instead
+/app/services/ntfy_service.rb:59 Line 59: Hardcoded string 'Tags' - use I18n.t() instead
+/app/services/pdf_cache_service.rb:193 Line 193: Hardcoded string '#{type_name}_#{record.id}_cached_#{Time.current.to_i}.pdf' - use I18n.t() instead
+/app/services/pdf_generator_service/assessment_block_builder.rb:155 Line 155: Hardcoded string 'No valid fields found: #{fields}' - use I18n.t() instead
+/app/services/pdf_generator_service/assessment_block_renderer.rb:29 Line 29: Hardcoded string 'Unknown block type: #{block.type}' - use I18n.t() instead
+/app/services/pdf_generator_service/assessment_block_renderer.rb:85 Line 85: Hardcoded string '#{indicator} ' - use I18n.t() instead
+/app/services/pdf_generator_service/assessment_block_renderer.rb:95 Line 95: Hardcoded string ': #{block.value}' - use I18n.t() instead
+/app/services/pdf_generator_service/configuration.rb:75 Line 75: Hardcoded string 'Photo 1' - use I18n.t() instead
+/app/services/pdf_generator_service/configuration.rb:75 Line 75: Hardcoded string 'Photo 2' - use I18n.t() instead
+/app/services/pdf_generator_service/configuration.rb:75 Line 75: Hardcoded string 'Photo 3' - use I18n.t() instead
+/app/services/pdf_generator_service/configuration.rb:98 Line 98: Hardcoded string 'NotoSans' - use I18n.t() instead
+/app/services/pdf_generator_service/configuration.rb:99 Line 99: Hardcoded string '#{font_path}/NotoSans-Regular.ttf' - use I18n.t() instead
+/app/services/pdf_generator_service/configuration.rb:100 Line 100: Hardcoded string '#{font_path}/NotoSans-Bold.ttf' - use I18n.t() instead
+/app/services/pdf_generator_service/configuration.rb:101 Line 101: Hardcoded string '#{font_path}/NotoSans-Regular.ttf' - use I18n.t() instead
+/app/services/pdf_generator_service/configuration.rb:102 Line 102: Hardcoded string '#{font_path}/NotoSans-Bold.ttf' - use I18n.t() instead
+/app/services/pdf_generator_service/configuration.rb:104 Line 104: Hardcoded string 'NotoEmoji' - use I18n.t() instead
+/app/services/pdf_generator_service/configuration.rb:105 Line 105: Hardcoded string '#{font_path}/NotoEmoji-Regular.ttf' - use I18n.t() instead
+/app/services/pdf_generator_service/configuration.rb:108 Line 108: Hardcoded string 'NotoSans' - use I18n.t() instead
+/app/services/pdf_generator_service/debug_info_renderer.rb:32 Line 32: Hardcoded string '#{query[:duration]} ms' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:219 Line 219: Hardcoded string '#{ChobbleForms::FieldUtils.form_field_label(:inspection, :width).sub(' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:219 Line 219: Hardcoded string ')}: #{Utilities.format_dimension(last_inspection.width)}' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:222 Line 222: Hardcoded string '#{ChobbleForms::FieldUtils.form_field_label(:inspection, :length).sub(' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:222 Line 222: Hardcoded string ')}: #{Utilities.format_dimension(last_inspection.length)}' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:225 Line 225: Hardcoded string '#{ChobbleForms::FieldUtils.form_field_label(:inspection, :height).sub(' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:225 Line 225: Hardcoded string ')}: #{Utilities.format_dimension(last_inspection.height)}' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:246 Line 246: Hardcoded string '#{ChobbleForms::FieldUtils.form_field_label(:inspection, :width).sub(' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:246 Line 246: Hardcoded string ')}: #{Utilities.format_dimension(last_inspection.width)}' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:249 Line 249: Hardcoded string '#{ChobbleForms::FieldUtils.form_field_label(:inspection, :length).sub(' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:249 Line 249: Hardcoded string ')}: #{Utilities.format_dimension(last_inspection.length)}' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:252 Line 252: Hardcoded string '#{ChobbleForms::FieldUtils.form_field_label(:inspection, :height).sub(' - use I18n.t() instead
+/app/services/pdf_generator_service/table_builder.rb:252 Line 252: Hardcoded string ')}: #{Utilities.format_dimension(last_inspection.height)}' - use I18n.t() instead
+/app/services/pdf_generator_service/utilities.rb:19 Line 19: Hardcoded string '%-d %B, %Y' - use I18n.t() instead
+/app/services/rpii_verification_service.rb:13 Line 13: Hardcoded string 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' - use I18n.t() instead
+/app/services/rpii_verification_service.rb:14 Line 14: Hardcoded string 'AppleWebKit/537.36 (KHTML, like Gecko) ' - use I18n.t() instead
+/app/services/rpii_verification_service.rb:91 Line 91: Hardcoded string 'User-Agent' - use I18n.t() instead
+/app/services/rpii_verification_service.rb:92 Line 92: Hardcoded string 'application/x-www-form-urlencoded; charset=UTF-8' - use I18n.t() instead
+/app/services/rpii_verification_service.rb:93 Line 93: Hardcoded string 'Content-Type' - use I18n.t() instead
+/app/services/rpii_verification_service.rb:94 Line 94: Hardcoded string 'X-Requested-With' - use I18n.t() instead
+/app/services/rpii_verification_service.rb:94 Line 94: Hardcoded string 'XMLHttpRequest' - use I18n.t() instead
+/app/services/rpii_verification_service.rb:106 Line 106: Hardcoded string 'RPII verification failed: #{response.code}' - use I18n.t() instead
+/app/services/s3_backup_service.rb:18 Line 18: Hardcoded string '%Y-%m-%d' - use I18n.t() instead
+/app/services/s3_backup_service.rb:25 Line 25: Hardcoded string '.backup '#{temp_backup_path}'' - use I18n.t() instead
+/app/services/sentry_test_service.rb:10 Line 10: Hardcoded string 'Test message from Rails app' - use I18n.t() instead
+/app/services/sentry_test_service.rb:11 Line 11: Hardcoded string 'Test message sent to Sentry' - use I18n.t() instead
+/app/services/sentry_test_service.rb:13 Line 13: Hardcoded string 'Failed to send test message: #{e.message}' - use I18n.t() instead
+/app/services/sentry_test_service.rb:21 Line 21: Hardcoded string 'Test exception sent to Sentry' - use I18n.t() instead
+/app/services/sentry_test_service.rb:28 Line 28: Hardcoded string 'SentryTestService' - use I18n.t() instead
+/app/services/sentry_test_service.rb:34 Line 34: Hardcoded string 'This is a test error with context' - use I18n.t() instead
+/app/services/sentry_test_service.rb:38 Line 38: Hardcoded string 'Test exception with context sent to Sentry' - use I18n.t() instead
+/app/services/sentry_test_service.rb:69 Line 69: Hardcoded string 'This is a test exception from SentryTestService' - use I18n.t() instead
+/app/services/sentry_test_service.rb:73 Line 73: Hardcoded string 'SentryTestService#test_error_type' - use I18n.t() instead
+/app/services/sentry_test_service.rb:77 Line 77: Hardcoded string 'Unknown error type: #{error_type}' - use I18n.t() instead
+/app/helpers/application_helper.rb:9 Line 9: Hardcoded string '%b %d, %Y' - use I18n.t() instead
+/app/helpers/application_helper.rb:120 Line 120: Hardcoded string ' * middle_length}#{last_char}' - use I18n.t() instead
+/app/helpers/inspections_helper.rb:100 Line 100: Hardcoded string '#{name} ✓' - use I18n.t() instead
+/app/helpers/users_helper.rb:9 Line 9: Hardcoded string 'Yes' - use I18n.t() instead
+/app/helpers/users_helper.rb:15 Line 15: Hardcoded string '#{count} #{(count == 1) ? ' - use I18n.t() instead
+/app/helpers/users_helper.rb:20 Line 20: Hardcoded string 'Never' - use I18n.t() instead
+/app/helpers/users_helper.rb:21 Line 21: Hardcoded string '#{time_ago_in_words(time)} ago' - use I18n.t() instead
+/app/jobs/sentry_test_job.rb:26 Line 26: Hardcoded string 'Configured' - use I18n.t() instead
+/app/jobs/sentry_test_job.rb:27 Line 27: Hardcoded string 'Not configured' - use I18n.t() instead
+
+FILE LENGTH VIOLATIONS (2):
+--------------------------------------------------
+/app/controllers/inspections_controller.rb: 601 lines (max 500)
+/app/models/inspection.rb: 569 lines (max 500)
+
+METHOD LENGTH VIOLATIONS (52):
+--------------------------------------------------
+/app/controllers/inspections_controller.rb:53 Method 'new_from_unit' is 23 lines (max 20)
+/app/controllers/inspections_controller.rb:99 Method 'update' is 23 lines (max 20)
+/app/controllers/inspections_controller.rb:123 Method 'destroy' is 26 lines (max 20)
+/app/controllers/inspections_controller.rb:276 Method 'validate_inspection_completability' is 22 lines (max 20)
+/app/controllers/inspections_controller.rb:560 Method 'log_inspection_event' is 23 lines (max 20)
+/app/controllers/sessions_controller.rb:75 Method 'verify_and_sign_in_with_passkey' is 23 lines (max 20)
+/app/controllers/units_controller.rb:96 Method 'update' is 42 lines (max 20)
+/app/controllers/units_controller.rb:139 Method 'destroy' is 28 lines (max 20)
+/app/controllers/units_controller.rb:189 Method 'create_from_inspection' is 23 lines (max 20)
+/app/controllers/units_controller.rb:215 Method 'validate_badge_id_param' is 23 lines (max 20)
+/app/controllers/units_controller.rb:239 Method 'log_unit_event' is 23 lines (max 20)
+/app/controllers/units_controller.rb:281 Method 'unit_params' is 23 lines (max 20)
+/app/controllers/users_controller.rb:114 Method 'update_settings' is 50 lines (max 20)
+/app/models/inspection.rb:407 Method 'incomplete_fields' is 75 lines (max 20)
+/app/services/pdf_generator_service/assessment_block_builder.rb:17 Method 'build' is 72 lines (max 20)
+/app/services/pdf_generator_service/assessment_block_builder.rb:92 Method 'get_form_config_fields' is 31 lines (max 20)
+/app/services/pdf_generator_service/assessment_block_renderer.rb:37 Method 'height_for' is 30 lines (max 20)
+/app/services/pdf_generator_service/assessment_block_renderer.rb:75 Method 'render_value_fragments' is 25 lines (max 20)
+/app/services/pdf_generator_service/assessment_columns.rb:94 Method 'place_content_in_columns' is 29 lines (max 20)
+/app/services/pdf_generator_service/assessment_columns.rb:124 Method 'render_content_at_position' is 37 lines (max 20)
+/app/services/pdf_generator_service/assessment_columns.rb:162 Method 'calculate_column_boxes' is 28 lines (max 20)
+/app/services/pdf_generator_service/debug_info_renderer.rb:7 Method 'self.add_debug_info_page' is 56 lines (max 20)
+/app/services/pdf_generator_service/disclaimer_footer_renderer.rb:8 Method 'self.render_disclaimer_footer' is 24 lines (max 20)
+/app/services/pdf_generator_service/disclaimer_footer_renderer.rb:37 Method 'self.render_footer_content' is 66 lines (max 20)
+/app/services/pdf_generator_service/header_generator.rb:115 Method 'render_unit_text_section' is 21 lines (max 20)
+/app/services/pdf_generator_service/image_processor.rb:21 Method 'self.add_unit_photo_footer' is 22 lines (max 20)
+/app/services/pdf_generator_service/image_processor.rb:67 Method 'self.calculate_footer_photo_dimensions' is 24 lines (max 20)
+/app/services/pdf_generator_service/position_calculator.rb:71 Method 'self.fit_dimensions' is 22 lines (max 20)
+/app/services/pdf_generator_service/table_builder.rb:214 Method 'self.build_unit_details_table_for_unit_pdf' is 26 lines (max 20)
+/app/services/pdf_generator_service/table_builder.rb:241 Method 'self.build_unit_details_table_with_inspection' is 64 lines (max 20)
+/app/services/pdf_generator_service/utilities.rb:35 Method 'self.add_draft_watermark' is 29 lines (max 20)
+/app/services/pdf_generator_service.rb:7 Method 'self.generate_inspection_report' is 48 lines (max 20)
+/app/services/pdf_generator_service.rb:56 Method 'self.generate_unit_report' is 29 lines (max 20)
+/app/services/pdf_generator_service.rb:132 Method 'self.generate_risk_assessment_section' is 21 lines (max 20)
+/app/services/pdf_generator_service.rb:171 Method 'self.render_assessment_blocks_in_columns' is 28 lines (max 20)
+/app/services/s3_backup_service.rb:11 Method 'perform' is 49 lines (max 20)
+/app/services/seed_data_service.rb:80 Method 'create_seed_units_for_user' is 27 lines (max 20)
+/app/services/seed_data_service.rb:109 Method 'generate_unit_ids_batch' is 37 lines (max 20)
+/app/services/seed_data_service.rb:148 Method 'create_unit_from_config' is 28 lines (max 20)
+/app/services/seed_data_service.rb:253 Method 'generate_risk_assessment' is 24 lines (max 20)
+/app/services/sentry_test_service.rb:5 Method 'perform' is 46 lines (max 20)
+/app/services/sentry_test_service.rb:52 Method 'test_error_type' is 28 lines (max 20)
+/app/helpers/inspections_helper.rb:31 Method 'inspection_actions' is 37 lines (max 20)
+/app/helpers/inspections_helper.rb:104 Method 'next_tab_navigation_info' is 42 lines (max 20)
+/app/helpers/units_helper.rb:33 Method 'unit_actions' is 46 lines (max 20)
+/app/jobs/sentry_test_job.rb:7 Method 'perform' is 25 lines (max 20)
+/lib/erb_lint_runner.rb:60 Method 'process_file' is 38 lines (max 20)
+/lib/erb_lint_runner.rb:105 Method 'print_summary' is 21 lines (max 20)
+/lib/seed_data.rb:76 Method 'self.structure_fields' is 32 lines (max 20)
+/lib/seed_data.rb:109 Method 'self.materials_fields' is 22 lines (max 20)
+/lib/seed_data.rb:132 Method 'self.fan_fields' is 37 lines (max 20)
+/lib/seed_data.rb:187 Method 'self.slide_fields' is 46 lines (max 20)
+
+================================================================================
+TOTAL: 459 violations found
+
+To apply StandardRB formatting: bundle exec standardrb --fix
+To lint only modified files: rake code_standards:lint_modified
+
+FORMATTING PREFERENCES (StandardRB compatible - see CLAUDE.md):
+• Arrays: alphabetical order when order doesn't matter, use %i[] %w[]
+• Arrays: one per line when over 80 chars, maintain alphabetical order
+• Method calls: extract variables or break at method chain points
+• Hash parameters: extract to variables for readability
+• Long strings: extract to variables or break with backslash
+• Comments: break at sentence boundaries (StandardRB preserves these)
+• Avoid parameter alignment - StandardRB collapses whitespace
