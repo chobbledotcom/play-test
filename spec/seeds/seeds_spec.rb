@@ -58,7 +58,7 @@ RSpec.describe "Seed Data", type: :model do
 
       it "creates companies with valid email formats" do
         InspectorCompany.all.find_each do |company|
-          expect(company.email).to match(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i)
+          expect(company.email).to match(/\A[\w+\-.]+@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i)
         end
       end
     end

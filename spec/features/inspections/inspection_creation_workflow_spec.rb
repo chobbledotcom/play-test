@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.feature "Inspection Creation Workflow", type: :feature do
   include InspectionTestHelpers
+
   let(:user) { create(:user) }
 
   before do

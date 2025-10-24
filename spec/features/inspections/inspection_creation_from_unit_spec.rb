@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.feature "Creating Inspection from Unit Page", type: :feature do
   include InspectionTestHelpers
+
   let(:inspector_company) { create(:inspector_company) }
   let(:user) { create(:user, :without_company, inspection_company: inspector_company) }
   let(:unit) { create(:unit, user: user) }
