@@ -39,33 +39,22 @@ class PdfGeneratorService
       return 0 if fragments.empty?
 
       font_size = font_size_for(block)
-
-      # Convert fragments to formatted text array
-      formatted_text = fragments.map do |fragment|
-        styles = []
-        styles << :bold if fragment[:bold]
-        styles << :italic if fragment[:italic]
-
-        {
-          text: fragment[:text],
-          styles: styles,
-          color: fragment[:color]
-        }
-      end
-
-      # Use height_of_formatted to get the actual height with wrapping
-      base_height = pdf.height_of_formatted(
-        formatted_text,
-        width: COLUMN_WIDTH,
-        size: font_size
-      )
-
-      # Add 33% of font size as spacing
+      formatted_text = convert_fragments_to_formatted_text(fragments)
+      base_height = pdf.height_of_formatted(formatted_text, width: COLUMN_WIDTH, size: font_size)
       spacing = (font_size * 0.33).round(1)
       base_height + spacing
     end
 
     private
+
+    def convert_fragments_to_formatted_text(fragments)
+      fragments.map do |fragment|
+        styles = []
+        styles << :bold if fragment[:bold]
+        styles << :italic if fragment[:italic]
+        {text: fragment[:text], styles: styles, color: fragment[:color]}
+      end
+    end
 
     def render_header_fragments(block)
       text = block.name || block.value
@@ -74,28 +63,31 @@ class PdfGeneratorService
 
     def render_value_fragments(block)
       fragments = []
-
-      # Add pass/fail indicator if present
-      if !block.pass_fail.nil?
-        indicator, color = case block.pass_fail
-        when true, "pass" then [I18n.t("shared.pass_pdf"), Configuration::PASS_COLOR]
-        when false, "fail" then [I18n.t("shared.fail_pdf"), Configuration::FAIL_COLOR]
-        else [I18n.t("shared.na_pdf"), Configuration::NA_COLOR]
-        end
-        fragments << {text: "#{indicator} ", bold: true, color: color}
-      end
-
-      # Add field name
-      if block.name
-        fragments << {text: block.name, bold: true, color: "000000"}
-      end
-
-      # Add value if present and not a pass/fail field
-      if block.value && !block.name.to_s.end_with?("_pass")
-        fragments << {text: ": #{block.value}", bold: false, color: "000000"}
-      end
-
+      add_pass_fail_indicator(fragments, block) unless block.pass_fail.nil?
+      fragments << {text: block.name, bold: true, color: "000000"} if block.name
+      add_value_text(fragments, block) if should_add_value?(block)
       fragments
+    end
+
+    def add_pass_fail_indicator(fragments, block)
+      indicator, color = determine_pass_fail_indicator(block.pass_fail)
+      fragments << {text: "#{indicator} ", bold: true, color: color}
+    end
+
+    def determine_pass_fail_indicator(pass_fail)
+      case pass_fail
+      when true, "pass" then [I18n.t("shared.pass_pdf"), Configuration::PASS_COLOR]
+      when false, "fail" then [I18n.t("shared.fail_pdf"), Configuration::FAIL_COLOR]
+      else [I18n.t("shared.na_pdf"), Configuration::NA_COLOR]
+      end
+    end
+
+    def should_add_value?(block)
+      block.value && !block.name.to_s.end_with?("_pass")
+    end
+
+    def add_value_text(fragments, block)
+      fragments << {text: ": #{block.value}", bold: false, color: "000000"}
     end
 
     def render_comment_fragments(block)

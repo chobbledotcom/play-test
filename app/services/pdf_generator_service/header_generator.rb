@@ -113,24 +113,31 @@ class PdfGeneratorService
       end
 
       def render_unit_text_section(pdf, unit, unit_id_text, logo_width)
-        # Shift text to the right to accommodate QR code
         qr_offset = Configuration::QR_CODE_SIZE + Configuration::HEADER_SPACING
         width = pdf.bounds.width - logo_width - qr_offset
         pdf.bounding_box([qr_offset, pdf.bounds.top], width: width) do
-          pdf.text unit_id_text, size: Configuration::HEADER_TEXT_SIZE,
-            style: :bold
-
-          expiry_label = I18n.t("pdf.unit.fields.expiry_date")
-          expiry_value = if unit.last_inspection&.reinspection_date
-            Utilities.format_date(unit.last_inspection.reinspection_date)
-          else
-            I18n.t("pdf.unit.fields.na")
-          end
-          pdf.text "#{expiry_label}: #{expiry_value}",
-            size: Configuration::HEADER_TEXT_SIZE, style: :bold
-
-          # Add extra line of spacing to match 3-line QR code height
+          render_unit_header_text(pdf, unit_id_text)
+          render_unit_expiry_text(pdf, unit)
           pdf.move_down Configuration::HEADER_TEXT_SIZE * 1.5
+        end
+      end
+
+      def render_unit_header_text(pdf, unit_id_text)
+        pdf.text unit_id_text, size: Configuration::HEADER_TEXT_SIZE, style: :bold
+      end
+
+      def render_unit_expiry_text(pdf, unit)
+        expiry_label = I18n.t("pdf.unit.fields.expiry_date")
+        expiry_value = format_unit_expiry_value(unit)
+        pdf.text "#{expiry_label}: #{expiry_value}",
+          size: Configuration::HEADER_TEXT_SIZE, style: :bold
+      end
+
+      def format_unit_expiry_value(unit)
+        if unit.last_inspection&.reinspection_date
+          Utilities.format_date(unit.last_inspection.reinspection_date)
+        else
+          I18n.t("pdf.unit.fields.na")
         end
       end
 

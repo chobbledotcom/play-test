@@ -212,22 +212,8 @@ class PdfGeneratorService
     end
 
     def self.build_unit_details_table_for_unit_pdf(unit, last_inspection)
-      dimensions = []
+      dimensions_text = build_dimensions_text(last_inspection)
 
-      if last_inspection
-        if last_inspection.width.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :width).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
-        end
-        if last_inspection.length.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :length).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
-        end
-        if last_inspection.height.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :height).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
-        end
-      end
-      dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
-
-      # Build simple two-column table for unit PDFs
       [
         [ChobbleForms::FieldUtils.form_field_label(:units, :name),
           Utilities.truncate_text(unit.name, UNIT_NAME_MAX_LENGTH)],
@@ -239,42 +225,57 @@ class PdfGeneratorService
     end
 
     def self.build_unit_details_table_with_inspection(unit, last_inspection, context)
+      dimensions_text = build_dimensions_text(last_inspection)
+      inspection = select_inspection_for_context(last_inspection, unit, context)
+      inspector_text = build_inspector_text(inspection)
+      issued_date = format_issued_date(inspection)
+
+      build_four_column_table_rows(unit, dimensions_text, inspector_text, issued_date)
+    end
+
+    def self.build_dimensions_text(inspection)
+      dimensions = collect_dimension_strings(inspection)
+      dimensions.any? ? dimensions.join(" ") : ""
+    end
+
+    def self.collect_dimension_strings(inspection)
+      return [] unless inspection
+
       dimensions = []
+      add_dimension(dimensions, inspection.width, :width) if inspection.width.present?
+      add_dimension(dimensions, inspection.length, :length) if inspection.length.present?
+      add_dimension(dimensions, inspection.height, :height) if inspection.height.present?
+      dimensions
+    end
 
-      if last_inspection
-        if last_inspection.width.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :width).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
-        end
-        if last_inspection.length.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :length).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
-        end
-        if last_inspection.height.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :height).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
-        end
-      end
-      dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
+    def self.add_dimension(dimensions, value, field)
+      label = ChobbleForms::FieldUtils.form_field_label(:inspection, field).sub(" (m)", "")
+      formatted_value = Utilities.format_dimension(value)
+      dimensions << "#{label}: #{formatted_value}"
+    end
 
-      # Get inspector details from current inspection (for inspection PDF) or last inspection (for unit PDF)
-      inspection = if context == :inspection
-        last_inspection
-      else
-        unit.last_inspection
-      end
+    def self.select_inspection_for_context(last_inspection, unit, context)
+      context == :inspection ? last_inspection : unit.last_inspection
+    end
+
+    def self.build_inspector_text(inspection)
       inspector_name = inspection&.user&.name
       rpii_number = inspection&.user&.rpii_inspector_number
 
-      # Combine inspector name with RPII number if present
-      inspector_text = if rpii_number.present?
-        "#{inspector_name} (#{I18n.t("pdf.inspection.fields.rpii_inspector_no")} #{rpii_number})"
+      if rpii_number.present?
+        rpii_label = I18n.t("pdf.inspection.fields.rpii_inspector_no")
+        "#{inspector_name} (#{rpii_label} #{rpii_number})"
       else
         inspector_name
       end
+    end
 
-      issued_date = if inspection&.inspection_date
-        Utilities.format_date(inspection.inspection_date)
-      end
+    def self.format_issued_date(inspection)
+      return nil unless inspection&.inspection_date
+      Utilities.format_date(inspection.inspection_date)
+    end
 
-      # Build the table rows
+    def self.build_four_column_table_rows(unit, dimensions_text, inspector_text, issued_date)
       [
         [
           ChobbleForms::FieldUtils.form_field_label(:units, :name),

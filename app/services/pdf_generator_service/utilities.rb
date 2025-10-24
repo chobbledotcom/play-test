@@ -33,33 +33,47 @@ class PdfGeneratorService
     end
 
     def self.add_draft_watermark(pdf)
-      # Add 3x3 grid of DRAFT watermarks to each page
       (1..pdf.page_count).each do |page_num|
         pdf.go_to_page(page_num)
-
-        pdf.transparent(WATERMARK_TRANSPARENCY) do
-          pdf.fill_color "FF0000"
-
-          # 3x3 grid positions
-          y_positions = [0.10, 0.30, 0.50, 0.70, 0.9].map { |pct| pdf.bounds.height * pct }
-          x_positions = [0.15, 0.50, 0.85].map { |pct| pdf.bounds.width * pct - (WATERMARK_WIDTH / 2) }
-
-          y_positions.each do |y|
-            x_positions.each do |x|
-              pdf.text_box I18n.t("pdf.inspection.watermark.draft"),
-                at: [x, y],
-                width: WATERMARK_WIDTH,
-                height: WATERMARK_HEIGHT,
-                size: WATERMARK_TEXT_SIZE,
-                style: :bold,
-                align: :center,
-                valign: :top
-            end
-          end
-        end
-
+        render_watermark_grid(pdf)
         pdf.fill_color "000000"
       end
+    end
+
+    def self.render_watermark_grid(pdf)
+      pdf.transparent(WATERMARK_TRANSPARENCY) do
+        pdf.fill_color "FF0000"
+        y_positions = calculate_watermark_y_positions(pdf)
+        x_positions = calculate_watermark_x_positions(pdf)
+        render_watermark_at_positions(pdf, y_positions, x_positions)
+      end
+    end
+
+    def self.calculate_watermark_y_positions(pdf)
+      [0.10, 0.30, 0.50, 0.70, 0.9].map { pdf.bounds.height * _1 }
+    end
+
+    def self.calculate_watermark_x_positions(pdf)
+      [0.15, 0.50, 0.85].map { pdf.bounds.width * _1 - (WATERMARK_WIDTH / 2) }
+    end
+
+    def self.render_watermark_at_positions(pdf, y_positions, x_positions)
+      y_positions.each do |y|
+        x_positions.each do |x|
+          render_watermark_text(pdf, x, y)
+        end
+      end
+    end
+
+    def self.render_watermark_text(pdf, x, y)
+      pdf.text_box I18n.t("pdf.inspection.watermark.draft"),
+        at: [x, y],
+        width: WATERMARK_WIDTH,
+        height: WATERMARK_HEIGHT,
+        size: WATERMARK_TEXT_SIZE,
+        style: :bold,
+        align: :center,
+        valign: :top
     end
   end
 end

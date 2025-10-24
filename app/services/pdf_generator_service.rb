@@ -9,78 +9,68 @@ class PdfGeneratorService
 
     Prawn::Document.new(page_size: "A4", page_layout: :portrait) do |pdf|
       Configuration.setup_pdf_fonts(pdf)
-
-      # Initialize array to collect all assessment blocks
       assessment_blocks = []
 
-      # Header section
-      HeaderGenerator.generate_inspection_pdf_header(pdf, inspection)
+      generate_inspection_header_and_sections(pdf, inspection, assessment_blocks)
+      footer_data = measure_and_render_footer_components(pdf, inspection)
+      render_assessment_blocks_in_columns(pdf, assessment_blocks, footer_data[:disclaimer], footer_data[:photo])
 
-      # Unit details section
-      generate_inspection_unit_details(pdf, inspection)
-
-      # Risk assessment section (if present)
-      generate_risk_assessment_section(pdf, inspection)
-
-      # Generate all assessment sections in the correct UI order from applicable_tabs
-      generate_assessments_in_ui_order(inspection, assessment_blocks)
-
-      # Render footer and photo first to measure actual space used
-      cursor_before_footer = pdf.cursor
-
-      # Disclaimer footer (only on first page)
-      DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
-      disclaimer_height = DisclaimerFooterRenderer.measure_footer_height(unbranded: false)
-
-      # Add unit photo in bottom right corner
-      photo_height = ImageProcessor.measure_unit_photo_height(pdf, inspection.unit, 4)
-      ImageProcessor.add_unit_photo_footer(pdf, inspection.unit, 4) if inspection.unit&.photo
-
-      # Reset cursor to render assessments with proper space accounting
-      pdf.move_cursor_to(cursor_before_footer)
-
-      # Render all collected assessments in newspaper-style columns
-      render_assessment_blocks_in_columns(pdf, assessment_blocks, disclaimer_height, photo_height)
-
-      # Add DRAFT watermark overlay for draft inspections (except in test env)
-      Utilities.add_draft_watermark(pdf) if !inspection.complete? && !Rails.env.test?
-
-      # Add photos page if photos are attached
-      PhotosRenderer.generate_photos_page(pdf, inspection)
-
-      # Add debug info page if enabled (admins only)
-      DebugInfoRenderer.add_debug_info_page(pdf, debug_queries) if debug_enabled && debug_queries.present?
+      add_inspection_overlays_and_pages(pdf, inspection, debug_enabled, debug_queries)
     end
+  end
+
+  def self.generate_inspection_header_and_sections(pdf, inspection, assessment_blocks)
+    HeaderGenerator.generate_inspection_pdf_header(pdf, inspection)
+    generate_inspection_unit_details(pdf, inspection)
+    generate_risk_assessment_section(pdf, inspection)
+    generate_assessments_in_ui_order(inspection, assessment_blocks)
+  end
+
+  def self.measure_and_render_footer_components(pdf, inspection)
+    cursor_before_footer = pdf.cursor
+    DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
+    disclaimer_height = DisclaimerFooterRenderer.measure_footer_height(unbranded: false)
+    photo_height = ImageProcessor.measure_unit_photo_height(pdf, inspection.unit, 4)
+    ImageProcessor.add_unit_photo_footer(pdf, inspection.unit, 4) if inspection.unit&.photo
+    pdf.move_cursor_to(cursor_before_footer)
+    {disclaimer: disclaimer_height, photo: photo_height}
+  end
+
+  def self.add_inspection_overlays_and_pages(pdf, inspection, debug_enabled, debug_queries)
+    Utilities.add_draft_watermark(pdf) if !inspection.complete? && !Rails.env.test?
+    PhotosRenderer.generate_photos_page(pdf, inspection)
+    DebugInfoRenderer.add_debug_info_page(pdf, debug_queries) if debug_enabled && debug_queries.present?
   end
 
   def self.generate_unit_report(unit, debug_enabled: false, debug_queries: [])
     require "prawn/table"
-
     unbranded = Rails.configuration.units.reports_unbranded
-
-    # Preload all inspections once to avoid N+1 queries
-    completed_inspections = unit.inspections
-      .includes(:user, inspector_company: {logo_attachment: :blob})
-      .complete
-      .order(inspection_date: :desc)
-
-    last_inspection = completed_inspections.first
+    completed_inspections = load_completed_inspections(unit)
 
     Prawn::Document.new(page_size: "A4", page_layout: :portrait) do |pdf|
       Configuration.setup_pdf_fonts(pdf)
-      HeaderGenerator.generate_unit_pdf_header(pdf, unit, unbranded: unbranded)
-      generate_unit_details_with_inspection(pdf, unit, last_inspection)
-      generate_unit_inspection_history_with_data(pdf, unit, completed_inspections)
-
-      # Disclaimer footer (only on first page, not for unbranded reports)
-      DisclaimerFooterRenderer.render_disclaimer_footer(pdf, unit.user, unbranded: unbranded)
-
-      # Add unit photo in bottom right corner (for unit PDFs, always use 3 columns)
-      ImageProcessor.add_unit_photo_footer(pdf, unit, 3) if unit.photo
-
-      # Add debug info page if enabled (admins only)
+      generate_unit_report_content(pdf, unit, completed_inspections, unbranded)
+      add_unit_footer_and_photo(pdf, unit, unbranded)
       DebugInfoRenderer.add_debug_info_page(pdf, debug_queries) if debug_enabled && debug_queries.present?
     end
+  end
+
+  def self.load_completed_inspections(unit)
+    unit.inspections
+      .includes(:user, inspector_company: {logo_attachment: :blob})
+      .complete
+      .order(inspection_date: :desc)
+  end
+
+  def self.generate_unit_report_content(pdf, unit, completed_inspections, unbranded)
+    HeaderGenerator.generate_unit_pdf_header(pdf, unit, unbranded: unbranded)
+    generate_unit_details_with_inspection(pdf, unit, completed_inspections.first)
+    generate_unit_inspection_history_with_data(pdf, unit, completed_inspections)
+  end
+
+  def self.add_unit_footer_and_photo(pdf, unit, unbranded)
+    DisclaimerFooterRenderer.render_disclaimer_footer(pdf, unit.user, unbranded: unbranded)
+    ImageProcessor.add_unit_photo_footer(pdf, unit, 3) if unit.photo
   end
 
   def self.generate_inspection_unit_details(pdf, inspection)
@@ -136,11 +126,14 @@ class PdfGeneratorService
     pdf.stroke_horizontal_rule
     pdf.move_down 10
 
-    # Create a text box constrained to 4 lines with shrink_to_fit
-    line_height = 10 * 1.2 # Normal font size * line height multiplier
-    max_height = line_height * 4 # 4 lines max
+    render_risk_assessment_text_box(pdf, inspection.risk_assessment)
+  end
 
-    pdf.text_box inspection.risk_assessment,
+  def self.render_risk_assessment_text_box(pdf, text)
+    line_height = 10 * 1.2
+    max_height = line_height * 4
+
+    pdf.text_box text,
       at: [0, pdf.cursor],
       width: pdf.bounds.width,
       height: max_height,
@@ -175,26 +168,18 @@ class PdfGeneratorService
     pdf.stroke_horizontal_rule
     pdf.move_down 15
 
-    # Calculate available height accounting for disclaimer footer only
-    available_height = if pdf.page_number == 1
-      pdf.cursor - disclaimer_height
-    else
-      pdf.cursor
-    end
-
-    # Check if we have enough space for at least some content
-    min_content_height = 100 # Minimum height for meaningful content
-    if available_height < min_content_height
-      pdf.start_new_page
-      available_height = pdf.cursor
-      0 # No footer on new pages
-    end
-
-    # Render assessments using the column layout with measured footer space
+    available_height = calculate_available_assessment_height(pdf, disclaimer_height)
     renderer = AssessmentColumns.new(assessment_blocks, available_height, photo_height)
     renderer.render(pdf)
-
     pdf.move_down 20
+  end
+
+  def self.calculate_available_assessment_height(pdf, disclaimer_height)
+    available = (pdf.page_number == 1) ? (pdf.cursor - disclaimer_height) : pdf.cursor
+    return available if available >= 100
+
+    pdf.start_new_page
+    pdf.cursor
   end
 
   # Helper methods for backward compatibility and testing
