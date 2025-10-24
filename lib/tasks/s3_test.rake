@@ -43,8 +43,8 @@ namespace :s3 do
     service
   end
 
-  define_method(:handle_s3_errors) do
-    yield
+  define_method(:handle_s3_errors) do |&block|
+    block.call
   rescue Aws::S3::Errors::ServiceError => e
     puts "\n❌ S3 Error: #{e.message}"
     Sentry.capture_exception(e)
