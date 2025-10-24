@@ -52,25 +52,12 @@ class InspectionsController < ApplicationController
 
   def new_from_unit
     @title = t("inspections.titles.new_from_unit")
-
-    search_param = params.dig(:search, :search)
-    @search_term = search_param
-
-    if search_param.present?
-      normalized_search = search_param.gsub(/\s+/, "").upcase[0, CustomIdGenerator::ID_LENGTH]
-
-      @unit = Unit
-        .includes(photo_attachment: :blob)
-        .find_by(id: normalized_search)
-
-      if @unit.nil?
-        @badge = Badge.find_by(id: normalized_search)
-      end
-    end
+    @search_term = unit_search_param
+    search_unit_or_badge if unit_search_param.present?
 
     respond_to do |format|
       format.html { render :new_from_unit }
-      format.turbo_stream { render turbo_stream: turbo_stream.replace("unit_search_results", partial: "inspections/unit_search_results") }
+      format.turbo_stream { render_unit_search_results }
     end
   end
 
@@ -98,22 +85,12 @@ class InspectionsController < ApplicationController
 
   def update
     previous_attributes = @inspection.attributes.dup
-
     params_to_update = inspection_params
 
-    if @image_processing_error
-      flash.now[:alert] = @image_processing_error.message
-      render :edit, status: :unprocessable_content
-      return
-    end
+    return render_image_processing_error if @image_processing_error
 
     if @inspection.update(params_to_update)
-      changed_data = calculate_changes(
-        previous_attributes,
-        @inspection.attributes,
-        inspection_params.keys
-      )
-      log_inspection_event("updated", @inspection, nil, changed_data)
+      log_update_changes(previous_attributes)
       handle_successful_update
     else
       handle_failed_update
@@ -121,29 +98,11 @@ class InspectionsController < ApplicationController
   end
 
   def destroy
-    if @inspection.complete?
-      alert_message = I18n.t("inspections.messages.delete_complete_denied")
-      redirect_to inspection_path(@inspection), alert: alert_message
-      return
-    end
+    return redirect_complete_inspection_delete if @inspection.complete?
 
-    # Capture inspection details before deletion for the audit log
-    inspection_details = {
-      inspection_date: @inspection.inspection_date,
-      unit_serial: @inspection.unit&.serial,
-      unit_name: @inspection.unit&.name,
-      complete_date: @inspection.complete_date
-    }
-
+    inspection_details = capture_inspection_details
     @inspection.destroy
-    # Log the deletion with the inspection details in metadata
-    Event.log(
-      user: current_user,
-      action: "deleted",
-      resource: @inspection,
-      details: nil,
-      metadata: inspection_details
-    )
+    log_deletion(inspection_details)
     redirect_to inspections_path, notice: I18n.t("inspections.messages.deleted")
   end
 
@@ -230,6 +189,67 @@ class InspectionsController < ApplicationController
 
   private
 
+  def unit_search_param = params.dig(:search, :search)
+
+  def search_unit_or_badge
+    normalized_search = unit_search_param.gsub(/\s+/, "").upcase[0, CustomIdGenerator::ID_LENGTH]
+    @unit = Unit.includes(photo_attachment: :blob).find_by(id: normalized_search)
+    @badge = Badge.find_by(id: normalized_search) if @unit.nil?
+  end
+
+  def render_unit_search_results
+    render turbo_stream: turbo_stream.replace("unit_search_results", partial: "inspections/unit_search_results")
+  end
+
+  def render_image_processing_error
+    flash.now[:alert] = @image_processing_error.message
+    render :edit, status: :unprocessable_content
+  end
+
+  def log_update_changes(previous_attributes)
+    changed_data = calculate_changes(previous_attributes, @inspection.attributes, inspection_params.keys)
+    log_inspection_event("updated", @inspection, nil, changed_data)
+  end
+
+  def redirect_complete_inspection_delete
+    alert_message = I18n.t("inspections.messages.delete_complete_denied")
+    redirect_to inspection_path(@inspection), alert: alert_message
+  end
+
+  def capture_inspection_details
+    {
+      inspection_date: @inspection.inspection_date,
+      unit_serial: @inspection.unit&.serial,
+      unit_name: @inspection.unit&.name,
+      complete_date: @inspection.complete_date
+    }
+  end
+
+  def log_deletion(inspection_details)
+    Event.log(
+      user: current_user,
+      action: "deleted",
+      resource: @inspection,
+      details: nil,
+      metadata: inspection_details
+    )
+  end
+
+  def log_completion_error
+    inspection_errors = @inspection.completion_errors
+    Rails.logger.error "Inspection #{@inspection.id} is marked complete but has errors: #{inspection_errors}"
+  end
+
+  def raise_or_log_integrity_error
+    error_message = I18n.t("inspections.errors.invalid_completion_state", errors: @inspection.completion_errors.join(", "))
+    if Rails.env.local?
+      test_message = "In tests, use create(:inspection, :completed) to avoid this."
+      raise StandardError, "DATA INTEGRITY ERROR: #{error_message}. #{test_message}"
+    else
+      Rails.logger.error "DATA INTEGRITY ERROR: #{error_message}"
+    end
+  end
+
   def check_assessments_enabled
     head :not_found unless Rails.configuration.app.has_assessments
   end
@@ -277,23 +297,8 @@ class InspectionsController < ApplicationController
     return unless @inspection.complete?
     return if @inspection.can_mark_complete?
 
-    error_message = I18n.t(
-      "inspections.errors.invalid_completion_state",
-      errors: @inspection.completion_errors.join(", ")
-    )
-
-    inspection_errors = @inspection.completion_errors
-    Rails.logger.error "Inspection #{@inspection.id} is marked complete " \
-                      "but has errors: #{inspection_errors}"
-
-    # Only raise error in development/test environments
-    if Rails.env.local?
-      test_message = "In tests, use create(:inspection, :completed) to avoid this."
-      raise StandardError, "DATA INTEGRITY ERROR: #{error_message}. #{test_message}"
-    else
-      # In production, log the error but continue
-      Rails.logger.error "DATA INTEGRITY ERROR: #{error_message}"
-    end
+    log_completion_error
+    raise_or_log_integrity_error
   end
 
   ASSESSMENT_SYSTEM_ATTRIBUTES = %w[
@@ -561,24 +566,31 @@ class InspectionsController < ApplicationController
     return unless current_user
 
     if inspection
-      Event.log(
-        user: current_user,
-        action: action,
-        resource: inspection,
-        details: details,
-        changed_data: changed_data
-      )
+      log_inspection_with_resource(action, inspection, details, changed_data)
     else
-      # For events without a specific inspection (like CSV export)
-      Event.log_system_event(
-        user: current_user,
-        action: action,
-        details: details,
-        metadata: {resource_type: "Inspection"}
-      )
+      log_inspection_system_event(action, details)
     end
   rescue => e
     Rails.logger.error "Failed to log inspection event: #{e.message}"
+  end
+
+  def log_inspection_with_resource(action, inspection, details, changed_data)
+    Event.log(
+      user: current_user,
+      action: action,
+      resource: inspection,
+      details: details,
+      changed_data: changed_data
+    )
+  end
+
+  def log_inspection_system_event(action, details)
+    Event.log_system_event(
+      user: current_user,
+      action: action,
+      details: details,
+      metadata: {resource_type: "Inspection"}
+    )
   end
 
   def calculate_changes(previous_attributes, current_attributes, changed_keys)
