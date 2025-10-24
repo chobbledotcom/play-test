@@ -59,9 +59,6 @@ module PlayTest
     config.sass.preferred_syntax = :scss
     config.sass.style = :expanded
 
-    # Preserve full timezone rather than offset in Rails 8.1+
-    config.active_support.to_time_preserves_timezone = :zone
-
     # === Environment Variable Configuration ===
     # Centralized configuration for all application-level ENV variables
     # No rescues - if a value exists, we assume it's in the correct format

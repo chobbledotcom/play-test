@@ -81,7 +81,7 @@ class ApplicationController < ActionController::Base
 
   sig { void }
   def store_location
-    session[:forwarding_url] = request.fullpath if request.get?
+    session[:forwarding_url] = request.fullpath if request.get? || request.head?
   end
 
   sig { params(default: String).void }
@@ -210,7 +210,7 @@ class ApplicationController < ActionController::Base
         %w[users create]
       ]
 
-      action = [controller_name, action_name]
+      action = [ controller_name, action_name ]
       return false if csrf_ignored_actions.include?(action)
     end
 
