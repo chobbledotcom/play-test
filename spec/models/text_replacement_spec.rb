@@ -36,6 +36,7 @@ RSpec.describe TextReplacement, type: :model do
 
   describe ".available_i18n_keys" do
     it "returns all i18n keys in the application" do
+      I18n.backend.load_translations
       keys = TextReplacement.available_i18n_keys
       expect(keys).to be_an(Array)
       expect(keys).to include("en.admin_text_replacements.title")

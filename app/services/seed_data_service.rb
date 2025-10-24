@@ -2,6 +2,7 @@
 
 class SeedDataService
   extend T::Sig
+
   CASTLE_IMAGE_COUNT = T.let(5, Integer)
   UNIT_COUNT = T.let(20, Integer)
   INSPECTION_COUNT = T.let(5, Integer)
