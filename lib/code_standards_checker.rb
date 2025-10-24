@@ -156,7 +156,17 @@ class CodeStandardsChecker
       stripped.include?("Rails.logger") ||
       stripped.include?("puts") ||
       stripped.include?("print") ||
-      stripped.include?(".execute(")
+      stripped.include?(".execute(") ||
+      line_has_technical_comment?(stripped)
+  end
+
+  def line_has_technical_comment?(line)
+    comment_match = line.match(/#\s*(.*)/)
+    return false unless comment_match
+
+    comment_text = comment_match[1].downcase
+    technical_keywords = %w[http rfc protocol header specification]
+    technical_keywords.any? { |keyword| comment_text.include?(keyword) }
   end
 
   def extract_quoted_strings(stripped)

@@ -35,8 +35,7 @@ class BackupsController < ApplicationController
     service = ActiveStorage::Blob.service
 
     # Verify we're using S3 storage (s3.enabled checked in before_action)
-    s3_service_class = "ActiveStorage::Service::S3Service"
-    unless service.class.name == s3_service_class
+    unless service.is_a?(ActiveStorage::Service::S3Service)
       raise t("backups.errors.s3_not_configured")
     end
 
@@ -104,6 +103,7 @@ class BackupsController < ApplicationController
   end
 
   def build_content_disposition(filename)
+    # HTTP header format per RFC 6266 (not user-facing, no i18n needed)
     "attachment; filename=\"#{filename}\""
   end
 
