@@ -93,53 +93,97 @@ class PdfGeneratorService
         [logo_width, logo_data, user.logo]
       end
 
-      def render_inspection_text_section(pdf, inspection, report_id_text,
-        status_text, status_color, logo_width)
-        # Shift text to the right to accommodate QR code
+      def render_inspection_text_section(
+        pdf,
+        inspection,
+        report_id_text,
+        status_text,
+        status_color,
+        logo_width
+      )
         qr_offset = Configuration::QR_CODE_SIZE + Configuration::HEADER_SPACING
         width = pdf.bounds.width - logo_width - qr_offset
         pdf.bounding_box([qr_offset, pdf.bounds.top], width: width) do
-          pdf.text report_id_text, size: Configuration::HEADER_TEXT_SIZE,
-            style: :bold
-          pdf.text status_text, size: Configuration::HEADER_TEXT_SIZE,
-            style: :bold,
-            color: status_color
-
-          expiry_label = I18n.t("pdf.inspection.fields.expiry_date")
-          expiry_value = Utilities.format_date(inspection.reinspection_date)
-          pdf.text "#{expiry_label}: #{expiry_value}",
-            size: Configuration::HEADER_TEXT_SIZE, style: :bold
+          render_inspection_report_id(pdf, report_id_text)
+          render_inspection_status(pdf, status_text, status_color)
+          render_inspection_expiry(pdf, inspection)
         end
       end
 
+      def render_inspection_report_id(pdf, report_id_text)
+        pdf.text(
+          report_id_text,
+          size: Configuration::HEADER_TEXT_SIZE,
+          style: :bold
+        )
+      end
+
+      def render_inspection_status(pdf, status_text, status_color)
+        pdf.text(
+          status_text,
+          size: Configuration::HEADER_TEXT_SIZE,
+          style: :bold,
+          color: status_color
+        )
+      end
+
+      def render_inspection_expiry(pdf, inspection)
+        expiry_label = I18n.t("pdf.inspection.fields.expiry_date")
+        expiry_value = Utilities.format_date(inspection.reinspection_date)
+        pdf.text(
+          "#{expiry_label}: #{expiry_value}",
+          size: Configuration::HEADER_TEXT_SIZE,
+          style: :bold
+        )
+      end
+
       def render_unit_text_section(pdf, unit, unit_id_text, logo_width)
-        # Shift text to the right to accommodate QR code
         qr_offset = Configuration::QR_CODE_SIZE + Configuration::HEADER_SPACING
         width = pdf.bounds.width - logo_width - qr_offset
         pdf.bounding_box([qr_offset, pdf.bounds.top], width: width) do
-          pdf.text unit_id_text, size: Configuration::HEADER_TEXT_SIZE,
-            style: :bold
-
-          expiry_label = I18n.t("pdf.unit.fields.expiry_date")
-          expiry_value = if unit.last_inspection&.reinspection_date
-            Utilities.format_date(unit.last_inspection.reinspection_date)
-          else
-            I18n.t("pdf.unit.fields.na")
-          end
-          pdf.text "#{expiry_label}: #{expiry_value}",
-            size: Configuration::HEADER_TEXT_SIZE, style: :bold
-
-          # Add extra line of spacing to match 3-line QR code height
+          render_unit_header_text(pdf, unit_id_text)
+          render_unit_expiry_text(pdf, unit)
           pdf.move_down Configuration::HEADER_TEXT_SIZE * 1.5
+        end
+      end
+
+      def render_unit_header_text(pdf, unit_id_text)
+        pdf.text(
+          unit_id_text,
+          size: Configuration::HEADER_TEXT_SIZE,
+          style: :bold
+        )
+      end
+
+      def render_unit_expiry_text(pdf, unit)
+        expiry_label = I18n.t("pdf.unit.fields.expiry_date")
+        expiry_value = format_unit_expiry_value(unit)
+        pdf.text(
+          "#{expiry_label}: #{expiry_value}",
+          size: Configuration::HEADER_TEXT_SIZE,
+          style: :bold
+        )
+      end
+
+      def format_unit_expiry_value(unit)
+        if unit.last_inspection&.reinspection_date
+          Utilities.format_date(unit.last_inspection.reinspection_date)
+        else
+          I18n.t("pdf.unit.fields.na")
         end
       end
 
       def render_logo_section(pdf, logo_data, logo_width, logo_attachment)
         x_position = pdf.bounds.width - logo_width + 10
-        pdf.bounding_box([x_position, pdf.bounds.top],
-          width: logo_width - 10) do
-          pdf.image StringIO.new(logo_data), height: Configuration::LOGO_HEIGHT,
+        pdf.bounding_box(
+          [x_position, pdf.bounds.top],
+          width: logo_width - 10
+        ) do
+          pdf.image(
+            StringIO.new(logo_data),
+            height: Configuration::LOGO_HEIGHT,
             position: :right
+          )
         end
       rescue Prawn::Errors::UnsupportedImageType => e
         raise ImageError.build_detailed_error(e, logo_attachment)

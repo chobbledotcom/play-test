@@ -74,8 +74,7 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
         allow(user).to receive(:logo).and_return(
           double("logo", attached?: false)
         )
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[]).with("PDF_LOGO").and_return(nil)
+        allow(Rails.configuration.pdf).to receive(:logo).and_return(nil)
       end
 
       it "renders disclaimer header" do
@@ -108,8 +107,7 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
         allow(user).to receive(:logo).and_return(
           double("logo", attached?: false)
         )
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[]).with("PDF_LOGO").and_return(nil)
+        allow(Rails.configuration.pdf).to receive(:logo).and_return(nil)
       end
 
       it "creates table with disclaimer and signature cells" do
@@ -125,8 +123,7 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
           double("signature", attached?: false)
         )
         allow(user).to receive(:logo).and_return(logo)
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[]).with("PDF_LOGO").and_return("true")
+        allow(Rails.configuration.pdf).to receive(:logo).and_return("logo.png")
       end
 
       it "creates table with disclaimer and logo cells" do
@@ -140,8 +137,7 @@ RSpec.describe PdfGeneratorService::DisclaimerFooterRenderer do
       before do
         allow(user).to receive(:signature).and_return(signature)
         allow(user).to receive(:logo).and_return(logo)
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[]).with("PDF_LOGO").and_return("true")
+        allow(Rails.configuration.pdf).to receive(:logo).and_return("logo.png")
       end
 
       it "creates table with all three cells" do

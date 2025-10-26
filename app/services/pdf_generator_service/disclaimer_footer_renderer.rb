@@ -8,26 +8,22 @@ class PdfGeneratorService
     def self.render_disclaimer_footer(pdf, user, unbranded: false)
       return if unbranded
 
-      # Save current position
       original_y = pdf.cursor
+      pdf.move_cursor_to FOOTER_HEIGHT
 
-      # Move to footer position
-      footer_y = FOOTER_HEIGHT
-      pdf.move_cursor_to footer_y
+      render_footer_in_bounding_box(pdf, user)
+      pdf.move_cursor_to original_y
+    end
 
-      # Create bounding box for footer
-      bounding_box_width = pdf.bounds.width
-      bounding_box_at = [0, pdf.cursor]
-      pdf.bounding_box(bounding_box_at,
-        width: bounding_box_width,
-        height: FOOTER_HEIGHT) do
-        # Add top padding
+    def self.render_footer_in_bounding_box(pdf, user)
+      pdf.bounding_box(
+        [0, pdf.cursor],
+        width: pdf.bounds.width,
+        height: FOOTER_HEIGHT
+      ) do
         pdf.move_down FOOTER_TOP_PADDING
         render_footer_content(pdf, user)
       end
-
-      # Restore position
-      pdf.move_cursor_to original_y
     end
 
     def self.measure_footer_height(unbranded:)
@@ -35,76 +31,69 @@ class PdfGeneratorService
     end
 
     def self.render_footer_content(pdf, user)
-      # Render disclaimer header
       render_disclaimer_header(pdf)
-
       pdf.move_down FOOTER_INTERNAL_PADDING
 
-      # Check what content we have
       has_signature = user&.signature&.attached?
-      pdf_logo = Rails.configuration.pdf.logo
-      has_user_logo = pdf_logo.present? && user&.logo&.attached?
-      pdf.bounds.width
+      has_user_logo = check_has_user_logo(user)
 
-      first_row = [
-        pdf.make_cell(
-          content: I18n.t("pdf.disclaimer.text"),
-          size: DISCLAIMER_TEXT_SIZE,
-          inline_format: true,
-          valign: :top,
-          padding: [0, (has_signature || has_user_logo) ? 10 : 0, 0, 0]
-        )
-      ]
-
-      if has_signature
-        first_row << pdf.make_cell(
-          image: StringIO.new(user.signature.download),
-          fit: [100, DISCLAIMER_TEXT_HEIGHT],
-          width: 100,
-          borders: %i[top bottom left right],
-          border_color: "CCCCCC",
-          border_width: 1,
-          padding: 5,
-          padding_right: has_user_logo ? 10 : 5,
-          padding_left: 5
-        )
-      end
-
-      if has_user_logo
-        first_row << pdf.make_cell(
-          image: StringIO.new(user.logo.download),
-          fit: [1000, DISCLAIMER_TEXT_HEIGHT],
-          borders: [],
-          padding: [0, 0, 0, 10]
-        )
-      end
-
-      if has_signature
-        caption_row = [pdf.make_cell(content: "", borders: [], padding: 0)]
-        caption_row << pdf.make_cell(
-          content: I18n.t("pdf.signature.caption"),
-          size: DISCLAIMER_TEXT_SIZE,
-          align: :center,
-          borders: [],
-          padding: [5, has_user_logo ? 10 : 5, 0, 5]
-        )
-        caption_row << pdf.make_cell(content: "", borders: [], padding: 0) if has_user_logo
-      end
-
-      first_row.length
-
+      first_row = build_footer_first_row(pdf, user, has_signature, has_user_logo)
       table_data = [first_row]
-      # table_data << caption_row if has_signature
 
-      pdf.table(table_data) do |t|
-        t.cells.borders = []
-      end
+      pdf.table(table_data) { |t| t.cells.borders = [] }
+    end
+
+    def self.check_has_user_logo(user)
+      pdf_logo = Rails.configuration.pdf.logo
+      pdf_logo.present? && user&.logo&.attached?
+    end
+
+    def self.build_footer_first_row(pdf, user, has_signature, has_user_logo)
+      first_row = [build_disclaimer_cell(pdf, has_signature, has_user_logo)]
+      first_row << build_signature_cell(pdf, user, has_user_logo) if has_signature
+      first_row << build_logo_cell(pdf, user) if has_user_logo
+      first_row
+    end
+
+    def self.build_disclaimer_cell(pdf, has_signature, has_user_logo)
+      pdf.make_cell(
+        content: I18n.t("pdf.disclaimer.text"),
+        size: DISCLAIMER_TEXT_SIZE,
+        inline_format: true,
+        valign: :top,
+        padding: [0, (has_signature || has_user_logo) ? 10 : 0, 0, 0]
+      )
+    end
+
+    def self.build_signature_cell(pdf, user, has_user_logo)
+      pdf.make_cell(
+        image: StringIO.new(user.signature.download),
+        fit: [100, DISCLAIMER_TEXT_HEIGHT],
+        width: 100,
+        borders: %i[top bottom left right],
+        border_color: "CCCCCC",
+        border_width: 1,
+        padding: 5,
+        padding_right: has_user_logo ? 10 : 5,
+        padding_left: 5
+      )
+    end
+
+    def self.build_logo_cell(pdf, user)
+      pdf.make_cell(
+        image: StringIO.new(user.logo.download),
+        fit: [1000, DISCLAIMER_TEXT_HEIGHT],
+        borders: [],
+        padding: [0, 0, 0, 10]
+      )
     end
 
     def self.render_disclaimer_header(pdf)
-      pdf.text I18n.t("pdf.disclaimer.header"),
+      pdf.text(
+        I18n.t("pdf.disclaimer.header"),
         size: DISCLAIMER_HEADER_SIZE,
         style: :bold
+      )
       pdf.stroke_horizontal_rule
     end
   end

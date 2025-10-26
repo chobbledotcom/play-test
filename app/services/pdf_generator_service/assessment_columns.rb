@@ -96,96 +96,81 @@ class PdfGeneratorService
       column_y = start_y
 
       content_blocks.each do |content|
-        # Check if we need to move to next column
-        if current_column < columns.size
-          available = column_y - (start_y - columns[current_column][:height])
+        break unless current_column < columns.size
 
-          if available < content[:height]
-            # Move to next column
-            current_column += 1
-            column_y = start_y
-
-            # Stop if we run out of columns
-            break if current_column >= columns.size
-          end
-        else
-          break
+        if needs_new_column?(column_y, start_y, columns[current_column], content[:height])
+          current_column += 1
+          column_y = start_y
+          break unless current_column < columns.size
         end
 
-        # Render content in current column
-        column = columns[current_column]
-        render_content_at_position(pdf, content, column, column_y, font_size)
-
-        # Update position
+        render_content_at_position(pdf, content, columns[current_column], column_y, font_size)
         column_y -= content[:height]
       end
     end
 
+    def needs_new_column?(column_y, start_y, column, content_height)
+      available = column_y - (start_y - column[:height])
+      available < content_height
+    end
+
     def render_content_at_position(pdf, content, column, y_pos, font_size)
-      # Save original state
       original_y = pdf.cursor
       original_fill_color = pdf.fill_color
 
-      # Calculate actual x position
-      actual_x = column[:x]
-
-      # Use the font size from the content block if available
       text_size = content[:font_size] || font_size
+      formatted_text = convert_content_fragments_to_formatted_text(content[:fragments])
 
-      # Convert fragments to formatted text array for proper wrapping
-      formatted_text = content[:fragments].map do |fragment|
-        styles = []
-        styles << :bold if fragment[:bold]
-        styles << :italic if fragment[:italic]
-
-        {
-          text: fragment[:text],
-          styles: styles,
-          color: fragment[:color]
-        }
-      end
-
-      # Render as single formatted text box for proper wrapping
       pdf.formatted_text_box(
         formatted_text,
-        at: [actual_x, y_pos],
+        at: [column[:x], y_pos],
         width: column[:width],
         size: text_size,
         overflow: :truncate
       )
 
-      # Restore original state
       pdf.fill_color original_fill_color
       pdf.move_cursor_to original_y
+    end
+
+    def convert_content_fragments_to_formatted_text(fragments)
+      fragments.map do |fragment|
+        styles = []
+        styles << :bold if fragment[:bold]
+        styles << :italic if fragment[:italic]
+        {text: fragment[:text], styles: styles, color: fragment[:color]}
+      end
     end
 
     def calculate_column_boxes(pdf)
       total_spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER * 3
       column_width = (pdf.bounds.width - total_spacer_width) / 4.0
-
       columns = []
 
-      # First three columns - full height
-      3.times do |i|
-        x = i * (column_width + Configuration::ASSESSMENT_COLUMN_SPACER)
-        columns << {
-          x: x,
-          y: pdf.cursor,
-          width: column_width,
-          height: assessment_results_height
-        }
-      end
+      3.times { |i| columns << create_full_height_column(i, column_width, pdf) }
+      columns << create_fourth_column(column_width, pdf)
+      columns
+    end
 
-      # Fourth column - reduced by photo height
-      fourth_column_height = [assessment_results_height - photo_height - 5, 0].max # 5pt buffer
-      columns << {
-        x: 3 * (column_width + Configuration::ASSESSMENT_COLUMN_SPACER),
+    def create_full_height_column(index, column_width, pdf)
+      spacer = Configuration::ASSESSMENT_COLUMN_SPACER
+      {
+        x: index * (column_width + spacer),
+        y: pdf.cursor,
+        width: column_width,
+        height: assessment_results_height
+      }
+    end
+
+    def create_fourth_column(column_width, pdf)
+      fourth_column_height = [assessment_results_height - photo_height - 5, 0].max
+      spacer = Configuration::ASSESSMENT_COLUMN_SPACER
+      {
+        x: 3 * (column_width + spacer),
         y: pdf.cursor,
         width: column_width,
         height: fourth_column_height
       }
-
-      columns
     end
 
     def calculate_line_height(font_size)

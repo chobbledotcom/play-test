@@ -15,110 +15,109 @@ class PdfGeneratorService
     end
 
     def build
-      blocks = []
-
-      # Add header block
-      blocks << AssessmentBlock.new(
-        type: :header,
-        name: I18n.t("forms.#{@assessment_type}.header")
-      )
-
-      # Process fields
-      ordered_fields = get_form_config_fields
-      field_groups = group_assessment_fields(ordered_fields)
-
-      field_groups.each do |base, fields|
-        # Skip if this is a not-applicable field with value 0
-        main_field = fields[:base] || fields[:pass]
-        if main_field && field_is_not_applicable?(main_field)
-          next
-        end
-
-        # Add value block
-        if main_field
-          value = @assessment.send(main_field)
-          label = get_field_label(fields)
-          pass_value = determine_pass_value(fields, main_field, value)
-          is_pass_field = main_field.to_s.end_with?("_pass")
-
-          # For boolean fields that aren't pass/fail fields
-          is_bool_non_pass = [true, false].include?(value) &&
-            !is_pass_field && pass_value.nil?
-          blocks << if is_bool_non_pass
-            AssessmentBlock.new(
-              type: :value,
-              name: label,
-              value: value ? I18n.t("shared.yes") : I18n.t("shared.no")
-            )
-          else
-            AssessmentBlock.new(
-              type: :value,
-              pass_fail: pass_value,
-              name: label,
-              value: is_pass_field ? nil : value
-            )
-          end
-        elsif fields[:comment]
-          # Handle standalone comment fields (no base or pass field)
-          label = get_field_label(fields)
-          comment = @assessment.send(fields[:comment])
-          if comment.present?
-            # Add a label block for the standalone comment
-            blocks << AssessmentBlock.new(
-              type: :value,
-              name: label,
-              value: nil
-            )
-          end
-        end
-
-        # Add comment block if present
-        if fields[:comment]
-          comment = @assessment.send(fields[:comment])
-          if comment.present?
-            blocks << AssessmentBlock.new(
-              type: :comment,
-              comment: comment
-            )
-          end
-        end
-      end
-
+      blocks = [create_header_block]
+      field_groups = group_assessment_fields(get_form_config_fields)
+      field_groups.each { |base, fields| process_field_group(blocks, fields) }
       blocks
     end
 
     private
 
+    def create_header_block
+      AssessmentBlock.new(
+        type: :header,
+        name: I18n.t("forms.#{@assessment_type}.header")
+      )
+    end
+
+    def process_field_group(blocks, fields)
+      main_field = fields[:base] || fields[:pass]
+      return if main_field && field_is_not_applicable?(main_field)
+
+      add_value_block(blocks, fields, main_field) if main_field
+      add_standalone_comment_label(blocks, fields) if fields[:comment] && !main_field
+      add_comment_block(blocks, fields) if fields[:comment]
+    end
+
+    def add_value_block(blocks, fields, main_field)
+      value = @assessment.send(main_field)
+      label = get_field_label(fields)
+      pass_value = determine_pass_value(fields, main_field, value)
+      is_pass_field = main_field.to_s.end_with?("_pass")
+      is_bool_non_pass = boolean_non_pass_field?(value, is_pass_field, pass_value)
+
+      blocks << if is_bool_non_pass
+        create_boolean_block(label, value)
+      else
+        create_standard_block(label, pass_value, is_pass_field, value)
+      end
+    end
+
+    def boolean_non_pass_field?(value, is_pass_field, pass_value)
+      [true, false].include?(value) && !is_pass_field && pass_value.nil?
+    end
+
+    def create_boolean_block(label, value)
+      AssessmentBlock.new(
+        type: :value,
+        name: label,
+        value: value ? I18n.t("shared.yes") : I18n.t("shared.no")
+      )
+    end
+
+    def create_standard_block(label, pass_value, is_pass_field, value)
+      AssessmentBlock.new(
+        type: :value,
+        pass_fail: pass_value,
+        name: label,
+        value: is_pass_field ? nil : value
+      )
+    end
+
+    def add_standalone_comment_label(blocks, fields)
+      comment = @assessment.send(fields[:comment])
+      return unless comment.present?
+
+      blocks << AssessmentBlock.new(
+        type: :value,
+        name: get_field_label(fields),
+        value: nil
+      )
+    end
+
+    def add_comment_block(blocks, fields)
+      comment = @assessment.send(fields[:comment])
+      return unless comment.present?
+
+      blocks << AssessmentBlock.new(
+        type: :comment,
+        comment: comment
+      )
+    end
+
     def get_form_config_fields
       return [] unless @assessment.class.respond_to?(:form_fields)
 
-      form_config = @assessment.class.form_fields
       ordered_fields = []
-
-      form_config.each do |section|
+      @assessment.class.form_fields.each do |section|
         section[:fields].each do |field_config|
-          field_name = field_config[:field]
-          partial_name = field_config[:partial]
-
-          # Get composite fields first to check if any exist
-          composite_fields = ChobbleForms::FieldUtils.get_composite_fields(field_name, partial_name)
-
-          # Skip if neither the base field nor any composite fields exist
-          has_base = @assessment.respond_to?(field_name)
-          has_composites = composite_fields.any? { |cf| @assessment.respond_to?(cf) }
-          next unless has_base || has_composites
-
-          # Add base field if it exists
-          ordered_fields << field_name if has_base
-
-          # Add composite fields that exist
-          composite_fields.each do |composite_field|
-            ordered_fields << composite_field if @assessment.respond_to?(composite_field)
-          end
+          add_field_and_composites(ordered_fields, field_config)
         end
       end
-
       ordered_fields
+    end
+
+    def add_field_and_composites(ordered_fields, field_config)
+      field_name = field_config[:field]
+      partial_name = field_config[:partial]
+      composite_fields = ChobbleForms::FieldUtils.get_composite_fields(field_name, partial_name)
+
+      has_base = @assessment.respond_to?(field_name)
+      has_composites = composite_fields.any? { |cf| @assessment.respond_to?(cf) }
+      return unless has_base || has_composites
+
+      ordered_fields << field_name if has_base
+      composite_fields.each { |cf| ordered_fields << cf if @assessment.respond_to?(cf) }
     end
 
     def group_assessment_fields(field_keys)

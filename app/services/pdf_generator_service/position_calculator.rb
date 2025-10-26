@@ -67,22 +67,22 @@ class PdfGeneratorService
       original_width.to_f / original_height.to_f
     end
 
-    # Calculate dimensions to fit within constraints while maintaining aspect ratio
     def self.fit_dimensions(original_width, original_height, max_width, max_height)
       return [max_width, max_height] if original_width.zero? || original_height.zero?
-
-      # If original already fits within constraints, return original dimensions
-      if original_width <= max_width && original_height <= max_height
-        return [original_width, original_height]
-      end
+      return [original_width, original_height] if fits_within_bounds?(original_width, original_height, max_width, max_height)
 
       aspect_ratio = calculate_aspect_ratio(original_width, original_height)
+      fit_to_constraints(aspect_ratio, max_width, max_height)
+    end
 
-      # Try fitting by width first
+    def self.fits_within_bounds?(width, height, max_width, max_height)
+      width <= max_width && height <= max_height
+    end
+
+    def self.fit_to_constraints(aspect_ratio, max_width, max_height)
       fitted_width = max_width
       fitted_height = (fitted_width / aspect_ratio).round
 
-      # If height is too big, fit by height instead
       if fitted_height > max_height
         fitted_height = max_height
         fitted_width = (fitted_height * aspect_ratio).round
