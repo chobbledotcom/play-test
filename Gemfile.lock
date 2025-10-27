@@ -287,7 +287,7 @@ GEM
     octokit (9.2.0)
       faraday (>= 1, < 3)
       sawyer (~> 0.9)
-    openssl (3.3.1)
+    openssl (3.3.2)
     openssl-signature_algorithm (1.3.0)
       openssl (> 2.0)
     parallel (1.27.0)
@@ -615,7 +615,7 @@ DEPENDENCIES
   licensed (~> 5.0)
   litestream
   mission_control-jobs (~> 1.0)
-  openssl (= 3.3.1)
+  openssl (= 3.3.2)
   parallel_tests
   pdf-inspector
   pg_query
