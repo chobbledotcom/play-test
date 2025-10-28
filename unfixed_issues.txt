@@ -1,122 +1,122 @@
 Found 117 ERB files to lint...
 ================================================================================
-[1/117] app/views/admin/files.html.erb                               ✅ (1.4s)
-[2/117] app/views/admin/index.html.erb                               ✅ (1.39s)
-[3/117] app/views/admin/releases.html.erb                            ❌ 1 violation(s) (1.35s)
-[4/117] app/views/admin_text_replacements/_form.html.erb             ❌ 1 violation(s) (1.35s)
-[5/117] app/views/admin_text_replacements/_tree.html.erb             ✅ (1.42s)
-[6/117] app/views/admin_text_replacements/edit.html.erb              ✅ (1.35s)
-[7/117] app/views/admin_text_replacements/index.html.erb             ✅ (1.34s)
-[8/117] app/views/admin_text_replacements/new.html.erb               ✅ (1.35s)
-[9/117] app/views/assessments/_anchorage_safety_results.html.erb     ✅ (1.35s)
-[10/117] app/views/assessments/_play_area_validation.html.erb         ✅ (1.41s)
-[11/117] app/views/assessments/_safety_standard_with_breakdown.html.erb ✅ (1.39s)
-[12/117] app/views/assessments/_slide_safety_results.html.erb         ✅ (1.39s)
-[13/117] app/views/assessments/_user_height_safety_results.html.erb   ✅ (1.4s)
-[14/117] app/views/backups/index.html.erb                             ❌ 1 violation(s) (1.42s)
-[15/117] app/views/badge_batches/edit.html.erb                        ✅ (1.5s)
-[16/117] app/views/badge_batches/index.html.erb                       ✅ (1.41s)
-[17/117] app/views/badge_batches/new.html.erb                         ✅ (1.37s)
-[18/117] app/views/badges/edit.html.erb                               ✅ (1.39s)
-[19/117] app/views/errors/internal_server_error.html.erb              ✅ (1.36s)
-[20/117] app/views/errors/not_found.html.erb                          ✅ (1.38s)
-[21/117] app/views/guides/_controls.html.erb                          ✅ (1.38s)
-[22/117] app/views/guides/index.html.erb                              ✅ (1.4s)
-[23/117] app/views/guides/show.html.erb                               ✅ (1.36s)
-[24/117] app/views/inspections/_assessment_form.html.erb              ✅ (1.36s)
-[25/117] app/views/inspections/_filter_form.html.erb                  ✅ (1.34s)
-[26/117] app/views/inspections/_form.html.erb                         ✅ (1.38s)
-[27/117] app/views/inspections/_inspection_details.html.erb           ❌ 1 violation(s) (1.31s)
-[28/117] app/views/inspections/_inspection_stats.html.erb             ❌ 2 violation(s) (1.33s)
-[29/117] app/views/inspections/_inspections_table.html.erb            ✅ (1.45s)
-[30/117] app/views/inspections/_mark_complete_section.html.erb        ❌ 1 violation(s) (1.34s)
-[31/117] app/views/inspections/_new_from_unit_content.html.erb        ❌ 1 violation(s) (1.34s)
-[32/117] app/views/inspections/_results_form.html.erb                 ❌ 3 violation(s) (1.54s)
-[33/117] app/views/inspections/_safety_standards_summary.html.erb     ❌ 2 violation(s) (1.48s)
-[34/117] app/views/inspections/_unit_search_results.html.erb          ❌ 1 violation(s) (1.48s)
-[35/117] app/views/inspections/_unit_selection_table.html.erb         ✅ (1.43s)
-[36/117] app/views/inspections/edit.html.erb                          ✅ (1.44s)
-[37/117] app/views/inspections/index.html.erb                         ❌ 3 violation(s) (1.43s)
-[38/117] app/views/inspections/log.html.erb                           ✅ (1.33s)
-[39/117] app/views/inspections/new_from_unit.html.erb                 ✅ (1.3s)
-[40/117] app/views/inspections/select_unit.html.erb                   ✅ (1.39s)
-[41/117] app/views/inspections/show.html.erb                          ❌ 3 violation(s) (1.38s)
-[42/117] app/views/inspector_companies/_filter_form.html.erb          ✅ (1.36s)
-[43/117] app/views/inspector_companies/_form.html.erb                 ❌ 1 violation(s) (1.33s)
-[44/117] app/views/inspector_companies/edit.html.erb                  ✅ (1.33s)
-[45/117] app/views/inspector_companies/index.html.erb                 ✅ (1.39s)
-[46/117] app/views/inspector_companies/new.html.erb                   ✅ (1.34s)
-[47/117] app/views/inspector_companies/show.html.erb                  ❌ 6 violation(s) (1.51s)
-[48/117] app/views/layouts/application.html.erb                       ✅ (1.52s)
-[49/117] app/views/layouts/pdf_viewer.html.erb                        ✅ (1.33s)
-[50/117] app/views/pages/_form.html.erb                               ❌ 1 violation(s) (1.32s)
-[51/117] app/views/pages/edit.html.erb                                ✅ (1.33s)
-[52/117] app/views/pages/index.html.erb                               ✅ (1.36s)
-[53/117] app/views/pages/new.html.erb                                 ✅ (1.32s)
-[54/117] app/views/pages/show.html.erb                                ✅ (1.36s)
-[55/117] app/views/safety_standards/_anchor_result.html.erb           ❌ 1 violation(s) (1.32s)
-[56/117] app/views/safety_standards/_anchorage_tab.html.erb           ✅ (1.33s)
-[57/117] app/views/safety_standards/_api_params.html.erb              ✅ (1.33s)
-[58/117] app/views/safety_standards/_api_response.html.erb            ✅ (1.3s)
-[59/117] app/views/safety_standards/_calculator_form.html.erb         ❌ 15 violation(s) (1.45s)
-[60/117] app/views/safety_standards/_curl_command.html.erb            ❌ 4 violation(s) (1.33s)
-[61/117] app/views/safety_standards/_fan_tab.html.erb                 ✅ (1.32s)
-[62/117] app/views/safety_standards/_material_tab.html.erb            ✅ (1.36s)
-[63/117] app/views/safety_standards/_result_with_breakdown.html.erb   ✅ (1.34s)
-[64/117] app/views/safety_standards/_runout_result.html.erb           ❌ 1 violation(s) (1.32s)
-[65/117] app/views/safety_standards/_slides_tab.html.erb              ✅ (1.36s)
-[66/117] app/views/safety_standards/_user_capacity_result.html.erb    ❌ 2 violation(s) (1.35s)
-[67/117] app/views/safety_standards/_user_capacity_tab.html.erb       ❌ 12 violation(s) (1.42s)
-[68/117] app/views/safety_standards/_wall_height_result.html.erb      ❌ 1 violation(s) (1.36s)
-[69/117] app/views/safety_standards/index.html.erb                    ✅ (1.39s)
-[70/117] app/views/safety_standards/index.turbo_stream.erb            ✅ (1.37s)
-[71/117] app/views/search/index.html.erb                              ✅ (1.37s)
-[72/117] app/views/sessions/new.html.erb                              ✅ (1.38s)
-[73/117] app/views/shared/_action_buttons.html.erb                    ✅ (1.31s)
-[74/117] app/views/shared/_action_links.html.erb                      ✅ (1.32s)
-[75/117] app/views/shared/_attached_image.html.erb                    ✅ (1.36s)
-[76/117] app/views/shared/_audit_log.html.erb                         ✅ (1.43s)
-[77/117] app/views/shared/_construction_banner.html.erb               ✅ (1.38s)
-[78/117] app/views/shared/_debug_info.html.erb                        ❌ 2 violation(s) (1.45s)
-[79/117] app/views/shared/_header_logo.html.erb                       ❌ 1 violation(s) (1.36s)
-[80/117] app/views/shared/_image.html.erb                             ✅ (1.37s)
-[81/117] app/views/shared/_image_link.html.erb                        ❌ 1 violation(s) (1.37s)
-[82/117] app/views/shared/_incomplete_fields.html.erb                 ❌ 1 violation(s) (1.38s)
-[83/117] app/views/shared/_page_header.html.erb                       ✅ (1.34s)
-[84/117] app/views/shared/_pass_fail_string.html.erb                  ✅ (1.34s)
-[85/117] app/views/shared/_pdf_embed.html.erb                         ✅ (1.38s)
-[86/117] app/views/shared/_safety_card.html.erb                       ✅ (1.41s)
-[87/117] app/views/shared/_safety_info_box.html.erb                   ✅ (1.38s)
-[88/117] app/views/shared/_safety_standards_display.html.erb          ✅ (1.36s)
-[89/117] app/views/shared/_save_message.html.erb                      ✅ (1.35s)
-[90/117] app/views/shared/_search_box.html.erb                        ✅ (1.34s)
-[91/117] app/views/shared/_share_button.html.erb                      ✅ (1.33s)
-[92/117] app/views/shared/_table_column.html.erb                      ✅ (1.35s)
-[93/117] app/views/shared/_unit_details.html.erb                      ✅ (1.5s)
-[94/117] app/views/shared/_unit_details_display.html.erb              ✅ (1.39s)
-[95/117] app/views/shared/_unit_details_form.html.erb                 ❌ 2 violation(s) (1.45s)
-[96/117] app/views/shared/safety_standards/_material_requirements.html.erb ✅ (1.39s)
-[97/117] app/views/shared/safety_standards/_slide_safety_requirements.html.erb ✅ (1.42s)
-[98/117] app/views/shared/safety_standards/_wall_height_requirements.html.erb ❌ 12 violation(s) (1.37s)
-[99/117] app/views/units/_equipment_details.html.erb                  ❌ 5 violation(s) (1.37s)
-[100/117] app/views/units/_equipment_table.html.erb                    ❌ 4 violation(s) (1.37s)
-[101/117] app/views/units/_filter_form.html.erb                        ✅ (1.39s)
-[102/117] app/views/units/_form.html.erb                               ❌ 3 violation(s) (1.57s)
-[103/117] app/views/units/_unit_details.html.erb                       ✅ (1.35s)
-[104/117] app/views/units/_unit_table.html.erb                         ✅ (1.38s)
-[105/117] app/views/units/edit.html.erb                                ✅ (1.34s)
-[106/117] app/views/units/index.html.erb                               ❌ 1 violation(s) (1.36s)
-[107/117] app/views/units/log.html.erb                                 ✅ (1.32s)
-[108/117] app/views/units/new.html.erb                                 ✅ (1.3s)
-[109/117] app/views/units/new_from_inspection.html.erb                 ✅ (1.34s)
-[110/117] app/views/units/show.html.erb                                ✅ (1.38s)
-[111/117] app/views/users/_rpii_verification_result.html.erb           ✅ (1.43s)
-[112/117] app/views/users/_sort_form.html.erb                          ✅ (1.37s)
-[113/117] app/views/users/change_password.html.erb                     ✅ (1.37s)
-[114/117] app/views/users/change_settings.html.erb                     ❌ 2 violation(s) (1.55s)
-[115/117] app/views/users/edit.html.erb                                ✅ (1.46s)
-[116/117] app/views/users/index.html.erb                               ✅ (1.41s)
-[117/117] app/views/users/new.html.erb                                 ✅ (1.34s)
+[1/117] app/views/admin/files.html.erb                               ✅
+[2/117] app/views/admin/index.html.erb                               ✅
+[3/117] app/views/admin/releases.html.erb                            ❌ 1 violation(s)
+[4/117] app/views/admin_text_replacements/_form.html.erb             ❌ 1 violation(s)
+[5/117] app/views/admin_text_replacements/_tree.html.erb             ✅
+[6/117] app/views/admin_text_replacements/edit.html.erb              ✅
+[7/117] app/views/admin_text_replacements/index.html.erb             ✅
+[8/117] app/views/admin_text_replacements/new.html.erb               ✅
+[9/117] app/views/assessments/_anchorage_safety_results.html.erb     ✅
+[10/117] app/views/assessments/_play_area_validation.html.erb         ✅
+[11/117] app/views/assessments/_safety_standard_with_breakdown.html.erb ✅
+[12/117] app/views/assessments/_slide_safety_results.html.erb         ✅
+[13/117] app/views/assessments/_user_height_safety_results.html.erb   ✅
+[14/117] app/views/backups/index.html.erb                             ❌ 1 violation(s)
+[15/117] app/views/badge_batches/edit.html.erb                        ✅
+[16/117] app/views/badge_batches/index.html.erb                       ✅
+[17/117] app/views/badge_batches/new.html.erb                         ✅
+[18/117] app/views/badges/edit.html.erb                               ✅
+[19/117] app/views/errors/internal_server_error.html.erb              ✅
+[20/117] app/views/errors/not_found.html.erb                          ✅
+[21/117] app/views/guides/_controls.html.erb                          ✅
+[22/117] app/views/guides/index.html.erb                              ✅
+[23/117] app/views/guides/show.html.erb                               ✅
+[24/117] app/views/inspections/_assessment_form.html.erb              ✅
+[25/117] app/views/inspections/_filter_form.html.erb                  ✅
+[26/117] app/views/inspections/_form.html.erb                         ✅
+[27/117] app/views/inspections/_inspection_details.html.erb           ❌ 1 violation(s)
+[28/117] app/views/inspections/_inspection_stats.html.erb             ❌ 2 violation(s)
+[29/117] app/views/inspections/_inspections_table.html.erb            ✅
+[30/117] app/views/inspections/_mark_complete_section.html.erb        ❌ 1 violation(s)
+[31/117] app/views/inspections/_new_from_unit_content.html.erb        ❌ 1 violation(s)
+[32/117] app/views/inspections/_results_form.html.erb                 ❌ 3 violation(s)
+[33/117] app/views/inspections/_safety_standards_summary.html.erb     ❌ 2 violation(s)
+[34/117] app/views/inspections/_unit_search_results.html.erb          ❌ 1 violation(s)
+[35/117] app/views/inspections/_unit_selection_table.html.erb         ✅
+[36/117] app/views/inspections/edit.html.erb                          ✅
+[37/117] app/views/inspections/index.html.erb                         ❌ 3 violation(s)
+[38/117] app/views/inspections/log.html.erb                           ✅
+[39/117] app/views/inspections/new_from_unit.html.erb                 ✅
+[40/117] app/views/inspections/select_unit.html.erb                   ✅
+[41/117] app/views/inspections/show.html.erb                          ❌ 3 violation(s)
+[42/117] app/views/inspector_companies/_filter_form.html.erb          ✅
+[43/117] app/views/inspector_companies/_form.html.erb                 ❌ 1 violation(s)
+[44/117] app/views/inspector_companies/edit.html.erb                  ✅
+[45/117] app/views/inspector_companies/index.html.erb                 ✅
+[46/117] app/views/inspector_companies/new.html.erb                   ✅
+[47/117] app/views/inspector_companies/show.html.erb                  ❌ 6 violation(s)
+[48/117] app/views/layouts/application.html.erb                       ✅
+[49/117] app/views/layouts/pdf_viewer.html.erb                        ✅
+[50/117] app/views/pages/_form.html.erb                               ❌ 1 violation(s)
+[51/117] app/views/pages/edit.html.erb                                ✅
+[52/117] app/views/pages/index.html.erb                               ✅
+[53/117] app/views/pages/new.html.erb                                 ✅
+[54/117] app/views/pages/show.html.erb                                ✅
+[55/117] app/views/safety_standards/_anchor_result.html.erb           ❌ 1 violation(s)
+[56/117] app/views/safety_standards/_anchorage_tab.html.erb           ✅
+[57/117] app/views/safety_standards/_api_params.html.erb              ✅
+[58/117] app/views/safety_standards/_api_response.html.erb            ✅
+[59/117] app/views/safety_standards/_calculator_form.html.erb         ❌ 15 violation(s)
+[60/117] app/views/safety_standards/_curl_command.html.erb            ❌ 4 violation(s)
+[61/117] app/views/safety_standards/_fan_tab.html.erb                 ✅
+[62/117] app/views/safety_standards/_material_tab.html.erb            ✅
+[63/117] app/views/safety_standards/_result_with_breakdown.html.erb   ✅
+[64/117] app/views/safety_standards/_runout_result.html.erb           ❌ 1 violation(s)
+[65/117] app/views/safety_standards/_slides_tab.html.erb              ✅
+[66/117] app/views/safety_standards/_user_capacity_result.html.erb    ❌ 2 violation(s)
+[67/117] app/views/safety_standards/_user_capacity_tab.html.erb       ❌ 12 violation(s)
+[68/117] app/views/safety_standards/_wall_height_result.html.erb      ❌ 1 violation(s)
+[69/117] app/views/safety_standards/index.html.erb                    ✅
+[70/117] app/views/safety_standards/index.turbo_stream.erb            ✅
+[71/117] app/views/search/index.html.erb                              ✅
+[72/117] app/views/sessions/new.html.erb                              ✅
+[73/117] app/views/shared/_action_buttons.html.erb                    ✅
+[74/117] app/views/shared/_action_links.html.erb                      ✅
+[75/117] app/views/shared/_attached_image.html.erb                    ✅
+[76/117] app/views/shared/_audit_log.html.erb                         ✅
+[77/117] app/views/shared/_construction_banner.html.erb               ✅
+[78/117] app/views/shared/_debug_info.html.erb                        ❌ 2 violation(s)
+[79/117] app/views/shared/_header_logo.html.erb                       ❌ 1 violation(s)
+[80/117] app/views/shared/_image.html.erb                             ✅
+[81/117] app/views/shared/_image_link.html.erb                        ❌ 1 violation(s)
+[82/117] app/views/shared/_incomplete_fields.html.erb                 ❌ 1 violation(s)
+[83/117] app/views/shared/_page_header.html.erb                       ✅
+[84/117] app/views/shared/_pass_fail_string.html.erb                  ✅
+[85/117] app/views/shared/_pdf_embed.html.erb                         ✅
+[86/117] app/views/shared/_safety_card.html.erb                       ✅
+[87/117] app/views/shared/_safety_info_box.html.erb                   ✅
+[88/117] app/views/shared/_safety_standards_display.html.erb          ✅
+[89/117] app/views/shared/_save_message.html.erb                      ✅
+[90/117] app/views/shared/_search_box.html.erb                        ✅
+[91/117] app/views/shared/_share_button.html.erb                      ✅
+[92/117] app/views/shared/_table_column.html.erb                      ✅
+[93/117] app/views/shared/_unit_details.html.erb                      ✅
+[94/117] app/views/shared/_unit_details_display.html.erb              ✅
+[95/117] app/views/shared/_unit_details_form.html.erb                 ❌ 2 violation(s)
+[96/117] app/views/shared/safety_standards/_material_requirements.html.erb ✅
+[97/117] app/views/shared/safety_standards/_slide_safety_requirements.html.erb ✅
+[98/117] app/views/shared/safety_standards/_wall_height_requirements.html.erb ❌ 12 violation(s)
+[99/117] app/views/units/_equipment_details.html.erb                  ❌ 5 violation(s)
+[100/117] app/views/units/_equipment_table.html.erb                    ❌ 4 violation(s)
+[101/117] app/views/units/_filter_form.html.erb                        ✅
+[102/117] app/views/units/_form.html.erb                               ❌ 3 violation(s)
+[103/117] app/views/units/_unit_details.html.erb                       ✅
+[104/117] app/views/units/_unit_table.html.erb                         ✅
+[105/117] app/views/units/edit.html.erb                                ✅
+[106/117] app/views/units/index.html.erb                               ❌ 1 violation(s)
+[107/117] app/views/units/log.html.erb                                 ✅
+[108/117] app/views/units/new.html.erb                                 ✅
+[109/117] app/views/units/new_from_inspection.html.erb                 ✅
+[110/117] app/views/units/show.html.erb                                ✅
+[111/117] app/views/users/_rpii_verification_result.html.erb           ✅
+[112/117] app/views/users/_sort_form.html.erb                          ✅
+[113/117] app/views/users/change_password.html.erb                     ✅
+[114/117] app/views/users/change_settings.html.erb                     ❌ 2 violation(s)
+[115/117] app/views/users/edit.html.erb                                ✅
+[116/117] app/views/users/index.html.erb                               ✅
+[117/117] app/views/users/new.html.erb                                 ✅
 ================================================================================
 
 SUMMARY:
