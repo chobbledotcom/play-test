@@ -133,7 +133,7 @@ end
 
 # Pinned for nixpkgs
 gem "psych", "= 5.2.3"
-gem "openssl", "3.3.1"
+gem "openssl", "3.3.2"
 
 # CI-only groups - excluded in development setup
 group :ci_annotations do
