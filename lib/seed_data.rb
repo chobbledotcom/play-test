@@ -1,9 +1,17 @@
 # typed: false
 # frozen_string_literal: true
 
-# This module provides field mappings for assessments
-# Used by both seeds and tests to ensure consistency
 module SeedData
+  PASS = "Pass"
+  FAIL = "Fail"
+  GOOD = "Good"
+  WEAR = "Wear"
+  OK = "OK"
+
+  def self.pass_fail_fields(passed, *fields)
+    fields.to_h { |field| [field, passed ? PASS : FAIL] }
+  end
+
   def self.check_passed?(inspection_passed)
     return true if inspection_passed
 
@@ -28,12 +36,12 @@ module SeedData
 
   def self.unit_fields
     {
-      name: "Bouncy Castle #{%w[Mega Super Fun Party Adventure].sample} #{SecureRandom.hex(4)}",
+      name: "Castle #{SecureRandom.hex(4)}",
       serial: "BC-#{Date.current.year}-#{SecureRandom.hex(4).upcase}",
-      manufacturer: ["ABC Inflatables", "XYZ Bounce Co", "Fun Factory", "Party Products Ltd"].sample,
-      operator: ["Rental Company #{SecureRandom.hex(2)}", "Party Hire #{SecureRandom.hex(2)}", "Events Ltd #{SecureRandom.hex(2)}"].sample,
+      manufacturer: "Test Mfg",
+      operator: "Test Op",
       manufacture_date: Date.current - rand(365..1825).days,
-      description: "Commercial grade inflatable bouncy castle suitable for events"
+      description: "Test unit"
     }
   end
 
@@ -52,7 +60,7 @@ module SeedData
   def self.results_fields(passed: true)
     {
       passed: passed,
-      risk_assessment: "Low risk - all safety features functional and tested"
+      risk_assessment: PASS
     }
   end
 
@@ -68,12 +76,94 @@ module SeedData
       pull_strength_pass: check_passed?(passed)
     }
 
-    fields[:anchor_type_comment] = "Some wear visible on anchor points" unless passed
+    fields[:anchor_type_comment] = WEAR unless passed
 
     fields
   end
 
   def self.structure_fields(passed: true)
+    structure_pass_fields(passed)
+      .merge(structure_numeric_fields)
+      .merge(structure_comments(passed))
+  end
+
+  def self.materials_fields(passed: true)
+    {
+      ropes: rand(18..45),
+      ropes_pass: check_passed_integer?(passed),
+      retention_netting_pass: check_passed_integer?(passed),
+      zips_pass: check_passed_integer?(passed),
+      windows_pass: check_passed_integer?(passed),
+      artwork_pass: check_passed_integer?(passed),
+      thread_pass: check_passed?(passed),
+      fabric_strength_pass: check_passed?(passed),
+      fire_retardant_pass: check_passed?(passed)
+    }.merge(materials_comments(passed))
+  end
+
+  def self.fan_fields(passed: true)
+    {
+      blower_flap_pass: check_passed_integer?(passed),
+      blower_finger_pass: check_passed?(passed),
+      blower_visual_pass: check_passed?(passed),
+      pat_pass: check_passed_integer?(passed),
+      blower_serial: "FAN-#{SecureRandom.hex(6).upcase}",
+      number_of_blowers: 1,
+      blower_tube_length: rand(2.0..5.0).round(1),
+      blower_tube_length_pass: check_passed?(passed)
+    }.merge(fan_comments(passed))
+  end
+
+  def self.user_height_fields(passed: true)
+    {
+      containing_wall_height: rand(1.0..2.0).round(1),
+      users_at_1000mm: rand(0..5),
+      users_at_1200mm: rand(2..8),
+      users_at_1500mm: rand(4..10),
+      users_at_1800mm: rand(2..6),
+      custom_user_height_comment: OK,
+      play_area_length: rand(3.0..10.0).round(1),
+      play_area_width: rand(3.0..8.0).round(1),
+      negative_adjustment: rand(0..2.0).round(1),
+      containing_wall_height_comment: OK,
+      play_area_length_comment: OK,
+      play_area_width_comment: OK
+    }
+  end
+
+  def self.slide_fields(passed: true)
+    platform_height = rand(2.0..6.0).round(1)
+    required_runout = EN14960.calculate_slide_runout(platform_height).value
+    runout = calculate_slide_runout(required_runout, passed)
+
+    {
+      slide_platform_height: platform_height,
+      slide_wall_height: rand(1.0..2.0).round(1),
+      runout: runout,
+      slide_first_metre_height: rand(0.3..0.8).round(1),
+      slide_beyond_first_metre_height: rand(0.8..1.5).round(1),
+      clamber_netting_pass: check_passed_integer?(passed),
+      runout_pass: check_passed?(passed),
+      slip_sheet_pass: check_passed?(passed),
+      slide_permanent_roof: false
+    }.merge(slide_comments(passed))
+  end
+
+  def self.enclosed_fields(passed: true)
+    {
+      exit_number: rand(1..3),
+      exit_number_pass: check_passed?(passed),
+      exit_sign_always_visible_pass: check_passed?(passed)
+    }.merge(
+      pass_fail_fields(
+        passed,
+        :exit_number_comment,
+        :exit_sign_always_visible_comment
+      )
+    )
+  end
+
+  def self.structure_pass_fields(passed)
     {
       seam_integrity_pass: check_passed?(passed),
       air_loss_pass: check_passed?(passed),
@@ -89,163 +179,64 @@ module SeedData
       entrapment_pass: check_passed?(passed),
       markings_pass: check_passed?(passed),
       grounding_pass: check_passed?(passed),
+      evacuation_time_pass: check_passed?(passed)
+    }
+  end
+
+  def self.structure_numeric_fields
+    {
       unit_pressure: rand(1.0..3.0).round(1),
       step_ramp_size: rand(200..400),
       platform_height: rand(500..1500),
       critical_fall_off_height: rand(500..2000),
       trough_depth: rand(30..80),
-      trough_adjacent_panel_width: rand(300..1000),
-      evacuation_time_pass: check_passed?(passed),
-      seam_integrity_comment: if passed
-                                "All seams in good condition"
-                              else
-                                "Minor thread loosening noted"
-                              end,
-      stitch_length_comment: "Measured at regular intervals",
-      platform_height_comment: "Platform height acceptable for age group"
+      trough_adjacent_panel_width: rand(300..1000)
     }
   end
 
-  def self.materials_fields(passed: true)
-    fields = {
-      ropes: rand(18..45),
-      ropes_pass: check_passed_integer?(passed),
-      retention_netting_pass: check_passed_integer?(passed),
-      zips_pass: check_passed_integer?(passed),
-      windows_pass: check_passed_integer?(passed),
-      artwork_pass: check_passed_integer?(passed),
-      thread_pass: check_passed?(passed),
-      fabric_strength_pass: check_passed?(passed),
-      fire_retardant_pass: check_passed?(passed)
+  def self.structure_comments(passed)
+    {
+      seam_integrity_comment: passed ? GOOD : WEAR,
+      stitch_length_comment: OK,
+      platform_height_comment: OK
     }
+  end
 
+  def self.materials_comments(passed)
+    passed ? {fabric_strength_comment: GOOD} : {
+      ropes_comment: WEAR,
+      fabric_strength_comment: WEAR
+    }
+  end
+
+  def self.fan_comments(passed)
+    expiry = (Date.current + 6.months).strftime("%B %Y")
+    pass_fail_fields(
+      passed,
+      :fan_size_type,
+      :blower_flap_comment,
+      :blower_finger_comment,
+      :blower_visual_comment
+    ).merge(pat_comment: passed ? "Valid #{expiry}" : "Overdue")
+  end
+
+  def self.calculate_slide_runout(required_runout, passed)
     if passed
-      fields[:fabric_strength_comment] = "Fabric in good condition"
-    else
-      fields[:ropes_comment] = "Rope shows signs of wear"
-      fields[:fabric_strength_comment] = "Minor surface wear noted"
-    end
-
-    fields
-  end
-
-  def self.fan_fields(passed: true)
-    {
-      blower_flap_pass: check_passed_integer?(passed),
-      blower_finger_pass: check_passed?(passed),
-      blower_visual_pass: check_passed?(passed),
-      pat_pass: check_passed_integer?(passed),
-      blower_serial: "FAN-#{SecureRandom.hex(6).upcase}",
-      number_of_blowers: 1,
-      blower_tube_length: rand(2.0..5.0).round(1),
-      blower_tube_length_pass: check_passed?(passed),
-      fan_size_type: if passed
-                       "Fan operating correctly at optimal pressure"
-                     else
-                       "Fan requires servicing"
-                     end,
-      blower_flap_comment: if passed
-                             "Flap mechanism functioning correctly"
-                           else
-                             "Flap sticking occasionally"
-                           end,
-      blower_finger_comment: if passed
-                               "Guard secure, no finger trap hazards"
-                             else
-                               "Guard needs tightening"
-                             end,
-      blower_visual_comment: if passed
-                               "Visual inspection satisfactory"
-                             else
-                               "Some wear visible on housing"
-                             end,
-      pat_comment: if passed
-                     "PAT test valid until #{(Date.current + 6.months).strftime("%B %Y")}"
-                   else
-                     "PAT test overdue"
-                   end
-    }
-  end
-
-  def self.user_height_fields(passed: true)
-    {
-      containing_wall_height: rand(1.0..2.0).round(1),
-      users_at_1000mm: rand(0..5),
-      users_at_1200mm: rand(2..8),
-      users_at_1500mm: rand(4..10),
-      users_at_1800mm: rand(2..6),
-      custom_user_height_comment: "Sample custom height comments",
-      play_area_length: rand(3.0..10.0).round(1),
-      play_area_width: rand(3.0..8.0).round(1),
-      negative_adjustment: rand(0..2.0).round(1),
-      containing_wall_height_comment: "Measured from base to top of wall",
-      play_area_length_comment: "Effective play area after deducting obstacles",
-      play_area_width_comment: "Width measured at narrowest point"
-    }
-  end
-
-  def self.slide_fields(passed: true)
-    platform_height = rand(2.0..6.0).round(1)
-
-    # Use the actual SafetyStandard calculation for consistency
-    required_runout = EN14960.calculate_slide_runout(platform_height).value
-
-    runout = if passed
       (required_runout + rand(0.5..1.5)).round(1)
     else
-      fail_margin = rand(0.1..0.3)
-      (required_runout - fail_margin)
+      (required_runout - rand(0.1..0.3))
     end
-
-    {
-      slide_platform_height: platform_height,
-      slide_wall_height: rand(1.0..2.0).round(1),
-      runout: runout,
-      slide_first_metre_height: rand(0.3..0.8).round(1),
-      slide_beyond_first_metre_height: rand(0.8..1.5).round(1),
-      clamber_netting_pass: check_passed_integer?(passed),
-      runout_pass: check_passed?(passed),
-      slip_sheet_pass: check_passed?(passed),
-      slide_permanent_roof: false,
-      slide_platform_height_comment: if passed
-                                       "Platform height compliant with EN 14960:2019"
-                                     else
-                                       "Platform height exceeds recommended limits"
-                                     end,
-      slide_wall_height_comment: "Wall height measured from slide bed",
-      runout_comment: if passed
-                        "Runout area clear and adequate"
-                      else
-                        "Runout area needs extending"
-                      end,
-      clamber_netting_comment: if passed
-                                 "Netting secure with no gaps"
-                               else
-                                 "Some gaps in netting need attention"
-                               end,
-      slip_sheet_comment: if passed
-                            "Slip sheet in good condition"
-                          else
-                            "Slip sheet showing wear"
-                          end
-    }
   end
 
-  def self.enclosed_fields(passed: true)
-    {
-      exit_number: rand(1..3),
-      exit_number_pass: check_passed?(passed),
-      exit_sign_always_visible_pass: check_passed?(passed),
-      exit_number_comment: if passed
-                             "Number of exits compliant with unit size"
-                           else
-                             "Additional exit required"
-                           end,
-      exit_sign_always_visible_comment: if passed
-                                          "Exit signs visible from all points"
-                                        else
-                                          "Exit signs obscured from some angles"
-                                        end
-    }
+  def self.slide_comments(passed)
+    pass_fail_fields(
+      passed,
+      :slide_platform_height_comment,
+      :runout_comment,
+      :clamber_netting_comment
+    ).merge(
+      slide_wall_height_comment: OK,
+      slip_sheet_comment: passed ? GOOD : WEAR
+    )
   end
 end

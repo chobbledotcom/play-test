@@ -68,12 +68,12 @@ FactoryBot.define do
       pull_strength_pass { true }
       anchor_degree_pass { true }
       anchor_accessories_pass { true }
-      num_low_anchors_comment { "Low anchor count appropriate" }
-      num_high_anchors_comment { "High anchor count adequate" }
-      anchor_type_comment { "Appropriate anchor type for surface" }
-      pull_strength_comment { "Pull strength meets requirements" }
-      anchor_degree_comment { "Anchor angle within specification" }
-      anchor_accessories_comment { "All anchor accessories present" }
+      num_low_anchors_comment { SeedData::OK }
+      num_high_anchors_comment { SeedData::OK }
+      anchor_type_comment { SeedData::OK }
+      pull_strength_comment { SeedData::PASS }
+      anchor_degree_comment { SeedData::OK }
+      anchor_accessories_comment { SeedData::PASS }
     end
 
     trait :failed do
