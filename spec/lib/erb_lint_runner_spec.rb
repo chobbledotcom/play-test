@@ -221,8 +221,8 @@ RSpec.describe ErbLintRunner do
         runner.send(:process_file, file, 1, 10)
       end
 
-      it "prints success message with elapsed time" do
-        expect(runner).to receive(:puts).with("✅ (2.5s)")
+      it "prints success message" do
+        expect(runner).to receive(:puts).with("✅")
         runner.send(:process_file, file, 1, 10)
       end
 
@@ -269,7 +269,7 @@ RSpec.describe ErbLintRunner do
         end
 
         it "prints failure message without slow warning" do
-          expect(runner).to receive(:puts).with("❌ 3 violation(s) (1.5s)")
+          expect(runner).to receive(:puts).with("❌ 3 violation(s)")
           runner.send(:process_file, file, 1, 10)
         end
       end
@@ -291,13 +291,13 @@ RSpec.describe ErbLintRunner do
         end
 
         it "prints failure message with slow warning" do
-          expect(runner).to receive(:puts).with("❌ 3 violation(s) (6.0s) ⚠️  SLOW")
+          expect(runner).to receive(:puts).with("❌ 3 violation(s) ⚠️  SLOW")
           runner.send(:process_file, file, 1, 10)
         end
 
         context "in verbose mode" do
           it "prints slow file details" do
-            expect(verbose_runner).to receive(:puts).with("❌ 3 violation(s) (6.0s) ⚠️  SLOW").ordered
+            expect(verbose_runner).to receive(:puts).with("❌ 3 violation(s) ⚠️  SLOW").ordered
             expect(verbose_runner).to receive(:puts).with("  Slow file details:").ordered
             expect(verbose_runner).to receive(:puts).with(["    10:5  Error message 1", "    20:10 Error message 2", "    30:15 Error message 3"]).ordered
             verbose_runner.send(:process_file, file, 1, 10)
