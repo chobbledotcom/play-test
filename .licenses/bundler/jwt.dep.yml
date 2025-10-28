@@ -1,6 +1,6 @@
 ---
 name: jwt
-version: 2.10.2
+version: 3.1.2
 type: bundler
 summary: JSON Web Token implementation in Ruby
 homepage: https://github.com/jwt/ruby-jwt
@@ -54,7 +54,7 @@ notices:
     Simon Fish
     jb08
     lukas
-    Rodrigo L??pez Dato
+    Rodrigo López Dato
     ojab
     Ritikesh
     sawyerzhang
@@ -83,10 +83,10 @@ notices:
     Takehiro Adachi
     Tobias Haar
     Toby Pinder
-    Tom?? Duarte
+    Tomé Duarte
     Travis Hunter
     Yuji Yaginuma
-    Zuzanna Stoli??ska
+    Zuzanna Stolińska
     aarongray
     danielgrippi
     fusagiko/takayamaki
@@ -109,7 +109,7 @@ notices:
     Dan Leyden
     Dave Grijalva
     Dmitry Pashkevich
-    Dorian Mari??
+    Dorian Marié
     Ernie Miller
     Evgeni Golov
     Ewoud Kohl van Wijngaarden
@@ -127,14 +127,14 @@ notices:
     Katelyn Kasperowicz
     Leonardo Saraiva
     Lowell Kirsh
-    Lo??c Lengrand
+    Loïc Lengrand
     Lucas Mazza
     Makoto Chiba
     Manuel Bustillo
     Marco Adkins
     Meredith Leu
     Micah Gates
-    Micha?? Begejowicz
+    Michał Begejowicz
     Mike Eirih
     Mike Pastore
     Mingan

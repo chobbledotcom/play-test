@@ -1,6 +1,6 @@
 ---
 name: fugit
-version: 1.11.1
+version: 1.12.1
 type: bundler
 summary: time tools for flor
 homepage: https://github.com/floraison/fugit
@@ -9,7 +9,7 @@ licenses:
 - sources: LICENSE.txt
   text: |2+
 
-    Copyright (c) 2017-2024, John Mettraux, jmettraux+flor@gmail.com
+    Copyright (c) 2017-2025, John Mettraux, jmettraux+flor@gmail.com
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

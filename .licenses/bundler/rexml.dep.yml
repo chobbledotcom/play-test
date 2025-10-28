@@ -1,6 +1,6 @@
 ---
 name: rexml
-version: 3.4.2
+version: 3.4.4
 type: bundler
 summary: An XML toolkit for Ruby
 homepage: https://github.com/ruby/rexml

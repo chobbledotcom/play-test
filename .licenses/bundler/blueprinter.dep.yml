@@ -1,6 +1,6 @@
 ---
 name: blueprinter
-version: 1.1.2
+version: 1.2.1
 type: bundler
 summary: Simple Fast Declarative Serialization Library
 homepage: https://github.com/procore-oss/blueprinter

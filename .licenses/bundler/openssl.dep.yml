@@ -1,6 +1,6 @@
 ---
 name: openssl
-version: 3.3.0
+version: 3.3.1
 type: bundler
 summary: SSL/TLS and general-purpose cryptography for Ruby
 homepage: https://github.com/ruby/openssl
