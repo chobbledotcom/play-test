@@ -73,6 +73,6 @@ class TextReplacement < ApplicationRecord
 
   sig { void }
   def reload_i18n_cache
-    DatabaseI18nBackend.reload_cache if defined?(DatabaseI18nBackend)
+    DatabaseI18nBackend.reload_cache
   end
 end

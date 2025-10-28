@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require "rails_helper"
@@ -9,35 +10,35 @@ RSpec.describe "Public Access Control", type: :request do
   let(:unit) { create(:unit, user: user) }
   let(:inspection) { create(:inspection, :completed, user: user, unit: unit) }
 
-  def ensure_logged_out
+  define_method(:ensure_logged_out) do
     logout if page.has_button?(I18n.t("sessions.buttons.log_out"))
   end
 
-  def expect_public_access(path, expected_path = nil)
+  define_method(:expect_public_access) do |path, expected_path = nil|
     visit path
     expect(page.status_code).to eq(200)
     expect(page.current_path).to eq(expected_path || path)
   end
 
-  def expect_redirect_to_login(path)
+  define_method(:expect_redirect_to_login) do |path|
     visit path
     expect(page.current_path).to eq(login_path)
   end
 
-  def expect_pdf_viewer(path)
+  define_method(:expect_pdf_viewer) do |path|
     visit path
     expect(page.current_path).to eq(path)
     expect(page.html).to include("<iframe")
     expect(page.html).to include("#{path}.pdf")
   end
 
-  def expect_pdf_response(path)
+  define_method(:expect_pdf_response) do |path|
     visit path
     expect(page.response_headers["Content-Type"]).to eq("application/pdf")
     expect(page.body[0..3]).to eq("%PDF")
   end
 
-  def expect_json_response(path, expected_key)
+  define_method(:expect_json_response) do |path, expected_key|
     visit path
     content_type = page.response_headers["Content-Type"]
     expect(content_type).to include("application/json")
@@ -45,14 +46,14 @@ RSpec.describe "Public Access Control", type: :request do
     expect(json).to have_key(expected_key)
   end
 
-  def expect_png_response(path)
+  define_method(:expect_png_response) do |path|
     page.driver.browser.get(path)
     content_type = page.driver.response.headers["Content-Type"]
     expect(content_type).to include("image/png")
     expect(page.driver.response.body[1..3]).to eq("PNG")
   end
 
-  def expect_html_with_iframe(path)
+  define_method(:expect_html_with_iframe) do |path|
     visit path
     content_type = page.response_headers["Content-Type"]
     expect(content_type).to eq("text/html; charset=utf-8")

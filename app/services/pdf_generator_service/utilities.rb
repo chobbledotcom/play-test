@@ -1,3 +1,5 @@
+# typed: false
+
 class PdfGeneratorService
   class Utilities
     include Configuration

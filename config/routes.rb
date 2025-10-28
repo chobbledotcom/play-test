@@ -1,3 +1,4 @@
+# typed: false
 # == Route Map
 #
 #                            Prefix Verb     URI Pattern                                                                                       Controller#Action
@@ -127,15 +128,10 @@
 #                rails_disk_service GET      /rails/active_storage/disk/:encoded_key/*filename(.:format)                                       active_storage/disk#show
 #         update_rails_disk_service PUT      /rails/active_storage/disk/:encoded_token(.:format)                                               active_storage/disk#update
 #              rails_direct_uploads POST     /rails/active_storage/direct_uploads(.:format)                                                    active_storage/direct_uploads#create
-
-# typed: false
+# frozen_string_literal: true
 
 Rails.application.routes.draw do
-  # Mount Mission Control Jobs (authentication handled by initializer)
-  # Only mount if available (not in test environment)
-  if defined?(MissionControl::Jobs::Engine)
-    mount MissionControl::Jobs::Engine => "/mission_control"
-  end
+  mount MissionControl::Jobs::Engine => "/mission_control"
 
   get "up" => "rails/health#show", :as => :rails_health_check
 
@@ -179,8 +175,9 @@ Rails.application.routes.draw do
     end
   end
 
-  # Inspections
-  match "new_inspection_from_unit", to: "inspections#new_from_unit", as: "new_inspection_from_unit", via: [:get, :post]
+  match "new_inspection_from_unit", to: "inspections#new_from_unit", as: "new_inspection_from_unit",
+    via: %i[get post]
+
   resources :inspections, except: [:new] do
     member do
       get "select_unit"

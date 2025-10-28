@@ -74,8 +74,20 @@ class ApplicationController < ActionController::Base
   def require_login
     return if logged_in?
 
+    store_location
     flash[:alert] = form_i18n(:session_new, :"status.login_required")
-    redirect_to login_path
+    redirect_to "/login"
+  end
+
+  sig { void }
+  def store_location
+    session[:forwarding_url] = request.fullpath if request.get? || request.head?
+  end
+
+  sig { params(default: String).void }
+  def redirect_back_or(default)
+    forwarding_url = session.delete(:forwarding_url)
+    redirect_to(forwarding_url || default)
   end
 
   sig { void }
@@ -102,6 +114,7 @@ class ApplicationController < ActionController::Base
   def require_admin
     return if current_user&.admin?
 
+    store_location
     flash[:alert] = I18n.t("forms.session_new.status.admin_required")
     redirect_to root_path
   end

@@ -1,3 +1,5 @@
+# typed: false
+
 class PhotoProcessingService
   require "vips"
 

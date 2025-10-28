@@ -1,3 +1,5 @@
+# typed: false
+
 class PdfGeneratorService
   class ImageError
     def self.build_detailed_error(original_error, attachment)

@@ -37,7 +37,8 @@ RSpec.feature "Backups Management", type: :feature do
   scenario "admin can access backups page" do
     # Mock S3 service and bucket
     s3_service = double("S3Service")
-    allow(s3_service).to receive(:class).and_return(double(name: "ActiveStorage::Service::S3Service"))
+    s3_class = ActiveStorage::Service::S3Service
+    allow(s3_service).to receive(:is_a?).with(s3_class).and_return(true)
     allow(ActiveStorage::Blob).to receive(:service).and_return(s3_service)
 
     bucket = double("bucket")
@@ -54,7 +55,9 @@ RSpec.feature "Backups Management", type: :feature do
       size: 4_194_304, # 4MB
       last_modified: Time.zone.parse("2024-01-14 10:00:00"))
 
-    allow(bucket).to receive(:objects).with(prefix: "db_backups/").and_return([backup1, backup2])
+    prefix = "db_backups/"
+    allow(bucket).to receive(:objects).with(prefix: prefix)
+      .and_return([backup1, backup2])
 
     sign_in(admin_user)
     visit admin_path
@@ -74,13 +77,15 @@ RSpec.feature "Backups Management", type: :feature do
     sign_in(regular_user)
     visit backups_path
 
-    expect(page).to have_content(I18n.t("forms.session_new.status.admin_required"))
+    admin_required = I18n.t("forms.session_new.status.admin_required")
+    expect(page).to have_content(admin_required)
     expect(current_path).to eq(root_path)
   end
 
   scenario "shows error when S3 fetch fails" do
     s3_service = double("S3Service")
-    allow(s3_service).to receive(:class).and_return(double(name: "ActiveStorage::Service::S3Service"))
+    s3_class = ActiveStorage::Service::S3Service
+    allow(s3_service).to receive(:is_a?).with(s3_class).and_return(true)
     allow(ActiveStorage::Blob).to receive(:service).and_return(s3_service)
     allow(s3_service).to receive(:send).and_raise("S3 Error")
 

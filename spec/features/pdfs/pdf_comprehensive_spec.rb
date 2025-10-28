@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 require "pdf/inspector"
 
@@ -100,7 +102,7 @@ RSpec.feature "PDF Comprehensive Testing", type: :feature do
 
   private
 
-  def extract_pdf_text(pdf_data)
+  define_method(:extract_pdf_text) do |pdf_data|
     reader = PDF::Reader.new(StringIO.new(pdf_data))
     reader.pages.map(&:text).join(" ")
   end

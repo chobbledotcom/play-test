@@ -1,3 +1,5 @@
+# typed: false
+
 module ViewHelpers
   # Check for form field presence by name attribute
   # Usage: expect_form_field("inspector_company[name]")

@@ -1,3 +1,5 @@
+# typed: false
+
 # Slow Test Detector - warns about tests taking more than 2 seconds
 # This shim tracks test execution time and warns about slow tests
 

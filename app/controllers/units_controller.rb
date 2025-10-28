@@ -94,73 +94,25 @@ class UnitsController < ApplicationController
   def edit = nil
 
   def update
+    return handle_image_processing_error if @image_processing_error
+
     previous_attributes = @unit.attributes.dup
-
-    params_to_update = unit_params
-
-    if @image_processing_error
-      flash.now[:alert] = @image_processing_error.message
-      handle_update_failure(@unit)
-      return
-    end
-
-    if @unit.update(params_to_update)
-      # Calculate what changed
-      changed_data = calculate_changes(
-        previous_attributes,
-        @unit.attributes,
-        unit_params.keys
-      )
-
-      log_unit_event("updated", @unit, nil, changed_data)
-
-      additional_streams = []
-      if params[:unit][:photo].present?
-        # Render just the file field without a new form wrapper
-        additional_streams << turbo_stream.replace(
-          "unit_photo_preview",
-          partial: "chobble_forms/file_field_turbo_response",
-          locals: {
-            model: @unit,
-            field: :photo,
-            turbo_frame_id: "unit_photo_preview",
-            i18n_base: "forms.units",
-            accept: "image/*"
-          }
-        )
-      end
-
-      handle_update_success(@unit, nil, nil, additional_streams: additional_streams)
+    if @unit.update(unit_params)
+      log_unit_changes(previous_attributes)
+      handle_update_success(@unit, nil, nil, additional_streams: photo_turbo_streams)
     else
       handle_update_failure(@unit)
     end
   end
 
   def destroy
-    # Capture unit details before deletion for the audit log
-    unit_details = {
-      name: @unit.name,
-      serial: @unit.serial,
-      operator: @unit.operator,
-      manufacturer: @unit.manufacturer
-    }
-
+    unit_details = capture_unit_details_for_deletion
     if @unit.destroy
-      # Log the deletion with the unit details in metadata
-      Event.log(
-        user: current_user,
-        action: "deleted",
-        resource: @unit,
-        details: nil,
-        metadata: unit_details
-      )
+      log_unit_deletion(unit_details)
       flash[:notice] = I18n.t("units.messages.deleted")
       redirect_to units_path
     else
-      error_message =
-        @unit.errors.full_messages.first ||
-        I18n.t("units.messages.delete_failed")
-      flash[:alert] = error_message
+      flash[:alert] = unit_deletion_error_message
       redirect_to @unit
     end
   end
@@ -187,26 +139,13 @@ class UnitsController < ApplicationController
   end
 
   def create_from_inspection
-    service = UnitCreationFromInspectionService.new(
-      user: current_user,
-      inspection_id: params[:id],
-      unit_params: unit_params
-    )
-
+    service = build_unit_creation_service
     if service.create
-      log_unit_event("created", service.unit)
-      flash[:notice] = I18n.t("units.messages.created_from_inspection")
-      redirect_to edit_inspection_path(service.inspection)
+      handle_unit_creation_success(service)
     elsif service.error_message
-      flash[:alert] = service.error_message
-      redirect_path = service.inspection ?
-        inspection_path(service.inspection) :
-        root_path
-      redirect_to redirect_path
+      handle_unit_creation_error(service)
     else
-      @unit = service.unit
-      @inspection = service.inspection
-      render :new_from_inspection, status: :unprocessable_content
+      render_unit_creation_form(service)
     end
   end
 
@@ -215,23 +154,12 @@ class UnitsController < ApplicationController
   def validate_badge_id_param
     return unless unit_badges_enabled?
 
-    id_param = (action_name == "new") ? params[:id] : params.dig(:unit, :id)
-    return unless id_param.present?
+    id_param = extract_badge_id_param
+    return if id_param.blank?
 
     normalized_id = normalize_unit_id(id_param)
-
-    # Check if unit already exists with this ID
-    existing_unit = Unit.find_by(id: normalized_id)
-    if existing_unit
-      flash[:notice] = I18n.t("units.messages.existing_unit_found")
-      redirect_to existing_unit and return
-    end
-
-    # Check if badge exists
-    unless Badge.exists?(id: normalized_id)
-      flash[:alert] = I18n.t("units.validations.invalid_badge_id")
-      redirect_to units_path and return
-    end
+    return redirect_to_existing_unit(normalized_id) if unit_exists?(normalized_id)
+    return redirect_to_invalid_badge unless badge_exists?(normalized_id)
 
     @validated_badge_id = normalized_id
   end
@@ -240,24 +168,12 @@ class UnitsController < ApplicationController
     return unless current_user
 
     if unit
-      Event.log(
-        user: current_user,
-        action: action,
-        resource: unit,
-        details: details,
-        changed_data: changed_data
-      )
+      log_resource_event(action, unit, details, changed_data)
     else
-      # For events without a specific unit (like CSV export)
-      Event.log_system_event(
-        user: current_user,
-        action: action,
-        details: details,
-        metadata: {resource_type: "Unit"}
-      )
+      log_system_unit_event(action, details)
     end
   rescue => e
-    Rails.logger.error I18n.t("units.errors.log_failed", message: e.message)
+    log_event_error(e)
   end
 
   def calculate_changes(previous_attributes, current_attributes, changed_keys)
@@ -279,26 +195,8 @@ class UnitsController < ApplicationController
   end
 
   def unit_params
-    permitted_fields = %i[
-      description
-      manufacture_date
-      manufacturer
-      name
-      operator
-      photo
-      serial
-      unit_type
-    ]
-
-    # Add :id to permitted fields if UNIT_BADGES is enabled
-    # but only for create actions (not update)
-    create_actions = %w[create create_from_inspection]
-    if unit_badges_enabled? && create_actions.include?(action_name)
-      permitted_fields << :id
-    end
-
+    permitted_fields = build_unit_permitted_fields
     permitted_params = params.require(:unit).permit(*permitted_fields)
-
     process_image_params(permitted_params, :photo)
   end
 
@@ -401,5 +299,152 @@ class UnitsController < ApplicationController
 
   def handle_inactive_user_redirect
     redirect_to units_path
+  end
+
+  def handle_image_processing_error
+    flash.now[:alert] = @image_processing_error.message
+    handle_update_failure(@unit)
+  end
+
+  def log_unit_changes(previous_attributes)
+    changed_data = calculate_changes(
+      previous_attributes,
+      @unit.attributes,
+      unit_params.keys
+    )
+    log_unit_event("updated", @unit, nil, changed_data)
+  end
+
+  def photo_turbo_streams
+    return [] unless params[:unit][:photo].present?
+
+    [turbo_stream.replace(
+      "unit_photo_preview",
+      partial: "chobble_forms/file_field_turbo_response",
+      locals: {
+        model: @unit,
+        field: :photo,
+        turbo_frame_id: "unit_photo_preview",
+        i18n_base: "forms.units",
+        accept: "image/*"
+      }
+    )]
+  end
+
+  def capture_unit_details_for_deletion
+    {
+      name: @unit.name,
+      serial: @unit.serial,
+      operator: @unit.operator,
+      manufacturer: @unit.manufacturer
+    }
+  end
+
+  def log_unit_deletion(unit_details)
+    Event.log(
+      user: current_user,
+      action: "deleted",
+      resource: @unit,
+      details: nil,
+      metadata: unit_details
+    )
+  end
+
+  def unit_deletion_error_message
+    @unit.errors.full_messages.first || I18n.t("units.messages.delete_failed")
+  end
+
+  def build_unit_creation_service
+    UnitCreationFromInspectionService.new(
+      user: current_user,
+      inspection_id: params[:id],
+      unit_params: unit_params
+    )
+  end
+
+  def handle_unit_creation_success(service)
+    log_unit_event("created", service.unit)
+    flash[:notice] = I18n.t("units.messages.created_from_inspection")
+    redirect_to edit_inspection_path(service.inspection)
+  end
+
+  def handle_unit_creation_error(service)
+    flash[:alert] = service.error_message
+    redirect_to unit_creation_error_path(service)
+  end
+
+  def unit_creation_error_path(service)
+    service.inspection ? inspection_path(service.inspection) : root_path
+  end
+
+  def render_unit_creation_form(service)
+    @unit = service.unit
+    @inspection = service.inspection
+    render :new_from_inspection, status: :unprocessable_content
+  end
+
+  def extract_badge_id_param
+    (action_name == "new") ? params[:id] : params.dig(:unit, :id)
+  end
+
+  def unit_exists?(normalized_id)
+    Unit.exists?(id: normalized_id)
+  end
+
+  def badge_exists?(normalized_id)
+    Badge.exists?(id: normalized_id)
+  end
+
+  def redirect_to_existing_unit(normalized_id)
+    flash[:notice] = I18n.t("units.messages.existing_unit_found")
+    redirect_to Unit.find(normalized_id)
+  end
+
+  def redirect_to_invalid_badge
+    flash[:alert] = I18n.t("units.validations.invalid_badge_id")
+    redirect_to units_path
+  end
+
+  def log_resource_event(action, unit, details, changed_data)
+    Event.log(
+      user: current_user,
+      action: action,
+      resource: unit,
+      details: details,
+      changed_data: changed_data
+    )
+  end
+
+  def log_system_unit_event(action, details)
+    Event.log_system_event(
+      user: current_user,
+      action: action,
+      details: details,
+      metadata: {resource_type: "Unit"}
+    )
+  end
+
+  def log_event_error(error)
+    Rails.logger.error I18n.t("units.errors.log_failed", message: error.message)
+  end
+
+  def build_unit_permitted_fields
+    fields = %i[
+      description
+      manufacture_date
+      manufacturer
+      name
+      operator
+      photo
+      serial
+      unit_type
+    ]
+    fields << :id if allow_badge_id_in_params?
+    fields
+  end
+
+  def allow_badge_id_in_params?
+    create_actions = %w[create create_from_inspection]
+    unit_badges_enabled? && create_actions.include?(action_name)
   end
 end

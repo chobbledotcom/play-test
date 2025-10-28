@@ -1,3 +1,5 @@
+# typed: false
+
 class CredentialsController < ApplicationController
   before_action :require_login
 

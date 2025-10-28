@@ -1,3 +1,5 @@
+# typed: false
+
 # Helper for printing detailed deprecation warnings in tests
 module DeprecationHelper
   def print_deprecation(message, trait_name: nil)
@@ -47,6 +49,4 @@ module DeprecationHelper
 end
 
 # Include in FactoryBot to make it available in factory definitions
-if defined?(FactoryBot)
-  FactoryBot::SyntaxRunner.include(DeprecationHelper)
-end
+FactoryBot::SyntaxRunner.include(DeprecationHelper)

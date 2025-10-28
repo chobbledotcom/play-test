@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.feature "Filter Visibility", type: :feature do
@@ -129,20 +131,20 @@ RSpec.feature "Filter Visibility", type: :feature do
 
   private
 
-  def expect_no_filter_form_for_inspections
+  define_method(:expect_no_filter_form_for_inspections) do
     expect(page).not_to have_css("form[action='#{inspections_path}'][method='get']")
     expect(page).not_to have_field("query")
     expect(page).not_to have_select("result")
     expect(page).not_to have_select("unit_id")
   end
 
-  def expect_inspections_filter_form_present
+  define_method(:expect_inspections_filter_form_present) do
     expect(page).to have_css("form[action='#{inspections_path}'][method='get']")
     expect(page).to have_field("query")
     expect(page).to have_select("result")
   end
 
-  def expect_no_filter_form_for_units
+  define_method(:expect_no_filter_form_for_units) do
     expect(page).not_to have_css("form[action='#{units_path}'][method='get']")
     expect(page).not_to have_field("query")
     expect(page).not_to have_select("status")
@@ -150,7 +152,7 @@ RSpec.feature "Filter Visibility", type: :feature do
     expect(page).not_to have_select("operator")
   end
 
-  def expect_units_filter_form_present
+  define_method(:expect_units_filter_form_present) do
     expect(page).to have_css("form[action='#{units_path}'][method='get']")
     expect(page).to have_field("query")
     expect(page).to have_select("status")
@@ -158,7 +160,7 @@ RSpec.feature "Filter Visibility", type: :feature do
     expect(page).to have_select("operator")
   end
 
-  def expect_manufacturer_dropdown_populated
+  define_method(:expect_manufacturer_dropdown_populated) do
     within "select[name='manufacturer']" do
       expect(page).to have_content("All Manufacturers")
       expect(page).to have_content("Acme Corp")
@@ -166,7 +168,7 @@ RSpec.feature "Filter Visibility", type: :feature do
     end
   end
 
-  def expect_operator_dropdown_populated
+  define_method(:expect_operator_dropdown_populated) do
     within "select[name='operator']" do
       expect(page).to have_content("All Operators")
       expect(page).to have_content("John Doe")

@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 namespace :sentry do
@@ -13,7 +14,9 @@ namespace :sentry do
     end
 
     puts "\nSentry configuration:"
-    puts "  DSN: #{result[:configuration][:dsn_configured] ? "Configured" : "Not configured"}"
+    puts "  DSN: #{result[:configuration][:dsn_configured] ?
+      "Configured" :
+      "Not configured"}"
     puts "  Environment: #{result[:configuration][:environment]}"
     puts "  Enabled environments: #{result[:configuration][:enabled_environments].join(", ")}"
     puts "\nCheck your BugSink dashboard to verify the test events were received."

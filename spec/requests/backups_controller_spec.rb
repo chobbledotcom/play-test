@@ -63,7 +63,8 @@ RSpec.describe "Backups", type: :request do
         before do
           # Mock S3 service
           s3_service = double("S3Service")
-          allow(s3_service).to receive(:class).and_return(double(name: "ActiveStorage::Service::S3Service"))
+          s3_class = ActiveStorage::Service::S3Service
+          allow(s3_service).to receive(:is_a?).with(s3_class).and_return(true)
           allow(ActiveStorage::Blob).to receive(:service).and_return(s3_service)
 
           # Mock bucket for backup_exists? check
@@ -75,12 +76,16 @@ RSpec.describe "Backups", type: :request do
             size: 5_242_880,
             last_modified: Time.zone.parse("2024-01-15 10:00:00"))
 
-          allow(bucket).to receive(:objects).with(prefix: "db_backups/").and_return([backup])
+          prefix = "db_backups/"
+          allow(bucket).to receive(:objects).with(prefix: prefix)
+            .and_return([backup])
 
           # Mock object for presigned URL generation
           s3_object = double("S3Object")
-          allow(bucket).to receive(:object).with(valid_key).and_return(s3_object)
-          allow(s3_object).to receive(:presigned_url).and_return("https://s3.example.com/signed-url")
+          allow(bucket).to receive(:object).with(valid_key)
+            .and_return(s3_object)
+          signed_url = "https://s3.example.com/signed-url"
+          allow(s3_object).to receive(:presigned_url).and_return(signed_url)
         end
 
         it "redirects to presigned S3 URL for valid backup" do
@@ -92,16 +97,19 @@ RSpec.describe "Backups", type: :request do
       it "handles non-existent backup gracefully" do
         # Mock empty backup list
         s3_service = double("S3Service")
-        allow(s3_service).to receive(:class).and_return(double(name: "ActiveStorage::Service::S3Service"))
+        s3_class = ActiveStorage::Service::S3Service
+        allow(s3_service).to receive(:is_a?).with(s3_class).and_return(true)
         allow(ActiveStorage::Blob).to receive(:service).and_return(s3_service)
 
         bucket = double("bucket")
         allow(s3_service).to receive(:send).with(:bucket).and_return(bucket)
-        allow(bucket).to receive(:objects).with(prefix: "db_backups/").and_return([])
+        prefix = "db_backups/"
+        allow(bucket).to receive(:objects).with(prefix: prefix).and_return([])
 
         get download_backups_path, params: {date: "2099-12-31"}
         expect(response).to redirect_to(backups_path)
-        expect(flash[:error]).to eq(I18n.t("backups.errors.backup_not_found"))
+        error_message = I18n.t("backups.errors.backup_not_found")
+        expect(flash[:error]).to eq(error_message)
       end
     end
 
@@ -111,7 +119,8 @@ RSpec.describe "Backups", type: :request do
       it "redirects to root with unauthorized message" do
         get download_backups_path, params: {date: "2024-01-15"}
         expect(response).to redirect_to(root_path)
-        expect(flash[:alert]).to eq(I18n.t("forms.session_new.status.admin_required"))
+        admin_required = I18n.t("forms.session_new.status.admin_required")
+        expect(flash[:alert]).to eq(admin_required)
       end
     end
 

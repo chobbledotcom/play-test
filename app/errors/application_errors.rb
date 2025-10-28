@@ -1,3 +1,5 @@
+# typed: false
+
 module ApplicationErrors
   class NotAnImageError < StandardError
     def initialize(message = nil)

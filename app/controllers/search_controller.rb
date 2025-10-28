@@ -1,3 +1,5 @@
+# typed: false
+
 class SearchController < ApplicationController
   skip_before_action :require_login
 

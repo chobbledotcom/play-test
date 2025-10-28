@@ -1,3 +1,5 @@
+# typed: false
+
 # == Schema Information
 #
 # Table name: fan_assessments
@@ -51,59 +53,59 @@ FactoryBot.define do
     blower_tube_length_comment { nil }
 
     trait :passed do
-      fan_size_type { "2HP blower" }
+      fan_size_type { SeedData::PASS }
       number_of_blowers { 1 }
       blower_flap_pass { :pass }
-      blower_flap_comment { "Flap opens and closes properly" }
+      blower_flap_comment { SeedData::PASS }
       blower_finger_pass { true }
-      blower_finger_comment { "Finger guards in place and secure" }
+      blower_finger_comment { SeedData::PASS }
       pat_pass { :pass }
-      pat_comment { "PAT test completed successfully" }
+      pat_comment { SeedData::PASS }
       blower_visual_pass { true }
-      blower_visual_comment { "Visual inspection shows good condition" }
+      blower_visual_comment { SeedData::PASS }
       blower_serial { "BL123456" }
       blower_tube_length { 2.5 }
       blower_tube_length_pass { true }
-      blower_tube_length_comment { "Tube length appropriate" }
+      blower_tube_length_comment { SeedData::OK }
     end
 
     trait :complete do
-      fan_size_type { "2HP blower" }
+      fan_size_type { SeedData::PASS }
       number_of_blowers { 1 }
       blower_flap_pass { :pass }
-      blower_flap_comment { "Flap opens and closes properly" }
+      blower_flap_comment { SeedData::PASS }
       blower_finger_pass { true }
-      blower_finger_comment { "Finger guards in place and secure" }
+      blower_finger_comment { SeedData::PASS }
       pat_pass { :pass }
-      pat_comment { "PAT test completed successfully" }
+      pat_comment { SeedData::PASS }
       blower_visual_pass { true }
-      blower_visual_comment { "Visual inspection shows good condition" }
+      blower_visual_comment { SeedData::PASS }
       blower_serial { "BL123456" }
       blower_tube_length { 2.5 }
       blower_tube_length_pass { true }
-      blower_tube_length_comment { "Tube length appropriate" }
+      blower_tube_length_comment { SeedData::OK }
     end
 
     trait :failed do
-      fan_size_type { "2HP blower - safety issues identified" }
+      fan_size_type { SeedData::FAIL }
       number_of_blowers { 2 }
       blower_flap_pass { :fail }
       blower_finger_pass { false }
       pat_pass { :fail }
       blower_visual_pass { false }
-      blower_flap_comment { "Flap does not open properly" }
-      blower_finger_comment { "Finger guards damaged" }
-      pat_comment { "PAT test failed" }
-      blower_visual_comment { "Visible damage to housing" }
+      blower_flap_comment { SeedData::FAIL }
+      blower_finger_comment { SeedData::FAIL }
+      pat_comment { SeedData::FAIL }
+      blower_visual_comment { SeedData::WEAR }
       blower_serial { "BL789012" }
       blower_tube_length { 0.5 }
       blower_tube_length_pass { false }
-      blower_tube_length_comment { "Tube length too short" }
+      blower_tube_length_comment { SeedData::FAIL }
     end
 
     trait :pat_failure do
       pat_pass { :fail }
-      pat_comment { "Electrical safety test failed - attention required" }
+      pat_comment { SeedData::FAIL }
     end
   end
 end

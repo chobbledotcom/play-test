@@ -1,3 +1,5 @@
+# typed: false
+
 namespace :coverage do
   desc "Run tests in parallel with coverage"
   task :parallel do

@@ -1,3 +1,5 @@
+# typed: false
+
 namespace :ntfy do
   desc "Send a test notification to ntfy.sh"
   task test: :environment do

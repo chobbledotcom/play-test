@@ -1,3 +1,5 @@
+# typed: false
+
 class PagesController < ApplicationController
   include TurboStreamResponders
 

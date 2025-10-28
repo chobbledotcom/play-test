@@ -1,3 +1,5 @@
+# typed: false
+
 namespace :active_storage do
   desc "Clean up orphaned Active Storage files (files without database records)"
   task cleanup_orphaned: :environment do

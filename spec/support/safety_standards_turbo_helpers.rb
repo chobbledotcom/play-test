@@ -1,3 +1,5 @@
+# typed: false
+
 module SafetyStandardsTurboHelpers
   def turbo_headers
     {"Accept" => "text/vnd.turbo-stream.html"}

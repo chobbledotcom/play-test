@@ -1,3 +1,5 @@
+# typed: false
+
 module SafetyStandardsTestHelpers
   FORM_TYPES = {
     anchors: "safety_standards_anchors",

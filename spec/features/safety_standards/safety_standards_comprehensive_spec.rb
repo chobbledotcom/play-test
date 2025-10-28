@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Safety Standards Comprehensive Tests" do
@@ -131,7 +133,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
   describe "API tests", type: :request do
     include_context "calculation parameters"
 
-    def api_request(params)
+    define_method(:api_request) do |params|
       post safety_standards_path,
         params: {calculation: params}.to_json,
         headers: {
@@ -140,7 +142,7 @@ RSpec.describe "Safety Standards Comprehensive Tests" do
         }
     end
 
-    def turbo_request(params)
+    define_method(:turbo_request) do |params|
       post safety_standards_path,
         params: {calculation: params},
         headers: {Accept: "text/vnd.turbo-stream.html"}

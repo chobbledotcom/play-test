@@ -1,19 +1,20 @@
+# typed: false
 # frozen_string_literal: true
 
 namespace :s3 do
-  def test_file_key
+  define_method(:test_file_key) do
     "test-uploads/rails-s3-test-file.txt"
   end
 
   # Helper methods
-  def ensure_s3_enabled
+  define_method(:ensure_s3_enabled) do
     return if ENV["USE_S3_STORAGE"] == "true"
 
     puts "❌ S3 storage is not enabled. Set USE_S3_STORAGE=true in your .env file"
     exit 1
   end
 
-  def validate_s3_config
+  define_method(:validate_s3_config) do
     required_vars = %w[S3_ENDPOINT S3_ACCESS_KEY_ID S3_SECRET_ACCESS_KEY S3_BUCKET]
     missing_vars = required_vars.select { |var| ENV[var].blank? }
 
@@ -31,7 +32,7 @@ namespace :s3 do
     end
   end
 
-  def get_s3_service
+  define_method(:get_s3_service) do
     service = ActiveStorage::Blob.service
 
     unless service.is_a?(ActiveStorage::Service::S3Service)
@@ -42,8 +43,8 @@ namespace :s3 do
     service
   end
 
-  def handle_s3_errors
-    yield
+  define_method(:handle_s3_errors) do |&block|
+    block.call
   rescue Aws::S3::Errors::ServiceError => e
     puts "\n❌ S3 Error: #{e.message}"
     Sentry.capture_exception(e)

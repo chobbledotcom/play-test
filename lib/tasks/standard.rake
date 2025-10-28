@@ -1,3 +1,5 @@
+# typed: false
+
 namespace :standard do
   desc "Lint Ruby code with Standard Ruby"
   task :check do

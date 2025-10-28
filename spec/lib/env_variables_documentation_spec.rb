@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "Environment Variables Documentation" do
@@ -67,7 +69,7 @@ RSpec.describe "Environment Variables Documentation" do
 
   private
 
-  def find_env_variables_in_codebase
+  define_method(:find_env_variables_in_codebase) do
     env_vars = Set.new
 
     search_in_directories(env_vars)
@@ -77,7 +79,7 @@ RSpec.describe "Environment Variables Documentation" do
     env_vars - system_env_variables
   end
 
-  def system_env_variables
+  define_method(:system_env_variables) do
     %w[
       BUNDLE_GEMFILE
       BUNDLER_VERSION
@@ -95,7 +97,7 @@ RSpec.describe "Environment Variables Documentation" do
     ].to_set
   end
 
-  def search_in_directories(env_vars)
+  define_method(:search_in_directories) do |env_vars|
     paths_to_search = %w[app config lib]
     file_patterns = %w[*.rb *.erb *.yml *.rake]
 
@@ -109,7 +111,7 @@ RSpec.describe "Environment Variables Documentation" do
     end
   end
 
-  def search_files_by_pattern(path, pattern, env_vars)
+  define_method(:search_files_by_pattern) do |path, pattern, env_vars|
     Dir.glob(File.join(path, "**", pattern)).each do |file|
       next if skip_file?(file)
 
@@ -118,7 +120,7 @@ RSpec.describe "Environment Variables Documentation" do
     end
   end
 
-  def skip_file?(file)
+  define_method(:skip_file?) do |file|
     file.include?("/vendor/") ||
       file.include?("/node_modules/") ||
       file.include?("/tmp/") ||
@@ -127,8 +129,7 @@ RSpec.describe "Environment Variables Documentation" do
       file.include?("/test/")
   end
 
-  def extract_env_vars_from_content(content, env_vars)
-    # Match ENV["VAR"], ENV['VAR']
+  define_method(:extract_env_vars_from_content) do |content, env_vars|
     content.scan(/ENV\[["']([^"']+)["']\]/).each do |match|
       env_vars.add(match[0])
     end
@@ -139,7 +140,7 @@ RSpec.describe "Environment Variables Documentation" do
     end
   end
 
-  def search_in_bin_directory(env_vars)
+  define_method(:search_in_bin_directory) do |env_vars|
     Rails.root.glob("bin/*").each do |file|
       next unless File.file?(file)
       content = File.read(file)
@@ -147,7 +148,7 @@ RSpec.describe "Environment Variables Documentation" do
     end
   end
 
-  def parse_env_example_file
+  define_method(:parse_env_example_file) do
     return Set.new unless File.exist?(env_example_path)
 
     env_vars = Set.new

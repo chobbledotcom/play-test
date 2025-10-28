@@ -1,3 +1,5 @@
+# typed: false
+
 # Support for running tests with in-memory SQLite database
 # Based on https://railsatscale.com/2023-08-25-how-we-used-a-sqlite-memory-db-for-rails-benchmarking/
 

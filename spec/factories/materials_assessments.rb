@@ -1,3 +1,5 @@
+# typed: false
+
 # == Schema Information
 #
 # Table name: materials_assessments
@@ -74,10 +76,10 @@ FactoryBot.define do
       zips_pass { :pass }
       windows_pass { :pass }
       artwork_pass { :pass }
-      ropes_comment { "Rope diameter meets safety standards" }
-      fabric_strength_comment { "Fabric in good condition" }
-      fire_retardant_comment { "Fire retardant treatment effective" }
-      thread_comment { "Thread quality appropriate" }
+      ropes_comment { SeedData::PASS }
+      fabric_strength_comment { SeedData::GOOD }
+      fire_retardant_comment { SeedData::PASS }
+      thread_comment { SeedData::OK }
     end
 
     trait :failed do

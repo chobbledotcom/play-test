@@ -1,3 +1,5 @@
+# typed: false
+
 # Test-specific translations that are only used in specs
 # These are not part of the production application
 

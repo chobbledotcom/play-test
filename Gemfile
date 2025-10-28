@@ -122,11 +122,8 @@ gem "aws-sdk-s3", require: false
 # SQLite replication to S3
 gem "litestream"
 
-# Production and development gems
-group :development, :production do
-  # Mission Control for managing background jobs
-  gem "mission_control-jobs", "~> 1.0", require: false
-end
+# Mission Control for managing background jobs
+gem "mission_control-jobs", "~> 1.0"
 
 # Production-only gems
 group :production do

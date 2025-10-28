@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 # Only load if parallel_rspec is available

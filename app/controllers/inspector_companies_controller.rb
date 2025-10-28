@@ -1,3 +1,5 @@
+# typed: false
+
 class InspectorCompaniesController < ApplicationController
   include TurboStreamResponders
 

@@ -1,3 +1,5 @@
+# typed: false
+
 require "pdf/inspector"
 
 RSpec.shared_examples "generates valid PDF structure" do |pdf_response|

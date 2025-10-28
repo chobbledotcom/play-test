@@ -1,3 +1,5 @@
+# typed: false
+
 # Copy environment variables to crontab
 ENV.each_key do |key|
   env key.to_sym, ENV[key]

@@ -1,3 +1,5 @@
+# typed: false
+
 require "capybara/cuprite"
 
 # Configure Cuprite for JavaScript testing

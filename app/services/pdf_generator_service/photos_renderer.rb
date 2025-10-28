@@ -1,3 +1,5 @@
+# typed: false
+
 class PdfGeneratorService
   class PhotosRenderer
     def self.generate_photos_page(pdf, inspection)

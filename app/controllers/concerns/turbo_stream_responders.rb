@@ -26,7 +26,7 @@ module TurboStreamResponders
     render turbo_stream: streams
   end
 
-  sig { params(model: ActiveRecord::Base, message_key: T.nilable(String), redirect_path: T.any(String, ActiveRecord::Base, NilClass), additional_streams: T::Array[Turbo::Streams::TagBuilder]).void }
+  sig { params(model: ActiveRecord::Base, message_key: T.nilable(String), redirect_path: T.nilable(T.any(String, ActiveRecord::Base)), additional_streams: T::Array[Turbo::Streams::TagBuilder]).void }
   def handle_update_success(model, message_key = nil, redirect_path = nil, additional_streams: [])
     message_key ||= "#{model.class.table_name}.messages.updated"
     redirect_path ||= model

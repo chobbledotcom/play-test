@@ -99,6 +99,6 @@ class SessionsController < ApplicationController
   def handle_successful_login(user)
     establish_user_session(user)
     flash[:notice] = I18n.t("session.login.success")
-    redirect_to inspections_path
+    redirect_back_or(inspections_path)
   end
 end

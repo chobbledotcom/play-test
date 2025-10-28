@@ -8,7 +8,7 @@ RSpec.describe BaseAssessmentBlueprint, type: :serializer do
     # Create a test class with known column names
     let(:test_class) do
       Class.new do
-        def self.column_name_syms
+        define_singleton_method(:column_name_syms) do
           %i[
             id
             name
@@ -59,7 +59,7 @@ RSpec.describe BaseAssessmentBlueprint, type: :serializer do
 
     it "handles classes with only excluded fields" do
       excluded_only_class = Class.new do
-        def self.column_name_syms
+        define_singleton_method(:column_name_syms) do
           %i[id created_at updated_at user_id]
         end
       end

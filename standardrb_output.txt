@@ -33,10 +33,6 @@ Supported parameters are:
 
   - Enabled
 standard: Use Ruby Standard Style (https://github.com/standardrb/standard)
-  app/controllers/units_controller.rb:219:12: Rails/Blank: Use `if id_param.blank?` instead of `unless id_param.present?`.
-  spec/lib/litestream_spec.rb:44:17: Rails/RootPathnameMethods: `Rails.root` is a `Pathname`, so you can use `Rails.root.join("config/initializers/litestream.rb").read`.
-  spec/lib/litestream_spec.rb:56:17: Rails/RootPathnameMethods: `Rails.root` is a `Pathname`, so you can use `Rails.root.join("config/puma.rb").read`.
-  spec/lib/litestream_spec.rb:66:17: Rails/RootPathnameMethods: `Rails.root` is a `Pathname`, so you can use `Rails.root.join("bin/docker-entrypoint").read`.
-  spec/lib/litestream_spec.rb:78:17: Rails/RootPathnameMethods: `Rails.root` is a `Pathname`, so you can use `Rails.root.join(".env.example").read`.
-  spec/lib/litestream_spec.rb:89:17: Rails/RootPathnameMethods: `Rails.root` is a `Pathname`, so you can use `Rails.root.join("config/database.yml").read`.
-standard: Run `standardrb --fix-unsafely` to DANGEROUSLY fix 6 problems.
+  app/controllers/units_controller.rb:319:15: Rails/Blank: Use `if params[:unit][:photo].blank?` instead of `unless params[:unit][:photo].present?`.
+  config/initializers/tapioca_solid_queue_fix.rb:12:3: Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
+standard: Run `standardrb --fix-unsafely` to DANGEROUSLY fix 2 problems.
