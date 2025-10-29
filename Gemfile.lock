@@ -493,13 +493,13 @@ GEM
       fugit (~> 1.11)
       railties (>= 7.1)
       thor (>= 1.3.1)
-    sorbet (0.5.12016)
-      sorbet-static (= 0.5.12016)
-    sorbet-runtime (0.5.12016)
-    sorbet-static (0.5.12016-x86_64-linux)
-    sorbet-static-and-runtime (0.5.12016)
-      sorbet (= 0.5.12016)
-      sorbet-runtime (= 0.5.12016)
+    sorbet (0.6.12673)
+      sorbet-static (= 0.6.12673)
+    sorbet-runtime (0.6.12673)
+    sorbet-static (0.6.12673-x86_64-linux)
+    sorbet-static-and-runtime (0.6.12673)
+      sorbet (= 0.6.12673)
+      sorbet-runtime (= 0.6.12673)
     spoom (1.7.9)
       erubi (>= 1.10.0)
       prism (>= 0.28.0)
@@ -641,7 +641,7 @@ DEPENDENCIES
   simplecov-cobertura
   solid_queue
   sorbet
-  sorbet-runtime (= 0.5.12016)
+  sorbet-runtime (= 0.6.12673)
   sprockets-rails
   sqlite3 (>= 1.4)
   standard
