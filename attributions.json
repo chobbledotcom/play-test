@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-10-27T03:16:51",
+  "generated_at": "2025-11-03T03:14:25",
   "total_dependencies": 151,
   "dependencies": [
     {
@@ -564,7 +564,7 @@
     },
     {
       "name": "openssl",
-      "version": "3.3.1",
+      "version": "3.3.2",
       "license": "other",
       "homepage": "https://github.com/ruby/openssl",
       "summary": "SSL/TLS and general-purpose cryptography for Ruby"
