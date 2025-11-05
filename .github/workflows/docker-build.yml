@@ -57,36 +57,44 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Build Docker image (no push)
-        if: '!inputs.push'
-        uses: docker/build-push-action@v6
-        with:
-          push: false
-          load: true
-          tags: play-test:${{ inputs.version }}
-          cache-from: |
-            type=gha
-            type=registry,ref=${{ vars.DOCKER_USERNAME }}/play-test:buildcache
-          cache-to: type=gha,mode=max
+      - name: Prepare Docker tags
+        id: tags
+        run: |
+          if [ "${{ inputs.push }}" = "true" ]; then
+            echo "tags<<EOF" >> $GITHUB_OUTPUT
+            echo "${{ vars.DOCKER_USERNAME }}/play-test:latest" >> $GITHUB_OUTPUT
+            echo "${{ vars.DOCKER_USERNAME }}/play-test:v${{ inputs.version }}" >> $GITHUB_OUTPUT
+            echo "git.chobble.com/chobble/play-test:latest" >> $GITHUB_OUTPUT
+            echo "git.chobble.com/chobble/play-test:v${{ inputs.version }}" >> $GITHUB_OUTPUT
+            echo "ghcr.io/${{ github.repository }}:latest" >> $GITHUB_OUTPUT
+            echo "ghcr.io/${{ github.repository }}:v${{ inputs.version }}" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "tags=play-test:${{ inputs.version }}" >> $GITHUB_OUTPUT
+          fi
       
-      - name: Build and push Docker images
-        if: inputs.push
+      - name: Prepare cache config
+        id: cache
+        run: |
+          if [ "${{ inputs.push }}" = "true" ]; then
+            echo "to<<EOF" >> $GITHUB_OUTPUT
+            echo "type=gha,mode=max" >> $GITHUB_OUTPUT
+            echo "type=registry,ref=${{ vars.DOCKER_USERNAME }}/play-test:buildcache,mode=max" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "to=type=gha,mode=max" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
-          push: true
-          tags: |
-            ${{ vars.DOCKER_USERNAME }}/play-test:latest
-            ${{ vars.DOCKER_USERNAME }}/play-test:v${{ inputs.version }}
-            git.chobble.com/chobble/play-test:latest
-            git.chobble.com/chobble/play-test:v${{ inputs.version }}
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:v${{ inputs.version }}
+          push: ${{ inputs.push }}
+          load: ${{ !inputs.push }}
+          tags: ${{ steps.tags.outputs.tags }}
           cache-from: |
             type=gha
             type=registry,ref=${{ vars.DOCKER_USERNAME }}/play-test:buildcache
-          cache-to: |
-            type=gha,mode=max
-            type=registry,ref=${{ vars.DOCKER_USERNAME }}/play-test:buildcache,mode=max
+          cache-to: ${{ steps.cache.outputs.to }}
       
       - name: Test Docker image
         if: '!inputs.push'

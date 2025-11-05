@@ -1,7 +1,6 @@
 name: "Test: Ruby"
 
 on:
-  push:
   pull_request:
   workflow_call:
 

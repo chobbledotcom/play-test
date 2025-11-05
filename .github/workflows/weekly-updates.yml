@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.AUTOMERGE_TOKEN }}
           fetch-depth: 0  # Full history for better git operations
       - name: Setup environment
         uses: ./.github/actions/setup-environment
@@ -50,4 +50,4 @@ jobs:
             - Regenerated third-party attributions from Gemfile
             
             [Automated weekly update]
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.AUTOMERGE_TOKEN }}
