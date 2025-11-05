@@ -102,57 +102,37 @@ jobs:
         run: |
           git push -f origin automated/erb-lint-fixes
       
-      - name: Create or update pull request
-        if: steps.check_changes.outputs.changed == 'true' || steps.erb_lint.outputs.has_unfixed == 'true'
-        id: create_pr
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-           # Check if PR already exists
-           PR_NUMBER=$(gh pr list --head automated/erb-lint-fixes --json number --jq '.[0].number' || echo "")
-           
-           # Prepare PR body
+       - name: Create or update pull request
+         if: steps.check_changes.outputs.changed == 'true' || steps.erb_lint.outputs.has_unfixed == 'true'
+         id: create_pr
+         env:
+           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         run: |
+           # Prepare description based on whether there are unfixed issues
            if [ "${{ steps.erb_lint.outputs.has_unfixed }}" == "true" ]; then
-             UNFIXED_MSG="
+             DESCRIPTION="This PR contains automated ERB template fixes.
+
            ⚠️ **Manual fixes required** - Some issues could not be auto-corrected.
            See the comment below for details."
-             AUTO_MERGE_MSG=""
+             AUTO_MERGE="false"
            else
-             UNFIXED_MSG="✅ All issues were auto-corrected!"
-             AUTO_MERGE_MSG="
-           
-           This PR will automatically merge if all status checks pass."
+             DESCRIPTION="This PR contains automated ERB template fixes.
+
+           ✅ All issues were auto-corrected!"
+             AUTO_MERGE="true"
            fi
            
-           PR_BODY="## Daily ERB Lint Auto-fix
+           PR_BODY=$(.github/scripts/build-pr-body.sh \
+             "Daily ERB Lint Auto-fix" \
+             "$DESCRIPTION" \
+             "$AUTO_MERGE")
            
-           This PR contains automated ERB template fixes.
+           PR_NUMBER=$(.github/scripts/create-or-update-pr.sh \
+             "automated/erb-lint-fixes" \
+             "Fix ERB Linting Issues" \
+             "$PR_BODY")
            
-           $UNFIXED_MSG$AUTO_MERGE_MSG
-           
-           ### Files Changed
-           \`\`\`
-           $(git diff --stat origin/main...HEAD 2>/dev/null || echo "No file changes")
-           \`\`\`
-           
-           ---
-           *This PR is automatically generated daily and will be updated if new issues are detected.*
-           *Last updated: $(date -u '+%Y-%m-%d %H:%M UTC')*"
-           
-           if [ -z "$PR_NUMBER" ]; then
-             echo "Creating new PR..."
-             PR_NUMBER=$(gh pr create \
-               --title "Fix ERB Linting Issues" \
-               --body "$PR_BODY" \
-               --base main \
-               --head automated/erb-lint-fixes \
-               --json number --jq '.number')
-             echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-           else
-             echo "PR #$PR_NUMBER already exists, updating..."
-             gh pr edit "$PR_NUMBER" --body "$PR_BODY"
-             echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-           fi
+           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
        
        - name: Add comment for unfixed issues
          if: steps.erb_lint.outputs.has_unfixed == 'true' && steps.create_pr.outputs.pr_number != ''
@@ -179,6 +159,4 @@ jobs:
          env:
            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          run: |
-           PR_NUMBER="${{ steps.create_pr.outputs.pr_number }}"
-           echo "Enabling auto-merge for PR #$PR_NUMBER (all issues auto-corrected)..."
-           gh pr merge "$PR_NUMBER" --auto --squash --delete-branch
+           .github/scripts/enable-auto-merge.sh "${{ steps.create_pr.outputs.pr_number }}"

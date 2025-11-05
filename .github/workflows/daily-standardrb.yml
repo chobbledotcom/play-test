@@ -81,38 +81,17 @@ jobs:
          env:
            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          run: |
-           # Check if PR already exists
-           PR_NUMBER=$(gh pr list --head automated/standardrb-fixes --json number --jq '.[0].number' || echo "")
+           PR_BODY=$(.github/scripts/build-pr-body.sh \
+             "Daily StandardRB Auto-fix" \
+             "This PR contains automated Ruby style fixes from StandardRB.
+
+           ✅ All issues were auto-corrected by StandardRB!" \
+             "true")
            
-           PR_BODY="## Daily StandardRB Auto-fix
-           
-           This PR contains automated Ruby style fixes from StandardRB.
-           
-           ### Files Changed
-           \`\`\`
-           $(git diff --stat origin/main...HEAD 2>/dev/null || echo "No file changes")
-           \`\`\`
-           
-           ✅ All issues were auto-corrected by StandardRB!
-           
-           This PR will automatically merge if all status checks pass.
-           
-           ---
-           *This PR is automatically generated daily and will be updated if new issues are detected.*
-           *Last updated: $(date -u '+%Y-%m-%d %H:%M UTC')*"
-           
-           if [ -z "$PR_NUMBER" ]; then
-             echo "Creating new PR..."
-             PR_NUMBER=$(gh pr create \
-               --title "Fix StandardRB Linting Issues" \
-               --body "$PR_BODY" \
-               --base main \
-               --head automated/standardrb-fixes \
-               --json number --jq '.number')
-           else
-             echo "PR #$PR_NUMBER already exists, updating..."
-             gh pr edit "$PR_NUMBER" --body "$PR_BODY"
-           fi
+           PR_NUMBER=$(.github/scripts/create-or-update-pr.sh \
+             "automated/standardrb-fixes" \
+             "Fix StandardRB Linting Issues" \
+             "$PR_BODY")
            
            echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
        
@@ -121,6 +100,4 @@ jobs:
          env:
            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          run: |
-           PR_NUMBER="${{ steps.create_pr.outputs.pr_number }}"
-           echo "Enabling auto-merge for PR #$PR_NUMBER..."
-           gh pr merge "$PR_NUMBER" --auto --squash --delete-branch
+           .github/scripts/enable-auto-merge.sh "${{ steps.create_pr.outputs.pr_number }}"
