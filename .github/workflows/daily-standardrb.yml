@@ -35,7 +35,7 @@ jobs:
             Fix StandardRB linting issues
             
             - Auto-corrected Ruby style issues
-            - Applied standardrb --fix
+            - Applied standardrb --fix-unsafely
             
             [Automated daily update]
           github-token: ${{ secrets.GITHUB_TOKEN }}
