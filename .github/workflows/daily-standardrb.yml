@@ -1,40 +1,33 @@
-name: "Daily: Fix StandardRB Issues"
-
+---
+name: 'Daily: Fix StandardRB Issues'
 on:
   schedule:
-    - cron: '0 4 * * *'  # Daily at 4am UTC (staggered from other daily jobs)
+    - cron: 0 4 * * *  # Daily at 4am UTC (staggered from other daily jobs)
   workflow_dispatch:  # Allow manual triggering
-
 permissions:
   contents: write
   pull-requests: write
-
 jobs:
   standardrb-fix:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0  # Full history for better git operations
-      
       - name: Setup environment
         uses: ./.github/actions/setup-environment
-      
       - name: Git setup
         uses: ./.github/actions/git-setup
-      
       - name: Create or switch to update branch
         run: |
           git checkout -B automated/standardrb-fixes
-      
       - name: Run StandardRB with auto-fix
         id: standardrb
         run: |
           echo "Running StandardRB with auto-fix..."
-          
+
           # Run standardrb --fix and capture the output
           if bundle exec standardrb --fix > standardrb_output.txt 2>&1; then
             echo "clean=true" >> $GITHUB_OUTPUT
@@ -43,10 +36,9 @@ jobs:
             echo "clean=false" >> $GITHUB_OUTPUT
             echo "StandardRB found issues (some may have been auto-fixed)"
           fi
-          
+
           # Show output for debugging
           cat standardrb_output.txt
-      
       - name: Check for changes
         id: check_changes
         run: |
@@ -58,46 +50,31 @@ jobs:
             echo "Changes detected (auto-fixes applied):"
             git diff --stat
           fi
-      
       - name: Commit changes
         if: steps.check_changes.outputs.changed == 'true'
         run: |
           git add -A
           git commit -m "Fix StandardRB linting issues
-          
           - Auto-corrected Ruby style issues
           - Applied standardrb --fix
-          
           [Automated daily update]"
-      
-       - name: Push changes
-         if: steps.check_changes.outputs.changed == 'true'
-         run: |
-           git push -f origin automated/standardrb-fixes
-       
-       - name: Create or update pull request
-         if: steps.check_changes.outputs.changed == 'true'
-         id: create_pr
-         env:
-           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-         run: |
-           PR_BODY=$(.github/scripts/build-pr-body.sh \
-             "Daily StandardRB Auto-fix" \
-             "This PR contains automated Ruby style fixes from StandardRB.
-
-           ✅ All issues were auto-corrected by StandardRB!" \
-             "true")
-           
-           PR_NUMBER=$(.github/scripts/create-or-update-pr.sh \
-             "automated/standardrb-fixes" \
-             "Fix StandardRB Linting Issues" \
-             "$PR_BODY")
-           
-           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-       
-       - name: Enable auto-merge
-         if: steps.check_changes.outputs.changed == 'true'
-         env:
-           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-         run: |
-           .github/scripts/enable-auto-merge.sh "${{ steps.create_pr.outputs.pr_number }}"
+      - name: Push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git push -f origin automated/standardrb-fixes
+      - name: Create or update pull request
+        if: steps.check_changes.outputs.changed == 'true'
+        id: create_pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(.github/scripts/create-automation-pr.sh \
+            "standardrb" \
+            "automated/standardrb-fixes")
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+      - name: Enable auto-merge
+        if: steps.check_changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |-
+          .github/scripts/enable-auto-merge.sh "${{ steps.create_pr.outputs.pr_number }}"
