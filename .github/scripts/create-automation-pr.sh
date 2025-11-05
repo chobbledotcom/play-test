@@ -90,16 +90,17 @@ EOF
 )
 
 # Create or update the PR
-PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number' || echo "")
+PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number' 2>/dev/null || echo "")
 
 if [ -z "$PR_NUMBER" ]; then
   echo "Creating new PR..."
-  PR_NUMBER=$(gh pr create \
+  PR_URL=$(gh pr create \
     --title "$PR_TITLE" \
     --body "$PR_BODY" \
     --base main \
-    --head "$BRANCH_NAME" \
-    --json number --jq '.number')
+    --head "$BRANCH_NAME")
+  # Extract PR number from URL (format: https://github.com/owner/repo/pull/123)
+  PR_NUMBER="${PR_URL##*/}"
 else
   echo "PR #$PR_NUMBER already exists, updating..."
   gh pr edit "$PR_NUMBER" --body "$PR_BODY"
