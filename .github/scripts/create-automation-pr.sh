@@ -1,6 +1,6 @@
 #!/bin/bash
 # Create or update an automated PR with standard formatting
-# Usage: create-automation-pr.sh <type> <branch-name> [has-unfixed-issues]
+# Usage: create-automation-pr.sh <type> <branch-name>
 #
 # Types: annotations, standardrb, erb-lint
 
@@ -8,10 +8,9 @@ set -e
 
 TYPE="$1"
 BRANCH_NAME="$2"
-HAS_UNFIXED="${3:-false}"
 
 if [ -z "$TYPE" ] || [ -z "$BRANCH_NAME" ]; then
-  echo "Usage: create-automation-pr.sh <type> <branch-name> [has-unfixed-issues]" >&2
+  echo "Usage: create-automation-pr.sh <type> <branch-name>" >&2
   exit 1
 fi
 
@@ -42,19 +41,8 @@ case "$TYPE" in
   erb-lint)
     PR_TITLE="Fix ERB Linting Issues"
     BODY_TITLE="Daily ERB Lint Auto-fix"
-    
-    if [ "$HAS_UNFIXED" = "true" ]; then
-      BODY_DESCRIPTION="This PR contains automated ERB template fixes.
-
-⚠️ **Manual fixes required** - Some issues could not be auto-corrected.
-See the comment below for details."
-      LABELS=""
-    else
-      BODY_DESCRIPTION="This PR contains automated ERB template fixes.
-
-✅ All issues were auto-corrected!"
-      LABELS="automerge"
-    fi
+    BODY_DESCRIPTION="This PR contains automated ERB template fixes from erb_lint."
+    LABELS="automerge"
     ;;
     
   *)

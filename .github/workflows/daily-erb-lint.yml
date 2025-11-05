@@ -69,32 +69,16 @@ jobs:
           - Auto-corrected ERB template issues
           - Applied erb_lint --autocorrect fixes
           [Automated daily update]"
-      - name: Create tracking file if only manual fixes needed
-        if: steps.check_changes.outputs.changed == 'false' && steps.erb_lint.outputs.has_unfixed
-          == 'true'
-        run: |
-          echo "This branch tracks ERB lint violations that need manual fixes" > .erb-lint-tracking
-          echo "Generated: $(date -u '+%Y-%m-%d %H:%M UTC')" >> .erb-lint-tracking
-          echo "" >> .erb-lint-tracking
-          echo "Total violations found: $(grep 'Total violations:' erb_lint_output.txt | grep -o '[0-9]\+')" >> .erb-lint-tracking
-          echo "Files with violations: $(grep 'Failed:' erb_lint_output.txt | grep -o '[0-9]\+')" >> .erb-lint-tracking
-          git add .erb-lint-tracking
-          git commit -m "Track ERB lint violations requiring manual fixes
-          No auto-fixable issues found, but manual fixes are needed.
-          See PR for full details.
-          [Automated daily update]"
+
       - name: Push changes
-        if: steps.check_changes.outputs.changed == 'true' || steps.erb_lint.outputs.has_unfixed
-          == 'true'
+        if: steps.check_changes.outputs.changed == 'true'
         run: |
           git push -f origin automated/erb-lint-fixes
       - name: Create or update pull request
-        if: steps.check_changes.outputs.changed == 'true' || steps.erb_lint.outputs.has_unfixed
-          == 'true'
+        if: steps.check_changes.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           .github/scripts/create-automation-pr.sh \
             "erb-lint" \
-            "automated/erb-lint-fixes" \
-            "${{ steps.erb_lint.outputs.has_unfixed }}"
+            "automated/erb-lint-fixes"
