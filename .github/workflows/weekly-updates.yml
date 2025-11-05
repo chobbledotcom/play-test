@@ -72,11 +72,11 @@ jobs:
           
           [Automated weekly update]"
       
-      - name: Push changes
-        if: steps.check_changes.outputs.changed == 'true'
-        run: |
-          git push -f origin automated/annotations-attributions
-      
+       - name: Push changes
+         if: steps.check_changes.outputs.changed == 'true'
+         run: |
+           git push -f origin automated/annotations-attributions
+       
        - name: Create or update pull request
          if: steps.check_changes.outputs.changed == 'true'
          id: create_pr
@@ -133,7 +133,7 @@ jobs:
            fi
            
            echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-      
+       
        - name: Enable auto-merge
          if: steps.check_changes.outputs.changed == 'true'
          env:
