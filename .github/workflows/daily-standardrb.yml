@@ -25,7 +25,7 @@ jobs:
           git checkout -B automated/standardrb-fixes
       - name: Run StandardRB with auto-fix
         run: |
-          bundle exec standardrb --fix
+          bundle exec standardrb --fix-unsafely
       - name: Commit, push, and create PR
         uses: ./.github/actions/create-automation-pr
         with:
