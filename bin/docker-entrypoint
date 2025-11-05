@@ -23,13 +23,6 @@ if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
   fi
 
   ./bin/rails db:prepare
-  
-  echo "Setting up cron jobs with whenever..."
-  # Generate crontab file for supercronic
-  bundle exec whenever > /tmp/crontab
-  
-  echo "Starting supercronic in background..."
-  supercronic /tmp/crontab &
 
   echo "Starting Solid Queue worker in background..."
   ./bin/jobs &
