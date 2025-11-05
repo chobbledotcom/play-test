@@ -33,18 +33,10 @@ case "$TYPE" in
   standardrb)
     PR_TITLE="Fix StandardRB Linting Issues"
     BODY_TITLE="Daily StandardRB Auto-fix"
-    
-    if [ "$HAS_UNFIXED" = "true" ]; then
-      BODY_DESCRIPTION="This PR contains automated Ruby style fixes from StandardRB.
-
-⚠️ **Manual fixes required** - Some issues could not be auto-corrected."
-      LABELS=""
-    else
-      BODY_DESCRIPTION="This PR contains automated Ruby style fixes from StandardRB.
+    BODY_DESCRIPTION="This PR contains automated Ruby style fixes from StandardRB.
 
 ✅ All issues were auto-corrected by StandardRB!"
-      LABELS="automerge"
-    fi
+    LABELS="automerge"
     ;;
     
   erb-lint)

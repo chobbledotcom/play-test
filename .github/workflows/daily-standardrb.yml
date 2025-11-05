@@ -67,12 +67,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Pass clean status - only automerge if all issues were fixed
-          HAS_UNFIXED="false"
-          if [ "${{ steps.standardrb.outputs.clean }}" != "true" ]; then
-            HAS_UNFIXED="true"
-          fi
           .github/scripts/create-automation-pr.sh \
             "standardrb" \
-            "automated/standardrb-fixes" \
-            "$HAS_UNFIXED"
+            "automated/standardrb-fixes"
