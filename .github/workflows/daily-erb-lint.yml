@@ -91,28 +91,10 @@ jobs:
       - name: Create or update pull request
         if: steps.check_changes.outputs.changed == 'true' || steps.erb_lint.outputs.has_unfixed
           == 'true'
-        id: create_pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_NUMBER=$(.github/scripts/create-automation-pr.sh \
+          .github/scripts/create-automation-pr.sh \
             "erb-lint" \
             "automated/erb-lint-fixes" \
-            "${{ steps.erb_lint.outputs.has_unfixed }}")
-          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-      - name: Add comment for unfixed issues
-        if: steps.erb_lint.outputs.has_unfixed == 'true' && steps.create_pr.outputs.pr_number
-          != ''
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          .github/scripts/add-pr-comment.sh \
-            "${{ steps.create_pr.outputs.pr_number }}" \
-            "unfixed_issues.txt"
-      - name: Enable auto-merge
-        if: steps.erb_lint.outputs.has_unfixed == 'false' && steps.create_pr.outputs.pr_number
-          != ''
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |-
-          .github/scripts/enable-auto-merge.sh "${{ steps.create_pr.outputs.pr_number }}"
+            "${{ steps.erb_lint.outputs.has_unfixed }}"

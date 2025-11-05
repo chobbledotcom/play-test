@@ -63,17 +63,9 @@ jobs:
           git push -f origin automated/annotations-attributions
       - name: Create or update pull request
         if: steps.check_changes.outputs.changed == 'true'
-        id: create_pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_NUMBER=$(.github/scripts/create-automation-pr.sh \
+          .github/scripts/create-automation-pr.sh \
             "annotations" \
-            "automated/annotations-attributions")
-          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-      - name: Enable auto-merge
-        if: steps.check_changes.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |-
-          .github/scripts/enable-auto-merge.sh "${{ steps.create_pr.outputs.pr_number }}"
+            "automated/annotations-attributions"

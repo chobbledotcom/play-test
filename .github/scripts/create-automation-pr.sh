@@ -11,7 +11,7 @@ BRANCH_NAME="$2"
 HAS_UNFIXED="${3:-false}"
 
 if [ -z "$TYPE" ] || [ -z "$BRANCH_NAME" ]; then
-  echo "Usage: create-automation-pr.sh <type> <branch-name> [has-unfixed-issues]"
+  echo "Usage: create-automation-pr.sh <type> <branch-name> [has-unfixed-issues]" >&2
   exit 1
 fi
 
@@ -27,16 +27,24 @@ case "$TYPE" in
 - 📝 Model annotations (from database schema)
 - 🛣️ Route annotations (from Rails routes)
 - 📦 Third-party attributions (from dependencies)"
-    AUTO_MERGE="true"
+    LABELS="automerge"
     ;;
     
   standardrb)
     PR_TITLE="Fix StandardRB Linting Issues"
     BODY_TITLE="Daily StandardRB Auto-fix"
-    BODY_DESCRIPTION="This PR contains automated Ruby style fixes from StandardRB.
+    
+    if [ "$HAS_UNFIXED" = "true" ]; then
+      BODY_DESCRIPTION="This PR contains automated Ruby style fixes from StandardRB.
+
+⚠️ **Manual fixes required** - Some issues could not be auto-corrected."
+      LABELS=""
+    else
+      BODY_DESCRIPTION="This PR contains automated Ruby style fixes from StandardRB.
 
 ✅ All issues were auto-corrected by StandardRB!"
-    AUTO_MERGE="true"
+      LABELS="automerge"
+    fi
     ;;
     
   erb-lint)
@@ -48,35 +56,27 @@ case "$TYPE" in
 
 ⚠️ **Manual fixes required** - Some issues could not be auto-corrected.
 See the comment below for details."
-      AUTO_MERGE="false"
+      LABELS=""
     else
       BODY_DESCRIPTION="This PR contains automated ERB template fixes.
 
 ✅ All issues were auto-corrected!"
-      AUTO_MERGE="true"
+      LABELS="automerge"
     fi
     ;;
     
   *)
-    echo "Unknown type: $TYPE"
-    echo "Valid types: annotations, standardrb, erb-lint"
+    echo "Unknown type: $TYPE" >&2
+    echo "Valid types: annotations, standardrb, erb-lint" >&2
     exit 1
     ;;
 esac
-
-# Build auto-merge message
-AUTO_MERGE_MSG=""
-if [ "$AUTO_MERGE" = "true" ]; then
-  AUTO_MERGE_MSG="
-
-This PR will automatically merge if all status checks pass."
-fi
 
 # Build complete PR body
 PR_BODY=$(cat <<EOF
 ## $BODY_TITLE
 
-$BODY_DESCRIPTION$AUTO_MERGE_MSG
+$BODY_DESCRIPTION
 
 ### Files Changed
 \`\`\`
@@ -89,21 +89,41 @@ $FILE_CHANGES
 EOF
 )
 
-# Create or update the PR
+# Check if PR already exists
 PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number' 2>/dev/null || echo "")
 
 if [ -z "$PR_NUMBER" ]; then
   echo "Creating new PR..." >&2
-  PR_URL=$(gh pr create \
-    --title "$PR_TITLE" \
-    --body "$PR_BODY" \
-    --base main \
-    --head "$BRANCH_NAME")
-  # Extract PR number from URL (format: https://github.com/owner/repo/pull/123)
-  PR_NUMBER="${PR_URL##*/}"
+  
+  # Create PR and capture number
+  if [ -n "$LABELS" ]; then
+    PR_NUMBER=$(gh pr create \
+      --title "$PR_TITLE" \
+      --body "$PR_BODY" \
+      --base main \
+      --head "$BRANCH_NAME" \
+      --label "$LABELS" \
+      --json number --jq '.number')
+  else
+    PR_NUMBER=$(gh pr create \
+      --title "$PR_TITLE" \
+      --body "$PR_BODY" \
+      --base main \
+      --head "$BRANCH_NAME" \
+      --json number --jq '.number')
+  fi
 else
   echo "PR #$PR_NUMBER already exists, updating..." >&2
+  
+  # Update PR body
   gh pr edit "$PR_NUMBER" --body "$PR_BODY"
+  
+  # Update labels based on current state
+  if [ -n "$LABELS" ]; then
+    gh pr edit "$PR_NUMBER" --add-label "$LABELS"
+  else
+    gh pr edit "$PR_NUMBER" --remove-label "automerge" 2>/dev/null || true
+  fi
 fi
 
 echo "$PR_NUMBER"
