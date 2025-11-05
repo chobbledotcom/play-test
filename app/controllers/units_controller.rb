@@ -316,7 +316,7 @@ class UnitsController < ApplicationController
   end
 
   def photo_turbo_streams
-    return [] unless params[:unit][:photo].present?
+    return [] if params[:unit][:photo].blank?
 
     [turbo_stream.replace(
       "unit_photo_preview",
