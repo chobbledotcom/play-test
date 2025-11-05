@@ -164,6 +164,7 @@
 #                        root GET    /                                                              mission_control/jobs/queues#index
 
 # typed: false
+
 Rails.application.routes.draw do
   mount MissionControl::Jobs::Engine => "/mission_control"
 
