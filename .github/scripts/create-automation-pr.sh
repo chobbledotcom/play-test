@@ -107,7 +107,12 @@ if [ -z "$PR_NUMBER" ]; then
   
   # Add label if specified
   if [ -n "$LABELS" ]; then
-    gh pr edit "$PR_NUMBER" --add-label "$LABELS"
+    echo "Adding label: $LABELS" >&2
+    gh pr edit "$PR_NUMBER" --add-label "$LABELS" || {
+      echo "Warning: Failed to add label '$LABELS' - creating it first" >&2
+      gh label create "$LABELS" --description "Automatically merge when ready" --color "0E8A16" 2>/dev/null || true
+      gh pr edit "$PR_NUMBER" --add-label "$LABELS"
+    }
   fi
 else
   echo "PR #$PR_NUMBER already exists, updating..." >&2
@@ -117,8 +122,14 @@ else
   
   # Update labels based on current state
   if [ -n "$LABELS" ]; then
-    gh pr edit "$PR_NUMBER" --add-label "$LABELS"
+    echo "Adding label: $LABELS" >&2
+    gh pr edit "$PR_NUMBER" --add-label "$LABELS" || {
+      echo "Warning: Failed to add label '$LABELS' - creating it first" >&2
+      gh label create "$LABELS" --description "Automatically merge when ready" --color "0E8A16" 2>/dev/null || true
+      gh pr edit "$PR_NUMBER" --add-label "$LABELS"
+    }
   else
+    echo "Removing automerge label" >&2
     gh pr edit "$PR_NUMBER" --remove-label "automerge" 2>/dev/null || true
   fi
 fi
