@@ -77,55 +77,68 @@ jobs:
         run: |
           git push -f origin automated/annotations-attributions
       
-      - name: Create or update pull request
-        if: steps.check_changes.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Check if PR already exists
-          PR_NUMBER=$(gh pr list --head automated/annotations-attributions --json number --jq '.[0].number' || echo "")
-          
-          if [ -z "$PR_NUMBER" ]; then
-            echo "Creating new PR..."
-            gh pr create \
-              --title "Update Attributions & Annotations" \
-              --body "## Weekly Automated Update
-          
-          This PR contains automated updates for:
-          - 📝 Model annotations (from database schema)
-          - 🛣️ Route annotations (from Rails routes)
-          - 📦 Third-party attributions (from dependencies)
-          
-          ### Files Changed
-          \`\`\`
-          $(git diff --stat origin/main...HEAD)
-          \`\`\`
-          
-          Please review the changes and merge if they look correct.
-          
-          ---
-          *This PR is automatically generated weekly and will be updated if new changes are detected.*" \
-              --base main \
-              --head automated/annotations-attributions
-          else
-            echo "PR #$PR_NUMBER already exists, updating..."
-            # Update the PR body to reflect latest changes
-            gh pr edit "$PR_NUMBER" \
-              --body "## Weekly Automated Update
-          
-          This PR contains automated updates for:
-          - 📝 Model annotations (from database schema)
-          - 🛣️ Route annotations (from Rails routes)
-          - 📦 Third-party attributions (from dependencies)
-          
-          ### Files Changed
-          \`\`\`
-          $(git diff --stat origin/main...HEAD)
-          \`\`\`
-          
-          Please review the changes and merge if they look correct.
-          
-          ---
-          *This PR is automatically generated weekly and will be updated if new changes are detected.*
-          *Last updated: $(date -u '+%Y-%m-%d %H:%M UTC')*"
-          fi
+       - name: Create or update pull request
+         if: steps.check_changes.outputs.changed == 'true'
+         id: create_pr
+         env:
+           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         run: |
+           # Check if PR already exists
+           PR_NUMBER=$(gh pr list --head automated/annotations-attributions --json number --jq '.[0].number' || echo "")
+           
+           if [ -z "$PR_NUMBER" ]; then
+             echo "Creating new PR..."
+             PR_NUMBER=$(gh pr create \
+               --title "Update Attributions & Annotations" \
+               --body "## Weekly Automated Update
+           
+           This PR contains automated updates for:
+           - 📝 Model annotations (from database schema)
+           - 🛣️ Route annotations (from Rails routes)
+           - 📦 Third-party attributions (from dependencies)
+           
+           ### Files Changed
+           \`\`\`
+           $(git diff --stat origin/main...HEAD)
+           \`\`\`
+           
+           This PR will automatically merge if all status checks pass.
+           
+           ---
+           *This PR is automatically generated weekly and will be updated if new changes are detected.*" \
+               --base main \
+               --head automated/annotations-attributions \
+               --json number --jq '.number')
+           else
+             echo "PR #$PR_NUMBER already exists, updating..."
+             # Update the PR body to reflect latest changes
+             gh pr edit "$PR_NUMBER" \
+               --body "## Weekly Automated Update
+           
+           This PR contains automated updates for:
+           - 📝 Model annotations (from database schema)
+           - 🛣️ Route annotations (from Rails routes)
+           - 📦 Third-party attributions (from dependencies)
+           
+           ### Files Changed
+           \`\`\`
+           $(git diff --stat origin/main...HEAD)
+           \`\`\`
+           
+           This PR will automatically merge if all status checks pass.
+           
+           ---
+           *This PR is automatically generated weekly and will be updated if new changes are detected.*
+           *Last updated: $(date -u '+%Y-%m-%d %H:%M UTC')*"
+           fi
+           
+           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+      
+       - name: Enable auto-merge
+         if: steps.check_changes.outputs.changed == 'true'
+         env:
+           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         run: |
+           PR_NUMBER="${{ steps.create_pr.outputs.pr_number }}"
+           echo "Enabling auto-merge for PR #$PR_NUMBER..."
+           gh pr merge "$PR_NUMBER" --auto --squash --delete-branch
