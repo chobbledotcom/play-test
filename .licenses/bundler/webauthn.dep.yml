@@ -1,6 +1,6 @@
 ---
 name: webauthn
-version: 3.4.1
+version: 3.4.3
 type: bundler
 summary: WebAuthn ruby server library
 homepage: https://github.com/cedarcode/webauthn-ruby

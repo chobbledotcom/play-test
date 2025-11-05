@@ -1,6 +1,6 @@
 ---
 name: cbor
-version: 0.5.9.9
+version: 0.5.10.1
 type: bundler
 summary: CBOR, Concise Binary Object Representation.
 homepage: http://cbor.io/

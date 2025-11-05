@@ -2,8 +2,8 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2025-10-20
-Total dependencies: 150
+Generated on: 2025-11-03
+Total dependencies: 151
 
 ## Dependencies by License
 
@@ -17,19 +17,19 @@ Total dependencies: 150
   - AWS Event Stream Library
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-partitions** v1.1174.0
+- **aws-partitions** v1.1176.0
   - Provides information about AWS partitions, regions, and services.
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-core** v3.233.0
+- **aws-sdk-core** v3.234.0
   - AWS SDK for Ruby - Core
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-kms** v1.114.0
+- **aws-sdk-kms** v1.115.0
   - AWS SDK for Ruby - KMS
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-s3** v1.200.0
+- **aws-sdk-s3** v1.201.0
   - AWS SDK for Ruby - Amazon S3
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
@@ -37,7 +37,7 @@ Total dependencies: 150
   - AWS Signature Version 4 library.
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **cbor** v0.5.9.9
+- **cbor** v0.5.10.1
   - CBOR, Concise Binary Object Representation.
   - Homepage: http://cbor.io/
 
@@ -49,7 +49,7 @@ Total dependencies: 150
   - ECDSA, EdDSA, RSA-PSS and RSA-PKCS#1 algorithms for ruby
   - Homepage: https://github.com/cedarcode/openssl-signature_algorithm
 
-- **simplecov-cobertura** v3.0.0
+- **simplecov-cobertura** v3.1.0
   - SimpleCov Cobertura Formatter
   - Homepage: https://github.com/jessebs/simplecov-cobertura
 
@@ -67,7 +67,7 @@ Total dependencies: 150
   - A declarative way to read and write binary file formats
   - Homepage: https://github.com/dmendel/bindata
 
-- **rexml** v3.4.2
+- **rexml** v3.4.4
   - An XML toolkit for Ruby
   - Homepage: https://github.com/ruby/rexml
 
@@ -81,45 +81,49 @@ Total dependencies: 150
   - Ruby library to interface with the SQLite3 database engine (http://www.sqlite.org).
   - Homepage: https://github.com/sparklemotion/sqlite3-ruby
 
-### MIT (83 dependencies)
+### MIT (84 dependencies)
 
-- **actioncable** v8.0.2.1
+- **action_text-trix** v2.1.15
+  - A rich text editor for everyday writing
+  - Homepage: https://github.com/basecamp/trix
+
+- **actioncable** v8.1.0
   - WebSocket framework for Rails.
   - Homepage: https://rubyonrails.org
 
-- **actionmailbox** v8.0.2.1
+- **actionmailbox** v8.1.0
   - Inbound email handling framework.
   - Homepage: https://rubyonrails.org
 
-- **actionmailer** v8.0.2.1
+- **actionmailer** v8.1.0
   - Email composition and delivery framework (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **actionpack** v8.0.2.1
+- **actionpack** v8.1.0
   - Web-flow and rendering framework putting the VC in MVC (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **actiontext** v8.0.2.1
+- **actiontext** v8.1.0
   - Rich text framework.
   - Homepage: https://rubyonrails.org
 
-- **actionview** v8.0.2.1
+- **actionview** v8.1.0
   - Rendering framework putting the V in MVC (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **activejob** v8.0.2.1
+- **activejob** v8.1.0
   - Job framework with pluggable queues.
   - Homepage: https://rubyonrails.org
 
-- **activemodel** v8.0.2.1
+- **activemodel** v8.1.0
   - A toolkit for building modeling frameworks (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **activestorage** v8.0.2.1
+- **activestorage** v8.1.0
   - Local and cloud file storage framework.
   - Homepage: https://rubyonrails.org
 
-- **activesupport** v8.0.2.1
+- **activesupport** v8.1.0
   - A toolkit of support libraries and Ruby core extensions extracted from the Rails framework.
   - Homepage: https://rubyonrails.org
 
@@ -127,7 +131,7 @@ Total dependencies: 150
   - Android key attestation verification
   - Homepage: https://github.com/bdewater/android_key_attestation
 
-- **blueprinter** v1.1.2
+- **blueprinter** v1.2.1
   - Simple Fast Declarative Serialization Library
   - Homepage: https://github.com/procore-oss/blueprinter
 
@@ -171,7 +175,7 @@ Total dependencies: 150
   - Small ERB Implementation
   - Homepage: https://github.com/jeremyevans/erubi
 
-- **et-orbi** v1.2.11
+- **et-orbi** v1.4.0
   - time with zones
   - Homepage: https://github.com/floraison/et-orbi
 
@@ -179,11 +183,11 @@ Total dependencies: 150
   - HTTP/REST API client library.
   - Homepage: https://lostisland.github.io/faraday
 
-- **fugit** v1.11.1
+- **fugit** v1.12.1
   - time tools for flor
   - Homepage: https://github.com/floraison/fugit
 
-- **globalid** v1.2.1
+- **globalid** v1.3.0
   - Refer to any model with a URI: gid://app/class/id
   - Homepage: http://www.rubyonrails.org
 
@@ -211,7 +215,7 @@ Total dependencies: 150
   - Loofah is a general library for manipulating and transforming HTML/XML documents and fragments, built on top of Nokogiri.
   - Homepage: https://github.com/flavorjones/loofah
 
-- **mail** v2.8.1
+- **mail** v2.9.0
   - Mail provides a nice Ruby DSL for making, sending and reading emails.
   - Homepage: https://github.com/mikel/mail
 
@@ -271,7 +275,7 @@ Total dependencies: 150
   - A general server command for Rack applications.
   - Homepage: https://github.com/rack/rackup
 
-- **rails** v8.0.2.1
+- **rails** v8.1.0
   - Full-stack web application framework.
   - Homepage: https://rubyonrails.org
 
@@ -283,7 +287,7 @@ Total dependencies: 150
   - This gem is responsible to sanitize HTML fragments in Rails applications.
   - Homepage: https://github.com/rails/rails-html-sanitizer
 
-- **railties** v8.0.2.1
+- **railties** v8.1.0
   - Tools for creating, working with, and running Rails applications.
   - Homepage: https://rubyonrails.org
 
@@ -323,7 +327,7 @@ Total dependencies: 150
   - Rugged is a Ruby binding to the libgit2 linkable library
   - Homepage: https://github.com/libgit2/rugged
 
-- **safety_net_attestation** v0.4.0
+- **safety_net_attestation** v0.5.0
   - SafetyNet attestation response verification
   - Homepage: https://github.com/bdewater/safety_net_attestation
 
@@ -343,13 +347,13 @@ Total dependencies: 150
   - Secret User Agent of HTTP
   - Homepage: https://github.com/lostisland/sawyer
 
-- **sentry-rails** v5.28.0
+- **sentry-rails** v6.0.0
   - A gem that provides Rails integration for the Sentry error logger
-  - Homepage: https://github.com/getsentry/sentry-ruby/tree/5.28.0/sentry-rails
+  - Homepage: https://github.com/getsentry/sentry-ruby/tree/6.0.0/sentry-rails
 
-- **sentry-ruby** v5.28.0
+- **sentry-ruby** v6.0.0
   - A gem that provides a client interface for the Sentry error logger
-  - Homepage: https://github.com/getsentry/sentry-ruby/tree/5.28.0/sentry-ruby
+  - Homepage: https://github.com/getsentry/sentry-ruby/tree/6.0.0/sentry-ruby
 
 - **simplecov** v0.22.0
   - Code coverage for Ruby
@@ -363,7 +367,7 @@ Total dependencies: 150
   - JSON formatter for SimpleCov
   - Homepage: https://github.com/fede-moya/simplecov_json_formatter
 
-- **solid_queue** v1.2.1
+- **solid_queue** v1.2.2
   - Database-backed Active Job backend.
   - Homepage: https://github.com/rails/solid_queue
 
@@ -403,7 +407,7 @@ Total dependencies: 150
   - HTTP User Agent parser
   - Homepage: https://github.com/gshutler/useragent
 
-- **webauthn** v3.4.1
+- **webauthn** v3.4.3
   - WebAuthn ruby server library
   - Homepage: https://github.com/cedarcode/webauthn-ruby
 
@@ -417,11 +421,11 @@ Total dependencies: 150
 
 ### OTHER (49 dependencies)
 
-- **activerecord** v8.0.2.1
+- **activerecord** v8.1.0
   - Object-relational mapper framework (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **annotaterb** v4.19.0
+- **annotaterb** v4.20.0
   - A gem for generating annotations for Rails projects.
   - Homepage: https://github.com/drwl/annotaterb
 
@@ -433,7 +437,7 @@ Total dependencies: 150
   - OpenBSD's bcrypt() password hashing algorithm.
   - Homepage: https://github.com/bcrypt-ruby/bcrypt-ruby
 
-- **benchmark** v0.4.1
+- **benchmark** v0.5.0
   - a performance benchmarking library
   - Homepage: https://github.com/ruby/benchmark
 
@@ -445,7 +449,7 @@ Total dependencies: 150
   - The best way to manage your application's dependencies
   - Homepage: https://bundler.io
 
-- **chobble-forms** v0.8.1
+- **chobble-forms** v0.9.0
   - Semantic Rails forms with strict i18n
   - Homepage: https://github.com/chobbledotcom/chobble-forms
 
@@ -489,11 +493,11 @@ Total dependencies: 150
   - Interactive Ruby command-line tool for REPL (Read Eval Print Loop).
   - Homepage: https://github.com/ruby/irb
 
-- **json** v2.13.0
+- **json** v2.15.1
   - JSON Implementation for Ruby
   - Homepage: https://github.com/ruby/json
 
-- **jwt** v2.10.2
+- **jwt** v3.1.2
   - JSON Web Token implementation in Ruby
   - Homepage: https://github.com/jwt/ruby-jwt
 
@@ -505,7 +509,7 @@ Total dependencies: 150
   - Provides a simple logging utility for outputting messages.
   - Homepage: https://github.com/ruby/logger
 
-- **marcel** v1.0.4
+- **marcel** v1.1.0
   - Simple mime type detection using magic numbers, filenames, and extensions
   - Homepage: https://github.com/rails/marcel
 
@@ -517,7 +521,7 @@ Total dependencies: 150
   - HTTP client api for Ruby.
   - Homepage: https://github.com/ruby/net-http
 
-- **net-imap** v0.5.9
+- **net-imap** v0.5.12
   - Ruby client api for Internet Message Access Protocol
   - Homepage: https://github.com/ruby/net-imap
 
@@ -541,7 +545,7 @@ Total dependencies: 150
   - Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby.
   - Homepage: https://nokogiri.org
 
-- **openssl** v3.3.0
+- **openssl** v3.3.2
   - SSL/TLS and general-purpose cryptography for Ruby
   - Homepage: https://github.com/ruby/openssl
 

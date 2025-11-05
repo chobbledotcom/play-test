@@ -72,7 +72,7 @@ class ErbLintRunner
     elapsed = (Time.now.to_f - start_time).round(2)
 
     if success
-      puts "✅ (#{elapsed}s)"
+      puts "✅"
     else
       violations = extract_violation_count(output)
       @total_violations += violations
@@ -80,13 +80,13 @@ class ErbLintRunner
 
       # Show slow linter warning if it took too long
       if elapsed > 5.0
-        puts "❌ #{violations} violation(s) (#{elapsed}s) ⚠️  SLOW"
+        puts "❌ #{violations} violation(s) ⚠️  SLOW"
         if @verbose
           puts "  Slow file details:"
           puts output.lines.grep(/\A\s*\d+:\d+/).first(3).map { |line| "    #{line.strip}" }
         end
       else
-        puts "❌ #{violations} violation(s) (#{elapsed}s)"
+        puts "❌ #{violations} violation(s)"
       end
     end
 
