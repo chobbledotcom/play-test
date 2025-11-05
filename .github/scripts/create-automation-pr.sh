@@ -95,22 +95,19 @@ PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number' 2>
 if [ -z "$PR_NUMBER" ]; then
   echo "Creating new PR..." >&2
   
-  # Create PR and capture number
+  # Create PR and get URL
+  PR_URL=$(gh pr create \
+    --title "$PR_TITLE" \
+    --body "$PR_BODY" \
+    --base main \
+    --head "$BRANCH_NAME")
+  
+  # Extract PR number from URL
+  PR_NUMBER="${PR_URL##*/}"
+  
+  # Add label if specified
   if [ -n "$LABELS" ]; then
-    PR_NUMBER=$(gh pr create \
-      --title "$PR_TITLE" \
-      --body "$PR_BODY" \
-      --base main \
-      --head "$BRANCH_NAME" \
-      --label "$LABELS" \
-      --json number --jq '.number')
-  else
-    PR_NUMBER=$(gh pr create \
-      --title "$PR_TITLE" \
-      --body "$PR_BODY" \
-      --base main \
-      --head "$BRANCH_NAME" \
-      --json number --jq '.number')
+    gh pr edit "$PR_NUMBER" --add-label "$LABELS"
   fi
 else
   echo "PR #$PR_NUMBER already exists, updating..." >&2
