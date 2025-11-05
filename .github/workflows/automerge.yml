@@ -18,6 +18,7 @@ on:
     types:
       - completed
   status: {}
+  workflow_dispatch:
 permissions:
   contents: write
   pull-requests: write
@@ -35,3 +36,4 @@ jobs:
           MERGE_DELETE_BRANCH: true
           MERGE_RETRIES: 6
           MERGE_RETRY_SLEEP: 10000
+          LOG: TRACE
