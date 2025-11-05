@@ -8,6 +8,6 @@ end
 set :output, "/rails/log/cron.log"
 set :environment, ENV.fetch("RAILS_ENV", "production")
 
-every 1.day, at: "2:00 am" do
-  rake "s3:backup:database", environment: :production
-end
+# S3 backup is now handled by Solid Queue recurring tasks (config/recurring.yml)
+# Removed duplicate cron schedule to prevent race condition where both cron and
+# Solid Queue would trigger the backup at the same time, causing file conflicts
