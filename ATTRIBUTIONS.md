@@ -2,7 +2,7 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2025-10-27
+Generated on: 2025-11-03
 Total dependencies: 151
 
 ## Dependencies by License
@@ -545,7 +545,7 @@ Total dependencies: 151
   - Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby.
   - Homepage: https://nokogiri.org
 
-- **openssl** v3.3.1
+- **openssl** v3.3.2
   - SSL/TLS and general-purpose cryptography for Ruby
   - Homepage: https://github.com/ruby/openssl
 
