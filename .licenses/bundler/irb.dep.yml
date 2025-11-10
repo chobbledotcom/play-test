@@ -1,6 +1,6 @@
 ---
 name: irb
-version: 1.15.2
+version: 1.15.3
 type: bundler
 summary: Interactive Ruby command-line tool for REPL (Read Eval Print Loop).
 homepage: https://github.com/ruby/irb

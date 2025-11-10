@@ -1,9 +1,9 @@
 ---
 name: sentry-ruby
-version: 6.0.0
+version: 6.1.0
 type: bundler
 summary: A gem that provides a client interface for the Sentry error logger
-homepage: https://github.com/getsentry/sentry-ruby/tree/6.0.0/sentry-ruby
+homepage: https://github.com/getsentry/sentry-ruby/tree/6.1.0/sentry-ruby
 license: mit
 licenses:
 - sources: LICENSE.txt

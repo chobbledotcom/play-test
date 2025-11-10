@@ -1,6 +1,6 @@
 ---
 name: solid_queue
-version: 1.2.2
+version: 1.2.4
 type: bundler
 summary: Database-backed Active Job backend.
 homepage: https://github.com/rails/solid_queue

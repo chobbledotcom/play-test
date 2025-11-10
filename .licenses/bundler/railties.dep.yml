@@ -1,6 +1,6 @@
 ---
 name: railties
-version: 8.1.0
+version: 8.1.1
 type: bundler
 summary: Tools for creating, working with, and running Rails applications.
 homepage: https://rubyonrails.org

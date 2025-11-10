@@ -2,7 +2,7 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2025-11-03
+Generated on: 2025-11-10
 Total dependencies: 151
 
 ## Dependencies by License
@@ -17,19 +17,19 @@ Total dependencies: 151
   - AWS Event Stream Library
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-partitions** v1.1176.0
+- **aws-partitions** v1.1180.0
   - Provides information about AWS partitions, regions, and services.
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-core** v3.234.0
+- **aws-sdk-core** v3.236.0
   - AWS SDK for Ruby - Core
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-kms** v1.115.0
+- **aws-sdk-kms** v1.116.0
   - AWS SDK for Ruby - KMS
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-s3** v1.201.0
+- **aws-sdk-s3** v1.202.0
   - AWS SDK for Ruby - Amazon S3
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
@@ -77,7 +77,7 @@ Total dependencies: 151
   - A Ruby/Rack web server built for parallelism.
   - Homepage: https://puma.io
 
-- **sqlite3** v2.7.3
+- **sqlite3** v2.7.4
   - Ruby library to interface with the SQLite3 database engine (http://www.sqlite.org).
   - Homepage: https://github.com/sparklemotion/sqlite3-ruby
 
@@ -87,43 +87,43 @@ Total dependencies: 151
   - A rich text editor for everyday writing
   - Homepage: https://github.com/basecamp/trix
 
-- **actioncable** v8.1.0
+- **actioncable** v8.1.1
   - WebSocket framework for Rails.
   - Homepage: https://rubyonrails.org
 
-- **actionmailbox** v8.1.0
+- **actionmailbox** v8.1.1
   - Inbound email handling framework.
   - Homepage: https://rubyonrails.org
 
-- **actionmailer** v8.1.0
+- **actionmailer** v8.1.1
   - Email composition and delivery framework (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **actionpack** v8.1.0
+- **actionpack** v8.1.1
   - Web-flow and rendering framework putting the VC in MVC (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **actiontext** v8.1.0
+- **actiontext** v8.1.1
   - Rich text framework.
   - Homepage: https://rubyonrails.org
 
-- **actionview** v8.1.0
+- **actionview** v8.1.1
   - Rendering framework putting the V in MVC (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **activejob** v8.1.0
+- **activejob** v8.1.1
   - Job framework with pluggable queues.
   - Homepage: https://rubyonrails.org
 
-- **activemodel** v8.1.0
+- **activemodel** v8.1.1
   - A toolkit for building modeling frameworks (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **activestorage** v8.1.0
+- **activestorage** v8.1.1
   - Local and cloud file storage framework.
   - Homepage: https://rubyonrails.org
 
-- **activesupport** v8.1.0
+- **activesupport** v8.1.1
   - A toolkit of support libraries and Ruby core extensions extracted from the Rails framework.
   - Homepage: https://rubyonrails.org
 
@@ -255,7 +255,7 @@ Total dependencies: 151
   - a very dumb PEG parser library
   - Homepage: https://github.com/floraison/raabro
 
-- **rack** v3.2.3
+- **rack** v3.2.4
   - A modular Ruby webserver interface.
   - Homepage: https://github.com/rack/rack
 
@@ -275,7 +275,7 @@ Total dependencies: 151
   - A general server command for Rack applications.
   - Homepage: https://github.com/rack/rackup
 
-- **rails** v8.1.0
+- **rails** v8.1.1
   - Full-stack web application framework.
   - Homepage: https://rubyonrails.org
 
@@ -287,11 +287,11 @@ Total dependencies: 151
   - This gem is responsible to sanitize HTML fragments in Rails applications.
   - Homepage: https://github.com/rails/rails-html-sanitizer
 
-- **railties** v8.1.0
+- **railties** v8.1.1
   - Tools for creating, working with, and running Rails applications.
   - Homepage: https://rubyonrails.org
 
-- **rake** v13.3.0
+- **rake** v13.3.1
   - Rake is a Make-like program implemented in Ruby
   - Homepage: https://github.com/ruby/rake
 
@@ -347,13 +347,13 @@ Total dependencies: 151
   - Secret User Agent of HTTP
   - Homepage: https://github.com/lostisland/sawyer
 
-- **sentry-rails** v6.0.0
+- **sentry-rails** v6.1.0
   - A gem that provides Rails integration for the Sentry error logger
-  - Homepage: https://github.com/getsentry/sentry-ruby/tree/6.0.0/sentry-rails
+  - Homepage: https://github.com/getsentry/sentry-ruby/tree/6.1.0/sentry-rails
 
-- **sentry-ruby** v6.0.0
+- **sentry-ruby** v6.1.0
   - A gem that provides a client interface for the Sentry error logger
-  - Homepage: https://github.com/getsentry/sentry-ruby/tree/6.0.0/sentry-ruby
+  - Homepage: https://github.com/getsentry/sentry-ruby/tree/6.1.0/sentry-ruby
 
 - **simplecov** v0.22.0
   - Code coverage for Ruby
@@ -367,7 +367,7 @@ Total dependencies: 151
   - JSON formatter for SimpleCov
   - Homepage: https://github.com/fede-moya/simplecov_json_formatter
 
-- **solid_queue** v1.2.2
+- **solid_queue** v1.2.4
   - Database-backed Active Job backend.
   - Homepage: https://github.com/rails/solid_queue
 
@@ -395,7 +395,7 @@ Total dependencies: 151
   - A racc based toml parser
   - Homepage: https://github.com/fbernier/tomlrb
 
-- **turbo-rails** v2.0.13
+- **turbo-rails** v2.0.20
   - The speed of a single-page web application without having to write any JavaScript.
   - Homepage: https://github.com/hotwired/turbo-rails
 
@@ -421,7 +421,7 @@ Total dependencies: 151
 
 ### OTHER (49 dependencies)
 
-- **activerecord** v8.1.0
+- **activerecord** v8.1.1
   - Object-relational mapper framework (part of Rails).
   - Homepage: https://rubyonrails.org
 
@@ -461,8 +461,8 @@ Total dependencies: 151
   - CSV Reading and Writing
   - Homepage: https://github.com/ruby/csv
 
-- **date** v3.4.1
-  - A subclass of Object includes Comparable module for handling dates.
+- **date** v3.5.0
+  - The official date library for Ruby.
   - Homepage: https://github.com/ruby/date
 
 - **drb** v2.2.3
@@ -473,7 +473,7 @@ Total dependencies: 151
   - BS EN 14960:2019 safety standard calculators for inflatable play equipment
   - Homepage: https://github.com/chobbledotcom/en14960
 
-- **erb** v5.1.1
+- **erb** v5.1.3
   - An easy to use but powerful templating system for Ruby.
   - Homepage: https://github.com/ruby/erb
 
@@ -489,11 +489,11 @@ Total dependencies: 151
   - Console interface
   - Homepage: https://github.com/ruby/io-console
 
-- **irb** v1.15.2
+- **irb** v1.15.3
   - Interactive Ruby command-line tool for REPL (Read Eval Print Loop).
   - Homepage: https://github.com/ruby/irb
 
-- **json** v2.15.1
+- **json** v2.15.2
   - JSON Implementation for Ruby
   - Homepage: https://github.com/ruby/json
 
@@ -537,7 +537,7 @@ Total dependencies: 151
   - Simple Mail Transfer Protocol client library for Ruby.
   - Homepage: https://github.com/ruby/net-smtp
 
-- **nio4r** v2.7.4
+- **nio4r** v2.7.5
   - New IO for Ruby
   - Homepage: https://github.com/socketry/nio4r
 
@@ -577,7 +577,7 @@ Total dependencies: 151
   - Racc is an LALR(1) parser generator
   - Homepage: https://github.com/ruby/racc
 
-- **rdoc** v6.15.0
+- **rdoc** v6.15.1
   - RDoc produces HTML and command-line documentation for Ruby projects
   - Homepage: https://ruby.github.io/rdoc
 
@@ -593,7 +593,7 @@ Total dependencies: 151
   - Pseudo IO on String
   - Homepage: https://github.com/ruby/stringio
 
-- **timeout** v0.4.3
+- **timeout** v0.4.4
   - Auto-terminate potentially long-running operations in Ruby.
   - Homepage: https://github.com/ruby/timeout
 
@@ -605,7 +605,7 @@ Total dependencies: 151
   - TrueType Font Metrics Parser
   - Homepage: http://prawnpdf.org/
 
-- **uri** v1.0.4
+- **uri** v1.1.1
   - URI is a module providing classes to handle Uniform Resource Identifiers
   - Homepage: https://github.com/ruby/uri
 
