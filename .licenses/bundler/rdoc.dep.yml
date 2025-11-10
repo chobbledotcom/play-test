@@ -1,6 +1,6 @@
 ---
 name: rdoc
-version: 6.15.0
+version: 6.15.1
 type: bundler
 summary: RDoc produces HTML and command-line documentation for Ruby projects
 homepage: https://ruby.github.io/rdoc

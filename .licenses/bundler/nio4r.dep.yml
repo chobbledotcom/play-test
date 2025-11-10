@@ -1,6 +1,6 @@
 ---
 name: nio4r
-version: 2.7.4
+version: 2.7.5
 type: bundler
 summary: New IO for Ruby
 homepage: https://github.com/socketry/nio4r
