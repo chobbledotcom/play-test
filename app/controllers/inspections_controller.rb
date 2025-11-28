@@ -4,6 +4,7 @@
 class InspectionsController < ApplicationController
   extend T::Sig
 
+  include ChangeTracking
   include InspectionTurboStreams
   include PublicViewable
   include UserActivityCheck
@@ -591,23 +592,5 @@ class InspectionsController < ApplicationController
       details: details,
       metadata: {resource_type: "Inspection"}
     )
-  end
-
-  def calculate_changes(previous_attributes, current_attributes, changed_keys)
-    changes = {}
-
-    changed_keys.map(&:to_s).each do |key|
-      previous_value = previous_attributes[key]
-      current_value = current_attributes[key]
-
-      next unless previous_value != current_value
-
-      changes[key] = {
-        "from" => previous_value,
-        "to" => current_value
-      }
-    end
-
-    changes.presence
   end
 end
