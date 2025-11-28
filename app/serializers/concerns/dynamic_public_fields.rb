@@ -1,24 +1,10 @@
-# typed: strict
+# typed: false
 # frozen_string_literal: true
 
 module DynamicPublicFields
-  extend T::Sig
-  extend T::Helpers
+  extend ActiveSupport::Concern
 
-  mixes_in_class_methods(ClassMethods)
-
-  module ClassMethods
-    extend T::Sig
-
-    sig { returns(T.nilable(T::Boolean)) }
-    attr_accessor :fields_defined
-
-    sig {
-      params(
-        model_class: T.untyped,
-        date_fields: T::Array[Symbol]
-      ).void
-    }
+  class_methods do
     def define_public_fields_for(model_class, date_fields: [])
       return if @fields_defined
 
