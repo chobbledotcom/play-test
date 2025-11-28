@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+# bin/jscpd - Run copy-paste detection on the codebase
+# Uses jscpd (https://github.com/kucherenko/jscpd)
+
+set -e
+
+# Color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Default settings
+MIN_LINES=5
+MIN_TOKENS=50
+DIRS="app/ lib/"
+
+show_help() {
+  echo "Usage: bin/jscpd [options]"
+  echo ""
+  echo "Run copy-paste detection on the codebase."
+  echo ""
+  echo "Options:"
+  echo "  -h, --help       Show this help message"
+  echo "  -a, --aggressive Use aggressive detection (min-lines=3, min-tokens=30)"
+  echo "  -d, --dirs DIRS  Directories to scan (default: app/ lib/)"
+  echo "  --html           Generate HTML report in tmp/jscpd-report/"
+  echo ""
+  echo "Examples:"
+  echo "  bin/jscpd                    # Standard scan"
+  echo "  bin/jscpd -a                 # Aggressive scan (more results)"
+  echo "  bin/jscpd -d 'spec/'         # Scan only spec directory"
+  echo "  bin/jscpd --html             # Generate HTML report"
+}
+
+REPORTERS="console"
+HTML_OUTPUT=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    -a|--aggressive)
+      MIN_LINES=3
+      MIN_TOKENS=30
+      shift
+      ;;
+    -d|--dirs)
+      DIRS="$2"
+      shift 2
+      ;;
+    --html)
+      REPORTERS="console,html"
+      HTML_OUTPUT="--output tmp/jscpd-report"
+      shift
+      ;;
+    *)
+      echo -e "${RED}Unknown option: $1${NC}"
+      show_help
+      exit 1
+      ;;
+  esac
+done
+
+echo -e "${BLUE}Running jscpd copy-paste detection...${NC}"
+echo -e "  Min lines: ${MIN_LINES}"
+echo -e "  Min tokens: ${MIN_TOKENS}"
+echo -e "  Directories: ${DIRS}"
+echo ""
+
+# Run jscpd via npx (ensures it's available even without global install)
+npx jscpd \
+  --reporters "$REPORTERS" \
+  --min-lines "$MIN_LINES" \
+  --min-tokens "$MIN_TOKENS" \
+  $HTML_OUTPUT \
+  $DIRS
+
+if [ -n "$HTML_OUTPUT" ]; then
+  echo -e "\n${GREEN}HTML report generated at: tmp/jscpd-report/html/index.html${NC}"
+fi

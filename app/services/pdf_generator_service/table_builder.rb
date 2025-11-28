@@ -212,20 +212,7 @@ class PdfGeneratorService
     end
 
     def self.build_unit_details_table_for_unit_pdf(unit, last_inspection)
-      dimensions = []
-
-      if last_inspection
-        if last_inspection.width.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :width).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
-        end
-        if last_inspection.length.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :length).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
-        end
-        if last_inspection.height.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :height).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
-        end
-      end
-      dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
+      dimensions_text = build_dimensions_text(last_inspection)
 
       # Build simple two-column table for unit PDFs
       [
@@ -239,20 +226,7 @@ class PdfGeneratorService
     end
 
     def self.build_unit_details_table_with_inspection(unit, last_inspection, context)
-      dimensions = []
-
-      if last_inspection
-        if last_inspection.width.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :width).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.width)}"
-        end
-        if last_inspection.length.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :length).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.length)}"
-        end
-        if last_inspection.height.present?
-          dimensions << "#{ChobbleForms::FieldUtils.form_field_label(:inspection, :height).sub(" (m)", "")}: #{Utilities.format_dimension(last_inspection.height)}"
-        end
-      end
-      dimensions_text = dimensions.any? ? dimensions.join(" ") : ""
+      dimensions_text = build_dimensions_text(last_inspection)
 
       # Get inspector details from current inspection (for inspection PDF) or last inspection (for unit PDF)
       inspection = if context == :inspection
@@ -301,6 +275,22 @@ class PdfGeneratorService
           issued_date
         ]
       ]
+    end
+
+    def self.build_dimensions_text(inspection)
+      return "" unless inspection
+
+      dimensions = []
+      %i[width length height].each do |dimension|
+        next unless inspection.send(dimension).present?
+
+        label = ChobbleForms::FieldUtils
+          .form_field_label(:inspection, dimension)
+          .sub(" (m)", "")
+        value = Utilities.format_dimension(inspection.send(dimension))
+        dimensions << "#{label}: #{value}"
+      end
+      dimensions.join(" ")
     end
   end
 end

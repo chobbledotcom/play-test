@@ -4,6 +4,7 @@
 class UnitsController < ApplicationController
   extend T::Sig
 
+  include ChangeTracking
   include TurboStreamResponders
   include PublicViewable
   include UserActivityCheck
@@ -174,24 +175,6 @@ class UnitsController < ApplicationController
     end
   rescue => e
     log_event_error(e)
-  end
-
-  def calculate_changes(previous_attributes, current_attributes, changed_keys)
-    changes = {}
-
-    changed_keys.map(&:to_s).each do |key|
-      previous_value = previous_attributes[key]
-      current_value = current_attributes[key]
-
-      if previous_value != current_value
-        changes[key] = {
-          "from" => previous_value,
-          "to" => current_value
-        }
-      end
-    end
-
-    changes.presence
   end
 
   def unit_params
