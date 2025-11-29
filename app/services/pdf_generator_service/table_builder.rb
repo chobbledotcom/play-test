@@ -282,7 +282,7 @@ class PdfGeneratorService
 
       dimensions = []
       %i[width length height].each do |dimension|
-        next unless inspection.send(dimension).present?
+        next if inspection.send(dimension).blank?
 
         label = ChobbleForms::FieldUtils
           .form_field_label(:inspection, dimension)
