@@ -38,7 +38,8 @@ class Unit < ApplicationRecord
 
   enum :unit_type, {
     bouncy_castle: "BOUNCY_CASTLE",
-    bouncing_pillow: "BOUNCING_PILLOW"
+    bouncing_pillow: "BOUNCING_PILLOW",
+    pat_testable: "PAT_TESTABLE"
   }
 
   belongs_to :user

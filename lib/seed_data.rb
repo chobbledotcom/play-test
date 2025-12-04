@@ -239,4 +239,52 @@ module SeedData
       slip_sheet_comment: passed ? GOOD : WEAR
     )
   end
+
+  def self.pat_fields(passed: true)
+    pat_numeric_fields
+      .merge(pat_pass_fields(passed))
+      .merge(pat_comments(passed))
+  end
+
+  def self.pat_numeric_fields
+    {
+      location: "Test Location #{SecureRandom.hex(4)}",
+      equipment_class: [1, 2].sample,
+      equipment_power: rand(100..3000),
+      fuse_rating: [3, 5, 13].sample,
+      earth_ohms: rand(0.01..0.5).round(2),
+      insulation_mohms: rand(100..500),
+      leakage_ma: rand(0.1..2.0).round(2),
+      rcd_trip_time_ms: rand(15.0..35.0).round(1)
+    }
+  end
+
+  def self.pat_pass_fields(passed)
+    {
+      equipment_class_pass: check_passed?(passed),
+      visual_pass: check_passed?(passed),
+      appliance_plug_check_pass: check_passed?(passed),
+      fuse_rating_pass: check_passed?(passed),
+      earth_ohms_pass: check_passed?(passed),
+      insulation_mohms_pass: check_passed?(passed),
+      leakage_ma_pass: check_passed?(passed),
+      load_test_pass: check_passed?(passed),
+      rcd_trip_time_ms_pass: check_passed?(passed)
+    }
+  end
+
+  def self.pat_comments(passed)
+    {
+      location_comment: passed ? OK : WEAR,
+      equipment_class_comment: passed ? OK : FAIL,
+      visual_comment: passed ? GOOD : WEAR,
+      appliance_plug_check_comment: passed ? GOOD : WEAR,
+      fuse_rating_comment: passed ? OK : FAIL,
+      earth_ohms_comment: passed ? OK : FAIL,
+      insulation_mohms_comment: passed ? OK : FAIL,
+      leakage_ma_comment: passed ? OK : FAIL,
+      load_test_comment: passed ? GOOD : FAIL,
+      rcd_trip_time_ms_comment: passed ? OK : FAIL
+    }
+  end
 end

@@ -1,0 +1,24 @@
+---
+en:
+  forms:
+    pat:
+      header: PAT Assessment
+      sections:
+        equipment_details: Equipment Details
+        visual_inspection: Visual Inspection
+        electrical_tests: Electrical Tests
+        functional_tests: Functional Tests
+      fields:
+        location: Test Location
+        equipment_class: Equipment Class (I or II)
+        equipment_power: Power Rating (W)
+        visual: Visual Inspection
+        appliance_plug_check: Plug & Cable Check
+        fuse_rating: Fuse Rating (A)
+        earth_ohms: Earth Continuity (Ω)
+        insulation_mohms: Insulation Resistance (MΩ)
+        leakage_ma: Earth Leakage (mA)
+        load_test: Load/Function Test
+        rcd_trip_time_ms: RCD Trip Time (ms)
+      submit: Save Assessment
+      submit_continue: Save & Continue
