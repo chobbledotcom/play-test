@@ -71,8 +71,8 @@ RSpec.feature "Filter Visibility", type: :feature do
 
     context "when user has units" do
       before do
-        create(:unit, user: user, manufacturer: "Acme Corp", operator: "John Doe")
-        create(:unit, user: user, manufacturer: "Widget Inc", operator: "Jane Smith")
+        create(:unit, user: user, manufacturer: "Acme Corp")
+        create(:unit, user: user, manufacturer: "Widget Inc")
       end
 
       scenario "shows filter form" do
@@ -85,12 +85,6 @@ RSpec.feature "Filter Visibility", type: :feature do
         visit units_path
 
         expect_manufacturer_dropdown_populated
-      end
-
-      scenario "populates operator dropdown with unique values" do
-        visit units_path
-
-        expect_operator_dropdown_populated
       end
     end
 
@@ -149,7 +143,6 @@ RSpec.feature "Filter Visibility", type: :feature do
     expect(page).not_to have_field("query")
     expect(page).not_to have_select("status")
     expect(page).not_to have_select("manufacturer")
-    expect(page).not_to have_select("operator")
   end
 
   define_method(:expect_units_filter_form_present) do
@@ -157,7 +150,6 @@ RSpec.feature "Filter Visibility", type: :feature do
     expect(page).to have_field("query")
     expect(page).to have_select("status")
     expect(page).to have_select("manufacturer")
-    expect(page).to have_select("operator")
   end
 
   define_method(:expect_manufacturer_dropdown_populated) do
@@ -165,14 +157,6 @@ RSpec.feature "Filter Visibility", type: :feature do
       expect(page).to have_content("All Manufacturers")
       expect(page).to have_content("Acme Corp")
       expect(page).to have_content("Widget Inc")
-    end
-  end
-
-  define_method(:expect_operator_dropdown_populated) do
-    within "select[name='operator']" do
-      expect(page).to have_content("All Operators")
-      expect(page).to have_content("John Doe")
-      expect(page).to have_content("Jane Smith")
     end
   end
 end

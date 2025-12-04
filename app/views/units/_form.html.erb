@@ -35,24 +35,6 @@
           required: true %>
     <% end %>
 
-    <%# Operator with optional count link %>
-    <% if unit.persisted? && unit.operator.present? %>
-      <% operator_count = current_user.units.where(operator: unit.operator).count %>
-      <% if operator_count > 0 %>
-        <%= render 'chobble_forms/field_with_link',
-            field_type: :autocomplete_field,
-            field: :operator,
-            required: true,
-            options: operator_options(current_user),
-            link_url: units_path(operator: unit.operator),
-            link_text: t('units.labels.all_count', count: operator_count) %>
-      <% else %>
-        <%= render 'chobble_forms/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
-      <% end %>
-    <% else %>
-      <%= render 'chobble_forms/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
-    <% end %>
-
     <%# Photo upload %>
     <%= turbo_frame_tag "unit_photo_preview" do %>
       <%= render 'chobble_forms/file_field', field: :photo, accept: "image/*" %>

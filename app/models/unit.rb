@@ -59,7 +59,7 @@ class Unit < ApplicationRecord
   before_destroy :destroy_draft_inspections
 
   # All fields are required for Units
-  validates :name, :serial, :description, :manufacturer, :operator, presence: true
+  validates :name, :serial, :description, :manufacturer, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
   validate :badge_id_valid, on: :create, if: -> { unit_badges_enabled? }
 
@@ -69,19 +69,17 @@ class Unit < ApplicationRecord
   scope :search, ->(query) {
     if query.present?
       search_term = "%#{query}%"
-      where(<<~SQL, *([search_term] * 5))
+      where(<<~SQL, *([search_term] * 4))
         serial LIKE ?
         OR name LIKE ?
         OR description LIKE ?
         OR manufacturer LIKE ?
-        OR operator LIKE ?
       SQL
     else
       all
     end
   }
   scope :by_manufacturer, ->(manufacturer) { where(manufacturer: manufacturer) if manufacturer.present? }
-  scope :by_operator, ->(operator) { where(operator: operator) if operator.present? }
   scope :with_recent_inspections, -> {
     cutoff_date = EN14960::Constants::REINSPECTION_INTERVAL_DAYS.days.ago
     joins(:inspections)

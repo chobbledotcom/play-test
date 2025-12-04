@@ -28,7 +28,7 @@ en:
   # ActiveRecord validation messages
   activerecord:
     attributes:
-      unit:
+      inspection:
         operator: Controller / Owner
     errors:
       messages:

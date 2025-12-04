@@ -24,7 +24,6 @@ RSpec.feature "Shared Unit Inspections with Badges", type: :feature do
 
       fill_in_form(:units, :id, badge.id)
       fill_in_form(:units, :name, "Shared Test Unit")
-      fill_in_form(:units, :operator, "Test Operator")
       fill_in_form(:units, :manufacturer, "Test Manufacturer")
       fill_in_form(:units, :serial, "SHARED123")
       fill_in_form(:units, :description, "Shared inspection test unit")
@@ -143,7 +142,6 @@ RSpec.feature "Shared Unit Inspections with Badges", type: :feature do
       visit new_unit_path
 
       fill_in_form(:units, :name, "User A's Unit")
-      fill_in_form(:units, :operator, "Test Operator")
       fill_in_form(:units, :manufacturer, "Test Manufacturer")
       fill_in_form(:units, :serial, "USERA123")
       fill_in_form(:units, :description, "Private unit for user A")

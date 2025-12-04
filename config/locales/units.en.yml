@@ -50,7 +50,6 @@ en:
       serial: Serial
       manufacturer: Manufacturer
       has_slide: Has Slide
-      operator: Controller / Owner
       description: Description
       photo: Photo
       width: Width
@@ -114,7 +113,6 @@ en:
       serial_blank: Serial can't be blank
       serial: Serial number can't be blank
       description_blank: Description can't be blank
-      operator_blank: Controller / Owner can't be blank
       location_blank: Location can't be blank
       width_blank: Width can't be blank
       length_blank: Length can't be blank

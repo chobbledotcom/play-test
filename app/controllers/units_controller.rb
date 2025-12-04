@@ -262,7 +262,6 @@ class UnitsController < ApplicationController
     units = units.search(params[:query])
     units = units.overdue if params[:status] == "overdue"
     units = units.by_manufacturer(params[:manufacturer])
-    units = units.by_operator(params[:operator])
     units.order(created_at: :desc)
   end
 
@@ -276,7 +275,6 @@ class UnitsController < ApplicationController
       title_parts << I18n.t("units.status.overdue")
     end
     title_parts << params[:manufacturer] if params[:manufacturer].present?
-    title_parts << params[:operator] if params[:operator].present?
     title_parts.join(" - ")
   end
 
@@ -318,7 +316,6 @@ class UnitsController < ApplicationController
     {
       name: @unit.name,
       serial: @unit.serial,
-      operator: @unit.operator,
       manufacturer: @unit.manufacturer
     }
   end
@@ -417,7 +414,6 @@ class UnitsController < ApplicationController
       manufacture_date
       manufacturer
       name
-      operator
       photo
       serial
       unit_type

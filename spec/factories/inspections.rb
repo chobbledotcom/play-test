@@ -56,6 +56,7 @@ FactoryBot.define do
     inspection_date { Date.current }
     complete_date { nil }
     is_seed { false }
+    operator { "Test Operator" }
     risk_assessment {
       "Standard risk assessment completed. Unit inspected in accordance with EN 14960:2019. " \
       "All safety features present and functional. No significant hazards identified. " \
