@@ -53,7 +53,8 @@ class Inspection < ApplicationRecord
 
   enum :inspection_type, {
     bouncy_castle: "BOUNCY_CASTLE",
-    bouncing_pillow: "BOUNCING_PILLOW"
+    bouncing_pillow: "BOUNCING_PILLOW",
+    pat_testable: "PAT_TESTABLE"
   }
 
   CASTLE_ASSESSMENT_TYPES = {
@@ -70,8 +71,14 @@ class Inspection < ApplicationRecord
     fan_assessment: Assessments::FanAssessment
   }.freeze
 
+  PAT_TESTABLE_ASSESSMENT_TYPES = {
+    pat_assessment: Assessments::PatAssessment
+  }.freeze
+
   ALL_ASSESSMENT_TYPES =
-    CASTLE_ASSESSMENT_TYPES.merge(PILLOW_ASSESSMENT_TYPES).freeze
+    CASTLE_ASSESSMENT_TYPES
+      .merge(PILLOW_ASSESSMENT_TYPES)
+      .merge(PAT_TESTABLE_ASSESSMENT_TYPES).freeze
 
   USER_EDITABLE_PARAMS = %i[
     has_slide
@@ -218,15 +225,19 @@ class Inspection < ApplicationRecord
 
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def assessment_types
-    bouncing_pillow? ? PILLOW_ASSESSMENT_TYPES : CASTLE_ASSESSMENT_TYPES
+    case
+    when pat_testable? then PAT_TESTABLE_ASSESSMENT_TYPES
+    when bouncing_pillow? then PILLOW_ASSESSMENT_TYPES
+    else CASTLE_ASSESSMENT_TYPES
+    end
   end
 
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def applicable_assessments
-    if bouncing_pillow?
-      pillow_applicable_assessments
-    else
-      castle_applicable_assessments
+    case
+    when pat_testable? then pat_testable_applicable_assessments
+    when bouncing_pillow? then pillow_applicable_assessments
+    else castle_applicable_assessments
     end
   end
 
@@ -251,6 +262,11 @@ class Inspection < ApplicationRecord
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def pillow_applicable_assessments
     PILLOW_ASSESSMENT_TYPES
+  end
+
+  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
+  def pat_testable_applicable_assessments
+    PAT_TESTABLE_ASSESSMENT_TYPES
   end
 
   public
@@ -279,7 +295,7 @@ class Inspection < ApplicationRecord
     applicable = applicable_assessments.keys.map { |k| k.to_s.chomp("_assessment") }
 
     # Add tabs in the correct UI order
-    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed]
+    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat]
     ordered_tabs.each do |tab|
       tabs << tab if applicable.include?(tab)
     end
@@ -293,10 +309,14 @@ class Inspection < ApplicationRecord
   # Advanced methods
   sig { returns(T::Boolean) }
   def can_be_completed?
-    unit.present? &&
+    base_requirements_met = unit.present? &&
       all_assessments_complete? &&
       !passed.nil? &&
-      inspection_date.present? &&
+      inspection_date.present?
+
+    return base_requirements_met if pat_testable?
+
+    base_requirements_met &&
       width.present? &&
       length.present? &&
       height.present? &&
@@ -396,8 +416,12 @@ class Inspection < ApplicationRecord
 
   sig { returns(T::Array[Symbol]) }
   def inspection_tab_incomplete_fields
-    # Fields required for the inspection tab specifically (excludes passed which is on results tab)
+    # Excludes passed which is on results tab
     fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
+
+    # PAT testable only needs inspection_date
+    fields = fields & [:inspection_date] if pat_testable?
+
     fields
       .reject { |f| f.end_with?("_comment") }
       .select { |f| send(f).nil? }
@@ -526,6 +550,7 @@ class Inspection < ApplicationRecord
       enclosed
       fan
       materials
+      pat
       slide
       structure
       user_height
