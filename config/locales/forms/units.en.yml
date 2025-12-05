@@ -13,6 +13,7 @@ en:
         unit_type: Unit Type
         serial: Manufacturer Serial Number
         manufacturer: Manufacturer
+        operator: Controller / Owner
         description: Description
         manufacture_date: Manufacture Date
         photo: Photo

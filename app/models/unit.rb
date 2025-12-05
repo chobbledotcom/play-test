@@ -36,6 +36,9 @@ class Unit < ApplicationRecord
   self.table_name = "units"
   include CustomIdGenerator
 
+  # Virtual attribute for unit form only (operator moved to inspections)
+  attribute :operator, :string
+
   enum :unit_type, {
     bouncy_castle: "BOUNCY_CASTLE",
     bouncing_pillow: "BOUNCING_PILLOW",

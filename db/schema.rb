@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema[8.1].define(version: 2025_12_05_000003) do
-=======
-ActiveRecord::Schema[8.1].define(version: 2025_12_04_000003) do
->>>>>>> c55b5e8c (Migrate operator field from units to inspections)
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false

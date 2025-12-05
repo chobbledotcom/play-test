@@ -24,6 +24,7 @@
     <% end %>
 
     <%= render 'chobble_forms/text_field', field: :name, required: true %>
+    <%= render 'chobble_forms/text_field', field: :operator %>
 
     <%# Unit type - only for development or test mode %>
     <% if Rails.env.development? || Rails.env.test? %>

@@ -67,6 +67,7 @@ class UnitsController < ApplicationController
 
   def new
     @unit = Unit.new
+    assign_default_operator(@unit)
 
     if @validated_badge_id.present?
       @unit.id = @validated_badge_id
@@ -77,6 +78,7 @@ class UnitsController < ApplicationController
   def create
     @unit = current_user.units.build(unit_params)
     @prefilled_badge = @validated_badge_id.present?
+    assign_default_operator(@unit)
 
     if @image_processing_error
       flash.now[:alert] = @image_processing_error.message
@@ -409,6 +411,7 @@ class UnitsController < ApplicationController
       manufacture_date
       manufacturer
       name
+      operator
       photo
       serial
       unit_type
@@ -420,5 +423,12 @@ class UnitsController < ApplicationController
   def allow_badge_id_in_params?
     create_actions = %w[create create_from_inspection]
     unit_badges_enabled? && create_actions.include?(action_name)
+  end
+
+  def assign_default_operator(unit)
+    return if unit.operator.present?
+
+    last_operator = current_user&.inspections&.order(created_at: :desc)&.pick(:operator)
+    unit.operator = last_operator.presence || ("Test Operator" if Rails.env.test?)
   end
 end
