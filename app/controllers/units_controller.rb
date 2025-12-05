@@ -160,9 +160,9 @@ class UnitsController < ApplicationController
 
     normalized_id = normalize_unit_id(id_param)
     return redirect_to_existing_unit(normalized_id) if unit_exists?(normalized_id)
-    return redirect_to_invalid_badge unless badge_exists?(normalized_id)
 
-    @validated_badge_id = normalized_id
+    # Only set validated badge ID if it exists, otherwise let model validation handle it
+    @validated_badge_id = normalized_id if badge_exists?(normalized_id)
   end
 
   def log_unit_event(action, unit, details = nil, changed_data = nil)
@@ -381,11 +381,6 @@ class UnitsController < ApplicationController
   def redirect_to_existing_unit(normalized_id)
     flash[:notice] = I18n.t("units.messages.existing_unit_found")
     redirect_to Unit.find(normalized_id)
-  end
-
-  def redirect_to_invalid_badge
-    flash[:alert] = I18n.t("units.validations.invalid_badge_id")
-    redirect_to units_path
   end
 
   def log_resource_event(action, unit, details, changed_data)
