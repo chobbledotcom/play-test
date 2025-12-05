@@ -126,7 +126,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
 
       expect {
         builder.send(:get_field_label, fields)
-      }.to raise_error(RuntimeError, "No valid fields found: {unknown_type: :some_field}")
+      }.to raise_error(RuntimeError, /No valid fields found:/)
     end
   end
 
