@@ -2,8 +2,6 @@
 form_fields:
   - legend_i18n_key: equipment_details
     fields:
-      - partial: :text_field
-        field: :location
       - partial: :number_pass_fail_comment
         field: :equipment_class
         attributes:

@@ -248,7 +248,6 @@ module SeedData
 
   def self.pat_numeric_fields
     {
-      location: "Test Location #{SecureRandom.hex(4)}",
       equipment_class: [1, 2].sample,
       equipment_power: rand(100..3000),
       fuse_rating: [3, 5, 13].sample,
@@ -275,8 +274,8 @@ module SeedData
 
   def self.pat_comments(passed)
     {
-      location_comment: passed ? OK : WEAR,
       equipment_class_comment: passed ? OK : FAIL,
+      equipment_power_comment: passed ? OK : FAIL,
       visual_comment: passed ? GOOD : WEAR,
       appliance_plug_check_comment: passed ? GOOD : WEAR,
       fuse_rating_comment: passed ? OK : FAIL,

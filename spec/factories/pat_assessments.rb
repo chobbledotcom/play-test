@@ -5,27 +5,7 @@ FactoryBot.define do
   factory :pat_assessment, class: "Assessments::PatAssessment" do
     association :inspection
 
-    # All fields default to nil for tests to control
-    location { nil }
-    equipment_class { nil }
-    equipment_class_pass { nil }
-    equipment_power { nil }
-    visual_pass { nil }
-    appliance_plug_check_pass { nil }
-    fuse_rating { nil }
-    fuse_rating_pass { nil }
-    earth_ohms { nil }
-    earth_ohms_pass { nil }
-    insulation_mohms { nil }
-    insulation_mohms_pass { nil }
-    leakage_ma { nil }
-    leakage_ma_pass { nil }
-    load_test_pass { nil }
-    rcd_trip_time_ms { nil }
-    rcd_trip_time_ms_pass { nil }
-
     trait :passed do
-      location { "Office" }
       equipment_class { 1 }
       equipment_class_pass { true }
       equipment_power { 500 }
@@ -45,8 +25,6 @@ FactoryBot.define do
     end
 
     trait :complete do
-      location { "Office" }
-      location_comment { "Ground floor office" }
       equipment_class { 1 }
       equipment_class_pass { true }
       equipment_class_comment { "Class I appliance" }
@@ -76,9 +54,9 @@ FactoryBot.define do
     end
 
     trait :failed do
-      location { "Workshop" }
       equipment_class { 1 }
       equipment_class_pass { false }
+      equipment_power { 500 }
       visual_pass { false }
       appliance_plug_check_pass { false }
       fuse_rating { 13 }

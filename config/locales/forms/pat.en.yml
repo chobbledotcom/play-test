@@ -9,7 +9,6 @@ en:
         electrical_tests: Electrical Tests
         functional_tests: Functional Tests
       fields:
-        location: Test Location
         equipment_class: Equipment Class (I or II)
         equipment_power: Power Rating (W)
         visual: Visual Inspection
