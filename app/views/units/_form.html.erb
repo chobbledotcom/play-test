@@ -30,7 +30,8 @@
       <%= render 'chobble_forms/select', field: :unit_type,
           options: options_for_select([
             [t('units.unit_types.bouncy_castle'), 'bouncy_castle'],
-            [t('units.unit_types.bouncing_pillow'), 'bouncing_pillow']
+            [t('units.unit_types.bouncing_pillow'), 'bouncing_pillow'],
+            [t('units.unit_types.pat_testable'), 'pat_testable']
           ], unit.unit_type),
           required: true %>
     <% end %>
