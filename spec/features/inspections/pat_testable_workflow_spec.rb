@@ -105,7 +105,7 @@ RSpec.feature "PAT Testable Inspection Workflow", type: :feature do
 
     # Bouncy castle tabs should NOT be visible
     %w[anchorage enclosed fan materials slide structure user_height].each do
-      expect_no_assessment_tab(_1)
+      expect_no_assessment_tab(it)
     end
   end
 
