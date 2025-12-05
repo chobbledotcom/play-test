@@ -80,6 +80,7 @@ class Inspection < ApplicationRecord
     inspection_date
     is_totally_enclosed
     length
+    operator
     passed
     photo_1
     photo_2
