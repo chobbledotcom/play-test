@@ -13,6 +13,7 @@ en:
       fields:
         id: Report ID
         inspection_date: Inspection Date
+        operator: Controller / Owner
         reinspection_date: Reinspection Date
         name: Unit Name
         inspector: Inspector Name

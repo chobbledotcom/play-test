@@ -190,10 +190,8 @@ RSpec.describe Inspection, type: :model do
   describe ".filter_by_operator" do
     let(:operator1) { "Operator A" }
     let(:operator2) { "Operator B" }
-    let(:unit1) { create(:unit, operator: operator1) }
-    let(:unit2) { create(:unit, operator: operator2) }
-    let!(:matching) { create(:inspection, unit: unit1) }
-    let!(:non_matching) { create(:inspection, unit: unit2) }
+    let!(:matching) { create(:inspection, operator: operator1) }
+    let!(:non_matching) { create(:inspection, operator: operator2) }
 
     it "filters by operator when present" do
       result = Inspection.filter_by_operator(operator1)

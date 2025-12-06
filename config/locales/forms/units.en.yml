@@ -14,7 +14,6 @@ en:
         serial: Manufacturer Serial Number
         manufacturer: Manufacturer
         description: Description
-        operator: Controller / Owner
         manufacture_date: Manufacture Date
         photo: Photo
       display_fields:
