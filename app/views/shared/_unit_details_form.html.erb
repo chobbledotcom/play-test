@@ -21,24 +21,6 @@
   <%= render 'chobble_forms/text_field', field: :serial, required: true %>
   <%= render 'chobble_forms/text_area', field: :description, required: true %>
 
-  <%# Operator with optional count link %>
-  <% if object.persisted? && object.operator.present? %>
-    <% operator_count = current_user.units.where(operator: object.operator).count %>
-    <% if operator_count > 0 %>
-      <%= render 'chobble_forms/field_with_link',
-          field_type: :autocomplete_field,
-          field: :operator,
-          required: true,
-          options: operator_options(current_user),
-          link_url: units_path(operator: object.operator),
-          link_text: t('units.labels.all_count', count: operator_count) %>
-    <% else %>
-      <%= render 'chobble_forms/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
-    <% end %>
-  <% else %>
-    <%= render 'chobble_forms/autocomplete_field', field: :operator, required: true, options: operator_options(current_user) %>
-  <% end %>
-
   <%= render 'chobble_forms/date_field', field: :manufacture_date %>
 
   <%# Only show these fields if unit is persisted %>

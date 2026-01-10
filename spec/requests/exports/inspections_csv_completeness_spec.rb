@@ -36,8 +36,8 @@ RSpec.describe "Inspections CSV Export Completeness", type: :request do
       csv_content = response.body
       headers = CSV.parse(csv_content).first
 
-      # Unit fields
-      expect(headers).to include("unit_name", "unit_serial", "unit_manufacturer", "unit_operator", "unit_description")
+      # Unit fields (operator is now on inspection, not unit)
+      expect(headers).to include("unit_name", "unit_serial", "unit_manufacturer", "unit_description")
 
       # Inspector company field
       expect(headers).to include("inspector_company_name")
@@ -76,7 +76,9 @@ RSpec.describe "Inspections CSV Export Completeness", type: :request do
       # Count should match all inspection columns minus exclusions plus related fields
       excluded_columns = %w[user_id inspector_company_id unit_id]
       inspection_column_count = Inspection.column_names.length - excluded_columns.length
-      related_field_count = 8 # unit_name, unit_serial, etc. + inspector_company_name + inspector_user_email + complete
+      # unit_name, unit_serial, unit_manufacturer, unit_description +
+      # inspector_company_name + inspector_user_email + complete
+      related_field_count = 7
 
       expect(headers.length).to eq(inspection_column_count + related_field_count)
     end

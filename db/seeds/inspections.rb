@@ -61,10 +61,13 @@ recent_inspection = Inspection.create!(
     inspector_company: $stefan_testing,
     inspection_date: 3.days.ago,
     complete_date: Time.current,
-    passed: true
+    passed: true,
+    operator: $unit_operators[$castle_standard]
   )
 )
-create_assessments_for_inspection(recent_inspection, $castle_standard, passed: true)
+create_assessments_for_inspection(
+  recent_inspection, $castle_standard, passed: true
+)
 
 failed_inspection = Inspection.create!(
   SeedData.inspection_fields.merge(
@@ -74,7 +77,9 @@ failed_inspection = Inspection.create!(
     inspection_date: 1.week.ago,
     complete_date: Time.current,
     passed: false,
-    risk_assessment: "Safety failures identified. Unit unsafe for use. Risk level: HIGH.",
+    operator: $unit_operators[$obstacle_course],
+    risk_assessment: "Safety failures identified. Unit unsafe for use. " \
+      "Risk level: HIGH.",
     width: 3.0,
     length: 12.0,
     height: 3.5,
@@ -83,7 +88,9 @@ failed_inspection = Inspection.create!(
     indoor_only: false
   )
 )
-create_assessments_for_inspection(failed_inspection, $obstacle_course, passed: false)
+create_assessments_for_inspection(
+  failed_inspection, $obstacle_course, passed: false
+)
 
 [6.months.ago, 1.year.ago].each do |date|
   historical = Inspection.create!(
@@ -94,6 +101,7 @@ create_assessments_for_inspection(failed_inspection, $obstacle_course, passed: f
       inspection_date: date,
       complete_date: Time.current,
       passed: true,
+      operator: $unit_operators[$castle_large],
       width: 9.0,
       length: 9.0,
       height: 4.5
@@ -109,6 +117,7 @@ Inspection.create!(
     inspector_company: $stefan_testing,
     inspection_date: Date.current,
     complete_date: nil,
+    operator: $unit_operators[$giant_slide],
     width: 5.0,
     length: 15.0,
     height: 7.5,
@@ -124,6 +133,7 @@ in_progress = Inspection.create!(
     unit: $gladiator_duel,
     inspector_company: $steph_test,
     complete_date: nil,
+    operator: $unit_operators[$gladiator_duel],
     width: 6.0,
     length: 6.0,
     height: 1.5,
@@ -141,14 +151,28 @@ in_progress.anchorage_assessment.update!(
 [$soft_play_unit, $castle_slide_combo, $bungee_run].each do |unit|
   dimensions = case unit
   when $soft_play_unit
-    {width: 6.0, length: 6.0, height: 2.5, has_slide: false, is_totally_enclosed: true, indoor_only: true}
+    {
+      width: 6.0, length: 6.0, height: 2.5,
+      has_slide: false, is_totally_enclosed: true, indoor_only: true
+    }
   when $castle_slide_combo
-    {width: 5.5, length: 7.0, height: 4.0, has_slide: true, is_totally_enclosed: false, indoor_only: false}
+    {
+      width: 5.5, length: 7.0, height: 4.0,
+      has_slide: true, is_totally_enclosed: false, indoor_only: false
+    }
   when $bungee_run
-    {width: 4.0, length: 10.0, height: 2.5, has_slide: false, is_totally_enclosed: false, indoor_only: false}
+    {
+      width: 4.0, length: 10.0, height: 2.5,
+      has_slide: false, is_totally_enclosed: false, indoor_only: false
+    }
   end
 
   passed_status = rand(0..4) > 0
+  risk = if passed_status
+    "Unit inspected and meets all safety requirements. Risk level: LOW."
+  else
+    "Safety failures identified. Unit unsafe for use. Risk level: HIGH."
+  end
 
   inspection = Inspection.create!(
     SeedData.inspection_fields.merge(
@@ -158,9 +182,8 @@ in_progress.anchorage_assessment.update!(
       inspection_date: rand(1..60).days.ago,
       complete_date: Time.current,
       passed: passed_status,
-      risk_assessment: passed_status ?
-        "Unit inspected and meets all safety requirements. Risk level: LOW." :
-        "Safety failures identified. Unit unsafe for use. Risk level: HIGH.",
+      operator: $unit_operators[unit],
+      risk_assessment: risk,
       **dimensions
     )
   )
@@ -175,6 +198,7 @@ lead_inspection = Inspection.create!(
     inspection_date: 2.months.ago,
     complete_date: Time.current,
     passed: true,
+    operator: $unit_operators[$castle_standard],
     width: 4.5,
     length: 4.5,
     height: 3.5,
@@ -183,7 +207,9 @@ lead_inspection = Inspection.create!(
     indoor_only: false
   )
 )
-create_assessments_for_inspection(lead_inspection, $castle_standard, passed: true)
+create_assessments_for_inspection(
+  lead_inspection, $castle_standard, passed: true
+)
 
 complete_inspection = Inspection.create!(
   SeedData.inspection_fields.merge(
@@ -193,6 +219,7 @@ complete_inspection = Inspection.create!(
     inspection_date: 1.month.ago,
     complete_date: Time.current,
     passed: true,
+    operator: $unit_operators[$castle_large],
     width: 9.0,
     length: 9.0,
     height: 4.5,
@@ -201,8 +228,11 @@ complete_inspection = Inspection.create!(
     indoor_only: false
   )
 )
-create_assessments_for_inspection(complete_inspection, $castle_large, passed: true)
+create_assessments_for_inspection(
+  complete_inspection, $castle_large, passed: true
+)
 
 complete_inspection.reload
 
-Rails.logger.debug { "Created #{Inspection.count} inspections with assessments." }
+count = Inspection.count
+Rails.logger.debug { "Created #{count} inspections with assessments." }

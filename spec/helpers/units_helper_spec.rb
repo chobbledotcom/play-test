@@ -41,25 +41,25 @@ RSpec.describe UnitsHelper, type: :helper do
   end
 
   describe "#operator_options" do
-    it "returns empty array when user has no units" do
+    it "returns empty array when user has no inspections" do
       expect(helper.operator_options(user)).to eq([])
     end
 
     it "returns unique operators sorted alphabetically" do
-      create(:unit, user: user, operator: "John Smith")
-      create(:unit, user: user, operator: "Alice Johnson")
-      create(:unit, user: user, operator: "John Smith") # duplicate
+      create(:inspection, user: user, operator: "John Smith")
+      create(:inspection, user: user, operator: "Alice Johnson")
+      create(:inspection, user: user, operator: "John Smith") # duplicate
 
       result = helper.operator_options(user)
       expect(result).to eq(["Alice Johnson", "John Smith"])
     end
 
     it "excludes blank operators" do
-      create(:unit, user: user, operator: "Valid Operator")
-      unit2 = create(:unit, user: user, operator: "Another Operator")
+      create(:inspection, user: user, operator: "Valid Operator")
+      inspection2 = create(:inspection, user: user, operator: "Another Operator")
 
-      # Manually update database to have blank operator (bypassing validations)
-      unit2.update_column(:operator, "")
+      # Manually update database to have blank operator
+      inspection2.update_column(:operator, "")
 
       result = helper.operator_options(user)
       expect(result).to eq(["Valid Operator"])
@@ -67,8 +67,8 @@ RSpec.describe UnitsHelper, type: :helper do
 
     it "only returns operators for the specific user" do
       other_user = create(:user)
-      create(:unit, user: user, operator: "User1 Operator")
-      create(:unit, user: other_user, operator: "User2 Operator")
+      create(:inspection, user: user, operator: "User1 Operator")
+      create(:inspection, user: other_user, operator: "User2 Operator")
 
       result = helper.operator_options(user)
       expect(result).to eq(["User1 Operator"])

@@ -24,7 +24,6 @@ RSpec.describe "Units Form", type: :feature do
       fill_in_form :units, :manufacturer, "JumpCo"
       fill_in_form :units, :serial, "ASSET-001"
       fill_in_form :units, :description, "Large bouncy castle for events"
-      fill_in_form :units, :operator, "Test Company Ltd"
       fill_in_form :units, :manufacture_date, "2023-01-15"
 
       submit_form :units
@@ -45,13 +44,12 @@ RSpec.describe "Units Form", type: :feature do
     it "shows validation errors for missing required fields" do
       submit_form :units
 
-      expected_count = Rails.configuration.units.badges_enabled ? 6 : 5
+      expected_count = Rails.configuration.units.badges_enabled ? 5 : 4
       expect_form_errors :units, count: expected_count
       expect(page).to have_content(I18n.t("units.validations.name_blank"))
       expect(page).to have_content(I18n.t("units.validations.manufacturer_blank"))
       expect(page).to have_content(I18n.t("units.validations.serial_blank"))
       expect(page).to have_content(I18n.t("units.validations.description_blank"))
-      expect(page).to have_content(I18n.t("units.validations.operator_blank"))
 
       if Rails.configuration.units.badges_enabled
         expect(page).to have_content(I18n.t("units.validations.id_blank"))
@@ -65,7 +63,6 @@ RSpec.describe "Units Form", type: :feature do
       fill_in_form :units, :manufacturer, "Test Mfg"
       fill_in_form :units, :serial, "DUPLICATE-001"
       fill_in_form :units, :description, "Test description"
-      fill_in_form :units, :operator, "Test Operator"
 
       submit_form :units
 

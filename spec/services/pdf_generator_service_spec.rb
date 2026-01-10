@@ -139,7 +139,7 @@ RSpec.describe PdfGeneratorService, pdf: true do
       expect(pdf_text).to include(I18n.t("units.fields.name"))
       expect(pdf_text).to include(I18n.t("forms.units.fields.serial"))
       expect(pdf_text).to include(I18n.t("forms.units.fields.manufacturer"))
-      expect(pdf_text).to include(I18n.t("forms.units.fields.operator"))
+      expect(pdf_text).to include(I18n.t("forms.inspection.fields.operator"))
     end
 
     context "with inspections" do

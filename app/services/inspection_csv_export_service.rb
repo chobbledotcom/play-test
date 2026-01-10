@@ -38,7 +38,7 @@ class InspectionCsvExportService
     inspection_columns = Inspection.column_name_syms - excluded_columns
 
     headers = inspection_columns
-    headers += %i[unit_name unit_serial unit_manufacturer unit_operator unit_description]
+    headers += %i[unit_name unit_serial unit_manufacturer unit_description]
     headers += %i[inspector_company_name]
     headers += %i[inspector_user_email]
     headers += %i[complete]
@@ -53,7 +53,6 @@ class InspectionCsvExportService
       in :unit_name then inspection.unit&.name
       in :unit_serial then inspection.unit&.serial
       in :unit_manufacturer then inspection.unit&.manufacturer
-      in :unit_operator then inspection.unit&.operator
       in :unit_description then inspection.unit&.description
       in :inspector_company_name then inspection.inspector_company&.name
       in :inspector_user_email then inspection.user&.email

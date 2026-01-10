@@ -11,9 +11,18 @@ RSpec.describe "Units Filtering", type: :request do
 
   describe "GET /units with filters" do
     # Create base units with default serials
-    let!(:base_airquee_unit) { create(:unit, user: user, name: "Airquee Castle", manufacturer: "Airquee Ltd", operator: "Operator A") }
-    let!(:base_bouncy_unit) { create(:unit, user: user, name: "Bouncy Castle", manufacturer: "Bouncy Co", operator: "Operator B") }
-    let!(:base_other_unit) { create(:unit, user: user, name: "Other Castle", manufacturer: "Other Brand", operator: "Operator C") }
+    let!(:base_airquee_unit) do
+      create(:unit, user: user, name: "Airquee Castle",
+        manufacturer: "Airquee Ltd")
+    end
+    let!(:base_bouncy_unit) do
+      create(:unit, user: user, name: "Bouncy Castle",
+        manufacturer: "Bouncy Co")
+    end
+    let!(:base_other_unit) do
+      create(:unit, user: user, name: "Other Castle",
+        manufacturer: "Other Brand")
+    end
 
     context "when filtering by manufacturer" do
       it "shows only units from the selected manufacturer" do
@@ -33,47 +42,17 @@ RSpec.describe "Units Filtering", type: :request do
       end
     end
 
-    context "when filtering by operator" do
-      it "shows only units from the selected operator" do
-        get units_path(operator: "Operator B")
-
-        expect(response.body).not_to include("Airquee Castle")
-        expect(response.body).to include("Bouncy Castle")
-        expect(response.body).not_to include("Other Castle")
-      end
-
-      it "shows all units when operator filter is empty string" do
-        get units_path(operator: "")
-
-        expect(response.body).to include("Airquee Castle")
-        expect(response.body).to include("Bouncy Castle")
-        expect(response.body).to include("Other Castle")
-      end
-    end
-
-    context "when combining filters" do
-      let!(:airquee_operatorb) { create(:unit, user: user, name: "Airquee B", manufacturer: "Airquee Ltd", operator: "Operator B") }
-
-      it "applies both filters" do
-        get units_path(manufacturer: "Airquee Ltd", operator: "Operator B")
-
-        expect(response.body).to include("Airquee B")
-        expect(response.body).not_to include("Airquee Castle")
-        expect(response.body).not_to include("Bouncy Castle")
-        expect(response.body).not_to include("Other Castle")
-      end
-    end
-
     context "when filtering by status" do
       let!(:current_unit) { create(:unit, user: user, name: "Current Unit") }
       let!(:overdue_unit) { create(:unit, user: user, name: "Overdue Unit") }
 
       before do
         # Create an old inspection for the overdue unit
+        days_ago = EN14960::Constants::REINSPECTION_INTERVAL_DAYS + 10
         create(:inspection, :completed,
           user: user,
           unit: overdue_unit,
-          inspection_date: (EN14960::Constants::REINSPECTION_INTERVAL_DAYS + 10).days.ago)
+          inspection_date: days_ago.days.ago)
 
         # Create a recent inspection for the current unit
         create(:inspection, :completed,
@@ -93,9 +72,12 @@ RSpec.describe "Units Filtering", type: :request do
     context "when searching" do
       before do
         # Create units with specific serials for search tests
-        create(:unit, user: user, name: "Search Airquee", serial: "AIR-2024-001", manufacturer: "Test", operator: "Test")
-        create(:unit, user: user, name: "Search Bouncy", serial: "BCY-2024-002", manufacturer: "Test", operator: "Test")
-        create(:unit, user: user, name: "Search Other", serial: "OTH-2024-003", manufacturer: "Test", operator: "Test")
+        create(:unit, user: user, name: "Search Airquee",
+          serial: "AIR-2024-001", manufacturer: "Test")
+        create(:unit, user: user, name: "Search Bouncy",
+          serial: "BCY-2024-002", manufacturer: "Test")
+        create(:unit, user: user, name: "Search Other",
+          serial: "OTH-2024-003", manufacturer: "Test")
       end
 
       it "finds units by serial number" do
