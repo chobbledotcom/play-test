@@ -51,7 +51,7 @@ class InspectionBlueprint < Blueprinter::Base
         name: inspection.unit.name,
         serial: inspection.unit.serial,
         manufacturer: inspection.unit.manufacturer,
-        operator: inspection.unit.operator
+        operator: inspection.operator
       }
     end
   end

@@ -79,7 +79,6 @@ RSpec.describe "BadgeBatches", type: :request do
           serial: "TEST123",
           description: "Test",
           manufacturer: "Test Mfg",
-          operator: "Test Op",
           created_at: timestamp,
           updated_at: timestamp
         }

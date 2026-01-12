@@ -87,6 +87,7 @@ class Inspection < ApplicationRecord
     inspection_date
     is_totally_enclosed
     length
+    operator
     passed
     photo_1
     photo_2
@@ -170,11 +171,7 @@ class Inspection < ApplicationRecord
     where(unit_id: unit_id) if unit_id.present?
   }
   scope :filter_by_operator, lambda { |operator|
-    if operator.present?
-      joins(:unit).where(units: {operator: operator})
-    else
-      all
-    end
+    where(operator: operator) if operator.present?
   }
   scope :filter_by_date_range, lambda { |start_date, end_date|
     range = start_date..end_date

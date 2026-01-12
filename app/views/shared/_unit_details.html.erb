@@ -79,12 +79,12 @@
         <span><%= unit.description %></span>
       </li>
 
-      <li>
-        <strong><%= ChobbleForms::FieldUtils.form_field_label(:units, :operator) %>:</strong>
-        <span><%= link_to unit.operator,
-                         units_path(operator: unit.operator, anchor: "main"),
-                         title: "View all units operated by #{unit.operator}" %></span>
-      </li>
+      <% if last_inspection&.operator.present? %>
+        <li>
+          <strong><%= ChobbleForms::FieldUtils.form_field_label(:inspection, :operator) %>:</strong>
+          <span><%= last_inspection.operator %></span>
+        </li>
+      <% end %>
 
       <% if last_inspection %>
         <li>

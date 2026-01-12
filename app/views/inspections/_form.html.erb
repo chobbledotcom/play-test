@@ -40,6 +40,7 @@
 
   <%= render 'chobble_forms/fieldset', legend_key: 'inspection_details' do %>
     <%= render 'chobble_forms/date_field', field: :inspection_date %>
+    <%= render 'chobble_forms/text_field', field: :operator %>
 
     <div class="calculated-field">
       <label><%= t('inspections.fields.reinspection_date') %></label>
