@@ -34,3 +34,23 @@ export function arrayBufferToBase64(buffer) {
   // Use URL-safe base64 encoding
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 }
+
+/**
+ * POST JSON data with CSRF token and credentials
+ * @param {string} url - The endpoint URL
+ * @param {object} data - The data to send as JSON
+ * @param {string} csrfToken - The CSRF token
+ * @returns {Promise<Response>} - The fetch response
+ */
+export function postJson(url, data, csrfToken) {
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken,
+    },
+    body: JSON.stringify(data),
+    credentials: "same-origin",
+  });
+}
