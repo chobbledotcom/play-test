@@ -222,19 +222,23 @@ class Inspection < ApplicationRecord
 
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def assessment_types
-    case
-    when pat_testable? then PAT_TESTABLE_ASSESSMENT_TYPES
-    when bouncing_pillow? then PILLOW_ASSESSMENT_TYPES
-    else CASTLE_ASSESSMENT_TYPES
+    if pat_testable?
+      PAT_TESTABLE_ASSESSMENT_TYPES
+    elsif bouncing_pillow?
+      PILLOW_ASSESSMENT_TYPES
+    else
+      CASTLE_ASSESSMENT_TYPES
     end
   end
 
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def applicable_assessments
-    case
-    when pat_testable? then pat_testable_applicable_assessments
-    when bouncing_pillow? then pillow_applicable_assessments
-    else castle_applicable_assessments
+    if pat_testable?
+      pat_testable_applicable_assessments
+    elsif bouncing_pillow?
+      pillow_applicable_assessments
+    else
+      castle_applicable_assessments
     end
   end
 
@@ -417,7 +421,7 @@ class Inspection < ApplicationRecord
     fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
 
     # PAT testable only needs inspection_date
-    fields = fields & [:inspection_date] if pat_testable?
+    fields &= [:inspection_date] if pat_testable?
 
     fields
       .reject { |f| f.end_with?("_comment") }

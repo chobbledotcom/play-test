@@ -2,6 +2,9 @@
 en:
   # User Management
   users:
+    status:
+      active: "Active (+%{days} days)"
+      inactive: "Inactive (-%{days} days)"
     title: Users
     titles:
       register: Register

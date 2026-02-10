@@ -239,7 +239,7 @@ class Unit < ApplicationRecord
     # Check if badge exists
     unless Badge.exists?(id: id)
       error_msg = I18n.t("units.validations.invalid_badge_id")
-      errors.add(:id, error_msg)
+      errors.add(:base, error_msg)
     end
   end
 end

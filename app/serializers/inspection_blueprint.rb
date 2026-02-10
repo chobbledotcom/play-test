@@ -5,20 +5,8 @@ class InspectionBlueprint < Blueprinter::Base
   extend T::Sig
   include DynamicPublicFields
 
-  DATE_FIELDS = T.let(
-    %i[complete_date inspection_date].freeze, T::Array[Symbol]
-  )
-
-  sig do
-    params(
-      object: T.untyped,
-      options: T::Hash[T.untyped, T.untyped]
-    ).returns(String)
-  end
-  def self.render(object, options = {})
-    define_public_fields_for(Inspection, date_fields: DATE_FIELDS)
-    super
-  end
+  dynamic_fields_for Inspection,
+    date_fields: %i[complete_date inspection_date]
 
   field :complete do |inspection|
     inspection.complete?
