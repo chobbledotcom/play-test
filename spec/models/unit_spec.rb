@@ -136,7 +136,7 @@ RSpec.describe Unit, type: :model do
           unit = build(:unit, explicit_id: "NOTFOUND", user: user)
           expect(unit.save).to be false
           error_msg = I18n.t("units.validations.invalid_badge_id")
-          expect(unit.errors[:id]).to include(error_msg)
+          expect(unit.errors[:base]).to include(error_msg)
         end
 
         it "validates ID presence" do
