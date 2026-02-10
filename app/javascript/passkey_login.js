@@ -1,5 +1,9 @@
 // Passkey login functionality
-import { base64ToArrayBuffer, arrayBufferToBase64 } from "./webauthn_utils";
+import {
+  base64ToArrayBuffer,
+  arrayBufferToBase64,
+  postJson,
+} from "./webauthn_utils";
 
 document.addEventListener("turbo:load", () => {
   const loginButtons = document.querySelectorAll(
@@ -115,16 +119,11 @@ document.addEventListener("turbo:load", () => {
           },
         };
 
-        const callbackResponse = await fetch("/passkey_callback", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "X-CSRF-Token": csrfToken,
-          },
-          body: JSON.stringify(credentialData),
-          credentials: "same-origin",
-        });
+        const callbackResponse = await postJson(
+          "/passkey_callback",
+          credentialData,
+          csrfToken,
+        );
 
         if (callbackResponse.ok) {
           window.location.href = "/inspections";

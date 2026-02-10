@@ -14,7 +14,7 @@ NC='\033[0m'
 
 # Default settings
 MIN_LINES=5
-MIN_TOKENS=50
+MIN_TOKENS=45
 DIRS="app/ lib/"
 
 show_help() {

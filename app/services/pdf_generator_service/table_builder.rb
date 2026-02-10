@@ -5,15 +5,19 @@ class PdfGeneratorService
   class TableBuilder
     include Configuration
 
+    def self.apply_standard_table_styling(table, data)
+      table.cells.borders = []
+      table.columns(0).font_style = :bold
+      table.columns(0).width = TABLE_FIRST_COLUMN_WIDTH
+      table.row(0..data.length - 1).background_color = "EEEEEE"
+      table.row(0..data.length - 1).borders = [:bottom]
+      table.row(0..data.length - 1).border_color = "DDDDDD"
+    end
+
     def self.create_pdf_table(pdf, data)
       table = pdf.table(data, width: pdf.bounds.width) do |t|
-        t.cells.borders = []
         t.cells.padding = TABLE_CELL_PADDING
-        t.columns(0).font_style = :bold
-        t.columns(0).width = TABLE_FIRST_COLUMN_WIDTH
-        t.row(0..data.length - 1).background_color = "EEEEEE"
-        t.row(0..data.length - 1).borders = [:bottom]
-        t.row(0..data.length - 1).border_color = "DDDDDD"
+        apply_standard_table_styling(t, data)
       end
 
       yield table if block_given?
@@ -26,14 +30,9 @@ class PdfGeneratorService
       pdf.move_down 10
 
       table = pdf.table(data, width: pdf.bounds.width) do |t|
-        t.cells.borders = []
         t.cells.padding = NICE_TABLE_CELL_PADDING
         t.cells.size = NICE_TABLE_TEXT_SIZE
-        t.columns(0).font_style = :bold
-        t.columns(0).width = TABLE_FIRST_COLUMN_WIDTH
-        t.row(0..data.length - 1).background_color = "EEEEEE"
-        t.row(0..data.length - 1).borders = [:bottom]
-        t.row(0..data.length - 1).border_color = "DDDDDD"
+        apply_standard_table_styling(t, data)
       end
 
       yield table if block_given?
