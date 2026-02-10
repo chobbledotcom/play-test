@@ -19,19 +19,6 @@ jobs:
     permissions:
       contents: read
  
-  docker-build:
-    name: Test Docker Build
-    needs: [test]
-    uses: ./.github/workflows/docker-build.yml
-    with:
-      push: false
-      version: test-${{ github.run_number }}
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
-  
   version-check:
     name: Check Version Calculation
     runs-on: ubuntu-latest
@@ -83,7 +70,7 @@ jobs:
   summary:
     name: Pre-Release Summary
     runs-on: ubuntu-latest
-    needs: [test, docker-build, version-check]
+    needs: [test, version-check]
     if: always()
     
     steps:
@@ -101,11 +88,9 @@ jobs:
           echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| Tests | ${{ needs.test.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Docker Build | ${{ needs.docker-build.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
-          if [[ "${{ needs.test.result }}" == "success" && \
-                "${{ needs.docker-build.result }}" == "success" ]]; then
+
+          if [[ "${{ needs.test.result }}" == "success" ]]; then
             echo "✅ **All checks passed! Ready for release.**" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Some checks failed. Please fix issues before releasing.**" >> $GITHUB_STEP_SUMMARY

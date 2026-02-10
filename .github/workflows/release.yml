@@ -61,25 +61,9 @@ jobs:
           
           echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
   
-  docker:
-    name: Build and Push Docker
-    needs: version
-    uses: ./.github/workflows/docker-build.yml
-    with:
-      push: true
-      version: ${{ needs.version.outputs.new }}
-    secrets:
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-      FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
-
   release:
     name: Create Release
-    needs: [version, docker]
+    needs: [version]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -114,11 +98,6 @@ jobs:
 
             [Read the full changelog here](https://github.com/${{ github.repository }}/compare/v${{ needs.version.outputs.current }}...v${{ needs.version.outputs.new }})
 
-            ## Docker Images
-            - `${{ vars.DOCKER_USERNAME }}/play-test:v${{ needs.version.outputs.new }}`
-            - `git.chobble.com/chobble/play-test:v${{ needs.version.outputs.new }}`
-            - `ghcr.io/${{ github.repository }}:v${{ needs.version.outputs.new }}`
-            
           files: |
             play-test-v${{ needs.version.outputs.new }}.zip
           draft: false
