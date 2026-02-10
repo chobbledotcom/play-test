@@ -2,6 +2,9 @@
 en:
   # User Management
   users:
+    status:
+      active: Active
+      inactive_for: "Inactive %{duration}"
     title: Users
     titles:
       register: Register

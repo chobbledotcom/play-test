@@ -6,6 +6,7 @@
   <!-- Header row -->
   <div class="table-list-header">
     <%= render 'shared/table_column', field: :email, model: :user_edit, header: true %>
+    <%= render 'shared/table_column', field: :status, model: :user_edit, header: true %>
     <%= render 'shared/table_column', field: :admin, model: :user_edit, header: true %>
     <%= render 'shared/table_column', field: :registered, model: :user_edit, header: true %>
     <%= render 'shared/table_column', field: :last_active, model: :user_edit, header: true %>
@@ -19,6 +20,9 @@
         <%= link_to edit_user_path(user), class: "table-list-link" do %>
           <%= render 'shared/table_column', field: :email, model: :user_edit do %>
             <%= user.email %>
+          <% end %>
+          <%= render 'shared/table_column', field: :status, model: :user_edit do %>
+            <%= user_activity_indicator(user) %>
           <% end %>
           <%= render 'shared/table_column', field: :admin, model: :user_edit do %>
             <%= user.admin? ? t('shared.yes') : t('shared.no') %>

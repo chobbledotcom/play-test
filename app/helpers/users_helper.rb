@@ -20,4 +20,15 @@ module UsersHelper
     return "Never" unless time
     "#{time_ago_in_words(time)} ago"
   end
+
+  sig { params(user: User).returns(String) }
+  def user_activity_indicator(user)
+    if user.is_active?
+      tag.data(I18n.t("users.status.active"), value: "active")
+    else
+      duration = time_ago_in_words(user.active_until)
+      label = I18n.t("users.status.inactive_for", duration:)
+      tag.data(label, value: "inactive")
+    end
+  end
 end
