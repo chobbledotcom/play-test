@@ -2,6 +2,7 @@ name: "Test: Ruby"
 
 on:
   pull_request:
+  merge_group:
   workflow_call:
 
 jobs:
