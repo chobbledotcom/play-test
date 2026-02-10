@@ -24,10 +24,12 @@ module UsersHelper
   sig { params(user: User).returns(String) }
   def user_activity_indicator(user)
     if user.is_active?
-      tag.data(I18n.t("users.status.active"), value: "active")
+      days = (Date.current - user.created_at.to_date).to_i
+      label = I18n.t("users.status.active", days:)
+      tag.data(label, value: "active")
     else
-      duration = time_ago_in_words(user.active_until)
-      label = I18n.t("users.status.inactive_for", duration:)
+      days = (Date.current - user.active_until).to_i
+      label = I18n.t("users.status.inactive", days:)
       tag.data(label, value: "inactive")
     end
   end

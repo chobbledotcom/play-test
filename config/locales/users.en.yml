@@ -3,8 +3,8 @@ en:
   # User Management
   users:
     status:
-      active: Active
-      inactive_for: "Inactive %{duration}"
+      active: "Active (+%{days} days)"
+      inactive: "Inactive (-%{days} days)"
     title: Users
     titles:
       register: Register
