@@ -49,12 +49,11 @@ RSpec.describe UsersHelper, type: :helper do
       expect(result).to include('value="inactive"')
     end
 
-    it "handles nil active_until for active users" do
+    it "renders nothing when active_until is nil" do
       user = create(:user)
       user.update_column(:active_until, nil)
       result = helper.user_activity_indicator(user)
-      expect(result).to include(I18n.t("users.status.active", days: 0))
-      expect(result).to include('value="active"')
+      expect(result).to eq("")
     end
   end
 
