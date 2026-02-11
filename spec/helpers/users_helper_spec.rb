@@ -34,6 +34,30 @@ RSpec.describe UsersHelper, type: :helper do
     end
   end
 
+  describe "#user_activity_indicator" do
+    it "shows days remaining for active users" do
+      user = create(:user, active_until: Date.current + 30.days)
+      result = helper.user_activity_indicator(user)
+      expect(result).to include(I18n.t("users.status.active", days: 30))
+      expect(result).to include('value="active"')
+    end
+
+    it "shows days since expiry for inactive users" do
+      user = create(:user, :inactive_user)
+      result = helper.user_activity_indicator(user)
+      expect(result).to include(I18n.t("users.status.inactive", days: 1))
+      expect(result).to include('value="inactive"')
+    end
+
+    it "handles nil active_until for active users" do
+      user = create(:user)
+      user.update_column(:active_until, nil)
+      result = helper.user_activity_indicator(user)
+      expect(result).to include(I18n.t("users.status.active", days: 0))
+      expect(result).to include('value="active"')
+    end
+  end
+
   describe "#format_job_time" do
     it "returns 'Never' for nil time" do
       expect(helper.format_job_time(nil)).to eq("Never")

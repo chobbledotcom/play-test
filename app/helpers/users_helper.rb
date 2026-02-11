@@ -24,7 +24,7 @@ module UsersHelper
   sig { params(user: User).returns(String) }
   def user_activity_indicator(user)
     if user.is_active?
-      days = (Date.current - user.created_at.to_date).to_i
+      days = user.active_until ? (user.active_until - Date.current).to_i : 0
       label = I18n.t("users.status.active", days:)
       tag.data(label, value: "active")
     else
