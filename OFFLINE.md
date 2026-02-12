@@ -377,6 +377,35 @@ SERVICE WORKER:
     └─ POST/PATCH     → passthrough (offline queue handles these)
 ```
 
+## Browser Compatibility
+
+| Technology | Chrome/Edge | Safari (iOS/macOS) | Firefox |
+|---|---|---|---|
+| Service Workers | Yes | Yes | Yes |
+| IndexedDB | Yes | Yes | Yes |
+| `navigator.onLine` / events | Yes | Yes | Yes |
+| Cache API | Yes | Yes | Yes |
+| Background Sync API | Yes | **No** | **No** |
+| `crypto.randomUUID()` | Yes | Yes (15.4+) | Yes |
+
+**What this means in practice:**
+
+- **Chrome/Edge:** Queued submissions sync even if the operator closed the tab. The
+  service worker wakes up in the background and replays.
+- **Safari/Firefox:** Sync only runs while the page is open, triggered by the
+  `online` event. If the operator closes the browser while offline, nothing syncs
+  until they reopen the app. This is fine for the field use case — they'll reopen
+  the app when back in range.
+
+**Safari cache eviction:** Safari may evict service worker caches after ~7 days of
+inactivity. Adding the app to the home screen (PWA install) gives it persistent
+storage and avoids this. Operators should be encouraged to "Add to Home Screen"
+on their iPads/phones — this is the intended usage pattern anyway.
+
+**Recommendation:** Build the `online` event listener as the primary sync mechanism
+(works everywhere). Layer Background Sync on top as a progressive enhancement for
+Chromium browsers. Never depend on Background Sync alone.
+
 ## Key Design Decisions
 
 1. **No client-side inspection creation** — operators must create the draft while
