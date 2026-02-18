@@ -4,7 +4,6 @@
 #
 # Table name: fan_assessments
 #
-#  id                         :integer          not null
 #  blower_finger_comment      :text
 #  blower_finger_pass         :boolean
 #  blower_flap_comment        :text
@@ -21,11 +20,11 @@
 #  pat_pass                   :integer
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
-#  inspection_id              :string(8)        not null, primary key
+#  inspection_id              :string(12)       not null, primary key
 #
 # Indexes
 #
-#  index_fan_assessments_on_inspection_id  (inspection_id)
+#  fan_assessments_new_pkey  (inspection_id) UNIQUE
 #
 # Foreign Keys
 #

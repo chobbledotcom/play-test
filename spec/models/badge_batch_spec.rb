@@ -1,6 +1,16 @@
 # typed: false
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: badge_batches
+#
+#  id         :integer          not null, primary key
+#  count      :integer
+#  note       :text
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
 require "rails_helper"
 
 RSpec.describe BadgeBatch, type: :model do

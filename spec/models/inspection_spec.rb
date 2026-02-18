@@ -5,7 +5,7 @@
 #
 # Table name: inspections
 #
-#  id                   :string(8)        not null, primary key
+#  id                   :string(12)       not null, primary key
 #  complete_date        :datetime
 #  has_slide            :boolean
 #  height               :decimal(8, 2)
@@ -24,9 +24,9 @@
 #  width_comment        :string(1000)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
-#  inspector_company_id :string(8)
-#  unit_id              :string(8)
-#  user_id              :string(8)        not null
+#  inspector_company_id :string
+#  unit_id              :string
+#  user_id              :string(12)       not null
 #
 # Indexes
 #

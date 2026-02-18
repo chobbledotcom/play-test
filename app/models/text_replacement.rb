@@ -11,6 +11,10 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# Indexes
+#
+#  index_text_replacements_on_i18n_key  (i18n_key) UNIQUE
+#
 class TextReplacement < ApplicationRecord
   extend T::Sig
 

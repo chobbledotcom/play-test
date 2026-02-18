@@ -5,7 +5,7 @@
 #
 # Table name: units
 #
-#  id               :string(8)        not null, primary key
+#  id               :string(12)       not null, primary key
 #  description      :string
 #  is_seed          :boolean          default(FALSE), not null
 #  manufacture_date :date
@@ -16,7 +16,7 @@
 #  unit_type        :string           default("bouncy_castle"), not null
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
-#  user_id          :string(8)        not null
+#  user_id          :string(12)       not null
 #
 # Indexes
 #
