@@ -14,8 +14,6 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
     unit_with_photo.photo.attach(
       fixture_file_upload("test_image.jpg", "image/jpeg")
     )
-    # Ensure the blob is fully persisted to avoid race conditions
-    unit_with_photo.photo.blob.analyze
   end
 
   describe ".generate_qr_code_header" do
