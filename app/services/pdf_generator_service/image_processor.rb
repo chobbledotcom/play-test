@@ -60,7 +60,7 @@ class PdfGeneratorService
 
     def self.process_image_with_orientation(attachment)
       image = create_image(attachment)
-      # Vips automatically handles EXIF orientation
+      # Images are already orientation-corrected from upload processing
       image.write_to_buffer(".png")
     end
 
@@ -90,7 +90,7 @@ class PdfGeneratorService
     end
 
     def self.render_processed_image(pdf, image, x, y, width, height, attachment)
-      # Vips automatically handles EXIF orientation
+      # Images are already orientation-corrected from upload processing
       processed_image = image.write_to_buffer(".png")
 
       image_options = {

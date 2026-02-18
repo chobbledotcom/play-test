@@ -1,6 +1,6 @@
 ---
 name: action_text-trix
-version: 2.1.15
+version: 2.1.16
 type: bundler
 summary: A rich text editor for everyday writing
 homepage: https://github.com/basecamp/trix
