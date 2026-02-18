@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.AUTOMERGE_TOKEN }}
           fetch-depth: 0  # Full history for better git operations
       - name: Setup environment
         uses: ./.github/actions/setup-environment
@@ -37,35 +37,17 @@ jobs:
       - name: Generate third-party attributions
         run: bundle exec rake attributions:generate
         continue-on-error: true
-      - name: Check for changes
-        id: check_changes
-        run: |
-          if git diff --quiet; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No changes detected"
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Changes detected:"
-            git diff --stat
-          fi
-      - name: Commit changes
-        if: steps.check_changes.outputs.changed == 'true'
-        run: |
-          git add -A
-          git commit -m "Update annotations and attributions
-          - Updated model annotations based on current schema
-          - Updated route annotations based on current routes
-          - Regenerated third-party attributions from Gemfile
-          [Automated weekly update]"
-      - name: Push changes
-        if: steps.check_changes.outputs.changed == 'true'
-        run: |
-          git push -f origin automated/annotations-attributions
-      - name: Create or update pull request
-        if: steps.check_changes.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          .github/scripts/create-automation-pr.sh \
-            "annotations" \
-            "automated/annotations-attributions"
+      - name: Commit, push, and create PR
+        uses: ./.github/actions/create-automation-pr
+        with:
+          type: annotations
+          branch-name: automated/annotations-attributions
+          commit-message: |
+            Update annotations and attributions
+            
+            - Updated model annotations based on current schema
+            - Updated route annotations based on current routes
+            - Regenerated third-party attributions from Gemfile
+            
+            [Automated weekly update]
+          github-token: ${{ secrets.AUTOMERGE_TOKEN }}

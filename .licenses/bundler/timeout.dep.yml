@@ -1,6 +1,6 @@
 ---
 name: timeout
-version: 0.4.3
+version: 0.4.4
 type: bundler
 summary: Auto-terminate potentially long-running operations in Ruby.
 homepage: https://github.com/ruby/timeout

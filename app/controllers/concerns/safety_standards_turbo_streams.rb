@@ -2,14 +2,13 @@
 # frozen_string_literal: true
 
 module SafetyStandardsTurboStreams
+  # Extends InspectionTurboStreams to add safety standards streams
   extend ActiveSupport::Concern
   extend T::Sig
 
   private
 
-  sig do
-    params(additional_info: T.nilable(String)).returns(T::Array[T.untyped])
-  end
+  sig { params(additional_info: T.nilable(String)).returns(T::Array[T.untyped]) }
   def success_turbo_streams(additional_info: nil)
     super + safety_standards_turbo_streams
   end

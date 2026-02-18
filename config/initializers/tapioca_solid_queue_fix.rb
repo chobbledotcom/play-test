@@ -9,9 +9,7 @@ if ENV["RUNNING_TAPIOCA"] == "true"
   require "active_job/queue_adapters/solid_queue_adapter"
 
   # Change the queue adapter to test mode for Tapioca
-  if Rails.application
-    Rails.application.configure do
-      config.active_job.queue_adapter = :test
-    end
+  Rails.application&.configure do
+    config.active_job.queue_adapter = :test
   end
 end

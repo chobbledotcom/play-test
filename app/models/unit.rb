@@ -38,7 +38,8 @@ class Unit < ApplicationRecord
 
   enum :unit_type, {
     bouncy_castle: "BOUNCY_CASTLE",
-    bouncing_pillow: "BOUNCING_PILLOW"
+    bouncing_pillow: "BOUNCING_PILLOW",
+    pat_testable: "PAT_TESTABLE"
   }
 
   belongs_to :user
@@ -240,7 +241,7 @@ class Unit < ApplicationRecord
     # Check if badge exists
     unless Badge.exists?(id: id)
       error_msg = I18n.t("units.validations.invalid_badge_id")
-      errors.add(:id, error_msg)
+      errors.add(:base, error_msg)
     end
   end
 end

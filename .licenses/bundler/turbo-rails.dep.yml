@@ -1,6 +1,6 @@
 ---
 name: turbo-rails
-version: 2.0.13
+version: 2.0.20
 type: bundler
 summary: The speed of a single-page web application without having to write any JavaScript.
 homepage: https://github.com/hotwired/turbo-rails

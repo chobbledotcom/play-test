@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.AUTOMERGE_TOKEN }}
           fetch-depth: 0  # Full history for better git operations
       - name: Setup environment
         uses: ./.github/actions/setup-environment
@@ -25,76 +25,18 @@ jobs:
         run: |
           git checkout -B automated/erb-lint-fixes
       - name: Run ERB lint with autocorrect
-        id: erb_lint
         run: |
-          echo "Running ERB lint with autocorrect..."
-
-          # Run erb_lint using rake task and capture both fixes and remaining issues
-          if bundle exec rake code_standards:erb_lint_fix > erb_lint_output.txt 2>&1; then
-            echo "erb_clean=true" >> $GITHUB_OUTPUT
-            echo "No ERB lint issues found or all were auto-fixed"
-          else
-            echo "erb_clean=false" >> $GITHUB_OUTPUT
-            echo "ERB lint found issues (some may have been auto-fixed)"
-          fi
-
-          # Check if there are any violations that couldn't be auto-fixed
-          # erb_lint shows "Failed: X files" and "Total violations: X" in the summary
-          if grep -q "Failed:" erb_lint_output.txt && grep -q "Total violations:" erb_lint_output.txt; then
-            echo "has_unfixed=true" >> $GITHUB_OUTPUT
-            # Save the output for later use in PR comment
-            cat erb_lint_output.txt > unfixed_issues.txt
-          else
-            echo "has_unfixed=false" >> $GITHUB_OUTPUT
-          fi
-
-          # Show output for debugging
-          cat erb_lint_output.txt
-      - name: Check for changes
-        id: check_changes
-        run: |
-          if git diff --quiet; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No changes detected"
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Changes detected (auto-fixes applied):"
-            git diff --stat
-          fi
-      - name: Commit changes
-        if: steps.check_changes.outputs.changed == 'true'
-        run: |
-          git add -A
-          git commit -m "Fix ERB linting issues
-          - Auto-corrected ERB template issues
-          - Applied erb_lint --autocorrect fixes
-          [Automated daily update]"
-      - name: Create tracking file if only manual fixes needed
-        if: steps.check_changes.outputs.changed == 'false' && steps.erb_lint.outputs.has_unfixed
-          == 'true'
-        run: |
-          echo "This branch tracks ERB lint violations that need manual fixes" > .erb-lint-tracking
-          echo "Generated: $(date -u '+%Y-%m-%d %H:%M UTC')" >> .erb-lint-tracking
-          echo "" >> .erb-lint-tracking
-          echo "Total violations found: $(grep 'Total violations:' erb_lint_output.txt | grep -o '[0-9]\+')" >> .erb-lint-tracking
-          echo "Files with violations: $(grep 'Failed:' erb_lint_output.txt | grep -o '[0-9]\+')" >> .erb-lint-tracking
-          git add .erb-lint-tracking
-          git commit -m "Track ERB lint violations requiring manual fixes
-          No auto-fixable issues found, but manual fixes are needed.
-          See PR for full details.
-          [Automated daily update]"
-      - name: Push changes
-        if: steps.check_changes.outputs.changed == 'true' || steps.erb_lint.outputs.has_unfixed
-          == 'true'
-        run: |
-          git push -f origin automated/erb-lint-fixes
-      - name: Create or update pull request
-        if: steps.check_changes.outputs.changed == 'true' || steps.erb_lint.outputs.has_unfixed
-          == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          .github/scripts/create-automation-pr.sh \
-            "erb-lint" \
-            "automated/erb-lint-fixes" \
-            "${{ steps.erb_lint.outputs.has_unfixed }}"
+          bundle exec rake code_standards:erb_lint_fix
+      - name: Commit, push, and create PR
+        uses: ./.github/actions/create-automation-pr
+        with:
+          type: erb-lint
+          branch-name: automated/erb-lint-fixes
+          commit-message: |
+            Fix ERB linting issues
+            
+            - Auto-corrected ERB template issues
+            - Applied erb_lint --autocorrect fixes
+            
+            [Automated daily update]
+          github-token: ${{ secrets.AUTOMERGE_TOKEN }}

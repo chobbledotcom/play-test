@@ -1,6 +1,6 @@
 ---
 name: rake
-version: 13.3.0
+version: 13.3.1
 type: bundler
 summary: Rake is a Make-like program implemented in Ruby
 homepage: https://github.com/ruby/rake

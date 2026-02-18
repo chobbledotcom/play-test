@@ -1,0 +1,52 @@
+---
+name: Create Automation PR
+description: Create or update an automated pull request with automerge label
+inputs:
+  type:
+    description: Type of automation (annotations, standardrb, erb-lint)
+    required: true
+  branch-name:
+    description: Branch name for the pull request
+    required: true
+  commit-message:
+    description: Commit message for the changes
+    required: true
+  github-token:
+    description: GitHub token for API access
+    required: true
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    - name: Check for changes
+      id: check_changes
+      shell: bash
+      run: |
+        if git diff --quiet; then
+          echo "changed=false" >> $GITHUB_OUTPUT
+          echo "No changes detected"
+        else
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "Changes detected:"
+          git diff --stat
+        fi
+    - name: Commit changes
+      if: steps.check_changes.outputs.changed == 'true'
+      shell: bash
+      run: |
+        git add -A
+        git commit -m "${{ inputs.commit-message }}"
+    - name: Push changes
+      if: steps.check_changes.outputs.changed == 'true'
+      shell: bash
+      run: |
+        git push -f origin ${{ inputs.branch-name }}
+    - name: Create or update pull request
+      if: steps.check_changes.outputs.changed == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        ${{ github.action_path }}/../../scripts/create-automation-pr.sh \
+          "${{ inputs.type }}" \
+          "${{ inputs.branch-name }}"

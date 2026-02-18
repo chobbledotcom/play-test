@@ -132,18 +132,8 @@ class PdfGeneratorService
       # Use the font size from the content block if available
       text_size = content[:font_size] || font_size
 
-      # Convert fragments to formatted text array for proper wrapping
-      formatted_text = content[:fragments].map do |fragment|
-        styles = []
-        styles << :bold if fragment[:bold]
-        styles << :italic if fragment[:italic]
-
-        {
-          text: fragment[:text],
-          styles: styles,
-          color: fragment[:color]
-        }
-      end
+      formatted_text = AssessmentBlockRenderer
+        .fragments_to_formatted_text(content[:fragments])
 
       # Render as single formatted text box for proper wrapping
       pdf.formatted_text_box(

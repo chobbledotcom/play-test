@@ -1,6 +1,6 @@
 #!/bin/bash
 # Create or update an automated PR with standard formatting
-# Usage: create-automation-pr.sh <type> <branch-name> [has-unfixed-issues]
+# Usage: create-automation-pr.sh <type> <branch-name>
 #
 # Types: annotations, standardrb, erb-lint
 
@@ -8,10 +8,9 @@ set -e
 
 TYPE="$1"
 BRANCH_NAME="$2"
-HAS_UNFIXED="${3:-false}"
 
 if [ -z "$TYPE" ] || [ -z "$BRANCH_NAME" ]; then
-  echo "Usage: create-automation-pr.sh <type> <branch-name> [has-unfixed-issues]" >&2
+  echo "Usage: create-automation-pr.sh <type> <branch-name>" >&2
   exit 1
 fi
 
@@ -33,36 +32,17 @@ case "$TYPE" in
   standardrb)
     PR_TITLE="Fix StandardRB Linting Issues"
     BODY_TITLE="Daily StandardRB Auto-fix"
-    
-    if [ "$HAS_UNFIXED" = "true" ]; then
-      BODY_DESCRIPTION="This PR contains automated Ruby style fixes from StandardRB.
-
-⚠️ **Manual fixes required** - Some issues could not be auto-corrected."
-      LABELS=""
-    else
-      BODY_DESCRIPTION="This PR contains automated Ruby style fixes from StandardRB.
+    BODY_DESCRIPTION="This PR contains automated Ruby style fixes from StandardRB.
 
 ✅ All issues were auto-corrected by StandardRB!"
-      LABELS="automerge"
-    fi
+    LABELS="automerge"
     ;;
     
   erb-lint)
     PR_TITLE="Fix ERB Linting Issues"
     BODY_TITLE="Daily ERB Lint Auto-fix"
-    
-    if [ "$HAS_UNFIXED" = "true" ]; then
-      BODY_DESCRIPTION="This PR contains automated ERB template fixes.
-
-⚠️ **Manual fixes required** - Some issues could not be auto-corrected.
-See the comment below for details."
-      LABELS=""
-    else
-      BODY_DESCRIPTION="This PR contains automated ERB template fixes.
-
-✅ All issues were auto-corrected!"
-      LABELS="automerge"
-    fi
+    BODY_DESCRIPTION="This PR contains automated ERB template fixes from erb_lint."
+    LABELS="automerge"
     ;;
     
   *)
@@ -95,22 +75,24 @@ PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number' 2>
 if [ -z "$PR_NUMBER" ]; then
   echo "Creating new PR..." >&2
   
-  # Create PR and capture number
+  # Create PR and get URL
+  PR_URL=$(gh pr create \
+    --title "$PR_TITLE" \
+    --body "$PR_BODY" \
+    --base main \
+    --head "$BRANCH_NAME")
+  
+  # Extract PR number from URL
+  PR_NUMBER="${PR_URL##*/}"
+  
+  # Add label if specified
   if [ -n "$LABELS" ]; then
-    PR_NUMBER=$(gh pr create \
-      --title "$PR_TITLE" \
-      --body "$PR_BODY" \
-      --base main \
-      --head "$BRANCH_NAME" \
-      --label "$LABELS" \
-      --json number --jq '.number')
-  else
-    PR_NUMBER=$(gh pr create \
-      --title "$PR_TITLE" \
-      --body "$PR_BODY" \
-      --base main \
-      --head "$BRANCH_NAME" \
-      --json number --jq '.number')
+    echo "Adding label: $LABELS" >&2
+    gh pr edit "$PR_NUMBER" --add-label "$LABELS" || {
+      echo "Warning: Failed to add label '$LABELS' - creating it first" >&2
+      gh label create "$LABELS" --description "Automatically merge when ready" --color "0E8A16" 2>/dev/null || true
+      gh pr edit "$PR_NUMBER" --add-label "$LABELS"
+    }
   fi
 else
   echo "PR #$PR_NUMBER already exists, updating..." >&2
@@ -120,8 +102,14 @@ else
   
   # Update labels based on current state
   if [ -n "$LABELS" ]; then
-    gh pr edit "$PR_NUMBER" --add-label "$LABELS"
+    echo "Adding label: $LABELS" >&2
+    gh pr edit "$PR_NUMBER" --add-label "$LABELS" || {
+      echo "Warning: Failed to add label '$LABELS' - creating it first" >&2
+      gh label create "$LABELS" --description "Automatically merge when ready" --color "0E8A16" 2>/dev/null || true
+      gh pr edit "$PR_NUMBER" --add-label "$LABELS"
+    }
   else
+    echo "Removing automerge label" >&2
     gh pr edit "$PR_NUMBER" --remove-label "automerge" 2>/dev/null || true
   fi
 fi

@@ -3,33 +3,10 @@
 
 class InspectionBlueprint < Blueprinter::Base
   extend T::Sig
+  include DynamicPublicFields
 
-  # Define public fields dynamically to avoid database access at load time
-  sig { returns(T.nilable(T::Boolean)) }
-  def self.define_public_fields
-    return if @fields_defined
-
-    Inspection.column_name_syms.each do |column|
-      next if PublicFieldFiltering::EXCLUDED_FIELDS.include?(column)
-
-      if %i[inspection_date complete_date].include?(column)
-        field column do |inspection|
-          value = inspection.send(column)
-          value&.strftime(JsonDateTransformer::API_DATE_FORMAT)
-        end
-      else
-        field column
-      end
-    end
-    @fields_defined = true
-  end
-
-  # Override render to ensure fields are defined
-  sig { params(object: T.untyped, options: T::Hash[T.untyped, T.untyped]).returns(String) }
-  def self.render(object, options = {})
-    define_public_fields
-    super
-  end
+  dynamic_fields_for Inspection,
+    date_fields: %i[complete_date inspection_date]
 
   field :complete do |inspection|
     inspection.complete?

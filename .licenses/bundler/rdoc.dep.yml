@@ -1,6 +1,6 @@
 ---
 name: rdoc
-version: 6.15.0
+version: 7.2.0
 type: bundler
 summary: RDoc produces HTML and command-line documentation for Ruby projects
 homepage: https://ruby.github.io/rdoc
@@ -80,6 +80,12 @@ notices:
     = Legal Notice Information
 
     The files in this distribution are covered by the Ruby license (see LICENSE) except the features mentioned below:
+
+    Aliki::
+      Aliki was written by Stan Lo and is included under the MIT license.
+
+      * lib/rdoc/generator/aliki.rb
+      * lib/rdoc/generator/template/aliki/*
 
     Darkfish::
       Darkfish was written by Michael Granger and is included under the BSD 3-Clause

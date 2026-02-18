@@ -264,6 +264,7 @@ en:
       enclosed_incomplete: Totally Enclosed Assessment incomplete
       fan_incomplete: Fan Assessment incomplete
       materials_incomplete: Materials Assessment incomplete
+      pat_incomplete: PAT Assessment incomplete
       slide_incomplete: Slide Assessment incomplete
       structure_incomplete: Structure Assessment incomplete
       user_height_incomplete: User Height Assessment incomplete

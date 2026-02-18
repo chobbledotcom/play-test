@@ -4,6 +4,7 @@
 class UnitsController < ApplicationController
   extend T::Sig
 
+  include ChangeTracking
   include TurboStreamResponders
   include PublicViewable
   include UserActivityCheck
@@ -159,9 +160,9 @@ class UnitsController < ApplicationController
 
     normalized_id = normalize_unit_id(id_param)
     return redirect_to_existing_unit(normalized_id) if unit_exists?(normalized_id)
-    return redirect_to_invalid_badge unless badge_exists?(normalized_id)
 
-    @validated_badge_id = normalized_id
+    # Only set validated badge ID if it exists, otherwise let model validation handle it
+    @validated_badge_id = normalized_id if badge_exists?(normalized_id)
   end
 
   def log_unit_event(action, unit, details = nil, changed_data = nil)
@@ -174,24 +175,6 @@ class UnitsController < ApplicationController
     end
   rescue => e
     log_event_error(e)
-  end
-
-  def calculate_changes(previous_attributes, current_attributes, changed_keys)
-    changes = {}
-
-    changed_keys.map(&:to_s).each do |key|
-      previous_value = previous_attributes[key]
-      current_value = current_attributes[key]
-
-      if previous_value != current_value
-        changes[key] = {
-          "from" => previous_value,
-          "to" => current_value
-        }
-      end
-    end
-
-    changes.presence
   end
 
   def unit_params
@@ -316,7 +299,7 @@ class UnitsController < ApplicationController
   end
 
   def photo_turbo_streams
-    return [] unless params[:unit][:photo].present?
+    return [] if params[:unit][:photo].blank?
 
     [turbo_stream.replace(
       "unit_photo_preview",
@@ -398,11 +381,6 @@ class UnitsController < ApplicationController
   def redirect_to_existing_unit(normalized_id)
     flash[:notice] = I18n.t("units.messages.existing_unit_found")
     redirect_to Unit.find(normalized_id)
-  end
-
-  def redirect_to_invalid_badge
-    flash[:alert] = I18n.t("units.validations.invalid_badge_id")
-    redirect_to units_path
   end
 
   def log_resource_event(action, unit, details, changed_data)

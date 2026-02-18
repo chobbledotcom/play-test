@@ -1,6 +1,6 @@
 ---
 name: sqlite3
-version: 2.7.3
+version: 2.8.1
 type: bundler
 summary: Ruby library to interface with the SQLite3 database engine (http://www.sqlite.org).
 homepage: https://github.com/sparklemotion/sqlite3-ruby
