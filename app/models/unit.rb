@@ -5,7 +5,7 @@
 #
 # Table name: units
 #
-#  id               :string(8)        not null, primary key
+#  id               :string(12)       not null, primary key
 #  description      :string
 #  is_seed          :boolean          default(FALSE), not null
 #  manufacture_date :date
@@ -16,7 +16,7 @@
 #  unit_type        :string           default("bouncy_castle"), not null
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
-#  user_id          :string(8)        not null
+#  user_id          :string(12)       not null
 #
 # Indexes
 #
@@ -35,6 +35,9 @@ class Unit < ApplicationRecord
 
   self.table_name = "units"
   include CustomIdGenerator
+
+  # Virtual attribute for unit form only (operator moved to inspections)
+  attribute :operator, :string
 
   enum :unit_type, {
     bouncy_castle: "BOUNCY_CASTLE",
@@ -60,7 +63,7 @@ class Unit < ApplicationRecord
   before_destroy :destroy_draft_inspections
 
   # All fields are required for Units
-  validates :name, :serial, :description, :manufacturer, :operator, presence: true
+  validates :name, :serial, :description, :manufacturer, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
   validate :badge_id_valid, on: :create, if: -> { unit_badges_enabled? }
 
@@ -70,19 +73,17 @@ class Unit < ApplicationRecord
   scope :search, ->(query) {
     if query.present?
       search_term = "%#{query}%"
-      where(<<~SQL, *([search_term] * 5))
+      where(<<~SQL, *([search_term] * 4))
         serial LIKE ?
         OR name LIKE ?
         OR description LIKE ?
         OR manufacturer LIKE ?
-        OR operator LIKE ?
       SQL
     else
       all
     end
   }
   scope :by_manufacturer, ->(manufacturer) { where(manufacturer: manufacturer) if manufacturer.present? }
-  scope :by_operator, ->(operator) { where(operator: operator) if operator.present? }
   scope :with_recent_inspections, -> {
     cutoff_date = EN14960::Constants::REINSPECTION_INTERVAL_DAYS.days.ago
     joins(:inspections)

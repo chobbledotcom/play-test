@@ -1,6 +1,39 @@
 # typed: false
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: slide_assessments
+#
+#  clamber_netting_comment                 :text
+#  clamber_netting_pass                    :integer
+#  runout                                  :decimal(8, 2)
+#  runout_comment                          :text
+#  runout_pass                             :boolean
+#  slide_beyond_first_metre_height         :decimal(8, 2)
+#  slide_beyond_first_metre_height_comment :text
+#  slide_first_metre_height                :decimal(8, 2)
+#  slide_first_metre_height_comment        :text
+#  slide_permanent_roof                    :boolean
+#  slide_permanent_roof_comment            :text
+#  slide_platform_height                   :decimal(8, 2)
+#  slide_platform_height_comment           :text
+#  slide_wall_height                       :decimal(8, 2)
+#  slide_wall_height_comment               :text
+#  slip_sheet_comment                      :text
+#  slip_sheet_pass                         :boolean
+#  created_at                              :datetime         not null
+#  updated_at                              :datetime         not null
+#  inspection_id                           :string(12)       not null, primary key
+#
+# Indexes
+#
+#  slide_assessments_new_pkey  (inspection_id) UNIQUE
+#
+# Foreign Keys
+#
+#  inspection_id  (inspection_id => inspections.id)
+#
 require "rails_helper"
 
 RSpec.describe Assessments::SlideAssessment, type: :model do

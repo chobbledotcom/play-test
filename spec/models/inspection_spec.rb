@@ -5,7 +5,7 @@
 #
 # Table name: inspections
 #
-#  id                   :string(8)        not null, primary key
+#  id                   :string(12)       not null, primary key
 #  complete_date        :datetime
 #  has_slide            :boolean
 #  height               :decimal(8, 2)
@@ -24,9 +24,9 @@
 #  width_comment        :string(1000)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
-#  inspector_company_id :string(8)
-#  unit_id              :string(8)
-#  user_id              :string(8)        not null
+#  inspector_company_id :string
+#  unit_id              :string
+#  user_id              :string(12)       not null
 #
 # Indexes
 #
@@ -190,10 +190,8 @@ RSpec.describe Inspection, type: :model do
   describe ".filter_by_operator" do
     let(:operator1) { "Operator A" }
     let(:operator2) { "Operator B" }
-    let(:unit1) { create(:unit, operator: operator1) }
-    let(:unit2) { create(:unit, operator: operator2) }
-    let!(:matching) { create(:inspection, unit: unit1) }
-    let!(:non_matching) { create(:inspection, unit: unit2) }
+    let!(:matching) { create(:inspection, operator: operator1) }
+    let!(:non_matching) { create(:inspection, operator: operator2) }
 
     it "filters by operator when present" do
       result = Inspection.filter_by_operator(operator1)

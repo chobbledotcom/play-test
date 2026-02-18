@@ -154,7 +154,6 @@ class SeedDataService
         serial: "SEED-#{Date.current.year}-#{SecureRandom.hex(4).upcase}",
         description: generate_description(config[:name]),
         manufacturer: config[:manufacturer],
-        operator: STEFAN_OWNER_NAMES.sample,
         is_seed: true
       )
       unit.save!
@@ -239,6 +238,7 @@ class SeedDataService
         is_seed: true,
         passed: is_complete ? passed : nil,
         risk_assessment: generate_risk_assessment(passed),
+        operator: STEFAN_OWNER_NAMES.sample,
         # Copy dimensions from config
         width: config[:width],
         length: config[:length],

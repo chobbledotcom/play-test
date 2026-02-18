@@ -14,11 +14,7 @@
         options_for_select([["All Manufacturers", ""]] + manufacturer_options(filter_user).map { |m| [m, m] }, params[:manufacturer]),
         {}, { onchange: "this.form.submit();" } %>
 
-    <%= form.select :operator,
-        options_for_select([["All Operators", ""]] + operator_options(filter_user).map { |o| [o, o] }, params[:operator]),
-        {}, { onchange: "this.form.submit();" } %>
-
-    <% if params[:status].present? || params[:manufacturer].present? || params[:operator].present? || params[:query].present? %>
+    <% if params[:status].present? || params[:manufacturer].present? || params[:query].present? %>
       <%= link_to t("ui.buttons.clear_filters"), filter_path %>
     <% end %>
 <% end %>

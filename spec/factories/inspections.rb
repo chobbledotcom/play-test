@@ -4,7 +4,7 @@
 #
 # Table name: inspections
 #
-#  id                   :string(8)        not null, primary key
+#  id                   :string(12)       not null, primary key
 #  complete_date        :datetime
 #  has_slide            :boolean
 #  height               :decimal(8, 2)
@@ -23,9 +23,9 @@
 #  width_comment        :string(1000)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
-#  inspector_company_id :string(8)
-#  unit_id              :string(8)
-#  user_id              :string(8)        not null
+#  inspector_company_id :string
+#  unit_id              :string
+#  user_id              :string(12)       not null
 #
 # Indexes
 #
@@ -56,6 +56,7 @@ FactoryBot.define do
     inspection_date { Date.current }
     complete_date { nil }
     is_seed { false }
+    operator { "Test Operator" }
     risk_assessment {
       "Standard risk assessment completed. Unit inspected in accordance with EN 14960:2019. " \
       "All safety features present and functional. No significant hazards identified. " \

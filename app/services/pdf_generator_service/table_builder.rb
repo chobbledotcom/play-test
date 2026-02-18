@@ -218,7 +218,7 @@ class PdfGeneratorService
         [ChobbleForms::FieldUtils.form_field_label(:units, :name),
           Utilities.truncate_text(unit.name, UNIT_NAME_MAX_LENGTH)],
         [ChobbleForms::FieldUtils.form_field_label(:units, :manufacturer), unit.manufacturer],
-        [ChobbleForms::FieldUtils.form_field_label(:units, :operator), unit.operator],
+        [ChobbleForms::FieldUtils.form_field_label(:inspection, :operator), last_inspection&.operator],
         [ChobbleForms::FieldUtils.form_field_label(:units, :serial), unit.serial],
         [I18n.t("pdf.inspection.fields.size_m"), dimensions_text]
       ]
@@ -264,8 +264,8 @@ class PdfGeneratorService
         [
           I18n.t("pdf.inspection.fields.size_m"),
           dimensions_text,
-          ChobbleForms::FieldUtils.form_field_label(:units, :operator),
-          unit.operator
+          ChobbleForms::FieldUtils.form_field_label(:inspection, :operator),
+          inspection&.operator
         ],
         [
           ChobbleForms::FieldUtils.form_field_label(:units, :serial),

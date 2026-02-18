@@ -19,9 +19,10 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       end
       let(:unit) { create(:unit, :with_all_fields) }
       let!(:inspection) do
-        create(:inspection,
+        create(:inspection, :completed,
           unit: unit,
           user: user,
+          operator: "Test Operator",
           width: 10.5,
           length: 8.0,
           height: 2.5)
@@ -47,7 +48,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         expect(flattened).to include(unit.description)
         expect(flattened).to include(unit.serial)
         expect(flattened).to include(unit.manufacturer)
-        expect(flattened).to include(unit.operator)
+        expect(flattened).to include(inspection.operator)
       end
 
       it "includes dimensions when available" do

@@ -9,7 +9,8 @@ if ENV["IN_MEMORY_DB"] == "true" && Rails.env.test?
       # Establish in-memory database connection
       ActiveRecord::Base.establish_connection(
         adapter: "sqlite3",
-        database: ":memory:",
+        database: "file:memdb_test?mode=memory&cache=shared",
+        uri: true,
         pool: 10,
         timeout: 10000
       )
