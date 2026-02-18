@@ -39,7 +39,6 @@ module SeedData
       name: "Castle #{SecureRandom.hex(4)}",
       serial: "BC-#{Date.current.year}-#{SecureRandom.hex(4).upcase}",
       manufacturer: "Test Mfg",
-      operator: "Test Op",
       manufacture_date: Date.current - rand(365..1825).days,
       description: "Test unit"
     }
@@ -48,6 +47,7 @@ module SeedData
   def self.inspection_fields(passed: true)
     {
       inspection_date: Date.current,
+      operator: "Test Operator",
       is_totally_enclosed: [true, false].sample,
       has_slide: [true, false].sample,
       indoor_only: [true, false].sample,

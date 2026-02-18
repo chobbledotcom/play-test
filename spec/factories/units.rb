@@ -4,7 +4,7 @@
 #
 # Table name: units
 #
-#  id               :string(8)        not null, primary key
+#  id               :string(12)       not null, primary key
 #  description      :string
 #  is_seed          :boolean          default(FALSE), not null
 #  manufacture_date :date
@@ -15,7 +15,7 @@
 #  unit_type        :string           default("bouncy_castle"), not null
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
-#  user_id          :string(8)        not null
+#  user_id          :string(12)       not null
 #
 # Indexes
 #
@@ -36,7 +36,6 @@ FactoryBot.define do
     serial { SecureRandom.hex(10) }
     description { "Test Bouncy Castle" }
     manufacturer { "Test Manufacturer" }
-    operator { "Test Operator" }
     manufacture_date { 1.year.ago }
     is_seed { false }
 
@@ -86,7 +85,6 @@ FactoryBot.define do
       manufacturer { "Different Manufacturer" }
       serial { "DIFF-TEST-001" }
       description { "A different test unit" }
-      operator { "Different Operator Ltd" }
       manufacture_date { Date.new(2024, 2, 20) }
     end
 
@@ -113,7 +111,6 @@ FactoryBot.define do
       manufacturer { "Premium Inflatables Ltd" }
       serial { "PRM-SERIAL-001" }
       description { "Premium bouncy castle with all features" }
-      operator { "Test Events Company" }
       manufacture_date { Date.new(2024, 1, 15) }
     end
   end

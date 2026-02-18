@@ -2,7 +2,6 @@
 #
 # Table name: user_height_assessments
 #
-#  id                             :integer          not null
 #  containing_wall_height         :decimal(8, 2)
 #  containing_wall_height_comment :text
 #  custom_user_height_comment     :text
@@ -22,7 +21,7 @@
 #
 # Indexes
 #
-#  index_user_height_assessments_on_inspection_id  (inspection_id)
+#  user_height_assessments_new_pkey  (inspection_id) UNIQUE
 #
 # Foreign Keys
 #

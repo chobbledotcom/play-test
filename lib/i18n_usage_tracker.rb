@@ -112,49 +112,23 @@ module I18nUsageTracker
   end
 end
 
-module I18n
-  class << self
-    alias_method :original_t, :t
-    alias_method :original_translate, :translate
+# Wraps t/translate on any target to track i18n usage
+module I18nUsageTracker::TrackingPatch
+  def self.apply_to(target)
+    target.alias_method :original_t, :t
+    target.alias_method :original_translate, :translate
 
-    def t(key, **options)
-      track_usage(key, options)
+    target.define_method(:t) do |key, **options|
+      I18nUsageTracker.track_key(key, options) if I18nUsageTracker.tracking_enabled
       original_t(key, **options)
     end
 
-    def translate(key, **options)
-      track_usage(key, options)
+    target.define_method(:translate) do |key, **options|
+      I18nUsageTracker.track_key(key, options) if I18nUsageTracker.tracking_enabled
       original_translate(key, **options)
     end
-
-    private
-
-    def track_usage(key, options)
-      return unless I18nUsageTracker.tracking_enabled
-      I18nUsageTracker.track_key(key, options)
-    end
   end
 end
 
-# Monkey-patch ActionView::Helpers::TranslationHelper to track i18n usage
-module ActionView::Helpers::TranslationHelper
-  alias_method :original_t, :t
-  alias_method :original_translate, :translate
-
-  def t(key, **options)
-    track_usage(key, options)
-    original_t(key, **options)
-  end
-
-  def translate(key, **options)
-    track_usage(key, options)
-    original_translate(key, **options)
-  end
-
-  private
-
-  def track_usage(key, options)
-    return unless I18nUsageTracker.tracking_enabled
-    I18nUsageTracker.track_key(key, options)
-  end
-end
+I18nUsageTracker::TrackingPatch.apply_to(I18n.singleton_class)
+I18nUsageTracker::TrackingPatch.apply_to(ActionView::Helpers::TranslationHelper)

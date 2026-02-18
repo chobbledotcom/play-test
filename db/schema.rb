@@ -10,26 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_04_000001) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_05_000003) do
   create_table "active_storage_attachments", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "record_type", null: false
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
     t.string "record_id"
+    t.string "record_type", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
-    t.string "key", null: false
-    t.string "filename", null: false
-    t.string "content_type"
-    t.text "metadata"
-    t.string "service_name", null: false
     t.bigint "byte_size", null: false
     t.string "checksum"
+    t.string "content_type"
     t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -40,75 +40,75 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_04_000001) do
   end
 
   create_table "anchorage_assessments", id: false, force: :cascade do |t|
-    t.string "inspection_id", limit: 12, null: false
-    t.integer "num_low_anchors"
-    t.integer "num_high_anchors"
-    t.boolean "anchor_accessories_pass"
-    t.boolean "anchor_degree_pass"
-    t.boolean "anchor_type_pass"
-    t.boolean "pull_strength_pass"
     t.text "anchor_accessories_comment"
+    t.boolean "anchor_accessories_pass"
     t.text "anchor_degree_comment"
+    t.boolean "anchor_degree_pass"
     t.text "anchor_type_comment"
-    t.text "pull_strength_comment"
-    t.text "num_low_anchors_comment"
-    t.text "num_high_anchors_comment"
-    t.boolean "num_low_anchors_pass"
-    t.boolean "num_high_anchors_pass"
+    t.boolean "anchor_type_pass"
     t.datetime "created_at", null: false
+    t.string "inspection_id", limit: 12, null: false
+    t.integer "num_high_anchors"
+    t.text "num_high_anchors_comment"
+    t.boolean "num_high_anchors_pass"
+    t.integer "num_low_anchors"
+    t.text "num_low_anchors_comment"
+    t.boolean "num_low_anchors_pass"
+    t.text "pull_strength_comment"
+    t.boolean "pull_strength_pass"
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "anchorage_assessments_new_pkey", unique: true
   end
 
   create_table "badge_batches", force: :cascade do |t|
-    t.text "note"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "count"
+    t.datetime "created_at", null: false
+    t.text "note"
+    t.datetime "updated_at", null: false
   end
 
   create_table "badges", id: { type: :string, limit: 8 }, force: :cascade do |t|
     t.integer "badge_batch_id", null: false
-    t.text "note"
     t.datetime "created_at", null: false
+    t.text "note"
     t.datetime "updated_at", null: false
     t.index ["badge_batch_id"], name: "index_badges_on_badge_batch_id"
     t.index ["id"], name: "index_badges_on_id", unique: true
   end
 
   create_table "credentials", force: :cascade do |t|
-    t.string "user_id", limit: 12, null: false
-    t.string "external_id", null: false
-    t.string "public_key", null: false
-    t.string "nickname", null: false
-    t.integer "sign_count", default: 0, null: false
     t.datetime "created_at", null: false
+    t.string "external_id", null: false
+    t.string "nickname", null: false
+    t.string "public_key", null: false
+    t.integer "sign_count", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.string "user_id", limit: 12, null: false
     t.index ["external_id"], name: "index_credentials_on_external_id", unique: true
     t.index ["user_id"], name: "index_credentials_on_user_id"
   end
 
   create_table "enclosed_assessments", id: false, force: :cascade do |t|
-    t.string "inspection_id", limit: 12, null: false
-    t.integer "exit_number"
-    t.boolean "exit_number_pass"
-    t.text "exit_number_comment"
-    t.boolean "exit_sign_always_visible_pass"
-    t.text "exit_sign_always_visible_comment"
     t.datetime "created_at", null: false
+    t.integer "exit_number"
+    t.text "exit_number_comment"
+    t.boolean "exit_number_pass"
+    t.text "exit_sign_always_visible_comment"
+    t.boolean "exit_sign_always_visible_pass"
+    t.string "inspection_id", limit: 12, null: false
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "enclosed_assessments_new_pkey", unique: true
   end
 
   create_table "events", force: :cascade do |t|
-    t.string "user_id", limit: 12, null: false
     t.string "action", null: false
-    t.string "resource_type", null: false
-    t.string "resource_id", limit: 12
-    t.text "details"
     t.json "changed_data"
-    t.json "metadata"
     t.datetime "created_at", null: false
+    t.text "details"
+    t.json "metadata"
+    t.string "resource_id", limit: 12
+    t.string "resource_type", null: false
+    t.string "user_id", limit: 12, null: false
     t.index ["action"], name: "index_events_on_action"
     t.index ["created_at"], name: "index_events_on_created_at"
     t.index ["resource_type", "resource_id"], name: "index_events_on_resource_type_and_resource_id"
@@ -117,48 +117,49 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_04_000001) do
   end
 
   create_table "fan_assessments", id: false, force: :cascade do |t|
-    t.string "inspection_id", limit: 12, null: false
-    t.text "fan_size_type"
-    t.integer "blower_flap_pass", limit: 1
-    t.text "blower_flap_comment"
-    t.boolean "blower_finger_pass"
     t.text "blower_finger_comment"
-    t.integer "pat_pass", limit: 1
-    t.text "pat_comment"
-    t.boolean "blower_visual_pass"
-    t.text "blower_visual_comment"
+    t.boolean "blower_finger_pass"
+    t.text "blower_flap_comment"
+    t.integer "blower_flap_pass", limit: 1
     t.string "blower_serial"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "number_of_blowers"
     t.decimal "blower_tube_length", precision: 8, scale: 2
-    t.boolean "blower_tube_length_pass"
     t.text "blower_tube_length_comment"
+    t.boolean "blower_tube_length_pass"
+    t.text "blower_visual_comment"
+    t.boolean "blower_visual_pass"
+    t.datetime "created_at", null: false
+    t.text "fan_size_type"
+    t.string "inspection_id", limit: 12, null: false
+    t.integer "number_of_blowers"
+    t.text "pat_comment"
+    t.integer "pat_pass", limit: 1
+    t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "fan_assessments_new_pkey", unique: true
   end
 
   create_table "inspections", id: { type: :string, limit: 12 }, force: :cascade do |t|
-    t.datetime "inspection_date"
-    t.boolean "passed"
-    t.string "user_id", limit: 12, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.datetime "pdf_last_accessed_at"
-    t.string "unit_id"
-    t.string "inspector_company_id"
-    t.decimal "width", precision: 8, scale: 2
-    t.decimal "length", precision: 8, scale: 2
-    t.decimal "height", precision: 8, scale: 2
-    t.boolean "has_slide"
-    t.boolean "is_totally_enclosed"
-    t.string "width_comment", limit: 1000
-    t.string "length_comment", limit: 1000
-    t.string "height_comment", limit: 1000
-    t.text "risk_assessment"
     t.datetime "complete_date"
-    t.boolean "is_seed", default: false, null: false
-    t.string "inspection_type", default: "BOUNCY_CASTLE", null: false
+    t.datetime "created_at", null: false
+    t.boolean "has_slide"
+    t.decimal "height", precision: 8, scale: 2
+    t.string "height_comment", limit: 1000
     t.boolean "indoor_only"
+    t.datetime "inspection_date"
+    t.string "inspection_type", default: "BOUNCY_CASTLE", null: false
+    t.string "inspector_company_id"
+    t.boolean "is_seed", default: false, null: false
+    t.boolean "is_totally_enclosed"
+    t.decimal "length", precision: 8, scale: 2
+    t.string "length_comment", limit: 1000
+    t.string "operator"
+    t.boolean "passed"
+    t.datetime "pdf_last_accessed_at"
+    t.text "risk_assessment"
+    t.string "unit_id"
+    t.datetime "updated_at", null: false
+    t.string "user_id", limit: 12, null: false
+    t.decimal "width", precision: 8, scale: 2
+    t.string "width_comment", limit: 1000
     t.index ["inspection_type"], name: "index_inspections_on_inspection_type"
     t.index ["inspector_company_id"], name: "index_inspections_on_inspector_company_id"
     t.index ["is_seed"], name: "index_inspections_on_is_seed"
@@ -167,148 +168,148 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_04_000001) do
   end
 
   create_table "inspector_companies", id: { type: :string, limit: 12 }, force: :cascade do |t|
-    t.string "name", null: false
-    t.string "email"
-    t.string "phone", null: false
+    t.boolean "active", default: true
     t.text "address", null: false
     t.string "city"
-    t.string "postal_code"
     t.string "country", default: "UK"
-    t.boolean "active", default: true
-    t.text "notes"
     t.datetime "created_at", null: false
+    t.string "email"
+    t.string "name", null: false
+    t.text "notes"
+    t.string "phone", null: false
+    t.string "postal_code"
     t.datetime "updated_at", null: false
     t.index ["active"], name: "index_inspector_companies_on_active"
   end
 
   create_table "materials_assessments", id: false, force: :cascade do |t|
-    t.string "inspection_id", limit: 12, null: false
-    t.integer "ropes"
-    t.integer "ropes_pass", limit: 1
-    t.integer "retention_netting_pass", limit: 1
-    t.integer "zips_pass", limit: 1
-    t.integer "windows_pass", limit: 1
-    t.integer "artwork_pass", limit: 1
-    t.boolean "thread_pass"
-    t.boolean "fabric_strength_pass"
-    t.boolean "fire_retardant_pass"
-    t.text "ropes_comment"
-    t.text "retention_netting_comment"
-    t.text "zips_comment"
-    t.text "windows_comment"
     t.text "artwork_comment"
-    t.text "thread_comment"
-    t.text "fabric_strength_comment"
-    t.text "fire_retardant_comment"
+    t.integer "artwork_pass", limit: 1
     t.datetime "created_at", null: false
+    t.text "fabric_strength_comment"
+    t.boolean "fabric_strength_pass"
+    t.text "fire_retardant_comment"
+    t.boolean "fire_retardant_pass"
+    t.string "inspection_id", limit: 12, null: false
+    t.text "retention_netting_comment"
+    t.integer "retention_netting_pass", limit: 1
+    t.integer "ropes"
+    t.text "ropes_comment"
+    t.integer "ropes_pass", limit: 1
+    t.text "thread_comment"
+    t.boolean "thread_pass"
     t.datetime "updated_at", null: false
+    t.text "windows_comment"
+    t.integer "windows_pass", limit: 1
+    t.text "zips_comment"
+    t.integer "zips_pass", limit: 1
     t.index ["inspection_id"], name: "materials_assessments_new_pkey", unique: true
   end
 
   create_table "pages", primary_key: "slug", id: :string, force: :cascade do |t|
-    t.string "meta_title"
-    t.text "meta_description"
-    t.string "link_title"
     t.text "content"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.boolean "is_snippet", default: false, null: false
+    t.string "link_title"
+    t.text "meta_description"
+    t.string "meta_title"
+    t.datetime "updated_at", null: false
   end
 
   create_table "pat_assessments", id: false, force: :cascade do |t|
-    t.string "inspection_id", limit: 12, null: false
+    t.text "appliance_plug_check_comment"
+    t.boolean "appliance_plug_check_pass"
+    t.datetime "created_at", null: false
+    t.decimal "earth_ohms", precision: 8, scale: 2
+    t.text "earth_ohms_comment"
+    t.boolean "earth_ohms_pass"
     t.integer "equipment_class"
-    t.boolean "equipment_class_pass"
     t.text "equipment_class_comment"
+    t.boolean "equipment_class_pass"
     t.integer "equipment_power"
     t.text "equipment_power_comment"
-    t.boolean "visual_pass"
-    t.text "visual_comment"
-    t.boolean "appliance_plug_check_pass"
-    t.text "appliance_plug_check_comment"
     t.integer "fuse_rating"
-    t.boolean "fuse_rating_pass"
     t.text "fuse_rating_comment"
-    t.decimal "earth_ohms", precision: 8, scale: 2
-    t.boolean "earth_ohms_pass"
-    t.text "earth_ohms_comment"
+    t.boolean "fuse_rating_pass"
+    t.string "inspection_id", limit: 12, null: false
     t.integer "insulation_mohms"
-    t.boolean "insulation_mohms_pass"
     t.text "insulation_mohms_comment"
+    t.boolean "insulation_mohms_pass"
     t.decimal "leakage_ma", precision: 8, scale: 2
-    t.boolean "leakage_ma_pass"
     t.text "leakage_ma_comment"
-    t.boolean "load_test_pass"
+    t.boolean "leakage_ma_pass"
     t.text "load_test_comment"
+    t.boolean "load_test_pass"
     t.decimal "rcd_trip_time_ms", precision: 8, scale: 2
-    t.boolean "rcd_trip_time_ms_pass"
     t.text "rcd_trip_time_ms_comment"
-    t.datetime "created_at", null: false
+    t.boolean "rcd_trip_time_ms_pass"
     t.datetime "updated_at", null: false
+    t.text "visual_comment"
+    t.boolean "visual_pass"
     t.index ["inspection_id"], name: "pat_assessments_pkey", unique: true
   end
 
   create_table "slide_assessments", id: false, force: :cascade do |t|
-    t.string "inspection_id", limit: 12, null: false
-    t.decimal "slide_platform_height", precision: 8, scale: 2
-    t.decimal "slide_wall_height", precision: 8, scale: 2
-    t.decimal "runout", precision: 8, scale: 2
-    t.decimal "slide_first_metre_height", precision: 8, scale: 2
-    t.decimal "slide_beyond_first_metre_height", precision: 8, scale: 2
-    t.integer "clamber_netting_pass", limit: 1
-    t.boolean "runout_pass"
-    t.boolean "slip_sheet_pass"
-    t.boolean "slide_permanent_roof"
-    t.text "slide_platform_height_comment"
-    t.text "slide_wall_height_comment"
-    t.text "slide_first_metre_height_comment"
-    t.text "slide_beyond_first_metre_height_comment"
-    t.text "slide_permanent_roof_comment"
     t.text "clamber_netting_comment"
-    t.text "runout_comment"
-    t.text "slip_sheet_comment"
+    t.integer "clamber_netting_pass", limit: 1
     t.datetime "created_at", null: false
+    t.string "inspection_id", limit: 12, null: false
+    t.decimal "runout", precision: 8, scale: 2
+    t.text "runout_comment"
+    t.boolean "runout_pass"
+    t.decimal "slide_beyond_first_metre_height", precision: 8, scale: 2
+    t.text "slide_beyond_first_metre_height_comment"
+    t.decimal "slide_first_metre_height", precision: 8, scale: 2
+    t.text "slide_first_metre_height_comment"
+    t.boolean "slide_permanent_roof"
+    t.text "slide_permanent_roof_comment"
+    t.decimal "slide_platform_height", precision: 8, scale: 2
+    t.text "slide_platform_height_comment"
+    t.decimal "slide_wall_height", precision: 8, scale: 2
+    t.text "slide_wall_height_comment"
+    t.text "slip_sheet_comment"
+    t.boolean "slip_sheet_pass"
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "slide_assessments_new_pkey", unique: true
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
-    t.bigint "job_id", null: false
-    t.string "queue_name", null: false
-    t.integer "priority", default: 0, null: false
     t.string "concurrency_key", null: false
-    t.datetime "expires_at", null: false
     t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.bigint "job_id", null: false
+    t.integer "priority", default: 0, null: false
+    t.string "queue_name", null: false
     t.index ["concurrency_key", "priority", "job_id"], name: "index_solid_queue_blocked_executions_for_release"
     t.index ["expires_at", "concurrency_key"], name: "index_solid_queue_blocked_executions_for_maintenance"
     t.index ["job_id"], name: "index_solid_queue_blocked_executions_on_job_id", unique: true
   end
 
   create_table "solid_queue_claimed_executions", force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.bigint "job_id", null: false
     t.bigint "process_id"
-    t.datetime "created_at", null: false
     t.index ["job_id"], name: "index_solid_queue_claimed_executions_on_job_id", unique: true
     t.index ["process_id", "job_id"], name: "index_solid_queue_claimed_executions_on_process_id_and_job_id"
   end
 
   create_table "solid_queue_failed_executions", force: :cascade do |t|
-    t.bigint "job_id", null: false
-    t.text "error"
     t.datetime "created_at", null: false
+    t.text "error"
+    t.bigint "job_id", null: false
     t.index ["job_id"], name: "index_solid_queue_failed_executions_on_job_id", unique: true
   end
 
   create_table "solid_queue_jobs", force: :cascade do |t|
-    t.string "queue_name", null: false
-    t.string "class_name", null: false
-    t.text "arguments"
-    t.integer "priority", default: 0, null: false
     t.string "active_job_id"
-    t.datetime "scheduled_at"
-    t.datetime "finished_at"
+    t.text "arguments"
+    t.string "class_name", null: false
     t.string "concurrency_key"
     t.datetime "created_at", null: false
+    t.datetime "finished_at"
+    t.integer "priority", default: 0, null: false
+    t.string "queue_name", null: false
+    t.datetime "scheduled_at"
     t.datetime "updated_at", null: false
     t.index ["active_job_id"], name: "index_solid_queue_jobs_on_active_job_id"
     t.index ["class_name"], name: "index_solid_queue_jobs_on_class_name"
@@ -318,146 +319,145 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_04_000001) do
   end
 
   create_table "solid_queue_pauses", force: :cascade do |t|
-    t.string "queue_name", null: false
     t.datetime "created_at", null: false
+    t.string "queue_name", null: false
     t.index ["queue_name"], name: "index_solid_queue_pauses_on_queue_name", unique: true
   end
 
   create_table "solid_queue_processes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "hostname"
     t.string "kind", null: false
     t.datetime "last_heartbeat_at", null: false
-    t.bigint "supervisor_id"
-    t.integer "pid", null: false
-    t.string "hostname"
     t.text "metadata"
-    t.datetime "created_at", null: false
     t.string "name", null: false
+    t.integer "pid", null: false
+    t.bigint "supervisor_id"
     t.index ["last_heartbeat_at"], name: "index_solid_queue_processes_on_last_heartbeat_at"
     t.index ["name", "supervisor_id"], name: "index_solid_queue_processes_on_name_and_supervisor_id", unique: true
     t.index ["supervisor_id"], name: "index_solid_queue_processes_on_supervisor_id"
   end
 
   create_table "solid_queue_ready_executions", force: :cascade do |t|
-    t.bigint "job_id", null: false
-    t.string "queue_name", null: false
-    t.integer "priority", default: 0, null: false
     t.datetime "created_at", null: false
+    t.bigint "job_id", null: false
+    t.integer "priority", default: 0, null: false
+    t.string "queue_name", null: false
     t.index ["job_id"], name: "index_solid_queue_ready_executions_on_job_id", unique: true
     t.index ["priority", "job_id"], name: "index_solid_queue_poll_all"
     t.index ["queue_name", "priority", "job_id"], name: "index_solid_queue_poll_by_queue"
   end
 
   create_table "solid_queue_recurring_executions", force: :cascade do |t|
-    t.bigint "job_id", null: false
-    t.string "task_key", null: false
-    t.datetime "run_at", null: false
     t.datetime "created_at", null: false
+    t.bigint "job_id", null: false
+    t.datetime "run_at", null: false
+    t.string "task_key", null: false
     t.index ["job_id"], name: "index_solid_queue_recurring_executions_on_job_id", unique: true
     t.index ["task_key", "run_at"], name: "index_solid_queue_recurring_executions_on_task_key_and_run_at", unique: true
   end
 
   create_table "solid_queue_recurring_tasks", force: :cascade do |t|
-    t.string "key", null: false
-    t.string "schedule", null: false
-    t.string "command", limit: 2048
-    t.string "class_name"
     t.text "arguments"
-    t.string "queue_name"
-    t.integer "priority", default: 0
-    t.boolean "static", default: true, null: false
-    t.text "description"
+    t.string "class_name"
+    t.string "command", limit: 2048
     t.datetime "created_at", null: false
+    t.text "description"
+    t.string "key", null: false
+    t.integer "priority", default: 0
+    t.string "queue_name"
+    t.string "schedule", null: false
+    t.boolean "static", default: true, null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_solid_queue_recurring_tasks_on_key", unique: true
     t.index ["static"], name: "index_solid_queue_recurring_tasks_on_static"
   end
 
   create_table "solid_queue_scheduled_executions", force: :cascade do |t|
-    t.bigint "job_id", null: false
-    t.string "queue_name", null: false
-    t.integer "priority", default: 0, null: false
-    t.datetime "scheduled_at", null: false
     t.datetime "created_at", null: false
+    t.bigint "job_id", null: false
+    t.integer "priority", default: 0, null: false
+    t.string "queue_name", null: false
+    t.datetime "scheduled_at", null: false
     t.index ["job_id"], name: "index_solid_queue_scheduled_executions_on_job_id", unique: true
     t.index ["scheduled_at", "priority", "job_id"], name: "index_solid_queue_dispatch_all"
   end
 
   create_table "solid_queue_semaphores", force: :cascade do |t|
-    t.string "key", null: false
-    t.integer "value", default: 1, null: false
-    t.datetime "expires_at", null: false
     t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.string "key", null: false
     t.datetime "updated_at", null: false
+    t.integer "value", default: 1, null: false
     t.index ["expires_at"], name: "index_solid_queue_semaphores_on_expires_at"
     t.index ["key", "value"], name: "index_solid_queue_semaphores_on_key_and_value"
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
   create_table "structure_assessments", id: false, force: :cascade do |t|
-    t.string "inspection_id", limit: 12, null: false
-    t.boolean "seam_integrity_pass"
-    t.boolean "air_loss_pass"
-    t.boolean "straight_walls_pass"
-    t.boolean "sharp_edges_pass"
-    t.boolean "unit_stable_pass"
-    t.decimal "unit_pressure", precision: 8, scale: 2
-    t.integer "critical_fall_off_height"
-    t.integer "trough_depth"
-    t.boolean "stitch_length_pass"
-    t.boolean "evacuation_time_pass"
-    t.boolean "critical_fall_off_height_pass"
-    t.boolean "unit_pressure_pass"
-    t.boolean "trough_pass"
-    t.boolean "entrapment_pass"
-    t.boolean "markings_pass"
-    t.boolean "grounding_pass"
-    t.text "seam_integrity_comment"
-    t.text "stitch_length_comment"
     t.text "air_loss_comment"
-    t.text "straight_walls_comment"
-    t.text "sharp_edges_comment"
-    t.text "unit_stable_comment"
-    t.text "evacuation_time_comment"
+    t.boolean "air_loss_pass"
+    t.datetime "created_at", null: false
+    t.integer "critical_fall_off_height"
     t.text "critical_fall_off_height_comment"
-    t.text "unit_pressure_comment"
-    t.text "trough_comment"
+    t.boolean "critical_fall_off_height_pass"
     t.text "entrapment_comment"
-    t.text "markings_comment"
+    t.boolean "entrapment_pass"
+    t.text "evacuation_time_comment"
+    t.boolean "evacuation_time_pass"
     t.text "grounding_comment"
-    t.string "trough_depth_comment", limit: 1000
+    t.boolean "grounding_pass"
+    t.string "inspection_id", limit: 12, null: false
+    t.text "markings_comment"
+    t.boolean "markings_pass"
+    t.integer "platform_height"
+    t.text "platform_height_comment"
+    t.boolean "platform_height_pass"
+    t.text "seam_integrity_comment"
+    t.boolean "seam_integrity_pass"
+    t.text "sharp_edges_comment"
+    t.boolean "sharp_edges_pass"
+    t.integer "step_ramp_size"
+    t.text "step_ramp_size_comment"
+    t.boolean "step_ramp_size_pass"
+    t.text "stitch_length_comment"
+    t.boolean "stitch_length_pass"
+    t.text "straight_walls_comment"
+    t.boolean "straight_walls_pass"
     t.integer "trough_adjacent_panel_width"
     t.text "trough_adjacent_panel_width_comment"
-    t.integer "step_ramp_size"
-    t.boolean "step_ramp_size_pass"
-    t.text "step_ramp_size_comment"
-    t.datetime "created_at", null: false
+    t.text "trough_comment"
+    t.integer "trough_depth"
+    t.string "trough_depth_comment", limit: 1000
+    t.boolean "trough_pass"
+    t.decimal "unit_pressure", precision: 8, scale: 2
+    t.text "unit_pressure_comment"
+    t.boolean "unit_pressure_pass"
+    t.text "unit_stable_comment"
+    t.boolean "unit_stable_pass"
     t.datetime "updated_at", null: false
-    t.integer "platform_height"
-    t.boolean "platform_height_pass"
-    t.text "platform_height_comment"
     t.index ["inspection_id"], name: "structure_assessments_new_pkey", unique: true
   end
 
   create_table "text_replacements", force: :cascade do |t|
-    t.string "i18n_key", null: false
-    t.text "value", null: false
     t.datetime "created_at", null: false
+    t.string "i18n_key", null: false
     t.datetime "updated_at", null: false
+    t.text "value", null: false
     t.index ["i18n_key"], name: "index_text_replacements_on_i18n_key", unique: true
   end
 
   create_table "units", id: { type: :string, limit: 12 }, force: :cascade do |t|
-    t.string "name"
-    t.string "user_id", limit: 12, null: false
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "manufacturer"
     t.string "description"
-    t.string "operator"
-    t.date "manufacture_date"
     t.boolean "is_seed", default: false, null: false
+    t.date "manufacture_date"
+    t.string "manufacturer"
+    t.string "name"
     t.string "serial"
     t.string "unit_type", default: "BOUNCY_CASTLE", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_id", limit: 12, null: false
     t.index ["is_seed"], name: "index_units_on_is_seed"
     t.index ["manufacturer", "serial"], name: "index_units_on_manufacturer_and_serial", unique: true
     t.index ["serial", "user_id"], name: "index_units_on_serial_and_user_id", unique: true
@@ -466,54 +466,54 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_04_000001) do
   end
 
   create_table "user_height_assessments", id: false, force: :cascade do |t|
-    t.string "inspection_id", limit: 12, null: false
     t.decimal "containing_wall_height", precision: 8, scale: 2
     t.text "containing_wall_height_comment"
+    t.datetime "created_at", null: false
+    t.text "custom_user_height_comment"
+    t.string "inspection_id", limit: 12, null: false
+    t.decimal "negative_adjustment", precision: 8, scale: 2
+    t.text "negative_adjustment_comment"
     t.decimal "play_area_length", precision: 8, scale: 2
     t.text "play_area_length_comment"
     t.decimal "play_area_width", precision: 8, scale: 2
     t.text "play_area_width_comment"
-    t.decimal "negative_adjustment", precision: 8, scale: 2
-    t.text "negative_adjustment_comment"
+    t.datetime "updated_at", null: false
     t.integer "users_at_1000mm"
     t.integer "users_at_1200mm"
     t.integer "users_at_1500mm"
     t.integer "users_at_1800mm"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text "custom_user_height_comment"
     t.index ["inspection_id"], name: "user_height_assessments_new_pkey", unique: true
   end
 
   create_table "user_sessions", force: :cascade do |t|
-    t.string "user_id", limit: 12, null: false
-    t.string "session_token", null: false
-    t.string "ip_address"
-    t.string "user_agent"
-    t.datetime "last_active_at", null: false
     t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.datetime "last_active_at", null: false
+    t.string "session_token", null: false
     t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.string "user_id", limit: 12, null: false
     t.index ["session_token"], name: "index_user_sessions_on_session_token", unique: true
     t.index ["user_id", "last_active_at"], name: "index_user_sessions_on_user_id_and_last_active_at"
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
   end
 
   create_table "users", id: { type: :string, limit: 12 }, force: :cascade do |t|
-    t.string "email"
-    t.string "password_digest"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.datetime "last_active_at"
-    t.string "inspection_company_id"
-    t.string "theme", default: "light"
-    t.string "rpii_inspector_number"
     t.date "active_until"
-    t.string "name"
-    t.string "phone"
     t.text "address"
     t.string "country"
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "inspection_company_id"
+    t.datetime "last_active_at"
+    t.string "name"
+    t.string "password_digest"
+    t.string "phone"
     t.string "postal_code"
+    t.string "rpii_inspector_number"
     t.datetime "rpii_verified_date"
+    t.string "theme", default: "light"
+    t.datetime "updated_at", null: false
     t.string "webauthn_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["inspection_company_id"], name: "index_users_on_inspection_company_id"

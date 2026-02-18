@@ -1,6 +1,6 @@
 ---
 name: aws-partitions
-version: 1.1180.0
+version: 1.1196.0
 type: bundler
 summary: Provides information about AWS partitions, regions, and services.
 homepage: https://github.com/aws/aws-sdk-ruby

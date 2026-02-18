@@ -8,6 +8,7 @@ en:
       fields:
         name: Name
         email: Email
+        status: Status
         password: New Password
         password_confirmation: Password confirmation
         rpii_inspector_number: RPII Inspector No

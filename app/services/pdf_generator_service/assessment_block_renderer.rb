@@ -34,14 +34,9 @@ class PdfGeneratorService
       block.header? ? ASSESSMENT_TITLE_SIZE : @font_size
     end
 
-    def height_for(block, pdf)
-      fragments = render_fragments(block)
-      return 0 if fragments.empty?
-
-      font_size = font_size_for(block)
-
-      # Convert fragments to formatted text array
-      formatted_text = fragments.map do |fragment|
+    # Converts internal fragment hashes to Prawn formatted text arrays
+    def self.fragments_to_formatted_text(fragments)
+      fragments.map do |fragment|
         styles = []
         styles << :bold if fragment[:bold]
         styles << :italic if fragment[:italic]
@@ -52,6 +47,14 @@ class PdfGeneratorService
           color: fragment[:color]
         }
       end
+    end
+
+    def height_for(block, pdf)
+      fragments = render_fragments(block)
+      return 0 if fragments.empty?
+
+      font_size = font_size_for(block)
+      formatted_text = self.class.fragments_to_formatted_text(fragments)
 
       # Use height_of_formatted to get the actual height with wrapping
       base_height = pdf.height_of_formatted(

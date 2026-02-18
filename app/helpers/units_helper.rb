@@ -12,8 +12,8 @@ module UnitsHelper
 
   sig { params(user: T.nilable(User)).returns(T::Array[String]) }
   def operator_options(user)
-    units = user ? user.units : Unit.all
-    units.distinct.pluck(:operator).compact.compact_blank.sort
+    inspections = user ? user.inspections : Inspection.all
+    inspections.distinct.pluck(:operator).compact.compact_blank.sort
   end
 
   sig { returns(String) }

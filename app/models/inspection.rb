@@ -5,7 +5,7 @@
 #
 # Table name: inspections
 #
-#  id                   :string(8)        not null, primary key
+#  id                   :string(12)       not null, primary key
 #  complete_date        :datetime
 #  has_slide            :boolean
 #  height               :decimal(8, 2)
@@ -24,9 +24,9 @@
 #  width_comment        :string(1000)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
-#  inspector_company_id :string(8)
-#  unit_id              :string(8)
-#  user_id              :string(8)        not null
+#  inspector_company_id :string
+#  unit_id              :string
+#  user_id              :string(12)       not null
 #
 # Indexes
 #
@@ -87,6 +87,7 @@ class Inspection < ApplicationRecord
     inspection_date
     is_totally_enclosed
     length
+    operator
     passed
     photo_1
     photo_2
@@ -170,11 +171,7 @@ class Inspection < ApplicationRecord
     where(unit_id: unit_id) if unit_id.present?
   }
   scope :filter_by_operator, lambda { |operator|
-    if operator.present?
-      joins(:unit).where(units: {operator: operator})
-    else
-      all
-    end
+    where(operator: operator) if operator.present?
   }
   scope :filter_by_date_range, lambda { |start_date, end_date|
     range = start_date..end_date
@@ -225,19 +222,23 @@ class Inspection < ApplicationRecord
 
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def assessment_types
-    case
-    when pat_testable? then PAT_TESTABLE_ASSESSMENT_TYPES
-    when bouncing_pillow? then PILLOW_ASSESSMENT_TYPES
-    else CASTLE_ASSESSMENT_TYPES
+    if pat_testable?
+      PAT_TESTABLE_ASSESSMENT_TYPES
+    elsif bouncing_pillow?
+      PILLOW_ASSESSMENT_TYPES
+    else
+      CASTLE_ASSESSMENT_TYPES
     end
   end
 
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def applicable_assessments
-    case
-    when pat_testable? then pat_testable_applicable_assessments
-    when bouncing_pillow? then pillow_applicable_assessments
-    else castle_applicable_assessments
+    if pat_testable?
+      pat_testable_applicable_assessments
+    elsif bouncing_pillow?
+      pillow_applicable_assessments
+    else
+      castle_applicable_assessments
     end
   end
 
@@ -420,7 +421,7 @@ class Inspection < ApplicationRecord
     fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
 
     # PAT testable only needs inspection_date
-    fields = fields & [:inspection_date] if pat_testable?
+    fields &= [:inspection_date] if pat_testable?
 
     fields
       .reject { |f| f.end_with?("_comment") }

@@ -9,6 +9,7 @@ class PhotoProcessingService
 
     begin
       image = Vips::Image.new_from_buffer(image_data, "")
+      image = image.autorot
       image = resize_image(image)
       image = add_white_background(image) if image.has_alpha?
       processed_data = image.jpegsave_buffer(Q: 75, strip: true)

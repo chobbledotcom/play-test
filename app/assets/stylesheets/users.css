@@ -8,3 +8,12 @@
     text-align: center;
   }
 }
+
+.users-list data[value="active"] {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.users-list data[value="inactive"] {
+  color: #c62828;
+}

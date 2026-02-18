@@ -52,6 +52,32 @@ RSpec.describe PhotoProcessingService do
 
       expect(processed_io[:filename]).to eq("photo.jpg")
     end
+
+    it "applies EXIF orientation for rotated photos" do
+      # Orientation 6 (rotate 90 CW) has raw pixels 100x60
+      # but should become 60x100 after autorot
+      fixture = "spec/fixtures/files/orientation_6_rotate_90_cw.jpg"
+      image_data = File.binread(Rails.root.join(fixture))
+
+      result = described_class.process_upload_data(image_data, "rotated.jpg")
+      image = Vips::Image.new_from_buffer(result[:io].read, "")
+
+      expect(image.width).to eq(60)
+      expect(image.height).to eq(100)
+    end
+
+    it "preserves dimensions for normally oriented photos" do
+      # Orientation 1 (normal) has raw pixels 100x60
+      # and should stay 100x60 after processing
+      fixture = "spec/fixtures/files/orientation_1_normal.jpg"
+      image_data = File.binread(Rails.root.join(fixture))
+
+      result = described_class.process_upload_data(image_data, "normal.jpg")
+      image = Vips::Image.new_from_buffer(result[:io].read, "")
+
+      expect(image.width).to eq(100)
+      expect(image.height).to eq(60)
+    end
   end
 
   describe ".valid_image_data?" do

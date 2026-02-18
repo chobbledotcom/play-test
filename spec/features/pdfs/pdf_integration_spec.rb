@@ -99,7 +99,7 @@ RSpec.feature "PDF Complete Integration", type: :feature do
 
     # Validate unit details
     expect(pdf_content).to include(unit.manufacturer)
-    expect(pdf_content).to include(unit.operator)
+    expect(pdf_content).to include(inspection.operator)
   end
 
   scenario "validates i18n coverage across different PDF scenarios" do

@@ -93,12 +93,16 @@ class PdfGeneratorService
         [logo_width, logo_data, user.logo]
       end
 
-      def render_inspection_text_section(pdf, inspection, report_id_text,
-        status_text, status_color, logo_width)
-        # Shift text to the right to accommodate QR code
+      # Yields a bounding box offset for the QR code area
+      def header_text_box(pdf, logo_width, &block)
         qr_offset = Configuration::QR_CODE_SIZE + Configuration::HEADER_SPACING
         width = pdf.bounds.width - logo_width - qr_offset
-        pdf.bounding_box([qr_offset, pdf.bounds.top], width: width) do
+        pdf.bounding_box([qr_offset, pdf.bounds.top], width: width, &block)
+      end
+
+      def render_inspection_text_section(pdf, inspection, report_id_text,
+        status_text, status_color, logo_width)
+        header_text_box(pdf, logo_width) do
           pdf.text report_id_text, size: Configuration::HEADER_TEXT_SIZE,
             style: :bold
           pdf.text status_text, size: Configuration::HEADER_TEXT_SIZE,
@@ -113,10 +117,7 @@ class PdfGeneratorService
       end
 
       def render_unit_text_section(pdf, unit, unit_id_text, logo_width)
-        # Shift text to the right to accommodate QR code
-        qr_offset = Configuration::QR_CODE_SIZE + Configuration::HEADER_SPACING
-        width = pdf.bounds.width - logo_width - qr_offset
-        pdf.bounding_box([qr_offset, pdf.bounds.top], width: width) do
+        header_text_box(pdf, logo_width) do
           pdf.text unit_id_text, size: Configuration::HEADER_TEXT_SIZE,
             style: :bold
 

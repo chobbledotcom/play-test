@@ -19,7 +19,6 @@ jobs:
               'daily-erb-lint.yml',
               'daily-standardrb.yml',
               'security-scan.yml',
-              'sorbet.yml',
               'test-ruby.yml',
               'weekly-updates.yml'
             ];

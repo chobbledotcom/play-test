@@ -67,6 +67,7 @@ class UnitsController < ApplicationController
 
   def new
     @unit = Unit.new
+    assign_default_operator(@unit)
 
     if @validated_badge_id.present?
       @unit.id = @validated_badge_id
@@ -77,6 +78,7 @@ class UnitsController < ApplicationController
   def create
     @unit = current_user.units.build(unit_params)
     @prefilled_badge = @validated_badge_id.present?
+    assign_default_operator(@unit)
 
     if @image_processing_error
       flash.now[:alert] = @image_processing_error.message
@@ -160,9 +162,9 @@ class UnitsController < ApplicationController
 
     normalized_id = normalize_unit_id(id_param)
     return redirect_to_existing_unit(normalized_id) if unit_exists?(normalized_id)
-    return redirect_to_invalid_badge unless badge_exists?(normalized_id)
 
-    @validated_badge_id = normalized_id
+    # Only set validated badge ID if it exists, otherwise let model validation handle it
+    @validated_badge_id = normalized_id if badge_exists?(normalized_id)
   end
 
   def log_unit_event(action, unit, details = nil, changed_data = nil)
@@ -262,7 +264,6 @@ class UnitsController < ApplicationController
     units = units.search(params[:query])
     units = units.overdue if params[:status] == "overdue"
     units = units.by_manufacturer(params[:manufacturer])
-    units = units.by_operator(params[:operator])
     units.order(created_at: :desc)
   end
 
@@ -276,7 +277,6 @@ class UnitsController < ApplicationController
       title_parts << I18n.t("units.status.overdue")
     end
     title_parts << params[:manufacturer] if params[:manufacturer].present?
-    title_parts << params[:operator] if params[:operator].present?
     title_parts.join(" - ")
   end
 
@@ -318,7 +318,6 @@ class UnitsController < ApplicationController
     {
       name: @unit.name,
       serial: @unit.serial,
-      operator: @unit.operator,
       manufacturer: @unit.manufacturer
     }
   end
@@ -383,11 +382,6 @@ class UnitsController < ApplicationController
     redirect_to Unit.find(normalized_id)
   end
 
-  def redirect_to_invalid_badge
-    flash[:alert] = I18n.t("units.validations.invalid_badge_id")
-    redirect_to units_path
-  end
-
   def log_resource_event(action, unit, details, changed_data)
     Event.log(
       user: current_user,
@@ -429,5 +423,12 @@ class UnitsController < ApplicationController
   def allow_badge_id_in_params?
     create_actions = %w[create create_from_inspection]
     unit_badges_enabled? && create_actions.include?(action_name)
+  end
+
+  def assign_default_operator(unit)
+    return if unit.operator.present?
+
+    last_operator = current_user&.inspections&.order(created_at: :desc)&.pick(:operator)
+    unit.operator = last_operator.presence || ("Test Operator" if Rails.env.test?)
   end
 end

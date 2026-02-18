@@ -4,7 +4,7 @@
 #
 # Table name: units
 #
-#  id               :string(8)        not null, primary key
+#  id               :string(12)       not null, primary key
 #  description      :string
 #  is_seed          :boolean          default(FALSE), not null
 #  manufacture_date :date
@@ -15,7 +15,7 @@
 #  unit_type        :string           default("bouncy_castle"), not null
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
-#  user_id          :string(8)        not null
+#  user_id          :string(12)       not null
 #
 # Indexes
 #
@@ -54,13 +54,12 @@ RSpec.describe Unit, type: :model do
   describe "validations" do
     it "validates presence of all required fields" do
       unit = build(:unit, user: user, name: nil, serial: nil,
-        description: nil, manufacturer: nil, operator: nil)
+        description: nil, manufacturer: nil)
       expect(unit).not_to be_valid
       expect(unit.errors[:name]).to be_present
       expect(unit.errors[:serial]).to be_present
       expect(unit.errors[:description]).to be_present
       expect(unit.errors[:manufacturer]).to be_present
-      expect(unit.errors[:operator]).to be_present
     end
 
     it "validates serial uniqueness within user" do
@@ -136,7 +135,7 @@ RSpec.describe Unit, type: :model do
           unit = build(:unit, explicit_id: "NOTFOUND", user: user)
           expect(unit.save).to be false
           error_msg = I18n.t("units.validations.invalid_badge_id")
-          expect(unit.errors[:id]).to include(error_msg)
+          expect(unit.errors[:base]).to include(error_msg)
         end
 
         it "validates ID presence" do
@@ -203,12 +202,10 @@ RSpec.describe Unit, type: :model do
 
     describe "validations in unit mode" do
       it "validates unit-specific fields when in unit mode" do
-        unit = build(:unit, user: user, manufacturer: nil,
-          operator: nil, serial: nil)
+        unit = build(:unit, user: user, manufacturer: nil, serial: nil)
 
         expect(unit).not_to be_valid
         expect(unit.errors[:manufacturer]).to be_present
-        expect(unit.errors[:operator]).to be_present
         expect(unit.errors[:serial]).to be_present
       end
 
@@ -231,7 +228,7 @@ RSpec.describe Unit, type: :model do
           results = Unit.search("Test Manufacturer")
           expect(results).to include(test_unit)
 
-          results = Unit.search("Test Operator")
+          results = Unit.search(test_unit.serial)
           expect(results).to include(test_unit)
         end
       end

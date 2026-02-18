@@ -10,6 +10,10 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# Indexes
+#
+#  index_text_replacements_on_i18n_key  (i18n_key) UNIQUE
+#
 FactoryBot.define do
   factory :text_replacement do
     sequence(:i18n_key) { |n| "en.test.key_#{n}" }

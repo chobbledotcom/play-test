@@ -1,5 +1,9 @@
 // Passkey registration functionality
-import { base64ToArrayBuffer, arrayBufferToBase64 } from "./webauthn_utils";
+import {
+  base64ToArrayBuffer,
+  arrayBufferToBase64,
+  postJson,
+} from "./webauthn_utils";
 
 window.registerPasskey = async function () {
   const nickname = prompt("Enter a nickname for this passkey:");
@@ -75,16 +79,11 @@ window.registerPasskey = async function () {
       credential_nickname: nickname,
     };
 
-    const callbackResponse = await fetch("/credentials/callback", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken,
-      },
-      body: JSON.stringify(credentialData),
-      credentials: "same-origin",
-    });
+    const callbackResponse = await postJson(
+      "/credentials/callback",
+      credentialData,
+      csrfToken,
+    );
 
     if (callbackResponse.ok) {
       window.location.reload();

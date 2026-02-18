@@ -2,7 +2,6 @@
 #
 # Table name: slide_assessments
 #
-#  id                                      :integer          not null
 #  clamber_netting_comment                 :text
 #  clamber_netting_pass                    :integer
 #  runout                                  :decimal(8, 2)
@@ -26,7 +25,7 @@
 #
 # Indexes
 #
-#  index_slide_assessments_on_inspection_id  (inspection_id)
+#  slide_assessments_new_pkey  (inspection_id) UNIQUE
 #
 # Foreign Keys
 #

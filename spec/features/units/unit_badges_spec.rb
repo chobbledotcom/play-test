@@ -26,7 +26,6 @@ RSpec.feature "Unit Badge Validation", type: :feature do
     scenario "creates unit with valid badge ID" do
       fill_in_form(:units, :id, badge.id)
       fill_in_form(:units, :name, "Test Unit")
-      fill_in_form(:units, :operator, "Test Operator")
       fill_in_form(:units, :manufacturer, "Test Manufacturer")
       fill_in_form(:units, :serial, "TEST123")
       fill_in_form(:units, :description, "Test description")
@@ -42,7 +41,6 @@ RSpec.feature "Unit Badge Validation", type: :feature do
 
       fill_in_form(:units, :id, badge_id_with_spaces)
       fill_in_form(:units, :name, "Test Unit")
-      fill_in_form(:units, :operator, "Test Operator")
       fill_in_form(:units, :manufacturer, "Test Manufacturer")
       fill_in_form(:units, :serial, "TEST123")
       fill_in_form(:units, :description, "Test description")
@@ -57,7 +55,6 @@ RSpec.feature "Unit Badge Validation", type: :feature do
 
       fill_in_form(:units, :id, badge.id)
       fill_in_form(:units, :name, "Test Unit")
-      fill_in_form(:units, :operator, "Test Operator")
       fill_in_form(:units, :manufacturer, "Test Manufacturer")
       fill_in_form(:units, :serial, "TEST123")
       fill_in_form(:units, :description, "Test description")
@@ -71,7 +68,6 @@ RSpec.feature "Unit Badge Validation", type: :feature do
     scenario "shows error when badge ID is invalid" do
       fill_in_form(:units, :id, "INVALID9")
       fill_in_form(:units, :name, "Test Unit")
-      fill_in_form(:units, :operator, "Test Operator")
       fill_in_form(:units, :manufacturer, "Test Manufacturer")
       fill_in_form(:units, :serial, "TEST123")
       fill_in_form(:units, :description, "Test description")
@@ -79,11 +75,24 @@ RSpec.feature "Unit Badge Validation", type: :feature do
       submit_form(:units)
 
       expect_i18n_content("units.validations.invalid_badge_id")
+      expect(page).to have_current_path(units_path)
+
+      # Check that form data is preserved
+      name_label = I18n.t("forms.units.fields.name")
+      operator_label = I18n.t("forms.units.fields.operator")
+      manufacturer_label = I18n.t("forms.units.fields.manufacturer")
+      serial_label = I18n.t("forms.units.fields.serial")
+      description_label = I18n.t("forms.units.fields.description")
+
+      expect(page).to have_field(name_label, with: "Test Unit")
+      expect(page).to have_field(operator_label, with: "Test Operator")
+      expect(page).to have_field(manufacturer_label, with: "Test Manufacturer")
+      expect(page).to have_field(serial_label, with: "TEST123")
+      expect(page).to have_field(description_label, with: "Test description")
     end
 
     scenario "shows error when ID is blank" do
       fill_in_form(:units, :name, "Test Unit")
-      fill_in_form(:units, :operator, "Test Operator")
       fill_in_form(:units, :manufacturer, "Test Manufacturer")
       fill_in_form(:units, :serial, "TEST123")
       fill_in_form(:units, :description, "Test description")
@@ -107,7 +116,6 @@ RSpec.feature "Unit Badge Validation", type: :feature do
 
     scenario "creates unit without requiring badge ID" do
       fill_in_form(:units, :name, "Test Unit")
-      fill_in_form(:units, :operator, "Test Operator")
       fill_in_form(:units, :manufacturer, "Test Manufacturer")
       fill_in_form(:units, :serial, "TEST123")
       fill_in_form(:units, :description, "Test description")
