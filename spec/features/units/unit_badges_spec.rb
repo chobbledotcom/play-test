@@ -68,6 +68,7 @@ RSpec.feature "Unit Badge Validation", type: :feature do
     scenario "shows error when badge ID is invalid" do
       fill_in_form(:units, :id, "INVALID9")
       fill_in_form(:units, :name, "Test Unit")
+      fill_in_form(:units, :operator, "Test Operator")
       fill_in_form(:units, :manufacturer, "Test Manufacturer")
       fill_in_form(:units, :serial, "TEST123")
       fill_in_form(:units, :description, "Test description")
