@@ -102,7 +102,6 @@ RSpec.describe PdfGeneratorService::HeaderGenerator do
 
         before do
           user.logo.attach(fixture_file_upload("test_image.jpg", "image/jpeg"))
-          user.logo.blob.analyze
         end
 
         it "returns logo data from user's attached logo" do
