@@ -3,7 +3,7 @@ import {
   base64ToArrayBuffer,
   arrayBufferToBase64,
   postJson,
-} from "./webauthn_utils";
+} from "webauthn_utils";
 
 window.registerPasskey = async function () {
   const nickname = prompt("Enter a nickname for this passkey:");
