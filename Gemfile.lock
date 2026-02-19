@@ -189,7 +189,7 @@ GEM
       concurrent-ruby (~> 1.1)
       webrick (~> 1.7)
       websocket-driver (~> 0.7)
-    ffi (1.17.2-x86_64-linux-gnu)
+    ffi (1.17.3-x86_64-linux-gnu)
     fugit (1.12.1)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
@@ -451,7 +451,7 @@ GEM
       rubocop (>= 1.75.2)
     ruby-progressbar (1.13.0)
     ruby-rc4 (0.1.5)
-    ruby-vips (2.2.3)
+    ruby-vips (2.3.0)
       ffi (~> 1.12)
       logger
     ruby-xxHash (0.4.0.2)
@@ -635,7 +635,7 @@ DEPENDENCIES
   rspec_junit_formatter
   rubocop-rails-omakase
   rubocop-sorbet
-  ruby-vips (= 2.2.3)
+  ruby-vips (= 2.3.0)
   sass-rails (~> 6.0)
   sentry-rails
   sentry-ruby

@@ -91,7 +91,7 @@ gem "image_processing", "~> 1.12"
 
 # Pin ruby-vips for nixpkgs compatibility
 # Note: Requires libvips to be installed on the system
-gem "ruby-vips", "= 2.2.3", require: false
+gem "ruby-vips", "2.3.0", require: false
 
 # QR code generation
 gem "rqrcode"
