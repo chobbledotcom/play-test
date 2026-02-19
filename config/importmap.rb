@@ -17,6 +17,7 @@ pin "image_resize"
 pin "passkey_registration"
 pin "passkey_login"
 pin "text_replacement_form"
+pin "webauthn_utils"
 
 # external libs
 pin "highlight.js", to: "highlight.js"
