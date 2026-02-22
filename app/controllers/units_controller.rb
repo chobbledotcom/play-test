@@ -422,5 +422,4 @@ class UnitsController < ApplicationController
     create_actions = %w[create create_from_inspection]
     unit_badges_enabled? && create_actions.include?(action_name)
   end
-
 end
