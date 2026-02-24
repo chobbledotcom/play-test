@@ -17,7 +17,7 @@ class ErrorsController < ApplicationController
         render json: {error: I18n.t("errors.not_found.title")},
           status: :not_found
       end
-      format.any { head :not_found }
+      format.any { head :not_found, content_type: "text/html" }
     end
   end
 
@@ -31,7 +31,7 @@ class ErrorsController < ApplicationController
         render json: {error: I18n.t("errors.internal_server_error.title")},
           status: :internal_server_error
       end
-      format.any { head :internal_server_error }
+      format.any { head :internal_server_error, content_type: "text/html" }
     end
   end
 

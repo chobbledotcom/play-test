@@ -14,9 +14,9 @@ pin "safety_standards_tabs"
 pin "guides_slider"
 pin "search"
 pin "image_resize"
-pin "webauthn_utils"
-pin "passkey_registration"
-pin "passkey_login"
+pin "webauthn_utils", to: "webauthn_utils.js"
+pin "passkey_registration", to: "passkey_registration.js"
+pin "passkey_login", to: "passkey_login.js"
 pin "text_replacement_form"
 
 # external libs
