@@ -3,7 +3,7 @@ import {
   base64ToArrayBuffer,
   arrayBufferToBase64,
   postJson,
-} from "./webauthn_utils";
+} from "webauthn_utils";
 
 document.addEventListener("turbo:load", () => {
   const loginButtons = document.querySelectorAll(
