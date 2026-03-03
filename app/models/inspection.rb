@@ -54,6 +54,7 @@ class Inspection < ApplicationRecord
   enum :inspection_type, {
     bouncy_castle: "BOUNCY_CASTLE",
     bouncing_pillow: "BOUNCING_PILLOW",
+    inflatable_ball_pool: "INFLATABLE_BALL_POOL",
     pat_testable: "PAT_TESTABLE"
   }
 
@@ -75,10 +76,18 @@ class Inspection < ApplicationRecord
     pat_assessment: Assessments::PatAssessment
   }.freeze
 
+  INFLATABLE_BALL_POOL_ASSESSMENT_TYPES = {
+    structure_assessment: Assessments::StructureAssessment,
+    materials_assessment: Assessments::MaterialsAssessment,
+    fan_assessment: Assessments::FanAssessment,
+    ball_pool_assessment: Assessments::BallPoolAssessment
+  }.freeze
+
   ALL_ASSESSMENT_TYPES =
     CASTLE_ASSESSMENT_TYPES
       .merge(PILLOW_ASSESSMENT_TYPES)
-      .merge(PAT_TESTABLE_ASSESSMENT_TYPES).freeze
+      .merge(PAT_TESTABLE_ASSESSMENT_TYPES)
+      .merge(INFLATABLE_BALL_POOL_ASSESSMENT_TYPES).freeze
 
   USER_EDITABLE_PARAMS = %i[
     has_slide
@@ -226,6 +235,8 @@ class Inspection < ApplicationRecord
       PAT_TESTABLE_ASSESSMENT_TYPES
     elsif bouncing_pillow?
       PILLOW_ASSESSMENT_TYPES
+    elsif inflatable_ball_pool?
+      INFLATABLE_BALL_POOL_ASSESSMENT_TYPES
     else
       CASTLE_ASSESSMENT_TYPES
     end
@@ -237,6 +248,8 @@ class Inspection < ApplicationRecord
       pat_testable_applicable_assessments
     elsif bouncing_pillow?
       pillow_applicable_assessments
+    elsif inflatable_ball_pool?
+      inflatable_ball_pool_applicable_assessments
     else
       castle_applicable_assessments
     end
@@ -270,6 +283,11 @@ class Inspection < ApplicationRecord
     PAT_TESTABLE_ASSESSMENT_TYPES
   end
 
+  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
+  def inflatable_ball_pool_applicable_assessments
+    INFLATABLE_BALL_POOL_ASSESSMENT_TYPES
+  end
+
   public
 
   # Iterate over only applicable assessments with a block
@@ -296,7 +314,7 @@ class Inspection < ApplicationRecord
     applicable = applicable_assessments.keys.map { |k| k.to_s.chomp("_assessment") }
 
     # Add tabs in the correct UI order
-    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat]
+    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat ball_pool]
     ordered_tabs.each do |tab|
       tabs << tab if applicable.include?(tab)
     end
@@ -317,10 +335,14 @@ class Inspection < ApplicationRecord
 
     return base_requirements_met if pat_testable?
 
-    base_requirements_met &&
+    dimensions_met = base_requirements_met &&
       width.present? &&
       length.present? &&
-      height.present? &&
+      height.present?
+
+    return dimensions_met if inflatable_ball_pool?
+
+    dimensions_met &&
       !has_slide.nil? &&
       !is_totally_enclosed.nil? &&
       !indoor_only.nil?
@@ -422,6 +444,12 @@ class Inspection < ApplicationRecord
 
     # PAT testable only needs inspection_date
     fields &= [:inspection_date] if pat_testable?
+
+    # Ball pool needs dimensions but not castle-specific flags
+    if inflatable_ball_pool?
+      castle_flags = %i[has_slide is_totally_enclosed indoor_only]
+      fields -= castle_flags
+    end
 
     fields
       .reject { |f| f.end_with?("_comment") }
@@ -548,6 +576,7 @@ class Inspection < ApplicationRecord
   def assessment_validation_data
     assessment_types = %i[
       anchorage
+      ball_pool
       enclosed
       fan
       materials

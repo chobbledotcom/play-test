@@ -10,6 +10,7 @@ SYSTEM_COLUMNS = %i[inspection_id created_at updated_at].freeze
 # Assessment types to validate
 ASSESSMENT_TYPES = %w[
   anchorage_assessment
+  ball_pool_assessment
   enclosed_assessment
   fan_assessment
   materials_assessment

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_05_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_03_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -74,6 +74,33 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_05_000003) do
     t.datetime "updated_at", null: false
     t.index ["badge_batch_id"], name: "index_badges_on_badge_batch_id"
     t.index ["id"], name: "index_badges_on_id", unique: true
+  end
+
+  create_table "ball_pool_assessments", id: false, force: :cascade do |t|
+    t.text "age_range_marking_comment"
+    t.boolean "age_range_marking_pass"
+    t.text "air_jugglers_compliant_comment"
+    t.boolean "air_jugglers_compliant_pass"
+    t.integer "ball_pool_depth"
+    t.text "ball_pool_depth_comment"
+    t.boolean "ball_pool_depth_pass"
+    t.integer "ball_pool_entry"
+    t.text "ball_pool_entry_comment"
+    t.boolean "ball_pool_entry_pass"
+    t.text "balls_compliant_comment"
+    t.boolean "balls_compliant_pass"
+    t.datetime "created_at", null: false
+    t.text "fitted_base_comment"
+    t.boolean "fitted_base_pass"
+    t.text "gaps_comment"
+    t.boolean "gaps_pass"
+    t.string "inspection_id", limit: 12, null: false
+    t.text "max_height_markings_comment"
+    t.boolean "max_height_markings_pass"
+    t.text "suitable_matting_comment"
+    t.boolean "suitable_matting_pass"
+    t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "ball_pool_assessments_pkey", unique: true
   end
 
   create_table "credentials", force: :cascade do |t|
@@ -524,6 +551,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_05_000003) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "anchorage_assessments", "inspections"
   add_foreign_key "badges", "badge_batches"
+  add_foreign_key "ball_pool_assessments", "inspections"
   add_foreign_key "credentials", "users"
   add_foreign_key "enclosed_assessments", "inspections"
   add_foreign_key "events", "users"

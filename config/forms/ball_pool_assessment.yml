@@ -1,0 +1,32 @@
+---
+form_fields:
+  - legend_i18n_key: markings
+    fields:
+      - partial: :pass_fail_comment
+        field: :age_range_marking
+      - partial: :pass_fail_comment
+        field: :max_height_markings
+  - legend_i18n_key: safety_checks
+    fields:
+      - partial: :pass_fail_comment
+        field: :suitable_matting
+      - partial: :pass_fail_comment
+        field: :air_jugglers_compliant
+      - partial: :pass_fail_comment
+        field: :balls_compliant
+      - partial: :pass_fail_comment
+        field: :gaps
+      - partial: :pass_fail_comment
+        field: :fitted_base
+  - legend_i18n_key: measurements
+    fields:
+      - partial: :number_pass_fail_comment
+        field: :ball_pool_depth
+        attributes:
+          step: 1
+          min: 0
+      - partial: :number_pass_fail_comment
+        field: :ball_pool_entry
+        attributes:
+          step: 1
+          min: 0

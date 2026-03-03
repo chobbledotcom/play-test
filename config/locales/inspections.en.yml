@@ -261,6 +261,7 @@ en:
       pdf_type: Inspection
     validation:
       anchorage_incomplete: Anchorage Assessment incomplete
+      ball_pool_incomplete: Ball Pool Assessment incomplete
       enclosed_incomplete: Totally Enclosed Assessment incomplete
       fan_incomplete: Fan Assessment incomplete
       materials_incomplete: Materials Assessment incomplete
