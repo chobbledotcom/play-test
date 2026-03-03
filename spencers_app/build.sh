@@ -34,9 +34,10 @@ run() {
   echo "Launching via Wine..."
   export WINEPREFIX
   export WINEDEBUG=-all
+  export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
   mkdir -p "$WINEPREFIX"
 
-  wine64 "$EXE" "$@"
+  wine "$EXE" "$@"
 }
 
 install_desktop() {
@@ -51,7 +52,7 @@ install_desktop() {
 [Desktop Entry]
 Name=RPII Utility
 Comment=RPII Inflatable Inspection Utility
-Exec=bash -c 'WINEPREFIX="${WINEPREFIX}" WINEDEBUG=-all wine64 "${EXE}"'
+Exec=bash -c 'WINEPREFIX="${WINEPREFIX}" WINEDEBUG=-all DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 wine "${EXE}"'
 Type=Application
 Categories=Utility;Office;
 Terminal=false
