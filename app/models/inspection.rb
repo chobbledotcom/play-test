@@ -117,7 +117,7 @@ class Inspection < ApplicationRecord
   # Fields required on the inspection tab per type (excluding passed/unit_id)
   INSPECTION_TAB_FIELDS = {
     bouncy_castle: %i[inspection_date] + DIMENSION_FIELDS + CASTLE_FLAG_FIELDS,
-    bouncing_pillow: %i[inspection_date] + DIMENSION_FIELDS + CASTLE_FLAG_FIELDS,
+    bouncing_pillow: %i[inspection_date] + DIMENSION_FIELDS,
     inflatable_ball_pool: %i[inspection_date] + DIMENSION_FIELDS,
     pat_testable: %i[inspection_date]
   }.freeze
