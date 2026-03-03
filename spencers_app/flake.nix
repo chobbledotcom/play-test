@@ -14,7 +14,7 @@
       devShells.${system}.default = pkgs.mkShell {
         packages = [
           pkgs.dotnet-sdk_9
-          pkgs.wineWowPackages.stagingFull
+          pkgs.wineWow64Packages.stagingFull
           pkgs.winetricks
         ];
 
