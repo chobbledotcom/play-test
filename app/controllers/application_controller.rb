@@ -144,14 +144,14 @@ class ApplicationController < ActionController::Base
 
     @debug_subscription = ActiveSupport::Notifications
       .subscribe("sql.active_record") do |_name, start, finish, _id, payload|
-      unless payload[:name] == "SCHEMA" || payload[:sql] =~ /^PRAGMA/
-        @debug_sql_queries << {
-          sql: payload[:sql],
-          duration: ((finish - start) * 1000).round(2),
-          name: payload[:name],
-          row_count: payload[:row_count] || 0
-        }
-      end
+        unless payload[:name] == "SCHEMA" || payload[:sql] =~ /^PRAGMA/
+          @debug_sql_queries << {
+            sql: payload[:sql],
+            duration: ((finish - start) * 1000).round(2),
+            name: payload[:name],
+            row_count: payload[:row_count] || 0
+          }
+        end
     end
   end
 
