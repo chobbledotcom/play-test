@@ -1,14 +1,12 @@
 {
   description = "RPII Utility - WinForms inspection app running on NixOS via Wine";
 
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  };
+  inputs = { };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, ... }:
     let
       system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; };
+      pkgs = import <nixpkgs> { inherit system; };
     in
     {
       devShells.${system}.default = pkgs.mkShell {
