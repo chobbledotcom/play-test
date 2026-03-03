@@ -111,6 +111,17 @@ class Inspection < ApplicationRecord
       risk_assessment
     ]
 
+  DIMENSION_FIELDS = %i[height length width].freeze
+  CASTLE_FLAG_FIELDS = %i[has_slide indoor_only is_totally_enclosed].freeze
+
+  # Fields required on the inspection tab per type (excluding passed/unit_id)
+  INSPECTION_TAB_FIELDS = {
+    bouncy_castle: %i[inspection_date] + DIMENSION_FIELDS + CASTLE_FLAG_FIELDS,
+    bouncing_pillow: %i[inspection_date] + DIMENSION_FIELDS + CASTLE_FLAG_FIELDS,
+    inflatable_ball_pool: %i[inspection_date] + DIMENSION_FIELDS,
+    pat_testable: %i[inspection_date]
+  }.freeze
+
   belongs_to :user
   belongs_to :unit, optional: true
   belongs_to :inspector_company, optional: true
@@ -328,24 +339,18 @@ class Inspection < ApplicationRecord
   # Advanced methods
   sig { returns(T::Boolean) }
   def can_be_completed?
-    base_requirements_met = unit.present? &&
+    base_met = unit.present? &&
       all_assessments_complete? &&
       !passed.nil? &&
       inspection_date.present?
 
-    return base_requirements_met if pat_testable?
+    return false unless base_met
 
-    dimensions_met = base_requirements_met &&
-      width.present? &&
-      length.present? &&
-      height.present?
+    required = INSPECTION_TAB_FIELDS.fetch(
+      inspection_type.to_sym, DIMENSION_FIELDS
+    ) - %i[inspection_date]
 
-    return dimensions_met if inflatable_ball_pool?
-
-    dimensions_met &&
-      !has_slide.nil? &&
-      !is_totally_enclosed.nil? &&
-      !indoor_only.nil?
+    required.all? { |f| !send(f).nil? }
   end
 
   sig { returns(T::Boolean) }
@@ -439,21 +444,11 @@ class Inspection < ApplicationRecord
 
   sig { returns(T::Array[Symbol]) }
   def inspection_tab_incomplete_fields
-    # Excludes passed which is on results tab
-    fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
+    fields = INSPECTION_TAB_FIELDS.fetch(
+      inspection_type.to_sym, DIMENSION_FIELDS
+    )
 
-    # PAT testable only needs inspection_date
-    fields &= [:inspection_date] if pat_testable?
-
-    # Ball pool needs dimensions but not castle-specific flags
-    if inflatable_ball_pool?
-      castle_flags = %i[has_slide is_totally_enclosed indoor_only]
-      fields -= castle_flags
-    end
-
-    fields
-      .reject { |f| f.end_with?("_comment") }
-      .select { |f| send(f).nil? }
+    fields.select { |f| send(f).nil? }
   end
 
   sig { returns(T::Array[T::Hash[Symbol, T.any(Symbol, String, T::Array[T::Hash[Symbol, T.any(Symbol, String)]])]]) }
