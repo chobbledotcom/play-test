@@ -12,7 +12,7 @@ RSpec.describe "Litestream Configuration" do
     it "is valid YAML with required databases" do
       expect(File.exist?(config_path)).to be true
 
-      db_paths = config["dbs"].map { |db| db["path"] }
+      db_paths = config["dbs"].pluck("path")
       expect(db_paths).to include("storage/production.sqlite3")
       expect(db_paths).to include("storage/development.sqlite3")
     end

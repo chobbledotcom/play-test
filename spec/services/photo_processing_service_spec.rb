@@ -57,7 +57,7 @@ RSpec.describe PhotoProcessingService do
       # Orientation 6 (rotate 90 CW) has raw pixels 100x60
       # but should become 60x100 after autorot
       fixture = "spec/fixtures/files/orientation_6_rotate_90_cw.jpg"
-      image_data = File.binread(Rails.root.join(fixture))
+      image_data = Rails.root.join(fixture).binread
 
       result = described_class.process_upload_data(image_data, "rotated.jpg")
       image = Vips::Image.new_from_buffer(result[:io].read, "")
@@ -70,7 +70,7 @@ RSpec.describe PhotoProcessingService do
       # Orientation 1 (normal) has raw pixels 100x60
       # and should stay 100x60 after processing
       fixture = "spec/fixtures/files/orientation_1_normal.jpg"
-      image_data = File.binread(Rails.root.join(fixture))
+      image_data = Rails.root.join(fixture).binread
 
       result = described_class.process_upload_data(image_data, "normal.jpg")
       image = Vips::Image.new_from_buffer(result[:io].read, "")

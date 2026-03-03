@@ -73,13 +73,13 @@ module ImageProcessable
     respond_to do |format|
       format.html do
         flash[:alert] = exception.message
-        redirect_back(fallback_location: root_path)
+        redirect_back_or_to(root_path)
       end
       format.turbo_stream do
         flash.now[:alert] = exception.message
         # For turbo_stream, we just need to redirect back with the flash message
         # The application layout will handle rendering the flash
-        redirect_back(fallback_location: root_path, status: :see_other)
+        redirect_back_or_to(root_path, status: :see_other)
       end
     end
   end
