@@ -1,6 +1,6 @@
 # play-test - BS EN 14960 inspection-logging tool
 
-A web app for managing safety inspections of inflatable play equipment like bouncy castles and slides. Built by [Chobble.com](https://chobble.com).
+A web app for managing safety inspections of inflatable play equipment like bouncy castles and slides. Developed by [Chobble CIC](https://chobble.com), a community interest company in Manchester, UK.
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Docker Image](https://img.shields.io/badge/docker-dockerstefn%2Fplay--test-blue)](https://hub.docker.com/r/dockerstefn/play-test)
@@ -116,10 +116,14 @@ If you want to help improve Play-Test, a great way would be to write some more `
 - **Semantic HTML + MVP.css** - Simple CSS
 - **Turbo** for progressive JS enhancement
 
+## About Chobble CIC
+
+play-test is developed by [Chobble CIC](https://chobble.com), a community interest company based in Manchester, UK. As a CIC, Chobble is regulated to operate in the public interest rather than for private shareholders — surplus profits are reinvested in community activities like open source development and reduced rates for charities and community organisations.
+
+Chobble's [principles](https://chobble.com/principles) include transparency, fair pricing, client ownership of their tools and data, and ethical boundaries. All source code is shared openly, and there's no vendor lock-in.
+
 ## Contributing
 
 Pull requests welcome! This is an open source project and we're not affiliated with any industry bodies, so improvements from anyone are appreciated.
 
 AGPLv3 - see [LICENSE](LICENSE) file. This means you can use, modify, and distribute the code, but you must share any improvements.
-
-Built by [Chobble](https://chobble.com) - an ethical and open source web and software developer in Prestwich, Manchester, UK

@@ -312,16 +312,16 @@ class InspectionsController < ApplicationController
   # This ensures mappings stay in sync with the model definition
   ASSESSMENT_TAB_MAPPING = Inspection::ALL_ASSESSMENT_TYPES
     .each_with_object({}) do |(method_name, _), hash|
-    # Convert :user_height_assessment to "user_height"
-    tab_name = method_name.to_s.gsub(/_assessment$/, "")
-    hash[tab_name] = method_name
+      # Convert :user_height_assessment to "user_height"
+      tab_name = method_name.to_s.gsub(/_assessment$/, "")
+      hash[tab_name] = method_name
   end.freeze
 
   ASSESSMENT_CLASS_MAPPING = Inspection::ALL_ASSESSMENT_TYPES
     .each_with_object({}) do |(method_name, klass), hash|
-    # Convert :user_height_assessment to "user_height"
-    tab_name = method_name.to_s.gsub(/_assessment$/, "")
-    hash[tab_name] = klass
+      # Convert :user_height_assessment to "user_height"
+      tab_name = method_name.to_s.gsub(/_assessment$/, "")
+      hash[tab_name] = klass
   end.freeze
 
   def build_base_params

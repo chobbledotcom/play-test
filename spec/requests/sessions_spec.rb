@@ -95,7 +95,7 @@ RSpec.describe "Sessions", type: :request do
         expect(json_response["allowCredentials"]).to be_an(Array)
         expect(json_response["allowCredentials"].length).to eq(2)
 
-        credential_ids = json_response["allowCredentials"].map { |c| c["id"] }
+        credential_ids = json_response["allowCredentials"].pluck("id")
         expect(credential_ids).to include(credential1.external_id)
         expect(credential_ids).to include(credential2.external_id)
 
