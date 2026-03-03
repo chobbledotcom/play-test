@@ -1,0 +1,5 @@
+# Build output
+dist/
+
+# Nix flake lock (regenerated per-machine)
+flake.lock
