@@ -54,6 +54,7 @@ class Inspection < ApplicationRecord
   enum :inspection_type, {
     bouncy_castle: "BOUNCY_CASTLE",
     bouncing_pillow: "BOUNCING_PILLOW",
+    inflatable_ball_pool: "INFLATABLE_BALL_POOL",
     pat_testable: "PAT_TESTABLE"
   }
 
@@ -75,10 +76,18 @@ class Inspection < ApplicationRecord
     pat_assessment: Assessments::PatAssessment
   }.freeze
 
+  INFLATABLE_BALL_POOL_ASSESSMENT_TYPES = {
+    structure_assessment: Assessments::StructureAssessment,
+    materials_assessment: Assessments::MaterialsAssessment,
+    fan_assessment: Assessments::FanAssessment,
+    ball_pool_assessment: Assessments::BallPoolAssessment
+  }.freeze
+
   ALL_ASSESSMENT_TYPES =
     CASTLE_ASSESSMENT_TYPES
       .merge(PILLOW_ASSESSMENT_TYPES)
-      .merge(PAT_TESTABLE_ASSESSMENT_TYPES).freeze
+      .merge(PAT_TESTABLE_ASSESSMENT_TYPES)
+      .merge(INFLATABLE_BALL_POOL_ASSESSMENT_TYPES).freeze
 
   USER_EDITABLE_PARAMS = %i[
     has_slide
@@ -101,6 +110,17 @@ class Inspection < ApplicationRecord
     USER_EDITABLE_PARAMS - %i[
       risk_assessment
     ]
+
+  DIMENSION_FIELDS = %i[height length width].freeze
+  CASTLE_FLAG_FIELDS = %i[has_slide indoor_only is_totally_enclosed].freeze
+
+  # Fields required on the inspection tab per type (excluding passed/unit_id)
+  INSPECTION_TAB_FIELDS = {
+    bouncy_castle: %i[inspection_date] + DIMENSION_FIELDS + CASTLE_FLAG_FIELDS,
+    bouncing_pillow: %i[inspection_date] + DIMENSION_FIELDS,
+    inflatable_ball_pool: %i[inspection_date] + DIMENSION_FIELDS,
+    pat_testable: %i[inspection_date]
+  }.freeze
 
   belongs_to :user
   belongs_to :unit, optional: true
@@ -226,6 +246,8 @@ class Inspection < ApplicationRecord
       PAT_TESTABLE_ASSESSMENT_TYPES
     elsif bouncing_pillow?
       PILLOW_ASSESSMENT_TYPES
+    elsif inflatable_ball_pool?
+      INFLATABLE_BALL_POOL_ASSESSMENT_TYPES
     else
       CASTLE_ASSESSMENT_TYPES
     end
@@ -237,6 +259,8 @@ class Inspection < ApplicationRecord
       pat_testable_applicable_assessments
     elsif bouncing_pillow?
       pillow_applicable_assessments
+    elsif inflatable_ball_pool?
+      inflatable_ball_pool_applicable_assessments
     else
       castle_applicable_assessments
     end
@@ -270,6 +294,11 @@ class Inspection < ApplicationRecord
     PAT_TESTABLE_ASSESSMENT_TYPES
   end
 
+  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
+  def inflatable_ball_pool_applicable_assessments
+    INFLATABLE_BALL_POOL_ASSESSMENT_TYPES
+  end
+
   public
 
   # Iterate over only applicable assessments with a block
@@ -296,7 +325,7 @@ class Inspection < ApplicationRecord
     applicable = applicable_assessments.keys.map { |k| k.to_s.chomp("_assessment") }
 
     # Add tabs in the correct UI order
-    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat]
+    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat ball_pool]
     ordered_tabs.each do |tab|
       tabs << tab if applicable.include?(tab)
     end
@@ -310,20 +339,18 @@ class Inspection < ApplicationRecord
   # Advanced methods
   sig { returns(T::Boolean) }
   def can_be_completed?
-    base_requirements_met = unit.present? &&
+    base_met = unit.present? &&
       all_assessments_complete? &&
       !passed.nil? &&
       inspection_date.present?
 
-    return base_requirements_met if pat_testable?
+    return false unless base_met
 
-    base_requirements_met &&
-      width.present? &&
-      length.present? &&
-      height.present? &&
-      !has_slide.nil? &&
-      !is_totally_enclosed.nil? &&
-      !indoor_only.nil?
+    required = INSPECTION_TAB_FIELDS.fetch(
+      inspection_type.to_sym, DIMENSION_FIELDS
+    ) - %i[inspection_date]
+
+    required.all? { |f| !send(f).nil? }
   end
 
   sig { returns(T::Boolean) }
@@ -417,15 +444,11 @@ class Inspection < ApplicationRecord
 
   sig { returns(T::Array[Symbol]) }
   def inspection_tab_incomplete_fields
-    # Excludes passed which is on results tab
-    fields = REQUIRED_TO_COMPLETE_FIELDS - [:passed]
+    fields = INSPECTION_TAB_FIELDS.fetch(
+      inspection_type.to_sym, DIMENSION_FIELDS
+    )
 
-    # PAT testable only needs inspection_date
-    fields &= [:inspection_date] if pat_testable?
-
-    fields
-      .reject { |f| f.end_with?("_comment") }
-      .select { |f| send(f).nil? }
+    fields.select { |f| send(f).nil? }
   end
 
   sig { returns(T::Array[T::Hash[Symbol, T.any(Symbol, String, T::Array[T::Hash[Symbol, T.any(Symbol, String)]])]]) }
@@ -548,6 +571,7 @@ class Inspection < ApplicationRecord
   def assessment_validation_data
     assessment_types = %i[
       anchorage
+      ball_pool
       enclosed
       fan
       materials

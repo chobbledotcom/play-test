@@ -1,0 +1,28 @@
+---
+en:
+  forms:
+    ball_pool:
+      header: Ball Pool
+      sections:
+        markings: Markings
+        safety_checks: Safety Checks
+        measurements: Measurements
+      fields:
+        age_range_marking: Marking to indicate age range
+        max_height_markings: Marking to indicate max user height
+        suitable_matting: Suitable matting
+        air_jugglers_compliant: Air jugglers compliant
+        balls_compliant: Balls compliant
+        gaps: No gaps in ball pool
+        fitted_base: Fitted base sheet
+        ball_pool_depth: Ball pool depth (mm) max 450mm
+        ball_pool_entry: Ball pool entry height (mm) max 630mm
+      status:
+        checks_passed: Fields completed
+        completion: Assessment Completion
+      submit: Save Assessment
+      submit_continue: Save & Continue
+      errors:
+        header:
+          one: '1 error prevented this assessment from being saved:'
+          other: '%{count} errors prevented this assessment from being saved:'

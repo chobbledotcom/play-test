@@ -66,6 +66,7 @@ en:
     unit_types:
       bouncy_castle: Bouncy Castle
       bouncing_pillow: Bouncing Pillow
+      inflatable_ball_pool: Inflatable Ball Pool
       pat_testable: PAT Testable Appliance
     labels:
       inspection_date: Inspection Date
