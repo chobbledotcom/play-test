@@ -1,6 +1,6 @@
 ---
 name: whenever
-version: 1.0.0
+version: 1.1.2
 type: bundler
 summary: Cron jobs in ruby.
 homepage: https://github.com/javan/whenever

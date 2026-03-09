@@ -1,6 +1,6 @@
 ---
 name: importmap-rails
-version: 2.2.2
+version: 2.2.3
 type: bundler
 summary: Use ESM with importmap to manage modern JavaScript in Rails without transpiling
   or bundling.

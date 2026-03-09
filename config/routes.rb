@@ -65,6 +65,8 @@
 #                                    PUT      /inspections/:inspection_id/fan_assessment(.:format)                                              fan_assessments#update
 #          inspection_pat_assessment PATCH    /inspections/:inspection_id/pat_assessment(.:format)                                              pat_assessments#update
 #                                    PUT      /inspections/:inspection_id/pat_assessment(.:format)                                              pat_assessments#update
+#    inspection_ball_pool_assessment PATCH    /inspections/:inspection_id/ball_pool_assessment(.:format)                                        ball_pool_assessments#update
+#                                    PUT      /inspections/:inspection_id/ball_pool_assessment(.:format)                                        ball_pool_assessments#update
 #                        inspections GET      /inspections(.:format)                                                                            inspections#index
 #                                    POST     /inspections(.:format)                                                                            inspections#create
 #                    edit_inspection GET      /inspections/:id/edit(.:format)                                                                   inspections#edit

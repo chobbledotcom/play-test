@@ -1,6 +1,6 @@
 ---
 name: dotenv-rails
-version: 3.1.8
+version: 3.2.0
 type: bundler
 summary: Autoload dotenv in Rails.
 homepage: https://github.com/bkeepers/dotenv
