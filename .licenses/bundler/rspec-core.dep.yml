@@ -1,8 +1,8 @@
 ---
 name: rspec-core
-version: 3.13.5
+version: 3.13.6
 type: bundler
-summary: rspec-core-3.13.5
+summary: rspec-core-3.13.6
 homepage: https://rspec.info
 license: mit
 licenses:

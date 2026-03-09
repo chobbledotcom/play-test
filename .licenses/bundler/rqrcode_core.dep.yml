@@ -1,6 +1,6 @@
 ---
 name: rqrcode_core
-version: 2.0.0
+version: 2.1.0
 type: bundler
 summary: A library to encode QR Codes
 homepage: https://github.com/whomwah/rqrcode_core
