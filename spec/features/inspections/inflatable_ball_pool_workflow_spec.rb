@@ -15,6 +15,7 @@ RSpec.feature "Inflatable Ball Pool Inspection Workflow", type: :feature do
     inspection = create_inspection_for_ball_pool_unit(unit)
 
     verify_correct_tabs_visible(inspection)
+    fill_inspection_tab(inspection)
     fill_all_ball_pool_assessments(inspection)
     complete_inspection(inspection)
     verify_inspection_complete(inspection)
@@ -105,6 +106,19 @@ RSpec.feature "Inflatable Ball Pool Inspection Workflow", type: :feature do
     %w[anchorage enclosed pat slide user_height].each do
       expect_no_assessment_tab(it)
     end
+  end
+
+  def fill_inspection_tab(inspection)
+    visit edit_inspection_path(inspection)
+
+    field_data = SeedData.inspection_fields(passed: true)
+    field_data.except!(:has_slide, :is_totally_enclosed, :indoor_only)
+
+    field_data.each do |field_name, value|
+      fill_inspection_field(field_name, value)
+    end
+
+    click_submit_button
   end
 
   def fill_all_ball_pool_assessments(inspection)
