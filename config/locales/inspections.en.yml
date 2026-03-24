@@ -109,6 +109,8 @@ en:
       status_help: Use the buttons below to change inspection status
       internal_id_help: For your records
       not_available: Not Available
+      value_and_pass_fail: '%{label} (+ Pass/Fail)'
+      pass_fail_only: '%{label} Pass/Fail'
     status:
       in_progress: In Progress
       complete: Complete
