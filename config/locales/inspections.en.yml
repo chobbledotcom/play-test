@@ -264,6 +264,7 @@ en:
     validation:
       anchorage_incomplete: Anchorage Assessment incomplete
       ball_pool_incomplete: Ball Pool Assessment incomplete
+      bungee_incomplete: Bungee Run Assessment incomplete
       catch_bed_incomplete: Catch Bed Assessment incomplete
       enclosed_incomplete: Totally Enclosed Assessment incomplete
       fan_incomplete: Fan Assessment incomplete

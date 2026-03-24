@@ -55,6 +55,7 @@ class Inspection < ApplicationRecord
   enum :inspection_type, {
     bouncy_castle: "BOUNCY_CASTLE",
     bouncing_pillow: "BOUNCING_PILLOW",
+    bungee_run: "BUNGEE_RUN",
     catch_bed: "CATCH_BED",
     inflatable_ball_pool: "INFLATABLE_BALL_POOL",
     inflatable_game: "INFLATABLE_GAME",
@@ -102,13 +103,22 @@ class Inspection < ApplicationRecord
     catch_bed_assessment: Assessments::CatchBedAssessment
   }.freeze
 
+  BUNGEE_RUN_ASSESSMENT_TYPES = {
+    structure_assessment: Assessments::StructureAssessment,
+    materials_assessment: Assessments::MaterialsAssessment,
+    fan_assessment: Assessments::FanAssessment,
+    anchorage_assessment: Assessments::AnchorageAssessment,
+    bungee_assessment: Assessments::BungeeAssessment
+  }.freeze
+
   ALL_ASSESSMENT_TYPES =
     CASTLE_ASSESSMENT_TYPES
       .merge(PILLOW_ASSESSMENT_TYPES)
       .merge(PAT_TESTABLE_ASSESSMENT_TYPES)
       .merge(INFLATABLE_BALL_POOL_ASSESSMENT_TYPES)
       .merge(INFLATABLE_GAME_ASSESSMENT_TYPES)
-      .merge(CATCH_BED_ASSESSMENT_TYPES).freeze
+      .merge(CATCH_BED_ASSESSMENT_TYPES)
+      .merge(BUNGEE_RUN_ASSESSMENT_TYPES).freeze
 
   USER_EDITABLE_PARAMS = %i[
     has_slide
@@ -140,6 +150,7 @@ class Inspection < ApplicationRecord
     bouncy_castle: %i[inspection_date] + DIMENSION_FIELDS + CASTLE_FLAG_FIELDS,
     bouncing_pillow: %i[inspection_date] + DIMENSION_FIELDS,
     inflatable_ball_pool: %i[inspection_date] + DIMENSION_FIELDS,
+    bungee_run: %i[inspection_date] + DIMENSION_FIELDS,
     catch_bed: %i[inspection_date] + DIMENSION_FIELDS,
     inflatable_game: %i[inspection_date] + DIMENSION_FIELDS,
     pat_testable: %i[inspection_date]
@@ -266,6 +277,7 @@ class Inspection < ApplicationRecord
   ASSESSMENT_TYPES_BY_INSPECTION_TYPE = {
     bouncy_castle: CASTLE_ASSESSMENT_TYPES,
     bouncing_pillow: PILLOW_ASSESSMENT_TYPES,
+    bungee_run: BUNGEE_RUN_ASSESSMENT_TYPES,
     catch_bed: CATCH_BED_ASSESSMENT_TYPES,
     inflatable_ball_pool: INFLATABLE_BALL_POOL_ASSESSMENT_TYPES,
     inflatable_game: INFLATABLE_GAME_ASSESSMENT_TYPES,
@@ -332,7 +344,7 @@ class Inspection < ApplicationRecord
     applicable = applicable_assessments.keys.map { |k| k.to_s.chomp("_assessment") }
 
     # Add tabs in the correct UI order
-    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat ball_pool catch_bed inflatable_game]
+    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat ball_pool bungee catch_bed inflatable_game]
     ordered_tabs.each do |tab|
       tabs << tab if applicable.include?(tab)
     end
