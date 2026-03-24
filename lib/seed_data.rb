@@ -270,6 +270,48 @@ module SeedData
     }
   end
 
+  def self.catch_bed_fields(passed: true)
+    {
+      type_of_unit: "Standard catch bed",
+      max_user_mass_marking_pass: check_passed?(passed),
+      arrest_pass: check_passed?(passed),
+      matting_pass: check_passed?(passed),
+      design_risk_pass: check_passed?(passed),
+      intended_play_pass: check_passed?(passed),
+      ancillary_fit_pass: check_passed?(passed),
+      ancillary_compliant_pass: check_passed?(passed),
+      apron_pass: check_passed?(passed),
+      trough_pass: check_passed?(passed),
+      framework_pass: check_passed?(passed),
+      grounding_pass: check_passed?(passed),
+      bed_height: rand(400..600),
+      bed_height_pass: check_passed?(passed),
+      platform_fall_distance: rand(0.8..1.5).round(2),
+      platform_fall_distance_pass: check_passed?(passed),
+      blower_tube_length: rand(2.5..4.0).round(2),
+      blower_tube_length_pass: check_passed?(passed)
+    }.merge(catch_bed_comments(passed))
+  end
+
+  def self.catch_bed_comments(passed)
+    {
+      max_user_mass_marking_comment: passed ? OK : FAIL,
+      arrest_comment: passed ? PASS : FAIL,
+      matting_comment: passed ? GOOD : FAIL,
+      design_risk_comment: passed ? PASS : FAIL,
+      intended_play_comment: passed ? PASS : FAIL,
+      ancillary_fit_comment: passed ? OK : FAIL,
+      ancillary_compliant_comment: passed ? OK : FAIL,
+      apron_comment: passed ? GOOD : FAIL,
+      trough_comment: passed ? OK : FAIL,
+      framework_comment: passed ? PASS : FAIL,
+      grounding_comment: passed ? PASS : FAIL,
+      bed_height_comment: passed ? OK : FAIL,
+      platform_fall_distance_comment: passed ? OK : FAIL,
+      blower_tube_length_comment: passed ? OK : FAIL
+    }
+  end
+
   def self.inflatable_game_fields(passed: true)
     {
       game_type: "Standard inflatable obstacle course",

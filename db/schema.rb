@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_25_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -101,6 +101,45 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_000001) do
     t.boolean "suitable_matting_pass"
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "ball_pool_assessments_pkey", unique: true
+  end
+
+  create_table "catch_bed_assessments", id: false, force: :cascade do |t|
+    t.text "ancillary_compliant_comment"
+    t.boolean "ancillary_compliant_pass"
+    t.text "ancillary_fit_comment"
+    t.boolean "ancillary_fit_pass"
+    t.text "apron_comment"
+    t.boolean "apron_pass"
+    t.text "arrest_comment"
+    t.boolean "arrest_pass"
+    t.integer "bed_height"
+    t.text "bed_height_comment"
+    t.boolean "bed_height_pass"
+    t.decimal "blower_tube_length", precision: 8, scale: 2
+    t.text "blower_tube_length_comment"
+    t.boolean "blower_tube_length_pass"
+    t.datetime "created_at", null: false
+    t.text "design_risk_comment"
+    t.boolean "design_risk_pass"
+    t.text "framework_comment"
+    t.boolean "framework_pass"
+    t.text "grounding_comment"
+    t.boolean "grounding_pass"
+    t.string "inspection_id", limit: 12, null: false
+    t.text "intended_play_comment"
+    t.boolean "intended_play_pass"
+    t.text "matting_comment"
+    t.boolean "matting_pass"
+    t.text "max_user_mass_marking_comment"
+    t.boolean "max_user_mass_marking_pass"
+    t.decimal "platform_fall_distance", precision: 8, scale: 2
+    t.text "platform_fall_distance_comment"
+    t.boolean "platform_fall_distance_pass"
+    t.text "trough_comment"
+    t.boolean "trough_pass"
+    t.text "type_of_unit"
+    t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "catch_bed_assessments_pkey", unique: true
   end
 
   create_table "credentials", force: :cascade do |t|
@@ -577,6 +616,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_000001) do
   add_foreign_key "anchorage_assessments", "inspections"
   add_foreign_key "badges", "badge_batches"
   add_foreign_key "ball_pool_assessments", "inspections"
+  add_foreign_key "catch_bed_assessments", "inspections"
   add_foreign_key "credentials", "users"
   add_foreign_key "enclosed_assessments", "inspections"
   add_foreign_key "events", "users"

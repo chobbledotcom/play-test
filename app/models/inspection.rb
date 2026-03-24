@@ -54,6 +54,7 @@ class Inspection < ApplicationRecord
   enum :inspection_type, {
     bouncy_castle: "BOUNCY_CASTLE",
     bouncing_pillow: "BOUNCING_PILLOW",
+    catch_bed: "CATCH_BED",
     inflatable_ball_pool: "INFLATABLE_BALL_POOL",
     inflatable_game: "INFLATABLE_GAME",
     pat_testable: "PAT_TESTABLE"
@@ -92,12 +93,21 @@ class Inspection < ApplicationRecord
       Assessments::InflatableGameAssessment
   }.freeze
 
+  CATCH_BED_ASSESSMENT_TYPES = {
+    structure_assessment: Assessments::StructureAssessment,
+    materials_assessment: Assessments::MaterialsAssessment,
+    fan_assessment: Assessments::FanAssessment,
+    anchorage_assessment: Assessments::AnchorageAssessment,
+    catch_bed_assessment: Assessments::CatchBedAssessment
+  }.freeze
+
   ALL_ASSESSMENT_TYPES =
     CASTLE_ASSESSMENT_TYPES
       .merge(PILLOW_ASSESSMENT_TYPES)
       .merge(PAT_TESTABLE_ASSESSMENT_TYPES)
       .merge(INFLATABLE_BALL_POOL_ASSESSMENT_TYPES)
-      .merge(INFLATABLE_GAME_ASSESSMENT_TYPES).freeze
+      .merge(INFLATABLE_GAME_ASSESSMENT_TYPES)
+      .merge(CATCH_BED_ASSESSMENT_TYPES).freeze
 
   USER_EDITABLE_PARAMS = %i[
     has_slide
@@ -129,6 +139,7 @@ class Inspection < ApplicationRecord
     bouncy_castle: %i[inspection_date] + DIMENSION_FIELDS + CASTLE_FLAG_FIELDS,
     bouncing_pillow: %i[inspection_date] + DIMENSION_FIELDS,
     inflatable_ball_pool: %i[inspection_date] + DIMENSION_FIELDS,
+    catch_bed: %i[inspection_date] + DIMENSION_FIELDS,
     inflatable_game: %i[inspection_date] + DIMENSION_FIELDS,
     pat_testable: %i[inspection_date]
   }.freeze
@@ -261,6 +272,8 @@ class Inspection < ApplicationRecord
       INFLATABLE_BALL_POOL_ASSESSMENT_TYPES
     elsif inflatable_game?
       INFLATABLE_GAME_ASSESSMENT_TYPES
+    elsif catch_bed?
+      CATCH_BED_ASSESSMENT_TYPES
     else
       CASTLE_ASSESSMENT_TYPES
     end
@@ -276,6 +289,8 @@ class Inspection < ApplicationRecord
       inflatable_ball_pool_applicable_assessments
     elsif inflatable_game?
       inflatable_game_applicable_assessments
+    elsif catch_bed?
+      catch_bed_applicable_assessments
     else
       castle_applicable_assessments
     end
@@ -319,6 +334,11 @@ class Inspection < ApplicationRecord
     INFLATABLE_GAME_ASSESSMENT_TYPES
   end
 
+  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
+  def catch_bed_applicable_assessments
+    CATCH_BED_ASSESSMENT_TYPES
+  end
+
   public
 
   # Iterate over only applicable assessments with a block
@@ -345,7 +365,7 @@ class Inspection < ApplicationRecord
     applicable = applicable_assessments.keys.map { |k| k.to_s.chomp("_assessment") }
 
     # Add tabs in the correct UI order
-    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat ball_pool inflatable_game]
+    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat ball_pool catch_bed inflatable_game]
     ordered_tabs.each do |tab|
       tabs << tab if applicable.include?(tab)
     end
@@ -592,6 +612,7 @@ class Inspection < ApplicationRecord
     assessment_types = %i[
       anchorage
       ball_pool
+      catch_bed
       enclosed
       fan
       inflatable_game

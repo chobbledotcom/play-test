@@ -1,0 +1,35 @@
+---
+en:
+  forms:
+    catch_bed:
+      header: Catch Bed
+      sections:
+        unit_details: Unit Details
+        markings: Markings
+        safety_checks: Safety Checks
+        measurements: Measurements
+      fields:
+        type_of_unit: Type of catch bed
+        max_user_mass_marking: Marking for max user mass
+        arrest: Bed suitable to arrest users when falling
+        matting: Suitable matting
+        design_risk: Design and construction minimises risk
+        intended_play: Intended play minimises risk
+        ancillary_fit: Ancillary equipment fit for purpose
+        ancillary_compliant: Ancillary equipment compliant
+        apron: Suitable apron and padding
+        trough: Trough depth suitable
+        framework: Framework secure
+        grounding: 120kg grounding test
+        bed_height: Bed height (mm) minimum 400mm
+        platform_fall_distance: Distance from platform edge to containing wall (m)
+        blower_tube_length: Blower tube length (m) at least 2.5m
+      status:
+        checks_passed: Fields completed
+        completion: Assessment Completion
+      submit: Save Assessment
+      submit_continue: Save & Continue
+      errors:
+        header:
+          one: '1 error prevented this assessment from being saved:'
+          other: '%{count} errors prevented this assessment from being saved:'
