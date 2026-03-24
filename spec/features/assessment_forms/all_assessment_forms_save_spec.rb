@@ -139,6 +139,32 @@ ENCLOSED_SAMPLE_DATA = {
   exit_sign_always_visible_comment: "Visibility confirmed from all angles"
 }.freeze
 
+BALL_POOL_SAMPLE_DATA = {
+
+  age_range_marking_pass: true,
+  max_height_markings_pass: false,
+  suitable_matting_pass: true,
+  air_jugglers_compliant_pass: true,
+  balls_compliant_pass: false,
+  gaps_pass: true,
+  fitted_base_pass: true,
+
+  ball_pool_depth: 400,
+  ball_pool_depth_pass: true,
+  ball_pool_entry: 600,
+  ball_pool_entry_pass: false,
+
+  age_range_marking_comment: "Age range clearly marked",
+  max_height_markings_comment: "Max height marking missing",
+  suitable_matting_comment: "Matting adequate",
+  air_jugglers_compliant_comment: "Air jugglers meet standard",
+  balls_compliant_comment: "Balls show wear",
+  gaps_comment: "No gaps found",
+  fitted_base_comment: "Base sheet fitted correctly",
+  ball_pool_depth_comment: "Depth within limits",
+  ball_pool_entry_comment: "Entry height exceeds maximum"
+}.freeze
+
 RSpec.feature "All Assessment Forms Save", type: :feature do
   include_examples "assessment form save", :structure, STRUCTURE_SAMPLE_DATA
   include_examples "assessment form save", :materials, MATERIALS_SAMPLE_DATA
@@ -147,4 +173,5 @@ RSpec.feature "All Assessment Forms Save", type: :feature do
   include_examples "assessment form save", :user_height, USER_HEIGHT_SAMPLE_DATA
   include_examples "assessment form save", :slide, SLIDE_SAMPLE_DATA
   include_examples "assessment form save", :enclosed, ENCLOSED_SAMPLE_DATA
+  include_examples "assessment form save", :ball_pool, BALL_POOL_SAMPLE_DATA
 end

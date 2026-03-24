@@ -18,6 +18,14 @@ RSpec.feature "Complete Inspection Workflow", type: :feature, js: false do
       unit_type: :bouncing_pillow
     ).execute
   end
+
+  scenario "complete workflow with inflatable ball pool unit" do
+    InspectionWorkflow.new(
+      has_slide: false,
+      is_totally_enclosed: false,
+      unit_type: :inflatable_ball_pool
+    ).execute
+  end
 end
 
 # RSpec.feature "Complete Inspection Workflow", type: :feature, js: true do
@@ -172,14 +180,23 @@ class InspectionWorkflow
 
   def fill_general_inspection_details
     field_data = SeedData.inspection_fields(passed: true)
-    field_data[:has_slide] = @options[:has_slide]
-    field_data[:is_totally_enclosed] = @options[:is_totally_enclosed]
-    field_data[:indoor_only] = @options[:indoor_only] || false
+
+    if castle_type?
+      field_data[:has_slide] = @options[:has_slide]
+      field_data[:is_totally_enclosed] = @options[:is_totally_enclosed]
+      field_data[:indoor_only] = @options[:indoor_only] || false
+    else
+      field_data.except!(:has_slide, :is_totally_enclosed, :indoor_only)
+    end
 
     field_data.each do |field_name, value|
       fill_inspection_field(field_name, value)
     end
     click_submit_button
+  end
+
+  def castle_type?
+    @options[:unit_type] == :bouncy_castle
   end
 
   def fill_all_assessments
@@ -367,8 +384,10 @@ class InspectionWorkflow
   def mark_second_inspection_complete
     visit edit_inspection_path(@second_inspection)
 
-    expect(@second_inspection.has_slide).to eq(@options[:has_slide])
-    expect(@second_inspection.is_totally_enclosed).to eq(@options[:is_totally_enclosed])
+    if castle_type?
+      expect(@second_inspection.has_slide).to eq(@options[:has_slide])
+      expect(@second_inspection.is_totally_enclosed).to eq(@options[:is_totally_enclosed])
+    end
 
     click_mark_complete_button
     expect_marked_complete_message
@@ -411,9 +430,10 @@ class InspectionWorkflow
   end
 
   ASSESSMENT_TABS = {
-    all: %w[user_height slide structure materials anchorage fan enclosed],
+    all: %w[user_height slide structure materials anchorage fan enclosed ball_pool],
     bouncing_pillow: %w[fan],
-    bouncy_castle: %w[user_height structure materials anchorage fan]
+    bouncy_castle: %w[user_height structure materials anchorage fan],
+    inflatable_ball_pool: %w[structure materials fan ball_pool]
   }.freeze
 
   def verify_applicable_tabs_for_unit_type

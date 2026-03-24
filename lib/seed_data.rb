@@ -240,6 +240,36 @@ module SeedData
     )
   end
 
+  def self.ball_pool_fields(passed: true)
+    {
+      age_range_marking_pass: check_passed?(passed),
+      max_height_markings_pass: check_passed?(passed),
+      suitable_matting_pass: check_passed?(passed),
+      air_jugglers_compliant_pass: check_passed?(passed),
+      balls_compliant_pass: check_passed?(passed),
+      gaps_pass: check_passed?(passed),
+      fitted_base_pass: check_passed?(passed),
+      ball_pool_depth: rand(300..450),
+      ball_pool_depth_pass: check_passed?(passed),
+      ball_pool_entry: rand(500..630),
+      ball_pool_entry_pass: check_passed?(passed)
+    }.merge(ball_pool_comments(passed))
+  end
+
+  def self.ball_pool_comments(passed)
+    {
+      age_range_marking_comment: passed ? OK : FAIL,
+      max_height_markings_comment: passed ? OK : FAIL,
+      suitable_matting_comment: passed ? GOOD : FAIL,
+      air_jugglers_compliant_comment: passed ? PASS : FAIL,
+      balls_compliant_comment: passed ? PASS : FAIL,
+      gaps_comment: passed ? OK : FAIL,
+      fitted_base_comment: passed ? OK : FAIL,
+      ball_pool_depth_comment: passed ? OK : FAIL,
+      ball_pool_entry_comment: passed ? OK : FAIL
+    }
+  end
+
   def self.pat_fields(passed: true)
     pat_numeric_fields
       .merge(pat_pass_fields(passed))
