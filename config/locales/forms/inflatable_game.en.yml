@@ -1,0 +1,29 @@
+---
+en:
+  forms:
+    inflatable_game:
+      header: Inflatable Game
+      sections:
+        game_details: Game Details
+        markings: Markings
+        safety_checks: Safety Checks
+        measurements: Measurements
+      fields:
+        game_type: Type of inflatable game
+        max_user_mass: Marking for max user mass
+        age_range_marking: Marking to indicate age range
+        constant_air_flow: Inflatable is constant air-flow unit
+        design_risk: Design and construction minimises risk
+        intended_play_risk: Intended play minimises risk
+        ancillary_equipment: Ancillary equipment fit for purpose
+        ancillary_equipment_compliant: Ancillary equipment compliant
+        containing_wall_height: Containing wall height (m)
+      status:
+        checks_passed: Fields completed
+        completion: Assessment Completion
+      submit: Save Assessment
+      submit_continue: Save & Continue
+      errors:
+        header:
+          one: '1 error prevented this assessment from being saved:'
+          other: '%{count} errors prevented this assessment from being saved:'

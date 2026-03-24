@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_03_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_24_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -162,6 +162,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_03_000001) do
     t.integer "pat_pass", limit: 1
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "fan_assessments_new_pkey", unique: true
+  end
+
+  create_table "inflatable_game_assessments", id: false, force: :cascade do |t|
+    t.text "age_range_marking_comment"
+    t.boolean "age_range_marking_pass"
+    t.text "ancillary_equipment_comment"
+    t.text "ancillary_equipment_compliant_comment"
+    t.boolean "ancillary_equipment_compliant_pass"
+    t.boolean "ancillary_equipment_pass"
+    t.text "constant_air_flow_comment"
+    t.boolean "constant_air_flow_pass"
+    t.decimal "containing_wall_height", precision: 8, scale: 2
+    t.text "containing_wall_height_comment"
+    t.boolean "containing_wall_height_pass"
+    t.datetime "created_at", null: false
+    t.text "design_risk_comment"
+    t.boolean "design_risk_pass"
+    t.text "game_type"
+    t.string "inspection_id", limit: 12, null: false
+    t.text "intended_play_risk_comment"
+    t.boolean "intended_play_risk_pass"
+    t.text "max_user_mass_comment"
+    t.boolean "max_user_mass_pass"
+    t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "inflatable_game_assessments_pkey", unique: true
   end
 
   create_table "inspections", id: { type: :string, limit: 12 }, force: :cascade do |t|
@@ -556,6 +581,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_03_000001) do
   add_foreign_key "enclosed_assessments", "inspections"
   add_foreign_key "events", "users"
   add_foreign_key "fan_assessments", "inspections"
+  add_foreign_key "inflatable_game_assessments", "inspections"
   add_foreign_key "inspections", "inspector_companies"
   add_foreign_key "inspections", "units"
   add_foreign_key "inspections", "users"
