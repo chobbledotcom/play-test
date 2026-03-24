@@ -270,6 +270,114 @@ module SeedData
     }
   end
 
+  def self.catch_bed_fields(passed: true)
+    catch_bed_pass_fields(passed)
+      .merge(catch_bed_measurements(passed))
+      .merge(catch_bed_comments(passed))
+  end
+
+  def self.catch_bed_pass_fields(passed)
+    {
+      type_of_unit: "Standard catch bed",
+      max_user_mass_marking_pass: check_passed?(passed),
+      arrest_pass: check_passed?(passed),
+      matting_pass: check_passed?(passed),
+      design_risk_pass: check_passed?(passed),
+      intended_play_pass: check_passed?(passed),
+      ancillary_fit_pass: check_passed?(passed),
+      ancillary_compliant_pass: check_passed?(passed),
+      apron_pass: check_passed?(passed),
+      trough_pass: check_passed?(passed),
+      framework_pass: check_passed?(passed),
+      grounding_pass: check_passed?(passed)
+    }
+  end
+
+  def self.catch_bed_measurements(passed)
+    {
+      bed_height: rand(400..600),
+      bed_height_pass: check_passed?(passed),
+      platform_fall_distance: rand(0.8..1.5).round(2),
+      platform_fall_distance_pass: check_passed?(passed),
+      blower_tube_length: rand(2.5..4.0).round(2),
+      blower_tube_length_pass: check_passed?(passed)
+    }
+  end
+
+  def self.catch_bed_comments(passed)
+    {
+      max_user_mass_marking_comment: passed ? OK : FAIL,
+      arrest_comment: passed ? PASS : FAIL,
+      matting_comment: passed ? GOOD : FAIL,
+      design_risk_comment: passed ? PASS : FAIL,
+      intended_play_comment: passed ? PASS : FAIL,
+      ancillary_fit_comment: passed ? OK : FAIL,
+      ancillary_compliant_comment: passed ? OK : FAIL,
+      apron_comment: passed ? GOOD : FAIL,
+      trough_comment: passed ? OK : FAIL,
+      framework_comment: passed ? PASS : FAIL,
+      grounding_comment: passed ? PASS : FAIL,
+      bed_height_comment: passed ? OK : FAIL,
+      platform_fall_distance_comment: passed ? OK : FAIL,
+      blower_tube_length_comment: passed ? OK : FAIL
+    }
+  end
+
+  def self.bungee_fields(passed: true)
+    bungee_pass_fields(passed)
+      .merge(bungee_measurements)
+      .merge(bungee_comments(passed))
+  end
+
+  def self.bungee_pass_fields(passed)
+    {
+      blower_forward_distance_pass: check_passed?(passed),
+      marking_max_mass_pass: check_passed?(passed),
+      marking_min_height_pass: check_passed?(passed),
+      pull_strength_pass: check_passed?(passed),
+      cord_length_max_pass: check_passed?(passed),
+      cord_diametre_min_pass: check_passed?(passed),
+      two_stage_locking_pass: check_passed?(passed),
+      baton_compliant_pass: check_passed?(passed),
+      lane_width_max_pass: check_passed?(passed),
+      rear_wall_pass: check_passed?(passed),
+      side_wall_pass: check_passed?(passed),
+      running_wall_pass: check_passed?(passed),
+      harness_width_pass: check_passed?(passed)
+    }
+  end
+
+  def self.bungee_measurements
+    {
+      harness_width: 200,
+      num_of_cords: 2,
+      rear_wall_thickness: 0.6,
+      rear_wall_height: 1.8,
+      side_wall_length: 1.5,
+      side_wall_height: 1.7,
+      running_wall_width: 0.45,
+      running_wall_height: 0.9
+    }
+  end
+
+  def self.bungee_comments(passed)
+    {
+      blower_forward_distance_comment: passed ? OK : FAIL,
+      marking_max_mass_comment: passed ? OK : FAIL,
+      marking_min_height_comment: passed ? OK : FAIL,
+      pull_strength_comment: passed ? PASS : FAIL,
+      cord_length_max_comment: passed ? OK : FAIL,
+      cord_diametre_min_comment: passed ? OK : FAIL,
+      two_stage_locking_comment: passed ? PASS : FAIL,
+      baton_compliant_comment: passed ? PASS : FAIL,
+      lane_width_max_comment: passed ? OK : FAIL,
+      rear_wall_comment: passed ? OK : FAIL,
+      side_wall_comment: passed ? OK : FAIL,
+      running_wall_comment: passed ? OK : FAIL,
+      harness_width_comment: passed ? OK : FAIL
+    }
+  end
+
   def self.inflatable_game_fields(passed: true)
     {
       game_type: "Standard inflatable obstacle course",

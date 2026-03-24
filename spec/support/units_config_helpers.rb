@@ -27,11 +27,16 @@ module UnitsConfigHelpers
 
   private
 
-  def set_units_config(badges_enabled:, unbranded: false)
+  def set_units_config(
+    badges_enabled:,
+    unbranded: false,
+    enabled_unit_types: []
+  )
     config = UnitsConfig.new(
       badges_enabled: badges_enabled,
       reports_unbranded: unbranded,
-      pdf_filename_prefix: ""
+      pdf_filename_prefix: "",
+      enabled_unit_types: enabled_unit_types
     )
     Rails.configuration.units = config
   end

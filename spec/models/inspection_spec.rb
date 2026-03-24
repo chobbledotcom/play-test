@@ -329,7 +329,7 @@ RSpec.describe Inspection, type: :model do
     it "identifies missing unit" do
       inspection.unit = nil
       missing = inspection.get_missing_assessments
-      expect(missing).to include("Unit")
+      expect(missing).to include(I18n.t("inspections.errors.unit_required"))
     end
   end
 
@@ -404,7 +404,7 @@ RSpec.describe Inspection, type: :model do
     it "sets complete_date and logs audit action" do
       inspection.complete_date = nil
       expect(inspection).to receive(:log_audit_action)
-        .with("completed", user, "Inspection completed")
+        .with("completed", user, I18n.t("inspections.messages.marked_complete"))
 
       inspection.complete!(user)
       expect(inspection.complete_date).not_to be_nil
@@ -415,7 +415,7 @@ RSpec.describe Inspection, type: :model do
     it "sets complete_date to nil and logs audit action" do
       inspection.complete_date = Time.current
       expect(inspection).to receive(:log_audit_action)
-        .with("marked_incomplete", user, "Inspection completed")
+        .with("marked_incomplete", user, I18n.t("inspections.messages.marked_incomplete"))
 
       inspection.un_complete!(user)
       expect(inspection.complete_date).to be_nil
@@ -479,7 +479,7 @@ RSpec.describe Inspection, type: :model do
     it "includes unit error when unit is missing" do
       inspection.unit = nil
       errors = inspection.completion_errors
-      expect(errors).to include("Unit is required")
+      expect(errors).to include(I18n.t("inspections.errors.unit_required"))
     end
 
     it "includes incomplete field information for each tab" do

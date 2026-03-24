@@ -109,6 +109,8 @@ en:
       status_help: Use the buttons below to change inspection status
       internal_id_help: For your records
       not_available: Not Available
+      value_and_pass_fail: '%{label} (+ Pass/Fail)'
+      pass_fail_only: '%{label} Pass/Fail'
     status:
       in_progress: In Progress
       complete: Complete
@@ -262,6 +264,8 @@ en:
     validation:
       anchorage_incomplete: Anchorage Assessment incomplete
       ball_pool_incomplete: Ball Pool Assessment incomplete
+      bungee_incomplete: Bungee Run Assessment incomplete
+      catch_bed_incomplete: Catch Bed Assessment incomplete
       enclosed_incomplete: Totally Enclosed Assessment incomplete
       fan_incomplete: Fan Assessment incomplete
       inflatable_game_incomplete: Inflatable Game Assessment incomplete

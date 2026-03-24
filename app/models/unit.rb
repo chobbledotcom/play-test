@@ -42,6 +42,8 @@ class Unit < ApplicationRecord
   enum :unit_type, {
     bouncy_castle: "BOUNCY_CASTLE",
     bouncing_pillow: "BOUNCING_PILLOW",
+    bungee_run: "BUNGEE_RUN",
+    catch_bed: "CATCH_BED",
     inflatable_ball_pool: "INFLATABLE_BALL_POOL",
     inflatable_game: "INFLATABLE_GAME",
     pat_testable: "PAT_TESTABLE"

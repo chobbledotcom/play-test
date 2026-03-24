@@ -47,6 +47,7 @@ class Inspection < ApplicationRecord
 
   include CustomIdGenerator
   include FormConfigurable
+  include InspectionCompletion
   include ValidationConfigurable
 
   PASS_FAIL_NA = {fail: 0, pass: 1, na: 2}.freeze
@@ -54,6 +55,8 @@ class Inspection < ApplicationRecord
   enum :inspection_type, {
     bouncy_castle: "BOUNCY_CASTLE",
     bouncing_pillow: "BOUNCING_PILLOW",
+    bungee_run: "BUNGEE_RUN",
+    catch_bed: "CATCH_BED",
     inflatable_ball_pool: "INFLATABLE_BALL_POOL",
     inflatable_game: "INFLATABLE_GAME",
     pat_testable: "PAT_TESTABLE"
@@ -92,12 +95,30 @@ class Inspection < ApplicationRecord
       Assessments::InflatableGameAssessment
   }.freeze
 
+  CATCH_BED_ASSESSMENT_TYPES = {
+    structure_assessment: Assessments::StructureAssessment,
+    materials_assessment: Assessments::MaterialsAssessment,
+    fan_assessment: Assessments::FanAssessment,
+    anchorage_assessment: Assessments::AnchorageAssessment,
+    catch_bed_assessment: Assessments::CatchBedAssessment
+  }.freeze
+
+  BUNGEE_RUN_ASSESSMENT_TYPES = {
+    structure_assessment: Assessments::StructureAssessment,
+    materials_assessment: Assessments::MaterialsAssessment,
+    fan_assessment: Assessments::FanAssessment,
+    anchorage_assessment: Assessments::AnchorageAssessment,
+    bungee_assessment: Assessments::BungeeAssessment
+  }.freeze
+
   ALL_ASSESSMENT_TYPES =
     CASTLE_ASSESSMENT_TYPES
       .merge(PILLOW_ASSESSMENT_TYPES)
       .merge(PAT_TESTABLE_ASSESSMENT_TYPES)
       .merge(INFLATABLE_BALL_POOL_ASSESSMENT_TYPES)
-      .merge(INFLATABLE_GAME_ASSESSMENT_TYPES).freeze
+      .merge(INFLATABLE_GAME_ASSESSMENT_TYPES)
+      .merge(CATCH_BED_ASSESSMENT_TYPES)
+      .merge(BUNGEE_RUN_ASSESSMENT_TYPES).freeze
 
   USER_EDITABLE_PARAMS = %i[
     has_slide
@@ -129,6 +150,8 @@ class Inspection < ApplicationRecord
     bouncy_castle: %i[inspection_date] + DIMENSION_FIELDS + CASTLE_FLAG_FIELDS,
     bouncing_pillow: %i[inspection_date] + DIMENSION_FIELDS,
     inflatable_ball_pool: %i[inspection_date] + DIMENSION_FIELDS,
+    bungee_run: %i[inspection_date] + DIMENSION_FIELDS,
+    catch_bed: %i[inspection_date] + DIMENSION_FIELDS,
     inflatable_game: %i[inspection_date] + DIMENSION_FIELDS,
     pat_testable: %i[inspection_date]
   }.freeze
@@ -251,34 +274,30 @@ class Inspection < ApplicationRecord
     complete_date.present?
   end
 
-  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
-  def assessment_types
-    if pat_testable?
-      PAT_TESTABLE_ASSESSMENT_TYPES
-    elsif bouncing_pillow?
-      PILLOW_ASSESSMENT_TYPES
-    elsif inflatable_ball_pool?
-      INFLATABLE_BALL_POOL_ASSESSMENT_TYPES
-    elsif inflatable_game?
-      INFLATABLE_GAME_ASSESSMENT_TYPES
-    else
-      CASTLE_ASSESSMENT_TYPES
-    end
-  end
+  ASSESSMENT_TYPES_BY_INSPECTION_TYPE = {
+    bouncy_castle: CASTLE_ASSESSMENT_TYPES,
+    bouncing_pillow: PILLOW_ASSESSMENT_TYPES,
+    bungee_run: BUNGEE_RUN_ASSESSMENT_TYPES,
+    catch_bed: CATCH_BED_ASSESSMENT_TYPES,
+    inflatable_ball_pool: INFLATABLE_BALL_POOL_ASSESSMENT_TYPES,
+    inflatable_game: INFLATABLE_GAME_ASSESSMENT_TYPES,
+    pat_testable: PAT_TESTABLE_ASSESSMENT_TYPES
+  }.freeze
 
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
+  def assessment_types
+    ASSESSMENT_TYPES_BY_INSPECTION_TYPE.fetch(
+      inspection_type.to_sym, CASTLE_ASSESSMENT_TYPES
+    )
+  end
+
+  # Only bouncy_castle has conditional assessments (slide, enclosed,
+  # anchorage). All other types include all their assessments.
+  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def applicable_assessments
-    if pat_testable?
-      pat_testable_applicable_assessments
-    elsif bouncing_pillow?
-      pillow_applicable_assessments
-    elsif inflatable_ball_pool?
-      inflatable_ball_pool_applicable_assessments
-    elsif inflatable_game?
-      inflatable_game_applicable_assessments
-    else
-      castle_applicable_assessments
-    end
+    return castle_applicable_assessments if bouncy_castle?
+
+    assessment_types
   end
 
   private
@@ -297,26 +316,6 @@ class Inspection < ApplicationRecord
         true
       end
     end
-  end
-
-  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
-  def pillow_applicable_assessments
-    PILLOW_ASSESSMENT_TYPES
-  end
-
-  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
-  def pat_testable_applicable_assessments
-    PAT_TESTABLE_ASSESSMENT_TYPES
-  end
-
-  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
-  def inflatable_ball_pool_applicable_assessments
-    INFLATABLE_BALL_POOL_ASSESSMENT_TYPES
-  end
-
-  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
-  def inflatable_game_applicable_assessments
-    INFLATABLE_GAME_ASSESSMENT_TYPES
   end
 
   public
@@ -345,7 +344,7 @@ class Inspection < ApplicationRecord
     applicable = applicable_assessments.keys.map { |k| k.to_s.chomp("_assessment") }
 
     # Add tabs in the correct UI order
-    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat ball_pool inflatable_game]
+    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat ball_pool bungee catch_bed inflatable_game]
     ordered_tabs.each do |tab|
       tabs << tab if applicable.include?(tab)
     end
@@ -354,86 +353,6 @@ class Inspection < ApplicationRecord
     tabs << "results"
 
     tabs
-  end
-
-  # Advanced methods
-  sig { returns(T::Boolean) }
-  def can_be_completed?
-    base_met = unit.present? &&
-      all_assessments_complete? &&
-      !passed.nil? &&
-      inspection_date.present?
-
-    return false unless base_met
-
-    required = INSPECTION_TAB_FIELDS.fetch(
-      inspection_type.to_sym, DIMENSION_FIELDS
-    ) - %i[inspection_date]
-
-    required.all? { |f| !send(f).nil? }
-  end
-
-  sig { returns(T::Boolean) }
-  def can_mark_complete? = can_be_completed?
-
-  sig { returns(T::Array[String]) }
-  def completion_errors
-    errors = []
-    errors << "Unit is required" if unit.blank?
-
-    # Get detailed incomplete field information
-    incomplete_tabs = incomplete_fields
-
-    incomplete_tabs.each do |tab_info|
-      tab_name = tab_info[:name]
-      incomplete_field_names = tab_info[:fields].map { |f| f[:label] }.join(", ")
-      errors << "#{tab_name}: #{incomplete_field_names}"
-    end
-
-    errors
-  end
-
-  sig { returns(T::Array[String]) }
-  def get_missing_assessments
-    missing = []
-
-    # Check for missing unit first
-    missing << "Unit" if unit.blank?
-
-    # Check for missing assessments using the new helper
-    each_applicable_assessment do |assessment_key, _, assessment|
-      next if assessment&.complete?
-
-      # Get the assessment type without "_assessment" suffix
-      assessment_type = assessment_key.to_s.sub("_assessment", "")
-      # Get the name from the form header
-      missing << I18n.t("forms.#{assessment_type}.header")
-    end
-
-    missing
-  end
-
-  sig { params(user: User).void }
-  def complete!(user)
-    update!(complete_date: Time.current)
-    log_audit_action("completed", user, "Inspection completed")
-  end
-
-  sig { params(user: User).void }
-  def un_complete!(user)
-    update!(complete_date: nil)
-    log_audit_action("marked_incomplete", user, "Inspection completed")
-  end
-
-  sig { returns(T::Array[String]) }
-  def validate_completeness
-    assessment_validation_data.filter_map do |name, assessment, message|
-      # Convert the symbol name (e.g., :slide) to assessment key (e.g., :slide_assessment)
-      assessment_key = :"#{name}_assessment"
-      next unless assessment_applicable?(assessment_key)
-
-      message if assessment.present? && !assessment.complete?
-    end
   end
 
   sig { params(action: String, user: T.nilable(User), details: String).void }
@@ -446,106 +365,25 @@ class Inspection < ApplicationRecord
     )
   end
 
-  sig { params(form: T.any(Symbol, String), field: T.any(Symbol, String)).returns(String) }
+  sig {
+    params(
+      form: T.any(Symbol, String),
+      field: T.any(Symbol, String)
+    ).returns(String)
+  }
   def field_label(form, field)
     key = "forms.#{form}.fields.#{field}"
-    # Try the field as-is first
     label = I18n.t(key, default: nil)
-    # Try removing _pass and/or _comment suffixes
     if label.nil?
-      base_field = ChobbleForms::FieldUtils.strip_field_suffix(field)
-      label = I18n.t("forms.#{form}.fields.#{base_field}", default: nil)
+      base = ChobbleForms::FieldUtils.strip_field_suffix(field)
+      label = I18n.t(
+        "forms.#{form}.fields.#{base}", default: nil
+      )
     end
-    # Try adding _pass suffix
-    label = I18n.t("#{key}_pass", default: nil) if label.nil? && !field.to_s.end_with?("_pass")
-    # If still not found, raise for the original key
+    if label.nil? && !field.to_s.end_with?("_pass")
+      label = I18n.t("#{key}_pass", default: nil)
+    end
     label || I18n.t(key)
-  end
-
-  sig { returns(T::Array[Symbol]) }
-  def inspection_tab_incomplete_fields
-    fields = INSPECTION_TAB_FIELDS.fetch(
-      inspection_type.to_sym, DIMENSION_FIELDS
-    )
-
-    fields.select { |f| send(f).nil? }
-  end
-
-  sig { returns(T::Array[T::Hash[Symbol, T.any(Symbol, String, T::Array[T::Hash[Symbol, T.any(Symbol, String)]])]]) }
-  def incomplete_fields
-    output = []
-
-    # Process tabs in the same order as applicable_tabs
-    applicable_tabs.each do |tab|
-      case tab
-      when "inspection"
-        # Get incomplete fields for the inspection tab (excluding passed)
-        inspection_tab_fields =
-          inspection_tab_incomplete_fields
-            .map { |f| {field: f, label: field_label(:inspection, f)} }
-
-        if inspection_tab_fields.any?
-          output << {
-            tab: :inspection,
-            name: I18n.t("forms.inspection.header"),
-            fields: inspection_tab_fields
-          }
-        end
-
-      when "results"
-        # Get incomplete fields for the results tab
-        results_fields = []
-        results_fields << {field: :passed, label: field_label(:results, :passed)} if passed.nil?
-
-        if results_fields.any?
-          output << {
-            tab: :results,
-            name: I18n.t("forms.results.header"),
-            fields: results_fields
-          }
-        end
-
-      else
-        # All other tabs are assessment tabs
-        assessment_key = :"#{tab}_assessment"
-        assessment = send(assessment_key) if respond_to?(assessment_key)
-
-        if assessment
-          grouped_fields = assessment.incomplete_fields_grouped
-          assessment_fields = []
-
-          grouped_fields.each do |base_field, info|
-            # Determine what's missing
-            has_value_missing = info[:fields].include?(base_field)
-            has_pass_missing = info[:fields].include?(:"#{base_field}_pass")
-
-            # Get the base label
-            base_label = field_label(tab.to_sym, base_field)
-
-            # Construct the full label
-            label = if has_value_missing && has_pass_missing
-              "#{base_label} (+ Pass/Fail)"
-            elsif has_pass_missing
-              "#{base_label} Pass/Fail"
-            else
-              base_label
-            end
-
-            assessment_fields << {field: base_field, label: label}
-          end
-
-          if assessment_fields.any?
-            output << {
-              tab: tab.to_sym,
-              name: I18n.t("forms.#{tab}.header"),
-              fields: assessment_fields
-            }
-          end
-        end
-      end
-    end
-
-    output
   end
 
   private
@@ -581,42 +419,19 @@ class Inspection < ApplicationRecord
     applicable_assessments.map { |assessment_key, _| send(assessment_key) }
   end
 
-  sig {
-    returns(
-      T::Array[
-        T::Array[T.any(Symbol, ActiveRecord::Base, String)]
-      ]
-    )
-  }
-  def assessment_validation_data
-    assessment_types = %i[
-      anchorage
-      ball_pool
-      enclosed
-      fan
-      inflatable_game
-      materials
-      pat
-      slide
-      structure
-      user_height
-    ]
-
-    assessment_types.map do |type|
-      assessment = send("#{type}_assessment")
-      message = I18n.t("inspections.validation.#{type}_incomplete")
-      [type, assessment, message]
-    end
-  end
-
   sig { void }
   def photos_must_be_images
-    [[:photo_1, photo_1], [:photo_2, photo_2], [:photo_3, photo_3]].each do |field_name, photo|
+    photos = {photo_1:, photo_2:, photo_3:}
+    photos.each do |field_name, photo|
       next unless photo.attached?
+      next unless photo.blob
 
-      # Check if blob exists and has content_type
-      if photo.blob && !photo.blob.content_type.to_s.start_with?("image/")
-        errors.add(field_name, I18n.t("activerecord.errors.messages.not_an_image"))
+      content_type = photo.blob.content_type.to_s
+      unless content_type.start_with?("image/")
+        msg = I18n.t(
+          "activerecord.errors.messages.not_an_image"
+        )
+        errors.add(field_name, msg)
         photo.purge
       end
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_25_000002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -101,6 +101,90 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_000001) do
     t.boolean "suitable_matting_pass"
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "ball_pool_assessments_pkey", unique: true
+  end
+
+  create_table "bungee_assessments", primary_key: "inspection_id", id: :string, force: :cascade do |t|
+    t.string "baton_compliant_comment", limit: 1000
+    t.boolean "baton_compliant_pass"
+    t.string "blower_forward_distance_comment", limit: 1000
+    t.boolean "blower_forward_distance_pass"
+    t.string "cord_diametre_min_comment", limit: 1000
+    t.boolean "cord_diametre_min_pass"
+    t.string "cord_length_max_comment", limit: 1000
+    t.boolean "cord_length_max_pass"
+    t.datetime "created_at", null: false
+    t.integer "harness_width"
+    t.string "harness_width_comment", limit: 1000
+    t.boolean "harness_width_pass"
+    t.string "lane_width_max_comment", limit: 1000
+    t.boolean "lane_width_max_pass"
+    t.string "marking_max_mass_comment", limit: 1000
+    t.boolean "marking_max_mass_pass"
+    t.string "marking_min_height_comment", limit: 1000
+    t.boolean "marking_min_height_pass"
+    t.integer "num_of_cords"
+    t.string "pull_strength_comment", limit: 1000
+    t.boolean "pull_strength_pass"
+    t.string "rear_wall_comment", limit: 1000
+    t.decimal "rear_wall_height", precision: 8, scale: 2
+    t.string "rear_wall_height_comment", limit: 1000
+    t.boolean "rear_wall_pass"
+    t.decimal "rear_wall_thickness", precision: 8, scale: 2
+    t.string "rear_wall_thickness_comment", limit: 1000
+    t.string "running_wall_comment", limit: 1000
+    t.decimal "running_wall_height", precision: 8, scale: 2
+    t.string "running_wall_height_comment", limit: 1000
+    t.boolean "running_wall_pass"
+    t.decimal "running_wall_width", precision: 8, scale: 2
+    t.string "running_wall_width_comment", limit: 1000
+    t.string "side_wall_comment", limit: 1000
+    t.decimal "side_wall_height", precision: 8, scale: 2
+    t.string "side_wall_height_comment", limit: 1000
+    t.decimal "side_wall_length", precision: 8, scale: 2
+    t.string "side_wall_length_comment", limit: 1000
+    t.boolean "side_wall_pass"
+    t.string "two_stage_locking_comment", limit: 1000
+    t.boolean "two_stage_locking_pass"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "catch_bed_assessments", id: false, force: :cascade do |t|
+    t.text "ancillary_compliant_comment"
+    t.boolean "ancillary_compliant_pass"
+    t.text "ancillary_fit_comment"
+    t.boolean "ancillary_fit_pass"
+    t.text "apron_comment"
+    t.boolean "apron_pass"
+    t.text "arrest_comment"
+    t.boolean "arrest_pass"
+    t.integer "bed_height"
+    t.text "bed_height_comment"
+    t.boolean "bed_height_pass"
+    t.decimal "blower_tube_length", precision: 8, scale: 2
+    t.text "blower_tube_length_comment"
+    t.boolean "blower_tube_length_pass"
+    t.datetime "created_at", null: false
+    t.text "design_risk_comment"
+    t.boolean "design_risk_pass"
+    t.text "framework_comment"
+    t.boolean "framework_pass"
+    t.text "grounding_comment"
+    t.boolean "grounding_pass"
+    t.string "inspection_id", limit: 12, null: false
+    t.text "intended_play_comment"
+    t.boolean "intended_play_pass"
+    t.text "matting_comment"
+    t.boolean "matting_pass"
+    t.text "max_user_mass_marking_comment"
+    t.boolean "max_user_mass_marking_pass"
+    t.decimal "platform_fall_distance", precision: 8, scale: 2
+    t.text "platform_fall_distance_comment"
+    t.boolean "platform_fall_distance_pass"
+    t.text "trough_comment"
+    t.boolean "trough_pass"
+    t.text "type_of_unit"
+    t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "catch_bed_assessments_pkey", unique: true
   end
 
   create_table "credentials", force: :cascade do |t|
@@ -577,6 +661,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_000001) do
   add_foreign_key "anchorage_assessments", "inspections"
   add_foreign_key "badges", "badge_batches"
   add_foreign_key "ball_pool_assessments", "inspections"
+  add_foreign_key "bungee_assessments", "inspections"
+  add_foreign_key "catch_bed_assessments", "inspections"
   add_foreign_key "credentials", "users"
   add_foreign_key "enclosed_assessments", "inspections"
   add_foreign_key "events", "users"
