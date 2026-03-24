@@ -26,18 +26,13 @@
     <%= render 'chobble_forms/text_field', field: :name, required: true %>
     <%= render 'chobble_forms/text_field', field: :operator %>
 
-    <%# Unit type - only for development or test mode %>
-    <% if Rails.env.development? || Rails.env.test? %>
+    <%# Unit type selector - shown when multiple types enabled %>
+    <% if Rails.configuration.units.unit_type_selection? %>
+      <% type_options = Rails.configuration.units.available_unit_types.map { |ut|
+        [t("units.unit_types.#{ut}"), ut]
+      } %>
       <%= render 'chobble_forms/select', field: :unit_type,
-          options: options_for_select([
-            [t('units.unit_types.bouncy_castle'), 'bouncy_castle'],
-            [t('units.unit_types.bouncing_pillow'), 'bouncing_pillow'],
-            [t('units.unit_types.bungee_run'), 'bungee_run'],
-            [t('units.unit_types.catch_bed'), 'catch_bed'],
-            [t('units.unit_types.inflatable_ball_pool'), 'inflatable_ball_pool'],
-            [t('units.unit_types.inflatable_game'), 'inflatable_game'],
-            [t('units.unit_types.pat_testable'), 'pat_testable']
-          ], unit.unit_type),
+          options: options_for_select(type_options, unit.unit_type),
           required: true %>
     <% end %>
 
