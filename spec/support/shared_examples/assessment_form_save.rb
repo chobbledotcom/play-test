@@ -24,7 +24,10 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
 
     define_method(:unit_options_for_assessment) do |type|
       case type
-      when :ball_pool then {unit_type: :inflatable_ball_pool}
+      when :ball_pool
+        {unit_type: :inflatable_ball_pool}
+      when :inflatable_game
+        {unit_type: :inflatable_game}
       else {}
       end
     end

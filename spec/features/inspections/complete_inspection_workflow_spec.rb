@@ -26,6 +26,14 @@ RSpec.feature "Complete Inspection Workflow", type: :feature, js: false do
       unit_type: :inflatable_ball_pool
     ).execute
   end
+
+  scenario "complete workflow with inflatable game unit" do
+    InspectionWorkflow.new(
+      has_slide: false,
+      is_totally_enclosed: false,
+      unit_type: :inflatable_game
+    ).execute
+  end
 end
 
 # RSpec.feature "Complete Inspection Workflow", type: :feature, js: true do
@@ -430,10 +438,11 @@ class InspectionWorkflow
   end
 
   ASSESSMENT_TABS = {
-    all: %w[user_height slide structure materials anchorage fan enclosed ball_pool],
+    all: %w[user_height slide structure materials anchorage fan enclosed ball_pool inflatable_game],
     bouncing_pillow: %w[fan],
     bouncy_castle: %w[user_height structure materials anchorage fan],
-    inflatable_ball_pool: %w[structure materials fan ball_pool]
+    inflatable_ball_pool: %w[structure materials fan ball_pool],
+    inflatable_game: %w[structure materials fan inflatable_game]
   }.freeze
 
   def verify_applicable_tabs_for_unit_type

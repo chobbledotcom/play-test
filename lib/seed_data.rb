@@ -270,6 +270,34 @@ module SeedData
     }
   end
 
+  def self.inflatable_game_fields(passed: true)
+    {
+      game_type: "Standard inflatable obstacle course",
+      max_user_mass_pass: check_passed?(passed),
+      age_range_marking_pass: check_passed?(passed),
+      constant_air_flow_pass: check_passed?(passed),
+      design_risk_pass: check_passed?(passed),
+      intended_play_risk_pass: check_passed?(passed),
+      ancillary_equipment_pass: check_passed?(passed),
+      ancillary_equipment_compliant_pass: check_passed?(passed),
+      containing_wall_height: rand(1.0..2.0).round(2),
+      containing_wall_height_pass: check_passed?(passed)
+    }.merge(inflatable_game_comments(passed))
+  end
+
+  def self.inflatable_game_comments(passed)
+    {
+      max_user_mass_comment: passed ? OK : FAIL,
+      age_range_marking_comment: passed ? OK : FAIL,
+      constant_air_flow_comment: passed ? PASS : FAIL,
+      design_risk_comment: passed ? PASS : FAIL,
+      intended_play_risk_comment: passed ? PASS : FAIL,
+      ancillary_equipment_comment: passed ? OK : FAIL,
+      ancillary_equipment_compliant_comment: passed ? OK : FAIL,
+      containing_wall_height_comment: passed ? OK : FAIL
+    }
+  end
+
   def self.pat_fields(passed: true)
     pat_numeric_fields
       .merge(pat_pass_fields(passed))
