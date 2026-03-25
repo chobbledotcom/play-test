@@ -59,7 +59,8 @@ class Inspection < ApplicationRecord
     catch_bed: "CATCH_BED",
     inflatable_ball_pool: "INFLATABLE_BALL_POOL",
     inflatable_game: "INFLATABLE_GAME",
-    pat_testable: "PAT_TESTABLE"
+    pat_testable: "PAT_TESTABLE",
+    play_zone: "PLAY_ZONE"
   }
 
   CASTLE_ASSESSMENT_TYPES = {
@@ -111,6 +112,15 @@ class Inspection < ApplicationRecord
     bungee_assessment: Assessments::BungeeAssessment
   }.freeze
 
+  PLAY_ZONE_ASSESSMENT_TYPES = {
+    structure_assessment: Assessments::StructureAssessment,
+    materials_assessment: Assessments::MaterialsAssessment,
+    fan_assessment: Assessments::FanAssessment,
+    user_height_assessment: Assessments::UserHeightAssessment,
+    slide_assessment: Assessments::SlideAssessment,
+    play_zone_assessment: Assessments::PlayZoneAssessment
+  }.freeze
+
   ALL_ASSESSMENT_TYPES =
     CASTLE_ASSESSMENT_TYPES
       .merge(PILLOW_ASSESSMENT_TYPES)
@@ -118,7 +128,8 @@ class Inspection < ApplicationRecord
       .merge(INFLATABLE_BALL_POOL_ASSESSMENT_TYPES)
       .merge(INFLATABLE_GAME_ASSESSMENT_TYPES)
       .merge(CATCH_BED_ASSESSMENT_TYPES)
-      .merge(BUNGEE_RUN_ASSESSMENT_TYPES).freeze
+      .merge(BUNGEE_RUN_ASSESSMENT_TYPES)
+      .merge(PLAY_ZONE_ASSESSMENT_TYPES).freeze
 
   USER_EDITABLE_PARAMS = %i[
     has_slide
@@ -153,7 +164,8 @@ class Inspection < ApplicationRecord
     bungee_run: %i[inspection_date] + DIMENSION_FIELDS,
     catch_bed: %i[inspection_date] + DIMENSION_FIELDS,
     inflatable_game: %i[inspection_date] + DIMENSION_FIELDS,
-    pat_testable: %i[inspection_date]
+    pat_testable: %i[inspection_date],
+    play_zone: %i[inspection_date has_slide] + DIMENSION_FIELDS
   }.freeze
 
   belongs_to :user
@@ -281,7 +293,8 @@ class Inspection < ApplicationRecord
     catch_bed: CATCH_BED_ASSESSMENT_TYPES,
     inflatable_ball_pool: INFLATABLE_BALL_POOL_ASSESSMENT_TYPES,
     inflatable_game: INFLATABLE_GAME_ASSESSMENT_TYPES,
-    pat_testable: PAT_TESTABLE_ASSESSMENT_TYPES
+    pat_testable: PAT_TESTABLE_ASSESSMENT_TYPES,
+    play_zone: PLAY_ZONE_ASSESSMENT_TYPES
   }.freeze
 
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
@@ -296,6 +309,7 @@ class Inspection < ApplicationRecord
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def applicable_assessments
     return castle_applicable_assessments if bouncy_castle?
+    return play_zone_applicable_assessments if play_zone?
 
     assessment_types
   end
@@ -314,6 +328,16 @@ class Inspection < ApplicationRecord
         !indoor_only?
       else
         true
+      end
+    end
+  end
+
+  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
+  def play_zone_applicable_assessments
+    PLAY_ZONE_ASSESSMENT_TYPES.select do |assessment_key, _|
+      case assessment_key
+      when :slide_assessment then has_slide?
+      else true
       end
     end
   end
@@ -344,7 +368,7 @@ class Inspection < ApplicationRecord
     applicable = applicable_assessments.keys.map { |k| k.to_s.chomp("_assessment") }
 
     # Add tabs in the correct UI order
-    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat ball_pool bungee catch_bed inflatable_game]
+    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat ball_pool bungee catch_bed inflatable_game play_zone]
     ordered_tabs.each do |tab|
       tabs << tab if applicable.include?(tab)
     end

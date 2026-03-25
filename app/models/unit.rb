@@ -46,7 +46,8 @@ class Unit < ApplicationRecord
     catch_bed: "CATCH_BED",
     inflatable_ball_pool: "INFLATABLE_BALL_POOL",
     inflatable_game: "INFLATABLE_GAME",
-    pat_testable: "PAT_TESTABLE"
+    pat_testable: "PAT_TESTABLE",
+    play_zone: "PLAY_ZONE"
   }
 
   belongs_to :user

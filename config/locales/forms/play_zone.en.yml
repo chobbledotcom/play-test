@@ -1,0 +1,33 @@
+---
+en:
+  forms:
+    play_zone:
+      header: Play Zone
+      sections:
+        markings: Markings
+        safety_checks: Safety Checks
+        measurements: Measurements
+      fields:
+        age_marking: Marking to indicate age range
+        height_marking: Marking to indicate max user height
+        sight_line: Sight lines clear to observe playing areas
+        access: Access, egress and connections safe
+        suitable_matting: Suitable matting
+        traffic_flow: Traffic flow design safe
+        air_juggler: Air jugglers compliant
+        balls: Balls compliant
+        ball_pool_gaps: No gaps in ball pool
+        fitted_sheet: Fitted base sheet
+        ball_pool_depth: Ball pool depth (mm) max 450mm
+        ball_pool_entry_height: Ball pool entry height (mm) max 630mm
+        slide_gradient: Platform incline gradient (deg) max 64 deg
+        slide_platform_height: Slide platform height (m) max 1.5m
+      status:
+        checks_passed: Fields completed
+        completion: Assessment Completion
+      submit: Save Assessment
+      submit_continue: Save & Continue
+      errors:
+        header:
+          one: '1 error prevented this assessment from being saved:'
+          other: '%{count} errors prevented this assessment from being saved:'
