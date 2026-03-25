@@ -406,6 +406,59 @@ module SeedData
     }
   end
 
+  def self.play_zone_fields(passed: true)
+    play_zone_pass_fields(passed)
+      .merge(play_zone_measurements(passed))
+      .merge(play_zone_comments(passed))
+  end
+
+  def self.play_zone_pass_fields(passed)
+    {
+      age_marking_pass: check_passed?(passed),
+      height_marking_pass: check_passed?(passed),
+      sight_line_pass: check_passed?(passed),
+      access_pass: check_passed?(passed),
+      suitable_matting_pass: check_passed?(passed),
+      traffic_flow_pass: check_passed?(passed),
+      air_juggler_pass: check_passed?(passed),
+      balls_pass: check_passed?(passed),
+      ball_pool_gaps_pass: check_passed?(passed),
+      fitted_sheet_pass: check_passed?(passed)
+    }
+  end
+
+  def self.play_zone_measurements(passed)
+    {
+      ball_pool_depth: rand(300..450),
+      ball_pool_depth_pass: check_passed?(passed),
+      ball_pool_entry_height: rand(500..630),
+      ball_pool_entry_height_pass: check_passed?(passed),
+      slide_gradient: rand(40..64),
+      slide_gradient_pass: check_passed?(passed),
+      slide_platform_height: rand(1.0..1.5).round(2),
+      slide_platform_height_pass: check_passed?(passed)
+    }
+  end
+
+  def self.play_zone_comments(passed)
+    {
+      age_marking_comment: passed ? OK : FAIL,
+      height_marking_comment: passed ? OK : FAIL,
+      sight_line_comment: passed ? OK : FAIL,
+      access_comment: passed ? OK : FAIL,
+      suitable_matting_comment: passed ? GOOD : FAIL,
+      traffic_flow_comment: passed ? OK : FAIL,
+      air_juggler_comment: passed ? PASS : FAIL,
+      balls_comment: passed ? PASS : FAIL,
+      ball_pool_gaps_comment: passed ? OK : FAIL,
+      fitted_sheet_comment: passed ? OK : FAIL,
+      ball_pool_depth_comment: passed ? OK : FAIL,
+      ball_pool_entry_height_comment: passed ? OK : FAIL,
+      slide_gradient_comment: passed ? OK : FAIL,
+      slide_platform_height_comment: passed ? OK : FAIL
+    }
+  end
+
   def self.pat_fields(passed: true)
     pat_numeric_fields
       .merge(pat_pass_fields(passed))
