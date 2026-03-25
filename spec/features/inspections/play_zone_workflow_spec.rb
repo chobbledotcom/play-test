@@ -56,7 +56,10 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
 
   scenario "play zone inspection shows correct tabs" do
     unit = create(:unit, user: user, unit_type: :play_zone)
-    inspection = create(:inspection, user: user, unit: unit)
+    inspection = create(
+      :inspection, user: user, unit: unit,
+      has_slide: nil
+    )
 
     visit edit_inspection_path(inspection)
 
@@ -106,7 +109,10 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
   end
 
   def create_inspection_for_unit(unit)
-    inspection = create(:inspection, user: user, unit: unit)
+    inspection = create(
+      :inspection, user: user, unit: unit,
+      has_slide: nil
+    )
     expect(inspection.inspection_type).to eq("play_zone")
     inspection
   end
