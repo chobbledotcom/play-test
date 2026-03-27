@@ -4,6 +4,9 @@
 # belong in git's global ignore instead:
 # `$XDG_CONFIG_HOME/git/ignore` or `~/.config/git/ignore`
 
+/spencers_app/obj/
+/spencers_app/bin/
+
 # Ignore bundler config.
 /.bundle
 /vendor/bundle
