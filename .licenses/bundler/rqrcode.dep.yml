@@ -1,6 +1,6 @@
 ---
 name: rqrcode
-version: 3.1.0
+version: 3.2.0
 type: bundler
 summary: A library to encode QR Codes
 homepage: https://github.com/whomwah/rqrcode
