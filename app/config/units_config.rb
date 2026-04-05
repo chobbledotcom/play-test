@@ -38,7 +38,7 @@ class UnitsConfig < T::Struct
   def available_unit_types
     all_types = Unit.unit_types.keys
     return all_types if enabled_unit_types.empty?
-    all_types.select { enabled_unit_types.include?(_1) }
+    all_types.select { enabled_unit_types.include?(it) }
   end
 
   sig { returns(T::Boolean) }
