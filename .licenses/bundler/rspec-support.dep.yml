@@ -1,8 +1,8 @@
 ---
 name: rspec-support
-version: 3.13.4
+version: 3.13.7
 type: bundler
-summary: rspec-support-3.13.4
+summary: rspec-support-3.13.7
 homepage: https://rspec.info
 license: mit
 licenses:
