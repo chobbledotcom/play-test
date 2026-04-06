@@ -1,6 +1,6 @@
 ---
 name: tilt
-version: 2.6.1
+version: 2.7.0
 type: bundler
 summary: Generic interface to multiple Ruby template engines
 homepage: https://github.com/jeremyevans/tilt

@@ -1,6 +1,6 @@
 ---
 name: bcrypt
-version: 3.1.20
+version: 3.1.21
 type: bundler
 summary: OpenBSD's bcrypt() password hashing algorithm.
 homepage: https://github.com/bcrypt-ruby/bcrypt-ruby

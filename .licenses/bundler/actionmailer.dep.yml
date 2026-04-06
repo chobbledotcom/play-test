@@ -1,6 +1,6 @@
 ---
 name: actionmailer
-version: 8.1.1
+version: 8.1.2
 type: bundler
 summary: Email composition and delivery framework (part of Rails).
 homepage: https://rubyonrails.org
