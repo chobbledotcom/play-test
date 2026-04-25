@@ -27,7 +27,8 @@ class AssessmentSchema
   def self.load(file_name)
     config_path = FORM_CONFIG_DIR.join("#{file_name}.yml")
     yaml = YAML.load_file(config_path).deep_symbolize_keys
-    new(file_name, yaml.fetch(:form_fields))
+    fieldsets = yaml.fetch(:form_fields).map { Fieldset.from_raw(_1) }
+    new(file_name, fieldsets)
   end
 
   sig { void }
@@ -87,16 +88,34 @@ class AssessmentSchema
   class Fieldset
     extend T::Sig
 
+    sig { params(raw: T::Hash[Symbol, T.untyped]).returns(Fieldset) }
+    def self.from_raw(raw)
+      legend = raw.fetch(:legend_i18n_key).to_sym
+      fields = (raw[:fields] || []).map { Field.new(_1) }
+      new(legend, fields)
+    end
+
     sig { returns(Symbol) }
     attr_reader :legend_i18n_key
 
     sig { returns(T::Array[Field]) }
     attr_reader :fields
 
-    sig { params(raw: T::Hash[Symbol, T.untyped]).void }
-    def initialize(raw)
-      @legend_i18n_key = raw.fetch(:legend_i18n_key).to_sym
-      @fields = (raw[:fields] || []).map { Field.new(_1) }.freeze
+    sig do
+      params(
+        legend_i18n_key: Symbol,
+        fields: T::Array[Field]
+      ).void
+    end
+    def initialize(legend_i18n_key, fields)
+      @legend_i18n_key = legend_i18n_key
+      @fields = fields.freeze
+    end
+
+    sig { params(excluded: T::Set[Symbol]).returns(Fieldset) }
+    def without(excluded)
+      remaining = fields.reject { |f| excluded.include?(f.name) }
+      Fieldset.new(legend_i18n_key, remaining)
     end
   end
 
@@ -109,20 +128,13 @@ class AssessmentSchema
   sig do
     params(
       name: String,
-      raw: T::Array[T::Hash[Symbol, T.untyped]]
+      fieldsets: T::Array[Fieldset]
     ).void
   end
-  def initialize(name, raw)
+  def initialize(name, fieldsets)
     @name = name
-    @raw = raw
-    @fieldsets = raw.map { Fieldset.new(_1) }.freeze
+    @fieldsets = fieldsets.freeze
   end
-
-  # Returns a deep copy of the original YAML structure. Callers that haven't
-  # yet been migrated to the typed API receive a fresh array each call so
-  # they can mutate without affecting the cached schema.
-  sig { returns(T::Array[T::Hash[Symbol, T.untyped]]) }
-  def to_form_config = @raw.deep_dup
 
   sig { returns(T::Array[Field]) }
   def fields
@@ -149,5 +161,14 @@ class AssessmentSchema
   sig { returns(T::Array[Symbol]) }
   def add_not_applicable_fields
     fields.select(&:add_not_applicable?).map(&:name)
+  end
+
+  # Returns a new schema with the named fields removed from each fieldset.
+  # Used for permission-driven filtering (e.g. hiding admin-only fields).
+  sig { params(field_names: Symbol).returns(AssessmentSchema) }
+  def exclude(*field_names)
+    excluded = field_names.to_set
+    filtered = fieldsets.map { |fs| fs.without(excluded) }
+    AssessmentSchema.new(name, filtered)
   end
 end

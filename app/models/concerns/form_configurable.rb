@@ -13,12 +13,11 @@ module FormConfigurable
       AssessmentSchema.for(self)
     end
 
-    sig do
-      params(user: T.nilable(User))
-        .returns(T::Array[T::Hash[Symbol, T.untyped]])
-    end
-    def form_fields(user: nil)
-      assessment_schema.to_form_config
+    # Schema for rendering. Override in subclasses to filter fields based on
+    # the current user (e.g. hiding admin-only fields).
+    sig { params(user: T.nilable(User)).returns(AssessmentSchema) }
+    def form_schema(user: nil)
+      assessment_schema
     end
   end
 end

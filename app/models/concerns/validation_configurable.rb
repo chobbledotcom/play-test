@@ -16,15 +16,7 @@ module ValidationConfigurable
 
     sig { void }
     def apply_form_validations
-      raw = begin
-        form_fields
-      rescue
-        nil
-      end
-      return unless raw
-
-      schema = AssessmentSchema.new(name.to_s, raw)
-      schema.fields.each { |field| apply_validation_for(field) }
+      assessment_schema.fields.each { |field| apply_validation_for(field) }
     end
 
     private

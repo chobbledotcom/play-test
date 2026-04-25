@@ -110,40 +110,48 @@ RSpec.describe AssessmentSchema do
     end
   end
 
-  describe "#to_form_config" do
-    let(:schema) { AssessmentSchema.for(Assessments::AnchorageAssessment) }
+  describe "#add_not_applicable_fields" do
+    it "lists fields whose attributes opt-in to not-applicable" do
+      flagged = AssessmentSchema::Field.new(
+        field: :flagged,
+        partial: :number,
+        attributes: {add_not_applicable: true}
+      )
+      unflagged = AssessmentSchema::Field.new(
+        field: :unflagged,
+        partial: :number,
+        attributes: {min: 0}
+      )
+      fieldset = AssessmentSchema::Fieldset.new(:section, [flagged, unflagged])
+      schema = described_class.new("custom", [fieldset])
 
-    it "returns the raw YAML structure" do
-      raw = schema.to_form_config
-      expect(raw).to be_an(Array)
-      expect(raw.first).to include(:legend_i18n_key, :fields)
-    end
-
-    it "returns a deep copy so callers can mutate safely" do
-      first = schema.to_form_config
-      first.first[:fields].clear
-      second = schema.to_form_config
-      expect(second.first[:fields]).not_to be_empty
+      expect(schema.add_not_applicable_fields).to eq([:flagged])
     end
   end
 
-  describe "#add_not_applicable_fields" do
-    it "lists fields whose attributes opt-in to not-applicable" do
-      raw = [
-        {
-          legend_i18n_key: :section,
-          fields: [
-            {
-              partial: :number,
-              field: :flagged,
-              attributes: {add_not_applicable: true}
-            },
-            {partial: :number, field: :unflagged, attributes: {min: 0}}
-          ]
-        }
-      ]
-      schema = described_class.new("custom", raw)
-      expect(schema.add_not_applicable_fields).to eq([:flagged])
+  describe "#exclude" do
+    let(:schema) { AssessmentSchema.for(InspectorCompany) }
+
+    it "returns a new schema with the named fields removed" do
+      filtered = schema.exclude(:notes)
+
+      expect(filtered).not_to be(schema)
+      expect(filtered.find_field(:notes)).to be_nil
+      expect(schema.find_field(:notes)).not_to be_nil
+    end
+
+    it "preserves field order and other fieldsets" do
+      filtered = schema.exclude(:notes)
+
+      expect(filtered.fieldsets.map(&:legend_i18n_key))
+        .to eq(schema.fieldsets.map(&:legend_i18n_key))
+      expect(filtered.find_field(:name)).not_to be_nil
+      expect(filtered.find_field(:active)).not_to be_nil
+    end
+
+    it "is a no-op for fields that aren't in the schema" do
+      filtered = schema.exclude(:nonexistent)
+      expect(filtered.fields.size).to eq(schema.fields.size)
     end
   end
 end
