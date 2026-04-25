@@ -1,0 +1,8 @@
+<% model.class.form_schema(user: current_user).fieldsets.each do |fieldset| %>
+  <%= render 'chobble_forms/fieldset', legend_key: fieldset.legend_i18n_key do %>
+    <% fieldset.fields.each do |field| %>
+      <% render_options = { field: field.name }.merge(field.attributes) %>
+      <%= render "chobble_forms/#{field.partial}", render_options %>
+    <% end %>
+  <% end %>
+<% end %>

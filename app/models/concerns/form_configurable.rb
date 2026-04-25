@@ -8,19 +8,16 @@ module FormConfigurable
   class_methods do
     extend T::Sig
 
-    sig { params(user: T.nilable(User)).returns(T::Array[T::Hash[Symbol, T.untyped]]) }
-    def form_fields(user: nil)
-      @form_fields ||= load_form_config_from_yaml
+    sig { returns(AssessmentSchema) }
+    def assessment_schema
+      AssessmentSchema.for(self)
     end
 
-    sig { returns(T::Array[T::Hash[Symbol, T.untyped]]) }
-    def load_form_config_from_yaml
-      # Remove namespace and use just the class name
-      file_name = name.demodulize.underscore
-      config_path = Rails.root.join("config/forms/#{file_name}.yml")
-      yaml_content = YAML.load_file(config_path)
-      yaml_content.deep_symbolize_keys!
-      yaml_content[:form_fields]
+    # Schema for rendering. Override in subclasses to filter fields based on
+    # the current user (e.g. hiding admin-only fields).
+    sig { params(user: T.nilable(User)).returns(AssessmentSchema) }
+    def form_schema(user: nil)
+      assessment_schema
     end
   end
 end

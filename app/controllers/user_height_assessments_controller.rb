@@ -17,39 +17,28 @@ class UserHeightAssessmentsController < ApplicationController
   end
 
   def field_update_streams
-    form_config = assessment_class.form_fields
+    schema = assessment_class.assessment_schema
 
     @fields_defaulted_to_zero.map do |field|
-      field_config = find_field_config(form_config, field)
-      next unless field_config
+      field_def = schema.find_field(field)
+      next unless field_def
 
-      build_field_turbo_stream(field, field_config)
+      build_field_turbo_stream(field, field_def)
     end.compact
   end
 
-  def build_field_turbo_stream(field, field_config)
+  def build_field_turbo_stream(field, field_def)
     turbo_stream.replace(
       field,
       partial: "chobble_forms/field_turbo_response",
       locals: {
         model: @assessment,
         field:,
-        partial: field_config[:partial],
+        partial: field_def.partial,
         i18n_base: "forms.user_height",
-        attributes: field_config[:attributes] || {}
+        attributes: field_def.attributes
       }
     )
-  end
-
-  def find_field_config(form_config, field_name)
-    # The YAML loads field names as strings, not symbols
-    field_str = field_name.to_s
-    form_config.each do |fieldset|
-      fieldset[:fields].each do |field_config|
-        return field_config if field_config[:field] == field_str
-      end
-    end
-    nil
   end
 
   def preprocess_values
@@ -73,7 +62,7 @@ class UserHeightAssessmentsController < ApplicationController
     user_height_fields.each do |field|
       if params[param_key][field].blank?
         params[param_key][field] = "0"
-        @fields_defaulted_to_zero << field
+        @fields_defaulted_to_zero << field.to_sym
       end
     end
   end

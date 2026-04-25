@@ -90,34 +90,19 @@ class PdfGeneratorService
     private
 
     def get_form_config_fields
-      return [] unless @assessment.class.respond_to?(:form_fields)
+      schema = assessment_schema
+      return [] unless schema
 
-      form_config = @assessment.class.form_fields
       ordered_fields = []
+      schema.fields.each do |field|
+        has_base = @assessment.respond_to?(field.name)
+        composites = field.composite_fields
+          .select { |cf| @assessment.respond_to?(cf) }
+        next unless has_base || composites.any?
 
-      form_config.each do |section|
-        section[:fields].each do |field_config|
-          field_name = field_config[:field]
-          partial_name = field_config[:partial]
-
-          # Get composite fields first to check if any exist
-          composite_fields = ChobbleForms::FieldUtils.get_composite_fields(field_name, partial_name)
-
-          # Skip if neither the base field nor any composite fields exist
-          has_base = @assessment.respond_to?(field_name)
-          has_composites = composite_fields.any? { |cf| @assessment.respond_to?(cf) }
-          next unless has_base || has_composites
-
-          # Add base field if it exists
-          ordered_fields << field_name if has_base
-
-          # Add composite fields that exist
-          composite_fields.each do |composite_field|
-            ordered_fields << composite_field if @assessment.respond_to?(composite_field)
-          end
-        end
+        ordered_fields << field.name if has_base
+        ordered_fields.concat(composites)
       end
-
       ordered_fields
     end
 
@@ -167,12 +152,15 @@ class PdfGeneratorService
     end
 
     def get_not_applicable_fields
-      return [] unless @assessment.class.respond_to?(:form_fields)
+      schema = assessment_schema
+      return [] unless schema
 
-      @assessment.class.form_fields
-        .flat_map { |section| section[:fields] }
-        .select { |field| field[:attributes]&.dig(:add_not_applicable) }
-        .map { |field| field[:field].to_sym }
+      schema.add_not_applicable_fields
+    end
+
+    def assessment_schema
+      return nil unless @assessment.class.respond_to?(:assessment_schema)
+      @assessment.class.assessment_schema
     end
 
     def field_is_not_applicable?(field)
