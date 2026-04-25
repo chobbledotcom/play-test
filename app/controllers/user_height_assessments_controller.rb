@@ -62,7 +62,7 @@ class UserHeightAssessmentsController < ApplicationController
     user_height_fields.each do |field|
       if params[param_key][field].blank?
         params[param_key][field] = "0"
-        @fields_defaulted_to_zero << field
+        @fields_defaulted_to_zero << field.to_sym
       end
     end
   end
