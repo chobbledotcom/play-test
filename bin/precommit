@@ -4,6 +4,10 @@
 
 set -uo pipefail
 
+# Prevent any tool from opening a pager
+export PAGER=cat
+export GIT_PAGER=cat
+
 # Color codes for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -47,27 +51,7 @@ run_check "JSCPD (copy-paste detection)" bin/jscpd
 run_check "Sorbet signature checker" bin/check-sorbet-changes --all
 
 # 6. Run code standards check on all Ruby files
-echo -e "\n${BLUE}Running code standards checks on Ruby files...${NC}"
-
-RUBY_FILES=$(find app lib -name '*.rb' -type f 2>/dev/null | sort)
-STANDARDS_FAILED=0
-
-if [ -z "$RUBY_FILES" ]; then
-  echo -e "${YELLOW}No Ruby files found to check${NC}"
-else
-  for file in $RUBY_FILES; do
-    if ! bin/code-standards-check "$file"; then
-      STANDARDS_FAILED=1
-      OVERALL_STATUS=1
-    fi
-  done
-fi
-
-if [ $STANDARDS_FAILED -eq 0 ]; then
-  echo -e "${GREEN}✓ Code standards checks passed${NC}"
-else
-  echo -e "${RED}✗ Code standards checks failed${NC}"
-fi
+run_check "Code standards checker" bin/code-standards-check
 
 # Summary
 echo -e "\n${YELLOW}========================================${NC}"

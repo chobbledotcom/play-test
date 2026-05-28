@@ -5,6 +5,10 @@
 
 set -e  # Exit on first error
 
+# Prevent any tool from opening a pager
+export PAGER=cat
+export GIT_PAGER=cat
+
 # Color codes for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'

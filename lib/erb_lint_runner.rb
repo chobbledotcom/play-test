@@ -67,7 +67,7 @@ class ErbLintRunner
     cmd_args = ["bundle", "exec", "erb_lint", file]
     cmd_args << "--autocorrect" if @autocorrect
 
-    output, status = Open3.capture2e(*cmd_args)
+    output, status = Open3.capture2e({"PAGER" => "cat"}, *cmd_args)
     success = status.success?
     elapsed = (Time.now.to_f - start_time).round(2)
 
