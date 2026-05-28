@@ -10,7 +10,6 @@
 #  manufacture_date :date
 #  manufacturer     :string
 #  name             :string
-#  operator         :string
 #  serial           :string
 #  unit_type        :string           default("bouncy_castle"), not null
 #  created_at       :datetime         not null

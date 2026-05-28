@@ -16,6 +16,7 @@
 #  is_totally_enclosed  :boolean
 #  length               :decimal(8, 2)
 #  length_comment       :string(1000)
+#  operator             :string
 #  passed               :boolean
 #  pdf_last_accessed_at :datetime
 #  risk_assessment      :text
