@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+# bin/precommit - Run all pre-commit quality checks (except tests)
+
+set -uo pipefail
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Track overall status
+OVERALL_STATUS=0
+
+# Function to run a check and report status
+run_check() {
+  local name="$1"
+  shift
+
+  echo -e "\n${BLUE}Running ${name}...${NC}"
+
+  if "$@"; then
+    echo -e "${GREEN}✓ ${name} passed${NC}"
+  else
+    echo -e "${RED}✗ ${name} failed${NC}"
+    OVERALL_STATUS=1
+  fi
+}
+
+echo -e "${YELLOW}Running all pre-commit checks...${NC}"
+
+# 1. Run comprehensive lint suite
+run_check "Lint suite (StandardRB, Sorbet, ERB, Brakeman, Biome, Actionlint)" bin/lint
+
+# 2. Run RuboCop
+run_check "RuboCop" bin/rubocop
+
+# 3. Run structural duplicate detection
+run_check "Flay (structural duplicates)" bin/flay
+
+# 4. Run copy-paste detection
+run_check "JSCPD (copy-paste detection)" bin/jscpd
+
+# 5. Check Sorbet signatures on changed code
+run_check "Sorbet signature checker" bin/check-sorbet-changes --all
+
+# 6. Run code standards check on all Ruby files
+echo -e "\n${BLUE}Running code standards checks on Ruby files...${NC}"
+
+RUBY_FILES=$(find app lib -name '*.rb' -type f 2>/dev/null | sort)
+STANDARDS_FAILED=0
+
+if [ -z "$RUBY_FILES" ]; then
+  echo -e "${YELLOW}No Ruby files found to check${NC}"
+else
+  for file in $RUBY_FILES; do
+    if ! bin/code-standards-check "$file"; then
+      STANDARDS_FAILED=1
+      OVERALL_STATUS=1
+    fi
+  done
+fi
+
+if [ $STANDARDS_FAILED -eq 0 ]; then
+  echo -e "${GREEN}✓ Code standards checks passed${NC}"
+else
+  echo -e "${RED}✗ Code standards checks failed${NC}"
+fi
+
+# Summary
+echo -e "\n${YELLOW}========================================${NC}"
+if [ $OVERALL_STATUS -eq 0 ]; then
+  echo -e "${GREEN}✓ All pre-commit checks passed!${NC}"
+else
+  echo -e "${RED}✗ Some checks failed. Please fix the issues above.${NC}"
+fi
+echo -e "${YELLOW}========================================${NC}"
+
+exit $OVERALL_STATUS
