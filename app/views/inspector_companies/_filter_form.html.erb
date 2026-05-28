@@ -1,4 +1,4 @@
-<%= form_with url: inspector_companies_path, method: :get, data: { turbo: false }, id: "search-box" do |form| %>
+<%= render layout: 'shared/filter_form', locals: { url: inspector_companies_path } do |form| %>
     <%= form.text_field :search,
         placeholder: t('inspector_companies.search.placeholder'),
         value: params[:search],

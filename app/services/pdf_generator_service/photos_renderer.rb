@@ -77,21 +77,21 @@ class PdfGeneratorService
     end
 
     def self.render_photo(pdf, photo, label, max_height)
-      photo.blob.download
-      processed_image = ImageProcessor.process_image_with_orientation(photo)
+      ImageError.with_error_handling(photo) do
+        photo.blob.download
+        processed_image = ImageProcessor.process_image_with_orientation(photo)
 
-      image_width, image_height = calculate_photo_dimensions_from_blob(
-        photo, pdf.bounds.width, max_height
-      )
-      x_position = (pdf.bounds.width - image_width) / 2
+        image_width, image_height = calculate_photo_dimensions_from_blob(
+          photo, pdf.bounds.width, max_height
+        )
+        x_position = (pdf.bounds.width - image_width) / 2
 
-      render_image_to_pdf(
-        pdf, processed_image, x_position, image_width, image_height, photo
-      )
+        render_image_to_pdf(
+          pdf, processed_image, x_position, image_width, image_height, photo
+        )
 
-      add_photo_label(pdf, label, image_height)
-    rescue Prawn::Errors::UnsupportedImageType => e
-      raise ImageError.build_detailed_error(e, photo)
+        add_photo_label(pdf, label, image_height)
+      end
     end
 
     def self.calculate_photo_dimensions_from_blob(photo, max_width, max_height)
@@ -112,9 +112,9 @@ class PdfGeneratorService
         width: width,
         height: height
       }
-      pdf.image StringIO.new(image_data), image_options
-    rescue Prawn::Errors::UnsupportedImageType => e
-      raise ImageError.build_detailed_error(e, photo)
+      ImageError.with_error_handling(photo) do
+        pdf.image StringIO.new(image_data), image_options
+      end
     end
 
     def self.add_photo_label(pdf, label, image_height)

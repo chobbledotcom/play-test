@@ -8,6 +8,7 @@ class UnitsController < ApplicationController
   include TurboStreamResponders
   include PublicViewable
   include UserActivityCheck
+  include EventLogging
 
   skip_before_action :require_login, only: %i[show]
   before_action :check_assessments_enabled

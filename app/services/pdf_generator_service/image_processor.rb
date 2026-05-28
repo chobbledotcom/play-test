@@ -21,24 +21,17 @@ class PdfGeneratorService
     def self.add_unit_photo_footer(pdf, unit, column_count = 3)
       return unless unit&.photo&.blob
 
-      # Calculate photo position in bottom right corner
       pdf_width = pdf.bounds.width
-
-      # Calculate photo dimensions based on column count
       attachment = unit.photo
       image = create_image(attachment)
       dimensions = calculate_footer_photo_dimensions(pdf, image, column_count)
       photo_width, photo_height = dimensions
 
-      # Position photo in bottom right corner
       photo_x = pdf_width - photo_width
-      # Account for footer height on first page
       photo_y = calculate_photo_y(pdf, photo_height)
 
       render_processed_image(pdf, image, photo_x, photo_y,
         photo_width, photo_height, attachment)
-    rescue Prawn::Errors::UnsupportedImageType => e
-      raise ImageError.build_detailed_error(e, attachment)
     end
 
     def self.measure_unit_photo_height(pdf, unit, column_count = 3)
@@ -50,7 +43,11 @@ class PdfGeneratorService
       _photo_width, photo_height = dimensions
 
       if photo_height <= 0
-        raise I18n.t("pdf_generator.errors.zero_photo_height", unit_id: unit.id)
+        error_message = I18n.t(
+          "pdf_generator.errors.zero_photo_height",
+          unit_id: unit.id
+        )
+        raise error_message
       end
 
       photo_height
@@ -65,28 +62,30 @@ class PdfGeneratorService
     end
 
     def self.calculate_footer_photo_dimensions(pdf, image, column_count = 3)
-      original_width = image.width
-      original_height = image.height
+      column_width = calculate_column_width(pdf, column_count)
+      photo_width = column_width.round
+      photo_height = calculate_height_from_aspect(
+        photo_width, image.width, image.height
+      )
 
-      # Calculate column width based on PDF width and column count
-      # Account for column spacers
+      [photo_width, photo_height]
+    end
+
+    def self.calculate_column_width(pdf, column_count)
       spacer_count = column_count - 1
       spacer_width = Configuration::ASSESSMENT_COLUMN_SPACER
       total_spacer_width = spacer_width * spacer_count
-      column_width = (pdf.bounds.width - total_spacer_width) / column_count.to_f
+      (pdf.bounds.width - total_spacer_width) / column_count.to_f
+    end
 
-      # Photo width equals one column width
-      photo_width = column_width.round
-
-      # Calculate height maintaining aspect ratio
+    def self.calculate_height_from_aspect(photo_width, original_width,
+      original_height)
       if original_width.zero? || original_height.zero?
-        photo_height = photo_width
+        photo_width
       else
         aspect_ratio = original_width.to_f / original_height.to_f
-        photo_height = (photo_width / aspect_ratio).round
+        (photo_width / aspect_ratio).round
       end
-
-      [photo_width, photo_height]
     end
 
     def self.render_processed_image(pdf, image, x, y, width, height, attachment)
@@ -98,9 +97,9 @@ class PdfGeneratorService
         width: width,
         height: height
       }
-      pdf.image StringIO.new(processed_image), image_options
-    rescue Prawn::Errors::UnsupportedImageType => e
-      raise ImageError.build_detailed_error(e, attachment)
+      ImageError.with_error_handling(attachment) do
+        pdf.image StringIO.new(processed_image), image_options
+      end
     end
 
     def self.create_image(attachment)
