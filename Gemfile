@@ -59,6 +59,10 @@ group :development do
 
   # Rubocop extension for Sorbet
   gem "rubocop-sorbet", require: false
+
+  # Structural duplicate detection
+  gem "flay", require: false
+  gem "flay-actionpack", require: false
 end
 
 group :test do

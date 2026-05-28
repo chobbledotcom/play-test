@@ -139,11 +139,11 @@ class PdfGeneratorService
         x_position = pdf.bounds.width - logo_width + 10
         pdf.bounding_box([x_position, pdf.bounds.top],
           width: logo_width - 10) do
-          pdf.image StringIO.new(logo_data), height: Configuration::LOGO_HEIGHT,
-            position: :right
+          ImageError.with_error_handling(logo_attachment) do
+            pdf.image StringIO.new(logo_data),
+              height: Configuration::LOGO_HEIGHT, position: :right
+          end
         end
-      rescue Prawn::Errors::UnsupportedImageType => e
-        raise ImageError.build_detailed_error(e, logo_attachment)
       end
     end
   end
