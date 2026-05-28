@@ -27,7 +27,7 @@ class AssessmentSchema
   def self.load(file_name)
     config_path = FORM_CONFIG_DIR.join("#{file_name}.yml")
     yaml = YAML.load_file(config_path).deep_symbolize_keys
-    fieldsets = yaml.fetch(:form_fields).map { Fieldset.from_raw(_1) }
+    fieldsets = yaml.fetch(:form_fields).map { Fieldset.from_raw(it) }
     new(file_name, fieldsets)
   end
 
@@ -91,7 +91,7 @@ class AssessmentSchema
     sig { params(raw: T::Hash[Symbol, T.untyped]).returns(Fieldset) }
     def self.from_raw(raw)
       legend = raw.fetch(:legend_i18n_key).to_sym
-      fields = (raw[:fields] || []).map { Field.new(_1) }
+      fields = (raw[:fields] || []).map { Field.new(it) }
       new(legend, fields)
     end
 
@@ -144,7 +144,7 @@ class AssessmentSchema
   sig { params(field_name: T.any(String, Symbol)).returns(T.nilable(Field)) }
   def find_field(field_name)
     sym = field_name.to_sym
-    fields.find { _1.name == sym }
+    fields.find { it.name == sym }
   end
 
   # Looks up the rendering partial for a field, falling back to its base
