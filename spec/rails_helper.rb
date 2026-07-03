@@ -26,10 +26,22 @@ end
 
 Rails.root.glob("spec/support/**/*.rb").sort_by(&:to_s).each { |f| require f }
 
-begin
-  ActiveRecord::Migration.maintain_test_schema!
-rescue ActiveRecord::PendingMigrationError => e
-  abort e.to_s.strip
+# An in-memory database starts empty on every boot, so load the schema
+# straight into the live connection (keeping it in the shared cache) rather
+# than the file-based maintain_test_schema! dance.
+def in_memory_database?
+  ActiveRecord::Base.connection_db_config.database.to_s.include?(":memory:")
+end
+
+if in_memory_database?
+  ActiveRecord::Schema.verbose = false
+  load Rails.root.join("db/schema.rb")
+else
+  begin
+    ActiveRecord::Migration.maintain_test_schema!
+  rescue ActiveRecord::PendingMigrationError => e
+    abort e.to_s.strip
+  end
 end
 
 # Configure ActiveStorage for test environment
@@ -68,7 +80,10 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
-    if ENV["TEST_ENV_NUMBER"]
+    # Re-establishing the connection for a file-based parallel worker is
+    # harmless, but for an in-memory DB it would drop the shared cache (and
+    # the schema loaded above) - each worker already has its own in-memory DB.
+    if ENV["TEST_ENV_NUMBER"] && !in_memory_database?
       ActiveRecord::Base.establish_connection(
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env).first
       )

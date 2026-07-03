@@ -28,12 +28,9 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup-environment
 
-      - name: Prepare database
-        env:
-          RAILS_ENV: test
-        run: |
-          bundle exec rails db:migrate
-          bundle exec rails parallel:prepare
+      # No database prep: the test suite uses an in-memory SQLite database and
+      # loads db/schema.rb into it at boot (see spec/rails_helper.rb), so there
+      # is nothing to migrate or prepare on disk.
 
       - name: Run tests
         env:

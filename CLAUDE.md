@@ -79,14 +79,17 @@ This is useful for production environments where PDF generation is expensive. Se
 - **Run parallel tests with coverage**: `bundle exec rake coverage:parallel`
 - Run single test: `bundle exec rspec spec/path/to/file_spec.rb:LINE_NUMBER`
 - Run with verbose output: `bundle exec rspec --format documentation`
-- Prepare parallel test databases: `bundle exec rails parallel:prepare`
+- **Test database is in-memory**: the test env uses shared-cache in-memory
+  SQLite and loads `db/schema.rb` at boot (see `spec/rails_helper.rb`), so
+  there is no `parallel:prepare`/`db:migrate` step - each parallel worker and
+  each mutant kill-fork gets its own isolated in-memory database
 
 ## Environment Notes
 
 - **ripgrep (rg) is NOT installed** - use `grep` command instead of `rg` for searching
 - **Full test suite is SLOW** - only run `bundle exec rspec` when explicitly requested
 - Prefer running individual test files or specific tests during development
-- **Database locking**: If tests fail with "database is locked", just inform the user and wait for them to confirm it's unlocked
+- **Database locking**: The test database is in-memory (no file lock). If a run still reports "database is locked", inform the user and wait for them to confirm it's unlocked
 - **NEVER paste code into Rails console** - it never works. Instead write very specific RSpec tests
 - **Active Storage cleanup**: Test suite automatically cleans tmp/storage before and after test runs
 

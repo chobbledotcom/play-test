@@ -23,8 +23,6 @@ jobs:
           RSPEC_JUNIT_FORMATTER: true
           RSPEC_JUNIT_OUTPUT: junit.xml
         run: |
-          bundle exec rails db:migrate
-          bundle exec rails parallel:prepare
           bundle exec rake coverage:parallel
 
       - name: Upload coverage to Codecov
