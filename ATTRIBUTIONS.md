@@ -2,7 +2,7 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2026-05-25
+Generated on: 2026-06-29
 Total dependencies: 151
 
 ## Dependencies by License
