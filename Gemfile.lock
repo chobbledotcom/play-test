@@ -116,7 +116,7 @@ GEM
     bigdecimal (3.3.1)
     bindata (2.5.1)
     blueprinter (1.2.1)
-    brakeman (8.0.4)
+    brakeman (8.0.5)
       racc
     builder (3.3.0)
     capybara (3.40.0)
@@ -278,6 +278,15 @@ GEM
       railties (>= 7.1)
       stimulus-rails
       turbo-rails
+    mutant (0.13.1)
+      diff-lcs (~> 1.3)
+      parser (~> 3.3.0)
+      regexp_parser (~> 2.10)
+      sorbet-runtime (~> 0.5.0)
+      unparser (~> 0.7.0)
+    mutant-rspec (0.13.1)
+      mutant (= 0.13.1)
+      rspec-core (>= 3.8.0, < 4.0.0)
     net-http (0.9.1)
       uri (>= 0.11.1)
     net-imap (0.6.3)
@@ -578,6 +587,9 @@ GEM
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
+    unparser (0.7.0)
+      diff-lcs (~> 1.6)
+      parser (>= 3.3.0)
     uri (1.1.1)
     useragent (0.16.11)
     webauthn (3.4.3)
@@ -630,6 +642,8 @@ DEPENDENCIES
   licensed (~> 5.0)
   litestream
   mission_control-jobs (~> 1.0)
+  mutant
+  mutant-rspec
   openssl (= 3.3.2)
   parallel_tests
   pdf-inspector
