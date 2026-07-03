@@ -165,7 +165,7 @@ RSpec.describe InspectorCompany, type: :model do
         expect(stats[:active_since]).to eq(company.created_at.year)
       end
 
-      it "reports zero counts when there are no inspections of a status" do
+      it "reports zero failed when every inspection passed" do
         user = create(:user, inspection_company: company)
         create(:inspection, :passed, user: user)
 
@@ -173,6 +173,16 @@ RSpec.describe InspectorCompany, type: :model do
 
         expect(stats[:passed_inspections]).to eq(1)
         expect(stats[:failed_inspections]).to eq(0)
+      end
+
+      it "reports zero passed when every inspection failed" do
+        user = create(:user, inspection_company: company)
+        create(:inspection, :failed, user: user)
+
+        stats = company.company_statistics
+
+        expect(stats[:passed_inspections]).to eq(0)
+        expect(stats[:failed_inspections]).to eq(1)
       end
     end
 
@@ -187,11 +197,11 @@ RSpec.describe InspectorCompany, type: :model do
         expect(company.recent_inspections(2)).not_to include(old)
       end
 
-      it "defaults to returning up to ten inspections" do
+      it "defaults to returning at most ten inspections" do
         user = create(:user, inspection_company: company)
-        create(:inspection, user: user)
+        create_list(:inspection, 11, user: user)
 
-        expect(company.recent_inspections.count).to eq(1)
+        expect(company.recent_inspections.length).to eq(10)
       end
     end
 
@@ -207,6 +217,10 @@ RSpec.describe InspectorCompany, type: :model do
         schema = InspectorCompany.form_schema(user: create(:user))
 
         expect(schema.find_field(:notes)).to be_nil
+      end
+
+      it "excludes the notes field when no user is given" do
+        expect(InspectorCompany.form_schema.find_field(:notes)).to be_nil
       end
     end
 

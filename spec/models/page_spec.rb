@@ -48,6 +48,27 @@ RSpec.describe Page, type: :model do
       page = Page.new(slug: "test-page")
       expect(page.to_param).to eq("test-page")
     end
+
+    it "returns 'new' when the slug is blank" do
+      expect(Page.new(slug: nil).to_param).to eq("new")
+      expect(Page.new(slug: "").to_param).to eq("new")
+    end
+  end
+
+  describe "#safe_content" do
+    it "returns the content marked as html_safe" do
+      page = Page.new(content: "<h1>Hello</h1>")
+      result = page.safe_content
+      expect(result).to eq("<h1>Hello</h1>")
+      expect(result).to be_html_safe
+    end
+
+    it "returns a blank safe string when content is nil" do
+      page = Page.new(content: nil)
+      result = page.safe_content
+      expect(result).to eq("")
+      expect(result).to be_html_safe
+    end
   end
 
   describe "creation" do

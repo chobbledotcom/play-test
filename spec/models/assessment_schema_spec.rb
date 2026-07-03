@@ -26,6 +26,43 @@ RSpec.describe AssessmentSchema do
       expect { described_class.load("definitely_not_real") }
         .to raise_error(Errno::ENOENT)
     end
+
+    it "builds the named schema's fieldsets and fields from the YAML" do
+      schema = described_class.load("anchorage_assessment")
+
+      expect(schema.name).to eq("anchorage_assessment")
+      expect(schema.fieldsets.map(&:legend_i18n_key))
+        .to eq([:anchor_counts, :anchor_quality])
+      expect(schema.fieldsets).to all(be_a(AssessmentSchema::Fieldset))
+      expect(schema.fields).to all(be_a(AssessmentSchema::Field))
+      expect(schema.fields.map(&:name))
+        .to include(:num_low_anchors, :num_high_anchors, :pull_strength)
+    end
+  end
+
+  describe ".reset_cache!" do
+    it "clears memoised schemas so the next lookup reloads" do
+      first = described_class.for(Assessments::AnchorageAssessment)
+      described_class.reset_cache!
+      second = described_class.for(Assessments::AnchorageAssessment)
+
+      expect(second).not_to be(first)
+    end
+  end
+
+  describe "#find_field" do
+    let(:schema) { described_class.for(Assessments::AnchorageAssessment) }
+
+    it "looks up a field by name given a string or a symbol" do
+      # pull_strength is not the first field, so a finder that ignores the
+      # name predicate would return the wrong field.
+      expect(schema.find_field("pull_strength")&.name).to eq(:pull_strength)
+      expect(schema.find_field(:pull_strength)&.name).to eq(:pull_strength)
+    end
+
+    it "returns nil for an unknown field" do
+      expect(schema.find_field(:definitely_not_a_field)).to be_nil
+    end
   end
 
   describe "#fieldsets and #fields" do
@@ -107,6 +144,16 @@ RSpec.describe AssessmentSchema do
 
     it "returns nil for an unknown field" do
       expect(schema.partial_for(:nonsense)).to be_nil
+    end
+
+    it "uses the exact field's partial even when its name has a suffix" do
+      # custom_user_height_comment is defined directly, and its stripped base
+      # (custom_user_height) is not a field - so the exact-match branch must
+      # win, otherwise the fallback would return nil.
+      uh_schema = AssessmentSchema.for(Assessments::UserHeightAssessment)
+
+      expect(uh_schema.partial_for(:custom_user_height_comment))
+        .to eq(:text_area)
     end
   end
 
