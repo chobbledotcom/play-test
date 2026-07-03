@@ -36,6 +36,10 @@ group :development, :test do
   # N+1 query detection
   gem "prosopite"
   gem "pg_query"
+
+  # Mutation testing (open source licence)
+  gem "mutant", require: false
+  gem "mutant-rspec", require: false
 end
 
 group :development do
