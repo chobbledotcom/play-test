@@ -26,23 +26,26 @@ end
 
 Rails.root.glob("spec/support/**/*.rb").sort_by(&:to_s).each { |f| require f }
 
-# An in-memory database starts empty on every boot, so load the schema
-# straight into the live connection (keeping it in the shared cache) rather
-# than the file-based maintain_test_schema! dance.
+# The suite MUST run against the in-memory database. A file-based SQLite
+# database locks under mutant's parallel kill-forks, and a lock timeout is
+# miscounted as a killed mutation - producing dishonest, non-deterministic
+# results. Refuse to run on anything else rather than silently fall back.
 def in_memory_database?
   ActiveRecord::Base.connection_db_config.database.to_s.include?(":memory:")
 end
 
-if in_memory_database?
-  ActiveRecord::Schema.verbose = false
-  load Rails.root.join("db/schema.rb")
-else
-  begin
-    ActiveRecord::Migration.maintain_test_schema!
-  rescue ActiveRecord::PendingMigrationError => e
-    abort e.to_s.strip
-  end
+unless in_memory_database?
+  abort <<~MSG.strip
+    Test database is not in-memory. config/database.yml must set the test
+    database to "file::memory:?cache=shared". Refusing to run: a file-based
+    database gives non-deterministic mutation results.
+  MSG
 end
+
+# An in-memory database starts empty on every boot, so load the schema
+# straight into the live connection (it stays in the shared cache).
+ActiveRecord::Schema.verbose = false
+load Rails.root.join("db/schema.rb")
 
 # Configure ActiveStorage for test environment
 require "active_storage"
@@ -80,14 +83,6 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
-    # Re-establishing the connection for a file-based parallel worker is
-    # harmless, but for an in-memory DB it would drop the shared cache (and
-    # the schema loaded above) - each worker already has its own in-memory DB.
-    if ENV["TEST_ENV_NUMBER"] && !in_memory_database?
-      ActiveRecord::Base.establish_connection(
-        ActiveRecord::Base.configurations.configs_for(env_name: Rails.env).first
-      )
-    end
     # Clean up Active Storage files at the start of test suite
     FileUtils.rm_rf(Rails.root.join("tmp/storage")) if Rails.env.test?
   end

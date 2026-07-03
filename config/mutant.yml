@@ -8,6 +8,9 @@ environment_variables:
   RAILS_ENV: test
 matcher:
   subjects:
-  - Credential
+  - AssessmentSchema
+  - Event
   - InspectorCompany
+  - Page
   - TextReplacement
+  - Unit

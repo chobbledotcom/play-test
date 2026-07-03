@@ -171,6 +171,36 @@ This is useful for production environments where PDF generation is expensive. Se
 - **Why files get orphaned**: When database is deleted but tmp/storage remains
 - **Test cleanup**: Automatic - rails_helper cleans tmp/storage before/after test suite
 
+## Mutation Testing
+
+[mutant](https://github.com/mbj/mutant) runs in open-source mode (no licence
+key) against the subjects listed in `config/mutant.yml`. It mutates the source
+(e.g. `>` to `>=`, deleting an argument) and re-runs the covering tests; a
+surviving mutation is behaviour no test asserts on, even at 100% line coverage.
+
+- **Run a subject**: `bundle exec mutant run --usage opensource --integration rspec --require ./config/environment -- 'InspectorCompany'`
+- **List mutable subjects**: `bundle exec mutant environment subject list`
+
+### Equivalent-mutant allowlist
+
+Some survivors are **equivalent mutants** - semantically identical code that no
+test can distinguish (e.g. `send` vs `public_send`, a guard masked by a later
+`rescue`). Mutant's OSS build cannot ignore individual mutations, so vetted
+equivalents are recorded in `config/mutant_allowed.txt` and checked with
+`bin/mutant-check`:
+
+- **Check configured subjects**: `bin/mutant-check` (fails only on survivors NOT
+  on the allowlist)
+- **Check specific subjects**: `bin/mutant-check Unit Event`
+- **Record new equivalents**: `bin/mutant-check --update Unit` (only after
+  confirming by hand that each survivor is genuinely equivalent)
+
+The in-memory test database gives each kill-fork its own isolated copy, so
+parallel runs are deterministic; set `MUTANT_JOBS` to pin the job count.
+Allowlist entries are keyed by a per-mutation hash tied to the current source,
+so they change when the mutated method changes - re-vet after editing a covered
+method.
+
 ## Core Development Principles
 
 ### Internationalization (i18n) - ALWAYS

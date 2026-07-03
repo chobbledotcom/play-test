@@ -411,7 +411,7 @@ RSpec.describe Unit, type: :model do
     it "does not invalidate cache when only updated_at changes" do
       expect(PdfCacheService).not_to receive(:invalidate_unit_cache)
 
-      unit.touch
+      unit.update!(updated_at: 1.day.from_now)
     end
 
     it "invalidates cache when other attributes change" do

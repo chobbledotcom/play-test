@@ -104,6 +104,16 @@ RSpec.describe Event, type: :model do
       expect(event.details).to eq("Daily backup completed")
       expect(event.metadata).to eq({"size" => "1GB"})
     end
+
+    it "defaults metadata to nil when omitted" do
+      event = Event.log_system_event(
+        user: user,
+        action: "backup_completed",
+        details: "Daily backup completed"
+      )
+
+      expect(event.metadata).to be_nil
+    end
   end
 
   describe "#description" do
