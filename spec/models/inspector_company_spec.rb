@@ -125,6 +125,18 @@ RSpec.describe InspectorCompany, type: :model do
       it "returns 0 when no inspections" do
         expect(company.pass_rate).to eq(0)
       end
+
+      it "rounds the percentage to two decimal places" do
+        expect(company.pass_rate(3, 1)).to eq(33.33)
+      end
+
+      it "computes the rate from the company inspections" do
+        user = create(:user, inspection_company: company)
+        create(:inspection, :passed, user: user)
+        create_list(:inspection, 3, :failed, user: user)
+
+        expect(company.pass_rate).to eq(25.0)
+      end
     end
 
     describe "#company_statistics" do
@@ -138,11 +150,75 @@ RSpec.describe InspectorCompany, type: :model do
           :active_since
         )
       end
+
+      it "counts passed and failed inspections" do
+        user = create(:user, inspection_company: company)
+        create_list(:inspection, 2, :passed, user: user)
+        create(:inspection, :failed, user: user)
+
+        stats = company.company_statistics
+
+        expect(stats[:total_inspections]).to eq(3)
+        expect(stats[:passed_inspections]).to eq(2)
+        expect(stats[:failed_inspections]).to eq(1)
+        expect(stats[:pass_rate]).to eq(66.67)
+        expect(stats[:active_since]).to eq(company.created_at.year)
+      end
+
+      it "reports zero counts when there are no inspections of a status" do
+        user = create(:user, inspection_company: company)
+        create(:inspection, :passed, user: user)
+
+        stats = company.company_statistics
+
+        expect(stats[:passed_inspections]).to eq(1)
+        expect(stats[:failed_inspections]).to eq(0)
+      end
+    end
+
+    describe "#recent_inspections" do
+      it "returns inspections most recent first, limited" do
+        user = create(:user, inspection_company: company)
+        old = create(:inspection, user: user, inspection_date: 3.days.ago)
+        mid = create(:inspection, user: user, inspection_date: 2.days.ago)
+        recent = create(:inspection, user: user, inspection_date: 1.day.ago)
+
+        expect(company.recent_inspections(2)).to eq([recent, mid])
+        expect(company.recent_inspections(2)).not_to include(old)
+      end
+
+      it "defaults to returning up to ten inspections" do
+        user = create(:user, inspection_company: company)
+        create(:inspection, user: user)
+
+        expect(company.recent_inspections.count).to eq(1)
+      end
+    end
+
+    describe ".form_schema" do
+      it "includes the notes field for admins" do
+        admin = create(:user, :admin)
+        schema = InspectorCompany.form_schema(user: admin)
+
+        expect(schema.find_field(:notes)).to be_present
+      end
+
+      it "excludes the notes field for non-admins" do
+        schema = InspectorCompany.form_schema(user: create(:user))
+
+        expect(schema.find_field(:notes)).to be_nil
+      end
     end
 
     describe "#logo_url" do
       it "returns nil when no logo attached" do
         expect(company.logo_url).to be_nil
+      end
+
+      it "returns the logo when one is attached" do
+        company.logo.attach(fixture_file_upload("test_image.jpg", "image/jpeg"))
+
+        expect(company.logo_url).to eq(company.logo)
       end
     end
   end
