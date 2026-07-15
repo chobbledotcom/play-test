@@ -1,7 +1,7 @@
 <%
-  # Determine form context
-  unit = @unit || local_assigns[:unit]
-  form_url = local_assigns[:form_url] || nil
+  unit = local_assigns.fetch(:unit)
+  form_url = local_assigns[:form_url]
+  prefilled_badge = local_assigns.fetch(:prefilled_badge, false)
 %>
 
 <%= render 'chobble_forms/form_context',
@@ -11,10 +11,10 @@
   <%= render 'chobble_forms/fieldset', legend_key: 'unit_details' do %>
     <%# Show ID field when UNIT_BADGES is enabled %>
     <% if Rails.configuration.units.badges_enabled %>
-      <% if unit.persisted? || @prefilled_badge %>
+      <% if unit.persisted? || prefilled_badge %>
         <%# Display ID as read-only for existing units or pre-filled badges %>
         <%= render 'chobble_forms/display_field', field: :id %>
-        <% if @prefilled_badge %>
+        <% if prefilled_badge %>
           <%= form.hidden_field :id %>
         <% end %>
       <% else %>
@@ -52,14 +52,13 @@
         <%= render 'chobble_forms/field_with_link',
             field_type: :text_field,
             field: :manufacturer,
-            required: true,
             link_url: units_path(manufacturer: unit.manufacturer),
             link_text: t('units.labels.all_count', count: manufacturer_count) %>
       <% else %>
-        <%= render 'chobble_forms/text_field', field: :manufacturer, required: true %>
+        <%= render 'chobble_forms/text_field', field: :manufacturer %>
       <% end %>
     <% else %>
-      <%= render 'chobble_forms/text_field', field: :manufacturer, required: true %>
+      <%= render 'chobble_forms/text_field', field: :manufacturer %>
     <% end %>
 
     <%= render 'chobble_forms/text_field', field: :serial, required: true %>
@@ -76,7 +75,7 @@
         <div>
           <label><%= t("units.fields.size_unit") %></label>
           <p style="margin: 0.5em 0; padding: 0.5em; background-color: #f5f5f5;">
-            <%= unit.last_inspection.width %>m × <%= unit.last_inspection.length %>m × <%= unit.last_inspection.height %>m
+            <%= unit.last_inspection.width %><%= t("shared.metres_by") %> <%= unit.last_inspection.length %><%= t("shared.metres_by") %> <%= unit.last_inspection.height %>m
             <em><%= t("units.labels.from_last_inspection") %></em>
           </p>
         </div>

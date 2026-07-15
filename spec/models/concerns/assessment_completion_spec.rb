@@ -61,6 +61,35 @@ RSpec.describe AssessmentCompletion, type: :model do
         expect(assessment).to be_complete
       end
     end
+
+    context "with fields configured as optional" do
+      let(:assessment) { inspection.structure_assessment }
+
+      it "does not return their values or checks as incomplete" do
+        optional_fields = %i[
+          step_ramp_size
+          step_ramp_size_pass
+          straight_walls_pass
+          trough_adjacent_panel_width
+          trough_depth
+        ]
+
+        expect(assessment.incomplete_fields).not_to include(*optional_fields)
+      end
+    end
+
+    context "with optional user count fields" do
+      it "does not return blank height counts as incomplete" do
+        optional_fields = %i[
+          users_at_1000mm
+          users_at_1200mm
+          users_at_1500mm
+          users_at_1800mm
+        ]
+
+        expect(assessment.incomplete_fields).not_to include(*optional_fields)
+      end
+    end
   end
 
   describe "#incomplete_fields_grouped" do

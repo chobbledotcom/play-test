@@ -78,7 +78,6 @@ class PdfGeneratorService
 
     def self.render_photo(pdf, photo, label, max_height)
       ImageError.with_error_handling(photo) do
-        photo.blob.download
         processed_image = ImageProcessor.process_image_with_orientation(photo)
 
         image_width, image_height = calculate_photo_dimensions_from_blob(

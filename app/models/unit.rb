@@ -67,8 +67,7 @@ class Unit < ApplicationRecord
   before_destroy :check_complete_inspections
   before_destroy :destroy_draft_inspections
 
-  # All fields are required for Units
-  validates :name, :serial, :description, :manufacturer, presence: true
+  validates :description, :name, :serial, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
   validate :badge_id_valid, on: :create, if: -> { unit_badges_enabled? }
 

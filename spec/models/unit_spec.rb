@@ -52,14 +52,20 @@ RSpec.describe Unit, type: :model do
   end
 
   describe "validations" do
-    it "validates presence of all required fields" do
+    it "validates presence of required fields" do
       unit = build(:unit, user: user, name: nil, serial: nil,
         description: nil, manufacturer: nil)
       expect(unit).not_to be_valid
       expect(unit.errors[:name]).to be_present
       expect(unit.errors[:serial]).to be_present
       expect(unit.errors[:description]).to be_present
-      expect(unit.errors[:manufacturer]).to be_present
+      expect(unit.errors[:manufacturer]).to be_empty
+    end
+
+    it "allows manufacture details to be blank" do
+      unit = build(:unit, user:, manufacture_date: nil, manufacturer: nil)
+
+      expect(unit).to be_valid
     end
 
     it "validates serial uniqueness within user" do
@@ -205,7 +211,6 @@ RSpec.describe Unit, type: :model do
         unit = build(:unit, user: user, manufacturer: nil, serial: nil)
 
         expect(unit).not_to be_valid
-        expect(unit.errors[:manufacturer]).to be_present
         expect(unit.errors[:serial]).to be_present
       end
 

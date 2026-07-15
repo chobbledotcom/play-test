@@ -18,29 +18,21 @@ class PdfGeneratorService
       pdf.image StringIO.new(qr_code_png), image_options
     end
 
-    def self.add_unit_photo_footer(pdf, unit, column_count = 3)
-      return unless unit&.photo&.blob
+    def self.add_unit_photo_footer(
+      pdf,
+      unit,
+      column_count = 3,
+      pdf_type: :unit,
+      record_id: unit&.id
+    )
+      return 0 unless unit&.photo&.blob
 
       pdf_width = pdf.bounds.width
       attachment = unit.photo
-      image = create_image(attachment)
+      context = performance_context(attachment).merge(pdf_type:, record_id:)
+      image = create_image(attachment, context)
       dimensions = calculate_footer_photo_dimensions(pdf, image, column_count)
       photo_width, photo_height = dimensions
-
-      photo_x = pdf_width - photo_width
-      photo_y = calculate_photo_y(pdf, photo_height)
-
-      render_processed_image(pdf, image, photo_x, photo_y,
-        photo_width, photo_height, attachment)
-    end
-
-    def self.measure_unit_photo_height(pdf, unit, column_count = 3)
-      return 0 unless unit&.photo&.blob
-
-      attachment = unit.photo
-      image = create_image(attachment)
-      dimensions = calculate_footer_photo_dimensions(pdf, image, column_count)
-      _photo_width, photo_height = dimensions
 
       if photo_height <= 0
         error_message = I18n.t(
@@ -50,15 +42,27 @@ class PdfGeneratorService
         raise error_message
       end
 
+      photo_x = pdf_width - photo_width
+      photo_y = calculate_photo_y(pdf, photo_height)
+
+      render_processed_image(pdf, image, photo_x, photo_y,
+        photo_width, photo_height, attachment, context)
+
       photo_height
     rescue Prawn::Errors::UnsupportedImageType => e
       raise ImageError.build_detailed_error(e, attachment)
     end
 
     def self.process_image_with_orientation(attachment)
-      image = create_image(attachment)
+      context = performance_context(attachment)
+      image = create_image(attachment, context)
       # Images are already orientation-corrected from upload processing
-      image.write_to_buffer(".png")
+      PdfPerformance.measure(
+        :image_transcode,
+        **context
+      ) do
+        image.write_to_buffer(".png")
+      end
     end
 
     def self.calculate_footer_photo_dimensions(pdf, image, column_count = 3)
@@ -88,9 +92,15 @@ class PdfGeneratorService
       end
     end
 
-    def self.render_processed_image(pdf, image, x, y, width, height, attachment)
+    def self.render_processed_image(pdf, image, x, y, width, height, attachment,
+      context)
       # Images are already orientation-corrected from upload processing
-      processed_image = image.write_to_buffer(".png")
+      processed_image = PdfPerformance.measure(
+        :image_transcode,
+        **context
+      ) do
+        image.write_to_buffer(".png")
+      end
 
       image_options = {
         at: [x, y],
@@ -98,13 +108,28 @@ class PdfGeneratorService
         height: height
       }
       ImageError.with_error_handling(attachment) do
-        pdf.image StringIO.new(processed_image), image_options
+        PdfPerformance.measure(
+          :image_embed,
+          **context
+        ) do
+          pdf.image StringIO.new(processed_image), image_options
+        end
       end
     end
 
-    def self.create_image(attachment)
-      image_data = attachment.blob.download
-      Vips::Image.new_from_buffer(image_data, "")
+    def self.create_image(attachment, context)
+      image_data = PdfPerformance.measure(
+        :image_download,
+        **context
+      ) do
+        attachment.blob.download
+      end
+      PdfPerformance.measure(
+        :image_decode,
+        **context
+      ) do
+        Vips::Image.new_from_buffer(image_data, "")
+      end
     end
 
     def self.calculate_photo_y(pdf, photo_height)
@@ -115,5 +140,16 @@ class PdfGeneratorService
         Configuration::QR_CODE_BOTTOM_OFFSET + photo_height
       end
     end
+
+    def self.performance_context(attachment)
+      record = attachment.record
+      {
+        pdf_type: record.class.model_name.singular.to_sym,
+        record_id: record.id,
+        attachment: attachment.name
+      }
+    end
+
+    private_class_method :performance_context
   end
 end

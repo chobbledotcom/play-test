@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Units Form", type: :feature do
+RSpec.feature "Units Form", type: :feature do
   let(:user) { create(:user) }
 
   before do
@@ -14,7 +14,7 @@ RSpec.describe "Units Form", type: :feature do
       visit "/units/new"
     end
 
-    it "successfully creates a unit with valid data" do
+    scenario "successfully creates a unit with valid data" do
       if Rails.configuration.units.badges_enabled
         badge = create(:badge, badge_batch: create(:badge_batch))
         fill_in_form :units, :id, badge.id
@@ -41,13 +41,38 @@ RSpec.describe "Units Form", type: :feature do
       expect(page).not_to have_content(I18n.t("events.messages.view_changes"))
     end
 
-    it "shows validation errors for missing required fields" do
+    scenario "creates a unit without optional manufacture details" do
+      if Rails.configuration.units.badges_enabled
+        badge = create(:badge, badge_batch: create(:badge_batch))
+        fill_in_form :units, :id, badge.id
+      end
+
+      fill_in_form :units, :name, "Unit without manufacture details"
+      fill_in_form :units, :serial, "OPTIONAL-001"
+      fill_in_form :units, :description, "Manufacture details are unknown"
+
       submit_form :units
 
-      expected_count = Rails.configuration.units.badges_enabled ? 5 : 4
+      unit = Unit.find_by!(serial: "OPTIONAL-001")
+      expect(page).to have_current_path(unit_path(unit))
+      expect(unit.manufacture_date).to be_nil
+      expect(unit.manufacturer).to be_blank
+    end
+
+    scenario "does not mark manufacture details as required" do
+      manufacture_date = I18n.t("forms.units.fields.manufacture_date")
+      manufacturer = I18n.t("forms.units.fields.manufacturer")
+
+      expect(find_field(manufacture_date)[:required]).to be_nil
+      expect(find_field(manufacturer)[:required]).to be_nil
+    end
+
+    scenario "shows validation errors for missing required fields" do
+      submit_form :units
+
+      expected_count = Rails.configuration.units.badges_enabled ? 4 : 3
       expect_form_errors :units, count: expected_count
       expect(page).to have_content(I18n.t("units.validations.name_blank"))
-      expect(page).to have_content(I18n.t("units.validations.manufacturer_blank"))
       expect(page).to have_content(I18n.t("units.validations.serial_blank"))
       expect(page).to have_content(I18n.t("units.validations.description_blank"))
 
@@ -56,7 +81,7 @@ RSpec.describe "Units Form", type: :feature do
       end
     end
 
-    it "validates serial uniqueness per user" do
+    scenario "validates serial uniqueness per user" do
       create(:unit, user: user, serial: "DUPLICATE-001")
 
       fill_in_form :units, :name, "Test Unit"
@@ -77,13 +102,13 @@ RSpec.describe "Units Form", type: :feature do
       visit edit_unit_path(unit)
     end
 
-    it "populates form with existing unit data" do
+    scenario "populates form with existing unit data" do
       expect(page).to have_field(I18n.t("forms.units.fields.name"), with: unit.name)
       expect(page).to have_field(I18n.t("forms.units.fields.manufacturer"), with: unit.manufacturer)
       expect(page).to have_button(I18n.t("forms.units.submit"))
     end
 
-    it "successfully updates unit with new data and creates audit log" do
+    scenario "successfully updates unit with new data and creates audit log" do
       fill_in_form :units, :name, "Updated Name"
       fill_in_form :units, :description, "Updated description"
 

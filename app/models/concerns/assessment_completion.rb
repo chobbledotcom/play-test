@@ -19,7 +19,10 @@ module AssessmentCompletion
 
   sig { returns(T::Array[Symbol]) }
   def incomplete_fields
-    (self.class.column_name_syms - SYSTEM_FIELDS)
+    fields = self.class.column_name_syms - SYSTEM_FIELDS
+    fields -= self.class.assessment_schema.completion_optional_fields
+
+    fields
       .reject { |f| f.end_with?("_comment") }
       .select { |f| field_is_incomplete?(f) }
       .reject { |f| field_allows_nil_when_na?(f) }
