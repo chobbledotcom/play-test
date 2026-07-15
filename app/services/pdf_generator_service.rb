@@ -100,7 +100,7 @@ class PdfGeneratorService
       unit.inspections
         .includes(:user, inspector_company: {logo_attachment: :blob})
         .complete
-        .order(inspection_date: :desc)
+        .order(complete_date: :desc)
         .load
     end
 
