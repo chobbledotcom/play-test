@@ -114,7 +114,12 @@ class PdfGeneratorService
         pdf_type: :unit,
         record_id: unit.id
       ) do
-        HeaderGenerator.generate_unit_pdf_header(pdf, unit, unbranded: unbranded)
+        HeaderGenerator.generate_unit_pdf_header(
+          pdf,
+          unit,
+          last_inspection:,
+          unbranded:
+        )
         generate_unit_details_with_inspection(pdf, unit, last_inspection)
       end
 
@@ -153,19 +158,30 @@ class PdfGeneratorService
 
     return unless unit
 
-    unit_data = TableBuilder.build_unit_details_table_with_inspection(unit, inspection, :inspection)
+    unit_data = TableBuilder.build_unit_details_table_with_inspection(
+      unit,
+      inspection
+    )
     TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.inspection.equipment_details"), unit_data)
 
     # Hide the table entirely when no unit is associated
   end
 
   def self.generate_unit_details(pdf, unit)
-    unit_data = TableBuilder.build_unit_details_table(unit, :unit)
+    unit_data = TableBuilder.build_unit_details_table(
+      unit,
+      :unit,
+      unit.last_inspection
+    )
     TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.unit.details"), unit_data)
   end
 
-  def self.generate_unit_details_with_inspection(pdf, unit, _last_inspection)
-    unit_data = TableBuilder.build_unit_details_table(unit, :unit)
+  def self.generate_unit_details_with_inspection(pdf, unit, last_inspection)
+    unit_data = TableBuilder.build_unit_details_table(
+      unit,
+      :unit,
+      last_inspection
+    )
     TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.unit.details"), unit_data)
   end
 

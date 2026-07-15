@@ -20,7 +20,6 @@
 # Indexes
 #
 #  index_units_on_is_seed                  (is_seed)
-#  index_units_on_manufacturer_and_serial  (manufacturer,serial) UNIQUE
 #  index_units_on_serial_and_user_id       (serial,user_id) UNIQUE
 #  index_units_on_unit_type                (unit_type)
 #  index_units_on_user_id                  (user_id)
@@ -82,6 +81,16 @@ RSpec.describe Unit, type: :model do
       create(:unit, user: user1, manufacturer: "TestCorp", serial: "ABC123")
       unit2 = build(:unit, user: user2, manufacturer: "TestCorp", serial: "ABC123")
       expect(unit2).to be_valid
+    end
+
+    it "allows same serial and blank manufacturer for different users" do
+      user1 = create(:user)
+      user2 = create(:user)
+      create(:unit, user: user1, manufacturer: "", serial: "ABC123")
+
+      unit2 = create(:unit, user: user2, manufacturer: "", serial: "ABC123")
+
+      expect(unit2).to be_persisted
     end
   end
 

@@ -158,6 +158,12 @@ RSpec.describe PdfGeneratorService, pdf: true do
           "shared.pass_pdf",
           "shared.fail_pdf")
       end
+
+      it "reuses the inspection loaded for the history" do
+        expect(unit).not_to receive(:last_inspection)
+
+        PdfGeneratorService.generate_unit_report(unit).render
+      end
     end
 
     context "with missing manufacturer" do

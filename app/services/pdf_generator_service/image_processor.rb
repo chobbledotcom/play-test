@@ -57,12 +57,7 @@ class PdfGeneratorService
       context = performance_context(attachment)
       image = create_image(attachment, context)
       # Images are already orientation-corrected from upload processing
-      PdfPerformance.measure(
-        :image_transcode,
-        **context
-      ) do
-        image.write_to_buffer(".png")
-      end
+      transcode_to_png(image, context)
     end
 
     def self.calculate_footer_photo_dimensions(pdf, image, column_count = 3)
@@ -95,12 +90,7 @@ class PdfGeneratorService
     def self.render_processed_image(pdf, image, x, y, width, height, attachment,
       context)
       # Images are already orientation-corrected from upload processing
-      processed_image = PdfPerformance.measure(
-        :image_transcode,
-        **context
-      ) do
-        image.write_to_buffer(".png")
-      end
+      processed_image = transcode_to_png(image, context)
 
       image_options = {
         at: [x, y],
@@ -132,6 +122,12 @@ class PdfGeneratorService
       end
     end
 
+    def self.transcode_to_png(image, context)
+      PdfPerformance.measure(:image_transcode, **context) do
+        image.write_to_buffer(".png")
+      end
+    end
+
     def self.calculate_photo_y(pdf, photo_height)
       if pdf.page_number == 1
         Configuration::FOOTER_HEIGHT +
@@ -150,6 +146,6 @@ class PdfGeneratorService
       }
     end
 
-    private_class_method :performance_context
+    private_class_method :performance_context, :transcode_to_png
   end
 end
