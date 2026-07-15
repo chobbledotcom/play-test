@@ -1,13 +1,6 @@
 # typed: false
 
-# Test-specific translations that are only used in specs
-# These are not part of the production application
-
-I18n.backend.store_translations(:en, {
-  test: {
-    password: "password123",
-    access_denied: "Access denied",
-    invalid_password: "wrongpassword",
-    admin_emails_pattern: "^admin\\d*@example\\.com$"
-  }
-})
+# Test-specific translations must survive I18n.backend.reload! calls.
+test_translations = Rails.root.join("spec/support/test_translations.en.yml")
+I18n.load_path << test_translations.to_s
+I18n.backend.load_translations(test_translations)

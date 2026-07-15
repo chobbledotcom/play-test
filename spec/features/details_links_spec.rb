@@ -31,7 +31,7 @@ RSpec.feature "Details element link behavior" do
   end
 
   scenario "multiple clicks on links work consistently" do
-    inspection.user_height_assessment.update_column(:users_at_1000mm, nil)
+    inspection.user_height_assessment.update_column(:containing_wall_height, nil)
 
     find("summary.incomplete-fields-summary").click
 
