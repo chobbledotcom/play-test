@@ -105,7 +105,7 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
       width: 8.0,
       inspection_fields: [:inspection_date],
       assessment_fields: {
-        user_height_assessment: [:users_at_1000mm]
+        user_height_assessment: [:containing_wall_height]
       }
     )
 
@@ -115,7 +115,32 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     expect_incomplete_section("inspection")
     expect_incomplete_section("user_height")
     expect_incomplete_field("inspection", "inspection_date")
-    expect_incomplete_field("user_height", "users_at_1000mm")
+    expect_incomplete_field("user_height", "containing_wall_height")
+  end
+
+  scenario "excludes fields configured as optional for completion" do
+    optional_inspection = create_incomplete_inspection(
+      assessment_fields: {
+        structure_assessment: %i[
+          step_ramp_size
+          step_ramp_size_pass
+          straight_walls_pass
+          trough_adjacent_panel_width
+          trough_depth
+        ],
+        user_height_assessment: %i[
+          users_at_1000mm
+          users_at_1200mm
+          users_at_1500mm
+          users_at_1800mm
+        ]
+      }
+    )
+
+    visit edit_inspection_path(optional_inspection)
+
+    expect(page).not_to have_css("details.incomplete-fields-details")
+    expect(page).to have_button(I18n.t("inspections.buttons.mark_complete"))
   end
 
   scenario "does not show incomplete fields when truly complete" do

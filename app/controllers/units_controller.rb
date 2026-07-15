@@ -196,9 +196,22 @@ class UnitsController < ApplicationController
 
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
 
+  sig { void }
   def set_unit
-    @unit = Unit.includes(photo_attachment: :blob)
-      .find_by(id: params[:id].upcase)
+    unit_id = params[:id].upcase
+    unit_query = Unit.includes(photo_attachment: :blob)
+
+    @unit = if request.format.pdf?
+      PdfPerformance.measure(
+        :record_load,
+        pdf_type: :unit,
+        record_id: unit_id
+      ) do
+        unit_query.find_by(id: unit_id)
+      end
+    else
+      unit_query.find_by(id: unit_id)
+    end
 
     unless @unit
       # Always return 404 for non-existent resources regardless of login status
@@ -220,14 +233,19 @@ class UnitsController < ApplicationController
   end
 
   def send_unit_pdf
-    # Unit already has photo loaded from set_unit
-    result = PdfCacheService.fetch_or_generate_unit_pdf(
-      @unit,
-      debug_enabled: admin_debug_enabled?,
-      debug_queries: debug_sql_queries
-    )
+    PdfPerformance.measure(
+      :total,
+      pdf_type: :unit,
+      record_id: @unit.id
+    ) do
+      result = PdfCacheService.fetch_or_generate_unit_pdf(
+        @unit,
+        debug_enabled: admin_debug_enabled?,
+        debug_queries: debug_sql_queries
+      )
 
-    handle_pdf_response(result, pdf_filename)
+      handle_pdf_response(result, pdf_filename)
+    end
   end
 
   def send_unit_qr_code

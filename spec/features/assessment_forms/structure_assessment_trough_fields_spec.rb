@@ -12,11 +12,16 @@ RSpec.feature "Trough Fields in Structure Assessment", type: :feature do
   describe "structure assessment form" do
     before { visit edit_inspection_path(inspection) }
 
-    it "shows trough fields in structure tab" do
+    scenario "shows optional trough fields in structure tab" do
       click_link I18n.t("inspections.tabs.structure")
 
-      expect(page).to have_content("Trough Depth")
-      expect(page).to have_content("Trough Adjacent Panel Width")
+      trough_depth = I18n.t("forms.structure.fields.trough_depth")
+      adjacent_width = I18n.t(
+        "forms.structure.fields.trough_adjacent_panel_width"
+      )
+
+      expect(find_field(trough_depth)[:required]).to be_nil
+      expect(find_field(adjacent_width)[:required]).to be_nil
     end
 
     it "saves trough field values" do

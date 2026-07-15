@@ -3,7 +3,7 @@
 </header>
 <%= render 'shared/action_buttons', actions: unit_actions(@unit) %>
 <hr id="form">
-<%= render 'form' %>
+<%= render 'form', unit: @unit %>
 <% if @unit.deletable? %>
   <%= button_to t('units.buttons.delete'),
     unit_path(@unit),
