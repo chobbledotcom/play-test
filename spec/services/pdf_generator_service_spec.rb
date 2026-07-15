@@ -181,6 +181,13 @@ RSpec.describe PdfGeneratorService, pdf: true do
           last_inspection: passed_inspection,
           unbranded: anything
         ).and_call_original
+        expect(described_class).to receive(
+          :generate_unit_details_with_inspection
+        ).with(
+          anything,
+          unit,
+          passed_inspection
+        ).and_call_original
 
         PdfGeneratorService.generate_unit_report(unit).render
       end
