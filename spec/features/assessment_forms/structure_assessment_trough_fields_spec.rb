@@ -39,6 +39,23 @@ RSpec.feature "Trough Fields in Structure Assessment", type: :feature do
       width = inspection.structure_assessment.trough_adjacent_panel_width
       expect(width).to eq(75)
     end
+
+    it "saves trough adjacent panel width as not applicable", js: true do
+      inspection.structure_assessment.update!(
+        trough_adjacent_panel_width: 75
+      )
+      visit edit_inspection_path(inspection, tab: "structure")
+
+      find(
+        "#trough_adjacent_panel_width .na-label input[type='checkbox']"
+      ).check
+      submit_form :structure
+
+      expect_updated_message
+      inspection.reload
+      width = inspection.structure_assessment.trough_adjacent_panel_width
+      expect(width).to eq(0)
+    end
   end
 
   describe "data migration" do
