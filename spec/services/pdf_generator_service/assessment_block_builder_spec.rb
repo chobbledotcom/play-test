@@ -203,7 +203,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
         structure_assessment.update!(
           trough_depth: 0,
           trough_depth_comment: "N/A comment",
-          trough_pass: true
+          trough_pass: "pass"
         )
 
         blocks = described_class.build_from_assessment("structure", structure_assessment)
@@ -228,18 +228,19 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       it "includes fields with value 0 when they don't have add_not_applicable" do
         # Regular integer field without add_not_applicable
         structure_assessment.update!(
-          trough_adjacent_panel_width: 0,
-          trough_adjacent_panel_width_comment: "Zero width"
+          step_ramp_size: 0,
+          step_ramp_size_comment: "Zero size"
         )
 
         blocks = described_class.build_from_assessment("structure", structure_assessment)
 
         # Should include the field even though value is 0
-        width_blocks = blocks.select do |b|
-          b.name&.include?("adjacent") || b.comment == "Zero width"
+        size_blocks = blocks.select do |b|
+          b.name == I18n.t("forms.structure.fields.step_ramp_size") ||
+            b.comment == "Zero size"
         end
 
-        expect(width_blocks).not_to be_empty
+        expect(size_blocks).not_to be_empty
       end
     end
   end

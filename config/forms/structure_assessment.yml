@@ -20,18 +20,17 @@ form_fields:
         field: :unit_stable
       - partial: :pass_fail_comment
         field: :evacuation_time
-      - partial: :number_pass_fail_comment
+      - partial: :number_pass_fail_na_comment
         field: :step_ramp_size
         attributes:
           step: 1
           min: 0
-          required: false
-      - partial: :number_pass_fail_comment
+      - partial: :number_pass_fail_na_comment
         field: :platform_height
         attributes:
           step: 1
           min: 10
-      - partial: :number_pass_fail_comment
+      - partial: :number_pass_fail_na_comment
         field: :critical_fall_off_height
         attributes:
           step: 1
@@ -53,8 +52,9 @@ form_fields:
         field: :trough_adjacent_panel_width
         attributes:
           min: 0
+          add_not_applicable: true
           required: false
-      - partial: :pass_fail_comment
+      - partial: :pass_fail_na_comment
         field: :trough
   - legend_i18n_key: safety_compliance
     fields:
@@ -62,5 +62,5 @@ form_fields:
         field: :entrapment
       - partial: :pass_fail_comment
         field: :markings
-      - partial: :pass_fail_comment
+      - partial: :pass_fail_na_comment
         field: :grounding

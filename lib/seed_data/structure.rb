@@ -17,14 +17,14 @@ module SeedData
         sharp_edges_pass: Shared.check_passed?(passed),
         unit_stable_pass: Shared.check_passed?(passed),
         stitch_length_pass: Shared.check_passed?(passed),
-        step_ramp_size_pass: Shared.check_passed?(passed),
-        platform_height_pass: Shared.check_passed?(passed),
-        critical_fall_off_height_pass: Shared.check_passed?(passed),
+        step_ramp_size_pass: Shared.check_passed_integer?(passed),
+        platform_height_pass: Shared.check_passed_integer?(passed),
+        critical_fall_off_height_pass: Shared.check_passed_integer?(passed),
         unit_pressure_pass: Shared.check_passed?(passed),
-        trough_pass: Shared.check_passed?(passed),
+        trough_pass: Shared.check_passed_integer?(passed),
         entrapment_pass: Shared.check_passed?(passed),
         markings_pass: Shared.check_passed?(passed),
-        grounding_pass: Shared.check_passed?(passed),
+        grounding_pass: Shared.check_passed_integer?(passed),
         evacuation_time_pass: Shared.check_passed?(passed)
       }
     end

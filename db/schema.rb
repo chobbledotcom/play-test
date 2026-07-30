@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_15_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -575,26 +575,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_120000) do
     t.datetime "created_at", null: false
     t.integer "critical_fall_off_height"
     t.text "critical_fall_off_height_comment"
-    t.boolean "critical_fall_off_height_pass"
+    t.integer "critical_fall_off_height_pass", limit: 1
     t.text "entrapment_comment"
     t.boolean "entrapment_pass"
     t.text "evacuation_time_comment"
     t.boolean "evacuation_time_pass"
     t.text "grounding_comment"
-    t.boolean "grounding_pass"
+    t.integer "grounding_pass", limit: 1
     t.string "inspection_id", limit: 12, null: false
     t.text "markings_comment"
     t.boolean "markings_pass"
     t.integer "platform_height"
     t.text "platform_height_comment"
-    t.boolean "platform_height_pass"
+    t.integer "platform_height_pass", limit: 1
     t.text "seam_integrity_comment"
     t.boolean "seam_integrity_pass"
     t.text "sharp_edges_comment"
     t.boolean "sharp_edges_pass"
     t.integer "step_ramp_size"
     t.text "step_ramp_size_comment"
-    t.boolean "step_ramp_size_pass"
+    t.integer "step_ramp_size_pass", limit: 1
     t.text "stitch_length_comment"
     t.boolean "stitch_length_pass"
     t.text "straight_walls_comment"
@@ -604,7 +604,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_120000) do
     t.text "trough_comment"
     t.integer "trough_depth"
     t.string "trough_depth_comment", limit: 1000
-    t.boolean "trough_pass"
+    t.integer "trough_pass", limit: 1
     t.decimal "unit_pressure", precision: 8, scale: 2
     t.text "unit_pressure_comment"
     t.boolean "unit_pressure_pass"

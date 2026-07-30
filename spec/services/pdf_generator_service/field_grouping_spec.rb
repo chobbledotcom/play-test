@@ -60,6 +60,7 @@ RSpec.describe "PdfGeneratorService::AssessmentBlockBuilder field grouping" do
 
       # Fields with add_not_applicable: true in form config
       expect(not_applicable_fields).to include(:trough_depth)
+      expect(not_applicable_fields).to include(:trough_adjacent_panel_width)
 
       # Pass/fail fields don't have add_not_applicable
       expect(not_applicable_fields).not_to include(:trough)
@@ -69,7 +70,7 @@ RSpec.describe "PdfGeneratorService::AssessmentBlockBuilder field grouping" do
     it "marks fields as not applicable when value is 0" do
       structure_assessment.update!(
         trough_depth: 0,
-        trough_adjacent_panel_width: 0
+        step_ramp_size: 0
       )
 
       # Only fields with add_not_applicable are marked N/A
@@ -77,8 +78,7 @@ RSpec.describe "PdfGeneratorService::AssessmentBlockBuilder field grouping" do
       expect(is_na).to be true
 
       # Regular fields with value 0 are not marked N/A
-      is_na = builder.send(:field_is_not_applicable?,
-        :trough_adjacent_panel_width)
+      is_na = builder.send(:field_is_not_applicable?, :step_ramp_size)
       expect(is_na).to be false
 
       # Pass fields are never marked N/A
@@ -90,7 +90,7 @@ RSpec.describe "PdfGeneratorService::AssessmentBlockBuilder field grouping" do
       structure_assessment.update!(
         trough_depth: 0, # Will be N/A
         trough_depth_comment: "Not applicable",
-        trough_pass: true, # Should still be included
+        trough_pass: "pass", # Should still be included
         trough_comment: nil
       )
 
@@ -104,7 +104,7 @@ RSpec.describe "PdfGeneratorService::AssessmentBlockBuilder field grouping" do
       check_label = I18n.t("forms.structure.fields.trough")
       check_blocks = blocks.select { |b| b.name == check_label }
       expect(check_blocks).not_to be_empty
-      expect(check_blocks.first.pass_fail).to be true
+      expect(check_blocks.first.pass_fail).to eq("pass")
     end
   end
 end
