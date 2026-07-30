@@ -68,6 +68,12 @@ class Assessments::StructureAssessment < ApplicationRecord
 
   belongs_to :inspection
 
+  enum :step_ramp_size_pass, Inspection::PASS_FAIL_NA, prefix: true
+  enum :platform_height_pass, Inspection::PASS_FAIL_NA, prefix: true
+  enum :critical_fall_off_height_pass, Inspection::PASS_FAIL_NA, prefix: true
+  enum :trough_pass, Inspection::PASS_FAIL_NA, prefix: true
+  enum :grounding_pass, Inspection::PASS_FAIL_NA, prefix: true
+
   after_update :log_assessment_update, if: :saved_changes?
 
   sig { returns(T::Boolean) }
