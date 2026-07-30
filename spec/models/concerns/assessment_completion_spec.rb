@@ -67,14 +67,38 @@ RSpec.describe AssessmentCompletion, type: :model do
 
       it "does not return their values or checks as incomplete" do
         optional_fields = %i[
-          step_ramp_size
-          step_ramp_size_pass
           straight_walls_pass
           trough_adjacent_panel_width
           trough_depth
         ]
 
         expect(assessment.incomplete_fields).not_to include(*optional_fields)
+      end
+    end
+
+    context "with structure fields marked as not applicable" do
+      let(:assessment) { inspection.structure_assessment }
+
+      it "requires the value when the check is not answered" do
+        expect(assessment.incomplete_fields)
+          .to include(:step_ramp_size, :step_ramp_size_pass)
+      end
+
+      it "does not require the value when the check is na" do
+        assessment.update!(
+          step_ramp_size_pass: :na,
+          platform_height_pass: :na,
+          critical_fall_off_height_pass: :na
+        )
+
+        expect(assessment.incomplete_fields).not_to include(
+          :step_ramp_size,
+          :step_ramp_size_pass,
+          :platform_height,
+          :platform_height_pass,
+          :critical_fall_off_height,
+          :critical_fall_off_height_pass
+        )
       end
     end
 

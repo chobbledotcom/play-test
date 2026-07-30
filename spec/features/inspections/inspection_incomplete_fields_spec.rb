@@ -122,8 +122,6 @@ RSpec.feature "Inspection incomplete fields display", type: :feature do
     optional_inspection = create_incomplete_inspection(
       assessment_fields: {
         structure_assessment: %i[
-          step_ramp_size
-          step_ramp_size_pass
           straight_walls_pass
           trough_adjacent_panel_width
           trough_depth
