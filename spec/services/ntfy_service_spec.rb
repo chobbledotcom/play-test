@@ -20,6 +20,9 @@ RSpec.describe NtfyService do
     before do
       allow(Net::HTTP).to receive(:new).and_return(http_double)
       allow(http_double).to receive(:use_ssl=)
+      allow(http_double).to receive(:open_timeout=)
+      allow(http_double).to receive(:read_timeout=)
+      allow(http_double).to receive(:write_timeout=)
       allow(http_double).to receive(:request)
     end
 

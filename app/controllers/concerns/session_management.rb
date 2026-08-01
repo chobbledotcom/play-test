@@ -8,8 +8,8 @@ module SessionManagement
 
   private
 
-  sig { params(user: User).returns(UserSession) }
-  def establish_user_session(user)
+  sig { params(user: User, remember: T::Boolean).returns(UserSession) }
+  def establish_user_session(user, remember: false)
     user_session = user.user_sessions.create!(
       ip_address: request.remote_ip,
       user_agent: request.user_agent,
@@ -17,7 +17,7 @@ module SessionManagement
     )
 
     session[:session_token] = user_session.session_token
-    create_user_session
+    create_user_session(remember: remember)
 
     user_session
   end

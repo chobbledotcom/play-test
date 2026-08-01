@@ -25,9 +25,9 @@ gem "tzinfo-data", platforms: %i[windows jruby]
 gem "chobble-forms", "~> 0.9.0"
 gem "en14960"
 
-# Sorbet runtime (needed in all environments and
-# pinned for nixpkgs)
-gem "sorbet-runtime", "= 0.5.12016"
+# Sorbet runtime (needed in all environments).
+# Mutant requires the 0.5 line; keep the checker and runtime in sync.
+gem "sorbet-runtime", "~> 0.5.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -59,7 +59,8 @@ group :development do
 
   # Sorbet type checker
   gem "sorbet", require: false
-  gem "tapioca", require: false
+  # 0.17.10+ requires the Sorbet 0.6 runtime, which conflicts with Mutant.
+  gem "tapioca", "= 0.17.9", require: false
 
   # Rubocop extension for Sorbet
   gem "rubocop-sorbet", require: false

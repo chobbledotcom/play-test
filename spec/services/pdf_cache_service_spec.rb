@@ -7,6 +7,13 @@ RSpec.describe PdfCacheService, type: :service do
   let(:incomplete_inspection) { create(:inspection) }
   let(:unit) { create(:unit) }
 
+  around do |example|
+    original_pdf_config = Rails.configuration.pdf
+    example.run
+  ensure
+    Rails.configuration.pdf = original_pdf_config
+  end
+
   shared_context "with caching enabled" do
     before do
       cached_config = PdfConfig.new(

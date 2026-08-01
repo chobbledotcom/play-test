@@ -94,4 +94,18 @@ RSpec.describe PhotoProcessingService do
       expect(described_class.valid_image_data?("")).to be false
     end
   end
+
+  describe ".upload_within_size_limit?" do
+    it "accepts files at the upload limit" do
+      upload = Struct.new(:size).new(described_class::MAX_UPLOAD_BYTES)
+
+      expect(described_class.upload_within_size_limit?(upload)).to be true
+    end
+
+    it "rejects files above the upload limit without reading them" do
+      upload = Struct.new(:size).new(described_class::MAX_UPLOAD_BYTES + 1)
+
+      expect(described_class.upload_within_size_limit?(upload)).to be false
+    end
+  end
 end

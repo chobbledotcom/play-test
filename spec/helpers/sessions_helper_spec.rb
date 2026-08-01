@@ -12,22 +12,26 @@ RSpec.describe SessionsHelper, type: :helper do
         session[:session_token] = "test_token_123"
       end
 
-      it "sets session token in permanent cookies" do
+      it "sets a persistent signed session token" do
         helper.remember_user
 
-        expect(cookies.permanent.signed[:session_token]).to eq("test_token_123")
+        expect(cookies.signed[:session_token]).to eq("test_token_123")
       end
 
       it "uses signed cookies for security" do
-        expect(cookies.permanent).to receive(:signed).and_return({})
+        expect(cookies).to receive(:signed).and_return({})
 
         helper.remember_user
       end
 
-      it "uses permanent cookies for persistence" do
-        expect(cookies).to receive(:permanent).and_return(double.as_null_object)
+      it "limits persistence to the session inactivity timeout" do
+        expected_expiry = UserSession::INACTIVITY_TIMEOUT.from_now
+        expect(cookies).to receive(:signed).and_return(cookie_jar = {})
 
         helper.remember_user
+
+        expect(cookie_jar[:session_token][:expires])
+          .to be_within(1.second).of(expected_expiry)
       end
     end
 
@@ -35,7 +39,7 @@ RSpec.describe SessionsHelper, type: :helper do
       it "does nothing" do
         helper.remember_user
 
-        expect(cookies.permanent.signed[:session_token]).to be_nil
+        expect(cookies.signed[:session_token]).to be_nil
       end
     end
   end
@@ -78,6 +82,22 @@ RSpec.describe SessionsHelper, type: :helper do
 
       it "clears the invalid token from session" do
         helper.current_user
+        expect(session[:session_token]).to be_nil
+      end
+    end
+
+    context "when session has an expired token" do
+      before do
+        user_session.update_column(
+          :last_active_at,
+          UserSession::INACTIVITY_TIMEOUT.ago - 1.second
+        )
+        session[:session_token] = user_session.session_token
+      end
+
+      it "rejects and deletes the expired session" do
+        expect(helper.current_user).to be_nil
+        expect(UserSession.exists?(user_session.id)).to be false
         expect(session[:session_token]).to be_nil
       end
     end
@@ -169,8 +189,14 @@ RSpec.describe SessionsHelper, type: :helper do
   end
 
   describe "#create_user_session" do
-    it "remembers the user" do
+    it "remembers the user when requested" do
       expect(helper).to receive(:remember_user)
+
+      helper.create_user_session(remember: true)
+    end
+
+    it "does not persist the user by default" do
+      expect(helper).to receive(:forget_user)
 
       helper.create_user_session
     end

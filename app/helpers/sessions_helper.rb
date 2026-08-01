@@ -5,11 +5,24 @@ module SessionsHelper
   extend T::Sig
   include ControllerContext
 
+  DUMMY_PASSWORD_DIGEST = BCrypt::Password.create(
+    "invalid-password",
+    cost: ActiveModel::SecurePassword.min_cost ?
+      BCrypt::Engine::MIN_COST :
+      BCrypt::Engine.cost
+  )
+
   sig { void }
   def remember_user
     return unless session[:session_token]
 
-    cookies.permanent.signed[:session_token] = session[:session_token]
+    cookies.signed[:session_token] = {
+      value: session[:session_token],
+      expires: UserSession::INACTIVITY_TIMEOUT.from_now,
+      httponly: true,
+      secure: request.ssl?,
+      same_site: :lax
+    }
   end
 
   sig { void }
@@ -35,12 +48,11 @@ module SessionsHelper
 
   sig { returns(T.nilable(User)) }
   def user_from_session_token
-    user_session = UserSession.find_by(session_token: session[:session_token])
+    user_session = active_user_session_for(session[:session_token])
     if user_session
       user_session.user
     else
-      # Session token is invalid, clear session
-      session.delete(:session_token)
+      clear_session_credentials
       nil
     end
   end
@@ -50,16 +62,34 @@ module SessionsHelper
     token = cookies.signed[:session_token]
     return unless token
 
-    user_session = UserSession.find_by(session_token: token)
+    user_session = active_user_session_for(token)
     if user_session
-      # Restore session from cookie
       session[:session_token] = token
+      remember_user
       user_session.user
     else
-      # Invalid cookie token, clear it
-      cookies.delete(:session_token)
+      clear_session_credentials
       nil
     end
+  end
+
+  sig { params(token: T.nilable(String)).returns(T.nilable(UserSession)) }
+  def active_user_session_for(token)
+    return unless token
+
+    user_session = UserSession.find_by(session_token: token)
+    return unless user_session
+    return user_session if user_session.active?
+
+    user_session.destroy
+    nil
+  end
+
+  sig { void }
+  def clear_session_credentials
+    session.delete(:session_token)
+    forget_user
+    @current_session = nil
   end
 
   public
@@ -86,20 +116,27 @@ module SessionsHelper
   def authenticate_user(email, password)
     return nil unless email.present? && password.present?
 
-    User.find_by(email: email.downcase)&.authenticate(password)
+    user = User.find_by(email: email.downcase)
+    return user.authenticate(password) if user
+
+    BCrypt::Password.new(DUMMY_PASSWORD_DIGEST).is_password?(password)
+    nil
   end
 
-  sig { void }
-  def create_user_session
-    remember_user
+  sig { params(remember: T::Boolean).void }
+  def create_user_session(remember: false)
+    remember ? remember_user : forget_user
+  end
+
+  sig { returns(T::Boolean) }
+  def remembered_user?
+    cookies.signed[:session_token].present?
   end
 
   sig { returns(T.nilable(UserSession)) }
   def current_session
     return unless session[:session_token]
 
-    @current_session ||= UserSession.find_by(
-      session_token: session[:session_token]
-    )
+    @current_session ||= active_user_session_for(session[:session_token])
   end
 end
