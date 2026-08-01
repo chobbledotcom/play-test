@@ -5,13 +5,6 @@ module SessionsHelper
   extend T::Sig
   include ControllerContext
 
-  DUMMY_PASSWORD_DIGEST = BCrypt::Password.create(
-    "invalid-password",
-    cost: ActiveModel::SecurePassword.min_cost ?
-      BCrypt::Engine::MIN_COST :
-      BCrypt::Engine.cost
-  )
-
   sig { void }
   def remember_user
     return unless session[:session_token]
@@ -32,7 +25,9 @@ module SessionsHelper
 
   sig { returns(T.nilable(User)) }
   def current_user
-    @current_user ||= fetch_current_user
+    return @current_user if defined?(@current_user)
+
+    @current_user = fetch_current_user
   end
 
   private
@@ -48,9 +43,9 @@ module SessionsHelper
 
   sig { returns(T.nilable(User)) }
   def user_from_session_token
-    user_session = active_user_session_for(session[:session_token])
-    if user_session
-      user_session.user
+    @current_session = active_user_session_for(session[:session_token])
+    if @current_session
+      @current_session.user
     else
       clear_session_credentials
       nil
@@ -62,11 +57,11 @@ module SessionsHelper
     token = cookies.signed[:session_token]
     return unless token
 
-    user_session = active_user_session_for(token)
-    if user_session
+    @current_session = active_user_session_for(token)
+    if @current_session
       session[:session_token] = token
       remember_user
-      user_session.user
+      @current_session.user
     else
       clear_session_credentials
       nil
@@ -111,16 +106,12 @@ module SessionsHelper
     params(
       email: T.nilable(String),
       password: T.nilable(String)
-    ).returns(T.nilable(T.any(User, T::Boolean)))
+    ).returns(T.nilable(User))
   end
   def authenticate_user(email, password)
     return nil unless email.present? && password.present?
 
-    user = User.find_by(email: email.downcase)
-    return user.authenticate(password) if user
-
-    BCrypt::Password.new(DUMMY_PASSWORD_DIGEST).is_password?(password)
-    nil
+    User.authenticate_by(email: email.downcase, password: password)
   end
 
   sig { params(remember: T::Boolean).void }
@@ -136,7 +127,8 @@ module SessionsHelper
   sig { returns(T.nilable(UserSession)) }
   def current_session
     return unless session[:session_token]
+    return @current_session if defined?(@current_session)
 
-    @current_session ||= active_user_session_for(session[:session_token])
+    @current_session = active_user_session_for(session[:session_token])
   end
 end

@@ -79,7 +79,7 @@ class UsersController < ApplicationController
   def update_password
     if @user.authenticate(params[:user][:current_password])
       if @user.update(password_params)
-        rotate_user_sessions
+        rotate_user_sessions(@user)
         flash[:notice] = I18n.t("users.messages.password_updated")
         redirect_to root_path
       else
@@ -224,13 +224,6 @@ class UsersController < ApplicationController
   end
 
   private
-
-  def rotate_user_sessions
-    remember = remembered_user?
-    @user.user_sessions.destroy_all
-    session.delete(:session_token)
-    establish_user_session(@user, remember: remember)
-  end
 
   sig { params(scope: T.untyped).returns(T.untyped) }
   def apply_sort(scope)

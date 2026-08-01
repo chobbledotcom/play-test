@@ -7,11 +7,10 @@ class ApplicationController < ActionController::Base
   include ImageProcessable
   include ActiveStorage::SetCurrent
 
-  RATE_LIMIT_STORE = if Rails.env.test?
-    ActiveSupport::Cache::MemoryStore.new
-  else
-    Rails.cache
-  end
+  RATE_LIMIT_STORE = T.let(
+    Rails.env.test? ? ActiveSupport::Cache::MemoryStore.new : Rails.cache,
+    ActiveSupport::Cache::Store
+  )
 
   before_action :require_login, unless: :skip_authentication?
   before_action :update_last_active_at, unless: :skip_authentication?

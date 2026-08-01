@@ -53,8 +53,11 @@ RSpec.describe NtfyService do
 
       it "sends to developer channel by default" do
         expect(Net::HTTP).to receive(:new).with("ntfy.sh", 443).once
-        NtfyService.notify(test_message)
-        sleep 0.1 # Give thread time to execute
+        expect(http_double).to receive(:open_timeout=).with(5)
+        expect(http_double).to receive(:read_timeout=).with(5)
+        expect(http_double).to receive(:write_timeout=).with(5)
+
+        NtfyService.notify(test_message).join
       end
 
       it "sends to developer channel when explicitly specified" do

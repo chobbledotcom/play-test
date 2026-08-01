@@ -17,9 +17,18 @@ module SessionManagement
     )
 
     session[:session_token] = user_session.session_token
+    @current_session = user_session
     create_user_session(remember: remember)
 
     user_session
+  end
+
+  sig { params(user: User).void }
+  def rotate_user_sessions(user)
+    remember = remembered_user?
+    user.user_sessions.destroy_all
+    session.delete(:session_token)
+    establish_user_session(user, remember: remember)
   end
 
   sig { void }

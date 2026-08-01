@@ -71,7 +71,7 @@ class PhotoProcessingService
 
   def self.upload_within_size_limit?(uploaded_file)
     return false if uploaded_file.blank?
-    return true unless uploaded_file.respond_to?(:size)
+    return false unless uploaded_file.respond_to?(:size)
 
     uploaded_file.size <= MAX_UPLOAD_BYTES
   end

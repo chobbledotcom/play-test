@@ -69,6 +69,13 @@ RSpec.describe SessionsHelper, type: :helper do
 
         2.times { helper.current_user }
       end
+
+      it "reuses the session lookup for current_session" do
+        expect(UserSession).to receive(:find_by).once.and_return(user_session)
+
+        expect(helper.current_user).to eq(user)
+        expect(helper.current_session).to eq(user_session)
+      end
     end
 
     context "when session has an invalid token" do
@@ -110,6 +117,13 @@ RSpec.describe SessionsHelper, type: :helper do
       it "restores session and returns the user" do
         expect(helper.current_user).to eq(user)
         expect(session[:session_token]).to eq(user_session.session_token)
+      end
+
+      it "reuses the cookie session lookup for current_session" do
+        expect(UserSession).to receive(:find_by).once.and_return(user_session)
+
+        expect(helper.current_user).to eq(user)
+        expect(helper.current_session).to eq(user_session)
       end
     end
 
@@ -225,7 +239,7 @@ RSpec.describe SessionsHelper, type: :helper do
       expect(result).to be_nil
     end
 
-    it "returns false when password is incorrect" do
+    it "returns nil when password is incorrect" do
       user_params = {
         email: "test@example.com",
         password: "correct_password",
@@ -234,7 +248,7 @@ RSpec.describe SessionsHelper, type: :helper do
       create(:user, user_params)
 
       result = helper.authenticate_user("test@example.com", "wrong_password")
-      expect(result).to eq(false)
+      expect(result).to be_nil
     end
 
     it "is case-insensitive for email" do
