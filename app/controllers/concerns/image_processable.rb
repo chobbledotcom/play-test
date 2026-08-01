@@ -64,6 +64,14 @@ module ImageProcessable
 
   sig { params(uploaded_file: T.untyped).void }
   def validate_image!(uploaded_file)
+    unless PhotoProcessingService.upload_within_size_limit?(uploaded_file)
+      message = I18n.t(
+        "errors.messages.image_too_large",
+        max_size_mb: PhotoProcessingService::MAX_UPLOAD_BYTES / 1.megabyte
+      )
+      raise ApplicationErrors::ImageProcessingError, message
+    end
+
     return if PhotoProcessingService.valid_image?(uploaded_file)
     raise ApplicationErrors::NotAnImageError
   end

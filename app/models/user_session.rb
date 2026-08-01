@@ -25,6 +25,8 @@
 #
 
 class UserSession < ApplicationRecord
+  INACTIVITY_TIMEOUT = 30.days
+
   belongs_to :user
 
   validates :session_token, presence: true, uniqueness: true
@@ -32,10 +34,10 @@ class UserSession < ApplicationRecord
 
   before_validation :generate_session_token, on: :create
 
-  scope :active, -> { where("last_active_at > ?", 30.days.ago) }
+  scope :active, -> { where("last_active_at > ?", INACTIVITY_TIMEOUT.ago) }
   scope :recent, -> { order(last_active_at: :desc) }
 
-  def active? = last_active_at > 30.days.ago
+  def active? = last_active_at > INACTIVITY_TIMEOUT.ago
 
   def touch_last_active
     update_column(:last_active_at, Time.current)

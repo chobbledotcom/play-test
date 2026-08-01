@@ -402,6 +402,19 @@ RSpec.describe ApplicationController, type: :controller do
         end
         expect(NtfyService).not_to have_received(:notify)
       end
+
+      it "does not notify for rate-limited requests" do
+        controller.define_singleton_method(:index) do
+          raise ActionController::TooManyRequests
+        end
+
+        begin
+          get :index
+        rescue
+          nil
+        end
+        expect(NtfyService).not_to have_received(:notify)
+      end
     end
 
     context "in development" do
