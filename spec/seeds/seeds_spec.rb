@@ -23,6 +23,10 @@ RSpec.describe "Seed Data", type: :model do
       load Rails.root.join("db/seeds.rb")
     end
 
+    after(:all) do
+      DatabaseCleaner.clean_with(:truncation)
+    end
+
     describe "Inspector Companies" do
       it "creates expected number of inspector companies" do
         expect(InspectorCompany.count).to eq(3)

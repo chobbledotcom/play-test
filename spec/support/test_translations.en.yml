@@ -1,0 +1,7 @@
+---
+en:
+  test:
+    access_denied: Access denied
+    admin_emails_pattern: "^admin\\d*@example\\.com$"
+    invalid_password: wrongpassword
+    password: password123

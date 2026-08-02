@@ -15,6 +15,37 @@ RSpec.feature "PDF Complete Integration", type: :feature do
     sign_in user
   end
 
+  scenario "records PDF generation performance timings" do
+    performance_stages = []
+    allow(Rails.logger).to receive(:info) do |message|
+      if message.is_a?(Hash) && message[:event] == "pdf.performance"
+        performance_stages << message[:stage]
+      end
+    end
+
+    visit inspection_path(inspection, format: :pdf)
+
+    expect(page.source).to start_with("%PDF")
+    expect(Rails.logger).to have_received(:info).with(
+      hash_including(
+        event: "pdf.performance",
+        stage: :document_build,
+        pdf_type: :inspection,
+        record_id: inspection.id
+      )
+    )
+    expect(Rails.logger).to have_received(:info).with(
+      hash_including(
+        event: "pdf.performance",
+        stage: :total,
+        pdf_type: :inspection,
+        record_id: inspection.id
+      )
+    )
+    expect(performance_stages.index(:access_tracking))
+      .to be < performance_stages.index(:total)
+  end
+
   scenario "generates comprehensive PDF with complete field coverage" do
     visit inspection_path(inspection, format: :pdf)
 

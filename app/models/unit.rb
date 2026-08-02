@@ -21,7 +21,6 @@
 # Indexes
 #
 #  index_units_on_is_seed                  (is_seed)
-#  index_units_on_manufacturer_and_serial  (manufacturer,serial) UNIQUE
 #  index_units_on_serial_and_user_id       (serial,user_id) UNIQUE
 #  index_units_on_unit_type                (unit_type)
 #  index_units_on_user_id                  (user_id)
@@ -67,8 +66,7 @@ class Unit < ApplicationRecord
   before_destroy :check_complete_inspections
   before_destroy :destroy_draft_inspections
 
-  # All fields are required for Units
-  validates :name, :serial, :description, :manufacturer, presence: true
+  validates :description, :name, :serial, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
   validate :badge_id_valid, on: :create, if: -> { unit_badges_enabled? }
 

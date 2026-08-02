@@ -62,6 +62,9 @@ class AssessmentSchema
     def required? = !!attributes[:required]
 
     sig { returns(T::Boolean) }
+    def optional_for_completion? = attributes[:required] == false
+
+    sig { returns(T::Boolean) }
     def numeric? = NUMERIC_PARTIALS.include?(partial)
 
     sig { returns(T::Boolean) }
@@ -161,6 +164,14 @@ class AssessmentSchema
   sig { returns(T::Array[Symbol]) }
   def add_not_applicable_fields
     fields.select(&:add_not_applicable?).map(&:name)
+  end
+
+  sig { returns(T::Array[Symbol]) }
+  def completion_optional_fields
+    @completion_optional_fields ||= fields
+      .select(&:optional_for_completion?)
+      .flat_map { [it.name, *it.composite_fields] }
+      .freeze
   end
 
   # Returns a new schema with the named fields removed from each fieldset.

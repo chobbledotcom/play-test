@@ -120,6 +120,21 @@ RSpec.describe AssessmentSchema do
       expect(ic_schema.find_field(:city)).not_to be_required
     end
 
+    it "detects fields explicitly optional for completion" do
+      optional = AssessmentSchema::Field.new(
+        field: :optional,
+        partial: :number,
+        attributes: {required: false}
+      )
+      unspecified = AssessmentSchema::Field.new(
+        field: :unspecified,
+        partial: :number
+      )
+
+      expect(optional).to be_optional_for_completion
+      expect(unspecified).not_to be_optional_for_completion
+    end
+
     it "computes composite fields via ChobbleForms::FieldUtils" do
       field = schema.find_field(:num_low_anchors)
       expect(field.composite_fields)
@@ -173,6 +188,28 @@ RSpec.describe AssessmentSchema do
       schema = described_class.new("custom", [fieldset])
 
       expect(schema.add_not_applicable_fields).to eq([:flagged])
+    end
+  end
+
+  describe "#completion_optional_fields" do
+    it "includes the persisted fields represented by optional form fields" do
+      optional = AssessmentSchema::Field.new(
+        field: :measurement,
+        partial: :number_pass_fail_comment,
+        attributes: {required: false}
+      )
+      required = AssessmentSchema::Field.new(
+        field: :check,
+        partial: :pass_fail_comment
+      )
+      fieldset = AssessmentSchema::Fieldset.new(:section, [optional, required])
+      schema = described_class.new("custom", [fieldset])
+
+      expect(schema.completion_optional_fields).to contain_exactly(
+        :measurement,
+        :measurement_pass,
+        :measurement_comment
+      )
     end
   end
 

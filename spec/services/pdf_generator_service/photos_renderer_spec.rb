@@ -317,8 +317,8 @@ RSpec.describe PdfGeneratorService::PhotosRenderer do
       allow(described_class).to receive(:add_photo_label)
     end
 
-    it "downloads and processes the image" do
-      expect(photo_blob).to receive(:download)
+    it "delegates the image download to the image processor" do
+      expect(photo_blob).not_to receive(:download)
       expect(PdfGeneratorService::ImageProcessor).to receive(:process_image_with_orientation).with(photo_attached_one)
       described_class.render_photo(pdf, photo_attached_one, "Test Label", 300)
     end

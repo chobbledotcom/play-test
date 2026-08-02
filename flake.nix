@@ -32,7 +32,6 @@
             rubyPackages_3_4.psych
             rubyPackages_3_4.ruby-vips
             rubyPackages_3_4.rugged
-            rubyPackages_3_4.sorbet-runtime
             ruby_3_4
             sqlite
             yamlfix
