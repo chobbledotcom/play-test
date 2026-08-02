@@ -27,7 +27,7 @@ jobs:
       new: ${{ steps.new.outputs.version }}
     
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       
@@ -85,7 +85,7 @@ jobs:
       contents: write
     
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
@@ -105,7 +105,7 @@ jobs:
           git archive --format=zip --prefix=play-test-v${{ needs.version.outputs.new }}/ HEAD > play-test-v${{ needs.version.outputs.new }}.zip
       
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ needs.version.outputs.new }}
           name: Release ${{ needs.version.outputs.new }}
