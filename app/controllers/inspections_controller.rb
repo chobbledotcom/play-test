@@ -4,6 +4,10 @@
 class InspectionsController < ApplicationController
   extend T::Sig
 
+  rate_limit to: 30, within: 1.minute, only: :show,
+    by: -> { request.remote_ip },
+    store: RATE_LIMIT_STORE, name: "public-report"
+
   include ChangeTracking
   include InspectionTurboStreams
   include PublicViewable
@@ -312,16 +316,16 @@ class InspectionsController < ApplicationController
   # This ensures mappings stay in sync with the model definition
   ASSESSMENT_TAB_MAPPING = Inspection::ALL_ASSESSMENT_TYPES
     .each_with_object({}) do |(method_name, _), hash|
-      # Convert :user_height_assessment to "user_height"
-      tab_name = method_name.to_s.gsub(/_assessment$/, "")
-      hash[tab_name] = method_name
+    # Convert :user_height_assessment to "user_height"
+    tab_name = method_name.to_s.gsub(/_assessment$/, "")
+    hash[tab_name] = method_name
   end.freeze
 
   ASSESSMENT_CLASS_MAPPING = Inspection::ALL_ASSESSMENT_TYPES
     .each_with_object({}) do |(method_name, klass), hash|
-      # Convert :user_height_assessment to "user_height"
-      tab_name = method_name.to_s.gsub(/_assessment$/, "")
-      hash[tab_name] = klass
+    # Convert :user_height_assessment to "user_height"
+    tab_name = method_name.to_s.gsub(/_assessment$/, "")
+    hash[tab_name] = klass
   end.freeze
 
   def build_base_params
@@ -354,7 +358,7 @@ class InspectionsController < ApplicationController
   def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
 
   def set_inspection
-    @inspection = Inspection
+    inspection_query = Inspection
       .includes(
         :user, :inspector_company,
         *Inspection::ALL_ASSESSMENT_TYPES.keys,
@@ -363,7 +367,19 @@ class InspectionsController < ApplicationController
         photo_2_attachment: :blob,
         photo_3_attachment: :blob
       )
-      .find_by(id: params[:id]&.upcase)
+    inspection_id = params[:id]&.upcase
+
+    @inspection = if request.format.pdf?
+      PdfPerformance.measure(
+        :record_load,
+        pdf_type: :inspection,
+        record_id: inspection_id
+      ) do
+        inspection_query.find_by(id: inspection_id)
+      end
+    else
+      inspection_query.find_by(id: inspection_id)
+    end
 
     head :not_found unless @inspection
   end
@@ -432,14 +448,26 @@ class InspectionsController < ApplicationController
   end
 
   def send_inspection_pdf
-    result = PdfCacheService.fetch_or_generate_inspection_pdf(
-      @inspection,
-      debug_enabled: admin_debug_enabled?,
-      debug_queries: debug_sql_queries
-    )
-    @inspection.update(pdf_last_accessed_at: Time.current)
+    PdfPerformance.measure(
+      :total,
+      pdf_type: :inspection,
+      record_id: @inspection.id
+    ) do
+      result = PdfCacheService.fetch_or_generate_inspection_pdf(
+        @inspection,
+        debug_enabled: admin_debug_enabled?,
+        debug_queries: debug_sql_queries
+      )
+      PdfPerformance.measure(
+        :access_tracking,
+        pdf_type: :inspection,
+        record_id: @inspection.id
+      ) do
+        @inspection.update(pdf_last_accessed_at: Time.current)
+      end
 
-    handle_pdf_response(result, pdf_filename)
+      handle_pdf_response(result, pdf_filename)
+    end
   end
 
   def send_inspection_qr_code

@@ -1,0 +1,9 @@
+<% if result %>
+  <%= render 'result_with_breakdown',
+    result_label: result_label,
+    result: result %>
+<% elsif error %>
+  <div class="error">
+    <p><strong><%= t('shared.error') %>:</strong> <%= error %></p>
+  </div>
+<% end %>

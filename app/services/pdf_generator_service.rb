@@ -13,40 +13,74 @@ class PdfGeneratorService
       # Initialize array to collect all assessment blocks
       assessment_blocks = []
 
-      # Header section
-      HeaderGenerator.generate_inspection_pdf_header(pdf, inspection)
+      PdfPerformance.measure(
+        :primary_content,
+        pdf_type: :inspection,
+        record_id: inspection.id
+      ) do
+        HeaderGenerator.generate_inspection_pdf_header(pdf, inspection)
+        generate_inspection_unit_details(pdf, inspection)
+        generate_risk_assessment_section(pdf, inspection)
+      end
 
-      # Unit details section
-      generate_inspection_unit_details(pdf, inspection)
-
-      # Risk assessment section (if present)
-      generate_risk_assessment_section(pdf, inspection)
-
-      # Generate all assessment sections in the correct UI order from applicable_tabs
-      generate_assessments_in_ui_order(inspection, assessment_blocks)
+      PdfPerformance.measure(
+        :assessment_data,
+        pdf_type: :inspection,
+        record_id: inspection.id
+      ) do
+        generate_assessments_in_ui_order(inspection, assessment_blocks)
+      end
 
       # Render footer and photo first to measure actual space used
       cursor_before_footer = pdf.cursor
 
-      # Disclaimer footer (only on first page)
-      DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
-      disclaimer_height = DisclaimerFooterRenderer.measure_footer_height(unbranded: false)
-
-      # Add unit photo in bottom right corner
-      photo_height = ImageProcessor.measure_unit_photo_height(pdf, inspection.unit, 4)
-      ImageProcessor.add_unit_photo_footer(pdf, inspection.unit, 4) if inspection.unit&.photo
+      disclaimer_height, photo_height = PdfPerformance.measure(
+        :footer,
+        pdf_type: :inspection,
+        record_id: inspection.id
+      ) do
+        DisclaimerFooterRenderer.render_disclaimer_footer(pdf, inspection.user)
+        measured_footer = DisclaimerFooterRenderer.measure_footer_height(
+          unbranded: false
+        )
+        measured_photo = ImageProcessor.add_unit_photo_footer(
+          pdf,
+          inspection.unit,
+          4,
+          pdf_type: :inspection,
+          record_id: inspection.id
+        )
+        [measured_footer, measured_photo]
+      end
 
       # Reset cursor to render assessments with proper space accounting
       pdf.move_cursor_to(cursor_before_footer)
 
       # Render all collected assessments in newspaper-style columns
-      render_assessment_blocks_in_columns(pdf, assessment_blocks, disclaimer_height, photo_height)
+      PdfPerformance.measure(
+        :assessment_layout,
+        pdf_type: :inspection,
+        record_id: inspection.id
+      ) do
+        render_assessment_blocks_in_columns(
+          pdf,
+          assessment_blocks,
+          disclaimer_height,
+          photo_height
+        )
+      end
 
       # Add DRAFT watermark overlay for draft inspections (except in test env)
       Utilities.add_draft_watermark(pdf) if !inspection.complete? && !Rails.env.test?
 
       # Add photos page if photos are attached
-      PhotosRenderer.generate_photos_page(pdf, inspection)
+      PdfPerformance.measure(
+        :report_photos,
+        pdf_type: :inspection,
+        record_id: inspection.id
+      ) do
+        PhotosRenderer.generate_photos_page(pdf, inspection)
+      end
 
       # Add debug info page if enabled (admins only)
       DebugInfoRenderer.add_debug_info_page(pdf, debug_queries) if debug_enabled && debug_queries.present?
@@ -58,25 +92,61 @@ class PdfGeneratorService
 
     unbranded = Rails.configuration.units.reports_unbranded
 
-    # Preload all inspections once to avoid N+1 queries
-    completed_inspections = unit.inspections
-      .includes(:user, inspector_company: {logo_attachment: :blob})
-      .complete
-      .order(inspection_date: :desc)
+    completed_inspections = PdfPerformance.measure(
+      :inspection_history_load,
+      pdf_type: :unit,
+      record_id: unit.id
+    ) do
+      unit.inspections
+        .includes(:user, inspector_company: {logo_attachment: :blob})
+        .complete
+        .order(complete_date: :desc)
+        .load
+    end
 
     last_inspection = completed_inspections.first
 
     Prawn::Document.new(page_size: "A4", page_layout: :portrait) do |pdf|
       Configuration.setup_pdf_fonts(pdf)
-      HeaderGenerator.generate_unit_pdf_header(pdf, unit, unbranded: unbranded)
-      generate_unit_details_with_inspection(pdf, unit, last_inspection)
-      generate_unit_inspection_history_with_data(pdf, unit, completed_inspections)
 
-      # Disclaimer footer (only on first page, not for unbranded reports)
-      DisclaimerFooterRenderer.render_disclaimer_footer(pdf, unit.user, unbranded: unbranded)
+      PdfPerformance.measure(
+        :primary_content,
+        pdf_type: :unit,
+        record_id: unit.id
+      ) do
+        HeaderGenerator.generate_unit_pdf_header(
+          pdf,
+          unit,
+          last_inspection:,
+          unbranded:
+        )
+        generate_unit_details_with_inspection(pdf, unit, last_inspection)
+      end
 
-      # Add unit photo in bottom right corner (for unit PDFs, always use 3 columns)
-      ImageProcessor.add_unit_photo_footer(pdf, unit, 3) if unit.photo
+      PdfPerformance.measure(
+        :inspection_history_layout,
+        pdf_type: :unit,
+        record_id: unit.id
+      ) do
+        generate_unit_inspection_history_with_data(
+          pdf,
+          unit,
+          completed_inspections
+        )
+      end
+
+      PdfPerformance.measure(
+        :footer,
+        pdf_type: :unit,
+        record_id: unit.id
+      ) do
+        DisclaimerFooterRenderer.render_disclaimer_footer(
+          pdf,
+          unit.user,
+          unbranded: unbranded
+        )
+        ImageProcessor.add_unit_photo_footer(pdf, unit, 3) if unit.photo
+      end
 
       # Add debug info page if enabled (admins only)
       DebugInfoRenderer.add_debug_info_page(pdf, debug_queries) if debug_enabled && debug_queries.present?
@@ -88,19 +158,30 @@ class PdfGeneratorService
 
     return unless unit
 
-    unit_data = TableBuilder.build_unit_details_table_with_inspection(unit, inspection, :inspection)
+    unit_data = TableBuilder.build_unit_details_table_with_inspection(
+      unit,
+      inspection
+    )
     TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.inspection.equipment_details"), unit_data)
 
     # Hide the table entirely when no unit is associated
   end
 
   def self.generate_unit_details(pdf, unit)
-    unit_data = TableBuilder.build_unit_details_table(unit, :unit)
+    unit_data = TableBuilder.build_unit_details_table(
+      unit,
+      :unit,
+      unit.last_inspection
+    )
     TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.unit.details"), unit_data)
   end
 
-  def self.generate_unit_details_with_inspection(pdf, unit, _last_inspection)
-    unit_data = TableBuilder.build_unit_details_table(unit, :unit)
+  def self.generate_unit_details_with_inspection(pdf, unit, last_inspection)
+    unit_data = TableBuilder.build_unit_details_table(
+      unit,
+      :unit,
+      last_inspection
+    )
     TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.unit.details"), unit_data)
   end
 

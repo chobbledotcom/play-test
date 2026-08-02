@@ -115,7 +115,6 @@ en:
     validations:
       id_blank: ID can't be blank
       name_blank: Name can't be blank
-      manufacturer_blank: Manufacturer can't be blank
       serial_blank: Serial can't be blank
       serial: Serial number can't be blank
       description_blank: Description can't be blank

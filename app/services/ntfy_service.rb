@@ -52,6 +52,9 @@ class NtfyService
       uri = URI.parse("https://ntfy.sh/#{channel_url}")
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
+      http.open_timeout = 5
+      http.read_timeout = 5
+      http.write_timeout = 5
 
       request = Net::HTTP::Post.new(uri.path)
       request["Title"] = "play-test notification"

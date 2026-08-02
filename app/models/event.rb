@@ -31,13 +31,23 @@
 class Event < ApplicationRecord
   extend T::Sig
 
+  EventDataHash = T.type_alias do
+    T.nilable(
+      T::Hash[String, T.nilable(T.any(String, Integer, T::Boolean))]
+    )
+  end
+
   belongs_to :user
   belongs_to :resource, polymorphic: true, optional: true
 
   validates :action, presence: true
   validates :resource_type, presence: true
   validates :resource_id, presence: true,
-    unless: -> { resource_type == "System" }
+    unless: -> { resource_type == Event.system_resource_type }
+
+  def self.system_resource_type
+    I18n.t("events.resource_types.system")
+  end
 
   # Scopes for common queries
   scope :recent, -> { order(created_at: :desc) }
@@ -54,8 +64,8 @@ class Event < ApplicationRecord
       action: String,
       resource: ActiveRecord::Base,
       details: T.nilable(String),
-      changed_data: T.nilable(T::Hash[String, T.nilable(T.any(String, Integer, T::Boolean))]),
-      metadata: T.nilable(T::Hash[String, T.nilable(T.any(String, Integer, T::Boolean))])
+      changed_data: EventDataHash,
+      metadata: EventDataHash
     ).returns(Event)
   end
   def self.log(user:, action:, resource:, details: nil,
@@ -77,14 +87,14 @@ class Event < ApplicationRecord
       user: User,
       action: String,
       details: String,
-      metadata: T.nilable(T::Hash[String, T.nilable(T.any(String, Integer, T::Boolean))])
+      metadata: EventDataHash
     ).returns(Event)
   end
   def self.log_system_event(user:, action:, details:, metadata: nil)
     create!(
       user: user,
       action: action,
-      resource_type: "System",
+      resource_type: system_resource_type,
       resource_id: nil,
       details: details,
       metadata: metadata

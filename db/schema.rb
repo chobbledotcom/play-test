@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_25_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -385,6 +385,45 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_000002) do
     t.index ["inspection_id"], name: "pat_assessments_pkey", unique: true
   end
 
+  create_table "play_zone_assessments", id: false, force: :cascade do |t|
+    t.text "access_comment"
+    t.boolean "access_pass"
+    t.text "age_marking_comment"
+    t.boolean "age_marking_pass"
+    t.text "air_juggler_comment"
+    t.boolean "air_juggler_pass"
+    t.integer "ball_pool_depth"
+    t.text "ball_pool_depth_comment"
+    t.boolean "ball_pool_depth_pass"
+    t.integer "ball_pool_entry_height"
+    t.text "ball_pool_entry_height_comment"
+    t.boolean "ball_pool_entry_height_pass"
+    t.text "ball_pool_gaps_comment"
+    t.boolean "ball_pool_gaps_pass"
+    t.text "balls_comment"
+    t.boolean "balls_pass"
+    t.datetime "created_at", null: false
+    t.text "fitted_sheet_comment"
+    t.boolean "fitted_sheet_pass"
+    t.text "height_marking_comment"
+    t.boolean "height_marking_pass"
+    t.string "inspection_id", limit: 12, null: false
+    t.text "sight_line_comment"
+    t.boolean "sight_line_pass"
+    t.integer "slide_gradient"
+    t.text "slide_gradient_comment"
+    t.boolean "slide_gradient_pass"
+    t.decimal "slide_platform_height", precision: 8, scale: 2
+    t.text "slide_platform_height_comment"
+    t.boolean "slide_platform_height_pass"
+    t.text "suitable_matting_comment"
+    t.boolean "suitable_matting_pass"
+    t.text "traffic_flow_comment"
+    t.boolean "traffic_flow_pass"
+    t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "play_zone_assessments_pkey", unique: true
+  end
+
   create_table "slide_assessments", id: false, force: :cascade do |t|
     t.text "clamber_netting_comment"
     t.integer "clamber_netting_pass", limit: 1
@@ -536,26 +575,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_000002) do
     t.datetime "created_at", null: false
     t.integer "critical_fall_off_height"
     t.text "critical_fall_off_height_comment"
-    t.boolean "critical_fall_off_height_pass"
+    t.integer "critical_fall_off_height_pass", limit: 1
     t.text "entrapment_comment"
     t.boolean "entrapment_pass"
     t.text "evacuation_time_comment"
     t.boolean "evacuation_time_pass"
     t.text "grounding_comment"
-    t.boolean "grounding_pass"
+    t.integer "grounding_pass", limit: 1
     t.string "inspection_id", limit: 12, null: false
     t.text "markings_comment"
     t.boolean "markings_pass"
     t.integer "platform_height"
     t.text "platform_height_comment"
-    t.boolean "platform_height_pass"
+    t.integer "platform_height_pass", limit: 1
     t.text "seam_integrity_comment"
     t.boolean "seam_integrity_pass"
     t.text "sharp_edges_comment"
     t.boolean "sharp_edges_pass"
     t.integer "step_ramp_size"
     t.text "step_ramp_size_comment"
-    t.boolean "step_ramp_size_pass"
+    t.integer "step_ramp_size_pass", limit: 1
     t.text "stitch_length_comment"
     t.boolean "stitch_length_pass"
     t.text "straight_walls_comment"
@@ -565,7 +604,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_000002) do
     t.text "trough_comment"
     t.integer "trough_depth"
     t.string "trough_depth_comment", limit: 1000
-    t.boolean "trough_pass"
+    t.integer "trough_pass", limit: 1
     t.decimal "unit_pressure", precision: 8, scale: 2
     t.text "unit_pressure_comment"
     t.boolean "unit_pressure_pass"
@@ -595,7 +634,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_000002) do
     t.datetime "updated_at", null: false
     t.string "user_id", limit: 12, null: false
     t.index ["is_seed"], name: "index_units_on_is_seed"
-    t.index ["manufacturer", "serial"], name: "index_units_on_manufacturer_and_serial", unique: true
     t.index ["serial", "user_id"], name: "index_units_on_serial_and_user_id", unique: true
     t.index ["unit_type"], name: "index_units_on_unit_type"
     t.index ["user_id"], name: "index_units_on_user_id"
@@ -673,6 +711,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_000002) do
   add_foreign_key "inspections", "users"
   add_foreign_key "materials_assessments", "inspections"
   add_foreign_key "pat_assessments", "inspections"
+  add_foreign_key "play_zone_assessments", "inspections"
   add_foreign_key "slide_assessments", "inspections"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

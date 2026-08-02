@@ -36,6 +36,44 @@ RSpec.describe "Session Invalidation", type: :request do
       expect(response.body).to include(I18n.t("forms.session_new.status.login_required"))
     end
 
+    it "invalidates sessions after 30 days of inactivity" do
+      post "/login", params: {
+        session: {email: user.email, password: "password123"}
+      }
+      user_session = UserSession.last
+      user_session.update_column(
+        :last_active_at,
+        UserSession::INACTIVITY_TIMEOUT.ago - 1.second
+      )
+
+      get "/inspections"
+
+      expect(response).to redirect_to(login_path)
+      expect(UserSession.exists?(user_session.id)).to be false
+    end
+
+    it "revokes every old session and rotates the current one after a password change" do
+      post "/login", params: {
+        session: {email: user.email, password: "password123"}
+      }
+      current_token = UserSession.last.session_token
+      other_session = create(:user_session, user: user)
+
+      patch update_password_user_path(user), params: {
+        user: {
+          current_password: "password123",
+          password: "newpassword123",
+          password_confirmation: "newpassword123"
+        }
+      }
+
+      expect(response).to redirect_to(root_path)
+      expect(UserSession.where(session_token: [current_token, other_session.session_token]))
+        .to be_empty
+      expect(user.user_sessions.count).to eq(1)
+      expect(user.user_sessions.first.session_token).not_to eq(current_token)
+    end
+
     it "allows logout everywhere else functionality" do
       # Create multiple sessions
 

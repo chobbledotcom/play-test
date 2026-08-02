@@ -29,6 +29,45 @@ RSpec.describe "Sessions", type: :request do
         expect(user_session.session_token).to be_present
         expect(user_session.last_active_at).to be_present
       end
+
+      it "only creates the hardened persistent cookie when remember me is checked" do
+        https!
+        post "/login", params: {
+          session: {
+            email: user.email,
+            password: "password123",
+            remember_me: "1"
+          }
+        }
+
+        session_cookie = Array(response.headers["Set-Cookie"])
+          .flatten
+          .flat_map { |header| header.to_s.split("\n") }
+          .find { |cookie| cookie.start_with?("session_token=") }
+
+        expect(session_cookie).to be_present
+        expect(session_cookie).to match(/expires=/i)
+        expect(session_cookie).to match(/secure/i)
+        expect(session_cookie).to match(/httponly/i)
+        expect(session_cookie).to match(/samesite=lax/i)
+      end
+
+      it "uses only the browser session when remember me is unchecked" do
+        post "/login", params: {
+          session: {
+            email: user.email,
+            password: "password123",
+            remember_me: "0"
+          }
+        }
+
+        persistent_cookie = Array(response.headers["Set-Cookie"])
+          .flatten
+          .flat_map { |header| header.to_s.split("\n") }
+          .find { |cookie| cookie.start_with?("session_token=") && cookie.match?(/expires=/i) }
+
+        expect(persistent_cookie).to be_nil
+      end
     end
 
     context "with invalid credentials" do

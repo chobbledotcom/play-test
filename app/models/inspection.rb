@@ -474,6 +474,11 @@ class Inspection < ApplicationRecord
 
   sig { void }
   def invalidate_unit_pdf_cache
+    changed_attrs = saved_changes.keys
+    ignorable_attrs = ["pdf_last_accessed_at", "updated_at"]
+
+    return if (changed_attrs - ignorable_attrs).empty?
+
     PdfCacheService.invalidate_unit_cache(unit) if unit
   end
 end

@@ -5,6 +5,9 @@ class UsersController < ApplicationController
   include SessionManagement
   include TurboStreamResponders
 
+  rate_limit to: 5, within: 1.hour, only: :create,
+    store: RATE_LIMIT_STORE, name: "registration"
+
   NON_ADMIN_PATHS = %i[
     change_settings
     change_password
@@ -76,6 +79,7 @@ class UsersController < ApplicationController
   def update_password
     if @user.authenticate(params[:user][:current_password])
       if @user.update(password_params)
+        rotate_user_sessions(@user)
         flash[:notice] = I18n.t("users.messages.password_updated")
         redirect_to root_path
       else

@@ -193,7 +193,9 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
 
   describe "edge cases and boundary conditions" do
     it "handles assessment with no fields gracefully" do
-      allow(assessment).to receive(:class).and_return(double(form_fields: []))
+      empty_schema = AssessmentSchema.new("mock_form", [])
+      allow(assessment).to receive(:class)
+        .and_return(double(assessment_schema: empty_schema))
       mock_form_translations
 
       blocks = described_class.build_from_assessment("mock_form", assessment)
