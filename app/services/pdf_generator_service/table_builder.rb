@@ -200,13 +200,11 @@ class PdfGeneratorService
       table.column_widths = [date_width, result_width, inspector_width]
     end
 
-    def self.build_unit_details_table(unit, context)
-      # Get dimensions from last inspection if available
-      last_inspection = unit.last_inspection
+    def self.build_unit_details_table(unit, context, last_inspection)
       if context == :unit
         build_unit_details_table_for_unit_pdf(unit, last_inspection)
       else
-        build_unit_details_table_with_inspection(unit, last_inspection, context)
+        build_unit_details_table_with_inspection(unit, last_inspection)
       end
     end
 
@@ -224,15 +222,8 @@ class PdfGeneratorService
       ]
     end
 
-    def self.build_unit_details_table_with_inspection(unit, last_inspection, context)
-      dimensions_text = build_dimensions_text(last_inspection)
-
-      # Get inspector details from current inspection (for inspection PDF) or last inspection (for unit PDF)
-      inspection = if context == :inspection
-        last_inspection
-      else
-        unit.last_inspection
-      end
+    def self.build_unit_details_table_with_inspection(unit, inspection)
+      dimensions_text = build_dimensions_text(inspection)
       inspector_name = inspection&.user&.name
       rpii_number = inspection&.user&.rpii_inspector_number
 

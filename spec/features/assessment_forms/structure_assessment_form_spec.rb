@@ -52,14 +52,14 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     textarea.set("Stitch length within specification")
     choose_structure_field :unit_pressure_pass, true
     choose_structure_field :evacuation_time_pass, true
-    choose_structure_field :critical_fall_off_height_pass, true
-    choose_structure_field :step_ramp_size_pass, true
-    choose_structure_field :platform_height_pass, true
-    choose_structure_field :trough_pass, true
+    choose_structure_field :critical_fall_off_height_pass, "pass"
+    choose_structure_field :step_ramp_size_pass, "pass"
+    choose_structure_field :platform_height_pass, "pass"
+    choose_structure_field :trough_pass, "pass"
 
     choose_structure_field :entrapment_pass, false
     choose_structure_field :markings_pass, true
-    choose_structure_field :grounding_pass, true
+    choose_structure_field :grounding_pass, "na"
 
     submit_form :structure
 
@@ -83,7 +83,11 @@ RSpec.feature "Structure Assessment Form", type: :feature do
 
     expect(structure.entrapment_pass).to be false
     expect(structure.markings_pass).to be true
-    expect(structure.grounding_pass).to be true
+    expect(structure.critical_fall_off_height_pass).to eq("pass")
+    expect(structure.step_ramp_size_pass).to eq("pass")
+    expect(structure.platform_height_pass).to eq("pass")
+    expect(structure.trough_pass).to eq("pass")
+    expect(structure.grounding_pass).to eq("na")
 
     inspection.reload
     structure = inspection.structure_assessment

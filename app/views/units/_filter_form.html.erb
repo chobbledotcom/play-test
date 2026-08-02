@@ -1,6 +1,6 @@
 <% filter_path = request.path.include?("/all") ? all_units_path : units_path %>
 <% filter_user = request.path.include?("/all") ? nil : current_user %>
-<%= form_with url: filter_path, method: :get, data: { turbo: false }, id: "search-box" do |form| %>
+<%= render layout: 'shared/filter_form', locals: { url: filter_path } do |form| %>
     <%= form.text_field :query,
         placeholder: unit_search_placeholder,
         value: params[:query],

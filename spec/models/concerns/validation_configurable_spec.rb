@@ -3,39 +3,38 @@
 require "rails_helper"
 
 RSpec.describe ValidationConfigurable do
+  let(:test_schema) do
+    fields = [
+      AssessmentSchema::Field.new(
+        partial: :text_field,
+        field: :inspection_date,
+        attributes: {required: true}
+      ),
+      AssessmentSchema::Field.new(
+        partial: :decimal,
+        field: :width,
+        attributes: {required: true, min: 1, max: 100}
+      ),
+      AssessmentSchema::Field.new(
+        partial: :number,
+        field: :height,
+        attributes: {min: 10}
+      )
+    ]
+    fieldset = AssessmentSchema::Fieldset.new(:test_section, fields)
+    AssessmentSchema.new("test_model", [fieldset])
+  end
+
   let(:test_model_class) do
+    schema = test_schema
     Class.new(ApplicationRecord) do
       self.table_name = "inspections"
 
-      define_singleton_method(:name) do
-        "TestModel"
-      end
+      define_singleton_method(:name) { "TestModel" }
 
       include FormConfigurable
 
-      define_singleton_method(:test_fields) do
-        [
-          {
-            partial: :text_field,
-            field: :inspection_date,
-            attributes: {required: true}
-          },
-          {
-            partial: :decimal,
-            field: :width,
-            attributes: {required: true, min: 1, max: 100}
-          },
-          {
-            partial: :number,
-            field: :height,
-            attributes: {min: 10}
-          }
-        ]
-      end
-
-      define_singleton_method(:form_fields) do
-        [{legend_i18n_key: "test_section", fields: test_fields}]
-      end
+      define_singleton_method(:assessment_schema) { schema }
 
       include ValidationConfigurable
     end

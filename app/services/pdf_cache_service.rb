@@ -17,12 +17,11 @@ class PdfCacheService
         .returns(CacheResult)
     end
     def fetch_or_generate_inspection_pdf(inspection, **options)
-      # Never cache incomplete inspections
-      unless caching_enabled? && inspection.complete?
-        return generate_pdf_result(inspection, :inspection, **options)
+      if caching_enabled? && inspection.complete?
+        fetch_or_generate(inspection, :inspection, **options)
+      else
+        generate_pdf_result(inspection, :inspection, **options)
       end
-
-      fetch_or_generate(inspection, :inspection, **options)
     end
 
     sig { params(unit: Unit, options: T.untyped).returns(CacheResult) }
@@ -52,8 +51,14 @@ class PdfCacheService
       ).returns(CacheResult)
     end
     def fetch_or_generate(record, type, **options)
-      valid_cache = record.cached_pdf.attached? &&
-        cached_pdf_valid?(record.cached_pdf, record)
+      valid_cache = PdfPerformance.measure(
+        :cache_lookup,
+        pdf_type: type,
+        record_id: record.id
+      ) do
+        record.cached_pdf.attached? &&
+          cached_pdf_valid?(record.cached_pdf, record)
+      end
 
       if valid_cache
         Rails.logger.info "PDF cache hit for #{type} #{record.id}"
@@ -79,7 +84,13 @@ class PdfCacheService
     end
     def generate_and_cache(record, type, **options)
       result = generate_pdf_result(record, type, **options)
-      store_cached_pdf(record, result.data)
+      PdfPerformance.measure(
+        :cache_store,
+        pdf_type: type,
+        record_id: record.id
+      ) do
+        store_cached_pdf(record, result.data)
+      end
       result
     end
 
@@ -91,14 +102,28 @@ class PdfCacheService
       ).returns(CacheResult)
     end
     def generate_pdf_result(record, type, **options)
-      pdf_document = case type
-      when :inspection
-        PdfGeneratorService.generate_inspection_report(record, **options)
-      when :unit
-        PdfGeneratorService.generate_unit_report(record, **options)
+      pdf_document = PdfPerformance.measure(
+        :document_build,
+        pdf_type: type,
+        record_id: record.id
+      ) do
+        case type
+        when :inspection
+          PdfGeneratorService.generate_inspection_report(record, **options)
+        when :unit
+          PdfGeneratorService.generate_unit_report(record, **options)
+        end
       end
 
-      CacheResult.new(type: :pdf_data, data: pdf_document.render)
+      pdf_data = PdfPerformance.measure(
+        :document_render,
+        pdf_type: type,
+        record_id: record.id
+      ) do
+        pdf_document.render
+      end
+
+      CacheResult.new(type: :pdf_data, data: pdf_data)
     end
 
     sig { params(record: T.any(Inspection, Unit)).void }

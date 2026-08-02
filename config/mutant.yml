@@ -1,0 +1,16 @@
+---
+usage: opensource
+integration:
+  name: rspec
+requires:
+- ./config/environment
+environment_variables:
+  RAILS_ENV: test
+matcher:
+  subjects:
+  - AssessmentSchema
+  - Event
+  - InspectorCompany
+  - Page
+  - TextReplacement
+  - Unit

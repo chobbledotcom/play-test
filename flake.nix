@@ -32,7 +32,6 @@
             rubyPackages_3_4.psych
             rubyPackages_3_4.ruby-vips
             rubyPackages_3_4.rugged
-            rubyPackages_3_4.sorbet-runtime
             ruby_3_4
             sqlite
             yamlfix
@@ -58,6 +57,7 @@
             echo "  rspec-replace  - Test replacements for broken tests"
             echo "  test-memory    - Run tests with memory analysis"
             echo "  find           - Run ripgrep for a string, useful dirs only"
+            echo "  flay           - Run structural duplicate detection on codebase"
             echo "  jscpd          - Run copy-paste detection on codebase"
             echo "  update-chobble - Update chobble-forms and en14960 gems"
           '';
