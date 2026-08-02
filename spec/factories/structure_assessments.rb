@@ -8,25 +8,25 @@
 #  air_loss_pass                       :boolean
 #  critical_fall_off_height            :integer
 #  critical_fall_off_height_comment    :text
-#  critical_fall_off_height_pass       :boolean
+#  critical_fall_off_height_pass       :integer
 #  entrapment_comment                  :text
 #  entrapment_pass                     :boolean
 #  evacuation_time_comment             :text
 #  evacuation_time_pass                :boolean
 #  grounding_comment                   :text
-#  grounding_pass                      :boolean
+#  grounding_pass                      :integer
 #  markings_comment                    :text
 #  markings_pass                       :boolean
 #  platform_height                     :integer
 #  platform_height_comment             :text
-#  platform_height_pass                :boolean
+#  platform_height_pass                :integer
 #  seam_integrity_comment              :text
 #  seam_integrity_pass                 :boolean
 #  sharp_edges_comment                 :text
 #  sharp_edges_pass                    :boolean
 #  step_ramp_size                      :integer
 #  step_ramp_size_comment              :text
-#  step_ramp_size_pass                 :boolean
+#  step_ramp_size_pass                 :integer
 #  stitch_length_comment               :text
 #  stitch_length_pass                  :boolean
 #  straight_walls_comment              :text
@@ -36,7 +36,7 @@
 #  trough_comment                      :text
 #  trough_depth                        :integer
 #  trough_depth_comment                :string(1000)
-#  trough_pass                         :boolean
+#  trough_pass                         :integer
 #  unit_pressure                       :decimal(8, 2)
 #  unit_pressure_comment               :text
 #  unit_pressure_pass                  :boolean
@@ -82,10 +82,14 @@ FactoryBot.define do
       if evaluator.measurement_checks_pass == true
         %w[
           stitch_length_pass evacuation_time_pass unit_pressure_pass
+        ].each do |check|
+          assessment.send("#{check}=", true)
+        end
+        %w[
           step_ramp_size_pass platform_height_pass
           critical_fall_off_height_pass
         ].each do |check|
-          assessment.send("#{check}=", true)
+          assessment.send("#{check}=", :pass)
         end
       elsif evaluator.measurement_checks_pass == false
         %w[
@@ -96,15 +100,15 @@ FactoryBot.define do
       end
 
       if evaluator.additional_checks_pass == true
-        %w[
-          trough_pass entrapment_pass markings_pass grounding_pass
-        ].each do |check|
+        %w[entrapment_pass markings_pass].each do |check|
           assessment.send("#{check}=", true)
         end
-      elsif evaluator.additional_checks_pass == false
-        %w[trough_pass entrapment_pass].each do |check|
-          assessment.send("#{check}=", false)
+        %w[trough_pass grounding_pass].each do |check|
+          assessment.send("#{check}=", :pass)
         end
+      elsif evaluator.additional_checks_pass == false
+        assessment.trough_pass = :fail
+        assessment.entrapment_pass = false
       end
     end
 
@@ -128,15 +132,15 @@ FactoryBot.define do
       stitch_length_pass { true }
       evacuation_time_pass { true }
       unit_pressure_pass { true }
-      step_ramp_size_pass { true }
-      platform_height_pass { true }
-      critical_fall_off_height_pass { true }
+      step_ramp_size_pass { :pass }
+      platform_height_pass { :pass }
+      critical_fall_off_height_pass { :pass }
 
       # Additional checks
-      trough_pass { true }
+      trough_pass { :pass }
       entrapment_pass { true }
       markings_pass { true }
-      grounding_pass { true }
+      grounding_pass { :pass }
     end
 
     trait :complete do
@@ -145,7 +149,7 @@ FactoryBot.define do
       # Additional complete-only fields
       trough_adjacent_panel_width { 800 }
       step_ramp_size { 300 }
-      step_ramp_size_pass { true }
+      step_ramp_size_pass { :pass }
 
       # Comments for documentation
       seam_integrity_comment { "Seams in good condition" }

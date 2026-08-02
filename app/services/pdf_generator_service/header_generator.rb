@@ -23,18 +23,29 @@ class PdfGeneratorService
       pdf.move_down Configuration::STATUS_SPACING
     end
 
-    def self.generate_unit_pdf_header(pdf, unit, unbranded: false)
-      create_unit_header(pdf, unit, unbranded: unbranded)
+    def self.generate_unit_pdf_header(pdf, unit, last_inspection:,
+      unbranded: false)
+      create_unit_header(
+        pdf,
+        unit,
+        last_inspection:,
+        unbranded:
+      )
       # Generate QR code in top left corner
       ImageProcessor.generate_qr_code_header(pdf, unit)
     end
 
-    def self.create_unit_header(pdf, unit, unbranded: false)
+    def self.create_unit_header(pdf, unit, last_inspection:, unbranded: false)
       user = unbranded ? nil : unit.user
       unit_id_text = build_unit_id_text(unit)
 
       render_header_with_logo(pdf, user) do |logo_width|
-        render_unit_text_section(pdf, unit, unit_id_text, logo_width)
+        render_unit_text_section(
+          pdf,
+          last_inspection,
+          unit_id_text,
+          logo_width
+        )
       end
 
       pdf.move_down Configuration::STATUS_SPACING
@@ -116,14 +127,15 @@ class PdfGeneratorService
         end
       end
 
-      def render_unit_text_section(pdf, unit, unit_id_text, logo_width)
+      def render_unit_text_section(pdf, last_inspection, unit_id_text,
+        logo_width)
         header_text_box(pdf, logo_width) do
           pdf.text unit_id_text, size: Configuration::HEADER_TEXT_SIZE,
             style: :bold
 
           expiry_label = I18n.t("pdf.unit.fields.expiry_date")
-          expiry_value = if unit.last_inspection&.reinspection_date
-            Utilities.format_date(unit.last_inspection.reinspection_date)
+          expiry_value = if last_inspection&.reinspection_date
+            Utilities.format_date(last_inspection.reinspection_date)
           else
             I18n.t("pdf.unit.fields.na")
           end

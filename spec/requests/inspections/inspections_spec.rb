@@ -180,6 +180,8 @@ RSpec.describe "Inspections", type: :request do
 
       it "serves PDF" do
         allow(PdfGeneratorService).to receive(:generate_inspection_report).and_return(double(render: "PDF"))
+        inspection
+        expect(PdfCacheService).not_to receive(:invalidate_unit_cache)
 
         get "/inspections/#{inspection.id}.pdf"
         expect(response).to have_http_status(:success)

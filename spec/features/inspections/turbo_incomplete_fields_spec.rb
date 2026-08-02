@@ -12,7 +12,7 @@ RSpec.feature "Turbo incomplete fields update", js: true do
     create(:inspection, :completed, user:, unit:).tap do |insp|
       insp.update_columns(complete_date: nil)
       # Make an assessment field incomplete to have something to test with
-      insp.user_height_assessment.update_column(:users_at_1000mm, nil)
+      insp.user_height_assessment.update_column(:containing_wall_height, nil)
     end
   end
 
@@ -28,7 +28,7 @@ RSpec.feature "Turbo incomplete fields update", js: true do
     expect(summary.text).to match(/Show 1 incomplete field/)
 
     visit edit_inspection_path(inspection, tab: "user_height")
-    height_label = I18n.t("forms.user_height.fields.users_at_1000mm")
+    height_label = I18n.t("forms.user_height.fields.containing_wall_height")
     fill_in height_label, with: "2"
 
     submit_form :user_height
