@@ -5,3 +5,6 @@ ignore:
     - Style/GlobalVars
   - 'db/schema.rb':
     - Rails/CreateTableWithTimestamps
+  - 'app/services/pdf_cache_service.rb':
+    # CacheResult intentionally enforces keyword-only initialization.
+    - Style/RedundantStructKeywordInit

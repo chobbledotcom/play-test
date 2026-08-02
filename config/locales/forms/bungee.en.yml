@@ -1,0 +1,40 @@
+---
+en:
+  forms:
+    bungee:
+      header: Bungee Run
+      sections:
+        markings: Markings
+        harness_and_cords: Harness & Cords
+        lanes_and_blower: Lanes & Blower
+        wall_dimensions: Wall Dimensions
+      fields:
+        blower_forward_distance: Blower no more than 1.5m forward of rear wall
+        marking_max_mass: Marking for max user mass 120kg
+        marking_min_height: Marking for minimum user height 1.2m
+        pull_strength: Harness pull strength test to 1200N
+        cord_length_max: All cords max length 3.3m
+        cord_diametre_min: All cord diameters min 12.5mm
+        two_stage_locking: Two-stage locking system present
+        baton_compliant: Baton is compliant
+        lane_width_max: Each lane max 900mm wide
+        harness_width: Harness width (mm)
+        num_of_cords: Number of cords
+        rear_wall_thickness: Rear wall thickness (m)
+        rear_wall_height: Rear wall height (m)
+        rear_wall: Rear wall dimensions meets requirements
+        side_wall_length: Side wall length (m)
+        side_wall_height: Side wall height (m)
+        side_wall: Side wall dimensions meets requirements
+        running_wall_width: Running wall width (m)
+        running_wall_height: Running wall height (m)
+        running_wall: Running wall dimensions meets requirements
+      status:
+        checks_passed: Fields completed
+        completion: Assessment Completion
+      submit: Save Assessment
+      submit_continue: Save & Continue
+      errors:
+        header:
+          one: '1 error prevented this assessment from being saved:'
+          other: '%{count} errors prevented this assessment from being saved:'

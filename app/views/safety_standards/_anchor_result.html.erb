@@ -1,9 +1,4 @@
-<% if @anchors_result %>
-  <%= render 'result_with_breakdown',
-    result_label: t('safety_standards.calculators.anchor.required_result'),
-    result: @anchors_result %>
-<% elsif @anchors_error %>
-  <div class="error">
-    <p><strong><%= t('shared.error') %>:</strong> <%= @anchors_error %></p>
-  </div>
-<% end %>
+<%= render 'calculation_result',
+  result: @anchors_result,
+  error: @anchors_error,
+  result_label: t('safety_standards.calculators.anchor.required_result') %>

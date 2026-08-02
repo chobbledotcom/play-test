@@ -57,7 +57,107 @@ RSpec.describe Event, type: :model do
     end
   end
 
+  describe ".log" do
+    it "creates an event mapping every attribute from the resource" do
+      event = Event.log(
+        user: user,
+        action: "updated",
+        resource: unit,
+        details: "Changed the name",
+        changed_data: {"name" => "New"},
+        metadata: {"ip" => "127.0.0.1"}
+      )
+
+      expect(event).to be_persisted
+      expect(event.user).to eq(user)
+      expect(event.action).to eq("updated")
+      expect(event.resource_type).to eq("Unit")
+      expect(event.resource_id).to eq(unit.id)
+      expect(event.details).to eq("Changed the name")
+      expect(event.changed_data).to eq({"name" => "New"})
+      expect(event.metadata).to eq({"ip" => "127.0.0.1"})
+    end
+
+    it "defaults details, changed_data and metadata to nil" do
+      event = Event.log(user: user, action: "viewed", resource: unit)
+
+      expect(event.details).to be_nil
+      expect(event.changed_data).to be_nil
+      expect(event.metadata).to be_nil
+    end
+  end
+
+  describe ".log_system_event" do
+    it "creates an event with the system resource type and no resource id" do
+      event = Event.log_system_event(
+        user: user,
+        action: "backup_completed",
+        details: "Daily backup completed",
+        metadata: {"size" => "1GB"}
+      )
+
+      expect(event).to be_persisted
+      expect(event.user).to eq(user)
+      expect(event.action).to eq("backup_completed")
+      expect(event.resource_type).to eq(Event.system_resource_type)
+      expect(event.resource_id).to be_nil
+      expect(event.details).to eq("Daily backup completed")
+      expect(event.metadata).to eq({"size" => "1GB"})
+    end
+
+    it "defaults metadata to nil when omitted" do
+      event = Event.log_system_event(
+        user: user,
+        action: "backup_completed",
+        details: "Daily backup completed"
+      )
+
+      expect(event.metadata).to be_nil
+    end
+  end
+
+  describe "#description" do
+    it "returns the details when present" do
+      event = Event.log(
+        user: user,
+        action: "updated",
+        resource: unit,
+        details: "A human readable summary"
+      )
+
+      expect(event.description).to eq("A human readable summary")
+    end
+
+    it "falls back to a summary built from the event fields" do
+      event = Event.log(user: user, action: "updated", resource: unit)
+      expected = "#{user.email} updated Unit #{unit.id}"
+
+      expect(event.description).to eq(expected)
+    end
+  end
+
+  describe "#triggered_by?" do
+    it "is true for the user who triggered the event" do
+      event = Event.log(user: user, action: "viewed", resource: unit)
+
+      expect(event.triggered_by?(user)).to be true
+    end
+
+    it "is false for a different user" do
+      other_user = create(:user)
+      event = Event.log(user: user, action: "viewed", resource: unit)
+
+      expect(event.triggered_by?(other_user)).to be false
+    end
+  end
+
   describe "#resource_object" do
+    it "returns the resource when it still exists" do
+      event = Event.log(user: user, action: "viewed", resource: unit)
+
+      expect(event.resource_object).to eq(unit)
+    end
+
     it "returns nil when resource has been deleted" do
       event = Event.create!(
         user: user,

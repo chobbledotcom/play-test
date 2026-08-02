@@ -1,0 +1,49 @@
+---
+form_fields:
+  - legend_i18n_key: unit_details
+    fields:
+      - partial: :text_area
+        field: :type_of_unit
+  - legend_i18n_key: markings
+    fields:
+      - partial: :pass_fail_comment
+        field: :max_user_mass_marking
+  - legend_i18n_key: safety_checks
+    fields:
+      - partial: :pass_fail_comment
+        field: :arrest
+      - partial: :pass_fail_comment
+        field: :matting
+      - partial: :pass_fail_comment
+        field: :design_risk
+      - partial: :pass_fail_comment
+        field: :intended_play
+      - partial: :pass_fail_comment
+        field: :ancillary_fit
+      - partial: :pass_fail_comment
+        field: :ancillary_compliant
+      - partial: :pass_fail_comment
+        field: :apron
+      - partial: :pass_fail_comment
+        field: :trough
+      - partial: :pass_fail_comment
+        field: :framework
+      - partial: :pass_fail_comment
+        field: :grounding
+  - legend_i18n_key: measurements
+    fields:
+      - partial: :number_pass_fail_comment
+        field: :bed_height
+        attributes:
+          step: 1
+          min: 0
+      - partial: :number_pass_fail_comment
+        field: :platform_fall_distance
+        attributes:
+          step: 0.01
+          min: 0
+      - partial: :number_pass_fail_comment
+        field: :blower_tube_length
+        attributes:
+          step: 0.01
+          min: 0

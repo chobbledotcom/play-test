@@ -1,0 +1,31 @@
+---
+form_fields:
+  - legend_i18n_key: game_details
+    fields:
+      - partial: :text_area
+        field: :game_type
+  - legend_i18n_key: markings
+    fields:
+      - partial: :pass_fail_comment
+        field: :max_user_mass
+      - partial: :pass_fail_comment
+        field: :age_range_marking
+  - legend_i18n_key: safety_checks
+    fields:
+      - partial: :pass_fail_comment
+        field: :constant_air_flow
+      - partial: :pass_fail_comment
+        field: :design_risk
+      - partial: :pass_fail_comment
+        field: :intended_play_risk
+      - partial: :pass_fail_comment
+        field: :ancillary_equipment
+      - partial: :pass_fail_comment
+        field: :ancillary_equipment_compliant
+  - legend_i18n_key: measurements
+    fields:
+      - partial: :number_pass_fail_comment
+        field: :containing_wall_height
+        attributes:
+          step: 0.01
+          min: 0

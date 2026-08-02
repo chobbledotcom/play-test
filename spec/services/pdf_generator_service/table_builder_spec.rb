@@ -33,7 +33,11 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       end
 
       it "formats unit data into 4x4 table structure" do
-        result = described_class.build_unit_details_table(unit, :inspection)
+        result = described_class.build_unit_details_table(
+          unit,
+          :inspection,
+          inspection
+        )
 
         expect(result).to be_an(Array)
         expect(result.length).to eq(4)
@@ -41,7 +45,11 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       end
 
       it "includes key unit information" do
-        result = described_class.build_unit_details_table(unit, :inspection)
+        result = described_class.build_unit_details_table(
+          unit,
+          :inspection,
+          inspection
+        )
         flattened = result.flatten
 
         expect(flattened).to include(unit.name)
@@ -52,10 +60,13 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       end
 
       it "includes dimensions when available" do
-        result = described_class.build_unit_details_table(unit, :inspection)
+        result = described_class.build_unit_details_table(
+          unit,
+          :inspection,
+          inspection
+        )
         dimensions_text = result[2][1] # Size field
 
-        # Just verify dimensions field exists - depends on unit.last_inspection
         expect(dimensions_text).to be_a(String)
       end
     end
@@ -64,7 +75,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       let(:unit) { create(:unit) }
 
       it "formats unit data into 2-column table structure" do
-        result = described_class.build_unit_details_table(unit, :unit)
+        result = described_class.build_unit_details_table(unit, :unit, nil)
 
         expect(result).to be_an(Array)
         expect(result.length).to eq(5)
@@ -78,7 +89,11 @@ RSpec.describe PdfGeneratorService::TableBuilder do
       end
 
       it "handles missing fields with empty values" do
-        result = described_class.build_unit_details_table(unit, "inspection")
+        result = described_class.build_unit_details_table(
+          unit,
+          "inspection",
+          nil
+        )
 
         expect(result[0][1]).to eq("") # empty name (truncate_text converts nil to "")
         expect(result[1][1]).to be_nil # nil description

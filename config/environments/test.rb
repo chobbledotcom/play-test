@@ -73,10 +73,11 @@ Rails.application.configure do
     admin_emails_pattern: "^admin.*@example\\.com$"
   )
 
-  # Units config for tests (disable badges)
+  # Units config for tests (disable badges, all types enabled)
   config.units = UnitsConfig.new(
     badges_enabled: false,
     reports_unbranded: config.units.reports_unbranded,
-    pdf_filename_prefix: config.units.pdf_filename_prefix
+    pdf_filename_prefix: config.units.pdf_filename_prefix,
+    enabled_unit_types: []
   )
 end

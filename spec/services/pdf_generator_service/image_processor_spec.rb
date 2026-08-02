@@ -55,6 +55,12 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
       it "respects column count parameter" do
         expect { described_class.add_unit_photo_footer(pdf, unit_with_photo, 4) }.not_to raise_error
       end
+
+      it "returns the rendered photo height" do
+        height = described_class.add_unit_photo_footer(pdf, unit_with_photo)
+
+        expect(height).to be_positive
+      end
     end
 
     context "with unit without photo" do
@@ -86,6 +92,9 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
   describe "integration with real PDF generation" do
     it "generates complete PDF with QR code and photos" do
       pdf_content = nil
+      photo_blob = unit_with_photo.photo.blob
+      expect(photo_blob).to receive(:download).once.and_call_original
+      allow(Rails.logger).to receive(:info)
 
       expect {
         pdf_content = PdfGeneratorService.generate_inspection_report(inspection_with_photo).render
@@ -93,6 +102,14 @@ RSpec.describe PdfGeneratorService::ImageProcessor do
 
       expect(pdf_content).to be_a(String)
       expect(pdf_content[0..3]).to eq("%PDF")
+      expect(Rails.logger).to have_received(:info).with(
+        hash_including(
+          event: "pdf.performance",
+          stage: :image_download,
+          pdf_type: :inspection,
+          record_id: inspection_with_photo.id
+        )
+      )
     end
 
     it "generates complete PDF without photos" do

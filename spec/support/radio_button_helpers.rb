@@ -142,7 +142,9 @@ module RadioButtonHelpers
     # Find the form section containing the field label, then find the radio button with the target text
     begin
       # Look for the specific form grid container with this field label
-      within(:xpath, "//div[@class='form-grid radio-comment'][.//label[@class='label'][normalize-space(.)='#{label}']]") do
+      label_filter = "[.//label[@class='label'][normalize-space(.)='#{label}']]"
+      container = "//div[contains(@class, 'form-grid')]#{label_filter}"
+      within(:xpath, container) do
         # Find the radio button with the target text and click it
         find("label", text: /^#{Regexp.escape(target_text)}$/).find("input[type='radio']").click
       end
