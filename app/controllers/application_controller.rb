@@ -5,6 +5,12 @@ class ApplicationController < ActionController::Base
   extend T::Sig
   include SessionsHelper
   include ImageProcessable
+  include ActiveStorage::SetCurrent
+
+  RATE_LIMIT_STORE = T.let(
+    Rails.env.test? ? ActiveSupport::Cache::MemoryStore.new : Rails.cache,
+    ActiveSupport::Cache::Store
+  )
 
   before_action :require_login, unless: :skip_authentication?
   before_action :update_last_active_at, unless: :skip_authentication?
@@ -144,14 +150,14 @@ class ApplicationController < ActionController::Base
 
     @debug_subscription = ActiveSupport::Notifications
       .subscribe("sql.active_record") do |_name, start, finish, _id, payload|
-        unless payload[:name] == "SCHEMA" || payload[:sql] =~ /^PRAGMA/
-          @debug_sql_queries << {
-            sql: payload[:sql],
-            duration: ((finish - start) * 1000).round(2),
-            name: payload[:name],
-            row_count: payload[:row_count] || 0
-          }
-        end
+      unless payload[:name] == "SCHEMA" || payload[:sql] =~ /^PRAGMA/
+        @debug_sql_queries << {
+          sql: payload[:sql],
+          duration: ((finish - start) * 1000).round(2),
+          name: payload[:name],
+          row_count: payload[:row_count] || 0
+        }
+      end
     end
   end
 
@@ -204,6 +210,8 @@ class ApplicationController < ActionController::Base
 
   sig { params(exception: StandardError).returns(T::Boolean) }
   def should_notify_error?(exception)
+    return false if exception.is_a?(ActionController::TooManyRequests)
+
     if exception.is_a?(ActionController::InvalidAuthenticityToken)
       csrf_ignored_actions = [
         %w[sessions create],

@@ -30,16 +30,8 @@
       <li>
         <%= link_to target_path, class: "table-list-link" do %>
           <%= render 'shared/table_column', field: :photo, model: :units, show: show_photo do %>
-            <% if !inspection.complete? && inspection.unit&.photo&.attached? %>
-              <%= render 'shared/image',
-                  image: inspection.unit.photo,
-                  size: :thumbnail,
-                  alt: "#{inspection.unit.name} photo" %>
-            <% elsif !inspection.complete? %>
-              <%= image_tag "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='system-ui' font-size='10'%3ENo Photo%3C/text%3E%3C/svg%3E",
-                  alt: t('units.messages.no_photo'),
-                  width: 60,
-                  height: 60 %>
+            <% if !inspection.complete? && inspection.unit %>
+              <%= render 'shared/unit_photo', unit: inspection.unit %>
             <% end %>
           <% end %>
           <%= render 'shared/table_column', field: :id, model: :inspection, item: inspection %>

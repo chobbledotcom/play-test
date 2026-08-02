@@ -3,7 +3,8 @@
 RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
   describe "#{assessment_type} assessment form" do
     let(:user) { create(:user) }
-    let(:unit) { create(:unit, user: user) }
+    let(:unit_options) { unit_options_for_assessment(assessment_type) }
+    let(:unit) { create(:unit, user: user, **unit_options) }
     let(:inspection) do
       options = {user: user, unit: unit}
       options[:has_slide] = true if assessment_type == :slide
@@ -21,8 +22,21 @@ RSpec.shared_examples "assessment form save" do |assessment_type, sample_data|
 
     private
 
+    define_method(:unit_options_for_assessment) do |type|
+      case type
+      when :ball_pool
+        {unit_type: :inflatable_ball_pool}
+      when :inflatable_game
+        {unit_type: :inflatable_game}
+      else {}
+      end
+    end
+
     define_method(:traits_for_assessment) do |type|
-      (type == :enclosed) ? {is_totally_enclosed: true} : {}
+      case type
+      when :enclosed then {is_totally_enclosed: true}
+      else {}
+      end
     end
 
     define_method(:visit_assessment_tab) do |type|

@@ -1,9 +1,4 @@
-<% if @wall_height_result %>
-  <%= render 'result_with_breakdown',
-    result_label: t('safety_standards.calculators.wall_height.required_wall_height_result'),
-    result: @wall_height_result %>
-<% elsif @wall_height_error %>
-  <div class="error">
-    <p><strong><%= t('shared.error') %>:</strong> <%= @wall_height_error %></p>
-  </div>
-<% end %>
+<%= render 'calculation_result',
+  result: @wall_height_result,
+  error: @wall_height_error,
+  result_label: t('safety_standards.calculators.wall_height.required_wall_height_result') %>

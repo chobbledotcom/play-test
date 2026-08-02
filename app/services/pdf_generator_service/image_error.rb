@@ -14,6 +14,12 @@ class PdfGeneratorService
       original_error.class.new(detailed_message)
     end
 
+    def self.with_error_handling(attachment)
+      yield
+    rescue Prawn::Errors::UnsupportedImageType => e
+      raise build_detailed_error(e, attachment)
+    end
+
     def self.extract_image_details(blob, attachment)
       record = attachment.record
       {

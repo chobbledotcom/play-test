@@ -1,0 +1,51 @@
+# Vetted equivalent mutants - survivors mutant cannot kill because the
+# mutated code is semantically identical to the original.
+#
+# Format: Subject#method:path:line:hash  # reason
+#
+# Regenerate with: bin/mutant-check --update [SUBJECT ...]
+# Entries are tied to the current source; they change when the file does.
+
+AssessmentSchema#fields:app/models/assessment_schema.rb:140:457a5
+AssessmentSchema#initialize:app/models/assessment_schema.rb:134:c5e0b
+AssessmentSchema#partial_for:app/models/assessment_schema.rb:153:eb8d6
+Event#resource_object:app/models/event.rb:118:228dd
+Event#resource_object:app/models/event.rb:118:3b0d4
+Event#resource_object:app/models/event.rb:118:41d7a
+Event#resource_object:app/models/event.rb:118:4a317
+Event#resource_object:app/models/event.rb:118:f7e8f
+Event#resource_object:app/models/event.rb:118:f9b27
+Event.log:app/models/event.rb:71:d1408
+Event.log_system_event:app/models/event.rb:93:a711e
+InspectorCompany#company_statistics:app/models/inspector_company.rb:93:08c2e
+InspectorCompany#company_statistics:app/models/inspector_company.rb:93:9a06d
+InspectorCompany#company_statistics:app/models/inspector_company.rb:93:e433b
+InspectorCompany#company_statistics:app/models/inspector_company.rb:93:ffb0f
+InspectorCompany#logo_url:app/models/inspector_company.rb:110:a25ae
+InspectorCompany#normalize_phone_number:app/models/inspector_company.rb:117:403f8
+InspectorCompany#normalize_phone_number:app/models/inspector_company.rb:117:7027f
+InspectorCompany#normalize_phone_number:app/models/inspector_company.rb:117:78d9a
+InspectorCompany#normalize_phone_number:app/models/inspector_company.rb:117:b329a
+InspectorCompany#normalize_phone_number:app/models/inspector_company.rb:117:c7c22
+InspectorCompany#normalize_phone_number:app/models/inspector_company.rb:117:e43d4
+TextReplacement.available_i18n_keys:app/models/text_replacement.rb:30:01a88
+TextReplacement.available_i18n_keys:app/models/text_replacement.rb:30:30aa1
+TextReplacement.available_i18n_keys:app/models/text_replacement.rb:30:dd597
+TextReplacement.flatten_keys:app/models/text_replacement.rb:45:ce11b
+TextReplacement.tree_structure:app/models/text_replacement.rb:60:85a22
+TextReplacement.tree_structure:app/models/text_replacement.rb:60:9c21a
+TextReplacement.tree_structure:app/models/text_replacement.rb:60:d6104
+Unit#badge_id_valid:app/models/unit.rb:240:667a8
+Unit#check_complete_inspections:app/models/unit.rb:170:e6a3a
+Unit#check_for_complete_inspections:app/models/unit.rb:197:89360
+Unit#deletable?:app/models/unit.rb:163:88894
+Unit#destroy_draft_inspections:app/models/unit.rb:178:4b656
+Unit#inspection_history:app/models/unit.rb:119:f1ae1
+Unit#inspection_summary:app/models/unit.rb:151:4a640
+Unit#last_inspection:app/models/unit.rb:109:13be1
+Unit#last_inspection_status:app/models/unit.rb:114:978f8
+Unit#next_inspection_due:app/models/unit.rb:124:69ece
+Unit#normalize_id:app/models/unit.rb:231:76233
+Unit#photo_must_be_image:app/models/unit.rb:205:d9912
+Unit#unit_badges_enabled?:app/models/unit.rb:226:c7706
+Unit.overdue:app/models/unit.rb:185:eb8b6

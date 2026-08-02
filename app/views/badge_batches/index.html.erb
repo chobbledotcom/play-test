@@ -4,7 +4,7 @@
   <%= link_to t("badges.buttons.new_batch"), new_badge_batch_path %>
 </nav>
 
-<%= form_with url: search_badge_batches_path, method: :get, data: { turbo: false }, id: "search-box" do |form| %>
+<%= render layout: 'shared/filter_form', locals: { url: search_badge_batches_path } do |form| %>
   <%= form.text_field :query,
       placeholder: t('badges.search.placeholder'),
       value: params[:query],

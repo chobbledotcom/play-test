@@ -8,11 +8,11 @@ Spencer's C# desktop app defines inspection checks for inflatable equipment type
 
 | Order | Unit Type | Unique Assessment | Shared Assessments | Conditionals | Status |
 |---|---|---|---|---|---|
-| 1 | `inflatable_ball_pool` | `ball_pool_assessment` (9 fields) | structure, materials, fan | none | |
-| 2 | `inflatable_game` | `inflatable_game_assessment` (9 fields) | structure, materials, fan | none | |
-| 3 | `catch_bed` | `catch_bed_assessment` (15 fields) | structure, materials, fan, anchorage | none | |
-| 4 | `bungee_run` | `bungee_assessment` (19 fields) | structure, materials, fan, anchorage | none | |
-| 5 | `play_zone` | `play_zone_assessment` (14 fields) | structure, materials, fan, user_height, slide | `has_slide` toggle | |
+| 1 | `inflatable_ball_pool` | `ball_pool_assessment` (9 fields) | structure, materials, fan | none | Done |
+| 2 | `inflatable_game` | `inflatable_game_assessment` (9 fields) | structure, materials, fan | none | Done |
+| 3 | `catch_bed` | `catch_bed_assessment` (15 fields) | structure, materials, fan, anchorage | none | Done |
+| 4 | `bungee_run` | `bungee_assessment` (19 fields) | structure, materials, fan, anchorage | none | Done |
+| 5 | `play_zone` | `play_zone_assessment` (14 fields) | structure, materials, fan, user_height, slide | `has_slide` toggle | Done |
 
 ## Per-Chunk Recipe
 

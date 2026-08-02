@@ -6,7 +6,6 @@ module ValidationConfigurable
   extend T::Sig
 
   included do
-    # Apply validations when the concern is included
     if ancestors.include?(FormConfigurable)
       apply_form_validations
     end
@@ -17,69 +16,34 @@ module ValidationConfigurable
 
     sig { void }
     def apply_form_validations
-      form_config = begin
-        form_fields
-      rescue
-        nil
-      end
-      return unless form_config
-
-      form_config.each do |section|
-        next unless section[:fields]
-
-        section[:fields].each do |field_config|
-          apply_validation_for_field(field_config)
-        end
-      end
+      assessment_schema.fields.each { |field| apply_validation_for(field) }
     end
 
     private
 
-    sig { params(field_config: T::Hash[Symbol, T.untyped]).void }
-    def apply_validation_for_field(field_config)
-      field = field_config[:field]
-      attributes = field_config[:attributes] || {}
-      partial = field_config[:partial]
+    sig { params(field: AssessmentSchema::Field).void }
+    def apply_validation_for(field)
+      validates field.name, presence: true if field.required?
 
-      return unless field
-
-      if attributes[:required]
-        validates field, presence: true
-      end
-
-      case partial
-      when :decimal_comment, :decimal
-        apply_decimal_validation(field, attributes)
-      when :number, :number_pass_fail_na_comment
-        apply_number_validation(field, attributes)
+      if field.numeric?
+        options = numericality_options(field)
+        options[:only_integer] = true
+        validates field.name, numericality: options, allow_blank: true
+      elsif field.decimal?
+        validates field.name,
+          numericality: numericality_options(field),
+          allow_blank: true
       end
     end
 
-    sig { params(field: Symbol, attributes: T::Hash[Symbol, T.untyped]).void }
-    def apply_decimal_validation(field, attributes)
-      options = build_numericality_options(attributes)
-      validates field, numericality: options, allow_blank: true
+    sig do
+      params(field: AssessmentSchema::Field)
+        .returns(T::Hash[Symbol, T.untyped])
     end
-
-    sig { params(field: Symbol, attributes: T::Hash[Symbol, T.untyped]).void }
-    def apply_number_validation(field, attributes)
-      options = build_numericality_options(attributes)
-      options[:only_integer] = true
-      validates field, numericality: options, allow_blank: true
-    end
-
-    sig { params(attributes: T::Hash[Symbol, T.untyped]).returns(T::Hash[Symbol, T.untyped]) }
-    def build_numericality_options(attributes)
+    def numericality_options(field)
       options = {}
-
-      if attributes[:min]
-        options[:greater_than_or_equal_to] = attributes[:min]
-      end
-
-      if attributes[:max]
-        options[:less_than_or_equal_to] = attributes[:max]
-      end
-
+      options[:greater_than_or_equal_to] = field.min if field.min
+      options[:less_than_or_equal_to] = field.max if field.max
       options
     end
   end

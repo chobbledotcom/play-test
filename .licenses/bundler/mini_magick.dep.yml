@@ -1,6 +1,6 @@
 ---
 name: mini_magick
-version: 5.2.0
+version: 5.3.1
 type: bundler
 summary: Manipulate images with minimal use of memory via ImageMagick
 homepage: https://github.com/minimagick/minimagick

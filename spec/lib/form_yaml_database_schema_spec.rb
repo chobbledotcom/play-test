@@ -39,17 +39,17 @@ PARTIAL_TYPE_MAPPINGS = {
 
 # Define allowed attributes for each partial type
 PARTIAL_ALLOWED_ATTRIBUTES = {
-  # Number fields can have step, min, max
-  number: %i[step min max],
-  number_pass_fail_comment: %i[step min max],
+  # Number fields can have presentation and required metadata
+  number: %i[max min required step],
+  number_pass_fail_comment: %i[max min required step],
   number_pass_fail_na_comment: %i[step min max],
   decimal_comment: %i[step min max],
-  integer_comment: %i[step min max add_not_applicable],
+  integer_comment: %i[add_not_applicable max min required step],
   # Most partials don't allow any attributes
   text_field: [],
   text_area: [],
   pass_fail: [],
-  pass_fail_comment: [],
+  pass_fail_comment: %i[required],
   pass_fail_na_comment: [],
   checkbox: [],
   yes_no_radio: [],
