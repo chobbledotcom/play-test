@@ -4,6 +4,11 @@
 class SessionsController < ApplicationController
   include SessionManagement
 
+  rate_limit to: 10, within: 3.minutes, only: :create,
+    store: RATE_LIMIT_STORE, name: "password"
+  rate_limit to: 20, within: 3.minutes, only: %i[passkey passkey_callback],
+    store: RATE_LIMIT_STORE, name: "passkey"
+
   skip_before_action :require_login,
     only: [:new, :create, :destroy, :passkey, :passkey_callback]
   before_action :require_logged_out,
@@ -13,8 +18,6 @@ class SessionsController < ApplicationController
   end
 
   def create
-    sleep(rand(0.5..1.0)) unless Rails.env.test?
-
     email = params.dig(:session, :email)
     password = params.dig(:session, :password)
 
@@ -97,7 +100,8 @@ class SessionsController < ApplicationController
   end
 
   def handle_successful_login(user)
-    establish_user_session(user)
+    remember = params.dig(:session, :remember_me) == "1"
+    establish_user_session(user, remember: remember)
     flash[:notice] = I18n.t("session.login.success")
     redirect_back_or(inspections_path)
   end

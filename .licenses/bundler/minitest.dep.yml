@@ -1,6 +1,6 @@
 ---
 name: minitest
-version: 6.0.1
+version: 6.0.2
 type: bundler
 summary: minitest provides a complete suite of testing facilities supporting TDD,
   BDD, and benchmarking

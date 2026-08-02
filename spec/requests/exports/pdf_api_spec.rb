@@ -22,6 +22,25 @@ RSpec.describe "PDF API Endpoints", type: :request do
         expect(response.body[0..3]).to eq("%PDF")
       end
 
+      it "generates a Disk-service URL for a cached PDF redirect" do
+        original_pdf_config = Rails.configuration.pdf
+        Rails.configuration.pdf = PdfConfig.new(
+          cache_enabled: true,
+          cache_from: Date.parse("2024-01-01"),
+          redirect_to_s3: true,
+          logo: nil
+        )
+
+        get "/inspections/#{inspection.id}.pdf"
+        expect(response).to have_http_status(:success)
+
+        get "/inspections/#{inspection.id}.pdf"
+        expect(response).to have_http_status(:redirect)
+        expect(response.location).to include("/rails/active_storage/disk/")
+      ensure
+        Rails.configuration.pdf = original_pdf_config
+      end
+
       it "handles case-insensitive inspection IDs" do
         get "/inspections/#{inspection.id.upcase}.pdf"
 

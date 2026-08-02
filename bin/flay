@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+
+# bin/flay - Run structural duplicate detection on the codebase
+# Uses flay (https://github.com/seattlerb/flay)
+
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+MASS_THRESHOLD=12
+DIRS="app/ lib/"
+EXTRA_GEMS=""
+FUZZY=""
+DIFF=""
+STRICT=""
+TOTALS_ONLY=""
+
+show_help() {
+  echo "Usage: bin/flay [options]"
+  echo ""
+  echo "Run structural duplicate detection on the codebase."
+  echo ""
+  echo "Options:"
+  echo "  -h, --help       Show this help message"
+  echo "  -s, --strict     Strict mode: mass=4, fuzzy detection enabled"
+  echo "  -m, --mass N     Set minimum mass threshold (default: 12)"
+  echo "  -f, --fuzzy      Enable fuzzy duplicate detection"
+  echo "  -d, --dirs DIRS  Directories to scan (default: app/ lib/)"
+  echo "  --diff           Show N-way diff of duplicated code"
+  echo "  -t, --totals     Show totals only (summary)"
+  echo "  --ruby-only      Scan only Ruby files (skip ERB)"
+  echo ""
+  echo "Examples:"
+  echo "  bin/flay                    # Standard scan (mass >= 12)"
+  echo "  bin/flay -s                 # Strict scan (mass >= 4, fuzzy)"
+  echo "  bin/flay -d 'spec/'         # Scan only spec directory"
+  echo "  bin/flay --diff             # Show diffs of duplicated code"
+}
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    -s|--strict)
+      MASS_THRESHOLD=4
+      FUZZY="--fuzzy"
+      STRICT=1
+      shift
+      ;;
+    -m|--mass)
+      MASS_THRESHOLD="$2"
+      shift 2
+      ;;
+    -f|--fuzzy)
+      FUZZY="--fuzzy"
+      shift
+      ;;
+    -d|--dirs)
+      DIRS="$2"
+      shift 2
+      ;;
+    --diff)
+      DIFF="--diff"
+      shift
+      ;;
+    -t|--totals)
+      TOTALS_ONLY="--totals"
+      shift
+      ;;
+    --ruby-only)
+      EXTRA_GEMS="skip"
+      shift
+      ;;
+    *)
+      echo -e "${RED}Unknown option: $1${NC}"
+      show_help
+      exit 1
+      ;;
+  esac
+done
+
+if [ -n "$STRICT" ]; then
+  echo -e "${YELLOW}Running flay in strict mode...${NC}"
+else
+  echo -e "${BLUE}Running flay structural duplicate detection...${NC}"
+fi
+echo -e "  Mass threshold: ${MASS_THRESHOLD}"
+echo -e "  Fuzzy: $([ -n "$FUZZY" ] && echo 'enabled' || echo 'disabled')"
+echo -e "  Directories: ${DIRS}"
+echo ""
+
+TARGETS=""
+if [ "$EXTRA_GEMS" != "skip" ]; then
+  ERB_FILES=$(find app/views -name '*.erb' -type f 2>/dev/null || true)
+  TARGETS="$ERB_FILES"
+fi
+
+OUTPUT=$(bundle exec flay \
+  --mass "$MASS_THRESHOLD" \
+  $FUZZY \
+  $DIFF \
+  $TOTALS_ONLY \
+  $DIRS \
+  $TARGETS 2>&1) || true
+
+echo "$OUTPUT"
+
+if echo "$OUTPUT" | grep -q "Identical\|Similar"; then
+  echo -e "\n${RED}Duplicate code detected. Refactor to eliminate duplication.${NC}"
+  exit 1
+else
+  echo -e "\n${GREEN}No structural duplicates found.${NC}"
+  exit 0
+fi

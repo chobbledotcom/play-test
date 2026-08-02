@@ -1,0 +1,137 @@
+#!/usr/bin/env ruby
+# typed: false
+# frozen_string_literal: true
+
+# Runs mutant over the configured subjects and compares the surviving
+# mutations against a checked-in allowlist of vetted equivalent mutants
+# (config/mutant_allowed.txt).
+#
+# Mutant's open-source build has no native way to ignore an individual
+# mutation, only whole subjects. Equivalent mutants - semantically
+# identical code that no test can distinguish - would otherwise resurface
+# on every scan and get relitigated. This script records them once so only
+# *new* survivors fail the check.
+#
+# Usage:
+#   bin/mutant-check                 # check every subject in config/mutant.yml
+#   bin/mutant-check Unit Event      # check specific subjects
+#   bin/mutant-check --update Unit   # add the current survivors to the allowlist
+#
+# Exits non-zero when a survivor is found that is not on the allowlist.
+
+require "yaml"
+
+ROOT = File.expand_path("..", __dir__)
+ALLOWLIST_PATH = File.join(ROOT, "config", "mutant_allowed.txt")
+CONFIG_PATH = File.join(ROOT, "config", "mutant.yml")
+
+# A surviving mutation is printed by mutant as
+#   evil:Subject#method:/abs/path.rb:LINE:HASH
+#   neutral:Subject#method:/abs/path.rb:LINE:HASH
+# The classification prefix is dropped; the remainder (with the path made
+# repo-relative) is the stable identity we track.
+SURVIVOR = %r{^(?:evil|neutral):(?<subject>.+?):(?<path>/.+?):(?<line>\d+):(?<hash>\h+)$}
+
+def load_allowlist
+  return [] unless File.exist?(ALLOWLIST_PATH)
+
+  File.readlines(ALLOWLIST_PATH, chomp: true).filter_map do |line|
+    # Skip full-line comments. Entries themselves contain '#' (Subject#method),
+    # so only strip a *trailing* " # reason" comment (whitespace then '#').
+    next if line.lstrip.start_with?("#")
+
+    entry = line.sub(/\s+#.*/, "").strip
+    entry unless entry.empty?
+  end.uniq
+end
+
+def subjects_from_config
+  config = YAML.safe_load_file(CONFIG_PATH)
+  config.dig("matcher", "subjects") || []
+end
+
+# The test database is in-memory, so mutant's parallel kill-forks each get
+# their own isolated copy with no shared file to lock - results are stable
+# across runs. Let mutant pick its own job count; override with MUTANT_JOBS.
+def run_mutant(subjects)
+  jobs = ENV["MUTANT_JOBS"]
+  command = [
+    "bundle", "exec", "mutant", "run",
+    "--usage", "opensource",
+    "--integration", "rspec",
+    "--require", "./config/environment",
+    *(["--jobs", jobs] if jobs),
+    "--", *subjects
+  ]
+  warn "Running: #{command.join(" ")}"
+  # Killfork logs can contain non-UTF-8 bytes; scrub so line matching is safe.
+  raw = IO.popen(command, err: [:child, :out]) { |io| io.read }
+  raw.force_encoding("UTF-8").scrub
+end
+
+def extract_survivors(output)
+  output.each_line.filter_map do |line|
+    next unless (match = SURVIVOR.match(line.strip))
+
+    relative = match[:path].delete_prefix("#{ROOT}/")
+    "#{match[:subject]}:#{relative}:#{match[:line]}:#{match[:hash]}"
+  end.uniq
+end
+
+def write_allowlist(survivors)
+  header = <<~HEADER
+    # Vetted equivalent mutants - survivors mutant cannot kill because the
+    # mutated code is semantically identical to the original.
+    #
+    # Format: Subject#method:path:line:hash  # reason
+    #
+    # Regenerate with: bin/mutant-check --update [SUBJECT ...]
+    # Entries are tied to the current source; they change when the file does.
+  HEADER
+  body = survivors.sort.join("\n")
+  File.write(ALLOWLIST_PATH, "#{header}\n#{body}\n")
+end
+
+update = ARGV.delete("--update")
+subjects = ARGV.empty? ? subjects_from_config : ARGV
+abort "No subjects given and none configured in config/mutant.yml" if subjects.empty?
+
+# An entry Subject#method / Subject.method / Subject belongs to one of the
+# checked subjects when its class-name prefix matches.
+def for_subjects?(entry, subjects)
+  subjects.any? { |s| entry == s || entry.start_with?("#{s}#", "#{s}.", "#{s}:") }
+end
+
+output = run_mutant(subjects)
+survivors = extract_survivors(output)
+allowlist = load_allowlist
+
+if update
+  # Only replace entries for the subjects we just ran, so a scoped update
+  # (e.g. `--update Unit`) keeps the other subjects' vetted entries.
+  kept = allowlist.reject { |entry| for_subjects?(entry, subjects) }
+  write_allowlist((kept + survivors).uniq)
+  puts "Wrote #{survivors.size} allowed mutation(s) for #{subjects.join(", ")}"
+  exit 0
+end
+
+new_survivors = survivors - allowlist
+# Only report staleness for the subjects actually checked this run.
+stale = (allowlist - survivors).select { |entry| for_subjects?(entry, subjects) }
+
+unless stale.empty?
+  puts "Allowlisted mutations no longer alive (safe to remove):"
+  stale.sort.each { |entry| puts "  - #{entry}" }
+end
+
+if new_survivors.empty?
+  puts "OK: #{survivors.size} survivor(s), all allowlisted."
+  exit 0
+end
+
+puts "New surviving mutations not on the allowlist:"
+new_survivors.sort.each { |entry| puts "  #{entry}" }
+puts
+puts "Review each: kill it with a test, or if it is genuinely equivalent,"
+puts "record it with `bin/mutant-check --update`."
+exit 1

@@ -9,7 +9,13 @@ module SessionsHelper
   def remember_user
     return unless session[:session_token]
 
-    cookies.permanent.signed[:session_token] = session[:session_token]
+    cookies.signed[:session_token] = {
+      value: session[:session_token],
+      expires: UserSession::INACTIVITY_TIMEOUT.from_now,
+      httponly: true,
+      secure: request.ssl?,
+      same_site: :lax
+    }
   end
 
   sig { void }
@@ -19,7 +25,9 @@ module SessionsHelper
 
   sig { returns(T.nilable(User)) }
   def current_user
-    @current_user ||= fetch_current_user
+    return @current_user if defined?(@current_user)
+
+    @current_user = fetch_current_user
   end
 
   private
@@ -35,12 +43,11 @@ module SessionsHelper
 
   sig { returns(T.nilable(User)) }
   def user_from_session_token
-    user_session = UserSession.find_by(session_token: session[:session_token])
-    if user_session
-      user_session.user
+    @current_session = active_user_session_for(session[:session_token])
+    if @current_session
+      @current_session.user
     else
-      # Session token is invalid, clear session
-      session.delete(:session_token)
+      clear_session_credentials
       nil
     end
   end
@@ -50,16 +57,34 @@ module SessionsHelper
     token = cookies.signed[:session_token]
     return unless token
 
-    user_session = UserSession.find_by(session_token: token)
-    if user_session
-      # Restore session from cookie
+    @current_session = active_user_session_for(token)
+    if @current_session
       session[:session_token] = token
-      user_session.user
+      remember_user
+      @current_session.user
     else
-      # Invalid cookie token, clear it
-      cookies.delete(:session_token)
+      clear_session_credentials
       nil
     end
+  end
+
+  sig { params(token: T.nilable(String)).returns(T.nilable(UserSession)) }
+  def active_user_session_for(token)
+    return unless token
+
+    user_session = UserSession.find_by(session_token: token)
+    return unless user_session
+    return user_session if user_session.active?
+
+    user_session.destroy
+    nil
+  end
+
+  sig { void }
+  def clear_session_credentials
+    session.delete(:session_token)
+    forget_user
+    @current_session = nil
   end
 
   public
@@ -81,25 +106,29 @@ module SessionsHelper
     params(
       email: T.nilable(String),
       password: T.nilable(String)
-    ).returns(T.nilable(T.any(User, T::Boolean)))
+    ).returns(T.nilable(User))
   end
   def authenticate_user(email, password)
     return nil unless email.present? && password.present?
 
-    User.find_by(email: email.downcase)&.authenticate(password)
+    User.authenticate_by(email: email.downcase, password: password)
   end
 
-  sig { void }
-  def create_user_session
-    remember_user
+  sig { params(remember: T::Boolean).void }
+  def create_user_session(remember: false)
+    remember ? remember_user : forget_user
+  end
+
+  sig { returns(T::Boolean) }
+  def remembered_user?
+    cookies.signed[:session_token].present?
   end
 
   sig { returns(T.nilable(UserSession)) }
   def current_session
     return unless session[:session_token]
+    return @current_session if defined?(@current_session)
 
-    @current_session ||= UserSession.find_by(
-      session_token: session[:session_token]
-    )
+    @current_session = active_user_session_for(session[:session_token])
   end
 end

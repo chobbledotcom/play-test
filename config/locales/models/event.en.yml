@@ -43,3 +43,8 @@ en:
       today: Today
       this_week: This week
       all_time: All time
+    resource_types:
+      system: System
+    errors:
+      log_failed: "Failed to log %{resource_type} event: %{message}"
+      system_log_failed: "Failed to log system event: %{message}"

@@ -158,6 +158,39 @@ RSpec.describe PdfGeneratorService, pdf: true do
           "shared.pass_pdf",
           "shared.fail_pdf")
       end
+
+      it "reuses the inspection loaded for the history" do
+        expect(unit).not_to receive(:last_inspection)
+
+        PdfGeneratorService.generate_unit_report(unit).render
+      end
+
+      it "uses the most recently completed inspection for unit details" do
+        passed_inspection.update_columns(
+          complete_date: 1.day.ago,
+          inspection_date: 2.days.ago
+        )
+        failed_inspection.update_columns(
+          complete_date: 2.days.ago,
+          inspection_date: 1.day.ago
+        )
+        header_generator = PdfGeneratorService::HeaderGenerator
+        expect(header_generator).to receive(:generate_unit_pdf_header).with(
+          anything,
+          unit,
+          last_inspection: passed_inspection,
+          unbranded: anything
+        ).and_call_original
+        expect(described_class).to receive(
+          :generate_unit_details_with_inspection
+        ).with(
+          anything,
+          unit,
+          passed_inspection
+        ).and_call_original
+
+        PdfGeneratorService.generate_unit_report(unit).render
+      end
     end
 
     context "with missing manufacturer" do

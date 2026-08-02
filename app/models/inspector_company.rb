@@ -31,31 +31,10 @@ class InspectorCompany < ApplicationRecord
 
   has_many :inspections, dependent: :destroy
 
-  # Override to filter admin-only fields
-  sig {
-    params(user: T.nilable(User)).returns(
-      T::Array[
-        T::Hash[
-          Symbol,
-          T.any(
-            String,
-            T::Array[T::Hash[Symbol, T.any(String, Symbol, Integer, T::Boolean, T::Hash[Symbol, T.any(String, Integer, T::Boolean)])]]
-          )
-        ]
-      ]
-    )
-  }
-  def self.form_fields(user: nil)
-    fields = super
-
-    # Remove notes field unless user is admin
-    unless user&.admin?
-      fields.each do |fieldset|
-        fieldset[:fields].delete_if { |field| field[:field] == :notes }
-      end
-    end
-
-    fields
+  sig { params(user: T.nilable(User)).returns(AssessmentSchema) }
+  def self.form_schema(user: nil)
+    return assessment_schema if user&.admin?
+    assessment_schema.exclude(:notes)
   end
 
   # File attachments

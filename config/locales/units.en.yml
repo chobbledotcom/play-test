@@ -66,8 +66,12 @@ en:
     unit_types:
       bouncy_castle: Bouncy Castle
       bouncing_pillow: Bouncing Pillow
+      bungee_run: Bungee Run
+      catch_bed: Catch Bed
       inflatable_ball_pool: Inflatable Ball Pool
+      inflatable_game: Inflatable Game
       pat_testable: PAT Testable Appliance
+      play_zone: Play Zone
     labels:
       inspection_date: Inspection Date
       dimensions: Dimensions
@@ -111,7 +115,6 @@ en:
     validations:
       id_blank: ID can't be blank
       name_blank: Name can't be blank
-      manufacturer_blank: Manufacturer can't be blank
       serial_blank: Serial can't be blank
       serial: Serial number can't be blank
       description_blank: Description can't be blank

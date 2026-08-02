@@ -6,25 +6,25 @@
 #  air_loss_pass                       :boolean
 #  critical_fall_off_height            :integer
 #  critical_fall_off_height_comment    :text
-#  critical_fall_off_height_pass       :boolean
+#  critical_fall_off_height_pass       :integer
 #  entrapment_comment                  :text
 #  entrapment_pass                     :boolean
 #  evacuation_time_comment             :text
 #  evacuation_time_pass                :boolean
 #  grounding_comment                   :text
-#  grounding_pass                      :boolean
+#  grounding_pass                      :integer
 #  markings_comment                    :text
 #  markings_pass                       :boolean
 #  platform_height                     :integer
 #  platform_height_comment             :text
-#  platform_height_pass                :boolean
+#  platform_height_pass                :integer
 #  seam_integrity_comment              :text
 #  seam_integrity_pass                 :boolean
 #  sharp_edges_comment                 :text
 #  sharp_edges_pass                    :boolean
 #  step_ramp_size                      :integer
 #  step_ramp_size_comment              :text
-#  step_ramp_size_pass                 :boolean
+#  step_ramp_size_pass                 :integer
 #  stitch_length_comment               :text
 #  stitch_length_pass                  :boolean
 #  straight_walls_comment              :text
@@ -34,7 +34,7 @@
 #  trough_comment                      :text
 #  trough_depth                        :integer
 #  trough_depth_comment                :string(1000)
-#  trough_pass                         :boolean
+#  trough_pass                         :integer
 #  unit_pressure                       :decimal(8, 2)
 #  unit_pressure_comment               :text
 #  unit_pressure_pass                  :boolean
@@ -67,6 +67,12 @@ class Assessments::StructureAssessment < ApplicationRecord
   self.primary_key = "inspection_id"
 
   belongs_to :inspection
+
+  enum :step_ramp_size_pass, Inspection::PASS_FAIL_NA, prefix: true
+  enum :platform_height_pass, Inspection::PASS_FAIL_NA, prefix: true
+  enum :critical_fall_off_height_pass, Inspection::PASS_FAIL_NA, prefix: true
+  enum :trough_pass, Inspection::PASS_FAIL_NA, prefix: true
+  enum :grounding_pass, Inspection::PASS_FAIL_NA, prefix: true
 
   after_update :log_assessment_update, if: :saved_changes?
 

@@ -93,5 +93,79 @@ RSpec.describe PhotoProcessingService do
       expect(described_class.valid_image_data?(nil)).to be false
       expect(described_class.valid_image_data?("")).to be false
     end
+
+    it "rejects data above the byte limit before decoding" do
+      oversized_data = instance_double(
+        String,
+        blank?: false,
+        bytesize: described_class::MAX_UPLOAD_BYTES + 1
+      )
+      expect(Vips::Image).not_to receive(:new_from_buffer)
+
+      expect(described_class.valid_image_data?(oversized_data)).to be false
+    end
+  end
+
+  describe ".upload_within_size_limit?" do
+    it "accepts files at the upload limit" do
+      upload = Struct.new(:size).new(described_class::MAX_UPLOAD_BYTES)
+
+      expect(described_class.upload_within_size_limit?(upload)).to be true
+    end
+
+    it "rejects files above the upload limit without reading them" do
+      upload = Struct.new(:size).new(described_class::MAX_UPLOAD_BYTES + 1)
+
+      expect(described_class.upload_within_size_limit?(upload)).to be false
+    end
+
+    it "rejects unsupported uploads without a size" do
+      upload = Object.new
+
+      expect(described_class.upload_within_size_limit?(upload)).to be false
+    end
+  end
+
+  describe ".valid_image?" do
+    it "validates tempfile-backed uploads without reading them into memory" do
+      tempfile = instance_double(Tempfile, path: "/tmp/upload.jpg")
+      upload = double(blank?: false, size: 1024, tempfile: tempfile)
+      image = double(width: 100, height: 100)
+
+      expect(Vips::Image).to receive(:new_from_file)
+        .with("/tmp/upload.jpg", access: :sequential)
+        .and_return(image)
+      expect(upload).not_to receive(:read)
+
+      expect(described_class.valid_image?(upload)).to be true
+    end
+  end
+
+  describe ".acceptable_dimensions?" do
+    define_method(:acceptable_dimensions?) do |width, height|
+      image = double(width: width, height: height)
+      described_class.send(:acceptable_dimensions?, image)
+    end
+
+    it "accepts each per-axis limit" do
+      expect(acceptable_dimensions?(described_class::MAX_IMAGE_DIMENSION, 1)).to be true
+      expect(acceptable_dimensions?(1, described_class::MAX_IMAGE_DIMENSION)).to be true
+    end
+
+    it "rejects one pixel over either per-axis limit" do
+      over_limit = described_class::MAX_IMAGE_DIMENSION + 1
+
+      expect(acceptable_dimensions?(over_limit, 1)).to be false
+      expect(acceptable_dimensions?(1, over_limit)).to be false
+    end
+
+    it "accepts the total-pixel limit" do
+      expect(acceptable_dimensions?(8_000, 5_000)).to be true
+    end
+
+    it "rejects values above the total-pixel limit" do
+      expect(3_015 * 13_267).to eq(described_class::MAX_IMAGE_PIXELS + 5)
+      expect(acceptable_dimensions?(3_015, 13_267)).to be false
+    end
   end
 end

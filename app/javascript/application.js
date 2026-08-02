@@ -3,6 +3,7 @@ import "@hotwired/turbo-rails";
 import "comment_toggles";
 import "na_toggles";
 import "na_number_toggles";
+import "na_number_submissions";
 import "details_links";
 import "dirty_forms";
 import "share_buttons";
