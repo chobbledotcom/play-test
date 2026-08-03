@@ -1,6 +1,6 @@
 ---
 name: rack-session
-version: 2.1.1
+version: 2.1.2
 type: bundler
 summary: A session implementation for Rack.
 homepage: https://github.com/rack/rack-session

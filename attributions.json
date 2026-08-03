@@ -1,94 +1,94 @@
 {
-  "generated_at": "2026-07-27T05:44:31",
-  "total_dependencies": 151,
+  "generated_at": "2026-08-03T05:37:32",
+  "total_dependencies": 149,
   "dependencies": [
     {
       "name": "action_text-trix",
-      "version": "2.1.16",
+      "version": "2.1.19",
       "license": "mit",
       "homepage": "https://github.com/basecamp/trix",
       "summary": "A rich text editor for everyday writing"
     },
     {
       "name": "actioncable",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "WebSocket framework for Rails."
     },
     {
       "name": "actionmailbox",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "Inbound email handling framework."
     },
     {
       "name": "actionmailer",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "Email composition and delivery framework (part of Rails)."
     },
     {
       "name": "actionpack",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "Web-flow and rendering framework putting the VC in MVC (part of Rails)."
     },
     {
       "name": "actiontext",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "Rich text framework."
     },
     {
       "name": "actionview",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "Rendering framework putting the V in MVC (part of Rails)."
     },
     {
       "name": "activejob",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "Job framework with pluggable queues."
     },
     {
       "name": "activemodel",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "A toolkit for building modeling frameworks (part of Rails)."
     },
     {
       "name": "activerecord",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "other",
       "homepage": "https://rubyonrails.org",
       "summary": "Object-relational mapper framework (part of Rails)."
     },
     {
       "name": "activestorage",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "Local and cloud file storage framework."
     },
     {
       "name": "activesupport",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "A toolkit of support libraries and Ruby core extensions extracted from the Rails framework."
     },
     {
       "name": "addressable",
-      "version": "2.8.9",
+      "version": "2.9.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/sporkmonger/addressable",
       "summary": "URI Implementation"
@@ -102,7 +102,7 @@
     },
     {
       "name": "annotaterb",
-      "version": "4.22.0",
+      "version": "4.24.0",
       "license": "other",
       "homepage": "https://github.com/drwl/annotaterb",
       "summary": "A gem for generating annotations for Rails projects."
@@ -123,7 +123,7 @@
     },
     {
       "name": "aws-sdk-core",
-      "version": "3.242.0",
+      "version": "3.254.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - Core"
@@ -137,7 +137,7 @@
     },
     {
       "name": "aws-sdk-s3",
-      "version": "1.213.0",
+      "version": "1.228.1",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - Amazon S3"
@@ -158,7 +158,7 @@
     },
     {
       "name": "bcrypt",
-      "version": "3.1.21",
+      "version": "3.1.22",
       "license": "other",
       "homepage": "https://github.com/bcrypt-ruby/bcrypt-ruby",
       "summary": "OpenBSD's bcrypt() password hashing algorithm."
@@ -179,7 +179,7 @@
     },
     {
       "name": "blueprinter",
-      "version": "1.2.1",
+      "version": "1.3.0",
       "license": "mit",
       "homepage": "https://github.com/procore-oss/blueprinter",
       "summary": "Simple Fast Declarative Serialization Library"
@@ -228,7 +228,7 @@
     },
     {
       "name": "concurrent-ruby",
-      "version": "1.3.6",
+      "version": "1.3.7",
       "license": "other",
       "homepage": "http://www.concurrent-ruby.com",
       "summary": "Modern concurrency tools for Ruby. Inspired by Erlang, Clojure, Scala, Haskell, F#, C#, Java, and classic concurrency patterns."
@@ -249,14 +249,14 @@
     },
     {
       "name": "crass",
-      "version": "1.0.6",
+      "version": "1.0.7",
       "license": "mit",
       "homepage": "https://github.com/rgrove/crass/",
       "summary": "CSS parser based on the CSS Syntax Level 3 spec."
     },
     {
       "name": "csv",
-      "version": "3.3.5",
+      "version": "3.3.6",
       "license": "other",
       "homepage": "https://github.com/ruby/csv",
       "summary": "CSV Reading and Writing"
@@ -267,13 +267,6 @@
       "license": "other",
       "homepage": "https://github.com/ruby/date",
       "summary": "The official date library for Ruby."
-    },
-    {
-      "name": "docile",
-      "version": "1.4.1",
-      "license": "mit",
-      "homepage": "https://ms-ati.github.io/docile/",
-      "summary": "Docile keeps your Ruby DSLs tame and well-behaved."
     },
     {
       "name": "dotenv",
@@ -305,7 +298,7 @@
     },
     {
       "name": "erb",
-      "version": "6.0.2",
+      "version": "6.0.4",
       "license": "other",
       "homepage": "https://github.com/ruby/erb",
       "summary": "An easy to use but powerful templating system for Ruby."
@@ -326,14 +319,14 @@
     },
     {
       "name": "faraday",
-      "version": "2.14.1",
+      "version": "2.14.3",
       "license": "mit",
       "homepage": "https://lostisland.github.io/faraday",
       "summary": "HTTP/REST API client library."
     },
     {
       "name": "faraday-net_http",
-      "version": "3.4.2",
+      "version": "3.4.4",
       "license": "other",
       "homepage": "https://github.com/lostisland/faraday-net_http",
       "summary": "Faraday adapter for Net::HTTP"
@@ -403,21 +396,21 @@
     },
     {
       "name": "json",
-      "version": "2.18.1",
+      "version": "2.21.2",
       "license": "other",
       "homepage": "https://github.com/ruby/json",
       "summary": "JSON Implementation for Ruby"
     },
     {
       "name": "jwt",
-      "version": "3.1.2",
+      "version": "3.2.0",
       "license": "other",
       "homepage": "https://github.com/jwt/ruby-jwt",
       "summary": "JSON Web Token implementation in Ruby"
     },
     {
       "name": "licensed",
-      "version": "5.0.4",
+      "version": "5.1.0",
       "license": "mit",
       "homepage": "https://github.com/github/licensed",
       "summary": "Extract and validate the licenses of dependencies."
@@ -445,7 +438,7 @@
     },
     {
       "name": "loofah",
-      "version": "2.25.0",
+      "version": "2.25.2",
       "license": "mit",
       "homepage": "https://github.com/flavorjones/loofah",
       "summary": "Loofah is a general library for manipulating and transforming HTML/XML documents and fragments, built on top of Nokogiri."
@@ -508,7 +501,7 @@
     },
     {
       "name": "net-imap",
-      "version": "0.6.3",
+      "version": "0.6.4.1",
       "license": "other",
       "homepage": "https://github.com/ruby/net-imap",
       "summary": "Ruby client api for Internet Message Access Protocol"
@@ -543,7 +536,7 @@
     },
     {
       "name": "nokogiri",
-      "version": "1.19.1",
+      "version": "1.19.4",
       "license": "other",
       "homepage": "https://nokogiri.org",
       "summary": "Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby."
@@ -570,8 +563,15 @@
       "summary": "ECDSA, EdDSA, RSA-PSS and RSA-PKCS#1 algorithms for ruby"
     },
     {
+      "name": "ostruct",
+      "version": "0.6.3",
+      "license": "other",
+      "homepage": "https://github.com/ruby/ostruct",
+      "summary": "Class to build custom data structures, similar to a Hash."
+    },
+    {
       "name": "parallel",
-      "version": "1.27.0",
+      "version": "1.28.0",
       "license": "mit",
       "homepage": "https://github.com/grosser/parallel",
       "summary": "Run any kind of code in parallel processes"
@@ -634,14 +634,14 @@
     },
     {
       "name": "public_suffix",
-      "version": "7.0.2",
+      "version": "7.0.5",
       "license": "mit",
       "homepage": "https://simonecarletti.com/code/publicsuffix-ruby",
       "summary": "Domain name parser based on the Public Suffix List."
     },
     {
       "name": "puma",
-      "version": "7.2.0",
+      "version": "8.0.2",
       "license": "bsd-3-clause",
       "homepage": "https://puma.io",
       "summary": "A Ruby/Rack web server built for parallelism."
@@ -662,7 +662,7 @@
     },
     {
       "name": "rack",
-      "version": "3.2.5",
+      "version": "3.2.6",
       "license": "mit",
       "homepage": "https://github.com/rack/rack",
       "summary": "A modular Ruby webserver interface."
@@ -676,7 +676,7 @@
     },
     {
       "name": "rack-session",
-      "version": "2.1.1",
+      "version": "2.1.2",
       "license": "mit",
       "homepage": "https://github.com/rack/rack-session",
       "summary": "A session implementation for Rack."
@@ -697,7 +697,7 @@
     },
     {
       "name": "rails",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "Full-stack web application framework."
@@ -711,14 +711,14 @@
     },
     {
       "name": "rails-html-sanitizer",
-      "version": "1.7.0",
+      "version": "1.7.1",
       "license": "mit",
       "homepage": "https://github.com/rails/rails-html-sanitizer",
       "summary": "This gem is responsible to sanitize HTML fragments in Rails applications."
     },
     {
       "name": "railties",
-      "version": "8.1.2",
+      "version": "8.1.3.1",
       "license": "mit",
       "homepage": "https://rubyonrails.org",
       "summary": "Tools for creating, working with, and running Rails applications."
@@ -858,56 +858,42 @@
     },
     {
       "name": "sentry-rails",
-      "version": "6.4.1",
+      "version": "6.6.2",
       "license": "mit",
-      "homepage": "https://github.com/getsentry/sentry-ruby/tree/6.4.1/sentry-rails",
+      "homepage": "https://github.com/getsentry/sentry-ruby/tree/6.6.2/sentry-rails",
       "summary": "A gem that provides Rails integration for the Sentry error logger"
     },
     {
       "name": "sentry-ruby",
-      "version": "6.4.1",
+      "version": "6.6.2",
       "license": "mit",
-      "homepage": "https://github.com/getsentry/sentry-ruby/tree/6.4.1/sentry-ruby",
+      "homepage": "https://github.com/getsentry/sentry-ruby/tree/6.6.2/sentry-ruby",
       "summary": "A gem that provides a client interface for the Sentry error logger"
     },
     {
       "name": "simplecov",
-      "version": "0.22.0",
+      "version": "1.0.3",
       "license": "mit",
       "homepage": "https://github.com/simplecov-ruby/simplecov",
       "summary": "Code coverage for Ruby"
     },
     {
       "name": "simplecov-cobertura",
-      "version": "3.1.0",
+      "version": "4.0.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/jessebs/simplecov-cobertura",
       "summary": "SimpleCov Cobertura Formatter"
     },
     {
-      "name": "simplecov-html",
-      "version": "0.13.2",
-      "license": "mit",
-      "homepage": "https://github.com/simplecov-ruby/simplecov-html",
-      "summary": "Default HTML formatter for SimpleCov code coverage tool for ruby 2.4+"
-    },
-    {
-      "name": "simplecov_json_formatter",
-      "version": "0.1.4",
-      "license": "mit",
-      "homepage": "https://github.com/fede-moya/simplecov_json_formatter",
-      "summary": "JSON formatter for SimpleCov"
-    },
-    {
       "name": "solid_queue",
-      "version": "1.3.2",
+      "version": "1.5.1",
       "license": "mit",
       "homepage": "https://github.com/rails/solid_queue",
       "summary": "Database-backed Active Job backend."
     },
     {
       "name": "sorbet-runtime",
-      "version": "0.5.12016",
+      "version": "0.5.12443",
       "license": "apache-2.0",
       "homepage": "https://sorbet.org",
       "summary": "Sorbet runtime"
@@ -928,7 +914,7 @@
     },
     {
       "name": "sqlite3",
-      "version": "2.9.1",
+      "version": "2.9.5",
       "license": "bsd-3-clause",
       "homepage": "https://github.com/sparklemotion/sqlite3-ruby",
       "summary": "Ruby library to interface with the SQLite3 database engine (http://www.sqlite.org)."
@@ -963,7 +949,7 @@
     },
     {
       "name": "timeout",
-      "version": "0.6.0",
+      "version": "0.6.1",
       "license": "other",
       "homepage": "https://github.com/ruby/timeout",
       "summary": "Auto-terminate potentially long-running operations in Ruby."
@@ -1033,7 +1019,7 @@
     },
     {
       "name": "websocket-driver",
-      "version": "0.8.0",
+      "version": "0.8.2",
       "license": "other",
       "homepage": "https://github.com/faye/websocket-driver-ruby",
       "summary": "WebSocket protocol handler with pluggable I/O"
