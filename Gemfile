@@ -60,7 +60,7 @@ group :development do
   # Sorbet type checker
   gem "sorbet", require: false
   # 0.17.10+ requires the Sorbet 0.6 runtime, which conflicts with Mutant.
-  gem "tapioca", "= 0.17.9", require: false
+  gem "tapioca", "0.19.0", require: false
 
   # Rubocop extension for Sorbet
   gem "rubocop-sorbet", require: false
