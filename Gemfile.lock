@@ -339,7 +339,7 @@ GEM
     prettyprint (0.2.0)
     prism (1.9.0)
     prosopite (2.2.0)
-    psych (5.2.3)
+    psych (5.4.0)
       date
       stringio
     public_suffix (7.0.5)
@@ -647,7 +647,7 @@ DEPENDENCIES
   prawn
   prawn-table
   prosopite
-  psych (= 5.2.3)
+  psych (= 5.4.0)
   puma (>= 5.0)
   rack-cors
   rails (~> 8.1.0)

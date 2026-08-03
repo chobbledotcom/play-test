@@ -141,7 +141,7 @@ group :production do
 end
 
 # Pinned for nixpkgs
-gem "psych", "= 5.2.3"
+gem "psych", "5.4.0"
 gem "openssl", "3.3.2"
 
 # CI-only groups - excluded in development setup
