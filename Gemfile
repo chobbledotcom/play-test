@@ -96,7 +96,7 @@ gem "bcrypt"
 gem "importmap-rails", "~> 2.1"
 
 # Image processing
-gem "image_processing", "~> 1.12"
+gem "image_processing", "~> 2.0"
 
 # Pin ruby-vips for nixpkgs compatibility
 # Note: Requires libvips to be installed on the system
