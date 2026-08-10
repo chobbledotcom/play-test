@@ -27,7 +27,7 @@ gem "en14960"
 
 # Sorbet runtime (needed in all environments).
 # Mutant requires the 0.5 line; keep the checker and runtime in sync.
-gem "sorbet-runtime", "~> 0.5.0"
+gem "sorbet-runtime", "~> 0.6.13414"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
