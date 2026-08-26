@@ -14,7 +14,7 @@ Page.find_or_create_by!(slug: "/") do |page|
       <header>
         <h1>play-test</h1>
         <p>Inspection management for inflatable play equipment</p>
-        <p>Developed by <a href="https://chobble.com">chobble.com</a></p>
+        <p>Developed by <a href="https://www.chobble.com">chobble.com</a></p>
         <p>Released under AGPLv3 - anyone can use and improve it</p>
       </header>
 
@@ -97,7 +97,7 @@ Page.find_or_create_by!(slug: "footer") do |page|
     <p>
       <strong>Self promo:</strong> Do you need a website, software development,#{" "}
       or honest techy advice? Get in touch with me at#{" "}
-      <a rel="nofollow" href="https://chobble.com">chobble.com</a>.
+      <a rel="nofollow" href="https://www.chobble.com">chobble.com</a>.
     </p>
     <p>
       <a rel="nofollow" href="https://git.chobble.com/chobble/play-test">
