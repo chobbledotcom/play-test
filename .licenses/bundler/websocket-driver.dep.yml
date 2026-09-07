@@ -1,6 +1,6 @@
 ---
 name: websocket-driver
-version: 0.8.0
+version: 0.8.2
 type: bundler
 summary: WebSocket protocol handler with pluggable I/O
 homepage: https://github.com/faye/websocket-driver-ruby
@@ -8,7 +8,7 @@ license: other
 licenses:
 - sources: LICENSE.md
   text: |
-    Copyright 2010-2025 James Coglan
+    Copyright 2010-2026 James Coglan
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may not use
     this file except in compliance with the License. You may obtain a copy of the

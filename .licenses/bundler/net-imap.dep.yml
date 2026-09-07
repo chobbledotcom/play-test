@@ -1,6 +1,6 @@
 ---
 name: net-imap
-version: 0.6.3
+version: 0.6.4.1
 type: bundler
 summary: Ruby client api for Internet Message Access Protocol
 homepage: https://github.com/ruby/net-imap
