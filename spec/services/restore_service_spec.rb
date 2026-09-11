@@ -95,6 +95,38 @@ RSpec.describe RestoreService, type: :service do
         expect(names).to eq(%w[local local])
       end
 
+      it "points restored blobs at the active service for the current target" do
+        service.perform(
+          date: timestamp,
+          storage_target: :current,
+          db_paths: [target_db],
+          archive_dir:,
+          storage_service: ActiveStorage::Service::DiskService.new(root: target_root)
+        )
+
+        active_name = ActiveStorage::Blob.service.name.to_s
+        expect(active_name).to eq("test")
+        expect(blob_service_names(target_db)).to eq([active_name, active_name])
+      end
+
+      it "removes stale WAL sidecars beside the restored database" do
+        wal = Pathname.new("#{target_db}-wal")
+        shm = Pathname.new("#{target_db}-shm")
+        File.write(wal, "stale")
+        File.write(shm, "stale")
+
+        service.perform(
+          date: timestamp,
+          storage_target: :local,
+          db_paths: [target_db],
+          archive_dir:,
+          storage_service: ActiveStorage::Service::DiskService.new(root: target_root)
+        )
+
+        expect(wal).not_to exist
+        expect(shm).not_to exist
+      end
+
       it "keeps a safety snapshot of the current database before overwriting" do
         service.perform(
           date: timestamp,

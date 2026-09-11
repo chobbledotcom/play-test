@@ -114,6 +114,15 @@ module BackupOperations
     extract_dir
   end
 
+  # Online backup of a SQLite database, including any uncheckpointed WAL
+  # pages, into a consistent snapshot file.
+  sig { params(source: Pathname, destination: Pathname).void }
+  def sqlite3_backup(source, destination)
+    # sqlite3 requires the .backup command and quoted path as a single argv.
+    backup_command = [".backup", "'#{destination}'"].join(" ")
+    system("sqlite3", source.to_s, backup_command, exception: true)
+  end
+
   sig { returns(String) }
   def s3_bucket = s3_env("S3_BUCKET")
 
@@ -162,22 +171,22 @@ module BackupOperations
     ).returns(ActiveStorage::Service)
   end
   def resolve_storage_service(storage_target)
-    name = storage_service_name(storage_target)
-    return ActiveStorage::Blob.service unless name
-
-    ActiveStorage::Blob.services.fetch(name)
+    ActiveStorage::Blob.services.fetch(storage_service_name(storage_target))
   end
 
+  # The Active Storage service name for the target; "current" resolves to the
+  # service the app is actually configured with.
   sig do
     params(
       storage_target: T.any(String, Symbol)
-    ).returns(T.nilable(String))
+    ).returns(String)
   end
   def storage_service_name(storage_target)
-    STORAGE_SERVICES.fetch(storage_target.to_sym) do
+    name = STORAGE_SERVICES.fetch(storage_target.to_sym) do
       message = "Unknown storage target: #{storage_target}"
       raise ArgumentError, "#{message}. Use local, s3 or current."
     end
+    name || ActiveStorage::Blob.service.name.to_s
   end
 
   # Point every restored Active Storage blob at the target service so the app

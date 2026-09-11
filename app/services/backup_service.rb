@@ -109,12 +109,10 @@ class BackupService
 
   sig { params(paths: T::Array[Pathname], staging: Pathname).void }
   def backup_databases(paths, staging)
-    FileUtils.mkdir_p(staging.join("db"))
+    db_dir = staging.join("db")
+    FileUtils.mkdir_p(db_dir)
     paths.each do |db_path|
-      destination = staging.join("db", db_name_for_path(db_path))
-      # sqlite3 requires the .backup command and quoted path as a single argv.
-      backup_command = [".backup", "'#{destination}'"].join(" ")
-      system("sqlite3", db_path.to_s, backup_command, exception: true)
+      sqlite3_backup(db_path, db_dir.join(db_name_for_path(db_path)))
     end
   end
 

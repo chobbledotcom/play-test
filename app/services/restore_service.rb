@@ -74,7 +74,7 @@ class RestoreService
       date: String,
       paths: T::Array[Pathname],
       target_service: T.untyped,
-      target_name: T.nilable(String)
+      target_name: String
     ).returns(T::Array[String])
   end
   def restore_archive(archive_path, date, paths, target_service, target_name)
@@ -84,7 +84,7 @@ class RestoreService
       backup_database_snapshots(paths)
       restored = restore_databases(staging, paths)
       restore_storage(staging, target_service)
-      update_blob_service_names(paths, target_name) if target_name
+      update_blob_service_names(paths, target_name)
       restored
     ensure
       FileUtils.rm_rf(staging)
@@ -105,7 +105,7 @@ class RestoreService
       storage_target: T.any(String, Symbol),
       service_name: T.nilable(String),
       storage_service: T.untyped
-    ).returns([T.untyped, T.nilable(String)])
+    ).returns([T.untyped, String])
   end
   def targets(storage_target, service_name, storage_service)
     service = storage_service || resolve_storage_service(storage_target)
@@ -119,7 +119,7 @@ class RestoreService
     paths.each do |db_path|
       next unless File.exist?(db_path)
 
-      FileUtils.cp(db_path, snapshot_path(db_path))
+      sqlite3_backup(db_path, snapshot_path(db_path))
     end
   end
 
@@ -136,9 +136,19 @@ class RestoreService
       raise unmatched_database_error(name) if target.nil?
 
       FileUtils.mkdir_p(target.dirname)
+      remove_database_sidecars(target)
       FileUtils.cp(file, target)
       name
     end
+  end
+
+  # Stale WAL/journal sidecars from the pre-restore database would otherwise be
+  # replayed over the restored file, so drop them first.
+  sig { params(db_path: Pathname).void }
+  def remove_database_sidecars(db_path)
+    base = db_path.to_s
+    sidecars = ["#{base}-wal", "#{base}-shm", "#{base}-journal"]
+    FileUtils.rm_f(Dir.glob(sidecars))
   end
 
   sig { params(staging: Pathname, target_service: T.untyped).void }
@@ -178,14 +188,14 @@ class RestoreService
       filename: String,
       location: String,
       restored: T::Array[String],
-      target_name: T.nilable(String)
+      target_name: String
     ).returns(T::Hash[Symbol, T.untyped])
   end
   def build_result(filename, location, restored, target_name)
     {
       filename: filename,
       location: location,
-      storage_target: target_name || ActiveStorage::Blob.service.name,
+      storage_target: target_name,
       restored_databases: restored
     }
   end
