@@ -58,7 +58,7 @@ RSpec.describe "Backups", type: :request do
 
       context "with valid date" do
         let(:valid_date) { "2024-01-15" }
-        let(:valid_key) { "db_backups/database-2024-01-15.tar.gz" }
+        let(:valid_key) { "full_backups/backup-2024-01-15.tar.gz" }
 
         before do
           # Mock S3 service
@@ -76,7 +76,7 @@ RSpec.describe "Backups", type: :request do
             size: 5_242_880,
             last_modified: Time.zone.parse("2024-01-15 10:00:00"))
 
-          prefix = "db_backups/"
+          prefix = "full_backups/"
           allow(bucket).to receive(:objects).with(prefix: prefix)
             .and_return([backup])
 
@@ -103,7 +103,7 @@ RSpec.describe "Backups", type: :request do
 
         bucket = double("bucket")
         allow(s3_service).to receive(:send).with(:bucket).and_return(bucket)
-        prefix = "db_backups/"
+        prefix = "full_backups/"
         allow(bucket).to receive(:objects).with(prefix: prefix).and_return([])
 
         get download_backups_path, params: {date: "2099-12-31"}

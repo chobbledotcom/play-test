@@ -1,9 +1,10 @@
 ---
 en:
   backups:
-    title: Database Backups
+    title: Backups
     filename: Filename
     size: Size
+    size_mb_unit: MB
     created_at: Created At
     actions: Actions
     download: Download

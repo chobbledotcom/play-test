@@ -12,7 +12,7 @@ namespace :test do
     Rails.configuration.database_configuration[Rails.env]["database"] = "/nonexistent/path/database.sqlite3"
 
     begin
-      Rake::Task["s3:backup:database"].invoke
+      Rake::Task["backup:create"].invoke
     rescue SystemExit => e
       puts "Task exited with status: #{e.status}"
     ensure
@@ -27,8 +27,8 @@ namespace :test do
     Rails.configuration.database_configuration[Rails.env]["database"] = nil
 
     begin
-      Rake::Task["s3:backup:database"].reenable
-      Rake::Task["s3:backup:database"].invoke
+      Rake::Task["backup:create"].reenable
+      Rake::Task["backup:create"].invoke
     rescue SystemExit => e
       puts "Task exited with status: #{e.status}"
     rescue => e

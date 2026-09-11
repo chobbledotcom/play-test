@@ -24,7 +24,7 @@ namespace :s3 do
 
       Sentry.capture_message(error_msg, level: "error", extra: {
         missing_vars: missing_vars,
-        task: "s3:backup",
+        task: "backup:create",
         environment: Rails.env
       })
 
