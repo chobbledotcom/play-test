@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Create a Bunny Magic Container from a backup archive.
+# Interactive wizard: https://bunny.net/docs/magic-containers/api-reference
+
+set -e
+
+exec "$(dirname "$0")/rake" magic_container:create "$@"
