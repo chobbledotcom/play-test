@@ -36,6 +36,7 @@ class RestoreService
   )
     validate_date!(date)
     paths = db_paths || database_paths
+    validate_unique_database_names!(paths)
     service, name = targets(storage_target, service_name, storage_service)
     local_dir = archive_dir || local_archive_dir
     filename = archive_filename(date)

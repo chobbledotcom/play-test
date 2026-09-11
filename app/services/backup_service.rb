@@ -33,6 +33,7 @@ class BackupService
   )
     destinations = normalize_destination(destination)
     paths = db_paths || database_paths
+    validate_unique_database_names!(paths)
     root = storage_root || current_storage_root
     local_dir = archive_dir || local_archive_dir
     raise "No databases to back up" if paths.empty? && root.nil?
@@ -145,7 +146,7 @@ class BackupService
     blobs = keys.reject { it.start_with?(*archive_prefixes) }
 
     blobs.each do |key|
-      destination = staging.join("active_storage", key)
+      destination = storage_destination(staging, key)
       FileUtils.mkdir_p(destination.dirname)
       File.open(destination, "wb") do |file|
         resource.bucket(s3_bucket).object(key).get { |chunk| file.write(chunk) }

@@ -48,6 +48,33 @@ module BackupOperations
     Pathname.new(Dir.mktmpdir(prefix, base.to_s))
   end
 
+  # Databases are stored in the archive by filename, so two paths with the
+  # same basename would silently overwrite each other's snapshot.
+  sig { params(paths: T::Array[Pathname]).void }
+  def validate_unique_database_names!(paths)
+    counts = paths.map { db_name_for_path(it) }.tally
+    duplicates = counts.select { |_, count| count > 1 }.keys
+    return if duplicates.empty?
+
+    raise ArgumentError, "Duplicate database names: #{duplicates.join(", ")}"
+  end
+
+  # S3 object keys are external input: a key such as "/etc/passwd" resets
+  # Pathname#join to an absolute path, and "../" segments can climb out of
+  # the staging directory, so containment is enforced here. Leading slashes
+  # are normalised as key components rather than absolute paths.
+  sig { params(staging: Pathname, key: String).returns(Pathname) }
+  def storage_destination(staging, key)
+    root = staging.join("active_storage").expand_path
+    destination = root.join(key.delete_prefix("/")).expand_path
+    root_prefix = "#{root}/"
+    unless destination.to_s.start_with?(root_prefix)
+      raise ArgumentError, "S3 key escapes archive staging: #{key}"
+    end
+
+    destination
+  end
+
   sig { returns(Pathname) }
   def local_archive_dir = Rails.root.join("storage/backups")
 

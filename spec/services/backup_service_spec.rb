@@ -108,7 +108,21 @@ RSpec.describe BackupService, type: :service do
           archive_dir:
         )
 
-        expect(Pathname.glob(Rails.root.join("tmp/backups/run-*"))).to be_empty
+        pattern = Rails.root.join("tmp/backups/run-#{Process.pid}-*")
+        expect(Pathname.glob(pattern)).to be_empty
+      end
+
+      it "rejects db_paths that share a database name" do
+        other = Pathname.new(workdir).join("elsewhere/database.sqlite3")
+
+        expect {
+          service.perform(
+            destination: :local,
+            db_paths: [source_db, other],
+            storage_root:,
+            archive_dir:
+          )
+        }.to raise_error(ArgumentError, "Duplicate database names: database.sqlite3")
       end
     end
 
@@ -191,6 +205,42 @@ RSpec.describe BackupService, type: :service do
 
         nested = extract_dir.join("active_storage/a/custom/key-1")
         expect(nested.read).to eq("nested content")
+      end
+
+      it "rejects S3 keys that escape the staging directory" do
+        stub_active_storage_as_s3
+        fake_s3.object("../../etc/passwd").put(body: "evil")
+
+        expect {
+          service.perform(
+            destination: :local,
+            db_paths: [source_db],
+            storage_root: nil,
+            archive_dir:,
+            s3_resource: fake_s3
+          )
+        }.to raise_error(ArgumentError, "S3 key escapes archive staging: ../../etc/passwd")
+      end
+
+      it "normalises leading-slash S3 keys into the staging directory" do
+        stub_active_storage_as_s3
+        fake_s3.object("/absolute/key-1").put(body: "absolute content")
+
+        service.perform(
+          destination: :local,
+          db_paths: [source_db],
+          storage_root: nil,
+          archive_dir:,
+          s3_resource: fake_s3
+        )
+
+        extract_dir = Pathname.new(workdir).join("extract")
+        FileUtils.mkdir_p(extract_dir)
+        archive = archive_dir.join("backup-#{timestamp}.tar.gz")
+        system("tar", "-xzf", archive.to_s, "-C", extract_dir.to_s, exception: true)
+
+        nested = extract_dir.join("active_storage/absolute/key-1")
+        expect(nested.read).to eq("absolute content")
       end
     end
 

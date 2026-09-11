@@ -153,6 +153,20 @@ RSpec.describe RestoreService, type: :service do
         }.to raise_error(/database\.sqlite3, which has no matching database/)
       end
 
+      it "rejects db_paths that share a database name" do
+        extra = Pathname.new(workdir).join("target-copy/database.sqlite3")
+
+        expect {
+          service.perform(
+            date: timestamp,
+            storage_target: :local,
+            db_paths: [target_db, extra],
+            archive_dir:,
+            storage_service: ActiveStorage::Service::DiskService.new(root: target_root)
+          )
+        }.to raise_error(ArgumentError, "Duplicate database names: database.sqlite3")
+      end
+
       it "raises when the backup is nowhere to be found" do
         empty_dir = Pathname.new(workdir).join("empty")
 
