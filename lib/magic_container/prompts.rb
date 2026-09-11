@@ -104,9 +104,7 @@ module MagicContainer
     sig { returns(String) }
     def read_line
       line = input.gets
-      if line.nil?
-        raise EOFError, "Input closed before the question was answered"
-      end
+      raise EOFError, "Input closed before the question was answered" if line.nil?
 
       line.chomp
     end
