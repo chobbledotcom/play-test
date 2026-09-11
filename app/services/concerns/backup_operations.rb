@@ -24,8 +24,29 @@ module BackupOperations
 
   private
 
+  # Staging area for assembling and extracting archives, unique per service
+  # instance so concurrent backup and restore operations (and parallel test
+  # workers) never trample each other's files. It is removed by
+  # #remove_temp_dir once the operation finishes.
   sig { returns(Pathname) }
-  def temp_dir = Rails.root.join("tmp/backups")
+  def temp_dir
+    prefix = "run-#{Process.pid}-"
+    @temp_dir ||= unique_dir(prefix, Rails.root.join("tmp/backups"))
+  end
+
+  sig { void }
+  def remove_temp_dir
+    return unless @temp_dir
+
+    FileUtils.rm_rf(@temp_dir)
+    @temp_dir = nil
+  end
+
+  sig { params(prefix: String, base: Pathname).returns(Pathname) }
+  def unique_dir(prefix, base)
+    FileUtils.mkdir_p(base)
+    Pathname.new(Dir.mktmpdir(prefix, base.to_s))
+  end
 
   sig { returns(Pathname) }
   def local_archive_dir = Rails.root.join("storage/backups")
@@ -38,12 +59,6 @@ module BackupOperations
 
   sig { params(filename: String).returns(String) }
   def archive_s3_key(filename) = "#{S3_ARCHIVE_PREFIX}#{filename}"
-
-  sig { returns(Pathname) }
-  def temp_archive_dir
-    FileUtils.mkdir_p(temp_dir)
-    temp_dir
-  end
 
   # Every file-based database configured for the current environment.
   # In-memory databases (the test suite) are skipped.
@@ -98,7 +113,7 @@ module BackupOperations
     FileUtils.mkdir_p(staging.join("db"))
     FileUtils.mkdir_p(staging.join("active_storage"))
 
-    archive_path = temp_archive_dir.join(archive_filename(timestamp))
+    archive_path = temp_dir.join(archive_filename(timestamp))
     tar_args = [archive_path.to_s, "-C", staging.to_s, "db", "active_storage"]
     system("tar", "-czf", *tar_args, exception: true)
     archive_path
@@ -141,11 +156,13 @@ module BackupOperations
     ENV[var].presence || raise("Missing #{var} environment variable")
   end
 
+  # Streamed so the archive never has to fit into memory.
   sig { params(resource: T.untyped, key: String).returns(Pathname) }
   def download_from_s3(resource, key)
-    destination = temp_archive_dir.join(File.basename(key))
-    content = resource.bucket(s3_bucket).object(key).get.body.read
-    File.binwrite(destination, content)
+    destination = temp_dir.join(File.basename(key))
+    File.open(destination, "wb") do |file|
+      resource.bucket(s3_bucket).object(key).get { |chunk| file.write(chunk) }
+    end
     destination
   end
 

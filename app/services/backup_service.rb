@@ -42,6 +42,7 @@ class BackupService
     build_result(archive_path, s3_key, destinations, local_dir)
   ensure
     FileUtils.rm_f(archive_path) if archive_path
+    remove_temp_dir
   end
 
   private
@@ -64,7 +65,7 @@ class BackupService
   end
   def create_full_archive(paths, root, s3_resource, local_dir)
     timestamp = Time.current.to_date.to_s
-    staging = temp_archive_dir.join(timestamp)
+    staging = temp_dir.join(timestamp)
     begin
       backup_databases(paths, staging)
       backup_storage(root, staging, s3_resource, local_dir)
@@ -134,7 +135,8 @@ class BackupService
   end
 
   # When Active Storage is backed by S3, snapshot every object in the bucket
-  # except previous backups. Files are keyed by their blob key.
+  # except previous backups. Files are stored under their full blob key, so
+  # keys containing directory paths survive the round trip.
   sig { params(staging: Pathname, s3_resource: T.untyped).void }
   def backup_s3_storage(staging, s3_resource)
     resource = s3_resource || s3_archive_resource
@@ -143,8 +145,11 @@ class BackupService
     blobs = keys.reject { it.start_with?(*archive_prefixes) }
 
     blobs.each do |key|
-      content = resource.bucket(s3_bucket).object(key).get.body.read
-      File.binwrite(staging.join("active_storage", File.basename(key)), content)
+      destination = staging.join("active_storage", key)
+      FileUtils.mkdir_p(destination.dirname)
+      File.open(destination, "wb") do |file|
+        resource.bucket(s3_bucket).object(key).get { |chunk| file.write(chunk) }
+      end
     end
   end
 

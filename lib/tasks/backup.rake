@@ -33,7 +33,7 @@ namespace :backup do
     puts "   Restored from: #{result[:location]}"
     puts "   Restored databases: #{result[:restored_databases].join(", ")}"
     puts "   Storage target: #{result[:storage_target]}"
-    puts "   Safety snapshots kept in tmp/backups/pre-restore-snapshots"
+    puts "   Safety snapshots kept in #{result[:snapshots_dir]}"
     puts "\n⚠️  Remember to restart your Rails app to pick up the restored database!"
   rescue => e
     puts "\n❌ Restore failed: #{e.message}"

@@ -50,11 +50,16 @@ class FakeS3Object
     self
   end
 
+  # Mirrors the real SDK: with a block it streams chunks, otherwise it
+  # returns a body that responds to read.
   def get
     raise Aws::S3::Errors::NoSuchKey.new(nil, "No such key: #{@key}") unless exists?
 
-    body = StringIO.new(@resource.store.fetch(@key)[:content])
-    FakeS3GetOutput.new(body)
+    content = @resource.store.fetch(@key)[:content]
+    return FakeS3GetOutput.new(StringIO.new(content)) unless block_given?
+
+    yield content
+    self
   end
 
   def exists?
@@ -119,4 +124,20 @@ def blob_service_names(db_path)
   db.execute("SELECT service_name FROM active_storage_blobs ORDER BY id").flatten
 ensure
   db&.close
+end
+
+# The test environment's Active Storage service is a disk service, so its
+# root is never nil. Pretend it is S3-backed to exercise the S3 branches.
+def stub_active_storage_as_s3
+  s3_service = double("S3Service")
+  allow(s3_service).to receive(:is_a?).with(ActiveStorage::Service::DiskService).and_return(false)
+  allow(ActiveStorage::Blob).to receive(:service).and_return(s3_service)
+end
+
+# Remove pre-restore snapshots created by this rspec process. Snapshot
+# directories carry the process id in their name, so this never deletes
+# another parallel worker's snapshots.
+def remove_process_snapshots
+  base = Rails.root.join("tmp/backups/snapshots")
+  base.glob("restore-#{$$}-*").each { |dir| FileUtils.rm_rf(dir) }
 end

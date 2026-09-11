@@ -41,7 +41,9 @@ class RestoreService
     filename = archive_filename(date)
     archive_path, location = locate_archive(local_dir, filename, s3_resource)
     restored = restore_archive(archive_path, date, paths, service, name)
-    build_result(filename, location, restored, name)
+    build_result(filename, location, restored, name, snapshot_dir)
+  ensure
+    remove_temp_dir
   end
 
   private
@@ -78,7 +80,7 @@ class RestoreService
     ).returns(T::Array[String])
   end
   def restore_archive(archive_path, date, paths, target_service, target_name)
-    staging = temp_archive_dir.join("restore-#{date}")
+    staging = temp_dir.join("restore-#{date}")
     begin
       extract_archive(archive_path, staging)
       backup_database_snapshots(paths)
@@ -151,11 +153,17 @@ class RestoreService
     FileUtils.rm_f(Dir.glob(sidecars))
   end
 
+  # Files nest under active_storage in the shape of their blob keys, so
+  # uploads use the full key, not just the basename.
   sig { params(staging: Pathname, target_service: T.untyped).void }
   def restore_storage(staging, target_service)
-    staging.glob("active_storage/*").each do |file|
+    files_root = staging.join("active_storage")
+    files_root.glob("**/*").each do |file|
+      next if file.directory?
+
+      key = file.relative_path_from(files_root).to_s
       File.open(file, "rb") do |io|
-        target_service.upload(file.basename.to_s, io)
+        target_service.upload(key, io)
       end
     end
   end
@@ -173,8 +181,17 @@ class RestoreService
     snapshot_dir.join(filename)
   end
 
+  # Safety snapshots must survive the restore, so they live outside the
+  # staging directory that remove_temp_dir cleans up. The own-process prefix
+  # lets the test suite clean up only its own snapshots, never another
+  # parallel worker's.
   sig { returns(Pathname) }
-  def snapshot_dir = temp_dir.join("pre-restore-snapshots")
+  def snapshot_dir
+    @snapshot_dir ||= unique_dir(
+      "restore-#{Process.pid}-",
+      Rails.root.join("tmp/backups/snapshots")
+    )
+  end
 
   sig { params(name: String).returns(String) }
   def unmatched_database_error(name)
@@ -188,14 +205,16 @@ class RestoreService
       filename: String,
       location: String,
       restored: T::Array[String],
-      target_name: String
+      target_name: String,
+      snapshots_dir: Pathname
     ).returns(T::Hash[Symbol, T.untyped])
   end
-  def build_result(filename, location, restored, target_name)
+  def build_result(filename, location, restored, target_name, snapshots_dir)
     {
       filename: filename,
       location: location,
       storage_target: target_name,
+      snapshots_dir: snapshots_dir.to_s,
       restored_databases: restored
     }
   end

@@ -31,7 +31,7 @@ RSpec.describe RestoreService, type: :service do
 
   after do
     FileUtils.rm_rf(workdir)
-    FileUtils.rm_rf(Rails.root.join("tmp/backups"))
+    remove_process_snapshots
   end
 
   def write_storage_file(relative_path, content)
@@ -128,7 +128,7 @@ RSpec.describe RestoreService, type: :service do
       end
 
       it "keeps a safety snapshot of the current database before overwriting" do
-        service.perform(
+        result = service.perform(
           date: timestamp,
           storage_target: :local,
           db_paths: [target_db],
@@ -136,7 +136,7 @@ RSpec.describe RestoreService, type: :service do
           storage_service: ActiveStorage::Service::DiskService.new(root: target_root)
         )
 
-        snapshots = Rails.root.glob("tmp/backups/pre-restore-snapshots/database.sqlite3.*.pre-restore")
+        snapshots = Pathname(result[:snapshots_dir]).glob("database.sqlite3.*.pre-restore")
         expect(snapshots.size).to eq(1)
         expect(widget_names(snapshots.first)).to eq(%w[Existing])
       end
@@ -198,6 +198,34 @@ RSpec.describe RestoreService, type: :service do
           "xyz789" => "body content"
         })
         expect(blob_service_names(target_db)).to eq(%w[s3_host s3_host])
+      end
+
+      it "uploads nested blob keys with their full path" do
+        stub_active_storage_as_s3
+        fake_s3.object("nested/dir/blob-1").put(body: "nested content")
+        BackupService.new.perform(
+          destination: :s3,
+          db_paths: [source_db],
+          storage_root: nil,
+          archive_dir:,
+          s3_resource: fake_s3
+        )
+
+        uploaded = {}
+        s3_storage = double("s3 storage", name: "s3_host")
+        allow(s3_storage).to receive(:upload) { |key, io| uploaded[key] = io.read }
+
+        service.perform(
+          date: timestamp,
+          storage_target: :s3,
+          db_paths: [target_db],
+          archive_dir:,
+          storage_service: s3_storage,
+          s3_resource: fake_s3
+        )
+
+        expect(uploaded).to eq("nested/dir/blob-1" => "nested content")
+        expect(widget_names(target_db)).to eq(%w[Alpha Beta])
       end
     end
 

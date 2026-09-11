@@ -24,7 +24,6 @@ RSpec.describe BackupService, type: :service do
 
   after do
     FileUtils.rm_rf(workdir)
-    FileUtils.rm_rf(Rails.root.join("tmp/backups"))
   end
 
   def write_storage_file(relative_path, content)
@@ -32,14 +31,6 @@ RSpec.describe BackupService, type: :service do
     FileUtils.mkdir_p(path.dirname)
     File.write(path, content)
     path
-  end
-
-  # The test environment's Active Storage service is a disk service, so its
-  # root is never nil. Pretend it is S3-backed to exercise the S3 branches.
-  def stub_active_storage_as_s3
-    s3_service = double("S3Service")
-    allow(s3_service).to receive(:is_a?).with(ActiveStorage::Service::DiskService).and_return(false)
-    allow(ActiveStorage::Blob).to receive(:service).and_return(s3_service)
   end
 
   describe "#perform" do
@@ -109,6 +100,16 @@ RSpec.describe BackupService, type: :service do
         storage_files = extract_dir.join("active_storage").children.map(&:basename).map(&:to_s)
         expect(storage_files).to contain_exactly("abc123")
       end
+      it "cleans up its temporary staging directory" do
+        service.perform(
+          destination: :local,
+          db_paths: [source_db],
+          storage_root:,
+          archive_dir:
+        )
+
+        expect(Pathname.glob(Rails.root.join("tmp/backups/run-*"))).to be_empty
+      end
     end
 
     context "when the destination is s3" do
@@ -169,6 +170,27 @@ RSpec.describe BackupService, type: :service do
 
         storage_files = extract_dir.join("active_storage").children.map(&:basename).map(&:to_s)
         expect(storage_files).to contain_exactly("blob-key-1", "blob-key-2")
+      end
+
+      it "preserves the full key of nested S3 objects in the archive" do
+        stub_active_storage_as_s3
+        fake_s3.object("a/custom/key-1").put(body: "nested content")
+
+        service.perform(
+          destination: :local,
+          db_paths: [source_db],
+          storage_root: nil,
+          archive_dir:,
+          s3_resource: fake_s3
+        )
+
+        extract_dir = Pathname.new(workdir).join("extract")
+        FileUtils.mkdir_p(extract_dir)
+        archive = archive_dir.join("backup-#{timestamp}.tar.gz")
+        system("tar", "-xzf", archive.to_s, "-C", extract_dir.to_s, exception: true)
+
+        nested = extract_dir.join("active_storage/a/custom/key-1")
+        expect(nested.read).to eq("nested content")
       end
     end
 

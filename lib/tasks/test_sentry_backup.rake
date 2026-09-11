@@ -13,8 +13,9 @@ namespace :test do
 
     begin
       Rake::Task["backup:create"].invoke
-    rescue SystemExit => e
-      puts "Task exited with status: #{e.status}"
+    rescue => e
+      puts "Caught error: #{e.class} - #{e.message}"
+      Sentry.capture_exception(e)
     ensure
       # Restore original config
       Rails.configuration.database_configuration[Rails.env]["database"] = original_config

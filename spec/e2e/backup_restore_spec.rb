@@ -35,7 +35,6 @@ RSpec.describe "Backup and restore end to end", type: :service do
 
   after do
     FileUtils.rm_rf(workdir)
-    FileUtils.rm_rf(Rails.root.join("tmp/backups"))
   end
 
   def write_storage_file(relative_path, content)
