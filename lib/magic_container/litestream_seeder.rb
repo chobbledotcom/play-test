@@ -16,8 +16,8 @@ module MagicContainer
       T.proc.params(args: T::Array[String]).returns([String, T::Boolean])
     end
 
-    SEED_SECONDS = 15
-    ATTEMPTS = 5
+    SEED_SECONDS = T.let(15, Integer)
+    ATTEMPTS = T.let(5, Integer)
 
     sig do
       params(
@@ -32,6 +32,9 @@ module MagicContainer
       @replica_path = replica_path
       @s3 = s3
       @runner = runner || lambda { |args| litestream_run(args) }
+      # Held so the Tempfile is not garbage collected while the litestream
+      # child process still reads its path.
+      @config_file = T.let(nil, T.nilable(Tempfile))
     end
 
     sig { void }
@@ -45,6 +48,9 @@ module MagicContainer
 
       message = "No Litestream snapshot appeared in #{replica_bucket}"
       raise "#{message} for #{replica_path}"
+    ensure
+      # The generated config carries the S3 secret, so it must not survive.
+      @config_file&.close!
     end
 
     private
@@ -66,12 +72,14 @@ module MagicContainer
 
     sig { returns(String) }
     def config_path
-      @config_path ||= begin
-        file = Tempfile.new("magic-container-litestream")
-        file.write(config_yaml)
-        file.flush
-        file.path
-      end
+      file = @config_file
+      return file.path if file
+
+      file = Tempfile.new("magic-container-litestream")
+      file.write(config_yaml)
+      file.flush
+      @config_file = file
+      file.path
     end
 
     sig { returns(String) }
@@ -107,9 +115,16 @@ module MagicContainer
     sig { returns(String) }
     def replica_bucket = s3.bucket
 
+    sig { returns(Pathname) }
     attr_reader :db_path
+
+    sig { returns(String) }
     attr_reader :replica_path
+
+    sig { returns(S3Details) }
     attr_reader :s3
+
+    sig { returns(Runner) }
     attr_reader :runner
   end
 end

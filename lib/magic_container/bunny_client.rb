@@ -24,7 +24,7 @@ module MagicContainer
   class BunnyClient
     extend T::Sig
 
-    BASE_URI = "https://api.bunny.net/mc"
+    BASE_URI = T.let("https://api.bunny.net/mc", String)
 
     Transport = T.type_alias do
       T.proc.params(
@@ -120,7 +120,10 @@ module MagicContainer
       request["Content-Type"] = "application/json"
       request.body = JSON.generate(body) if body
 
-      response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+      response = Net::HTTP.start(
+        uri.host, uri.port,
+        use_ssl: true, open_timeout: 10, read_timeout: 30
+      ) do |http|
         http.request(request)
       end
       decoded = decode(response.body)
@@ -172,7 +175,10 @@ module MagicContainer
       raise BunnyError.new(status, "Bunny API error: #{label}")
     end
 
+    sig { returns(String) }
     attr_reader :access_key
+
+    sig { returns(Transport) }
     attr_reader :transport
   end
 end

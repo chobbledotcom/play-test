@@ -92,4 +92,29 @@ RSpec.describe MagicContainer::BunnyClient do
     expect(call[:path]).to eq("/apps/app-1/containers/c-9/env")
     expect(call[:body]).to eq({"BASE_URL" => "https://mc-1.bunny.run"})
   end
+
+  context "when the API rejects the request" do
+    subject(:strict_client) { described_class.new(access_key: "bunny-key") }
+
+    it "raises BunnyError with the API detail" do
+      response = instance_double(
+        Net::HTTPNotFound,
+        code: "404",
+        body: {"title" => "Not Found", "detail" => "Application missing"}.to_json
+      )
+      allow(Net::HTTP).to receive(:start).and_return(response)
+
+      expect { strict_client.registries }
+        .to raise_error(MagicContainer::BunnyError, "Bunny API error: Not Found - Application missing")
+    end
+
+    it "exposes the HTTP status" do
+      response = instance_double(Net::HTTPNotFound, code: "404", body: "")
+      allow(Net::HTTP).to receive(:start).and_return(response)
+
+      expect { strict_client.registries }.to raise_error do |error|
+        expect(error.status).to eq(404)
+      end
+    end
+  end
 end

@@ -9,11 +9,11 @@ module MagicContainer
   class Prompts
     extend T::Sig
 
-    BOLD = "\e[1m"
-    BLUE = "\e[34m"
-    GREEN = "\e[32m"
-    YELLOW = "\e[33m"
-    RESET = "\e[0m"
+    BOLD = T.let("\e[1m", String)
+    BLUE = T.let("\e[34m", String)
+    GREEN = T.let("\e[32m", String)
+    YELLOW = T.let("\e[33m", String)
+    RESET = T.let("\e[0m", String)
 
     sig do
       params(
@@ -71,9 +71,12 @@ module MagicContainer
       end
 
       choice = ask("Number", default: "1")
-      index = Integer(choice, 10) - 1
-      within_range = index.between?(0, choices.length - 1)
-      return T.must(choices[index]).last if within_range
+      number = Integer(choice, 10, exception: false)
+      if number
+        index = number - 1
+        within_range = index.between?(0, choices.length - 1)
+        return T.must(choices[index]).last if within_range
+      end
 
       output.puts "#{YELLOW}Not a valid choice.#{RESET}"
       select(label, choices)
@@ -95,23 +98,37 @@ module MagicContainer
 
     private
 
+    # Closed input cannot answer a required question, so abort instead of
+    # looping forever. This happens when the user presses Ctrl-D or when
+    # piped input ends before all questions are answered.
+    sig { returns(String) }
+    def read_line
+      line = input.gets
+      raise EOFError, "Input closed before the question was answered" if line.nil?
+
+      line.chomp
+    end
+
     sig { params(label: String).returns(String) }
     def question(label)
       output.print "#{BOLD}#{label}:#{RESET} "
       output.flush
-      input.gets.to_s.chomp
+      read_line
     end
 
     sig { params(label: String).returns(String) }
     def hidden_question(label)
       output.print "#{BOLD}#{label}:#{RESET} "
       output.flush
-      return input.gets.to_s.chomp unless input.respond_to?(:noecho)
+      return read_line unless input.respond_to?(:noecho)
 
-      input.noecho { input.gets.to_s.chomp }
+      input.noecho { read_line }
     end
 
+    sig { returns(T.any(IO, StringIO)) }
     attr_reader :input
+
+    sig { returns(T.any(IO, StringIO)) }
     attr_reader :output
   end
 end

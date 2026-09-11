@@ -3,6 +3,7 @@
 
 require "open3"
 require "securerandom"
+require "tmpdir"
 
 module MagicContainer
   # Interactive wizard that turns a backup archive into a deployed Bunny
@@ -13,12 +14,13 @@ module MagicContainer
   class Wizard
     extend T::Sig
 
-    CONTAINER_PORT = 3000
-    ENDPOINT_POLLS = 10
+    CONTAINER_PORT = T.let(3000, Integer)
+    ENDPOINT_POLLS = T.let(10, Integer)
 
     sig { params(prompts: Prompts).void }
     def initialize(prompts: Prompts.new)
       @prompts = prompts
+      @bunny_access_key = T.let(nil, T.nilable(String))
     end
 
     sig { void }
@@ -153,7 +155,13 @@ module MagicContainer
 
     sig { returns(Integer) }
     def ask_volume_size
-      prompts.ask("Volume size (GB)", default: "5").to_i
+      loop do
+        answer = prompts.ask("Volume size (GB)", default: "5")
+        size = Integer(answer, exception: false)
+        return size if size && size.positive?
+
+        prompts.note("Enter a positive whole number of gigabytes")
+      end
     end
 
     sig { params(label: String).returns(S3Details) }
@@ -439,7 +447,11 @@ module MagicContainer
       FileUtils.mkdir_p(dir)
       path = dir.join("#{app_id}.env")
       lines = EnvBuilder.build(answers).map { |name, value| "#{name}=#{value}" }
-      File.write(path, lines.join("\n") + "\n")
+      # The file holds every secret, so it must never exist with wider
+      # permissions than the creation mode.
+      File.open(path, File::WRONLY | File::CREAT | File::TRUNC, 0o600) do |file|
+        file.write(lines.join("\n") + "\n")
+      end
       FileUtils.chmod(0o600, path)
       path
     end

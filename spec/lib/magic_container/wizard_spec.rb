@@ -17,7 +17,8 @@ RSpec.describe MagicContainer::Wizard do
   end
   let(:output) { StringIO.new }
   let(:workdir) { Pathname.new(Dir.mktmpdir("wizard-spec")) }
-  let(:archive_path) { workdir.join("backup-2026-01-01.tar.gz") }
+  let(:archive_filename) { "backup-2026-01-01.tar.gz" }
+  let(:archive_path) { workdir.join(archive_filename) }
 
   let(:answers) do
     [
@@ -200,5 +201,76 @@ RSpec.describe MagicContainer::Wizard do
     expect(File.stat(env_file).mode.to_s(8)).to end_with("600")
     expect(File.read(env_file)).to include("SECRET_KEY_BASE=")
     expect(output.string).to include("URL: https://mc-123.bunny.run")
+  end
+
+  context "when the archive path does not exist" do
+    let(:answers) do
+      list = super()
+      list[2] = "/nonexistent/backup-2026-01-01.tar.gz"
+      list
+    end
+
+    it "aborts before executing anything" do
+      expect { wizard.call }.to raise_error(/Archive not found/)
+      expect(calls).to be_empty
+      expect(restore_service).not_to have_received(:perform)
+    end
+  end
+
+  context "when the archive filename has no date" do
+    let(:archive_filename) { "custom.tar.gz" }
+
+    it "aborts when the date cannot be parsed" do
+      expect { wizard.call }.to raise_error(/Cannot read a backup date/)
+    end
+  end
+
+  context "when no container endpoint appears" do
+    before do
+      responses["/apps/42/endpoints"] = {"items" => []}
+      allow(wizard).to receive(:sleep)
+    end
+
+    it "raises after polling" do
+      expect { wizard.call }
+        .to raise_error(/No container endpoint appeared for app 42/)
+
+      polls = calls.count { it[:path] == "/apps/42/endpoints" }
+      expect(polls).to eq(MagicContainer::Wizard::ENDPOINT_POLLS)
+    end
+  end
+
+  context "when the user supplies a base url" do
+    let(:answers) do
+      list = super()
+      list[21] = "https://example.com"
+      list
+    end
+
+    it "keeps the given base url and skips the env update" do
+      wizard.call
+
+      expect(calls).not_to include(hash_including(path: "/apps/42/containers/c-9/env"))
+      env_file = Rails.root.join("tmp/magic-container/42.env")
+      expect(File.read(env_file)).to include("BASE_URL=https://example.com")
+    end
+  end
+
+  context "when the volume is declined" do
+    let(:answers) do
+      list = super()
+      list[8] = "n"
+      list
+    end
+
+    it "creates the container without a volume" do
+      wizard.call
+
+      create_call = calls.find { it[:path] == "/apps" }
+      body = create_call.fetch(:body)
+      container = body.fetch(:containerTemplates).first
+      expect(container).not_to have_key(:volumeMounts)
+      expect(body).not_to have_key(:volumes)
+    end
   end
 end

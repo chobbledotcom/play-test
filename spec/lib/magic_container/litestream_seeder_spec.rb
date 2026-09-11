@@ -27,9 +27,16 @@ RSpec.describe MagicContainer::LitestreamSeeder do
   let(:commands) { [] }
   let(:snapshot_outputs) { [] }
   let(:final_snapshot_output) { "production.sqlite3    2026-01-01T10:00:00Z  123 generations" }
+  let(:captured) { {} }
   let(:runner) do
     lambda { |args|
       commands << args
+      flag = args.index("-config")
+      if flag
+        path = args.fetch(flag + 1)
+        captured[:path] = path
+        captured[:config] = YAML.load_file(path)
+      end
       if args.include?("snapshots")
         [snapshot_outputs.shift || final_snapshot_output, true]
       else
@@ -50,19 +57,16 @@ RSpec.describe MagicContainer::LitestreamSeeder do
 
     replicate = commands.first
     expect(replicate).to include("replicate", "sleep #{described_class::SEED_SECONDS}")
-    config_flag = replicate[replicate.index("-config") + 1]
-    expect(File).to exist(config_flag)
 
     verify = commands.last
     expect(verify).to include("snapshots", db_path.to_s)
+    expect(captured).to have_key(:config)
   end
 
   it "mirrors the container replica layout in the config" do
     seeder.call
 
-    replicate = commands.first
-    config_path = replicate[replicate.index("-config") + 1]
-    config = YAML.load_file(config_path)
+    config = captured.fetch(:config)
     replica = config.fetch("dbs").first.fetch("replicas").first
 
     expect(config.fetch("dbs").first.fetch("path")).to eq(db_path.to_s)
@@ -75,6 +79,12 @@ RSpec.describe MagicContainer::LitestreamSeeder do
       "secret-access-key" => "ls-secret",
       "type" => "s3"
     )
+  end
+
+  it "removes the generated config after seeding" do
+    seeder.call
+
+    expect(File).not_to exist(captured.fetch(:path))
   end
 
   it "retries until a snapshot appears in the replica" do

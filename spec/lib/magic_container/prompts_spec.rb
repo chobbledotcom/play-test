@@ -53,6 +53,13 @@ RSpec.describe MagicContainer::Prompts do
       expect(answer).to eq("secret-value")
       expect(output.string).to include("(hidden input)")
     end
+
+    it "re-asks a required secret after a blank answer" do
+      prompts = described_class.new(input: StringIO.new("\nreal-value\n"), output:)
+
+      expect(prompts.secret("Token", required: true)).to eq("real-value")
+      expect(output.string).to include("A value is required")
+    end
   end
 
   describe "#select" do
@@ -81,6 +88,23 @@ RSpec.describe MagicContainer::Prompts do
 
       expect(answer).to eq("7")
       expect(output.string).to include("Not a valid choice")
+    end
+
+    it "asks again when the answer is not a number" do
+      answer = described_class.new(
+        input: StringIO.new("abc\n2\n"), output:
+      ).select("Registry", choices)
+
+      expect(answer).to eq("9")
+      expect(output.string).to include("Not a valid choice")
+    end
+  end
+
+  describe "closed input" do
+    it "raises instead of looping forever on end of input" do
+      prompts = described_class.new(input: StringIO.new, output:)
+
+      expect { prompts.ask("Name") }.to raise_error(EOFError)
     end
   end
 
