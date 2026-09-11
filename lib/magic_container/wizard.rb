@@ -158,7 +158,7 @@ module MagicContainer
       loop do
         answer = prompts.ask("Volume size (GB)", default: "5")
         size = Integer(answer, exception: false)
-        return size if size && size.positive?
+        return size if size&.positive?
 
         prompts.note("Enter a positive whole number of gigabytes")
       end
