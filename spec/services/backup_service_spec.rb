@@ -324,4 +324,16 @@ RSpec.describe BackupService, type: :service do
       end
     end
   end
+
+  describe "#current_storage_root" do
+    it "returns the root of the active disk service" do
+      expect(service.send(:current_storage_root)).to eq(Rails.root.join("tmp/storage"))
+    end
+
+    it "returns nil when Active Storage is backed by S3" do
+      stub_active_storage_as_s3
+
+      expect(service.send(:current_storage_root)).to be_nil
+    end
+  end
 end
