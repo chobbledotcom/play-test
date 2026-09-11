@@ -14,18 +14,11 @@ Sentry.init do |config|
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
   config.send_default_pii = false
 
-  config.before_send = lambda do |event, hint|
-    if Current.user
-      event.user = {
-        id: Current.user.id,
-        email: Current.user.email
-      }
-    end
-
-    event
-  end
-
   if observability.git_commit.present?
     config.release = observability.git_commit
   end
+end
+
+Sentry.configure_scope do |scope|
+  scope.add_event_processor { SentryUserTaggingService.tag(it) }
 end

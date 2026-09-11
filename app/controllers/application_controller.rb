@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
     ActiveSupport::Cache::Store
   )
 
+  before_action :set_current_user
   before_action :require_login, unless: :skip_authentication?
   before_action :update_last_active_at, unless: :skip_authentication?
 
@@ -102,6 +103,13 @@ class ApplicationController < ActionController::Base
 
     flash[:alert] = form_i18n(:session_new, :"status.already_logged_in")
     redirect_to inspections_path
+  end
+
+  # Runs before authentication so exceptions raised anywhere in the request
+  # lifecycle can be attributed to the signed-in user.
+  sig { void }
+  def set_current_user
+    Current.user = current_user
   end
 
   sig { void }

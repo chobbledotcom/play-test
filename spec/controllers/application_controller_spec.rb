@@ -199,6 +199,30 @@ RSpec.describe ApplicationController, type: :controller do
       end
     end
 
+    describe "#set_current_user" do
+      controller do
+        skip_before_action :require_login
+
+        define_method(:index) do
+          render plain: Current.user&.email || "anonymous"
+        end
+      end
+
+      it "assigns the signed-in user to Current during the request" do
+        allow(controller).to receive(:current_user).and_return(user)
+
+        get :index
+
+        expect(response.body).to eq(user.email)
+      end
+
+      it "leaves Current empty when nobody is signed in" do
+        get :index
+
+        expect(response.body).to eq("anonymous")
+      end
+    end
+
     describe "#require_logged_out" do
       controller do
         skip_before_action :require_login
