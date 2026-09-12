@@ -3,6 +3,11 @@
 
 require "aws-sdk-s3"
 
+# Rails only requires the Active Storage adapter named in storage.yml, so
+# S3-backed deployments never load DiskService. Required here because
+# #current_storage_root references the class directly.
+require "active_storage/service/disk_service"
+
 # Shared operations for backing up and restoring the whole storage: every
 # file-based SQLite database plus all Active Storage files. Archives are tar.gz
 # files containing a db/ folder and an active_storage/ folder (files keyed by
