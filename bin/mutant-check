@@ -50,9 +50,9 @@ def subjects_from_config
   config.dig("matcher", "subjects") || []
 end
 
-# The test database is in-memory, so mutant's parallel kill-forks each get
-# their own isolated copy with no shared file to lock - results are stable
-# across runs. Let mutant pick its own job count; override with MUTANT_JOBS.
+# Select in-memory SQLite before Rails boots so mutant's parallel kill-forks
+# each get their own isolated copy with no shared file to lock.
+# Let mutant pick its own job count; override with MUTANT_JOBS.
 def run_mutant(subjects)
   jobs = ENV["MUTANT_JOBS"]
   command = [
@@ -65,7 +65,9 @@ def run_mutant(subjects)
   ]
   warn "Running: #{command.join(" ")}"
   # Killfork logs can contain non-UTF-8 bytes; scrub so line matching is safe.
-  raw = IO.popen(command, err: [:child, :out]) { |io| io.read }
+  raw = IO.popen({"IN_MEMORY_DB" => "true"}, command, err: [:child, :out]) do |io|
+    io.read
+  end
   raw.force_encoding("UTF-8").scrub
 end
 

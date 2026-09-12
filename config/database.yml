@@ -23,13 +23,11 @@ development:
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
-# In-memory, shared-cache SQLite. A URI database with cache=shared lets every
-# connection in a process (the test thread and Capybara's Puma server thread)
-# see the same schema and data, with no file on disk to lock under mutant's
-# parallel kill-forks. Shared cache is per-process, so parallel_test workers are
-# isolated automatically - TEST_ENV_NUMBER is no longer needed to separate them.
-# WAL/mmap pragmas are dropped because they are meaningless for an in-memory DB.
+# WAL allows browser requests and the test thread to read concurrently with
+# writes. A separate file per process also isolates simultaneous suite runs.
+# Mutant opts into memory before boot so kill-forks never share a database file.
 test:
+<% if ENV["IN_MEMORY_DB"] == "true" %>
   adapter: sqlite3
   database: "file::memory:?cache=shared"
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
@@ -38,6 +36,10 @@ test:
     journal_mode: memory
     synchronous: "off"
     busy_timeout: 5000
+<% else %>
+  <<: *default
+  database: tmp/test-<%= Process.pid %>.sqlite3
+<% end %>
 # SQLite3 write its data on the local filesystem, as such it requires
 # persistent disks. If you are deploying to a managed service, you should
 # make sure it provides disk persistence, as many don't.

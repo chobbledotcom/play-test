@@ -79,17 +79,24 @@ This is useful for production environments where PDF generation is expensive. Se
 - **Run parallel tests with coverage**: `bundle exec rake coverage:parallel`
 - Run single test: `bundle exec rspec spec/path/to/file_spec.rb:LINE_NUMBER`
 - Run with verbose output: `bundle exec rspec --format documentation`
-- **Test database is in-memory**: the test env uses shared-cache in-memory
-  SQLite and loads `db/schema.rb` at boot (see `spec/rails_helper.rb`), so
-  there is no `parallel:prepare`/`db:migrate` step - each parallel worker and
-  each mutant kill-fork gets its own isolated in-memory database
+- **Test database is per-process SQLite with WAL**: ordinary tests use
+  `tmp/test-#{Process.pid}.sqlite3`, load `db/schema.rb` at boot, and remove
+  the database after the suite (see `spec/rails_helper.rb`). No
+  `parallel:prepare`/`db:migrate` step is needed for tests.
+- **Mutant uses in-memory SQLite**: `IN_MEMORY_DB=true` explicitly selects
+  shared-cache memory at configuration load, before Rails boots. Mutant
+  enables this for isolated kill-forks; do not reconnect later in support
+  hooks or use memory mode as the default for browser tests.
 
 ## Environment Notes
 
 - **ripgrep (rg) is NOT installed** - use `grep` command instead of `rg` for searching
 - **Full test suite is SLOW** - only run `bundle exec rspec` when explicitly requested
 - Prefer running individual test files or specific tests during development
-- **Database locking**: The test database is in-memory (no file lock). If a run still reports "database is locked", inform the user and wait for them to confirm it's unlocked
+- **Database locking**: Ordinary tests use isolated per-process WAL databases.
+  Opt-in shared-cache memory can still cause table locks between browser
+  server and test connections. If a run reports "database is locked", inform
+  the user and wait for them to confirm it's unlocked.
 - **NEVER paste code into Rails console** - it never works. Instead write very specific RSpec tests
 - **Active Storage cleanup**: Test suite automatically cleans tmp/storage before and after test runs
 
@@ -195,8 +202,11 @@ equivalents are recorded in `config/mutant_allowed.txt` and checked with
 - **Record new equivalents**: `bin/mutant-check --update Unit` (only after
   confirming by hand that each survivor is genuinely equivalent)
 
-The in-memory test database gives each kill-fork its own isolated copy, so
-parallel runs are deterministic; set `MUTANT_JOBS` to pin the job count.
+`bin/mutant-check` passes `IN_MEMORY_DB=true` to the child at launch, and
+`config/mutant.yml` enables it for direct mutant commands. Unlike ordinary
+tests' per-process WAL databases, memory mode gives each kill-fork its own
+isolated copy without an inherited shared database file. Set `MUTANT_JOBS`
+to pin the job count.
 Allowlist entries are keyed by a per-mutation hash tied to the current source,
 so they change when the mutated method changes - re-vet after editing a covered
 method.

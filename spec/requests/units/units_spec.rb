@@ -412,15 +412,34 @@ RSpec.describe "Units", type: :request do
       login_user_via_form(user)
     end
 
-    it "handles concurrent requests gracefully" do
-      threads = []
-      5.times do
-        threads << Thread.new do
-          visit units_path
-          expect(page).to have_http_status(:success)
+    it "handles concurrent requests gracefully", :concurrent do
+      requests = Array.new(5) do
+        request = ActionDispatch::Integration::Session.new(Rails.application)
+        credentials = {email: user.email, password: user.password}
+        request.post login_path, params: {session: credentials}
+        expect(request.response).to have_http_status(:found)
+        expect(request.response.location).to end_with(inspections_path)
+        request
+      end
+      path = units_path
+      start = Queue.new
+      ready = Queue.new
+      threads = requests.map do |request|
+        Thread.new do
+          ready << true
+          start.pop
+          ActiveRecord::Base.connection_pool.with_connection do
+            request.get path
+            request.response.status
+          end
         end
       end
-      threads.each(&:join)
+      5.times { ready.pop }
+      5.times { start << true }
+      aggregate_failures "request threads" do
+        threads.each { |thread| expect { thread.join }.not_to raise_error }
+      end
+      expect(threads.map(&:value)).to eq([200] * 5)
     end
 
     it "prevents mass assignment of protected attributes" do

@@ -34,7 +34,7 @@ Each chunk creates/modifies these files atomically:
 
 ### Test:
 ```bash
-bundle exec rails db:migrate && bundle exec rails parallel:prepare && bin/test
+bundle exec rails db:migrate && bin/test
 ```
 
 ---

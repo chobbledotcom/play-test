@@ -4,8 +4,8 @@ require "spec_helper"
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 
-if Rails.env.production?
-  abort("The Rails environment is running in production mode!")
+unless Rails.env.test?
+  abort("Refusing to load the test schema outside the test environment.")
 end
 
 require "rspec/rails"
@@ -26,24 +26,20 @@ end
 
 Rails.root.glob("spec/support/**/*.rb").sort_by(&:to_s).each { |f| require f }
 
-# The suite MUST run against the in-memory database. A file-based SQLite
-# database locks under mutant's parallel kill-forks, and a lock timeout is
-# miscounted as a killed mutation - producing dishonest, non-deterministic
-# results. Refuse to run on anything else rather than silently fall back.
-def in_memory_database?
-  ActiveRecord::Base.connection_db_config.database.to_s.include?(":memory:")
+pid = Process.pid
+expected_database = if ENV["IN_MEMORY_DB"] == "true"
+  "file::memory:?cache=shared"
+else
+  "tmp/test-#{pid}.sqlite3"
+end
+database_config = ActiveRecord::Base.connection_db_config
+unless database_config.adapter == "sqlite3" &&
+    database_config.database == expected_database
+  abort("Refusing to load the test schema outside the isolated test database.")
 end
 
-unless in_memory_database?
-  abort <<~MSG.strip
-    Test database is not in-memory. config/database.yml must set the test
-    database to "file::memory:?cache=shared". Refusing to run: a file-based
-    database gives non-deterministic mutation results.
-  MSG
-end
-
-# An in-memory database starts empty on every boot, so load the schema
-# straight into the live connection (it stays in the shared cache).
+# Each process owns its database, so no migration or parallel preparation
+# is needed. Mutant selects its fork-isolated memory database before Rails boots.
 ActiveRecord::Schema.verbose = false
 load Rails.root.join("db/schema.rb")
 
@@ -53,21 +49,19 @@ ActiveStorage::Current.url_options = {
   host: "play-test.co.uk"
 }
 RSpec.configure do |config|
-  config.before(:each) do
+  config.before(:each) do |example|
     admin_pattern = "^admin\\d*(_[a-f0-9]+)?@example\\.com$"
     Rails.configuration.admin_emails_pattern = admin_pattern
-    DatabaseCleaner.strategy = :transaction
-  end
-
-  config.before(:each, js: true) do
-    DatabaseCleaner.strategy = :truncation
+    uses_threads = example.metadata[:js] || example.metadata[:concurrent]
+    DatabaseCleaner.strategy = uses_threads ? :truncation : :transaction
   end
 
   config.before(:each) do
     DatabaseCleaner.start
   end
 
-  config.after(:each) do
+  # Capybara must finish pending requests before their tables are cleaned.
+  config.append_after(:each) do
     DatabaseCleaner.clean
   end
 
@@ -85,6 +79,16 @@ RSpec.configure do |config|
     DatabaseCleaner.clean_with(:truncation)
     # Clean up Active Storage files at the start of test suite
     FileUtils.rm_rf(Rails.root.join("tmp/storage")) if Rails.env.test?
+  end
+
+  config.after(:suite) do
+    current_pid = Process.pid
+    database = "tmp/test-#{current_pid}.sqlite3"
+    if ActiveRecord::Base.connection_db_config.database == database
+      ActiveRecord::Base.connection_pool.disconnect!
+      database = Rails.root.join(database).to_s
+      FileUtils.rm_f([database, "#{database}-shm", "#{database}-wal"])
+    end
   end
 
   config.filter_rails_from_backtrace!

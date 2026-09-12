@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run ALL RSpec tests quickly with in-memory database and show full count
+# Run ALL RSpec tests quickly with the configured database and show full count
 # Similar to bin/test but without coverage and with cleaner output
 
 set -e
@@ -12,14 +12,14 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${YELLOW}🧪 Running ALL tests in parallel...${NC}"
-echo -e "${BLUE}Using in-memory database for speed${NC}"
+echo -e "${BLUE}Using the configured database${NC}"
 echo ""
 
 # Create a temporary file to capture the output
 temp_output=$(mktemp)
 
 # Run tests and capture all output
-if DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec parallel_rspec spec/ > "$temp_output" 2>&1; then
+if DISABLE_SIMPLECOV=true bundle exec parallel_rspec spec/ > "$temp_output" 2>&1; then
     echo -e "${GREEN}✅ Tests passed!${NC}"
     
     # Extract the final test count

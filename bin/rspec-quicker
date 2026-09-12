@@ -51,7 +51,7 @@ fi
 if [[ "$format_args" != *"json"* ]]; then
   echo -e "${YELLOW}⚡ RSpec Quicker${NC} - Parallel tests with fail-fast"
   echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-  echo -e "  ${GREEN}✓${NC} In-memory database for speed"
+  echo -e "  ${GREEN}✓${NC} Using the configured database"
   echo -e "  ${GREEN}✓${NC} Coverage disabled"
   echo -e "  ${GREEN}✓${NC} Stops on first failure"
   echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -69,7 +69,7 @@ fi
 # Check if we're using JSON format
 if [[ "$format_args" == *"json"* ]]; then
   # For JSON format, minimal filtering to preserve all output including summary line
-  DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec parallel_rspec \
+  DISABLE_SIMPLECOV=true bundle exec parallel_rspec \
     --fail-fast \
     --test-options "--fail-fast $format_args" \
     "${other_args[@]}" 2>&1 | \
@@ -77,7 +77,7 @@ if [[ "$format_args" == *"json"* ]]; then
     grep -v "RSpec is shutting down and will print the summary report"
 else
   # For other formats, clean up the output but preserve the summary
-  DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec parallel_rspec \
+  DISABLE_SIMPLECOV=true bundle exec parallel_rspec \
     --fail-fast \
     --test-options "--fail-fast $format_args" \
     "${other_args[@]}" 2>&1 | \
