@@ -62,6 +62,12 @@ module MagicContainer
       apps
     end
 
+    # A single application with its full configuration. The listing only
+    # carries id/name, but a reused app keeps everything except its
+    # environment, so candidates must be verified against the plan.
+    sig { params(app_id: String).returns(T::Hash[String, T.untyped]) }
+    def application(app_id) = request(:get, "/apps/#{app_id}")
+
     sig { returns(String) }
     def optimal_region
       region = request(:get, "/regions/optimal").fetch("region")

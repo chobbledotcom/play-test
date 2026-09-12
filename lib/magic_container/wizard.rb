@@ -38,22 +38,16 @@ module MagicContainer
     sig { void }
     def call
       prompts.banner(t("banners.main"))
-      answers = collect
+      answers = answers_to_use
       return unless confirm_plan(answers)
 
+      # Saved only once the plan is confirmed: abandoning a run before this
+      # point must not overwrite the retry state an earlier attempt left.
+      store.save(answers)
       execute(answers)
     end
 
     private
-
-    # Collected fresh or loaded from a previous attempt, then persisted so a
-    # failure part-way through can be retried without re-entering answers.
-    sig { returns(Answers) }
-    def collect
-      answers = answers_to_use
-      store.save(answers)
-      answers
-    end
 
     sig { returns(Answers) }
     def answers_to_use
@@ -445,12 +439,12 @@ module MagicContainer
 
     # Bunny only reveals an application's id in the create response; a
     # create whose response never came back (network failure after Bunny
-    # built the app) leaves an orphan no retry can know by id. Apps already
-    # carrying this attempt's name are offered before another create can
-    # duplicate them.
+    # built the app) leaves an orphan no retry can know by id. Name matches
+    # are verified against the confirmed plan and offered for reuse before
+    # another create can duplicate them.
     sig { params(client: BunnyClient, answers: Answers).returns(T.nilable(String)) }
     def orphaned_app_id(client, answers)
-      matches = client.applications.select { it["name"] == answers.app_name }
+      matches = matching_apps(client, answers)
       return if matches.empty?
 
       if matches.one?
@@ -470,6 +464,45 @@ module MagicContainer
       choices.push([t("questions.orphan_create"), ""])
       prompts.select(t("questions.orphan_select", name: answers.app_name), choices)
         .presence
+    end
+
+    # Same-named apps are reconciled by fetching each candidate's full
+    # application, because a reused app keeps its deployed image, registry,
+    # runtime, region, volume and endpoints - only the environment is
+    # replaced. The listing carries no template detail to verify, and an
+    # app not configured exactly as the confirmed plan asks is never
+    # offered; a fresh one is created instead.
+    sig do
+      params(
+        client: BunnyClient,
+        answers: Answers
+      ).returns(T::Array[T::Hash[String, T.untyped]])
+    end
+    def matching_apps(client, answers)
+      client.applications
+        .select { it["name"] == answers.app_name }
+        .filter_map { |listed| client.application(listed.fetch("id").to_s) }
+        .select { |app| orphan_matches_plan?(app, answers) }
+    end
+
+    sig do
+      params(
+        app: T::Hash[String, T.untyped],
+        answers: Answers
+      ).returns(T::Boolean)
+    end
+    def orphan_matches_plan?(app, answers)
+      template = app.fetch("containerTemplates").first
+      endpoints = Array(template.fetch("endpoints"))
+      template.fetch("imageName") == image_name(answers.image_ref) &&
+        template.fetch("imageNamespace") == image_namespace(answers.image_ref) &&
+        template.fetch("imageTag") == answers.image_tag &&
+        template.fetch("imageRegistryId").to_s == answers.registry_id &&
+        Array(template.fetch("volumeMounts")).any? == answers.volume &&
+        app.fetch("runtimeType") == answers.runtime_type &&
+        app.fetch("regionSettings").fetch("requiredRegionIds")
+          .include?(answers.region) &&
+        endpoints.any? { it.fetch("publicHost", "").end_with?(".bunny.run") }
     end
 
     sig do

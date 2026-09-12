@@ -31,6 +31,16 @@ RSpec.describe MagicContainer::BunnyClient do
     expect(calls.first[:path]).to eq("/registries")
   end
 
+  it "fetches a single application's full configuration" do
+    responses["/apps/app-2"] = {
+      "id" => "app-2",
+      "containerTemplates" => [{"imageName" => "app"}]
+    }
+
+    expect(client.application("app-2")).to include("id" => "app-2")
+    expect(calls.first[:path]).to eq("/apps/app-2")
+  end
+
   it "lists every application across cursor pages" do
     pages = {
       "/apps" => {

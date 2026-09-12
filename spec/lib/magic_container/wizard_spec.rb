@@ -76,6 +76,26 @@ RSpec.describe MagicContainer::Wizard do
       responses.fetch(path)
     }
   end
+  # A full GET /apps/{id} application - the shape Bunny returns for one
+  # the wizard itself created from the default answers
+  let(:app_detail) do
+    lambda { |id: "42", image_tag: "latest"|
+      {
+        "id" => id,
+        "name" => "play-test",
+        "runtimeType" => "shared",
+        "regionSettings" => {"requiredRegionIds" => ["LDN"]},
+        "containerTemplates" => [{
+          "imageName" => "play-test",
+          "imageNamespace" => "chobble",
+          "imageTag" => image_tag,
+          "imageRegistryId" => "7",
+          "volumeMounts" => [{"name" => "storage"}],
+          "endpoints" => [{"publicHost" => "mc-123.bunny.run"}]
+        }]
+      }
+    }
+  end
 
   let!(:client) do
     bunny = MagicContainer::BunnyClient.new(access_key: "bunny-key", transport: transport)
@@ -394,6 +414,8 @@ RSpec.describe MagicContainer::Wizard do
     end
     let(:orphan_output) { StringIO.new }
 
+    before { responses["/apps/42"] = app_detail.call }
+
     it "offers the existing app for reuse instead of creating a duplicate" do
       described_class.new(prompts: orphan_prompts, store: store).call
 
@@ -414,6 +436,8 @@ RSpec.describe MagicContainer::Wizard do
     end
     let(:orphan_output) { StringIO.new }
 
+    before { responses["/apps/42"] = app_detail.call }
+
     it "creates a fresh app" do
       described_class.new(prompts: orphan_prompts, store: store).call
 
@@ -422,7 +446,21 @@ RSpec.describe MagicContainer::Wizard do
     end
   end
 
-  context "when several apps carry the answers' name" do
+  context "when a same-named app does not match the confirmed plan" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before { responses["/apps/42"] = app_detail.call(image_tag: "an-old-tag") }
+
+    it "creates a fresh app instead of offering the mismatched one" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :get && it[:path] == "/apps/42" }).to eq(1)
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when several matching apps carry the answers' name" do
     let(:existing_apps) do
       [
         {"id" => 43, "name" => "play-test"},
@@ -437,6 +475,11 @@ RSpec.describe MagicContainer::Wizard do
     end
     let(:orphan_output) { StringIO.new }
 
+    before do
+      responses["/apps/42"] = app_detail.call
+      responses["/apps/43"] = app_detail.call(id: "43")
+    end
+
     it "lets the operator pick which app to reuse" do
       described_class.new(prompts: orphan_prompts, store: store).call
 
@@ -446,7 +489,7 @@ RSpec.describe MagicContainer::Wizard do
     end
   end
 
-  context "when several apps carry the answers' name and a fresh one is picked" do
+  context "when several matching apps carry the name and a fresh one is picked" do
     let(:existing_apps) do
       [
         {"id" => 43, "name" => "play-test"},
@@ -461,10 +504,43 @@ RSpec.describe MagicContainer::Wizard do
     end
     let(:orphan_output) { StringIO.new }
 
+    before do
+      responses["/apps/43"] = app_detail.call(id: "43")
+      responses["/apps/44"] = app_detail.call(id: "44")
+    end
+
     it "creates a new app" do
       described_class.new(prompts: orphan_prompts, store: store).call
 
       expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a newly collected plan is declined" do
+    let(:decline_plan_prompts) do
+      list = ["n", *answers]
+      list[list.length - 1] = "n"
+      MagicContainer::Prompts.new(
+        input: StringIO.new(list.join("\n")),
+        output: decline_plan_output
+      )
+    end
+    let(:decline_plan_output) { StringIO.new }
+
+    before do
+      wizard.call
+      calls.clear
+    end
+
+    it "keeps the previous attempt's retry state untouched" do
+      described_class.new(prompts: decline_plan_prompts, store: store).call
+
+      content = store_path.read
+      expect(content).to include("MAGIC_APP_ID=42")
+      expect(content).to include("MAGIC_SEEDED_REPLICA_PATHS=production.sqlite3")
+      expect(calls).not_to include(hash_including(method: :post))
+      expect(restore_service).to have_received(:perform).exactly(:once)
+      expect(seeder).to have_received(:call).exactly(:once)
     end
   end
 
