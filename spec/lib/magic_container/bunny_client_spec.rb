@@ -11,6 +11,7 @@ RSpec.describe MagicContainer::BunnyClient do
     {
       "/apps" => {"id" => 42},
       "/apps/app-1/deploy" => {},
+      "/apps/app-1/restart" => {},
       "/apps/app-1/endpoints" => {"items" => [{"publicHost" => "mc-1.bunny.run"}]},
       "/apps/app-1/containers/c-9/env" => {},
       "/registries" => {"items" => [{"displayName" => "Docker Hub", "hostName" => "docker.io", "id" => 7}]},
@@ -56,7 +57,7 @@ RSpec.describe MagicContainer::BunnyClient do
       autoScaling: {min: 1, max: 1},
       containerTemplates: [{name: "app"}],
       name: "play-test",
-      regionSettings: {requiredRegionIds: ["LDN"]},
+      regionSettings: {allowedRegionIds: ["LDN"], requiredRegionIds: ["LDN"]},
       runtimeType: "shared",
       volumes: [{name: "storage", size: 5}]
     )
@@ -78,6 +79,12 @@ RSpec.describe MagicContainer::BunnyClient do
     client.deploy("app-1")
 
     expect(calls.first).to include(method: :post, path: "/apps/app-1/deploy")
+  end
+
+  it "restarts the application" do
+    client.restart("app-1")
+
+    expect(calls.first).to include(method: :post, path: "/apps/app-1/restart")
   end
 
   it "lists application endpoints" do
@@ -106,6 +113,42 @@ RSpec.describe MagicContainer::BunnyClient do
 
       expect { strict_client.registries }
         .to raise_error(MagicContainer::BunnyError, "Bunny API error: Not Found - Application missing")
+    end
+
+    it "raises BunnyError with field-level validation rows" do
+      body = {
+        "title" => "Validation Error",
+        "detail" => "One or more validation errors occurred.",
+        "errors" => [
+          {"field" => "RegionSettings", "message" => "The allowedRegionIds field is required."}
+        ]
+      }
+      response = instance_double(Net::HTTPBadRequest, code: "400", body: body.to_json)
+      allow(Net::HTTP).to receive(:start).and_return(response)
+
+      expect { strict_client.registries }.to raise_error(MagicContainer::BunnyError) do |error|
+        expect(error.message).to eq(
+          "Bunny API error: Validation Error - One or more validation errors" \
+            " occurred. - RegionSettings: The allowedRegionIds field is required."
+        )
+      end
+    end
+
+    it "raises BunnyError with field-level validation maps" do
+      body = {
+        "title" => "Validation Error",
+        "detail" => "One or more validation errors occurred.",
+        "errors" => {"RegionSettings" => ["The allowedRegionIds field is required."]}
+      }
+      response = instance_double(Net::HTTPBadRequest, code: "400", body: body.to_json)
+      allow(Net::HTTP).to receive(:start).and_return(response)
+
+      expect { strict_client.registries }.to raise_error(MagicContainer::BunnyError) do |error|
+        expect(error.message).to eq(
+          "Bunny API error: Validation Error - One or more validation errors" \
+            " occurred. - RegionSettings: The allowedRegionIds field is required."
+        )
+      end
     end
 
     it "exposes the HTTP status" do

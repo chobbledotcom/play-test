@@ -8,12 +8,15 @@ class RestoreService
 
   # Restore a full backup (database + Active Storage files).
   #
-  # date           - the backup date in YYYY-MM-DD format
-  # storage_target - where Active Storage files are restored to:
-  #                  "local" (disk), "s3" (object storage) or "current"
-  #                  (the service the app is currently using)
-  # service_name   - when migrating storage, the Active Storage service name
-  #                  blobs in the restored database are pointed at
+  # date                  - the backup date in YYYY-MM-DD format
+  # storage_target        - where Active Storage files are restored to:
+  #                         "local" (disk), "s3" (object storage) or "current"
+  #                         (the service the app is currently using)
+  # service_name          - when migrating storage, the Active Storage service
+  #                         name blobs in the restored database are pointed at
+  # skip_existing_uploads - when true, files already present on the target
+  #                         service are left alone instead of re-uploaded, so
+  #                         a retried restore does not repeat the work
   sig do
     params(
       date: String,
@@ -22,7 +25,8 @@ class RestoreService
       db_paths: T.nilable(T::Array[Pathname]),
       archive_dir: T.nilable(Pathname),
       storage_service: T.untyped,
-      s3_resource: T.untyped
+      s3_resource: T.untyped,
+      skip_existing_uploads: T::Boolean
     ).returns(T::Hash[Symbol, T.untyped])
   end
   def perform(
@@ -32,7 +36,8 @@ class RestoreService
     db_paths: nil,
     archive_dir: nil,
     storage_service: nil,
-    s3_resource: nil
+    s3_resource: nil,
+    skip_existing_uploads: false
   )
     validate_date!(date)
     paths = db_paths || database_paths
@@ -41,8 +46,10 @@ class RestoreService
     local_dir = archive_dir || local_archive_dir
     filename = archive_filename(date)
     archive_path, location = locate_archive(local_dir, filename, s3_resource)
-    restored = restore_archive(archive_path, date, paths, service, name)
-    build_result(filename, location, restored, name, snapshot_dir)
+    restored, uploads = restore_archive(
+      archive_path, date, paths, service, name, skip_existing_uploads
+    )
+    build_result(filename, location, restored, uploads, name, snapshot_dir)
   ensure
     remove_temp_dir
   end
@@ -77,18 +84,19 @@ class RestoreService
       date: String,
       paths: T::Array[Pathname],
       target_service: T.untyped,
-      target_name: String
-    ).returns(T::Array[String])
+      target_name: String,
+      skip_existing_uploads: T::Boolean
+    ).returns([T::Array[String], T::Hash[Symbol, Integer]])
   end
-  def restore_archive(archive_path, date, paths, target_service, target_name)
+  def restore_archive(archive_path, date, paths, target_service, target_name, skip_existing_uploads)
     staging = temp_dir.join("restore-#{date}")
     begin
       extract_archive(archive_path, staging)
       backup_database_snapshots(paths)
       restored = restore_databases(staging, paths)
-      restore_storage(staging, target_service)
+      uploads = restore_storage(staging, target_service, skip_existing_uploads)
       update_blob_service_names(paths, target_name)
-      restored
+      [restored, uploads]
     ensure
       FileUtils.rm_rf(staging)
       downloaded = archive_path.to_s.start_with?(temp_dir.to_s)
@@ -155,18 +163,33 @@ class RestoreService
   end
 
   # Files nest under active_storage in the shape of their blob keys, so
-  # uploads use the full key, not just the basename.
-  sig { params(staging: Pathname, target_service: T.untyped).void }
-  def restore_storage(staging, target_service)
+  # uploads use the full key, not just the basename. When skipping existing
+  # uploads, files already on the target are counted and left alone.
+  sig do
+    params(
+      staging: Pathname,
+      target_service: T.untyped,
+      skip_existing_uploads: T::Boolean
+    ).returns(T::Hash[Symbol, Integer])
+  end
+  def restore_storage(staging, target_service, skip_existing_uploads)
+    counts = {uploaded: 0, skipped: 0}
     files_root = staging.join("active_storage")
     files_root.glob("**/*").each do |file|
       next if file.directory?
 
       key = file.relative_path_from(files_root).to_s
+      if skip_existing_uploads && target_service.exist?(key)
+        counts[:skipped] += 1
+        next
+      end
+
       File.open(file, "rb") do |io|
         target_service.upload(key, io)
       end
+      counts[:uploaded] += 1
     end
+    counts
   end
 
   sig { params(paths: T::Array[Pathname], service_name: String).void }
@@ -206,17 +229,20 @@ class RestoreService
       filename: String,
       location: String,
       restored: T::Array[String],
+      uploads: T::Hash[Symbol, Integer],
       target_name: String,
       snapshots_dir: Pathname
     ).returns(T::Hash[Symbol, T.untyped])
   end
-  def build_result(filename, location, restored, target_name, snapshots_dir)
+  def build_result(filename, location, restored, uploads, target_name, snapshots_dir)
     {
       filename: filename,
       location: location,
       storage_target: target_name,
       snapshots_dir: snapshots_dir.to_s,
-      restored_databases: restored
+      restored_databases: restored,
+      storage_files_uploaded: uploads.fetch(:uploaded),
+      storage_files_skipped: uploads.fetch(:skipped)
     }
   end
 end

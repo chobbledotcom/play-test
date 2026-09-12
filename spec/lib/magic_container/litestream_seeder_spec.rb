@@ -26,19 +26,29 @@ RSpec.describe MagicContainer::LitestreamSeeder do
   end
   let(:commands) { [] }
   let(:snapshot_outputs) { [] }
-  let(:final_snapshot_output) { "production.sqlite3    2026-01-01T10:00:00Z  123 generations" }
-  let(:captured) { {} }
+  # Litestream v0.3.13 lists a header row plus one row per snapshot. The
+  # rows carry the replica name (not the path), generation, index, size and
+  # creation time - which is why the old path-matching check never passed.
+  let(:listing_with_snapshot) do
+    <<~LISTING
+      replica  generation                              index  size  created
+      s3       00d7b2e5-4d8a-4bd2-a8a5-9c821c1f3a33    0      24576  2026-01-01T10:00:00Z
+    LISTING
+  end
+  let(:listing_without_snapshot) do
+    "replica  generation  index  size  created"
+  end
+  let(:captured) { [] }
   let(:runner) do
     lambda { |args|
       commands << args
       flag = args.index("-config")
       if flag
         path = args.fetch(flag + 1)
-        captured[:path] = path
-        captured[:config] = YAML.load_file(path)
+        captured << {path: path, config: YAML.load_file(path)}
       end
       if args.include?("snapshots")
-        [snapshot_outputs.shift || final_snapshot_output, true]
+        [snapshot_outputs.shift || listing_with_snapshot, true]
       else
         ["replicating", true]
       end
@@ -60,13 +70,13 @@ RSpec.describe MagicContainer::LitestreamSeeder do
 
     verify = commands.last
     expect(verify).to include("snapshots", db_path.to_s)
-    expect(captured).to have_key(:config)
+    expect(captured).to be_present
   end
 
   it "mirrors the container replica layout in the config" do
     seeder.call
 
-    config = captured.fetch(:config)
+    config = captured.last.fetch(:config)
     replica = config.fetch("dbs").first.fetch("replicas").first
 
     expect(config.fetch("dbs").first.fetch("path")).to eq(db_path.to_s)
@@ -84,11 +94,11 @@ RSpec.describe MagicContainer::LitestreamSeeder do
   it "removes the generated config after seeding" do
     seeder.call
 
-    expect(File).not_to exist(captured.fetch(:path))
+    expect(File).not_to exist(captured.last.fetch(:path))
   end
 
   it "retries until a snapshot appears in the replica" do
-    snapshot_outputs << "" << ""
+    snapshot_outputs << listing_without_snapshot << listing_without_snapshot
 
     seeder.call
 
@@ -97,8 +107,28 @@ RSpec.describe MagicContainer::LitestreamSeeder do
   end
 
   it "raises when no snapshot appears after every attempt" do
-    snapshot_outputs.concat([""] * 6)
+    snapshot_outputs.concat([listing_without_snapshot] * 6)
 
-    expect { seeder.call }.to raise_error(/No Litestream snapshot appeared in ls-bucket/)
+    expect { seeder.call }
+      .to raise_error(/No Litestream snapshot appeared in ls-bucket/)
+  end
+
+  describe "#seeded?" do
+    it "is true when the listing has a snapshot row" do
+      expect(seeder.seeded?).to be true
+      expect(commands).to all(include("snapshots"))
+    end
+
+    it "is false when the listing is only the header" do
+      snapshot_outputs << listing_without_snapshot
+
+      expect(seeder.seeded?).to be false
+    end
+
+    it "removes the generated config after checking" do
+      seeder.seeded?
+
+      expect(File).not_to exist(captured.last.fetch(:path))
+    end
   end
 end

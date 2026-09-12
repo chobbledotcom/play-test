@@ -7,7 +7,7 @@ require "rails_helper"
 # BunnyClient behind a fake transport, and fakes for the restore and
 # litestream seeding, asserting the exact container the wizard builds.
 RSpec.describe MagicContainer::Wizard do
-  subject(:wizard) { described_class.new(prompts: prompts) }
+  subject(:wizard) { described_class.new(prompts: prompts, store: store) }
 
   let(:prompts) do
     MagicContainer::Prompts.new(
@@ -19,6 +19,8 @@ RSpec.describe MagicContainer::Wizard do
   let(:workdir) { Pathname.new(Dir.mktmpdir("wizard-spec")) }
   let(:archive_filename) { "backup-2026-01-01.tar.gz" }
   let(:archive_path) { workdir.join(archive_filename) }
+  let(:store) { MagicContainer::AnswersStore.new(path: store_path) }
+  let(:store_path) { workdir.join(".env.magic_container") }
 
   let(:answers) do
     [
@@ -55,8 +57,11 @@ RSpec.describe MagicContainer::Wizard do
     {
       "/apps" => {"id" => 42},
       "/apps/42/deploy" => {},
-      "/apps/42/endpoints" => {"items" => [{"publicHost" => "mc-123.bunny.run", "containerId" => "c-9"}]},
+      "/apps/42/endpoints" => {
+        "items" => [{"publicHost" => "mc-123.bunny.run", "containerId" => "c-9"}]
+      },
       "/apps/42/containers/c-9/env" => {},
+      "/apps/42/restart" => {},
       "/registries" => {"items" => [{"displayName" => "Docker Hub", "hostName" => "docker.io", "id" => 7}]},
       "/regions/optimal" => {"region" => {"id" => "LDN"}}
     }
@@ -84,12 +89,18 @@ RSpec.describe MagicContainer::Wizard do
           FileUtils.mkdir_p(db_path.dirname)
           File.write(db_path, "sqlite")
         end
-        {restored_databases: ["production.sqlite3"]}
+        {
+          restored_databases: ["production.sqlite3"],
+          storage_files_skipped: 0,
+          storage_files_uploaded: 1
+        }
       end
     end
   end
 
-  let!(:seeder) { instance_double(MagicContainer::LitestreamSeeder, call: true) }
+  let!(:seeder) do
+    instance_double(MagicContainer::LitestreamSeeder, seeded?: false, call: true)
+  end
 
   before do
     allow(ENV).to receive(:[]).and_call_original
@@ -114,6 +125,7 @@ RSpec.describe MagicContainer::Wizard do
       archive_dir: workdir,
       date: "2026-01-01",
       service_name: "s3_host",
+      skip_existing_uploads: true,
       storage_target: :s3
     )
     db_paths = @restore_args.fetch(:db_paths)
@@ -128,10 +140,12 @@ RSpec.describe MagicContainer::Wizard do
 
     wizard.call
 
-    seeded_root = Pathname.new(
-      Dir.glob(Rails.root.join("tmp/magic-container-*").to_s).first
-    )
-    expect(@seeder_kwargs[:db_path]).to eq(seeded_root.join("production.sqlite3"))
+    # Not via Dir.glob: leftover workdirs from real wizard runs in tmp make
+    # "the first matching directory" unpredictable.
+    db_path = @seeder_kwargs.fetch(:db_path)
+    expect(db_path.dirname.to_s)
+      .to start_with(Rails.root.join("tmp/magic-container-").to_s)
+    expect(db_path.basename.to_s).to eq("production.sqlite3")
     expect(@seeder_kwargs[:replica_path]).to eq("production.sqlite3")
 
     s3 = @seeder_kwargs.fetch(:s3)
@@ -156,13 +170,14 @@ RSpec.describe MagicContainer::Wizard do
       }],
       imageName: "play-test",
       imageNamespace: "chobble",
+      imagePullPolicy: "always",
       imageRegistryId: "7",
       imageTag: "latest",
       volumeMounts: [{mountPath: "/rails/storage", name: "storage"}]
     )
     expect(body).to include(
       name: "play-test",
-      regionSettings: {requiredRegionIds: ["LDN"]},
+      regionSettings: {allowedRegionIds: ["LDN"], requiredRegionIds: ["LDN"]},
       runtimeType: "shared",
       volumes: [{name: "storage", size: 5}]
     )
@@ -191,6 +206,7 @@ RSpec.describe MagicContainer::Wizard do
     env_call = calls.find { it[:path] == "/apps/42/containers/c-9/env" }
     expect(env_call[:method]).to eq(:put)
     expect(env_call.fetch(:body)).to include("BASE_URL" => "https://mc-123.bunny.run")
+    expect(calls).to include(hash_including(method: :post, path: "/apps/42/restart"))
   end
 
   it "saves an environment record and reports the url" do
@@ -271,6 +287,145 @@ RSpec.describe MagicContainer::Wizard do
       container = body.fetch(:containerTemplates).first
       expect(container).not_to have_key(:volumeMounts)
       expect(body).not_to have_key(:volumes)
+    end
+  end
+
+  context "when a typed master key has the wrong format" do
+    let(:answers) do
+      list = super()
+      list[22] = "9" * 64
+      list.insert(23, "a" * 32)
+      list
+    end
+
+    it "rejects the malformed key and accepts the retried one" do
+      wizard.call
+
+      expect(output.string)
+        .to include("RAILS_MASTER_KEY must be 32 hexadecimal characters")
+      create_call = calls.find { it[:path] == "/apps" }
+      env = create_call.fetch(:body).fetch(:containerTemplates).first
+        .fetch(:environmentVariables).to_h { it.values_at(:name, :value) }
+      expect(env["RAILS_MASTER_KEY"]).to eq("a" * 32)
+    end
+  end
+
+  context "when a previous attempt saved its answers" do
+    let(:retry_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new(["y", "y"].join("\n")),
+        output: retry_output
+      )
+    end
+    let(:retry_output) { StringIO.new }
+
+    before do
+      wizard.call
+      allow(seeder).to receive(:seeded?).and_return(true)
+      allow(restore_service).to receive(:perform) do |args|
+        @restore_args = args
+        args.fetch(:db_paths).each do |db_path|
+          FileUtils.mkdir_p(db_path.dirname)
+          File.write(db_path, "sqlite")
+        end
+        {
+          restored_databases: ["production.sqlite3"],
+          storage_files_skipped: 2,
+          storage_files_uploaded: 0
+        }
+      end
+      calls.clear
+    end
+
+    it "reuses the answers and skips completed work" do
+      described_class.new(prompts: retry_prompts, store: store).call
+
+      expect(retry_output.string).to include("Loaded answers from #{store_path}")
+      expect(retry_output.string).to include("Skipped 2 Active Storage files")
+      expect(retry_output.string).to include("already seeded - skipping")
+      expect(retry_output.string).to include("Reusing app 42")
+
+      expect(calls).not_to include(hash_including(method: :post, path: "/apps"))
+      expect(calls).to include(hash_including(method: :post, path: "/apps/42/deploy"))
+      expect(seeder).to have_received(:call).exactly(:once)
+    end
+
+    it "keeps the app id in the answers file" do
+      described_class.new(prompts: retry_prompts, store: store).call
+
+      expect(store_path.read).to include("MAGIC_APP_ID=42")
+    end
+  end
+
+  context "when the stored master key is malformed" do
+    let(:replenish_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new(["y", "a" * 32, "y"].join("\n")),
+        output: replenish_output
+      )
+    end
+    let(:replenish_output) { StringIO.new }
+
+    before do
+      wizard.call
+      store.save(store.load.with(rails_master_key: "9" * 64))
+    end
+
+    it "asks for a replacement and deploys it" do
+      described_class.new(prompts: replenish_prompts, store: store).call
+
+      expect(replenish_output.string)
+        .to include("stored RAILS_MASTER_KEY is malformed")
+      env_calls = calls.select { it[:path] == "/apps/42/containers/c-9/env" }
+      expect(env_calls.last.fetch(:body)).to include("RAILS_MASTER_KEY" => "a" * 32)
+      expect(store_path.read).to include("MAGIC_RAILS_MASTER_KEY=#{"a" * 32}")
+    end
+  end
+
+  context "when previous answers exist but are declined" do
+    let(:decline_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new(["n", *answers, "y"].join("\n")),
+        output: decline_output
+      )
+    end
+    let(:decline_output) { StringIO.new }
+
+    before { wizard.call }
+
+    it "collects fresh answers and creates a new app" do
+      calls.clear
+      described_class.new(prompts: decline_prompts, store: store).call
+
+      expect(decline_output.string).not_to include("Loaded answers from")
+      expect(calls.count { it[:path] == "/apps" }).to eq(1)
+      expect(seeder).to have_received(:call).twice
+    end
+  end
+
+  context "when previous answers point at a missing archive" do
+    before do
+      wizard.call
+      FileUtils.rm_f(archive_path)
+    end
+
+    it "aborts before executing anything" do
+      retry_prompts = MagicContainer::Prompts.new(
+        input: StringIO.new("y\n"), output: StringIO.new
+      )
+      expect { described_class.new(prompts: retry_prompts, store: store).call }
+        .to raise_error(/Archive not found/)
+    end
+  end
+
+  context "when the litestream replica is already seeded" do
+    before { allow(seeder).to receive(:seeded?).and_return(true) }
+
+    it "skips seeding and alerts" do
+      wizard.call
+
+      expect(seeder).not_to have_received(:call)
+      expect(output.string).to include("already seeded - skipping")
     end
   end
 end

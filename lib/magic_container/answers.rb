@@ -21,5 +21,8 @@ module MagicContainer
     const :rails_master_key, String
     const :sentry_dsn, String
     const :secret_key_base, String
+    # The Bunny app id once an attempt got as far as creating it, so a retried
+    # attempt reuses the app instead of creating a duplicate.
+    const :app_id, T.nilable(String), default: nil
   end
 end

@@ -1,6 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
+require "active_storage/service/s3_service"
 require "open3"
 require "securerandom"
 require "tmpdir"
@@ -15,11 +16,20 @@ module MagicContainer
     extend T::Sig
 
     CONTAINER_PORT = T.let(3000, Integer)
-    ENDPOINT_POLLS = T.let(10, Integer)
+    # First deploys pull the whole image before the endpoint answers, which
+    # regularly outlasts 30 seconds on a shared runtime.
+    ENDPOINT_POLLS = T.let(60, Integer)
+    POLL_SECONDS = T.let(5, Integer)
 
-    sig { params(prompts: Prompts).void }
-    def initialize(prompts: Prompts.new)
+    sig do
+      params(
+        prompts: Prompts,
+        store: AnswersStore
+      ).void
+    end
+    def initialize(prompts: Prompts.new, store: AnswersStore.new)
       @prompts = prompts
+      @store = store
       @bunny_access_key = T.let(nil, T.nilable(String))
     end
 
@@ -34,8 +44,28 @@ module MagicContainer
 
     private
 
+    # Collected fresh or loaded from a previous attempt, then persisted so a
+    # failure part-way through can be retried without re-entering answers.
     sig { returns(Answers) }
     def collect
+      answers = answers_to_use
+      store.save(answers)
+      answers
+    end
+
+    sig { returns(Answers) }
+    def answers_to_use
+      previous = store.load
+      if previous && prompts.confirm(
+        "Reuse the previous attempt's answers from #{store.path}?"
+      )
+        validate_archive(previous.archive_path)
+        prompts.note("Loaded answers from #{store.path}")
+        return previous.with(
+          rails_master_key: replenished_master_key(previous.rails_master_key)
+        )
+      end
+
       client = BunnyClient.new(access_key: bunny_access_key)
       Answers.new(
         access_key: bunny_access_key,
@@ -79,10 +109,38 @@ module MagicContainer
         base_url: prompts.ask(
           "Public base URL (blank to use container URL)", default: ""
         ),
-        rails_master_key: prompts.secret("RAILS_MASTER_KEY", required: false),
+        rails_master_key: ask_rails_master_key,
         sentry_dsn: prompts.ask("Sentry DSN", default: ""),
         secret_key_base: SecureRandom.hex(64)
       }
+    end
+
+    # Rails hex-unpacks RAILS_MASTER_KEY into a 16-byte AES-128 key for
+    # credentials, so anything but 32 hex characters makes the container
+    # crash-loop at boot ("key must be 16 bytes").
+    sig { returns(String) }
+    def ask_rails_master_key
+      loop do
+        key = prompts.secret("RAILS_MASTER_KEY", required: false)
+        return key if master_key_valid?(key)
+
+        prompts.note("RAILS_MASTER_KEY must be 32 hexadecimal characters")
+      end
+    end
+
+    # A store saved by an older wizard may hold a key the validation above
+    # would never have accepted; re-ask rather than redeploy the bad value.
+    sig { params(stored: String).returns(String) }
+    def replenished_master_key(stored)
+      return stored if master_key_valid?(stored)
+
+      prompts.note("The stored RAILS_MASTER_KEY is malformed - re-entering")
+      ask_rails_master_key
+    end
+
+    sig { params(key: String).returns(T::Boolean) }
+    def master_key_valid?(key)
+      key.empty? || key.match?(/\A[0-9a-f]{32}\z/i)
     end
 
     sig { returns(String) }
@@ -105,9 +163,13 @@ module MagicContainer
       latest = latest_archive&.to_s || ""
       answer = prompts.ask("Backup archive path", default: latest)
       path = Pathname.new(File.expand_path(answer))
-      raise "Archive not found: #{path}" unless path.file?
-
+      validate_archive(path)
       path
+    end
+
+    sig { params(path: Pathname).void }
+    def validate_archive(path)
+      raise "Archive not found: #{path}" unless path.file?
     end
 
     sig { returns(T.nilable(Pathname)) }
@@ -225,7 +287,7 @@ module MagicContainer
 
       restore_backup(answers, workdir, storage_service)
       seed_database_replicas(answers, workdir)
-      app_id = create_app(client, answers)
+      app_id = find_or_create_app(client, answers)
       client.deploy(app_id)
       url = container_url(client, app_id, answers)
       answers = answers.with(base_url: url) if answers.base_url.empty?
@@ -257,11 +319,16 @@ module MagicContainer
         date: backup_date(answers.archive_path),
         db_paths: archive_database_paths(answers.archive_path, workdir),
         service_name: "s3_host",
+        skip_existing_uploads: true,
         storage_service: storage_service,
         storage_target: :s3
       )
       names = result[:restored_databases].join(", ")
       prompts.note("Restored databases: #{names}")
+      existing = result.fetch(:storage_files_skipped)
+      if existing.positive?
+        prompts.note("Skipped #{existing} Active Storage files already on S3")
+      end
     end
 
     sig { params(archive_path: Pathname).returns(String) }
@@ -305,6 +372,11 @@ module MagicContainer
           replica_path: replica_path,
           s3: answers.litestream_s3
         )
+        if seeder.seeded?
+          prompts.note("Litestream replica for #{name} already seeded - skipping")
+          next
+        end
+
         seeder.call
         prompts.note("Seeded #{name} to #{replica_path}")
       end
@@ -325,15 +397,25 @@ module MagicContainer
     end
 
     sig { params(client: BunnyClient, answers: Answers).returns(String) }
-    def create_app(client, answers)
+    def find_or_create_app(client, answers)
+      existing_id = answers.app_id
+      if existing_id
+        prompts.note("Reusing app #{existing_id} created by a previous attempt")
+        return existing_id
+      end
+
       prompts.note("Creating the Magic Container app...")
-      client.create_application(
+      app_id = client.create_application(
         container: container_for(answers),
         name: answers.app_name,
         region: answers.region,
         runtime_type: answers.runtime_type,
         volume: answers.volume ? answers.volume_size_gb : nil
       )
+      # Persisted at once so a failure after creation retries against the
+      # same app instead of leaving an orphan behind.
+      store.save(answers.with(app_id: app_id))
+      app_id
     end
 
     sig do
@@ -346,6 +428,9 @@ module MagicContainer
           .map { |name, value| {name: name, value: value} },
         imageName: image_name(answers.image_ref),
         imageNamespace: image_namespace(answers.image_ref),
+        # The wizard deploys a mutable tag (latest), so every deploy must
+        # pull fresh rather than reuse whatever the node already cached.
+        imagePullPolicy: "always",
         imageRegistryId: answers.registry_id,
         imageTag: answers.image_tag,
         name: "app"
@@ -397,6 +482,8 @@ module MagicContainer
       container_id = endpoint.fetch("containerId")
       env = EnvBuilder.build(answers.with(base_url: url)).to_h
       client.replace_env(app_id, container_id, env)
+      # The running pod only picks the replaced environment up on restart.
+      client.restart(app_id)
       prompts.note("BASE_URL set to #{url}")
       url
     end
@@ -415,7 +502,7 @@ module MagicContainer
         end
         return T.cast(endpoint, T::Hash[String, T.untyped]) if endpoint
 
-        sleep 3
+        sleep POLL_SECONDS
       end
       raise "No container endpoint appeared for app #{app_id}"
     end
@@ -456,6 +543,10 @@ module MagicContainer
       path
     end
 
+    sig { returns(Prompts) }
     attr_reader :prompts
+
+    sig { returns(AnswersStore) }
+    attr_reader :store
   end
 end

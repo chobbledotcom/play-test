@@ -68,7 +68,10 @@ module MagicContainer
         autoScaling: {min: 1, max: 1},
         containerTemplates: [container],
         name: name,
-        regionSettings: {requiredRegionIds: [region]},
+        regionSettings: {
+          allowedRegionIds: [region],
+          requiredRegionIds: [region]
+        },
         runtimeType: runtime_type
       }
       payload[:volumes] = [{name: "storage", size: volume}] if volume
@@ -77,6 +80,11 @@ module MagicContainer
 
     sig { params(app_id: String).void }
     def deploy(app_id) = request(:post, "/apps/#{app_id}/deploy")
+
+    # Restarts the app's pods so they pick up replaced environment
+    # variables - a running container keeps booting with the old set.
+    sig { params(app_id: String).void }
+    def restart(app_id) = request(:post, "/apps/#{app_id}/restart")
 
     sig { params(app_id: String).returns(T::Array[T::Hash[String, T.untyped]]) }
     def endpoints(app_id) = items(request(:get, "/apps/#{app_id}/endpoints"))
@@ -168,11 +176,34 @@ module MagicContainer
       ).void
     end
     def raise_error(status, body)
-      title = body&.fetch("title", nil)
-      detail = body&.fetch("detail", nil)
-      message = [title, detail].compact.join(" - ")
+      parts = [body&.fetch("title", nil), body&.fetch("detail", nil)]
+      parts += validation_messages(body)
+      message = parts.compact.join(" - ")
       label = message.empty? ? status.to_s : message
       raise BunnyError.new(status, "Bunny API error: #{label}")
+    end
+
+    # Field-level detail Bunny returns with validation failures. Rejections
+    # arrive either as a field=>messages map or as {field, message} rows;
+    # without these the raised error hides which field was rejected.
+    sig do
+      params(body: T.nilable(T::Hash[String, T.untyped]))
+        .returns(T::Array[String])
+    end
+    def validation_messages(body)
+      errors = body&.fetch("errors", nil)
+      return [] if errors.nil?
+
+      case errors
+      when Hash
+        errors.map { |field, messages| "#{field}: #{Array(messages).join(", ")}" }
+      else
+        Array(errors).map do |error|
+          field = error.fetch("field", nil)
+          message = error.fetch("message", nil)
+          field ? "#{field}: #{message}" : message
+        end.compact
+      end
     end
 
     sig { returns(String) }

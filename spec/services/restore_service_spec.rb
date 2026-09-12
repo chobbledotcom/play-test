@@ -212,6 +212,49 @@ RSpec.describe RestoreService, type: :service do
           "xyz789" => "body content"
         })
         expect(blob_service_names(target_db)).to eq(%w[s3_host s3_host])
+        expect(result[:storage_files_uploaded]).to eq(2)
+        expect(result[:storage_files_skipped]).to eq(0)
+      end
+
+      it "skips files already on the target when asked to" do
+        uploaded = {}
+        s3_storage = double("s3 storage", name: "s3_host")
+        allow(s3_storage).to receive(:exist?) { |key| key == "abc123" }
+        allow(s3_storage).to receive(:upload) { |key, io| uploaded[key] = io.read }
+
+        result = service.perform(
+          date: timestamp,
+          storage_target: :s3,
+          db_paths: [target_db],
+          archive_dir:,
+          storage_service: s3_storage,
+          s3_resource: fake_s3,
+          skip_existing_uploads: true
+        )
+
+        expect(uploaded).to eq("xyz789" => "body content")
+        expect(result[:storage_files_uploaded]).to eq(1)
+        expect(result[:storage_files_skipped]).to eq(1)
+      end
+
+      it "re-uploads existing files by default" do
+        uploaded = {}
+        s3_storage = double("s3 storage", name: "s3_host")
+        allow(s3_storage).to receive(:exist?) { true }
+        allow(s3_storage).to receive(:upload) { |key, io| uploaded[key] = io.read }
+
+        result = service.perform(
+          date: timestamp,
+          storage_target: :s3,
+          db_paths: [target_db],
+          archive_dir:,
+          storage_service: s3_storage,
+          s3_resource: fake_s3
+        )
+
+        expect(uploaded.keys).to contain_exactly("abc123", "xyz789")
+        expect(result[:storage_files_uploaded]).to eq(2)
+        expect(result[:storage_files_skipped]).to eq(0)
       end
 
       it "uploads nested blob keys with their full path" do
