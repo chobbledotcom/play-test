@@ -45,6 +45,23 @@ module MagicContainer
     sig { returns(T::Array[T::Hash[String, T.untyped]]) }
     def registries = items(request(:get, "/registries"))
 
+    # Every application on the account, following the cursor until the final
+    # page. The wizard reconciles apps by name, so the lookup must see
+    # beyond the first page.
+    sig { returns(T::Array[T::Hash[String, T.untyped]]) }
+    def applications
+      apps = T.cast([], T::Array[T::Hash[String, T.untyped]])
+      cursor = ""
+      loop do
+        path = cursor.empty? ? "/apps" : "/apps?cursor=#{encode(cursor)}"
+        page = request(:get, path)
+        apps += items(page)
+        cursor = page["cursor"].to_s
+        break if cursor.empty?
+      end
+      apps
+    end
+
     sig { returns(String) }
     def optimal_region
       region = request(:get, "/regions/optimal").fetch("region")
@@ -180,7 +197,10 @@ module MagicContainer
       parts += validation_messages(body)
       message = parts.compact.join(" - ")
       label = message.empty? ? status.to_s : message
-      raise BunnyError.new(status, "Bunny API error: #{label}")
+      raise BunnyError.new(
+        status,
+        I18n.t("magic_container.bunny_client.errors.api_error", label: label)
+      )
     end
 
     # Field-level detail Bunny returns with validation failures. Rejections
@@ -205,6 +225,9 @@ module MagicContainer
         end.compact
       end
     end
+
+    sig { params(cursor: String).returns(String) }
+    def encode(cursor) = URI.encode_www_form_component(cursor)
 
     sig { returns(String) }
     attr_reader :access_key

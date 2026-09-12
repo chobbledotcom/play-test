@@ -31,6 +31,26 @@ RSpec.describe MagicContainer::BunnyClient do
     expect(calls.first[:path]).to eq("/registries")
   end
 
+  it "lists every application across cursor pages" do
+    pages = {
+      "/apps" => {
+        "items" => [{"id" => 42, "name" => "play-test"}],
+        "cursor" => "next page"
+      },
+      "/apps?cursor=next+page" => {"items" => [{"id" => 43, "name" => "another"}]}
+    }
+    paginated = lambda { |method, path, body|
+      calls << {method: method, path: path, body: body}
+      pages.fetch(path)
+    }
+    paginated_client = described_class.new(access_key: "bunny-key", transport: paginated)
+
+    expect(paginated_client.applications).to eq(
+      [{"id" => 42, "name" => "play-test"}, {"id" => 43, "name" => "another"}]
+    )
+    expect(calls.pluck(:path)).to eq(["/apps", "/apps?cursor=next+page"])
+  end
+
   it "returns the optimal region id" do
     expect(client.optimal_region).to eq("LDN")
   end

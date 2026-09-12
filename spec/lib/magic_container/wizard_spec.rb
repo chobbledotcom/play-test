@@ -53,6 +53,7 @@ RSpec.describe MagicContainer::Wizard do
   end
 
   let(:calls) { [] }
+  let(:existing_apps) { [] }
   let(:responses) do
     {
       "/apps" => {"id" => 42},
@@ -69,6 +70,9 @@ RSpec.describe MagicContainer::Wizard do
   let(:transport) do
     lambda { |method, path, body|
       calls << {method: method, path: path, body: body}
+      # POST /apps creates; GET /apps lists what already exists
+      return {"items" => existing_apps} if method == :get && path == "/apps"
+
       responses.fetch(path)
     }
   end
@@ -99,7 +103,7 @@ RSpec.describe MagicContainer::Wizard do
   end
 
   let!(:seeder) do
-    instance_double(MagicContainer::LitestreamSeeder, seeded?: false, call: true)
+    instance_double(MagicContainer::LitestreamSeeder, call: true)
   end
 
   before do
@@ -157,10 +161,16 @@ RSpec.describe MagicContainer::Wizard do
     expect(seeder).to have_received(:call)
   end
 
+  it "records the seeded replica path in the answers store" do
+    wizard.call
+
+    expect(store_path.read).to include("MAGIC_SEEDED_REPLICA_PATHS=production.sqlite3")
+  end
+
   it "creates the application with the container, volume and endpoint" do
     wizard.call
 
-    create_call = calls.find { it[:path] == "/apps" }
+    create_call = calls.find { it[:method] == :post && it[:path] == "/apps" }
     body = create_call.fetch(:body)
     container = body.fetch(:containerTemplates).first
     expect(container).to include(
@@ -186,7 +196,7 @@ RSpec.describe MagicContainer::Wizard do
   it "populates the container environment from the answers" do
     wizard.call
 
-    create_call = calls.find { it[:path] == "/apps" }
+    create_call = calls.find { it[:method] == :post && it[:path] == "/apps" }
     env = create_call.fetch(:body).fetch(:containerTemplates).first
       .fetch(:environmentVariables).to_h { it.values_at(:name, :value) }
     expect(env).to include(
@@ -263,10 +273,13 @@ RSpec.describe MagicContainer::Wizard do
       list
     end
 
-    it "keeps the given base url and skips the env update" do
+    it "keeps the given base url and pushes it to the container" do
       wizard.call
 
-      expect(calls).not_to include(hash_including(path: "/apps/42/containers/c-9/env"))
+      expect(calls).to include(hash_including(path: "/apps/42/containers/c-9/env"))
+      env_call = calls.find { it[:path] == "/apps/42/containers/c-9/env" }
+      expect(env_call.fetch(:body)).to include("BASE_URL" => "https://example.com")
+      expect(calls).to include(hash_including(method: :post, path: "/apps/42/restart"))
       env_file = Rails.root.join("tmp/magic-container/42.env")
       expect(File.read(env_file)).to include("BASE_URL=https://example.com")
     end
@@ -282,7 +295,7 @@ RSpec.describe MagicContainer::Wizard do
     it "creates the container without a volume" do
       wizard.call
 
-      create_call = calls.find { it[:path] == "/apps" }
+      create_call = calls.find { it[:method] == :post && it[:path] == "/apps" }
       body = create_call.fetch(:body)
       container = body.fetch(:containerTemplates).first
       expect(container).not_to have_key(:volumeMounts)
@@ -303,7 +316,7 @@ RSpec.describe MagicContainer::Wizard do
 
       expect(output.string)
         .to include("RAILS_MASTER_KEY must be 32 hexadecimal characters")
-      create_call = calls.find { it[:path] == "/apps" }
+      create_call = calls.find { it[:method] == :post && it[:path] == "/apps" }
       env = create_call.fetch(:body).fetch(:containerTemplates).first
         .fetch(:environmentVariables).to_h { it.values_at(:name, :value) }
       expect(env["RAILS_MASTER_KEY"]).to eq("a" * 32)
@@ -321,7 +334,6 @@ RSpec.describe MagicContainer::Wizard do
 
     before do
       wizard.call
-      allow(seeder).to receive(:seeded?).and_return(true)
       allow(restore_service).to receive(:perform) do |args|
         @restore_args = args
         args.fetch(:db_paths).each do |db_path|
@@ -342,7 +354,9 @@ RSpec.describe MagicContainer::Wizard do
 
       expect(retry_output.string).to include("Loaded answers from #{store_path}")
       expect(retry_output.string).to include("Skipped 2 Active Storage files")
-      expect(retry_output.string).to include("already seeded - skipping")
+      expect(retry_output.string).to include(
+        I18n.t("magic_container.wizard.notes.seeded_skip", name: "production.sqlite3")
+      )
       expect(retry_output.string).to include("Reusing app 42")
 
       expect(calls).not_to include(hash_including(method: :post, path: "/apps"))
@@ -350,10 +364,107 @@ RSpec.describe MagicContainer::Wizard do
       expect(seeder).to have_received(:call).exactly(:once)
     end
 
+    it "applies the final answers to the reused app before deploying" do
+      described_class.new(prompts: retry_prompts, store: store).call
+
+      # The retry loads the resolved base url, so the environment is rebuilt
+      # from the answers and pushed to the reused app
+      env_calls = calls.select { it[:path] == "/apps/42/containers/c-9/env" }
+      expect(env_calls).to be_present
+      expect(env_calls.first.fetch(:body)).to include(
+        "BASE_URL" => "https://mc-123.bunny.run"
+      )
+      expect(calls).to include(hash_including(method: :post, path: "/apps/42/restart"))
+    end
+
     it "keeps the app id in the answers file" do
       described_class.new(prompts: retry_prompts, store: store).call
 
       expect(store_path.read).to include("MAGIC_APP_ID=42")
+    end
+  end
+
+  context "when an existing Bunny app already carries the answers' name" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+    let(:orphan_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new([*answers, "y"].join("\n")),
+        output: orphan_output
+      )
+    end
+    let(:orphan_output) { StringIO.new }
+
+    it "offers the existing app for reuse instead of creating a duplicate" do
+      described_class.new(prompts: orphan_prompts, store: store).call
+
+      expect(orphan_output.string).to include("Reusing existing Bunny app 42")
+      expect(calls).not_to include(hash_including(method: :post, path: "/apps"))
+      expect(calls).to include(hash_including(method: :post, path: "/apps/42/deploy"))
+      expect(store_path.read).to include("MAGIC_APP_ID=42")
+    end
+  end
+
+  context "when the orphaned app is declined" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+    let(:orphan_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new([*answers, "n"].join("\n")),
+        output: orphan_output
+      )
+    end
+    let(:orphan_output) { StringIO.new }
+
+    it "creates a fresh app" do
+      described_class.new(prompts: orphan_prompts, store: store).call
+
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+      expect(store_path.read).to include("MAGIC_APP_ID=42")
+    end
+  end
+
+  context "when several apps carry the answers' name" do
+    let(:existing_apps) do
+      [
+        {"id" => 43, "name" => "play-test"},
+        {"id" => 42, "name" => "play-test"}
+      ]
+    end
+    let(:orphan_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new([*answers, "2"].join("\n")),
+        output: orphan_output
+      )
+    end
+    let(:orphan_output) { StringIO.new }
+
+    it "lets the operator pick which app to reuse" do
+      described_class.new(prompts: orphan_prompts, store: store).call
+
+      expect(calls).not_to include(hash_including(method: :post, path: "/apps"))
+      expect(calls).to include(hash_including(method: :post, path: "/apps/42/deploy"))
+      expect(store_path.read).to include("MAGIC_APP_ID=42")
+    end
+  end
+
+  context "when several apps carry the answers' name and a fresh one is picked" do
+    let(:existing_apps) do
+      [
+        {"id" => 43, "name" => "play-test"},
+        {"id" => 44, "name" => "play-test"}
+      ]
+    end
+    let(:orphan_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new([*answers, "3"].join("\n")),
+        output: orphan_output
+      )
+    end
+    let(:orphan_output) { StringIO.new }
+
+    it "creates a new app" do
+      described_class.new(prompts: orphan_prompts, store: store).call
+
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
     end
   end
 
@@ -398,7 +509,8 @@ RSpec.describe MagicContainer::Wizard do
       described_class.new(prompts: decline_prompts, store: store).call
 
       expect(decline_output.string).not_to include("Loaded answers from")
-      expect(calls.count { it[:path] == "/apps" }).to eq(1)
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+      expect(calls.count { it[:method] == :get && it[:path] == "/apps" }).to eq(1)
       expect(seeder).to have_received(:call).twice
     end
   end
@@ -407,6 +519,7 @@ RSpec.describe MagicContainer::Wizard do
     before do
       wizard.call
       FileUtils.rm_f(archive_path)
+      calls.clear
     end
 
     it "aborts before executing anything" do
@@ -415,17 +528,9 @@ RSpec.describe MagicContainer::Wizard do
       )
       expect { described_class.new(prompts: retry_prompts, store: store).call }
         .to raise_error(/Archive not found/)
-    end
-  end
-
-  context "when the litestream replica is already seeded" do
-    before { allow(seeder).to receive(:seeded?).and_return(true) }
-
-    it "skips seeding and alerts" do
-      wizard.call
-
-      expect(seeder).not_to have_received(:call)
-      expect(output.string).to include("already seeded - skipping")
+      expect(calls).to be_empty
+      expect(restore_service).to have_received(:perform).exactly(:once)
+      expect(seeder).to have_received(:call).exactly(:once)
     end
   end
 end

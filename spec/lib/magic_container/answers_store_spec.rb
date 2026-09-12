@@ -86,6 +86,18 @@ RSpec.describe MagicContainer::AnswersStore do
       expect(store.load.app_id).to eq("42")
     end
 
+    it "round-trips replica paths recorded as seeded for retries" do
+      store.save(answers.with(seeded_replica_paths: %w[production.sqlite3]))
+
+      expect(store.load.seeded_replica_paths).to eq(["production.sqlite3"])
+    end
+
+    it "round-trips values carrying leading and trailing whitespace" do
+      store.save(answers.with(sentry_dsn: "  dsn with spaces  "))
+
+      expect(store.load.sentry_dsn).to eq("  dsn with spaces  ")
+    end
+
     it "round-trips declined volumes and other booleans" do
       store.save(answers.with(volume: false))
 
@@ -116,6 +128,28 @@ RSpec.describe MagicContainer::AnswersStore do
       content = store_path.read
       expect(content).to include("MAGIC_BUNNY_ACCESS_KEY=bunny-key")
       expect(content).not_to include("MAGIC_APP_ID=")
+      expect(content).not_to include("MAGIC_SEEDED_REPLICA_PATHS=")
+    end
+
+    it "keeps the last complete state when the swap fails" do
+      store.save(answers)
+      allow(File).to receive(:rename).and_raise(IOError)
+
+      expect { store.save(answers.with(app_name: "later")) }
+        .to raise_error(IOError)
+      expect(store.load.app_name).to eq("play-test")
+      # The interrupted dump stays part of the git-ignored, owner-only set
+      temp = Pathname.new("#{store_path}.tmp")
+      expect(File.stat(temp).mode.to_s(8)).to end_with("600")
+    end
+
+    it "replaces the previous content entirely" do
+      store.save(answers)
+      store.save(answers.with(app_id: "42"))
+
+      expect(store.load.app_id).to eq("42")
+      content = store_path.read
+      expect(content.scan("MAGIC_APP_NAME=").length).to eq(1)
     end
   end
 

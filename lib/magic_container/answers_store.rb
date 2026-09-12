@@ -5,9 +5,12 @@ module MagicContainer
   # Persists the wizard's answers in a dotenv-style file so a failed attempt
   # can be retried without re-entering every answer. The file holds every
   # secret, so it lives git-ignored (/.env* in .gitignore) with owner-only
-  # permissions, and records the created app id for idempotent retries.
-  # Values are written raw to end of line - no quoting or substitution - and
-  # read back the same way, so secrets survive the round trip untouched.
+  # permissions, and records the created app id and seeded replica paths for
+  # idempotent retries. Values are written raw to end of line - no quoting or
+  # substitution - and read back the same way, so secrets survive the round
+  # trip untouched. Saves are atomic: the dump lands in a sibling temporary
+  # file that is renamed over the store, so an interrupted save never
+  # destroys the previous complete state.
   class AnswersStore
     extend T::Sig
 
@@ -32,11 +35,17 @@ module MagicContainer
 
     sig { params(answers: Answers).void }
     def save(answers)
-      # The file holds every secret, so it must never exist with wider
-      # permissions than the creation mode.
-      File.open(path, File::WRONLY | File::CREAT | File::TRUNC, 0o600) do |file|
+      # An interrupted save must not destroy the last complete state - the
+      # dump lands in a git-ignored sibling (/.env* in .gitignore) and is
+      # renamed over the store atomically. Both files hold every secret, so
+      # both live with owner-only permissions.
+      temp_path = Pathname.new("#{path}.tmp")
+      File.open(temp_path, File::WRONLY | File::CREAT | File::TRUNC, 0o600) do |file|
         file.write(dump(answers))
+        file.flush
+        file.fsync
       end
+      File.rename(temp_path, path)
       FileUtils.chmod(0o600, path)
     end
 
@@ -80,6 +89,8 @@ module MagicContainer
       ]
       app_id = answers.app_id
       entries.push(["MAGIC_APP_ID", app_id]) if app_id
+      seeded = answers.seeded_replica_paths
+      entries.push(["MAGIC_SEEDED_REPLICA_PATHS", seeded.join(",")]) if seeded.any?
       entries
     end
 
@@ -99,14 +110,17 @@ module MagicContainer
       ]
     end
 
-    # One KEY=value per line, value running raw to end of line.
+    # One KEY=value per line, value running raw to end of line. Only the
+    # line terminator is dropped, so leading and trailing whitespace in a
+    # value survives the round trip - stripping the whole line would alter
+    # secrets and archive paths the wizard promised to restore verbatim.
     sig { params(content: String).returns(T::Hash[String, String]) }
     def parse(content)
       content.each_line.filter_map do |line|
-        stripped = line.strip
-        next if stripped.empty? || stripped.start_with?("#")
+        trimmed = line.strip
+        next if trimmed.empty? || trimmed.start_with?("#")
 
-        key, value = stripped.split("=", 2)
+        key, value = line.chomp.split("=", 2)
         next if key.blank? || value.nil?
 
         [key, value]
@@ -129,6 +143,7 @@ module MagicContainer
         region: env.fetch("MAGIC_REGION"),
         runtime_type: env.fetch("MAGIC_RUNTIME_TYPE"),
         secret_key_base: env.fetch("MAGIC_SECRET_KEY_BASE"),
+        seeded_replica_paths: env["MAGIC_SEEDED_REPLICA_PATHS"].to_s.split(","),
         sentry_dsn: env.fetch("MAGIC_SENTRY_DSN"),
         storage_s3: s3_details(env, STORAGE_PREFIX),
         litestream_s3: s3_details(env, LITESTREAM_PREFIX),

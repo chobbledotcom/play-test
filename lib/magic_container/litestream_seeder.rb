@@ -39,45 +39,43 @@ module MagicContainer
 
     sig { void }
     def call
+      # A baseline listing captured before any push distinguishes snapshots
+      # this call pushed from whatever the replica already held: seeding is
+      # done when the listing grows, not when it merely holds rows.
+      baseline = listing.lines.count
       ATTEMPTS.times do
         push_snapshot
-        return if seeded?
+        return if listing.lines.count > baseline
 
         sleep 2
       end
 
-      message = "No Litestream snapshot appeared in #{replica_bucket}"
-      raise "#{message} for #{replica_path}. Last listing:\n#{listing}"
-    ensure
-      close_config
-    end
-
-    # Whether the replica already holds a snapshot, so a retried wizard run
-    # can skip databases whose replicas were seeded by an earlier attempt.
-    sig { returns(T::Boolean) }
-    def seeded?
-      listing.lines.count > 1
+      raise I18n.t("magic_container.litestream_seeder.errors.no_snapshot",
+        bucket: replica_bucket, replica_path: replica_path, listing: listing)
     ensure
       close_config
     end
 
     # The snapshot listing from litestream v0.3.13: a header row followed by
     # one row per snapshot. Rows carry the replica name ("s3"), generation,
-    # index, size and creation time - never the replica path - so presence of
-    # any row beyond the header is the seeded signal.
+    # index, size and creation time - never the replica path. The generated
+    # config carries the S3 secret, so it never survives the listing.
     sig { returns(String) }
     def listing
       command = ["bundle", "exec", "litestream", "snapshots",
         "-config", config_path.to_s, db_path.to_s]
       stdout, _success = runner.call(command)
       stdout
+    ensure
+      close_config
     end
 
     private
 
     # The generated config carries the S3 secret, so it must not survive
-    # whichever public method created it. close! unlinks the file, so the
-    # reference is dropped too, letting a later command write a fresh one.
+    # whichever public method last needed it. close! unlinks the file, so
+    # the reference is dropped too, letting a later command write a fresh
+    # one.
     sig { void }
     def close_config
       file = @config_file
@@ -129,7 +127,8 @@ module MagicContainer
       stdout, stderr, status = Open3.capture3(*args)
       unless status.success?
         detail = stderr.empty? ? stdout : stderr
-        raise "Litestream command failed: #{args.join(" ")}\n#{detail}"
+        raise I18n.t("magic_container.litestream_seeder.errors.command_failed",
+          command: args.join(" "), detail: detail)
       end
 
       [stdout, true]

@@ -32,6 +32,9 @@ module MagicContainer
       output.puts "#{BOLD}#{BLUE}== #{label} ==#{RESET}"
     end
 
+    sig { params(key: String).returns(String) }
+    def t(key) = I18n.t("magic_container.prompts.#{key}")
+
     # A nil default makes the question required; a blank default ("")
     # makes it optional, returning the empty string.
     sig { params(label: String, default: T.nilable(String)).returns(String) }
@@ -42,7 +45,7 @@ module MagicContainer
         return default if answer.empty? && !default.nil?
         return answer unless answer.empty?
 
-        output.puts "#{YELLOW}A value is required.#{RESET}"
+        output.puts "#{YELLOW}#{t("required")}#{RESET}"
       end
     end
 
@@ -51,10 +54,10 @@ module MagicContainer
       suffix = required ? "" : " (blank to skip)"
       answer = hidden_question("#{label}#{suffix}")
       while answer.empty? && required
-        output.puts "#{YELLOW}A value is required.#{RESET}"
+        output.puts "#{YELLOW}#{t("required")}#{RESET}"
         answer = hidden_question("#{label}#{suffix}")
       end
-      output.puts "(hidden input)"
+      output.puts t("hidden_answer")
       answer
     end
 
@@ -70,7 +73,7 @@ module MagicContainer
         output.puts "  #{index + 1}. #{name}"
       end
 
-      choice = ask("Number", default: "1")
+      choice = ask(t("number"), default: "1")
       number = Integer(choice, 10, exception: false)
       if number
         index = number - 1
@@ -78,7 +81,7 @@ module MagicContainer
         return T.must(choices[index]).last if within_range
       end
 
-      output.puts "#{YELLOW}Not a valid choice.#{RESET}"
+      output.puts "#{YELLOW}#{t("not_a_valid_choice")}#{RESET}"
       select(label, choices)
     end
 
@@ -104,7 +107,7 @@ module MagicContainer
     sig { returns(String) }
     def read_line
       line = input.gets
-      raise EOFError, "Input closed before the question was answered" if line.nil?
+      raise EOFError, t("input_closed") if line.nil?
 
       line.chomp
     end

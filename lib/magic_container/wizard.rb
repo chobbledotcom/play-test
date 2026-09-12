@@ -12,6 +12,8 @@ module MagicContainer
   # prepared up front: Active Storage files are uploaded to S3, the
   # databases are seeded into the Litestream replica the container restores
   # from on first boot, and the app is created with a full environment.
+  # Every step persists enough state in the answers store that a failed
+  # attempt can be retried without repeating completed work.
   class Wizard
     extend T::Sig
 
@@ -35,7 +37,7 @@ module MagicContainer
 
     sig { void }
     def call
-      prompts.banner("Bunny Magic Container from a backup")
+      prompts.banner(t("banners.main"))
       answers = collect
       return unless confirm_plan(answers)
 
@@ -56,11 +58,9 @@ module MagicContainer
     sig { returns(Answers) }
     def answers_to_use
       previous = store.load
-      if previous && prompts.confirm(
-        "Reuse the previous attempt's answers from #{store.path}?"
-      )
+      if previous && prompts.confirm(t("questions.confirm_reuse", path: store.path))
         validate_archive(previous.archive_path)
-        prompts.note("Loaded answers from #{store.path}")
+        prompts.note(t("notes.loaded_answers", path: store.path))
         return previous.with(
           rails_master_key: replenished_master_key(previous.rails_master_key)
         )
@@ -69,7 +69,7 @@ module MagicContainer
       client = BunnyClient.new(access_key: bunny_access_key)
       Answers.new(
         access_key: bunny_access_key,
-        app_name: prompts.ask("Bunny application name", default: "play-test"),
+        app_name: prompts.ask(t("questions.app_name"), default: "play-test"),
         archive_path: ask_archive,
         **collect_deployment(client),
         **collect_storage,
@@ -83,11 +83,9 @@ module MagicContainer
         region: ask_region(client),
         registry_id: ask_registry(client),
         image_ref: image_ref,
-        image_tag: prompts.ask("Image tag", default: "latest"),
+        image_tag: prompts.ask(t("questions.image_tag"), default: "latest"),
         runtime_type: ask_runtime_type,
-        volume: prompts.confirm(
-          "Attach a persistent volume for the databases?"
-        ),
+        volume: prompts.confirm(t("questions.attach_volume")),
         volume_size_gb: ask_volume_size
       }
     end
@@ -95,8 +93,8 @@ module MagicContainer
     sig { returns(T::Hash[Symbol, T.untyped]) }
     def collect_storage
       {
-        storage_s3: ask_s3_details("Active Storage S3 (uploaded files)"),
-        litestream_s3: ask_s3_details("Litestream S3 (database replicas)")
+        storage_s3: ask_s3_details(t("questions.storage_banner")),
+        litestream_s3: ask_s3_details(t("questions.litestream_banner"))
       }
     end
 
@@ -104,13 +102,11 @@ module MagicContainer
     def collect_optional
       {
         display_app_name: prompts.ask(
-          "Display app name (APP_NAME)", default: "Play-Test"
+          t("questions.display_app_name"), default: "Play-Test"
         ),
-        base_url: prompts.ask(
-          "Public base URL (blank to use container URL)", default: ""
-        ),
+        base_url: prompts.ask(t("questions.base_url"), default: ""),
         rails_master_key: ask_rails_master_key,
-        sentry_dsn: prompts.ask("Sentry DSN", default: ""),
+        sentry_dsn: prompts.ask(t("questions.sentry_dsn"), default: ""),
         secret_key_base: SecureRandom.hex(64)
       }
     end
@@ -121,10 +117,10 @@ module MagicContainer
     sig { returns(String) }
     def ask_rails_master_key
       loop do
-        key = prompts.secret("RAILS_MASTER_KEY", required: false)
+        key = prompts.secret(t("questions.master_key"), required: false)
         return key if master_key_valid?(key)
 
-        prompts.note("RAILS_MASTER_KEY must be 32 hexadecimal characters")
+        prompts.note(t("notes.master_key_invalid"))
       end
     end
 
@@ -134,7 +130,7 @@ module MagicContainer
     def replenished_master_key(stored)
       return stored if master_key_valid?(stored)
 
-      prompts.note("The stored RAILS_MASTER_KEY is malformed - re-entering")
+      prompts.note(t("notes.master_key_replenishing"))
       ask_rails_master_key
     end
 
@@ -149,11 +145,11 @@ module MagicContainer
 
       from_env = ENV["BUNNY_ACCESS_KEY"].to_s
       key = if from_env.empty?
-        prompts.secret("Bunny API access key", required: true)
-      elsif prompts.confirm("Use the BUNNY_ACCESS_KEY from your environment?")
+        prompts.secret(t("questions.bunny_access_key"), required: true)
+      elsif prompts.confirm(t("questions.bunny_key_from_env"))
         from_env
       else
-        prompts.secret("Bunny API access key", required: true)
+        prompts.secret(t("questions.bunny_access_key"), required: true)
       end
       @bunny_access_key = key
     end
@@ -161,7 +157,7 @@ module MagicContainer
     sig { returns(Pathname) }
     def ask_archive
       latest = latest_archive&.to_s || ""
-      answer = prompts.ask("Backup archive path", default: latest)
+      answer = prompts.ask(t("questions.archive_path"), default: latest)
       path = Pathname.new(File.expand_path(answer))
       validate_archive(path)
       path
@@ -169,7 +165,7 @@ module MagicContainer
 
     sig { params(path: Pathname).void }
     def validate_archive(path)
-      raise "Archive not found: #{path}" unless path.file?
+      raise t("errors.archive_not_found", path: path) unless path.file?
     end
 
     sig { returns(T.nilable(Pathname)) }
@@ -181,14 +177,14 @@ module MagicContainer
     sig { params(client: BunnyClient).returns(String) }
     def ask_region(client)
       optimal = client.optimal_region
-      return optimal if prompts.confirm("Use the optimal region (#{optimal})?")
+      return optimal if prompts.confirm(t("questions.optimal_region", region: optimal))
 
       regions = client.regions.filter { it["hasCapacity"] }
       choices = regions.map do |region|
         name = region.fetch("name")
         ["#{name} (#{region.fetch("id")})", region.fetch("id")]
       end
-      prompts.select("Region", choices)
+      prompts.select(t("questions.region"), choices)
     end
 
     sig { params(client: BunnyClient).returns(String) }
@@ -198,42 +194,42 @@ module MagicContainer
         label = "#{name} (#{registry.fetch("hostName")})"
         [label, registry.fetch("id").to_s]
       end
-      prompts.select("Image registry", choices)
+      prompts.select(t("questions.registry"), choices)
     end
 
     sig { returns(String) }
     def image_ref
-      prompts.ask("Image (namespace/name)", default: "chobble/play-test")
+      prompts.ask(t("questions.image"), default: "chobble/play-test")
     end
 
     sig { returns(String) }
     def ask_runtime_type
       choices = [
-        ["Shared (cheaper, burstable resources)", "shared"],
-        ["Reserved (dedicated resources)", "reserved"]
+        [t("questions.runtime_shared"), "shared"],
+        [t("questions.runtime_reserved"), "reserved"]
       ]
-      prompts.select("Runtime type", choices)
+      prompts.select(t("questions.runtime_type"), choices)
     end
 
     sig { returns(Integer) }
     def ask_volume_size
       loop do
-        answer = prompts.ask("Volume size (GB)", default: "5")
+        answer = prompts.ask(t("questions.volume_size"), default: "5")
         size = Integer(answer, exception: false)
         return size if size&.positive?
 
-        prompts.note("Enter a positive whole number of gigabytes")
+        prompts.note(t("notes.volume_size_invalid"))
       end
     end
 
     sig { params(label: String).returns(S3Details) }
     def ask_s3_details(label)
       prompts.banner(label)
-      endpoint = prompts.ask("Endpoint (e.g. https://storage.bunnycdn.com)")
-      bucket = prompts.ask("Bucket")
-      region = prompts.ask("Region", default: "us-east-1")
-      access_key_id = prompts.ask("Access key id")
-      secret = prompts.secret("Secret access key", required: true)
+      endpoint = prompts.ask(t("questions.s3_endpoint"))
+      bucket = prompts.ask(t("questions.s3_bucket"))
+      region = prompts.ask(t("questions.s3_region"), default: "us-east-1")
+      access_key_id = prompts.ask(t("questions.s3_access_key_id"))
+      secret = prompts.secret(t("questions.s3_secret_key"), required: true)
       S3Details.new(
         access_key_id: access_key_id,
         bucket: bucket,
@@ -245,36 +241,35 @@ module MagicContainer
 
     sig { params(answers: Answers).returns(T::Boolean) }
     def confirm_plan(answers)
-      prompts.banner("Plan")
+      prompts.banner(t("banners.plan"))
       summary_lines(answers).each { prompts.note(it) }
-      prompts.confirm("Create the Magic Container with these settings?")
+      prompts.confirm(t("questions.confirm_plan"))
     end
 
     sig { params(answers: Answers).returns(T::Array[String]) }
     def summary_lines(answers)
       storage = answers.storage_s3
       litestream = answers.litestream_s3
-      app_name = answers.app_name
-      runtime = answers.runtime_type
-      region = answers.region
+      image = "#{answers.image_ref}:#{answers.image_tag}"
       [
-        "Archive: #{answers.archive_path.basename}",
-        "App: #{app_name} (#{runtime}) in #{region}",
-        "Image: #{answers.image_ref}:#{answers.image_tag}",
-        "Volume: #{volume_summary(answers)}",
-        "Active Storage S3: #{storage.bucket} at #{storage.endpoint}",
-        "Litestream S3: #{litestream.bucket} at #{litestream.endpoint}",
-        "Databases will be restored from the archive and seeded to Litestream",
-        "Active Storage files will be uploaded to the S3 bucket",
-        "A new SECRET_KEY_BASE was generated"
+        t("plan.archive", archive: answers.archive_path.basename),
+        t("plan.app", app: answers.app_name, region: answers.region,
+          runtime: answers.runtime_type),
+        t("plan.image", image: image),
+        volume_summary(answers),
+        t("plan.storage", bucket: storage.bucket, endpoint: storage.endpoint),
+        t("plan.litestream", bucket: litestream.bucket, endpoint: litestream.endpoint),
+        t("plan.db_restore"),
+        t("plan.storage_upload"),
+        t("plan.secret_generated")
       ]
     end
 
     sig { params(answers: Answers).returns(String) }
     def volume_summary(answers)
-      return "#{answers.volume_size_gb}GB persistent volume" if answers.volume
+      return t("plan.volume_with", size: answers.volume_size_gb) if answers.volume
 
-      "none, databases re-restore from Litestream on boot"
+      t("plan.volume_without")
     end
 
     sig { params(answers: Answers).void }
@@ -286,11 +281,17 @@ module MagicContainer
       storage_service = build_storage_service(answers.storage_s3)
 
       restore_backup(answers, workdir, storage_service)
-      seed_database_replicas(answers, workdir)
-      app_id = find_or_create_app(client, answers)
+      answers = seed_database_replicas(answers, workdir)
+      answers = find_or_create_app(client, answers)
+      app_id = T.must(answers.app_id)
       client.deploy(app_id)
       url = container_url(client, app_id, answers)
-      answers = answers.with(base_url: url) if answers.base_url.empty?
+      if answers.base_url.empty?
+        # Persisted so a retry reuses the resolved url instead of treating
+        # the resolved deployment as still unresolved.
+        answers = answers.with(base_url: url)
+        store.save(answers)
+      end
       report(answers, app_id, url, workdir)
     end
 
@@ -313,7 +314,7 @@ module MagicContainer
       ).void
     end
     def restore_backup(answers, workdir, storage_service)
-      prompts.note("Restoring backup and uploading Active Storage files...")
+      prompts.note(t("notes.restoring"))
       result = RestoreService.new.perform(
         archive_dir: answers.archive_path.dirname,
         date: backup_date(answers.archive_path),
@@ -324,10 +325,10 @@ module MagicContainer
         storage_target: :s3
       )
       names = result[:restored_databases].join(", ")
-      prompts.note("Restored databases: #{names}")
+      prompts.note(t("notes.restored_databases", names: names))
       existing = result.fetch(:storage_files_skipped)
       if existing.positive?
-        prompts.note("Skipped #{existing} Active Storage files already on S3")
+        prompts.note(t("notes.files_skipped", count: existing))
       end
     end
 
@@ -336,7 +337,7 @@ module MagicContainer
       pattern = /backup-(\d{4}-\d{2}-\d{2})\.tar\.gz\z/
       match = archive_path.basename.to_s.match(pattern)
       if match.nil?
-        raise "Cannot read a backup date from #{archive_path.basename}"
+        raise t("errors.backup_date_missing", name: archive_path.basename)
       end
 
       T.must(match[1])
@@ -350,36 +351,52 @@ module MagicContainer
     end
     def archive_database_paths(archive_path, workdir)
       stdout, status = Open3.capture2("tar", "-tzf", archive_path.to_s)
-      raise "Could not list #{archive_path}" unless status.success?
+      raise t("errors.archive_listing_failed", archive: archive_path) unless status.success?
 
       names = stdout.lines.map(&:chomp)
         .select { it.start_with?("db/") && it.end_with?(".sqlite3") }
         .map { it.delete_prefix("db/") }
-      raise "No databases found in #{archive_path}" if names.empty?
+      raise t("errors.no_databases", archive: archive_path) if names.empty?
 
       names.map { workdir.join(it) }
     end
 
-    sig { params(answers: Answers, workdir: Pathname).void }
+    # Returns the answers so the execution flow keeps whatever seeding
+    # progress was persisted along the way.
+    sig { params(answers: Answers, workdir: Pathname).returns(Answers) }
     def seed_database_replicas(answers, workdir)
-      prompts.note("Seeding Litestream replicas from the restored databases...")
+      prompts.note(t("notes.seeding"))
       litestream_entries.each do |name, replica_path|
         db_path = workdir.join(name)
         next unless db_path.exist?
+        if answers.seeded_replica_paths.include?(replica_path)
+          prompts.note(t("notes.seeded_skip", name: name))
+          next
+        end
 
         seeder = LitestreamSeeder.new(
           db_path: db_path,
           replica_path: replica_path,
           s3: answers.litestream_s3
         )
-        if seeder.seeded?
-          prompts.note("Litestream replica for #{name} already seeded - skipping")
-          next
-        end
-
         seeder.call
-        prompts.note("Seeded #{name} to #{replica_path}")
+        prompts.note(t("notes.seeded", name: name, replica_path: replica_path))
+        answers = record_seeded(answers, replica_path)
       end
+      answers
+    end
+
+    # Persisted the moment the seed lands, so the skip above only ever
+    # trusts work this answers lineage performed - data some other
+    # deployment left in the bucket is always re-seeded, never mistaken
+    # for this backup's seed.
+    sig { params(answers: Answers, replica_path: String).returns(Answers) }
+    def record_seeded(answers, replica_path)
+      updated = answers.with(
+        seeded_replica_paths: answers.seeded_replica_paths + [replica_path]
+      )
+      store.save(updated)
+      updated
     end
 
     # Which databases the container restores, mirroring config/litestream.yml
@@ -396,26 +413,63 @@ module MagicContainer
       end
     end
 
-    sig { params(client: BunnyClient, answers: Answers).returns(String) }
+    # Returns the answers with the app id set, so the execution flow keeps
+    # whatever the attempt went as far as persisting.
+    sig { params(client: BunnyClient, answers: Answers).returns(Answers) }
     def find_or_create_app(client, answers)
       existing_id = answers.app_id
       if existing_id
-        prompts.note("Reusing app #{existing_id} created by a previous attempt")
-        return existing_id
+        prompts.note(t("notes.app_reused", id: existing_id))
+        return answers
       end
 
-      prompts.note("Creating the Magic Container app...")
-      app_id = client.create_application(
-        container: container_for(answers),
-        name: answers.app_name,
-        region: answers.region,
-        runtime_type: answers.runtime_type,
-        volume: answers.volume ? answers.volume_size_gb : nil
-      )
-      # Persisted at once so a failure after creation retries against the
-      # same app instead of leaving an orphan behind.
-      store.save(answers.with(app_id: app_id))
-      app_id
+      app_id = orphaned_app_id(client, answers)
+      if app_id
+        prompts.note(t("notes.orphan_reused", id: app_id))
+      else
+        prompts.note(t("notes.creating_app"))
+        app_id = client.create_application(
+          container: container_for(answers),
+          name: answers.app_name,
+          region: answers.region,
+          runtime_type: answers.runtime_type,
+          volume: answers.volume ? answers.volume_size_gb : nil
+        )
+      end
+      # Persisted at once so a failure after creating - or recovering - an
+      # app retries against the same id instead of duplicating it.
+      answers = answers.with(app_id: app_id)
+      store.save(answers)
+      answers
+    end
+
+    # Bunny only reveals an application's id in the create response; a
+    # create whose response never came back (network failure after Bunny
+    # built the app) leaves an orphan no retry can know by id. Apps already
+    # carrying this attempt's name are offered before another create can
+    # duplicate them.
+    sig { params(client: BunnyClient, answers: Answers).returns(T.nilable(String)) }
+    def orphaned_app_id(client, answers)
+      matches = client.applications.select { it["name"] == answers.app_name }
+      return if matches.empty?
+
+      if matches.one?
+        app_id = T.must(matches.first).fetch("id").to_s
+        return app_id if prompts.confirm(
+          t("questions.reuse_orphan", id: app_id, name: answers.app_name),
+          default: false
+        )
+
+        return nil
+      end
+
+      choices = matches.map do |app|
+        label = t("questions.orphan_choice", id: app.fetch("id"), name: app.fetch("name"))
+        [label, app.fetch("id").to_s]
+      end
+      choices.push([t("questions.orphan_create"), ""])
+      prompts.select(t("questions.orphan_select", name: answers.app_name), choices)
+        .presence
     end
 
     sig do
@@ -464,8 +518,12 @@ module MagicContainer
       image_ref.include?("/") ? image_ref.split("/", 2).last : image_ref
     end
 
-    # Returns the final public URL. When no BASE_URL was given, the URL the
-    # container answers on is pushed into the environment after deploy.
+    # Returns the final public URL. The container's environment is always
+    # replaced from the final answers before a restart: a reused app still
+    # runs whatever the failed attempt left behind, which can be a
+    # malformed RAILS_MASTER_KEY or a stale env from before the answers
+    # were corrected, and the running pod only picks a replaced
+    # environment up on restart.
     sig do
       params(
         client: BunnyClient,
@@ -474,17 +532,14 @@ module MagicContainer
       ).returns(String)
     end
     def container_url(client, app_id, answers)
-      prompts.note("Waiting for the container endpoint...")
+      prompts.note(t("notes.waiting_endpoint"))
       endpoint = await_endpoint(client, app_id)
-      url = "https://#{endpoint.fetch("publicHost")}"
-      return url if answers.base_url.present?
-
-      container_id = endpoint.fetch("containerId")
+      host = endpoint.fetch("publicHost")
+      url = answers.base_url.presence || "https://#{host}"
       env = EnvBuilder.build(answers.with(base_url: url)).to_h
-      client.replace_env(app_id, container_id, env)
-      # The running pod only picks the replaced environment up on restart.
+      client.replace_env(app_id, endpoint.fetch("containerId"), env)
       client.restart(app_id)
-      prompts.note("BASE_URL set to #{url}")
+      prompts.note(t("notes.base_url_set", url: url))
       url
     end
 
@@ -504,7 +559,7 @@ module MagicContainer
 
         sleep POLL_SECONDS
       end
-      raise "No container endpoint appeared for app #{app_id}"
+      raise t("errors.endpoint_missing", id: app_id)
     end
 
     sig do
@@ -516,16 +571,16 @@ module MagicContainer
       ).void
     end
     def report(answers, app_id, url, workdir)
-      prompts.banner("Deployed")
-      prompts.note("App: #{answers.app_name} (id #{app_id})")
-      prompts.note("URL: #{url}")
-      prompts.note("Working files kept in #{workdir}")
-      prompts.note("First boot restores databases via Litestream")
+      prompts.banner(t("banners.deployed"))
+      prompts.note(t("notes.report_app", app: answers.app_name, id: app_id))
+      prompts.note(t("notes.report_url", url: url))
+      prompts.note(t("notes.report_workdir", path: workdir))
+      prompts.note(t("notes.report_first_boot"))
       backup = answers.base_url.presence || url
-      prompts.note("BASE_URL is set to #{backup}")
+      prompts.note(t("notes.report_base_url", url: backup))
 
       env_path = save_env_file(answers, app_id)
-      prompts.note("Environment record saved to #{env_path}")
+      prompts.note(t("notes.env_saved", path: env_path))
     end
 
     sig { params(answers: Answers, app_id: String).returns(Pathname) }
@@ -541,6 +596,13 @@ module MagicContainer
       end
       FileUtils.chmod(0o600, path)
       path
+    end
+
+    sig do
+      params(key: String, values: T::Hash[Symbol, T.untyped]).returns(String)
+    end
+    def t(key, values = {})
+      I18n.t("magic_container.wizard.#{key}", **values)
     end
 
     sig { returns(Prompts) }

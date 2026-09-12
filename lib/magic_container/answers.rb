@@ -24,5 +24,9 @@ module MagicContainer
     # The Bunny app id once an attempt got as far as creating it, so a retried
     # attempt reuses the app instead of creating a duplicate.
     const :app_id, T.nilable(String), default: nil
+    # Replica paths this attempt has already pushed to Litestream, so a retry
+    # skips only work this answers lineage performed - never data some other
+    # deployment left in the replica.
+    const :seeded_replica_paths, T::Array[String], default: []
   end
 end
