@@ -3,24 +3,19 @@
 
 class BadgeBatchCsvExportService
   extend T::Sig
+  include CsvExport
 
   sig { params(badge_batch: BadgeBatch).void }
   def initialize(badge_batch)
     @badge_batch = badge_batch
   end
 
-  sig { returns(String) }
-  def generate
-    CSV.generate(headers: true) do |csv|
-      csv << headers
-
-      @badge_batch.badges.includes(:unit).order(:id).each do |badge|
-        csv << row_for_badge(badge)
-      end
-    end
-  end
-
   private
+
+  sig { returns(ActiveRecord::Relation) }
+  def records
+    @badge_batch.badges.includes(:unit).order(:id)
+  end
 
   sig { returns(T::Array[String]) }
   def headers
@@ -35,7 +30,7 @@ class BadgeBatchCsvExportService
   end
 
   sig { params(badge: Badge).returns(T::Array[String]) }
-  def row_for_badge(badge)
+  def row_for(badge)
     batch_creation_date = @badge_batch.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
     [

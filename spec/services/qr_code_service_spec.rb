@@ -27,12 +27,9 @@ RSpec.describe QrCodeService do
 
   shared_examples "generates QR code" do |record_type|
     let(:record) { send(record_type) }
-    let(:method_name) { :"generate_#{record_type}_qr_code" }
     let(:expected_url) { "#{base_url}/#{record_type}s/#{record.id}" }
 
-    it "delegates to correct method and returns QR code blob" do
-      expect(described_class).to receive(method_name)
-        .with(record).and_call_original
+    it "generates the record's report QR code blob" do
       expect(described_class).to receive(:generate_qr_code_from_url)
         .with(expected_url).and_call_original
 

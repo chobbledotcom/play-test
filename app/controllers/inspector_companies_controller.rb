@@ -31,7 +31,7 @@ class InspectorCompaniesController < ApplicationController
     @inspector_company = InspectorCompany.new(inspector_company_params)
 
     if @inspector_company.save
-      handle_create_success(@inspector_company)
+      handle_save_success(@inspector_company, :created)
     else
       handle_create_failure(@inspector_company)
     end
@@ -42,7 +42,7 @@ class InspectorCompaniesController < ApplicationController
 
   def update
     if @inspector_company.update(inspector_company_params)
-      handle_update_success(@inspector_company)
+      handle_save_success(@inspector_company, :updated)
     else
       handle_update_failure(@inspector_company)
     end

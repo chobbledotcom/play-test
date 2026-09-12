@@ -5,22 +5,16 @@ class ImageProcessorService
   THUMBNAIL_SIZE = 200
   DEFAULT_SIZE = 800
 
-  def self.thumbnail(image)
+  def self.thumbnail(image) = sized_variant(image, THUMBNAIL_SIZE)
+
+  def self.default(image) = sized_variant(image, DEFAULT_SIZE)
+
+  def self.sized_variant(image, size)
     return nil unless image&.attached?
 
     image.variant(
       format: :jpeg,
-      resize_to_limit: [THUMBNAIL_SIZE, THUMBNAIL_SIZE],
-      saver: {quality: 75}
-    )
-  end
-
-  def self.default(image)
-    return nil unless image&.attached?
-
-    image.variant(
-      format: :jpeg,
-      resize_to_limit: [DEFAULT_SIZE, DEFAULT_SIZE],
+      resize_to_limit: [size, size],
       saver: {quality: 75}
     )
   end

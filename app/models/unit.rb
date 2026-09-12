@@ -38,7 +38,9 @@ class Unit < ApplicationRecord
   # Virtual attribute for unit form only (operator moved to inspections)
   attribute :operator, :string
 
-  enum :unit_type, {
+  # Shared vocabulary for both unit_type and Inspection's inspection_type
+  # enum — one source of truth so the two can never drift (see NEW_UNIT_TYPES.md)
+  UNIT_TYPES = {
     bouncy_castle: "BOUNCY_CASTLE",
     bouncing_pillow: "BOUNCING_PILLOW",
     bungee_run: "BUNGEE_RUN",
@@ -47,7 +49,9 @@ class Unit < ApplicationRecord
     inflatable_game: "INFLATABLE_GAME",
     pat_testable: "PAT_TESTABLE",
     play_zone: "PLAY_ZONE"
-  }
+  }.freeze
+
+  enum :unit_type, UNIT_TYPES
 
   belongs_to :user
   has_many :inspections
@@ -60,15 +64,18 @@ class Unit < ApplicationRecord
   validate :photo_must_be_image
 
   # Callbacks
-  before_validation :normalize_id, on: :create, if: -> { unit_badges_enabled? }
-  before_create :generate_custom_id, unless: -> { unit_badges_enabled? }
+  before_validation :normalize_id, on: :create,
+    if: -> { Rails.configuration.units.badges_enabled }
+  before_create :generate_custom_id,
+    unless: -> { Rails.configuration.units.badges_enabled }
   after_update :invalidate_pdf_cache
   before_destroy :check_complete_inspections
   before_destroy :destroy_draft_inspections
 
   validates :description, :name, :serial, presence: true
   validates :serial, uniqueness: {scope: [:user_id]}
-  validate :badge_id_valid, on: :create, if: -> { unit_badges_enabled? }
+  validate :badge_id_valid, on: :create,
+    if: -> { Rails.configuration.units.badges_enabled }
 
   # Scopes - enhanced from original Equipment and new Unit functionality
   scope :seed_data, -> { where(is_seed: true) }
@@ -192,14 +199,6 @@ class Unit < ApplicationRecord
   private
 
   sig { void }
-  def check_for_complete_inspections
-    if complete_inspections.exists?
-      errors.add(:base, :has_complete_inspections)
-      throw(:abort)
-    end
-  end
-
-  sig { void }
   def photo_must_be_image
     return unless photo.attached?
 
@@ -218,11 +217,6 @@ class Unit < ApplicationRecord
     return if (changed_attrs - ignorable_attrs).empty?
 
     PdfCacheService.invalidate_unit_cache(self)
-  end
-
-  sig { returns(T::Boolean) }
-  def unit_badges_enabled?
-    Rails.configuration.units.badges_enabled
   end
 
   sig { void }

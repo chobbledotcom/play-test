@@ -22,12 +22,7 @@ module CustomIdGenerator
     sig { returns(String) }
     def generate_random_id
       loop do
-        raw_id = SecureRandom.alphanumeric(32).upcase
-        filtered_chars = raw_id.chars.reject do |char|
-          AMBIGUOUS_CHARS.include?(char)
-        end
-        id = filtered_chars.first(ID_LENGTH).join
-        next if id.length < ID_LENGTH
+        id = generate_single_id_string
         break id unless exists?(id: id)
       end
     end
@@ -57,13 +52,20 @@ module CustomIdGenerator
     sig { returns(String) }
     def generate_single_id_string
       loop do
-        raw_id = SecureRandom.alphanumeric(32).upcase
-        filtered_chars = raw_id.chars.reject do |char|
-          AMBIGUOUS_CHARS.include?(char)
-        end
-        id = filtered_chars.first(ID_LENGTH).join
+        id = candidate_id_chars
         return id if id.length == ID_LENGTH
       end
+    end
+
+    private
+
+    sig { returns(String) }
+    def candidate_id_chars
+      raw_id = SecureRandom.alphanumeric(32).upcase
+      raw_id.chars
+        .reject { |char| AMBIGUOUS_CHARS.include?(char) }
+        .first(ID_LENGTH)
+        .join
     end
   end
 

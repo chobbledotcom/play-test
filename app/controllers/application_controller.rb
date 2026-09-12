@@ -256,4 +256,30 @@ class ApplicationController < ActionController::Base
         disposition: "inline"
     end
   end
+
+  sig { void }
+  def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
+
+  # Wrap show-page record loading in PDF performance measurement, but only
+  # for PDF requests — HTML requests skip the instrumentation entirely
+  sig do
+    params(
+      pdf_type: Symbol,
+      record_id: T.nilable(String),
+      query: T.untyped
+    ).returns(T.untyped)
+  end
+  def find_by_id_with_pdf_measurement(pdf_type, record_id, query)
+    if request.format.pdf?
+      PdfPerformance.measure(
+        :record_load,
+        pdf_type: pdf_type,
+        record_id: record_id
+      ) do
+        query.find_by(id: record_id)
+      end
+    else
+      query.find_by(id: record_id)
+    end
+  end
 end

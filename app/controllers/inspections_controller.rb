@@ -9,6 +9,7 @@ class InspectionsController < ApplicationController
     store: RATE_LIMIT_STORE, name: "public-report"
 
   include ChangeTracking
+  include EventLogging
   include InspectionTurboStreams
   include PublicViewable
   include UserActivityCheck
@@ -260,16 +261,11 @@ class InspectionsController < ApplicationController
   end
 
   def check_unit_badges_for_create
-    return unless unit_badges_enabled?
+    return unless Rails.configuration.units.badges_enabled
     return if params[:unit_id].present?
 
     flash[:alert] = t("inspections.errors.direct_creation_disabled")
     redirect_to new_inspection_from_unit_path
-  end
-
-  sig { returns(T::Boolean) }
-  def unit_badges_enabled?
-    Rails.configuration.units.badges_enabled
   end
 
   def partition_inspections(all_inspections)
@@ -312,21 +308,11 @@ class InspectionsController < ApplicationController
     updated_at
   ].freeze
 
-  # Build safe mappings from Inspection::ALL_ASSESSMENT_TYPES
-  # This ensures mappings stay in sync with the model definition
-  ASSESSMENT_TAB_MAPPING = Inspection::ALL_ASSESSMENT_TYPES
-    .each_with_object({}) do |(method_name, _), hash|
-    # Convert :user_height_assessment to "user_height"
-    tab_name = method_name.to_s.gsub(/_assessment$/, "")
-    hash[tab_name] = method_name
-  end.freeze
-
-  ASSESSMENT_CLASS_MAPPING = Inspection::ALL_ASSESSMENT_TYPES
-    .each_with_object({}) do |(method_name, klass), hash|
-    # Convert :user_height_assessment to "user_height"
-    tab_name = method_name.to_s.gsub(/_assessment$/, "")
-    hash[tab_name] = klass
-  end.freeze
+  # Build safe tab mapping from Inspection::ALL_ASSESSMENT_TYPES
+  # This ensures the mapping stays in sync with the model definition
+  ASSESSMENT_TAB_MAPPING = Inspection::ALL_ASSESSMENT_TYPES.keys
+    .index_by { |method_name| method_name.to_s.delete_suffix("_assessment") }
+    .freeze
 
   def build_base_params
     params.require(:inspection).permit(*Inspection::USER_EDITABLE_PARAMS)
@@ -355,8 +341,6 @@ class InspectionsController < ApplicationController
     .filter_by_unit(params[:unit_id])
     .filter_by_operator(params[:operator])
 
-  def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
-
   def set_inspection
     inspection_query = Inspection
       .includes(
@@ -369,25 +353,15 @@ class InspectionsController < ApplicationController
       )
     inspection_id = params[:id]&.upcase
 
-    @inspection = if request.format.pdf?
-      PdfPerformance.measure(
-        :record_load,
-        pdf_type: :inspection,
-        record_id: inspection_id
-      ) do
-        inspection_query.find_by(id: inspection_id)
-      end
-    else
-      inspection_query.find_by(id: inspection_id)
-    end
+    @inspection = find_by_id_with_pdf_measurement(
+      :inspection, inspection_id, inspection_query
+    )
 
     head :not_found unless @inspection
   end
 
   def check_inspection_owner
-    return if current_user && @inspection.user_id == current_user.id
-
-    head :not_found
+    head :not_found unless owns_resource?
   end
 
   def redirect_if_complete
@@ -412,7 +386,7 @@ class InspectionsController < ApplicationController
   def validate_unit_ownership
     return unless inspection_params[:unit_id]
 
-    unit = if unit_badges_enabled?
+    unit = if Rails.configuration.units.badges_enabled
       Unit.find_by(id: inspection_params[:unit_id])
     else
       current_user.units.find_by(id: inspection_params[:unit_id])
@@ -484,15 +458,7 @@ class InspectionsController < ApplicationController
     check_inspection_owner
   end
 
-  def owns_resource?
-    @inspection && current_user && @inspection.user_id == current_user.id
-  end
-
-  def pdf_filename
-    prefix = Rails.configuration.units.pdf_filename_prefix
-    type_name = I18n.t("inspections.export.pdf_type")
-    "#{prefix}#{type_name}-#{@inspection.id}.pdf"
-  end
+  def viewable_resource = @inspection
 
   def qr_code_filename
     identifier = @inspection.unit&.serial || @inspection.id
@@ -562,7 +528,7 @@ class InspectionsController < ApplicationController
       [@inspection, @previous_inspection, results_fields]
     else
       assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
-      assessment_class = ASSESSMENT_CLASS_MAPPING[params[:tab]]
+      assessment_class = Inspection::ALL_ASSESSMENT_TYPES[assessment_method]
       [
         @inspection.public_send(assessment_method),
         @previous_inspection.public_send(assessment_method),
@@ -592,33 +558,7 @@ class InspectionsController < ApplicationController
   end
 
   def log_inspection_event(action, inspection, details = nil, changed_data = nil)
-    return unless current_user
-
-    if inspection
-      log_inspection_with_resource(action, inspection, details, changed_data)
-    else
-      log_inspection_system_event(action, details)
-    end
-  rescue => e
-    Rails.logger.error "Failed to log inspection event: #{e.message}"
-  end
-
-  def log_inspection_with_resource(action, inspection, details, changed_data)
-    Event.log(
-      user: current_user,
-      action: action,
-      resource: inspection,
-      details: details,
-      changed_data: changed_data
-    )
-  end
-
-  def log_inspection_system_event(action, details)
-    Event.log_system_event(
-      user: current_user,
-      action: action,
-      details: details,
-      metadata: {resource_type: "Inspection"}
-    )
+    log_event(action, inspection, resource_type: "Inspection",
+      details: details, changed_data: changed_data)
   end
 end

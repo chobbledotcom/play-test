@@ -48,10 +48,18 @@ module PublicViewable
     raise NotImplementedError
   end
 
-  # Determine if current user owns the resource
+  # The record this controller exposes to the public viewer
+  # (e.g. @inspection or @unit)
+  sig { returns(T.nilable(ActiveRecord::Base)) }
+  def viewable_resource
+    raise NotImplementedError
+  end
+
+  # Determine if current user owns the viewable resource
   sig { returns(T::Boolean) }
   def owns_resource?
-    raise NotImplementedError
+    resource = viewable_resource
+    !resource.nil? && logged_in? && resource.user_id == current_user.id
   end
 
   # Render appropriate view for show action
@@ -66,10 +74,12 @@ module PublicViewable
     # Otherwise render normal view for owners (no explicit render needed)
   end
 
-  # To be implemented by including controllers
   sig { returns(String) }
   def pdf_filename
-    raise NotImplementedError
+    resource = T.must(viewable_resource)
+    prefix = Rails.configuration.units.pdf_filename_prefix
+    type_name = I18n.t("#{controller_name}.export.pdf_type")
+    "#{prefix}#{type_name}-#{resource.id}.pdf"
   end
 
   sig { returns(String) }

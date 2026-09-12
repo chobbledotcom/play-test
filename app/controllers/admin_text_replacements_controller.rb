@@ -42,10 +42,11 @@ class AdminTextReplacementsController < ApplicationController
 
   def update
     if @text_replacement.update(text_replacement_params)
-      handle_update_success(
+      handle_save_success(
         @text_replacement,
-        "admin_text_replacements.messages.updated",
-        admin_text_replacements_path
+        :updated,
+        message_key: "admin_text_replacements.messages.updated",
+        redirect_path: admin_text_replacements_path
       )
     else
       @available_keys = TextReplacement.available_i18n_keys

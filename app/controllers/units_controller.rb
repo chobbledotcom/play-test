@@ -87,7 +87,7 @@ class UnitsController < ApplicationController
 
     if @unit.save
       log_unit_event("created", @unit)
-      handle_create_success(@unit)
+      handle_save_success(@unit, :created)
     else
       handle_create_failure(@unit)
     end
@@ -101,7 +101,8 @@ class UnitsController < ApplicationController
     previous_attributes = @unit.attributes.dup
     if @unit.update(unit_params)
       log_unit_changes(previous_attributes)
-      handle_update_success(@unit, nil, nil, additional_streams: photo_turbo_streams)
+      handle_save_success(@unit, :updated,
+        additional_streams: photo_turbo_streams)
     else
       handle_update_failure(@unit)
     end
@@ -154,7 +155,7 @@ class UnitsController < ApplicationController
   private
 
   def validate_badge_id_param
-    return unless unit_badges_enabled?
+    return unless Rails.configuration.units.badges_enabled
 
     id_param = extract_badge_id_param
     return if id_param.blank?
@@ -167,15 +168,8 @@ class UnitsController < ApplicationController
   end
 
   def log_unit_event(action, unit, details = nil, changed_data = nil)
-    return unless current_user
-
-    if unit
-      log_resource_event(action, unit, details, changed_data)
-    else
-      log_system_unit_event(action, details)
-    end
-  rescue => e
-    log_event_error(e)
+    log_event(action, unit, resource_type: "Unit",
+      details: details, changed_data: changed_data)
   end
 
   def unit_params
@@ -184,34 +178,17 @@ class UnitsController < ApplicationController
     process_image_params(permitted_params, :photo)
   end
 
-  sig { returns(T::Boolean) }
-  def unit_badges_enabled?
-    Rails.configuration.units.badges_enabled
-  end
-
   sig { params(raw_id: String).returns(String) }
   def normalize_unit_id(raw_id)
     raw_id.gsub(/\s+/, "").upcase[0, 8]
   end
-
-  def no_index = response.set_header("X-Robots-Tag", "noindex,nofollow")
 
   sig { void }
   def set_unit
     unit_id = params[:id].upcase
     unit_query = Unit.includes(photo_attachment: :blob)
 
-    @unit = if request.format.pdf?
-      PdfPerformance.measure(
-        :record_load,
-        pdf_type: :unit,
-        record_id: unit_id
-      ) do
-        unit_query.find_by(id: unit_id)
-      end
-    else
-      unit_query.find_by(id: unit_id)
-    end
+    @unit = find_by_id_with_pdf_measurement(:unit, unit_id, unit_query)
 
     unless @unit
       # Always return 404 for non-existent resources regardless of login status
@@ -262,15 +239,7 @@ class UnitsController < ApplicationController
     check_unit_owner
   end
 
-  def owns_resource?
-    @unit && current_user && @unit.user_id == current_user.id
-  end
-
-  def pdf_filename
-    prefix = Rails.configuration.units.pdf_filename_prefix
-    type_name = I18n.t("units.export.pdf_type")
-    "#{prefix}#{type_name}-#{@unit.id}.pdf"
-  end
+  def viewable_resource = @unit
 
   def resource_pdf_url
     unit_path(@unit, format: :pdf)
@@ -399,29 +368,6 @@ class UnitsController < ApplicationController
     redirect_to Unit.find(normalized_id)
   end
 
-  def log_resource_event(action, unit, details, changed_data)
-    Event.log(
-      user: current_user,
-      action: action,
-      resource: unit,
-      details: details,
-      changed_data: changed_data
-    )
-  end
-
-  def log_system_unit_event(action, details)
-    Event.log_system_event(
-      user: current_user,
-      action: action,
-      details: details,
-      metadata: {resource_type: "Unit"}
-    )
-  end
-
-  def log_event_error(error)
-    Rails.logger.error I18n.t("units.errors.log_failed", message: error.message)
-  end
-
   def build_unit_permitted_fields
     fields = %i[
       description
@@ -439,6 +385,6 @@ class UnitsController < ApplicationController
 
   def allow_badge_id_in_params?
     create_actions = %w[create create_from_inspection]
-    unit_badges_enabled? && create_actions.include?(action_name)
+    Rails.configuration.units.badges_enabled && create_actions.include?(action_name)
   end
 end

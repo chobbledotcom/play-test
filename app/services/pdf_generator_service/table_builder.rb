@@ -24,10 +24,14 @@ class PdfGeneratorService
       table
     end
 
-    def self.create_nice_box_table(pdf, title, data)
+    def self.render_table_header(pdf, title)
       pdf.text title, size: HEADER_TEXT_SIZE, style: :bold
       pdf.stroke_horizontal_rule
       pdf.move_down 10
+    end
+
+    def self.create_nice_box_table(pdf, title, data)
+      render_table_header(pdf, title)
 
       table = pdf.table(data, width: pdf.bounds.width) do |t|
         t.cells.padding = NICE_TABLE_CELL_PADDING
@@ -41,9 +45,7 @@ class PdfGeneratorService
     end
 
     def self.create_unit_details_table(pdf, title, data)
-      pdf.text title, size: HEADER_TEXT_SIZE, style: :bold
-      pdf.stroke_horizontal_rule
-      pdf.move_down 10
+      render_table_header(pdf, title)
 
       table = create_styled_unit_table(pdf, data)
       yield table if block_given?
@@ -95,9 +97,7 @@ class PdfGeneratorService
     end
 
     def self.create_inspection_history_table(pdf, title, inspections)
-      pdf.text title, size: HEADER_TEXT_SIZE, style: :bold
-      pdf.stroke_horizontal_rule
-      pdf.move_down 10
+      render_table_header(pdf, title)
 
       table_data = build_inspection_history_data(inspections)
       table = create_styled_history_table(pdf, table_data)

@@ -36,7 +36,7 @@ class PagesController < ApplicationController
   def create
     @page = Page.new(page_params)
     if @page.save
-      handle_create_success(@page)
+      handle_save_success(@page, :created)
     else
       handle_create_failure(@page)
     end
@@ -47,7 +47,7 @@ class PagesController < ApplicationController
 
   def update
     if @page.update(page_params)
-      handle_update_success(@page)
+      handle_save_success(@page, :updated)
     else
       handle_update_failure(@page)
     end

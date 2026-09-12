@@ -6,6 +6,7 @@ require "csv"
 
 class InspectionCsvExportService
   extend T::Sig
+  include CsvExport
 
   sig do
     params(
@@ -19,20 +20,14 @@ class InspectionCsvExportService
     @inspections = inspections
   end
 
-  sig { returns(String) }
-  def generate
-    CSV.generate(headers: true) do |csv|
-      csv << headers
-
-      @inspections.each do |inspection|
-        csv << row_data(inspection)
-      end
-    end
-  end
-
   private
 
-  sig { returns(T::Array[String]) }
+  sig { returns(T.untyped) }
+  def records
+    @inspections
+  end
+
+  sig { returns(T::Array[Symbol]) }
   def headers
     excluded_columns = %i[user_id inspector_company_id unit_id]
     inspection_columns = Inspection.column_name_syms - excluded_columns
@@ -47,7 +42,7 @@ class InspectionCsvExportService
   end
 
   sig { params(inspection: Inspection).returns(T::Array[T.untyped]) }
-  def row_data(inspection)
+  def row_for(inspection)
     headers.map do |header|
       case header
       in :unit_name then inspection.unit&.name
