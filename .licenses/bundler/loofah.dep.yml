@@ -1,6 +1,6 @@
 ---
 name: loofah
-version: 2.25.0
+version: 2.25.2
 type: bundler
 summary: Loofah is a general library for manipulating and transforming HTML/XML documents
   and fragments, built on top of Nokogiri.

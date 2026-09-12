@@ -1,6 +1,6 @@
 ---
 name: actiontext
-version: 8.1.2
+version: 8.1.3.1
 type: bundler
 summary: Rich text framework.
 homepage: https://rubyonrails.org

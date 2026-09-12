@@ -1,6 +1,6 @@
 ---
 name: crass
-version: 1.0.6
+version: 1.0.7
 type: bundler
 summary: CSS parser based on the CSS Syntax Level 3 spec.
 homepage: https://github.com/rgrove/crass/
@@ -8,7 +8,7 @@ license: mit
 licenses:
 - sources: LICENSE
   text: |
-    Copyright (c) 2020 Ryan Grove (ryan@wonko.com)
+    Copyright Ryan Grove <ryan@wonko.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the ‘Software’), to deal in
