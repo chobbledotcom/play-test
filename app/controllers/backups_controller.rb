@@ -76,8 +76,9 @@ class BackupsController < ApplicationController
   end
 
   def build_backup_list(bucket)
+    prefix = BackupOperations::S3_ARCHIVE_PREFIX
     backups = []
-    bucket.objects(prefix: "db_backups/").each do |object|
+    bucket.objects(prefix: prefix).each do |object|
       next unless valid_backup_filename?(object.key)
 
       backups << build_backup_info(object)
@@ -86,7 +87,7 @@ class BackupsController < ApplicationController
   end
 
   def valid_backup_filename?(key)
-    key.match?(/database-\d{4}-\d{2}-\d{2}\.tar\.gz$/)
+    key.match?(/backup-\d{4}-\d{2}-\d{2}\.tar\.gz$/)
   end
 
   def build_backup_info(object)
@@ -117,6 +118,7 @@ class BackupsController < ApplicationController
   end
 
   def build_backup_key(date)
-    "db_backups/database-#{date}.tar.gz"
+    prefix = BackupOperations::S3_ARCHIVE_PREFIX
+    "#{prefix}backup-#{date}.tar.gz"
   end
 end

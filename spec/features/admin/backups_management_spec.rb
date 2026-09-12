@@ -46,16 +46,16 @@ RSpec.feature "Backups Management", type: :feature do
 
     # Mock S3 objects
     backup1 = double("backup1",
-      key: "db_backups/database-2024-01-15.tar.gz",
+      key: "full_backups/backup-2024-01-15.tar.gz",
       size: 5_242_880, # 5MB
       last_modified: Time.zone.parse("2024-01-15 10:00:00"))
 
     backup2 = double("backup2",
-      key: "db_backups/database-2024-01-14.tar.gz",
+      key: "full_backups/backup-2024-01-14.tar.gz",
       size: 4_194_304, # 4MB
       last_modified: Time.zone.parse("2024-01-14 10:00:00"))
 
-    prefix = "db_backups/"
+    prefix = "full_backups/"
     allow(bucket).to receive(:objects).with(prefix: prefix)
       .and_return([backup1, backup2])
 
@@ -65,12 +65,12 @@ RSpec.feature "Backups Management", type: :feature do
     click_link I18n.t("navigation.backups")
 
     expect(page).to have_content(I18n.t("backups.title"))
-    expect(page).to have_content("database-2024-01-15.tar.gz")
+    expect(page).to have_content("backup-2024-01-15.tar.gz")
     expect(page).to have_content("5.0 MB")
-    expect(page).to have_content("database-2024-01-14.tar.gz")
+    expect(page).to have_content("backup-2024-01-14.tar.gz")
     expect(page).to have_content("4.0 MB")
-    expect(page).to have_link("database-2024-01-15.tar.gz")
-    expect(page).to have_link("database-2024-01-14.tar.gz")
+    expect(page).to have_link("backup-2024-01-15.tar.gz")
+    expect(page).to have_link("backup-2024-01-14.tar.gz")
   end
 
   scenario "regular user cannot access backups page" do
