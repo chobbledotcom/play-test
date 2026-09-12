@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -e
+# Report test failures, not filter_output/sed exit codes, from the pipelines below
+set -o pipefail
 
 # Colors for output
 RED='\033[0;31m'
