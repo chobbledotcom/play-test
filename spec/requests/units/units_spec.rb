@@ -423,8 +423,10 @@ RSpec.describe "Units", type: :request do
       end
       path = units_path
       start = Queue.new
+      ready = Queue.new
       threads = requests.map do |request|
         Thread.new do
+          ready << true
           start.pop
           ActiveRecord::Base.connection_pool.with_connection do
             request.get path
@@ -432,6 +434,7 @@ RSpec.describe "Units", type: :request do
           end
         end
       end
+      5.times { ready.pop }
       5.times { start << true }
       aggregate_failures "request threads" do
         threads.each { |thread| expect { thread.join }.not_to raise_error }

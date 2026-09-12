@@ -7,6 +7,7 @@ module LoginHelpers
     post "/login", params: {session: {email: user.email, password: user.password}}
   end
 
+  # Browser callers create fixtures next, so authentication must finish first.
   def login_user_via_form(user)
     visit login_path
     fill_in_form(:session_new, :email, user.email)
