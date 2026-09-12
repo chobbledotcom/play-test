@@ -12,14 +12,10 @@ module LoginHelpers
     fill_in_form(:session_new, :email, user.email)
     fill_in_form(:session_new, :password, user.password)
     submit_form(:session_new)
+    expect(page).to have_button(I18n.t("sessions.buttons.log_out"))
   end
 
-  def sign_in(user)
-    visit login_path
-    fill_in_form(:session_new, :email, user.email)
-    fill_in_form(:session_new, :password, user.password)
-    submit_form(:session_new)
-  end
+  alias_method :sign_in, :login_user_via_form
 
   def create_and_login_user(attributes = {})
     user = create(:user, attributes)

@@ -16,7 +16,7 @@ if [[ -z "$format_args" ]]; then
 fi
 
 # Run tests
-DISABLE_SIMPLECOV=true IN_MEMORY_DB=true bundle exec parallel_rspec \
+DISABLE_SIMPLECOV=true bundle exec parallel_rspec \
   --fail-fast \
   --test-options "--fail-fast $format_args" \
   "$@" 2>&1 | \

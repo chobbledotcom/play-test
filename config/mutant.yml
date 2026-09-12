@@ -5,6 +5,7 @@ integration:
 requires:
 - ./config/environment
 environment_variables:
+  IN_MEMORY_DB: "true"
   RAILS_ENV: test
 matcher:
   subjects:
