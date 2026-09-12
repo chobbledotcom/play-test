@@ -8,29 +8,8 @@ class QrCodeService
   def self.generate_qr_code(record)
     require "rqrcode"
 
-    # Create QR code for the report URL using the shorter format
-    if record.is_a?(Inspection)
-      generate_inspection_qr_code(record)
-    elsif record.is_a?(Unit)
-      generate_unit_qr_code(record)
-    end
-  end
-
-  sig { params(inspection: Inspection).returns(String) }
-  def self.generate_inspection_qr_code(inspection)
-    require "rqrcode"
-
     base_url = T.must(Rails.configuration.app.base_url)
-    url = "#{base_url}/inspections/#{inspection.id}"
-    generate_qr_code_from_url(url)
-  end
-
-  sig { params(unit: Unit).returns(String) }
-  def self.generate_unit_qr_code(unit)
-    require "rqrcode"
-
-    base_url = T.must(Rails.configuration.app.base_url)
-    url = "#{base_url}/units/#{unit.id}"
+    url = "#{base_url}/#{record.model_name.route_key}/#{record.id}"
     generate_qr_code_from_url(url)
   end
 

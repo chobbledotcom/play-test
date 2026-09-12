@@ -52,84 +52,64 @@ class Inspection < ApplicationRecord
 
   PASS_FAIL_NA = {fail: 0, pass: 1, na: 2}.freeze
 
-  enum :inspection_type, {
-    bouncy_castle: "BOUNCY_CASTLE",
-    bouncing_pillow: "BOUNCING_PILLOW",
-    bungee_run: "BUNGEE_RUN",
-    catch_bed: "CATCH_BED",
-    inflatable_ball_pool: "INFLATABLE_BALL_POOL",
-    inflatable_game: "INFLATABLE_GAME",
-    pat_testable: "PAT_TESTABLE",
-    play_zone: "PLAY_ZONE"
-  }
+  enum :inspection_type, Unit::UNIT_TYPES
 
-  CASTLE_ASSESSMENT_TYPES = {
-    user_height_assessment: Assessments::UserHeightAssessment,
-    slide_assessment: Assessments::SlideAssessment,
-    structure_assessment: Assessments::StructureAssessment,
-    anchorage_assessment: Assessments::AnchorageAssessment,
-    materials_assessment: Assessments::MaterialsAssessment,
-    enclosed_assessment: Assessments::EnclosedAssessment,
-    fan_assessment: Assessments::FanAssessment
-  }.freeze
-
-  PILLOW_ASSESSMENT_TYPES = {
-    fan_assessment: Assessments::FanAssessment
-  }.freeze
-
-  PAT_TESTABLE_ASSESSMENT_TYPES = {
-    pat_assessment: Assessments::PatAssessment
-  }.freeze
-
-  INFLATABLE_BALL_POOL_ASSESSMENT_TYPES = {
-    structure_assessment: Assessments::StructureAssessment,
-    materials_assessment: Assessments::MaterialsAssessment,
-    fan_assessment: Assessments::FanAssessment,
-    ball_pool_assessment: Assessments::BallPoolAssessment
-  }.freeze
-
-  INFLATABLE_GAME_ASSESSMENT_TYPES = {
-    structure_assessment: Assessments::StructureAssessment,
-    materials_assessment: Assessments::MaterialsAssessment,
-    fan_assessment: Assessments::FanAssessment,
-    inflatable_game_assessment:
-      Assessments::InflatableGameAssessment
-  }.freeze
-
-  CATCH_BED_ASSESSMENT_TYPES = {
-    structure_assessment: Assessments::StructureAssessment,
-    materials_assessment: Assessments::MaterialsAssessment,
-    fan_assessment: Assessments::FanAssessment,
-    anchorage_assessment: Assessments::AnchorageAssessment,
-    catch_bed_assessment: Assessments::CatchBedAssessment
-  }.freeze
-
-  BUNGEE_RUN_ASSESSMENT_TYPES = {
-    structure_assessment: Assessments::StructureAssessment,
-    materials_assessment: Assessments::MaterialsAssessment,
-    fan_assessment: Assessments::FanAssessment,
-    anchorage_assessment: Assessments::AnchorageAssessment,
-    bungee_assessment: Assessments::BungeeAssessment
-  }.freeze
-
-  PLAY_ZONE_ASSESSMENT_TYPES = {
-    structure_assessment: Assessments::StructureAssessment,
-    materials_assessment: Assessments::MaterialsAssessment,
-    fan_assessment: Assessments::FanAssessment,
-    user_height_assessment: Assessments::UserHeightAssessment,
-    slide_assessment: Assessments::SlideAssessment,
-    play_zone_assessment: Assessments::PlayZoneAssessment
+  # One registry of the assessments each unit type carries. Kept in the
+  # original merge order so ALL_ASSESSMENT_TYPES below is unchanged.
+  UNIT_TYPE_ASSESSMENT_TYPES = {
+    bouncy_castle: {
+      user_height_assessment: Assessments::UserHeightAssessment,
+      slide_assessment: Assessments::SlideAssessment,
+      structure_assessment: Assessments::StructureAssessment,
+      anchorage_assessment: Assessments::AnchorageAssessment,
+      materials_assessment: Assessments::MaterialsAssessment,
+      enclosed_assessment: Assessments::EnclosedAssessment,
+      fan_assessment: Assessments::FanAssessment
+    },
+    bouncing_pillow: {
+      fan_assessment: Assessments::FanAssessment
+    },
+    pat_testable: {
+      pat_assessment: Assessments::PatAssessment
+    },
+    inflatable_ball_pool: {
+      structure_assessment: Assessments::StructureAssessment,
+      materials_assessment: Assessments::MaterialsAssessment,
+      fan_assessment: Assessments::FanAssessment,
+      ball_pool_assessment: Assessments::BallPoolAssessment
+    },
+    inflatable_game: {
+      structure_assessment: Assessments::StructureAssessment,
+      materials_assessment: Assessments::MaterialsAssessment,
+      fan_assessment: Assessments::FanAssessment,
+      inflatable_game_assessment: Assessments::InflatableGameAssessment
+    },
+    catch_bed: {
+      structure_assessment: Assessments::StructureAssessment,
+      materials_assessment: Assessments::MaterialsAssessment,
+      fan_assessment: Assessments::FanAssessment,
+      anchorage_assessment: Assessments::AnchorageAssessment,
+      catch_bed_assessment: Assessments::CatchBedAssessment
+    },
+    bungee_run: {
+      structure_assessment: Assessments::StructureAssessment,
+      materials_assessment: Assessments::MaterialsAssessment,
+      fan_assessment: Assessments::FanAssessment,
+      anchorage_assessment: Assessments::AnchorageAssessment,
+      bungee_assessment: Assessments::BungeeAssessment
+    },
+    play_zone: {
+      structure_assessment: Assessments::StructureAssessment,
+      materials_assessment: Assessments::MaterialsAssessment,
+      fan_assessment: Assessments::FanAssessment,
+      user_height_assessment: Assessments::UserHeightAssessment,
+      slide_assessment: Assessments::SlideAssessment,
+      play_zone_assessment: Assessments::PlayZoneAssessment
+    }
   }.freeze
 
   ALL_ASSESSMENT_TYPES =
-    CASTLE_ASSESSMENT_TYPES
-      .merge(PILLOW_ASSESSMENT_TYPES)
-      .merge(PAT_TESTABLE_ASSESSMENT_TYPES)
-      .merge(INFLATABLE_BALL_POOL_ASSESSMENT_TYPES)
-      .merge(INFLATABLE_GAME_ASSESSMENT_TYPES)
-      .merge(CATCH_BED_ASSESSMENT_TYPES)
-      .merge(BUNGEE_RUN_ASSESSMENT_TYPES)
-      .merge(PLAY_ZONE_ASSESSMENT_TYPES).freeze
+    UNIT_TYPE_ASSESSMENT_TYPES.values.reduce(:merge).freeze
 
   USER_EDITABLE_PARAMS = %i[
     has_slide
@@ -286,21 +266,10 @@ class Inspection < ApplicationRecord
     complete_date.present?
   end
 
-  ASSESSMENT_TYPES_BY_INSPECTION_TYPE = {
-    bouncy_castle: CASTLE_ASSESSMENT_TYPES,
-    bouncing_pillow: PILLOW_ASSESSMENT_TYPES,
-    bungee_run: BUNGEE_RUN_ASSESSMENT_TYPES,
-    catch_bed: CATCH_BED_ASSESSMENT_TYPES,
-    inflatable_ball_pool: INFLATABLE_BALL_POOL_ASSESSMENT_TYPES,
-    inflatable_game: INFLATABLE_GAME_ASSESSMENT_TYPES,
-    pat_testable: PAT_TESTABLE_ASSESSMENT_TYPES,
-    play_zone: PLAY_ZONE_ASSESSMENT_TYPES
-  }.freeze
-
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def assessment_types
-    ASSESSMENT_TYPES_BY_INSPECTION_TYPE.fetch(
-      inspection_type.to_sym, CASTLE_ASSESSMENT_TYPES
+    UNIT_TYPE_ASSESSMENT_TYPES.fetch(
+      inspection_type.to_sym, UNIT_TYPE_ASSESSMENT_TYPES[:bouncy_castle]
     )
   end
 
@@ -318,7 +287,7 @@ class Inspection < ApplicationRecord
 
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def castle_applicable_assessments
-    CASTLE_ASSESSMENT_TYPES.select do |assessment_key, _|
+    UNIT_TYPE_ASSESSMENT_TYPES[:bouncy_castle].select do |assessment_key, _|
       case assessment_key
       when :slide_assessment
         has_slide?
@@ -334,7 +303,7 @@ class Inspection < ApplicationRecord
 
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def play_zone_applicable_assessments
-    PLAY_ZONE_ASSESSMENT_TYPES.select do |assessment_key, _|
+    UNIT_TYPE_ASSESSMENT_TYPES[:play_zone].select do |assessment_key, _|
       case assessment_key
       when :slide_assessment then has_slide?
       else true

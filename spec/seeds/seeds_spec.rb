@@ -8,7 +8,7 @@ RSpec.describe "Seed Data", type: :model do
     before(:all) do
       # Clear all data first
       # Clear assessments using the hash
-      Inspection::CASTLE_ASSESSMENT_TYPES.each_value do |assessment_class|
+      Inspection::UNIT_TYPE_ASSESSMENT_TYPES[:bouncy_castle].each_value do |assessment_class|
         assessment_class.destroy_all
       end
 
@@ -242,7 +242,7 @@ RSpec.describe "Seed Data", type: :model do
       let(:complete_inspections) { Inspection.where.not(complete_date: nil) }
 
       # Test each assessment type dynamically
-      Inspection::CASTLE_ASSESSMENT_TYPES.each do |assessment_key, assessment_class|
+      Inspection::UNIT_TYPE_ASSESSMENT_TYPES[:bouncy_castle].each do |assessment_key, assessment_class|
         it "creates #{assessment_key} assessments for complete inspections" do
           complete_inspections.each do |inspection|
             assessment = inspection.send(assessment_key)
@@ -504,7 +504,7 @@ RSpec.describe "Seed Data", type: :model do
           Unit.includes(:user, :inspections).all
 
           # Build includes list dynamically from ASSESSMENT_TYPES
-          assessment_associations = Inspection::CASTLE_ASSESSMENT_TYPES.keys
+          assessment_associations = Inspection::UNIT_TYPE_ASSESSMENT_TYPES[:bouncy_castle].keys
           Inspection.includes(:user, :unit, :inspector_company, *assessment_associations).all
         }.not_to raise_error
       end
@@ -542,7 +542,7 @@ RSpec.describe "Seed Data", type: :model do
         base_models = [InspectorCompany, User, Unit, Inspection]
 
         # Add assessment models from the hash
-        assessment_models = Inspection::CASTLE_ASSESSMENT_TYPES.values
+        assessment_models = Inspection::UNIT_TYPE_ASSESSMENT_TYPES[:bouncy_castle].values
 
         (base_models + assessment_models).each do |model_class|
           model_class.all.find_each do |record|
@@ -561,7 +561,7 @@ RSpec.describe "Seed Data", type: :model do
           Inspection.all.find_each(&:validate!)
 
           # Validate assessments using the hash
-          Inspection::CASTLE_ASSESSMENT_TYPES.each_value do |assessment_class|
+          Inspection::UNIT_TYPE_ASSESSMENT_TYPES[:bouncy_castle].each_value do |assessment_class|
             assessment_class.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each(&:validate!)
           end
         }.not_to raise_error
@@ -600,7 +600,7 @@ RSpec.describe "Seed Data", type: :model do
       it "ensures assessment data consistency with inspection results" do
         # Test that inspections and assessments are properly linked
         Inspection.where.not(complete_date: nil).find_each do |inspection|
-          Inspection::CASTLE_ASSESSMENT_TYPES.each do |assessment_key, assessment_class|
+          Inspection::UNIT_TYPE_ASSESSMENT_TYPES[:bouncy_castle].each do |assessment_key, assessment_class|
             assessment = inspection.send(assessment_key)
             if assessment
               expect(assessment.inspection).to eq(inspection),

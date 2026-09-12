@@ -31,29 +31,29 @@ module InspectionsHelper
   def inspection_actions(inspection)
     actions = T.let([], T::Array[T::Hash[Symbol, T.any(String, Symbol, T::Boolean)]])
 
-    if inspection.complete?
-      # Complete inspections: Switch to In Progress / Log
-      actions << {
+    # Complete inspections show switch-to-in-progress; incomplete show
+    # update and delete. Log appears in both branches, always second.
+    actions << if inspection.complete?
+      {
         label: t("inspections.buttons.switch_to_in_progress"),
         url: mark_draft_inspection_path(inspection),
         method: :patch,
         confirm: t("inspections.messages.mark_in_progress_confirm"),
         button: true
       }
-      actions << {
-        label: t("inspections.buttons.log"),
-        url: log_inspection_path(inspection)
-      }
     else
-      # Incomplete inspections: Update Inspection / Log / Delete Inspection
-      actions << {
+      {
         label: t("inspections.buttons.update"),
         url: edit_inspection_path(inspection)
       }
-      actions << {
-        label: t("inspections.buttons.log"),
-        url: log_inspection_path(inspection)
-      }
+    end
+
+    actions << {
+      label: t("inspections.buttons.log"),
+      url: log_inspection_path(inspection)
+    }
+
+    unless inspection.complete?
       actions << {
         label: t("inspections.buttons.delete"),
         url: inspection_path(inspection),

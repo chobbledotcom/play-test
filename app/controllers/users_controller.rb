@@ -61,7 +61,9 @@ class UsersController < ApplicationController
     params[:user][:inspection_company_id] = nil if params[:user][:inspection_company_id] == ""
 
     if @user.update(user_params)
-      handle_update_success(@user, "users.messages.user_updated", users_path)
+      handle_save_success(@user, :updated,
+        message_key: "users.messages.user_updated",
+        redirect_path: users_path)
     else
       handle_update_failure(@user)
     end
@@ -155,10 +157,11 @@ class UsersController < ApplicationController
         )
       end
 
-      handle_update_success(
+      handle_save_success(
         @user,
-        "users.messages.settings_updated",
-        change_settings_user_path(@user),
+        :updated,
+        message_key: "users.messages.settings_updated",
+        redirect_path: change_settings_user_path(@user),
         additional_streams: additional_streams
       )
     else

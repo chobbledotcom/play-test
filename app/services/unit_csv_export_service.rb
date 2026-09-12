@@ -3,6 +3,7 @@
 
 class UnitCsvExportService
   extend T::Sig
+  include CsvExport
 
   ATTRIBUTES = %w[id name manufacturer serial].freeze
 
@@ -11,14 +12,20 @@ class UnitCsvExportService
     @units = units
   end
 
-  sig { returns(String) }
-  def generate
-    CSV.generate(headers: true) do |csv|
-      csv << ATTRIBUTES
+  private
 
-      @units.order(created_at: :desc).each do |unit|
-        csv << ATTRIBUTES.map { |attr| unit.send(attr) }
-      end
-    end
+  sig { returns(ActiveRecord::Relation) }
+  def records
+    @units.order(created_at: :desc)
+  end
+
+  sig { returns(T::Array[String]) }
+  def headers
+    ATTRIBUTES
+  end
+
+  sig { params(unit: Unit).returns(T::Array[T.untyped]) }
+  def row_for(unit)
+    ATTRIBUTES.map { |attr| unit.send(attr) }
   end
 end

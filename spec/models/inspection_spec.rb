@@ -48,6 +48,18 @@ RSpec.describe Inspection, type: :model do
   let(:user) { create(:user) }
   let(:inspection) { create(:inspection, user:) }
 
+  describe "unit type vocabulary" do
+    it "keeps the inspection_type enum identical to the unit_type enum" do
+      expect(Inspection.defined_enums["inspection_type"])
+        .to eq(Unit.defined_enums["unit_type"])
+    end
+
+    it "registers assessments for every unit type" do
+      expect(Inspection::UNIT_TYPE_ASSESSMENT_TYPES.keys)
+        .to match_array(Unit::UNIT_TYPES.keys)
+    end
+  end
+
   describe "validations" do
     it "requires inspection_date" do
       invalid_inspection = build(:inspection, inspection_date: nil)

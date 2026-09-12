@@ -115,17 +115,14 @@ end
 # Wraps t/translate on any target to track i18n usage
 module I18nUsageTracker::TrackingPatch
   def self.apply_to(target)
-    target.alias_method :original_t, :t
-    target.alias_method :original_translate, :translate
+    [:t, :translate].each do |method_name|
+      original_method = "original_#{method_name}"
+      target.alias_method original_method, method_name
 
-    target.define_method(:t) do |key, **options|
-      I18nUsageTracker.track_key(key, options) if I18nUsageTracker.tracking_enabled
-      original_t(key, **options)
-    end
-
-    target.define_method(:translate) do |key, **options|
-      I18nUsageTracker.track_key(key, options) if I18nUsageTracker.tracking_enabled
-      original_translate(key, **options)
+      target.define_method(method_name) do |key, **options|
+        I18nUsageTracker.track_key(key, options) if I18nUsageTracker.tracking_enabled
+        public_send(original_method, key, **options)
+      end
     end
   end
 end

@@ -193,6 +193,31 @@ RSpec.describe Unit, type: :model do
       expect(unit.photo).not_to be_attached
       expect(unit).to be_valid
     end
+
+    it "rejects non-image files with a validation error" do
+      unit = build(:unit)
+      unit.photo.attach(
+        io: StringIO.new("not an image"),
+        filename: "notes.txt",
+        content_type: "text/plain"
+      )
+
+      expect(unit).not_to be_valid
+      expect(unit.errors[:photo]).to include("must be an image file")
+    end
+
+    it "purges a non-image attachment" do
+      unit = build(:unit)
+      unit.photo.attach(
+        io: StringIO.new("not an image"),
+        filename: "notes.txt",
+        content_type: "text/plain"
+      )
+
+      unit.validate
+
+      expect(unit.photo).not_to be_attached
+    end
   end
 
   describe "search functionality" do

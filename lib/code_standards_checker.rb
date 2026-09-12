@@ -298,13 +298,6 @@ class CodeStandardsChecker
   end
 
   def build_final_method_info(method_name, start_line, content, file_path)
-    end_line = content.lines.length
-    {
-      name: method_name,
-      start_line: start_line,
-      end_line: end_line,
-      length: end_line - start_line + 1,
-      file: file_path
-    }
+    build_method_info(method_name, start_line, content.lines.length, file_path)
   end
 end

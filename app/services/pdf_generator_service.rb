@@ -167,15 +167,6 @@ class PdfGeneratorService
     # Hide the table entirely when no unit is associated
   end
 
-  def self.generate_unit_details(pdf, unit)
-    unit_data = TableBuilder.build_unit_details_table(
-      unit,
-      :unit,
-      unit.last_inspection
-    )
-    TableBuilder.create_unit_details_table(pdf, I18n.t("pdf.unit.details"), unit_data)
-  end
-
   def self.generate_unit_details_with_inspection(pdf, unit, last_inspection)
     unit_data = TableBuilder.build_unit_details_table(
       unit,

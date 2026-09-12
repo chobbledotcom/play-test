@@ -633,7 +633,7 @@ RSpec.describe "Inspections", type: :request do
           inspection: {unit_id: unit.id}
         }
 
-        expect(Rails.logger).to have_received(:error).with(/Failed to log inspection event/)
+        expect(Rails.logger).to have_received(:error).with(/Failed to log Inspection event/)
         # Request should still succeed
         expect(response).to have_http_status(:redirect)
       end

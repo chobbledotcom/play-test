@@ -26,9 +26,9 @@ module TurboStreamResponders
     render turbo_stream: streams
   end
 
-  sig { params(model: ActiveRecord::Base, message_key: T.nilable(String), redirect_path: T.nilable(T.any(String, ActiveRecord::Base)), additional_streams: T::Array[Turbo::Streams::TagBuilder]).void }
-  def handle_update_success(model, message_key = nil, redirect_path = nil, additional_streams: [])
-    message_key ||= "#{model.class.table_name}.messages.updated"
+  sig { params(model: ActiveRecord::Base, verb: Symbol, message_key: T.nilable(String), redirect_path: T.nilable(T.any(String, ActiveRecord::Base)), additional_streams: T::Array[Turbo::Streams::TagBuilder]).void }
+  def handle_save_success(model, verb, message_key: nil, redirect_path: nil, additional_streams: [])
+    message_key ||= "#{model.class.table_name}.messages.#{verb}"
     redirect_path ||= model
 
     respond_to do |format|
@@ -56,31 +56,8 @@ module TurboStreamResponders
           errors: model.errors.full_messages
         }
       end
-      format.turbo_stream do
-        render_save_message_stream(
-          success: false,
-          message: I18n.t("shared.messages.save_failed"),
-          model: model
-        )
-      end
+      format.turbo_stream { render_failure_stream(model) }
       yield(format) if block_given?
-    end
-  end
-
-  sig { params(model: ActiveRecord::Base, message_key: T.nilable(String)).void }
-  def handle_create_success(model, message_key = nil)
-    message_key ||= "#{model.class.table_name}.messages.created"
-    respond_to do |format|
-      format.html do
-        flash[:notice] = I18n.t(message_key)
-        redirect_to model
-      end
-      format.turbo_stream do
-        render_save_message_stream(
-          success: true,
-          message: I18n.t(message_key)
-        )
-      end
     end
   end
 
@@ -88,13 +65,16 @@ module TurboStreamResponders
   def handle_create_failure(model, view = :new)
     respond_to do |format|
       format.html { render view, status: :unprocessable_content }
-      format.turbo_stream do
-        render_save_message_stream(
-          success: false,
-          message: I18n.t("shared.messages.save_failed"),
-          model: model
-        )
-      end
+      format.turbo_stream { render_failure_stream(model) }
     end
+  end
+
+  sig { params(model: ActiveRecord::Base).void }
+  def render_failure_stream(model)
+    render_save_message_stream(
+      success: false,
+      message: I18n.t("shared.messages.save_failed"),
+      model: model
+    )
   end
 end

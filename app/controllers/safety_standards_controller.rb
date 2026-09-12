@@ -124,8 +124,7 @@ class SafetyStandardsController < ApplicationController
 
   sig { void }
   def handle_calculation_post
-    type = params[:calculation][:type]
-    calculate_safety_standard if CALCULATION_TYPES.include?(type)
+    perform_requested_calculation
 
     respond_to do |format|
       format.turbo_stream
@@ -136,14 +135,17 @@ class SafetyStandardsController < ApplicationController
 
   sig { void }
   def handle_calculation_get
-    if params[:calculation].present?
-      type = params[:calculation][:type]
-      calculate_safety_standard if CALCULATION_TYPES.include?(type)
-    end
+    perform_requested_calculation if params[:calculation].present?
 
     respond_to do |format|
       format.html
     end
+  end
+
+  sig { void }
+  def perform_requested_calculation
+    type = params[:calculation][:type]
+    calculate_safety_standard if CALCULATION_TYPES.include?(type)
   end
 
   sig { void }
@@ -267,15 +269,6 @@ class SafetyStandardsController < ApplicationController
       passed: false,
       status: t("safety_standards.api.invalid_calculation_type",
         type: type || t("safety_standards.api.none_provided")),
-      result: nil
-    }
-  end
-
-  sig { params(message: String).returns(T::Hash[Symbol, T.untyped]) }
-  def error_response(message)
-    {
-      passed: false,
-      status: t("safety_standards.api.calculation_failed", error: message),
       result: nil
     }
   end
