@@ -38,24 +38,18 @@ RSpec.describe MagicContainer::LitestreamSeeder do
   let(:listing_without_snapshot) do
     "replica  generation  index  size  created"
   end
-  # A replica another deployment already wrote to: the growth check must
-  # still recognise this call's push, where a presence check would have
-  # mistaken the existing rows for our seed.
+  # A replica another deployment already wrote to, or a previous push whose
+  # generation litestream resumed: rows without any of this call's making
   let(:crowded_listing) do
     <<~LISTING
       replica  generation                              index  size  created
       s3       11111111-1111-1111-1111-111111111111    0      20480  2025-12-01T10:00:00Z
     LISTING
   end
-  let(:grown_listing) do
-    "#{crowded_listing}s3       22222222-2222-2222-2222-222222222222" \
-      "    0      24576  2026-01-01T10:00:00Z\n"
-  end
   let(:captured) { [] }
-  # Each listing the seeder captures, in order: the baseline before the
-  # first push, then one after every push. A run that exhausts the list
-  # sees an empty replica.
-  let(:snapshot_outputs) { [listing_without_snapshot, listing_with_snapshot] }
+  # Each listing the seeder captures, in order, one after every push. A
+  # run that exhausts the list sees an empty replica.
+  let(:snapshot_outputs) { [listing_with_snapshot] }
   let(:runner) do
     lambda { |args|
       commands << args
@@ -79,13 +73,13 @@ RSpec.describe MagicContainer::LitestreamSeeder do
 
   after { FileUtils.rm_rf(workdir) }
 
-  it "seeds and verifies the snapshot from a baseline listing" do
+  it "pushes once and verifies the snapshot appears in the listing" do
     seeder.call
 
-    # The listing captured before the first push is the baseline
-    expect(commands.first).to include("snapshots", db_path.to_s)
+    expect(commands.first).to include("replicate", "sleep #{described_class::SEED_SECONDS}")
     expect(commands.count { it.include?("replicate") }).to eq(1)
     expect(commands.last).to include("snapshots", db_path.to_s)
+    expect(commands.count { it.include?("snapshots") }).to eq(1)
     expect(captured).to be_present
   end
 
@@ -119,15 +113,18 @@ RSpec.describe MagicContainer::LitestreamSeeder do
     expect(File).not_to exist(captured.last.fetch(:path))
   end
 
-  it "succeeds when the push grows a replica that already held rows" do
-    snapshot_outputs.replace([crowded_listing, grown_listing])
+  it "succeeds when the replica already holds rows and the push adds none" do
+    # litestream resumes the generation it finds rather than re-snapshotting,
+    # so a push of unchanged content completes without a new listing row
+    snapshot_outputs.replace([crowded_listing])
 
     seeder.call
 
     expect(commands.count { it.include?("replicate") }).to eq(1)
+    expect(commands.count { it.include?("snapshots") }).to eq(1)
   end
 
-  it "retries until the listing grows" do
+  it "retries until a snapshot appears in the listing" do
     snapshot_outputs.replace(
       [listing_without_snapshot, listing_without_snapshot, listing_with_snapshot]
     )
@@ -135,17 +132,18 @@ RSpec.describe MagicContainer::LitestreamSeeder do
     seeder.call
 
     expect(commands.count { it.include?("snapshots") }).to eq(3)
-    expect(commands.count { it.include?("replicate") }).to eq(2)
+    expect(commands.count { it.include?("replicate") }).to eq(3)
   end
 
-  it "raises when no new rows appear after every attempt" do
+  it "raises when no snapshot appears after every attempt" do
     attempts = described_class::ATTEMPTS
-    # Baseline, one after each push attempt, plus the listing quoted in
-    # the raised error
-    snapshot_outputs.replace([listing_without_snapshot] * (attempts + 2))
+    # One listing after each push attempt, plus the listing quoted in the
+    # raised error
+    snapshot_outputs.replace([listing_without_snapshot] * (attempts + 1))
 
     expect { seeder.call }.to raise_error(/\ANo Litestream snapshot appeared/)
     expect(commands.count { it.include?("replicate") }).to eq(attempts)
+    expect(commands.count { it.include?("snapshots") }).to eq(attempts + 1)
   end
 
   it "includes the command output when a litestream command fails" do

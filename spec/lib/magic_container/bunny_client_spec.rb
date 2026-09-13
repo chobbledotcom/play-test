@@ -61,6 +61,22 @@ RSpec.describe MagicContainer::BunnyClient do
     expect(calls.pluck(:path)).to eq(["/apps", "/apps?cursor=next+page"])
   end
 
+  it "raises when the apps cursor does not advance" do
+    pages = {
+      "/apps" => {"items" => [], "cursor" => "stuck"},
+      "/apps?cursor=stuck" => {"items" => [], "cursor" => "stuck"}
+    }
+    stuck = lambda { |method, path, body|
+      calls << {method: method, path: path, body: body}
+      pages.fetch(path)
+    }
+    stuck_client = described_class.new(access_key: "bunny-key", transport: stuck)
+
+    expect { stuck_client.applications }
+      .to raise_error(/repeated a cursor and will never finish: stuck/)
+    expect(calls.pluck(:path)).to eq(["/apps", "/apps?cursor=stuck"])
+  end
+
   it "returns the optimal region id" do
     expect(client.optimal_region).to eq("LDN")
   end
@@ -75,8 +91,7 @@ RSpec.describe MagicContainer::BunnyClient do
       container: container,
       name: "play-test",
       region: "LDN",
-      runtime_type: "shared",
-      volume: 5
+      runtime_type: "shared"
     )
 
     expect(app_id).to eq("42")
@@ -88,21 +103,8 @@ RSpec.describe MagicContainer::BunnyClient do
       containerTemplates: [{name: "app"}],
       name: "play-test",
       regionSettings: {allowedRegionIds: ["LDN"], requiredRegionIds: ["LDN"]},
-      runtimeType: "shared",
-      volumes: [{name: "storage", size: 5}]
+      runtimeType: "shared"
     )
-  end
-
-  it "omits the volume when none is given" do
-    client.create_application(
-      container: {name: "app"},
-      name: "play-test",
-      region: "LDN",
-      runtime_type: "shared",
-      volume: nil
-    )
-
-    expect(calls.first[:body]).not_to have_key(:volumes)
   end
 
   it "deploys the application" do

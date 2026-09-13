@@ -32,8 +32,6 @@ RSpec.describe MagicContainer::Wizard do
       "", # image (default chobble/play-test)
       "", # tag (default latest)
       "", # runtime (default shared)
-      "", # attach volume (default yes)
-      "", # volume size (default 5)
       "https://as.example.com", # storage endpoint
       "as-bucket", # storage bucket
       "", # storage region (default us-east-1)
@@ -79,7 +77,7 @@ RSpec.describe MagicContainer::Wizard do
   # A full GET /apps/{id} application - the shape Bunny returns for one
   # the wizard itself created from the default answers
   let(:app_detail) do
-    lambda { |id: "42", image_tag: "latest"|
+    lambda { |id: "42", image_tag: "latest", image_pull_policy: "always"|
       {
         "id" => id,
         "name" => "play-test",
@@ -89,10 +87,15 @@ RSpec.describe MagicContainer::Wizard do
           "imageName" => "play-test",
           "imageNamespace" => "chobble",
           "imageTag" => image_tag,
+          "imagePullPolicy" => image_pull_policy,
           "imageRegistryId" => "7",
-          "volumeMounts" => [{"name" => "storage"}],
-          "endpoints" => [{"publicHost" => "mc-123.bunny.run"}]
-        }]
+          "volumeMounts" => [],
+          "endpoints" => [{
+            "displayName" => "web",
+            "portMappings" => [{"containerPort" => 3000}]
+          }]
+        }],
+        "volumes" => []
       }
     }
   end
@@ -187,7 +190,7 @@ RSpec.describe MagicContainer::Wizard do
     expect(store_path.read).to include("MAGIC_SEEDED_REPLICA_PATHS=production.sqlite3")
   end
 
-  it "creates the application with the container, volume and endpoint" do
+  it "creates the application with the configured container" do
     wizard.call
 
     create_call = calls.find { it[:method] == :post && it[:path] == "/apps" }
@@ -202,14 +205,14 @@ RSpec.describe MagicContainer::Wizard do
       imageNamespace: "chobble",
       imagePullPolicy: "always",
       imageRegistryId: "7",
-      imageTag: "latest",
-      volumeMounts: [{mountPath: "/rails/storage", name: "storage"}]
+      imageTag: "latest"
     )
+    expect(container).not_to have_key(:volumeMounts)
+    expect(body).not_to have_key(:volumes)
     expect(body).to include(
       name: "play-test",
       regionSettings: {allowedRegionIds: ["LDN"], requiredRegionIds: ["LDN"]},
-      runtimeType: "shared",
-      volumes: [{name: "storage", size: 5}]
+      runtimeType: "shared"
     )
   end
 
@@ -289,7 +292,7 @@ RSpec.describe MagicContainer::Wizard do
   context "when the user supplies a base url" do
     let(:answers) do
       list = super()
-      list[21] = "https://example.com"
+      list[19] = "https://example.com"
       list
     end
 
@@ -305,29 +308,11 @@ RSpec.describe MagicContainer::Wizard do
     end
   end
 
-  context "when the volume is declined" do
-    let(:answers) do
-      list = super()
-      list[8] = "n"
-      list
-    end
-
-    it "creates the container without a volume" do
-      wizard.call
-
-      create_call = calls.find { it[:method] == :post && it[:path] == "/apps" }
-      body = create_call.fetch(:body)
-      container = body.fetch(:containerTemplates).first
-      expect(container).not_to have_key(:volumeMounts)
-      expect(body).not_to have_key(:volumes)
-    end
-  end
-
   context "when a typed master key has the wrong format" do
     let(:answers) do
       list = super()
-      list[22] = "9" * 64
-      list.insert(23, "a" * 32)
+      list[20] = "9" * 64
+      list.insert(21, "a" * 32)
       list
     end
 
@@ -457,6 +442,97 @@ RSpec.describe MagicContainer::Wizard do
       expect(output.string).not_to include("Reusing existing Bunny app")
       expect(calls.count { it[:method] == :get && it[:path] == "/apps/42" }).to eq(1)
       expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app uses a cacheable pull policy" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before { responses["/apps/42"] = app_detail.call(image_pull_policy: "cached") }
+
+    it "creates a fresh app instead of offering the mismatched one" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app has volumes or mounts the plan does not" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before do
+      responses["/apps/42"] = app_detail.call
+        .then { |detail| detail.merge("volumes" => [{"name" => "storage", "size" => 1}]) }
+    end
+
+    it "creates a fresh app instead of offering the mismatched one" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app reports an incomplete application payload" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before { responses["/apps/42"] = {"id" => "42", "name" => "play-test"} }
+
+    it "creates a fresh app instead of raising on the payload" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app has no container templates at all" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before do
+      responses["/apps/42"] = app_detail.call.merge("containerTemplates" => [])
+    end
+
+    it "creates a fresh app instead of raising on the payload" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when the backup at the recorded path is regenerated" do
+    let(:retry_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new(["y", "y"].join("\n")),
+        output: retry_output
+      )
+    end
+    let(:retry_output) { StringIO.new }
+
+    before do
+      wizard.call
+      staging = workdir.join("staging2")
+      FileUtils.mkdir_p(staging.join("db"))
+      File.write(staging.join("db/production.sqlite3"), "replacement contents")
+      system("tar", "-czf", archive_path.to_s, "-C", staging.to_s, "db", exception: true)
+      calls.clear
+    end
+
+    it "re-seeds the replica from the replacement contents" do
+      described_class.new(prompts: retry_prompts, store: store).call
+
+      expect(seeder).to have_received(:call).twice
+      expect(retry_output.string).not_to include("already seeded")
+    end
+
+    it "records the replacement archive's digest against the seeded paths" do
+      described_class.new(prompts: retry_prompts, store: store).call
+
+      digest = Digest::SHA256.file(archive_path).hexdigest
+      expect(store_path.read).to include("MAGIC_ARCHIVE_DIGEST=#{digest}")
+      expect(store.load.seeded_replica_paths).to eq(["production.sqlite3"])
     end
   end
 

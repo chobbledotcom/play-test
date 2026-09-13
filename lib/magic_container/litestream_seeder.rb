@@ -39,13 +39,9 @@ module MagicContainer
 
     sig { void }
     def call
-      # A baseline listing captured before any push distinguishes snapshots
-      # this call pushed from whatever the replica already held: seeding is
-      # done when the listing grows, not when it merely holds rows.
-      baseline = listing.lines.count
       ATTEMPTS.times do
         push_snapshot
-        return if listing.lines.count > baseline
+        return if replica_holds_snapshot?
 
         sleep 2
       end
@@ -54,6 +50,18 @@ module MagicContainer
         bucket: replica_bucket, replica_path: replica_path, listing: listing)
     ensure
       close_config
+    end
+
+    # Any row beyond the header means the replica holds a snapshot. litestream
+    # resumes the generation a re-push finds rather than adding a new
+    # snapshot row, so growth cannot serve as the success signal - only
+    # presence can. A failed litestream command raises on its own, and the
+    # wizard only pushes where its persisted state says this archive has not
+    # yet been seeded (state the archive digest invalidates when the backup
+    # file is regenerated).
+    sig { returns(T::Boolean) }
+    def replica_holds_snapshot?
+      listing.lines.count > 1
     end
 
     # The snapshot listing from litestream v0.3.13: a header row followed by

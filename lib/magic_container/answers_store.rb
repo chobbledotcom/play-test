@@ -83,12 +83,12 @@ module MagicContainer
         ["MAGIC_REGION", answers.region],
         ["MAGIC_RUNTIME_TYPE", answers.runtime_type],
         ["MAGIC_SECRET_KEY_BASE", answers.secret_key_base],
-        ["MAGIC_SENTRY_DSN", answers.sentry_dsn],
-        ["MAGIC_VOLUME", answers.volume.to_s],
-        ["MAGIC_VOLUME_SIZE_GB", answers.volume_size_gb.to_s]
+        ["MAGIC_SENTRY_DSN", answers.sentry_dsn]
       ]
       app_id = answers.app_id
       entries.push(["MAGIC_APP_ID", app_id]) if app_id
+      digest = answers.archive_digest
+      entries.push(["MAGIC_ARCHIVE_DIGEST", digest]) if digest
       seeded = answers.seeded_replica_paths
       entries.push(["MAGIC_SEEDED_REPLICA_PATHS", seeded.join(",")]) if seeded.any?
       entries
@@ -133,6 +133,7 @@ module MagicContainer
         access_key: env.fetch(BUNNY_KEY),
         app_id: env["MAGIC_APP_ID"].presence,
         app_name: env.fetch("MAGIC_APP_NAME"),
+        archive_digest: env["MAGIC_ARCHIVE_DIGEST"].presence,
         archive_path: Pathname.new(env.fetch("MAGIC_ARCHIVE_PATH")),
         base_url: env.fetch("MAGIC_BASE_URL"),
         display_app_name: env.fetch("MAGIC_DISPLAY_APP_NAME"),
@@ -146,9 +147,7 @@ module MagicContainer
         seeded_replica_paths: env["MAGIC_SEEDED_REPLICA_PATHS"].to_s.split(","),
         sentry_dsn: env.fetch("MAGIC_SENTRY_DSN"),
         storage_s3: s3_details(env, STORAGE_PREFIX),
-        litestream_s3: s3_details(env, LITESTREAM_PREFIX),
-        volume: env.fetch("MAGIC_VOLUME") == "true",
-        volume_size_gb: Integer(env.fetch("MAGIC_VOLUME_SIZE_GB"))
+        litestream_s3: s3_details(env, LITESTREAM_PREFIX)
       )
     end
 

@@ -19,8 +19,6 @@ RSpec.describe MagicContainer::AnswersStore do
       registry_id: "7",
       image_ref: "chobble/play-test",
       image_tag: "latest",
-      volume: true,
-      volume_size_gb: 5,
       storage_s3: storage_s3,
       litestream_s3: litestream_s3,
       display_app_name: "Play-Test",
@@ -70,8 +68,6 @@ RSpec.describe MagicContainer::AnswersStore do
       expect(loaded.registry_id).to eq("7")
       expect(loaded.image_ref).to eq("chobble/play-test")
       expect(loaded.image_tag).to eq("latest")
-      expect(loaded.volume).to be true
-      expect(loaded.volume_size_gb).to eq(5)
       expect(loaded.storage_s3.secret_access_key).to eq("as secret #1")
       expect(loaded.storage_s3.bucket).to eq("as-bucket")
       expect(loaded.litestream_s3.secret_access_key).to eq("ls-secret")
@@ -86,6 +82,12 @@ RSpec.describe MagicContainer::AnswersStore do
       expect(store.load.app_id).to eq("42")
     end
 
+    it "round-trips the archive digest recorded against seeding progress" do
+      store.save(answers.with(archive_digest: "digest123"))
+
+      expect(store.load.archive_digest).to eq("digest123")
+    end
+
     it "round-trips replica paths recorded as seeded for retries" do
       store.save(answers.with(seeded_replica_paths: %w[production.sqlite3]))
 
@@ -96,12 +98,6 @@ RSpec.describe MagicContainer::AnswersStore do
       store.save(answers.with(sentry_dsn: "  dsn with spaces  "))
 
       expect(store.load.sentry_dsn).to eq("  dsn with spaces  ")
-    end
-
-    it "round-trips declined volumes and other booleans" do
-      store.save(answers.with(volume: false))
-
-      expect(store.load.volume).to be false
     end
 
     it "ignores comments and blank lines" do

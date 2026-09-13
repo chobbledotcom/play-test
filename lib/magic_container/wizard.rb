@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "active_storage/service/s3_service"
+require "digest"
 require "open3"
 require "securerandom"
 require "tmpdir"
@@ -78,9 +79,7 @@ module MagicContainer
         registry_id: ask_registry(client),
         image_ref: image_ref,
         image_tag: prompts.ask(t("questions.image_tag"), default: "latest"),
-        runtime_type: ask_runtime_type,
-        volume: prompts.confirm(t("questions.attach_volume")),
-        volume_size_gb: ask_volume_size
+        runtime_type: ask_runtime_type
       }
     end
 
@@ -205,17 +204,6 @@ module MagicContainer
       prompts.select(t("questions.runtime_type"), choices)
     end
 
-    sig { returns(Integer) }
-    def ask_volume_size
-      loop do
-        answer = prompts.ask(t("questions.volume_size"), default: "5")
-        size = Integer(answer, exception: false)
-        return size if size&.positive?
-
-        prompts.note(t("notes.volume_size_invalid"))
-      end
-    end
-
     sig { params(label: String).returns(S3Details) }
     def ask_s3_details(label)
       prompts.banner(label)
@@ -250,20 +238,13 @@ module MagicContainer
         t("plan.app", app: answers.app_name, region: answers.region,
           runtime: answers.runtime_type),
         t("plan.image", image: image),
-        volume_summary(answers),
         t("plan.storage", bucket: storage.bucket, endpoint: storage.endpoint),
         t("plan.litestream", bucket: litestream.bucket, endpoint: litestream.endpoint),
+        t("plan.databases"),
         t("plan.db_restore"),
         t("plan.storage_upload"),
         t("plan.secret_generated")
       ]
-    end
-
-    sig { params(answers: Answers).returns(String) }
-    def volume_summary(answers)
-      return t("plan.volume_with", size: answers.volume_size_gb) if answers.volume
-
-      t("plan.volume_without")
     end
 
     sig { params(answers: Answers).void }
@@ -360,6 +341,7 @@ module MagicContainer
     sig { params(answers: Answers, workdir: Pathname).returns(Answers) }
     def seed_database_replicas(answers, workdir)
       prompts.note(t("notes.seeding"))
+      answers = bind_archive_digest(answers)
       litestream_entries.each do |name, replica_path|
         db_path = workdir.join(name)
         next unless db_path.exist?
@@ -378,6 +360,20 @@ module MagicContainer
         answers = record_seeded(answers, replica_path)
       end
       answers
+    end
+
+    # Seeded paths only count against the archive that produced them: a
+    # backup regenerated at the recorded path (same filename, new contents)
+    # must not inherit the previous contents' seeding progress. The digest
+    # is persisted so a retry compares against what was actually pushed.
+    sig { params(answers: Answers).returns(Answers) }
+    def bind_archive_digest(answers)
+      digest = Digest::SHA256.file(answers.archive_path).hexdigest
+      return answers if answers.archive_digest == digest
+
+      updated = answers.with(archive_digest: digest, seeded_replica_paths: [])
+      store.save(updated)
+      updated
     end
 
     # Persisted the moment the seed lands, so the skip above only ever
@@ -426,8 +422,7 @@ module MagicContainer
           container: container_for(answers),
           name: answers.app_name,
           region: answers.region,
-          runtime_type: answers.runtime_type,
-          volume: answers.volume ? answers.volume_size_gb : nil
+          runtime_type: answers.runtime_type
         )
       end
       # Persisted at once so a failure after creating - or recovering - an
@@ -492,24 +487,40 @@ module MagicContainer
       ).returns(T::Boolean)
     end
     def orphan_matches_plan?(app, answers)
-      template = app.fetch("containerTemplates").first
-      endpoints = Array(template.fetch("endpoints"))
-      template.fetch("imageName") == image_name(answers.image_ref) &&
-        template.fetch("imageNamespace") == image_namespace(answers.image_ref) &&
-        template.fetch("imageTag") == answers.image_tag &&
-        template.fetch("imageRegistryId").to_s == answers.registry_id &&
-        Array(template.fetch("volumeMounts")).any? == answers.volume &&
-        app.fetch("runtimeType") == answers.runtime_type &&
-        app.fetch("regionSettings").fetch("requiredRegionIds")
+      # Bunny, not us, shapes this payload: anything absent is a mismatch,
+      # never a crash, so an unexpected app is simply never offered.
+      template = Array(app["containerTemplates"]).first
+      return false unless template.is_a?(Hash)
+
+      registry_id = template["imageRegistryId"]
+      template["imageName"] == image_name(answers.image_ref) &&
+        template["imageNamespace"] == image_namespace(answers.image_ref) &&
+        template["imageTag"] == answers.image_tag &&
+        template["imagePullPolicy"] == "always" &&
+        !registry_id.nil? && registry_id.to_s == answers.registry_id &&
+        app["runtimeType"] == answers.runtime_type &&
+        Array(app.dig("regionSettings", "requiredRegionIds"))
           .include?(answers.region) &&
-        endpoints.any? { it.fetch("publicHost", "").end_with?(".bunny.run") }
+        Array(app["volumes"]).empty? && Array(template["volumeMounts"]).empty? &&
+        endpoint_matches?(template)
+    end
+
+    # The wizard deploys a single "web" endpoint on the container port; a
+    # recovered orphan may never have been deployed, so the endpoint is
+    # matched by its configuration rather than by a runtime public host.
+    sig { params(template: T::Hash[String, T.untyped]).returns(T::Boolean) }
+    def endpoint_matches?(template)
+      Array(template["endpoints"]).any? do |endpoint|
+        ports = Array(endpoint["portMappings"]).map { it["containerPort"] }
+        endpoint["displayName"] == "web" && ports.include?(CONTAINER_PORT)
+      end
     end
 
     sig do
       params(answers: Answers).returns(T::Hash[String, T.untyped])
     end
     def container_for(answers)
-      container = {
+      {
         endpoints: container_endpoints,
         environmentVariables: EnvBuilder.build(answers)
           .map { |name, value| {name: name, value: value} },
@@ -522,12 +533,6 @@ module MagicContainer
         imageTag: answers.image_tag,
         name: "app"
       }
-      if answers.volume
-        container[:volumeMounts] = [
-          {mountPath: "/rails/storage", name: "storage"}
-        ]
-      end
-      container
     end
 
     sig { returns(T::Array[T::Hash[String, T.untyped]]) }

@@ -12,8 +12,6 @@ module MagicContainer
     const :registry_id, String
     const :image_ref, String
     const :image_tag, String
-    const :volume, T::Boolean
-    const :volume_size_gb, Integer
     const :storage_s3, S3Details
     const :litestream_s3, S3Details
     const :display_app_name, String
@@ -24,6 +22,10 @@ module MagicContainer
     # The Bunny app id once an attempt got as far as creating it, so a retried
     # attempt reuses the app instead of creating a duplicate.
     const :app_id, T.nilable(String), default: nil
+    # A fingerprint of the archive the seeded replica paths below were
+    # pushed from, so a backup regenerated at the recorded path cannot
+    # inherit the previous contents' seeding progress.
+    const :archive_digest, T.nilable(String), default: nil
     # Replica paths this attempt has already pushed to Litestream, so a retry
     # skips only work this answers lineage performed - never data some other
     # deployment left in the replica.

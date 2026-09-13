@@ -4,7 +4,6 @@
 require "net/http"
 require "json"
 require "uri"
-
 module MagicContainer
   class BunnyError < StandardError
     extend T::Sig
@@ -51,6 +50,7 @@ module MagicContainer
     sig { returns(T::Array[T::Hash[String, T.untyped]]) }
     def applications
       apps = T.cast([], T::Array[T::Hash[String, T.untyped]])
+      cursors = Set.new
       cursor = ""
       loop do
         path = cursor.empty? ? "/apps" : "/apps?cursor=#{encode(cursor)}"
@@ -58,6 +58,13 @@ module MagicContainer
         apps += items(page)
         cursor = page["cursor"].to_s
         break if cursor.empty?
+
+        # A cursor seen before means the listing will never finish; fail
+        # loud rather than repeat HTTP requests forever.
+        unless cursors.add?(cursor)
+          raise I18n.t("magic_container.bunny_client.errors.cursor_loop",
+            cursor: cursor)
+        end
       end
       apps
     end
@@ -82,11 +89,10 @@ module MagicContainer
         name: String,
         runtime_type: String,
         region: String,
-        container: T::Hash[String, T.untyped],
-        volume: T.nilable(Integer)
+        container: T::Hash[String, T.untyped]
       ).returns(String)
     end
-    def create_application(name:, runtime_type:, region:, container:, volume:)
+    def create_application(name:, runtime_type:, region:, container:)
       payload = {
         autoScaling: {min: 1, max: 1},
         containerTemplates: [container],
@@ -97,7 +103,6 @@ module MagicContainer
         },
         runtimeType: runtime_type
       }
-      payload[:volumes] = [{name: "storage", size: volume}] if volume
       request(:post, "/apps", payload).fetch("id").to_s
     end
 

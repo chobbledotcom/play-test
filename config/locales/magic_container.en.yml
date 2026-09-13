@@ -5,6 +5,7 @@ en:
     bunny_client:
       errors:
         api_error: "Bunny API error: %{label}"
+        cursor_loop: "Bunny app listing repeated a cursor and will never finish: %{cursor}"
     litestream_seeder:
       errors:
         command_failed: "Litestream command failed: %{command}\n%{detail}"
@@ -48,23 +49,20 @@ en:
         seeded: "Seeded %{name} to %{replica_path}"
         seeded_skip: "Litestream replica for %{name} already seeded by a previous attempt - skipping"
         seeding: "Seeding Litestream replicas from the restored databases..."
-        volume_size_invalid: "Enter a positive whole number of gigabytes"
         waiting_endpoint: "Waiting for the container endpoint..."
       plan:
         app: "App: %{app} (%{runtime}) in %{region}"
         archive: "Archive: %{archive}"
+        databases: "Databases re-restore from Litestream on boot"
         db_restore: "Databases will be restored from the archive and seeded to Litestream"
         image: "Image: %{image}"
         litestream: "Litestream S3: %{bucket} at %{endpoint}"
         secret_generated: "A new SECRET_KEY_BASE was generated"
         storage: "Active Storage S3: %{bucket} at %{endpoint}"
         storage_upload: "Active Storage files will be uploaded to the S3 bucket"
-        volume_with: "%{size}GB persistent volume"
-        volume_without: "none, databases re-restore from Litestream on boot"
       questions:
         app_name: "Bunny application name"
         archive_path: "Backup archive path"
-        attach_volume: "Attach a persistent volume for the databases?"
         base_url: "Public base URL (blank to use container URL)"
         bunny_access_key: "Bunny API access key"
         bunny_key_from_env: "Use the BUNNY_ACCESS_KEY from your environment?"
@@ -92,4 +90,3 @@ en:
         s3_secret_key: "Secret access key"
         sentry_dsn: "Sentry DSN"
         storage_banner: "Active Storage S3 (uploaded files)"
-        volume_size: "Volume size (GB)"
