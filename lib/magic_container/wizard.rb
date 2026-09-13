@@ -499,6 +499,7 @@ module MagicContainer
         template["imagePullPolicy"] == "always" &&
         !registry_id.nil? && registry_id.to_s == answers.registry_id &&
         app["runtimeType"] == answers.runtime_type &&
+        app["autoScaling"] == {"min" => 1, "max" => 1} &&
         Array(app.dig("regionSettings", "requiredRegionIds"))
           .include?(answers.region) &&
         Array(app["volumes"]).empty? && Array(template["volumeMounts"]).empty? &&

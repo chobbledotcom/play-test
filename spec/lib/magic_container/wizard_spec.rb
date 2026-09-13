@@ -82,6 +82,7 @@ RSpec.describe MagicContainer::Wizard do
         "id" => id,
         "name" => "play-test",
         "runtimeType" => "shared",
+        "autoScaling" => {"min" => 1, "max" => 1},
         "regionSettings" => {"requiredRegionIds" => ["LDN"]},
         "containerTemplates" => [{
           "imageName" => "play-test",
@@ -188,6 +189,30 @@ RSpec.describe MagicContainer::Wizard do
     wizard.call
 
     expect(store_path.read).to include("MAGIC_SEEDED_REPLICA_PATHS=production.sqlite3")
+  end
+
+  it "seeds the Solid Queue replica alongside the primary database" do
+    staging = workdir.join("queuedb")
+    FileUtils.mkdir_p(staging.join("db"))
+    File.write(staging.join("db/production.sqlite3"), "sqlite")
+    File.write(staging.join("db/production_queue.sqlite3"), "queue sqlite")
+    system("tar", "-czf", archive_path.to_s, "-C", staging.to_s, "db", exception: true)
+    replica_paths = []
+    allow(MagicContainer::LitestreamSeeder).to receive(:new).and_wrap_original do |_m, k|
+      replica_paths << k.fetch(:replica_path)
+      seeder
+    end
+    fresh_prompts = MagicContainer::Prompts.new(
+      input: StringIO.new(answers.join("\n")), output: StringIO.new
+    )
+
+    described_class.new(prompts: fresh_prompts, store: store).call
+
+    expect(replica_paths).to eq(["production.sqlite3", "production_queue.sqlite3"])
+    stored = store_path.read
+    expect(stored).to include(
+      "MAGIC_SEEDED_REPLICA_PATHS=production.sqlite3,production_queue.sqlite3"
+    )
   end
 
   it "creates the application with the configured container" do
@@ -464,6 +489,43 @@ RSpec.describe MagicContainer::Wizard do
     before do
       responses["/apps/42"] = app_detail.call
         .then { |detail| detail.merge("volumes" => [{"name" => "storage", "size" => 1}]) }
+    end
+
+    it "creates a fresh app instead of offering the mismatched one" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app has volume mounts with no volume" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before do
+      responses["/apps/42"] = app_detail.call.then do |detail|
+        templates = detail.fetch("containerTemplates").map do |template|
+          template.merge("volumeMounts" => [{"name" => "storage"}])
+        end
+        detail.merge("containerTemplates" => templates)
+      end
+    end
+
+    it "creates a fresh app instead of offering the mismatched one" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app autoscales beyond the plan" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before do
+      responses["/apps/42"] = app_detail.call.then do |detail|
+        detail.merge("autoScaling" => {"min" => 1, "max" => 3})
+      end
     end
 
     it "creates a fresh app instead of offering the mismatched one" do
