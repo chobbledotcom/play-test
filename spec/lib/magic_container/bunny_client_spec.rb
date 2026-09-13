@@ -11,6 +11,7 @@ RSpec.describe MagicContainer::BunnyClient do
     {
       "/apps" => {"id" => 42},
       "/apps/app-1/deploy" => {},
+      "/apps/app-1/restart" => {},
       "/apps/app-1/endpoints" => {"items" => [{"publicHost" => "mc-1.bunny.run"}]},
       "/apps/app-1/containers/c-9/env" => {},
       "/registries" => {"items" => [{"displayName" => "Docker Hub", "hostName" => "docker.io", "id" => 7}]},
@@ -30,6 +31,52 @@ RSpec.describe MagicContainer::BunnyClient do
     expect(calls.first[:path]).to eq("/registries")
   end
 
+  it "fetches a single application's full configuration" do
+    responses["/apps/app-2"] = {
+      "id" => "app-2",
+      "containerTemplates" => [{"imageName" => "app"}]
+    }
+
+    expect(client.application("app-2")).to include("id" => "app-2")
+    expect(calls.first[:path]).to eq("/apps/app-2")
+  end
+
+  it "lists every application across cursor pages" do
+    pages = {
+      "/apps" => {
+        "items" => [{"id" => 42, "name" => "play-test"}],
+        "cursor" => "next page"
+      },
+      "/apps?cursor=next+page" => {"items" => [{"id" => 43, "name" => "another"}]}
+    }
+    paginated = lambda { |method, path, body|
+      calls << {method: method, path: path, body: body}
+      pages.fetch(path)
+    }
+    paginated_client = described_class.new(access_key: "bunny-key", transport: paginated)
+
+    expect(paginated_client.applications).to eq(
+      [{"id" => 42, "name" => "play-test"}, {"id" => 43, "name" => "another"}]
+    )
+    expect(calls.pluck(:path)).to eq(["/apps", "/apps?cursor=next+page"])
+  end
+
+  it "raises when the apps cursor does not advance" do
+    pages = {
+      "/apps" => {"items" => [], "cursor" => "stuck"},
+      "/apps?cursor=stuck" => {"items" => [], "cursor" => "stuck"}
+    }
+    stuck = lambda { |method, path, body|
+      calls << {method: method, path: path, body: body}
+      pages.fetch(path)
+    }
+    stuck_client = described_class.new(access_key: "bunny-key", transport: stuck)
+
+    expect { stuck_client.applications }
+      .to raise_error(/repeated a cursor and will never finish: stuck/)
+    expect(calls.pluck(:path)).to eq(["/apps", "/apps?cursor=stuck"])
+  end
+
   it "returns the optimal region id" do
     expect(client.optimal_region).to eq("LDN")
   end
@@ -44,8 +91,7 @@ RSpec.describe MagicContainer::BunnyClient do
       container: container,
       name: "play-test",
       region: "LDN",
-      runtime_type: "shared",
-      volume: 5
+      runtime_type: "shared"
     )
 
     expect(app_id).to eq("42")
@@ -56,28 +102,21 @@ RSpec.describe MagicContainer::BunnyClient do
       autoScaling: {min: 1, max: 1},
       containerTemplates: [{name: "app"}],
       name: "play-test",
-      regionSettings: {requiredRegionIds: ["LDN"]},
-      runtimeType: "shared",
-      volumes: [{name: "storage", size: 5}]
+      regionSettings: {allowedRegionIds: ["LDN"], requiredRegionIds: ["LDN"]},
+      runtimeType: "shared"
     )
-  end
-
-  it "omits the volume when none is given" do
-    client.create_application(
-      container: {name: "app"},
-      name: "play-test",
-      region: "LDN",
-      runtime_type: "shared",
-      volume: nil
-    )
-
-    expect(calls.first[:body]).not_to have_key(:volumes)
   end
 
   it "deploys the application" do
     client.deploy("app-1")
 
     expect(calls.first).to include(method: :post, path: "/apps/app-1/deploy")
+  end
+
+  it "restarts the application" do
+    client.restart("app-1")
+
+    expect(calls.first).to include(method: :post, path: "/apps/app-1/restart")
   end
 
   it "lists application endpoints" do
@@ -106,6 +145,42 @@ RSpec.describe MagicContainer::BunnyClient do
 
       expect { strict_client.registries }
         .to raise_error(MagicContainer::BunnyError, "Bunny API error: Not Found - Application missing")
+    end
+
+    it "raises BunnyError with field-level validation rows" do
+      body = {
+        "title" => "Validation Error",
+        "detail" => "One or more validation errors occurred.",
+        "errors" => [
+          {"field" => "RegionSettings", "message" => "The allowedRegionIds field is required."}
+        ]
+      }
+      response = instance_double(Net::HTTPBadRequest, code: "400", body: body.to_json)
+      allow(Net::HTTP).to receive(:start).and_return(response)
+
+      expect { strict_client.registries }.to raise_error(MagicContainer::BunnyError) do |error|
+        expect(error.message).to eq(
+          "Bunny API error: Validation Error - One or more validation errors" \
+            " occurred. - RegionSettings: The allowedRegionIds field is required."
+        )
+      end
+    end
+
+    it "raises BunnyError with field-level validation maps" do
+      body = {
+        "title" => "Validation Error",
+        "detail" => "One or more validation errors occurred.",
+        "errors" => {"RegionSettings" => ["The allowedRegionIds field is required."]}
+      }
+      response = instance_double(Net::HTTPBadRequest, code: "400", body: body.to_json)
+      allow(Net::HTTP).to receive(:start).and_return(response)
+
+      expect { strict_client.registries }.to raise_error(MagicContainer::BunnyError) do |error|
+        expect(error.message).to eq(
+          "Bunny API error: Validation Error - One or more validation errors" \
+            " occurred. - RegionSettings: The allowedRegionIds field is required."
+        )
+      end
     end
 
     it "exposes the HTTP status" do

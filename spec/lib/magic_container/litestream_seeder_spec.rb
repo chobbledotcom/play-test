@@ -26,19 +26,40 @@ RSpec.describe MagicContainer::LitestreamSeeder do
   end
   let(:commands) { [] }
   let(:snapshot_outputs) { [] }
-  let(:final_snapshot_output) { "production.sqlite3    2026-01-01T10:00:00Z  123 generations" }
-  let(:captured) { {} }
+  # Litestream v0.3.13 lists a header row plus one row per snapshot. The
+  # rows carry the replica name (not the path), generation, index, size and
+  # creation time - which is why the old path-matching check never passed.
+  let(:listing_with_snapshot) do
+    <<~LISTING
+      replica  generation                              index  size  created
+      s3       00d7b2e5-4d8a-4bd2-a8a5-9c821c1f3a33    0      24576  2026-01-01T10:00:00Z
+    LISTING
+  end
+  let(:listing_without_snapshot) do
+    "replica  generation  index  size  created"
+  end
+  # A replica another deployment already wrote to, or a previous push whose
+  # generation litestream resumed: rows without any of this call's making
+  let(:crowded_listing) do
+    <<~LISTING
+      replica  generation                              index  size  created
+      s3       11111111-1111-1111-1111-111111111111    0      20480  2025-12-01T10:00:00Z
+    LISTING
+  end
+  let(:captured) { [] }
+  # Each listing the seeder captures, in order, one after every push. A
+  # run that exhausts the list sees an empty replica.
+  let(:snapshot_outputs) { [listing_with_snapshot] }
   let(:runner) do
     lambda { |args|
       commands << args
       flag = args.index("-config")
       if flag
         path = args.fetch(flag + 1)
-        captured[:path] = path
-        captured[:config] = YAML.load_file(path)
+        captured << {path: path, config: YAML.load_file(path)}
       end
       if args.include?("snapshots")
-        [snapshot_outputs.shift || final_snapshot_output, true]
+        [snapshot_outputs.shift || listing_without_snapshot, true]
       else
         ["replicating", true]
       end
@@ -52,21 +73,20 @@ RSpec.describe MagicContainer::LitestreamSeeder do
 
   after { FileUtils.rm_rf(workdir) }
 
-  it "replicates once with a generated config and verifies the snapshot" do
+  it "pushes once and verifies the snapshot appears in the listing" do
     seeder.call
 
-    replicate = commands.first
-    expect(replicate).to include("replicate", "sleep #{described_class::SEED_SECONDS}")
-
-    verify = commands.last
-    expect(verify).to include("snapshots", db_path.to_s)
-    expect(captured).to have_key(:config)
+    expect(commands.first).to include("replicate", "sleep #{described_class::SEED_SECONDS}")
+    expect(commands.count { it.include?("replicate") }).to eq(1)
+    expect(commands.last).to include("snapshots", db_path.to_s)
+    expect(commands.count { it.include?("snapshots") }).to eq(1)
+    expect(captured).to be_present
   end
 
   it "mirrors the container replica layout in the config" do
     seeder.call
 
-    config = captured.fetch(:config)
+    config = captured.last.fetch(:config)
     replica = config.fetch("dbs").first.fetch("replicas").first
 
     expect(config.fetch("dbs").first.fetch("path")).to eq(db_path.to_s)
@@ -81,24 +101,61 @@ RSpec.describe MagicContainer::LitestreamSeeder do
     )
   end
 
+  it "removes the generated config after listing" do
+    seeder.listing
+
+    expect(File).not_to exist(captured.last.fetch(:path))
+  end
+
   it "removes the generated config after seeding" do
     seeder.call
 
-    expect(File).not_to exist(captured.fetch(:path))
+    expect(File).not_to exist(captured.last.fetch(:path))
   end
 
-  it "retries until a snapshot appears in the replica" do
-    snapshot_outputs << "" << ""
+  it "succeeds when the replica already holds rows and the push adds none" do
+    # litestream resumes the generation it finds rather than re-snapshotting,
+    # so a push of unchanged content completes without a new listing row
+    snapshot_outputs.replace([crowded_listing])
 
     seeder.call
 
-    replicate_runs = commands.count { it.include?("replicate") }
-    expect(replicate_runs).to eq(3)
+    expect(commands.count { it.include?("replicate") }).to eq(1)
+    expect(commands.count { it.include?("snapshots") }).to eq(1)
+  end
+
+  it "retries until a snapshot appears in the listing" do
+    snapshot_outputs.replace(
+      [listing_without_snapshot, listing_without_snapshot, listing_with_snapshot]
+    )
+
+    seeder.call
+
+    expect(commands.count { it.include?("snapshots") }).to eq(3)
+    expect(commands.count { it.include?("replicate") }).to eq(3)
   end
 
   it "raises when no snapshot appears after every attempt" do
-    snapshot_outputs.concat([""] * 6)
+    attempts = described_class::ATTEMPTS
+    # One listing after each push attempt, plus the listing quoted in the
+    # raised error
+    snapshot_outputs.replace([listing_without_snapshot] * (attempts + 1))
 
-    expect { seeder.call }.to raise_error(/No Litestream snapshot appeared in ls-bucket/)
+    expect { seeder.call }.to raise_error(/\ANo Litestream snapshot appeared/)
+    expect(commands.count { it.include?("replicate") }).to eq(attempts)
+    expect(commands.count { it.include?("snapshots") }).to eq(attempts + 1)
+  end
+
+  it "includes the command output when a litestream command fails" do
+    status = instance_double(Process::Status, success?: false)
+    allow(Open3).to receive(:capture3).and_return(["stdout", "boom", status])
+    real_runner = described_class.new(
+      db_path: db_path,
+      replica_path: "production.sqlite3",
+      s3: s3_details
+    )
+
+    expect { real_runner.call }
+      .to raise_error(/\ALitestream command failed: .+\nboom\z/)
   end
 end

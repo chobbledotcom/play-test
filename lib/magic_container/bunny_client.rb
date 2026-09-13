@@ -4,7 +4,6 @@
 require "net/http"
 require "json"
 require "uri"
-
 module MagicContainer
   class BunnyError < StandardError
     extend T::Sig
@@ -45,6 +44,37 @@ module MagicContainer
     sig { returns(T::Array[T::Hash[String, T.untyped]]) }
     def registries = items(request(:get, "/registries"))
 
+    # Every application on the account, following the cursor until the final
+    # page. The wizard reconciles apps by name, so the lookup must see
+    # beyond the first page.
+    sig { returns(T::Array[T::Hash[String, T.untyped]]) }
+    def applications
+      apps = T.cast([], T::Array[T::Hash[String, T.untyped]])
+      cursors = Set.new
+      cursor = ""
+      loop do
+        path = cursor.empty? ? "/apps" : "/apps?cursor=#{encode(cursor)}"
+        page = request(:get, path)
+        apps += items(page)
+        cursor = page["cursor"].to_s
+        break if cursor.empty?
+
+        # A cursor seen before means the listing will never finish; fail
+        # loud rather than repeat HTTP requests forever.
+        unless cursors.add?(cursor)
+          raise I18n.t("magic_container.bunny_client.errors.cursor_loop",
+            cursor: cursor)
+        end
+      end
+      apps
+    end
+
+    # A single application with its full configuration. The listing only
+    # carries id/name, but a reused app keeps everything except its
+    # environment, so candidates must be verified against the plan.
+    sig { params(app_id: String).returns(T::Hash[String, T.untyped]) }
+    def application(app_id) = request(:get, "/apps/#{app_id}")
+
     sig { returns(String) }
     def optimal_region
       region = request(:get, "/regions/optimal").fetch("region")
@@ -59,24 +89,30 @@ module MagicContainer
         name: String,
         runtime_type: String,
         region: String,
-        container: T::Hash[String, T.untyped],
-        volume: T.nilable(Integer)
+        container: T::Hash[String, T.untyped]
       ).returns(String)
     end
-    def create_application(name:, runtime_type:, region:, container:, volume:)
+    def create_application(name:, runtime_type:, region:, container:)
       payload = {
         autoScaling: {min: 1, max: 1},
         containerTemplates: [container],
         name: name,
-        regionSettings: {requiredRegionIds: [region]},
+        regionSettings: {
+          allowedRegionIds: [region],
+          requiredRegionIds: [region]
+        },
         runtimeType: runtime_type
       }
-      payload[:volumes] = [{name: "storage", size: volume}] if volume
       request(:post, "/apps", payload).fetch("id").to_s
     end
 
     sig { params(app_id: String).void }
     def deploy(app_id) = request(:post, "/apps/#{app_id}/deploy")
+
+    # Restarts the app's pods so they pick up replaced environment
+    # variables - a running container keeps booting with the old set.
+    sig { params(app_id: String).void }
+    def restart(app_id) = request(:post, "/apps/#{app_id}/restart")
 
     sig { params(app_id: String).returns(T::Array[T::Hash[String, T.untyped]]) }
     def endpoints(app_id) = items(request(:get, "/apps/#{app_id}/endpoints"))
@@ -168,12 +204,41 @@ module MagicContainer
       ).void
     end
     def raise_error(status, body)
-      title = body&.fetch("title", nil)
-      detail = body&.fetch("detail", nil)
-      message = [title, detail].compact.join(" - ")
+      parts = [body&.fetch("title", nil), body&.fetch("detail", nil)]
+      parts += validation_messages(body)
+      message = parts.compact.join(" - ")
       label = message.empty? ? status.to_s : message
-      raise BunnyError.new(status, "Bunny API error: #{label}")
+      raise BunnyError.new(
+        status,
+        I18n.t("magic_container.bunny_client.errors.api_error", label: label)
+      )
     end
+
+    # Field-level detail Bunny returns with validation failures. Rejections
+    # arrive either as a field=>messages map or as {field, message} rows;
+    # without these the raised error hides which field was rejected.
+    sig do
+      params(body: T.nilable(T::Hash[String, T.untyped]))
+        .returns(T::Array[String])
+    end
+    def validation_messages(body)
+      errors = body&.fetch("errors", nil)
+      return [] if errors.nil?
+
+      case errors
+      when Hash
+        errors.map { |field, messages| "#{field}: #{Array(messages).join(", ")}" }
+      else
+        Array(errors).map do |error|
+          field = error.fetch("field", nil)
+          message = error.fetch("message", nil)
+          field ? "#{field}: #{message}" : message
+        end.compact
+      end
+    end
+
+    sig { params(cursor: String).returns(String) }
+    def encode(cursor) = URI.encode_www_form_component(cursor)
 
     sig { returns(String) }
     attr_reader :access_key

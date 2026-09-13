@@ -7,7 +7,7 @@ require "rails_helper"
 # BunnyClient behind a fake transport, and fakes for the restore and
 # litestream seeding, asserting the exact container the wizard builds.
 RSpec.describe MagicContainer::Wizard do
-  subject(:wizard) { described_class.new(prompts: prompts) }
+  subject(:wizard) { described_class.new(prompts: prompts, store: store) }
 
   let(:prompts) do
     MagicContainer::Prompts.new(
@@ -19,6 +19,8 @@ RSpec.describe MagicContainer::Wizard do
   let(:workdir) { Pathname.new(Dir.mktmpdir("wizard-spec")) }
   let(:archive_filename) { "backup-2026-01-01.tar.gz" }
   let(:archive_path) { workdir.join(archive_filename) }
+  let(:store) { MagicContainer::AnswersStore.new(path: store_path) }
+  let(:store_path) { workdir.join(".env.magic_container") }
 
   let(:answers) do
     [
@@ -30,8 +32,6 @@ RSpec.describe MagicContainer::Wizard do
       "", # image (default chobble/play-test)
       "", # tag (default latest)
       "", # runtime (default shared)
-      "", # attach volume (default yes)
-      "", # volume size (default 5)
       "https://as.example.com", # storage endpoint
       "as-bucket", # storage bucket
       "", # storage region (default us-east-1)
@@ -51,12 +51,16 @@ RSpec.describe MagicContainer::Wizard do
   end
 
   let(:calls) { [] }
+  let(:existing_apps) { [] }
   let(:responses) do
     {
       "/apps" => {"id" => 42},
       "/apps/42/deploy" => {},
-      "/apps/42/endpoints" => {"items" => [{"publicHost" => "mc-123.bunny.run", "containerId" => "c-9"}]},
+      "/apps/42/endpoints" => {
+        "items" => [{"publicHost" => "mc-123.bunny.run", "containerId" => "c-9"}]
+      },
       "/apps/42/containers/c-9/env" => {},
+      "/apps/42/restart" => {},
       "/registries" => {"items" => [{"displayName" => "Docker Hub", "hostName" => "docker.io", "id" => 7}]},
       "/regions/optimal" => {"region" => {"id" => "LDN"}}
     }
@@ -64,7 +68,36 @@ RSpec.describe MagicContainer::Wizard do
   let(:transport) do
     lambda { |method, path, body|
       calls << {method: method, path: path, body: body}
+      # POST /apps creates; GET /apps lists what already exists
+      return {"items" => existing_apps} if method == :get && path == "/apps"
+
       responses.fetch(path)
+    }
+  end
+  # A full GET /apps/{id} application - the shape Bunny returns for one
+  # the wizard itself created from the default answers
+  let(:app_detail) do
+    lambda { |id: "42", image_tag: "latest", image_pull_policy: "always"|
+      {
+        "id" => id,
+        "name" => "play-test",
+        "runtimeType" => "shared",
+        "autoScaling" => {"min" => 1, "max" => 1},
+        "regionSettings" => {"requiredRegionIds" => ["LDN"]},
+        "containerTemplates" => [{
+          "imageName" => "play-test",
+          "imageNamespace" => "chobble",
+          "imageTag" => image_tag,
+          "imagePullPolicy" => image_pull_policy,
+          "imageRegistryId" => "7",
+          "volumeMounts" => [],
+          "endpoints" => [{
+            "displayName" => "web",
+            "portMappings" => [{"containerPort" => 3000}]
+          }]
+        }],
+        "volumes" => []
+      }
     }
   end
 
@@ -84,12 +117,18 @@ RSpec.describe MagicContainer::Wizard do
           FileUtils.mkdir_p(db_path.dirname)
           File.write(db_path, "sqlite")
         end
-        {restored_databases: ["production.sqlite3"]}
+        {
+          restored_databases: ["production.sqlite3"],
+          storage_files_skipped: 0,
+          storage_files_uploaded: 1
+        }
       end
     end
   end
 
-  let!(:seeder) { instance_double(MagicContainer::LitestreamSeeder, call: true) }
+  let!(:seeder) do
+    instance_double(MagicContainer::LitestreamSeeder, call: true)
+  end
 
   before do
     allow(ENV).to receive(:[]).and_call_original
@@ -114,6 +153,7 @@ RSpec.describe MagicContainer::Wizard do
       archive_dir: workdir,
       date: "2026-01-01",
       service_name: "s3_host",
+      skip_existing_uploads: true,
       storage_target: :s3
     )
     db_paths = @restore_args.fetch(:db_paths)
@@ -128,10 +168,12 @@ RSpec.describe MagicContainer::Wizard do
 
     wizard.call
 
-    seeded_root = Pathname.new(
-      Dir.glob(Rails.root.join("tmp/magic-container-*").to_s).first
-    )
-    expect(@seeder_kwargs[:db_path]).to eq(seeded_root.join("production.sqlite3"))
+    # Not via Dir.glob: leftover workdirs from real wizard runs in tmp make
+    # "the first matching directory" unpredictable.
+    db_path = @seeder_kwargs.fetch(:db_path)
+    expect(db_path.dirname.to_s)
+      .to start_with(Rails.root.join("tmp/magic-container-").to_s)
+    expect(db_path.basename.to_s).to eq("production.sqlite3")
     expect(@seeder_kwargs[:replica_path]).to eq("production.sqlite3")
 
     s3 = @seeder_kwargs.fetch(:s3)
@@ -143,10 +185,40 @@ RSpec.describe MagicContainer::Wizard do
     expect(seeder).to have_received(:call)
   end
 
-  it "creates the application with the container, volume and endpoint" do
+  it "records the seeded replica path in the answers store" do
     wizard.call
 
-    create_call = calls.find { it[:path] == "/apps" }
+    expect(store_path.read).to include("MAGIC_SEEDED_REPLICA_PATHS=production.sqlite3")
+  end
+
+  it "seeds the Solid Queue replica alongside the primary database" do
+    staging = workdir.join("queuedb")
+    FileUtils.mkdir_p(staging.join("db"))
+    File.write(staging.join("db/production.sqlite3"), "sqlite")
+    File.write(staging.join("db/production_queue.sqlite3"), "queue sqlite")
+    system("tar", "-czf", archive_path.to_s, "-C", staging.to_s, "db", exception: true)
+    replica_paths = []
+    allow(MagicContainer::LitestreamSeeder).to receive(:new).and_wrap_original do |_m, k|
+      replica_paths << k.fetch(:replica_path)
+      seeder
+    end
+    fresh_prompts = MagicContainer::Prompts.new(
+      input: StringIO.new(answers.join("\n")), output: StringIO.new
+    )
+
+    described_class.new(prompts: fresh_prompts, store: store).call
+
+    expect(replica_paths).to eq(["production.sqlite3", "production_queue.sqlite3"])
+    stored = store_path.read
+    expect(stored).to include(
+      "MAGIC_SEEDED_REPLICA_PATHS=production.sqlite3,production_queue.sqlite3"
+    )
+  end
+
+  it "creates the application with the configured container" do
+    wizard.call
+
+    create_call = calls.find { it[:method] == :post && it[:path] == "/apps" }
     body = create_call.fetch(:body)
     container = body.fetch(:containerTemplates).first
     expect(container).to include(
@@ -156,22 +228,23 @@ RSpec.describe MagicContainer::Wizard do
       }],
       imageName: "play-test",
       imageNamespace: "chobble",
+      imagePullPolicy: "always",
       imageRegistryId: "7",
-      imageTag: "latest",
-      volumeMounts: [{mountPath: "/rails/storage", name: "storage"}]
+      imageTag: "latest"
     )
+    expect(container).not_to have_key(:volumeMounts)
+    expect(body).not_to have_key(:volumes)
     expect(body).to include(
       name: "play-test",
-      regionSettings: {requiredRegionIds: ["LDN"]},
-      runtimeType: "shared",
-      volumes: [{name: "storage", size: 5}]
+      regionSettings: {allowedRegionIds: ["LDN"], requiredRegionIds: ["LDN"]},
+      runtimeType: "shared"
     )
   end
 
   it "populates the container environment from the answers" do
     wizard.call
 
-    create_call = calls.find { it[:path] == "/apps" }
+    create_call = calls.find { it[:method] == :post && it[:path] == "/apps" }
     env = create_call.fetch(:body).fetch(:containerTemplates).first
       .fetch(:environmentVariables).to_h { it.values_at(:name, :value) }
     expect(env).to include(
@@ -191,6 +264,7 @@ RSpec.describe MagicContainer::Wizard do
     env_call = calls.find { it[:path] == "/apps/42/containers/c-9/env" }
     expect(env_call[:method]).to eq(:put)
     expect(env_call.fetch(:body)).to include("BASE_URL" => "https://mc-123.bunny.run")
+    expect(calls).to include(hash_including(method: :post, path: "/apps/42/restart"))
   end
 
   it "saves an environment record and reports the url" do
@@ -243,34 +317,434 @@ RSpec.describe MagicContainer::Wizard do
   context "when the user supplies a base url" do
     let(:answers) do
       list = super()
-      list[21] = "https://example.com"
+      list[19] = "https://example.com"
       list
     end
 
-    it "keeps the given base url and skips the env update" do
+    it "keeps the given base url and pushes it to the container" do
       wizard.call
 
-      expect(calls).not_to include(hash_including(path: "/apps/42/containers/c-9/env"))
+      expect(calls).to include(hash_including(path: "/apps/42/containers/c-9/env"))
+      env_call = calls.find { it[:path] == "/apps/42/containers/c-9/env" }
+      expect(env_call.fetch(:body)).to include("BASE_URL" => "https://example.com")
+      expect(calls).to include(hash_including(method: :post, path: "/apps/42/restart"))
       env_file = Rails.root.join("tmp/magic-container/42.env")
       expect(File.read(env_file)).to include("BASE_URL=https://example.com")
     end
   end
 
-  context "when the volume is declined" do
+  context "when a typed master key has the wrong format" do
     let(:answers) do
       list = super()
-      list[8] = "n"
+      list[20] = "9" * 64
+      list.insert(21, "a" * 32)
       list
     end
 
-    it "creates the container without a volume" do
+    it "rejects the malformed key and accepts the retried one" do
       wizard.call
 
-      create_call = calls.find { it[:path] == "/apps" }
-      body = create_call.fetch(:body)
-      container = body.fetch(:containerTemplates).first
-      expect(container).not_to have_key(:volumeMounts)
-      expect(body).not_to have_key(:volumes)
+      expect(output.string)
+        .to include("RAILS_MASTER_KEY must be 32 hexadecimal characters")
+      create_call = calls.find { it[:method] == :post && it[:path] == "/apps" }
+      env = create_call.fetch(:body).fetch(:containerTemplates).first
+        .fetch(:environmentVariables).to_h { it.values_at(:name, :value) }
+      expect(env["RAILS_MASTER_KEY"]).to eq("a" * 32)
+    end
+  end
+
+  context "when a previous attempt saved its answers" do
+    let(:retry_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new(["y", "y"].join("\n")),
+        output: retry_output
+      )
+    end
+    let(:retry_output) { StringIO.new }
+
+    before do
+      wizard.call
+      allow(restore_service).to receive(:perform) do |args|
+        @restore_args = args
+        args.fetch(:db_paths).each do |db_path|
+          FileUtils.mkdir_p(db_path.dirname)
+          File.write(db_path, "sqlite")
+        end
+        {
+          restored_databases: ["production.sqlite3"],
+          storage_files_skipped: 2,
+          storage_files_uploaded: 0
+        }
+      end
+      calls.clear
+    end
+
+    it "reuses the answers and skips completed work" do
+      described_class.new(prompts: retry_prompts, store: store).call
+
+      expect(retry_output.string).to include("Loaded answers from #{store_path}")
+      expect(retry_output.string).to include("Skipped 2 Active Storage files")
+      expect(retry_output.string).to include(
+        I18n.t("magic_container.wizard.notes.seeded_skip", name: "production.sqlite3")
+      )
+      expect(retry_output.string).to include("Reusing app 42")
+
+      expect(calls).not_to include(hash_including(method: :post, path: "/apps"))
+      expect(calls).to include(hash_including(method: :post, path: "/apps/42/deploy"))
+      expect(seeder).to have_received(:call).exactly(:once)
+    end
+
+    it "applies the final answers to the reused app before deploying" do
+      described_class.new(prompts: retry_prompts, store: store).call
+
+      # The retry loads the resolved base url, so the environment is rebuilt
+      # from the answers and pushed to the reused app
+      env_calls = calls.select { it[:path] == "/apps/42/containers/c-9/env" }
+      expect(env_calls).to be_present
+      expect(env_calls.first.fetch(:body)).to include(
+        "BASE_URL" => "https://mc-123.bunny.run"
+      )
+      expect(calls).to include(hash_including(method: :post, path: "/apps/42/restart"))
+    end
+
+    it "keeps the app id in the answers file" do
+      described_class.new(prompts: retry_prompts, store: store).call
+
+      expect(store_path.read).to include("MAGIC_APP_ID=42")
+    end
+  end
+
+  context "when an existing Bunny app already carries the answers' name" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+    let(:orphan_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new([*answers, "y"].join("\n")),
+        output: orphan_output
+      )
+    end
+    let(:orphan_output) { StringIO.new }
+
+    before { responses["/apps/42"] = app_detail.call }
+
+    it "offers the existing app for reuse instead of creating a duplicate" do
+      described_class.new(prompts: orphan_prompts, store: store).call
+
+      expect(orphan_output.string).to include("Reusing existing Bunny app 42")
+      expect(calls).not_to include(hash_including(method: :post, path: "/apps"))
+      expect(calls).to include(hash_including(method: :post, path: "/apps/42/deploy"))
+      expect(store_path.read).to include("MAGIC_APP_ID=42")
+    end
+  end
+
+  context "when the orphaned app is declined" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+    let(:orphan_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new([*answers, "n"].join("\n")),
+        output: orphan_output
+      )
+    end
+    let(:orphan_output) { StringIO.new }
+
+    before { responses["/apps/42"] = app_detail.call }
+
+    it "creates a fresh app" do
+      described_class.new(prompts: orphan_prompts, store: store).call
+
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+      expect(store_path.read).to include("MAGIC_APP_ID=42")
+    end
+  end
+
+  context "when a same-named app does not match the confirmed plan" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before { responses["/apps/42"] = app_detail.call(image_tag: "an-old-tag") }
+
+    it "creates a fresh app instead of offering the mismatched one" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :get && it[:path] == "/apps/42" }).to eq(1)
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app uses a cacheable pull policy" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before { responses["/apps/42"] = app_detail.call(image_pull_policy: "cached") }
+
+    it "creates a fresh app instead of offering the mismatched one" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app has volumes or mounts the plan does not" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before do
+      responses["/apps/42"] = app_detail.call
+        .then { |detail| detail.merge("volumes" => [{"name" => "storage", "size" => 1}]) }
+    end
+
+    it "creates a fresh app instead of offering the mismatched one" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app has volume mounts with no volume" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before do
+      responses["/apps/42"] = app_detail.call.then do |detail|
+        templates = detail.fetch("containerTemplates").map do |template|
+          template.merge("volumeMounts" => [{"name" => "storage"}])
+        end
+        detail.merge("containerTemplates" => templates)
+      end
+    end
+
+    it "creates a fresh app instead of offering the mismatched one" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app autoscales beyond the plan" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before do
+      responses["/apps/42"] = app_detail.call.then do |detail|
+        detail.merge("autoScaling" => {"min" => 1, "max" => 3})
+      end
+    end
+
+    it "creates a fresh app instead of offering the mismatched one" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app reports an incomplete application payload" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before { responses["/apps/42"] = {"id" => "42", "name" => "play-test"} }
+
+    it "creates a fresh app instead of raising on the payload" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a same-named app has no container templates at all" do
+    let(:existing_apps) { [{"id" => 42, "name" => "play-test"}] }
+
+    before do
+      responses["/apps/42"] = app_detail.call.merge("containerTemplates" => [])
+    end
+
+    it "creates a fresh app instead of raising on the payload" do
+      described_class.new(prompts: prompts, store: store).call
+
+      expect(output.string).not_to include("Reusing existing Bunny app")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when the backup at the recorded path is regenerated" do
+    let(:retry_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new(["y", "y"].join("\n")),
+        output: retry_output
+      )
+    end
+    let(:retry_output) { StringIO.new }
+
+    before do
+      wizard.call
+      staging = workdir.join("staging2")
+      FileUtils.mkdir_p(staging.join("db"))
+      File.write(staging.join("db/production.sqlite3"), "replacement contents")
+      system("tar", "-czf", archive_path.to_s, "-C", staging.to_s, "db", exception: true)
+      calls.clear
+    end
+
+    it "re-seeds the replica from the replacement contents" do
+      described_class.new(prompts: retry_prompts, store: store).call
+
+      expect(seeder).to have_received(:call).twice
+      expect(retry_output.string).not_to include("already seeded")
+    end
+
+    it "records the replacement archive's digest against the seeded paths" do
+      described_class.new(prompts: retry_prompts, store: store).call
+
+      digest = Digest::SHA256.file(archive_path).hexdigest
+      expect(store_path.read).to include("MAGIC_ARCHIVE_DIGEST=#{digest}")
+      expect(store.load.seeded_replica_paths).to eq(["production.sqlite3"])
+    end
+  end
+
+  context "when several matching apps carry the answers' name" do
+    let(:existing_apps) do
+      [
+        {"id" => 43, "name" => "play-test"},
+        {"id" => 42, "name" => "play-test"}
+      ]
+    end
+    let(:orphan_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new([*answers, "2"].join("\n")),
+        output: orphan_output
+      )
+    end
+    let(:orphan_output) { StringIO.new }
+
+    before do
+      responses["/apps/42"] = app_detail.call
+      responses["/apps/43"] = app_detail.call(id: "43")
+    end
+
+    it "lets the operator pick which app to reuse" do
+      described_class.new(prompts: orphan_prompts, store: store).call
+
+      expect(calls).not_to include(hash_including(method: :post, path: "/apps"))
+      expect(calls).to include(hash_including(method: :post, path: "/apps/42/deploy"))
+      expect(store_path.read).to include("MAGIC_APP_ID=42")
+    end
+  end
+
+  context "when several matching apps carry the name and a fresh one is picked" do
+    let(:existing_apps) do
+      [
+        {"id" => 43, "name" => "play-test"},
+        {"id" => 44, "name" => "play-test"}
+      ]
+    end
+    let(:orphan_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new([*answers, "3"].join("\n")),
+        output: orphan_output
+      )
+    end
+    let(:orphan_output) { StringIO.new }
+
+    before do
+      responses["/apps/43"] = app_detail.call(id: "43")
+      responses["/apps/44"] = app_detail.call(id: "44")
+    end
+
+    it "creates a new app" do
+      described_class.new(prompts: orphan_prompts, store: store).call
+
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+    end
+  end
+
+  context "when a newly collected plan is declined" do
+    let(:decline_plan_prompts) do
+      list = ["n", *answers]
+      list[list.length - 1] = "n"
+      MagicContainer::Prompts.new(
+        input: StringIO.new(list.join("\n")),
+        output: decline_plan_output
+      )
+    end
+    let(:decline_plan_output) { StringIO.new }
+
+    before do
+      wizard.call
+      calls.clear
+    end
+
+    it "keeps the previous attempt's retry state untouched" do
+      described_class.new(prompts: decline_plan_prompts, store: store).call
+
+      content = store_path.read
+      expect(content).to include("MAGIC_APP_ID=42")
+      expect(content).to include("MAGIC_SEEDED_REPLICA_PATHS=production.sqlite3")
+      expect(calls).not_to include(hash_including(method: :post))
+      expect(restore_service).to have_received(:perform).exactly(:once)
+      expect(seeder).to have_received(:call).exactly(:once)
+    end
+  end
+
+  context "when the stored master key is malformed" do
+    let(:replenish_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new(["y", "a" * 32, "y"].join("\n")),
+        output: replenish_output
+      )
+    end
+    let(:replenish_output) { StringIO.new }
+
+    before do
+      wizard.call
+      store.save(store.load.with(rails_master_key: "9" * 64))
+    end
+
+    it "asks for a replacement and deploys it" do
+      described_class.new(prompts: replenish_prompts, store: store).call
+
+      expect(replenish_output.string)
+        .to include("stored RAILS_MASTER_KEY is malformed")
+      env_calls = calls.select { it[:path] == "/apps/42/containers/c-9/env" }
+      expect(env_calls.last.fetch(:body)).to include("RAILS_MASTER_KEY" => "a" * 32)
+      expect(store_path.read).to include("MAGIC_RAILS_MASTER_KEY=#{"a" * 32}")
+    end
+  end
+
+  context "when previous answers exist but are declined" do
+    let(:decline_prompts) do
+      MagicContainer::Prompts.new(
+        input: StringIO.new(["n", *answers, "y"].join("\n")),
+        output: decline_output
+      )
+    end
+    let(:decline_output) { StringIO.new }
+
+    before { wizard.call }
+
+    it "collects fresh answers and creates a new app" do
+      calls.clear
+      described_class.new(prompts: decline_prompts, store: store).call
+
+      expect(decline_output.string).not_to include("Loaded answers from")
+      expect(calls.count { it[:method] == :post && it[:path] == "/apps" }).to eq(1)
+      expect(calls.count { it[:method] == :get && it[:path] == "/apps" }).to eq(1)
+      expect(seeder).to have_received(:call).twice
+    end
+  end
+
+  context "when previous answers point at a missing archive" do
+    before do
+      wizard.call
+      FileUtils.rm_f(archive_path)
+      calls.clear
+    end
+
+    it "aborts before executing anything" do
+      retry_prompts = MagicContainer::Prompts.new(
+        input: StringIO.new("y\n"), output: StringIO.new
+      )
+      expect { described_class.new(prompts: retry_prompts, store: store).call }
+        .to raise_error(/Archive not found/)
+      expect(calls).to be_empty
+      expect(restore_service).to have_received(:perform).exactly(:once)
+      expect(seeder).to have_received(:call).exactly(:once)
     end
   end
 end

@@ -41,33 +41,61 @@ module MagicContainer
     def call
       ATTEMPTS.times do
         push_snapshot
-        return if replica_seeded?
+        return if replica_holds_snapshot?
 
         sleep 2
       end
 
-      message = "No Litestream snapshot appeared in #{replica_bucket}"
-      raise "#{message} for #{replica_path}"
+      raise I18n.t("magic_container.litestream_seeder.errors.no_snapshot",
+        bucket: replica_bucket, replica_path: replica_path, listing: listing)
     ensure
-      # The generated config carries the S3 secret, so it must not survive.
-      @config_file&.close!
+      close_config
+    end
+
+    # Any row beyond the header means the replica holds a snapshot. litestream
+    # resumes the generation a re-push finds rather than adding a new
+    # snapshot row, so growth cannot serve as the success signal - only
+    # presence can. A failed litestream command raises on its own, and the
+    # wizard only pushes where its persisted state says this archive has not
+    # yet been seeded (state the archive digest invalidates when the backup
+    # file is regenerated).
+    sig { returns(T::Boolean) }
+    def replica_holds_snapshot?
+      listing.lines.count > 1
+    end
+
+    # The snapshot listing from litestream v0.3.13: a header row followed by
+    # one row per snapshot. Rows carry the replica name ("s3"), generation,
+    # index, size and creation time - never the replica path. The generated
+    # config carries the S3 secret, so it never survives the listing.
+    sig { returns(String) }
+    def listing
+      command = ["bundle", "exec", "litestream", "snapshots",
+        "-config", config_path.to_s, db_path.to_s]
+      stdout, _success = runner.call(command)
+      stdout
+    ensure
+      close_config
     end
 
     private
+
+    # The generated config carries the S3 secret, so it must not survive
+    # whichever public method last needed it. close! unlinks the file, so
+    # the reference is dropped too, letting a later command write a fresh
+    # one.
+    sig { void }
+    def close_config
+      file = @config_file
+      @config_file = nil
+      file&.close!
+    end
 
     sig { void }
     def push_snapshot
       runner.call(["bundle", "exec", "litestream", "replicate",
         "-config", config_path.to_s,
         "-exec", "sleep #{SEED_SECONDS}"])
-    end
-
-    sig { returns(T::Boolean) }
-    def replica_seeded?
-      command = ["bundle", "exec", "litestream", "snapshots",
-        "-config", config_path.to_s, db_path.to_s]
-      stdout, _success = runner.call(command)
-      stdout.include?(replica_path)
     end
 
     sig { returns(String) }
@@ -104,9 +132,11 @@ module MagicContainer
 
     sig { params(args: T::Array[String]).returns([String, T::Boolean]) }
     def litestream_run(args)
-      stdout, _stderr, status = Open3.capture3(*args)
+      stdout, stderr, status = Open3.capture3(*args)
       unless status.success?
-        raise "Litestream command failed: #{args.join(" ")}"
+        detail = stderr.empty? ? stdout : stderr
+        raise I18n.t("magic_container.litestream_seeder.errors.command_failed",
+          command: args.join(" "), detail: detail)
       end
 
       [stdout, true]

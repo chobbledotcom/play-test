@@ -34,9 +34,7 @@ RSpec.describe MagicContainer::EnvBuilder do
         endpoint: "https://as.example.com",
         region: "ldn",
         secret_access_key: "as-secret"
-      ),
-      volume: true,
-      volume_size_gb: 5
+      )
     )
   end
 
