@@ -502,7 +502,7 @@ GEM
       concurrent-ruby (~> 1.0, >= 1.0.2)
       logger
     sexp_processor (4.17.5)
-    simplecov (1.0.3)
+    simplecov (1.2.0)
     simplecov-cobertura (4.0.0)
       rexml
       simplecov (~> 1.0)
