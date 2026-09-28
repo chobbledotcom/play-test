@@ -12,6 +12,7 @@ en:
       settings: Your Settings
       change_password: Change Password
       index: Users
+      confirm_destroy: Delete User
     headers:
       user_details: User Details
     sections:
@@ -24,6 +25,7 @@ en:
       email: Email
       password: Password
       sort: Sort by
+      confirmation_name: 'Type "%{name}" to confirm deletion'
     forms:
       email: Email
       password: Password
@@ -80,6 +82,8 @@ en:
       delete_seeds: Delete Seeds
       activate: Activate User
       deactivate: Deactivate User
+      deactivate_instead: Deactivate Instead
+      back: Back
     messages:
       no_users: No users found
       admin_yes: 'Yes'
@@ -88,10 +92,19 @@ en:
       user_inactive: Your account is not currently active. Please contact an administrator.
       impersonate_confirm: You will be logged in as %{email}. You'll need to log out
         to return to your admin account.
-      delete_confirm: Are you sure?
       account_created: Account created
       user_updated: User updated
       user_deleted: User deleted
+      delete_warning:
+        one: Deleting this user will permanently destroy their inspection. This
+          cannot be undone.
+        other: Deleting this user will permanently destroy all %{count} of their
+          inspections. This cannot be undone.
+      delete_deactivate_hint: You probably want to deactivate this user instead.
+        Deactivating sets their active date to today (midnight this morning), so
+        they are deactivated immediately, but their inspections are kept.
+      delete_name_mismatch: The name you typed does not match this user's name, so
+        the user has not been deleted.
       password_updated: Password updated
       settings_updated: Settings updated
       impersonating: You are now impersonating %{email}

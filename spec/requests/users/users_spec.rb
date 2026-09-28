@@ -191,7 +191,7 @@ RSpec.describe "Users", type: :request do
     end
 
     it "#{allowed ? "allows" : "denies"} destroying other users" do
-      delete user_path(target_user)
+      delete user_path(target_user), params: {confirmation_name: target_user.name}
 
       if allowed
         expect_redirect_with_notice(response)

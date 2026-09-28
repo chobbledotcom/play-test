@@ -83,7 +83,6 @@
         data: { confirm: t('users.messages.impersonate_confirm', email: @user.email) } %>
   </article>
   <article>
-    <%= button_to t('users.buttons.delete'), user_path(@user), method: :delete,
-        data: { confirm: t('users.messages.delete_confirm') } %>
+    <%= link_to t('users.buttons.delete'), confirm_destroy_user_path(@user) %>
   </article>
 <% end %>
