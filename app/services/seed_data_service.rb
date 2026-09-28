@@ -3,7 +3,7 @@
 class SeedDataService
   extend T::Sig
 
-  CASTLE_IMAGE_COUNT = T.let(5, Integer)
+  CASTLE_IMAGE_COUNT = T.let(8, Integer)
   UNIT_COUNT = T.let(20, Integer)
   INSPECTION_COUNT = T.let(5, Integer)
   INSPECTION_INTERVAL_DAYS = T.let(364, Integer)
@@ -158,10 +158,11 @@ class SeedDataService
       )
       unit.save!
 
-      # Attach random castle image if available
+      # Attach the castle image matching this unit config so each unit type
+      # always shows its own equipment
       # For test environment, skip images as castle files don't exist
       if @castle_images.any? && !Rails.env.test?
-        castle_image = @castle_images.sample
+        castle_image = @castle_images[index % CASTLE_IMAGE_COUNT]
         # Create a new attachment - ActiveStorage will dedupe the blob automatically
         unit.photo.attach(
           io: StringIO.new(castle_image[:content]),
