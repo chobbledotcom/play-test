@@ -6,7 +6,11 @@ RSpec.feature "User deletion confirmation", type: :feature do
   let(:admin_user) { create(:user, :admin) }
   let(:target_user) { create(:user) }
 
-  before do
+  let(:confirmation_label) do
+    I18n.t("forms.user_destroy.fields.confirmation_name", name: target_user.name)
+  end
+
+  background do
     sign_in(admin_user)
   end
 
@@ -15,7 +19,18 @@ RSpec.feature "User deletion confirmation", type: :feature do
 
     click_link I18n.t("users.buttons.delete")
 
-    expect(page).to have_content(I18n.t("users.titles.confirm_destroy"))
+    expect(page).to have_content(I18n.t("forms.user_destroy.header"))
+    expect(User.exists?(target_user.id)).to be true
+  end
+
+  scenario "a user without a name cannot be taken to the confirmation page" do
+    target_user.update!(name: nil)
+
+    visit edit_user_path(target_user)
+    click_link I18n.t("users.buttons.delete")
+
+    expect(page).to have_content(I18n.t("users.messages.delete_name_required"))
+    expect(current_path).to eq(edit_user_path(target_user))
     expect(User.exists?(target_user.id)).to be true
   end
 
@@ -32,9 +47,8 @@ RSpec.feature "User deletion confirmation", type: :feature do
   scenario "typing the wrong name does not delete the user" do
     visit confirm_destroy_user_path(target_user)
 
-    fill_in I18n.t("users.fields.confirmation_name", name: target_user.name),
-      with: target_user.name.downcase
-    click_button I18n.t("users.buttons.delete")
+    fill_in confirmation_label, with: target_user.name.downcase
+    click_button I18n.t("forms.user_destroy.submit")
 
     expect(page).to have_content(I18n.t("users.messages.delete_name_mismatch"))
     expect(User.exists?(target_user.id)).to be true
@@ -43,9 +57,8 @@ RSpec.feature "User deletion confirmation", type: :feature do
   scenario "typing the exact name deletes the user" do
     visit confirm_destroy_user_path(target_user)
 
-    fill_in I18n.t("users.fields.confirmation_name", name: target_user.name),
-      with: "  #{target_user.name}  "
-    click_button I18n.t("users.buttons.delete")
+    fill_in confirmation_label, with: "  #{target_user.name}  "
+    click_button I18n.t("forms.user_destroy.submit")
 
     expect(page).to have_content(I18n.t("users.messages.user_deleted"))
     expect(current_path).to eq(users_path)

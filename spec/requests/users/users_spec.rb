@@ -237,6 +237,20 @@ RSpec.describe "Users", type: :request do
     end
   end
 
+  describe "user deletion" do
+    let(:admin) { create(:user, :admin) }
+    let(:target_user) { create(:user) }
+
+    before { login_as(admin) }
+
+    it "does not destroy the user when the confirmation name is blank" do
+      delete user_path(target_user), params: {confirmation_name: "   "}
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(User.exists?(target_user.id)).to be true
+    end
+  end
+
   define_method(:valid_user_params) do |overrides = {}|
     user_data = SeedData.user_fields.merge(rpii_inspector_number: "RPII123")
     {user: user_data.merge(overrides)}

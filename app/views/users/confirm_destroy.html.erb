@@ -1,20 +1,21 @@
 <article>
-  <h1><%= t('users.titles.confirm_destroy') %></h1>
+  <%= render 'chobble_forms/form_context',
+      model: nil,
+      i18n_base: 'forms.user_destroy',
+      url: user_path(@user),
+      method: :delete do |form| %>
+    <p><strong><%= t('users.messages.delete_warning', count: @inspection_count) %></strong></p>
 
-  <p><strong><%= t('users.messages.delete_warning', count: @inspection_count) %></strong></p>
+    <p><%= t('users.messages.delete_deactivate_hint') %></p>
 
-  <p><%= t('users.messages.delete_deactivate_hint') %></p>
+    <%= form.label :confirmation_name,
+        t('forms.user_destroy.fields.confirmation_name', name: @user.name) %>
+    <%= form.text_field :confirmation_name %>
+  <% end %>
 
   <%= button_to t('users.buttons.deactivate_instead'),
       deactivate_user_path(@user),
       method: :patch %>
-
-  <%= form_with url: user_path(@user), method: :delete do |form| %>
-    <%= form.label :confirmation_name,
-        t('users.fields.confirmation_name', name: @user.name) %>
-    <%= form.text_field :confirmation_name %>
-    <%= form.submit t('users.buttons.delete') %>
-  <% end %>
 
   <p><%= link_to t('users.buttons.back'), edit_user_path(@user) %></p>
 </article>

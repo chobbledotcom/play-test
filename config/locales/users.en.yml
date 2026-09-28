@@ -12,7 +12,6 @@ en:
       settings: Your Settings
       change_password: Change Password
       index: Users
-      confirm_destroy: Delete User
     headers:
       user_details: User Details
     sections:
@@ -25,7 +24,6 @@ en:
       email: Email
       password: Password
       sort: Sort by
-      confirmation_name: 'Type "%{name}" to confirm deletion'
     forms:
       email: Email
       password: Password
@@ -105,6 +103,8 @@ en:
         they are deactivated immediately, but their inspections are kept.
       delete_name_mismatch: The name you typed does not match this user's name, so
         the user has not been deleted.
+      delete_name_required: This user has no name set, so deletion cannot be
+        confirmed. Add a name on the edit page first.
       password_updated: Password updated
       settings_updated: Settings updated
       impersonating: You are now impersonating %{email}

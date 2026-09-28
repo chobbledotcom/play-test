@@ -1,0 +1,8 @@
+---
+en:
+  forms:
+    user_destroy:
+      header: Delete User
+      fields:
+        confirmation_name: 'Type "%{name}" to confirm deletion'
+      submit: Delete
