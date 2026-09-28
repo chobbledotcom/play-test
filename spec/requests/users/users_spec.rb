@@ -191,7 +191,7 @@ RSpec.describe "Users", type: :request do
     end
 
     it "#{allowed ? "allows" : "denies"} destroying other users" do
-      delete user_path(target_user)
+      delete user_path(target_user), params: {confirmation_name: target_user.name}
 
       if allowed
         expect_redirect_with_notice(response)
@@ -234,6 +234,20 @@ RSpec.describe "Users", type: :request do
       let(:target_user) { admin }
 
       include_examples "admin actions", false
+    end
+  end
+
+  describe "user deletion" do
+    let(:admin) { create(:user, :admin) }
+    let(:target_user) { create(:user) }
+
+    before { login_as(admin) }
+
+    it "does not destroy the user when the confirmation name is blank" do
+      delete user_path(target_user), params: {confirmation_name: "   "}
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(User.exists?(target_user.id)).to be true
     end
   end
 

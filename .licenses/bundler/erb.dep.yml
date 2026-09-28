@@ -1,6 +1,6 @@
 ---
 name: erb
-version: 6.0.4
+version: 6.0.7
 type: bundler
 summary: An easy to use but powerful templating system for Ruby.
 homepage: https://github.com/ruby/erb
@@ -80,5 +80,5 @@ licenses:
     [ruby/erb]:             https://github.com/ruby/erb
     [ruby toolbox]:         https://www.ruby-toolbox.com/categories/template_engines
     [sprintf]:              https://docs.ruby-lang.org/en/master/Kernel.html#method-i-sprintf
-    [template processor]:   https://en.wikipedia.org/wiki/Template_processor_
+    [template processor]:   https://en.wikipedia.org/wiki/Template_processor
 notices: []

@@ -2,7 +2,7 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2026-09-07
+Generated on: 2026-09-28
 Total dependencies: 149
 
 ## Dependencies by License
@@ -17,19 +17,19 @@ Total dependencies: 149
   - AWS Event Stream Library
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-partitions** v1.1220.0
+- **aws-partitions** v1.1286.0
   - Provides information about AWS partitions, regions, and services.
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-core** v3.254.0
+- **aws-sdk-core** v3.256.0
   - AWS SDK for Ruby - Core
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-kms** v1.122.0
+- **aws-sdk-kms** v1.132.0
   - AWS SDK for Ruby - KMS
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-s3** v1.228.1
+- **aws-sdk-s3** v1.230.0
   - AWS SDK for Ruby - Amazon S3
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
@@ -53,7 +53,7 @@ Total dependencies: 149
   - SimpleCov Cobertura Formatter
   - Homepage: https://github.com/jessebs/simplecov-cobertura
 
-- **sorbet-runtime** v0.5.12443
+- **sorbet-runtime** v0.6.13490
   - Sorbet runtime
   - Homepage: https://sorbet.org
 
@@ -81,7 +81,7 @@ Total dependencies: 149
   - Ruby library to interface with the SQLite3 database engine (http://www.sqlite.org).
   - Homepage: https://github.com/sparklemotion/sqlite3-ruby
 
-### MIT (82 dependencies)
+### MIT (81 dependencies)
 
 - **action_text-trix** v2.1.19
   - A rich text editor for everyday writing
@@ -171,7 +171,7 @@ Total dependencies: 149
   - Small ERB Implementation
   - Homepage: https://github.com/jeremyevans/erubi
 
-- **et-orbi** v1.4.0
+- **et-orbi** v1.4.1
   - time with zones
   - Homepage: https://github.com/floraison/et-orbi
 
@@ -179,19 +179,19 @@ Total dependencies: 149
   - HTTP/REST API client library.
   - Homepage: https://lostisland.github.io/faraday
 
-- **fugit** v1.12.1
+- **fugit** v1.13.0
   - time tools for flor
   - Homepage: https://github.com/floraison/fugit
 
-- **globalid** v1.3.0
+- **globalid** v1.4.0
   - Refer to any model with a URI: gid://app/class/id
   - Homepage: http://www.rubyonrails.org
 
-- **i18n** v1.14.8
+- **i18n** v1.15.2
   - New wave Internationalization support for Ruby
   - Homepage: https://github.com/ruby-i18n/i18n
 
-- **image_processing** v1.14.0
+- **image_processing** v2.1.0
   - High-level wrapper for processing images for the web with ImageMagick or libvips.
   - Homepage: https://github.com/janko/image_processing
 
@@ -215,15 +215,11 @@ Total dependencies: 149
   - Mail provides a nice Ruby DSL for making, sending and reading emails.
   - Homepage: https://github.com/mikel/mail
 
-- **mini_magick** v5.3.1
-  - Manipulate images with minimal use of memory via ImageMagick
-  - Homepage: https://github.com/minimagick/minimagick
-
 - **mini_mime** v1.1.5
   - A minimal mime type library
   - Homepage: https://github.com/discourse/mini_mime
 
-- **minitest** v6.0.2
+- **minitest** v6.0.6
   - minitest provides a complete suite of testing facilities supporting TDD, BDD, and benchmarking
   - Homepage: https://minite.st/
 
@@ -243,7 +239,7 @@ Total dependencies: 149
   - Prism Ruby parser
   - Homepage: https://github.com/ruby/prism
 
-- **psych** v5.2.3
+- **psych** v5.5.0
   - Psych is a YAML parser and emitter
   - Homepage: https://github.com/ruby/psych
 
@@ -251,11 +247,11 @@ Total dependencies: 149
   - Domain name parser based on the Public Suffix List.
   - Homepage: https://simonecarletti.com/code/publicsuffix-ruby
 
-- **raabro** v1.4.0
+- **raabro** v1.5.0
   - a very dumb PEG parser library
   - Homepage: https://github.com/floraison/raabro
 
-- **rack** v3.2.6
+- **rack** v3.2.7
   - A modular Ruby webserver interface.
   - Homepage: https://github.com/rack/rack
 
@@ -291,7 +287,7 @@ Total dependencies: 149
   - Tools for creating, working with, and running Rails applications.
   - Homepage: https://rubyonrails.org
 
-- **rake** v13.3.1
+- **rake** v13.4.2
   - Rake is a Make-like program implemented in Ruby
   - Homepage: https://github.com/ruby/rake
 
@@ -347,19 +343,19 @@ Total dependencies: 149
   - Secret User Agent of HTTP
   - Homepage: https://github.com/lostisland/sawyer
 
-- **sentry-rails** v6.6.2
+- **sentry-rails** v7.0.0
   - A gem that provides Rails integration for the Sentry error logger
-  - Homepage: https://github.com/getsentry/sentry-ruby/tree/6.6.2/sentry-rails
+  - Homepage: https://github.com/getsentry/sentry-ruby/tree/7.0.0/sentry-rails
 
-- **sentry-ruby** v6.6.2
+- **sentry-ruby** v7.0.0
   - A gem that provides a client interface for the Sentry error logger
-  - Homepage: https://github.com/getsentry/sentry-ruby/tree/6.6.2/sentry-ruby
+  - Homepage: https://github.com/getsentry/sentry-ruby/tree/7.0.0/sentry-ruby
 
 - **simplecov** v1.0.3
   - Code coverage for Ruby
   - Homepage: https://github.com/simplecov-ruby/simplecov
 
-- **solid_queue** v1.5.1
+- **solid_queue** v1.6.0
   - Database-backed Active Job backend.
   - Homepage: https://github.com/rails/solid_queue
 
@@ -407,11 +403,11 @@ Total dependencies: 149
   - Cron jobs in ruby.
   - Homepage: https://github.com/javan/whenever
 
-- **zeitwerk** v2.7.5
+- **zeitwerk** v2.8.3
   - Efficient and thread-safe constant autoloader
   - Homepage: https://github.com/fxn/zeitwerk
 
-### OTHER (49 dependencies)
+### OTHER (50 dependencies)
 
 - **activerecord** v8.1.3.1
   - Object-relational mapper framework (part of Rails).
@@ -441,7 +437,7 @@ Total dependencies: 149
   - Semantic Rails forms with strict i18n
   - Homepage: https://github.com/chobbledotcom/chobble-forms
 
-- **concurrent-ruby** v1.3.7
+- **concurrent-ruby** v1.3.8
   - Modern concurrency tools for Ruby. Inspired by Erlang, Clojure, Scala, Haskell, F#, C#, Java, and classic concurrency patterns.
   - Homepage: http://www.concurrent-ruby.com
 
@@ -461,7 +457,7 @@ Total dependencies: 149
   - BS EN 14960:2019 safety standard calculators for inflatable play equipment
   - Homepage: https://github.com/chobbledotcom/en14960
 
-- **erb** v6.0.4
+- **erb** v6.0.7
   - An easy to use but powerful templating system for Ruby.
   - Homepage: https://github.com/ruby/erb
 
@@ -469,15 +465,15 @@ Total dependencies: 149
   - Faraday adapter for Net::HTTP
   - Homepage: https://github.com/lostisland/faraday-net_http
 
-- **ffi** v1.17.3
+- **ffi** v1.17.4
   - Ruby FFI
   - Homepage: https://github.com/ffi/ffi/wiki
 
-- **io-console** v0.8.2
+- **io-console** v0.9.2
   - Console interface
   - Homepage: https://github.com/ruby/io-console
 
-- **irb** v1.17.0
+- **irb** v1.18.0
   - Interactive Ruby command-line tool for REPL (Read Eval Print Loop).
   - Homepage: https://github.com/ruby/irb
 
@@ -533,7 +529,7 @@ Total dependencies: 149
   - Nokogiri (鋸) makes it easy and painless to work with XML and HTML from Ruby.
   - Homepage: https://nokogiri.org
 
-- **openssl** v3.3.2
+- **openssl** v4.0.2
   - SSL/TLS and general-purpose cryptography for Ruby
   - Homepage: https://github.com/ruby/openssl
 
@@ -549,7 +545,7 @@ Total dependencies: 149
   - Low level PDF generator.
   - Homepage: http://prawnpdf.org/
 
-- **pp** v0.6.3
+- **pp** v0.6.4
   - Provides a PrettyPrinter for Ruby objects
   - Homepage: https://github.com/ruby/pp
 
@@ -569,11 +565,15 @@ Total dependencies: 149
   - Racc is an LALR(1) parser generator
   - Homepage: https://github.com/ruby/racc
 
-- **rdoc** v7.2.0
+- **rbs** v4.2.1.pre.1
+  - Type signature for Ruby.
+  - Homepage: https://github.com/ruby/rbs
+
+- **rdoc** v8.0.0
   - RDoc produces HTML and command-line documentation for Ruby projects
   - Homepage: https://ruby.github.io/rdoc
 
-- **reline** v0.6.3
+- **reline** v0.7.0
   - Alternative GNU Readline or Editline implementation by pure Ruby.
   - Homepage: https://github.com/ruby/reline
 
