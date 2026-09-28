@@ -1,6 +1,11 @@
 <article>
+  <%
+    # The form_context partial reads the scope local unconditionally; nil keeps
+    # confirmation_name a top-level parameter
+  %>
   <%= render 'chobble_forms/form_context',
       model: nil,
+      scope: nil,
       i18n_base: 'forms.user_destroy',
       url: user_path(@user),
       method: :delete do |form| %>
