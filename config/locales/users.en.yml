@@ -103,8 +103,6 @@ en:
         they are deactivated immediately, but their inspections are kept.
       delete_name_mismatch: The name you typed does not match this user's name, so
         the user has not been deleted.
-      delete_name_required: This user has no name set, so deletion cannot be
-        confirmed. Add a name on the edit page first.
       password_updated: Password updated
       settings_updated: Settings updated
       impersonating: You are now impersonating %{email}

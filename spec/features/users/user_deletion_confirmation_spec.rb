@@ -23,17 +23,6 @@ RSpec.feature "User deletion confirmation", type: :feature do
     expect(User.exists?(target_user.id)).to be true
   end
 
-  scenario "a user without a name cannot be taken to the confirmation page" do
-    target_user.update!(name: nil)
-
-    visit edit_user_path(target_user)
-    click_link I18n.t("users.buttons.delete")
-
-    expect(page).to have_content(I18n.t("users.messages.delete_name_required"))
-    expect(current_path).to eq(edit_user_path(target_user))
-    expect(User.exists?(target_user.id)).to be true
-  end
-
   scenario "confirmation page warns about inspection loss and offers deactivation" do
     unit = create(:unit, user: target_user)
     create_list(:inspection, 3, user: target_user, unit: unit)

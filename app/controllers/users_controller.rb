@@ -73,18 +73,12 @@ class UsersController < ApplicationController
 
   sig { void }
   def confirm_destroy
-    if @user.name.blank?
-      flash[:alert] = I18n.t("users.messages.delete_name_required")
-      return redirect_to edit_user_path(@user)
-    end
-
     @inspection_count = @user.inspections.count
   end
 
   sig { void }
   def destroy
-    confirmation_name = params[:confirmation_name].to_s.strip
-    if confirmation_name.present? && confirmation_name == @user.name
+    if params[:confirmation_name].to_s.strip == @user.name
       @user.destroy
       flash[:notice] = I18n.t("users.messages.user_deleted")
       redirect_to users_path
