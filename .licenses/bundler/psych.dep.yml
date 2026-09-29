@@ -1,6 +1,6 @@
 ---
 name: psych
-version: 5.2.3
+version: 5.5.0
 type: bundler
 summary: Psych is a YAML parser and emitter
 homepage: https://github.com/ruby/psych

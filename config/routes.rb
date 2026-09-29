@@ -213,6 +213,7 @@ Rails.application.routes.draw do
       patch "update_settings"
       post "impersonate"
       post "stop_impersonating"
+      get "confirm_destroy"
       post "verify_rpii"
       post "add_seeds"
       delete "delete_seeds"
