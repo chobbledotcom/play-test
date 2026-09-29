@@ -2,6 +2,8 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
+  extend T::Sig
+
   include SessionManagement
   include TurboStreamResponders
 
@@ -69,10 +71,22 @@ class UsersController < ApplicationController
     end
   end
 
+  sig { void }
+  def confirm_destroy
+    @inspection_count = @user.inspections.count
+  end
+
+  sig { void }
   def destroy
-    @user.destroy
-    flash[:notice] = I18n.t("users.messages.user_deleted")
-    redirect_to users_path
+    if params[:confirmation_name].to_s.strip == @user.name
+      @user.destroy
+      flash[:notice] = I18n.t("users.messages.user_deleted")
+      redirect_to users_path
+    else
+      @inspection_count = @user.inspections.count
+      flash.now[:alert] = I18n.t("users.messages.delete_name_mismatch")
+      render :confirm_destroy, status: :unprocessable_content
+    end
   end
 
   def change_password
@@ -92,8 +106,6 @@ class UsersController < ApplicationController
       render :change_password, status: :unprocessable_content
     end
   end
-
-  extend T::Sig
 
   sig { void }
   def impersonate

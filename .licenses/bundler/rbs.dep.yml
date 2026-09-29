@@ -1,14 +1,14 @@
 ---
-name: pp
-version: 0.6.4
+name: rbs
+version: 4.2.1.pre.1
 type: bundler
-summary: Provides a PrettyPrinter for Ruby objects
-homepage: https://github.com/ruby/pp
+summary: Type signature for Ruby.
+homepage: https://github.com/ruby/rbs
 license: other
 licenses:
 - sources: COPYING
   text: |
-    Ruby is copyrighted free software by Yukihiro Matsumoto <matz@netlab.jp>.
+    rbs is copyrighted free software by Soutaro Matsumoto <matsumoto@soutaro.com>.
     You can redistribute it and/or modify it under either the terms of the
     2-clause BSDL (see the file BSDL), or the conditions below:
 

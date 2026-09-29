@@ -1,6 +1,6 @@
 ---
 name: rdoc
-version: 7.2.0
+version: 8.0.0
 type: bundler
 summary: RDoc produces HTML and command-line documentation for Ruby projects
 homepage: https://ruby.github.io/rdoc
@@ -8,6 +8,10 @@ license: other
 licenses:
 - sources: LICENSE.rdoc
   text: |
+    :stopdoc:
+    SPDX-License-Identifier: Ruby or GPL-2.0-only
+    :startdoc:
+
     = License
 
     RDoc is copyrighted free software.

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-07T06:56:07",
+  "generated_at": "2026-09-28T08:08:11",
   "total_dependencies": 149,
   "dependencies": [
     {
@@ -116,28 +116,28 @@
     },
     {
       "name": "aws-partitions",
-      "version": "1.1220.0",
+      "version": "1.1286.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "Provides information about AWS partitions, regions, and services."
     },
     {
       "name": "aws-sdk-core",
-      "version": "3.254.0",
+      "version": "3.256.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - Core"
     },
     {
       "name": "aws-sdk-kms",
-      "version": "1.122.0",
+      "version": "1.132.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - KMS"
     },
     {
       "name": "aws-sdk-s3",
-      "version": "1.228.1",
+      "version": "1.230.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - Amazon S3"
@@ -228,7 +228,7 @@
     },
     {
       "name": "concurrent-ruby",
-      "version": "1.3.7",
+      "version": "1.3.8",
       "license": "other",
       "homepage": "http://www.concurrent-ruby.com",
       "summary": "Modern concurrency tools for Ruby. Inspired by Erlang, Clojure, Scala, Haskell, F#, C#, Java, and classic concurrency patterns."
@@ -298,7 +298,7 @@
     },
     {
       "name": "erb",
-      "version": "6.0.4",
+      "version": "6.0.7",
       "license": "other",
       "homepage": "https://github.com/ruby/erb",
       "summary": "An easy to use but powerful templating system for Ruby."
@@ -312,7 +312,7 @@
     },
     {
       "name": "et-orbi",
-      "version": "1.4.0",
+      "version": "1.4.1",
       "license": "mit",
       "homepage": "https://github.com/floraison/et-orbi",
       "summary": "time with zones"
@@ -333,35 +333,35 @@
     },
     {
       "name": "ffi",
-      "version": "1.17.3",
+      "version": "1.17.4",
       "license": "other",
       "homepage": "https://github.com/ffi/ffi/wiki",
       "summary": "Ruby FFI"
     },
     {
       "name": "fugit",
-      "version": "1.12.1",
+      "version": "1.13.0",
       "license": "mit",
       "homepage": "https://github.com/floraison/fugit",
       "summary": "time tools for flor"
     },
     {
       "name": "globalid",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "license": "mit",
       "homepage": "http://www.rubyonrails.org",
       "summary": "Refer to any model with a URI: gid://app/class/id"
     },
     {
       "name": "i18n",
-      "version": "1.14.8",
+      "version": "1.15.2",
       "license": "mit",
       "homepage": "https://github.com/ruby-i18n/i18n",
       "summary": "New wave Internationalization support for Ruby"
     },
     {
       "name": "image_processing",
-      "version": "1.14.0",
+      "version": "2.1.0",
       "license": "mit",
       "homepage": "https://github.com/janko/image_processing",
       "summary": "High-level wrapper for processing images for the web with ImageMagick or libvips."
@@ -375,14 +375,14 @@
     },
     {
       "name": "io-console",
-      "version": "0.8.2",
+      "version": "0.9.2",
       "license": "other",
       "homepage": "https://github.com/ruby/io-console",
       "summary": "Console interface"
     },
     {
       "name": "irb",
-      "version": "1.17.0",
+      "version": "1.18.0",
       "license": "other",
       "homepage": "https://github.com/ruby/irb",
       "summary": "Interactive Ruby command-line tool for REPL (Read Eval Print Loop)."
@@ -465,13 +465,6 @@
       "summary": "An implementation of Matrix and Vector classes."
     },
     {
-      "name": "mini_magick",
-      "version": "5.3.1",
-      "license": "mit",
-      "homepage": "https://github.com/minimagick/minimagick",
-      "summary": "Manipulate images with minimal use of memory via ImageMagick"
-    },
-    {
       "name": "mini_mime",
       "version": "1.1.5",
       "license": "mit",
@@ -480,7 +473,7 @@
     },
     {
       "name": "minitest",
-      "version": "6.0.2",
+      "version": "6.0.6",
       "license": "mit",
       "homepage": "https://minite.st/",
       "summary": "minitest provides a complete suite of testing facilities supporting TDD, BDD, and benchmarking"
@@ -550,7 +543,7 @@
     },
     {
       "name": "openssl",
-      "version": "3.3.2",
+      "version": "4.0.2",
       "license": "other",
       "homepage": "https://github.com/ruby/openssl",
       "summary": "SSL/TLS and general-purpose cryptography for Ruby"
@@ -592,7 +585,7 @@
     },
     {
       "name": "pp",
-      "version": "0.6.3",
+      "version": "0.6.4",
       "license": "other",
       "homepage": "https://github.com/ruby/pp",
       "summary": "Provides a PrettyPrinter for Ruby objects"
@@ -627,7 +620,7 @@
     },
     {
       "name": "psych",
-      "version": "5.2.3",
+      "version": "5.5.0",
       "license": "mit",
       "homepage": "https://github.com/ruby/psych",
       "summary": "Psych is a YAML parser and emitter"
@@ -648,7 +641,7 @@
     },
     {
       "name": "raabro",
-      "version": "1.4.0",
+      "version": "1.5.0",
       "license": "mit",
       "homepage": "https://github.com/floraison/raabro",
       "summary": "a very dumb PEG parser library"
@@ -662,7 +655,7 @@
     },
     {
       "name": "rack",
-      "version": "3.2.6",
+      "version": "3.2.7",
       "license": "mit",
       "homepage": "https://github.com/rack/rack",
       "summary": "A modular Ruby webserver interface."
@@ -725,21 +718,28 @@
     },
     {
       "name": "rake",
-      "version": "13.3.1",
+      "version": "13.4.2",
       "license": "mit",
       "homepage": "https://github.com/ruby/rake",
       "summary": "Rake is a Make-like program implemented in Ruby"
     },
     {
+      "name": "rbs",
+      "version": "4.2.1.pre.1",
+      "license": "other",
+      "homepage": "https://github.com/ruby/rbs",
+      "summary": "Type signature for Ruby."
+    },
+    {
       "name": "rdoc",
-      "version": "7.2.0",
+      "version": "8.0.0",
       "license": "other",
       "homepage": "https://ruby.github.io/rdoc",
       "summary": "RDoc produces HTML and command-line documentation for Ruby projects"
     },
     {
       "name": "reline",
-      "version": "0.6.3",
+      "version": "0.7.0",
       "license": "other",
       "homepage": "https://github.com/ruby/reline",
       "summary": "Alternative GNU Readline or Editline implementation by pure Ruby."
@@ -858,16 +858,16 @@
     },
     {
       "name": "sentry-rails",
-      "version": "6.6.2",
+      "version": "7.0.0",
       "license": "mit",
-      "homepage": "https://github.com/getsentry/sentry-ruby/tree/6.6.2/sentry-rails",
+      "homepage": "https://github.com/getsentry/sentry-ruby/tree/7.0.0/sentry-rails",
       "summary": "A gem that provides Rails integration for the Sentry error logger"
     },
     {
       "name": "sentry-ruby",
-      "version": "6.6.2",
+      "version": "7.0.0",
       "license": "mit",
-      "homepage": "https://github.com/getsentry/sentry-ruby/tree/6.6.2/sentry-ruby",
+      "homepage": "https://github.com/getsentry/sentry-ruby/tree/7.0.0/sentry-ruby",
       "summary": "A gem that provides a client interface for the Sentry error logger"
     },
     {
@@ -886,14 +886,14 @@
     },
     {
       "name": "solid_queue",
-      "version": "1.5.1",
+      "version": "1.6.0",
       "license": "mit",
       "homepage": "https://github.com/rails/solid_queue",
       "summary": "Database-backed Active Job backend."
     },
     {
       "name": "sorbet-runtime",
-      "version": "0.5.12443",
+      "version": "0.6.13490",
       "license": "apache-2.0",
       "homepage": "https://sorbet.org",
       "summary": "Sorbet runtime"
@@ -1040,7 +1040,7 @@
     },
     {
       "name": "zeitwerk",
-      "version": "2.7.5",
+      "version": "2.8.3",
       "license": "mit",
       "homepage": "https://github.com/fxn/zeitwerk",
       "summary": "Efficient and thread-safe constant autoloader"
