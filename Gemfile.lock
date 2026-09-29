@@ -667,7 +667,7 @@ DEPENDENCIES
   simplecov-cobertura
   solid_queue
   sorbet
-  sorbet-runtime (~> 0.6.13490)
+  sorbet-runtime (~> 0.6.13497)
   sprockets-rails
   sqlite3 (>= 1.4)
   standard
