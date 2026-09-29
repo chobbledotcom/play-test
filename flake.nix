@@ -28,6 +28,7 @@
             nodejs
             openssl
             pkg-config
+            python3
             rubyPackages_3_4.openssl
             rubyPackages_3_4.psych
             rubyPackages_3_4.ruby-vips
@@ -58,8 +59,8 @@
             echo "  test-memory    - Run tests with memory analysis"
             echo "  find           - Run ripgrep for a string, useful dirs only"
             echo "  flay           - Run structural duplicate detection on codebase"
+            echo "  grade-code     - Grade source and spec files against the house rules with Jev"
             echo "  jscpd          - Run copy-paste detection on codebase"
-            echo "  update-chobble - Update chobble-forms and en14960 gems"
           '';
         };
       }
