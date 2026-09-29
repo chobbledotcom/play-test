@@ -202,7 +202,7 @@ GEM
       raabro (~> 1.4)
     globalid (1.4.0)
       activesupport (>= 6.1)
-    google-protobuf (4.34.0-x86_64-linux-gnu)
+    google-protobuf (4.36.1-x86_64-linux-gnu)
       bigdecimal
       rake (~> 13.3)
     hashery (2.1.2)
@@ -325,8 +325,8 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pg_query (6.2.2)
-      google-protobuf (>= 3.25.3)
+    pg_query (6.2.3)
+      google-protobuf (>= 4.34.0)
     pp (0.6.4)
       prettyprint
     prawn (2.5.0)
