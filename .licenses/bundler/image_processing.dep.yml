@@ -1,6 +1,6 @@
 ---
 name: image_processing
-version: 1.14.0
+version: 2.1.0
 type: bundler
 summary: High-level wrapper for processing images for the web with ImageMagick or
   libvips.
