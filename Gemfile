@@ -27,7 +27,7 @@ gem "en14960"
 
 # Sorbet runtime (needed in all environments).
 # Mutant requires the 0.5 line; keep the checker and runtime in sync.
-gem "sorbet-runtime", "~> 0.6.13490"
+gem "sorbet-runtime", "~> 0.6.13497"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -60,7 +60,7 @@ group :development do
   # Sorbet type checker
   gem "sorbet", require: false
   # 0.17.10+ requires the Sorbet 0.6 runtime, which conflicts with Mutant.
-  gem "tapioca", "0.19.0", require: false
+  gem "tapioca", "0.19.2", require: false
 
   # Rubocop extension for Sorbet
   gem "rubocop-sorbet", require: false
@@ -132,7 +132,7 @@ gem "aws-sdk-s3", require: false
 gem "litestream"
 
 # Mission Control for managing background jobs
-gem "mission_control-jobs", "~> 1.0"
+gem "mission_control-jobs", "~> 1.3"
 
 # Production-only gems
 group :production do

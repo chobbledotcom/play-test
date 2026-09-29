@@ -85,8 +85,8 @@ GEM
       activesupport (>= 6.0.0)
     ast (2.4.3)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1286.0)
-    aws-sdk-core (3.256.0)
+    aws-partitions (1.1287.0)
+    aws-sdk-core (3.257.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -98,8 +98,8 @@ GEM
     aws-sdk-kms (1.132.0)
       aws-sdk-core (~> 3, >= 3.256.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.230.0)
-      aws-sdk-core (~> 3, >= 3.254.1)
+    aws-sdk-s3 (1.232.0)
+      aws-sdk-core (~> 3, >= 3.256.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.1)
@@ -142,9 +142,9 @@ GEM
       openssl-signature_algorithm (~> 1.0)
     crass (1.0.7)
     csv (3.3.6)
-    cuprite (0.17)
+    cuprite (0.18)
       capybara (~> 3.0)
-      ferrum (~> 0.17.0)
+      ferrum (~> 0.18.0)
     database_cleaner-active_record (2.2.2)
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0)
@@ -170,7 +170,7 @@ GEM
       rubocop (>= 1)
       smart_properties
     erubi (1.13.1)
-    et-orbi (1.4.1)
+    et-orbi (1.4.2)
       tzinfo
     factory_bot (6.5.6)
       activesupport (>= 6.1.0)
@@ -183,11 +183,10 @@ GEM
       logger
     faraday-net_http (3.4.4)
       net-http (~> 0.5)
-    ferrum (0.17.1)
+    ferrum (0.18.0)
       addressable (~> 2.5)
       base64 (~> 0.2)
       concurrent-ruby (~> 1.1)
-      webrick (~> 1.7)
       websocket-driver (~> 0.7)
     ffi (1.17.4-x86_64-linux-gnu)
     flay (2.14.4)
@@ -197,12 +196,12 @@ GEM
       sexp_processor (~> 4.0)
     flay-actionpack (0.0.5)
       flay (>= 1.2, < 3)
-    fugit (1.13.0)
+    fugit (1.14.0)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
     globalid (1.4.0)
       activesupport (>= 6.1)
-    google-protobuf (4.34.0-x86_64-linux-gnu)
+    google-protobuf (4.36.1-x86_64-linux-gnu)
       bigdecimal
       rake (~> 13.3)
     hashery (2.1.2)
@@ -213,7 +212,7 @@ GEM
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
-    io-console (0.9.2)
+    io-console (0.9.3)
     irb (1.18.0)
       pp (>= 0.6.0)
       prism (>= 1.3.0)
@@ -265,7 +264,7 @@ GEM
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
-    mission_control-jobs (1.1.0)
+    mission_control-jobs (1.3.1)
       actioncable (>= 7.1)
       actionpack (>= 7.1)
       activejob (>= 7.1)
@@ -325,8 +324,8 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pg_query (6.2.2)
-      google-protobuf (>= 3.25.3)
+    pg_query (6.2.3)
+      google-protobuf (>= 4.34.0)
     pp (0.6.4)
       prettyprint
     prawn (2.5.0)
@@ -507,20 +506,20 @@ GEM
       rexml
       simplecov (~> 1.0)
     smart_properties (1.17.0)
-    solid_queue (1.6.0)
+    solid_queue (1.7.0)
       activejob (>= 7.1)
       activerecord (>= 7.1)
       concurrent-ruby (>= 1.3.1)
       fugit (~> 1.11)
       railties (>= 7.1)
       thor (>= 1.3.1)
-    sorbet (0.6.13490)
-      sorbet-static (= 0.6.13490)
-    sorbet-runtime (0.6.13490)
-    sorbet-static (0.6.13490-x86_64-linux)
-    sorbet-static-and-runtime (0.6.13490)
-      sorbet (= 0.6.13490)
-      sorbet-runtime (= 0.6.13490)
+    sorbet (0.6.13497)
+      sorbet-static (= 0.6.13497)
+    sorbet-runtime (0.6.13497)
+    sorbet-static (0.6.13497-x86_64-linux)
+    sorbet-static-and-runtime (0.6.13497)
+      sorbet (= 0.6.13497)
+      sorbet-runtime (= 0.6.13497)
     spoom (1.8.7)
       erubi (>= 1.10.0)
       prism (>= 0.28.0)
@@ -556,7 +555,7 @@ GEM
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
     stringio (3.2.0)
-    tapioca (0.19.0)
+    tapioca (0.19.2)
       benchmark
       bundler (>= 2.2.25)
       netrc (>= 0.11.0)
@@ -564,8 +563,8 @@ GEM
       rbi (>= 0.3.7)
       require-hooks (>= 0.2.2)
       rubydex (>= 0.1.0.beta10)
-      sorbet-static-and-runtime (>= 0.5.11087)
-      spoom (>= 1.7.9)
+      sorbet-static-and-runtime (>= 0.6.12698)
+      spoom (>= 1.7.16)
       thor (>= 1.2.0)
       tsort
     thor (1.5.0)
@@ -601,7 +600,6 @@ GEM
       openssl (>= 2.2)
       safety_net_attestation (~> 0.5.0)
       tpm-key_attestation (~> 0.14.0)
-    webrick (1.9.2)
     websocket-driver (0.8.2)
       base64
       websocket-extensions (>= 0.1.0)
@@ -638,7 +636,7 @@ DEPENDENCIES
   importmap-rails (~> 2.1)
   licensed (~> 5.0)
   litestream
-  mission_control-jobs (~> 1.0)
+  mission_control-jobs (~> 1.3)
   mutant
   mutant-rspec
   openssl (= 4.0.2)
@@ -667,12 +665,12 @@ DEPENDENCIES
   simplecov-cobertura
   solid_queue
   sorbet
-  sorbet-runtime (~> 0.6.13490)
+  sorbet-runtime (~> 0.6.13497)
   sprockets-rails
   sqlite3 (>= 1.4)
   standard
   standard-rails
-  tapioca (= 0.19.0)
+  tapioca (= 0.19.2)
   turbo-rails (~> 2.0)
   tzinfo-data
   webauthn (~> 3.4)
