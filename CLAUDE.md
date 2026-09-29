@@ -46,6 +46,26 @@ end
 - Start with `# typed: false` and upgrade to `strict` when ready
 - Use `# typed: strict` for new files where possible
 
+### Type Check in CI
+
+`Sorbet Type Check` runs `bin/check-sorbet-errors`, which typechecks with
+`bundle exec srb tc` and fails when the error count rises above
+`sorbet/error-count-baseline` (currently 922 pre-existing errors in
+`typed: true`/`strict` files). Fix new errors; lower the baseline when debt is
+paid down.
+
+Tapioca's DSL RBIs (model columns, associations, scopes) are gitignored and
+generated in CI before the check. To reproduce locally:
+
+```bash
+RAILS_ENV=test DATABASE_URL=sqlite3:tmp/tapioca-scratch.sqlite3 bundle exec rails db:prepare
+RAILS_ENV=test DATABASE_URL=sqlite3:tmp/tapioca-scratch.sqlite3 bundle exec tapioca dsl
+bundle exec srb tc
+```
+
+Rails and gem internals that Tapioca cannot generate faithfully live in
+`sorbet/rbi/manual/`; keep new declarations there rather than disabling checks.
+
 ## PDF Caching
 
 The system supports caching generated PDFs in S3/object storage to improve performance. To enable:

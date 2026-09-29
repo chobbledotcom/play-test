@@ -3,5 +3,25 @@
 --ignore=/spec/
 --ignore=/test/
 --ignore=/vendor/
---ignore=/sorbet/rbi/dsl/
 --ignore=/db/
+# The nix devshell keeps its GEM_HOME inside the repo; CI never scans it
+--ignore=/.gems/
+# Submodule checkout of chobble-forms; CI does not fetch submodules
+--ignore=/gems/
+# Tapioca DSL RBIs for framework and engine classes. The app's own model
+# RBIs are checked; these describe Rails and gem internals whose RBIs
+# cannot be generated faithfully without gem RBIs.
+--ignore=/sorbet/rbi/dsl/abstract_controller/
+--ignore=/sorbet/rbi/dsl/action_controller/
+--ignore=/sorbet/rbi/dsl/action_dispatch/
+--ignore=/sorbet/rbi/dsl/action_view/
+--ignore=/sorbet/rbi/dsl/active_job/
+--ignore=/sorbet/rbi/dsl/active_model/
+--ignore=/sorbet/rbi/dsl/active_record/
+--ignore=/sorbet/rbi/dsl/active_storage/
+--ignore=/sorbet/rbi/dsl/active_support/
+--ignore=/sorbet/rbi/dsl/google/
+--ignore=/sorbet/rbi/dsl/mission_control/
+--ignore=/sorbet/rbi/dsl/pg_query/
+--ignore=/sorbet/rbi/dsl/solid_queue/
+--ignore=/sorbet/rbi/dsl/sprockets/
