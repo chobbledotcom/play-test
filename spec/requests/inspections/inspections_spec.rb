@@ -160,6 +160,12 @@ RSpec.describe "Inspections", type: :request do
         expect(assigns(:title)).to include("Passed")
       end
 
+      it "shows the base title for unknown result filters" do
+        get "/inspections", params: {result: "nonsense"}
+
+        expect(assigns(:title)).to eq(I18n.t("inspections.titles.index"))
+      end
+
       it "exports CSV" do
         create(:inspection, :completed, user: user, unit: unit, risk_assessment: "Test risk assessment")
 

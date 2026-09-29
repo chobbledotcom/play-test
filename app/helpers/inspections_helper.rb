@@ -75,14 +75,9 @@ module InspectionsHelper
   sig { params(result: T.nilable(String)).returns(String) }
   def inspections_index_title(result)
     title = I18n.t("inspections.titles.index")
-    return title unless result
+    return title unless %w[passed failed].include?(result)
 
-    status = case result
-    in "passed" then I18n.t("inspections.status.passed")
-    in "failed" then I18n.t("inspections.status.failed")
-    else result
-    end
-    "#{title} - #{status}"
+    "#{title} - #{I18n.t("inspections.status.#{result}")}"
   end
 
   sig { returns(String) }
