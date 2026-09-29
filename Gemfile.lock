@@ -85,8 +85,8 @@ GEM
       activesupport (>= 6.0.0)
     ast (2.4.3)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1286.0)
-    aws-sdk-core (3.256.0)
+    aws-partitions (1.1287.0)
+    aws-sdk-core (3.257.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -98,8 +98,8 @@ GEM
     aws-sdk-kms (1.132.0)
       aws-sdk-core (~> 3, >= 3.256.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.230.0)
-      aws-sdk-core (~> 3, >= 3.254.1)
+    aws-sdk-s3 (1.232.0)
+      aws-sdk-core (~> 3, >= 3.256.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
     aws-sigv4 (1.12.1)
@@ -202,7 +202,7 @@ GEM
       raabro (~> 1.4)
     globalid (1.4.0)
       activesupport (>= 6.1)
-    google-protobuf (4.34.0-x86_64-linux-gnu)
+    google-protobuf (4.36.1-x86_64-linux-gnu)
       bigdecimal
       rake (~> 13.3)
     hashery (2.1.2)
@@ -213,7 +213,7 @@ GEM
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
-    io-console (0.9.2)
+    io-console (0.9.3)
     irb (1.18.0)
       pp (>= 0.6.0)
       prism (>= 1.3.0)
@@ -265,7 +265,7 @@ GEM
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
-    mission_control-jobs (1.1.0)
+    mission_control-jobs (1.3.1)
       actioncable (>= 7.1)
       actionpack (>= 7.1)
       activejob (>= 7.1)
@@ -325,8 +325,8 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pg_query (6.2.2)
-      google-protobuf (>= 3.25.3)
+    pg_query (6.2.3)
+      google-protobuf (>= 4.34.0)
     pp (0.6.4)
       prettyprint
     prawn (2.5.0)
@@ -502,7 +502,7 @@ GEM
       concurrent-ruby (~> 1.0, >= 1.0.2)
       logger
     sexp_processor (4.17.5)
-    simplecov (1.0.3)
+    simplecov (1.2.0)
     simplecov-cobertura (4.0.0)
       rexml
       simplecov (~> 1.0)
@@ -638,7 +638,7 @@ DEPENDENCIES
   importmap-rails (~> 2.1)
   licensed (~> 5.0)
   litestream
-  mission_control-jobs (~> 1.0)
+  mission_control-jobs (~> 1.3)
   mutant
   mutant-rspec
   openssl (= 4.0.2)

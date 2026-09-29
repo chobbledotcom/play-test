@@ -132,7 +132,7 @@ gem "aws-sdk-s3", require: false
 gem "litestream"
 
 # Mission Control for managing background jobs
-gem "mission_control-jobs", "~> 1.0"
+gem "mission_control-jobs", "~> 1.3"
 
 # Production-only gems
 group :production do
