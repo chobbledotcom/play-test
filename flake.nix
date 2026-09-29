@@ -34,6 +34,7 @@
             rubyPackages_3_4.ruby-vips
             rubyPackages_3_4.rugged
             ruby_3_4
+            sqlite
             yamlfix
             yamllint
           ];

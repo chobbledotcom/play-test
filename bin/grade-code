@@ -377,8 +377,8 @@ CHECKS = [
          question=dict(
              type="noul",
              instructions=(
-                 "Does this template contain any `class` or `style` attribute at "
-                 "all? House rule: zero class attributes, zero inline styles - "
+                 "Is this template free of `class` and `style` attributes? "
+                 "House rule: zero class attributes, zero inline styles - "
                  "all styling comes from the MVP.css framework's semantic "
                  "selectors, so a class here is always a breach."
              ),
@@ -524,12 +524,12 @@ CHECKS = [
          question=dict(
              type="noul",
              instructions=(
-                 "Do the factories and test data stay minimal - required "
-                 "attributes and uniqueness only, with variations expressed as "
-                 "traits - rather than over-specifying realistic-looking data, or "
-                 "hand-building records that a factory already provides (for "
-                 "example creating assessments instead of updating the ones the "
-                 "inspection factory already made)?"
+                 "Do the factories or test data over-specify - "
+                 "realistic-looking data beyond required attributes and "
+                 "uniqueness, variations not expressed as traits - or "
+                 "hand-build records that a factory already provides "
+                 "(for example creating assessments instead of updating "
+                 "the ones the inspection factory already made)?"
              ),
              criteria={
                  "true": "Over-specified factories or hand-built records",
@@ -753,7 +753,7 @@ def grade_file(abs_path, rel_path, kind, args, api_key):
         questions, meta = build_jev_questions(checks)
         state = build_jev_state(rel_path, kind, source, truncated)
         t_jev = time.time()
-        slug = re.sub(r"[^a-z0-9]", "", rel_path)[-40:]
+        slug = re.sub(r"[^a-z0-9]", "", rel_path.lower())[-40:]
         resp, err = call_jev(state, questions, args.model, api_key, f"grade-code-{slug}")
         if err:
             return dict(x, score=None, letter="-",
@@ -767,6 +767,12 @@ def grade_file(abs_path, rel_path, kind, args, api_key):
             "seconds": round(time.time() - t_jev, 2),
         }
         results = grade_jev_answers(resp.get("answers", {}), meta)
+        if not results:
+            return dict(x, score=None, letter="-",
+                        counts={"PASS": 0, "WARN": 0, "FAIL": 0}, checks={},
+                        jev=jev_info, jev_error="no usable answers",
+                        skipped="no usable answers",
+                        seconds=round(time.time() - t_start, 2))
         score, letter, counts = summarise(results)
         return dict(x, score=score, letter=letter, counts=counts, checks=results,
                     jev=jev_info, jev_error=None, seconds=round(time.time() - t_start, 2))
