@@ -1,0 +1,34 @@
+name: "Sorbet Type Check"
+
+on:
+  pull_request:
+  merge_group:
+  workflow_call:
+
+jobs:
+  sorbet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      # Tapioca's DSL RBIs describe model columns, associations and scopes.
+      # They are gitignored, so generate them against a scratch test database
+      # before typechecking.
+      - name: Prepare scratch database
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: sqlite3:tmp/tapioca-scratch.sqlite3
+        run: bundle exec rails db:prepare
+
+      - name: Generate Tapioca DSL RBIs
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: sqlite3:tmp/tapioca-scratch.sqlite3
+        run: bundle exec tapioca dsl
+
+      - name: Run Sorbet
+        run: bin/check-sorbet-errors

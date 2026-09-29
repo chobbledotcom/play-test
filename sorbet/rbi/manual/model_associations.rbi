@@ -14,8 +14,11 @@ end
 
 class Inspection < ApplicationRecord
   extend T::Sig
-  
+
   # Attributes from database
+  sig { returns(String) }
+  def id; end
+
   sig { returns(T.nilable(DateTime)) }
   def complete_date; end
   
