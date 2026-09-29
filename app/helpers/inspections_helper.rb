@@ -72,6 +72,19 @@ module InspectionsHelper
     inspection.applicable_tabs
   end
 
+  sig { params(result: T.nilable(String)).returns(String) }
+  def inspections_index_title(result)
+    title = I18n.t("inspections.titles.index")
+    return title unless result
+
+    status = case result
+    in "passed" then I18n.t("inspections.status.passed")
+    in "failed" then I18n.t("inspections.status.failed")
+    else result
+    end
+    "#{title} - #{status}"
+  end
+
   sig { returns(String) }
   def current_tab
     params[:tab].presence || "inspection"

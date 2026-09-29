@@ -235,6 +235,28 @@ class ApplicationController < ActionController::Base
     true
   end
 
+  # Shared scaffolding for serving a cacheable PDF: total-time measurement,
+  # then the block produces the fetch/generate result, then the response
+  sig { params(pdf_type: Symbol, record_id: T.untyped, block: T.proc.returns(T.untyped)).void }
+  def deliver_cached_pdf(pdf_type, record_id, &block)
+    PdfPerformance.measure(
+      :total,
+      pdf_type: pdf_type,
+      record_id: record_id
+    ) do
+      result = yield
+      handle_pdf_response(result, pdf_filename)
+    end
+  end
+
+  sig { params(record: T.untyped, filename: String).void }
+  def send_qr_code(record, filename)
+    send_data QrCodeService.generate_qr_code(record),
+      filename: filename,
+      type: "image/png",
+      disposition: "inline"
+  end
+
   sig { params(result: T.untyped, filename: String).void }
   def handle_pdf_response(result, filename)
     case result.type
