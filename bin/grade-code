@@ -1,0 +1,936 @@
+#!/usr/bin/env python3
+"""
+grade-code — grade this repo's source and spec files against the house coding
+rules in CLAUDE.md using Jev (TypeSafe System One) via the OpenCode zen API.
+
+Every check is a judgement call, not a grep: one Jev systemone call per file,
+one question per check, all questions for that file asked in a single call.
+The script carries no mechanical checks — the repo already runs those
+(CodeStandardsChecker, standardrb, the custom cops, bin/lint). What is left is
+the taste: idiomatic Rails, small single-purpose methods, short comments that
+explain WHY and carry no history notes, plain technical English, no dead code
+or defensive fallbacks, I18n for every user-facing string, semantic HTML, and
+specs that are not tautological and read as a clear story.
+
+Targets are files or directories; the default is the whole of app, spec and
+lib. Files are graded one at a time.
+
+Usage:
+    ./bin/grade-code                                    # app, spec, lib
+    ./bin/grade-code app/models spec/features           # chosen dirs
+    ./bin/grade-code app/models/inspection.rb           # full single-file report
+    ./bin/grade-code --kinds model,controller,service   # only these kinds
+    ./bin/grade-code --limit 20                         # first 20 discovered
+    ./bin/grade-code spec --workers 6                   # parallel (default 1)
+    ./bin/grade-code --csv grades.csv --json
+    ./bin/grade-code --list-checks                      # print the rubric
+
+The Jev API key is read from OPENCODE_API_KEY, then /run/secrets/opencode_api_key,
+then a .env file in the repo root. Batch mode always exits 0 (it is a report);
+single-file mode exits 2 when the file could not be graded.
+"""
+
+import argparse
+import csv
+import json
+import os
+import re
+import sys
+import time
+import urllib.error
+import urllib.request
+from collections import Counter, OrderedDict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+ZEN_SYSTEMONE_URL = "https://opencode.ai/zen/v1/systemone"
+DEFAULT_MODEL = "jev-1.13"
+DEFAULT_KEY_FILE = "/run/secrets/opencode_api_key"
+
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DEFAULT_TARGETS = ["app", "spec", "lib"]
+
+MAX_SOURCE_CHARS = 60000
+GRADABLE_EXTS = (".rb", ".erb", ".js")
+SKIP_DIR_NAMES = {
+    ".bundle", ".git", "coverage", "gems", "log", "node_modules",
+    "public", "sorbet", "spencers_app", "storage", "tmp", "vendor",
+}
+SKIP_PATH_PREFIXES = ("app/assets/",)
+# third-party code, not house code: the upstream highlight.js distribution
+VENDORED_FILES = ("app/javascript/highlight.js",)
+
+KIND_LABELS = {
+    "controller": "Rails controller",
+    "helper": "Rails helper",
+    "job": "Rails job",
+    "lib": "library code",
+    "model": "Rails model",
+    "serializer": "Rails serializer",
+    "service": "Rails service object",
+    "spec": "RSpec spec",
+    "spec_feature": "RSpec feature spec",
+    "spec_support": "RSpec support code (helper, factory, harness)",
+    "view": "ERB template",
+    "javascript": "JavaScript",
+}
+
+RAILS_KINDS = {
+    "controller", "helper", "job", "model", "serializer", "service",
+}
+RUBY_KINDS = RAILS_KINDS | {"lib", "spec", "spec_feature", "spec_support"}
+APP_KINDS = RAILS_KINDS | {"lib"}
+TEST_KINDS = {"spec", "spec_feature"}
+ANY_KINDS = RUBY_KINDS | {"javascript", "view"}
+
+FORM_RE = re.compile(r"form_with|form_context|simple_form|<form")
+FACTORY_RE = re.compile(r"(?:create|build|attributes_for)\(:")
+
+
+# ---------------------------------------------------------------------------
+# Discovery: targets (files or dirs) -> gradable files with a kind
+# ---------------------------------------------------------------------------
+
+
+def classify(rel_path):
+    """Map a repo-relative path to a file kind, or None if not gradable.
+
+    Only the app, spec and lib trees carry house coding rules worth grading:
+    config, migrations, seeds data and vendored assets do not.
+    """
+    if rel_path.startswith(SKIP_PATH_PREFIXES):
+        return None
+    if not rel_path.endswith(GRADABLE_EXTS):
+        return None
+    if rel_path.endswith(".min.js") or rel_path in VENDORED_FILES:
+        return None
+    if rel_path.startswith("app/views/"):
+        return "view"
+    if rel_path.startswith("app/javascript/"):
+        return "javascript"
+    if rel_path.startswith("spec/"):
+        if rel_path.startswith("spec/features/"):
+            return "spec_feature"
+        support = ("spec/support/", "spec/factories/", "spec/fixtures/")
+        if rel_path.startswith(support):
+            return "spec_support"
+        if rel_path in ("spec/rails_helper.rb", "spec/spec_helper.rb"):
+            return "spec_support"
+        return "spec"
+    for prefix, kind in (
+        ("app/models/", "model"),
+        ("app/controllers/", "controller"),
+        ("app/services/", "service"),
+        ("app/helpers/", "helper"),
+        ("app/jobs/", "job"),
+        ("app/serializers/", "serializer"),
+    ):
+        if rel_path.startswith(prefix):
+            return kind
+    if rel_path.startswith("lib/"):
+        return "lib"
+    return None
+
+
+def discover(targets, kinds=None):
+    """Expand file and dir targets into (abs_path, rel_path, kind) triples."""
+    found = []
+    for target in targets:
+        path = target if os.path.isabs(target) else os.path.join(REPO_ROOT, target)
+        if os.path.isfile(path):
+            candidates = [path]
+        elif os.path.isdir(path):
+            candidates = []
+            for root, dirs, files in os.walk(path):
+                dirs[:] = [d for d in dirs if d not in SKIP_DIR_NAMES]
+                candidates.extend(os.path.join(root, f) for f in files)
+        else:
+            print(f"no such file or directory: {target}", file=sys.stderr)
+            continue
+        for candidate in candidates:
+            rel = os.path.relpath(candidate, REPO_ROOT)
+            kind = classify(rel)
+            if kind and (not kinds or kind in kinds):
+                found.append((candidate, rel, kind))
+    return sorted(set(found))
+
+
+def read_source(abs_path):
+    """Read a file for grading. Returns (source, truncated)."""
+    with open(abs_path, encoding="utf-8", errors="replace") as f:
+        text = f.read()
+    if len(text) <= MAX_SOURCE_CHARS:
+        return text, False
+    return text[:MAX_SOURCE_CHARS], True
+
+
+# ---------------------------------------------------------------------------
+# The rubric
+#
+# engine "jev" -> the question is sent to Jev (one call per file, all
+# questions together) and the answer is graded against the thresholds below.
+#
+# For noul checks the probability is the goodness, unless invert is set: then
+# the question asks for a *bad* thing and a low probability is good.
+# score checks grade a 0..N level against score_pass / score_warn.
+# ---------------------------------------------------------------------------
+
+CHECKS = [
+    dict(id="idiomatic_rails", label="Idiomatic Rails", types=RAILS_KINDS, weight=6,
+         question=dict(
+             type="score",
+             instructions=(
+                 "Is this Rails code idiomatic? House standards: scopes for "
+                 "non-trivial queries, `find_by` rather than `where(...).first`, "
+                 "validations for data integrity, meaningful associations, "
+                 "RESTful actions, business logic in models or services rather "
+                 "than controllers, service objects for work that spans models, "
+                 "delegation where it earns its place, and ActiveRecord idioms "
+                 "instead of hand-rolled SQL."
+             ),
+             criteria=[
+                 "Not idiomatic - hand-rolled SQL, non-RESTful actions, logic in the wrong layer",
+                 "Mostly conventional with a few unidiomatic spots",
+                 "Solid, idiomatic Rails throughout",
+                 "Textbook - conventions, scopes, validations and delegation used exactly where they belong",
+             ],
+         ),
+         score_pass=2, score_warn=1),
+    dict(id="method_simplicity", label="Nice simple methods", types=RUBY_KINDS, weight=6,
+         question=dict(
+             type="score",
+             instructions=(
+                 "Are the methods nice and simple? Each should do one thing, stay "
+                 "short (house limit is 20 lines), use guard clauses instead of "
+                 "nesting, and carry a descriptive name. Complex conditions belong "
+                 "in a named predicate method rather than inline in a branch."
+             ),
+             criteria=[
+                 "Long multi-purpose methods, deep nesting, cryptic names",
+                 "One or two methods are too long or do too much",
+                 "Methods are short, single-purpose and well named",
+                 "Every method is a small obvious unit whose name says what it does",
+             ],
+         ),
+         score_pass=2, score_warn=1),
+    dict(id="comments_why_not_what", label="Comments explain WHY", types=ANY_KINDS, weight=4,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Do the comments in `source` earn their place - do they explain "
+                 "WHY (business context, a regulatory requirement, a non-obvious "
+                 "decision a reader could not infer) rather than restating WHAT "
+                 "the next line of code already says? Judge only the comments that "
+                 "are there: a file with no comments passes, because it neither "
+                 "explains nor misleads. Comments that merely narrate the code - "
+                 "'# increment the counter', '# verify we're on the right tab' - "
+                 "count against it."
+             ),
+             criteria={
+                 "true": "Comments that exist carry real reasons, or there are none",
+                 "false": "Comments narrate what the code does, or repeat it back",
+             },
+         ),
+         threshold=0.5),
+    dict(id="comments_short_plain", label="Short comments, plain English", types=ANY_KINDS, weight=3,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Are the comments short and in simple technical English - a "
+                 "sentence or two, plain words, British spelling - rather than "
+                 "essays, chatty prose, jargon-stacking or American spelling? "
+                 "Judge only the comments that are there: a file with no comments "
+                 "passes."
+             ),
+             criteria={
+                 "true": "Comments are brief, plain and use British spelling",
+                 "false": "Comments are long-winded, chatty, flowery or American",
+             },
+         ),
+         threshold=0.5),
+    dict(id="no_history_notes", label="No history notes or stale TODOs", types=ANY_KINDS, weight=4,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Are the comments free of history notes - 'changed this to that', "
+                 "'previously we did X', notes about who changed what and when, "
+                 "dated or stale TODO/FIXME notes, and commentary that the next "
+                 "refactor will make wrong?"
+             ),
+             criteria={
+                 "true": "No history notes, changelog-style comments or stale TODOs",
+                 "false": "Changelog-style notes, dated commentary or stale TODOs",
+             },
+         ),
+         threshold=0.5),
+    dict(id="no_dead_code", label="No dead code or speculative abstraction", types=ANY_KINDS, weight=4,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Does `source` carry dead weight - methods nothing calls, "
+                 "commented-out code, speculative abstractions, or a fallback for "
+                 "a case that cannot happen?"
+             ),
+             criteria={
+                 "true": "Dead code, commented-out blocks or needless abstraction",
+                 "false": "Nothing unused - every method earns its place",
+             },
+         ),
+         invert=True, threshold=0.5),
+    dict(id="no_defensive_coding", label="No defensive coding or silent fallbacks", types=RUBY_KINDS, weight=4,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Does `source` defend against problems that cannot happen - "
+                 "`respond_to?` checks against interfaces the app owns, rescues "
+                 "that swallow errors, nil-guards on values the app guarantees, "
+                 "or `||` fallbacks that hide missing data? House style prefers "
+                 "crashing loudly over quietly failing."
+             ),
+             criteria={
+                 "true": "Defensive checks, silent rescues or fallbacks that hide failures",
+                 "false": "Trusts its own interfaces and lets errors bubble up",
+             },
+         ),
+         invert=True, threshold=0.5),
+    dict(id="modern_ruby", label="Modern, tidy Ruby", types=RUBY_KINDS, weight=3,
+         question=dict(
+             type="score",
+             instructions=(
+                 "How modern and tidy is the Ruby? House style prefers endless "
+                 "methods for simple computation, shorthand hashes (`{width:, "
+                 "height:}`), numbered block parameters (`map { _1.upcase }`), "
+                 "pattern matching for dispatch, `filter_map`, rightward "
+                 "assignment where it reads well, and no backslash continuations "
+                 "or parameter-alignment padding."
+             ),
+             criteria=[
+                 "Dated Ruby throughout - old syntax the language no longer needs",
+                 "Mostly legacy syntax; modern idioms only where the old ones bite",
+                 "Acceptable - modern idioms where they help, some dated syntax left",
+                 "Consistently the newest tidy syntax, in the right places",
+             ],
+         ),
+         score_pass=2, score_warn=1),
+    dict(id="naming_british", label="British, descriptive naming", types=ANY_KINDS, weight=3,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Are the identifiers in `source` British English and idiomatic "
+                 "for their language - snake_case in Ruby, camelCase in "
+                 "JavaScript - with no American spellings (color, organize, "
+                 "initialize) and no opaque abbreviations? Ordinary names such as "
+                 "`name`, `email` or `user` count as fine; only genuinely cryptic "
+                 "or misleading names count against it."
+             ),
+             criteria={
+                 "true": "Names are British, idiomatic for the language and readable",
+                 "false": "American spellings or opaque abbreviations",
+             },
+         ),
+         threshold=0.5),
+    dict(id="sorbet_sigs", label="Sorbet sigil and sigs", types=APP_KINDS, weight=3,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Does `source` follow the repo's Sorbet convention: a `# typed:` "
+                 "sigil at the top of the file, and `sig` blocks on the methods of "
+                 "a file marked `# typed: strict` or `# typed: strong`?"
+             ),
+             criteria={
+                 "true": "Typed sigil present, and sigs wherever the file type requires them",
+                 "false": "Missing the typed sigil, or methods in a strict/strong file lack sigs",
+             },
+         ),
+         threshold=0.5),
+    dict(id="i18n_strings", label="I18n for user-facing strings", types=RAILS_KINDS | {"view"}, weight=6,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Ignoring strings nobody sees (log messages, file paths, class "
+                 "names, error classes, format strings), is every user-facing "
+                 "string routed through I18n - `t(...)` in views and helpers, "
+                 "locale keys or `I18n.t` in models, controllers, services and "
+                 "serializers - with no hardcoded English the user could read?"
+             ),
+             criteria={
+                 "true": "All user-facing strings come from locale files",
+                 "false": "Hardcoded user-facing strings",
+             },
+         ),
+         threshold=0.5),
+    dict(id="skinny_controller", label="Thin controller", types={"controller"}, weight=5,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Does this controller stay thin - find the record, set instance "
+                 "variables, delegate to a model or service, use semantic params, "
+                 "and choose the right HTTP method - rather than holding business "
+                 "logic, queries or data munging of its own?"
+             ),
+             criteria={
+                 "true": "Thin: sets up and delegates, logic lives elsewhere",
+                 "false": "Business logic or heavy data handling in the controller",
+             },
+         ),
+         threshold=0.5),
+    dict(id="no_css_classes", label="No class or style attributes", types={"view"}, weight=4,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Does this template contain any `class` or `style` attribute at "
+                 "all? House rule: zero class attributes, zero inline styles - "
+                 "all styling comes from the MVP.css framework's semantic "
+                 "selectors, so a class here is always a breach."
+             ),
+             criteria={
+                 "true": "Every class and style attribute absent - markup carries no styling hooks",
+                 "false": "One or more class or style attributes",
+             },
+         ),
+         threshold=0.5),
+    dict(id="semantic_structure", label="Semantic HTML structure", types={"view"}, weight=3,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Is the structure of this template semantic - `<article>`, "
+                 "`<header>`, `<nav>`, `<main>`, tables with `<thead>`, `<tbody>` "
+                 "and `<th scope>`, forms with `<fieldset>`, `<legend>` and "
+                 "associated `<label>`s - rather than `<div>` used for layout or "
+                 "`<section>` standing in for `<article>`? A small partial that "
+                 "wraps one value in an unclassed `<div>` is fine; judge the "
+                 "structure, not the element count."
+             ),
+             criteria={
+                 "true": "Elements chosen for their meaning, tables and forms complete",
+                 "false": "Div-for-layout, unlabelled inputs or headerless tables",
+             },
+         ),
+         threshold=0.5),
+    dict(id="form_conventions", label="Form partial and i18n conventions", types={"view"}, weight=5,
+         requires_source=FORM_RE,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Does this form follow the house conventions: `render "
+                 "'form/form_context'` with a `model` and an `i18n_base`, field "
+                 "partials that take their labels from the "
+                 "`#{i18n_base}.fields` locale namespace, and the submit button "
+                 "supplied automatically by the partial rather than hand-rolled?"
+             ),
+             criteria={
+                 "true": "Uses form_context, field partials and the automatic submit button",
+                 "false": "Hand-rolled form, manual submit button or hardcoded labels",
+             },
+         ),
+         threshold=0.5),
+    dict(id="turbo_first", label="Progressive enhancement, Turbo-first", types={"javascript"}, weight=4,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Is this JavaScript progressive enhancement - the page works as "
+                 "plain HTML first, this code only layers on Turbo and Stimulus "
+                 "conventions (`data: { turbo_method: }`, `turbo_confirm`, submit "
+                 "hooks) - with no framework sprawl, no hijacking of native "
+                 "behaviour, and no dead listeners?"
+             ),
+             criteria={
+                 "true": "Enhances plain HTML with Turbo/Stimulus idioms",
+                 "false": "Replaces native behaviour, or reaches for a framework to do it",
+             },
+         ),
+         threshold=0.5),
+
+    # --- specs: not tautological, names that say something, real coverage ---
+    dict(id="not_tautological", label="Tests assert behaviour, not wiring", types=TEST_KINDS, weight=6,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Do any of these examples assert on implementation rather than "
+                 "observable behaviour - checking that a collaborator was called, "
+                 "that a field was copied or a default forwarded, echoing a mock's "
+                 "own return value back, asserting on source text or class names, "
+                 "or bare `expect(x).to be true` / `not_to be_nil` assertions that "
+                 "pass whatever the code does?"
+             ),
+             criteria={
+                 "true": "Tests assert wiring, mock echoes, source text or tautologies",
+                 "false": "Tests assert what a user or caller can observe",
+             },
+         ),
+         invert=True, threshold=0.5),
+    dict(id="succinct_names", label="Succinct, specific example names", types=TEST_KINDS, weight=3,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Are the example names succinct and specific - 'archives a "
+                 "company when the archive link is clicked' - rather than generic "
+                 "('works', 'test 1', 'handles the case') or rambling "
+                 "multi-sentence restatements of the setup?"
+             ),
+             criteria={
+                 "true": "Names state the behaviour in a few words",
+                 "false": "Names are generic, numbered or rambling",
+             },
+         ),
+         threshold=0.5),
+    dict(id="happy_and_edge", label="Happy path and edge cases", types=TEST_KINDS, weight=4,
+         question=dict(
+             type="score",
+             instructions=(
+                 "Do the tests cover the happy path and the edge cases that could "
+                 "plausibly break - boundaries, invalid input, empty collections, "
+                 "authorisation, error paths - or only the sunny path?"
+             ),
+             criteria=[
+                 "One trivial example that proves little",
+                 "Happy path only",
+                 "Happy path plus some meaningful edge cases",
+                 "Thorough - happy path, boundaries, error paths and edge cases",
+             ],
+         ),
+         score_pass=2, score_warn=1),
+    dict(id="clear_test_story", label="Each test reads as a story", types=TEST_KINDS, weight=3,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Does each example read as a clear story - visible setup, action, "
+                 "assertion - without burying the important step in a helper used "
+                 "only once, or duplicating so much shared setup that the point of "
+                 "the example is lost?"
+             ),
+             criteria={
+                 "true": "Arrange, act and assert are visible in each example",
+                 "false": "Indirection or duplication hides what is being tested",
+             },
+         ),
+         threshold=0.5),
+    dict(id="rspec_dsl", label="House RSpec DSL", types=TEST_KINDS, weight=2,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Does `source` use the house RSpec DSL - `RSpec.feature` with "
+                 "`scenario` and `background` for feature specs, `RSpec.describe` "
+                 "with `context` and `it` for everything else, Factory Bot for "
+                 "test data, and no `test`/`should` syntax?"
+             ),
+             criteria={
+                 "true": "Correct DSL for the file type",
+                 "false": "Wrong DSL block, or test/should syntax",
+             },
+         ),
+         threshold=0.5),
+    dict(id="factory_minimal", label="Minimal factory data", types={"spec", "spec_support"}, weight=3,
+         requires_source=FACTORY_RE,
+         question=dict(
+             type="noul",
+             instructions=(
+                 "Do the factories and test data stay minimal - required "
+                 "attributes and uniqueness only, with variations expressed as "
+                 "traits - rather than over-specifying realistic-looking data, or "
+                 "hand-building records that a factory already provides (for "
+                 "example creating assessments instead of updating the ones the "
+                 "inspection factory already made)?"
+             ),
+             criteria={
+                 "true": "Over-specified factories or hand-built records",
+                 "false": "Minimal data, traits for variants",
+             },
+         ),
+         invert=True, threshold=0.5),
+]
+
+
+# ---------------------------------------------------------------------------
+# Jev client
+# ---------------------------------------------------------------------------
+
+
+def load_api_key():
+    """OPENCODE_API_KEY, then /run/secrets/opencode_api_key, then .env."""
+    key = os.environ.get("OPENCODE_API_KEY")
+    if key:
+        return key.strip()
+    try:
+        with open(DEFAULT_KEY_FILE) as f:
+            return f.read().strip()
+    except OSError:
+        pass
+    env_path = os.path.join(REPO_ROOT, ".env")
+    try:
+        with open(env_path) as f:
+            for line in f:
+                name, sep, value = line.partition("=")
+                if sep and name.strip() == "OPENCODE_API_KEY":
+                    return value.strip().strip("'\"")
+    except OSError:
+        pass
+    return None
+
+
+def call_jev(state, questions, model, api_key, session_id):
+    payload = {"model": model, "state": state, "questions": questions}
+    req = urllib.request.Request(
+        ZEN_SYSTEMONE_URL,
+        data=json.dumps(payload).encode(),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "grade-code/0.1 (play-test)",
+            "x-opencode-session": session_id,
+        },
+        method="POST",
+    )
+    last_err = None
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=180) as r:
+                return json.loads(r.read().decode()), None
+        except urllib.error.HTTPError as e:
+            body = e.read().decode()[:400]
+            last_err = f"HTTP {e.code}: {body}"
+            if e.code == 429:
+                if "FreeUsageLimitError" in body:
+                    # free-tier quota exhausted - retrying will not help, and
+                    # the backoff would stall the whole sweep
+                    break
+                time.sleep(5 * (attempt + 1))
+                continue
+            if e.code in (402, 401, 400):  # will not fix on retry
+                break
+        except Exception as e:  # noqa: BLE001
+            last_err = f"{type(e).__name__}: {e}"
+        time.sleep(1 + attempt)
+    return None, last_err
+
+
+# ---------------------------------------------------------------------------
+# Grading
+# ---------------------------------------------------------------------------
+
+
+def active_checks(kind, source):
+    out = []
+    for c in CHECKS:
+        if kind not in c["types"]:
+            continue
+        pattern = c.get("requires_source")
+        if pattern and not pattern.search(source):
+            continue
+        out.append(c)
+    return out
+
+
+def build_jev_state(rel_path, kind, source, truncated):
+    return {
+        "file": {
+            "path": rel_path,
+            "kind": kind,
+            "kind_label": KIND_LABELS.get(kind, kind),
+            "lines": source.count("\n") + 1,
+            "truncated": truncated,
+        },
+        "source": source,
+    }
+
+
+def grade_jev_answers(answers, meta):
+    results = OrderedDict()
+    for cid, c in meta.items():
+        ans = answers.get(cid)
+        if ans is None:
+            continue
+        entry = {
+            "label": c["label"],
+            "engine": "jev",
+            "weight": c["weight"],
+            "raw": ans,
+        }
+        if ans["type"] == "noul":
+            p = ans["noul"]
+            good = (1.0 - p) if c.get("invert") else p
+            entry["value"] = p
+            entry["goodness"] = good
+            thr = c.get("threshold", 0.5)
+            if good >= thr:
+                entry["status"] = "PASS"
+            elif good >= thr - 0.3:
+                entry["status"] = "WARN"
+            else:
+                entry["status"] = "FAIL"
+            entry["note"] = f"noul={p:.2f}" + (" (inverted)" if c.get("invert") else "")
+        elif ans["type"] == "score":
+            s = ans["score"]
+            levels = len(ans["legend"])
+            good = 1.0 if s >= c["score_pass"] else (0.5 if s >= c["score_warn"] else 0.0)
+            entry["value"] = s
+            entry["goodness"] = good
+            entry["status"] = "PASS" if good == 1.0 else ("WARN" if good == 0.5 else "FAIL")
+            entry["note"] = f"score={s:.2f}/{levels - 1} (conf {ans.get('confidence', 0):.2f})"
+        elif ans["type"] == "choice":
+            entry["value"] = ans["choice"]
+            entry["goodness"] = 1.0 if ans["choice"] in c.get("pass_choices", ()) else 0.0
+            entry["status"] = "PASS" if entry["goodness"] else "FAIL"
+            entry["note"] = f"choice={ans['choice']} (conf {ans.get('confidence', 0):.2f})"
+        else:
+            continue
+        # a hard FAIL the model is not confident about is a review flag, not a
+        # verdict (TypeSafe confidence architecture: act only when confident)
+        conf = ans.get("confidence")
+        if conf is not None and conf < 0.3 and entry["status"] == "FAIL":
+            entry["status"] = "WARN"
+            entry["goodness"] = 0.5
+            entry["note"] += " [low confidence - human review]"
+        results[cid] = entry
+    return results
+
+
+def summarise(results):
+    counted = {k: v for k, v in results.items() if v["status"] != "SKIP"}
+    total_w = sum(r["weight"] for r in counted.values())
+    got_w = sum(r["weight"] * r["goodness"] for r in counted.values())
+    score = round(100 * got_w / total_w) if total_w else 0
+    letter = "A" if score >= 90 else "B" if score >= 75 else "C" if score >= 60 else "D" if score >= 45 else "F"
+    counts = {s: sum(1 for r in counted.values() if r["status"] == s) for s in ("PASS", "WARN", "FAIL")}
+    return score, letter, counts
+
+
+def build_jev_questions(checks):
+    questions = {}
+    meta = {}
+    for c in checks:
+        questions[c["id"]] = json.loads(json.dumps(c["question"]))
+        meta[c["id"]] = c
+    return questions, meta
+
+
+def print_report(x, results, score, letter, counts, jev_info):
+    print(f"Code grader - {x['path']}")
+    truncated = " (source truncated)" if x.get("truncated") else ""
+    print(f"kind: {x['kind']} ({KIND_LABELS.get(x['kind'], x['kind'])}) | "
+          f"lines: {x['lines']} | checks: {len(results)}{truncated}")
+    print()
+    for r in results.values():
+        mark = {"PASS": "+", "WARN": "~", "FAIL": "X", "SKIP": "-"}[r["status"]]
+        print(f"  [{mark}] {r['status']:<4} {r['label']:<44} "
+              f"({r['engine']:<4} w{r['weight']}) {r['note']}")
+    print()
+    print(f"Score: {score}/100 ({letter}) - {counts['PASS']} pass, "
+          f"{counts['WARN']} warn, {counts['FAIL']} fail")
+    if jev_info:
+        print(f"Jev: model={jev_info['model']}, {jev_info['input_tokens']} in / "
+              f"{jev_info['output_tokens']} out tokens, {jev_info['seconds']:.2f}s")
+
+
+# ---------------------------------------------------------------------------
+# One file at a time
+# ---------------------------------------------------------------------------
+
+
+def grade_file(abs_path, rel_path, kind, args, api_key):
+    """Grade one file. Returns a result dict; never raises."""
+    t_start = time.time()
+    try:
+        source, truncated = read_source(abs_path)
+        x = {
+            "path": rel_path,
+            "kind": kind,
+            "lines": source.count("\n") + 1,
+            "truncated": truncated,
+        }
+        checks = active_checks(kind, source)
+        if not checks:
+            return dict(x, score=None, letter="-",
+                        counts={"PASS": 0, "WARN": 0, "FAIL": 0}, checks={},
+                        jev=None, jev_error=None,
+                        skipped=f"no checks apply to kind '{kind}'",
+                        seconds=round(time.time() - t_start, 2))
+        if not api_key:
+            return dict(x, score=None, letter="-",
+                        counts={"PASS": 0, "WARN": 0, "FAIL": 0}, checks={},
+                        jev=None, jev_error="no API key",
+                        skipped="no Jev API key", seconds=round(time.time() - t_start, 2))
+
+        questions, meta = build_jev_questions(checks)
+        state = build_jev_state(rel_path, kind, source, truncated)
+        t_jev = time.time()
+        slug = re.sub(r"[^a-z0-9]", "", rel_path)[-40:]
+        resp, err = call_jev(state, questions, args.model, api_key, f"grade-code-{slug}")
+        if err:
+            return dict(x, score=None, letter="-",
+                        counts={"PASS": 0, "WARN": 0, "FAIL": 0}, checks={},
+                        jev=None, jev_error=err, skipped=err,
+                        seconds=round(time.time() - t_start, 2))
+        jev_info = {
+            "model": resp.get("model", args.model),
+            "input_tokens": resp.get("usage", {}).get("input_tokens"),
+            "output_tokens": resp.get("usage", {}).get("output_tokens"),
+            "seconds": round(time.time() - t_jev, 2),
+        }
+        results = grade_jev_answers(resp.get("answers", {}), meta)
+        score, letter, counts = summarise(results)
+        return dict(x, score=score, letter=letter, counts=counts, checks=results,
+                    jev=jev_info, jev_error=None, seconds=round(time.time() - t_start, 2))
+    except Exception as e:  # noqa: BLE001
+        return {"path": rel_path, "kind": kind, "score": None, "letter": "E",
+                "counts": {"PASS": 0, "WARN": 0, "FAIL": 0}, "checks": {},
+                "jev": None, "jev_error": None,
+                "error": f"{type(e).__name__}: {e}",
+                "seconds": round(time.time() - t_start, 2)}
+
+
+# ---------------------------------------------------------------------------
+# Batch mode
+# ---------------------------------------------------------------------------
+
+
+def run_batch(targets, args, api_key):
+    t0 = time.time()
+    rows = []
+    done = 0
+    with ThreadPoolExecutor(max_workers=args.workers) as pool:
+        futs = {
+            pool.submit(grade_file, abs_path, rel_path, kind, args, api_key): rel_path
+            for abs_path, rel_path, kind in targets
+        }
+        for fut in as_completed(futs):
+            row = fut.result()
+            done += 1
+            rows.append(row)
+            if row["score"] is None:
+                why = row.get("error") or row.get("skipped") or ""
+                print(f"[{done}/{len(targets)}] SKIP {row['path']} - {why[:80]}", file=sys.stderr)
+            else:
+                fails = ",".join(cid for cid, r in row["checks"].items() if r["status"] == "FAIL") or "-"
+                print(f"[{done}/{len(targets)}] {row['score']:>3} {row['letter']} "
+                      f"{row['kind']:<13} {fails[:50]} {row['path']}", file=sys.stderr)
+
+    rows.sort(key=lambda r: (r["score"] is None, r["score"] if r["score"] is not None else 0))
+    graded = [r for r in rows if r["score"] is not None]
+    errors = [r for r in rows if r["score"] is None]
+
+    if args.json:
+        print(json.dumps(rows, indent=2))
+    else:
+        print(f"\nCode grader - batch of {len(rows)} (workers={args.workers}, model={args.model})")
+        print(f"{'Score':>5} {'L':<2} {'Kind':<13} {'p/w/x':<9} {'Lines':>5}  Failed checks")
+        print("-" * 110)
+        for r in rows:
+            if r["score"] is None:
+                why = r.get("error") or r.get("skipped") or ""
+                print(f"{'---':>5} {'-':<2} {r['kind']:<13} {'':<9} {r.get('lines', 0):>5}  "
+                      f"{r['path']} - {why[:60]}")
+                continue
+            c = r["counts"]
+            fails = ",".join(cid for cid, chk in r["checks"].items() if chk["status"] == "FAIL")
+            print(f"{r['score']:>5} {r['letter']:<2} {r['kind']:<13} "
+                  f"{c['PASS']}/{c['WARN']}/{c['FAIL']:<5} {r['lines']:>5}  {fails or '-'} {r['path']}")
+
+        if graded:
+            scores = sorted(r["score"] for r in graded)
+            median = scores[len(scores) // 2]
+            letters = Counter(r["letter"] for r in graded)
+            kinds = Counter(r["kind"] for r in graded)
+            wall = time.time() - t0
+            print("-" * 110)
+            print(f"{len(graded)} graded, {len(errors)} errored | median {median} | "
+                  f"{' '.join(f'{l}:{n}' for l, n in sorted(letters.items()))} | "
+                  f"{' '.join(f'{k}:{n}' for k, n in sorted(kinds.items()))} | "
+                  f"{wall:.0f}s total, {wall / max(len(rows), 1):.1f}s/file")
+            fail_counter = Counter()
+            warn_counter = Counter()
+            for r in graded:
+                for cid, chk in r["checks"].items():
+                    if chk["status"] == "FAIL":
+                        fail_counter[chk["label"]] += 1
+                    elif chk["status"] == "WARN":
+                        warn_counter[chk["label"]] += 1
+            if fail_counter:
+                print("\nMost-failed checks across the batch:")
+                for label, n in fail_counter.most_common(10):
+                    print(f"  FAIL x{n:<4} {label}")
+            if warn_counter:
+                print("\nMost-warned checks across the batch:")
+                for label, n in warn_counter.most_common(5):
+                    print(f"  WARN x{n:<4} {label}")
+
+    if args.csv:
+        with open(args.csv, "w", newline="") as f:
+            w = csv.writer(f)
+            w.writerow(["score", "letter", "kind", "lines", "path", "pass", "warn", "fail",
+                        "failed_checks", "jev_error", "error"])
+            for r in rows:
+                w.writerow([
+                    r["score"] if r["score"] is not None else "",
+                    r["letter"], r["kind"], r.get("lines", ""), r["path"],
+                    r["counts"]["PASS"], r["counts"]["WARN"], r["counts"]["FAIL"],
+                    ";".join(cid for cid, chk in r["checks"].items() if chk["status"] == "FAIL"),
+                    r.get("jev_error") or "",
+                    r.get("error") or "",
+                ])
+        print(f"\nCSV written to {args.csv}", file=sys.stderr)
+    return 0
+
+
+# ---------------------------------------------------------------------------
+# main
+# ---------------------------------------------------------------------------
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Grade this repo's source and spec files against the house "
+                    "coding rules using Jev.",
+        epilog="Batch mode (2+ files) prints a worst-first ranked table; a "
+               "single file prints the full per-check report.",
+    )
+    parser.add_argument("targets", nargs="*",
+                        help=f"files or dirs to grade (default: {' '.join(DEFAULT_TARGETS)})")
+    parser.add_argument("--kinds", help="comma-separated kinds to keep: "
+                        + ",".join(sorted(KIND_LABELS)))
+    parser.add_argument("--limit", type=int, help="grade at most N discovered files")
+    parser.add_argument("--workers", type=int, default=1,
+                        help="parallel batch workers (default 1 - one file at a time)")
+    parser.add_argument("--csv", help="write batch results to a CSV file")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help=f"Jev model id (default {DEFAULT_MODEL})")
+    parser.add_argument("--json", action="store_true", help="machine-readable output")
+    parser.add_argument("--list-checks", action="store_true", help="print the rubric and exit")
+    args = parser.parse_args()
+
+    if args.list_checks:
+        for c in CHECKS:
+            kinds = ",".join(sorted(c["types"]))
+            print(f"{c['id']:<26} w{c['weight']:<3} [{kinds}]\n"
+                  f"{'':<26}    {c['label']}")
+        return 0
+
+    kinds = set(args.kinds.split(",")) if args.kinds else None
+    if kinds and kinds - set(KIND_LABELS):
+        parser.error(f"unknown kind(s): {', '.join(sorted(kinds - set(KIND_LABELS)))}")
+
+    targets = discover(args.targets or DEFAULT_TARGETS, kinds)
+    if not targets:
+        print(f"no gradable files in: {', '.join(args.targets or DEFAULT_TARGETS)}", file=sys.stderr)
+        return 2
+    if args.limit:
+        targets = targets[: args.limit]
+
+    api_key = load_api_key()
+
+    if len(targets) == 1 and not args.json and not args.csv:
+        abs_path, rel_path, kind = targets[0]
+        result = grade_file(abs_path, rel_path, kind, args, api_key)
+        if result["score"] is None:
+            print(f"ERROR grading {rel_path}: {result.get('error') or result.get('skipped')}",
+                  file=sys.stderr)
+            return 2
+        print_report(result, result["checks"], result["score"], result["letter"],
+                     result["counts"], result["jev"])
+        if result.get("jev_error"):
+            print(f"note: Jev unavailable ({result['jev_error']})", file=sys.stderr)
+        return 0
+
+    return run_batch(targets, args, api_key)
+
+
+if __name__ == "__main__":
+    sys.exit(main())
