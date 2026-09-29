@@ -35,13 +35,15 @@ RSpec.describe "users/edit.html.erb", type: :view do
     end
 
     expect(rendered).to have_select("Inspection Company")
-    expect(rendered).to have_button("Delete")
+    expect(rendered).to have_link("Delete",
+      href: confirm_destroy_user_path(user_to_edit))
   end
 
   it "includes navigation links" do
     render
 
-    expect(rendered).to have_button("Delete")
+    expect(rendered).to have_link("Delete",
+      href: confirm_destroy_user_path(user_to_edit))
   end
 
   it "displays validation errors when present" do

@@ -16,13 +16,6 @@ development:
     args: [both]
     schedule: at 2am every day
     description: Daily full backup (database + Active Storage) to S3 and local
-test:
-  backup:
-    class: BackupJob
-    queue: default
-    args: [s3]
-    schedule: every 5 minutes
-    description: Test full backup to S3 (runs every 5 minutes for testing)
 production:
   backup:
     class: BackupJob
