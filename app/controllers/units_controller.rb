@@ -210,28 +210,17 @@ class UnitsController < ApplicationController
   end
 
   def send_unit_pdf
-    PdfPerformance.measure(
-      :total,
-      pdf_type: :unit,
-      record_id: @unit.id
-    ) do
-      result = PdfCacheService.fetch_or_generate_unit_pdf(
+    deliver_cached_pdf(:unit, @unit.id) do
+      PdfCacheService.fetch_or_generate_unit_pdf(
         @unit,
         debug_enabled: admin_debug_enabled?,
         debug_queries: debug_sql_queries
       )
-
-      handle_pdf_response(result, pdf_filename)
     end
   end
 
   def send_unit_qr_code
-    qr_code_png = QrCodeService.generate_qr_code(@unit)
-
-    send_data qr_code_png,
-      filename: "#{@unit.serial}_QR.png",
-      type: "image/png",
-      disposition: "inline"
+    send_qr_code(@unit, I18n.t("units.export.qr_filename", serial: @unit.serial))
   end
 
   # PublicViewable implementation

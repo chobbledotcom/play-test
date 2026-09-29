@@ -239,6 +239,24 @@ class Inspection < ApplicationRecord
   def self.both_dates_present?(start_date, end_date) =
     start_date.present? && end_date.present?
 
+  # The index page shows drafts oldest-first so the oldest work surfaces, but
+  # completed reports newest-first like a history feed. Runs on loaded records
+  # so the includes for photos and companies are preserved.
+  sig do
+    params(inspections: T::Array[Inspection])
+      .returns({drafts: T::Array[Inspection], complete: T::Array[Inspection]})
+  end
+  def self.partition_for_index(inspections)
+    {
+      drafts: inspections
+        .select { |inspection| inspection.complete_date.nil? }
+        .sort_by(&:created_at),
+      complete: inspections
+        .select { |inspection| inspection.complete_date.present? }
+        .sort_by { |inspection| -inspection.created_at.to_i }
+    }
+  end
+
   # Calculated fields
   sig { returns(T.nilable(Date)) }
   def reinspection_date

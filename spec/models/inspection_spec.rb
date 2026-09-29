@@ -120,6 +120,22 @@ RSpec.describe Inspection, type: :model do
     end
   end
 
+  describe ".partition_for_index" do
+    it "orders drafts oldest first and completed newest first" do
+      oldest_complete = create(:inspection, :completed, created_at: 3.days.ago)
+      newest_complete = create(:inspection, :completed, created_at: 1.day.ago)
+      oldest_draft = create(:inspection, created_at: 2.days.ago)
+      newest_draft = create(:inspection, created_at: 1.hour.ago)
+
+      partitioned = Inspection.partition_for_index(
+        [oldest_complete, newest_complete, oldest_draft, newest_draft]
+      )
+
+      expect(partitioned.fetch(:drafts)).to eq([oldest_draft, newest_draft])
+      expect(partitioned.fetch(:complete)).to eq([newest_complete, oldest_complete])
+    end
+  end
+
   describe ".filter_by_result" do
     let!(:passed) { create(:inspection, :passed) }
     let!(:failed) { create(:inspection, :failed) }

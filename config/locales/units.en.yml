@@ -169,6 +169,7 @@ en:
       copied: Copied!
     export:
       pdf_type: Unit
+      qr_filename: "%{serial}_QR.png"
     forms:
       search: Search units...
     links:
