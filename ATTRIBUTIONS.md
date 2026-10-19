@@ -2,7 +2,7 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2026-09-28
+Generated on: 2026-10-19
 Total dependencies: 149
 
 ## Dependencies by License
@@ -17,11 +17,11 @@ Total dependencies: 149
   - AWS Event Stream Library
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-partitions** v1.1286.0
+- **aws-partitions** v1.1287.0
   - Provides information about AWS partitions, regions, and services.
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-core** v3.256.0
+- **aws-sdk-core** v3.257.0
   - AWS SDK for Ruby - Core
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
@@ -29,7 +29,7 @@ Total dependencies: 149
   - AWS SDK for Ruby - KMS
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-s3** v1.230.0
+- **aws-sdk-s3** v1.232.0
   - AWS SDK for Ruby - Amazon S3
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
@@ -53,7 +53,7 @@ Total dependencies: 149
   - SimpleCov Cobertura Formatter
   - Homepage: https://github.com/jessebs/simplecov-cobertura
 
-- **sorbet-runtime** v0.6.13490
+- **sorbet-runtime** v0.6.13497
   - Sorbet runtime
   - Homepage: https://sorbet.org
 
@@ -171,7 +171,7 @@ Total dependencies: 149
   - Small ERB Implementation
   - Homepage: https://github.com/jeremyevans/erubi
 
-- **et-orbi** v1.4.1
+- **et-orbi** v1.4.2
   - time with zones
   - Homepage: https://github.com/floraison/et-orbi
 
@@ -179,7 +179,7 @@ Total dependencies: 149
   - HTTP/REST API client library.
   - Homepage: https://lostisland.github.io/faraday
 
-- **fugit** v1.13.0
+- **fugit** v1.14.0
   - time tools for flor
   - Homepage: https://github.com/floraison/fugit
 
@@ -223,7 +223,7 @@ Total dependencies: 149
   - minitest provides a complete suite of testing facilities supporting TDD, BDD, and benchmarking
   - Homepage: https://minite.st/
 
-- **mission_control-jobs** v1.1.0
+- **mission_control-jobs** v1.3.1
   - Operational controls for Active Job
   - Homepage: https://github.com/rails/mission_control-jobs
 
@@ -351,11 +351,11 @@ Total dependencies: 149
   - A gem that provides a client interface for the Sentry error logger
   - Homepage: https://github.com/getsentry/sentry-ruby/tree/7.0.0/sentry-ruby
 
-- **simplecov** v1.0.3
+- **simplecov** v1.2.0
   - Code coverage for Ruby
   - Homepage: https://github.com/simplecov-ruby/simplecov
 
-- **solid_queue** v1.6.0
+- **solid_queue** v1.7.0
   - Database-backed Active Job backend.
   - Homepage: https://github.com/rails/solid_queue
 
@@ -469,7 +469,7 @@ Total dependencies: 149
   - Ruby FFI
   - Homepage: https://github.com/ffi/ffi/wiki
 
-- **io-console** v0.9.2
+- **io-console** v0.9.3
   - Console interface
   - Homepage: https://github.com/ruby/io-console
 
