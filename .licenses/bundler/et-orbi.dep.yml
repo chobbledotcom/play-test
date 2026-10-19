@@ -1,6 +1,6 @@
 ---
 name: et-orbi
-version: 1.4.1
+version: 1.4.2
 type: bundler
 summary: time with zones
 homepage: https://github.com/floraison/et-orbi
