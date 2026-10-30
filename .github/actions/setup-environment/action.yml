@@ -5,13 +5,13 @@ runs:
   using: "composite"
   steps:
     - name: Install packages
-      uses: awalsh128/cache-apt-pkgs-action@latest
-      with:
-        # Rugged's static OpenSSL link needs this archive on Ubuntu 26.
-        packages: >-
-          google-chrome-stable curl libjemalloc2 libjitterentropy3-dev
-          sqlite3 libvips42
-        version: 1.3
+      # Rugged's static OpenSSL link needs libjitterentropy3-dev on Ubuntu 26.
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends -y \
+          curl google-chrome-stable libjemalloc2 libjitterentropy3-dev \
+          libvips42 sqlite3
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1

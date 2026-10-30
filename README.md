@@ -90,6 +90,10 @@ Ubuntu 26.04 also requires `libjitterentropy3-dev` for Rugged's static OpenSSL
 link during `bundle install`. CI installs it in the shared setup action;
 the devenv configuration is unchanged.
 
+The shared CI setup refreshes APT indexes and installs packages directly.
+Failed downloads stop setup instead of leaving missing native libraries for
+Rails to load.
+
 ## Testing
 
 Currently over 90% test coverage:
