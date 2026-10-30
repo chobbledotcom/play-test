@@ -105,6 +105,10 @@ bin/coverage_check app/models/inspection.rb
 open coverage/index.html
 ```
 
+Security scans run `bin/brakeman --no-pager`, which requires the latest
+Brakeman release. Update it with `bundle update brakeman --conservative`
+when the version check fails.
+
 ## Test Coverage
 
 If you want to help improve Play-Test, a great way would be to write some more `rspec` and `Capybara` tests. Check out [coverage.play-test.co.uk](https://coverage.play-test.co.uk/) for an up-to-date test coverage breakdown.
