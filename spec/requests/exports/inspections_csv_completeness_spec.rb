@@ -12,22 +12,21 @@ RSpec.describe "Inspections CSV Export Completeness", type: :request do
   end
 
   describe "CSV export completeness" do
-    it "includes all inspection database columns (except excluded ones)" do
+    it "preserves the fixed inspection summary columns" do
       get inspections_path(format: :csv)
 
       expect(response).to have_http_status(:success)
       csv_content = response.body
       headers = CSV.parse(csv_content).first
 
-      # Expected exclusions (foreign keys handled separately)
-      excluded_columns = %w[user_id inspector_company_id unit_id]
-      expected_inspection_columns = Inspection.column_names - excluded_columns
-
-      # All inspection columns should be present
-      expected_inspection_columns.each do |column|
-        expect(headers).to include(column),
-          "CSV missing inspection column: #{column}. All inspection columns should be included automatically."
-      end
+      expect(headers).to eq(%w[
+        id complete_date created_at has_slide height height_comment
+        indoor_only inspection_date inspection_type is_seed is_totally_enclosed
+        length length_comment operator passed pdf_last_accessed_at
+        risk_assessment updated_at width width_comment
+        unit_name unit_serial unit_manufacturer unit_description
+        inspector_company_name inspector_user_email complete
+      ])
     end
 
     it "includes all expected related model fields" do
@@ -65,22 +64,14 @@ RSpec.describe "Inspections CSV Export Completeness", type: :request do
       expect(row["inspector_user_email"]).to eq(user.email)
     end
 
-    it "automatically includes new inspection columns if added" do
-      # This test ensures the reflection-based approach will pick up new columns
-      # without requiring manual updates to the CSV export code
-
+    it "does not expose configuration revisions or detailed assessment answers" do
       get inspections_path(format: :csv)
-      csv_content = response.body
-      headers = CSV.parse(csv_content).first
+      headers = CSV.parse(response.body).first
 
-      # Count should match all inspection columns minus exclusions plus related fields
-      excluded_columns = %w[user_id inspector_company_id unit_id]
-      inspection_column_count = Inspection.column_names.length - excluded_columns.length
-      # unit_name, unit_serial, unit_manufacturer, unit_description +
-      # inspector_company_name + inspector_user_email + complete
-      related_field_count = 7
-
-      expect(headers.length).to eq(inspection_column_count + related_field_count)
+      expect(headers).not_to include(
+        "checklist_revision", "has_fencing", "has_ball_pool",
+        "inspection_location", "number_of_users", "fabric_strength_pass"
+      )
     end
 
     it "handles inspections without units gracefully" do

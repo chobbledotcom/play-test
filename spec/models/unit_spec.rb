@@ -67,6 +67,26 @@ RSpec.describe Unit, type: :model do
       expect(unit).to be_valid
     end
 
+    %i[
+      bouncy_castle bungee_run catch_bed inflatable_ball_pool inflatable_game
+      play_zone
+    ].each do |unit_type|
+      it "requires a blower for constant-air #{unit_type} units" do
+        unit = build(:unit, user:, unit_type:, has_blower: false)
+
+        expect(unit).not_to be_valid
+        error = I18n.t("activerecord.errors.messages.required_for_constant_air")
+        expect(unit.errors[:has_blower]).to include(error)
+      end
+    end
+
+    it "allows a bouncing pillow without an inflation blower" do
+      unit = build(:unit, user:, unit_type: :bouncing_pillow, has_blower: false)
+
+      expect(unit).to be_valid
+      expect(unit.has_blower).to be(false)
+    end
+
     it "validates serial uniqueness within user" do
       existing_unit = create(:unit)
       # Same user, same serial should fail

@@ -95,6 +95,29 @@ module InspectionTestHelpers
     end
   end
 
+  def fill_applicable_assessments_via_ui(inspection)
+    applicable = inspection.reload.applicable_assessments
+    inspection.applicable_tabs.each do |tab_name|
+      assessment_name = :"#{tab_name}_assessment"
+      next unless applicable.key?(assessment_name)
+      assessment = inspection.public_send(assessment_name)
+      fields = attributes_for(assessment_name, :complete)
+        .slice(*assessment.form_schema.attribute_names)
+
+      if block_given?
+        yield tab_name, fields
+        next
+      end
+
+      visit edit_inspection_path(inspection, tab: tab_name)
+      fields.each do |field_name, value|
+        fill_assessment_field(tab_name, field_name, value)
+      end
+      submit_form tab_name.to_sym
+      expect_updated_message
+    end
+  end
+
   # Navigation helpers
   def visit_inspection_edit(inspection)
     visit edit_inspection_path(inspection)
@@ -130,7 +153,7 @@ module InspectionTestHelpers
 
     case value
     when true, false
-      if field_name.to_s.end_with?("_pass") || field_name.to_s == "passed"
+      if field_name.to_s == "passed"
         choose_pass_fail(field_label, value)
       elsif BOOLEAN_FIELDS.include?(field_name.to_s)
         value ? check_form_radio(tab_name.to_sym, field_name) :
@@ -139,12 +162,11 @@ module InspectionTestHelpers
         choose_yes_no(field_label, value)
       end
     when :pass, "pass"
-      choose_pass_fail(field_label, true)
+      choose_pass_fail(field_label, "pass")
     when :fail, "fail"
-      choose_pass_fail(field_label, false)
+      choose_pass_fail(field_label, "fail")
     when :na, "na"
-      # For now, skip N/A values as the test uses passing values
-      # The form should support N/A but we don't need to test it here
+      choose_pass_fail(field_label, "na")
     else
       fill_in_form(tab_name.to_sym, field_name, value) if value.present?
     end

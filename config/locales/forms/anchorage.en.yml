@@ -7,6 +7,7 @@ en:
         anchor_counts: Anchor Counts
         anchor_quality: Anchor Quality
       fields:
+        bungee_side_area: Optional bungee reference Area2, per side (m²)
         num_low_anchors: Low anchor points
         num_high_anchors: High anchor points
         anchor_accessories: Correct anchor accessories

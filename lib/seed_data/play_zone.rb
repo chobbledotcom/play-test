@@ -11,29 +11,32 @@ module SeedData
 
     def self.pass_fields(passed)
       {
-        age_marking_pass: Shared.check_passed?(passed),
-        height_marking_pass: Shared.check_passed?(passed),
-        sight_line_pass: Shared.check_passed?(passed),
-        access_pass: Shared.check_passed?(passed),
-        suitable_matting_pass: Shared.check_passed?(passed),
-        traffic_flow_pass: Shared.check_passed?(passed),
-        air_juggler_pass: Shared.check_passed?(passed),
-        balls_pass: Shared.check_passed?(passed),
-        ball_pool_gaps_pass: Shared.check_passed?(passed),
-        fitted_sheet_pass: Shared.check_passed?(passed)
+        age_marking_pass: Shared.outcome(passed),
+        height_marking_pass: Shared.outcome(passed),
+        sight_line_pass: Shared.outcome(passed),
+        access_pass: Shared.outcome(passed),
+        suitable_matting_pass: Shared.outcome(passed),
+        traffic_flow_pass: Shared.outcome(passed),
+        air_juggler_pass: Shared.outcome(passed),
+        balls_pass: Shared.outcome(passed),
+        ball_pool_gaps_pass: Shared.outcome(passed),
+        fitted_sheet_pass: Shared.outcome(passed)
       }
     end
 
     def self.measurements(passed)
       {
+        height_marking: 1,
+        minimum_age: 1,
+        maximum_age: 3,
         ball_pool_depth: rand(300..450),
-        ball_pool_depth_pass: Shared.check_passed?(passed),
+        ball_pool_depth_pass: Shared.outcome(passed),
         ball_pool_entry_height: rand(500..630),
-        ball_pool_entry_height_pass: Shared.check_passed?(passed),
+        ball_pool_entry_height_pass: Shared.outcome(passed),
         slide_gradient: rand(40..64),
-        slide_gradient_pass: Shared.check_passed?(passed),
+        slide_gradient_pass: Shared.outcome(passed),
         slide_platform_height: rand(1.0..1.5).round(2),
-        slide_platform_height_pass: Shared.check_passed?(passed)
+        slide_platform_height_pass: Shared.outcome(passed)
       }
     end
 

@@ -1,0 +1,26 @@
+<%# Locals: assessment (Assessment instance) %>
+<%
+  comparisons = AssessmentGuidance.new(assessment).comparisons
+  bungee_anchors = assessment.is_a?(Assessments::AnchorageAssessment) &&
+    assessment.current_bungee?
+%>
+<% if comparisons.any? || bungee_anchors %>
+  <aside aria-label="<%= t('assessment_guidance.title') %>">
+    <h2><%= t('assessment_guidance.title') %></h2>
+    <p><%= t('assessment_guidance.advisory') %></p>
+    <% if comparisons.any? %>
+      <ul>
+        <% comparisons.each do |entry| %>
+          <li>
+            <strong><%= measurement_guidance_text(assessment, entry) %></strong>
+            <p><%= t(entry.fetch(:context), scope: 'assessment_guidance.rules',
+              reference: entry.fetch(:reference)) %></p>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+    <% if bungee_anchors %>
+      <%= render 'assessments/bungee_anchor_guidance', assessment: assessment %>
+    <% end %>
+  </aside>
+<% end %>

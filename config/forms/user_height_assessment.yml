@@ -2,6 +2,12 @@
 form_fields:
   - legend_i18n_key: height_measurements
     fields:
+      - partial: :number
+        field: :maximum_user_height
+        introduced_in_revision: 2
+        attributes:
+          min: 0
+          step: 0.01
       - partial: :decimal_comment
         field: :containing_wall_height
         attributes:

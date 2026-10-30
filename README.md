@@ -61,18 +61,15 @@ docker run -p 3000:3000 dockerstefn/play-test
 
 ### Development Setup
 
-There's a Nix flake for easy environment setup:
+Uses [devenv](https://devenv.sh) for easy environment setup:
 
 ```bash
 # Clone the repo
 git clone https://github.com/yourusername/play-test.git
 cd play-test
 
-# With direnv (recommended)
-direnv allow
-
-# Or manually with Nix
-nix develop
+# Enter the development environment (run `devenv shell` again whenever you need it)
+devenv shell
 
 # Standard Rails setup
 bundle install
@@ -83,11 +80,19 @@ rails server
 ### Traditional Setup
 
 ```bash
-# Requires Ruby 3.0+ and SQLite
+# Requires the Ruby version in .ruby-version and SQLite
 bundle install
 rails db:setup
 rails server
 ```
+
+Ubuntu 26.04 also requires `libjitterentropy3-dev` for Rugged's static OpenSSL
+link during `bundle install`. CI installs it in the shared setup action;
+the devenv configuration is unchanged.
+
+The shared CI setup refreshes APT indexes and installs packages directly.
+Failed downloads stop setup instead of leaving missing native libraries for
+Rails to load.
 
 ## Testing
 
@@ -103,6 +108,21 @@ bin/coverage_check app/models/inspection.rb
 # View detailed HTML report
 open coverage/index.html
 ```
+
+Tests use a separate SQLite WAL database per process. Ordinary examples use
+Rails' transactional fixtures, which pin the database connection across
+request cleanup. Do not replace these with unpinned DatabaseCleaner
+transactions: Rails can return their still-open transactions to the pool
+between requests.
+
+Examples tagged `js: true` or `concurrent` use committed data and
+DatabaseCleaner truncation after Capybara finishes pending requests. Tag
+examples that make database requests from additional threads accordingly.
+`IN_MEMORY_DB=true` remains an explicit option for mutant's isolated forks.
+
+Security scans run `bin/brakeman --no-pager`, which requires the latest
+Brakeman release. Update it with `bundle update brakeman --conservative`
+when the version check fails.
 
 ## Test Coverage
 

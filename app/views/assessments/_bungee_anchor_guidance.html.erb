@@ -1,0 +1,19 @@
+<%# Locals: assessment (Assessments::AnchorageAssessment, current bungee run) %>
+<p><%= t('assessment_guidance.bungee_anchors.source') %></p>
+<% if assessment.bungee_side_area.nil? %>
+  <p><%= t('assessment_guidance.bungee_anchors.missing') %></p>
+<% else %>
+  <p><%= t('assessment_guidance.bungee_anchors.result',
+    area: number_with_precision(assessment.bungee_side_area,
+      precision: 4, strip_insignificant_zeros: true),
+    per_side: assessment.required_anchors_per_side,
+    total: assessment.required_anchors) %></p>
+  <% if assessment.num_low_anchors.nil? || assessment.num_high_anchors.nil? %>
+    <p><%= t('assessment_guidance.bungee_anchors.missing_counts') %></p>
+  <% else %>
+    <p><%= t('assessment_guidance.bungee_anchors.comparison',
+      actual: assessment.total_anchors,
+      status: t(assessment.meets_anchor_requirements? ? 'within' : 'outside',
+        scope: 'assessment_guidance.status')) %></p>
+  <% end %>
+<% end %>

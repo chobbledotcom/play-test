@@ -1,0 +1,44 @@
+---
+en:
+  forms:
+    bouncing_pillow:
+      header: Pillow
+      sections:
+        inflatable: Inflatable
+        site: Site
+        impact_area: Impact Area
+        fencing: Fencing
+      fields:
+        security_of_seams: Security of seams
+        air_loss_points: Air loss points
+        foundation: Foundation
+        gradient_average: Average gradient (degrees)
+        fabric_fr: Fabric fire resistance
+        fabric_strength: Fabric strength
+        internal_pressure: Internal pressure (kPa)
+        grounding: Grounding
+        deflation_evacuation_time: Deflation / evacuation time (minutes)
+        artwork: Artwork
+        identification: Identification
+        slope: Slope (degrees)
+        clear_area: Clear area (m)
+        headroom: Headroom
+        hard_objects: Hard objects
+        depth_of_impact_attenuation: Depth of impact attenuation (cm)
+        signage: Signage
+        number_of_users: Maximum permitted number of users (users)
+        fencing_distance: Fencing distance (m)
+        fencing_height: Fencing height (m)
+        fencing_strength: Fencing strength
+        fencing_visibility: Fencing visibility
+        fencing_entrapment: Fencing entrapment safety
+        fencing_gateways: Fencing gateways (gateways)
+      status:
+        checks_passed: Fields completed
+        completion: Assessment Completion
+      submit: Save Assessment
+      submit_continue: Save & Continue
+      errors:
+        header:
+          one: '1 error prevented this assessment from being saved:'
+          other: '%{count} errors prevented this assessment from being saved:'

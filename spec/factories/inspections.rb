@@ -50,8 +50,10 @@ FactoryBot.define do
     inspector_company { user.inspection_company }
 
     passed { true }
-    has_slide { true }
-    is_totally_enclosed { true }
+    has_slide { unit.nil? || unit.configuration_fields.include?(:has_slide) }
+    is_totally_enclosed {
+      unit.nil? || unit.configuration_fields.include?(:is_totally_enclosed)
+    }
     indoor_only { false }
     inspection_date { Date.current }
     complete_date { nil }
@@ -83,14 +85,13 @@ FactoryBot.define do
       width { 5.5 }
       length { 6.0 }
       height { 4.5 }
-      indoor_only { [true, false].sample }
+      inspection_location { "Test installation site" if unit&.bouncing_pillow? }
+      indoor_only { false }
 
       after(:create) do |inspection|
         inspection.reload
-        inspection.assessment_types.each do |assessment_name, assessment_class|
-          # Get existing assessment (auto-created by inspection model)
+        inspection.applicable_assessments.each_key do |assessment_name|
           assessment = inspection.send(assessment_name)
-          # Update with complete attributes
           complete_attrs = FactoryBot.attributes_for(assessment_name, :complete)
           assessment.update!(complete_attrs)
         end
@@ -128,7 +129,7 @@ FactoryBot.define do
       height { 4.5 }
 
       after(:create) do |inspection|
-        # Update all assessments with complete data (assessments are already created by inspection callback)
+        # Update all assessments (built lazily by the inspection model)
         Inspection::ASSESSMENT_TYPES.each_key do |assessment_type|
           assessment = inspection.send(assessment_type)
           assessment_factory = assessment_type.to_s.sub(/_assessment$/, "").to_sym

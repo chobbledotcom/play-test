@@ -14,14 +14,6 @@ module SeedData
     Shared.pass_fail_fields(passed, *fields)
   end
 
-  def self.check_passed?(inspection_passed)
-    Shared.check_passed?(inspection_passed)
-  end
-
-  def self.check_passed_integer?(inspection_passed)
-    Shared.check_passed_integer?(inspection_passed)
-  end
-
   def self.user_fields
     Shared.user_fields
   end
@@ -44,6 +36,7 @@ module SeedData
 
   def self.user_height_fields(passed: true)
     {
+      maximum_user_height: rand(1.2..1.8).round(1),
       containing_wall_height: rand(1.0..2.0).round(1),
       users_at_1000mm: rand(0..5),
       users_at_1200mm: rand(2..8),
@@ -62,8 +55,8 @@ module SeedData
   def self.enclosed_fields(passed: true)
     {
       exit_number: rand(1..3),
-      exit_number_pass: Shared.check_passed?(passed),
-      exit_sign_always_visible_pass: Shared.check_passed?(passed)
+      exit_number_pass: Shared.outcome(passed),
+      exit_sign_always_visible_pass: Shared.outcome(passed)
     }.merge(
       Shared.pass_fail_fields(
         passed,

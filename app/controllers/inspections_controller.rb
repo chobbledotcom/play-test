@@ -23,6 +23,8 @@ class InspectionsController < ApplicationController
   before_action :redirect_if_complete,
     except: %i[create index destroy mark_draft show log new_from_unit]
   before_action :require_user_active, only: %i[create edit update new_from_unit]
+  before_action :prepare_current_checklist,
+    only: %i[complete edit mark_draft update update_unit]
   before_action :validate_inspection_completability, only: %i[show edit]
   before_action :no_index, except: %i[new_from_unit]
 
@@ -195,6 +197,11 @@ class InspectionsController < ApplicationController
 
   private
 
+  sig { void }
+  def prepare_current_checklist
+    @inspection.prepare_for_edit!
+  end
+
   def unit_search_param = params.dig(:search, :search)
 
   def search_unit_or_badge
@@ -296,6 +303,7 @@ class InspectionsController < ApplicationController
 
   def validate_inspection_completability
     return unless @inspection.complete?
+    return unless @inspection.current_checklist?
     return if @inspection.can_mark_complete?
 
     log_completion_error
@@ -319,7 +327,7 @@ class InspectionsController < ApplicationController
   end
 
   def add_assessment_params(base_params)
-    Inspection::ALL_ASSESSMENT_TYPES.each_key do |ass_type|
+    @inspection.applicable_assessments.each_key do |ass_type|
       ass_key = "#{ass_type}_attributes"
       next if params[:inspection][ass_key].blank?
 
@@ -330,8 +338,9 @@ class InspectionsController < ApplicationController
   end
 
   def assessment_permitted_attributes(assessment_type)
-    model_class = "Assessments::#{assessment_type.to_s.camelize}".constantize
-    model_class.column_name_syms - ASSESSMENT_SYSTEM_ATTRIBUTES
+    assessment = @inspection.public_send(assessment_type)
+    assessment.form_schema.attribute_names &
+      (assessment.class.column_name_syms - ASSESSMENT_SYSTEM_ATTRIBUTES.map(&:to_sym))
   end
 
   def filtered_inspections_query_without_order = current_user.inspections
@@ -437,7 +446,10 @@ class InspectionsController < ApplicationController
         pdf_type: :inspection,
         record_id: @inspection.id
       ) do
-        @inspection.update(pdf_last_accessed_at: Time.current)
+        # update_column only: a full save would autosave the assessment
+        # placeholders built while rendering the report, and the cache
+        # invalidation callbacks deliberately ignore this column anyway.
+        @inspection.update_column(:pdf_last_accessed_at, Time.current)
       end
 
       handle_pdf_response(result, pdf_filename)
@@ -486,6 +498,7 @@ class InspectionsController < ApplicationController
   end
 
   NOT_COPIED_FIELDS = %i[
+    checklist_revision
     complete_date
     created_at
     id
@@ -519,7 +532,8 @@ class InspectionsController < ApplicationController
   def get_prefill_objects
     case params[:tab]
     when "inspection", "", nil
-      [@inspection, @previous_inspection, Inspection.column_name_syms]
+      fields = @inspection.form_schema.attribute_names + %i[operator]
+      [@inspection, @previous_inspection, fields]
     when "results"
       # Results tab uses inspection fields directly, not an assessment
       # Include all fields shown on results tab: passed, risk_assessment, and photos
@@ -528,12 +542,11 @@ class InspectionsController < ApplicationController
       [@inspection, @previous_inspection, results_fields]
     else
       assessment_method = ASSESSMENT_TAB_MAPPING[params[:tab]]
-      assessment_class = Inspection::ALL_ASSESSMENT_TYPES[assessment_method]
-      [
-        @inspection.public_send(assessment_method),
-        @previous_inspection.public_send(assessment_method),
-        assessment_class.column_name_syms
-      ]
+      previous = if @previous_inspection.assessment_applicable?(assessment_method)
+        @previous_inspection.public_send(assessment_method)
+      end
+      current = @inspection.public_send(assessment_method)
+      [current, previous, current.form_schema.attribute_names]
     end
   end
 

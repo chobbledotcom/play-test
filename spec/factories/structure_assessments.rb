@@ -71,11 +71,11 @@ FactoryBot.define do
       if evaluator.critical_checks_pass == true
         %w[seam_integrity_pass air_loss_pass
           straight_walls_pass sharp_edges_pass unit_stable_pass].each do |check|
-          assessment.send("#{check}=", true)
+          assessment.send("#{check}=", "pass")
         end
       elsif evaluator.critical_checks_pass == false
         %w[seam_integrity_pass air_loss_pass].each do |check|
-          assessment.send("#{check}=", false)
+          assessment.send("#{check}=", "fail")
         end
       end
 
@@ -83,7 +83,7 @@ FactoryBot.define do
         %w[
           stitch_length_pass evacuation_time_pass unit_pressure_pass
         ].each do |check|
-          assessment.send("#{check}=", true)
+          assessment.send("#{check}=", "pass")
         end
         %w[
           step_ramp_size_pass platform_height_pass
@@ -95,30 +95,30 @@ FactoryBot.define do
         %w[
           stitch_length_pass unit_pressure_pass evacuation_time_pass
         ].each do |check|
-          assessment.send("#{check}=", false)
+          assessment.send("#{check}=", "fail")
         end
       end
 
       if evaluator.additional_checks_pass == true
         %w[entrapment_pass markings_pass].each do |check|
-          assessment.send("#{check}=", true)
+          assessment.send("#{check}=", "pass")
         end
         %w[trough_pass grounding_pass].each do |check|
           assessment.send("#{check}=", :pass)
         end
       elsif evaluator.additional_checks_pass == false
         assessment.trough_pass = :fail
-        assessment.entrapment_pass = false
+        assessment.entrapment_pass = "fail"
       end
     end
 
     trait :passed do
       # Critical safety checks
-      seam_integrity_pass { true }
-      air_loss_pass { true }
-      straight_walls_pass { true }
-      sharp_edges_pass { true }
-      unit_stable_pass { true }
+      seam_integrity_pass { "pass" }
+      air_loss_pass { "pass" }
+      straight_walls_pass { "pass" }
+      sharp_edges_pass { "pass" }
+      unit_stable_pass { "pass" }
 
       # Measurements with passing values
       unit_pressure { 2.5 }
@@ -129,17 +129,17 @@ FactoryBot.define do
       trough_adjacent_panel_width { 800 }
 
       # Measurement pass/fail checks
-      stitch_length_pass { true }
-      evacuation_time_pass { true }
-      unit_pressure_pass { true }
+      stitch_length_pass { "pass" }
+      evacuation_time_pass { "pass" }
+      unit_pressure_pass { "pass" }
       step_ramp_size_pass { :pass }
       platform_height_pass { :pass }
       critical_fall_off_height_pass { :pass }
 
       # Additional checks
       trough_pass { :pass }
-      entrapment_pass { true }
-      markings_pass { true }
+      entrapment_pass { "pass" }
+      markings_pass { "pass" }
       grounding_pass { :pass }
     end
 

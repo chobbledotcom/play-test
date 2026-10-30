@@ -49,20 +49,21 @@ ActiveStorage::Current.url_options = {
   host: "play-test.co.uk"
 }
 RSpec.configure do |config|
-  config.before(:each) do |example|
-    admin_pattern = "^admin\\d*(_[a-f0-9]+)?@example\\.com$"
-    Rails.configuration.admin_emails_pattern = admin_pattern
+  # Native fixtures pin the transaction across request executor cleanup.
+  config.around(:each) do |example|
     uses_threads = example.metadata[:js] || example.metadata[:concurrent]
-    DatabaseCleaner.strategy = uses_threads ? :truncation : :transaction
+    self.use_transactional_tests = !uses_threads
+    example.run
   end
 
   config.before(:each) do
-    DatabaseCleaner.start
+    admin_pattern = "^admin\\d*(_[a-f0-9]+)?@example\\.com$"
+    Rails.configuration.admin_emails_pattern = admin_pattern
   end
 
   # Capybara must finish pending requests before their tables are cleaned.
   config.append_after(:each) do
-    DatabaseCleaner.clean
+    DatabaseCleaner.clean_with(:truncation) unless use_transactional_tests
   end
 
   config.include FactoryBot::Syntax::Methods
@@ -73,7 +74,7 @@ RSpec.configure do |config|
   # config.include ChobbleForms::Helpers, type: :view
 
   config.fixture_paths = [Rails.root.join("spec/fixtures")]
-  config.use_transactional_fixtures = false
+  config.use_transactional_fixtures = true
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)

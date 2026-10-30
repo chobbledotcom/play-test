@@ -14,9 +14,9 @@ module SeedData
         runout: runout,
         slide_first_metre_height: rand(0.3..0.8).round(1),
         slide_beyond_first_metre_height: rand(0.8..1.5).round(1),
-        clamber_netting_pass: Shared.check_passed_integer?(passed),
-        runout_pass: Shared.check_passed?(passed),
-        slip_sheet_pass: Shared.check_passed?(passed),
+        clamber_netting_pass: Shared.outcome(passed),
+        runout_pass: Shared.outcome(passed),
+        slip_sheet_pass: Shared.outcome(passed),
         slide_permanent_roof: false
       }.merge(comments(passed))
     end

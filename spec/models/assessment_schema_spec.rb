@@ -114,6 +114,26 @@ RSpec.describe AssessmentSchema do
       expect(pf_field).not_to be_decimal
     end
 
+    it "recognises integer and fractional-step composite measurements" do
+      integer = AssessmentSchema::Field.new(
+        field: :count, partial: :integer_comment
+      )
+      decimal = AssessmentSchema::Field.new(
+        field: :pressure, partial: :number_pass_fail_comment,
+        attributes: {step: 0.01}
+      )
+      unrestricted = AssessmentSchema::Field.new(
+        field: :depth, partial: :number_pass_fail_na_comment,
+        attributes: {step: "any"}
+      )
+
+      expect(integer).to be_numeric
+      expect(integer).not_to be_decimal
+      expect(decimal).to be_decimal
+      expect(decimal).not_to be_numeric
+      expect(unrestricted).to be_decimal
+    end
+
     it "detects required attribute" do
       ic_schema = AssessmentSchema.for(InspectorCompany)
       expect(ic_schema.find_field(:name)).to be_required
@@ -236,6 +256,75 @@ RSpec.describe AssessmentSchema do
     it "is a no-op for fields that aren't in the schema" do
       filtered = schema.exclude(:nonexistent)
       expect(filtered.fields.size).to eq(schema.fields.size)
+    end
+
+    it "drops fieldsets with no applicable fields" do
+      field = AssessmentSchema::Field.new(field: :one, partial: :text_field)
+      fieldset = AssessmentSchema::Fieldset.new(:section, [field])
+      schema = described_class.new("custom", [fieldset])
+
+      expect(schema.exclude(:one).fieldsets).to be_empty
+    end
+  end
+
+  describe "#attribute_names" do
+    it "includes measurements and composites but not virtual outcome bases" do
+      fields = [
+        AssessmentSchema::Field.new(
+          field: :length, partial: :number_pass_fail_comment
+        ),
+        AssessmentSchema::Field.new(
+          field: :seams, partial: :pass_fail_comment
+        ),
+        AssessmentSchema::Field.new(
+          field: :permanent_roof, partial: :yes_no_radio
+        )
+      ]
+      fieldset = AssessmentSchema::Fieldset.new(:section, fields)
+      schema = described_class.new("custom", [fieldset])
+
+      expect(schema.attribute_names).to contain_exactly(
+        :length, :length_pass, :length_comment, :seams_pass,
+        :seams_comment, :permanent_roof
+      )
+    end
+  end
+
+  describe "#for_revision" do
+    it "preserves historical answers without inventing new measurements" do
+      fields = [
+        AssessmentSchema::Field.new(
+          field: :pull_strength, partial: :number_pass_fail_comment,
+          legacy_partial: :pass_fail_comment
+        ),
+        AssessmentSchema::Field.new(
+          field: :maximum_age, partial: :number, introduced_in_revision: 2
+        )
+      ]
+      fieldset = AssessmentSchema::Fieldset.new(:section, fields)
+      schema = described_class.new("custom", [fieldset])
+
+      historical = schema.for_revision(1)
+      expect(historical.attribute_names)
+        .to contain_exactly(:pull_strength_pass, :pull_strength_comment)
+      expect(historical.find_field(:pull_strength).partial)
+        .to eq(:pass_fail_comment)
+      expect(schema.for_revision(2).attribute_names)
+        .to include(:pull_strength, :maximum_age)
+      expect(fields.first.introduced_in_revision).to eq(1)
+      expect(fields.first.attributes).to be_empty
+      expect(fields.last.attributes).to be_empty
+    end
+
+    it "removes sections introduced after the historical revision" do
+      field = AssessmentSchema::Field.new(
+        field: :site, partial: :text_field, introduced_in_revision: 2
+      )
+      fieldset = AssessmentSchema::Fieldset.new(:site, [field])
+      schema = described_class.new("custom", [fieldset])
+
+      expect(schema.for_revision(1).fieldsets).to be_empty
+      expect(schema.for_revision(2).fieldsets).not_to be_empty
     end
   end
 end

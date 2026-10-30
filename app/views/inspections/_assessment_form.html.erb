@@ -17,11 +17,13 @@
   model: assessment,
   i18n_base: "forms.#{assessment_type}",
   submit_key: submit_key,
+  method: :patch,
   url: send("inspection_#{assessment_type}_assessment_path", inspection) do |form| %>
   <%= hidden_field_tag :tab, assessment_type %>
   <%= render 'chobble_forms/fields', model: assessment %>
+  <%= render 'assessments/measurement_guidance', assessment: assessment %>
 
-  <% if has_safety_standards %>
+  <% if has_safety_standards && !(assessment_type == 'anchorage' && assessment.current_bungee?) %>
     <%= render 'shared/safety_standards_display',
         reference_partials: reference_partials,
         dynamic_content: -> do %>

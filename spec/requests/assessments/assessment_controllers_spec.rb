@@ -19,15 +19,15 @@ RSpec.describe "Assessment Controllers", type: :request do
 
       patch inspection_structure_assessment_path(inspection), params: {
         assessment.class.model_name.param_key => {
-          seam_integrity_pass: true,
-          stitch_length_pass: true
+          seam_integrity_pass: "pass",
+          stitch_length_pass: "pass"
         }
       }
 
       expect(response).to redirect_to(inspection_path(inspection))
       inspection.reload
-      expect(inspection.structure_assessment.seam_integrity_pass).to be true
-      expect(inspection.structure_assessment.stitch_length_pass).to be true
+      expect(inspection.structure_assessment.seam_integrity_pass).to eq("pass")
+      expect(inspection.structure_assessment.stitch_length_pass).to eq("pass")
     end
   end
 
@@ -61,14 +61,14 @@ RSpec.describe "Assessment Controllers", type: :request do
       patch inspection_materials_assessment_path(inspection), params: {
         assessment.class.model_name.param_key => {
           ropes: 30,
-          fabric_strength_pass: true
+          fabric_strength_pass: "pass"
         }
       }
 
       expect(response).to redirect_to(inspection_path(inspection))
       inspection.reload
       expect(inspection.materials_assessment.ropes).to eq(30)
-      expect(inspection.materials_assessment.fabric_strength_pass).to be true
+      expect(inspection.materials_assessment.fabric_strength_pass).to eq("pass")
     end
   end
 

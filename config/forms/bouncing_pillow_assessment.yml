@@ -1,0 +1,112 @@
+---
+form_fields:
+  - legend_i18n_key: inflatable
+    fields:
+      - partial: :pass_fail_comment
+        field: :security_of_seams
+        introduced_in_revision: 2
+      - partial: :pass_fail_comment
+        field: :air_loss_points
+        introduced_in_revision: 2
+      - partial: :pass_fail_comment
+        field: :foundation
+        introduced_in_revision: 2
+      - partial: :number_pass_fail_comment
+        field: :gradient_average
+        introduced_in_revision: 2
+        attributes:
+          step: 0.01
+          min: 0
+      - partial: :pass_fail_comment
+        field: :fabric_fr
+        introduced_in_revision: 2
+      - partial: :pass_fail_comment
+        field: :fabric_strength
+        introduced_in_revision: 2
+      - partial: :number_pass_fail_comment
+        field: :internal_pressure
+        introduced_in_revision: 2
+        attributes:
+          step: 0.01
+          min: 0
+      - partial: :pass_fail_comment
+        field: :grounding
+        introduced_in_revision: 2
+      - partial: :number_pass_fail_comment
+        field: :deflation_evacuation_time
+        introduced_in_revision: 2
+        attributes:
+          step: 1
+          min: 0
+      - partial: :pass_fail_comment
+        field: :artwork
+        introduced_in_revision: 2
+      - partial: :pass_fail_comment
+        field: :identification
+        introduced_in_revision: 2
+  - legend_i18n_key: site
+    fields:
+      - partial: :number_pass_fail_comment
+        field: :slope
+        introduced_in_revision: 2
+        attributes:
+          step: 0.01
+          min: 0
+      - partial: :number_pass_fail_comment
+        field: :clear_area
+        introduced_in_revision: 2
+        attributes:
+          step: 0.01
+          min: 0
+      - partial: :pass_fail_comment
+        field: :headroom
+        introduced_in_revision: 2
+  - legend_i18n_key: impact_area
+    fields:
+      - partial: :pass_fail_comment
+        field: :hard_objects
+        introduced_in_revision: 2
+      - partial: :number_pass_fail_comment
+        field: :depth_of_impact_attenuation
+        introduced_in_revision: 2
+        attributes:
+          step: 0.01
+          min: 0
+      - partial: :pass_fail_comment
+        field: :signage
+        introduced_in_revision: 2
+      - partial: :number_pass_fail_comment
+        field: :number_of_users
+        introduced_in_revision: 2
+        attributes:
+          step: 1
+          min: 0
+  - legend_i18n_key: fencing
+    fields:
+      - partial: :number_pass_fail_comment
+        field: :fencing_distance
+        introduced_in_revision: 2
+        attributes:
+          step: 0.01
+          min: 0
+      - partial: :number_pass_fail_comment
+        field: :fencing_height
+        introduced_in_revision: 2
+        attributes:
+          step: 0.01
+          min: 0
+      - partial: :pass_fail_comment
+        field: :fencing_strength
+        introduced_in_revision: 2
+      - partial: :pass_fail_comment
+        field: :fencing_visibility
+        introduced_in_revision: 2
+      - partial: :pass_fail_comment
+        field: :fencing_entrapment
+        introduced_in_revision: 2
+      - partial: :number_pass_fail_comment
+        field: :fencing_gateways
+        introduced_in_revision: 2
+        attributes:
+          step: 1
+          min: 0

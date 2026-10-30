@@ -56,9 +56,9 @@ FactoryBot.define do
     trait :passed do
       ropes { 25 }
       ropes_pass { :pass }
-      fabric_strength_pass { true }
-      fire_retardant_pass { true }
-      thread_pass { true }
+      fabric_strength_pass { "pass" }
+      fire_retardant_pass { "pass" }
+      thread_pass { "pass" }
       retention_netting_pass { :pass }
       zips_pass { :pass }
       windows_pass { :pass }
@@ -68,9 +68,9 @@ FactoryBot.define do
     trait :complete do
       ropes { 25 }
       ropes_pass { :pass }
-      fabric_strength_pass { true }
-      fire_retardant_pass { true }
-      thread_pass { true }
+      fabric_strength_pass { "pass" }
+      fire_retardant_pass { "pass" }
+      thread_pass { "pass" }
       retention_netting_pass { :pass }
       zips_pass { :pass }
       windows_pass { :pass }
@@ -84,16 +84,16 @@ FactoryBot.define do
     trait :failed do
       ropes { 10 }  # Below minimum
       ropes_pass { :fail }
-      fabric_strength_pass { false }
-      fire_retardant_pass { false }
-      thread_pass { false }
+      fabric_strength_pass { "fail" }
+      fire_retardant_pass { "fail" }
+      thread_pass { "fail" }
       retention_netting_pass { :fail }
     end
 
     trait :critical_failures do
-      fabric_strength_pass { false }
-      fire_retardant_pass { false }
-      thread_pass { false }
+      fabric_strength_pass { "fail" }
+      fire_retardant_pass { "fail" }
+      thread_pass { "fail" }
     end
 
     trait :ropes_na do

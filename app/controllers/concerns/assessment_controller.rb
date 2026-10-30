@@ -11,6 +11,7 @@ module AssessmentController
     before_action :set_inspection
     before_action :check_inspection_owner
     before_action :require_user_active
+    before_action :prepare_current_checklist
     before_action :set_assessment
     before_action :set_previous_inspection
   end
@@ -20,7 +21,7 @@ module AssessmentController
     # Apply any model-specific preprocessing (like setting defaults)
     preprocess_values if respond_to?(:preprocess_values, true)
 
-    if @assessment.update(assessment_params)
+    if save_assessment
       handle_successful_update
     else
       handle_failed_update
@@ -28,6 +29,25 @@ module AssessmentController
   end
 
   private
+
+  sig { returns(T::Boolean) }
+  def save_assessment
+    @assessment.class.transaction do
+      next false unless @assessment.update(assessment_params)
+
+      @inspection.complete_date = nil if @inspection.complete?
+      @inspection.save!
+      true
+    end
+  end
+
+  sig { void }
+  def prepare_current_checklist
+    @inspection.prepare_for_edit!
+    unless @inspection.assessment_applicable?(assessment_association.to_sym)
+      head :not_found
+    end
+  end
 
   sig { void }
   def handle_successful_update
@@ -119,11 +139,10 @@ module AssessmentController
     assessment_class.model_name.param_key.to_sym
   end
 
-  sig { returns(T::Array[String]) }
+  sig { returns(T::Array[Symbol]) }
   def permitted_attributes
-    # Get all attributes except sensitive ones
-    excluded_attrs = %w[id inspection_id created_at updated_at]
-    assessment_class.attribute_names - excluded_attrs
+    @assessment.form_schema.attribute_names &
+      (assessment_class.column_name_syms - %i[id inspection_id created_at updated_at])
   end
 
   # Automatically derive from controller name

@@ -47,8 +47,6 @@ class Assessments::SlideAssessment < ApplicationRecord
 
   belongs_to :inspection
 
-  enum :clamber_netting_pass, Inspection::PASS_FAIL_NA
-
   sig { returns(T::Boolean) }
   def meets_runout_requirements?
     return false unless runout.present? && slide_platform_height.present?

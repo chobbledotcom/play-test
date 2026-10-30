@@ -86,8 +86,8 @@ module FormHelpers
     raise "Missing i18n key: #{i18n_base}.sections - every form must define its sections"
   end
 
-  def expect_form_fields_present(i18n_base)
-    fields = I18n.t("#{i18n_base}.fields", raise: true)
+  def expect_form_fields_present(i18n_base, excluding: [])
+    fields = I18n.t("#{i18n_base}.fields", raise: true).except(*excluding)
 
     has_pass_fail_fields = fields.keys.any? { |k| k.to_s.end_with?("_pass") }
 
@@ -211,10 +211,11 @@ module FormHelpers
 
     # Skip comment fields entirely - matching original behavior
     return if field_str.end_with?("_comment")
+    return if value.nil? || value == ""
 
     case value
     when true, false
-      if field_str.end_with?("_pass") || field_str == "passed"
+      if field_str == "passed"
         field_label = get_field_label(form_name, field_name)
         choose_pass_fail(field_label, value)
       elsif %w[has_slide is_totally_enclosed passed slide_permanent_roof].include?(field_str)
@@ -227,8 +228,8 @@ module FormHelpers
         field_label = get_field_label(form_name, field_name)
         choose_yes_no(field_label, value)
       end
-    when nil, ""
-      # Skip nil or empty values
+    when "pass", "fail", "na", :pass, :fail, :na
+      choose_pass_fail(get_field_label(form_name, field_name), value)
     else
       fill_in_form(form_name.to_sym, field_name, value)
     end
@@ -264,14 +265,15 @@ module FormHelpers
   end
 
   def fill_comment_field(form_name, field_name, value)
-    # Comment fields use a checkbox toggle pattern
-    # First, check the comment checkbox to show the field
-    checkbox = find("input[type='checkbox'][data-comment-toggle='#{form_name}_#{field_name}']")
-    checkbox.check unless checkbox.checked?
-
-    # Then fill in the text field
-    text_field_id = "#{form_name}_#{field_name}"
-    fill_in text_field_id, with: value
+    base_field = field_name.to_s.delete_suffix("_comment")
+    header = I18n.t("forms.#{form_name}.header")
+    within("form", text: header) do
+      checkbox = find(
+        "input[type='checkbox'][id*='#{base_field}_has_comment_']"
+      )
+      checkbox.check
+      find(:id, checkbox["data-comment-toggle"], visible: :all).set(value)
+    end
   end
 
   def expect_assessment_check_mark(tab_name, has_check: true)

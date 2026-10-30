@@ -37,12 +37,16 @@
 /config/master.key
 /config/credentials/*
 
-.direnv
+.devenv*
 .gems
+devenv.local.nix
 
 # Ignore test coverage reports
 /coverage/*
 /.bundle
+
+# Ignore mutant 0.17.0 persistent session results
+/.mutant/
 
 # Ignore terragon setup marker
 .terragon-setup-complete

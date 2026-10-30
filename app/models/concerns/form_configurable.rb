@@ -5,6 +5,20 @@ module FormConfigurable
   extend ActiveSupport::Concern
   extend T::Sig
 
+  sig { params(user: T.nilable(User)).returns(AssessmentSchema) }
+  def form_schema(user: nil)
+    schema = self.class.form_schema(user: user)
+    if is_a?(Inspection)
+      checklist.filter_schema(:inspection, schema)
+    elsif is_a?(AssessmentCompletion)
+      inspection.checklist.filter_schema(
+        self.class.name.demodulize.underscore.to_sym, schema
+      )
+    else
+      schema
+    end
+  end
+
   class_methods do
     extend T::Sig
 

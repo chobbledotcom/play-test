@@ -12,28 +12,30 @@ module SeedData
     def self.pass_fields(passed)
       {
         type_of_unit: "Standard catch bed",
-        max_user_mass_marking_pass: Shared.check_passed?(passed),
-        arrest_pass: Shared.check_passed?(passed),
-        matting_pass: Shared.check_passed?(passed),
-        design_risk_pass: Shared.check_passed?(passed),
-        intended_play_pass: Shared.check_passed?(passed),
-        ancillary_fit_pass: Shared.check_passed?(passed),
-        ancillary_compliant_pass: Shared.check_passed?(passed),
-        apron_pass: Shared.check_passed?(passed),
-        trough_pass: Shared.check_passed?(passed),
-        framework_pass: Shared.check_passed?(passed),
-        grounding_pass: Shared.check_passed?(passed)
+        max_user_mass_marking_pass: Shared.outcome(passed),
+        arrest_pass: Shared.outcome(passed),
+        matting_pass: Shared.outcome(passed),
+        design_risk_pass: Shared.outcome(passed),
+        intended_play_pass: Shared.outcome(passed),
+        ancillary_fit_pass: Shared.outcome(passed),
+        ancillary_compliant_pass: Shared.outcome(passed),
+        apron_pass: Shared.outcome(passed),
+        trough_pass: Shared.outcome(passed),
+        framework_pass: Shared.outcome(passed),
+        grounding_pass: Shared.outcome(passed)
       }
     end
 
     def self.measurements(passed)
       {
+        maximum_users: 4,
+        max_user_mass_marking: 120,
         bed_height: rand(400..600),
-        bed_height_pass: Shared.check_passed?(passed),
+        bed_height_pass: Shared.outcome(passed),
         platform_fall_distance: rand(0.8..1.5).round(2),
-        platform_fall_distance_pass: Shared.check_passed?(passed),
+        platform_fall_distance_pass: Shared.outcome(passed),
         blower_tube_length: rand(2.5..4.0).round(2),
-        blower_tube_length_pass: Shared.check_passed?(passed)
+        blower_tube_length_pass: Shared.outcome(passed)
       }
     end
 

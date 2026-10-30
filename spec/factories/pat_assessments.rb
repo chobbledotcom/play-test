@@ -49,69 +49,69 @@ FactoryBot.define do
 
     trait :passed do
       equipment_class { 1 }
-      equipment_class_pass { true }
+      equipment_class_pass { "pass" }
       equipment_power { 500 }
-      visual_pass { true }
-      appliance_plug_check_pass { true }
+      visual_pass { "pass" }
+      appliance_plug_check_pass { "pass" }
       fuse_rating { 13 }
-      fuse_rating_pass { true }
+      fuse_rating_pass { "pass" }
       earth_ohms { 0.1 }
-      earth_ohms_pass { true }
+      earth_ohms_pass { "pass" }
       insulation_mohms { 200 }
-      insulation_mohms_pass { true }
+      insulation_mohms_pass { "pass" }
       leakage_ma { 0.5 }
-      leakage_ma_pass { true }
-      load_test_pass { true }
+      leakage_ma_pass { "pass" }
+      load_test_pass { "pass" }
       rcd_trip_time_ms { 25.0 }
-      rcd_trip_time_ms_pass { true }
+      rcd_trip_time_ms_pass { "pass" }
     end
 
     trait :complete do
       equipment_class { 1 }
-      equipment_class_pass { true }
+      equipment_class_pass { "pass" }
       equipment_class_comment { "Class I appliance" }
       equipment_power { 500 }
       equipment_power_comment { "500W heater" }
-      visual_pass { true }
+      visual_pass { "pass" }
       visual_comment { "No visible damage" }
-      appliance_plug_check_pass { true }
+      appliance_plug_check_pass { "pass" }
       appliance_plug_check_comment { "Plug in good condition" }
       fuse_rating { 13 }
-      fuse_rating_pass { true }
+      fuse_rating_pass { "pass" }
       fuse_rating_comment { "Correct fuse fitted" }
       earth_ohms { 0.1 }
-      earth_ohms_pass { true }
+      earth_ohms_pass { "pass" }
       earth_ohms_comment { "Within limits" }
       insulation_mohms { 200 }
-      insulation_mohms_pass { true }
+      insulation_mohms_pass { "pass" }
       insulation_mohms_comment { "Above minimum" }
       leakage_ma { 0.5 }
-      leakage_ma_pass { true }
+      leakage_ma_pass { "pass" }
       leakage_ma_comment { "Within safe limits" }
-      load_test_pass { true }
+      load_test_pass { "pass" }
       load_test_comment { "Operates correctly" }
       rcd_trip_time_ms { 25.0 }
-      rcd_trip_time_ms_pass { true }
+      rcd_trip_time_ms_pass { "pass" }
       rcd_trip_time_ms_comment { "RCD trips within time" }
     end
 
     trait :failed do
       equipment_class { 1 }
-      equipment_class_pass { false }
+      equipment_class_pass { "fail" }
       equipment_power { 500 }
-      visual_pass { false }
-      appliance_plug_check_pass { false }
+      visual_pass { "fail" }
+      appliance_plug_check_pass { "fail" }
       fuse_rating { 13 }
-      fuse_rating_pass { false }
+      fuse_rating_pass { "fail" }
       earth_ohms { 2.0 }
-      earth_ohms_pass { false }
+      earth_ohms_pass { "fail" }
       insulation_mohms { 0 }
-      insulation_mohms_pass { false }
+      insulation_mohms_pass { "fail" }
       leakage_ma { 10.0 }
-      leakage_ma_pass { false }
-      load_test_pass { false }
+      leakage_ma_pass { "fail" }
+      load_test_pass { "fail" }
       rcd_trip_time_ms { 500.0 }
-      rcd_trip_time_ms_pass { false }
+      rcd_trip_time_ms_pass { "fail" }
     end
   end
 end

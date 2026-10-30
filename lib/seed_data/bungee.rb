@@ -11,24 +11,28 @@ module SeedData
 
     def self.pass_fields(passed)
       {
-        blower_forward_distance_pass: Shared.check_passed?(passed),
-        marking_max_mass_pass: Shared.check_passed?(passed),
-        marking_min_height_pass: Shared.check_passed?(passed),
-        pull_strength_pass: Shared.check_passed?(passed),
-        cord_length_max_pass: Shared.check_passed?(passed),
-        cord_diametre_min_pass: Shared.check_passed?(passed),
-        two_stage_locking_pass: Shared.check_passed?(passed),
-        baton_compliant_pass: Shared.check_passed?(passed),
-        lane_width_max_pass: Shared.check_passed?(passed),
-        rear_wall_pass: Shared.check_passed?(passed),
-        side_wall_pass: Shared.check_passed?(passed),
-        running_wall_pass: Shared.check_passed?(passed),
-        harness_width_pass: Shared.check_passed?(passed)
+        blower_forward_distance_pass: Shared.outcome(passed),
+        marking_max_mass_pass: Shared.outcome(passed),
+        marking_min_height_pass: Shared.outcome(passed),
+        pull_strength_pass: Shared.outcome(passed),
+        cord_length_max_pass: Shared.outcome(passed),
+        cord_diametre_min_pass: Shared.outcome(passed),
+        two_stage_locking_pass: Shared.outcome(passed),
+        baton_compliant_pass: Shared.outcome(passed),
+        lane_width_max_pass: Shared.outcome(passed),
+        rear_wall_pass: Shared.outcome(passed),
+        side_wall_pass: Shared.outcome(passed),
+        running_wall_pass: Shared.outcome(passed),
+        harness_width_pass: Shared.outcome(passed)
       }
     end
 
     def self.measurements
       {
+        maximum_users: 4,
+        marking_max_mass: 120,
+        marking_min_height: 1.2,
+        pull_strength: 2500,
         harness_width: 200,
         num_of_cords: 2,
         rear_wall_thickness: 0.6,

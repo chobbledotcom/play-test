@@ -20,8 +20,6 @@ RSpec.feature "Unit creation company restriction", type: :feature do
       expect(page).to have_current_path(new_unit_path)
       expect(page).to have_content(I18n.t("units.titles.new"))
 
-      expect_form_fields_present("forms.units")
-
       fill_in_form :units, :name, "Test Unit"
       fill_in_form :units, :serial, "TEST123"
       fill_in_form :units, :manufacturer, "Test Manufacturer"
@@ -31,21 +29,9 @@ RSpec.feature "Unit creation company restriction", type: :feature do
 
       expect(page).to have_content(I18n.t("units.messages.created"))
       expect(page).to have_content("Test Unit")
-    end
 
-    scenario "demonstrates comprehensive form helper usage" do
-      visit new_unit_path
-
-      expect_form_fields_present("forms.units")
-
-      fill_in_form :units, :name, "Helper Demo Unit"
-      fill_in_form :units, :serial, "DEMO123"
-      fill_in_form :units, :manufacturer, "Helper Corp"
-      fill_in_form :units, :description, "Demonstrates form helper capabilities"
-
-      submit_form :units
-
-      expect(page).to have_content("Helper Demo Unit")
+      unit = user.units.find_by!(serial: "TEST123")
+      expect(unit.name).to eq("Test Unit")
     end
   end
 

@@ -2,6 +2,13 @@
 form_fields:
   - legend_i18n_key: anchor_counts
     fields:
+      - partial: :number
+        field: :bungee_side_area
+        introduced_in_revision: 2
+        attributes:
+          step: 0.0001
+          min: 0
+          required: false
       - partial: :number_pass_fail_comment
         field: :num_low_anchors
         attributes:

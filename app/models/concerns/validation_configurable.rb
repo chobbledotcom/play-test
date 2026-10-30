@@ -23,17 +23,25 @@ module ValidationConfigurable
 
     sig { params(field: AssessmentSchema::Field).void }
     def apply_validation_for(field)
-      validates field.name, presence: true if field.required?
-
-      if field.numeric?
-        options = numericality_options(field)
-        options[:only_integer] = true
-        validates field.name, numericality: options, allow_blank: true
-      elsif field.decimal?
-        validates field.name,
-          numericality: numericality_options(field),
-          allow_blank: true
+      applicable = ->(record) do
+        configured = record.form_schema.find_field(field.name)
+        configured && configured.partial == field.partial &&
+          !(record.is_a?(AssessmentCompletion) &&
+            record.measurement_not_applicable?(field.name))
       end
+      if field.required?
+        required_fields = field.attribute_names
+          .reject { it.end_with?("_comment") }
+        unless required_fields.empty?
+          validates(*required_fields, presence: true, if: applicable)
+        end
+      end
+      return unless field.numeric? || field.decimal?
+
+      options = numericality_options(field)
+      options[:only_integer] = true if field.numeric?
+      validates field.name, numericality: options,
+        allow_blank: true, if: applicable
     end
 
     sig do

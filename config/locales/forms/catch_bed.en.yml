@@ -9,8 +9,9 @@ en:
         safety_checks: Safety Checks
         measurements: Measurements
       fields:
+        maximum_users: Maximum permitted number of users
         type_of_unit: Type of catch bed
-        max_user_mass_marking: Marking for max user mass
+        max_user_mass_marking: Maximum permitted user mass and marking (kg)
         arrest: Bed suitable to arrest users when falling
         matting: Suitable matting
         design_risk: Design and construction minimises risk
@@ -24,6 +25,8 @@ en:
         bed_height: Bed height (mm) minimum 400mm
         platform_fall_distance: Distance from platform edge to containing wall (m)
         blower_tube_length: Blower tube length (m) at least 2.5m
+      legacy_fields:
+        max_user_mass_marking: Marking for max user mass
       status:
         checks_passed: Fields completed
         completion: Assessment Completion

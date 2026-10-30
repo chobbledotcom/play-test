@@ -87,7 +87,7 @@ module Assessments
     def missing_measurements_result
       {
         valid: false,
-        errors: [I18n.t("assessments.user_height.errors.missing_measurements")],
+        errors: [I18n.t("forms.user_height.errors.missing_measurements")],
         measurements: {}
       }
     end
