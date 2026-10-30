@@ -37,8 +37,9 @@
 /config/master.key
 /config/credentials/*
 
-.direnv
+.devenv*
 .gems
+devenv.local.nix
 
 # Ignore test coverage reports
 /coverage/*
