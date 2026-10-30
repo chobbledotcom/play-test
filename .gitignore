@@ -45,6 +45,9 @@ devenv.local.nix
 /coverage/*
 /.bundle
 
+# Ignore mutant 0.17.0 persistent session results
+/.mutant/
+
 # Ignore terragon setup marker
 .terragon-setup-complete
 
