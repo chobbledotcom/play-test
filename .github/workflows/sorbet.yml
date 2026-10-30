@@ -5,6 +5,9 @@ on:
   merge_group:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   sorbet:
     runs-on: ubuntu-latest
