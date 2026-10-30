@@ -80,11 +80,15 @@ rails server
 ### Traditional Setup
 
 ```bash
-# Requires Ruby 3.0+ and SQLite
+# Requires the Ruby version in .ruby-version and SQLite
 bundle install
 rails db:setup
 rails server
 ```
+
+Ubuntu 26.04 also requires `libjitterentropy3-dev` for Rugged's static OpenSSL
+link during `bundle install`. CI installs it in the shared setup action;
+the devenv configuration is unchanged.
 
 ## Testing
 
