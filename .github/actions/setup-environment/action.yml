@@ -15,4 +15,11 @@ runs:
       with:
         ruby-version: .ruby-version
         bundler-cache: true
+
+    - name: Print Rugged build failure
+      if: failure()
+      shell: bash
+      run: |
+        find vendor/bundle -path '*/rugged-*/mkmf.log' \
+          -print -exec cat {} \;
         
