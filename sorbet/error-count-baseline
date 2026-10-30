@@ -1,0 +1,3 @@
+# Maximum Sorbet errors the CI gate tolerates (see bin/check-sorbet-errors).
+# Only lower this: it counts pre-existing debt in typed:true/strict files.
+919

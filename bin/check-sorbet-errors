@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+# Fail when Sorbet reports more type errors than the committed baseline allows.
+# The codebase is being typed gradually, so the gate tracks the count rather
+# than demanding zero today: fix new errors, and lower the baseline in
+# sorbet/error-count-baseline whenever debt is paid down.
+
+set -euo pipefail
+
+BASELINE_FILE="sorbet/error-count-baseline"
+OUTPUT_FILE="${SORBET_OUTPUT:-.sorbet-results}"
+SORBET_COMMAND="${SORBET_COMMAND:-bundle exec srb tc}"
+
+baseline=$(grep -v '^#' "$BASELINE_FILE" | head -1)
+
+$SORBET_COMMAND > "$OUTPUT_FILE" 2>&1 || true
+
+count=$(sed -n 's/^Errors: \([0-9]*\)$/\1/p' "$OUTPUT_FILE" | tail -1)
+
+if [ -z "$count" ]; then
+  echo "Sorbet produced no error count - inspect $OUTPUT_FILE" >&2
+  tail -20 "$OUTPUT_FILE" >&2
+  exit 2
+fi
+
+if [ "$count" -gt "$baseline" ]; then
+  echo "Sorbet errors: $count (baseline allows $baseline)" >&2
+  echo "Fix the new errors, or lower $BASELINE_FILE when debt is genuinely paid down." >&2
+  echo "Newest errors:" >&2
+  tail -40 "$OUTPUT_FILE" >&2
+  exit 1
+fi
+
+echo "Sorbet errors: $count (baseline $baseline) - OK"
+
+if [ "$count" -lt "$baseline" ]; then
+  echo "Debt paid down: lower $BASELINE_FILE from $baseline to $count" >&2
+fi
