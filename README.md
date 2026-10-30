@@ -61,18 +61,15 @@ docker run -p 3000:3000 dockerstefn/play-test
 
 ### Development Setup
 
-There's a Nix flake for easy environment setup:
+Uses [devenv](https://devenv.sh) for easy environment setup:
 
 ```bash
 # Clone the repo
 git clone https://github.com/yourusername/play-test.git
 cd play-test
 
-# With direnv (recommended)
-direnv allow
-
-# Or manually with Nix
-nix develop
+# Enter the development environment (run `devenv shell` again whenever you need it)
+devenv shell
 
 # Standard Rails setup
 bundle install
