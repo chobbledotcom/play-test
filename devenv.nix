@@ -1,6 +1,9 @@
 { pkgs, ... }:
 
 {
+  # Rails loads .env itself; devenv must not inject it into the shell
+  dotenv.disableHint = true;
+
   packages = with pkgs; [
     actionlint
     cmake
