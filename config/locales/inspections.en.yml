@@ -228,30 +228,6 @@ en:
         for a unit first.
       not_found: Inspection record not found
       access_denied: Access denied
-    safety_standards:
-      title: Safety Standards Compliance
-      description: Assessment against EN 14960:2019 requirements
-#      anchor_requirements: "Anchor Requirements (box model)"
-      anchor_calculation: 'Required anchors: %{required} (based on %{area}m² area)'
-      anchor_status: 'Current anchors: %{current} of %{required} required'
-      slide_requirements: Slide Safety Requirements
-      runout_requirement: 'Minimum runout: %{required}m (50% of platform height)'
-      runout_status: 'Current runout: %{current}m'
-      user_capacity: User Capacity
-      capacity_by_height: 'Capacity by user height:'
-      capacity_1000mm: '1.0m users: %{count} (1 per m²)'
-      capacity_1200mm: '1.2m users: %{count} (0.75 per m²)'
-      capacity_1500mm: '1.5m users: %{count} (0.60 per m²)'
-      capacity_1800mm: '1.8m users: %{count} (0.5 per m²)'
-      max_user_height_note: Capacity calculated for users up to %{height}m tall
-      wall_height_requirements: Wall Height Requirements
-      wall_height_status: Platform %{platform}m requires %{required}
-      material_requirements: Material Requirements
-      fabric_strength: Fabric must meet tensile strength requirements
-      rope_diameter: Rope diameter must be 18-45mm
-      electrical_requirements: Electrical Safety
-      pat_testing: PAT testing required
-      blower_distance: Blower must be 1.2m from equipment edge
     share:
       button: Share / Copy
       title: Inspection Report %{id}

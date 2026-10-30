@@ -1,46 +1,17 @@
+<%# locals: (inspection:) %>
 <%
-  # Check if there are incomplete fields for this inspection
-  has_incomplete_fields = @inspection.incomplete_fields.any?
+  has_incomplete_fields = inspection.incomplete_fields.any?
   submit_key = has_incomplete_fields ? "submit_continue" : "submit"
 %>
 <%= render 'chobble_forms/form_context',
-  model: @inspection,
+  model: inspection,
   i18n_base: 'forms.results',
   submit_key: submit_key,
   excluded_prefill_fields: [:passed] do |form| %>
   <%= hidden_field_tag :tab, 'results' %>
   <%= render 'chobble_forms/fieldset', legend_key: 'comments' do %>
-    <% comments_found = false %>
-    <% comment_items = [] %>
-
-    <% # Get all comment fields from the inspection itself %>
-    <% @inspection.attributes.slice(*@inspection.form_schema(user: nil).attribute_names.map(&:to_s)).each do |field_name, value| %>
-      <% if field_name.end_with?('_comment') && value.present? %>
-        <% comments_found = true %>
-        <% base_field = field_name.chomp('_comment') %>
-        <% label = @inspection.field_label(:inspection, base_field) %>
-        <% comment_items << { label: label, value: value } %>
-      <% end %>
-    <% end %>
-
-    <% # Get all comment fields from assessments %>
-    <% @inspection.applicable_assessments.each do |assessment_key, assessment_class| %>
-      <% assessment = @inspection.send(assessment_key) %>
-      <% next unless assessment %>
-
-      <% fields = assessment.form_schema(user: nil).attribute_names.map(&:to_s) %>
-      <% assessment.attributes.slice(*fields).each do |field_name, value| %>
-        <% if field_name.end_with?('_comment') && value.present? %>
-          <% comments_found = true %>
-          <% form_name = assessment_key.to_s.gsub(/_assessment$/, '') %>
-          <% base_field = field_name.chomp('_comment') %>
-          <% label = @inspection.field_label(form_name, base_field) %>
-          <% comment_items << { label: label, value: value } %>
-        <% end %>
-      <% end %>
-    <% end %>
-
-    <% if comments_found %>
+    <% comment_items = inspection.comment_items %>
+    <% if comment_items.any? %>
       <ul>
         <% comment_items.each do |item| %>
           <li>

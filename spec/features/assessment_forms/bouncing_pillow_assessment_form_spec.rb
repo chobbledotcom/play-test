@@ -8,10 +8,10 @@ RSpec.feature "Pillow assessment", type: :feature do
   let(:unit) { create(:unit, user:, unit_type: :bouncing_pillow) }
   let(:inspection) do
     create(:inspection, user:, unit:, has_fencing: false,
-      inspection_location: "North field", checklist_revision: 2)
+      inspection_location: "North field")
   end
 
-  before { sign_in(user) }
+  background { sign_in(user) }
 
   def answer_pillow(inspection, outcome: "pass")
     visit edit_inspection_path(inspection, tab: "bouncing_pillow")
@@ -69,8 +69,8 @@ RSpec.feature "Pillow assessment", type: :feature do
 
   scenario "failed checks allow optional comments and still complete" do
     answer_pillow(inspection, outcome: "fail")
-    find("textarea[name$='[foundation_comment]']", visible: :all)
-      .set("Sand foundation requires attention")
+    fill_comment_field :bouncing_pillow, :foundation_comment,
+      "Sand foundation requires attention"
     submit_form :bouncing_pillow
     expect_updated_message
 
@@ -87,7 +87,7 @@ RSpec.feature "Pillow assessment", type: :feature do
     expect_updated_message
 
     second = create(:inspection, user:, unit:, has_fencing: false,
-      inspection_location: "South field", checklist_revision: 2)
+      inspection_location: "South field")
     answer_pillow(second)
     fill_in I18n.t("forms.bouncing_pillow.fields.slope"), with: "4.0"
     fill_in I18n.t("forms.bouncing_pillow.fields.clear_area"), with: "3.5"

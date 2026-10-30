@@ -87,6 +87,9 @@ class Assessments::AnchorageAssessment < ApplicationRecord
       inspection.inspection_type == "bungee_run"
   end
 
+  # Spencer's bungee anchorage calculation (the agreed working
+  # specification): side area × 114 / 1600 × the 2.5 bungee multiplier,
+  # rounded up. Labelled per side.
   sig { returns(T.nilable(Integer)) }
   def required_anchors_per_side
     return unless current_bungee? && !bungee_side_area.nil?

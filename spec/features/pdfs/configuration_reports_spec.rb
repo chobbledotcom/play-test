@@ -25,7 +25,8 @@ RSpec.feature "Configuration-aware inspection reports", type: :feature do
       number_of_users_pass: "pass", grounding_pass: "na",
       grounding_comment: "Explicit inspector judgement",
       fencing_height: 9.9, fencing_height_pass: "fail",
-      fencing_height_comment: "Inapplicable fence comment")
+      fencing_height_comment: "Inapplicable fence comment"
+    )
 
     visit inspection_path(inspection, format: :json)
     report = JSON.parse(page.body)

@@ -21,6 +21,8 @@ en:
         ancillary_equipment: Ancillary equipment fit for purpose
         ancillary_equipment_compliant: Ancillary equipment compliant
         containing_wall_height: Containing wall height, when walls exceed 630 mm (m)
+      legacy_fields:
+        max_user_mass: Marking for max user mass
       status:
         checks_passed: Fields completed
         completion: Assessment Completion

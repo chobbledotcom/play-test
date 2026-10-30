@@ -44,7 +44,6 @@ class Assessments::FanAssessment < ApplicationRecord
 
   belongs_to :inspection
 
-
   validates :inspection_id,
     uniqueness: true
 end

@@ -95,7 +95,6 @@ class AssessmentSchema
     sig { returns(T.nilable(Numeric)) }
     def max = attributes[:max]
 
-
     sig { returns(T::Array[Symbol]) }
     def attribute_names
       names = composite_fields

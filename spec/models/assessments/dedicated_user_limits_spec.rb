@@ -12,7 +12,7 @@ RSpec.describe "Dedicated assessment user-count limits", type: :model do
   }.each do |type, key|
     context type.to_s do
       let(:unit) { create(:unit, unit_type: type) }
-      let(:inspection) { create(:inspection, unit: unit, checklist_revision: 2) }
+      let(:inspection) { create(:inspection, unit: unit) }
       let(:assessment) { inspection.public_send(key) }
 
       it "requires an actual count for a current checklist" do

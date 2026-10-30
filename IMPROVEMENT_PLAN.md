@@ -3,19 +3,31 @@
 ## Status and scope
 
 This document records the decisions agreed during the unit/assessment audit and
-clarification interview. It is an implementation plan, not a record of completed
-application changes.
+clarification interview. The implementation and subsequent Rails review retain
+this agreed scope.
 
 The goal is to make each inspection present the correct checklist for its unit's
 primary type and permitted components, including the missing bouncing-pillow
 assessment. The same applicability rules must govern forms, completion, guidance,
 prefilling and detailed reports.
 
-The audit was source-based. The reported missing fields are accepted user
-observations; no successful Rails runtime verification was recorded. Bundler was
-unavailable in the audit environment and the cached Nix Ruby path was missing.
-Use the repository's documented development environment before claiming runtime
-verification of the implementation.
+The original audit was source-based. Implementation and review were subsequently
+verified using the repository's Nix development environment:
+
+- 572 examples passed across 42 affected test targets, including the existing
+  inspection model, unit requests, browser workflows, reports and migrations.
+- StandardRB passed for 103 affected Ruby files; ERB lint passed for all nine
+  changed templates; the Sorbet changed-signature check passed.
+- Live Chromium checks exercised fractional slide runout, Pillow N/A answers
+  with comments, the Results summary, advisory bungee guidance, and JSON/PDF/CSV
+  responses. CSV remained summary-only; explicit N/A survived detailed export.
+
+Review refinements centralised configuration display and comment collection,
+consolidated UI-driven test setup, and removed an unreferenced summary partial
+and its redundant view spec. Regression fixes preserve fractional slide runout
+and the PDF table's optional-inspection contract. This was focused verification,
+not a full-suite run; screenshot-tagged examples retained their default exclusion.
+Spencer's checklist remains a working specification, not a certification claim.
 
 ## Agreed product decisions
 

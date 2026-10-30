@@ -31,6 +31,8 @@ en:
         running_wall_height: Running wall height (m)
         running_wall: Running wall dimensions meets requirements
       legacy_fields:
+        marking_max_mass: Marking for max user mass 120kg
+        marking_min_height: Marking for minimum user height 1.2m
         pull_strength: Harness pull strength test to 1200N
       status:
         checks_passed: Fields completed

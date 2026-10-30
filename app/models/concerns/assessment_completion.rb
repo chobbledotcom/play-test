@@ -5,6 +5,9 @@ module AssessmentCompletion
   extend ActiveSupport::Concern
   extend T::Sig
 
+  # Outcome fields that stored pass/fail/na enums BEFORE this checklist
+  # revision existed; everything else with a revision-1 *_pass was a plain
+  # boolean and must export as one for legacy reports.
   ORIGINAL_ENUM_FIELDS = {
     "FanAssessment" => %i[pat_pass blower_flap_pass],
     "MaterialsAssessment" => %i[
@@ -64,18 +67,30 @@ module AssessmentCompletion
   def measurement_not_applicable?(field)
     return false if field.end_with?("_pass", "_comment")
 
-    outcome = if %i[minimum_age maximum_age].include?(field)
-      form_schema.attribute_names.find do |name|
+    outcome = outcome_field_for(field)
+    !outcome.nil? && public_send(outcome) == "na"
+  end
+
+  private
+
+  # A measurement is exempted from completion when the outcome covering its
+  # group is marked N/A. Most measurements own "#{field}_pass", but grouped
+  # measurements share one outcome (the bungee walls share rear_wall_pass)
+  # and the age markings share the marking outcome, so resolve the longest
+  # matching outcome field.
+  sig { params(field: Symbol).returns(T.nilable(Symbol)) }
+  def outcome_field_for(field)
+    if %i[minimum_age maximum_age].include?(field)
+      return form_schema.attribute_names.find do |name|
         %i[age_range_marking_pass age_marking_pass].include?(name)
       end
-    else
-      form_schema.attribute_names.select do |name|
-        next false unless name.end_with?("_pass")
-
-        base = name.to_s.delete_suffix("_pass")
-        field == base.to_sym || field.start_with?("#{base}_")
-      end.max_by { it.to_s.length }
     end
-    !outcome.nil? && public_send(outcome) == "na"
+
+    form_schema.attribute_names.select do |name|
+      next false unless name.end_with?("_pass")
+
+      base = name.to_s.delete_suffix("_pass")
+      field == base.to_sym || field.start_with?("#{base}_")
+    end.max_by { it.to_s.length }
   end
 end

@@ -138,8 +138,9 @@ RSpec.describe "Units", type: :request do
         expect(page).to have_content(I18n.t("forms.units.sections.unit_details"))
         expect(page).to have_content(I18n.t("forms.units.sections.manufacture"))
 
-        # Check for form fields
-        expect_form_fields_present("forms.units")
+        # Components have separate type-specific visibility coverage.
+        expect_form_fields_present("forms.units",
+          excluding: InspectionChecklist::COMPONENT_FIELDS)
       end
     end
 

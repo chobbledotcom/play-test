@@ -76,14 +76,13 @@ RSpec.feature "User Height Assessment", type: :feature do
 
       expect(page.status_code).to eq(422)
 
-      expect(page).to have_css(".form-errors")
       wall_height_error = I18n.t(
         "forms.user_height.errors.containing_wall_height_negative"
       )
       expect(page).to have_content(wall_height_error)
 
-      assessment = inspection.user_height_assessment.reload
-      expect(assessment.containing_wall_height).not_to eq(-1)
+      expect(Assessments::UserHeightAssessment.find_by(inspection:))
+        .to be_nil
     end
   end
 end

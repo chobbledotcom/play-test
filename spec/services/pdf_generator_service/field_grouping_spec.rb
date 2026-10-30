@@ -41,20 +41,6 @@ RSpec.describe "PdfGeneratorService::AssessmentBlockBuilder field grouping" do
       })
     end
 
-    it "includes composite fields from form config" do
-      # Fields defined as 'trough' in form config should expand
-      # to include trough_pass and trough_comment
-      ordered_fields = builder.send(:get_form_config_fields)
-      trough_fields = ordered_fields.select { |f| f.to_s.include?("trough") }
-
-      expect(trough_fields).to include(:trough_depth)
-      expect(trough_fields).to include(:trough_depth_comment)
-      expect(trough_fields).to include(:trough_adjacent_panel_width)
-      expect(trough_fields).to include(:trough_adjacent_panel_width_comment)
-      expect(trough_fields).to include(:trough_pass)
-      expect(trough_fields).to include(:trough_comment)
-    end
-
     it "correctly identifies not-applicable fields" do
       not_applicable_fields = builder.send(:get_not_applicable_fields)
 

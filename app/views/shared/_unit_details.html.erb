@@ -98,9 +98,9 @@
           <strong><%= ChobbleForms::FieldUtils.form_field_label(:units, :unit_type) %>:</strong>
           <span><%= t("units.unit_types.#{inspection_type}") %></span>
         </li>
-        <% fields = last_inspection.form_schema(user: nil).attribute_names %>
-        <% fields.select { |field| field.to_s.start_with?("has_", "is_") || %i[indoor_only inspection_location].include?(field) }.each do |field| %>
+        <% last_inspection.configuration_display_fields.each do |field| %>
           <% value = last_inspection.public_send(field) %>
+          <% next if value.nil? %>
           <li>
             <strong><%= last_inspection.field_label(:inspection, field) %>:</strong>
             <span><%= [true, false].include?(value) ? t(value ? "shared.yes" : "shared.no") : value %></span>

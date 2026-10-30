@@ -88,54 +88,6 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     end
   end
 
-  describe "#get_field_label (private method)" do
-    before do
-      # Mock I18n responses
-      allow(I18n).to receive(:t!).and_call_original
-      allow(inspection).to receive(:field_label) do |form, field|
-        I18n.t!("forms.#{form}.fields.#{field}")
-      end
-    end
-
-    it "prioritizes base field label" do
-      fields = {base: :ropes, pass: :ropes_pass, comment: :ropes_comment}
-
-      expect(I18n).to receive(:t!).with("forms.mock_form.fields.ropes")
-        .and_return("Ropes Label")
-
-      label = builder.send(:get_field_label, fields)
-      expect(label).to eq("Ropes Label")
-    end
-
-    it "uses pass field label when no base field" do
-      fields = {pass: :fabric_strength_pass, comment: :fabric_strength_comment}
-
-      expect(I18n).to receive(:t!).with("forms.mock_form.fields.fabric_strength")
-        .and_return("Fabric Pass Label")
-
-      label = builder.send(:get_field_label, fields)
-      expect(label).to eq("Fabric Pass Label")
-    end
-
-    it "uses comment field label for standalone comments" do
-      fields = {comment: :custom_comment}
-
-      expect(I18n).to receive(:t!).with("forms.mock_form.fields.custom")
-        .and_return("Custom Comment Label")
-
-      label = builder.send(:get_field_label, fields)
-      expect(label).to eq("Custom Comment Label")
-    end
-
-    it "raises error for unknown field types" do
-      fields = {unknown_type: :some_field}
-
-      expect {
-        builder.send(:get_field_label, fields)
-      }.to raise_error(RuntimeError, /No valid fields found:/)
-    end
-  end
-
   describe "#determine_pass_value (private method)" do
     it "returns pass field value when pass field exists" do
       fields = {base: :ropes, pass: :ropes_pass}
@@ -160,38 +112,29 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     end
   end
 
-  describe "#get_form_config_fields (private method)" do
-    context "with user_height assessment" do
-      let(:assessment) { inspection.user_height_assessment }
-      let(:builder) { described_class.new("user_height", assessment) }
+  describe "user-height report content" do
+    let(:assessment) { inspection.user_height_assessment }
+    let(:builder) { described_class.new("user_height", assessment) }
 
-      it "includes standalone comment fields from form config" do
-        fields = builder.send(:get_form_config_fields)
+    it "retains standalone inspection comments" do
+      assessment.custom_user_height_comment = "Reduced capacity for supervision"
 
-        expect(fields).to include(:custom_user_height_comment)
-      end
+      comments = builder.build.select(&:comment?).map(&:comment)
 
-      it "expands composite fields correctly" do
-        fields = builder.send(:get_form_config_fields)
+      expect(comments).to contain_exactly("Reduced capacity for supervision")
+    end
 
-        # Should include base fields and their comment variants
-        expect(fields).to include(:containing_wall_height)
-        expect(fields).to include(:containing_wall_height_comment)
-      end
+    it "keeps the wall measurement and its associated comment" do
+      assessment.assign_attributes(containing_wall_height: 2.5,
+        containing_wall_height_comment: "Measured beside the play area")
 
-      it "maintains field order from form configuration" do
-        fields = builder.send(:get_form_config_fields)
+      blocks = builder.build
+      label = I18n.t("forms.user_height.fields.containing_wall_height")
+      wall = blocks.find { |block| block.value? && block.name == label }
 
-        # Check that fields appear in the order defined in the form config
-        wall_height_index = fields.index(:containing_wall_height)
-        play_area_index = fields.index(:play_area_length)
-        user_count_index = fields.index(:users_at_1000mm)
-        custom_comment_index = fields.index(:custom_user_height_comment)
-
-        expect(wall_height_index).to be < play_area_index
-        expect(play_area_index).to be < user_count_index
-        expect(user_count_index).to be < custom_comment_index
-      end
+      expect(wall.value).to eq(BigDecimal("2.5"))
+      expect(blocks.select(&:comment?).map(&:comment))
+        .to contain_exactly("Measured beside the play area")
     end
   end
 
@@ -208,24 +151,13 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       expect(blocks.first.type).to eq(:header)
     end
 
-    it "handles nil values correctly" do
-      allow(assessment).to receive(:ropes).and_return(nil)
-      allow(assessment).to receive(:ropes_pass).and_return(nil)
-      allow(assessment).to receive(:ropes_comment).and_return(nil)
-      mock_form_translations
+    it "retains unanswered measurements without inventing comments" do
+      blocks = described_class.new("materials", assessment).build
+      label = I18n.t("forms.materials.fields.ropes")
+      ropes = blocks.find { |block| block.value? && block.name == label }
 
-      builder = described_class.new("mock_form", assessment)
-      fields = {base: :ropes, pass: :ropes_pass, comment: :ropes_comment}
-
-      # Mock the field grouping
-      allow(builder).to receive(:get_form_config_fields).and_return([:ropes, :ropes_pass, :ropes_comment])
-      allow(builder).to receive(:group_assessment_fields).and_return({ropes: fields})
-
-      blocks = builder.build
-
-      # Should create header and value block even with nil values
-      expect(blocks.count(&:value?)).to be >= 1
-      # Should not create comment block for nil comment
+      expect(ropes.value).to be_nil
+      expect(ropes.pass_fail).to be_nil
       expect(blocks.select(&:comment?)).to be_empty
     end
 

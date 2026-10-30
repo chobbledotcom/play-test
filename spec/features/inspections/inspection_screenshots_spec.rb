@@ -50,10 +50,6 @@ class InspectionScreenshotWorkflow
     self
   end
 
-  def applicable_tabs
-    @inspection.reload.applicable_tabs.reject { |tab| tab == "inspection" }
-  end
-
   private
 
   def setup_user
@@ -169,23 +165,15 @@ class InspectionScreenshotWorkflow
   end
 
   def fill_all_assessments
-    applicable_tabs.each do |tab_name|
-      fill_assessment_tab(tab_name)
+    fill_applicable_assessments_via_ui(@inspection) do |tab_name, fields|
+      fill_assessment_tab(tab_name, fields)
     end
+    fill_assessment_tab("results", SeedData.results_fields(passed: true))
   end
 
-  def fill_assessment_tab(tab_name)
+  def fill_assessment_tab(tab_name, field_data)
     visit edit_inspection_path(@inspection, tab: tab_name)
     capture_guide_screenshot("#{tab_name.humanize} Assessment Form")
-
-    field_data = if tab_name == "results"
-      SeedData.results_fields(passed: true)
-    else
-      assessment_name = :"#{tab_name}_assessment"
-      assessment = @inspection.reload.public_send(assessment_name)
-      attributes_for(assessment_name, :complete)
-        .slice(*assessment.form_schema.attribute_names)
-    end
 
     field_data.each do |field_name, value|
       fill_assessment_field(tab_name, field_name, value)

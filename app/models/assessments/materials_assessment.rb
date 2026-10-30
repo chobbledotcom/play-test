@@ -46,6 +46,5 @@ class Assessments::MaterialsAssessment < ApplicationRecord
 
   belongs_to :inspection
 
-
   after_update :log_assessment_update, if: :saved_changes?
 end

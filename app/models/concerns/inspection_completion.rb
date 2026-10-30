@@ -126,7 +126,6 @@ module InspectionCompletion
 
   private
 
-
   sig { params(output: T::Array[T.untyped]).void }
   def add_inspection_tab_fields(output)
     fields = inspection_tab_incomplete_fields.map do |f|

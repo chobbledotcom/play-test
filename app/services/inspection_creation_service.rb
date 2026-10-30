@@ -60,18 +60,6 @@ class InspectionCreationService
     )
   end
 
-  sig do
-    params(unit: Unit, previous: Inspection)
-      .returns(T::Hash[Symbol, T.untyped])
-  end
-  def previous_values(unit, previous)
-    allowed = %i[height length width] + unit.configuration_fields
-    (COPY_FROM_LAST_INSPECTION_FIELDS & allowed).filter_map do |field|
-      value = previous.public_send(field)
-      [field, value] unless value.nil?
-    end.to_h
-  end
-
   sig { params(inspection: Inspection).void }
   def notify_if_production(inspection)
     return unless Rails.env.production?
@@ -116,5 +104,18 @@ class InspectionCreationService
   sig { params(inspection: Inspection).returns(String) }
   def build_failure_redirect_path(inspection)
     inspection.unit.present? ? "/units/#{inspection.unit.id}" : "/"
+  end
+
+  sig do
+    params(unit: Unit, previous: Inspection)
+      .returns(T::Hash[Symbol, T.untyped])
+  end
+
+  def previous_values(unit, previous)
+    allowed = %i[height length width] + unit.configuration_fields
+    (COPY_FROM_LAST_INSPECTION_FIELDS & allowed).filter_map do |field|
+      value = previous.public_send(field)
+      [field, value] unless value.nil?
+    end.to_h
   end
 end

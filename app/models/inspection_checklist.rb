@@ -218,11 +218,11 @@ class InspectionChecklist
     when :ball_pool_assessment
       @inspection.has_air_jugglers? ? [] : %i[air_jugglers_compliant]
     when :fan_assessment
-      type == :bouncing_pillow ? %i[blower_flap blower_tube_length] : []
+      (type == :bouncing_pillow) ? %i[blower_flap blower_tube_length] : []
     when :user_height_assessment
-      type == :play_zone ? %i[maximum_user_height] : []
+      (type == :play_zone) ? %i[maximum_user_height] : []
     when :anchorage_assessment
-      type == :bungee_run ? [] : %i[bungee_side_area]
+      (type == :bungee_run) ? [] : %i[bungee_side_area]
     else []
     end
   end

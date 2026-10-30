@@ -155,8 +155,8 @@ class UnitsController < ApplicationController
   def create_from_inspection
     if params[:intent] == "configure"
       @inspection = current_user.inspections.find(params[:id])
-      @unit = current_user.units.build(unit_params)
-      render_configuration_preview(:new_from_inspection)
+      @unit = current_user.units.build(unit_params).prepare_configuration!
+      render :new_from_inspection
       return
     end
 

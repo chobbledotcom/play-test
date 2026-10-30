@@ -19,7 +19,8 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
 
     # After setting has_slide, slide tab should appear
     verify_correct_tabs_visible(inspection, with_slide: true)
-    fill_all_play_zone_assessments(inspection)
+    fill_applicable_assessments_via_ui(inspection)
+    fill_results_tab(inspection)
     complete_inspection(inspection)
     verify_inspection_complete(inspection)
   end
@@ -30,7 +31,8 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
 
     fill_inspection_tab(inspection, has_slide: false)
     verify_correct_tabs_visible(inspection, with_slide: false)
-    fill_all_play_zone_assessments(inspection)
+    fill_applicable_assessments_via_ui(inspection)
+    fill_results_tab(inspection)
     complete_inspection(inspection)
     verify_inspection_complete(inspection)
   end
@@ -45,7 +47,8 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
 
     verify_correct_tabs_visible(inspection,
       with_slide: false, with_enclosure: true)
-    fill_all_play_zone_assessments(inspection)
+    fill_applicable_assessments_via_ui(inspection)
+    fill_results_tab(inspection)
     complete_inspection(inspection)
     verify_inspection_complete(inspection)
   end
@@ -85,7 +88,6 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
     expect_assessment_tab("play_zone")
     expect_assessment_tab("anchorage")
 
-    # Slide tab not shown until has_slide is set
     expect_no_assessment_tab("slide")
 
     %w[enclosed pat ball_pool catch_bed
@@ -180,18 +182,6 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
     click_submit_button
   end
 
-  def fill_all_play_zone_assessments(inspection)
-    inspection.reload.applicable_assessments.each_key do |assessment_name|
-      tab = assessment_name.to_s.delete_suffix("_assessment")
-      assessment = inspection.public_send(assessment_name)
-      fields = attributes_for(assessment_name, :complete)
-        .slice(*assessment.form_schema.attribute_names)
-      fill_assessment(inspection, tab, fields)
-    end
-
-    fill_results_tab(inspection)
-  end
-
   def fill_results_tab(inspection)
     visit edit_inspection_path(inspection, tab: "results")
     fill_assessment_field("results", :passed, true)
@@ -199,17 +189,6 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
       "Unit passes all play zone checks"
     )
     submit_form :results
-    expect_updated_message
-  end
-
-  def fill_assessment(inspection, tab_name, field_data)
-    visit edit_inspection_path(inspection, tab: tab_name)
-
-    field_data.each do |field_name, value|
-      fill_assessment_field(tab_name, field_name, value)
-    end
-
-    submit_form tab_name.to_sym
     expect_updated_message
   end
 

@@ -20,6 +20,8 @@ en:
         fitted_base: Fitted base sheet
         ball_pool_depth: Ball pool depth (mm) max 450mm
         ball_pool_entry: Ball pool entry height (mm) max 630mm
+      legacy_fields:
+        max_height_markings: Marking to indicate max user height
       status:
         checks_passed: Fields completed
         completion: Assessment Completion

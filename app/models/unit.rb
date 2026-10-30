@@ -111,7 +111,6 @@ class Unit < ApplicationRecord
       .having("MAX(inspections.complete_date) + INTERVAL #{EN14960::Constants::REINSPECTION_INTERVAL_DAYS} DAY <= CURRENT_DATE")
   }
 
-
   sig { returns(String) }
   def self.default_unit_type
     Rails.configuration.units.available_unit_types.fetch(0)
@@ -131,13 +130,14 @@ class Unit < ApplicationRecord
     end
   end
 
+  # A preview may carry flags from a previously selected type, including
+  # before the unit has been saved.
   sig { returns(Unit) }
   def prepare_configuration!
     InspectionChecklist.normalise_type_change(self, unit_type)
     initialise_configuration if new_record?
     self
   end
-  # Instance methods
 
   sig { returns(T.nilable(Inspection)) }
   def last_inspection

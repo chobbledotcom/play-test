@@ -24,7 +24,7 @@ class PdfGeneratorService
       )
 
       # Process fields
-      ordered_fields = get_form_config_fields
+      ordered_fields = form_config_fields
       field_groups = group_assessment_fields(ordered_fields)
       section_starts = pillow_section_starts
 
@@ -97,6 +97,7 @@ class PdfGeneratorService
     end
 
     private
+
     def pillow_section_starts
       return {} unless @assessment_type.to_s == "bouncing_pillow"
 
@@ -108,8 +109,7 @@ class PdfGeneratorService
       end
     end
 
-
-    def get_form_config_fields
+    def form_config_fields
       (assessment_schema.attribute_names & @assessment.class.column_name_syms) -
         PublicFieldFiltering::PDF_TOTAL_EXCLUDED_FIELDS
     end
@@ -173,9 +173,8 @@ class PdfGeneratorService
     def field_is_not_applicable?(field)
       base = ChobbleForms::FieldUtils.strip_field_suffix(field)
       outcome = :"#{base}_pass"
-      if @assessment.has_attribute?(outcome)
-        return false if @assessment.public_send(outcome) == "na"
-      end
+      return false if @assessment.has_attribute?(outcome) &&
+        @assessment.public_send(outcome) == "na"
       return false unless @not_applicable_fields.include?(field)
 
       value = @assessment.send(field)

@@ -1,7 +1,12 @@
-<% comparisons = AssessmentGuidance.new(assessment).comparisons %>
-<% if assessment.inspection.current_checklist? && (comparisons.any? || assessment.is_a?(Assessments::AnchorageAssessment) && assessment.current_bungee?) %>
+<%# Locals: assessment (Assessment instance) %>
+<%
+  comparisons = AssessmentGuidance.new(assessment).comparisons
+  bungee_anchors = assessment.is_a?(Assessments::AnchorageAssessment) &&
+    assessment.current_bungee?
+%>
+<% if comparisons.any? || bungee_anchors %>
   <aside aria-label="<%= t('assessment_guidance.title') %>">
-    <h3><%= t('assessment_guidance.title') %></h3>
+    <h2><%= t('assessment_guidance.title') %></h2>
     <p><%= t('assessment_guidance.advisory') %></p>
     <% if comparisons.any? %>
       <ul>
@@ -14,25 +19,8 @@
         <% end %>
       </ul>
     <% end %>
-    <% if assessment.is_a?(Assessments::AnchorageAssessment) && assessment.current_bungee? %>
-      <p><%= t('assessment_guidance.bungee_anchors.source') %></p>
-      <% if assessment.bungee_side_area.nil? %>
-        <p><%= t('assessment_guidance.bungee_anchors.missing') %></p>
-      <% else %>
-        <p><%= t('assessment_guidance.bungee_anchors.result',
-          area: number_with_precision(assessment.bungee_side_area,
-            precision: 4, strip_insignificant_zeros: true),
-          per_side: assessment.required_anchors_per_side,
-          total: assessment.required_anchors) %></p>
-        <% if assessment.num_low_anchors.nil? || assessment.num_high_anchors.nil? %>
-          <p><%= t('assessment_guidance.bungee_anchors.missing_counts') %></p>
-        <% else %>
-          <p><%= t('assessment_guidance.bungee_anchors.comparison',
-            actual: assessment.total_anchors,
-            status: t(assessment.meets_anchor_requirements? ? 'within' : 'outside',
-              scope: 'assessment_guidance.status')) %></p>
-        <% end %>
-      <% end %>
+    <% if bungee_anchors %>
+      <%= render 'assessments/bungee_anchor_guidance', assessment: assessment %>
     <% end %>
   </aside>
 <% end %>

@@ -51,8 +51,9 @@ RSpec.describe ValidationConfigurable do
       model = test_model_class.new
 
       expect(model).not_to be_valid
-      expect(model.errors[:inspection_date]).to include("can't be blank")
-      expect(model.errors[:width]).to include("can't be blank")
+      expect(model.errors[:inspection_date])
+        .to include(I18n.t("errors.messages.blank"))
+      expect(model.errors[:width]).to include(I18n.t("errors.messages.blank"))
       expect(model.errors[:height]).to be_empty
       expect(model.errors[:notes_comment]).to be_empty
     end
@@ -62,7 +63,7 @@ RSpec.describe ValidationConfigurable do
 
       expect(model).not_to be_valid
       expect(model.errors[:width])
-        .to include("must be greater than or equal to 1")
+        .to include(I18n.t("errors.messages.greater_than_or_equal_to", count: 1))
     end
 
     it "allows valid values" do

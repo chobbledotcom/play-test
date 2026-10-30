@@ -10,17 +10,31 @@ RSpec.feature "Recorded user limits and advisory guidance", type: :feature do
 
   background { sign_in(user) }
 
+  scenario "saves fractional slide runout measurements" do
+    unit = create(:unit, user: user, unit_type: :bouncy_castle,
+      has_slide: true)
+    inspection = create(:inspection, user: user, unit: unit)
+    visit edit_inspection_path(inspection, tab: "slide")
+
+    fill_in_form :slide, :runout, 2.75
+    choose_pass_fail(get_field_label(:slide, :runout_pass), "pass")
+    submit_form :slide
+    expect_updated_message
+
+    expect(inspection.slide_assessment.reload.runout).to eq(BigDecimal("2.75"))
+    expect(inspection.slide_assessment.runout_pass).to eq("pass")
+  end
+
   scenario "an unsafe harness test is saved with a manual outcome and limits" do
     unit = create(:unit, user: user, unit_type: :bungee_run)
-    inspection = create(:inspection, user: user, unit: unit,
-      checklist_revision: 2)
+    inspection = create(:inspection, user: user, unit: unit)
     visit edit_inspection_path(inspection, tab: "bungee")
 
     fill_in_form :bungee, :maximum_users, 7
     fill_in_form :bungee, :marking_max_mass, 125
     fill_in_form :bungee, :marking_min_height, 1.1
     fill_in_form :bungee, :pull_strength, 1200
-    find("input[name$='[pull_strength_pass]'][value='fail']").set(true)
+    choose_pass_fail(get_field_label(:bungee, :pull_strength_pass), "fail")
     submit_form :bungee
 
     assessment = inspection.bungee_assessment.reload
@@ -43,10 +57,9 @@ RSpec.feature "Recorded user limits and advisory guidance", type: :feature do
     inflatable_game: ["inflatable_game", :max_user_mass, 125]
   }.each do |type, (tab, limit_field, limit)|
     scenario "records actual age and user limits for #{type}" do
-      components = type == :inflatable_game ? {has_inflatable_bed: true} : {}
+      components = (type == :inflatable_game) ? {has_inflatable_bed: true} : {}
       unit = create(:unit, user: user, unit_type: type, **components)
-      inspection = create(:inspection, user: user, unit: unit,
-        checklist_revision: 2)
+      inspection = create(:inspection, user: user, unit: unit)
       visit edit_inspection_path(inspection, tab: tab)
 
       fill_in_form tab, :maximum_users, 7 unless type == :play_zone
@@ -70,14 +83,13 @@ RSpec.feature "Recorded user limits and advisory guidance", type: :feature do
 
   scenario "records catch-bed mass while allowing an unsafe bed measurement" do
     unit = create(:unit, user: user, unit_type: :catch_bed)
-    inspection = create(:inspection, user: user, unit: unit,
-      checklist_revision: 2)
+    inspection = create(:inspection, user: user, unit: unit)
     visit edit_inspection_path(inspection, tab: "catch_bed")
 
     fill_in_form :catch_bed, :maximum_users, 7
     fill_in_form :catch_bed, :max_user_mass_marking, 125
     fill_in_form :catch_bed, :bed_height, 399
-    find("input[name$='[bed_height_pass]'][value='fail']").set(true)
+    choose_pass_fail(get_field_label(:catch_bed, :bed_height_pass), "fail")
     submit_form :catch_bed
 
     assessment = inspection.catch_bed_assessment.reload
@@ -91,8 +103,7 @@ RSpec.feature "Recorded user limits and advisory guidance", type: :feature do
 
   scenario "bungee anchorage offers only the formula when no area is supplied" do
     unit = create(:unit, user: user, unit_type: :bungee_run)
-    inspection = create(:inspection, user: user, unit: unit,
-      checklist_revision: 2)
+    inspection = create(:inspection, user: user, unit: unit)
     values = attributes_for(:anchorage_assessment, :complete)
       .merge(bungee_side_area: nil)
     inspection.anchorage_assessment.update!(values)
@@ -106,10 +117,26 @@ RSpec.feature "Recorded user limits and advisory guidance", type: :feature do
     expect(inspection.anchorage_assessment.required_anchors).to be_nil
   end
 
+  scenario "a supplied bungee area with missing counts is not a failure" do
+    unit = create(:unit, user: user, unit_type: :bungee_run)
+    inspection = create(:inspection, user: user, unit: unit)
+    visit edit_inspection_path(inspection, tab: "anchorage")
+
+    fill_in_form :anchorage, :bungee_side_area, 10
+    submit_form :anchorage
+    visit edit_inspection_path(inspection, tab: "anchorage")
+
+    expect(page).to have_content(
+      I18n.t("assessment_guidance.bungee_anchors.missing_counts")
+    )
+    expect(page).not_to have_content(
+      I18n.t("assessment_guidance.status.outside")
+    )
+  end
+
   scenario "compares bungee totals with two rounded side requirements" do
     unit = create(:unit, user: user, unit_type: :bungee_run)
-    inspection = create(:inspection, user: user, unit: unit,
-      checklist_revision: 2)
+    inspection = create(:inspection, user: user, unit: unit)
     visit edit_inspection_path(inspection, tab: "anchorage")
 
     fill_in_form :anchorage, :bungee_side_area, 10
@@ -126,14 +153,13 @@ RSpec.feature "Recorded user limits and advisory guidance", type: :feature do
 
   scenario "play-zone access geometry does not overwrite slide geometry" do
     unit = create(:unit, user: user, unit_type: :play_zone, has_slide: true)
-    inspection = create(:inspection, user: user, unit: unit,
-      checklist_revision: 2)
+    inspection = create(:inspection, user: user, unit: unit)
     inspection.slide_assessment.update!(slide_platform_height: 3)
     visit edit_inspection_path(inspection, tab: "play_zone")
 
     fill_in_form :play_zone, :slide_gradient, 65
     fill_in_form :play_zone, :slide_platform_height, 1.4
-    find("input[name$='[slide_gradient_pass]'][value='fail']").set(true)
+    choose_pass_fail(get_field_label(:play_zone, :slide_gradient_pass), "fail")
     submit_form :play_zone
 
     assessment = inspection.play_zone_assessment.reload
@@ -147,8 +173,7 @@ RSpec.feature "Recorded user limits and advisory guidance", type: :feature do
 
   scenario "records the castle's actual maximum height and user counts" do
     unit = create(:unit, user: user, unit_type: :bouncy_castle)
-    inspection = create(:inspection, user: user, unit: unit,
-      checklist_revision: 2)
+    inspection = create(:inspection, user: user, unit: unit)
     visit edit_inspection_path(inspection, tab: "user_height")
 
     fill_in_form :user_height, :maximum_user_height, 1.2
@@ -169,10 +194,9 @@ RSpec.feature "Recorded user limits and advisory guidance", type: :feature do
 
   scenario "an N/A harness test has no invented measurement or comparison" do
     unit = create(:unit, user: user, unit_type: :bungee_run)
-    inspection = create(:inspection, user: user, unit: unit,
-      checklist_revision: 2)
+    inspection = create(:inspection, user: user, unit: unit)
     visit edit_inspection_path(inspection, tab: "bungee")
-    find("input[name$='[pull_strength_pass]'][value='na']").set(true)
+    choose_pass_fail(get_field_label(:bungee, :pull_strength_pass), "na")
     submit_form :bungee
 
     expect(inspection.bungee_assessment.reload.pull_strength).to be_nil

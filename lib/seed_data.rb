@@ -14,8 +14,6 @@ module SeedData
     Shared.pass_fail_fields(passed, *fields)
   end
 
-
-
   def self.user_fields
     Shared.user_fields
   end

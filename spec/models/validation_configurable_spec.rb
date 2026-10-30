@@ -10,13 +10,15 @@ RSpec.describe ValidationConfigurable do
       it "applies min validation from YAML for containing_wall_height" do
         assessment.containing_wall_height = -1
         expect(assessment).not_to be_valid
-        expect(assessment.errors[:containing_wall_height]).to include("must be greater than or equal to 0")
+        expect(assessment.errors[:containing_wall_height])
+          .to include(I18n.t("errors.messages.greater_than_or_equal_to", count: 0))
       end
 
       it "applies max validation from YAML for containing_wall_height" do
         assessment.containing_wall_height = 51
         expect(assessment).not_to be_valid
-        expect(assessment.errors[:containing_wall_height]).to include("must be less than or equal to 50")
+        expect(assessment.errors[:containing_wall_height])
+          .to include(I18n.t("errors.messages.less_than_or_equal_to", count: 50))
       end
 
       it "allows valid values for containing_wall_height" do
@@ -28,7 +30,8 @@ RSpec.describe ValidationConfigurable do
       it "applies integer validation for users_at_1000mm" do
         assessment.users_at_1000mm = 5.5
         expect(assessment).not_to be_valid
-        expect(assessment.errors[:users_at_1000mm]).to include("must be an integer")
+        expect(assessment.errors[:users_at_1000mm])
+          .to include(I18n.t("errors.messages.not_an_integer"))
       end
 
       it "allows blank values" do
@@ -46,19 +49,22 @@ RSpec.describe ValidationConfigurable do
       it "applies min validation from YAML for width" do
         inspection.width = -1
         expect(inspection).not_to be_valid
-        expect(inspection.errors[:width]).to include("must be greater than or equal to 0")
+        expect(inspection.errors[:width])
+          .to include(I18n.t("errors.messages.greater_than_or_equal_to", count: 0))
       end
 
       it "applies max validation from YAML for width" do
         inspection.width = 201
         expect(inspection).not_to be_valid
-        expect(inspection.errors[:width]).to include("must be less than or equal to 200")
+        expect(inspection.errors[:width])
+          .to include(I18n.t("errors.messages.less_than_or_equal_to", count: 200))
       end
 
       it "applies validations for height with different max value" do
         inspection.height = 51
         expect(inspection).not_to be_valid
-        expect(inspection.errors[:height]).to include("must be less than or equal to 50")
+        expect(inspection.errors[:height])
+          .to include(I18n.t("errors.messages.less_than_or_equal_to", count: 50))
       end
     end
 

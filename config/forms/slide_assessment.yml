@@ -29,6 +29,7 @@ form_fields:
       - partial: :number_pass_fail_comment
         field: :runout
         attributes:
+          step: 0.01
           min: 0
           max: 50
       - partial: :pass_fail_comment

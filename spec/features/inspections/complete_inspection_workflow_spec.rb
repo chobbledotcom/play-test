@@ -231,28 +231,22 @@ class InspectionWorkflow
   end
 
   def fill_all_assessments
-    applicable_tabs.each_with_index do |tab_name, index|
-      verify_assessment_check_marks(completed_tabs: applicable_tabs[0...index])
-      fill_assessment_tab(tab_name)
-      if index < applicable_tabs.length - 1
-        verify_inspection_not_completable
-      end
+    completed_tabs = []
+    fill_applicable_assessments_via_ui(@inspection) do |tab_name, fields|
+      verify_assessment_check_marks(completed_tabs:)
+      fill_assessment_tab(tab_name, fields)
+      completed_tabs << tab_name
+      verify_inspection_not_completable
     end
+
+    verify_assessment_check_marks(completed_tabs:)
+    fill_assessment_tab("results", SeedData.results_fields(passed: true))
 
     verify_assessment_check_marks(completed_tabs: applicable_tabs)
   end
 
-  def fill_assessment_tab(tab_name)
+  def fill_assessment_tab(tab_name, field_data)
     visit edit_inspection_path(@inspection, tab: tab_name)
-
-    field_data = if tab_name == "results"
-      SeedData.results_fields(passed: true)
-    else
-      assessment_name = :"#{tab_name}_assessment"
-      assessment = @inspection.reload.public_send(assessment_name)
-      attributes_for(assessment_name, :complete)
-        .slice(*assessment.form_schema.attribute_names)
-    end
 
     field_data.each do |field_name, value|
       fill_assessment_field(tab_name, field_name, value)

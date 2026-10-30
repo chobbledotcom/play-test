@@ -333,26 +333,52 @@ class Inspection < ApplicationRecord
     ).returns(String)
   }
   def field_label(form, field)
-    if !current_checklist? && form.to_s == "bungee" &&
-        ChobbleForms::FieldUtils.strip_field_suffix(field) == :pull_strength
-      return I18n.t("forms.bungee.legacy_fields.pull_strength")
+    base = ChobbleForms::FieldUtils.strip_field_suffix(field.to_sym)
+    # Legacy checklists render fields through their original partials, so a
+    # renamed label (e.g. with a unit suffix) must not leak into them.
+    if !current_checklist?
+      legacy = I18n.t("forms.#{form}.legacy_fields.#{base}", default: nil)
+      return legacy if legacy
     end
 
     key = "forms.#{form}.fields.#{field}"
     label = I18n.t(key, default: nil)
-    if label.nil?
-      base = ChobbleForms::FieldUtils.strip_field_suffix(field)
-      label = I18n.t(
-        "forms.#{form}.fields.#{base}", default: nil
-      )
-    end
-    if label.nil? && !field.to_s.end_with?("_pass")
-      label = I18n.t("#{key}_pass", default: nil)
-    end
+    label ||= I18n.t("forms.#{form}.fields.#{base}", default: nil)
+    label ||= I18n.t("#{key}_pass", default: nil) unless
+      field.to_s.end_with?("_pass")
     label || I18n.t(key)
   end
 
+  sig { returns(T::Array[T::Hash[Symbol, String]]) }
+  def comment_items
+    items = schema_comment_items(self, :inspection)
+    each_applicable_assessment do |key, _klass, assessment|
+      form = key.to_s.delete_suffix("_assessment")
+      items.concat(schema_comment_items(assessment, form))
+    end
+    items
+  end
+
+  sig { returns(T::Array[Symbol]) }
+  def configuration_display_fields
+    form_schema.attribute_names &
+      (InspectionChecklist::COMPONENT_FIELDS + %i[inspection_location])
+  end
+
   private
+
+  sig do
+    params(record: ApplicationRecord, form: T.any(Symbol, String))
+      .returns(T::Array[T::Hash[Symbol, String]])
+  end
+  def schema_comment_items(record, form)
+    schema_fields = record.form_schema(user: nil).attribute_names.map(&:to_s)
+    record.attributes.slice(*schema_fields).filter_map do |field, value|
+      next unless field.end_with?("_comment") && value.present?
+
+      {label: field_label(form, field.delete_suffix("_comment")), value: value}
+    end
+  end
 
   sig { void }
   def set_inspector_company_from_user

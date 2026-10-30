@@ -44,12 +44,8 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     fill_structure_field :trough_adjacent_panel_width, "800"
 
     choose_structure_field :stitch_length_pass, "pass"
-    # Fill comment field
-    checkbox = find(:css, "input[id*='stitch_length_has_comment_']")
-    checkbox.check unless checkbox.checked?
-    textarea = find(:css, "textarea[id*='stitch_length_comment_']",
-      visible: :all)
-    textarea.set("Stitch length within specification")
+    fill_comment_field :structure, :stitch_length_comment,
+      "Stitch length within specification"
     choose_structure_field :unit_pressure_pass, "pass"
     choose_structure_field :evacuation_time_pass, "pass"
     choose_structure_field :critical_fall_off_height_pass, "pass"

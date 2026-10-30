@@ -68,7 +68,6 @@ class Assessments::StructureAssessment < ApplicationRecord
 
   belongs_to :inspection
 
-
   after_update :log_assessment_update, if: :saved_changes?
 
   sig { returns(T::Boolean) }

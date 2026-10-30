@@ -233,6 +233,11 @@ RSpec.describe AssessmentCompletion, type: :model do
         assessment.update!(ropes: nil, ropes_pass: "pass")
       end
 
+      it "requires the measurement but not another outcome" do
+        expect(assessment.incomplete_fields).to include(:ropes)
+        expect(assessment.incomplete_fields).not_to include(:ropes_pass)
+      end
+
       it "returns only the value field" do
         grouped = assessment.incomplete_fields_grouped
 
@@ -268,20 +273,6 @@ RSpec.describe AssessmentCompletion, type: :model do
 
       it "does not include the field in incomplete fields (NA is a valid selection)" do
         expect(assessment.incomplete_fields).not_to include(:retention_netting_pass)
-      end
-    end
-
-    context "when pass field is set to pass or fail" do
-      before do
-        assessment.update!(ropes: nil, ropes_pass: "pass")
-      end
-
-      it "includes the value field in incomplete fields" do
-        expect(assessment.incomplete_fields).to include(:ropes)
-      end
-
-      it "does not include the pass field in incomplete fields" do
-        expect(assessment.incomplete_fields).not_to include(:ropes_pass)
       end
     end
   end

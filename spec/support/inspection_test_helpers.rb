@@ -95,6 +95,29 @@ module InspectionTestHelpers
     end
   end
 
+  def fill_applicable_assessments_via_ui(inspection)
+    applicable = inspection.reload.applicable_assessments
+    inspection.applicable_tabs.each do |tab_name|
+      assessment_name = :"#{tab_name}_assessment"
+      next unless applicable.key?(assessment_name)
+      assessment = inspection.public_send(assessment_name)
+      fields = attributes_for(assessment_name, :complete)
+        .slice(*assessment.form_schema.attribute_names)
+
+      if block_given?
+        yield tab_name, fields
+        next
+      end
+
+      visit edit_inspection_path(inspection, tab: tab_name)
+      fields.each do |field_name, value|
+        fill_assessment_field(tab_name, field_name, value)
+      end
+      submit_form tab_name.to_sym
+      expect_updated_message
+    end
+  end
+
   # Navigation helpers
   def visit_inspection_edit(inspection)
     visit edit_inspection_path(inspection)

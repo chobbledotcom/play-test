@@ -24,6 +24,8 @@ en:
         ball_pool_entry_height: Ball pool entry height (mm) max 630mm
         slide_gradient: Access gradient to platform, not slide slope (degrees)
         slide_platform_height: Slide platform height (m) max 1.5m
+      legacy_fields:
+        height_marking: Marking to indicate max user height
       status:
         checks_passed: Fields completed
         completion: Assessment Completion

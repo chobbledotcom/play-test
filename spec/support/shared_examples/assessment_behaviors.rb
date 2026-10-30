@@ -2,7 +2,6 @@
 
 # Shared examples for common assessment model behaviors
 
-
 RSpec.shared_examples "an assessment model" do
   describe "associations" do
     it "belongs to inspection" do

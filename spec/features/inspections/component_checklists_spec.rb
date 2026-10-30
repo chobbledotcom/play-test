@@ -36,6 +36,27 @@ RSpec.feature "Component-aware inspection lifecycle", type: :feature do
     expect(unit.is_totally_enclosed).to be false
   end
 
+  scenario "changing an unsaved unit type clears incompatible components" do
+    visit new_unit_path
+    fill_in_form :units, :name, "Reconfigured unit"
+    fill_in_form :units, :serial, "UNSAVED-TYPE-CHANGE"
+    fill_in_form :units, :description, "Unit configuration preview"
+    select I18n.t("units.unit_types.bouncing_pillow"),
+      from: I18n.t("forms.units.fields.unit_type")
+    click_button I18n.t("forms.units.buttons.apply_type")
+    choose_yes_no I18n.t("forms.units.fields.has_fencing"), true
+
+    select I18n.t("units.unit_types.bouncy_castle"),
+      from: I18n.t("forms.units.fields.unit_type")
+    click_button I18n.t("forms.units.buttons.apply_type")
+    submit_form :units
+
+    unit = Unit.find_by!(serial: "UNSAVED-TYPE-CHANGE")
+    expect(unit).to be_bouncy_castle
+    expect(unit.has_fencing).to be false
+    expect(unit.has_blower).to be true
+  end
+
   scenario "uses the sole enabled non-castle type and rejects impossible components" do
     original = Rails.configuration.units
     Rails.configuration.units = UnitsConfig.new(
@@ -144,7 +165,8 @@ RSpec.feature "Component-aware inspection lifecycle", type: :feature do
     expect(Assessments::BouncingPillowAssessment.find_by(inspection:)).to be_nil
 
     click_button I18n.t("inspections.buttons.switch_to_in_progress")
-    expect(inspection.reload.checklist_revision).to eq(2)
+    expect(inspection.reload.checklist_revision)
+      .to eq(InspectionChecklist::CURRENT_REVISION)
     expect(inspection).not_to be_complete
     expect(page).to have_content(I18n.t("forms.bouncing_pillow.header"))
     expect(Assessments::BouncingPillowAssessment.find_by(inspection:)).to be_nil

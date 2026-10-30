@@ -68,7 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_090400) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "badges", id: { type: :string, limit: 8 }, force: :cascade do |t|
+  create_table "badges", id: {type: :string, limit: 8}, force: :cascade do |t|
     t.integer "badge_batch_id", null: false
     t.datetime "created_at", null: false
     t.text "note"
@@ -353,7 +353,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_090400) do
     t.index ["inspection_id"], name: "inflatable_game_assessments_pkey", unique: true
   end
 
-  create_table "inspections", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "inspections", id: {type: :string, limit: 12}, force: :cascade do |t|
     t.integer "checklist_revision"
     t.datetime "complete_date"
     t.datetime "created_at", null: false
@@ -392,7 +392,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_090400) do
     t.index ["user_id"], name: "index_inspections_on_user_id"
   end
 
-  create_table "inspector_companies", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "inspector_companies", id: {type: :string, limit: 12}, force: :cascade do |t|
     t.boolean "active", default: true
     t.text "address", null: false
     t.string "city"
@@ -714,7 +714,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_090400) do
     t.index ["i18n_key"], name: "index_text_replacements_on_i18n_key", unique: true
   end
 
-  create_table "units", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "units", id: {type: :string, limit: 12}, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "description"
     t.boolean "has_air_jugglers"
@@ -775,7 +775,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_090400) do
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
   end
 
-  create_table "users", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "users", id: {type: :string, limit: 12}, force: :cascade do |t|
     t.date "active_until"
     t.text "address"
     t.string "country"

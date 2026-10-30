@@ -5,7 +5,7 @@ require "rails_helper"
 
 RSpec.describe Assessments::AnchorageAssessment, type: :model do
   let(:unit) { create(:unit, unit_type: :bungee_run) }
-  let(:inspection) { create(:inspection, unit: unit, checklist_revision: 2) }
+  let(:inspection) { create(:inspection, unit: unit) }
   let(:assessment) { inspection.anchorage_assessment }
 
   it "rounds each side up before doubling, not after doubling" do
@@ -66,8 +66,7 @@ RSpec.describe Assessments::AnchorageAssessment, type: :model do
   end
 
   it "preserves the castle calculation for current castle checklists" do
-    castle = create(:inspection, checklist_revision: 2,
-      length: 10, width: 4, height: 3)
+    castle = create(:inspection, length: 10, width: 4, height: 3)
     expected = EN14960.calculate_anchors(length: 10.0,
       width: 4.0, height: 3.0).value
 

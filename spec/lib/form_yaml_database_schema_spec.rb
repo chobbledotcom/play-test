@@ -245,7 +245,6 @@ RSpec.describe "Form YAML Database Schema Validation" do
             column_type = column_types[primary_field]
             allowed_partials = PARTIAL_TYPE_MAPPINGS[column_type] || []
 
-
             next if allowed_partials.include?(partial)
 
             errors << <<~MSG
