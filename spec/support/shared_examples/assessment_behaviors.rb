@@ -10,28 +10,27 @@ RSpec.shared_examples "an assessment model" do
   end
 
   describe "audit logging" do
-    it "logs assessment updates when changes are made" do
-      changeable_field = assessment.class.column_names.find { |col|
-        col.end_with?("_comment", "_pass") && assessment.respond_to?("#{col}=")
-      }
+    let(:audit_events) { Event.for_resource(inspection) }
 
-      if changeable_field
-        expect(assessment).to receive(:log_assessment_update)
-        test_value = if changeable_field.end_with?("_pass")
-          "pass"
-        else
-          "new value"
-        end
-        assessment.update!(changeable_field => test_value)
-      else
-        pending "No changeable field found for audit logging test"
-      end
+    before { assessment.save! }
+
+    it "logs assessment updates when changes are made" do
+      comment_field = assessment.class.column_names.grep(/_comment\z/).first
+
+      expect {
+        assessment.update!(comment_field => "Updated inspection comment")
+      }.to change(audit_events, :count).by(1)
+
+      expect(audit_events.last).to have_attributes(
+        action: "assessment_updated",
+        user: inspection.user
+      )
     end
 
     it "does not log when no changes are made" do
-      assessment.save
-      expect(assessment).not_to receive(:log_assessment_update)
-      assessment.save
+      expect {
+        assessment.save!
+      }.not_to change(audit_events, :count)
     end
   end
 
