@@ -29,6 +29,17 @@ RSpec.feature "Complete Inspection Workflow", type: :feature, js: false do
 
   scenario "complete workflow with inflatable game unit" do
     InspectionWorkflow.new(
+      has_slide: true,
+      is_totally_enclosed: true,
+      unit_type: :inflatable_game,
+      has_inflatable_bed: true,
+      has_containing_walls: true,
+      has_ancillary_equipment: true
+    ).execute
+  end
+
+  scenario "complete game workflow without optional components" do
+    InspectionWorkflow.new(
       has_slide: false,
       is_totally_enclosed: false,
       unit_type: :inflatable_game
@@ -61,8 +72,11 @@ class InspectionWorkflow
   attr_reader :second_inspection
   attr_reader :options
 
-  def initialize(has_slide:, is_totally_enclosed:, unit_type: :bouncy_castle, indoor_only: false)
-    @options = {has_slide:, is_totally_enclosed:, unit_type:, indoor_only:}
+  def initialize(has_slide:, is_totally_enclosed:, unit_type: :bouncy_castle,
+    indoor_only: false, **components)
+    @options = {
+      has_slide:, is_totally_enclosed:, unit_type:, indoor_only:, **components
+    }
   end
 
   def t(key, **options)
@@ -161,6 +175,12 @@ class InspectionWorkflow
 
     select t("units.unit_types.#{@options[:unit_type]}"),
       from: t("forms.units.fields.unit_type")
+    click_button t("forms.units.buttons.apply_type")
+    configuration = Unit.new(unit_type: @options[:unit_type])
+    configuration.configuration_fields.each do |field|
+      value = @options.fetch(field, configuration.public_send(field))
+      value ? check_form_radio(:units, field) : uncheck_form_radio(:units, field)
+    end
 
     submit_form :units
     expect_units_message("created")
@@ -189,12 +209,15 @@ class InspectionWorkflow
   def fill_general_inspection_details
     field_data = SeedData.inspection_fields(passed: true)
 
-    if castle_type?
-      field_data[:has_slide] = @options[:has_slide]
-      field_data[:is_totally_enclosed] = @options[:is_totally_enclosed]
-      field_data[:indoor_only] = @options[:indoor_only] || false
-    else
-      field_data.except!(:has_slide, :is_totally_enclosed, :indoor_only)
+    configuration = @unit.configuration_fields
+    field_data.except!(:has_slide, :is_totally_enclosed, :indoor_only)
+    configuration.each do |field|
+      value = @options.fetch(field, @inspection.public_send(field))
+      value ? check_form_radio(:inspection, field) :
+              uncheck_form_radio(:inspection, field)
+    end
+    if @options[:unit_type] == :bouncing_pillow
+      field_data[:inspection_location] = "Test installation site"
     end
 
     field_data.each do |field_name, value|
@@ -208,24 +231,22 @@ class InspectionWorkflow
   end
 
   def fill_all_assessments
-    applicable_tabs.each_with_index do |tab_name, index|
-      verify_assessment_check_marks(completed_tabs: applicable_tabs[0...index])
-      fill_assessment_tab(tab_name)
-      if index < applicable_tabs.length - 1
-        verify_inspection_not_completable
-      end
+    completed_tabs = []
+    fill_applicable_assessments_via_ui(@inspection) do |tab_name, fields|
+      verify_assessment_check_marks(completed_tabs:)
+      fill_assessment_tab(tab_name, fields)
+      completed_tabs << tab_name
+      verify_inspection_not_completable
     end
+
+    verify_assessment_check_marks(completed_tabs:)
+    fill_assessment_tab("results", SeedData.results_fields(passed: true))
 
     verify_assessment_check_marks(completed_tabs: applicable_tabs)
   end
 
-  def fill_assessment_tab(tab_name)
+  def fill_assessment_tab(tab_name, field_data)
     visit edit_inspection_path(@inspection, tab: tab_name)
-
-    field_data = SeedData.send(
-      "#{tab_name}_fields",
-      passed: true
-    )
 
     field_data.each do |field_name, value|
       fill_assessment_field(tab_name, field_name, value)
@@ -438,11 +459,14 @@ class InspectionWorkflow
   end
 
   ASSESSMENT_TABS = {
-    all: %w[user_height slide structure materials anchorage fan enclosed ball_pool inflatable_game],
-    bouncing_pillow: %w[fan],
+    all: %w[
+      user_height slide structure materials anchorage fan enclosed
+      ball_pool inflatable_game bouncing_pillow
+    ],
+    bouncing_pillow: %w[bouncing_pillow],
     bouncy_castle: %w[user_height structure materials anchorage fan],
-    inflatable_ball_pool: %w[structure materials fan ball_pool],
-    inflatable_game: %w[structure materials fan inflatable_game]
+    inflatable_ball_pool: %w[structure materials anchorage fan ball_pool],
+    inflatable_game: %w[structure materials anchorage fan inflatable_game]
   }.freeze
 
   def verify_applicable_tabs_for_unit_type
@@ -450,10 +474,13 @@ class InspectionWorkflow
 
     expected_tabs = ASSESSMENT_TABS[@options[:unit_type]].dup
 
-    if @options[:unit_type] == :bouncy_castle
+    if %i[bouncy_castle inflatable_game play_zone].include?(@options[:unit_type])
       expected_tabs << "slide" if @options[:has_slide]
       expected_tabs << "enclosed" if @options[:is_totally_enclosed]
-      expected_tabs.delete("anchorage") if @options[:indoor_only]
+    end
+    expected_tabs.delete("anchorage") if @options[:indoor_only]
+    if @options[:unit_type] == :bouncing_pillow && @unit.has_blower
+      expected_tabs << "fan"
     end
 
     expected_tabs.each do |tab|

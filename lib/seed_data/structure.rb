@@ -11,21 +11,21 @@ module SeedData
 
     def self.pass_fields(passed)
       {
-        seam_integrity_pass: Shared.check_passed?(passed),
-        air_loss_pass: Shared.check_passed?(passed),
-        straight_walls_pass: Shared.check_passed?(passed),
-        sharp_edges_pass: Shared.check_passed?(passed),
-        unit_stable_pass: Shared.check_passed?(passed),
-        stitch_length_pass: Shared.check_passed?(passed),
-        step_ramp_size_pass: Shared.check_passed_integer?(passed),
-        platform_height_pass: Shared.check_passed_integer?(passed),
-        critical_fall_off_height_pass: Shared.check_passed_integer?(passed),
-        unit_pressure_pass: Shared.check_passed?(passed),
-        trough_pass: Shared.check_passed_integer?(passed),
-        entrapment_pass: Shared.check_passed?(passed),
-        markings_pass: Shared.check_passed?(passed),
-        grounding_pass: Shared.check_passed_integer?(passed),
-        evacuation_time_pass: Shared.check_passed?(passed)
+        seam_integrity_pass: Shared.outcome(passed),
+        air_loss_pass: Shared.outcome(passed),
+        straight_walls_pass: Shared.outcome(passed),
+        sharp_edges_pass: Shared.outcome(passed),
+        unit_stable_pass: Shared.outcome(passed),
+        stitch_length_pass: Shared.outcome(passed),
+        step_ramp_size_pass: Shared.outcome(passed),
+        platform_height_pass: Shared.outcome(passed),
+        critical_fall_off_height_pass: Shared.outcome(passed),
+        unit_pressure_pass: Shared.outcome(passed),
+        trough_pass: Shared.outcome(passed),
+        entrapment_pass: Shared.outcome(passed),
+        markings_pass: Shared.outcome(passed),
+        grounding_pass: Shared.outcome(passed),
+        evacuation_time_pass: Shared.outcome(passed)
       }
     end
 

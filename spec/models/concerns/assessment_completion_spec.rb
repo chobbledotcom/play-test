@@ -44,6 +44,7 @@ RSpec.describe AssessmentCompletion, type: :model do
     context "with a complete assessment" do
       before do
         assessment.update!(
+          maximum_user_height: 1.8,
           containing_wall_height: 2.5,
           users_at_1000mm: 5,
           users_at_1200mm: 10,
@@ -114,6 +115,86 @@ RSpec.describe AssessmentCompletion, type: :model do
         expect(assessment.incomplete_fields).not_to include(*optional_fields)
       end
     end
+
+    context "with optional comments and explicit outcomes" do
+      let(:assessment) { inspection.materials_assessment }
+
+      it "accepts failed and N/A answers without comments or N/A values" do
+        assessment.assign_attributes(
+          ropes_pass: "na", fabric_strength_pass: "fail",
+          fire_retardant_pass: "pass", thread_pass: "pass",
+          retention_netting_pass: "na", zips_pass: "na",
+          windows_pass: "na", artwork_pass: "na"
+        )
+
+        expect(assessment.ropes).to be_nil
+        expect(assessment).to be_complete
+      end
+
+      it "does not treat a blank outcome as an answer" do
+        assessment.ropes_pass = ""
+
+        expect(assessment.incomplete_fields).to include(:ropes_pass)
+      end
+    end
+
+    context "with a textual answer" do
+      let(:unit) { create(:unit, unit_type: :catch_bed) }
+      let(:inspection) { create(:inspection, unit: unit) }
+      let(:assessment) { inspection.catch_bed_assessment }
+
+      it "treats whitespace as incomplete rather than a recorded answer" do
+        assessment.type_of_unit = " "
+
+        expect(assessment.incomplete_fields).to include(:type_of_unit)
+      end
+    end
+
+    context "with inapplicable component checks" do
+      let(:unit) { create(:unit, unit_type: :play_zone) }
+      let(:inspection) do
+        create(:inspection, unit: unit, has_ball_pool: false,
+          has_air_jugglers: false, has_slide: false)
+      end
+      let(:assessment) { inspection.play_zone_assessment }
+
+      it "does not require hidden components or their measurements" do
+        expect(assessment.incomplete_fields).not_to include(
+          :balls_pass, :air_juggler_pass, :ball_pool_depth,
+          :ball_pool_depth_pass, :slide_gradient, :slide_gradient_pass
+        )
+      end
+    end
+
+    context "with N/A age markings" do
+      let(:unit) { create(:unit, unit_type: :inflatable_ball_pool) }
+      let(:inspection) { create(:inspection, unit: unit) }
+      let(:assessment) { inspection.ball_pool_assessment }
+
+      it "exempts both associated age limits" do
+        expect(assessment.incomplete_fields)
+          .to include(:minimum_age, :maximum_age)
+        assessment.age_range_marking_pass = "na"
+
+        expect(assessment.incomplete_fields)
+          .not_to include(:minimum_age, :maximum_age)
+      end
+    end
+
+    context "with grouped N/A wall checks" do
+      let(:unit) { create(:unit, unit_type: :bungee_run) }
+      let(:inspection) { create(:inspection, unit: unit) }
+      let(:assessment) { inspection.bungee_assessment }
+
+      it "exempts measurements in the associated wall group only" do
+        assessment.rear_wall_pass = "na"
+
+        expect(assessment.incomplete_fields)
+          .not_to include(:rear_wall_height, :rear_wall_thickness)
+        expect(assessment.incomplete_fields)
+          .to include(:side_wall_height, :side_wall_length)
+      end
+    end
   end
 
   describe "#incomplete_fields_grouped" do
@@ -149,7 +230,12 @@ RSpec.describe AssessmentCompletion, type: :model do
 
     context "when only value field is missing" do
       before do
-        assessment.update!(ropes: nil, ropes_pass: 1)
+        assessment.update!(ropes: nil, ropes_pass: "pass")
+      end
+
+      it "requires the measurement but not another outcome" do
+        expect(assessment.incomplete_fields).to include(:ropes)
+        expect(assessment.incomplete_fields).not_to include(:ropes_pass)
       end
 
       it "returns only the value field" do
@@ -189,19 +275,35 @@ RSpec.describe AssessmentCompletion, type: :model do
         expect(assessment.incomplete_fields).not_to include(:retention_netting_pass)
       end
     end
+  end
 
-    context "when pass field is set to pass or fail" do
-      before do
-        assessment.update!(ropes: nil, ropes_pass: "pass")
-      end
+  describe "outcome storage" do
+    let(:assessment) { inspection.anchorage_assessment }
 
-      it "includes the value field in incomplete fields" do
-        expect(assessment.incomplete_fields).to include(:ropes)
-      end
+    it "stores Fail, Pass and N/A as 0, 1 and 2 without changing blanks" do
+      {"fail" => 0, "pass" => 1, "na" => 2, nil => nil}.each do |answer, raw|
+        assessment.update!(pull_strength_pass: answer)
+        assessment.reload
 
-      it "does not include the pass field in incomplete fields" do
-        expect(assessment.incomplete_fields).not_to include(:ropes_pass)
+        expect(assessment.pull_strength_pass).to eq(answer)
+        expect(assessment.pull_strength_pass_before_type_cast).to eq(raw)
       end
+    end
+
+    it "exposes only the three outcome states without boolean aliases" do
+      states = assessment.class.defined_enums.fetch("pull_strength_pass")
+
+      expect(states).to eq("fail" => 0, "pass" => 1, "na" => 2)
+      expect { assessment.pull_strength_pass = true }
+        .to raise_error(ArgumentError)
+    end
+
+    it "identifies only originally boolean outcomes for historical exports" do
+      klass = Assessments::MaterialsAssessment
+
+      expect(klass.legacy_boolean_outcome_fields).to contain_exactly(
+        :thread_pass, :fabric_strength_pass, :fire_retardant_pass
+      )
     end
   end
 end

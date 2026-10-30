@@ -29,10 +29,12 @@ class InspectionCsvExportService
 
   sig { returns(T::Array[Symbol]) }
   def headers
-    excluded_columns = %i[user_id inspector_company_id unit_id]
-    inspection_columns = Inspection.column_name_syms - excluded_columns
-
-    headers = inspection_columns
+    headers = %i[
+      id complete_date created_at has_slide height height_comment
+      indoor_only inspection_date inspection_type is_seed is_totally_enclosed
+      length length_comment operator passed pdf_last_accessed_at
+      risk_assessment updated_at width width_comment
+    ]
     headers += %i[unit_name unit_serial unit_manufacturer unit_description]
     headers += %i[inspector_company_name]
     headers += %i[inspector_user_email]

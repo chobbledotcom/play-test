@@ -46,6 +46,7 @@ FactoryBot.define do
     negative_adjustment { nil }
 
     trait :complete do
+      maximum_user_height { 1.8 }
       containing_wall_height { 1.2 }
       containing_wall_height_comment { "Wall height adequate for age group" }
       play_area_length { 5.0 }
@@ -66,6 +67,7 @@ FactoryBot.define do
     end
 
     trait :standard_test_values do
+      maximum_user_height { 1.8 }
       containing_wall_height { 2.5 }
       users_at_1000mm { 5 }
       users_at_1200mm { 4 }
@@ -78,6 +80,7 @@ FactoryBot.define do
     end
 
     trait :with_basic_data do
+      maximum_user_height { 1.8 }
       containing_wall_height { 1.5 }
       users_at_1000mm { 10 }
       users_at_1200mm { 8 }

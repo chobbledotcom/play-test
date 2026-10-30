@@ -1,0 +1,38 @@
+---
+en:
+  assessment_guidance:
+    title: Measured-value guidance
+    advisory: "Advisory comparisons with Spencer's working checklist, not independent verification against a published standard. Exceptions and the equipment's intended use still require inspection judgement. Values and Pass, Fail or N/A outcomes remain independently recorded; a measurement outside a reference remains saveable. Save the form to refresh these comparisons."
+    comparison: "%{label}: %{value} — %{status}"
+    status:
+      within: within the numeric reference
+      outside: outside the numeric reference; review the source context
+      not_triggered: conditional numeric requirement not triggered
+      recorded: recorded limit; source gives no numeric threshold
+    rules:
+      user_capacity: "Calculated reference maximum: %{reference} users at this height. Spencer's Form1.resx:34211–34218 divides usable play area by 1, 1.33, 1.66 or 2 m² per user at heights 1.0, 1.2, 1.5 or 1.8 m, rounded down. Steps are excluded; obstacles reduce usable area. Only relevant height bands need answers. Uses the existing EN14960 user-capacity calculator; its constants describe this as industry practice, not a published EN 14960 rule."
+      pool_depth: "Spencer's Form1.Designer.cs:2398,2515: ball depth at most 450 mm OR a clearly marked maximum fill line. A depth above 450 mm does not decide the outcome when the fill-line alternative applies."
+      pool_entry: "Spencer's Form1.Designer.cs:2343,2470: highest entry point or accessible platform into the ball pool at most 630 mm."
+      toddler_height: "Spencer's Form1.Designer.cs:2167,2640: markings indicate a maximum user height of 1 m for toddler play zones and inflatable ball pools."
+      toddler_age: "Spencer's Form1.Designer.cs:2175,2648: markings indicate an approximate user age range of 1–3 years. This is an approximate working reference, not a precise age cut-off."
+      mass: "Spencer's Form1.Designer.cs:1608,3184: markings indicate a maximum user mass of 120 kg. Record the actual permitted mass, not the reference as a default."
+      bungee_height: "Spencer's Form1.Designer.cs:1600: markings indicate a minimum user height of 1.2 m."
+      harness_pull: "Spencer's Form1.Designer.cs:1582–1591: test the harness to 2400 N using a calibrated crane scale. This supersedes the old 1200 N wording for current checklists only."
+      harness_width: "Spencer's Form1.Designer.cs:1954: harness width at least 200 mm."
+      rear_wall: "Spencer's Form1.Designer.cs:1861: rear wall at least 1.8 m high measured from the bed, and at least 0.6 m thick."
+      starting_wall: "Spencer's Form1.Designer.cs:1791: rearmost outside containment and lane-divider walls at the starting position at least 1.7 m high and 1.5 m long."
+      running_wall: "Spencer's Form1.Designer.cs:1721: running side walls and lane dividers at least 0.45 m thick and 0.9 m tall, measured from the bed."
+      catch_bed_height: "Spencer's Form1.Designer.cs:3389: bed height at least 400 mm for Rodeo Bull, Wipeout, Lastman Standing and Surf Sim examples. This qualification is context, not a structured catch-bed subtype or a requirement for every free-text description."
+      catch_platform: "Spencer's Form1.Designer.cs:3297: distance from the near-side platform edge to the inside containing-wall edge is 1.8 m. The source gives this reference distance without a separate tolerance."
+      catch_blower: "Spencer's Form1.Designer.cs:3271: inflation tube at least 2.5 m from cone edge to inflatable on the open-walled side of a flat catch bed. Review whether this open-side qualification applies."
+      game_mass: "Spencer's Form1.Designer.cs:2931: maximum user mass marking of 120 kg applies when the game has an inflatable bed."
+      game_age: "Spencer's Form1.Designer.cs:2869: skill-based games may have a broad age range. Record the actual permitted range; the source supplies no universal numeric ages for games."
+      game_wall: "Spencer's Form1.Designer.cs:2770: containing walls over 630 mm high must be at least 0.9 m. The 0.9 m comparison is not triggered for walls at or below 630 mm."
+      access_gradient: "Spencer's Form1.Designer.cs:2308: access to the platform at most 64 degrees, not the slope of the slide. The separate Slide assessment retains its own measurements."
+      zone_platform: "Spencer's Form1.Designer.cs:2280: play-zone slide platform height at most 1.5 m. This value is independent of the separate Slide assessment's platform height."
+    bungee_anchors:
+      source: "Spencer's Form1.Designer.cs:6018 displays the advisory formula: anchors per side = ceil((Area2 × 114 / 1600) × 2.5). For an independently supplied Area2, the total comparison uses two sides × the rounded per-side count against low plus high anchors. The source does not define Area2 or calculate it from dimensions. An independently established area in m² is optional; no area is inferred from the castle calculator, and omitting it does not block completion."
+      missing: No reference Area2 has been supplied; only the advisory formula is available.
+      missing_counts: Enter both low and high anchor counts before comparing the total.
+      result: "Area2 %{area} m²: %{per_side} anchors per side; %{total} anchors total."
+      comparison: "%{actual} total anchors recorded — %{status}."

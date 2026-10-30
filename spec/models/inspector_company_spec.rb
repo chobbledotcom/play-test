@@ -222,6 +222,17 @@ RSpec.describe InspectorCompany, type: :model do
       it "excludes the notes field when no user is given" do
         expect(InspectorCompany.form_schema.find_field(:notes)).to be_nil
       end
+
+      it "preserves permissions through the instance schema API" do
+        admin = create(:user, :admin)
+        inspector = create(:user)
+
+        expect(company.form_schema(user: admin).find_field(:notes))
+          .to be_present
+        expect(company.form_schema(user: inspector).find_field(:notes))
+          .to be_nil
+        expect(company.form_schema.find_field(:notes)).to be_nil
+      end
     end
 
     describe "#logo_url" do

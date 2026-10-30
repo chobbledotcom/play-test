@@ -23,15 +23,15 @@ module SeedData
 
     def self.pass_fields(passed)
       {
-        equipment_class_pass: Shared.check_passed?(passed),
-        visual_pass: Shared.check_passed?(passed),
-        appliance_plug_check_pass: Shared.check_passed?(passed),
-        fuse_rating_pass: Shared.check_passed?(passed),
-        earth_ohms_pass: Shared.check_passed?(passed),
-        insulation_mohms_pass: Shared.check_passed?(passed),
-        leakage_ma_pass: Shared.check_passed?(passed),
-        load_test_pass: Shared.check_passed?(passed),
-        rcd_trip_time_ms_pass: Shared.check_passed?(passed)
+        equipment_class_pass: Shared.outcome(passed),
+        visual_pass: Shared.outcome(passed),
+        appliance_plug_check_pass: Shared.outcome(passed),
+        fuse_rating_pass: Shared.outcome(passed),
+        earth_ohms_pass: Shared.outcome(passed),
+        insulation_mohms_pass: Shared.outcome(passed),
+        leakage_ma_pass: Shared.outcome(passed),
+        load_test_pass: Shared.outcome(passed),
+        rcd_trip_time_ms_pass: Shared.outcome(passed)
       }
     end
 

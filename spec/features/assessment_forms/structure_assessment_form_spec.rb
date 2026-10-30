@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.feature "Structure Assessment Form", type: :feature do
   let(:user) { create(:user) }
-  let(:unit) { create(:unit, user: user) }
+  let(:unit) { create(:unit, user: user, has_slide: true) }
   let(:inspection) { create(:inspection, user: user, unit: unit) }
 
   before { sign_in(user) }
@@ -30,11 +30,11 @@ RSpec.feature "Structure Assessment Form", type: :feature do
   scenario "user can fill and save structure assessment form" do
     visit edit_inspection_path(inspection, tab: "structure")
 
-    choose_structure_field :seam_integrity_pass, true
-    choose_structure_field :air_loss_pass, true
-    choose_structure_field :straight_walls_pass, true
-    choose_structure_field :sharp_edges_pass, false
-    choose_structure_field :unit_stable_pass, true
+    choose_structure_field :seam_integrity_pass, "pass"
+    choose_structure_field :air_loss_pass, "pass"
+    choose_structure_field :straight_walls_pass, "pass"
+    choose_structure_field :sharp_edges_pass, "fail"
+    choose_structure_field :unit_stable_pass, "pass"
 
     fill_structure_field :unit_pressure, "2.8"
     fill_structure_field :critical_fall_off_height, "1200"
@@ -43,22 +43,18 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     fill_structure_field :trough_depth, "200"
     fill_structure_field :trough_adjacent_panel_width, "800"
 
-    choose_structure_field :stitch_length_pass, true
-    # Fill comment field
-    checkbox = find(:css, "input[id*='stitch_length_has_comment_']")
-    checkbox.check unless checkbox.checked?
-    textarea = find(:css, "textarea[id*='stitch_length_comment_']",
-      visible: :all)
-    textarea.set("Stitch length within specification")
-    choose_structure_field :unit_pressure_pass, true
-    choose_structure_field :evacuation_time_pass, true
+    choose_structure_field :stitch_length_pass, "pass"
+    fill_comment_field :structure, :stitch_length_comment,
+      "Stitch length within specification"
+    choose_structure_field :unit_pressure_pass, "pass"
+    choose_structure_field :evacuation_time_pass, "pass"
     choose_structure_field :critical_fall_off_height_pass, "pass"
     choose_structure_field :step_ramp_size_pass, "pass"
     choose_structure_field :platform_height_pass, "pass"
     choose_structure_field :trough_pass, "pass"
 
-    choose_structure_field :entrapment_pass, false
-    choose_structure_field :markings_pass, true
+    choose_structure_field :entrapment_pass, "fail"
+    choose_structure_field :markings_pass, "pass"
     choose_structure_field :grounding_pass, "na"
 
     submit_form :structure
@@ -68,21 +64,21 @@ RSpec.feature "Structure Assessment Form", type: :feature do
     inspection.reload
     structure = inspection.structure_assessment
 
-    expect(structure.seam_integrity_pass).to be true
-    expect(structure.air_loss_pass).to be true
-    expect(structure.straight_walls_pass).to be true
-    expect(structure.sharp_edges_pass).to be false
-    expect(structure.unit_stable_pass).to be true
+    expect(structure.seam_integrity_pass).to eq("pass")
+    expect(structure.air_loss_pass).to eq("pass")
+    expect(structure.straight_walls_pass).to eq("pass")
+    expect(structure.sharp_edges_pass).to eq("fail")
+    expect(structure.unit_stable_pass).to eq("pass")
 
     expect(structure.unit_pressure).to eq(2.8)
 
-    expect(structure.stitch_length_pass).to be true
+    expect(structure.stitch_length_pass).to eq("pass")
     expected_comment = "Stitch length within specification"
     expect(structure.stitch_length_comment).to eq(expected_comment)
-    expect(structure.unit_pressure_pass).to be true
+    expect(structure.unit_pressure_pass).to eq("pass")
 
-    expect(structure.entrapment_pass).to be false
-    expect(structure.markings_pass).to be true
+    expect(structure.entrapment_pass).to eq("fail")
+    expect(structure.markings_pass).to eq("pass")
     expect(structure.critical_fall_off_height_pass).to eq("pass")
     expect(structure.step_ramp_size_pass).to eq("pass")
     expect(structure.platform_height_pass).to eq("pass")

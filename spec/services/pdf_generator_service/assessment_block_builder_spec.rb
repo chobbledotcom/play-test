@@ -5,8 +5,8 @@ require "rails_helper"
 
 RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
   let(:inspection) { create(:inspection) }
-  let(:materials_assessment) { create(:materials_assessment, inspection: inspection) }
-  let(:structure_assessment) { create(:structure_assessment, inspection: inspection) }
+  let(:materials_assessment) { inspection.materials_assessment }
+  let(:structure_assessment) { inspection.structure_assessment }
 
   describe ".build_from_assessment" do
     context "with a materials assessment" do
@@ -50,7 +50,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
 
         thread_block = blocks[6] # Thread block
         expect(thread_block.type).to eq(:value)
-        expect(thread_block.pass_fail).to eq(true) # From seed data
+        expect(thread_block.pass_fail).to eq("pass")
         expect(thread_block.name).to eq(I18n.t("forms.materials.fields.thread"))
       end
 

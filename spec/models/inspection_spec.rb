@@ -413,24 +413,30 @@ RSpec.describe Inspection, type: :model do
   end
 
   describe "#complete!" do
-    it "sets complete_date and logs audit action" do
-      inspection.complete_date = nil
-      expect(inspection).to receive(:log_audit_action)
-        .with("completed", user, I18n.t("inspections.messages.marked_complete"))
+    let(:inspection) do
+      create(:inspection, :completed, user:, complete_date: nil)
+    end
 
-      inspection.complete!(user)
-      expect(inspection.complete_date).not_to be_nil
+    it "completes an answered checklist" do
+      expect { inspection.complete!(user) }
+        .to change { inspection.reload.complete? }.from(false).to(true)
+    end
+
+    it "rejects an unfinished checklist without completing it" do
+      draft = create(:inspection, user:)
+
+      expect { draft.complete!(user) }
+        .to raise_error(ActiveRecord::RecordInvalid)
+      expect(draft.reload).not_to be_complete
     end
   end
 
   describe "#un_complete!" do
-    it "sets complete_date to nil and logs audit action" do
-      inspection.complete_date = Time.current
-      expect(inspection).to receive(:log_audit_action)
-        .with("marked_incomplete", user, I18n.t("inspections.messages.marked_incomplete"))
+    let(:inspection) { create(:inspection, :completed, user:) }
 
-      inspection.un_complete!(user)
-      expect(inspection.complete_date).to be_nil
+    it "returns a completed inspection to draft" do
+      expect { inspection.un_complete!(user) }
+        .to change { inspection.reload.complete? }.from(true).to(false)
     end
   end
 

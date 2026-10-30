@@ -85,7 +85,7 @@ module InspectionsHelper
       inspection.inspection_tab_incomplete_fields.empty?
     when "results"
       # For results tab, check if passed field is filled (risk_assessment is optional)
-      inspection.passed.present?
+      !inspection.passed.nil?
     else
       # For assessment tabs, check the corresponding assessment
       assessment_method = "#{tab}_assessment"

@@ -39,7 +39,10 @@ class AssessmentSchema
   class Field
     extend T::Sig
 
-    NUMERIC_PARTIALS = %i[number number_pass_fail_na_comment].freeze
+    NUMERIC_PARTIALS = %i[
+      integer_comment number number_comment
+      number_pass_fail_comment number_pass_fail_na_comment
+    ].freeze
     DECIMAL_PARTIALS = %i[decimal decimal_comment].freeze
 
     sig { returns(Symbol) }
@@ -51,11 +54,19 @@ class AssessmentSchema
     sig { returns(T::Hash[Symbol, T.untyped]) }
     attr_reader :attributes
 
+    sig { returns(Integer) }
+    attr_reader :introduced_in_revision
+
+    sig { returns(T.nilable(Symbol)) }
+    attr_reader :legacy_partial
+
     sig { params(raw: T::Hash[Symbol, T.untyped]).void }
     def initialize(raw)
       @name = raw.fetch(:field).to_sym
       @partial = raw.fetch(:partial).to_sym
       @attributes = (raw[:attributes] || {}).freeze
+      @introduced_in_revision = raw.fetch(:introduced_in_revision, 1)
+      @legacy_partial = raw[:legacy_partial]&.to_sym
     end
 
     sig { returns(T::Boolean) }
@@ -65,10 +76,15 @@ class AssessmentSchema
     def optional_for_completion? = attributes[:required] == false
 
     sig { returns(T::Boolean) }
-    def numeric? = NUMERIC_PARTIALS.include?(partial)
+    def numeric? = NUMERIC_PARTIALS.include?(partial) && !decimal?
 
     sig { returns(T::Boolean) }
-    def decimal? = DECIMAL_PARTIALS.include?(partial)
+    def decimal?
+      step = attributes.fetch(:step, 1)
+      DECIMAL_PARTIALS.include?(partial) ||
+        (NUMERIC_PARTIALS.include?(partial) &&
+          (step.to_s == "any" || step.to_f % 1 != 0))
+    end
 
     sig { returns(T::Boolean) }
     def add_not_applicable? = !!attributes[:add_not_applicable]
@@ -78,6 +94,26 @@ class AssessmentSchema
 
     sig { returns(T.nilable(Numeric)) }
     def max = attributes[:max]
+
+    sig { returns(T::Array[Symbol]) }
+    def attribute_names
+      names = composite_fields
+      outcome_only = partial.to_s.start_with?("pass_fail") &&
+        !name.end_with?("_pass")
+      outcome_only ? names : [name, *names].uniq
+    end
+
+    sig { params(revision: Integer).returns(T.nilable(Field)) }
+    def for_revision(revision)
+      return if introduced_in_revision > revision
+      return self unless revision == 1 && legacy_partial
+
+      Field.new(
+        field: name,
+        partial: legacy_partial,
+        attributes: attributes
+      )
+    end
 
     sig { returns(T::Array[Symbol]) }
     def composite_fields
@@ -174,12 +210,27 @@ class AssessmentSchema
       .freeze
   end
 
+  sig { returns(T::Array[Symbol]) }
+  def attribute_names
+    fields.flat_map(&:attribute_names).uniq
+  end
+
+  sig { params(revision: Integer).returns(AssessmentSchema) }
+  def for_revision(revision)
+    filtered = fieldsets.filter_map do |fieldset|
+      fields = fieldset.fields.filter_map { it.for_revision(revision) }
+      Fieldset.new(fieldset.legend_i18n_key, fields) unless fields.empty?
+    end
+    AssessmentSchema.new(name, filtered)
+  end
+
   # Returns a new schema with the named fields removed from each fieldset.
   # Used for permission-driven filtering (e.g. hiding admin-only fields).
   sig { params(field_names: Symbol).returns(AssessmentSchema) }
   def exclude(*field_names)
     excluded = field_names.to_set
     filtered = fieldsets.map { |fs| fs.without(excluded) }
+      .reject { it.fields.empty? }
     AssessmentSchema.new(name, filtered)
   end
 end

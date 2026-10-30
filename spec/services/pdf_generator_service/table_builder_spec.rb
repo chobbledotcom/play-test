@@ -32,7 +32,7 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         unit.reload # Ensure unit sees the inspection
       end
 
-      it "formats unit data into 4x4 table structure" do
+      it "formats identity and snapshot configuration in four columns" do
         result = described_class.build_unit_details_table(
           unit,
           :inspection,
@@ -40,7 +40,8 @@ RSpec.describe PdfGeneratorService::TableBuilder do
         )
 
         expect(result).to be_an(Array)
-        expect(result.length).to eq(4)
+        configuration = described_class.inspection_configuration_rows(inspection)
+        expect(result.length).to eq(4 + configuration.length)
         result.each { |row| expect(row.length).to eq(4) }
       end
 

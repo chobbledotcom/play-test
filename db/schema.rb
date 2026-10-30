@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_30_090400) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -41,21 +41,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
 
   create_table "anchorage_assessments", id: false, force: :cascade do |t|
     t.text "anchor_accessories_comment"
-    t.boolean "anchor_accessories_pass"
+    t.integer "anchor_accessories_pass"
     t.text "anchor_degree_comment"
-    t.boolean "anchor_degree_pass"
+    t.integer "anchor_degree_pass"
     t.text "anchor_type_comment"
-    t.boolean "anchor_type_pass"
+    t.integer "anchor_type_pass"
+    t.decimal "bungee_side_area", precision: 10, scale: 4
     t.datetime "created_at", null: false
     t.string "inspection_id", limit: 12, null: false
     t.integer "num_high_anchors"
     t.text "num_high_anchors_comment"
-    t.boolean "num_high_anchors_pass"
+    t.integer "num_high_anchors_pass"
     t.integer "num_low_anchors"
     t.text "num_low_anchors_comment"
-    t.boolean "num_low_anchors_pass"
+    t.integer "num_low_anchors_pass"
     t.text "pull_strength_comment"
-    t.boolean "pull_strength_pass"
+    t.integer "pull_strength_pass"
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "anchorage_assessments_new_pkey", unique: true
   end
@@ -67,7 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "badges", id: { type: :string, limit: 8 }, force: :cascade do |t|
+  create_table "badges", id: {type: :string, limit: 8}, force: :cascade do |t|
     t.integer "badge_batch_id", null: false
     t.datetime "created_at", null: false
     t.text "note"
@@ -78,63 +79,136 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
 
   create_table "ball_pool_assessments", id: false, force: :cascade do |t|
     t.text "age_range_marking_comment"
-    t.boolean "age_range_marking_pass"
+    t.integer "age_range_marking_pass"
     t.text "air_jugglers_compliant_comment"
-    t.boolean "air_jugglers_compliant_pass"
+    t.integer "air_jugglers_compliant_pass"
     t.integer "ball_pool_depth"
     t.text "ball_pool_depth_comment"
-    t.boolean "ball_pool_depth_pass"
+    t.integer "ball_pool_depth_pass"
     t.integer "ball_pool_entry"
     t.text "ball_pool_entry_comment"
-    t.boolean "ball_pool_entry_pass"
+    t.integer "ball_pool_entry_pass"
     t.text "balls_compliant_comment"
-    t.boolean "balls_compliant_pass"
+    t.integer "balls_compliant_pass"
     t.datetime "created_at", null: false
     t.text "fitted_base_comment"
-    t.boolean "fitted_base_pass"
+    t.integer "fitted_base_pass"
     t.text "gaps_comment"
-    t.boolean "gaps_pass"
+    t.integer "gaps_pass"
     t.string "inspection_id", limit: 12, null: false
+    t.decimal "max_height_markings", precision: 8, scale: 2
     t.text "max_height_markings_comment"
-    t.boolean "max_height_markings_pass"
+    t.integer "max_height_markings_pass"
+    t.decimal "maximum_age", precision: 5, scale: 1
+    t.integer "maximum_users"
+    t.decimal "minimum_age", precision: 5, scale: 1
     t.text "suitable_matting_comment"
-    t.boolean "suitable_matting_pass"
+    t.integer "suitable_matting_pass"
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "ball_pool_assessments_pkey", unique: true
   end
 
+  create_table "bouncing_pillow_assessments", id: false, force: :cascade do |t|
+    t.text "air_loss_points_comment"
+    t.integer "air_loss_points_pass"
+    t.text "artwork_comment"
+    t.integer "artwork_pass"
+    t.decimal "clear_area", precision: 10, scale: 2
+    t.text "clear_area_comment"
+    t.integer "clear_area_pass"
+    t.datetime "created_at", null: false
+    t.integer "deflation_evacuation_time"
+    t.text "deflation_evacuation_time_comment"
+    t.integer "deflation_evacuation_time_pass"
+    t.decimal "depth_of_impact_attenuation", precision: 10, scale: 2
+    t.text "depth_of_impact_attenuation_comment"
+    t.integer "depth_of_impact_attenuation_pass"
+    t.text "fabric_fr_comment"
+    t.integer "fabric_fr_pass"
+    t.text "fabric_strength_comment"
+    t.integer "fabric_strength_pass"
+    t.decimal "fencing_distance", precision: 10, scale: 2
+    t.text "fencing_distance_comment"
+    t.integer "fencing_distance_pass"
+    t.text "fencing_entrapment_comment"
+    t.integer "fencing_entrapment_pass"
+    t.integer "fencing_gateways"
+    t.text "fencing_gateways_comment"
+    t.integer "fencing_gateways_pass"
+    t.decimal "fencing_height", precision: 10, scale: 2
+    t.text "fencing_height_comment"
+    t.integer "fencing_height_pass"
+    t.text "fencing_strength_comment"
+    t.integer "fencing_strength_pass"
+    t.text "fencing_visibility_comment"
+    t.integer "fencing_visibility_pass"
+    t.text "foundation_comment"
+    t.integer "foundation_pass"
+    t.decimal "gradient_average", precision: 10, scale: 2
+    t.text "gradient_average_comment"
+    t.integer "gradient_average_pass"
+    t.text "grounding_comment"
+    t.integer "grounding_pass"
+    t.text "hard_objects_comment"
+    t.integer "hard_objects_pass"
+    t.text "headroom_comment"
+    t.integer "headroom_pass"
+    t.text "identification_comment"
+    t.integer "identification_pass"
+    t.string "inspection_id", limit: 12, null: false
+    t.decimal "internal_pressure", precision: 10, scale: 2
+    t.text "internal_pressure_comment"
+    t.integer "internal_pressure_pass"
+    t.integer "number_of_users"
+    t.text "number_of_users_comment"
+    t.integer "number_of_users_pass"
+    t.text "security_of_seams_comment"
+    t.integer "security_of_seams_pass"
+    t.text "signage_comment"
+    t.integer "signage_pass"
+    t.decimal "slope", precision: 10, scale: 2
+    t.text "slope_comment"
+    t.integer "slope_pass"
+    t.datetime "updated_at", null: false
+    t.index ["inspection_id"], name: "bouncing_pillow_assessments_pkey", unique: true
+  end
+
   create_table "bungee_assessments", primary_key: "inspection_id", id: :string, force: :cascade do |t|
     t.string "baton_compliant_comment", limit: 1000
-    t.boolean "baton_compliant_pass"
+    t.integer "baton_compliant_pass"
     t.string "blower_forward_distance_comment", limit: 1000
-    t.boolean "blower_forward_distance_pass"
+    t.integer "blower_forward_distance_pass"
     t.string "cord_diametre_min_comment", limit: 1000
-    t.boolean "cord_diametre_min_pass"
+    t.integer "cord_diametre_min_pass"
     t.string "cord_length_max_comment", limit: 1000
-    t.boolean "cord_length_max_pass"
+    t.integer "cord_length_max_pass"
     t.datetime "created_at", null: false
     t.integer "harness_width"
     t.string "harness_width_comment", limit: 1000
-    t.boolean "harness_width_pass"
+    t.integer "harness_width_pass"
     t.string "lane_width_max_comment", limit: 1000
-    t.boolean "lane_width_max_pass"
+    t.integer "lane_width_max_pass"
+    t.decimal "marking_max_mass", precision: 8, scale: 2
     t.string "marking_max_mass_comment", limit: 1000
-    t.boolean "marking_max_mass_pass"
+    t.integer "marking_max_mass_pass"
+    t.decimal "marking_min_height", precision: 8, scale: 2
     t.string "marking_min_height_comment", limit: 1000
-    t.boolean "marking_min_height_pass"
+    t.integer "marking_min_height_pass"
+    t.integer "maximum_users"
     t.integer "num_of_cords"
+    t.decimal "pull_strength", precision: 10, scale: 2
     t.string "pull_strength_comment", limit: 1000
-    t.boolean "pull_strength_pass"
+    t.integer "pull_strength_pass"
     t.string "rear_wall_comment", limit: 1000
     t.decimal "rear_wall_height", precision: 8, scale: 2
     t.string "rear_wall_height_comment", limit: 1000
-    t.boolean "rear_wall_pass"
+    t.integer "rear_wall_pass"
     t.decimal "rear_wall_thickness", precision: 8, scale: 2
     t.string "rear_wall_thickness_comment", limit: 1000
     t.string "running_wall_comment", limit: 1000
     t.decimal "running_wall_height", precision: 8, scale: 2
     t.string "running_wall_height_comment", limit: 1000
-    t.boolean "running_wall_pass"
+    t.integer "running_wall_pass"
     t.decimal "running_wall_width", precision: 8, scale: 2
     t.string "running_wall_width_comment", limit: 1000
     t.string "side_wall_comment", limit: 1000
@@ -142,46 +216,48 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.string "side_wall_height_comment", limit: 1000
     t.decimal "side_wall_length", precision: 8, scale: 2
     t.string "side_wall_length_comment", limit: 1000
-    t.boolean "side_wall_pass"
+    t.integer "side_wall_pass"
     t.string "two_stage_locking_comment", limit: 1000
-    t.boolean "two_stage_locking_pass"
+    t.integer "two_stage_locking_pass"
     t.datetime "updated_at", null: false
   end
 
   create_table "catch_bed_assessments", id: false, force: :cascade do |t|
     t.text "ancillary_compliant_comment"
-    t.boolean "ancillary_compliant_pass"
+    t.integer "ancillary_compliant_pass"
     t.text "ancillary_fit_comment"
-    t.boolean "ancillary_fit_pass"
+    t.integer "ancillary_fit_pass"
     t.text "apron_comment"
-    t.boolean "apron_pass"
+    t.integer "apron_pass"
     t.text "arrest_comment"
-    t.boolean "arrest_pass"
+    t.integer "arrest_pass"
     t.integer "bed_height"
     t.text "bed_height_comment"
-    t.boolean "bed_height_pass"
+    t.integer "bed_height_pass"
     t.decimal "blower_tube_length", precision: 8, scale: 2
     t.text "blower_tube_length_comment"
-    t.boolean "blower_tube_length_pass"
+    t.integer "blower_tube_length_pass"
     t.datetime "created_at", null: false
     t.text "design_risk_comment"
-    t.boolean "design_risk_pass"
+    t.integer "design_risk_pass"
     t.text "framework_comment"
-    t.boolean "framework_pass"
+    t.integer "framework_pass"
     t.text "grounding_comment"
-    t.boolean "grounding_pass"
+    t.integer "grounding_pass"
     t.string "inspection_id", limit: 12, null: false
     t.text "intended_play_comment"
-    t.boolean "intended_play_pass"
+    t.integer "intended_play_pass"
     t.text "matting_comment"
-    t.boolean "matting_pass"
+    t.integer "matting_pass"
+    t.decimal "max_user_mass_marking", precision: 8, scale: 2
     t.text "max_user_mass_marking_comment"
-    t.boolean "max_user_mass_marking_pass"
+    t.integer "max_user_mass_marking_pass"
+    t.integer "maximum_users"
     t.decimal "platform_fall_distance", precision: 8, scale: 2
     t.text "platform_fall_distance_comment"
-    t.boolean "platform_fall_distance_pass"
+    t.integer "platform_fall_distance_pass"
     t.text "trough_comment"
-    t.boolean "trough_pass"
+    t.integer "trough_pass"
     t.text "type_of_unit"
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "catch_bed_assessments_pkey", unique: true
@@ -203,9 +279,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.datetime "created_at", null: false
     t.integer "exit_number"
     t.text "exit_number_comment"
-    t.boolean "exit_number_pass"
+    t.integer "exit_number_pass"
     t.text "exit_sign_always_visible_comment"
-    t.boolean "exit_sign_always_visible_pass"
+    t.integer "exit_sign_always_visible_pass"
     t.string "inspection_id", limit: 12, null: false
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "enclosed_assessments_new_pkey", unique: true
@@ -229,15 +305,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
 
   create_table "fan_assessments", id: false, force: :cascade do |t|
     t.text "blower_finger_comment"
-    t.boolean "blower_finger_pass"
+    t.integer "blower_finger_pass"
     t.text "blower_flap_comment"
     t.integer "blower_flap_pass", limit: 1
     t.string "blower_serial"
     t.decimal "blower_tube_length", precision: 8, scale: 2
     t.text "blower_tube_length_comment"
-    t.boolean "blower_tube_length_pass"
+    t.integer "blower_tube_length_pass"
     t.text "blower_visual_comment"
-    t.boolean "blower_visual_pass"
+    t.integer "blower_visual_pass"
     t.datetime "created_at", null: false
     t.text "fan_size_type"
     t.string "inspection_id", limit: 12, null: false
@@ -250,37 +326,50 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
 
   create_table "inflatable_game_assessments", id: false, force: :cascade do |t|
     t.text "age_range_marking_comment"
-    t.boolean "age_range_marking_pass"
+    t.integer "age_range_marking_pass"
     t.text "ancillary_equipment_comment"
     t.text "ancillary_equipment_compliant_comment"
-    t.boolean "ancillary_equipment_compliant_pass"
-    t.boolean "ancillary_equipment_pass"
+    t.integer "ancillary_equipment_compliant_pass"
+    t.integer "ancillary_equipment_pass"
     t.text "constant_air_flow_comment"
-    t.boolean "constant_air_flow_pass"
+    t.integer "constant_air_flow_pass"
     t.decimal "containing_wall_height", precision: 8, scale: 2
     t.text "containing_wall_height_comment"
-    t.boolean "containing_wall_height_pass"
+    t.integer "containing_wall_height_pass"
     t.datetime "created_at", null: false
     t.text "design_risk_comment"
-    t.boolean "design_risk_pass"
+    t.integer "design_risk_pass"
     t.text "game_type"
     t.string "inspection_id", limit: 12, null: false
     t.text "intended_play_risk_comment"
-    t.boolean "intended_play_risk_pass"
+    t.integer "intended_play_risk_pass"
+    t.decimal "max_user_mass", precision: 8, scale: 2
     t.text "max_user_mass_comment"
-    t.boolean "max_user_mass_pass"
+    t.integer "max_user_mass_pass"
+    t.decimal "maximum_age", precision: 5, scale: 1
+    t.integer "maximum_users"
+    t.decimal "minimum_age", precision: 5, scale: 1
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "inflatable_game_assessments_pkey", unique: true
   end
 
-  create_table "inspections", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "inspections", id: {type: :string, limit: 12}, force: :cascade do |t|
+    t.integer "checklist_revision"
     t.datetime "complete_date"
     t.datetime "created_at", null: false
+    t.boolean "has_air_jugglers"
+    t.boolean "has_ancillary_equipment"
+    t.boolean "has_ball_pool"
+    t.boolean "has_blower"
+    t.boolean "has_containing_walls"
+    t.boolean "has_fencing"
+    t.boolean "has_inflatable_bed"
     t.boolean "has_slide"
     t.decimal "height", precision: 8, scale: 2
     t.string "height_comment", limit: 1000
     t.boolean "indoor_only"
     t.datetime "inspection_date"
+    t.string "inspection_location"
     t.string "inspection_type", default: "BOUNCY_CASTLE", null: false
     t.string "inspector_company_id"
     t.boolean "is_seed", default: false, null: false
@@ -303,7 +392,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.index ["user_id"], name: "index_inspections_on_user_id"
   end
 
-  create_table "inspector_companies", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "inspector_companies", id: {type: :string, limit: 12}, force: :cascade do |t|
     t.boolean "active", default: true
     t.text "address", null: false
     t.string "city"
@@ -323,9 +412,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.integer "artwork_pass", limit: 1
     t.datetime "created_at", null: false
     t.text "fabric_strength_comment"
-    t.boolean "fabric_strength_pass"
+    t.integer "fabric_strength_pass"
     t.text "fire_retardant_comment"
-    t.boolean "fire_retardant_pass"
+    t.integer "fire_retardant_pass"
     t.string "inspection_id", limit: 12, null: false
     t.text "retention_netting_comment"
     t.integer "retention_netting_pass", limit: 1
@@ -333,7 +422,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.text "ropes_comment"
     t.integer "ropes_pass", limit: 1
     t.text "thread_comment"
-    t.boolean "thread_pass"
+    t.integer "thread_pass"
     t.datetime "updated_at", null: false
     t.text "windows_comment"
     t.integer "windows_pass", limit: 1
@@ -354,72 +443,75 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
 
   create_table "pat_assessments", id: false, force: :cascade do |t|
     t.text "appliance_plug_check_comment"
-    t.boolean "appliance_plug_check_pass"
+    t.integer "appliance_plug_check_pass"
     t.datetime "created_at", null: false
     t.decimal "earth_ohms", precision: 8, scale: 2
     t.text "earth_ohms_comment"
-    t.boolean "earth_ohms_pass"
+    t.integer "earth_ohms_pass"
     t.integer "equipment_class"
     t.text "equipment_class_comment"
-    t.boolean "equipment_class_pass"
+    t.integer "equipment_class_pass"
     t.integer "equipment_power"
     t.text "equipment_power_comment"
     t.integer "fuse_rating"
     t.text "fuse_rating_comment"
-    t.boolean "fuse_rating_pass"
+    t.integer "fuse_rating_pass"
     t.string "inspection_id", limit: 12, null: false
     t.integer "insulation_mohms"
     t.text "insulation_mohms_comment"
-    t.boolean "insulation_mohms_pass"
+    t.integer "insulation_mohms_pass"
     t.decimal "leakage_ma", precision: 8, scale: 2
     t.text "leakage_ma_comment"
-    t.boolean "leakage_ma_pass"
+    t.integer "leakage_ma_pass"
     t.text "load_test_comment"
-    t.boolean "load_test_pass"
+    t.integer "load_test_pass"
     t.decimal "rcd_trip_time_ms", precision: 8, scale: 2
     t.text "rcd_trip_time_ms_comment"
-    t.boolean "rcd_trip_time_ms_pass"
+    t.integer "rcd_trip_time_ms_pass"
     t.datetime "updated_at", null: false
     t.text "visual_comment"
-    t.boolean "visual_pass"
+    t.integer "visual_pass"
     t.index ["inspection_id"], name: "pat_assessments_pkey", unique: true
   end
 
   create_table "play_zone_assessments", id: false, force: :cascade do |t|
     t.text "access_comment"
-    t.boolean "access_pass"
+    t.integer "access_pass"
     t.text "age_marking_comment"
-    t.boolean "age_marking_pass"
+    t.integer "age_marking_pass"
     t.text "air_juggler_comment"
-    t.boolean "air_juggler_pass"
+    t.integer "air_juggler_pass"
     t.integer "ball_pool_depth"
     t.text "ball_pool_depth_comment"
-    t.boolean "ball_pool_depth_pass"
+    t.integer "ball_pool_depth_pass"
     t.integer "ball_pool_entry_height"
     t.text "ball_pool_entry_height_comment"
-    t.boolean "ball_pool_entry_height_pass"
+    t.integer "ball_pool_entry_height_pass"
     t.text "ball_pool_gaps_comment"
-    t.boolean "ball_pool_gaps_pass"
+    t.integer "ball_pool_gaps_pass"
     t.text "balls_comment"
-    t.boolean "balls_pass"
+    t.integer "balls_pass"
     t.datetime "created_at", null: false
     t.text "fitted_sheet_comment"
-    t.boolean "fitted_sheet_pass"
+    t.integer "fitted_sheet_pass"
+    t.decimal "height_marking", precision: 8, scale: 2
     t.text "height_marking_comment"
-    t.boolean "height_marking_pass"
+    t.integer "height_marking_pass"
     t.string "inspection_id", limit: 12, null: false
+    t.decimal "maximum_age", precision: 5, scale: 1
+    t.decimal "minimum_age", precision: 5, scale: 1
     t.text "sight_line_comment"
-    t.boolean "sight_line_pass"
+    t.integer "sight_line_pass"
     t.integer "slide_gradient"
     t.text "slide_gradient_comment"
-    t.boolean "slide_gradient_pass"
+    t.integer "slide_gradient_pass"
     t.decimal "slide_platform_height", precision: 8, scale: 2
     t.text "slide_platform_height_comment"
-    t.boolean "slide_platform_height_pass"
+    t.integer "slide_platform_height_pass"
     t.text "suitable_matting_comment"
-    t.boolean "suitable_matting_pass"
+    t.integer "suitable_matting_pass"
     t.text "traffic_flow_comment"
-    t.boolean "traffic_flow_pass"
+    t.integer "traffic_flow_pass"
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "play_zone_assessments_pkey", unique: true
   end
@@ -431,7 +523,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.string "inspection_id", limit: 12, null: false
     t.decimal "runout", precision: 8, scale: 2
     t.text "runout_comment"
-    t.boolean "runout_pass"
+    t.integer "runout_pass"
     t.decimal "slide_beyond_first_metre_height", precision: 8, scale: 2
     t.text "slide_beyond_first_metre_height_comment"
     t.decimal "slide_first_metre_height", precision: 8, scale: 2
@@ -443,7 +535,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.decimal "slide_wall_height", precision: 8, scale: 2
     t.text "slide_wall_height_comment"
     t.text "slip_sheet_comment"
-    t.boolean "slip_sheet_pass"
+    t.integer "slip_sheet_pass"
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "slide_assessments_new_pkey", unique: true
   end
@@ -571,34 +663,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
 
   create_table "structure_assessments", id: false, force: :cascade do |t|
     t.text "air_loss_comment"
-    t.boolean "air_loss_pass"
+    t.integer "air_loss_pass"
     t.datetime "created_at", null: false
     t.integer "critical_fall_off_height"
     t.text "critical_fall_off_height_comment"
     t.integer "critical_fall_off_height_pass", limit: 1
     t.text "entrapment_comment"
-    t.boolean "entrapment_pass"
+    t.integer "entrapment_pass"
     t.text "evacuation_time_comment"
-    t.boolean "evacuation_time_pass"
+    t.integer "evacuation_time_pass"
     t.text "grounding_comment"
     t.integer "grounding_pass", limit: 1
     t.string "inspection_id", limit: 12, null: false
     t.text "markings_comment"
-    t.boolean "markings_pass"
+    t.integer "markings_pass"
     t.integer "platform_height"
     t.text "platform_height_comment"
     t.integer "platform_height_pass", limit: 1
     t.text "seam_integrity_comment"
-    t.boolean "seam_integrity_pass"
+    t.integer "seam_integrity_pass"
     t.text "sharp_edges_comment"
-    t.boolean "sharp_edges_pass"
+    t.integer "sharp_edges_pass"
     t.integer "step_ramp_size"
     t.text "step_ramp_size_comment"
     t.integer "step_ramp_size_pass", limit: 1
     t.text "stitch_length_comment"
-    t.boolean "stitch_length_pass"
+    t.integer "stitch_length_pass"
     t.text "straight_walls_comment"
-    t.boolean "straight_walls_pass"
+    t.integer "straight_walls_pass"
     t.integer "trough_adjacent_panel_width"
     t.text "trough_adjacent_panel_width_comment"
     t.text "trough_comment"
@@ -607,9 +699,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.integer "trough_pass", limit: 1
     t.decimal "unit_pressure", precision: 8, scale: 2
     t.text "unit_pressure_comment"
-    t.boolean "unit_pressure_pass"
+    t.integer "unit_pressure_pass"
     t.text "unit_stable_comment"
-    t.boolean "unit_stable_pass"
+    t.integer "unit_stable_pass"
     t.datetime "updated_at", null: false
     t.index ["inspection_id"], name: "structure_assessments_new_pkey", unique: true
   end
@@ -622,10 +714,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.index ["i18n_key"], name: "index_text_replacements_on_i18n_key", unique: true
   end
 
-  create_table "units", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "units", id: {type: :string, limit: 12}, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "description"
+    t.boolean "has_air_jugglers"
+    t.boolean "has_ancillary_equipment"
+    t.boolean "has_ball_pool"
+    t.boolean "has_blower"
+    t.boolean "has_containing_walls"
+    t.boolean "has_fencing"
+    t.boolean "has_inflatable_bed"
+    t.boolean "has_slide"
+    t.boolean "indoor_only"
     t.boolean "is_seed", default: false, null: false
+    t.boolean "is_totally_enclosed"
     t.date "manufacture_date"
     t.string "manufacturer"
     t.string "name"
@@ -645,6 +747,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.datetime "created_at", null: false
     t.text "custom_user_height_comment"
     t.string "inspection_id", limit: 12, null: false
+    t.decimal "maximum_user_height", precision: 8, scale: 2
     t.decimal "negative_adjustment", precision: 8, scale: 2
     t.text "negative_adjustment_comment"
     t.decimal "play_area_length", precision: 8, scale: 2
@@ -672,7 +775,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
   end
 
-  create_table "users", id: { type: :string, limit: 12 }, force: :cascade do |t|
+  create_table "users", id: {type: :string, limit: 12}, force: :cascade do |t|
     t.date "active_until"
     t.text "address"
     t.string "country"
@@ -699,6 +802,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120000) do
   add_foreign_key "anchorage_assessments", "inspections"
   add_foreign_key "badges", "badge_batches"
   add_foreign_key "ball_pool_assessments", "inspections"
+  add_foreign_key "bouncing_pillow_assessments", "inspections"
   add_foreign_key "bungee_assessments", "inspections"
   add_foreign_key "catch_bed_assessments", "inspections"
   add_foreign_key "credentials", "users"

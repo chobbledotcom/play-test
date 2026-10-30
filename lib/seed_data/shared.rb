@@ -17,16 +17,10 @@ module SeedData
       field_mappings.transform_values { |v| passed ? v : FAIL }
     end
 
-    def self.check_passed?(inspection_passed)
-      return true if inspection_passed
+    def self.outcome(inspection_passed)
+      return "pass" if inspection_passed
 
-      rand < 0.9
-    end
-
-    def self.check_passed_integer?(inspection_passed)
-      return :pass if inspection_passed
-
-      (rand < 0.9) ? :pass : :fail
+      (rand < 0.9) ? "pass" : "fail"
     end
 
     def self.user_fields
@@ -71,14 +65,15 @@ module SeedData
 
     def self.anchorage_fields(passed: true)
       fields = {
+        bungee_side_area: rand(15.0..25.0).round(2),
         num_low_anchors: rand(6..12),
         num_high_anchors: rand(4..8),
-        num_low_anchors_pass: check_passed?(passed),
-        num_high_anchors_pass: check_passed?(passed),
-        anchor_accessories_pass: check_passed?(passed),
-        anchor_degree_pass: check_passed?(passed),
-        anchor_type_pass: check_passed?(passed),
-        pull_strength_pass: check_passed?(passed)
+        num_low_anchors_pass: outcome(passed),
+        num_high_anchors_pass: outcome(passed),
+        anchor_accessories_pass: outcome(passed),
+        anchor_degree_pass: outcome(passed),
+        anchor_type_pass: outcome(passed),
+        pull_strength_pass: outcome(passed)
       }
 
       fields[:anchor_type_comment] = WEAR unless passed

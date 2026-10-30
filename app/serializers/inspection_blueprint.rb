@@ -6,7 +6,12 @@ class InspectionBlueprint < Blueprinter::Base
   include DynamicPublicFields
 
   dynamic_fields_for Inspection,
-    date_fields: %i[complete_date inspection_date]
+    date_fields: %i[complete_date inspection_date],
+    excluded_fields: %i[checklist_revision],
+    revision_fields: %i[
+      has_air_jugglers has_ancillary_equipment has_ball_pool has_blower
+      has_containing_walls has_fencing has_inflatable_bed inspection_location
+    ]
 
   field :complete do |inspection|
     inspection.complete?
@@ -52,11 +57,20 @@ class InspectionBlueprint < Blueprinter::Base
       assessment_data = {}
 
       public_fields =
-        klass.column_name_syms -
-        PublicFieldFiltering::EXCLUDED_FIELDS
+        (assessment.form_schema(user: nil).attribute_names &
+          klass.column_name_syms) - PublicFieldFiltering::EXCLUDED_FIELDS
 
       public_fields.each do |field|
         value = assessment.send(field)
+        if !inspection.current_checklist? &&
+            klass.legacy_boolean_outcome_fields.include?(field) &&
+            !value.nil?
+          value = case value
+          when "pass" then true
+          when "fail" then false
+          else value
+          end
+        end
         assessment_data[field] = value unless value.nil?
       end
 

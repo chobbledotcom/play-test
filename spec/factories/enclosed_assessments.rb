@@ -27,23 +27,23 @@ FactoryBot.define do
     association :inspection
 
     exit_number { 2 }
-    exit_number_pass { true }
+    exit_number_pass { "pass" }
     exit_number_comment { "Adequate emergency exits" }
-    exit_sign_always_visible_pass { true }
+    exit_sign_always_visible_pass { "pass" }
     exit_sign_always_visible_comment { "Exits clearly marked and visible" }
 
     trait :complete do
       exit_number { 2 }
-      exit_number_pass { true }
-      exit_sign_always_visible_pass { true }
+      exit_number_pass { "pass" }
+      exit_sign_always_visible_pass { "pass" }
       exit_number_comment { "Adequate emergency exits" }
       exit_sign_always_visible_comment { "Exits clearly marked and visible" }
     end
 
     trait :failed do
       exit_number { 1 }  # Still a valid number, but assessment failed
-      exit_number_pass { false }
-      exit_sign_always_visible_pass { false }
+      exit_number_pass { "fail" }
+      exit_sign_always_visible_pass { "fail" }
       exit_number_comment { "Insufficient emergency exits for occupancy" }
       exit_sign_always_visible_comment { "Exits not clearly marked" }
     end

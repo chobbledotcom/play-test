@@ -2,10 +2,6 @@
 
 # Shared examples for common assessment model behaviors
 
-def enum_field?(assessment_class, field)
-  assessment_class.respond_to?(:defined_enums) && assessment_class.defined_enums.key?(field.to_s)
-end
-
 RSpec.shared_examples "an assessment model" do
   describe "associations" do
     it "belongs to inspection" do
@@ -14,32 +10,27 @@ RSpec.shared_examples "an assessment model" do
   end
 
   describe "audit logging" do
-    it "logs assessment updates when changes are made" do
-      changeable_field = assessment.class.column_names.find { |col|
-        col.end_with?("_comment", "_pass") && assessment.respond_to?("#{col}=")
-      }
+    let(:audit_events) { Event.for_resource(inspection) }
 
-      if changeable_field
-        expect(assessment).to receive(:log_assessment_update)
-        test_value = if changeable_field.end_with?("_pass")
-          if enum_field?(assessment.class, changeable_field)
-            "pass"
-          else
-            true
-          end
-        else
-          "new value"
-        end
-        assessment.update!(changeable_field => test_value)
-      else
-        pending "No changeable field found for audit logging test"
-      end
+    before { assessment.save! }
+
+    it "logs assessment updates when changes are made" do
+      comment_field = assessment.class.column_names.grep(/_comment\z/).first
+
+      expect {
+        assessment.update!(comment_field => "Updated inspection comment")
+      }.to change(audit_events, :count).by(1)
+
+      expect(audit_events.last).to have_attributes(
+        action: "assessment_updated",
+        user: inspection.user
+      )
     end
 
     it "does not log when no changes are made" do
-      assessment.save
-      expect(assessment).not_to receive(:log_assessment_update)
-      assessment.save
+      expect {
+        assessment.save!
+      }.not_to change(audit_events, :count)
     end
   end
 
@@ -52,7 +43,7 @@ RSpec.shared_examples "an assessment model" do
   describe "validation patterns" do
     context "pass/fail fields" do
       described_class.column_names.select { |col| col.end_with?("_pass") }.each do |field|
-        include_examples "validates boolean field", field
+        include_examples "validates outcome field", field
       end
     end
 
@@ -116,28 +107,13 @@ RSpec.shared_examples "validates non-negative integer field" do |field|
   end
 end
 
-RSpec.shared_examples "validates boolean field" do |field|
-  it "allows nil for #{field}" do
-    assessment.send("#{field}=", nil)
-    expect(assessment).to be_valid
-  end
+RSpec.shared_examples "validates outcome field" do |field|
+  [nil, "pass", "fail", "na"].each do |answer|
+    it "allows #{answer.inspect} for #{field}" do
+      assessment.public_send("#{field}=", answer)
 
-  it "allows true for #{field}" do
-    if enum_field?(assessment.class, field)
-      assessment.send("#{field}=", "pass")
-    else
-      assessment.send("#{field}=", true)
+      expect(assessment).to be_valid
     end
-    expect(assessment).to be_valid
-  end
-
-  it "allows false for #{field}" do
-    if enum_field?(assessment.class, field)
-      assessment.send("#{field}=", "fail")
-    else
-      assessment.send("#{field}=", false)
-    end
-    expect(assessment).to be_valid
   end
 end
 

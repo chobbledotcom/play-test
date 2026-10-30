@@ -43,25 +43,14 @@ class InspectionCreationService
   end
 
   COPY_FROM_LAST_INSPECTION_FIELDS = T.let(
-    %i[
-      has_slide
-      is_totally_enclosed
-      length
-      width
-      height
-    ].freeze,
+    (%i[height length width] + InspectionChecklist::COMPONENT_FIELDS).freeze,
     T::Array[Symbol]
   )
 
   sig { params(unit: T.nilable(Unit)).returns(Inspection) }
   def build_inspection(unit)
     last_inspection = unit&.last_inspection
-    copy_fields = {}
-    if last_inspection
-      copy_fields = COPY_FROM_LAST_INSPECTION_FIELDS.map do |field|
-        [field, last_inspection.send(field)]
-      end.to_h
-    end
+    copy_fields = last_inspection ? previous_values(unit, last_inspection) : {}
 
     @user.inspections.build(
       unit: unit,
@@ -115,5 +104,18 @@ class InspectionCreationService
   sig { params(inspection: Inspection).returns(String) }
   def build_failure_redirect_path(inspection)
     inspection.unit.present? ? "/units/#{inspection.unit.id}" : "/"
+  end
+
+  sig do
+    params(unit: Unit, previous: Inspection)
+      .returns(T::Hash[Symbol, T.untyped])
+  end
+
+  def previous_values(unit, previous)
+    allowed = %i[height length width] + unit.configuration_fields
+    (COPY_FROM_LAST_INSPECTION_FIELDS & allowed).filter_map do |field|
+      value = previous.public_send(field)
+      [field, value] unless value.nil?
+    end.to_h
   end
 end

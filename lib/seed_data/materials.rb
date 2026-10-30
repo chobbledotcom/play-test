@@ -6,14 +6,14 @@ module SeedData
     def self.fields(passed: true)
       {
         ropes: rand(18..45),
-        ropes_pass: Shared.check_passed_integer?(passed),
-        retention_netting_pass: Shared.check_passed_integer?(passed),
-        zips_pass: Shared.check_passed_integer?(passed),
-        windows_pass: Shared.check_passed_integer?(passed),
-        artwork_pass: Shared.check_passed_integer?(passed),
-        thread_pass: Shared.check_passed?(passed),
-        fabric_strength_pass: Shared.check_passed?(passed),
-        fire_retardant_pass: Shared.check_passed?(passed)
+        ropes_pass: Shared.outcome(passed),
+        retention_netting_pass: Shared.outcome(passed),
+        zips_pass: Shared.outcome(passed),
+        windows_pass: Shared.outcome(passed),
+        artwork_pass: Shared.outcome(passed),
+        thread_pass: Shared.outcome(passed),
+        fabric_strength_pass: Shared.outcome(passed),
+        fire_retardant_pass: Shared.outcome(passed)
       }.merge(comments(passed))
     end
 

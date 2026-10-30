@@ -25,3 +25,29 @@ form_fields:
         field: :is_totally_enclosed
       - partial: :yes_no_radio
         field: :indoor_only
+      - partial: :yes_no_radio
+        field: :has_ball_pool
+        introduced_in_revision: 2
+      - partial: :yes_no_radio
+        field: :has_air_jugglers
+        introduced_in_revision: 2
+      - partial: :yes_no_radio
+        field: :has_inflatable_bed
+        introduced_in_revision: 2
+      - partial: :yes_no_radio
+        field: :has_containing_walls
+        introduced_in_revision: 2
+      - partial: :yes_no_radio
+        field: :has_ancillary_equipment
+        introduced_in_revision: 2
+      - partial: :yes_no_radio
+        field: :has_fencing
+        introduced_in_revision: 2
+      - partial: :yes_no_radio
+        field: :has_blower
+        introduced_in_revision: 2
+  - legend_i18n_key: inspection_site
+    fields:
+      - partial: :text_field
+        field: :inspection_location
+        introduced_in_revision: 2

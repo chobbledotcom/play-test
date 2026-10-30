@@ -28,17 +28,32 @@
 
     <%# Unit type selector - shown when multiple types enabled %>
     <% if Rails.configuration.units.unit_type_selection? %>
-      <% type_options = Rails.configuration.units.available_unit_types.map { |ut|
-        [t("units.unit_types.#{ut}"), ut]
-      } %>
+      <%
+        available_types = Rails.configuration.units.available_unit_types
+        available_types |= [unit.unit_type] if unit.persisted?
+        type_options = available_types.map { |type|
+          [t("units.unit_types.#{type}"), type]
+        }
+      %>
       <%= render 'chobble_forms/select', field: :unit_type,
           options: options_for_select(type_options, unit.unit_type),
           required: true %>
+      <%= form.button t('forms.units.buttons.apply_type'),
+        name: :intent, value: 'configure', formnovalidate: true %>
+      <small><%= t('forms.units.help.apply_type') %></small>
     <% end %>
 
     <%# Photo upload %>
     <%= turbo_frame_tag "unit_photo_preview" do %>
       <%= render 'chobble_forms/file_field', field: :photo, accept: "image/*" %>
+    <% end %>
+  <% end %>
+
+  <% unless unit.configuration_fields.empty? %>
+    <%= render 'chobble_forms/fieldset', legend_key: 'configuration' do %>
+      <% unit.configuration_fields.each do |field| %>
+        <%= render 'chobble_forms/yes_no_radio', field: field %>
+      <% end %>
     <% end %>
   <% end %>
 

@@ -16,7 +16,8 @@ RSpec.feature "Bungee Run Inspection Workflow", type: :feature do
 
     verify_correct_tabs_visible(inspection)
     fill_inspection_tab(inspection)
-    fill_all_bungee_assessments(inspection)
+    fill_applicable_assessments_via_ui(inspection)
+    fill_results_tab(inspection)
     complete_inspection(inspection)
     verify_inspection_complete(inspection)
   end
@@ -124,36 +125,11 @@ RSpec.feature "Bungee Run Inspection Workflow", type: :feature do
     click_submit_button
   end
 
-  def fill_all_bungee_assessments(inspection)
-    {
-      "structure" => SeedData.structure_fields(passed: true),
-      "anchorage" => SeedData.anchorage_fields(passed: true),
-      "materials" => SeedData.materials_fields(passed: true),
-      "fan" => SeedData.fan_fields(passed: true),
-      "bungee" => SeedData.bungee_fields(passed: true)
-    }.each do |tab, fields|
-      fill_assessment(inspection, tab, fields)
-    end
-
-    fill_results_tab(inspection)
-  end
-
   def fill_results_tab(inspection)
     visit edit_inspection_path(inspection, tab: "results")
     fill_assessment_field("results", :passed, true)
     fill_in_risk_assessment("Unit passes all bungee checks")
     submit_form :results
-    expect_updated_message
-  end
-
-  def fill_assessment(inspection, tab_name, field_data)
-    visit edit_inspection_path(inspection, tab: tab_name)
-
-    field_data.each do |field_name, value|
-      fill_assessment_field(tab_name, field_name, value)
-    end
-
-    submit_form tab_name.to_sym
     expect_updated_message
   end
 
