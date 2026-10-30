@@ -8,8 +8,11 @@ en:
         safety_checks: Safety Checks
         measurements: Measurements
       fields:
+        maximum_users: Maximum permitted number of users
         age_range_marking: Marking to indicate age range
-        max_height_markings: Marking to indicate max user height
+        minimum_age: Minimum permitted user age (years)
+        maximum_age: Maximum permitted user age (years)
+        max_height_markings: Maximum permitted user height and marking (m)
         suitable_matting: Suitable matting
         air_jugglers_compliant: Air jugglers compliant
         balls_compliant: Balls compliant

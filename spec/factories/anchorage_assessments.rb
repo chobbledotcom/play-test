@@ -48,25 +48,27 @@ FactoryBot.define do
     anchor_accessories_pass { nil }
 
     trait :passed do
+      bungee_side_area { 20 }
       num_low_anchors { 6 }
       num_high_anchors { 4 }
-      num_low_anchors_pass { true }
-      num_high_anchors_pass { true }
-      anchor_type_pass { true }
-      pull_strength_pass { true }
-      anchor_degree_pass { true }
-      anchor_accessories_pass { true }
+      num_low_anchors_pass { "pass" }
+      num_high_anchors_pass { "pass" }
+      anchor_type_pass { "pass" }
+      pull_strength_pass { "pass" }
+      anchor_degree_pass { "pass" }
+      anchor_accessories_pass { "pass" }
     end
 
     trait :complete do
+      bungee_side_area { 20 }
       num_low_anchors { 6 }
       num_high_anchors { 4 }
-      num_low_anchors_pass { true }
-      num_high_anchors_pass { true }
-      anchor_type_pass { true }
-      pull_strength_pass { true }
-      anchor_degree_pass { true }
-      anchor_accessories_pass { true }
+      num_low_anchors_pass { "pass" }
+      num_high_anchors_pass { "pass" }
+      anchor_type_pass { "pass" }
+      pull_strength_pass { "pass" }
+      anchor_degree_pass { "pass" }
+      anchor_accessories_pass { "pass" }
       num_low_anchors_comment { SeedData::OK }
       num_high_anchors_comment { SeedData::OK }
       anchor_type_comment { SeedData::OK }
@@ -78,24 +80,24 @@ FactoryBot.define do
     trait :failed do
       num_low_anchors { 2 }
       num_high_anchors { 1 }
-      num_low_anchors_pass { false }
-      num_high_anchors_pass { false }
-      anchor_type_pass { false }
-      pull_strength_pass { false }
-      anchor_degree_pass { true }
-      anchor_accessories_pass { true }
+      num_low_anchors_pass { "fail" }
+      num_high_anchors_pass { "fail" }
+      anchor_type_pass { "fail" }
+      pull_strength_pass { "fail" }
+      anchor_degree_pass { "pass" }
+      anchor_accessories_pass { "pass" }
     end
 
     trait :critical_failures do
-      anchor_type_pass { false }
-      pull_strength_pass { false }
+      anchor_type_pass { "fail" }
+      pull_strength_pass { "fail" }
     end
 
     trait :insufficient_anchors do
       num_low_anchors { 1 }
       num_high_anchors { 1 }
-      num_low_anchors_pass { false }
-      num_high_anchors_pass { false }
+      num_low_anchors_pass { "fail" }
+      num_high_anchors_pass { "fail" }
     end
   end
 end

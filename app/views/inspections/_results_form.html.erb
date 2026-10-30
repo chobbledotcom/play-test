@@ -14,7 +14,7 @@
     <% comment_items = [] %>
 
     <% # Get all comment fields from the inspection itself %>
-    <% @inspection.attributes.each do |field_name, value| %>
+    <% @inspection.attributes.slice(*@inspection.form_schema(user: nil).attribute_names.map(&:to_s)).each do |field_name, value| %>
       <% if field_name.end_with?('_comment') && value.present? %>
         <% comments_found = true %>
         <% base_field = field_name.chomp('_comment') %>
@@ -28,7 +28,8 @@
       <% assessment = @inspection.send(assessment_key) %>
       <% next unless assessment %>
 
-      <% assessment.attributes.each do |field_name, value| %>
+      <% fields = assessment.form_schema(user: nil).attribute_names.map(&:to_s) %>
+      <% assessment.attributes.slice(*fields).each do |field_name, value| %>
         <% if field_name.end_with?('_comment') && value.present? %>
           <% comments_found = true %>
           <% form_name = assessment_key.to_s.gsub(/_assessment$/, '') %>

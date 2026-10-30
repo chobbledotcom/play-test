@@ -1,0 +1,39 @@
+---
+en:
+  activerecord:
+    errors:
+      messages:
+        not_applicable_to_unit_type: is not applicable to this unit type
+        required_for_constant_air: is required for a constant-air unit
+        incomplete_checklist: Complete all applicable inspection fields before marking the inspection complete
+  forms:
+    units:
+      sections:
+        configuration: Physical Configuration
+      buttons:
+        apply_type: Apply Unit Type
+      help:
+        apply_type: Apply the selected type to show its configuration fields without saving the unit.
+      fields:
+        has_air_jugglers: Has air jugglers
+        has_ancillary_equipment: Has ancillary equipment
+        has_ball_pool: Has a ball pool
+        has_blower: Has an inflation blower
+        has_containing_walls: Has containing walls
+        has_fencing: Has perimeter fencing
+        has_inflatable_bed: Has an inflatable bed
+        has_slide: Has a slide
+        indoor_only: Indoor use only
+        is_totally_enclosed: Is totally enclosed
+    inspection:
+      sections:
+        inspection_site: Installation Site
+      fields:
+        has_air_jugglers: Has air jugglers
+        has_ancillary_equipment: Has ancillary equipment
+        has_ball_pool: Has a ball pool
+        has_blower: Has an inflation blower
+        has_containing_walls: Has containing walls
+        has_fencing: Has perimeter fencing
+        has_inflatable_bed: Has an inflatable bed
+        inspection_location: Installation site

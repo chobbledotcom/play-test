@@ -130,7 +130,7 @@ module InspectionTestHelpers
 
     case value
     when true, false
-      if field_name.to_s.end_with?("_pass") || field_name.to_s == "passed"
+      if field_name.to_s == "passed"
         choose_pass_fail(field_label, value)
       elsif BOOLEAN_FIELDS.include?(field_name.to_s)
         value ? check_form_radio(tab_name.to_sym, field_name) :
@@ -139,12 +139,11 @@ module InspectionTestHelpers
         choose_yes_no(field_label, value)
       end
     when :pass, "pass"
-      choose_pass_fail(field_label, true)
+      choose_pass_fail(field_label, "pass")
     when :fail, "fail"
-      choose_pass_fail(field_label, false)
+      choose_pass_fail(field_label, "fail")
     when :na, "na"
-      # For now, skip N/A values as the test uses passing values
-      # The form should support N/A but we don't need to test it here
+      choose_pass_fail(field_label, "na")
     else
       fill_in_form(tab_name.to_sym, field_name, value) if value.present?
     end

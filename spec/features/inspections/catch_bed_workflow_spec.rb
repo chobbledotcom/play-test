@@ -125,13 +125,13 @@ RSpec.feature "Catch Bed Inspection Workflow", type: :feature do
   end
 
   def fill_all_catch_bed_assessments(inspection)
-    {
-      "structure" => SeedData.structure_fields(passed: true),
-      "anchorage" => SeedData.anchorage_fields(passed: true),
-      "materials" => SeedData.materials_fields(passed: true),
-      "fan" => SeedData.fan_fields(passed: true),
-      "catch_bed" => SeedData.catch_bed_fields(passed: true)
-    }.each { |tab, fields| fill_assessment(inspection, tab, fields) }
+    inspection.reload.applicable_assessments.each_key do |assessment_name|
+      tab = assessment_name.to_s.delete_suffix("_assessment")
+      assessment = inspection.public_send(assessment_name)
+      fields = attributes_for(assessment_name, :complete)
+        .slice(*assessment.form_schema.attribute_names)
+      fill_assessment(inspection, tab, fields)
+    end
 
     fill_results_tab(inspection)
   end

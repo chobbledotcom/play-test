@@ -31,20 +31,24 @@ FactoryBot.define do
     running_wall_height { nil }
 
     trait :passed do
-      blower_forward_distance_pass { true }
-      marking_max_mass_pass { true }
-      marking_min_height_pass { true }
-      pull_strength_pass { true }
-      cord_length_max_pass { true }
-      cord_diametre_min_pass { true }
-      two_stage_locking_pass { true }
-      baton_compliant_pass { true }
-      lane_width_max_pass { true }
-      rear_wall_pass { true }
-      side_wall_pass { true }
-      running_wall_pass { true }
+      maximum_users { 4 }
+      marking_max_mass { 120 }
+      marking_min_height { 1.2 }
+      pull_strength { 2400 }
+      blower_forward_distance_pass { "pass" }
+      marking_max_mass_pass { "pass" }
+      marking_min_height_pass { "pass" }
+      pull_strength_pass { "pass" }
+      cord_length_max_pass { "pass" }
+      cord_diametre_min_pass { "pass" }
+      two_stage_locking_pass { "pass" }
+      baton_compliant_pass { "pass" }
+      lane_width_max_pass { "pass" }
+      rear_wall_pass { "pass" }
+      side_wall_pass { "pass" }
+      running_wall_pass { "pass" }
       harness_width { 200 }
-      harness_width_pass { true }
+      harness_width_pass { "pass" }
       num_of_cords { 2 }
       rear_wall_thickness { 0.6 }
       rear_wall_height { 1.8 }
@@ -55,32 +59,36 @@ FactoryBot.define do
     end
 
     trait :complete do
-      blower_forward_distance_pass { true }
+      maximum_users { 4 }
+      marking_max_mass { 120 }
+      marking_min_height { 1.2 }
+      pull_strength { 2400 }
+      blower_forward_distance_pass { "pass" }
       blower_forward_distance_comment { SeedData::OK }
-      marking_max_mass_pass { true }
+      marking_max_mass_pass { "pass" }
       marking_max_mass_comment { SeedData::OK }
-      marking_min_height_pass { true }
+      marking_min_height_pass { "pass" }
       marking_min_height_comment { SeedData::OK }
-      pull_strength_pass { true }
+      pull_strength_pass { "pass" }
       pull_strength_comment { SeedData::PASS }
-      cord_length_max_pass { true }
+      cord_length_max_pass { "pass" }
       cord_length_max_comment { SeedData::OK }
-      cord_diametre_min_pass { true }
+      cord_diametre_min_pass { "pass" }
       cord_diametre_min_comment { SeedData::OK }
-      two_stage_locking_pass { true }
+      two_stage_locking_pass { "pass" }
       two_stage_locking_comment { SeedData::PASS }
-      baton_compliant_pass { true }
+      baton_compliant_pass { "pass" }
       baton_compliant_comment { SeedData::PASS }
-      lane_width_max_pass { true }
+      lane_width_max_pass { "pass" }
       lane_width_max_comment { SeedData::OK }
-      rear_wall_pass { true }
+      rear_wall_pass { "pass" }
       rear_wall_comment { SeedData::OK }
-      side_wall_pass { true }
+      side_wall_pass { "pass" }
       side_wall_comment { SeedData::OK }
-      running_wall_pass { true }
+      running_wall_pass { "pass" }
       running_wall_comment { SeedData::OK }
       harness_width { 200 }
-      harness_width_pass { true }
+      harness_width_pass { "pass" }
       harness_width_comment { SeedData::OK }
       num_of_cords { 2 }
       rear_wall_thickness { 0.6 }
@@ -92,20 +100,20 @@ FactoryBot.define do
     end
 
     trait :failed do
-      blower_forward_distance_pass { false }
-      marking_max_mass_pass { false }
-      marking_min_height_pass { false }
-      pull_strength_pass { false }
-      cord_length_max_pass { false }
-      cord_diametre_min_pass { false }
-      two_stage_locking_pass { false }
-      baton_compliant_pass { false }
-      lane_width_max_pass { false }
-      rear_wall_pass { false }
-      side_wall_pass { false }
-      running_wall_pass { false }
+      blower_forward_distance_pass { "fail" }
+      marking_max_mass_pass { "fail" }
+      marking_min_height_pass { "fail" }
+      pull_strength_pass { "fail" }
+      cord_length_max_pass { "fail" }
+      cord_diametre_min_pass { "fail" }
+      two_stage_locking_pass { "fail" }
+      baton_compliant_pass { "fail" }
+      lane_width_max_pass { "fail" }
+      rear_wall_pass { "fail" }
+      side_wall_pass { "fail" }
+      running_wall_pass { "fail" }
       harness_width { 150 }
-      harness_width_pass { false }
+      harness_width_pass { "fail" }
       num_of_cords { 1 }
       rear_wall_thickness { 0.4 }
       rear_wall_height { 1.2 }

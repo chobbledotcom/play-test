@@ -44,8 +44,13 @@ class Assessments::AnchorageAssessment < ApplicationRecord
 
   after_update :log_assessment_update, if: :saved_changes?
 
-  sig { returns(T::Boolean) }
+  sig { returns(T.nilable(T::Boolean)) }
   def meets_anchor_requirements?
+    if current_bungee?
+      return if bungee_side_area.nil? ||
+        num_low_anchors.nil? || num_high_anchors.nil?
+      return total_anchors >= required_anchors
+    end
     unless total_anchors &&
         inspection.width &&
         inspection.height &&
@@ -59,16 +64,33 @@ class Assessments::AnchorageAssessment < ApplicationRecord
   sig { returns(Integer) }
   def total_anchors = (num_low_anchors || 0) + (num_high_anchors || 0)
 
-  sig { returns(Integer) }
+  sig { returns(T.nilable(Integer)) }
   def required_anchors
+    if current_bungee?
+      return if bungee_side_area.nil?
+      return required_anchors_per_side * 2
+    end
     return 0 if inspection.volume.blank?
     anchorage_result.value
   end
 
   sig { returns(T::Array[T.untyped]) }
   def anchorage_breakdown
+    return [] if current_bungee?
     return [] unless inspection.volume
     anchorage_result.breakdown
+  end
+
+  sig { returns(T::Boolean) }
+  def current_bungee?
+    inspection.current_checklist? &&
+      inspection.inspection_type == "bungee_run"
+  end
+
+  sig { returns(T.nilable(Integer)) }
+  def required_anchors_per_side
+    return unless current_bungee? && !bungee_side_area.nil?
+    (bungee_side_area * 114 / 1600 * BigDecimal("2.5")).ceil
   end
 
   private

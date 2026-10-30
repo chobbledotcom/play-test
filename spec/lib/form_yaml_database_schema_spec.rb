@@ -21,12 +21,11 @@ ASSESSMENT_TYPES = %w[
 
 # Define expected partials for different column types
 PARTIAL_TYPE_MAPPINGS = {
-  # Boolean columns
-  boolean: %i[pass_fail checkbox yes_no_radio pass_fail_comment
-    yes_no_radio_comment],
-  # Integer columns (includes pass/fail/NA values as 0/1/2)
+  # Physical configuration remains boolean; outcomes use integer enums.
+  boolean: %i[checkbox yes_no_radio yes_no_radio_comment],
   integer: %i[number integer_comment number_pass_fail_comment
-    number_pass_fail_na_comment pass_fail_na_comment],
+    number_pass_fail_na_comment pass_fail pass_fail_comment
+    pass_fail_na_comment],
   # Decimal columns (we use decimal, not float)
   decimal: %i[number decimal_comment number_pass_fail_comment
     number_pass_fail_na_comment],
@@ -246,14 +245,6 @@ RSpec.describe "Form YAML Database Schema Validation" do
             column_type = column_types[primary_field]
             allowed_partials = PARTIAL_TYPE_MAPPINGS[column_type] || []
 
-            # For composite partials, check the base field type
-            if %i[pass_fail_comment pass_fail_na_comment].include?(partial)
-              # These handle boolean _pass fields
-              pass_field = "#{field}_pass"
-              if column_types[pass_field] == :boolean
-                next # This is valid
-              end
-            end
 
             next if allowed_partials.include?(partial)
 

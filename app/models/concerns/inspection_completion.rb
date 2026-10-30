@@ -13,18 +13,10 @@ module InspectionCompletion
 
   sig { returns(T::Boolean) }
   def can_be_completed?
-    base_met = unit.present? &&
-      all_assessments_complete? &&
+    unit.present? &&
       !passed.nil? &&
-      inspection_date.present?
-
-    return false unless base_met
-
-    required = self.class::INSPECTION_TAB_FIELDS.fetch(
-      inspection_type.to_sym, self.class::DIMENSION_FIELDS
-    ) - %i[inspection_date]
-
-    required.all? { |f| !send(f).nil? }
+      inspection_tab_incomplete_fields.empty? &&
+      all_assessments_complete?
   end
 
   sig { returns(T::Boolean) }
@@ -67,6 +59,12 @@ module InspectionCompletion
 
   sig { params(user: User).void }
   def complete!(user)
+    prepare_for_edit!
+    unless can_be_completed?
+      errors.add(:base, :incomplete_checklist)
+      raise ActiveRecord::RecordInvalid, self
+    end
+
     update!(complete_date: Time.current)
     log_audit_action(
       "completed", user,
@@ -85,21 +83,15 @@ module InspectionCompletion
 
   sig { returns(T::Array[String]) }
   def validate_completeness
-    assessment_validation_data.filter_map do |name, assessment, msg|
-      assessment_key = :"#{name}_assessment"
-      next unless assessment_applicable?(assessment_key)
-
-      msg if assessment.present? && !assessment.complete?
-    end
+    completion_errors
   end
 
   sig { returns(T::Array[Symbol]) }
   def inspection_tab_incomplete_fields
-    fields = self.class::INSPECTION_TAB_FIELDS.fetch(
-      inspection_type.to_sym, self.class::DIMENSION_FIELDS
-    )
-
-    fields.select { |f| send(f).nil? }
+    checklist.required_inspection_fields.select do |field|
+      value = public_send(field)
+      value.nil? || (value.is_a?(String) && value.blank?)
+    end
   end
 
   sig {
@@ -134,23 +126,6 @@ module InspectionCompletion
 
   private
 
-  sig {
-    returns(
-      T::Array[
-        T::Array[T.any(Symbol, ActiveRecord::Base, String)]
-      ]
-    )
-  }
-  def assessment_validation_data
-    self.class::ALL_ASSESSMENT_TYPES.keys.map do |key|
-      type = key.to_s.sub("_assessment", "").to_sym
-      assessment = send(key)
-      msg = I18n.t(
-        "inspections.validation.#{type}_incomplete"
-      )
-      [type, assessment, msg]
-    end
-  end
 
   sig { params(output: T::Array[T.untyped]).void }
   def add_inspection_tab_fields(output)
@@ -188,7 +163,6 @@ module InspectionCompletion
   }
   def add_assessment_tab_fields(output, tab)
     assessment_key = :"#{tab}_assessment"
-    return unless respond_to?(assessment_key)
 
     assessment = send(assessment_key)
     return unless assessment

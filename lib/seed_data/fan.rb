@@ -5,14 +5,14 @@ module SeedData
   module Fan
     def self.fields(passed: true)
       {
-        blower_flap_pass: Shared.check_passed_integer?(passed),
-        blower_finger_pass: Shared.check_passed?(passed),
-        blower_visual_pass: Shared.check_passed?(passed),
-        pat_pass: Shared.check_passed_integer?(passed),
+        blower_flap_pass: Shared.outcome(passed),
+        blower_finger_pass: Shared.outcome(passed),
+        blower_visual_pass: Shared.outcome(passed),
+        pat_pass: Shared.outcome(passed),
         blower_serial: "FAN-#{SecureRandom.hex(6).upcase}",
         number_of_blowers: 1,
         blower_tube_length: rand(2.0..5.0).round(1),
-        blower_tube_length_pass: Shared.check_passed?(passed)
+        blower_tube_length_pass: Shared.outcome(passed)
       }.merge(comments(passed))
     end
 

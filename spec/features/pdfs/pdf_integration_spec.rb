@@ -61,9 +61,11 @@ RSpec.feature "PDF Complete Integration", type: :feature do
       # Validate all field labels are present
       fields = I18n.t("forms.#{assessment_type}.fields")
       assessment = inspection.send(assessment_key)
+      applicable_fields = assessment.form_schema(user: nil).attribute_names
 
       fields.each do |field_key, field_label|
         next unless assessment.respond_to?(field_key)
+        next unless applicable_fields.include?(field_key.to_sym)
 
         expected_label = get_expected_pdf_label(
           field_key, field_label, fields, assessment_type
@@ -86,7 +88,7 @@ RSpec.feature "PDF Complete Integration", type: :feature do
         next if value.nil?
 
         if field_key.to_s.end_with?("_pass") && !value.nil?
-          expected_indicator = value ? "[PASS]" : "[FAIL]"
+          expected_indicator = I18n.t("shared.#{value}_pdf")
           expect(pdf_content).to include(expected_indicator),
             "Missing pass/fail indicator for " \
               "#{assessment_type}.#{field_key}"

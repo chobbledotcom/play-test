@@ -10,8 +10,7 @@
   unit ||= inspection&.unit
   show_inspection_fields ||= false
 
-  # Get the most recent inspection for dimension data
-  last_inspection = unit&.last_inspection || inspection
+  last_inspection = inspection || unit&.last_inspection
 %>
 
 <div class="unit-details-wrapper">
@@ -91,6 +90,22 @@
           <strong><%= t("units.fields.size_unit") %>:</strong>
           <span><%= last_inspection.width %><%= t("shared.metres_by") %> <%= last_inspection.length %><%= t("shared.metres_by") %> <%= last_inspection.height %>m</span>
         </li>
+      <% end %>
+
+      <% if last_inspection %>
+        <% inspection_type = last_inspection.inspection_type %>
+        <li>
+          <strong><%= ChobbleForms::FieldUtils.form_field_label(:units, :unit_type) %>:</strong>
+          <span><%= t("units.unit_types.#{inspection_type}") %></span>
+        </li>
+        <% fields = last_inspection.form_schema(user: nil).attribute_names %>
+        <% fields.select { |field| field.to_s.start_with?("has_", "is_") || %i[indoor_only inspection_location].include?(field) }.each do |field| %>
+          <% value = last_inspection.public_send(field) %>
+          <li>
+            <strong><%= last_inspection.field_label(:inspection, field) %>:</strong>
+            <span><%= [true, false].include?(value) ? t(value ? "shared.yes" : "shared.no") : value %></span>
+          </li>
+        <% end %>
       <% end %>
 
       <% if unit.manufacture_date %>

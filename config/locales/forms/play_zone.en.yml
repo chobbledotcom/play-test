@@ -9,7 +9,9 @@ en:
         measurements: Measurements
       fields:
         age_marking: Marking to indicate age range
-        height_marking: Marking to indicate max user height
+        minimum_age: Minimum permitted user age (years)
+        maximum_age: Maximum permitted user age (years)
+        height_marking: Maximum permitted user height and marking (m)
         sight_line: Sight lines clear to observe playing areas
         access: Access, egress and connections safe
         suitable_matting: Suitable matting
@@ -20,7 +22,7 @@ en:
         fitted_sheet: Fitted base sheet
         ball_pool_depth: Ball pool depth (mm) max 450mm
         ball_pool_entry_height: Ball pool entry height (mm) max 630mm
-        slide_gradient: Platform incline gradient (deg) max 64 deg
+        slide_gradient: Access gradient to platform, not slide slope (degrees)
         slide_platform_height: Slide platform height (m) max 1.5m
       status:
         checks_passed: Fields completed

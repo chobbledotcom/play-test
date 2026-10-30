@@ -9,10 +9,11 @@ en:
         lanes_and_blower: Lanes & Blower
         wall_dimensions: Wall Dimensions
       fields:
+        maximum_users: Maximum permitted number of users
         blower_forward_distance: Blower no more than 1.5m forward of rear wall
-        marking_max_mass: Marking for max user mass 120kg
-        marking_min_height: Marking for minimum user height 1.2m
-        pull_strength: Harness pull strength test to 1200N
+        marking_max_mass: Maximum permitted user mass and marking (kg)
+        marking_min_height: Minimum permitted user height and marking (m)
+        pull_strength: Measured harness pull test (N), working requirement 2400 N
         cord_length_max: All cords max length 3.3m
         cord_diametre_min: All cord diameters min 12.5mm
         two_stage_locking: Two-stage locking system present
@@ -29,6 +30,8 @@ en:
         running_wall_width: Running wall width (m)
         running_wall_height: Running wall height (m)
         running_wall: Running wall dimensions meets requirements
+      legacy_fields:
+        pull_strength: Harness pull strength test to 1200N
       status:
         checks_passed: Fields completed
         completion: Assessment Completion

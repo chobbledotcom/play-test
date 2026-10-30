@@ -264,7 +264,25 @@ class PdfGeneratorService
           I18n.t("pdf.inspection.fields.issued_date"),
           issued_date
         ]
+      ] + inspection_configuration_rows(inspection)
+    end
+
+    def self.inspection_configuration_rows(inspection)
+      fields = inspection.form_schema(user: nil).attribute_names.select do |field|
+        field.to_s.start_with?("has_", "is_") ||
+          %i[indoor_only inspection_location].include?(field)
+      end
+      inspection_type = inspection.inspection_type
+      type_row = [
+        ChobbleForms::FieldUtils.form_field_label(:units, :unit_type),
+        I18n.t!("units.unit_types.#{inspection_type}"), "", ""
       ]
+      [type_row] + fields.map do |field|
+        value = inspection.public_send(field)
+        value = I18n.t(value ? "shared.yes" : "shared.no") if
+          [true, false].include?(value)
+        [inspection.field_label(:inspection, field), value.to_s, "", ""]
+      end
     end
 
     def self.build_dimensions_text(inspection)

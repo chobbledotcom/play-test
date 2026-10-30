@@ -19,7 +19,7 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
 
     # After setting has_slide, slide tab should appear
     verify_correct_tabs_visible(inspection, with_slide: true)
-    fill_all_play_zone_assessments(inspection, with_slide: true)
+    fill_all_play_zone_assessments(inspection)
     complete_inspection(inspection)
     verify_inspection_complete(inspection)
   end
@@ -30,7 +30,22 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
 
     fill_inspection_tab(inspection, has_slide: false)
     verify_correct_tabs_visible(inspection, with_slide: false)
-    fill_all_play_zone_assessments(inspection, with_slide: false)
+    fill_all_play_zone_assessments(inspection)
+    complete_inspection(inspection)
+    verify_inspection_complete(inspection)
+  end
+
+  scenario "complete enclosed play zone inspection" do
+    unit = create_play_zone_unit
+    inspection = create_inspection_for_unit(unit)
+    fill_inspection_tab(inspection, has_slide: false)
+    visit edit_inspection_path(inspection)
+    check_form_radio(:inspection, :is_totally_enclosed)
+    click_submit_button
+
+    verify_correct_tabs_visible(inspection,
+      with_slide: false, with_enclosure: true)
+    fill_all_play_zone_assessments(inspection)
     complete_inspection(inspection)
     verify_inspection_complete(inspection)
   end
@@ -58,7 +73,7 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
     unit = create(:unit, user: user, unit_type: :play_zone)
     inspection = create(
       :inspection, user: user, unit: unit,
-      has_slide: nil
+      has_slide: false, is_totally_enclosed: false
     )
 
     visit edit_inspection_path(inspection)
@@ -68,19 +83,22 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
     expect_assessment_tab("materials")
     expect_assessment_tab("fan")
     expect_assessment_tab("play_zone")
+    expect_assessment_tab("anchorage")
 
     # Slide tab not shown until has_slide is set
     expect_no_assessment_tab("slide")
 
     %w[enclosed pat ball_pool catch_bed
-      inflatable_game anchorage bungee].each do |tab|
+      inflatable_game bungee bouncing_pillow].each do |tab|
       expect_no_assessment_tab(tab)
     end
   end
 
   scenario "play zone form renders all i18n fields" do
-    unit = create(:unit, user: user, unit_type: :play_zone)
-    inspection = create(:inspection, user: user, unit: unit)
+    unit = create(:unit, user: user, unit_type: :play_zone,
+      has_ball_pool: true, has_air_jugglers: true, has_slide: true)
+    inspection = create(:inspection, user: user, unit: unit,
+      has_ball_pool: true, has_air_jugglers: true, has_slide: true)
 
     visit edit_inspection_path(inspection, tab: "play_zone")
 
@@ -101,6 +119,10 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
 
     select I18n.t("units.unit_types.play_zone"),
       from: I18n.t("forms.units.fields.unit_type")
+    click_button I18n.t("forms.units.buttons.apply_type")
+    check_form_radio(:units, :has_ball_pool)
+    check_form_radio(:units, :has_air_jugglers)
+    uncheck_form_radio(:units, :is_totally_enclosed)
 
     submit_form :units
     expect_units_message("created")
@@ -111,13 +133,13 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
   def create_inspection_for_unit(unit)
     inspection = create(
       :inspection, user: user, unit: unit,
-      has_slide: nil
+      has_slide: false, is_totally_enclosed: false
     )
     expect(inspection.inspection_type).to eq("play_zone")
     inspection
   end
 
-  def verify_correct_tabs_visible(inspection, with_slide:)
+  def verify_correct_tabs_visible(inspection, with_slide:, with_enclosure: false)
     visit edit_inspection_path(inspection)
 
     expect_assessment_tab("structure")
@@ -125,6 +147,7 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
     expect_assessment_tab("materials")
     expect_assessment_tab("fan")
     expect_assessment_tab("play_zone")
+    expect_assessment_tab("anchorage")
 
     if with_slide
       expect_assessment_tab("slide")
@@ -132,8 +155,13 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
       expect_no_assessment_tab("slide")
     end
 
-    %w[enclosed pat ball_pool catch_bed
-      inflatable_game anchorage bungee].each do |tab|
+    if with_enclosure
+      expect_assessment_tab("enclosed")
+    else
+      expect_no_assessment_tab("enclosed")
+    end
+    %w[pat ball_pool catch_bed
+      inflatable_game bungee bouncing_pillow].each do |tab|
       expect_no_assessment_tab(tab)
     end
   end
@@ -152,22 +180,12 @@ RSpec.feature "Play Zone Inspection Workflow", type: :feature do
     click_submit_button
   end
 
-  def fill_all_play_zone_assessments(inspection, with_slide:)
-    tabs = {
-      "structure" => SeedData.structure_fields(passed: true),
-      "user_height" =>
-        SeedData.user_height_fields(passed: true),
-      "materials" => SeedData.materials_fields(passed: true),
-      "fan" => SeedData.fan_fields(passed: true),
-      "play_zone" =>
-        SeedData.play_zone_fields(passed: true)
-    }
-
-    if with_slide
-      tabs["slide"] = SeedData.slide_fields(passed: true)
-    end
-
-    tabs.each do |tab, fields|
+  def fill_all_play_zone_assessments(inspection)
+    inspection.reload.applicable_assessments.each_key do |assessment_name|
+      tab = assessment_name.to_s.delete_suffix("_assessment")
+      assessment = inspection.public_send(assessment_name)
+      fields = attributes_for(assessment_name, :complete)
+        .slice(*assessment.form_schema.attribute_names)
       fill_assessment(inspection, tab, fields)
     end
 

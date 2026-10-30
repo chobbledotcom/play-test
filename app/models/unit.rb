@@ -63,6 +63,9 @@ class Unit < ApplicationRecord
   has_one_attached :cached_pdf
   validate :photo_must_be_image
 
+  before_validation :prepare_configuration
+  validate :configuration_is_applicable
+
   # Callbacks
   before_validation :normalize_id, on: :create,
     if: -> { Rails.configuration.units.badges_enabled }
@@ -108,6 +111,32 @@ class Unit < ApplicationRecord
       .having("MAX(inspections.complete_date) + INTERVAL #{EN14960::Constants::REINSPECTION_INTERVAL_DAYS} DAY <= CURRENT_DATE")
   }
 
+
+  sig { returns(String) }
+  def self.default_unit_type
+    Rails.configuration.units.available_unit_types.fetch(0)
+  end
+
+  sig { returns(T::Array[Symbol]) }
+  def configuration_fields
+    InspectionChecklist.component_fields(unit_type)
+  end
+
+  sig { returns(T::Hash[Symbol, T.nilable(T::Boolean)]) }
+  def configuration_snapshot
+    defaults = InspectionChecklist.configuration_defaults(unit_type)
+    allowed = configuration_fields
+    defaults.to_h do |field, default|
+      [field, allowed.include?(field) ? self[field] : default]
+    end
+  end
+
+  sig { returns(Unit) }
+  def prepare_configuration!
+    InspectionChecklist.normalise_type_change(self, unit_type)
+    initialise_configuration if new_record?
+    self
+  end
   # Instance methods
 
   sig { returns(T.nilable(Inspection)) }
@@ -197,6 +226,24 @@ class Unit < ApplicationRecord
   end
 
   private
+
+  sig { void }
+  def initialise_configuration
+    InspectionChecklist.initialise_configuration(self, unit_type)
+  end
+
+  sig { void }
+  def prepare_configuration
+    prepare_configuration! if persisted? && will_save_change_to_unit_type?
+    initialise_configuration if new_record?
+    self.has_blower = true if has_blower.nil? &&
+      InspectionChecklist.constant_air?(unit_type)
+  end
+
+  sig { void }
+  def configuration_is_applicable
+    InspectionChecklist.validate_configuration(self, unit_type)
+  end
 
   sig { void }
   def photo_must_be_image

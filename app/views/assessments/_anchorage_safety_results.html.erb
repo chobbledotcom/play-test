@@ -2,7 +2,7 @@
 <%# Locals: assessment (AnchorageAssessment instance) %>
 <%= render 'shared/safety_info_box',
   content: -> do %>
-  <% if assessment.required_anchors > 0 %>
+  <% if assessment.required_anchors&.positive? %>
     <%# Build the anchorage details in the expected format %>
     <% anchor_details = {
          text: "#{t('safety_standards.anchor_requirements.required')} #{assessment.required_anchors}",

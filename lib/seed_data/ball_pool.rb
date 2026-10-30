@@ -5,17 +5,21 @@ module SeedData
   module BallPool
     def self.fields(passed: true)
       {
-        age_range_marking_pass: Shared.check_passed?(passed),
-        max_height_markings_pass: Shared.check_passed?(passed),
-        suitable_matting_pass: Shared.check_passed?(passed),
-        air_jugglers_compliant_pass: Shared.check_passed?(passed),
-        balls_compliant_pass: Shared.check_passed?(passed),
-        gaps_pass: Shared.check_passed?(passed),
-        fitted_base_pass: Shared.check_passed?(passed),
+        maximum_users: 4,
+        max_height_markings: 1,
+        minimum_age: 1,
+        maximum_age: 3,
+        age_range_marking_pass: Shared.outcome(passed),
+        max_height_markings_pass: Shared.outcome(passed),
+        suitable_matting_pass: Shared.outcome(passed),
+        air_jugglers_compliant_pass: Shared.outcome(passed),
+        balls_compliant_pass: Shared.outcome(passed),
+        gaps_pass: Shared.outcome(passed),
+        fitted_base_pass: Shared.outcome(passed),
         ball_pool_depth: rand(300..450),
-        ball_pool_depth_pass: Shared.check_passed?(passed),
+        ball_pool_depth_pass: Shared.outcome(passed),
         ball_pool_entry: rand(500..630),
-        ball_pool_entry_pass: Shared.check_passed?(passed)
+        ball_pool_entry_pass: Shared.outcome(passed)
       }.merge(comments(passed))
     end
 

@@ -66,8 +66,9 @@ class UnitsController < ApplicationController
     end
   end
 
+  sig { void }
   def new
-    @unit = Unit.new
+    @unit = Unit.new(unit_type: Unit.default_unit_type).prepare_configuration!
 
     if @validated_badge_id.present?
       @unit.id = @validated_badge_id
@@ -75,9 +76,12 @@ class UnitsController < ApplicationController
     end
   end
 
+  sig { void }
   def create
     @unit = current_user.units.build(unit_params)
     @prefilled_badge = @validated_badge_id.present?
+
+    return if render_configuration_preview(:new)
 
     if @image_processing_error
       flash.now[:alert] = @image_processing_error.message
@@ -95,11 +99,15 @@ class UnitsController < ApplicationController
 
   def edit = nil
 
+  sig { void }
   def update
     return handle_image_processing_error if @image_processing_error
 
     previous_attributes = @unit.attributes.dup
-    if @unit.update(unit_params)
+    @unit.assign_attributes(unit_params)
+    return if render_configuration_preview(:edit)
+
+    if @unit.save
       log_unit_changes(previous_attributes)
       handle_save_success(@unit, :updated,
         additional_streams: photo_turbo_streams)
@@ -125,6 +133,7 @@ class UnitsController < ApplicationController
     @title = I18n.t("units.titles.log", unit: @unit.name)
   end
 
+  sig { void }
   def new_from_inspection
     @inspection = current_user.inspections.find_by(id: params[:id])
 
@@ -138,10 +147,19 @@ class UnitsController < ApplicationController
       redirect_to inspection_path(@inspection) and return
     end
 
-    @unit = Unit.new(user: current_user)
+    @unit = Unit.new(user: current_user, unit_type: Unit.default_unit_type)
+      .prepare_configuration!
   end
 
+  sig { void }
   def create_from_inspection
+    if params[:intent] == "configure"
+      @inspection = current_user.inspections.find(params[:id])
+      @unit = current_user.units.build(unit_params)
+      render_configuration_preview(:new_from_inspection)
+      return
+    end
+
     service = build_unit_creation_service
     if service.create
       handle_unit_creation_success(service)
@@ -153,6 +171,15 @@ class UnitsController < ApplicationController
   end
 
   private
+
+  sig { params(template: Symbol).returns(T::Boolean) }
+  def render_configuration_preview(template)
+    return false unless params[:intent] == "configure"
+
+    @unit.prepare_configuration!
+    render template
+    true
+  end
 
   def validate_badge_id_param
     return unless Rails.configuration.units.badges_enabled
@@ -172,9 +199,14 @@ class UnitsController < ApplicationController
       details: details, changed_data: changed_data)
   end
 
+  sig { returns(ActionController::Parameters) }
   def unit_params
     permitted_fields = build_unit_permitted_fields
     permitted_params = params.require(:unit).permit(*permitted_fields)
+    if %w[create create_from_inspection].include?(action_name) &&
+        !permitted_params.key?(:unit_type)
+      permitted_params[:unit_type] = Unit.default_unit_type
+    end
     process_image_params(permitted_params, :photo)
   end
 
@@ -368,6 +400,7 @@ class UnitsController < ApplicationController
     redirect_to Unit.find(normalized_id)
   end
 
+  sig { returns(T::Array[Symbol]) }
   def build_unit_permitted_fields
     fields = %i[
       description
@@ -379,6 +412,7 @@ class UnitsController < ApplicationController
       serial
       unit_type
     ]
+    fields += InspectionChecklist::COMPONENT_FIELDS
     fields << :id if allow_badge_id_in_params?
     fields
   end

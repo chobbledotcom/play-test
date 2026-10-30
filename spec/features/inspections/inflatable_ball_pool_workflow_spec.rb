@@ -51,18 +51,20 @@ RSpec.feature "Inflatable Ball Pool Inspection Workflow", type: :feature do
     expect_assessment_tab("materials")
     expect_assessment_tab("fan")
     expect_assessment_tab("ball_pool")
+    expect_assessment_tab("anchorage")
 
     # Should NOT have bouncy castle specific tabs
     expect_no_assessment_tab("user_height")
     expect_no_assessment_tab("slide")
-    expect_no_assessment_tab("anchorage")
     expect_no_assessment_tab("enclosed")
     expect_no_assessment_tab("pat")
   end
 
   scenario "ball pool inspection form renders all i18n sections and fields" do
-    unit = create(:unit, user: user, unit_type: :inflatable_ball_pool)
-    inspection = create(:inspection, user: user, unit: unit)
+    unit = create(:unit, user: user, unit_type: :inflatable_ball_pool,
+      has_air_jugglers: true)
+    inspection = create(:inspection, user: user, unit: unit,
+      has_air_jugglers: true)
 
     visit edit_inspection_path(inspection, tab: "ball_pool")
 
@@ -102,8 +104,9 @@ RSpec.feature "Inflatable Ball Pool Inspection Workflow", type: :feature do
     expect_assessment_tab("materials")
     expect_assessment_tab("fan")
     expect_assessment_tab("ball_pool")
+    expect_assessment_tab("anchorage")
 
-    %w[anchorage enclosed pat slide user_height].each do |tab|
+    %w[enclosed pat slide user_height bouncing_pillow].each do |tab|
       expect_no_assessment_tab(tab)
     end
   end
@@ -122,17 +125,13 @@ RSpec.feature "Inflatable Ball Pool Inspection Workflow", type: :feature do
   end
 
   def fill_all_ball_pool_assessments(inspection)
-    # Fill shared assessments
-    fill_assessment(inspection, "structure",
-      SeedData.structure_fields(passed: true))
-    fill_assessment(inspection, "materials",
-      SeedData.materials_fields(passed: true))
-    fill_assessment(inspection, "fan",
-      SeedData.fan_fields(passed: true))
-
-    # Fill ball pool specific assessment
-    fill_assessment(inspection, "ball_pool",
-      SeedData.ball_pool_fields(passed: true))
+    inspection.reload.applicable_assessments.each_key do |assessment_name|
+      tab = assessment_name.to_s.delete_suffix("_assessment")
+      assessment = inspection.public_send(assessment_name)
+      fields = attributes_for(assessment_name, :complete)
+        .slice(*assessment.form_schema.attribute_names)
+      fill_assessment(inspection, tab, fields)
+    end
 
     # Fill results tab
     visit edit_inspection_path(inspection, tab: "results")

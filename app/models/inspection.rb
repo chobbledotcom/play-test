@@ -67,7 +67,8 @@ class Inspection < ApplicationRecord
       fan_assessment: Assessments::FanAssessment
     },
     bouncing_pillow: {
-      fan_assessment: Assessments::FanAssessment
+      fan_assessment: Assessments::FanAssessment,
+      bouncing_pillow_assessment: Assessments::BouncingPillowAssessment
     },
     pat_testable: {
       pat_assessment: Assessments::PatAssessment
@@ -76,12 +77,16 @@ class Inspection < ApplicationRecord
       structure_assessment: Assessments::StructureAssessment,
       materials_assessment: Assessments::MaterialsAssessment,
       fan_assessment: Assessments::FanAssessment,
+      anchorage_assessment: Assessments::AnchorageAssessment,
       ball_pool_assessment: Assessments::BallPoolAssessment
     },
     inflatable_game: {
       structure_assessment: Assessments::StructureAssessment,
       materials_assessment: Assessments::MaterialsAssessment,
       fan_assessment: Assessments::FanAssessment,
+      anchorage_assessment: Assessments::AnchorageAssessment,
+      slide_assessment: Assessments::SlideAssessment,
+      enclosed_assessment: Assessments::EnclosedAssessment,
       inflatable_game_assessment: Assessments::InflatableGameAssessment
     },
     catch_bed: {
@@ -102,6 +107,8 @@ class Inspection < ApplicationRecord
       structure_assessment: Assessments::StructureAssessment,
       materials_assessment: Assessments::MaterialsAssessment,
       fan_assessment: Assessments::FanAssessment,
+      anchorage_assessment: Assessments::AnchorageAssessment,
+      enclosed_assessment: Assessments::EnclosedAssessment,
       user_height_assessment: Assessments::UserHeightAssessment,
       slide_assessment: Assessments::SlideAssessment,
       play_zone_assessment: Assessments::PlayZoneAssessment
@@ -111,12 +118,10 @@ class Inspection < ApplicationRecord
   ALL_ASSESSMENT_TYPES =
     UNIT_TYPE_ASSESSMENT_TYPES.values.reduce(:merge).freeze
 
-  USER_EDITABLE_PARAMS = %i[
-    has_slide
+  USER_EDITABLE_PARAMS = (%i[
     height
-    indoor_only
     inspection_date
-    is_totally_enclosed
+    inspection_location
     length
     operator
     passed
@@ -126,27 +131,7 @@ class Inspection < ApplicationRecord
     risk_assessment
     unit_id
     width
-  ].freeze
-
-  REQUIRED_TO_COMPLETE_FIELDS =
-    USER_EDITABLE_PARAMS - %i[
-      risk_assessment
-    ]
-
-  DIMENSION_FIELDS = %i[height length width].freeze
-  CASTLE_FLAG_FIELDS = %i[has_slide indoor_only is_totally_enclosed].freeze
-
-  # Fields required on the inspection tab per type (excluding passed/unit_id)
-  INSPECTION_TAB_FIELDS = {
-    bouncy_castle: %i[inspection_date] + DIMENSION_FIELDS + CASTLE_FLAG_FIELDS,
-    bouncing_pillow: %i[inspection_date] + DIMENSION_FIELDS,
-    inflatable_ball_pool: %i[inspection_date] + DIMENSION_FIELDS,
-    bungee_run: %i[inspection_date] + DIMENSION_FIELDS,
-    catch_bed: %i[inspection_date] + DIMENSION_FIELDS,
-    inflatable_game: %i[inspection_date] + DIMENSION_FIELDS,
-    pat_testable: %i[inspection_date],
-    play_zone: %i[inspection_date has_slide] + DIMENSION_FIELDS
-  }.freeze
+  ] + InspectionChecklist::COMPONENT_FIELDS).freeze
 
   belongs_to :user
   belongs_to :unit, optional: true
@@ -159,34 +144,33 @@ class Inspection < ApplicationRecord
   validate :photos_must_be_images
 
   before_validation :set_inspector_company_from_user, on: :create
-  before_validation :set_inspection_type_from_unit, on: :create
+  before_validation :initialise_current_checklist, on: :create
+  before_validation :synchronise_changed_unit, on: :update
+  validate :configuration_is_applicable, if: :current_checklist?
 
   after_update :invalidate_pdf_cache
   after_save :invalidate_unit_pdf_cache
+  after_save :prune_inapplicable_answers, if: :checklist_configuration_changed?
 
   ALL_ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
     has_one assessment_name,
       class_name: assessment_class.name,
+      inverse_of: :inspection,
       dependent: :destroy
   end
 
   # Accept nested attributes for all assessments
   accepts_nested_attributes_for(*ALL_ASSESSMENT_TYPES.keys)
 
-  # Override assessment getters to auto-create if missing
-  ALL_ASSESSMENT_TYPES.each do |assessment_name, assessment_class|
-    # Auto-create version
+  # Reading an inspection must not create assessment records or upgrade
+  # history.
+  ALL_ASSESSMENT_TYPES.each_key do |assessment_name|
     define_method(assessment_name) do
-      super() || assessment_class.find_or_create_by!(inspection: self)
+      super() || public_send("build_#{assessment_name}")
     end
 
-    # Non-creating version for safe navigation
     define_method("#{assessment_name}?") do
-      if association(assessment_name).loaded?
-        send(assessment_name)
-      else
-        assessment_class.find_by(inspection: self)
-      end
+      association(assessment_name).reader
     end
   end
 
@@ -268,50 +252,34 @@ class Inspection < ApplicationRecord
 
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def assessment_types
-    UNIT_TYPE_ASSESSMENT_TYPES.fetch(
-      inspection_type.to_sym, UNIT_TYPE_ASSESSMENT_TYPES[:bouncy_castle]
-    )
+    UNIT_TYPE_ASSESSMENT_TYPES.fetch(inspection_type.to_sym)
   end
 
-  # Only bouncy_castle has conditional assessments (slide, enclosed,
-  # anchorage). All other types include all their assessments.
+  sig { returns(InspectionChecklist) }
+  def checklist
+    @checklist ||= InspectionChecklist.new(self)
+  end
+
+  sig { returns(T::Boolean) }
+  def current_checklist?
+    checklist_revision == InspectionChecklist::CURRENT_REVISION
+  end
+
   sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
   def applicable_assessments
-    return castle_applicable_assessments if bouncy_castle?
-    return play_zone_applicable_assessments if play_zone?
-
-    assessment_types
+    assessment_types.slice(*checklist.assessment_names)
   end
 
-  private
-
-  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
-  def castle_applicable_assessments
-    UNIT_TYPE_ASSESSMENT_TYPES[:bouncy_castle].select do |assessment_key, _|
-      case assessment_key
-      when :slide_assessment
-        has_slide?
-      when :enclosed_assessment
-        is_totally_enclosed?
-      when :anchorage_assessment
-        !indoor_only?
-      else
-        true
-      end
-    end
+  sig { returns(Inspection) }
+  def prepare_for_edit!
+    legacy = !current_checklist?
+    synchronise_unit_configuration if unit &&
+      inspection_type != unit.unit_type
+    self.checklist_revision = InspectionChecklist::CURRENT_REVISION
+    initialise_snapshot_fields
+    InspectionChecklist.normalise_type_change(self, inspection_type) if legacy
+    self
   end
-
-  sig { returns(T::Hash[Symbol, T.class_of(ApplicationRecord)]) }
-  def play_zone_applicable_assessments
-    UNIT_TYPE_ASSESSMENT_TYPES[:play_zone].select do |assessment_key, _|
-      case assessment_key
-      when :slide_assessment then has_slide?
-      else true
-      end
-    end
-  end
-
-  public
 
   # Iterate over only applicable assessments with a block
   sig { params(block: T.proc.params(assessment_key: Symbol, assessment_class: T.class_of(ApplicationRecord), assessment: ApplicationRecord).void).void }
@@ -337,7 +305,7 @@ class Inspection < ApplicationRecord
     applicable = applicable_assessments.keys.map { |k| k.to_s.chomp("_assessment") }
 
     # Add tabs in the correct UI order
-    ordered_tabs = %w[user_height slide structure anchorage materials fan enclosed pat ball_pool bungee catch_bed inflatable_game play_zone]
+    ordered_tabs = %w[user_height slide structure anchorage materials bouncing_pillow fan enclosed pat ball_pool bungee catch_bed inflatable_game play_zone]
     ordered_tabs.each do |tab|
       tabs << tab if applicable.include?(tab)
     end
@@ -365,6 +333,11 @@ class Inspection < ApplicationRecord
     ).returns(String)
   }
   def field_label(form, field)
+    if !current_checklist? && form.to_s == "bungee" &&
+        ChobbleForms::FieldUtils.strip_field_suffix(field) == :pull_strength
+      return I18n.t("forms.bungee.legacy_fields.pull_strength")
+    end
+
     key = "forms.#{form}.fields.#{field}"
     label = I18n.t(key, default: nil)
     if label.nil?
@@ -387,12 +360,78 @@ class Inspection < ApplicationRecord
   end
 
   sig { void }
-  def set_inspection_type_from_unit
-    return unless unit
-    return unless new_record?
+  def initialise_current_checklist
+    self.checklist_revision = InspectionChecklist::CURRENT_REVISION
+    self.inspection_type = unit.unit_type if unit
+    initialise_snapshot_fields
+  end
 
-    # Set inspection type to match unit type
+  sig { void }
+  def initialise_snapshot_fields
+    defaults = if unit
+      unit.configuration_snapshot
+    else
+      InspectionChecklist.configuration_defaults(inspection_type)
+    end
+    defaults.each { |field, value| self[field] = value if self[field].nil? }
+  end
+
+  sig { void }
+  def synchronise_changed_unit
+    return unless will_save_change_to_unit_id?
+
+    self.checklist_revision = InspectionChecklist::CURRENT_REVISION
+    synchronise_unit_configuration if unit
+  end
+
+  sig { void }
+  def synchronise_unit_configuration
     self.inspection_type = unit.unit_type
+    assign_attributes(unit.configuration_snapshot)
+  end
+
+  sig { void }
+  def configuration_is_applicable
+    InspectionChecklist.validate_configuration(self, inspection_type)
+  end
+
+  sig { returns(T::Boolean) }
+  def checklist_configuration_changed?
+    return false if previously_new_record? || !current_checklist?
+
+    fields = InspectionChecklist::COMPONENT_FIELDS +
+      %i[checklist_revision inspection_type unit_id]
+    fields.any? { |field| saved_change_to_attribute?(field) }
+  end
+
+  sig { void }
+  def prune_inapplicable_answers
+    configuration = InspectionChecklist.component_fields(inspection_type)
+    return if configuration.any? { |field| self[field].nil? }
+
+    applicable = applicable_assessments.keys
+    ALL_ASSESSMENT_TYPES.each_key do |key|
+      assessment = public_send("#{key}?")
+      next unless assessment
+
+      if applicable.include?(key)
+        prune_hidden_fields(assessment)
+      elsif assessment.persisted?
+        assessment.destroy!
+      else
+        association(key).reset
+      end
+    end
+  end
+
+  sig { params(assessment: ApplicationRecord).void }
+  def prune_hidden_fields(assessment)
+    schema = assessment.class.assessment_schema
+    hidden = schema.attribute_names - assessment.form_schema.attribute_names
+    hidden &= assessment.class.column_name_syms
+    values = hidden.to_h { |field| [field, nil] }
+    assessment.assign_attributes(values)
+    assessment.save! if assessment.changed?
   end
 
   sig { returns(T::Boolean) }

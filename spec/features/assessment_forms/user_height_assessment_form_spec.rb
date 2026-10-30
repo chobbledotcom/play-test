@@ -37,6 +37,7 @@ RSpec.feature "User Height Assessment", type: :feature do
     end
 
     it "saves the assessment data when submitting the form" do
+      fill_in_form :user_height, :maximum_user_height, "1.8"
       fill_in_form :user_height, :containing_wall_height, "2.5"
 
       fill_in_form :user_height, :users_at_1000mm, "5"
@@ -56,6 +57,7 @@ RSpec.feature "User Height Assessment", type: :feature do
       inspection.reload
       assessment = inspection.user_height_assessment
       expect(assessment).to be_present
+      expect(assessment.maximum_user_height).to eq(1.8)
       expect(assessment.containing_wall_height).to eq(2.5)
       expect(assessment.users_at_1000mm).to eq(5)
       expect(assessment.users_at_1200mm).to eq(4)

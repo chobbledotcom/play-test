@@ -6,7 +6,10 @@
     <% if inspection.anchorage_assessment? %>
       <section class="standards-section">
         <h4><%= t('inspections.safety_standards.anchor_requirements') %></h4>
-        <% if inspection.area.present? %>
+        <% if inspection.anchorage_assessment.current_bungee? %>
+          <%= render 'assessments/measurement_guidance',
+            assessment: inspection.anchorage_assessment %>
+        <% elsif inspection.area.present? %>
           <p><%= t('inspections.safety_standards.anchor_calculation',
                    required: inspection.anchorage_assessment.required_anchors,
                    area: inspection.area) %></p>

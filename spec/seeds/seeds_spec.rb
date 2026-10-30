@@ -279,12 +279,12 @@ RSpec.describe "Seed Data", type: :model do
             expect(assessment.inspection).to be_present
             expect(assessment.num_low_anchors).to be_present
             expect(assessment.num_high_anchors).to be_present
-            expect([true, false]).to include(assessment.num_low_anchors_pass)
-            expect([true, false]).to include(assessment.num_high_anchors_pass)
-            expect([true, false]).to include(assessment.anchor_accessories_pass)
-            expect([true, false]).to include(assessment.anchor_degree_pass)
-            expect([true, false]).to include(assessment.anchor_type_pass)
-            expect([true, false]).to include(assessment.pull_strength_pass)
+            expect(%w[pass fail na]).to include(assessment.num_low_anchors_pass)
+            expect(%w[pass fail na]).to include(assessment.num_high_anchors_pass)
+            expect(%w[pass fail na]).to include(assessment.anchor_accessories_pass)
+            expect(%w[pass fail na]).to include(assessment.anchor_degree_pass)
+            expect(%w[pass fail na]).to include(assessment.anchor_type_pass)
+            expect(%w[pass fail na]).to include(assessment.pull_strength_pass)
           end
         end
 
@@ -300,11 +300,11 @@ RSpec.describe "Seed Data", type: :model do
         it "creates assessments with all required safety checks" do
           Assessments::StructureAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
-            expect([true, false]).to include(assessment.seam_integrity_pass)
-            expect([true, false]).to include(assessment.air_loss_pass)
-            expect([true, false]).to include(assessment.straight_walls_pass)
-            expect([true, false]).to include(assessment.sharp_edges_pass)
-            expect([true, false]).to include(assessment.unit_stable_pass)
+            expect(%w[pass fail na]).to include(assessment.seam_integrity_pass)
+            expect(%w[pass fail na]).to include(assessment.air_loss_pass)
+            expect(%w[pass fail na]).to include(assessment.straight_walls_pass)
+            expect(%w[pass fail na]).to include(assessment.sharp_edges_pass)
+            expect(%w[pass fail na]).to include(assessment.unit_stable_pass)
           end
         end
 
@@ -335,9 +335,9 @@ RSpec.describe "Seed Data", type: :model do
             expect(assessment.inspection).to be_present
             expect(assessment.ropes).to be_present
             expect(["pass", "fail", "na"]).to include(assessment.ropes_pass)
-            expect([true, false]).to include(assessment.fabric_strength_pass)
-            expect([true, false]).to include(assessment.fire_retardant_pass)
-            expect([true, false]).to include(assessment.thread_pass)
+            expect(%w[pass fail na]).to include(assessment.fabric_strength_pass)
+            expect(%w[pass fail na]).to include(assessment.fire_retardant_pass)
+            expect(%w[pass fail na]).to include(assessment.thread_pass)
           end
         end
 
@@ -353,8 +353,8 @@ RSpec.describe "Seed Data", type: :model do
           Assessments::FanAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.inspection).to be_present
             expect(["pass", "fail", "na"]).to include(assessment.blower_flap_pass)
-            expect([true, false]).to include(assessment.blower_finger_pass)
-            expect([true, false]).to include(assessment.blower_visual_pass)
+            expect(%w[pass fail na]).to include(assessment.blower_finger_pass)
+            expect(%w[pass fail na]).to include(assessment.blower_visual_pass)
             expect(["pass", "fail", "na"]).to include(assessment.pat_pass)
             expect(assessment.blower_serial).to be_present
           end
@@ -364,7 +364,7 @@ RSpec.describe "Seed Data", type: :model do
           Assessments::FanAssessment.joins(:inspection).where.not(inspections: {complete_date: nil}).find_each do |assessment|
             expect(assessment.blower_tube_length).to be_present
             expect(assessment.blower_tube_length).to be_between(1.0, 10.0)
-            expect([true, false]).to include(assessment.blower_tube_length_pass)
+            expect(%w[pass fail na]).to include(assessment.blower_tube_length_pass)
           end
         end
       end
@@ -456,8 +456,8 @@ RSpec.describe "Seed Data", type: :model do
         it "creates assessments with required safety checks" do
           slide_assessments.each do |assessment|
             expect(["pass", "fail", "na"]).to include(assessment.clamber_netting_pass)
-            expect([true, false]).to include(assessment.runout_pass)
-            expect([true, false]).to include(assessment.slip_sheet_pass)
+            expect(%w[pass fail na]).to include(assessment.runout_pass)
+            expect(%w[pass fail na]).to include(assessment.slip_sheet_pass)
           end
         end
       end
@@ -483,8 +483,8 @@ RSpec.describe "Seed Data", type: :model do
           enclosed_assessments.each do |assessment|
             expect(assessment.inspection).to be_present
             expect(assessment.exit_number).to be_present
-            expect([true, false]).to include(assessment.exit_number_pass)
-            expect([true, false]).to include(assessment.exit_sign_always_visible_pass)
+            expect(%w[pass fail na]).to include(assessment.exit_number_pass)
+            expect(%w[pass fail na]).to include(assessment.exit_sign_always_visible_pass)
           end
         end
 

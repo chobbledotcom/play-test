@@ -54,9 +54,15 @@ RSpec.describe Inspection, type: :model do
   end
 
   describe "indoor_only field requirement" do
-    it "includes indoor_only in required fields" do
-      required_fields = Inspection::REQUIRED_TO_COMPLETE_FIELDS
-      expect(required_fields).to include(:indoor_only)
+    it "requires an explicit indoor or outdoor answer before completion" do
+      inspection = create(:inspection)
+      inspection.indoor_only = nil
+
+      expect(inspection.inspection_tab_incomplete_fields)
+        .to include(:indoor_only)
+      inspection.indoor_only = false
+      expect(inspection.inspection_tab_incomplete_fields)
+        .not_to include(:indoor_only)
     end
 
     it "is included in USER_EDITABLE_PARAMS" do

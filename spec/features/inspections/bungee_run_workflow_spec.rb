@@ -125,13 +125,11 @@ RSpec.feature "Bungee Run Inspection Workflow", type: :feature do
   end
 
   def fill_all_bungee_assessments(inspection)
-    {
-      "structure" => SeedData.structure_fields(passed: true),
-      "anchorage" => SeedData.anchorage_fields(passed: true),
-      "materials" => SeedData.materials_fields(passed: true),
-      "fan" => SeedData.fan_fields(passed: true),
-      "bungee" => SeedData.bungee_fields(passed: true)
-    }.each do |tab, fields|
+    inspection.reload.applicable_assessments.each_key do |assessment_name|
+      tab = assessment_name.to_s.delete_suffix("_assessment")
+      assessment = inspection.public_send(assessment_name)
+      fields = attributes_for(assessment_name, :complete)
+        .slice(*assessment.form_schema.attribute_names)
       fill_assessment(inspection, tab, fields)
     end
 

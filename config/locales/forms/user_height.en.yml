@@ -10,6 +10,7 @@ en:
         tallest_user_capacity: User Capacity (Maximum)
         play_area: Play Area
       fields:
+        maximum_user_height: Maximum permitted user height (m)
         containing_wall_height: Main Wall Height (m)
         users_at_1000mm: Users at 1m
         users_at_1200mm: Users at 1.2m
@@ -40,6 +41,8 @@ en:
         header:
           one: '1 error prevented this assessment from being saved:'
           other: '%{count} errors prevented this assessment from being saved:'
+        missing_measurements: Enter both the unit and play-area length and width
+          to calculate guidance.
         containing_wall_height_negative: Containing wall height must be greater than
           or equal to 0
         users_at_1000mm_negative: Users at 1m must be greater than or equal to 0

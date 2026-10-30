@@ -9,6 +9,9 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
   let(:builder) { described_class.new("mock_form", assessment) }
 
   define_method(:mock_form_translations) do
+    allow(inspection).to receive(:field_label) do |form, field|
+      I18n.t!("forms.#{form}.fields.#{field}")
+    end
     allow(I18n).to receive(:t).and_call_original
     allow(I18n).to receive(:t).with("forms.mock_form.header")
       .and_return("Mock Form Header")
@@ -89,6 +92,9 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
     before do
       # Mock I18n responses
       allow(I18n).to receive(:t!).and_call_original
+      allow(inspection).to receive(:field_label) do |form, field|
+        I18n.t!("forms.#{form}.fields.#{field}")
+      end
     end
 
     it "prioritizes base field label" do
@@ -133,19 +139,17 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
   describe "#determine_pass_value (private method)" do
     it "returns pass field value when pass field exists" do
       fields = {base: :ropes, pass: :ropes_pass}
-      allow(assessment).to receive(:ropes_pass).and_return(true)
+      allow(assessment).to receive(:ropes_pass).and_return("pass")
 
       result = builder.send(:determine_pass_value, fields, :ropes, 5)
-      expect(result).to eq(true)
+      expect(result).to eq("pass")
     end
 
     it "returns value when main field is a pass field" do
       fields = {pass: :thread_pass}
-      # Mock the assessment to return false for thread_pass
-      allow(assessment).to receive(:thread_pass).and_return(false)
-      # When the main field IS the pass field, it returns the value from assessment
-      result = builder.send(:determine_pass_value, fields, :thread_pass, true)
-      expect(result).to eq(false) # Returns assessment value, not passed value
+      allow(assessment).to receive(:thread_pass).and_return("fail")
+      result = builder.send(:determine_pass_value, fields, :thread_pass, "pass")
+      expect(result).to eq("fail")
     end
 
     it "returns nil when no pass field and main field is not pass" do
@@ -194,8 +198,8 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
   describe "edge cases and boundary conditions" do
     it "handles assessment with no fields gracefully" do
       empty_schema = AssessmentSchema.new("mock_form", [])
-      allow(assessment).to receive(:class)
-        .and_return(double(assessment_schema: empty_schema))
+      allow(assessment).to receive(:form_schema).with(user: nil)
+        .and_return(empty_schema)
       mock_form_translations
 
       blocks = described_class.build_from_assessment("mock_form", assessment)
@@ -230,11 +234,11 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       # and other fields that might have "pass" in their name
 
       # Test with known pass field from materials assessment
-      assessment.fabric_strength_pass = true
+      assessment.fabric_strength_pass = "pass"
       fields = {pass: :fabric_strength_pass}
 
       pass_value = builder.send(:determine_pass_value, fields, :fabric_strength_pass, true)
-      expect(pass_value).to eq(true)
+      expect(pass_value).to eq("pass")
 
       # Test field grouping logic for fields with "pass" in the name
       field_keys = [:fabric_strength_pass, :fabric_strength_comment, :thread_pass]
@@ -243,11 +247,11 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
       expect(groups[:fabric_strength][:pass]).to eq(:fabric_strength_pass)
 
       # Test that when main field is the pass field itself, it returns the assessment value
-      assessment.thread_pass = false
+      assessment.thread_pass = "fail"
       fields_with_only_pass = {pass: :thread_pass}
       pass_value = builder.send(:determine_pass_value, fields_with_only_pass, :thread_pass, true)
       # When the main field IS the pass field, it returns the value from assessment
-      expect(pass_value).to eq(false)
+      expect(pass_value).to eq("fail")
 
       # Test that fields without pass suffix return nil for pass_fail
       assessment.ropes = 25
@@ -266,7 +270,7 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
         # Use actual slide assessment fields
         slide_assessment.update!(
           slide_platform_height: 2.5,
-          runout_pass: true,
+          runout_pass: "pass",
           slide_platform_height_comment: "Height is safe"
         )
       end
@@ -302,9 +306,9 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
           ropes: 5,
           ropes_pass: "pass",
           ropes_comment: "Good condition",
-          fabric_strength_pass: false,
+          fabric_strength_pass: "fail",
           fabric_strength_comment: "",
-          thread_pass: true
+          thread_pass: "pass"
         )
       end
 
@@ -321,19 +325,19 @@ RSpec.describe PdfGeneratorService::AssessmentBlockBuilder do
         expect(ropes_block).not_to be_nil
         expect(ropes_block.pass_fail).to eq("pass")
 
-        # Boolean false should remain false - fabric_strength has no base field, only pass field
+        # Outcome-only checks retain their explicit enum answer.
         fabric_block = value_blocks.find do |b|
           b.name&.include?("Fabric")
         end
         expect(fabric_block).not_to be_nil
-        expect(fabric_block.pass_fail).to eq(false)
+        expect(fabric_block.pass_fail).to eq("fail")
 
-        # Boolean true should remain true - thread has no base field, only pass field
+        # Outcome-only checks do not invent a measurement.
         thread_block = value_blocks.find do |b|
           b.name&.include?("Thread")
         end
         expect(thread_block).not_to be_nil
-        expect(thread_block.pass_fail).to eq(true)
+        expect(thread_block.pass_fail).to eq("pass")
       end
     end
   end

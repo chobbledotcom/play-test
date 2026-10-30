@@ -56,15 +56,15 @@ FactoryBot.define do
       number_of_blowers { 1 }
       blower_flap_pass { :pass }
       blower_flap_comment { SeedData::PASS }
-      blower_finger_pass { true }
+      blower_finger_pass { "pass" }
       blower_finger_comment { SeedData::PASS }
       pat_pass { :pass }
       pat_comment { SeedData::PASS }
-      blower_visual_pass { true }
+      blower_visual_pass { "pass" }
       blower_visual_comment { SeedData::PASS }
       blower_serial { "BL123456" }
       blower_tube_length { 2.5 }
-      blower_tube_length_pass { true }
+      blower_tube_length_pass { "pass" }
       blower_tube_length_comment { SeedData::OK }
     end
 
@@ -73,15 +73,15 @@ FactoryBot.define do
       number_of_blowers { 1 }
       blower_flap_pass { :pass }
       blower_flap_comment { SeedData::PASS }
-      blower_finger_pass { true }
+      blower_finger_pass { "pass" }
       blower_finger_comment { SeedData::PASS }
       pat_pass { :pass }
       pat_comment { SeedData::PASS }
-      blower_visual_pass { true }
+      blower_visual_pass { "pass" }
       blower_visual_comment { SeedData::PASS }
       blower_serial { "BL123456" }
       blower_tube_length { 2.5 }
-      blower_tube_length_pass { true }
+      blower_tube_length_pass { "pass" }
       blower_tube_length_comment { SeedData::OK }
     end
 
@@ -89,16 +89,16 @@ FactoryBot.define do
       fan_size_type { SeedData::FAIL }
       number_of_blowers { 2 }
       blower_flap_pass { :fail }
-      blower_finger_pass { false }
+      blower_finger_pass { "fail" }
       pat_pass { :fail }
-      blower_visual_pass { false }
+      blower_visual_pass { "fail" }
       blower_flap_comment { SeedData::FAIL }
       blower_finger_comment { SeedData::FAIL }
       pat_comment { SeedData::FAIL }
       blower_visual_comment { SeedData::WEAR }
       blower_serial { "BL789012" }
       blower_tube_length { 0.5 }
-      blower_tube_length_pass { false }
+      blower_tube_length_pass { "fail" }
       blower_tube_length_comment { SeedData::FAIL }
     end
 

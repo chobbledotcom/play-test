@@ -9,15 +9,18 @@ en:
         safety_checks: Safety Checks
         measurements: Measurements
       fields:
+        maximum_users: Maximum permitted number of users
         game_type: Type of inflatable game
-        max_user_mass: Marking for max user mass
-        age_range_marking: Marking to indicate age range
+        max_user_mass: Maximum permitted user mass and marking, with inflatable bed (kg)
+        age_range_marking: Marking to indicate permitted age range
+        minimum_age: Minimum permitted user age (years)
+        maximum_age: Maximum permitted user age (years)
         constant_air_flow: Inflatable is constant air-flow unit
         design_risk: Design and construction minimises risk
         intended_play_risk: Intended play minimises risk
         ancillary_equipment: Ancillary equipment fit for purpose
         ancillary_equipment_compliant: Ancillary equipment compliant
-        containing_wall_height: Containing wall height (m)
+        containing_wall_height: Containing wall height, when walls exceed 630 mm (m)
       status:
         checks_passed: Fields completed
         completion: Assessment Completion

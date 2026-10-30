@@ -8,12 +8,24 @@ This document maps each field from the bouncing pillow inspection form to either
 
 1. **fan_assessments** - Covers entire Blower section
 
-### New Assessments to Create
+### Assessment implementation
 
-1. **bouncing_pillow_inflatable_assessments** - Inflatable-specific checks
-2. **bouncing_pillow_site_assessments** - Site condition checks
-3. **bouncing_pillow_impact_assessments** - Impact area and safety checks
-4. **bouncing_pillow_fencing_assessments** - Fencing and containment checks
+All 24 check groups below share one `bouncing_pillow_assessments` record and
+one Pillow tab, save action and completion indicator. The four headings are
+fieldsets, not separate tables. Fan remains a separate assessment when present.
+
+Each `_pass` outcome uses integer-backed Pass/Fail/N/A storage (1/0/2);
+unanswered outcomes remain null. Comments are optional. Measurements are
+required for applicable answered checks unless their outcome is N/A.
+
+Fencing fields use the `fencing_` prefix and are omitted when the inspection
+has no fencing. Site identity belongs to `Inspection#inspection_location`;
+site findings remain on this assessment for that inspection.
+
+Measurement units are degrees for average gradient and slope, kPa for internal
+pressure, minutes for deflation/evacuation, metres for clear area and fencing
+distance/height, centimetres for impact attenuation depth, and integer counts
+for maximum permitted users and gateways. Example values below are not defaults.
 
 ---
 
@@ -118,13 +130,13 @@ This section maps perfectly to the existing `fan_assessments` table:
 
 ## Summary
 
-For bouncing pillow inspections, we will:
+For bouncing pillow inspections:
 
-1. **Reuse** the existing `fan_assessments` table for all blower-related checks
-2. **Create** four new assessment tables:
-   - `bouncing_pillow_inflatable_assessments` (main inflatable checks + container)
-   - `bouncing_pillow_site_assessments` (site conditions)
-   - `bouncing_pillow_impact_assessments` (impact area safety)
-   - `bouncing_pillow_fencing_assessments` (fencing and barriers)
+1. Reuse `fan_assessments` for blower checks when a blower is present.
+2. Store Inflatable, Site, Impact Area and optional Fencing checks in the single
+   `bouncing_pillow_assessments` table.
+3. Keep site identity on each inspection, so moving a unit does not overwrite
+   historical site findings.
 
-This approach maintains consistency with the existing assessment structure where each assessment type has its own dedicated table with pass/fail/comment fields for each check.
+The inventory above retains the original boolean terminology as source material;
+the implemented outcome contract is Pass/Fail/N/A as described above.

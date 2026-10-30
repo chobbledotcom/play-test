@@ -26,12 +26,21 @@ class PdfGeneratorService
       # Process fields
       ordered_fields = get_form_config_fields
       field_groups = group_assessment_fields(ordered_fields)
+      section_starts = pillow_section_starts
 
       field_groups.each do |base, fields|
         # Skip if this is a not-applicable field with value 0
         main_field = fields[:base] || fields[:pass]
         if main_field && field_is_not_applicable?(main_field)
           next
+        end
+
+        if section_starts.key?(base)
+          section = section_starts.fetch(base)
+          blocks << AssessmentBlock.new(
+            type: :header,
+            name: I18n.t!("forms.bouncing_pillow.sections.#{section}")
+          )
         end
 
         # Add value block
@@ -88,22 +97,21 @@ class PdfGeneratorService
     end
 
     private
+    def pillow_section_starts
+      return {} unless @assessment_type.to_s == "bouncing_pillow"
+
+      assessment_schema.fieldsets.each_with_object({}) do |fieldset, starts|
+        field = fieldset.fields.first
+        next unless field
+
+        starts[field.name] = fieldset.legend_i18n_key
+      end
+    end
+
 
     def get_form_config_fields
-      schema = assessment_schema
-      return [] unless schema
-
-      ordered_fields = []
-      schema.fields.each do |field|
-        has_base = @assessment.respond_to?(field.name)
-        composites = field.composite_fields
-          .select { |cf| @assessment.respond_to?(cf) }
-        next unless has_base || composites.any?
-
-        ordered_fields << field.name if has_base
-        ordered_fields.concat(composites)
-      end
-      ordered_fields
+      (assessment_schema.attribute_names & @assessment.class.column_name_syms) -
+        PublicFieldFiltering::PDF_TOTAL_EXCLUDED_FIELDS
     end
 
     def group_assessment_fields(field_keys)
@@ -142,7 +150,7 @@ class PdfGeneratorService
     end
 
     def field_label(field_name)
-      I18n.t!("forms.#{@assessment_type}.fields.#{field_name}")
+      @assessment.inspection.field_label(@assessment_type, field_name)
     end
 
     def determine_pass_value(fields, main_field, value)
@@ -159,11 +167,15 @@ class PdfGeneratorService
     end
 
     def assessment_schema
-      return nil unless @assessment.class.respond_to?(:assessment_schema)
-      @assessment.class.assessment_schema
+      @assessment.form_schema(user: nil)
     end
 
     def field_is_not_applicable?(field)
+      base = ChobbleForms::FieldUtils.strip_field_suffix(field)
+      outcome = :"#{base}_pass"
+      if @assessment.has_attribute?(outcome)
+        return false if @assessment.public_send(outcome) == "na"
+      end
       return false unless @not_applicable_fields.include?(field)
 
       value = @assessment.send(field)

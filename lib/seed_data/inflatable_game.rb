@@ -5,16 +5,20 @@ module SeedData
   module InflatableGame
     def self.fields(passed: true)
       {
+        maximum_users: 4,
+        max_user_mass: 120,
+        minimum_age: 1,
+        maximum_age: 16,
         game_type: "Standard inflatable obstacle course",
-        max_user_mass_pass: Shared.check_passed?(passed),
-        age_range_marking_pass: Shared.check_passed?(passed),
-        constant_air_flow_pass: Shared.check_passed?(passed),
-        design_risk_pass: Shared.check_passed?(passed),
-        intended_play_risk_pass: Shared.check_passed?(passed),
-        ancillary_equipment_pass: Shared.check_passed?(passed),
-        ancillary_equipment_compliant_pass: Shared.check_passed?(passed),
+        max_user_mass_pass: Shared.outcome(passed),
+        age_range_marking_pass: Shared.outcome(passed),
+        constant_air_flow_pass: Shared.outcome(passed),
+        design_risk_pass: Shared.outcome(passed),
+        intended_play_risk_pass: Shared.outcome(passed),
+        ancillary_equipment_pass: Shared.outcome(passed),
+        ancillary_equipment_compliant_pass: Shared.outcome(passed),
         containing_wall_height: rand(1.0..2.0).round(2),
-        containing_wall_height_pass: Shared.check_passed?(passed)
+        containing_wall_height_pass: Shared.outcome(passed)
       }.merge(comments(passed))
     end
 

@@ -214,7 +214,7 @@ module FormHelpers
 
     case value
     when true, false
-      if field_str.end_with?("_pass") || field_str == "passed"
+      if field_str == "passed"
         field_label = get_field_label(form_name, field_name)
         choose_pass_fail(field_label, value)
       elsif %w[has_slide is_totally_enclosed passed slide_permanent_roof].include?(field_str)
@@ -228,7 +228,8 @@ module FormHelpers
         choose_yes_no(field_label, value)
       end
     when nil, ""
-      # Skip nil or empty values
+    when "pass", "fail", "na", :pass, :fail, :na
+      choose_pass_fail(get_field_label(form_name, field_name), value)
     else
       fill_in_form(form_name.to_sym, field_name, value)
     end
