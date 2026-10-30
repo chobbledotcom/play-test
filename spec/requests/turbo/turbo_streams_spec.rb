@@ -61,6 +61,15 @@ RSpec.describe "Turbo Streams", type: :request do
     # Test all assessment types with a single loop
     Inspection::ALL_ASSESSMENT_TYPES.each_key do |assessment_type|
       context "#{assessment_type} assessment" do
+        let(:unit_type) do
+          Inspection::UNIT_TYPE_ASSESSMENT_TYPES.find do |_, assessments|
+            assessments.key?(assessment_type)
+          end.first
+        end
+        let(:inspection) do
+          unit = create(:unit, user:, unit_type:)
+          create(:inspection, user:, unit:)
+        end
         let(:assessment) { inspection.send(assessment_type) }
         let(:path) { send("inspection_#{assessment_type}_path", inspection) }
         let(:params) do
