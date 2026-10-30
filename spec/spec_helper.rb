@@ -22,7 +22,9 @@ unless ENV["DISABLE_SIMPLECOV"] == "true"
       # Enable branch coverage for better insights
       enable_coverage :branch
 
-      # Set minimum coverage percentage (lowered for development)
+      # Per-process floor for parallel runs: SimpleCov evaluates this against
+      # each worker's merged subset, so it stays low. The real coverage gate
+      # is the coverage:check ratchet (enforced by rake coverage:parallel).
       minimum_coverage 25
 
       # Configure for parallel tests - SimpleCov handles this automatically
