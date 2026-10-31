@@ -54,13 +54,15 @@ module RadioButtonHelpers
   end
 
   # Text helpers for radio values
+  # Radio labels come from the same locale keys the chobble-forms partials
+  # render, so a label change here can never drift from the UI text.
   def radio_text_for_boolean(value, style = :yes_no)
-    case style
-    when :yes_no
-      value ? "Yes" : "No"
-    when :pass_fail
-      value ? "Pass" : "Fail"
+    key = if style == :yes_no
+      value ? "yes" : "no"
+    else
+      value ? "pass" : "fail"
     end
+    I18n.t("shared.#{key}")
   end
 
   def boolean_to_radio_value(value)
@@ -122,18 +124,24 @@ module RadioButtonHelpers
   end
 
   def click_radio_in_pass_fail_div(value)
+    labels = value ? %w[shared.yes shared.pass] : %w[shared.no shared.fail]
     within(".pass-fail") do
-      text_pattern = value ? /^(Yes|Pass)$/ : /^(No|Fail)$/
-      find("label", text: text_pattern).find("input[type='radio']").click
+      find("label", text: labelled_radio_pattern(labels))
+        .find("input[type='radio']").click
     end
+  end
+
+  def labelled_radio_pattern(i18n_keys)
+    labels = i18n_keys.map { |key| Regexp.escape(I18n.t(key)) }.join("|")
+    /^#{labels}$/
   end
 
   def find_and_click_radio(label, value)
     # Convert value to the text that appears on the radio button label
     target_text = case value.to_s
-    when "pass" then "Pass"
-    when "fail" then "Fail"
-    when "na" then "Not Applicable"
+    when "pass" then I18n.t("shared.pass")
+    when "fail" then I18n.t("shared.fail")
+    when "na" then I18n.t("shared.not_applicable")
     else
       # Fallback for boolean values
       radio_text_for_boolean(value, :pass_fail)
