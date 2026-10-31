@@ -5,6 +5,7 @@
 unless ENV["DISABLE_SIMPLECOV"] == "true"
   begin
     require "simplecov"
+    require_relative "../lib/simplecov_setup"
 
     # Configure formatters based on environment variable
     if ENV["SIMPLECOV_COBERTURA"] == "true"
@@ -12,25 +13,7 @@ unless ENV["DISABLE_SIMPLECOV"] == "true"
       SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
     end
 
-    SimpleCov.start "rails" do
-      skip "/spec/"
-      skip "/config/"
-      skip "/vendor/"
-      skip "/db/seeds/"
-      skip "db/seeds.rb"
-
-      # Enable branch coverage for better insights
-      enable_coverage :branch
-
-      # Set minimum coverage percentage (lowered for development)
-      minimum_coverage 25
-
-      # Configure for parallel tests - SimpleCov handles this automatically
-      if ENV["TEST_ENV_NUMBER"]
-        command_name "RSpec-#{ENV["TEST_ENV_NUMBER"]}"
-        merge_timeout 3600
-      end
-    end
+    SimplecovSetup.start
   rescue LoadError
     # SimpleCov not available (excluded in development setup)
     # Tests will run without coverage reporting
