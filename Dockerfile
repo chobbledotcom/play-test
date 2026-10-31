@@ -38,7 +38,7 @@ RUN curl -fsSLO "$SUPERCRONIC_URL" \
 
 # Set production environment (can be overridden with build args)
 ARG RAILS_ENV=production
-ARG BUNDLE_WITHOUT=development
+ARG BUNDLE_WITHOUT="development:test:ci_annotations:ci_coverage"
 ENV RAILS_ENV="${RAILS_ENV}" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \

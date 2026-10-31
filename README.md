@@ -59,6 +59,10 @@ docker pull dockerstefn/play-test
 docker run -p 3000:3000 dockerstefn/play-test
 ```
 
+Production builds exclude development, test and CI-only gem groups, including
+`licensed` and its Rugged dependency. Licence auditing still runs in CI.
+The `BUNDLE_WITHOUT` build argument can be overridden for non-production images.
+
 ### Development Setup
 
 Uses [devenv](https://devenv.sh) for easy environment setup:
