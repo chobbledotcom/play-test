@@ -22,4 +22,13 @@ RSpec.feature "Inspection edit N/A label", type: :feature do
 
     expect(page).not_to have_content("Not Applicable")
   end
+
+  scenario "no tab of the edit page shows Not Applicable" do
+    # Derived from the model's tab registry so a new assessment tab is
+    # covered automatically
+    inspection.applicable_tabs.each do |tab|
+      visit edit_inspection_path(inspection, tab: tab)
+      expect(page).not_to have_content("Not Applicable")
+    end
+  end
 end
