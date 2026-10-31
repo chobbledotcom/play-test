@@ -53,7 +53,7 @@ en:
     comments: Comments
     pass: Pass
     fail: Fail
-    not_applicable: Not Applicable
+    not_applicable: N/A
     pass_pdf: '[PASS]'
     fail_pdf: '[FAIL]'
     na_pdf: '[N/A]'

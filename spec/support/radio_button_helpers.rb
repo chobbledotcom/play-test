@@ -133,7 +133,7 @@ module RadioButtonHelpers
     target_text = case value.to_s
     when "pass" then "Pass"
     when "fail" then "Fail"
-    when "na" then "Not Applicable"
+    when "na" then "N/A"
     else
       # Fallback for boolean values
       radio_text_for_boolean(value, :pass_fail)
