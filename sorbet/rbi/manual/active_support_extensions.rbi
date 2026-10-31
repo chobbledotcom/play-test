@@ -64,6 +64,30 @@ class Integer
   def year; end
 end
 
+class String
+  extend T::Sig
+
+  sig { returns(T.nilable(String)) }
+  def presence; end
+end
+
+class NilClass
+  extend T::Sig
+
+  sig { returns(NilClass) }
+  def presence; end
+end
+
+class Object
+  extend T::Sig
+
+  sig { returns(T::Boolean) }
+  def present?; end
+
+  sig { returns(T::Boolean) }
+  def blank?; end
+end
+
 module ActiveSupport
   class Duration
     extend T::Sig

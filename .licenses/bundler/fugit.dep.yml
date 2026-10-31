@@ -1,6 +1,6 @@
 ---
 name: fugit
-version: 1.13.0
+version: 1.14.0
 type: bundler
 summary: time tools for flor
 homepage: https://github.com/floraison/fugit

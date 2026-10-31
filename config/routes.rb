@@ -27,6 +27,7 @@
 #                  update_settings_user PATCH    /users/:id/update_settings(.:format)                                                              users#update_settings
 #                      impersonate_user POST     /users/:id/impersonate(.:format)                                                                  users#impersonate
 #               stop_impersonating_user POST     /users/:id/stop_impersonating(.:format)                                                           users#stop_impersonating
+#                  confirm_destroy_user GET      /users/:id/confirm_destroy(.:format)                                                              users#confirm_destroy
 #                      verify_rpii_user POST     /users/:id/verify_rpii(.:format)                                                                  users#verify_rpii
 #                        add_seeds_user POST     /users/:id/add_seeds(.:format)                                                                    users#add_seeds
 #                     delete_seeds_user DELETE   /users/:id/delete_seeds(.:format)                                                                 users#delete_seeds
@@ -169,6 +170,8 @@
 #  application_recurring_task GET    /applications/:application_id/recurring_tasks/:id(.:format)    mission_control/jobs/recurring_tasks#show
 #                             PATCH  /applications/:application_id/recurring_tasks/:id(.:format)    mission_control/jobs/recurring_tasks#update
 #                             PUT    /applications/:application_id/recurring_tasks/:id(.:format)    mission_control/jobs/recurring_tasks#update
+#         application_batches GET    /applications/:application_id/batches(.:format)                mission_control/jobs/batches#index
+#           application_batch GET    /applications/:application_id/batches/:id(.:format)            mission_control/jobs/batches#show
 #                      queues GET    /queues(.:format)                                              mission_control/jobs/queues#index
 #                       queue GET    /queues/:id(.:format)                                          mission_control/jobs/queues#show
 #                         job GET    /jobs/:id(.:format)                                            mission_control/jobs/jobs#show

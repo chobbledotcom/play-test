@@ -46,6 +46,26 @@ end
 - Start with `# typed: false` and upgrade to `strict` when ready
 - Use `# typed: strict` for new files where possible
 
+### Type Check in CI
+
+`Sorbet Type Check` runs `bin/check-sorbet-errors`, which typechecks with
+`bundle exec srb tc` and fails when the error count rises above
+`sorbet/error-count-baseline` (currently 922 pre-existing errors in
+`typed: true`/`strict` files). Fix new errors; lower the baseline when debt is
+paid down.
+
+Tapioca's DSL RBIs (model columns, associations, scopes) are gitignored and
+generated in CI before the check. To reproduce locally:
+
+```bash
+RAILS_ENV=test DATABASE_URL=sqlite3:tmp/tapioca-scratch.sqlite3 bundle exec rails db:prepare
+RAILS_ENV=test DATABASE_URL=sqlite3:tmp/tapioca-scratch.sqlite3 bundle exec tapioca dsl
+bundle exec srb tc
+```
+
+Rails and gem internals that Tapioca cannot generate faithfully live in
+`sorbet/rbi/manual/`; keep new declarations there rather than disabling checks.
+
 ## PDF Caching
 
 The system supports caching generated PDFs in S3/object storage to improve performance. To enable:
@@ -455,6 +475,34 @@ bin/coverage_check app/controllers/users_controller.rb
 - **Target**: >90% line coverage, >80% branch coverage for all files
 - **Priority files**: Controllers, services, models with business logic
 - **Low coverage files**: Immediate attention required for < 80% coverage
+
+### Code Quality Grading
+
+**Jev Grader** (`bin/grade-code`) - scores source and spec files against the
+house rules with Jev, one file per call. No mechanical checks: those are
+CodeStandardsChecker, standardrb and `bin/lint`.
+
+- **Usage**: `bin/grade-code [files or dirs]` - defaults to `app spec lib`
+- **Single file**: prints the full per-check report; **2+ files**: worst-first
+  ranked table with the most-failed checks across the batch
+
+```bash
+bin/grade-code                                  # whole source and test tree
+bin/grade-code app/models --workers 6           # parallel sweep of a directory
+bin/grade-code --kinds model,controller         # only these kinds
+bin/grade-code app/models/inspection.rb         # one file in detail
+bin/grade-code spec --limit 20 --csv tmp/grades.csv # first 20, written to CSV
+bin/grade-code --list-checks                    # the rubric
+```
+
+- **What it scores**: idiomatic Rails, nice simple methods, short comments that
+  explain WHY with no history notes, plain technical English, no dead code or
+  defensive fallbacks, I18n for user-facing strings, semantic HTML, form
+  partial conventions, and for specs: not tautological, succinct names, happy
+  path plus edge cases
+- **Needs** `OPENCODE_API_KEY` (or `/run/secrets/opencode_api_key`, or `.env`)
+- **Cost**: ~80s for the whole 560-file tree at `--workers 6`; advisory only,
+  nothing is blocked on the score
 
 ### Code Organization
 
