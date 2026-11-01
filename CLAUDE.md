@@ -50,7 +50,7 @@ end
 
 `Sorbet Type Check` runs `bin/check-sorbet-errors`, which typechecks with
 `bundle exec srb tc` and fails when the error count rises above
-`sorbet/error-count-baseline` (currently 922 pre-existing errors in
+`sorbet/error-count-baseline` (currently 931 pre-existing errors in
 `typed: true`/`strict` files). Fix new errors; lower the baseline when debt is
 paid down.
 
