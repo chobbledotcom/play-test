@@ -3,4 +3,7 @@
 # 919 -> 964 on 2026-10-31: reconciled with main's measured count after debt
 # landed through PRs #574 and #562, which merged without the gate running
 # (the workflow had no push trigger, so main was never checked directly).
-964
+# 964 -> 931 on 2026-11-01: ControllerContext declared its context methods
+# abstract, making every controller an unimplemented interface (33 x 5023);
+# the concern now declares them as plain super-forwarding methods.
+931
