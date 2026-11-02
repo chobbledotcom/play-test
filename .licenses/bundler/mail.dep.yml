@@ -1,6 +1,6 @@
 ---
 name: mail
-version: 2.9.0
+version: 2.9.1
 type: bundler
 summary: Mail provides a nice Ruby DSL for making, sending and reading emails.
 homepage: https://github.com/mikel/mail

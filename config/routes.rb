@@ -64,6 +64,8 @@
 #                                       PUT      /inspections/:inspection_id/enclosed_assessment(.:format)                                         enclosed_assessments#update
 #             inspection_fan_assessment PATCH    /inspections/:inspection_id/fan_assessment(.:format)                                              fan_assessments#update
 #                                       PUT      /inspections/:inspection_id/fan_assessment(.:format)                                              fan_assessments#update
+# inspection_bouncing_pillow_assessment PATCH    /inspections/:inspection_id/bouncing_pillow_assessment(.:format)                                  bouncing_pillow_assessments#update
+#                                       PUT      /inspections/:inspection_id/bouncing_pillow_assessment(.:format)                                  bouncing_pillow_assessments#update
 #             inspection_pat_assessment PATCH    /inspections/:inspection_id/pat_assessment(.:format)                                              pat_assessments#update
 #                                       PUT      /inspections/:inspection_id/pat_assessment(.:format)                                              pat_assessments#update
 #       inspection_ball_pool_assessment PATCH    /inspections/:inspection_id/ball_pool_assessment(.:format)                                        ball_pool_assessments#update
