@@ -1,6 +1,6 @@
 ---
 name: net-smtp
-version: 0.5.1
+version: 0.5.2
 type: bundler
 summary: Simple Mail Transfer Protocol client library for Ruby.
 homepage: https://github.com/ruby/net-smtp

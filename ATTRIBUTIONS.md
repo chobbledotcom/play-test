@@ -2,7 +2,7 @@
 
 This project uses the following open source dependencies:
 
-Generated on: 2026-10-19
+Generated on: 2026-11-02
 Total dependencies: 149
 
 ## Dependencies by License
@@ -17,7 +17,7 @@ Total dependencies: 149
   - AWS Event Stream Library
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-partitions** v1.1287.0
+- **aws-partitions** v1.1290.0
   - Provides information about AWS partitions, regions, and services.
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
@@ -29,7 +29,7 @@ Total dependencies: 149
   - AWS SDK for Ruby - KMS
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
-- **aws-sdk-s3** v1.232.0
+- **aws-sdk-s3** v1.232.2
   - AWS SDK for Ruby - Amazon S3
   - Homepage: https://github.com/aws/aws-sdk-ruby
 
@@ -53,7 +53,7 @@ Total dependencies: 149
   - SimpleCov Cobertura Formatter
   - Homepage: https://github.com/jessebs/simplecov-cobertura
 
-- **sorbet-runtime** v0.6.13497
+- **sorbet-runtime** v0.6.13508
   - Sorbet runtime
   - Homepage: https://sorbet.org
 
@@ -77,7 +77,7 @@ Total dependencies: 149
   - A Ruby/Rack web server built for parallelism.
   - Homepage: https://puma.io
 
-- **sqlite3** v2.9.5
+- **sqlite3** v2.9.6
   - Ruby library to interface with the SQLite3 database engine (http://www.sqlite.org).
   - Homepage: https://github.com/sparklemotion/sqlite3-ruby
 
@@ -211,7 +211,7 @@ Total dependencies: 149
   - Loofah is a general library for manipulating and transforming HTML/XML documents and fragments, built on top of Nokogiri.
   - Homepage: https://github.com/flavorjones/loofah
 
-- **mail** v2.9.0
+- **mail** v2.9.1
   - Mail provides a nice Ruby DSL for making, sending and reading emails.
   - Homepage: https://github.com/mikel/mail
 
@@ -351,7 +351,7 @@ Total dependencies: 149
   - A gem that provides a client interface for the Sentry error logger
   - Homepage: https://github.com/getsentry/sentry-ruby/tree/7.0.0/sentry-ruby
 
-- **simplecov** v1.2.0
+- **simplecov** v1.3.1
   - Code coverage for Ruby
   - Homepage: https://github.com/simplecov-ruby/simplecov
 
@@ -399,7 +399,7 @@ Total dependencies: 149
   - WebAuthn ruby server library
   - Homepage: https://github.com/cedarcode/webauthn-ruby
 
-- **whenever** v1.1.2
+- **whenever** v1.1.3
   - Cron jobs in ruby.
   - Homepage: https://github.com/javan/whenever
 
@@ -413,7 +413,7 @@ Total dependencies: 149
   - Object-relational mapper framework (part of Rails).
   - Homepage: https://rubyonrails.org
 
-- **annotaterb** v4.24.0
+- **annotaterb** v4.25.0
   - A gem for generating annotations for Rails projects.
   - Homepage: https://github.com/drwl/annotaterb
 
@@ -445,7 +445,7 @@ Total dependencies: 149
   - CSV Reading and Writing
   - Homepage: https://github.com/ruby/csv
 
-- **date** v3.5.1
+- **date** v3.6.0
   - The official date library for Ruby.
   - Homepage: https://github.com/ruby/date
 
@@ -469,7 +469,7 @@ Total dependencies: 149
   - Ruby FFI
   - Homepage: https://github.com/ffi/ffi/wiki
 
-- **io-console** v0.9.3
+- **io-console** v0.9.4
   - Console interface
   - Homepage: https://github.com/ruby/io-console
 
@@ -505,7 +505,7 @@ Total dependencies: 149
   - HTTP client api for Ruby.
   - Homepage: https://github.com/ruby/net-http
 
-- **net-imap** v0.6.4.1
+- **net-imap** v0.6.7
   - Ruby client api for Internet Message Access Protocol
   - Homepage: https://github.com/ruby/net-imap
 
@@ -513,11 +513,11 @@ Total dependencies: 149
   - Ruby client library for POP3.
   - Homepage: https://github.com/ruby/net-pop
 
-- **net-protocol** v0.2.2
+- **net-protocol** v0.4.0
   - The abstract interface for net-* client.
   - Homepage: https://github.com/ruby/net-protocol
 
-- **net-smtp** v0.5.1
+- **net-smtp** v0.5.2
   - Simple Mail Transfer Protocol client library for Ruby.
   - Homepage: https://github.com/ruby/net-smtp
 
@@ -569,7 +569,7 @@ Total dependencies: 149
   - Type signature for Ruby.
   - Homepage: https://github.com/ruby/rbs
 
-- **rdoc** v8.0.0
+- **rdoc** v8.1.0
   - RDoc produces HTML and command-line documentation for Ruby projects
   - Homepage: https://ruby.github.io/rdoc
 
