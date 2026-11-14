@@ -8,6 +8,9 @@ on:
 jobs:
   coverage:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
 
     steps:
       - name: Checkout code
@@ -42,16 +45,12 @@ jobs:
         run: |
           bundle exec rake coverage:parallel
   
-      - name: Deploy to Bunny
-        uses: R-J-dev/bunny-deploy@v3.0.0
+      - name: Deploy to Bunny CDN
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: BunnyWay/actions/deploy-site@deploy-site_0.1.1
         with:
-          access-key: ${{ secrets.BUNNY_ACCESS_KEY }}
-          directory-to-upload: coverage
-          storage-endpoint: "https://storage.bunnycdn.com"
-          storage-zone-name: "play-test-coverage"
-          storage-zone-password: ${{ secrets.BUNNY_STORAGE_ZONE_PASSWORD }}
-          concurrency: "5"
-          enable-delete-action: true
-          enable-purge-pull-zone: true
-          pull-zone-id: "4593821"
-          replication-timeout: "15000"
+          site: play-test-coverage
+          directory: coverage
+          api_key: ${{ secrets.BUNNY_ACCESS_KEY }}
+          cli_version: "0.19"
+          deployments: true
