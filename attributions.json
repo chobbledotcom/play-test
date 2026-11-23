@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-19T07:13:57",
+  "generated_at": "2026-11-02T08:46:36",
   "total_dependencies": 149,
   "dependencies": [
     {
@@ -102,7 +102,7 @@
     },
     {
       "name": "annotaterb",
-      "version": "4.24.0",
+      "version": "4.25.0",
       "license": "other",
       "homepage": "https://github.com/drwl/annotaterb",
       "summary": "A gem for generating annotations for Rails projects."
@@ -116,7 +116,7 @@
     },
     {
       "name": "aws-partitions",
-      "version": "1.1287.0",
+      "version": "1.1290.0",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "Provides information about AWS partitions, regions, and services."
@@ -137,7 +137,7 @@
     },
     {
       "name": "aws-sdk-s3",
-      "version": "1.232.0",
+      "version": "1.232.2",
       "license": "apache-2.0",
       "homepage": "https://github.com/aws/aws-sdk-ruby",
       "summary": "AWS SDK for Ruby - Amazon S3"
@@ -263,7 +263,7 @@
     },
     {
       "name": "date",
-      "version": "3.5.1",
+      "version": "3.6.0",
       "license": "other",
       "homepage": "https://github.com/ruby/date",
       "summary": "The official date library for Ruby."
@@ -375,7 +375,7 @@
     },
     {
       "name": "io-console",
-      "version": "0.9.3",
+      "version": "0.9.4",
       "license": "other",
       "homepage": "https://github.com/ruby/io-console",
       "summary": "Console interface"
@@ -445,7 +445,7 @@
     },
     {
       "name": "mail",
-      "version": "2.9.0",
+      "version": "2.9.1",
       "license": "mit",
       "homepage": "https://github.com/mikel/mail",
       "summary": "Mail provides a nice Ruby DSL for making, sending and reading emails."
@@ -494,7 +494,7 @@
     },
     {
       "name": "net-imap",
-      "version": "0.6.4.1",
+      "version": "0.6.7",
       "license": "other",
       "homepage": "https://github.com/ruby/net-imap",
       "summary": "Ruby client api for Internet Message Access Protocol"
@@ -508,14 +508,14 @@
     },
     {
       "name": "net-protocol",
-      "version": "0.2.2",
+      "version": "0.4.0",
       "license": "other",
       "homepage": "https://github.com/ruby/net-protocol",
       "summary": "The abstract interface for net-* client."
     },
     {
       "name": "net-smtp",
-      "version": "0.5.1",
+      "version": "0.5.2",
       "license": "other",
       "homepage": "https://github.com/ruby/net-smtp",
       "summary": "Simple Mail Transfer Protocol client library for Ruby."
@@ -732,7 +732,7 @@
     },
     {
       "name": "rdoc",
-      "version": "8.0.0",
+      "version": "8.1.0",
       "license": "other",
       "homepage": "https://ruby.github.io/rdoc",
       "summary": "RDoc produces HTML and command-line documentation for Ruby projects"
@@ -872,7 +872,7 @@
     },
     {
       "name": "simplecov",
-      "version": "1.2.0",
+      "version": "1.3.1",
       "license": "mit",
       "homepage": "https://github.com/simplecov-ruby/simplecov",
       "summary": "Code coverage for Ruby"
@@ -893,7 +893,7 @@
     },
     {
       "name": "sorbet-runtime",
-      "version": "0.6.13497",
+      "version": "0.6.13508",
       "license": "apache-2.0",
       "homepage": "https://sorbet.org",
       "summary": "Sorbet runtime"
@@ -914,7 +914,7 @@
     },
     {
       "name": "sqlite3",
-      "version": "2.9.5",
+      "version": "2.9.6",
       "license": "bsd-3-clause",
       "homepage": "https://github.com/sparklemotion/sqlite3-ruby",
       "summary": "Ruby library to interface with the SQLite3 database engine (http://www.sqlite.org)."
@@ -1033,7 +1033,7 @@
     },
     {
       "name": "whenever",
-      "version": "1.1.2",
+      "version": "1.1.3",
       "license": "mit",
       "homepage": "https://github.com/javan/whenever",
       "summary": "Cron jobs in ruby."
